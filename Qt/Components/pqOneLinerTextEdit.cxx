@@ -45,6 +45,8 @@ pqOneLinerTextEdit::pqOneLinerTextEdit(QWidget* _parent)
   this->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
   this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
+  this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
   this->connect(this, &QTextEdit::textChanged, this, &pqOneLinerTextEdit::adjustToText);
 }
 

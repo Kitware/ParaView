@@ -686,6 +686,9 @@ SET (TESTS_WITHOUT_BASELINES
   DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
   ExportSpreadsheetFormatting.xml
+  ExpressionsDialog.xml
+  ExpressionsExporter.xml
+  ExpressionsSettings.xml
   ExtractParticlesOverTime.xml
   FavoritesFilters.xml
   FindWidget.xml
@@ -1430,6 +1433,7 @@ if(PARAVIEW_USE_PYTHON)
       )
 
     list(APPEND TESTS_WITHOUT_BASELINES
+      ExpressionChooser.xml
       PythonCalculator.xml
       PythonCalculatorInput.xml
       )

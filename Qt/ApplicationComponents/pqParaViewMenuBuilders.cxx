@@ -80,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLogViewerReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
+#include "pqManageExpressionsReaction.h"
 #include "pqManageFavoritesReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
@@ -347,6 +348,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 
   new pqCustomizeShortcutsReaction(
     menu.addAction("Customize Shortcuts...") << pqSetName("actionCustomize"));
+
+  new pqManageExpressionsReaction(
+    menu.addAction("Manage Expressions") << pqSetName("actionToolsManageExpressions"));
 
   menu.addSeparator(); // --------------------------------------------------
 

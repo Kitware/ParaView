@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create a source and a PythonCalculator -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="FastUniformGrid" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PythonCalculator" />
+
+  <!-- setup en expression, save it and retrieve it from the chooser -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="abs(X)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/AddToList" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="abs(X+1)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/Chooser" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/Chooser/1QMenu0" command="activate" arguments="abs(X)" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" property="plainText" arguments="abs(X)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- create a Calculator : save two expression -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Calculator" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner" command="set_string" arguments="cos(X)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/AddToList" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner" command="set_string" arguments="sin(X)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/AddToList" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- check manager content -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OpenManager" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="0.2,cos(X)" />
+
+  <!-- set a custom name to an expression -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="1.1" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="1.1" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="myCustomExpressionName" />
+
+  <!-- use expression from manager -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setSelection" arguments="0.0,0.1" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/useCurrent" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/close" command="activate" arguments="" />
+
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner" property="plainText" arguments="cos(X)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- chooser button should display expression name -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/Chooser" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/Chooser/1QMenu0" command="activate" arguments="myCustomExpressionName" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner" property="plainText" arguments="sin(X)" />
+</pqevents>

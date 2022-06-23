@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqOneLinerTextEdit.h
+   Module: pqManageExpressionsReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,56 +29,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqOneLinerTextEdit_h
-#define pqOneLinerTextEdit_h
+#ifndef pqManageExpressionsReaction_h
+#define pqManageExpressionsReaction_h
 
-#include "pqTextEdit.h"
-#include "pqWidgetsModule.h"
+#include "pqMasterOnlyReaction.h"
+
+class QAction;
 
 /**
- * pqOneLinerTextEdit is a specialization of pqTextEdit to handle one-liner expressions.
- *
- * This widget differs from pqTextEdit with the following:
- *  * New lines characters are disabled from input event and cleaned from pasted text.
- *  * Text is wrapped to fit the widget width.
- *  * Widget height is adapted to the content, so the whole text is displayed.
+ * @ingroup Reactions
+ * pqManageExpressionsReaction is the reaction to pop-up the expressions manager dialog.
  */
-class PQWIDGETS_EXPORT pqOneLinerTextEdit : public pqTextEdit
+class PQAPPLICATIONCOMPONENTS_EXPORT pqManageExpressionsReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
-  typedef pqTextEdit Superclass;
+  typedef pqMasterOnlyReaction Superclass;
 
 public:
-  pqOneLinerTextEdit(QWidget* parent = nullptr);
-  ~pqOneLinerTextEdit() override = default;
+  pqManageExpressionsReaction(QAction* action);
+
+  /**
+   * Pops-up the pqExpressionsManager dialog.
+   */
+  static void manageExpressions();
 
 protected:
-  /**
-   * Reimplemented to disable "Enter" and "Return" key
-   */
-  void keyPressEvent(QKeyEvent* e) override;
-
-  /**
-   * Reimplemented to update widget height depending on
-   * text wrapping.
-   */
-  void resizeEvent(QResizeEvent* e) override;
-
-  /**
-   * Reimplemented to avoid carriage return in pasted text.
-   * Also remove redundant spaces.
-   * see QString::simplified()
-   */
-  void insertFromMimeData(const QMimeData* source) override;
-
-protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
-  /**
-   * Adjust widget height to the number of displayed lines.
-   */
-  void adjustToText();
+  void onTriggered() override { pqManageExpressionsReaction::manageExpressions(); }
 
 private:
-  Q_DISABLE_COPY(pqOneLinerTextEdit)
+  Q_DISABLE_COPY(pqManageExpressionsReaction)
 };
 
 #endif

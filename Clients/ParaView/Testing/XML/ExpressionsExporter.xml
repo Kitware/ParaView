@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageExpressions" />
+
+  <!-- add some expressions -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,numpy.tan(Z)" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,numpy.cos(X)" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Expression" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,cos(Z)*kHat" />
+
+  <!-- export expressions to pvce -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/exportExpressions" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/ExportExpressions" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/expressions.json" />
+
+  <!-- remove expressions -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/removeAll" command="activate" arguments="" />
+  <pqevent object="1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- import expressions from previous file -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/importExpressions" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/ImportExpressions" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/expressions.json" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="3" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/close" command="activate" arguments="" />
+</pqevents>

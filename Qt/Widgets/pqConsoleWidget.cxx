@@ -103,7 +103,7 @@ public:
       text_cursor.position() < this->InteractivePosition;
 
     // Allow copying anywhere in the console ...
-    if (e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier)
+    if (e->matches(QKeySequence::Copy))
     {
       if (selection)
       {
@@ -115,7 +115,7 @@ public:
     }
 
     // Allow cut only if the selection is limited to the interactive area ...
-    if (e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier)
+    if (e->matches(QKeySequence::Cut))
     {
       if (selection && !history_area)
       {
@@ -127,7 +127,7 @@ public:
     }
 
     // Allow paste only if the selection is in the interactive area ...
-    if (e->key() == Qt::Key_V && e->modifiers() == Qt::ControlModifier)
+    if (e->matches(QKeySequence::Paste))
     {
       if (!history_area)
       {

@@ -10,6 +10,7 @@ DEPENDS
   ParaView::pqCore
   ParaView::qttesting
   VTK::jsoncpp
+  VTK::nlohmannjson
 PRIVATE_DEPENDS
   ParaView::RemotingAnimation
   ParaView::RemotingApplication
