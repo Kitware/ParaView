@@ -16,7 +16,6 @@
 
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
-#include "vtkContourValues.h"
 #include "vtkCutter.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
@@ -32,10 +31,7 @@
 #include "vtkPointLocator.h"
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
-#include "vtkSMPTools.h"
 #include "vtkUnsignedIntArray.h"
-
-#include <cmath>
 
 vtkStandardNewMacro(vtkThreeSliceFilter);
 
@@ -223,28 +219,6 @@ int vtkThreeSliceFilter::RequestData(
   return 1;
 }
 
-namespace
-{
-class CutWorker
-{
-public:
-  CutWorker(vtkCutter* slices[3])
-    : Slices(slices)
-  {
-  }
-  void operator()(vtkIdType begin, vtkIdType end)
-  {
-    for (vtkIdType idx = begin; idx < end; ++idx)
-    {
-      Slices[idx]->Update();
-    }
-  }
-
-private:
-  vtkCutter** Slices;
-};
-}
-
 //----------------------------------------------------------------------------
 void vtkThreeSliceFilter::Process(
   vtkDataSet* input, vtkPolyData* outputs[4], unsigned int compositeIndex)
@@ -306,14 +280,12 @@ void vtkThreeSliceFilter::Process(
     }
   }
 
-  // Setup internal pipeline
-  this->Slices[0]->SetInputData(input);
-  this->Slices[1]->SetInputData(input);
-  this->Slices[2]->SetInputData(input);
-
-  // Update components in parallel
-  CutWorker worker(this->Slices);
-  vtkSMPTools::For(0, 3, 1, worker);
+  // Update slices
+  for (int i = 0; i < 3; ++i)
+  {
+    this->Slices[i]->SetInputData(input);
+    this->Slices[i]->Update();
+  }
 
   // Update the internal pipeline
   this->CombinedFilteredInput->Update();
