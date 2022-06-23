@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAxis.h"
 #include "vtkBoundingBox.h"
 #include "vtkChartXY.h"
-#include "vtkColorTransferControlPointsItem.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkColorTransferFunctionItem.h"
 #include "vtkCompositeControlPointsItem.h"
@@ -50,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVColorTransferControlPointsItem.h"
 #include "vtkPiecewiseControlPointsItem.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPiecewiseFunctionItem.h"
@@ -336,7 +336,7 @@ void pqTransferFunctionWidget::initialize(
 
     if (stc_editable)
     {
-      vtkNew<vtkColorTransferControlPointsItem> cpItem;
+      vtkNew<vtkPVColorTransferControlPointsItem> cpItem;
       cpItem->SetColorTransferFunction(ctf);
       cpItem->SetColorFill(true);
       cpItem->SetEndPointsXMovable(false);
@@ -665,8 +665,9 @@ void pqTransferFunctionWidget::showUsageStatus()
   QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
   if (mainWindow)
   {
-    mainWindow->statusBar()->showMessage(tr("Grab and move a handle to interactively change the "
-                                            "range. Double click on it to set custom range."),
+    mainWindow->statusBar()->showMessage(
+      tr("Drag a handle to change the range. "
+         "Double click it to set custom range. Return/Enter to edit color."),
       2000);
   }
 }

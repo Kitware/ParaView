@@ -177,7 +177,8 @@ set(classes
   pqViewFrame
   pqViewFrameActionsInterface
   pqViewManager
-  pqWidgetRangeDomain)
+  pqWidgetRangeDomain
+  vtkPVColorTransferControlPointsItem)
 
 set_property(SOURCE pqComponentsInit.cxx APPEND
   PROPERTY
