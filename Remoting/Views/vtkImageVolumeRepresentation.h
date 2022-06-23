@@ -79,6 +79,7 @@ public:
   void SetSpecular(double);
   void SetSpecularPower(double);
   void SetShade(bool);
+  void SetAnisotropy(float);
   void SetSliceFunction(vtkImplicitFunction* slice);
 
   //@{
@@ -94,6 +95,8 @@ public:
   void SetRequestedRenderMode(int);
   void SetBlendMode(int);
   void SetCropping(int);
+  void SetGlobalIlluminationReach(float);
+  void SetVolumetricScatteringBlending(float);
 
   //@{
   /**

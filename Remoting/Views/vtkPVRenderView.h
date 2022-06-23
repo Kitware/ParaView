@@ -30,6 +30,7 @@
 #include "vtkBoundingBox.h" // needed for iVar
 #include "vtkNew.h"         // needed for iVar
 #include "vtkPVView.h"
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for iVar
 #include "vtkWeakPointer.h"         // needed for iVar
@@ -947,9 +948,12 @@ public:
   /**
    * Set the path tracers volume anisotropy
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use vtkVolumeProperty::SetScatteringAnisotropy instead")
   void SetVolumeAnisotropy(double);
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use vtkVolumeProperty::GetScatteringAnisotropy instead")
   double GetVolumeAnisotropy();
   //@}
+
   //@{
   /**
    * Set the number of primary rays that OSPRay shoots per pixel.

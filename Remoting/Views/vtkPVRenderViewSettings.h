@@ -70,6 +70,15 @@ public:
   vtkGetMacro(OutlineThreshold, vtkIdType);
   //@}
 
+  //@{
+  /**
+   * When rendering a volume, this option simulates light coming from both its direction
+   * and its opposite for all lights in the scene. It is enabled by default.
+   */
+  vtkSetMacro(TwoSidedLighting, bool);
+  vtkGetMacro(TwoSidedLighting, bool);
+  //@}
+
   enum
   {
     AUTOMATIC = 0,
@@ -130,6 +139,7 @@ protected:
 
   int DefaultInteractionMode;
   vtkIdType OutlineThreshold;
+  bool TwoSidedLighting = true;
   int PointPickingRadius;
   bool DisableIceT;
   bool EnableFastPreselection;

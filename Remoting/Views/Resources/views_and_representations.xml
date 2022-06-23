@@ -2949,29 +2949,12 @@
       </IntVectorProperty>
       <DoubleVectorProperty
           name="VolumeAnisotropy"
-          command="SetVolumeAnisotropy"
           default_values="0.0"
+          panel_visibility="never"
           animateable="0"
           number_of_elements="1">
-        <DoubleRangeDomain
-            min="-1.0"
-            max="1.0"
-            name="range"/>
-        <Documentation>Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableOSPRay"
-                                       values="1" />
-              <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                 <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
-              </PropertyWidgetDecorator>
-            </Expression>
-	  </PropertyWidgetDecorator>
-        </Hints>
+        <Documentation>DEPRECATED_IN_5.11 (Use SetAnisotropy of vtkImageVolumeRepresentation instead):
+          Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty
           name="Denoise"
@@ -3302,7 +3285,6 @@
         <Property name="RouletteDepth"/>
         <Property name="MaxFrames"/>
         <Property name="Denoise"/>
-        <Property name="VolumeAnisotropy"/>
         <Property name="LightScale"/>
         <Property name="OSPRayTemporalCacheSize"/>
         <Property name="BackgroundNorth"/>
@@ -4864,6 +4846,14 @@
             <Property name="Shade"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
+            <Property name="GlobalIlluminationReach"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="VolumetricScatteringBlending"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="VolumeAnisotropy"
+                      panel_visibility="advanced"/>
             <Property name="InterpolationType"
                       panel_visibility="never" />
             <Property name="BlendMode" />
@@ -5574,6 +5564,62 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable shading.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetGlobalIlluminationReach"
+            default_values="0.0"
+            name="GlobalIlluminationReach"
+            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+          min="0.0"
+          name="range" />
+        <Documentation>
+          This parameter acts as a balance between localness and globalness of shadows.
+          A higher value results in more accurate, but also slower renders.
+          A slower value results in faster renders, but only produces ambiant occlusion.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                      mode="visibility"
+                      property="Shade"
+                      value="1"
+                      inverse="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetVolumetricScatteringBlending"
+            default_values="0.0"
+            name="VolumetricScatteringBlending"
+            number_of_elements="1">
+        <DoubleRangeDomain max="2.0"
+          min="0.0"
+          name="range" />
+        <Documentation>
+          This parameter controls the blending between surfacic approximation
+          and volumetric multi-scattering.
+          A value of 0.0 means that no scattered rays will be cast, no volumetric shadows.
+          A value of 1.0 means that the shader will smartly blend between the two models.
+          A value of 2.0 means that the shader only uses the volumetric scattering model.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                      mode="visibility"
+                      property="Shade"
+                      value="1"
+                      inverse="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAnisotropy"
+            default_values="0.0"
+            name="VolumeAnisotropy"
+            number_of_elements="1"
+            panel_visibility="advanced">
+        <DoubleRangeDomain max="1.0"
+          min="-1.0"
+          name="range" />
+        <Documentation>
+          Set the volume's anisotropy, according to the Henyey-Greenstein model.
+          Describes whether the model is rather backwards-scattering (-1.0) or forwards-scattering (1.0).
+          An isotropic volume has a null anisotropy.
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetMapScalars"
                          default_values="1"
                          name="MapScalars"

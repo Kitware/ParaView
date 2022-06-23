@@ -626,6 +626,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="TwoSidedLighting"
+        default_values="1"
+        number_of_elements="1"
+        command="SetTwoSidedLighting">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When rendering a volume, this option simulates light coming from both its direction
+          and its opposite for all lights in the scene.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="DefaultInteractionMode"
         command="SetDefaultInteractionMode"
         number_of_elements="1"
@@ -754,6 +765,7 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="OutlineThreshold" />
+        <Property name="TwoSidedLighting" />
         <Property name="DefaultInteractionMode" />
         <Property name="ShowAnnotation" />
         <Property name="PointPickingRadius" />
