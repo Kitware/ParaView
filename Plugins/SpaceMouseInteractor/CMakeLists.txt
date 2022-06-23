@@ -19,7 +19,7 @@ if (PARAVIEW_USE_QT)
     list(APPEND sources
       pqSpaceMouseImpl.cxx
       pqSpaceMouseImpl.h)
-    find_package(3DxWareSDK)
+    find_package(3DxWareSDK REQUIRED)
   else()
     # this is a do-nothing implementation until 3DConnexion releases support.
     list(APPEND sources
