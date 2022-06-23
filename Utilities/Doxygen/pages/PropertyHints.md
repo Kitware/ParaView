@@ -335,3 +335,34 @@ The snippet below shows these hints in use.
     </Hints>
   </ProxyProperty>
 ```
+
+Widget
+------
+
+Enable specific features on a text entry widget.
+
+For `StringVectorProperty` elements asking for a free input, the default
+one-line text entry can be enhanced using one of the following hint attributes.
+
+**Attribute `type`**
+
+Set it to `multi_line` to allow line breaks, useful to enter a script.
+
+The other possible value is `one_liner_wrapped`, when line breaks should be avoid in the text
+but text wrapping is enabled for reading purpose. This also enable the integration with the
+Expression Manager, to easily save and reuse entered property text.
+
+**Attribute `syntax`**
+Set it to `python` to ask for syntax highlighting when `type` is set to `multi_line` (`pygments` python module should be found).
+With `one_liner_wrapped`, the tools button for Expression Manager are configured for `Python` expression type.
+
+```xml
+<StringVectorProperty command="SetScript"
+                      name="Script"
+                      number_of_elements="1"
+                      panel_visibility="default">
+  <Hints>
+    <Widget type="multi_line" syntax="python" />
+  </Hints>
+</StringVectorProperty>
+```
