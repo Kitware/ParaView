@@ -558,13 +558,13 @@ bool pqExpressionsManagerDialog::importFromFile()
       expressionsList.push_back({ exprGroup.c_str(), exprName.c_str(), exprValue.c_str() });
     }
   }
-  catch (vtknlohmann::detail::out_of_range const& exception)
+  catch (nlohmann::detail::out_of_range const& exception)
   {
     qCritical() << "Invalid expression file. " << exception.what()
                 << "\nSee documentation for accepted format";
     return false;
   }
-  catch (vtknlohmann::detail::type_error const& exception)
+  catch (nlohmann::detail::type_error const& exception)
   {
     qCritical() << "Invalid expression file. " << exception.what()
                 << "\nSee documentation for accepted format";
