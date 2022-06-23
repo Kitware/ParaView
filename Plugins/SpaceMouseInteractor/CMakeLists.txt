@@ -38,7 +38,9 @@ paraview_add_plugin(SpaceMouseInteractor
   SOURCES       ${sources})
 
 # support __declspec(property) on Mac
-target_compile_options(SpaceMouseInteractor PRIVATE "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:-fdeclspec>")
+target_compile_options(SpaceMouseInteractor
+  PRIVATE
+    "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:-fdeclspec>")
 
 target_link_libraries(SpaceMouseInteractor
   PRIVATE
