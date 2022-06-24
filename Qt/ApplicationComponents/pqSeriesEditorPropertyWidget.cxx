@@ -144,6 +144,7 @@ public:
     this->Ui.SeriesTable->allowsRegexpMatching(true);
     this->Ui.SeriesTable->supportsOpacityMapping(false);
     this->Ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::VISIBILITY, true);
+    this->Ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::OPACITY, true);
   }
 };
 //=============================================================================
@@ -207,6 +208,16 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
   else
   {
     ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::COLOR, false);
+  }
+
+  if (smgroup->GetProperty("SeriesOpacity"))
+  {
+    this->addPropertyLink(
+      this, "seriesOpacity", SIGNAL(seriesOpacityChanged()), smgroup->GetProperty("SeriesOpacity"));
+  }
+  else
+  {
+    ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::OPACITY, false);
   }
 
   if (smgroup->GetProperty("SeriesLineThickness"))
@@ -277,6 +288,11 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
 
   this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
     &pqSeriesEditorPropertyWidget::seriesColorChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
+    &pqSeriesEditorPropertyWidget::presetColorChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedOpacitiesChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesOpacityChanged);
+
   this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::presetChanged, this,
     &pqSeriesEditorPropertyWidget::onPresetChanged);
   this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::annotationsChanged, this,
@@ -286,11 +302,6 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
 
   this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::selectionChanged, this,
     &pqSeriesEditorPropertyWidget::refreshPropertiesWidgets);
-
-  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
-    &pqSeriesEditorPropertyWidget::presetColorChanged);
-  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
-    &pqSeriesEditorPropertyWidget::seriesColorChanged);
 
   auto lastNameProp = smgroup->GetProperty("LastPresetName");
   if (!lastNameProp)
@@ -351,6 +362,37 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesLabel() const
 void pqSeriesEditorPropertyWidget::setPresetColor(const QList<QVariant>& vtkNotUsed(values))
 {
   // handle by `onPresetChanged`.
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSeriesEditorPropertyWidget::seriesOpacity() const
+{
+  const QList<QVariant>& opacities = this->Internals->Ui.SeriesTable->indexedOpacities();
+  const QList<QVariant>& labels = this->seriesLabel();
+
+  QList<QVariant> reply;
+  for (int i = 0; i < opacities.size(); i++)
+  {
+    // "labels" is a list of QVariant corresponding to an alternation of
+    // "AnnotationItem" values and labels. Here we retrieve only the labels.
+    reply.push_back(labels[2 * i]);
+    reply.push_back(opacities[i]);
+  }
+  return reply;
+}
+
+//-----------------------------------------------------------------------------
+void pqSeriesEditorPropertyWidget::setSeriesOpacity(const QList<QVariant>& values)
+{
+  QList<QVariant> opacities;
+  // "values" is a list of QVariant corresponding to an alternation of serie labels
+  // and corresonding opacitiy values. Here we retrieve only the opacities values.
+  for (int i = 1; i < values.size(); i += 2)
+  {
+    opacities.push_back(values[i]);
+  }
+
+  this->Internals->Ui.SeriesTable->setIndexedOpacities(opacities);
 }
 
 //-----------------------------------------------------------------------------

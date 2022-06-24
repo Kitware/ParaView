@@ -185,6 +185,16 @@ void vtkXYChartRepresentation::SetColor(const char* seriesname, double r, double
 }
 
 //----------------------------------------------------------------------------
+void vtkXYChartRepresentation::SetOpacity(const char* seriesname, double opacity)
+{
+  if (seriesname)
+  {
+    this->Internals->Opacities[seriesname] = opacity;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetUseColorMapping(const char* seriesname, bool useColorMapping)
 {
   assert(seriesname != nullptr);
@@ -267,6 +277,13 @@ void vtkXYChartRepresentation::ClearLineStyles()
 void vtkXYChartRepresentation::ClearColors()
 {
   this->Internals->Colors.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::ClearOpacities()
+{
+  this->Internals->Opacities.clear();
   this->Modified();
 }
 
