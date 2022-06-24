@@ -87,8 +87,8 @@ public:
     groupList->addItem(pqExpressionsManager::PYTHON_EXPRESSION_GROUP());
 
     // Make the combobox selection automatically apply
-    QObject::connect(
-      groupList, &QComboBox::textActivated, this, &pqEditGroupDelegate::closeCurrentEditor);
+    QObject::connect(groupList, QOverload<int>::of(&QComboBox::activated), this,
+      &pqEditGroupDelegate::closeCurrentEditor);
 
     return groupList;
   }
