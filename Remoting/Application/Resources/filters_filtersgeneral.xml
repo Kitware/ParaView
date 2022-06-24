@@ -535,6 +535,35 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkFiniteElementFieldDistributor"
+                 label="Finite Element Field Distributor"
+                 name="FiniteElementFieldDistributor">
+      <Documentation long_help="The Finite Element Field Distributor filter (or the FEFD filter in short)
+                                can now visualize Discontinuous Galerkin (DG) finite element fields of type H(Grad), H(Curl), and H(Div)
+                                Note that all cells must be of the same type and the field data must
+                                contain a vtkStringArray describing the DG fields, basis types, and
+                                reference cells."
+                     short_help="Distribute finite element fields.">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Finite Element
+          Field Distributor filter. The input dataset must have an Information Records
+          string array in the field data.
+        </Documentation>
+      </InputProperty>
+      <!-- End FiniteElementFieldDistributor -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkGradientFilter"
                  label="Gradient Of Unstructured DataSet"
                  name="UnstructuredGradientLegacy">

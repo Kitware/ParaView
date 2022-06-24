@@ -245,6 +245,7 @@
   <Proxy group="filters" name="ExtractSelectionOverTime" icon=":/pqWidgets/Icons/pqPlotSelectionOverTime.svg" />
   <Proxy group="filters" name="ExtractSubsetWithSeed" />
   <Proxy group="filters" name="ExtractTimeSteps" />
+  <Proxy group="filters" name="FiniteElementFieldDistributor" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="ForceTime" />
