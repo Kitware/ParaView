@@ -1,0 +1,64 @@
+<h1>Cinema View URL Test Plan</h1>
+
+The following links test attribute passing over URL, within the browser:
+<p></p>
+
+<h3>No server</h3>
+<table>
+<tr>
+    <td>Normal behavior</td>
+    <td><a href="cinema_view.html">
+                 cinema_view.html</a></td>
+</tr>
+<tr>
+    <td>Passing a database.json file</td>
+    <td><a href="cinema_view.html?databases=testing/view/small.json">
+                 cinema_view.html?databases=testing/view/small.json</a></td>
+</tr>
+<tr>
+    <td>Single database</td>
+    <td><a href="cinema_view.html?databases=data/sedov3.cdb">
+                 cinema_view.html?databases=data/sedov3.cdb</a></td>
+</tr>
+<tr>
+    <td>Multiple databases</td>
+    <td><a href="cinema_view.html?databases=data/sedov3.cdb,data/sedov2.cdb,data/sedov1.cdb">
+                 cinema_view.html?databases=data/sedov3.cdb,data/sedov2.cdb,data/sedov1.cdb</a></td>
+</tr>
+<tr>
+    <td>Loading ParaView database (assetname attribute)</td>
+    <td><a href="cinema_view.html?databases=data/test_paraview.cdb&assetname=FILE_png">
+                 cinema_view.html?databases=data/test_paraview.cdb&assetname=FILE_png</a></td>
+</tr>
+</table>
+
+<h3>With server</h3>
+Run server at <code>testing/view/server.py</code>
+<p></p>
+<table>
+<tr>
+    <td>Normal behavior</td>
+    <td><a href="http://127.0.0.1:8000/cinema_view.html">
+                 cinema_view.html</a></td>
+</tr>
+<tr>
+    <td>Passing a database.json file</td>
+    <td><a href="http://127.0.0.1:8000/cinema_view.html?databases=testing/view/small.json">
+                 cinema_view.html?databases=testing/view/small.json</a></td>
+</tr>
+<tr>
+    <td>Single database</td>
+    <td><a href="http://127.0.0.1:8000/cinema_view.html?databases=data/sedov3.cdb">
+                 cinema_view.html?databases=data/sedov3.cdb</a></td>
+</tr>
+<tr>
+    <td>Multiple databases</td>
+    <td><a href="http://127.0.0.1:8000/cinema_view.html?databases=data/sedov3.cdb,data/sedov2.cdb,data/sedov1.cdb">
+                 cinema_view.html?databases=data/sedov3.cdb,data/sedov2.cdb,data/sedov1.cdb</a></td>
+</tr>
+<tr>
+    <td>Loading ParaView database (assetname attribute)</td>
+    <td><a href="http://127.0.0.1:8000/cinema_view.html?databases=data/test_paraview.cdb&assetname=FILE_png">
+                 cinema_view.html?databases=data/test_paraview.cdb&assetname=FILE_png</a></td>
+</tr>
+</table>

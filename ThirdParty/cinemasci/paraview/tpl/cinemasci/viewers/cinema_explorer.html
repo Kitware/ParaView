@@ -47,33 +47,44 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <head>
 	<title>Cinema:Explorer</title>
+    <meta app="Cinema:Explorer" version="2.2">
 	<meta charset="utf-8">
 	<meta name='author' content="Cameron Tauxe">
 	<meta name='author' content="James Ahrens">
 	<meta name='author' content="David Rogers">
 	<meta name='author' content="Robin Maack">
 
-    <!-- external -->
-	<script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Begin: Cinema Local File Install -->
+    <!-- d3 -->
+    <!--
+	<script src="cinema/lib/d3.v5.min.js"></script>
+    -->
+    <!-- components -->
+    <!--
+	<link rel='stylesheet' href='cinema/lib/CinemaComponents.v2.7.1.min.css'>
+	<script src='cinema/lib/CinemaComponents.v2.7.1.min.js'></script>
+    -->
+    <!-- vtk -->
     <script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
+    <!-- End:   Cinema Local File Install -->
 
+    <!-- Begin: Cinema External Access Install -->
+    <!-- d3 -->
+	<script src="https://d3js.org/d3.v5.min.js"></script>
     <!-- components -->
 	<link rel='stylesheet' href='https://cinemascience.github.io/release/CinemaComponents.v2.7.1.min.css'>
 	<script src='https://cinemascience.github.io/release/CinemaComponents.v2.7.1.min.js'></script>
+    <!-- vtk -->
+    <script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
+    <!-- End:   Cinema External Access Install -->
 
-	<!-- alternative local components files (for testing builds) (please comment this out before commiting)-->
-	<!--
-	<link rel='stylesheet' href='test/CinemaComponents.min.css'>
-	<script src='test/CinemaComponents.js'></script>
-	-->
-
-	<!--Import Viewer's CSS-->
-	<link rel='stylesheet' href='cinema/explorer/2.0/css/viewer.css'>
+	<!-- Import Viewer's CSS -->
+	<link rel='stylesheet' href='cinema/explorer/2.2/css/viewer.css'>
 </head>
 <body>
 	<div id="top">
 		<div id="header">
-			<h1>Cinema:Explorer</h1>
+			<h3>Cinema:Explorer</h3>
 			<!--Controls to select and load databases-->
 			<div id="databaseControls">
 				<span id="databaseLabel">Select Database:</span>
@@ -117,7 +128,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<div id="viewContainer"></div>
 
 	<!--Main Script-->
-	<script src="cinema/lib/databases.js"></script>
-	<script src="cinema/explorer/2.0/js/main.js"></script>
+	<script src="cinema/lib/2.2/databases.js"></script>
+	<script src="cinema/explorer/2.2/js/main.js"></script>
 </body>
 </html>
