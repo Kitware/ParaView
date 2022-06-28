@@ -215,6 +215,7 @@ set(classes
   pqUndoRedoReaction
   pqUsageLoggingBehavior
   pqUseSeparateColorMapReaction
+  pqUseSeparateOpacityArrayReaction
   pqVCRToolbar
   pqVerifyRequiredPluginBehavior
   pqViewMenuManager
