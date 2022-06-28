@@ -199,7 +199,7 @@ void pqMetaDataPropertyWidget::updateMetadata(
     }
   }
 
-  source->UpdateVTKObjects();
+  source->UpdateProperty(smproperty->GetXMLName());
   source->UpdatePipelineInformation();
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(source->NewPropertyIterator());
