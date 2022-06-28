@@ -1,3 +1,4 @@
+
 <ServerManagerConfiguration>
   <ProxyGroup name="settings">
     <!-- ================================================================== -->
@@ -1221,6 +1222,18 @@
           When enabled, the color transfer function switches to indexed-lookup
           (categorical colors) mode.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="Using2DTransferFunction" function="boolean_invert"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="UsingSeparateOpacityArray" function="boolean_invert"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty default_values="0"
