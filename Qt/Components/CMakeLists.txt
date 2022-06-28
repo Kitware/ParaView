@@ -69,6 +69,7 @@ set(classes
   pqDataInformationWidget
   pqDialog
   pqDisplayColorWidget
+  pqDisplayOpacityWidget
   pqDisplayPanel
   pqDisplayPanelInterface
   pqDisplayPanelPropertyWidget
