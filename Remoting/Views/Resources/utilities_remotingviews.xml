@@ -1664,6 +1664,11 @@
         <Property name="Annotations" />
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="IndexedColors" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Using2DTransferFunction" function="boolean_invert"/>
+          </PropertyWidgetDecorator>
+        </Hints>
       </PropertyGroup>
 
       <!-- End of PVLookupTable -->
