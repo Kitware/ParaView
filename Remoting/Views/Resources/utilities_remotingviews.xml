@@ -1626,11 +1626,6 @@
           When enabled, the opacity transfer function is used for
           rendering, if applicable.
         </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="Using2DTransferFunction" function="boolean_invert"/>
-          </PropertyWidgetDecorator>
-        </Hints>
       </IntVectorProperty>
 
       <PropertyGroup label="Transfer Functions" panel_widget="ColorOpacityEditor">
