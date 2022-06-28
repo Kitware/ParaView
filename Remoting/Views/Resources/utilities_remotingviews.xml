@@ -1320,6 +1320,16 @@
           Proxy only property used by the ColorOpacityWidget to know if a 2D transfer function is being used.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="UsingSeparateOpacityArray"
+                         is_internal="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Proxy only property used by the ColorOpacityWidget to know if a separate array is being used to
+          map opacity in volume rendering.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty clean_command="RemoveAllPoints"
                             command="AddRGBPoint"
                             name="RGBPoints"

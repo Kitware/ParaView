@@ -213,10 +213,25 @@ void pqColorMapEditor::updateActive()
       {
         useTF2DProperty->AddLinkedProperty(lutProxy->GetProperty("Using2DTransferFunction"));
       }
+      else
+      {
+        vtkSMPropertyHelper(lutProxy, "Using2DTransferFunction").Set(0);
+      }
+      if (vtkSMProperty* useSepOpacityProperty =
+            repr->getProxy()->GetProperty("UseSeparateOpacityArray"))
+      {
+        useSepOpacityProperty->AddLinkedProperty(
+          lutProxy->GetProperty("UsingSeparateOpacityArray"));
+      }
+      else
+      {
+        vtkSMPropertyHelper(lutProxy, "UsingSeparateOpacityArray").Set(0);
+      }
     }
     else if (lutProxy != nullptr)
     {
       vtkSMPropertyHelper(lutProxy, "Using2DTransferFunction").Set(0);
+      vtkSMPropertyHelper(lutProxy, "UsingSeparateOpacityArray").Set(0);
     }
     this->setColorTransferFunction(lutProxy);
   }
