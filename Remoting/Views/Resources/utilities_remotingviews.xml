@@ -1403,11 +1403,18 @@
           of the interval.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name = "IndexedLookup" function="boolean_invert"/>
-          </PropertyWidgetDecorator>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="Using2DTransferFunction" function="boolean_invert"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="IndexedLookup" function="boolean_invert"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="Using2DTransferFunction" function="boolean_invert"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="UsingSeparateOpacityArray" function="boolean_invert"/>
+              </PropertyWidgetDecorator>
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
