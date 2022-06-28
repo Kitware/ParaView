@@ -1312,7 +1312,8 @@
         </Hints>
       </ProxyProperty>
       <IntVectorProperty default_values="0"
-                         name="Use2DTransferFunction"
+                         name="Using2DTransferFunction"
+                         is_internal="1"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -1396,7 +1397,7 @@
             <Property name = "IndexedLookup" function="boolean_invert"/>
           </PropertyWidgetDecorator>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="Use2DTransferFunction" function="boolean_invert"/>
+            <Property name="Using2DTransferFunction" function="boolean_invert"/>
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
@@ -1597,7 +1598,7 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="Use2DTransferFunction" function="boolean_invert"/>
+            <Property name="Using2DTransferFunction" function="boolean_invert"/>
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
@@ -1607,7 +1608,6 @@
         <Property name="RGBPoints" function="XRGBPoints" />
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
         <Property name="TransferFunction2D" function="TransferFunction2D" />
-        <Property name="Use2DTransferFunction" function="Use2DTransferFunction" />
         <Property name="UseLogScale" function="UseLogScale" />
         <Property name="UseOpacityControlPointsFreehandDrawing" function="UseOpacityControlPointsFreehandDrawing" />
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />
@@ -1631,7 +1631,7 @@
         <Property name="NumberOfTableValues" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="Use2DTransferFunction" function="boolean_invert"/>
+            <Property name="Using2DTransferFunction" function="boolean_invert"/>
           </PropertyWidgetDecorator>
         </Hints>
       </PropertyGroup>

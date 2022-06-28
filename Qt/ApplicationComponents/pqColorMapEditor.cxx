@@ -206,6 +206,18 @@ void pqColorMapEditor::updateActive()
   if (repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
   {
     vtkSMProxy* lutProxy = vtkSMPropertyHelper(repr->getProxy(), "LookupTable", true).GetAsProxy();
+    if (lutProxy)
+    {
+      // setup property links with the representation.
+      if (vtkSMProperty* useTF2DProperty = repr->getProxy()->GetProperty("UseTransfer2D"))
+      {
+        useTF2DProperty->AddLinkedProperty(lutProxy->GetProperty("Using2DTransferFunction"));
+      }
+    }
+    else if (lutProxy != nullptr)
+    {
+      vtkSMPropertyHelper(lutProxy, "Using2DTransferFunction").Set(0);
+    }
     this->setColorTransferFunction(lutProxy);
   }
   else

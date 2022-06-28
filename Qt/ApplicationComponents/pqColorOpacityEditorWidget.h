@@ -93,7 +93,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
       setScalarOpacityFunctionProxy)
   Q_PROPERTY(
     pqSMProxy transferFunction2DProxy READ transferFunction2DProxy WRITE setTransferFunction2DProxy)
-  Q_PROPERTY(bool use2DTransferFunction READ use2DTransferFunction WRITE setUse2DTransferFunction)
   Q_PROPERTY(QList<QVariant> transfer2DBoxes READ transfer2DBoxes WRITE setTransfer2DBoxes)
 
   typedef pqPropertyWidget Superclass;
@@ -162,9 +161,9 @@ public:
   pqSMProxy transferFunction2DProxy() const;
 
   /**
-   * Returns the value for use2DTransferFunction
+   * Returns the value for Using2DTransferFunction internal server-manager property.
    */
-  bool use2DTransferFunction() const;
+  bool using2DTransferFunction() const;
 
   /**
    * Returns the current list of boxes for the 2D transfer
@@ -260,6 +259,12 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void saveAsPreset();
 
+  /**
+   * Compute the data histogram 1D or 2D. Depends on the "Using2DTransferFunction" internal
+   * property.
+   */
+  void computeDataHistogram();
+
   void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
 
   /**
@@ -267,11 +272,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * to -1 which sets its text to an empty string
    */
   void resetColorMapComboBox();
-
-  /**
-   * Set whether to use a 2D transfer function.
-   */
-  void setUse2DTransferFunction(bool value);
 
   /**
    * Sets the box items that control the 2D transfer function.
@@ -335,11 +335,6 @@ Q_SIGNALS:
    * Signal fired when the transfer function 2D proxy is changed.
    */
   void transferFunction2DProxyChanged();
-
-  /**
-   * Signal fired when use2DTransferFunction changes.
-   */
-  void use2DTransferFunctionChanged();
 
   /**
    * Signal fired when the transfer function 2d boxes change.
