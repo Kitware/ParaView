@@ -1211,27 +1211,6 @@
                            name="PVLookupTable"
                            post_push="Build"
                            processes="dataserver|renderserver|client">
-      <IntVectorProperty default_values="0"
-                         name="AutomaticRescaleRangeMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry value="-1" text="Never"/>
-          <Entry value="0" text="Grow and update on 'Apply'"/>
-          <Entry value="1" text="Grow and update every timestep"/>
-          <Entry value="2" text="Update on 'Apply'"/>
-          <Entry value="3" text="Clamp and update every timestep"/>
-        </EnumerationDomain>
-        <Documentation>
-          Choose whether and how to automatically rescale the color map range.
-          "Never" means the color map range will never be changed.
-          "Grow and update on 'Apply'" will expand the range to contain the
-          union of the current range and the range of the current data source.
-          "Grow and update every timestep" will expand the range to contain
-          the union of the current range and the range of the current data source
-          when the timestep is changed. "Clamp and update every timestep" will
-          update the color map range to the current source data range.
-        </Documentation>
-      </IntVectorProperty>
       <IntVectorProperty name="IndexedLookup"
                          command="SetIndexedLookup"
                          default_values="0"
@@ -1276,6 +1255,27 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty default_values="0"
+                         name="AutomaticRescaleRangeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="-1" text="Never"/>
+          <Entry value="0" text="Grow and update on 'Apply'"/>
+          <Entry value="1" text="Grow and update every timestep"/>
+          <Entry value="2" text="Update on 'Apply'"/>
+          <Entry value="3" text="Clamp and update every timestep"/>
+        </EnumerationDomain>
+        <Documentation>
+          Choose whether and how to automatically rescale the color map range.
+          "Never" means the color map range will never be changed.
+          "Grow and update on 'Apply'" will expand the range to contain the
+          union of the current range and the range of the current data source.
+          "Grow and update every timestep" will expand the range to contain
+          the union of the current range and the range of the current data source
+          when the timestep is changed. "Clamp and update every timestep" will
+          update the color map range to the current source data range.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty name="RescaleOnVisibilityChange"
                          default_values="0"
                          number_of_elements="1">
