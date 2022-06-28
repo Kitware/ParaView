@@ -214,6 +214,7 @@ set(classes
   pqUndoRedoBehavior
   pqUndoRedoReaction
   pqUsageLoggingBehavior
+  pqUse2DTransferFunctionReaction
   pqUseSeparateColorMapReaction
   pqUseSeparateOpacityArrayReaction
   pqVCRToolbar
