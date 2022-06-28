@@ -155,6 +155,21 @@ Q_SIGNALS:
    */
   void attrArrayNameModified();
 
+  /**
+   * Signal fired to indicate the representation type has changed. ("Volume", "Surface", ..)
+   */
+  void representationTypeModified();
+
+  /**
+   * Signal fired to indicate the use separate opacity array property has changed.
+   */
+  void useSeparateOpacityArrayModified();
+
+  /**
+   * Signal fired to indicate the use 2D transfer function property has changed.
+   */
+  void useTransfer2DModified();
+
 public Q_SLOTS:
   /**
    * Slot to update the lookup table if the application setting to

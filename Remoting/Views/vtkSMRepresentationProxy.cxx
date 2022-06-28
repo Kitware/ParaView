@@ -434,3 +434,41 @@ bool vtkSMRepresentationProxy::SetRepresentationType(const char* type)
 
   return false;
 }
+
+//---------------------------------------------------------------------------
+const char* vtkSMRepresentationProxy::GetRepresentationType()
+{
+  if (vtkSMProperty* property = this->GetProperty("Representation"))
+  {
+    return vtkSMPropertyHelper(property).GetAsString(0);
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+bool vtkSMRepresentationProxy::IsVolumeRendering()
+{
+  const char* reprType = this->GetRepresentationType();
+  if (reprType != nullptr && std::string(reprType) == "Volume")
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool vtkSMRepresentationProxy::GetUsing2DTransferFunction()
+{
+  if (vtkSMProperty* smproperty = this->GetProperty("UseTransfer2D"))
+  {
+    return vtkSMPropertyHelper(smproperty).GetAsInt();
+  }
+  else
+  {
+    return false;
+  }
+}
