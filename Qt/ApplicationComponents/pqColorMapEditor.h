@@ -103,6 +103,9 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * update the enabled state for show/edit scalar bar buttons.
    */
   void updateScalarBarButtons();
+  void updateColorArraySelectorWidgets();
+  void updateOpacityArraySelectorWidgets();
+  void updateColor2ArraySelectorWidgets();
 
 private:
   Q_DISABLE_COPY(pqColorMapEditor)

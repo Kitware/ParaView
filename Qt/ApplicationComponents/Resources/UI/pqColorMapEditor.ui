@@ -94,10 +94,81 @@
         <height>76</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,1">
-       <property name="margin" stdset="0">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,0,1">
+       <item>
+        <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0">
+         <item row="0" column="1">
+          <widget class="QLabel" name="ColorLabel">
+           <property name="text">
+            <string>Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="Color2Label">
+           <property name="text">
+            <string>Color Y</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="OpacityLabel">
+           <property name="text">
+            <string>Opacity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QToolButton" name="UseSeparateColorArray">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Components/Resources/pqComponents.qrc">
+             <normaloff>:/pqWidgets/Icons/pqSeparateColorMap.svg</normaloff>:/pqWidgets/Icons/pqSeparateColorMap.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QToolButton" name="Use2DTransferFunction">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QToolButton" name="UseSeparateOpacityArray">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" colspan="2">
+          <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true"/>
+         </item>
+         <item row="1" column="2" colspan="2">
+          <widget class="pqDisplayColor2Widget" name="DisplayColor2Widget" native="true"/>
+         </item>
+         <item row="2" column="2" colspan="2">
+          <widget class="pqDisplayOpacityWidget" name="DisplayOpacityWidget" native="true"/>
+         </item>
+        </layout>
+       </item>
        <item>
         <widget class="QFrame" name="PropertiesFrame">
          <property name="sizePolicy">
@@ -246,6 +317,24 @@
    <class>pqSearchBox</class>
    <extends>QWidget</extends>
    <header>pqSearchBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDisplayColorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayColorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDisplayOpacityWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayOpacityWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDisplayColor2Widget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayColor2Widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
