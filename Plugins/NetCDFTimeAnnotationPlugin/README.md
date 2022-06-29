@@ -34,9 +34,9 @@ you need to change the order of the Date array elements as in the following exam
 
 ## Important note
 
-This plugin takes benefit from the third-party `netcdftime`
-Python module, it is mandatory to have it installed in order to build
-and use this filter.
+This plugin takes benefit from the third-party `cftime` or `netcdftime`
+Python modules (the former being preferred). It is mandatory to have
+one of them installed in order to build and use this filter.
 
 ## Example
 User can refer to this page

@@ -275,7 +275,6 @@ set(paraview_default_plugins
   LegacyExodusReader
   Moments
   MooseXfemClip
-  NetCDFTimeAnnotationPlugin
   NodeEditor
   NonOrthogonalSource
   PacMan

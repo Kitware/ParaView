@@ -47,7 +47,7 @@ dnf install -y --setopt=install_weak_deps=False \
     python3-pandas python3-pandas-datareader python3-sphinx python3-pip \
     python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib
 
-python3 -m pip install wslink
+python3 -m pip install wslink cftime
 
 # Plugin dependencies
 dnf install -y --setopt=install_weak_deps=False \
