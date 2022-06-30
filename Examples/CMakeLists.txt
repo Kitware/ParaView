@@ -103,3 +103,13 @@ if (TARGET VTK::IOCatalystConduit)
   add_example(Catalyst2/CxxMultimesh)
   add_example(Catalyst2/CxxSteeringExample)
 endif ()
+
+add_custom_target(paraview-examples
+  COMMAND
+    "${CMAKE_CTEST_COMMAND}"
+    --test-dir "${CMAKE_BINARY_DIR}"
+    --tests-regex "ParaViewExample-"
+    --extra-verbose
+    -C "$<CONFIGURATION>"
+  USES_TERMINAL
+  COMMENT "Running ParaView Examples")
