@@ -8,6 +8,7 @@
         <file>Icons/no_opacity.png</file>
         <file>Icons/pdf.png</file>
         <file>Icons/PVSplashScreen.png</file>
+        <file>Icons/pq2DTransferFunction.svg</file>
         <file>Icons/pq3DView16.png</file>
         <file>Icons/pqAdvanced.svg</file>
         <file>Icons/pqAddFavorites16.png</file>
@@ -110,6 +111,7 @@
         <file>Icons/pqNodeMapData.svg</file>
         <file>Icons/pqNodeSetData.svg</file>
         <file>Icons/pqOctreeData.svg</file>
+        <file>Icons/pqOpacityTransferFunction.svg</file>
         <file>Icons/pqOpen.svg</file>
         <file>Icons/pqPalette.svg</file>
         <file>Icons/pqPaste.svg</file>
