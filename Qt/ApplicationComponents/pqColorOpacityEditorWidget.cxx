@@ -879,6 +879,9 @@ void pqColorOpacityEditorWidget::updateCurrentData()
     // rescale the transfer function manually
     ui.CurrentDataValue->setEnabled(ui.ColorEditor->currentPoint() != 0 &&
       ui.ColorEditor->currentPoint() != (ui.ColorEditor->numberOfControlPoints() - 1));
+
+    ui.CurrentDataValue->setToolTip(
+      "Select point and press \"Enter\" or \"Return\" to change colors");
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
@@ -890,6 +893,8 @@ void pqColorOpacityEditorWidget::updateCurrentData()
     // rescale the transfer function manually
     ui.CurrentDataValue->setEnabled(ui.OpacityEditor->currentPoint() != 0 &&
       ui.OpacityEditor->currentPoint() != (ui.OpacityEditor->numberOfControlPoints() - 1));
+
+    ui.CurrentDataValue->setToolTip("Double-click point to change interpolation");
   }
   else
   {
