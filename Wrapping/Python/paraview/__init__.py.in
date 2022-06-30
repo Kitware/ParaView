@@ -18,6 +18,9 @@ ParaView modules to force backwards compatibility to an older version::
 """
 from __future__ import absolute_import
 
+__version__ = '@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@'
+__version_full__ = '@PARAVIEW_VERSION_FULL@'
+
 #==============================================================================
 #
 #  Program:   ParaView
@@ -193,9 +196,9 @@ class compatibility:
     minor = None
     major = None
 
+    @classmethod
     def GetVersion(cls):
         return _version(cls.major, cls.minor)
-    GetVersion = classmethod(GetVersion)
 
 # This is reimplemented in vtkSMCoreUtilities::SanitizeName(). Keep both
 # implementations consistent.
