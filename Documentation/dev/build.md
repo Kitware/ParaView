@@ -307,7 +307,8 @@ Less common, but variables which may be of interest to some:
     enable in this build. This is useful to generate ParaView builds with
     limited features. More on this later.
   * `PARAVIEW_BUILD_EXAMPLES` (default `OFF`): If set, ParaView's example code
-    will be added as tests to the ParaView test suite.
+    will be added as tests to the ParaView test suite. These tests may be built
+    and run using the `paraview-examples` target.
   * `PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION` (default `OFF`): If set, the HTML
     documentation for ParaView's C++, Python, and proxies will be generated.
   * `PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION` (default `OFF`): Whether
