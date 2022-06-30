@@ -35,10 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
+#include "pqDisplayColorWidget.h"
 #include "pqPropertyLinks.h"
 #include "pqUndoStack.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMViewProxy.h"
 
 #include <QPointer>
 #include <QSet>
@@ -70,7 +73,29 @@ protected:
 
     BEGIN_UNDO_SET("Change representation type");
     vtkSMProxy* reprProxy = this->proxySM();
-    vtkSMRepresentationProxy::SetRepresentationType(reprProxy, value.toString().toUtf8().data());
+    auto widget = qobject_cast<pqDisplayRepresentationWidget*>(this->objectQt());
+    vtkSMViewProxy* view = widget->viewProxy();
+    if (auto reprPVProxy = vtkSMPVRepresentationProxy::SafeDownCast(reprProxy))
+    {
+      // In case we might volume render,
+      // we're looking at wether we need to update the scalar bar visibility.
+      // We want to update the scalar bar visibility if no LUT proxy exists.
+      // (it means that the user clicked on `Volume` while no array was selected)
+      // This needs to be done before calling SetRepresentationType, as this method
+      // will setup a LUT proxy.
+      vtkSMProxy* lutProxy = reprPVProxy->GetLUTProxy(view);
+      const QString& type = value.toString();
+
+      // Let'set the new representation
+      reprPVProxy->SetRepresentationType(type.toUtf8().data());
+
+      // When volume rendering, we need to set a scalar bar if it was not already present,
+      // because volume redering can only be done when using a scalar field.
+      if (!lutProxy && type == QString("Volume"))
+      {
+        pqDisplayColorWidget::updateScalarBarVisibility(view, reprProxy);
+      }
+    }
     END_UNDO_SET();
   }
 
@@ -123,6 +148,12 @@ pqDisplayRepresentationWidget::~pqDisplayRepresentationWidget()
 }
 
 //-----------------------------------------------------------------------------
+vtkSMViewProxy* pqDisplayRepresentationWidget::viewProxy() const
+{
+  return this->Representation ? this->Representation->getViewProxy() : nullptr;
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::setRepresentation(pqDataRepresentation* display)
 {
   if (this->Internal->PQRepr)
@@ -137,6 +168,8 @@ void pqDisplayRepresentationWidget::setRepresentation(pqDataRepresentation* disp
     display->connect(
       this, SIGNAL(representationTextChanged(const QString&)), SLOT(renderViewEventually()));
   }
+
+  this->Representation = display;
 }
 
 //-----------------------------------------------------------------------------

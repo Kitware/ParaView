@@ -835,22 +835,34 @@ bool vtkSMPVRepresentationProxy::UpdateScalarBarRange(vtkSMProxy* view, bool del
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visible)
+vtkSMProxy* vtkSMPVRepresentationProxy::GetLUTProxy(vtkSMProxy* view)
 {
   if (!view)
   {
-    return false;
+    return nullptr;
   }
 
   vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
   if (!lutProperty)
   {
     vtkWarningMacro("Missing 'LookupTable' property.");
-    return false;
+    return nullptr;
   }
 
   vtkSMPropertyHelper lutPropertyHelper(lutProperty);
   if (lutPropertyHelper.GetNumberOfElements() == 0 || lutPropertyHelper.GetAsProxy(0) == nullptr)
+  {
+    return nullptr;
+  }
+
+  return lutPropertyHelper.GetAsProxy(0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visible)
+{
+  vtkSMProxy* lutProxy = this->GetLUTProxy(view);
+  if (!lutProxy)
   {
     vtkWarningMacro("Failed to determine the LookupTable being used.");
     return false;
@@ -862,8 +874,6 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
     .arg(view)
     .arg(visible)
     .arg("comment", visible ? "show color bar/color legend" : "hide color bar/color legend");
-
-  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
 
   // If the lut proxy changed, we need to remove ourself (representation proxy)
   // from the scalar bar widget that we used to be linked to.
