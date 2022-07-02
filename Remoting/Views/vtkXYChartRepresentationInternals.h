@@ -456,7 +456,7 @@ protected:
 
     vtkColor3d color = this->GetSeriesParameter(
       self, tableName, columnName, role, this->Colors, vtkColor3d(0, 0, 0));
-    plot->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+    plot->SetColorF(color.GetRed(), color.GetGreen(), color.GetBlue());
     plot->GetSelectionPen()->SetColorF(self->SelectionColor);
 
     plot->SetWidth(
