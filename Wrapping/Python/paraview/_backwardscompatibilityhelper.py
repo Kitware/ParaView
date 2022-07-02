@@ -824,6 +824,20 @@ def getattr(proxy, pname):
                     "properties, then set the 'ThresholdMethod' property to "
                     "'Between' to threshold between the lower and upper thresholds.")
 
+    if pname == "ThresholdBetween" and proxy.SMProxy.GetXMLName() == "VTKmThreshold":
+        # The Threshold filter now offers additional thresholding methods
+        # besides ThresholdBetween. The lower and upper threshold values
+        # are also set separately.
+        if paraview.compatibility.GetVersion() <= 5.10:
+            return [proxy.GetProperty("LowerThreshold").GetData(),
+                    proxy.GetProperty("UpperThreshold").GetData()]
+        else:
+            raise NotSupportedException("The 'ThresholdRange' property has been "
+                    "removed in ParaView 5.11. Please set the lower and upper "
+                    "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
+                    "properties, then set the 'ThresholdMethod' property to "
+                    "'Between' to threshold between the lower and upper thresholds.")
+
     if pname == "CutoffArray" and proxy.SMProxy.GetXMLName() != "SPHDataSetInterpolator":
         raise NotSupportedException("The 'CutoffArray' property has been removed in ParaView 5.11."
                     "If you are wishing to use this property, please use 'SPHDataSetInterpolator' "

@@ -131,13 +131,12 @@
         <Documentation>The value of this property contains the name of the
         scalar array from which to perform thresholding.</Documentation>
       </StringVectorProperty>
-      <DoubleVectorProperty command="ThresholdBetween"
-                            default_values="0 0"
-                            label="Threshold Range"
-                            name="ThresholdBetween"
-                            number_of_elements="2"
-                            panel_widget="double_range">
-        <ArrayRangeDomain name="range">
+      <DoubleVectorProperty command="SetLowerThreshold"
+                            default_values="0"
+                            name="LowerThreshold"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="min">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -145,9 +144,59 @@
                       name="SelectInputScalars" />
           </RequiredProperties>
         </ArrayRangeDomain>
-        <Documentation>The values of this property specify the upper and lower
-        bounds of the thresholding operation.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          The value of this property specifies the lower bound of the
+          thresholding operation.
+        </Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThreshold"
+                            default_values="0"
+                            name="UpperThreshold"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="max">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="2" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          The value of this property specifies the upper bound of the
+          thresholding operation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetThresholdFunction"
+                         default_values="0"
+                         name="ThresholdMethod"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="Between" value="0"/>
+          <Entry text="Below Lower Threshold" value="1"/>
+          <Entry text="Above Upper Threshold" value="2"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates the threshold method.
+        </Documentation>
+      </IntVectorProperty>
 
       <Hints>
         <Visibility replace_input="2" />
