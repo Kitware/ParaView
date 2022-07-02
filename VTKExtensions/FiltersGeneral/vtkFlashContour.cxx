@@ -1226,7 +1226,7 @@ void vtkFlashContour::ProcessCellFinal(const double cornerPoints[32], const doub
 {
   vtkIdType pointIds[6];
   vtkMarchingCubesTriangleCases *triCase, *triCases;
-  EDGE_LIST* edge;
+  int* edge;
   double k, v0, v1;
   triCases = vtkMarchingCubesTriangleCases::GetCases();
 
