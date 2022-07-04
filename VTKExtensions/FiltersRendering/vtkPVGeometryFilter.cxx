@@ -22,13 +22,11 @@
 #include "vtkCellArray.h"
 #include "vtkCellArrayIterator.h"
 #include "vtkCellData.h"
-#include "vtkCellIterator.h"
 #include "vtkCellTypes.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTreeIterator.h"
-#include "vtkDataSetSurfaceFilter.h"
 #include "vtkExplicitStructuredGrid.h"
 #include "vtkExplicitStructuredGridSurfaceFilter.h"
 #include "vtkFeatureEdges.h"
@@ -36,6 +34,7 @@
 #include "vtkGarbageCollector.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
+#include "vtkGeometryFilter.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
@@ -159,17 +158,17 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
-  this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
+  this->GeometryFilter = vtkGeometryFilter::New();
   // we're prepping geometry for rendering
   // fast mode is adequate.
-  this->DataSetSurfaceFilter->SetFastMode(true);
+  this->GeometryFilter->SetFastMode(true);
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
   this->FeatureEdgesFilter = vtkFeatureEdges::New();
 
   // Setup a callback for the internal readers to report progress.
-  this->DataSetSurfaceFilter->AddObserver(
+  this->GeometryFilter->AddObserver(
     vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
   this->GenericGeometryFilter->AddObserver(
     vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
@@ -196,10 +195,10 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
 {
   // Be careful how you delete these so that you don't foul up the garbage
   // collector.
-  if (this->DataSetSurfaceFilter)
+  if (this->GeometryFilter)
   {
-    vtkDataSetSurfaceFilter* tmp = this->DataSetSurfaceFilter;
-    this->DataSetSurfaceFilter = nullptr;
+    vtkGeometryFilter* tmp = this->GeometryFilter;
+    this->GeometryFilter = nullptr;
     tmp->Delete();
   }
   if (this->GenericGeometryFilter)
@@ -281,7 +280,7 @@ vtkExecutive* vtkPVGeometryFilter::CreateDefaultExecutive()
 void vtkPVGeometryFilter::HandleGeometryFilterProgress(vtkObject* caller, unsigned long, void*)
 {
   vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(caller);
-  // This limits progress for only the DataSetSurfaceFilter.
+  // This limits progress for only the GeometryFilter.
   if (algorithm)
   {
     double progress = algorithm->GetProgress();
@@ -435,8 +434,7 @@ void vtkPVGeometryFilter::ExecuteAMRBlock(
   {
     int extent[6];
     input->GetExtent(extent);
-    this->DataSetSurfaceFilter->UniformGridExecute(
-      input, output, input->GetExtent(), extent, const_cast<bool*>(extractface));
+    this->GeometryFilter->StructuredExecute(input, output, extent, const_cast<bool*>(extractface));
   }
   this->OutlineFlag = 0;
 }
@@ -448,46 +446,43 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
   // Copy field data from the input block to the output block
   output->GetFieldData()->PassData(input->GetFieldData());
 
-  if (input->IsA("vtkImageData"))
+  if (auto imageData = vtkImageData::SafeDownCast(input))
   {
-    this->ImageDataExecute(
-      vtkImageData::SafeDownCast(input), output, doCommunicate, updatePiece, wholeExtent);
+    this->ImageDataExecute(imageData, output, doCommunicate, updatePiece, wholeExtent);
   }
-  else if (input->IsA("vtkStructuredGrid"))
+  else if (auto structuredGrid = vtkStructuredGrid::SafeDownCast(input))
   {
-    this->StructuredGridExecute(vtkStructuredGrid::SafeDownCast(input), output, updatePiece,
-      updateNumPieces, updateGhosts, wholeExtent);
+    this->StructuredGridExecute(
+      structuredGrid, output, updatePiece, updateNumPieces, updateGhosts, wholeExtent);
   }
-  else if (input->IsA("vtkRectilinearGrid"))
+  else if (auto rectilinearGrid = vtkRectilinearGrid::SafeDownCast(input))
   {
-    this->RectilinearGridExecute(vtkRectilinearGrid::SafeDownCast(input), output, updatePiece,
-      updateNumPieces, updateGhosts, wholeExtent);
+    this->RectilinearGridExecute(
+      rectilinearGrid, output, updatePiece, updateNumPieces, updateGhosts, wholeExtent);
   }
-  else if (input->IsA("vtkUnstructuredGridBase"))
+  else if (auto unstructuredGridBase = vtkUnstructuredGridBase::SafeDownCast(input))
   {
-    this->UnstructuredGridExecute(
-      vtkUnstructuredGridBase::SafeDownCast(input), output, doCommunicate);
+    this->UnstructuredGridExecute(unstructuredGridBase, output, doCommunicate);
   }
-  else if (input->IsA("vtkPolyData"))
+  else if (auto polyData = vtkPolyData::SafeDownCast(input))
   {
-    this->PolyDataExecute(vtkPolyData::SafeDownCast(input), output, doCommunicate);
+    this->PolyDataExecute(polyData, output, doCommunicate);
   }
-  else if (input->IsA("vtkHyperTreeGrid"))
+  else if (auto hyperTreeGrid = vtkHyperTreeGrid::SafeDownCast(input))
   {
-    this->HyperTreeGridExecute(vtkHyperTreeGrid::SafeDownCast(input), output, doCommunicate);
+    this->HyperTreeGridExecute(hyperTreeGrid, output, doCommunicate);
   }
-  else if (input->IsA("vtkExplicitStructuredGrid"))
+  else if (auto explicitStructuredGrid = vtkExplicitStructuredGrid::SafeDownCast(input))
   {
-    this->ExplicitStructuredGridExecute(
-      vtkExplicitStructuredGrid::SafeDownCast(input), output, doCommunicate, wholeExtent);
+    this->ExplicitStructuredGridExecute(explicitStructuredGrid, output, doCommunicate, wholeExtent);
   }
-  else if (input->IsA("vtkDataSet"))
+  else if (auto dataset = vtkDataSet::SafeDownCast(input))
   {
-    this->DataSetExecute(static_cast<vtkDataSet*>(input), output, doCommunicate);
+    this->DataSetExecute(dataset, output, doCommunicate);
   }
-  else if (input->IsA("vtkGenericDataSet"))
+  else if (auto genericDataSet = vtkGenericDataSet::SafeDownCast(input))
   {
-    this->GenericDataSetExecute(static_cast<vtkGenericDataSet*>(input), output, doCommunicate);
+    this->GenericDataSetExecute(genericDataSet, output, doCommunicate);
   }
 }
 
@@ -1280,8 +1275,8 @@ void vtkPVGeometryFilter::ImageDataExecute(
   {
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->StructuredExecute(
-        input, output, input->GetExtent(), const_cast<int*>(ext));
+      this->GeometryFilter->StructuredExecute(
+        input, output, const_cast<int*>(ext), nullptr, nullptr);
     }
     this->OutlineFlag = 0;
     return;
@@ -1331,7 +1326,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input, vtkPol
   {
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(), wholeExtent);
+      this->GeometryFilter->StructuredExecute(input, output, wholeExtent, nullptr, nullptr);
     }
     this->OutlineFlag = 0;
     return;
@@ -1358,8 +1353,8 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input, vtkP
   {
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->StructuredExecute(
-        input, output, input->GetExtent(), const_cast<int*>(wholeExtent));
+      this->GeometryFilter->StructuredExecute(
+        input, output, const_cast<int*>(wholeExtent), nullptr, nullptr);
     }
     this->OutlineFlag = 0;
     return;
@@ -1390,22 +1385,20 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
     {
       // Check to see if the data actually has nonlinear cells.  Handling
       // nonlinear cells adds unnecessary work if we only have linear cells.
-      vtkSmartPointer<vtkCellIterator> cellIter =
-        vtkSmartPointer<vtkCellIterator>::Take(input->NewCellIterator());
-      for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
+      if (input->GetNumberOfCells() > 0)
       {
-        if (!vtkCellTypes::IsLinear(cellIter->GetCellType()))
+        auto helper = vtkGeometryFilterHelper::CharacterizeUnstructuredGrid(input);
+        if (!helper->IsLinear)
         {
           handleSubdivision = true;
-          break;
         }
+        delete helper;
       }
     }
 
     vtkSmartPointer<vtkIdTypeArray> facePtIds2OriginalPtIds;
 
-    vtkSmartPointer<vtkUnstructuredGridBase> inputClone =
-      vtkSmartPointer<vtkUnstructuredGridBase>::Take(input->NewInstance());
+    auto inputClone = vtkSmartPointer<vtkUnstructuredGridBase>::Take(input->NewInstance());
     inputClone->ShallowCopy(input);
     input = inputClone;
 
@@ -1414,8 +1407,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // Use the vtkUnstructuredGridGeometryFilter to extract 2D surface cells
       // from the geometry.  This is important to extract an appropriate
       // wireframe in vtkPVRecoverGeometryWireframe.  Also, at the time of this
-      // writing vtkDataSetSurfaceFilter only properly subdivides 2D cells past
-      // level 1.
+      // writing vtkGeometryFilter only properly subdivides 2D cells past level 1.
       this->UnstructuredGridGeometryFilter->SetInputData(input);
 
       // Let the vtkUnstructuredGridGeometryFilter record from which point and
@@ -1424,8 +1416,8 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->UnstructuredGridGeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
       // Turn off ghost cell clipping. This ensures that ghost cells are retained
-      // and handed to the DataSetSurfaceFilter to ensure only valid faces are
-      // generated. If this weren't here, then the DataSetSurfaceFilter would
+      // and handed to the GeometryFilter to ensure only valid faces are
+      // generated. If this weren't here, then the GeometryFilter would
       // generate boundary faces between normal cells and where the ghost cells
       // used to be, which is not correct.
       this->UnstructuredGridGeometryFilter->DuplicateGhostCellClippingOff();
@@ -1452,23 +1444,23 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // recognize.  Note that because the data set comes from
       // UnstructuredGridGeometryFilter, the ids will represent the faces rather
       // than the original cells, which is important.
-      this->DataSetSurfaceFilter->PassThroughCellIdsOn();
-      this->DataSetSurfaceFilter->SetOriginalCellIdsName(
+      this->GeometryFilter->PassThroughCellIdsOn();
+      this->GeometryFilter->SetOriginalCellIdsName(
         vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
 
       if (this->PassThroughPointIds)
       {
-        // vtkDataSetSurfaceFilter is going to strip the vtkOriginalPointIds
+        // vtkGeometryFilter is going to strip the vtkOriginalPointIds
         // created by the vtkPVUnstructuredGridGeometryFilter because it
-        // cannot interpolate the ids.  Make the vtkDataSetSurfaceFilter make
+        // cannot interpolate the ids.  Make the vtkGeometryFilter make
         // its own original ids array.  We will resolve them later.
-        this->DataSetSurfaceFilter->PassThroughPointIdsOn();
+        this->GeometryFilter->PassThroughPointIdsOn();
       }
     }
 
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
+      this->GeometryFilter->UnstructuredGridExecute(input, output);
     }
 
     if (this->Triangulate && (output->GetNumberOfPolys() > 0))
@@ -1483,10 +1475,10 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
     if (handleSubdivision)
     {
-      // Restore state of DataSetSurfaceFilter.
-      this->DataSetSurfaceFilter->SetPassThroughCellIds(this->PassThroughCellIds);
-      this->DataSetSurfaceFilter->SetOriginalCellIdsName(nullptr);
-      this->DataSetSurfaceFilter->SetPassThroughPointIds(this->PassThroughPointIds);
+      // Restore state of GeometryFilter.
+      this->GeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+      this->GeometryFilter->SetOriginalCellIdsName(nullptr);
+      this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
       // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
       // that will cause the wireframe to be rendered correctly.
@@ -1723,7 +1715,7 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port, vtkInformation* info
 void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
-  vtkGarbageCollectorReport(collector, this->DataSetSurfaceFilter, "DataSetSurfaceFilter");
+  vtkGarbageCollectorReport(collector, this->GeometryFilter, "GeometryFilter");
   vtkGarbageCollectorReport(collector, this->GenericGeometryFilter, "GenericGeometryFilter");
   vtkGarbageCollectorReport(
     collector, this->UnstructuredGridGeometryFilter, "UnstructuredGridGeometryFilter");
@@ -1755,9 +1747,9 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
 {
   this->PassThroughCellIds = newvalue;
-  if (this->DataSetSurfaceFilter)
+  if (this->GeometryFilter)
   {
-    this->DataSetSurfaceFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+    this->GeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
   }
   if (this->GenericGeometryFilter)
   {
@@ -1769,9 +1761,9 @@ void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
 void vtkPVGeometryFilter::SetPassThroughPointIds(int newvalue)
 {
   this->PassThroughPointIds = newvalue;
-  if (this->DataSetSurfaceFilter)
+  if (this->GeometryFilter)
   {
-    this->DataSetSurfaceFilter->SetPassThroughPointIds(this->PassThroughPointIds);
+    this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
   }
 }
 
@@ -1792,9 +1784,9 @@ void vtkPVGeometryFilter::SetNonlinearSubdivisionLevel(int newvalue)
   {
     this->NonlinearSubdivisionLevel = newvalue;
 
-    if (this->DataSetSurfaceFilter)
+    if (this->GeometryFilter)
     {
-      this->DataSetSurfaceFilter->SetNonlinearSubdivisionLevel(this->NonlinearSubdivisionLevel);
+      this->GeometryFilter->SetNonlinearSubdivisionLevel(this->NonlinearSubdivisionLevel);
     }
 
     this->Modified();

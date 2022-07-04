@@ -29,11 +29,11 @@
 
 class vtkCallbackCommand;
 class vtkDataSet;
-class vtkDataSetSurfaceFilter;
 class vtkExplicitStructuredGrid;
 class vtkFeatureEdges;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
+class vtkGeometryFilter;
 class vtkHyperTreeGrid;
 class vtkImageData;
 class vtkUniformGrid;
@@ -311,7 +311,7 @@ protected:
 
   vtkMultiProcessController* Controller;
   vtkOutlineSource* OutlineSource;
-  vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
+  vtkGeometryFilter* GeometryFilter;
   vtkGenericGeometryFilter* GenericGeometryFilter;
   vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
   vtkPVRecoverGeometryWireframe* RecoverWireframeFilter;
