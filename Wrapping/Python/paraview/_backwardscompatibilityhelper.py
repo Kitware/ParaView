@@ -866,14 +866,6 @@ def getattr(proxy, pname):
 # label and not its name.
 def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
-    if version < 5.2:
-        if key == "ResampleWithDataset":
-            return builtins.getattr(module, "LegacyResampleWithDataset")(**kwargs)
-    if version < 5.3:
-        if key == "PLYReader":
-            # note the case. The old reader didn't support `FileNames` property,
-            # only `FileName`.
-            return builtins.getattr(module, "plyreader")(**kwargs)
     if version < 5.5:
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
