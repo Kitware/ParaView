@@ -594,47 +594,6 @@ struct Process_5_4_to_5_5
 };
 
 //===========================================================================
-struct Process_5_5_to_5_6
-{
-  bool operator()(xml_document& document) { return ConvertGlyphFilter(document); }
-
-  static bool ConvertGlyphFilter(xml_document& document)
-  {
-    bool warn = false;
-    //-------------------------------------------------------------------------
-    // Convert "Glyph" to "GlyphLegacy" and "GlyphWithCustomSource" to
-    // "GlyphWithCustomSourceLegacy". We don't explicitly convert those filters to the
-    // new ones, we just create the old proxies for now.
-    //-------------------------------------------------------------------------
-    pugi::xpath_node_set glyph_elements =
-      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Glyph']");
-    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
-         iter != glyph_elements.end(); ++iter)
-    {
-      iter->node().attribute("type").set_value("GlyphLegacy");
-      warn = true;
-    }
-    glyph_elements = document.select_nodes(
-      "//ServerManagerState/Proxy[@group='filters' and @type='GlyphWithCustomSource']");
-    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
-         iter != glyph_elements.end(); ++iter)
-    {
-      iter->node().attribute("type").set_value("GlyphWithCustomSourceLegacy");
-      warn = true;
-    }
-    if (warn)
-    {
-      vtkGenericWarningMacro(
-        "The state file uses the old 'Glyph' filter implementation. "
-        "The implementation has changed in ParaView 5.6. "
-        "Consider replacing the Glyph filter with a new Glyph filter. The old implementation "
-        "is still available as 'Glyph Legacy' and will be used for loading this state file.");
-    }
-    return true;
-  }
-};
-
-//===========================================================================
 struct Process_5_6_to_5_7
 {
   bool operator()(xml_document& document)
@@ -1574,13 +1533,6 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     converter.Session = session;
     status = converter(document);
     version = vtkSMVersion(5, 5, 0);
-  }
-
-  if (status && (version < vtkSMVersion(5, 6, 0)))
-  {
-    Process_5_5_to_5_6 converter;
-    status = converter(document);
-    version = vtkSMVersion(5, 6, 0);
   }
 
   if (status && (version < vtkSMVersion(5, 7, 0)))

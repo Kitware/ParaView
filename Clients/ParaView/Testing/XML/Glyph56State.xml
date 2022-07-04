@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<pqevents>
-  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
-</pqevents>
