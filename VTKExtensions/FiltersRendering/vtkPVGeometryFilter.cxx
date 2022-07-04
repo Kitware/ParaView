@@ -230,16 +230,6 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::SetTriangulate(int val)
-{
-  if (this->Triangulate != val)
-  {
-    this->Triangulate = val;
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestDataObject(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {

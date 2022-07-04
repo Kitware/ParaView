@@ -143,7 +143,7 @@ public:
    * This option has no effect when using OpenGL2 rendering backend. OpenGL2
    * rendering always triangulates polygonal meshes.
    */
-  virtual void SetTriangulate(int val);
+  vtkSetMacro(Triangulate, int);
   vtkGetMacro(Triangulate, int);
   vtkBooleanMacro(Triangulate, int);
   //@}
