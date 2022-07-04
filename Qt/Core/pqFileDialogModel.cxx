@@ -269,24 +269,6 @@ bool CaseInsensitiveSort(const pqFileDialogModelFileInfo& A, const pqFileDialogM
   return A.label().toLower() < B.label().toLower();
 }
 
-class CaseInsensitiveSortGroup
-  : public std::binary_function<pqFileDialogModelFileInfo, pqFileDialogModelFileInfo, bool>
-{
-public:
-  CaseInsensitiveSortGroup(const QString& groupName) { this->numPrefix = groupName.length(); }
-  bool operator()(const pqFileDialogModelFileInfo& A, const pqFileDialogModelFileInfo& B) const
-  {
-    QString aLabel = A.label();
-    QString bLabel = B.label();
-    aLabel = aLabel.right(aLabel.length() - numPrefix);
-    bLabel = bLabel.right(bLabel.length() - numPrefix);
-    return aLabel < bLabel;
-  }
-
-private:
-  int numPrefix;
-};
-
 bool getShowDetailedInformationSetting()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();

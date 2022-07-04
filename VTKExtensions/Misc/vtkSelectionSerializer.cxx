@@ -13,9 +13,6 @@
 
 =========================================================================*/
 
-// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (INDEXED_VERTICES).
-#define VTK_DEPRECATION_LEVEL 0
-
 #include "vtkSelectionSerializer.h"
 
 #include "vtkClientServerStreamInstantiator.h"
@@ -316,14 +313,6 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML, vtkSelectionNod
           if (elem->GetScalarAttribute("value", &val))
           {
             node->GetProperties()->Set(vtkSelectionNode::PIXEL_COUNT(), val);
-          }
-        }
-        else if (strcmp("INDEXED_VERTICES", key) == 0)
-        {
-          int val;
-          if (elem->GetScalarAttribute("value", &val))
-          {
-            node->GetProperties()->Set(vtkSelectionNode::INDEXED_VERTICES(), val);
           }
         }
         else if (strcmp("COMPOSITE_INDEX", key) == 0)

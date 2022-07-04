@@ -84,6 +84,7 @@
         <!-- Does this have any data type domain? -->
         <Documentation>Set the input to the Geometry Filter.</Documentation>
       </InputProperty>
+      <!-- PARAVIEW_DEPRECATED_IN_5_11_0 -->
       <IntVectorProperty animateable="0"
                          command="SetUseStrips"
                          default_values="0"
@@ -95,6 +96,7 @@
         strips. This should render faster and use less memory, but no cell data
         is copied.</Documentation>
       </IntVectorProperty>
+      <!-- PARAVIEW_DEPRECATED_IN_5_11_0 -->
       <IntVectorProperty animateable="0"
                          command="SetForceUseStrips"
                          default_values="0"

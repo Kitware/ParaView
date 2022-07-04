@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkLegacy.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"

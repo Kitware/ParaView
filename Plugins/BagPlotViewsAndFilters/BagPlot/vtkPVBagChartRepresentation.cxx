@@ -332,7 +332,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
 
     p50LinePlot->GetPen()->SetWidth(this->GridLineThickness);
     p50LinePlot->GetPen()->SetLineType(this->GridLineStyle);
-    p50LinePlot->SetColor(this->P50Color[0], this->P50Color[1], this->P50Color[2]);
+    p50LinePlot->SetColorF(this->P50Color[0], this->P50Color[1], this->P50Color[2]);
     p50LinePlot->SetOpacity(this->Opacity);
 
     vtkNew<vtkContourFilter> pUserContour;
@@ -347,7 +347,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
 
     pUserLinePlot->GetPen()->SetWidth(this->GridLineThickness);
     pUserLinePlot->GetPen()->SetLineType(this->GridLineStyle);
-    pUserLinePlot->SetColor(this->PUserColor[0], this->PUserColor[1], this->PUserColor[2]);
+    pUserLinePlot->SetColorF(this->PUserColor[0], this->PUserColor[1], this->PUserColor[2]);
     pUserLinePlot->SetOpacity(this->Opacity);
 
     p50LinePlot->SetVisible(medianTable->GetNumberOfRows() >= 2);

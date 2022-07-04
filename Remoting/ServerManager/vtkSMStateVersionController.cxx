@@ -1227,13 +1227,7 @@ struct Process_5_9_to_5_10
     //   - Property LowerThreshold for the lower threshold value
     //   - Property UpperThreshold for the upper threshold value
     //   - Property ThresholdMethod for the thresholding function
-    pugi::xpath_node_set xpath_set =
-      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Threshold']");
-
-    for (auto xpath_node : xpath_set)
-    {
-      auto node = xpath_node.node();
-
+    auto fixup_threshold = [](pugi::xml_node node) {
       if (!node.select_nodes("./Property[@name='ThresholdBetween']").empty())
       {
         const std::string id(node.attribute("id").value());
@@ -1280,6 +1274,20 @@ struct Process_5_9_to_5_10
         elementNode.append_attribute("index").set_value(0);
         elementNode.append_attribute("value").set_value(0);
       }
+    };
+
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Threshold']");
+    for (auto xpath_node : xpath_set)
+    {
+      fixup_threshold(xpath_node.node());
+    }
+
+    pugi::xpath_node_set xpath_set_vtkm = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='VTKmThreshold']");
+    for (auto xpath_node : xpath_set_vtkm)
+    {
+      fixup_threshold(xpath_node.node());
     }
 
     return true;

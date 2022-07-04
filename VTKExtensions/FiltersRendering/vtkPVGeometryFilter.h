@@ -25,6 +25,7 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
+#include "vtkParaViewDeprecation.h"                   // for PARAVIEW_DEPRECATED_IN_5_11_0
 class vtkCallbackCommand;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
@@ -94,16 +95,34 @@ public:
    * triangle strips.  This should render faster and use less memory, but no
    * cell data is copied.  By default, UseStrips is Off.
    */
-  void SetUseStrips(int);
-  vtkGetMacro(UseStrips, int);
-  vtkBooleanMacro(UseStrips, int);
-  //@}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  void SetUseStrips(int) {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual int GetUseStrips() VTK_FUTURE_CONST { return false; }
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void UseStripsOn() {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void UseStripsOff() {}
 
   // Description:
   // Makes set use strips call modified after it changes the setting.
-  void SetForceUseStrips(int);
-  vtkGetMacro(ForceUseStrips, int);
-  vtkBooleanMacro(ForceUseStrips, int);
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  void SetForceUseStrips(int) {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual int GetForceUseStrips() VTK_FUTURE_CONST { return false; }
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void ForceUseStripsOn() {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void ForceUseStripsOff() {}
+  //@}
 
   //@{
   /**
@@ -282,12 +301,9 @@ protected:
 
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
 
-  void ChangeUseStripsInternal(int val, int force);
-
   int OutlineFlag;
   int UseOutline;
   int BlockColorsDistinctValues;
-  int UseStrips;
   int GenerateCellNormals;
   int Triangulate;
   int NonlinearSubdivisionLevel;
@@ -325,9 +341,7 @@ protected:
   bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;
-  int ForceUseStrips;
   vtkTimeStamp StripSettingMTime;
-  int StripModFirstPass;
   bool HideInternalAMRFaces;
   bool UseNonOverlappingAMRMetaDataForOutlines;
   bool GenerateFeatureEdges;

@@ -13,9 +13,6 @@
 
 =========================================================================*/
 
-// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (SetUseStrips).
-#define VTK_DEPRECATION_LEVEL 0
-
 #include "vtkPVGeometryFilter.h"
 
 #include "vtkAMRInformation.h"
@@ -155,7 +152,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UseOutline = 1;
   this->GenerateFeatureEdges = false;
   this->BlockColorsDistinctValues = 7;
-  this->UseStrips = 0;
   // generating cell normals by default really slows down paraview
   // it is especially noticeable with the OpenGL2 backend.  Leaving
   // it on for the old backend as some tests rely on the cell normals
@@ -191,8 +187,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
 
   this->PassThroughCellIds = 1;
   this->PassThroughPointIds = 1;
-  this->ForceUseStrips = 0;
-  this->StripModFirstPass = 1;
 
   this->HideInternalAMRFaces = true;
   this->UseNonOverlappingAMRMetaDataForOutlines = true;
@@ -1565,83 +1559,66 @@ void vtkPVGeometryFilter::PolyDataExecute(
   if (!this->UseOutline)
   {
     this->OutlineFlag = 0;
-    if (this->UseStrips)
+    output->ShallowCopy(input);
+    if (this->PassThroughCellIds)
     {
-      vtkNew<vtkPolyData> inCopy;
-      vtkNew<vtkStripper> stripper;
-      stripper->SetPassThroughCellIds(this->PassThroughCellIds);
-      // stripper->SetPassThroughPointIds(this->PassThroughPointIds);
-      inCopy->ShallowCopy(input);
-      inCopy->RemoveGhostCells();
-      stripper->SetInputData(inCopy);
-      stripper->Update();
-      output->CopyStructure(stripper->GetOutput());
-      output->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
-      output->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
-    }
-    else
-    {
-      output->ShallowCopy(input);
-      if (this->PassThroughCellIds)
-      {
-        vtkNew<vtkIdTypeArray> originalCellIds;
-        originalCellIds->SetName("vtkOriginalCellIds");
-        originalCellIds->SetNumberOfComponents(1);
-        vtkNew<vtkIdTypeArray> originalFaceIds;
-        originalFaceIds->SetName(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
-        originalFaceIds->SetNumberOfComponents(1);
-        vtkCellData* outputCD = output->GetCellData();
-        outputCD->AddArray(originalCellIds.Get());
-        if (this->Triangulate)
-        {
-          outputCD->AddArray(originalFaceIds.Get());
-        }
-        vtkIdType numTup = output->GetNumberOfCells();
-        originalCellIds->SetNumberOfValues(numTup);
-        originalFaceIds->SetNumberOfValues(numTup);
-        for (vtkIdType cId = 0; cId < numTup; cId++)
-        {
-          originalCellIds->SetValue(cId, cId);
-          originalFaceIds->SetValue(cId, cId);
-        }
-      }
-      if (this->PassThroughPointIds)
-      {
-        vtkNew<vtkIdTypeArray> originalPointIds;
-        originalPointIds->SetName("vtkOriginalPointIds");
-        originalPointIds->SetNumberOfComponents(1);
-        vtkPointData* outputPD = output->GetPointData();
-        outputPD->AddArray(originalPointIds.Get());
-        vtkIdType numTup = output->GetNumberOfPoints();
-        originalPointIds->SetNumberOfValues(numTup);
-        for (vtkIdType pId = 0; pId < numTup; pId++)
-        {
-          originalPointIds->SetValue(pId, pId);
-        }
-      }
-
-      output->RemoveGhostCells();
-
+      vtkNew<vtkIdTypeArray> originalCellIds;
+      originalCellIds->SetName("vtkOriginalCellIds");
+      originalCellIds->SetNumberOfComponents(1);
+      vtkNew<vtkIdTypeArray> originalFaceIds;
+      originalFaceIds->SetName(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+      originalFaceIds->SetNumberOfComponents(1);
+      vtkCellData* outputCD = output->GetCellData();
+      outputCD->AddArray(originalCellIds.Get());
       if (this->Triangulate)
       {
-        // Triangulate the polygonal mesh.
-        vtkNew<vtkTriangleFilter> triangleFilter;
-        triangleFilter->SetInputData(output);
-        triangleFilter->Update();
-
-        // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
-        // that will cause the wireframe to be rendered correctly.
-        this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
-        // TODO: Make the consecutive internal filter execution have monotonically
-        // increasing progress rather than restarting for every internal filter.
-        this->RecoverWireframeFilter->Update();
-        this->RecoverWireframeFilter->SetInputData(nullptr);
-
-        // Get what should be the final output.
-        output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
-
-        output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+        outputCD->AddArray(originalFaceIds.Get());
       }
+      vtkIdType numTup = output->GetNumberOfCells();
+      originalCellIds->SetNumberOfValues(numTup);
+      originalFaceIds->SetNumberOfValues(numTup);
+      for (vtkIdType cId = 0; cId < numTup; cId++)
+      {
+        originalCellIds->SetValue(cId, cId);
+        originalFaceIds->SetValue(cId, cId);
+      }
+    }
+    if (this->PassThroughPointIds)
+    {
+      vtkNew<vtkIdTypeArray> originalPointIds;
+      originalPointIds->SetName("vtkOriginalPointIds");
+      originalPointIds->SetNumberOfComponents(1);
+      vtkPointData* outputPD = output->GetPointData();
+      outputPD->AddArray(originalPointIds.Get());
+      vtkIdType numTup = output->GetNumberOfPoints();
+      originalPointIds->SetNumberOfValues(numTup);
+      for (vtkIdType pId = 0; pId < numTup; pId++)
+      {
+        originalPointIds->SetValue(pId, pId);
+      }
+    }
+
+    output->RemoveGhostCells();
+
+    if (this->Triangulate)
+    {
+      // Triangulate the polygonal mesh.
+      vtkNew<vtkTriangleFilter> triangleFilter;
+      triangleFilter->SetInputData(output);
+      triangleFilter->Update();
+
+      // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
+      // that will cause the wireframe to be rendered correctly.
+      this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
+      // TODO: Make the consecutive internal filter execution have monotonically
+      // increasing progress rather than restarting for every internal filter.
+      this->RecoverWireframeFilter->Update();
+      this->RecoverWireframeFilter->SetInputData(nullptr);
+
+      // Get what should be the final output.
+      output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
+
+      output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
     }
     return;
   }
@@ -1781,7 +1758,6 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
   }
 
   os << indent << "UseOutline: " << (this->UseOutline ? "on" : "off") << endl;
-  os << indent << "UseStrips: " << (this->UseStrips ? "on" : "off") << endl;
   os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals ? "on" : "off") << endl;
   os << indent << "NonlinearSubdivisionLevel: " << this->NonlinearSubdivisionLevel << endl;
   os << indent << "Controller: " << this->Controller << endl;
@@ -1819,43 +1795,6 @@ void vtkPVGeometryFilter::SetPassThroughPointIds(int newvalue)
       this->PassThroughPointIds);
     }
   */
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::SetForceUseStrips(int newvalue)
-{
-  this->ForceUseStrips = newvalue;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::SetUseStrips(int newvalue)
-{
-  if (this->UseStrips != newvalue)
-  {
-    this->UseStrips = newvalue;
-    if (this->DataSetSurfaceFilter)
-    {
-      this->DataSetSurfaceFilter->SetUseStrips(this->UseStrips);
-    }
-    // this little bit of nastiness is here for surface selection
-    // surf selection has to have strips off
-    // but we don't want to reexecute this filter unless we really really have
-    // to, so this checks:
-    // if we have been asked to change the setting for selection AND
-    // if something other than the strip setting has been changed
-    int OnlyStripsChanged = 1;
-    if ((this->GetInput() && this->GetInput()->GetMTime() > this->StripSettingMTime) ||
-      this->MTime > this->StripSettingMTime || this->StripModFirstPass)
-    {
-      OnlyStripsChanged = 0;
-    }
-    if (this->ForceUseStrips && !OnlyStripsChanged)
-    {
-      this->Modified();
-      this->StripModFirstPass = 0;
-    }
-    this->StripSettingMTime.Modified();
-  }
 }
 
 //----------------------------------------------------------------------------
