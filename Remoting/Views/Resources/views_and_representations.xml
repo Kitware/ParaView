@@ -4633,17 +4633,6 @@
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
-    <PVRepresentationProxy base_proxygroup="representations"
-                           base_proxyname="UnstructuredGridRepresentation"
-                           class="vtkPVCompositeRepresentation"
-                           name="UnstructuredGridBaseRepresentation"
-                           processes="client|renderserver|dataserver">
-      <Deprecated deprecated_in="5.4" to_remove_in="5.5">
-          This is no longer needed. Simply use UniformGridVolumeRepresentation.
-      </Deprecated>
-    </PVRepresentationProxy>
-
-    <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
