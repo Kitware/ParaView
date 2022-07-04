@@ -60,7 +60,6 @@
 #include "vtkRectilinearGridOutlineFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
@@ -99,8 +98,8 @@ class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Op
 {
 public:
   // Subclasses must overload this method, which performs the actual
-  // operations.  The methods should first do a reintepret cast of the arrays
-  // to the type suggestsed by \c datatype (which will be one of the VTK type
+  // operations.  The methods should first do a reinterpret_cast of the arrays
+  // to the type suggested by \c datatype (which will be one of the VTK type
   // identifiers like VTK_INT, etc.).  Both arrays are considered top be
   // length entries.  The method should perform the operation A*B (where * is
   // a placeholder for whatever operation is actually performed) and store the
@@ -977,8 +976,8 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
       counts.push_back(multipiece->GetNumberOfPartitions());
     }
     std::vector<unsigned int> gcounts(counts.size());
-    this->Controller->AllReduce(
-      &counts[0], &gcounts[0], static_cast<vtkIdType>(counts.size()), vtkCommunicator::MAX_OP);
+    this->Controller->AllReduce(counts.data(), gcounts.data(),
+      static_cast<vtkIdType>(counts.size()), vtkCommunicator::MAX_OP);
     for (size_t cc = 0; cc < gcounts.size(); ++cc)
     {
       pieces_to_merge[cc]->SetNumberOfPartitions(gcounts[cc]);
@@ -1014,8 +1013,8 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     {
       std::vector<unsigned char> reduced_non_null_leaves;
       reduced_non_null_leaves.resize(reduced_size, 0);
-      this->Controller->AllReduce(
-        &non_null_leaves[0], &reduced_non_null_leaves[0], reduced_size, vtkCommunicator::MAX_OP);
+      this->Controller->AllReduce(non_null_leaves.data(), reduced_non_null_leaves.data(),
+        reduced_size, vtkCommunicator::MAX_OP);
 
       outIter->SkipEmptyNodesOff();
       outIter->VisitOnlyLeavesOn();
@@ -1626,8 +1625,6 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
     this->OutlineFlag = 0;
 
     vtkNew<vtkHyperTreeGridGeometry> internalFilter;
-    // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-    // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
     vtkNew<vtkHyperTreeGrid> htgCopy;
     htgCopy->ShallowCopy(input);
     internalFilter->SetInputData(htgCopy);
@@ -1776,13 +1773,6 @@ void vtkPVGeometryFilter::SetPassThroughPointIds(int newvalue)
   {
     this->DataSetSurfaceFilter->SetPassThroughPointIds(this->PassThroughPointIds);
   }
-  /*
-  if (this->GenericGeometryFilter)
-    {
-    this->GenericGeometryFilter->SetPassThroughPointIds(
-      this->PassThroughPointIds);
-    }
-  */
 }
 
 //----------------------------------------------------------------------------
