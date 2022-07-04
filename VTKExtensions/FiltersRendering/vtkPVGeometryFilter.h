@@ -26,6 +26,7 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
 #include "vtkParaViewDeprecation.h"                   // for PARAVIEW_DEPRECATED_IN_5_11_0
+
 class vtkCallbackCommand;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
@@ -341,7 +342,6 @@ protected:
   bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;
-  vtkTimeStamp StripSettingMTime;
   bool HideInternalAMRFaces;
   bool UseNonOverlappingAMRMetaDataForOutlines;
   bool GenerateFeatureEdges;
