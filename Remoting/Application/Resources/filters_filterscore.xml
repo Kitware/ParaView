@@ -1598,6 +1598,18 @@ found and the point will be rejected.</Documentation>
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetSnapToCellWithClosestPoint"
+                         default_values="0"
+                         name="SnapToCellWithClosestPoint"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+          Set whether to snap to the cell with the closest point, if no cell has been found while
+          FindCell is executed. Note: This is useful only when the source is a vtkPointSet.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <!-- cell locator begin -->
       <ProxyProperty command="SetCellLocatorPrototype"
                      label="Cell Locator"
