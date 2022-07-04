@@ -4,7 +4,7 @@
     <SourceProxy class="vtkImageGradient"
                  label="Gradient Legacy"
                  name="GradientLegacy">
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         This filter has been merged with 'GradientOfUnstructuredDataSet' into a new 'Gradient' filter.
         Please consider using that instead.
       </Deprecated>

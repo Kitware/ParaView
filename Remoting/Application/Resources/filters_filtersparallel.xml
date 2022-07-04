@@ -4,7 +4,7 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  name="ProbeLineLegacy">
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         This has been replaced by 'ProbeLine'. Please consider
         using that instead.
       </Deprecated>
@@ -395,7 +395,7 @@
                      point, whether or not it lies at an input point. The Probe
                      filter operates on any type of data and produces polygonal
                      output (a line).</Documentation>
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         This has been replaced by 'ProbeLine'. Please consider
         using that instead.
       </Deprecated>
