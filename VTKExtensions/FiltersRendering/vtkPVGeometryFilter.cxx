@@ -1748,22 +1748,20 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  if (this->OutlineFlag)
-  {
-    os << indent << "OutlineFlag: On\n";
-  }
-  else
-  {
-    os << indent << "OutlineFlag: Off\n";
-  }
-
+  os << indent << "OutlineFlag: " << (this->OutlineFlag ? "on" : "off") << endl;
   os << indent << "UseOutline: " << (this->UseOutline ? "on" : "off") << endl;
+  os << indent << "GenerateFeatureEdges: " << (this->GenerateFeatureEdges ? "on" : "off") << endl;
+  os << indent << "BlockColorsDistinctValues: " << this->BlockColorsDistinctValues << endl;
   os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals ? "on" : "off") << endl;
+  os << indent << "Triangulate: " << (this->Triangulate ? "on" : "off") << endl;
   os << indent << "NonlinearSubdivisionLevel: " << this->NonlinearSubdivisionLevel << endl;
   os << indent << "Controller: " << this->Controller << endl;
-
-  os << indent << "PassThroughCellIds: " << (this->PassThroughCellIds ? "On\n" : "Off\n");
-  os << indent << "PassThroughPointIds: " << (this->PassThroughPointIds ? "On\n" : "Off\n");
+  os << indent << "PassThroughCellIds: " << (this->PassThroughCellIds ? "on" : "off") << endl;
+  os << indent << "PassThroughPointIds: " << (this->PassThroughPointIds ? "on" : "off") << endl;
+  os << indent << "GenerateProcessIds: " << (this->GenerateProcessIds ? "on" : "off") << endl;
+  os << indent << "HideInternalAMRFaces: " << (this->HideInternalAMRFaces ? "on" : "off") << endl;
+  os << indent << "UseNonOverlappingAMRMetaDataForOutlines: "
+     << (this->UseNonOverlappingAMRMetaDataForOutlines ? "on" : "off") << endl;
 }
 
 //----------------------------------------------------------------------------
