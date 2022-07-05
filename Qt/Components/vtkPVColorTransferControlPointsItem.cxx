@@ -56,8 +56,7 @@ bool vtkPVColorTransferControlPointsItem::KeyPressEvent(const vtkContextKeyEvent
   // Enter or Return was pressed, edit the color of the current point.
   if (key.GetInteractor()->GetKeySym() == std::string("Return"))
   {
-    this->InvokeEvent(
-      vtkControlPointsItem::CurrentPointEditEvent, reinterpret_cast<void*>(this->CurrentPoint));
+    this->InvokeEvent(vtkControlPointsItem::CurrentPointEditEvent);
     return true;
   }
   return this->Superclass::KeyPressEvent(key);
