@@ -192,6 +192,26 @@ public:
   vtkSetClampMacro(NumberOfLayers, int, 0, VTK_INT_MAX);
   vtkGetMacro(NumberOfLayers, int);
   //@}
+
+  //@{
+  /**
+   * Set/Get the flag the control if, when using the number of layers to extract connected elements,
+   * the initial selection seed should be removed.
+   * Default is falsse
+   */
+  vtkSetMacro(RemoveSeed, bool);
+  vtkGetMacro(RemoveSeed, bool);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the flag the control if, when using the number of layers to extract connected elements,
+   * the intermediate layers should be removed.
+   * Default is falsse
+   */
+  vtkSetMacro(RemoveIntermediateLayers, bool);
+  vtkGetMacro(RemoveIntermediateLayers, bool);
+  //@}
 protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource() override;
@@ -226,6 +246,8 @@ protected:
   char* ArrayName;
   char* QueryString;
   int NumberOfLayers;
+  bool RemoveSeed = false;
+  bool RemoveIntermediateLayers = false;
 
 private:
   vtkPVSelectionSource(const vtkPVSelectionSource&) = delete;

@@ -763,6 +763,26 @@
         </Documentation>
         <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveSeed"
+                         default_values="0"
+                         name="RemoveSeed"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if the initial seed selection is remove or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveIntermediateLayers"
+                         default_values="0"
+                         name="RemoveIntermediateLayers"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if intermediate layers are removes or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <!-- End of SelectionQuerySource -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -821,6 +841,26 @@
           Specify the number of layers of connected elements to include in the selection.
         </Documentation>
         <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveSeed"
+                         default_values="0"
+                         name="RemoveSeed"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if the initial seed selection is remove or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveIntermediateLayers"
+                         default_values="0"
+                         name="RemoveIntermediateLayers"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if intermediate layers are removes or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </Proxy>
     <!-- ==================================================================== -->

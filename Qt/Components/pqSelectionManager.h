@@ -130,9 +130,13 @@ public Q_SLOTS:
   void onSourceRemoved(pqPipelineSource*);
 
   /**
-   * Expand/contract selection to include additional layers.
+   * Expand/contract the selection to include additional layers.
+   * This cannot shrink the initial selection seed.
+   * Set layers to control the number of layers to expand/contract from current selection
+   * Set removeSeed to remove the initial selection seed
+   * Set removeIntermediateLayers to remove intermediate expand layers
    */
-  void expandSelection(int layers);
+  void expandSelection(int layers, bool removeSeed = false, bool removeIntermediateLayers = false);
 
 private Q_SLOTS:
   /**
