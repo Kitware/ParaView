@@ -172,6 +172,18 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetRemoveGhostInterfaces"
+                         default_values="1"
+                         name="RemoveGhostInterfaces"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether Ghost interfaces will be removed. When you are rendering you want to remove ghost interfaces.
+          There are certain algorithms though that need the ghost interfaces. This flag is meaningful only for
+          vtkUnstructuredGrid/vtkUnstructuredGridBase.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End DataSetSurfaceFilter -->
     </SourceProxy>
 
