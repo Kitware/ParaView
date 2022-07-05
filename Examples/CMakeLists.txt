@@ -58,8 +58,7 @@ endif ()
 
 add_example(Plugins/AddPQProxy)
 add_example(Plugins/Autostart)
-# This has a build failure, see https://gitlab.kitware.com/paraview/paraview/-/issues/21388
-# add_example(Plugins/ComplexPluginArchitecture)
+add_example(Plugins/ComplexPluginArchitecture)
 add_example(Plugins/ContextMenu)
 add_example(Plugins/DynamicInitializer)
 add_example(Plugins/DockWidget)
