@@ -1471,6 +1471,32 @@ struct Process_5_9_to_5_10
   }
 };
 
+struct Process_5_10_to_5_11
+{
+  bool operator()(xml_document& document) { return HandleDataSetSurfaceFilter(document); }
+
+  static bool HandleDataSetSurfaceFilter(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='DataSetSurfaceFilter']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      for (auto child : node.children())
+      {
+        // remove UseGeometryFilter flag
+        if (std::string(child.attribute("name").as_string()) == "UseGeometryFilter")
+        {
+          node.remove_child(child);
+        }
+      }
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -1583,6 +1609,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_9_to_5_10 converter;
     status = converter(document);
     version = vtkSMVersion(5, 10, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 11, 0)))
+  {
+    Process_5_10_to_5_11 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 11, 0);
   }
 
   if (status)
