@@ -6,7 +6,10 @@ def _get_catalyst_state(options):
     # if not extracts have been configured, then there's nothing to generate.
     extractors = simple.GetExtractors()
     if not extractors:
+        from .. import print_warning
+        print_warning('No extractors defined. Extractors are required to export a Catalyst state.')
         return None
+
     # convert catalyst options to PythonStateOptions.
     soptions = servermanager.ProxyManager().NewProxy("pythontracing", "PythonStateOptions")
     soptions = servermanager._getPyProxy(soptions)
@@ -55,7 +58,9 @@ def save_catalyst_state(fname, options):
     options = servermanager._getPyProxy(options)
     state = _get_catalyst_state(options)
     if not state:
-        raise RuntimeError("No state generated")
+        from .. import print_error
+        print_error('No state generated')
+        return
 
     with open(fname, 'w') as file:
         file.write(state)
