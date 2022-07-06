@@ -27,14 +27,12 @@
 
     variables:
         CMAKE_CONFIGURATION: macos_arm64_python_qt
-        CTEST_NO_WARNINGS_ALLOWED: 1
 
 .macos_x86_64_python_qt:
     extends: .macos_build
 
     variables:
         CMAKE_CONFIGURATION: macos_x86_64_python_qt
-        CTEST_NO_WARNINGS_ALLOWED: 1
 
 ## Tags
 
@@ -71,6 +69,7 @@
 
 .cmake_build_macos:
     stage: build
+    extends: .warning_policy
 
     script:
         - *before_script_macos
@@ -86,6 +85,7 @@
         - ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - ctest -VV -S .gitlab/ci/ctest_build.cmake
         - sccache --show-stats
+        - exec .gitlab/ci/check_warnings.sh .
 
     interruptible: true
     timeout: 2 hours

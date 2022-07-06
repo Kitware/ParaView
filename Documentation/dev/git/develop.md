@@ -419,7 +419,8 @@ can usually help. There is two locations to read the results, GitLab CI and CDas
 Both should be checked and considered clean before merging.
 
 To read GitLab CI result, click on the Pipelines tab then on the last pipeline.
-It is expected to be fully green. If it is not, click on the red jobs to see the reason for the failure.
+It is expected to be fully green. If there is a yellow warning job, please consult CDash.
+If there is a red failed job, click on it to see the reason for the failure.
 It should clearly appears on the bottom of the log.
 Possible failures are:
  - Timeouts: please rerun the job and report to CI maintainers

@@ -110,7 +110,6 @@
 
     variables:
         CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_tidy
-        CTEST_NO_WARNINGS_ALLOWED: 1
 
 .linux_builder_tags:
     tags:
@@ -164,6 +163,7 @@
 
 .cmake_build_linux:
     stage: build
+    extends: .warning_policy
 
     script:
         - *before_script_linux
@@ -172,6 +172,7 @@
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
         - sccache --show-stats
+        - exec .gitlab/ci/check_warnings.sh .
 
     interruptible: true
 

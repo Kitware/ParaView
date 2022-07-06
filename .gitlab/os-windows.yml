@@ -90,6 +90,7 @@
 
 .cmake_build_windows:
     stage: build
+    extends: .warning_policy
 
     script:
         - *before_script_windows
@@ -107,6 +108,7 @@
         - ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - ctest -VV -S .gitlab/ci/ctest_build.cmake | Out-File -FilePath compile_output.log
         - buildcache --show-stats
+        - .gitlab\ci\check_warnings.ps1 -BuildPath . # This will call exit in case of warnings
     interruptible: true
 
 .cmake_test_windows:
