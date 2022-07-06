@@ -91,6 +91,16 @@ public Q_SLOTS:
    */
   void saveToKeyFrame(vtkSMProxy* keyframeProxy);
 
+  /**
+   * Set the positions points for path-based keyframe.
+   */
+  void setPositionPoints(const std::vector<double>&);
+
+  /**
+   * Set the focal points for path-based keyframe.
+   */
+  void setFocalPoints(const std::vector<double>&);
+
 protected:
   // Overridden to update the 3D widget's visibility states.
   void showEvent(QShowEvent*) override;

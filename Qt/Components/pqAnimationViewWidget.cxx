@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqKeyFrameEditor.h"
-#include "pqOrbitCreatorDialog.h"
 #include "pqPipelineTimeKeyFrameEditor.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
@@ -175,6 +174,13 @@ public:
   {
     if (this->cameraCue(cue))
     {
+      vtkSMProxy* pxy = cue->getAnimatedProxy();
+      pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
+      if (pqProxy* animation_pqproxy = model->findItem<pqProxy*>(pxy))
+      {
+        return QString("Camera - %1").arg(animation_pqproxy->getSMName());
+      }
+
       return "Camera";
     }
     else if (this->pythonCue(cue))
@@ -735,7 +741,14 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 
       l->addWidget(editor);
 
+      auto apply = buttons->addButton(QDialogButtonBox::Apply);
+
       connect(this->Internal->Editor, SIGNAL(accepted()), editor, SLOT(writeKeyFrameData()));
+      QObject::connect(apply, &QPushButton::clicked, editor, &pqKeyFrameEditor::writeKeyFrameData);
+
+      QObject::connect(apply, &QPushButton::clicked, [=]() { apply->setEnabled(false); });
+      QObject::connect(editor, &pqKeyFrameEditor::modified, [=]() { apply->setEnabled(true); });
+
       this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
       this->Internal->Editor->resize(600, 400);
     }
@@ -958,13 +971,9 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
     this->Internal->CreateProperty->setSourceWithoutProperties(pxy);
     // add camera animation modes as properties for creating the camera
     // animation track.
-    this->Internal->CreateProperty->addSMProperty("Orbit", "orbit", 0);
     this->Internal->CreateProperty->addSMProperty("Follow Path", "path", 0);
     this->Internal->CreateProperty->addSMProperty("Follow Data", "data", 0);
-    this->Internal->CreateProperty->addSMProperty(
-      "Interpolate camera locations (spline)", "camera", 0);
-    this->Internal->CreateProperty->addSMProperty(
-      "Interpolate camera locations (linear)", "linearCamera", 0);
+    this->Internal->CreateProperty->addSMProperty("Interpolate cameras", "camera", 0);
   }
   else
   {
@@ -1019,20 +1028,6 @@ void pqAnimationViewWidget::createTrack()
     }
   }
 
-  pqOrbitCreatorDialog creator(this);
-
-  // if mode=="orbit" show up a dialog allowing the user to customize the
-  // orbit.
-  if (ren && mode == "orbit")
-  {
-    creator.setNormal(ren->GetActiveCamera()->GetViewUp());
-    creator.setOrigin(ren->GetActiveCamera()->GetPosition());
-    if (creator.exec() != QDialog::Accepted)
-    {
-      return;
-    }
-  }
-
   BEGIN_UNDO_SET("Add Animation Track");
 
   // This will create the cue and initialize it with default keyframes.
@@ -1043,7 +1038,7 @@ void pqAnimationViewWidget::createTrack()
 
   if (ren)
   {
-    if (mode == "path" || mode == "orbit")
+    if (mode == "path")
     {
       // Setup default animation to revolve around the selected objects (if any)
       // in a plane normal to the current view-up vector.
@@ -1068,22 +1063,9 @@ void pqAnimationViewWidget::createTrack()
       pqSMAdaptor::setElementProperty(
         cue->getProxy()->GetProperty("Mode"), 0); // non-PATH-based animation.
 
-      pqSMAdaptor::setElementProperty(
-        cue->getProxy()->GetProperty("Interpolation"), (mode == "camera") ? 1 : 0);
+      pqSMAdaptor::setElementProperty(cue->getProxy()->GetProperty("Interpolation"), 1);
     }
     cue->getProxy()->UpdateVTKObjects();
-
-    if (mode == "orbit")
-    {
-      // update key frame parameters based on the orbit points.
-      vtkSMProxy* kf = cue->getKeyFrame(0);
-      SM_SCOPED_TRACE(PropertiesModified).arg(kf);
-      pqSMAdaptor::setMultipleElementProperty(
-        kf->GetProperty("PositionPathPoints"), creator.orbitPoints(7));
-      pqSMAdaptor::setMultipleElementProperty(kf->GetProperty("FocalPathPoints"), creator.center());
-      pqSMAdaptor::setElementProperty(kf->GetProperty("ClosedPositionPath"), 1);
-      kf->UpdateVTKObjects();
-    }
   }
 
   END_UNDO_SET();

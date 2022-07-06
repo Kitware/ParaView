@@ -968,6 +968,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   AnimationUseCamera.xml
+  AnimationFollowPath.xml
   AnimationSetTimeCursor.xml
   AnisotropyPBR.xml
   Annotations.xml
