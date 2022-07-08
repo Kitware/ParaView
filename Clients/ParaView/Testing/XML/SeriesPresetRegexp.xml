@@ -6,8 +6,9 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PassArrays" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setSelection" arguments="0.0,29.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="openContextMenu" arguments="0.0" />
+  <pqevent object="TreeViewCheckMenu" command="activate" arguments="Uncheck highlighted items" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="0.0,2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="11.0,2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="22.0,2" />
