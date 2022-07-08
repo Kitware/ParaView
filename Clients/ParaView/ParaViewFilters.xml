@@ -106,18 +106,16 @@
   </Category>
   <Category name="AMR" menu_label="&amp;AMR">
     <Proxy group="filters" name="AMRConnectivity" />
-    <Proxy group="filters" name="AMRCutPlane" />
     <Proxy group="filters" name="AMRDualClip" />
     <Proxy group="filters" name="AMRDualContour" />
     <Proxy group="filters" name="AMRFragmentsFilter" />
     <Proxy group="filters" name="AMRFragmentIntegration" />
     <Proxy group="filters" name="AMRResampleFilter" />
-    <Proxy group="filters" name="AMRSlice" />
     <Proxy group="filters" name="AMRToMultiBlock" />
-    <Proxy group="filters" name="AMRCutPlane" />
     <Proxy group="filters" name="OverlappingLevelIdScalars" />
     <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
+    <Proxy group="filters" name="SliceWithPlane"/>
   </Category>
   <Category name="Quadrature Points" menu_label="&amp;Quadrature Points">
     <Proxy group="filters" name="QuadraturePointInterpolator" />
@@ -157,13 +155,11 @@
 
   <!-- This section list all filters that can be available in ParaView and their icons -->
   <Proxy group="filters" name="AMRConnectivity" />
-  <Proxy group="filters" name="AMRCutPlane" />
   <Proxy group="filters" name="AMRDualClip" />
   <Proxy group="filters" name="AMRDualContour" />
   <Proxy group="filters" name="AMRFragmentIntegration" />
   <Proxy group="filters" name="AMRFragmentsFilter" />
   <Proxy group="filters" name="AMRResampleFilter" />
-  <Proxy group="filters" name="AMRSlice" />
   <Proxy group="filters" name="AMRToMultiBlock" />
   <Proxy group="filters" name="ANLHaloFinder" />
   <Proxy group="filters" name="ANLSubhaloFinder" />

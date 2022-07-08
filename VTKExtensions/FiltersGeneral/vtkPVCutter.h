@@ -26,17 +26,18 @@
 #include "vtkCutter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 
+class vtkPVPlaneCutter;
+
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVCutter : public vtkCutter
 {
 public:
   vtkTypeMacro(vtkPVCutter, vtkCutter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
   static vtkPVCutter* New();
 
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  //@
+  ///@
   /**
    * Only used for cutting hyper tree grids. If set to true, the dual grid is used for cutting
    */
@@ -51,11 +52,11 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;
 
-  bool Dual;
+  bool Dual = false;
+  vtkNew<vtkPVPlaneCutter> PlaneCutter;
 
 private:
   vtkPVCutter(const vtkPVCutter&) = delete;

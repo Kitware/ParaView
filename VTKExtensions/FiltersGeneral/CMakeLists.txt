@@ -60,6 +60,7 @@ set(classes
   vtkPVLinearExtrusionFilter
   vtkPVMetaClipDataSet
   vtkPVMetaSliceDataSet
+  vtkPVPlaneCutter
   vtkPVTextSource
   vtkPVThreshold
   vtkPVTransposeTable

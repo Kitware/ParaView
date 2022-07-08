@@ -617,7 +617,7 @@
     <Proxy group="implicit_functions"
            name="Cylinder" />
   </ProxyGroup>
-  <ProxyGroup name="slice_htg_implicit_functions">
+  <ProxyGroup name="slice_htg_amr_implicit_functions">
     <Proxy group="implicit_functions"
            name="Plane" />
     <Proxy group="implicit_functions"

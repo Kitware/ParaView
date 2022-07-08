@@ -27,7 +27,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCutter.h"
 #include "vtkPVPlane.h"
-#include "vtkPlane.h"
 #include "vtkSmartPointer.h"
 
 class vtkPVMetaSliceDataSet::vtkInternals
@@ -59,8 +58,6 @@ vtkPVMetaSliceDataSet::vtkPVMetaSliceDataSet()
 
   this->RegisterFilter(this->Internal->Cutter.GetPointer());
   this->RegisterFilter(this->Internal->ExtractCells.GetPointer());
-
-  this->AxisCut = false;
 
   this->ImplicitFunctions[METASLICE_DATASET] = nullptr;
   this->ImplicitFunctions[METASLICE_HYPERTREEGRID] = nullptr;

@@ -8,6 +8,9 @@
                      short_help="Extract block.">
         This filter extracts a range of groups from a multiblock dataset
       </Documentation>
+      <Deprecated deprecated_in="5.11" to_remove_in="5.13">
+        Extract Block (Legacy) has been deprecated. Please use ExtractBlock instead.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
