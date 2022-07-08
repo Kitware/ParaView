@@ -329,7 +329,15 @@ void vtkSMScalarBarWidgetRepresentationProxy::AddRange(vtkSMPVRepresentationProx
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetRepresentationProxy::RemoveRange(vtkSMPVRepresentationProxy* proxy)
 {
-  this->Proxies.erase(proxy);
+  try
+  {
+    this->Proxies.erase(proxy);
+  }
+  catch (std::exception& e)
+  {
+    vtkErrorMacro(<< "Proxy " << proxy->GetXMLName() << " was probably not registered.");
+    vtkErrorMacro(<< e.what());
+  }
 }
 
 //----------------------------------------------------------------------------

@@ -53,6 +53,12 @@ public:
    */
   virtual bool GetUsingScalarColoring();
 
+  /**
+   * Returns the lut proxy of this representation in the given view.
+   * This method will return `nullptr` if no lut proxy exists in this view.
+   */
+  vtkSMProxy* GetLUTProxy(vtkSMProxy* view);
+
   //@{
   /**
    * Safely call GetUsingScalarColoring() after casting the proxy to appropriate

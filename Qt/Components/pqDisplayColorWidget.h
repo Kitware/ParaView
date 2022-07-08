@@ -42,6 +42,7 @@ class pqDataRepresentation;
 class pqScalarsToColors;
 class QComboBox;
 class vtkEventQtSlotConnect;
+class vtkSMProxy;
 class vtkSMViewProxy;
 
 /**
@@ -78,6 +79,12 @@ public:
    * Returns the view proxy corresponding to the set representation, if any.
    */
   vtkSMViewProxy* viewProxy() const;
+
+  /**
+   * Updates the scalar bar visibility of the representation `reprProxy` in `view`.
+   * The behavior of the scalar bar visibility is dependent of the general settings.
+   */
+  static void updateScalarBarVisibility(vtkSMViewProxy* view, vtkSMProxy* reprProxy);
 
 Q_SIGNALS:
   /**

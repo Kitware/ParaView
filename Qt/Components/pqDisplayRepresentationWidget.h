@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDataRepresentation;
 class vtkSMProxy;
+class vtkSMViewProxy;
 
 /**
  * A widget for representation type for a vtkSMRepresentationProxy. It works
@@ -60,6 +61,11 @@ public:
    * Returns the selected representation as a string.
    */
   QString representationText() const;
+
+  /**
+   * Returns the view proxy corresponding to the set representation, if any.
+   */
+  vtkSMViewProxy* viewProxy() const;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -91,6 +97,8 @@ private:
   pqInternals* Internal;
 
   class PropertyLinksConnection;
+
+  pqDataRepresentation* Representation = nullptr;
 };
 
 /**
