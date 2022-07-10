@@ -162,6 +162,7 @@ set(classes
   pqSignalAdaptorKeyFrameType
   pqSignalAdaptorSelectionTreeWidget
   pqSignalAdaptorTreeWidget
+  pqReaderSelectionPropertyWidget
   pqStringVectorPropertyWidget
   pqTabbedMultiViewWidget
   pqTextureComboBox

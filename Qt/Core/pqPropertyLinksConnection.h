@@ -119,13 +119,13 @@ protected:
 
 Q_SIGNALS:
   /**
-   * Fired whenever the Qt widget changes (except in during a call to
+   * Fired whenever the Qt widget changes (except during a call to
    * copyValuesFromServerManagerToQt()).
    */
   void qtpropertyModified();
 
   /**
-   * Fired whenever the ServerManager property changes (except in during a call to
+   * Fired whenever the ServerManager property changes (except during a call to
    * copyValuesFromQtToServerManager()).
    */
   void smpropertyModified();

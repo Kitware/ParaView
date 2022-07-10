@@ -931,12 +931,39 @@
                             number_of_elements_per_command="3"
                             repeat_command="1">
         <Documentation>
-          List of file patterns, names and underling filter to use by default when selecting a file with the "Supported Files" filter selected.
+          List of file patterns, names and underlying filter to use by default when selecting a file with the "Supported Files" filter selected.
         </Documentation>
         <Hints>
           <ShowLabel />
         </Hints>
       </StringVectorProperty>
+      <StringVectorProperty command="SetExcludedNameFilter"
+                            name="ReaderSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfExcludedNameFilters"
+                            use_index="1"
+                            panel_widget="reader_selector">
+        <Documentation>
+          List of readers to display or hide in the File .. Open dialog.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty
+        name="AllNameFilters"
+        command="GetAllNameFilters"
+        label="Allowed Readers"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        panel_visibility="never">
+        <Documentation>
+          List of all readers, with on/off values paired. Used by the custom widget above, not displayed.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+        </Hints>
+      </StringVectorProperty>
+
       <Hints>
         <UseDocumentationForLabels />
       </Hints>

@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPauseLiveSourcePropertyWidget.h"
 #include "pqPropertyCollectionWidget.h"
 #include "pqProxyEditorPropertyWidget.h"
+#include "pqReaderSelectionPropertyWidget.h"
 #include "pqSelectionQueryPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqSessionTypeDecorator.h"
@@ -224,6 +225,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "file_list")
   {
     return new pqFileListPropertyWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "reader_selector")
+  {
+    return new pqReaderSelectionPropertyWidget(smProxy, smProperty, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***
