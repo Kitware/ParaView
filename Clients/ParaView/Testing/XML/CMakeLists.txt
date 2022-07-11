@@ -1614,7 +1614,6 @@ set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
 
 # ZoomToData is not working as well in crs
 set(ZoomToData_DISABLE_CRS TRUE)
-
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
@@ -1644,6 +1643,19 @@ set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (CGNSReaderDataLocation_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (CTHAMRBaseline_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (CTHAMRContour_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (CTHAMRDualClip_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (CTHAMRMaterialInterfaceFilter_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (CTHDerivedDensity2DClyinder_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (ReadPartitionedCGNS_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (SPTimeseries_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
