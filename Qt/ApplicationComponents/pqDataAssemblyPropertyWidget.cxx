@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
 #include "pqDoubleRangeDialog.h"
+#include "pqHeaderView.h"
 #include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
 #include "pqSelectionManager.h"
@@ -934,6 +935,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   internals.Ui.setupUi(this);
   internals.Ui.hierarchy->header()->setDefaultSectionSize(iconSize + 4);
   internals.Ui.hierarchy->header()->setMinimumSectionSize(iconSize + 4);
+  internals.Ui.hierarchy->setSortingEnabled(true);
 
   internals.AssemblyTreeModel = new pqDataAssemblyTreeModel(this);
 
@@ -973,6 +975,12 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   // change pqTreeView header.
   internals.Ui.hierarchy->setupCustomHeader(/*use_pqHeaderView=*/true);
   new pqTreeViewSelectionHelper(internals.Ui.hierarchy);
+  if (auto headerView = qobject_cast<pqHeaderView*>(internals.Ui.hierarchy->header()))
+  {
+    headerView->setToggleCheckStateOnSectionClick(false);
+    // use underlying structure by default - no alphabetic sort until header clicked.
+    headerView->setSortIndicator(-1, Qt::AscendingOrder);
+  }
 
   hookupTableView(internals.Ui.table, internals.SelectorsTableModel, internals.Ui.add,
     internals.Ui.remove, internals.Ui.removeAll);

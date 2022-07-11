@@ -158,19 +158,26 @@ void pqHeaderView::mousePressEvent(QMouseEvent* evt)
 //-----------------------------------------------------------------------------
 void pqHeaderView::mouseReleaseEvent(QMouseEvent* evt)
 {
+  bool handled = false;
   if ((evt->pos() - this->PressPosition).manhattanLength() < 3)
   {
-    this->mouseClickEvent(evt);
+    handled = this->mouseClickEvent(evt);
   }
   this->PressPosition = QPoint();
+  if (!handled)
+  {
+    // allow superclass events to process, so header sorting works.
+    this->Superclass::mousePressEvent(evt);
+    this->Superclass::mouseReleaseEvent(evt);
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqHeaderView::mouseClickEvent(QMouseEvent* evt)
+bool pqHeaderView::mouseClickEvent(QMouseEvent* evt)
 {
   if (evt->button() != Qt::LeftButton)
   {
-    return;
+    return false;
   }
 
   if (auto amodel = this->model())
@@ -185,7 +192,7 @@ void pqHeaderView::mouseClickEvent(QMouseEvent* evt)
         if (rect.contains(this->PressPosition))
         {
           Q_EMIT this->customIndicatorClicked(logicalIndex, rect.bottomLeft(), role);
-          return;
+          return true;
         }
       }
     }
@@ -209,9 +216,11 @@ void pqHeaderView::mouseClickEvent(QMouseEvent* evt)
             break;
         }
         amodel->setHeaderData(logicalIndex, this->orientation(), newdata, Qt::CheckStateRole);
+        return true;
       }
     }
   }
+  return false;
 }
 
 //-----------------------------------------------------------------------------

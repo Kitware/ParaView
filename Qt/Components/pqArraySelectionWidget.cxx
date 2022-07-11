@@ -425,14 +425,22 @@ pqArraySelectionWidget::pqArraySelectionWidget(int numColumns, QWidget* parentOb
   this->setRootIsDecorated(false);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  // allow the QTreeView and QSortFilterProxyModel to handle sorting.
+  this->setSortingEnabled(true);
 
   // name it changed just to avoid having to change a whole lot of tests.
   this->header()->setObjectName("1QHeaderView0");
+  if (auto headerView = qobject_cast<pqHeaderView*>(this->header()))
+  {
+    headerView->setToggleCheckStateOnSectionClick(false);
+  }
 
   auto mymodel = new pqArraySelectionWidget::Model(0, numColumns, this);
   auto sortmodel = new QSortFilterProxyModel(this);
   sortmodel->setSourceModel(mymodel);
   this->setModel(sortmodel);
+  // use underlying structure by default - no alphabetic sort until header clicked.
+  this->header()->setSortIndicator(-1, Qt::AscendingOrder);
 
   this->Timer->setInterval(10);
   this->Timer->setSingleShot(true);
