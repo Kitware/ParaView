@@ -63,6 +63,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
   Q_PROPERTY(
     QList<QVariant> seriesColor READ seriesColor WRITE setSeriesColor NOTIFY seriesColorChanged)
 
+  Q_PROPERTY(QList<QVariant> seriesOpacity READ seriesOpacity WRITE setSeriesOpacity NOTIFY
+      seriesOpacityChanged)
+
   Q_PROPERTY(
     QList<QVariant> presetColor READ presetColor WRITE setPresetColor NOTIFY presetColorChanged)
 
@@ -106,6 +109,15 @@ public:
 
   QList<QVariant> presetColor() const;
   void setPresetColor(const QList<QVariant>&);
+
+  //@{
+  /**
+   * Get/Set the opacity for each of the series.
+   */
+  QList<QVariant> seriesOpacity() const;
+  void setSeriesOpacity(const QList<QVariant>&);
+  //@}
+
   //@{
   /**
    * Get/Set the label for each of the series.
@@ -182,6 +194,13 @@ Q_SIGNALS:
   //@}
 
   void presetColorChanged();
+
+  //@{
+  /**
+   * Fired when the series opacity changes.
+   */
+  void seriesOpacityChanged();
+  //@}
 
   //@{
   /**

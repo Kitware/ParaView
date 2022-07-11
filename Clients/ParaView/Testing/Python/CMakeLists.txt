@@ -109,6 +109,7 @@ paraview_add_test_python(
 # These tests could run safely in serial and parallel.
 set(PVBATCH_TESTS
   BatchAxesGrid.py
+  TestXYChartOpacity.py
   FontSize.py # BUG #19816
   PLYWriter.py
   VolumeCellSelection.py

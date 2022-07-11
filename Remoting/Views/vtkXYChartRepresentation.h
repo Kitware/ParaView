@@ -110,6 +110,7 @@ public:
   void SetLineThickness(const char* name, double value);
   void SetLineStyle(const char* name, int value);
   void SetColor(const char* name, double r, double g, double b);
+  void SetOpacity(const char* seriesname, double opacity);
   void SetAxisCorner(const char* name, int corner);
   void SetMarkerStyle(const char* name, int style);
   void SetMarkerSize(const char* name, double value);
@@ -123,6 +124,7 @@ public:
   void ClearLineThicknesses();
   void ClearLineStyles();
   void ClearColors();
+  void ClearOpacities();
   void ClearAxisCorners();
   void ClearMarkerSizes();
   void ClearMarkerStyles();
