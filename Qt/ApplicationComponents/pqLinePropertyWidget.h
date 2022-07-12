@@ -88,6 +88,7 @@ protected Q_SLOTS:
   void pick(double x, double y, double z);
   void pickPoint1(double x, double y, double z);
   void pickPoint2(double x, double y, double z);
+  void pickNormal(double x, double y, double z, double nx, double ny, double nz);
 
   /**
    * Updates the length label.

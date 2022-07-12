@@ -57,7 +57,8 @@ public:
   enum PickOption
   {
     Coordinates,
-    Normal
+    Normal,
+    CoordinatesAndNormal
   };
 
   pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh,
@@ -92,6 +93,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 Q_SIGNALS:
   void pick(double x, double y, double z);
+  void pickNormal(double px, double py, double pz, double nx, double ny, double nz);
 
 private Q_SLOTS:
   void pickPoint();

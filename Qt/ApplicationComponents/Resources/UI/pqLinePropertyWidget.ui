@@ -74,7 +74,10 @@
       </font>
      </property>
      <property name="text">
-      <string>Note: Use 'P' to place alternating points on mesh or 'Ctrl+P' to snap to the closest mesh point. Use '1'/'Ctrl+1' for point 1 and '2'/'Ctrl+2' for point 2.</string>
+      <string>Note: Use 'P' to place alternating points on mesh or 'Ctrl+P' to snap to the closest mesh point.
+Use '1'/'Ctrl+1' for point 1 and '2'/'Ctrl+2' for point 2.
+Use 'N' to place P1 on the mesh and make P1-P2 be the normal at the surface.
+Use 'X'/'Y'/'Z'/'L' to constrain the movement to the X / Y / Z / Line axis respectively.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
