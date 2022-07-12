@@ -711,7 +711,7 @@ std::string vtkSMPVRepresentationProxy::GetDecoratedArrayName(const std::string&
 {
   std::ostringstream ss;
   ss << arrayname;
-  if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
+  if (this->GetProperty("TransferFunction2D"))
   {
     bool useGradientAsY =
       (vtkSMPropertyHelper(this, "UseGradientForTransfer2D", true).GetAsInt() == 1);
