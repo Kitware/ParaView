@@ -851,6 +851,14 @@ def getattr(proxy, pname):
                 "The " + proxy.SMProxy.GetXMLName() + ".StaticMesh property has been changed in ParaView 5.11. " \
                 "Please set the MeshOverTime property instead.")
 
+    if proxy.SMProxy.GetXMLName() == "DataSetSurfaceFilter":
+        if pname == "UseGeometryFilter":
+            if paraview.compatibility.GetVersion() <= 5.10:
+                return 1
+            else:
+                raise NotSupportedException(
+                    "Since ParaView 5.11, 'UseGeometryFilter' has been removed. ")
+
     raise Continue()
 
 # Depending on the compatibility version that has been set, older functionalities

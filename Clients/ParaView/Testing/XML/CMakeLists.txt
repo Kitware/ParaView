@@ -1340,6 +1340,11 @@ if (PARAVIEW_USE_MPI)
     TEST_SCRIPTS GhostCellsGenerator.xml
     )
 
+  paraview_add_client_server_render_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS RemoveGhostInterfaces.xml
+  )
+
   if (PARAVIEW_ENABLE_COSMOTOOLS)
     # Test the Generic IO file writer in VTKExtensions/CosmoTools
     ExternalData_Expand_Arguments(ParaViewData _

@@ -1,15 +1,50 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- Create a wavelet -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="DataSetSurfaceFilter" />
+
+  <!-- Create the first slice of the wavelet -->
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/normalZ" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/normalX" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originZ" command="set_string" arguments="10" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Create the second slice of the wavelet -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,34,10,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,34,10,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/normalZ" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/normalX" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originZ" command="set_string" arguments="-9.99" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Close the view of the wavelet   -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,6,11,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,6,11,/0:0/0:1" />
+
+  <!-- Append the 2 slices  -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,67108864,64,9,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,67108864,64,9,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="keyEvent" arguments="7:16777249:0::0:1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="keyEvent" arguments="7:16777249:0::0:1" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Append" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
+
+  <!-- Use Connectivity Filter -->
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PVConnectivityFilter" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Use PassArrays Filter -->
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PassArrays" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointDataArrays/ArraySelectionWidget" command="setCheckState" arguments="0.0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointDataArrays/ArraySelectionWidget" command="setCheckState" arguments="1.0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Select the second region/2d wavelet -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/OrientationAxesVisibility/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionInteractiveSelectSurfaceCellData" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.502404,0.429688,1,1,0)" />
@@ -17,9 +52,14 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.502404,0.429688,1,0,0)" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractSelection" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface With Edges" />
+
+  <!-- Change camera orientation -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.259615,0.376953,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.362981,0.402344,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.362981,0.402344,1,0,0)" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface With Edges" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/OrientationAxesVisibility/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 </pqevents>

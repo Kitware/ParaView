@@ -26,13 +26,14 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
 #include "vtkParaViewDeprecation.h"                   // for PARAVIEW_DEPRECATED_IN_5_11_0
+
 class vtkCallbackCommand;
 class vtkDataSet;
-class vtkDataSetSurfaceFilter;
 class vtkExplicitStructuredGrid;
 class vtkFeatureEdges;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
+class vtkGeometryFilter;
 class vtkHyperTreeGrid;
 class vtkImageData;
 class vtkUniformGrid;
@@ -142,7 +143,7 @@ public:
    * This option has no effect when using OpenGL2 rendering backend. OpenGL2
    * rendering always triangulates polygonal meshes.
    */
-  virtual void SetTriangulate(int val);
+  vtkSetMacro(Triangulate, int);
   vtkGetMacro(Triangulate, int);
   vtkBooleanMacro(Triangulate, int);
   //@}
@@ -310,7 +311,7 @@ protected:
 
   vtkMultiProcessController* Controller;
   vtkOutlineSource* OutlineSource;
-  vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
+  vtkGeometryFilter* GeometryFilter;
   vtkGenericGeometryFilter* GenericGeometryFilter;
   vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
   vtkPVRecoverGeometryWireframe* RecoverWireframeFilter;
@@ -341,7 +342,6 @@ protected:
   bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;
-  vtkTimeStamp StripSettingMTime;
   bool HideInternalAMRFaces;
   bool UseNonOverlappingAMRMetaDataForOutlines;
   bool GenerateFeatureEdges;
