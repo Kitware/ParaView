@@ -122,6 +122,24 @@ public:
   vtkGetMacro(EnableFastPreselection, bool);
   //@}
 
+  //@{
+  /**
+   * When enabled and growing selection, remove the initial selection seed.
+   * Default is false.
+   */
+  vtkSetMacro(GrowSelectionRemoveSeed, bool);
+  vtkGetMacro(GrowSelectionRemoveSeed, bool);
+  //@}
+
+  //@{
+  /**
+   * When enabled and growing selection, remove the intermediate layers.
+   * Default is false.
+   */
+  vtkSetMacro(GrowSelectionRemoveIntermediateLayers, bool);
+  vtkGetMacro(GrowSelectionRemoveIntermediateLayers, bool);
+  //@}
+
   ///@{
   /**
    * Used by vtkPVRenderView and other views to determine background color.
@@ -143,6 +161,8 @@ protected:
   int PointPickingRadius;
   bool DisableIceT;
   bool EnableFastPreselection;
+  bool GrowSelectionRemoveSeed = false;
+  bool GrowSelectionRemoveIntermediateLayers = false;
 
   double BackgroundColor[3];
   double Background2Color[3];

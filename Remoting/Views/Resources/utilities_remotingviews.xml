@@ -704,6 +704,28 @@
           highlighting, especially for big datasets.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="GrowSelectionRemoveSeed"
+                         label="Remove seed on grow selection"
+                         command="SetGrowSelectionRemoveSeed"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled and growing selection, remove the initial selection seed.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="GrowSelectionRemoveIntermediateLayers"
+                         label="Remove intermediate layers on grow selection"
+                         command="SetGrowSelectionRemoveIntermediateLayers"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled and growing selection, remove the intermediate layers.
+        </Documentation>
+      </IntVectorProperty>
 
       <PropertyGroup label="Geometry Mapper Options">
         <Property name="ResolveCoincidentTopology" />
@@ -761,6 +783,12 @@
       <PropertyGroup label="Client/Server Rendering Options">
         <Property name="ImageReductionFactor" />
         <Property name="CompressorConfig" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Selection Options">
+        <Property name="EnableFastPreselection" />
+        <Property name="GrowSelectionRemoveSeed" />
+        <Property name="GrowSelectionRemoveIntermediateLayers" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">

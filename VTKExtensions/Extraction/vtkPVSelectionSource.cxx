@@ -358,6 +358,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   source->SetContainingCells(this->ContainingCells);
   source->SetInverse(this->Inverse);
   source->SetNumberOfLayers(this->NumberOfLayers);
+  source->SetRemoveSeed(this->RemoveSeed);
+  source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
 
   switch (this->Mode)
   {
@@ -395,6 +397,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           source->SetContainingCells(nodeId, this->ContainingCells);
           source->SetInverse(nodeId, this->Inverse);
           source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+          source->SetRemoveSeed(this->RemoveSeed);
+          source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
           source->SetArrayName(nodeId, idsOfSpecificPedigree.first.c_str());
           for (const auto& id : idsOfSpecificPedigree.second)
           {
@@ -417,6 +421,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           source->SetContainingCells(nodeId, this->ContainingCells);
           source->SetInverse(nodeId, this->Inverse);
           source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+          source->SetRemoveSeed(this->RemoveSeed);
+          source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
           source->SetArrayName(nodeId, stringIdsOfSpecificPedigree.first.c_str());
           for (const auto& stringId : stringIdsOfSpecificPedigree.second)
           {
@@ -440,6 +446,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         source->SetContainingCells(nodeId, this->ContainingCells);
         source->SetInverse(nodeId, this->Inverse);
         source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+        source->SetRemoveSeed(this->RemoveSeed);
+        source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
         source->SetCompositeIndex(nodeId, static_cast<int>(pieceIdsOfSpecificCompositeId.first));
         for (const auto& pieceId : pieceIdsOfSpecificCompositeId.second)
         {
@@ -462,6 +470,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         source->SetContainingCells(nodeId, this->ContainingCells);
         source->SetInverse(nodeId, this->Inverse);
         source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+        source->SetRemoveSeed(this->RemoveSeed);
+        source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
         source->SetHierarchicalLevel(
           nodeId, static_cast<int>(idsOfSpecificHierarchicalId.first.Level));
         source->SetHierarchicalIndex(
@@ -586,4 +596,6 @@ void vtkPVSelectionSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ArrayName: " << (this->ArrayName ? this->ArrayName : "(null)") << endl;
   os << indent << "QueryString: " << (this->QueryString ? this->QueryString : "(null)") << endl;
   os << indent << "NumberOfLayers: " << this->NumberOfLayers << endl;
+  os << indent << "RemoveSeed: " << this->RemoveSeed << endl;
+  os << indent << "RemoveIntermediateLayers: " << this->RemoveIntermediateLayers << endl;
 }

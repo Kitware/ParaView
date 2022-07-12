@@ -135,7 +135,7 @@ void pqSelectionManager::onItemRemoved(pqServerManagerModelItem* item)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::expandSelection(int layers)
+void pqSelectionManager::expandSelection(int layers, bool removeSeed, bool removeIntermediateLayers)
 {
   for (auto port : this->Implementation->SelectedPorts)
   {
@@ -148,6 +148,9 @@ void pqSelectionManager::expandSelection(int layers)
           vtkSMPropertyHelper(appendSelections->GetProperty("Input")).GetAsProxy(i);
         vtkSMPropertyHelper numberOfLayersHelper(selectionSource, "NumberOfLayers");
         numberOfLayersHelper.Set(numberOfLayersHelper.GetAsInt() + layers);
+        vtkSMPropertyHelper(selectionSource, "RemoveSeed").Set(removeSeed);
+        vtkSMPropertyHelper(selectionSource, "RemoveIntermediateLayers")
+          .Set(removeIntermediateLayers);
         selectionSource->UpdateVTKObjects();
       }
     }

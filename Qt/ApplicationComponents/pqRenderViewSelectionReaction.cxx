@@ -418,7 +418,10 @@ void pqRenderViewSelectionReaction::beginSelection()
     case SHRINK_SELECTION:
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
-        core->selectionManager()->expandSelection(this->Mode == GROW_SELECTION ? 1 : -1);
+        auto settings = vtkPVRenderViewSettings::GetInstance();
+        core->selectionManager()->expandSelection(this->Mode == GROW_SELECTION ? 1 : -1,
+          settings->GetGrowSelectionRemoveSeed(),
+          settings->GetGrowSelectionRemoveIntermediateLayers());
       }
       break;
 
