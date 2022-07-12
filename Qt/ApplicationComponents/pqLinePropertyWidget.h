@@ -68,6 +68,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void useXAxis() { this->useAxis(0); }
   void useYAxis() { this->useAxis(1); }
   void useZAxis() { this->useAxis(2); }
+  void flipP2();
   void centerOnBounds();
 
   /**

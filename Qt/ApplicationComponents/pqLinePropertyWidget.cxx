@@ -110,6 +110,8 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   this->connect(ui.yAxis, SIGNAL(clicked()), SLOT(useYAxis()));
   this->connect(ui.zAxis, SIGNAL(clicked()), SLOT(useZAxis()));
 
+  this->connect(ui.flipP2, SIGNAL(clicked()), SLOT(flipP2()));
+
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   this->connect(
@@ -211,6 +213,25 @@ void pqLinePropertyWidget::useAxis(int axis)
     Q_EMIT this->changeAvailable();
     this->render();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::flipP2()
+{
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  double origin[3];
+  vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Get(origin, 3);
+  double p2[3];
+  vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Get(p2, 3);
+  for (int i = 0; i < 3; ++i)
+  {
+    p2[i] = 2.0 * origin[i] - p2[i];
+  }
+  vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(p2, 3);
+
+  wdgProxy->UpdateVTKObjects();
+  Q_EMIT this->changeAvailable();
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
