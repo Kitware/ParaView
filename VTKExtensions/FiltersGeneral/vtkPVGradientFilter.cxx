@@ -79,7 +79,7 @@ int vtkPVGradientFilter::RequestDataObject(
 
 //----------------------------------------------------------------------------
 int vtkPVGradientFilter::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* inDataObj = vtkDataObject::GetData(inputVector[0]);
   vtkHyperTreeGrid* inHTG = vtkHyperTreeGrid::GetData(inputVector[0]);
@@ -124,5 +124,25 @@ int vtkPVGradientFilter::RequestData(
     return 1;
   }
 
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  // We create a new superclass instance instead of using `this->Superclass::` so as to
+  // go through the object factory
+  vtkNew<Superclass> instance;
+  instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+  instance->SetResultArrayName(this->GetResultArrayName());
+  instance->SetDivergenceArrayName(this->GetDivergenceArrayName());
+  instance->SetVorticityArrayName(this->GetVorticityArrayName());
+  instance->SetQCriterionArrayName(this->GetQCriterionArrayName());
+  instance->SetFasterApproximation(this->GetFasterApproximation());
+  instance->SetComputeGradient(this->GetComputeGradient());
+  instance->SetComputeDivergence(this->GetComputeDivergence());
+  instance->SetComputeVorticity(this->GetComputeVorticity());
+  instance->SetComputeQCriterion(this->GetComputeQCriterion());
+  instance->SetContributingCellOption(this->GetContributingCellOption());
+  instance->SetReplacementValueOption(this->GetReplacementValueOption());
+
+  instance->SetInputDataObject(inDataObj);
+  instance->Update();
+  outDataObj->ShallowCopy(instance->GetOutput());
+
+  return 1;
 }
