@@ -225,6 +225,10 @@
                      the specified plane. The Slice filter takes any type of
                      dataset as input. The output of this filter is polygonal
                      data.</Documentation>
+      <Deprecated deprecated_in="5.11" to_remove_in="5.13">
+        This filter is deprecated and will be removed in a future
+        release. Please use the Slice filter instead.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
