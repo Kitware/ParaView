@@ -218,3 +218,14 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
   unset(_vtk_testing_python_exe)
   unset(_vtk_test_python_args)
 endif()
+
+#------------------------------------------------------------------------------
+# Add a test using python plugin and a python script
+
+paraview_add_test_python(
+  NO_DATA NO_RT
+  TestPV_PLUGIN_PATH.py
+)
+
+set_tests_properties(paraviewPython-TestPV_PLUGIN_PATH
+        PROPERTIES ENVIRONMENT "PV_PLUGIN_PATH=${CMAKE_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/")
