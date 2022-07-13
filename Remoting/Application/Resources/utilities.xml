@@ -735,8 +735,7 @@
     </Proxy>
 
     <Proxy class="vtkExecutableRunner"
-           name="ExecutableRunner"
-           processes="client|dataserver|renderserver">
+           name="ExecutableRunner" >
       <Documentation>
         Execute a process on server side.
       </Documentation>
