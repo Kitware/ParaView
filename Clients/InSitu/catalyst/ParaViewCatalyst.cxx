@@ -155,6 +155,8 @@ static bool create_producer_fides(const std::string& channel_name, const conduit
       .Set(1, node["data_source_path/path"].as_string().c_str());
     vtkInSituInitializationHelper::SetProducer(channel_name, producer);
     producer->UpdateVTKObjects();
+    // Required so that vtkFidesReader will setup the inline reader
+    producer->UpdatePipelineInformation();
     producer->Delete();
   }
 

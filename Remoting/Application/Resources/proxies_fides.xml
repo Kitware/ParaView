@@ -103,7 +103,7 @@
       <StringVectorProperty
             name="FileName"
             animateable="0"
-            command="ParseDataModel"
+            command="SetFileName"
             number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
