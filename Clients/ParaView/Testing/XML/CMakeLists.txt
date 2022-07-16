@@ -1663,6 +1663,8 @@ set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
