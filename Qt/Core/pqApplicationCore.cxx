@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
-#include <QHelpEngine>
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
@@ -82,6 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
 #include "vtkLegacy.h"
+#include "vtkPVConfig.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
@@ -102,6 +102,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <cassert>
+
+#ifdef PARAVIEW_USE_QTHELP
+#include <QHelpEngine>
+#endif
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
