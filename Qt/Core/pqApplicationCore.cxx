@@ -81,7 +81,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
 #include "vtkLegacy.h"
-#include "vtkPVConfig.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
