@@ -524,8 +524,7 @@ int vtkSciVizStatistics::RequestData(
 
 int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* dataAttrIn)
 {
-  std::set<vtkStdString>::iterator colIt;
-  for (colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++colIt)
+  for (auto colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++colIt)
   {
     vtkAbstractArray* arr = dataAttrIn->GetAbstractArray(colIt->c_str());
     if (arr)
