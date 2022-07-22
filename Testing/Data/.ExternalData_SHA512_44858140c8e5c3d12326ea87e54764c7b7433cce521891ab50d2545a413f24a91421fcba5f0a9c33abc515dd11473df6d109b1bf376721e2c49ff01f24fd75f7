@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<VTKFile type="HyperTreeGrid" version="2.0" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <HyperTreeGrid BranchFactor="2" TransposedRootIndexing="0" Dimensions="3 2 3">
+    <Grid>
+      <DataArray type="Float64" Name="XCoordinates" NumberOfTuples="3" format="appended" RangeMin="-1"                   RangeMax="1"                    offset="0"                   />
+      <DataArray type="Float64" Name="YCoordinates" NumberOfTuples="2" format="appended" RangeMin="-1"                   RangeMax="1"                    offset="48"                  />
+      <DataArray type="Float64" Name="ZCoordinates" NumberOfTuples="3" format="appended" RangeMin="-1"                   RangeMax="1"                    offset="96"                  />
+    </Grid>
+    <Trees>
+        <DataArray type="Bit" Name="Descriptors" NumberOfTuples="17" format="appended" RangeMin="0"                    RangeMax="1"                    offset="144"                 />
+        <DataArray type="Int64" Name="NumberOfVerticesPerDepth" NumberOfTuples="7" format="appended" RangeMin="1"                    RangeMax="8"                    offset="184"                 />
+        <DataArray type="Int64" Name="TreeIds" NumberOfTuples="4" format="appended" RangeMin="0"                    RangeMax="3"                    offset="232"                 />
+        <DataArray type="UInt32" Name="DepthPerTree" NumberOfTuples="4" format="appended" RangeMin="1"                    RangeMax="4"                    offset="284"                 />
+    </Trees>
+    <CellData>
+        <DataArray type="Float64" Name="Depth" NumberOfTuples="28" format="appended" RangeMin="0"                    RangeMax="3"                    offset="328"                 />
+    </CellData>
+  </HyperTreeGrid>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAYAAAAEgAAAA==eJxjYACBD/sZUMAHewAfxgLfAQAAAACAAAAQAAAAEQAAAA==eJxjYACBD/sZILQ9ABJGAt8=AQAAAACAAAAYAAAAEgAAAA==eJxjYACBD/sZUMAHewAfxgLfAQAAAACAAAADAAAACwAAAA==eJw74MAAAALDAQE=AQAAAACAAAA4AAAAEQAAAA==eJxjZIAADhw0Iw4aAARgAB0=AQAAAACAAAAgAAAAEwAAAA==eJxjYIAARijNBKWZoTQAAHAABw==AQAAAACAAAAQAAAADgAAAA==eJxjYWBgYETCAABoAAg=AQAAAACAAADgAAAAGAAAAA==eJxjYEAGH+wpoxkcKKM5KKQxAQAcMA25
+  </AppendedData>
+</VTKFile>
