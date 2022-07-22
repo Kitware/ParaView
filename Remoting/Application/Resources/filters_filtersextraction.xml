@@ -279,7 +279,7 @@
                      short_help="Extract level.">This filter extracts a range
         of levels from a hierarchical dataset
       </Documentation>
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         **Extract Level** has been deprecated. **Extract Block** now supports
         extract levels from AMR datasets as well and hence this filter is unnecessary.
       </Deprecated>

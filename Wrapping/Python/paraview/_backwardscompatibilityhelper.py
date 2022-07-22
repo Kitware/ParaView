@@ -866,14 +866,6 @@ def getattr(proxy, pname):
 # label and not its name.
 def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
-    if version < 5.2:
-        if key == "ResampleWithDataset":
-            return builtins.getattr(module, "LegacyResampleWithDataset")(**kwargs)
-    if version < 5.3:
-        if key == "PLYReader":
-            # note the case. The old reader didn't support `FileNames` property,
-            # only `FileName`.
-            return builtins.getattr(module, "plyreader")(**kwargs)
     if version < 5.5:
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
@@ -881,13 +873,6 @@ def GetProxy(module, key, **kwargs):
             clip = builtins.getattr(module, key)(**kwargs)
             clip.Invert = 0
             return clip
-    if version < 5.6:
-        if key == "Glyph":
-            # In PV 5.6, we replaced the Glyph filter with a new implementation that has a
-            # different set of properties. The previous implementation was renamed to
-            # GlyphLegacy.
-            glyph = builtins.getattr(module, "GlyphLegacy")(**kwargs)
-            return glyph
     if version < 5.7:
         if key == "ExodusRestartReader" or key == "ExodusIIReader":
             # in 5.7, we changed the names for blocks, this preserves old
