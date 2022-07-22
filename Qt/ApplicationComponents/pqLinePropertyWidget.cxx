@@ -110,6 +110,8 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   this->connect(ui.yAxis, SIGNAL(clicked()), SLOT(useYAxis()));
   this->connect(ui.zAxis, SIGNAL(clicked()), SLOT(useZAxis()));
 
+  this->connect(ui.flipP2, SIGNAL(clicked()), SLOT(flipP2()));
+
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   this->connect(
@@ -142,6 +144,12 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   pickHelper6->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   this->connect(
     pickHelper6, SIGNAL(pick(double, double, double)), SLOT(pickPoint2(double, double, double)));
+
+  pqPointPickingHelper* pickHelperTest = new pqPointPickingHelper(
+    QKeySequence(tr("N")), false, this, pqPointPickingHelper::CoordinatesAndNormal);
+  pickHelperTest->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  this->connect(pickHelperTest, SIGNAL(pickNormal(double, double, double, double, double, double)),
+    SLOT(pickNormal(double, double, double, double, double, double)));
 
   pqCoreUtilities::connect(
     this->widgetProxy(), vtkCommand::PropertyModifiedEvent, this, SLOT(updateLengthLabel()));
@@ -214,6 +222,25 @@ void pqLinePropertyWidget::useAxis(int axis)
 }
 
 //-----------------------------------------------------------------------------
+void pqLinePropertyWidget::flipP2()
+{
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  double origin[3];
+  vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Get(origin, 3);
+  double p2[3];
+  vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Get(p2, 3);
+  for (int i = 0; i < 3; ++i)
+  {
+    p2[i] = 2.0 * origin[i] - p2[i];
+  }
+  vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(p2, 3);
+
+  wdgProxy->UpdateVTKObjects();
+  Q_EMIT this->changeAvailable();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
 void pqLinePropertyWidget::centerOnBounds()
 {
   vtkBoundingBox bbox = this->dataBounds();
@@ -274,4 +301,23 @@ void pqLinePropertyWidget::pickPoint2(double wx, double wy, double wz)
   wdgProxy->UpdateVTKObjects();
   Q_EMIT this->changeAvailable();
   this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::pickNormal(
+  double wx, double wy, double wz, double nx, double ny, double nz)
+{
+  if (nx != 0.0 || ny != 0.0 || nz != 0.0)
+  {
+    vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+
+    double p1[3] = { wx, wy, wz };
+    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(p1, 3);
+    double p2[3] = { wx + nx, wy + ny, wz + nz };
+    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(p2, 3);
+
+    wdgProxy->UpdateVTKObjects();
+    Q_EMIT this->changeAvailable();
+    this->render();
+  }
 }

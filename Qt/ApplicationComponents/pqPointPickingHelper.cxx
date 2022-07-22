@@ -112,25 +112,45 @@ void pqPointPickingHelper::pickPoint()
           eventpos, position, normal, this->PickOnMesh) ||
       this->PickCameraFocalInfo)
     {
-      if (this->PickOpt == PickOption::Coordinates)
+      auto lambdaIsValidVector = [](const double x[3]) {
+        return (!std::isnan(x[0]) || !std::isnan(x[1]) || !std::isnan(x[2]));
+      };
+      switch (this->PickOpt)
       {
-        if (!std::isnan(position[0]) || !std::isnan(position[1]) || !std::isnan(position[2]))
+        case PickOption::Coordinates:
         {
-          Q_EMIT this->pick(position[0], position[1], position[2]);
+          if (lambdaIsValidVector(position))
+          {
+            Q_EMIT this->pick(position[0], position[1], position[2]);
+          }
+          // else statement is not needed because vtkPVRayCastPickingHelper prints an error message
         }
-        // else statement is not needed because vtkPVRayCastPickingHelper prints an error message
-      }
-      else // this->PickOpt == PickOption::Normal
-      {
-        // this is a check to ensure that the normal will not be changed if's not available
-        if (!std::isnan(normal[0]) || !std::isnan(normal[1]) || !std::isnan(normal[2]))
+        break;
+        case PickOption::Normal:
         {
-          Q_EMIT this->pick(normal[0], normal[1], normal[2]);
+          if (lambdaIsValidVector(normal))
+          {
+            Q_EMIT this->pick(normal[0], normal[1], normal[2]);
+          }
+          else
+          {
+            qWarning() << "The intersection normal was not available" << QT_ENDL;
+          }
         }
-        else
+        break;
+        case PickOption::CoordinatesAndNormal:
         {
-          qWarning() << "The intersection normal was not available" << QT_ENDL;
+          if (lambdaIsValidVector(position) && lambdaIsValidVector(normal))
+          {
+            Q_EMIT this->pickNormal(
+              position[0], position[1], position[2], normal[0], normal[1], normal[2]);
+          }
+          else
+          {
+            qWarning() << "The intersection normal was not available" << QT_ENDL;
+          }
         }
+        break;
       }
     }
   }
