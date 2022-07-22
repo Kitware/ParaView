@@ -1062,7 +1062,7 @@ void pqPipelineModel::removeChildFromParent(pqPipelineModelDataItem* child)
 //-----------------------------------------------------------------------------
 void pqPipelineModel::serverDataChanged()
 {
-  // TODO: we should determine which server data actually chnaged
+  // TODO: we should determine which server data actually changed
   // and invalidate only that one. FOr now, just invalidate all.
 
   int max = this->Internal->Root.Children.size() - 1;
