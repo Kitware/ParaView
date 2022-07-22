@@ -387,6 +387,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 Q_SIGNALS:
   void firstChildAdded(const QModelIndex& index);
+  void childWithChildrenAdded(const QModelIndex& index);
 
 private Q_SLOTS:
   void onInsituConnectionInitiated(pqServer* server);
