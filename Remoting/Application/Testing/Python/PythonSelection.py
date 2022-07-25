@@ -52,8 +52,8 @@ SelectSurfacePoints(Rectangle=[100, 100, 200, 200], View=RenderView1)
 CheckSelection(numPoints=8, numCells=8)
 
 SetActiveSource(s)
-SelectSurfaceCells(Rectangle=[100, 100, 200, 200], View=RenderView1)
-CheckSelection(numPoints=18, numCells=20)
+SelectSurfaceCells(Rectangle=[0, 0, 215, 215], View=RenderView1)
+CheckSelection(numPoints=19, numCells=24)
 
 # Polygon selection. Use active view instead of passing it in.
 SetActiveSource(s)
