@@ -33,7 +33,8 @@ mark_as_advanced(PARAVIEW_BUILD_ALL_MODULES)
 set(_vtk_module_reason_WANT_BY_DEFAULT
   "via `PARAVIEW_BUILD_ALL_MODULES`")
 
-option(PARAVIEW_BUILD_EXAMPLES "Enable ParaView examples" OFF)
+vtk_deprecated_setting(examples_default PARAVIEW_ENABLE_EXAMPLES PARAVIEW_BUILD_EXAMPLES "OFF")
+option(PARAVIEW_ENABLE_EXAMPLES "Enable ParaView examples" "${examples_default}")
 set(PARAVIEW_BUILD_TESTING "OFF"
   CACHE STRING "Enable testing")
 set_property(CACHE PARAVIEW_BUILD_TESTING

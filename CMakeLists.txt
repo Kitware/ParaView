@@ -914,6 +914,6 @@ install(
   COMPONENT   "license")
 
 #-----------------------------------------------------------------------------
-if (PARAVIEW_BUILD_EXAMPLES)
+if (PARAVIEW_ENABLE_EXAMPLES)
   add_subdirectory(Examples)
 endif ()
