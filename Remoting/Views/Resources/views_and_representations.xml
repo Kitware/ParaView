@@ -9085,6 +9085,11 @@
         Normalized position of the bottom left corner of the text box in pixels.
         </Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <PropertyGroup label="Logo Position" panel_widget="TextLocationEditor">
         <Property name="LogoLocation" function="WindowLocation" />
