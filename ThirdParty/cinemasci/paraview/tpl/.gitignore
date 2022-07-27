@@ -1,4 +1,4 @@
-__pycache__
+**/__pycache__/
 idea
 .DS_Store
 testing/scratch
@@ -6,3 +6,4 @@ html/
 build/
 *.egg-info/
 dist/
+venv/

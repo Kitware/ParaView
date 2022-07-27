@@ -39,7 +39,7 @@ var currentDb;
     //whether or not the currentDb has extra axis ordering data
 var hasAxisOrdering = false; 
     //this can be overriden with HTTP params
-var databaseList = 'cinema/explorer/2.0/databases.json'; 
+var databaseList = 'cinema/explorer/2.2/databases.json'; 
 var databaseListType = 'json';
 
 var loaded = false;

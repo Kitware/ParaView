@@ -2,387 +2,52 @@
 <html>
 
 <head>
-	<style>
-		p.slider_area {
-		  	font-style: normal;
-		  	font-weight: normal;
-		  	font-size: 1em;
-		  	font-family: "Geneva";
-		}
-
-		.flex-container {
-		  	display: flex;
-		  	flex-wrap: wrap;
-		}
-	</style>
-    <meta app="Cinema:View" version="2.0">
+    <meta app="Cinema:View" version="2.2">
     <meta charset="utf-8">
-    <link rel='stylesheet' href='cinema/view/2.0/css/view.css'>
-    <link rel='stylesheet' href='cinema/view/2.0/css/common.css'>
+    <link rel='stylesheet' href='cinema/lib/2.2/common.css'>
+    <link rel="stylesheet" href="cinema/view/2.2/css/select-css.css">
+    <link rel="stylesheet" href="cinema/view/2.2/css/range-css.css">
+
+    <!-- Begin: Cinema Local File Install -->
+    <!--
     <script src='cinema/lib/d3.v4.min.js'></script>
-    <link rel="stylesheet" href="cinema/view/2.0/css/select-css.css">
-    <link rel="stylesheet" href="cinema/view/2.0/css/range-css.css">
+    -->
+    <!-- End:   Cinema Local File Install -->
+    <!-- Begin: Cinema External Access Install -->
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- End:   Cinema External Access Install -->
 </head>
 
 <body>
-    <script src="cinema/lib/databases.js"></script>
 <div class="container">
 <header>
-    <h1>Cinema:View</h1>
+    <!-- Begin: Cinema Viewer Title -->
+    Cinema:View
+    <!-- End:   Cinema Viewer Title -->
 </header>
 
 <div id="resultsArea">
-	
     <div class="imageArea flex-container" id="imageArea"></div>
-    
     <div class="sliderArea">
-    	<div id="delectDB">
-	    	<p class="slider_area"> Select Dataset:
-	    		<select id="dbList" class="select-css" onchange="optionSelected();">
-				</select>
-			</p>
-		</div>
-    	<div id="imgSize">
-    		<p class="slider_area">
-            	<div>Image Size:</div>
-            	<input type="range" min="1" max="100" id="imageSize" class="slidecontainer" step="1">
-        	</p>
+        <div id="delectDB">
+            <p> Select Dataset:
+                <select id="dbList" class="select-css" onchange="optionSelected();">
+                </select>
+            </p>
         </div>
-        <p class="slider_area">
-        	<div id="sliderContainer" class="sliderContainer"> </div>
-        </p>
+        <div id="imgSize">
+                <p>Image Size:</p>
+                <input type="range" min="1" max="100" id="imageSize" class="slidecontainer" step="1">
+        </div>
+        <div id="sliderContainer" class="sliderContainer">
+        </div>
     </div>
-	
 </div>
 
-<footer>&nbsp</footer>
+<footer><img src="cinema/lib/2.2/img/cinema_logo_filmreel_named_100px_white.png" height=30px></img></footer>
 
 </div>
-   		<script>
-            var emptyImage   = 'cinema/view/2.0/images/empty.png';
-			var databaseList = 'cinema/view/2.0/databases.json';
-            var databaseListType = 'json'
-            var AssetName = "FILE"
-
-            // first, check for attributes from the server
-            loadAttributes(function(response) 
-            {
-                jsondata = JSON.parse(response);
-                if ("assetname" in jsondata) {
-                    AssetName = jsondata.assetname
-                }
-            });
-
-
-            // override attributes from a local URL, if present
-            var url = window.location.href;
-            var urlArgs = url.split('?');
-
-            if (urlArgs.length > 1) {
-                var urlArgPairs = urlArgs[1].split('&');
-
-                // go through all the pairs, and if you find something you expect, deal with it
-                for (var i in urlArgPairs) {
-                    var kvpair = urlArgPairs[i].split('=');
-
-                    // now look for the values you expect, and do something with them
-                    //
-                    // Note that this will not properly handle the case in which both parameters
-                    // are set by url attributes 
-                    if (kvpair[0] == 'databases') {
-                        databaseList = kvpair[1];
-                    } else if (kvpair[0] == 'assetname') {
-                        AssetName = kvpair[1];
-                    }
-                }
-            }
-
-   			function loadAttributes(callback) 
-   			{
-			  	var xobj = new XMLHttpRequest();
-			  	xobj.overrideMimeType("application/json");
-			  	xobj.open('GET', "cinema/view/cinema_attributes.json", true); // Replace 'my_data' with the path to your file
-			  	xobj.onreadystatechange = function () {
-			    	if (xobj.readyState == 4 && (xobj.status == 0 || xobj.status == 200)) {
-			    		// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-			    		callback(xobj.responseText);
-			    	}
-			  	};
-			  	xobj.send(null);
-			}
-
-   			function loadData(callback) 
-   			{
-			  	var xobj = new XMLHttpRequest();
-			  	xobj.overrideMimeType("application/json");
-			  	xobj.open('GET', databaseList, true); // Replace 'my_data' with the path to your file
-			  	xobj.onreadystatechange = function () {
-			    	if (xobj.readyState == 4 && (xobj.status == 0 || xobj.status == 200)) {
-			    		// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-			    		callback(xobj.responseText);
-			    	}
-			  	};
-			  	xobj.send(null);
-			}
-
-
-			function onlyUnique(value, index, self) 
-			{
-			    return self.indexOf(value) === index;
-			}
-
-			function getLookupKey(keys, query) 
-			{
-				var key = "";
-				keys.forEach(function(item, index) {
-					key += query[item] + "_";
-				});
-
-				return key;
-			}
-
-
-			// Initialize Dropdown list from JSON
-            var actual_JSON;
-
-            databaseListType = db_get_database_list_type( databaseList )
-            if (databaseListType == "json") {
-                loadData(function(response) 
-                {
-                    // Parse JSON string into object
-                    actual_JSON = JSON.parse(response);
-
-                    var dbs = [];
-                    for (i = 0; i < actual_JSON.length; i++) 
-                    {
-                        dbs.push( actual_JSON[i].database_name );
-                    }
-
-                    var sel = document.getElementById('dbList');
-                    for(var i=0; i <actual_JSON.length; i++) {
-                        var opt = document.createElement('option');
-                        opt.innerHTML = dbs[i];
-                        opt.value = i;
-                        sel.appendChild(opt);
-                    }
-
-                    // Fill in DB
-                    optionSelected();
-                });
-            } else {
-                // convert a database into a json data structure
-                actual_JSON = db_create_view_database_list( databaseList );
-
-                var dbs = [];
-                for (i = 0; i < actual_JSON.length; i++) 
-                {
-                    dbs.push( actual_JSON[i].database_name );
-                }
-
-                var sel = document.getElementById('dbList');
-                for(var i=0; i <actual_JSON.length; i++) {
-                    var opt = document.createElement('option');
-                    opt.innerHTML = dbs[i];
-                    opt.value = i;
-                    sel.appendChild(opt);
-                }
-
-                // Fill in DB
-                optionSelected();
-            }
-
-
-			function optionSelected()
-			{
-				// Clear image area
-            	var div = document.getElementById("imageArea"); 
-            	while(div.firstChild) { 
-                	div.removeChild(div.firstChild); 
-            	} 
-
-
-            	// Clear slider area
-            	var div = document.getElementById("sliderContainer"); 
-            	while(div.firstChild) { 
-                 	div.removeChild(div.firstChild); 
-            	} 
-
-				
-            	// Get selected option
-				var e = document.getElementById("dbList");
-				var value = e.options[e.selectedIndex].value;
-				var text = e.options[e.selectedIndex].text;
-				
-
-				// Parse the json
-				var datasettoLoad = [];
-				var datasetNamestoLoad = [];
-				for (i=0; i<actual_JSON.length; i++) 
-			    {	
-			    	if (i == parseInt(value))
-			    	{
-			    		for (j=0; j<actual_JSON[i].datasets.length; j++) 
-			    		{
-				  			datasettoLoad.push( actual_JSON[i].datasets[j].location );
-				  			datasetNamestoLoad.push( actual_JSON[i].datasets[j].name );
-			    		}
-			    	}
-				}
-
-				var dataSets = datasettoLoad;
-	            // START: add code to manage databases to view
-	            // END:   add code to manage databases to view
-
-	   			var dataResults = null;
-	   			var dataValues = null;
-	   			var query = {};
-	   			var images = [];
-	   			var numImages = 0;
-
-	   			var q = d3.queue();
-	   			dataSets.forEach(function(item, index) {
-					q.defer(d3.csv, item + "/data.csv");
-				});
-
-				q.awaitAll(function(error, results) {
-					var values = {};
-					results.forEach(function(item, index) {
-						var keys = Object.keys(item[0]).filter(function(d) {
-							return !isNaN(+item[0][d]);
-						});
-
-						var lookup = {};
-
-						item.forEach(function(result, index) {
-							keys.forEach(function(key, index) {
-								if (!(key in values)) {
-									values[key] = [];
-								}
-
-								values[key].push(result[key]);
-							});
-
-							lookup[getLookupKey(keys, result)] = result;
-						})
-
-						results[index] = {keys: keys, results: results[index], lookup: lookup};
-					});
-
-					var keys = Object.keys(values);
-					keys.forEach(function(key, index) {
-						values[key] = values[key].filter(onlyUnique);
-						values[key] = values[key].sort(function(a, b){return (+a)-(+b)});
-					});
-
-					doneLoading(results, values);
-				});
-
-				function updateResults() 
-				{
-					// Called when sliders are moced
-					dataResults.forEach(function(result, index) {
-   						var imgSrcKey = getLookupKey(result.keys, query);
-   						if (imgSrcKey in result.lookup) {
-	   						var imgSrc = dataSets[index] + "/" +result.lookup[imgSrcKey][AssetName];
-		   					images[index].img.attr("src", imgSrc);
-   						}
-   						else {
-		   					images[index].img.attr("src", emptyImage);
-   						}
-   					});
-				}
-
-				function doneLoading(results, values) 
-				{
-					var imageSizeSlider = d3.select("#imageSize")
-						.property("value", (100/dataSets.length)-1)
-						.on("input", function() {
-							for (i = 0; i < numImages; i++) {
-								var selectedItem = "#image_div_" + i.toString();
-								d3.select(selectedItem).style("width","" + imageSizeSlider.node().value + "%")
-							}
-						});
-
-					dataResults = results;
-					dataValues = values;
-
-					var keys = Object.keys(values);
-					keys.forEach(function(key, index) {
-						var sliderDiv = d3.select("#sliderContainer").append("div");
-						sliderDiv.append("div")
-							.html(key)
-	                        .style("padding", "5px");
-						var slider = sliderDiv.append("div")
-				   			.append("input")
-				   				.attr("type","range")
-				   				.attr("class","slidecontainer")
-				   				.attr("min", "0")
-				   				.attr("max", values[key].length - 1)
-				   				.property("value", "0")
-				   				.style("float", "left");
-				   		var sliderText = sliderDiv.append("input")
-				   				.attr("type","text")
-				   				.attr("value", values[key][0])
-				   				.style("width", "40px")
-				   				.on("input", function() {
-				   					query[key] = this.value;
-				   					var index = values[key].indexOf(this.value);
-				   					slider.property("value", index);
-			   						updateResults();
-				   				});
-
-				   		slider.on("input", function() {
-				   				var val = values[key][+this.value];
-					   			sliderText.property("value", val);
-			   					query[key] = val;
-			   					updateResults();
-				   			});
-
-				   		query[key] = values[key][0];
-					});
-
-
-					dataResults.forEach(function(result, index) {
-						console.log("index:", index);
-						console.log("val:",imageSizeSlider.node().value);
-						numImages = numImages + 1
-						var imgSrcKey = getLookupKey(result.keys, query);
-
-						var img = d3.select("#imageArea")
-							.append("div")
-								.attr("id", "image_div_" + index.toString())
-								.style("width","" + imageSizeSlider.node().value + "%")
-								.style("text-align","center")
-								.text(datasetNamestoLoad[index])
-
-							.append("img")
-								.attr("class", "cinemaImage")
-								.attr("src", emptyImage)
-								.style("width","100%")
-
-								.on("load", function() {
-                                      if (this.src != emptyImage) { 
-			   							images[index].height = this.height;
-									}
-			   					})
-								.on("error", function() {
-			   						this.src=emptyImage;
-			   						this.height = images[index].height;
-			   					});
-
-						images.push({img: img});
-
-			   			if (imgSrcKey in result.lookup) {
-				   			var imgSrc = dataSets[index] + "/" + result.lookup[imgSrcKey][AssetName];
-					   		images[index].img.attr("src", imgSrc);
-			   			}
-			   			else {
-					   		images[index].img.attr("src", emptyImage);
-			   			}
-					});
-				}
-			}
-
-   		</script>
-   </body>
+<script src="cinema/lib/2.2/databases.js"></script>
+<script src="cinema/view/2.2/main.js"></script>
+</body>
 </html>
