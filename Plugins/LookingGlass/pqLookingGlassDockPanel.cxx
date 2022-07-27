@@ -28,6 +28,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QOpenGLContext>
+#include <QSignalBlocker>
 
 #include "vtkCollection.h"
 #include "vtkGenericOpenGLRenderWindow.h"
@@ -42,6 +43,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkTextureObject.h"
 
+#include <array>
 #include <cmath>
 
 namespace
@@ -98,6 +100,7 @@ class pqLookingGlassDockPanel::pqInternal
 {
 public:
   Ui::pqLookingGlassDockPanel Ui;
+  std::array<double, 2> FocalDistanceSliderRange;
 };
 
 void pqLookingGlassDockPanel::constructor()
@@ -121,13 +124,14 @@ void pqLookingGlassDockPanel::constructor()
     ui.PullFocalPlaneForwardButton, SIGNAL(clicked(bool)), SLOT(pullFocalPlaneForward()));
   this->connect(ui.SaveQuilt, SIGNAL(clicked(bool)), SLOT(saveQuilt()));
   this->connect(ui.RecordQuilt, SIGNAL(clicked(bool)), SLOT(onRecordQuiltClicked()));
+  this->connect(ui.FocalDistance, SIGNAL(valueEdited(double)), SLOT(onFocalDistanceEdited(double)));
 
   this->connect(activeObjects, SIGNAL(serverChanged(pqServer*)), SLOT(reset()));
 
   // Disable button if active view is not compatible with LG
   this->connect(activeObjects, SIGNAL(viewChanged(pqView*)), SLOT(activeViewChanged(pqView*)));
 
-  this->updateSaveRecordVisibility();
+  this->updateEnableStates();
 
   // Populate target device dropdown
   auto devices = vtkLookingGlassInterface::GetDevices();
@@ -141,6 +145,9 @@ void pqLookingGlassDockPanel::constructor()
   this->connect(ui.TargetDeviceComboBox,
     static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
     &pqLookingGlassDockPanel::onTargetDeviceChanged);
+
+  ui.FocalDistance->setResolution(100);
+  resetFocalDistanceSliderRange();
 }
 
 pqLookingGlassDockPanel::~pqLookingGlassDockPanel()
@@ -304,7 +311,7 @@ void pqLookingGlassDockPanel::onRender()
     this->EndObserver = endObserver;
     this->DisplayWindow->AddObserver(vtkCommand::RenderEvent, this->EndObserver);
 
-    this->updateSaveRecordVisibility();
+    this->updateEnableStates();
   }
 
   int renderSize[2];
@@ -383,8 +390,11 @@ void pqLookingGlassDockPanel::resetToCenterOfRotation()
   position.Set(0, pos[0] - fp[0] + cor[0]);
   position.Set(1, pos[1] - fp[1] + cor[1]);
   position.Set(2, pos[2] - fp[2] + cor[2]);
+
   this->View->getProxy()->UpdateVTKObjects();
   this->View->render();
+
+  resetFocalDistanceSliderRange();
 }
 
 void pqLookingGlassDockPanel::pushFocalPlaneBack()
@@ -394,6 +404,9 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
     return;
   }
 
+  double directionOfProjection[3];
+  double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
   auto viewProxy = this->View->getProxy();
 
   // limit the clipping range to limit parallex
@@ -401,16 +414,6 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
 
   std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPointInfo").GetDoubleArray();
   std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPositionInfo").GetDoubleArray();
-
-  double dx = fp[0] - pos[0];
-  double dy = fp[1] - pos[1];
-  double dz = fp[2] - pos[2];
-  double distance = sqrt(dx * dx + dy * dy + dz * dz);
-
-  double directionOfProjection[3];
-  directionOfProjection[0] = dx / distance;
-  directionOfProjection[1] = dy / distance;
-  directionOfProjection[2] = dz / distance;
 
   double focalPlaneMovementFactor =
     vtkSMPropertyHelper(settings, "FocalPlaneMovementFactor").GetAsDouble();
@@ -429,6 +432,8 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
   //  focalPlaneMovementFactor * cameraDistance * (farClippingLimit - 1.0));
   viewProxy->UpdateVTKObjects();
   this->View->render();
+
+  resetFocalDistanceSliderRange();
 }
 
 void pqLookingGlassDockPanel::pullFocalPlaneForward()
@@ -438,6 +443,9 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
     return;
   }
 
+  double directionOfProjection[3];
+  double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
   auto viewProxy = this->View->getProxy();
 
   // limit the clipping range to limit parallex
@@ -445,16 +453,6 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
 
   std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPointInfo").GetDoubleArray();
   std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPositionInfo").GetDoubleArray();
-
-  double dx = fp[0] - pos[0];
-  double dy = fp[1] - pos[1];
-  double dz = fp[2] - pos[2];
-  double distance = sqrt(dx * dx + dy * dy + dz * dz);
-
-  double directionOfProjection[3];
-  directionOfProjection[0] = dx / distance;
-  directionOfProjection[1] = dy / distance;
-  directionOfProjection[2] = dz / distance;
 
   double focalPlaneMovementFactor =
     vtkSMPropertyHelper(settings, "FocalPlaneMovementFactor").GetAsDouble();
@@ -473,9 +471,11 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
   //  focalPlaneMovementFactor * cameraDistance * (1.0 - nearClippingLimit));
   viewProxy->UpdateVTKObjects();
   this->View->render();
+
+  resetFocalDistanceSliderRange();
 }
 
-void pqLookingGlassDockPanel::updateSaveRecordVisibility()
+void pqLookingGlassDockPanel::updateEnableStates()
 {
   bool visible = this->Interface && this->DisplayWindow;
 
@@ -487,6 +487,8 @@ void pqLookingGlassDockPanel::updateSaveRecordVisibility()
   ui.PullFocalPlaneForwardButton->setEnabled(visible);
   ui.TargetDeviceComboBox->setEnabled(visible);
   ui.TargetDeviceLabel->setEnabled(visible);
+  ui.FocalDistanceLabel->setEnabled(visible);
+  ui.FocalDistance->setEnabled(visible);
 }
 
 QString pqLookingGlassDockPanel::getQuiltFileSuffix()
@@ -566,6 +568,75 @@ void pqLookingGlassDockPanel::onRecordQuiltClicked()
   {
     ui.RecordQuilt->setText("Record Quilt");
   }
+}
+
+double pqLookingGlassDockPanel::computeFocalDistanceAndDirection(double directionOfProjection[3])
+{
+  if (!this->View)
+  {
+    return -1;
+  }
+
+  auto viewProxy = this->View->getProxy();
+  std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPoint").GetDoubleArray();
+  std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPosition").GetDoubleArray();
+
+  double dx = fp[0] - pos[0];
+  double dy = fp[1] - pos[1];
+  double dz = fp[2] - pos[2];
+  double distance = sqrt(dx * dx + dy * dy + dz * dz);
+
+  directionOfProjection[0] = dx / distance;
+  directionOfProjection[1] = dy / distance;
+  directionOfProjection[2] = dz / distance;
+
+  return distance;
+}
+
+void pqLookingGlassDockPanel::onFocalDistanceEdited(double distance)
+{
+  if (!this->View)
+  {
+    return;
+  }
+
+  auto viewProxy = this->View->getProxy();
+
+  std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPointInfo").GetDoubleArray();
+  std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPositionInfo").GetDoubleArray();
+
+  double directionOfProjection[3];
+  double oldDistance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
+  fp[0] = pos[0] + directionOfProjection[0] * distance;
+  fp[1] = pos[1] + directionOfProjection[1] * distance;
+  fp[2] = pos[2] + directionOfProjection[2] * distance;
+  vtkSMPropertyHelper(viewProxy, "CameraFocalPoint").Set(&fp[0], 3);
+
+  viewProxy->UpdateVTKObjects();
+  this->View->render();
+}
+
+void pqLookingGlassDockPanel::resetFocalDistanceSliderRange()
+{
+  if (!this->View)
+  {
+    return;
+  }
+
+  double directionOfProjection[3];
+  double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
+  // The slider will move 1/4 backward/forward
+  this->Internal->FocalDistanceSliderRange[0] = distance * 3 / 4;
+  this->Internal->FocalDistanceSliderRange[1] = distance * 5 / 4;
+
+  auto& ui = this->Internal->Ui;
+  QSignalBlocker blocked(ui.FocalDistance);
+
+  ui.FocalDistance->setMinimum(this->Internal->FocalDistanceSliderRange[0]);
+  ui.FocalDistance->setMaximum(this->Internal->FocalDistanceSliderRange[1]);
+  ui.FocalDistance->setValue(distance);
 }
 
 void pqLookingGlassDockPanel::onTargetDeviceChanged(int index)

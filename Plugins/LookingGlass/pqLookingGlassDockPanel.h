@@ -65,7 +65,7 @@ protected Q_SLOTS:
   void resetToCenterOfRotation();
   void pushFocalPlaneBack();
   void pullFocalPlaneForward();
-  void updateSaveRecordVisibility();
+  void updateEnableStates();
   void saveQuilt();
   void onRecordQuiltClicked();
   void onTargetDeviceChanged(int index);
@@ -73,6 +73,8 @@ protected Q_SLOTS:
 
   void startRecordingQuilt();
   void stopRecordingQuilt();
+
+  void onFocalDistanceEdited(double position);
 
   void reset();
 
@@ -106,6 +108,12 @@ protected:
   // file name, based upon the number of tiles. Example: "_qs5x9".
   // This communicates the tile information to the LG software.
   QString getQuiltFileSuffix();
+
+  // Reset the focal plane slider range
+  void resetFocalDistanceSliderRange();
+
+  // Compute the focal distance and direction
+  double computeFocalDistanceAndDirection(double directionOfProjection[3]);
 
   // Get the Looking Glass settings for the displayed view
   vtkSMProxy* getSettingsForView(pqRenderView* view);
