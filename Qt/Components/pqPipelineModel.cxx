@@ -1033,6 +1033,12 @@ void pqPipelineModel::addChild(pqPipelineModelDataItem* _parent, pqPipelineModel
   {
     Q_EMIT this->firstChildAdded(parentIndex);
   }
+  // This is a special case where an added child has children already. This can occur
+  // when a change of input is triggered on a source that has children.
+  if (!child->Children.empty())
+  {
+    Q_EMIT this->childWithChildrenAdded(this->getIndex(child));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1062,7 +1068,7 @@ void pqPipelineModel::removeChildFromParent(pqPipelineModelDataItem* child)
 //-----------------------------------------------------------------------------
 void pqPipelineModel::serverDataChanged()
 {
-  // TODO: we should determine which server data actually chnaged
+  // TODO: we should determine which server data actually changed
   // and invalidate only that one. FOr now, just invalidate all.
 
   int max = this->Internal->Root.Children.size() - 1;

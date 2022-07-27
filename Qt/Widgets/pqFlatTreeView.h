@@ -64,9 +64,9 @@ class QRect;
  *
  * The tree view is flattened by taking long indented chains of
  * single items and lining them up vertically. If an item is the
- * only descendent of its parent item, it is drawn directly below
+ * only descendant of its parent item, it is drawn directly below
  * its parent. A vertical branch is drawn between the items to
- * indicate relationship. If an item has more than one descendent,
+ * indicate relationship. If an item has more than one descendant,
  * those items are indented from the parent. Normal tree view
  * branches are drawn between the parent and child items to show
  * the relationship.
