@@ -1377,6 +1377,7 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the dataset from which to obtain
         probe values. The data attributes come from this dataset.</Documentation>

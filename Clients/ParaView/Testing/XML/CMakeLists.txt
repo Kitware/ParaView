@@ -111,6 +111,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/glTF/InterpolationTest/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/Triangle/Triangle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/SimpleSkin/SimpleSkin.gltf}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_0_0.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletGradientLegacy.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/img1.png}"
   "DATA{${paraview_test_data_directory_input}/Data/img2.png}"
@@ -175,6 +178,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/todd2_small/dumps/3D_nomix_diff-dmp000000}"
   "DATA{${paraview_test_data_directory_input}/Data/todd2_small/dumps/3D_nomix_diff-dmp000010}"
   "DATA{${paraview_test_data_directory_input}/Data/tube.exo}"
+  "DATA{${paraview_test_data_directory_input}/Data/Unbalanced3DepthOctTree3x2x3.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/vehicle_data.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletElevation.vti}"
@@ -595,6 +599,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonView_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewScript.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestResampleHyperTreeGridWithSphere.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TextSourceBorder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TextSourceInteriorLines.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TextSourcesInChartViews.png}"
@@ -844,6 +849,7 @@ SET(TESTS_WITH_BASELINES
   ShowMultiPieceFieldData.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
+  TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   TransferFunction2DYScalars.xml
   ZoomToData.xml
