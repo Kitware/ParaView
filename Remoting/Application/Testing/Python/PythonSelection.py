@@ -48,21 +48,21 @@ Show(s)
 Render()
 
 # Rectangle selection
-SelectSurfacePoints(Rectangle=[100, 100, 200, 200], View=RenderView1)
-CheckSelection(numPoints=8, numCells=8)
+SelectSurfacePoints(Rectangle=[0, 0, 220, 220], View=RenderView1)
+CheckSelection(numPoints=10, numCells=10)
 
 SetActiveSource(s)
-SelectSurfaceCells(Rectangle=[0, 0, 215, 215], View=RenderView1)
+SelectSurfaceCells(Rectangle=[0, 0, 220, 220], View=RenderView1)
 CheckSelection(numPoints=19, numCells=24)
 
 # Polygon selection. Use active view instead of passing it in.
 SetActiveSource(s)
-SelectSurfacePoints(Polygon=[100, 100, 100, 200, 200, 200])
-CheckSelection(numPoints=6, numCells=6)
+SelectSurfacePoints(Polygon=[0, 0, 0, 220, 220, 220])
+CheckSelection(numPoints=7, numCells=7)
 
 SetActiveSource(s)
-SelectSurfaceCells(Polygon=[100, 100, 100, 200, 200, 200])
-CheckSelection(numPoints=15, numCells=14)
+SelectSurfaceCells(Polygon=[0, 0, 0, 220, 220, 220])
+CheckSelection(numPoints=16, numCells=16)
 
 # Rectangle selection through
 HideAll()
