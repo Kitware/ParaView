@@ -224,9 +224,16 @@ void pqCommandLineOptionsBehavior::processState()
   const auto& fname = cConfig->stateFileName();
   if (!fname.empty())
   {
-    // Load state file using canonical path without fix-filenames dialog.
-    pqLoadStateReaction::loadState(
-      QFileInfo(QString::fromStdString(fname)).canonicalFilePath(), true);
+    QFileInfo fileInfo(QString::fromStdString(fname));
+    if (fileInfo.exists())
+    {
+      // Load state file using canonical path without fix-filenames dialog.
+      pqLoadStateReaction::loadState(fileInfo.canonicalFilePath(), true);
+    }
+    else
+    {
+      qCritical() << "Specified state file does not exists: '" << fname.c_str() << "'";
+    }
   }
 }
 
