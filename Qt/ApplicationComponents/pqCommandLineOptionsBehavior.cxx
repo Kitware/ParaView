@@ -196,6 +196,7 @@ void pqCommandLineOptionsBehavior::processData()
 
     // We don't directly set the data file name instead use the dialog. This
     // makes it possible to select a file group.
+    // This also resolve relative path into a canonical one.
     pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
       tr("Internal Open File"), QString(), QString());
     dialog.setFileMode(pqFileDialog::ExistingFiles);
@@ -223,8 +224,16 @@ void pqCommandLineOptionsBehavior::processState()
   const auto& fname = cConfig->stateFileName();
   if (!fname.empty())
   {
-    // Load state file without fix-filenames dialog.
-    pqLoadStateReaction::loadState(QString::fromStdString(fname), true);
+    QFileInfo fileInfo(QString::fromStdString(fname));
+    if (fileInfo.exists())
+    {
+      // Load state file using canonical path without fix-filenames dialog.
+      pqLoadStateReaction::loadState(fileInfo.canonicalFilePath(), true);
+    }
+    else
+    {
+      qCritical() << "Specified state file does not exists: '" << fname.c_str() << "'";
+    }
   }
 }
 
