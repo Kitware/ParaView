@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include <vtksys/SystemTools.hxx>
 
 #include <QApplication>
 #include <QDebug>
@@ -221,10 +222,14 @@ void pqCommandLineOptionsBehavior::processData()
 void pqCommandLineOptionsBehavior::processState()
 {
   auto cConfig = pqCoreConfiguration::instance();
-  const auto& fname = cConfig->stateFileName();
-  if (!fname.empty())
+  std::string fullPath;
+  if (!cConfig->stateFileName().empty())
   {
-    QFileInfo fileInfo(QString::fromStdString(fname));
+    fullPath = vtksys::SystemTools::CollapseFullPath(cConfig->stateFileName());
+  }
+  if (!fullPath.empty())
+  {
+    QFileInfo fileInfo(QString::fromStdString(fullPath));
     if (fileInfo.exists())
     {
       // Load state file using canonical path without fix-filenames dialog.
@@ -232,7 +237,7 @@ void pqCommandLineOptionsBehavior::processState()
     }
     else
     {
-      qCritical() << "Specified state file does not exists: '" << fname.c_str() << "'";
+      qCritical() << "Specified state file does not exists: '" << fullPath.c_str() << "'";
     }
   }
 }
