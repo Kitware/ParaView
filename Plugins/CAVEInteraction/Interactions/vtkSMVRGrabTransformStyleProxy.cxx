@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRGrabTransformStyle.cxx
+   Module:  vtkSMVRGrabTransformStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRGrabTransformStyle.h"
+#include "vtkSMVRGrabTransformStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <sstream>
 
-// WRS: This version of "vtkVRGrabTransformStyle.cxx" contains code that will
+// WRS: This version of "vtkSMVRGrabTransformStyleProxy.cxx" contains code that will
 //   output information into a file (or pipe), that allows an helper tool to
 //   visualize the interactions that are taking place.  The purpose of this
 //   is to help debug the order of transformations performed by this style.
@@ -112,11 +112,11 @@ void sendLocationToPVtest(int marker, int freq, float x, float y, float z)
 #endif /* OUTPUT_DATA_FOR_DEBUGGING */
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRGrabTransformStyle);
+vtkStandardNewMacro(vtkSMVRGrabTransformStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRGrabTransformStyle::vtkVRGrabTransformStyle()
+vtkSMVRGrabTransformStyleProxy::vtkSMVRGrabTransformStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Navigate world");
@@ -127,11 +127,11 @@ vtkVRGrabTransformStyle::vtkVRGrabTransformStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRGrabTransformStyle::~vtkVRGrabTransformStyle() = default;
+vtkSMVRGrabTransformStyleProxy::~vtkSMVRGrabTransformStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRGrabTransformStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRGrabTransformStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -145,7 +145,7 @@ void vtkVRGrabTransformStyle::PrintSelf(ostream& os, vtkIndent indent)
 // NOTE: in the vtkVRSpaceNavigatorGrabWorldStyle.cxx code, the multiple steps used to
 //   get the "rview->getProxy()" value is simply replaced with "this->ControlledProxy".
 //   I would like to get an explanation so we know if we can do the same here.
-vtkCamera* vtkVRGrabTransformStyle::GetCamera()
+vtkCamera* vtkSMVRGrabTransformStyleProxy::GetCamera()
 {
   vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
@@ -176,7 +176,7 @@ vtkCamera* vtkVRGrabTransformStyle::GetCamera()
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRGrabTransformStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRGrabTransformStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
   if (role == "Navigate world")
@@ -206,7 +206,7 @@ void vtkVRGrabTransformStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRGrabTransformStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRGrabTransformStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   static double lastspeed = -1.0;
 
@@ -216,7 +216,7 @@ void vtkVRGrabTransformStyle::HandleTracker(const vtkVREvent& event)
     return;
   if (this->EnableNavigate)
   {
-    camera = vtkVRGrabTransformStyle::GetCamera();
+    camera = vtkSMVRGrabTransformStyleProxy::GetCamera();
     if (!camera)
     {
       vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");
@@ -320,7 +320,7 @@ void vtkVRGrabTransformStyle::HandleTracker(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-float vtkVRGrabTransformStyle::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix)
+float vtkSMVRGrabTransformStyleProxy::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix)
 {
   // Return the distance between the camera and the focal point.
   // WRS: and the distance between the camera and the focal point is a speed factor???

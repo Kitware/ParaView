@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqLoadStateReaction.h"
+#include "pqProxyWidget.h"
 #include "pqRenderView.h"
 #include "pqSaveStateReaction.h"
 #include "pqServerManagerModel.h"
@@ -60,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkVRInteractorStyle.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 #include "vtkVRInteractorStyleFactory.h"
 #include "vtkWeakPointer.h"
 
@@ -77,12 +78,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
 public:
-  QString createName(vtkVRInteractorStyle*);
+  QString createName(vtkSMVRInteractorStyleProxy*);
 
   bool IsRunning;
 
   vtkWeakPointer<vtkCamera> Camera;
-  QMap<QString, vtkVRInteractorStyle*> StyleNameMap;
+  QMap<QString, vtkSMVRInteractorStyleProxy*> StyleNameMap;
 };
 
 //-----------------------------------------------------------------------------
@@ -104,11 +105,8 @@ void pqVRDockPanel::constructor()
   this->Internals->propertyCombo->setCollapseVectors(true);
 
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
-  std::vector<std::string> styleDescs = styleFactory->GetInteractorStyleDescriptions();
-  for (size_t i = 0; i < styleDescs.size(); ++i)
-  {
-    this->Internals->stylesCombo->addItem(QString::fromStdString(styleDescs[i]));
-  }
+  styleFactory->AddObserver(
+    vtkVRInteractorStyleFactory::INTERACTOR_STYLES_UPDATED, this, &pqVRDockPanel::initStyles);
 
   // Connections
   connect(this->Internals->addConnection, SIGNAL(clicked()), this, SLOT(addConnection()));
@@ -151,9 +149,6 @@ void pqVRDockPanel::constructor()
   connect(this->Internals->proxyCombo, SIGNAL(currentProxyChanged(vtkSMProxy*)), this,
     SLOT(proxyChanged(vtkSMProxy*)));
 
-  connect(this->Internals->stylesCombo, SIGNAL(currentIndexChanged(QString)), this,
-    SLOT(styleComboChanged(QString)));
-
   connect(this->Internals->saveState, SIGNAL(clicked()), this, SLOT(saveState()));
 
   connect(this->Internals->restoreState, SIGNAL(clicked()), this, SLOT(restoreState()));
@@ -162,7 +157,6 @@ void pqVRDockPanel::constructor()
 
   connect(this->Internals->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 
-  this->styleComboChanged(this->Internals->stylesCombo->currentText());
   this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
 
@@ -182,6 +176,21 @@ pqVRDockPanel::~pqVRDockPanel()
     this->stop();
   }
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::initStyles()
+{
+  vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
+  std::vector<std::string> styleDescs = styleFactory->GetInteractorStyleDescriptions();
+  this->Internals->stylesCombo->clear();
+  for (size_t i = 0; i < styleDescs.size(); ++i)
+  {
+    this->Internals->stylesCombo->addItem(QString::fromStdString(styleDescs[i]));
+  }
+
+  connect(this->Internals->stylesCombo, SIGNAL(currentIndexChanged(QString)), this,
+    SLOT(styleComboChanged(QString)), Qt::UniqueConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -326,11 +335,12 @@ void pqVRDockPanel::addStyle()
   QString styleString = this->Internals->stylesCombo->currentText();
 
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
-  vtkVRInteractorStyle* style =
+  vtkSMVRInteractorStyleProxy* style =
     styleFactory->NewInteractorStyleFromDescription(styleString.toStdString());
 
   if (!style)
   {
+    vtkWarningWithObjectMacro(nullptr, "Unable to add style " << styleString.toStdString());
     return;
   }
 
@@ -361,7 +371,7 @@ void pqVRDockPanel::removeStyle()
   }
   QString name = item->text();
 
-  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, nullptr);
+  vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
   if (!style)
   {
     return;
@@ -376,7 +386,7 @@ void pqVRDockPanel::updateStyles()
   this->Internals->StyleNameMap.clear();
   this->Internals->stylesTable->clear();
 
-  Q_FOREACH (vtkVRInteractorStyle* style, pqVRQueueHandler::instance()->styles())
+  Q_FOREACH (vtkSMVRInteractorStyleProxy* style, pqVRQueueHandler::instance()->styles())
   {
     QString name = this->Internals->createName(style);
     this->Internals->StyleNameMap.insert(name, style);
@@ -399,7 +409,7 @@ void pqVRDockPanel::editStyle(QListWidgetItem* item)
 
   pqVRAddStyleDialog dialog(this);
   QString name = item->text();
-  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, nullptr);
+  vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
   if (!style)
   {
     return;
@@ -418,6 +428,33 @@ void pqVRDockPanel::updateStyleButtons(int row)
   bool enabled = (row >= 0);
   this->Internals->editStyle->setEnabled(enabled);
   this->Internals->removeStyle->setEnabled(enabled);
+
+  if (enabled)
+  {
+    // Remove the existing proxy widget
+    pqProxyWidget* proxyWidget = this->widget()->findChild<pqProxyWidget*>();
+    if (proxyWidget)
+    {
+      proxyWidget->parentWidget()->layout()->removeWidget(proxyWidget);
+      proxyWidget->deleteLater();
+    }
+
+    QListWidgetItem* item = this->Internals->stylesTable->currentItem();
+    QString name = item->text();
+    vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
+
+    if (!style)
+    {
+      vtkWarningWithObjectMacro(
+        nullptr, "Unable to create proxy widget, no style with name " << name.toStdString());
+      return;
+    }
+
+    proxyWidget = new pqProxyWidget(style, this);
+    proxyWidget->setApplyChangesImmediately(true);
+    QGridLayout* layout = qobject_cast<QGridLayout*>(this->widget()->layout());
+    layout->addWidget(proxyWidget, 9, 0);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -430,7 +467,8 @@ void pqVRDockPanel::proxyChanged(vtkSMProxy* pxy)
 void pqVRDockPanel::styleComboChanged(const QString& name)
 {
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
-  vtkVRInteractorStyle* style = styleFactory->NewInteractorStyleFromDescription(name.toStdString());
+  vtkSMVRInteractorStyleProxy* style =
+    styleFactory->NewInteractorStyleFromDescription(name.toStdString());
   int size = style ? style->GetControlledPropertySize() : -1;
   if (style)
   {
@@ -648,7 +686,7 @@ void pqVRDockPanel::updateDebugLabel()
 //-----------------------------------------------------------------------------
 // createName() -- this method returns the string that will appear in the
 //   "Interactions:" list in the Qt VR Panel for the individual given "*style".
-QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle* style)
+QString pqVRDockPanel::pqInternals::createName(vtkSMVRInteractorStyleProxy* style)
 {
   QString description;  // A one-line description of the interaction (style, object, property)
   QString className;    // The name of the style's VTK class (e.g. vtkVRTrackStyle)

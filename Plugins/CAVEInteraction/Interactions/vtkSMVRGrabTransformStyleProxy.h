@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRGrabWorldStyle.h
+   Module:  vtkSMVRGrabTransformStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,11 +29,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRGrabWorldStyle_h
-#define vtkVRGrabWorldStyle_h
+#ifndef vtkSMVRGrabTransformStyleProxy_h
+#define vtkSMVRGrabTransformStyleProxy_h
 
+#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
-#include "vtkVRTrackStyle.h"
+#include "vtkSMVRTrackStyleProxy.h"
 
 class vtkCamera;
 class vtkMatrix4x4;
@@ -42,40 +43,32 @@ class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class vtkVRGrabWorldStyle : public vtkVRTrackStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRGrabTransformStyleProxy : public vtkSMVRTrackStyleProxy
 {
 public:
-  static vtkVRGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle);
+  static vtkSMVRGrabTransformStyleProxy* New();
+  vtkTypeMacro(vtkSMVRGrabTransformStyleProxy, vtkSMVRTrackStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkVRGrabWorldStyle();
-  ~vtkVRGrabWorldStyle() override;
+  vtkSMVRGrabTransformStyleProxy();
+  ~vtkSMVRGrabTransformStyleProxy() override;
 
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
-  bool EnableTranslate; /* mirrors the button assigned the "Translate World" role */
-  bool EnableRotate;    /* mirrors the button assigned the "Rotate World" role */
+  bool EnableNavigate;    /* mirrors the button assigned the "Navigate World" role */
+  bool IsInitialRecorded; /* flag indicating that we're in the middle of a navigation operation */
 
-  bool IsInitialTransRecorded; /* flag indicating that we're in the middle of a translation
-                                  operation */
-  bool IsInitialRotRecorded; /* flag indicating that we're in the middle of a rotation operation */
-                             /* NOTE: only one of translation or rotation can be active at a time */
-
-  vtkNew<vtkMatrix4x4> InverseInitialTransMatrix;
-  vtkNew<vtkMatrix4x4> InverseInitialRotMatrix;
-
-  vtkNew<vtkMatrix4x4> CachedTransMatrix;
-  vtkNew<vtkMatrix4x4> CachedRotMatrix;
+  vtkNew<vtkMatrix4x4> SavedModelViewMatrix;
+  vtkNew<vtkMatrix4x4> SavedInverseWandMatrix;
 
 private:
-  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&) = delete; // Not implemented
-  void operator=(const vtkVRGrabWorldStyle&) = delete;      // Not implemented
+  vtkSMVRGrabTransformStyleProxy(const vtkSMVRGrabTransformStyleProxy&) = delete;
+  void operator=(const vtkSMVRGrabTransformStyleProxy&) = delete;
 
-  float GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix); /* WRS: what does this do? */
-  vtkCamera* GetCamera();
+  float GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix); /* WRS-TODO: what does this do? */
+  vtkCamera* GetCamera();                                       // WRS-TODO: how is this used?
 };
 
-#endif // vtkVRGrabWorldStyle_h
+#endif // vtkSMVRGrabTransformStyleProxy_h

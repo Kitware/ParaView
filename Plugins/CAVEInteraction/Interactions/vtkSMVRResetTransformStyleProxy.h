@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRControlSliceOrientationStyle.h
+   Module:  vtkSMVRResetTransfromStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,50 +29,47 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRControlSliceOrientationStyle_h
-#define vtkVRControlSliceOrientationStyle_h
+#ifndef vtkSMVRResetTransformStyleProxy_h
+#define vtkSMVRResetTransformStyleProxy_h
 
+#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
-#include "vtkVRInteractorStyle.h"
+#include "vtkSMVRTrackStyleProxy.h"
 
+class vtkCamera;
 class vtkMatrix4x4;
+class vtkSMRenderViewProxy;
+class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
+struct vtkVREvent;
 
-class vtkVRControlSliceOrientationStyle : public vtkVRInteractorStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRResetTransformStyleProxy : public vtkSMVRTrackStyleProxy
 {
 public:
-  static vtkVRControlSliceOrientationStyle* New();
-  vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle);
+  static vtkSMVRResetTransformStyleProxy* New();
+  vtkTypeMacro(vtkSMVRResetTransformStyleProxy, vtkSMVRTrackStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  int GetControlledPropertySize() override { return 3; }
-
-  /// Update() called to update all the remote vtkObjects and perhaps even to render.
-  ///   Typically processing intensive operations go here. The method should not
-  ///   be called from within the handler and is reserved to be called from an
-  ///   external interaction style manager.
-  bool Update() override;
-
 protected:
-  vtkVRControlSliceOrientationStyle();
-  ~vtkVRControlSliceOrientationStyle() override;
+  vtkSMVRResetTransformStyleProxy();
+  ~vtkSMVRResetTransformStyleProxy() override;
 
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
-  bool Enabled;
-  bool InitialOrientationRecorded;
+  bool EnableNavigate;    /* mirrors the button assigned the "Navigate World" role */
+  bool IsInitialRecorded; /* flag indicating that we're in the middle of a navigation operation */
 
-  double InitialQuat[4];
-  double InitialTrackerQuat[4];
-  double UpdatedQuat[4];
-  double Normal[4];
-
-  vtkNew<vtkMatrix4x4> InitialInvertedPose;
+  vtkNew<vtkMatrix4x4> SavedModelViewMatrix;
+  vtkNew<vtkMatrix4x4> SavedInverseWandMatrix;
 
 private:
-  vtkVRControlSliceOrientationStyle(
-    const vtkVRControlSliceOrientationStyle&) = delete;              // Not implemented
-  void operator=(const vtkVRControlSliceOrientationStyle&) = delete; // Not implemented
+  vtkSMVRResetTransformStyleProxy(
+    const vtkSMVRResetTransformStyleProxy&) = delete;              // Not implemented
+  void operator=(const vtkSMVRResetTransformStyleProxy&) = delete; // Not implemented
+
+  float GetSpeedFactor(vtkCamera* cam); // WRS-TODO: what does this do?
+  vtkCamera* GetCamera();
 };
 
-#endif // vtkVRControlSliceOrientationStyle_h
+#endif // vtkSMVRResetTransformStyleProxy_h

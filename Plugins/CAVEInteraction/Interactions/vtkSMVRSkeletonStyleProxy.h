@@ -1,7 +1,8 @@
 /*=========================================================================
+ * NOTE !!!! This is really a test Interactor Style until I learn how to include new ones!
 
    Program: ParaView
-   Module:  vtkVRSpaceNavigatorGrabWorldStyle.h
+   Module:  vtkSMVRSkeletonStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +30,49 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRSpaceNavigatorGrabWorldStyle_h
-#define vtkVRSpaceNavigatorGrabWorldStyle_h
+#ifndef vtkSMVRSkeletonStyleProxy_h
+#define vtkSMVRSkeletonStyleProxy_h
 
-#include "vtkVRInteractorStyle.h"
+#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkNew.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 
+class vtkCamera;
+class vtkMatrix4x4;
+class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkTransform;
-
 struct vtkVREvent;
 
-class vtkVRSpaceNavigatorGrabWorldStyle : public vtkVRInteractorStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRSkeletonStyleProxy : public vtkSMVRInteractorStyleProxy
 {
 public:
-  static vtkVRSpaceNavigatorGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle);
+  static vtkSMVRSkeletonStyleProxy* New();
+  vtkTypeMacro(vtkSMVRSkeletonStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkVRSpaceNavigatorGrabWorldStyle();
-  ~vtkVRSpaceNavigatorGrabWorldStyle() override;
+  vtkSMVRSkeletonStyleProxy();
+  ~vtkSMVRSkeletonStyleProxy();
 
+  void HandleButton(const vtkVREvent& event) override;
   void HandleAnalog(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
+
+  bool EnableReport;
+
+  bool IsInitialTransRecorded;
+  bool IsInitialRotRecorded;
+
+  vtkNew<vtkMatrix4x4> InverseInitialTransMatrix;
+  vtkNew<vtkMatrix4x4> InverseInitialRotMatrix;
+
+  vtkNew<vtkMatrix4x4> CachedTransMatrix;
+  vtkNew<vtkMatrix4x4> CachedRotMatrix;
 
 private:
-  vtkVRSpaceNavigatorGrabWorldStyle(
-    const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;              // Not implemented
-  void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete; // Not implemented
+  vtkSMVRSkeletonStyleProxy(const vtkSMVRSkeletonStyleProxy&); // Not implemented
+  void operator=(const vtkSMVRSkeletonStyleProxy&);            // Not implemented
 };
 
-#endif // vtkVRSpaceNavigatorGrabWorldStyle_h
+#endif //  vtkSMVRSkeletonStyleProxy_h

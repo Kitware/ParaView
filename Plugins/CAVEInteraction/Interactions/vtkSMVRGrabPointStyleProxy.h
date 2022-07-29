@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRGrabTransfromStyle.h
+   Module:  vtkSMVRGrabPointStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,11 +29,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRResetTransformStyle_h
-#define vtkVRResetTransformStyle_h
+#ifndef vtkSMVRGrabPointStyleProxy_h
+#define vtkSMVRGrabPointStyleProxy_h
 
+#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
-#include "vtkVRTrackStyle.h" // WRS-TODO: why include "vtkVRTrackStyle.h" and not "vtkVRInteractorStyle.h"?  Test the latter
+#include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkCamera;
 class vtkMatrix4x4;
@@ -42,32 +43,40 @@ class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class vtkVRResetTransformStyle : public vtkVRTrackStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRGrabPointStyleProxy : public vtkSMVRInteractorStyleProxy
 {
 public:
-  static vtkVRResetTransformStyle* New();
-  vtkTypeMacro(vtkVRResetTransformStyle, vtkVRTrackStyle);
+  static vtkSMVRGrabPointStyleProxy* New();
+  vtkTypeMacro(vtkSMVRGrabPointStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  int GetControlledPropertySize() override { return 3; }
+
+  /// Update() called to update all the remote vtkObjects and perhaps even to render.
+  ///   Typically processing intensive operations go here. The method should not
+  ///   be called from within the handler and is reserved to be called from an
+  ///   external interaction style manager.
+  bool Update() override;
 
 protected:
-  vtkVRResetTransformStyle();
-  ~vtkVRResetTransformStyle() override;
+  vtkSMVRGrabPointStyleProxy();
+  ~vtkSMVRGrabPointStyleProxy() override;
 
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
   bool EnableNavigate;    /* mirrors the button assigned the "Navigate World" role */
   bool IsInitialRecorded; /* flag indicating that we're in the middle of a navigation operation */
+  double Origin[4];
 
   vtkNew<vtkMatrix4x4> SavedModelViewMatrix;
   vtkNew<vtkMatrix4x4> SavedInverseWandMatrix;
 
 private:
-  vtkVRResetTransformStyle(const vtkVRResetTransformStyle&) = delete; // Not implemented
-  void operator=(const vtkVRResetTransformStyle&) = delete;           // Not implemented
+  vtkSMVRGrabPointStyleProxy(const vtkSMVRGrabPointStyleProxy&) = delete; // Not implemented
+  void operator=(const vtkSMVRGrabPointStyleProxy&) = delete;             // Not implemented
 
   float GetSpeedFactor(vtkCamera* cam); // WRS-TODO: what does this do?
-  vtkCamera* GetCamera();
+  vtkCamera* GetCamera();               // WRS-TODO: how is this used?
 };
 
-#endif // vtkVRResetTransformStyle_h
+#endif // vtkSMVRGrabPointStyleProxy_h

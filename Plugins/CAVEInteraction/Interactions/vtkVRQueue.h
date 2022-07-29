@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkVRQueue_h
 #define vtkVRQueue_h
 
+#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
 #include "vtkObject.h"
 
@@ -77,7 +78,7 @@ struct vtkVREvent
   unsigned int timeStamp;
 };
 
-class vtkVRQueue : public vtkObject
+class VTKINTERACTIONSTYLES_EXPORT vtkVRQueue : public vtkObject
 {
 public:
   static vtkVRQueue* New();

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqVRPNEventListener.h"
 #include "pqView.h"
+#include "vtkVRQueue.h"
 
 #include "vtkCamera.h"
 #include "vtkMath.h"

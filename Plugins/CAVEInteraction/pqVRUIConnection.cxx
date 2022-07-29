@@ -42,6 +42,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkTransform.h"
+#include "vtkVRQueue.h"
 #include "vtkVRUIPipe.h"
 #include "vtkVRUIServerState.h"
 #include "vtkVRUITrackerState.h"

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRTrackStyle.h
+   Module:  vtkSMVRVirtualHandStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRTrackStyle_h
-#define vtkVRTrackStyle_h
+#ifndef vtkSMVRVirtualHandStyleProxy_h
+#define vtkSMVRVirtualHandStyleProxy_h
 
-#include "vtkVRInteractorStyle.h"
+#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkNew.h"
+#include "vtkSMVRTrackStyleProxy.h"
 
+class vtkCamera;
+class vtkMatrix4x4;
+class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkTransform;
-
 struct vtkVREvent;
 
-class vtkVRTrackStyle : public vtkVRInteractorStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRVirtualHandStyleProxy : public vtkSMVRTrackStyleProxy
 {
 public:
-  static vtkVRTrackStyle* New();
-  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle);
+  static vtkSMVRVirtualHandStyleProxy* New();
+  vtkTypeMacro(vtkSMVRVirtualHandStyleProxy, vtkSMVRTrackStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  int GetControlledPropertySize() override { return 16; }
-
 protected:
-  vtkVRTrackStyle();
-  ~vtkVRTrackStyle() override;
+  vtkSMVRVirtualHandStyleProxy();
+  ~vtkSMVRVirtualHandStyleProxy(); // WRS-TODO: no "override" here?  Others have it.
+
+  void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
+  bool CurrentButton;
+  bool PrevButton;
+
+  bool EventPress;
+  bool EventRelease;
+
+  vtkNew<vtkMatrix4x4> CurrentTrackerMatrix;
+  vtkNew<vtkMatrix4x4> InverseTrackerMatrix;
+  vtkNew<vtkMatrix4x4> CachedModelMatrix;
+  vtkNew<vtkMatrix4x4> NewModelMatrix;
+
 private:
-  vtkVRTrackStyle(const vtkVRTrackStyle&) = delete; // Not implemented.
-  void operator=(const vtkVRTrackStyle&) = delete;  // Not implemented.
+  vtkSMVRVirtualHandStyleProxy(const vtkSMVRVirtualHandStyleProxy&) = delete;
+  void operator=(const vtkSMVRVirtualHandStyleProxy&) = delete;
 };
 
-#endif // vtkVRTrackStyle_h
+#endif // vtkSMVRVirtualHandStyleProxy_h

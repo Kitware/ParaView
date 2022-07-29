@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRGrabWorldStyle.cxx
+   Module:  vtkSMVRGrabWorldStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRGrabWorldStyle.h"
+#include "vtkSMVRGrabWorldStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRGrabWorldStyle);
+vtkStandardNewMacro(vtkSMVRGrabWorldStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRGrabWorldStyle::vtkVRGrabWorldStyle()
+vtkSMVRGrabWorldStyleProxy::vtkSMVRGrabWorldStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Rotate world");
@@ -71,11 +71,11 @@ vtkVRGrabWorldStyle::vtkVRGrabWorldStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle() = default;
+vtkSMVRGrabWorldStyleProxy::~vtkSMVRGrabWorldStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRGrabWorldStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRGrabWorldStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -93,7 +93,7 @@ void vtkVRGrabWorldStyle::PrintSelf(ostream& os, vtkIndent indent)
 // NOTE: in the vtkVRSpaceNavigatorGrabWorldStyle.cxx code, the multiple steps used to
 //   get the "rview->getProxy()" value is simply replaced with "this->ControlledProxy".
 //   I would like to get an explanation so we know if we can do the same here.
-vtkCamera* vtkVRGrabWorldStyle::GetCamera()
+vtkCamera* vtkSMVRGrabWorldStyleProxy::GetCamera()
 {
   vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
@@ -116,7 +116,7 @@ vtkCamera* vtkVRGrabWorldStyle::GetCamera()
   }
   if (!camera)
   {
-    vtkWarningMacro(<< "vtkVRGrabWorldStyle: Cannot grab active camera.");
+    vtkWarningMacro(<< "vtkSMVRGrabWorldStyleProxy: Cannot grab active camera.");
   }
 
   return camera;
@@ -124,7 +124,7 @@ vtkCamera* vtkVRGrabWorldStyle::GetCamera()
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRGrabWorldStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRGrabWorldStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
   if (role == "Translate world")
@@ -159,7 +159,7 @@ void vtkVRGrabWorldStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRGrabWorldStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRGrabWorldStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   vtkCamera* camera = nullptr;
   std::string role = this->GetTrackerRole(event.name);
@@ -173,7 +173,7 @@ void vtkVRGrabWorldStyle::HandleTracker(const vtkVREvent& event)
       this->IsInitialRotRecorded = false; /* disable any current rotation event.   WRS: why? */
 
       /* get the active camera */
-      camera = vtkVRGrabWorldStyle::GetCamera();
+      camera = vtkSMVRGrabWorldStyleProxy::GetCamera();
       if (!camera)
       {
         vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");
@@ -292,7 +292,7 @@ printf("loc 0 %f %f %f\n", transformMatrix->Element[0][3], transformMatrix->Elem
       this->IsInitialTransRecorded = false; /* disable any current translation event.   WRS: why? */
 
       /* get the active camera */
-      camera = vtkVRGrabWorldStyle::GetCamera();
+      camera = vtkSMVRGrabWorldStyleProxy::GetCamera();
       if (!camera)
       {
         vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");
@@ -376,7 +376,7 @@ printf("loc 0 %f %f %f\n", transformMatrix->Element[0][3], transformMatrix->Elem
 }
 
 // ----------------------------------------------------------------------------
-float vtkVRGrabWorldStyle::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix)
+float vtkSMVRGrabWorldStyleProxy::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix)
 {
   // Return the distance between the camera and the focal point.
   // WRS: and the distance between the camera and the focal point is a speed factor???

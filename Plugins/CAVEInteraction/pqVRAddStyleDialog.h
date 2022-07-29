@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDialog>
 
-class vtkVRInteractorStyle;
+class vtkSMVRInteractorStyleProxy;
 
 class pqVRAddStyleDialog : public QDialog
 {
@@ -45,7 +45,7 @@ public:
   pqVRAddStyleDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   virtual ~pqVRAddStyleDialog();
 
-  void setInteractorStyle(vtkVRInteractorStyle*, const QString& name);
+  void setInteractorStyle(vtkSMVRInteractorStyleProxy*, const QString& name);
   void updateInteractorStyle();
 
   // Returns true if there are any user-configurable options.

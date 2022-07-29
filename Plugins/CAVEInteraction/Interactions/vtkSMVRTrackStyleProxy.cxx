@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRTrackStyle.cxx
+   Module:  vtkSMVRTrackStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 /***********************************************************************/
 /*                                                                     */
-/* Style for the head tracking interface -- vtkVRTrackStyle            */
+/* Style for the head tracking interface -- vtkSMVRTrackStyleProxy     */
 /*                                                                     */
 /* NOTES:                                                              */
 /*    * The simplest of interface styles -- simply maps head tracking  */
@@ -41,10 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*        property that will be connected to the head tracker.         */
 /*                                                                     */
 /***********************************************************************/
-#include "vtkVRTrackStyle.h"
+#include "vtkSMVRTrackStyleProxy.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
@@ -54,11 +55,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRTrackStyle);
+vtkStandardNewMacro(vtkSMVRTrackStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRTrackStyle::vtkVRTrackStyle()
+vtkSMVRTrackStyleProxy::vtkSMVRTrackStyleProxy()
   : Superclass()
 {
   this->AddTrackerRole("Tracker");
@@ -66,18 +67,18 @@ vtkVRTrackStyle::vtkVRTrackStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRTrackStyle::~vtkVRTrackStyle() = default;
+vtkSMVRTrackStyleProxy::~vtkSMVRTrackStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRTrackStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRTrackStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRTrackStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRTrackStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   std::string role = this->GetTrackerRole(event.name);
 

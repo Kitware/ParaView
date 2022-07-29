@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRControlSlicePositionStyle.h
+   Module:  vtkSMVRSpaceNavigatorGrabWorldStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,45 +29,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRControlSlicePositionStyle_h
-#define vtkVRControlSlicePositionStyle_h
+#ifndef vtkSMVRSpaceNavigatorGrabWorldStyleProxy_h
+#define vtkSMVRSpaceNavigatorGrabWorldStyleProxy_h
 
-#include "vtkNew.h"
-#include "vtkVRInteractorStyle.h"
+#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkSMVRInteractorStyleProxy.h"
 
+class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
+class vtkSMProxy;
+class vtkSMRenderViewProxy;
 class vtkTransform;
-class vtkMatrix4x4;
 
-class vtkVRControlSlicePositionStyle : public vtkVRInteractorStyle
+struct vtkVREvent;
+
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRSpaceNavigatorGrabWorldStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
-  static vtkVRControlSlicePositionStyle* New();
-  vtkTypeMacro(vtkVRControlSlicePositionStyle, vtkVRInteractorStyle);
+  static vtkSMVRSpaceNavigatorGrabWorldStyleProxy* New();
+  vtkTypeMacro(vtkSMVRSpaceNavigatorGrabWorldStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  int GetControlledPropertySize() override { return 3; }
-
-  /// Update() called to update all the remote vtkObjects and perhaps even to render.
-  ///   Typically processing intensive operations go here. The method should not
-  ///   be called from within the handler and is reserved to be called from an
-  ///   external interaction style manager.
-  bool Update() override;
-
 protected:
-  vtkVRControlSlicePositionStyle();
-  ~vtkVRControlSlicePositionStyle() override;
+  vtkSMVRSpaceNavigatorGrabWorldStyleProxy();
+  ~vtkSMVRSpaceNavigatorGrabWorldStyleProxy() override;
 
-  void HandleButton(const vtkVREvent& event) override;
-  void HandleTracker(const vtkVREvent& event) override;
-
-  bool Enabled;
-  bool InitialPositionRecorded;
-  double Origin[4];
-  vtkNew<vtkMatrix4x4> InitialInvertedPose;
+  void HandleAnalog(const vtkVREvent& event) override;
 
 private:
-  vtkVRControlSlicePositionStyle(const vtkVRControlSlicePositionStyle&) = delete; // Not implemented
-  void operator=(const vtkVRControlSlicePositionStyle&) = delete;                 // Not implemented
+  vtkSMVRSpaceNavigatorGrabWorldStyleProxy(
+    const vtkSMVRSpaceNavigatorGrabWorldStyleProxy&) = delete;              // Not implemented
+  void operator=(const vtkSMVRSpaceNavigatorGrabWorldStyleProxy&) = delete; // Not implemented
 };
 
-#endif // vtkVRControlSlicePositionStyle_h
+#endif // vtkSMVRSpaceNavigatorGrabWorldStyleProxy_h

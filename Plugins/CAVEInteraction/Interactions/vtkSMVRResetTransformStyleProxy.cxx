@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRResetTransformStyle.cxx
+   Module:  vtkSMVRResetTransformStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRResetTransformStyle.h"
+#include "vtkSMVRResetTransformStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRResetTransformStyle);
+vtkStandardNewMacro(vtkSMVRResetTransformStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRResetTransformStyle::vtkVRResetTransformStyle()
+vtkSMVRResetTransformStyleProxy::vtkSMVRResetTransformStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Navigate world");
@@ -66,11 +66,11 @@ vtkVRResetTransformStyle::vtkVRResetTransformStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRResetTransformStyle::~vtkVRResetTransformStyle() = default;
+vtkSMVRResetTransformStyleProxy::~vtkSMVRResetTransformStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRResetTransformStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRResetTransformStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -81,7 +81,7 @@ void vtkVRResetTransformStyle::PrintSelf(ostream& os, vtkIndent indent)
 // ----------------------------------------------------------------------------
 // GetCamera() method
 //
-vtkCamera* vtkVRResetTransformStyle::GetCamera()
+vtkCamera* vtkSMVRResetTransformStyleProxy::GetCamera()
 {
   vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
@@ -112,7 +112,7 @@ vtkCamera* vtkVRResetTransformStyle::GetCamera()
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRResetTransformStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRResetTransformStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
 
@@ -136,7 +136,7 @@ void vtkVRResetTransformStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRResetTransformStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRResetTransformStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   vtkCamera* camera = nullptr;
   std::string role = this->GetTrackerRole(event.name);
@@ -145,7 +145,7 @@ void vtkVRResetTransformStyle::HandleTracker(const vtkVREvent& event)
     return;
   if (this->EnableNavigate)
   {
-    camera = vtkVRResetTransformStyle::GetCamera();
+    camera = vtkSMVRResetTransformStyleProxy::GetCamera();
     if (!camera)
     {
       vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");
@@ -192,7 +192,7 @@ void vtkVRResetTransformStyle::HandleTracker(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // GetSpeedFactor(): ...
-float vtkVRResetTransformStyle::GetSpeedFactor(vtkCamera* cam)
+float vtkSMVRResetTransformStyleProxy::GetSpeedFactor(vtkCamera* cam)
 {
   // Return the distance between the camera and the focal point.
   // WRS: and the distance between the camera and the focal point is a speed factor???

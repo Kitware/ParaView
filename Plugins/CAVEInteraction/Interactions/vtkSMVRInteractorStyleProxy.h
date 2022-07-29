@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRInteractorStyle.h
+   Module:  vtkSMVRInteractorStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,10 +29,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRInteractorStyle_h
-#define vtkVRInteractorStyle_h
+#ifndef vtkSMVRInteractorStyleProxy_h
+#define vtkSMVRInteractorStyleProxy_h
 
-#include <vtkObject.h>
+#include "vtkInteractionStylesModule.h" // for export macro
+#include <vtkSMProxy.h>
 
 #include <map>
 #include <string>
@@ -45,11 +46,11 @@ class vtkSMDoubleVectorProperty;
 class vtkStringList;
 struct vtkVREvent;
 
-class vtkVRInteractorStyle : public vtkObject
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRInteractorStyleProxy : public vtkSMProxy
 {
 public:
-  static vtkVRInteractorStyle* New();
-  vtkTypeMacro(vtkVRInteractorStyle, vtkObject);
+  static vtkSMVRInteractorStyleProxy* New();
+  vtkTypeMacro(vtkSMVRInteractorStyleProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
@@ -111,8 +112,8 @@ public:
   virtual vtkPVXMLElement* SaveConfiguration() const;
 
 protected:
-  vtkVRInteractorStyle();
-  virtual ~vtkVRInteractorStyle();
+  vtkSMVRInteractorStyleProxy();
+  virtual ~vtkSMVRInteractorStyleProxy();
 
   virtual void HandleButton(const vtkVREvent& event);
   virtual void HandleAnalog(const vtkVREvent& event);
@@ -139,8 +140,8 @@ protected:
   std::string GetKeyInMap(const StringMap& map_, const std::string& value);
 
 private:
-  vtkVRInteractorStyle(const vtkVRInteractorStyle&) = delete;
-  void operator=(const vtkVRInteractorStyle&) = delete;
+  vtkSMVRInteractorStyleProxy(const vtkSMVRInteractorStyleProxy&) = delete;
+  void operator=(const vtkSMVRInteractorStyleProxy&) = delete;
 };
 
 #endif

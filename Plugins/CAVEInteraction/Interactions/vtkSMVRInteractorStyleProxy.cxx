@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRInteractorStyle.cxx
+   Module:  vtkSMVRInteractorStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRInteractorStyle.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
@@ -47,13 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRInteractorStyle);
-vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy);
+vtkStandardNewMacro(vtkSMVRInteractorStyleProxy);
+vtkCxxSetObjectMacro(vtkSMVRInteractorStyleProxy, ControlledProxy, vtkSMProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRInteractorStyle::vtkVRInteractorStyle()
-  : Superclass()
+vtkSMVRInteractorStyleProxy::vtkSMVRInteractorStyleProxy()
+  : vtkSMProxy()
   , ControlledProxy(nullptr)
   , ControlledPropertyName(nullptr)
 {
@@ -61,7 +61,7 @@ vtkVRInteractorStyle::vtkVRInteractorStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRInteractorStyle::~vtkVRInteractorStyle()
+vtkSMVRInteractorStyleProxy::~vtkSMVRInteractorStyleProxy()
 {
   this->SetControlledProxy(nullptr);
   this->SetControlledPropertyName(nullptr);
@@ -69,7 +69,7 @@ vtkVRInteractorStyle::~vtkVRInteractorStyle()
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRInteractorStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ControlledPropertyName: " << this->ControlledPropertyName << endl;
@@ -105,7 +105,7 @@ void vtkVRInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
 }
 // ----------------------------------------------------------------------------
 // Configure() method -- to reread from a State file (PVSM file)
-bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
+bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
   if (!child->GetName() || strcmp(child->GetName(), "Style") != 0 ||
     strcmp(this->GetClassName(), child->GetAttributeOrEmpty("class")) != 0)
@@ -243,7 +243,7 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
 
 // ----------------------------------------------------------------------------
 // SaveConfiguration() method -- store into a State file (PVSM file)
-vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
+vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
@@ -299,22 +299,22 @@ vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
 
 // -----------------------------------------------------------------------------
 // Update() method -- empty in the generic class
-bool vtkVRInteractorStyle::Update()
+bool vtkSMVRInteractorStyleProxy::Update()
 {
   return true;
 }
 
 // ----------------------------------------------------------------------------
 // HandleButton() method -- empty in the generic class
-void vtkVRInteractorStyle::HandleButton(const vtkVREvent& vtkNotUsed(event)) {}
+void vtkSMVRInteractorStyleProxy::HandleButton(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // HandleAnalog() method -- empty in the generic class
-void vtkVRInteractorStyle::HandleAnalog(const vtkVREvent& vtkNotUsed(event)) {}
+void vtkSMVRInteractorStyleProxy::HandleAnalog(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method -- empty in the generic class
-void vtkVRInteractorStyle::HandleTracker(const vtkVREvent& vtkNotUsed(event)) {}
+void vtkSMVRInteractorStyleProxy::HandleTracker(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -326,7 +326,7 @@ void vtkVRInteractorStyle::HandleTracker(const vtkVREvent& vtkNotUsed(event)) {}
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-std::vector<std::string> vtkVRInteractorStyle::Tokenize(std::string input)
+std::vector<std::string> vtkSMVRInteractorStyleProxy::Tokenize(std::string input)
 {
   std::replace(input.begin(), input.end(), '.', ' ');
   std::istringstream stm(input);
@@ -342,25 +342,26 @@ std::vector<std::string> vtkVRInteractorStyle::Tokenize(std::string input)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::AddAnalogRole(const std::string& role)
+void vtkSMVRInteractorStyleProxy::AddAnalogRole(const std::string& role)
 {
   this->Analogs.insert(StringMap::value_type(role, std::string()));
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::AddButtonRole(const std::string& role)
+void vtkSMVRInteractorStyleProxy::AddButtonRole(const std::string& role)
 {
   this->Buttons.insert(StringMap::value_type(role, std::string()));
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::AddTrackerRole(const std::string& role)
+void vtkSMVRInteractorStyleProxy::AddTrackerRole(const std::string& role)
 {
   this->Trackers.insert(StringMap::value_type(role, std::string()));
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::MapKeysToStringList(const StringMap& source, vtkStringList* target)
+void vtkSMVRInteractorStyleProxy::MapKeysToStringList(
+  const StringMap& source, vtkStringList* target)
 {
   target->RemoveAllItems();
   for (StringMap::const_iterator iter = source.begin(), itEnd = source.end(); iter != itEnd; ++iter)
@@ -370,7 +371,7 @@ void vtkVRInteractorStyle::MapKeysToStringList(const StringMap& source, vtkStrin
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetValueInMap(
+bool vtkSMVRInteractorStyleProxy::SetValueInMap(
   StringMap& map_, const std::string& key, const std::string& value)
 {
   StringMap::iterator iter = map_.find(key);
@@ -383,14 +384,16 @@ bool vtkVRInteractorStyle::SetValueInMap(
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetValueInMap(const StringMap& map_, const std::string& key)
+std::string vtkSMVRInteractorStyleProxy::GetValueInMap(
+  const StringMap& map_, const std::string& key)
 {
   StringMap::const_iterator iter = map_.find(key);
   return iter != map_.end() ? iter->second : std::string();
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetKeyInMap(const StringMap& map_, const std::string& value)
+std::string vtkSMVRInteractorStyleProxy::GetKeyInMap(
+  const StringMap& map_, const std::string& value)
 {
   for (StringMap::const_iterator iter = map_.begin(), itEnd = map_.end(); iter != itEnd; ++iter)
   {
@@ -403,7 +406,7 @@ std::string vtkVRInteractorStyle::GetKeyInMap(const StringMap& map_, const std::
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::HandleEvent(const vtkVREvent& event)
+bool vtkSMVRInteractorStyleProxy::HandleEvent(const vtkVREvent& event)
 {
   switch (event.eventType)
   {
@@ -421,91 +424,91 @@ bool vtkVRInteractorStyle::HandleEvent(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::GetAnalogRoles(vtkStringList* roles)
+void vtkSMVRInteractorStyleProxy::GetAnalogRoles(vtkStringList* roles)
 {
   this->MapKeysToStringList(this->Analogs, roles);
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::GetButtonRoles(vtkStringList* roles)
+void vtkSMVRInteractorStyleProxy::GetButtonRoles(vtkStringList* roles)
 {
   this->MapKeysToStringList(this->Buttons, roles);
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::GetTrackerRoles(vtkStringList* roles)
+void vtkSMVRInteractorStyleProxy::GetTrackerRoles(vtkStringList* roles)
 {
   this->MapKeysToStringList(this->Trackers, roles);
 }
 
 // ----------------------------------------------------------------------------
-int vtkVRInteractorStyle::GetNumberOfAnalogRoles()
+int vtkSMVRInteractorStyleProxy::GetNumberOfAnalogRoles()
 {
   return static_cast<int>(this->Analogs.size());
 }
 
 // ----------------------------------------------------------------------------
-int vtkVRInteractorStyle::GetNumberOfButtonRoles()
+int vtkSMVRInteractorStyleProxy::GetNumberOfButtonRoles()
 {
   return static_cast<int>(this->Buttons.size());
 }
 
 // ----------------------------------------------------------------------------
-int vtkVRInteractorStyle::GetNumberOfTrackerRoles()
+int vtkSMVRInteractorStyleProxy::GetNumberOfTrackerRoles()
 {
   return static_cast<int>(this->Trackers.size());
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetAnalogRole(const std::string& name)
+std::string vtkSMVRInteractorStyleProxy::GetAnalogRole(const std::string& name)
 {
   return this->GetKeyInMap(this->Analogs, name);
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetButtonRole(const std::string& name)
+std::string vtkSMVRInteractorStyleProxy::GetButtonRole(const std::string& name)
 {
   return this->GetKeyInMap(this->Buttons, name);
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetTrackerRole(const std::string& name)
+std::string vtkSMVRInteractorStyleProxy::GetTrackerRole(const std::string& name)
 {
   return this->GetKeyInMap(this->Trackers, name);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetAnalogName(const std::string& role, const std::string& name)
+bool vtkSMVRInteractorStyleProxy::SetAnalogName(const std::string& role, const std::string& name)
 {
   return this->SetValueInMap(this->Analogs, role, name);
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetAnalogName(const std::string& role)
+std::string vtkSMVRInteractorStyleProxy::GetAnalogName(const std::string& role)
 {
   return this->GetValueInMap(this->Analogs, role);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetButtonName(const std::string& role, const std::string& name)
+bool vtkSMVRInteractorStyleProxy::SetButtonName(const std::string& role, const std::string& name)
 {
   return this->SetValueInMap(this->Buttons, role, name);
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetButtonName(const std::string& role)
+std::string vtkSMVRInteractorStyleProxy::GetButtonName(const std::string& role)
 {
   return this->GetValueInMap(this->Buttons, role);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetTrackerName(const std::string& role, const std::string& name)
+bool vtkSMVRInteractorStyleProxy::SetTrackerName(const std::string& role, const std::string& name)
 {
   return this->SetValueInMap(this->Trackers, role, name);
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkVRInteractorStyle::GetTrackerName(const std::string& role)
+std::string vtkSMVRInteractorStyleProxy::GetTrackerName(const std::string& role)
 {
   return this->GetValueInMap(this->Trackers, role);
 }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRGrabPointStyle.cxx
+   Module:  vtkSMVRGrabPointStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRGrabPointStyle.h"
+#include "vtkSMVRGrabPointStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRGrabPointStyle);
+vtkStandardNewMacro(vtkSMVRGrabPointStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRGrabPointStyle::vtkVRGrabPointStyle()
+vtkSMVRGrabPointStyleProxy::vtkSMVRGrabPointStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Grab point");
@@ -66,11 +66,11 @@ vtkVRGrabPointStyle::vtkVRGrabPointStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRGrabPointStyle::~vtkVRGrabPointStyle() = default;
+vtkSMVRGrabPointStyleProxy::~vtkSMVRGrabPointStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRGrabPointStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRGrabPointStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -81,7 +81,7 @@ void vtkVRGrabPointStyle::PrintSelf(ostream& os, vtkIndent indent)
 // ----------------------------------------------------------------------------
 // Update() method
 // WRS-TODO: Explain what this->ControlledProxy indicates and why it's important for Update()
-bool vtkVRGrabPointStyle::Update()
+bool vtkSMVRGrabPointStyleProxy::Update()
 {
   if (!this->ControlledProxy)
   {
@@ -97,7 +97,7 @@ bool vtkVRGrabPointStyle::Update()
 // NOTE: in the vtkVRSpaceNavigatorGrabWorldStyle.cxx code, the multiple steps used to
 //   get the "rview->getProxy()" value is simply replaced with "this->ControlledProxy".
 //   I would like to get an explanation so we know if we can do the same here.
-vtkCamera* vtkVRGrabPointStyle::GetCamera()
+vtkCamera* vtkSMVRGrabPointStyleProxy::GetCamera()
 {
   vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
@@ -128,7 +128,7 @@ vtkCamera* vtkVRGrabPointStyle::GetCamera()
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRGrabPointStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRGrabPointStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
   if (role == "Grab point")
@@ -151,7 +151,7 @@ void vtkVRGrabPointStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRGrabPointStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRGrabPointStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   vtkCamera* camera = nullptr;
   std::string role = this->GetTrackerRole(event.name);
@@ -159,7 +159,7 @@ void vtkVRGrabPointStyle::HandleTracker(const vtkVREvent& event)
     return;
   if (this->EnableNavigate)
   {
-    camera = vtkVRGrabPointStyle::GetCamera();
+    camera = vtkSMVRGrabPointStyleProxy::GetCamera();
     if (!camera)
     {
       vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");
@@ -215,7 +215,7 @@ void vtkVRGrabPointStyle::HandleTracker(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-float vtkVRGrabPointStyle::GetSpeedFactor(vtkCamera* cam)
+float vtkSMVRGrabPointStyleProxy::GetSpeedFactor(vtkCamera* cam)
 {
   // Return the distance between the camera and the focal point.
   // WRS: and the distance between the camera and the focal point is a speed factor???

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRVirtualHandStyle.cxx
+   Module:  vtkSMVRVirtualHandStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#include "vtkVRVirtualHandStyle.h"
+#include "vtkSMVRVirtualHandStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // -----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRVirtualHandStyle);
+vtkStandardNewMacro(vtkSMVRVirtualHandStyleProxy);
 
 // -----------------------------------------------------------------------------
 // Constructor method
-vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
+vtkSMVRVirtualHandStyleProxy::vtkSMVRVirtualHandStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Grab world");
@@ -73,11 +73,11 @@ vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
 
 // -----------------------------------------------------------------------------
 // Destructor method
-vtkVRVirtualHandStyle::~vtkVRVirtualHandStyle() = default;
+vtkSMVRVirtualHandStyleProxy::~vtkSMVRVirtualHandStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRVirtualHandStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRVirtualHandStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -101,7 +101,7 @@ void vtkVRVirtualHandStyle::PrintSelf(ostream& os, vtkIndent indent)
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRVirtualHandStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRVirtualHandStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
   if (role == "Grab world")
@@ -124,7 +124,7 @@ void vtkVRVirtualHandStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRVirtualHandStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRVirtualHandStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   std::string role = this->GetTrackerRole(event.name);
   if (role == "Tracker")

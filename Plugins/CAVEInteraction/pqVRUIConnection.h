@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqVRUIConnection_h
 
 #include "vtkSmartPointer.h"
-#include "vtkVRQueue.h"
 #include "vtkVRUITrackerState.h"
 #include <QThread>
 #include <map>
 #include <vector>
 
+class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkTransform;

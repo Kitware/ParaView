@@ -1,0 +1,18 @@
+NAME
+  CAVEInteraction::Styles
+LIBRARY_NAME
+  vtkInteractionStyles
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::RenderingCore
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
+  ParaView::pqApplicationComponents
+PRIVATE_DEPENDS
+  VTK::CommonTransforms
+  VTK::FiltersCore
+  VTK::FiltersGeneral
+  VTK::FiltersSources

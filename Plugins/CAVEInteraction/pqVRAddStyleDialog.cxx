@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkNew.h"
 #include "vtkSMProxy.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 #include "vtkStringList.h"
-#include "vtkVRInteractorStyle.h"
 
 #include <QComboBox>
 
@@ -58,7 +58,7 @@ class pqVRAddStyleDialog::pqInternals : public Ui::VRAddStyleDialog
 {
 public:
   bool CanConfigure;
-  vtkVRInteractorStyle* Style;
+  vtkSMVRInteractorStyleProxy* Style;
 
   enum InputType
   {
@@ -162,7 +162,7 @@ pqVRAddStyleDialog::~pqVRAddStyleDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqVRAddStyleDialog::setInteractorStyle(vtkVRInteractorStyle* style, const QString& name)
+void pqVRAddStyleDialog::setInteractorStyle(vtkSMVRInteractorStyleProxy* style, const QString& name)
 {
   this->Internals->Style = style;
   this->Internals->infoLabel->setText(tr("Configuring style %1.").arg(name));
