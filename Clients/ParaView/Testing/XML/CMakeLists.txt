@@ -731,6 +731,12 @@ if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)
     PluginEULA.xml)
 endif ()
 
+if (PARAVIEW_ENABLE_OPENVDB)
+  list (APPEND TESTS_WITHOUT_BASELINES
+    OpenVDBReader.xml
+  )
+endif ()
+
 if (PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
     TestPythonConsole.xml

@@ -414,6 +414,7 @@ endif()
 
 if (TARGET VTK::IOOpenVDB)
   list(APPEND xml_files
+    Resources/readers_ioopenvdb.xml
     Resources/writers_ioopenvdb.xml)
 endif()
 
