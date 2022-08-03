@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSaveAnimationExtractsProxy.h"
 
+#include "vtkCompositeAnimationPlayer.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
@@ -105,8 +106,7 @@ bool vtkSMSaveAnimationExtractsProxy::SaveExtracts()
 {
   auto session = this->GetSession();
 
-  vtkNew<vtkSMParaViewPipelineController> controller;
-  auto scene = controller->FindAnimationScene(session);
+  vtkSMProxy* scene = vtkSMPropertyHelper(this, "AnimationScene").GetAsProxy();
   if (!scene)
   {
     vtkErrorMacro("No animation scene found. Cannot generate extracts.");
@@ -120,6 +120,48 @@ bool vtkSMSaveAnimationExtractsProxy::SaveExtracts()
   vtkNew<ExtractsWriter> writer;
   writer->Initialize(this);
   writer->SetAnimationScene(scene);
+  writer->SetStride(vtkSMPropertyHelper(this, "FrameStride").GetAsInt());
+  // Convert frame window to PlaybackTimeWindow; FrameWindow is an integral
+  // value indicating the frame number of timestep; PlaybackTimeWindow is double
+  // values as animation time.
+  int frameWindow[2] = { 0, 0 };
+  vtkSMPropertyHelper(this, "FrameWindow").Get(frameWindow, 2);
+  double playbackTimeWindow[2] = { -1, 0 };
+  switch (vtkSMPropertyHelper(scene, "PlayMode").GetAsInt())
+  {
+    case vtkCompositeAnimationPlayer::SEQUENCE:
+    {
+      int numFrames = vtkSMPropertyHelper(scene, "NumberOfFrames").GetAsInt();
+      double startTime = vtkSMPropertyHelper(scene, "StartTime").GetAsDouble();
+      double endTime = vtkSMPropertyHelper(scene, "EndTime").GetAsDouble();
+      frameWindow[0] = frameWindow[0] < 0 ? 0 : frameWindow[0];
+      frameWindow[1] = frameWindow[1] >= numFrames ? numFrames - 1 : frameWindow[1];
+      playbackTimeWindow[0] =
+        startTime + ((endTime - startTime) * frameWindow[0]) / (numFrames - 1);
+      playbackTimeWindow[1] =
+        startTime + ((endTime - startTime) * frameWindow[1]) / (numFrames - 1);
+    }
+    break;
+    case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
+    {
+      vtkSMProxy* timeKeeper = vtkSMPropertyHelper(scene, "TimeKeeper").GetAsProxy();
+      vtkSMPropertyHelper tsValuesHelper(timeKeeper, "TimestepValues");
+      int numTS = tsValuesHelper.GetNumberOfElements();
+      frameWindow[0] = frameWindow[0] < 0 ? 0 : frameWindow[0];
+      frameWindow[1] = frameWindow[1] >= numTS ? numTS - 1 : frameWindow[1];
+      playbackTimeWindow[0] = tsValuesHelper.GetAsDouble(frameWindow[0]);
+      playbackTimeWindow[1] = tsValuesHelper.GetAsDouble(frameWindow[1]);
+    }
+
+    break;
+    case vtkCompositeAnimationPlayer::REAL_TIME:
+      // this should not happen. vtkSMSaveAnimationProxy::Prepare() should have
+      // changed the play mode to SEQUENCE or SNAP_TO_TIMESTEPS.
+      abort();
+  }
+  writer->SetStartFileCount(frameWindow[0]);
+  writer->SetPlaybackTimeWindow(playbackTimeWindow);
+
   // register with progress handler so we monitor progress events.
   session->GetProgressHandler()->RegisterProgressEvent(
     writer.Get(), static_cast<int>(this->GetGlobalID()));

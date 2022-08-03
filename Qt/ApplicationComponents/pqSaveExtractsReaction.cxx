@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProgressManager.h"
 #include "pqProxyWidgetDialog.h"
+
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSaveAnimationExtractsProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
@@ -62,6 +64,8 @@ bool pqSaveExtractsReaction::generateExtracts()
   if (exporter)
   {
     controller->PreInitializeProxy(exporter);
+    auto scene = controller->FindAnimationScene(pxm->GetSession());
+    vtkSMPropertyHelper(exporter, "AnimationScene").Set(scene);
     controller->PostInitializeProxy(exporter);
 
     pqProxyWidgetDialog dialog(exporter, pqCoreUtilities::mainWidget());
@@ -72,7 +76,7 @@ bool pqSaveExtractsReaction::generateExtracts()
       pqAnimationProgressDialog progress(
         "Save Extracts Progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
       progress.setWindowTitle("Saving Extracts ...");
-      progress.setAnimationScene(controller->FindAnimationScene(pxm->GetSession()));
+      progress.setAnimationScene(scene);
       progress.show();
 
       auto appcore = pqApplicationCore::instance();
