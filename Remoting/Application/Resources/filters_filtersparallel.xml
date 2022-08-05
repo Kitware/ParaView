@@ -930,7 +930,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPCellDataToPointData"
+    <SourceProxy class="vtkCellDataToPointData"
                  label="Cell Data to Point Data"
                  name="CellDataToPointData">
       <Documentation long_help="Create point attributes by averaging cell attributes."
