@@ -565,8 +565,11 @@ def SaveExtracts(**kwargs):
 
     scene.UpdateAnimationUsingDataTimeSteps()
 
-    pxm = servermanager.ProxyManager()
-    proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
+    controller = servermanager.ParaViewPipelineController()
+    proxy = servermanager.misc.SaveAnimationExtracts()
+    controller.PreInitializeProxy(proxy)
+    proxy.AnimationScene = scene
+    controller.PostInitializeProxy(proxy)
     SetProperties(proxy, **kwargs)
     return proxy.SaveExtracts()
 
