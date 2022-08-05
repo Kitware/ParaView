@@ -5,18 +5,21 @@
 #  Gmsh_LIBRARIES: the Gmsh library
 #  Gmsh_FOUND: if false, do not try to use Gmsh
 #  Gmsh_VERSION: The found version of Gmsh
+#  Gmsh::Gmsh: Imported target for the Gmsh library
 
 find_path(Gmsh_INCLUDE_DIR
   NAMES
     gmsh.h
   PATHS
     /usr/local/include
-    /usr/include)
+    /usr/include
+  DOC "Gmsh include directory")
 mark_as_advanced(Gmsh_INCLUDE_DIR)
 
 find_library(Gmsh_LIBRARY
   NAMES
-    gmsh libgmsh)
+    gmsh libgmsh
+  DOC "Gmsh library path")
 mark_as_advanced(Gmsh_LIBRARY)
 
 if (Gmsh_INCLUDE_DIR)
