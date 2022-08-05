@@ -14,6 +14,7 @@
   =========================================================================*/
 #include "vtkPlotEdges.h"
 
+#include "vtkAppendPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCleanPolyData.h"
@@ -27,20 +28,15 @@
 #include "vtkMath.h"
 #include "vtkMergePoints.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
-#include "vtkType.h"
-
-#include "vtkAppendCompositeDataLeaves.h"
-#include "vtkAppendPolyData.h"
-#include "vtkMultiProcessController.h"
 #include "vtkReductionFilter.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-
-#define MY_MAX(x, y) ((x) < (y) ? (y) : (x))
+#include "vtkType.h"
 
 //-----------------------------------------------------------------------------
 class vtkPlotEdges::Segment : public vtkObject
@@ -55,7 +51,6 @@ class vtkPlotEdges::Segment : public vtkObject
   void AddPoint(vtkIdType cellId, vtkIdType pointId);
   void InsertSegment(vtkIdType pos, Segment* segment);
 
-  // vtkIdList* GetPointIdList();
   vtkGetObjectMacro(PointIdList, vtkIdList);
   unsigned int GetCountPointIds() { return this->PointIdList->GetNumberOfIds(); }
 
@@ -257,28 +252,23 @@ void vtkPlotEdges::Segment::ComputeDirection(
   vtkIdType pointId = this->PointIdList->GetId(pointIndex);
   if (pointIndex == -1 || pointId == -1)
   {
-    cerr << "Given point " << pointId << " doesn't exist." << endl;
     return;
   }
-  // cerr<< "DIR: pointId:" << pointId << " pointIndex: " << pointIndex << endl;
 
   double point1[3];
 
   this->PolyData->GetPoint(pointId, point1);
-  // cerr<< "DIR: point1:" << point1[0] << "," << point1[1] << "," << point1[2] << endl;
 
   // Point2
   double point2[3];
   pointIndex += increment ? 1 : -1;
   pointId = this->PointIdList->GetId(pointIndex);
-  // cerr<< "DIR: pointId:" << pointId << " pointIndex: " << pointIndex << endl;
   if (pointIndex == -1 || pointIndex >= this->PointIdList->GetNumberOfIds())
-  { // not enough points to compute the direction
-    cerr << " NOT REALLY an error. please erase this line" << pointIndex << endl;
+  {
+    // not enough points to compute the direction
     return;
   }
   this->PolyData->GetPoint(pointId, point2);
-  // cerr<< "DIR: point2:" << point2[0] << "," << point2[1] << "," << point2[2] << endl;
 
   // vector21
   double vector21[3];
@@ -290,7 +280,6 @@ void vtkPlotEdges::Segment::ComputeDirection(
   double averageLength = this->GetLength() / this->PointIdList->GetNumberOfIds();
   while (averageLength > length)
   {
-    // cerr<< "DIR: length: " << length << " average:" << averageLength << endl;
     direction[0] += vector21[0];
     direction[1] += vector21[1];
     direction[2] += vector21[2];
@@ -302,12 +291,9 @@ void vtkPlotEdges::Segment::ComputeDirection(
     pointId = this->PointIdList->GetId(pointIndex);
     if (pointIndex == -1 || pointIndex > this->PointIdList->GetNumberOfIds())
     {
-      cerr << "error. it is not logically possible to get this case." << endl;
       return;
     }
     this->PolyData->GetPoint(pointId, point2);
-    // cerr<< "DIR: point1:" << point1[0] << "," << point1[1] << "," << point1[2] << endl;
-    // cerr<< "DIR: point2:" << point2[0] << "," << point2[1] << "," << point2[2] << endl;
     vector21[0] = point1[0] - point2[0];
     vector21[1] = point1[1] - point2[1];
     vector21[2] = point1[2] - point2[2];
@@ -319,7 +305,6 @@ void vtkPlotEdges::Segment::ComputeDirection(
     direction[1] += vector21[1] * (averageLength / length);
     direction[2] += vector21[2] * (averageLength / length);
   }
-  // cerr<< "DIR: direction:" << direction[0] << "," << direction[1] << "," << direction[2] << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -347,7 +332,6 @@ void vtkPlotEdges::Segment::AddPoint(vtkIdType vtkNotUsed(cellId), vtkIdType poi
   this->PointIdList->InsertNextId(pointId);
 
   double length = sqrt(vtkMath::Distance2BetweenPoints(currentPoint, newPoint));
-  // double length = vtkMath::Norm(direction);
 
   if (this->ArcLengths->GetMaxId() != -1)
   {
@@ -362,17 +346,6 @@ void vtkPlotEdges::Segment::AddPoint(vtkIdType vtkNotUsed(cellId), vtkIdType poi
   this->EndDirection[0] = 0.;
   this->EndDirection[1] = 0.;
   this->EndDirection[2] = 0.;
-
-  /*
-    cerr <<  __FUNCTION__
-    << " pt:" << pointId << "(" << newPoint[0] << "," << newPoint[1]
-    << "," << newPoint[2] << ")" << " new length: " << m_Length
-    << " startDirection:(" << this->StartDirection[0]
-    << "," << this->StartDirection[1] << "," << this->StartDirection[2] << ")"
-    << " endDirection:(" << this->EndDirection[0]
-    << "," << this->EndDirection[1]
-    << "," << this->EndDirection[2] << ")" << endl;
-  */
 }
 
 //-----------------------------------------------------------------------------
@@ -380,13 +353,10 @@ void vtkPlotEdges::Segment::InsertSegment(vtkIdType pos, Segment* segment)
 {
   if (segment->PolyData != this->PolyData)
   {
-    cerr << __FUNCTION__ << " can't mix segments with different vtkPolyData." << endl;
     return;
   }
   // GetLength() can change during InsertSegment, we save the result here.
   double length = this->GetLength();
-  // cerr << __FUNCTION__ << this->PointIdList->GetNumberOfIds() << " points with "
-  //          << segment->this->PointIdList->GetNumberOfIds() << endl;
 
   // What is the point in common between the 2 segments.
   // that point has to be updated with the other segment extremity.
@@ -454,16 +424,13 @@ void vtkPlotEdges::Segment::InsertSegment(vtkIdType pos, Segment* segment)
       }
     }
   }
-  // cerr << __FUNCTION__ << "startID: " << this->StartId
-  //          << " endId: " << this->EndId << endl;
+
   this->StartDirection[0] = 0.;
   this->StartDirection[1] = 0.;
   this->StartDirection[2] = 0.;
   this->EndDirection[0] = 0.;
   this->EndDirection[1] = 0.;
   this->EndDirection[2] = 0.;
-
-  // cerr << __FUNCTION__ << "end." << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -500,7 +467,6 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
   {
     return -1.;
   }
-  //  return segment1->GetLength() + segment2->GetLength();
 
   //        (a.b + 1)     1 -  | ||a||-||b|| |
   // Score =  -------  *(     ----------------- )
@@ -511,14 +477,14 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
   double segment1Direction[3], segment2Direction[3];
   segment1->GetDirection(this->PointId, segment1Direction);
   segment2->GetDirection(this->PointId, segment2Direction);
-  // cerr << __FUNCTION__ << " normalize" << endl;
+
   double segment1DirectionNorm = vtkMath::Normalize(segment1Direction);
   double segment2DirectionNorm = vtkMath::Normalize(segment2Direction);
 
   double angleScore = (1. - vtkMath::Dot(segment1Direction, segment2Direction)) / 2.;
   double pointFrequencyScore = 1. -
-    fabs(segment1DirectionNorm - segment2DirectionNorm) /
-      MY_MAX(segment1DirectionNorm, segment2DirectionNorm);
+    std::abs(segment1DirectionNorm - segment2DirectionNorm) /
+      std::max(segment1DirectionNorm, segment2DirectionNorm);
   double penaltyScore = 1.;
   // prevent small loops
 
@@ -713,10 +679,6 @@ void vtkPlotEdges::ExtractSegments(
   vtkPolyData* polyData = cleanPolyData->GetOutput();
   polyData->BuildLinks();
 
-  //   cerr << "Input PolyData nb points:"
-  //             << polyData->GetNumberOfPoints() << " nb cells:"
-  //             << polyData->GetNumberOfCells() << endl;
-
   int abort = 0;
   vtkIdType numCells = polyData->GetNumberOfCells();
   vtkIdType progressInterval = numCells / 20 + 1;
@@ -727,18 +689,21 @@ void vtkPlotEdges::ExtractSegments(
   for (vtkIdType cellId = 0; cellId < numCells && !abort; cellId++)
   {
     if (!(cellId % progressInterval))
-    { // Give/Get some feedbacks for/from the user
+    {
+      // Give/Get some feedbacks for/from the user
       this->UpdateProgress(static_cast<float>(cellId) / numCells);
       abort = this->GetAbortExecute();
     }
 
     if (visitedCells[cellId])
-    { // the cell has already been visited, go to the next
+    {
+      // the cell has already been visited, go to the next
       continue;
     }
 
     if (polyData->GetCellType(cellId) != VTK_LINE && polyData->GetCellType(cellId) != VTK_POLY_LINE)
-    { // No other types than VTK_LINE and VTK_POLY_LINE is handled
+    {
+      // No other types than VTK_LINE and VTK_POLY_LINE is handled
       continue;
     }
 
@@ -750,7 +715,6 @@ void vtkPlotEdges::ExtractSegments(
     polyData->GetCellPoints(cellId, numCellPts, cellPts);
     if (numCellPts != 2)
     {
-      cerr << "!!! Cell " << cellId << " has " << numCellPts << "pts" << endl;
       continue;
     }
 
@@ -789,21 +753,14 @@ void vtkPlotEdges::ExtractSegments(
 void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollection* segments,
   vtkCollection* nodes, char* visitedCells, vtkIdType cellId, vtkIdType pointId, Node* node)
 {
-  // cerr<< __FUNCTION__ << " cell: " << cellId << " point: " << node->GetPointId() << endl;
   if (visitedCells[cellId])
   {
-    // cerr << "Cell already visited: " << cellId << endl;
-    // cerr << "End" << __FUNCTION__ << endl;
     return;
   }
   if (polyData->GetCellType(cellId) != VTK_LINE && polyData->GetCellType(cellId) != VTK_POLY_LINE)
   {
-    // cerr << "!!!!!!!!!Cell not a line: " << cellId << endl;
-    // cerr << "End" << __FUNCTION__ << endl;
     return;
   }
-
-  // vtkIdType pointId = node->GetPointId();
 
   // Get all the points from the cell
   vtkIdType numCellPts;
@@ -813,8 +770,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 
   if (numCellPts != 2)
   {
-    cerr << "!!!!!!!The cell " << cellId << " has " << numCellPts << " points" << endl;
-    // cerr << "End" << __FUNCTION__ << endl;
     return;
   }
 
@@ -852,8 +807,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
   {
     if (numPtCells > 2)
     {
-      // cerr << "At point " << pointId2 << " found a node of "
-      //          << numPtCells << " cells " << endl;
       // we are at a tree branch node
       Node* node2 = vtkPlotEdges::GetNodeAtPoint(nodes, pointId2);
       if (!node2)
@@ -868,9 +821,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 
       for (vtkIdType i = 0; i < numPtCells; ++i)
       {
-        // cerr << "At point " << pointId2
-        //          << ", get the node branch of cell "
-        //          << cellIds[i] << endl;
         if (!visitedCells[cellIds[i]] &&
           (polyData->GetCellType(cellIds[i]) == VTK_LINE ||
             polyData->GetCellType(cellIds[i]) == VTK_POLY_LINE))
@@ -886,7 +836,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
     {
       // get the next cell
       vtkIdType cellId2 = (cellIds[0] == cellId) ? cellIds[1] : cellIds[0];
-      // cerr<< "Next Cell is " << cellId2 << endl;
       if (visitedCells[cellId2])
       {
         break;
@@ -894,8 +843,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
       if (polyData->GetCellType(cellId2) != VTK_LINE &&
         polyData->GetCellType(cellId2) != VTK_POLY_LINE)
       {
-        cerr << "!!!!!! The cell " << cellId2 << " is of type: " << polyData->GetCellType(cellId2)
-             << endl;
         // need to do something smarter
         break;
       }
@@ -905,7 +852,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 
       if (numCell2Pts != 2)
       {
-        cerr << "The cell " << cellId << " has " << numCellPts << " points" << endl;
         // need to do something smarter
         break;
       }
@@ -914,7 +860,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
       segment->AddPoint(cellId2, pointId3);
 
       // go one step forward
-      // cerr<< "Next Point is " << pointId3 << endl;
       visitedCells[cellId2] = 1;
       cellId = cellId2;
       pointId2 = pointId3;
@@ -922,15 +867,12 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
       polyData->GetPointCells(pointId2, numPtCells, cellIds);
     }
   }
-  // cerr << "End" << __FUNCTION__ << endl;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollection* nodes)
 {
   Node* node = nullptr;
-  // cerr << __FUNCTION__ << ": " << nodes->GetNumberOfItems()
-  //          << " nodes." << endl;
   vtkCollectionIterator* nodeIt = nodes->NewIterator();
   // do a first pass with straightforward nodes(2 branches)
   nodeIt->GoToFirstItem();
@@ -941,12 +883,6 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
     {
       Segment* segmentA = Segment::SafeDownCast(node->GetSegments()->GetItemAsObject(0));
       Segment* segmentB = Segment::SafeDownCast(node->GetSegments()->GetItemAsObject(1));
-      // double point[3];
-      // node->GetPolyData()->GetPoint(node->GetPointId(), point);
-      // cerr << "Node at point " << node->GetPointId()
-      //          << "(" << point[0] << "," << point[1] << "," << point[2]
-      //          << ") has only 2 segments:(" << segmentA
-      //          << ") and(" << segmentB << endl;
       vtkPlotEdges::MergeSegments(segments, nodes, node, segmentA, segmentB);
       nodeIt->GoToNextItem();
       nodes->RemoveItem(node);
@@ -964,16 +900,9 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
     node = Node::SafeDownCast(nodeIt->GetCurrentObject());
     double point[3];
     node->GetPolyData()->GetPoint(node->GetPointId(), point);
-    // cerr << "Connect node(" << node
-    //        << ") at point: " << node->GetPointId()
-    //        << "(" << point[0] << ","
-    //        << point[1] << "," << point[2] << ")" <<endl;
 
     while (node->GetSegments()->GetNumberOfItems() > 1)
     {
-      // cerr << node->GetSegments()->GetNumberOfItems()
-      //           << " segments" << endl;
-
       vtkCollectionIterator* it = node->GetSegments()->NewIterator();
       vtkCollectionIterator* it2 = node->GetSegments()->NewIterator();
 
@@ -998,12 +927,6 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
             segmentA = segmentI;
             segmentB = segmentJ;
             old_score = score;
-
-            // cerr << "Score of " << score
-            //          << " between segmentI:"<< endl;
-            // segmentI->Print(cerr);
-            // cerr << "and segmentJ:" << endl;
-            // segmentJ->Print(cerr);
           }
         }
       }
@@ -1029,25 +952,6 @@ void vtkPlotEdges::MergeSegments(
     node->GetSegments()->RemoveItem(segmentB);
     return;
   }
-
-  // cerr << "Merge segment(" << segmentA << ") "
-  //             << segmentA->GetStartId() << "-("
-  //             << segmentA->GetCountPointIds() << ")-"
-  //             << segmentA->GetEndId()
-  //             << " with segment(" << segmentB << ") "
-  //             << segmentB->GetStartId() << "-("
-  //             << segmentB->GetCountPointIds() << ")-"
-  //             << segmentB->GetEndId() << endl;
-  //   double point[3];
-  //   cerr << "Score" << node->ComputeConnectionScore(segmentA, segmentB)
-  //             << " Direction 1:" << segmentA->GetDirection(node->GetPointId(),point)[0]
-  //             << "," << segmentA->GetDirection(node->GetPointId(),point)[1]
-  //             << "," << segmentA->GetDirection(node->GetPointId(),point)[2]
-  //             << endl
-  //             << " Direction 2:" << segmentB->GetDirection(node->GetPointId(),point)[0]
-  //             << "," << segmentB->GetDirection(node->GetPointId(),point)[1]
-  //             << "," << segmentB->GetDirection(node->GetPointId(),point)[2]
-  //             << endl;
 
   segmentA->InsertSegment(node->GetPointId(), segmentB);
   node->GetSegments()->RemoveItem(segmentA);
@@ -1148,24 +1052,6 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments, vtkMultiBloc
       arcLength->SetName("PlotEdges arc_length");
     }
     pd->GetPointData()->AddArray(arcLength);
-
-    /*
-      cerr << "Add PolyLine of " <<
-      segment->GetPointIdList()->GetNumberOfIds() << " points" << endl;
-      for (vtkIdType i=0; i < segment->GetPointIdList()->GetNumberOfIds(); ++i)
-      {
-      cerr << segment->GetPointIdList()->GetId(i) << " " ;
-      }
-      cerr << endl;
-
-      cerr << "ArcLengths " <<
-      segment->GetArcLengths()->GetMaxId() << " points" << endl;
-      for (vtkIdType i=0; i < segment->GetArcLengths()->GetMaxId(); ++i)
-      {
-      cerr << segment->GetArcLengths()->GetValue(i) << " " ;
-      }
-      cerr << endl;
-    */
   }
 }
 
@@ -1176,6 +1062,6 @@ void vtkPlotEdges::PrintSegments(vtkCollection* segments)
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
   {
     Segment* segment = Segment::SafeDownCast(it->GetCurrentObject());
-    segment->Print(cerr);
+    segment->Print(std::cout);
   }
 }
