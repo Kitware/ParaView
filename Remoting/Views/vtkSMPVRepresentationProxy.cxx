@@ -861,6 +861,11 @@ vtkSMProxy* vtkSMPVRepresentationProxy::GetLUTProxy(vtkSMProxy* view)
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visible)
 {
+  if (!view)
+  {
+    return false;
+  }
+
   vtkSMProxy* lutProxy = this->GetLUTProxy(view);
   if (!lutProxy)
   {
