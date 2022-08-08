@@ -1638,47 +1638,48 @@ set(ZoomToData_DISABLE_CRS TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
-set (FavoritesFilters_FORCE_SERIAL TRUE)
-set (PolygonCellSelection_FORCE_SERIAL TRUE)
-set (PolygonPointSelection_FORCE_SERIAL TRUE)
-set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
-set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (PropertyLink_FORCE_SERIAL TRUE)
-set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
-set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
-set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
-set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
-set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
-set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
-set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
-set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
-set (ShaderReplacements_FORCE_SERIAL TRUE)
-set (CustomViewpoints_FORCE_SERIAL TRUE)
-set (ExodusModeShapes_FORCE_SERIAL TRUE)
-set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
-set (RecentFiles_FORCE_SERIAL TRUE) # use key events
-set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CGNSReaderDataLocation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRBaseline_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRContour_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRDualClip_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRMaterialInterfaceFilter_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHDerivedDensity2DClyinder_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
+set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
+set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (CustomViewpoints_FORCE_SERIAL TRUE)
+set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (ExodusModeShapes_FORCE_SERIAL TRUE)
+set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ExpressionsDialog_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (FavoritesFilters_FORCE_SERIAL TRUE)
+set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
+set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
+set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
+set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (PolygonCellSelection_FORCE_SERIAL TRUE)
+set (PolygonPointSelection_FORCE_SERIAL TRUE)
+set (PropertyLink_FORCE_SERIAL TRUE)
 set (ReadPartitionedCGNS_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 set (SPTimeseries_FORCE_SERIAL TRUE)  # since this uses popup-menu
-set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (ShaderReplacements_FORCE_SERIAL TRUE)
+set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
+set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
-set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
-set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
