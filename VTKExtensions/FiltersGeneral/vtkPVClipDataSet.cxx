@@ -14,15 +14,17 @@
 =========================================================================*/
 #include "vtkPVClipDataSet.h"
 
-#include "vtkAMRDualClip.h"
-#include "vtkAppendFilter.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
+#include "vtkDataSetTriangleFilter.h"
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkGeometryFilter.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridAxisClip.h"
 #include "vtkInformation.h"
+#include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMassProperties.h"
 #include "vtkMathUtilities.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
@@ -36,8 +38,6 @@
 #include "vtkSphere.h"
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
-
-#include "vtkInformationStringVectorKey.h"
 
 vtkStandardNewMacro(vtkPVClipDataSet);
 
@@ -260,64 +260,214 @@ int vtkPVClipDataSet::ClipUsingThreshold(
   return 1;
 }
 
+namespace
+{
+//----------------------------------------------------------------------------
+struct ClipPlaneInfo
+{
+  vtkSmartPointer<vtkPlane> Plane;
+  double bounds[6];
+  double Volume;
+};
+
+//----------------------------------------------------------------------------
+void ReorderPlanesBasedOnBounds(double bounds[6], std::vector<vtkSmartPointer<vtkPlane>>& boxPlanes)
+{
+  // create a copy of the box planes
+  std::vector<vtkSmartPointer<vtkPlane>> boxPlanesQueue(boxPlanes.size());
+  std::copy(boxPlanes.begin(), boxPlanes.end(), boxPlanesQueue.begin());
+  boxPlanes.clear();
+
+  while (!boxPlanesQueue.empty())
+  {
+    // First try to remove planes that don't need to be checked.
+    // If a plane doesn't intersect with the box, then the box is either in the direction of plane
+    // normal or the opposite one. If the box is in same direction, then the plane is not needed.
+    for (auto it = boxPlanesQueue.begin(); it != boxPlanesQueue.end();)
+    {
+      auto plane = *it;
+      bool remove = false;
+      auto intersect = vtkBox::IntersectWithPlane(bounds, plane->GetOrigin(), plane->GetNormal());
+      if (intersect == 0)
+      {
+        // cite https://math.stackexchange.com/questions/1330210/
+        double minPoint[3] = { bounds[0], bounds[2], bounds[4] };
+        double directionVector[3];
+        vtkMath::Subtract(minPoint, plane->GetOrigin(), directionVector);
+        double dotProd = vtkMath::Dot(plane->GetNormal(), directionVector);
+        // We check for negative dot product because the plane's normal is pointing outwards
+        // (InsideOut is on).
+        if (dotProd < 0)
+        {
+          it = boxPlanesQueue.erase(it);
+          remove = true;
+        }
+      }
+      if (!remove)
+      {
+        ++it;
+      }
+    }
+
+    // It is beneficial to reorder planes based on which one creates the smallest clip result with
+    // regard to the bounding box.
+    if (boxPlanesQueue.size() > 1)
+    {
+      // create a cube
+      vtkNew<vtkUnstructuredGrid> cube;
+      vtkNew<vtkPoints> points;
+      points->SetDataTypeToDouble();
+      points->InsertNextPoint(bounds[0], bounds[2], bounds[4]);
+      points->InsertNextPoint(bounds[1], bounds[2], bounds[4]);
+      points->InsertNextPoint(bounds[1], bounds[3], bounds[4]);
+      points->InsertNextPoint(bounds[0], bounds[3], bounds[4]);
+      points->InsertNextPoint(bounds[0], bounds[2], bounds[5]);
+      points->InsertNextPoint(bounds[1], bounds[2], bounds[5]);
+      points->InsertNextPoint(bounds[1], bounds[3], bounds[5]);
+      points->InsertNextPoint(bounds[0], bounds[3], bounds[5]);
+      cube->SetPoints(points);
+      vtkNew<vtkIdList> ids;
+      ids->InsertNextId(0);
+      ids->InsertNextId(1);
+      ids->InsertNextId(2);
+      ids->InsertNextId(3);
+      ids->InsertNextId(4);
+      ids->InsertNextId(5);
+      ids->InsertNextId(6);
+      ids->InsertNextId(7);
+      cube->InsertNextCell(VTK_HEXAHEDRON, ids);
+
+      std::vector<ClipPlaneInfo> clipPlaneInfo(boxPlanesQueue.size());
+      for (size_t i = 0; i < boxPlanesQueue.size(); ++i)
+      {
+        auto& plane = boxPlanesQueue[i];
+        // clip the cube with the plane
+        vtkNew<vtkTableBasedClipDataSet> clip;
+        clip->SetInputData(cube);
+        clip->InsideOutOn();
+        clip->SetClipFunction(plane);
+        // triangulate it because vtkMassProperties only works with triangles
+        vtkNew<vtkDataSetTriangleFilter> tri;
+        tri->SetInputConnection(clip->GetOutputPort());
+        // extract surface
+        vtkNew<vtkGeometryFilter> geom;
+        geom->SetInputConnection(tri->GetOutputPort());
+        // Compute Volume. Note: GetVolume calls Update()
+        vtkNew<vtkMassProperties> mass;
+        mass->SetInputConnection(geom->GetOutputPort());
+        clipPlaneInfo[i].Volume = mass->GetVolume();
+        clipPlaneInfo[i].Plane = plane;
+        geom->GetOutput()->GetBounds(clipPlaneInfo[i].bounds);
+      }
+      // sort planes based on volume
+      std::sort(clipPlaneInfo.begin(), clipPlaneInfo.end(),
+        [](const ClipPlaneInfo& a, const ClipPlaneInfo& b) { return a.Volume < b.Volume; });
+      // put the best plane in the output
+      boxPlanes.push_back(clipPlaneInfo[0].Plane);
+      // update the bounds for the next iteration
+      std::copy(clipPlaneInfo[0].bounds, clipPlaneInfo[0].bounds + 6, bounds);
+      // put the remaining planes in the queue
+      boxPlanesQueue.resize(boxPlanesQueue.size() - 1);
+      for (size_t i = 1; i < clipPlaneInfo.size(); ++i)
+      {
+        boxPlanesQueue[i - 1] = clipPlaneInfo[i].Plane;
+      }
+    }
+    else if (boxPlanesQueue.size() == 1)
+    {
+      // just add the plane
+      boxPlanes.push_back(boxPlanesQueue[0]);
+      boxPlanesQueue.clear();
+    }
+  }
+}
+constexpr vtkIdType VTK_MINIMUM_CELLS_TO_REORDER_PLANES = 1000000;
+}
+
 //----------------------------------------------------------------------------
 int vtkPVClipDataSet::ClipUsingSuperclass(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (vtkImplicitFunction* clipFunction = this->GetClipFunction())
+  if (vtkPVBox* pvBox = vtkPVBox::SafeDownCast(this->GetClipFunction()))
   {
-    if (clipFunction->IsA("vtkPVBox") && this->ExactBoxClip && this->GetInsideOut())
+    if (this->ExactBoxClip && this->GetInsideOut())
     {
       int retVal = 1;
-      // create 3 implicit functions representing the matching outside pairs of the box
-      vtkAbstractTransform* transform = clipFunction->GetTransform();
-      vtkPVBox* pvBox = vtkPVBox::SafeDownCast(clipFunction);
+      // create 6 implicit functions planes representing the faces of the boc
+      vtkAbstractTransform* transform = pvBox->GetTransform();
       double bounds[6];
       pvBox->GetBounds(bounds);
-      vtkSmartPointer<vtkDataObject> currentInputDO = vtkDataObject::GetData(inputVector[0], 0);
+      vtkSmartPointer<vtkDataSet> currentInputDO = vtkDataSet::GetData(inputVector[0], 0);
+      // get the bounds of the dataset
+      double dataBounds[6];
+      currentInputDO->GetBounds(dataBounds);
+      std::vector<vtkSmartPointer<vtkPlane>> boxPlanes;
+      boxPlanes.reserve(6);
       for (int i = 0; i < 3; i++)
       {
         for (int j = 0; j < 2; j++)
         {
-          vtkNew<vtkPlane> plane;
+          auto plane = vtkSmartPointer<vtkPlane>::New();
+          double origin[3] = { 0, 0, 0 };
           double normal[3] = { 0, 0, 0 };
           if (j == 0)
           {
             normal[i] = -1;
-            plane->SetOrigin(bounds[0], bounds[2], bounds[4]);
+            origin[0] = bounds[0];
+            origin[1] = bounds[2];
+            origin[2] = bounds[4];
           }
           else
           {
             normal[i] = 1;
-            plane->SetOrigin(bounds[1], bounds[3], bounds[5]);
+            origin[0] = bounds[1];
+            origin[1] = bounds[3];
+            origin[2] = bounds[5];
           }
+          // it's more efficient to transform the origin and normal once rather than
+          // transform all the points of the input.
+          if (transform)
+          {
+            auto inverse = transform->GetInverse();
+            inverse->TransformNormalAtPoint(origin, normal, normal);
+            inverse->TransformPoint(origin, origin);
+          }
+          plane->SetOrigin(origin);
           plane->SetNormal(normal);
-          plane->SetTransform(transform);
-          this->ClipFunction = plane; // temporarily set it without changing MTime of the filter
 
-          // Creating new input information.
-          vtkSmartPointer<vtkInformationVector> newInInfoVec =
-            vtkSmartPointer<vtkInformationVector>::New();
-          vtkSmartPointer<vtkInformation> newInInfo = vtkSmartPointer<vtkInformation>::New();
-          newInInfo->Set(vtkDataObject::DATA_OBJECT(), currentInputDO);
-          newInInfoVec->SetInformationObject(0, newInInfo);
-
-          // Creating new output information.
-          vtkSmartPointer<vtkUnstructuredGrid> usGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-          vtkSmartPointer<vtkInformationVector> newOutInfoVec =
-            vtkSmartPointer<vtkInformationVector>::New();
-          vtkSmartPointer<vtkInformation> newOutInfo = vtkSmartPointer<vtkInformation>::New();
-          newOutInfo->Set(vtkDataObject::DATA_OBJECT(), usGrid);
-          newOutInfoVec->SetInformationObject(0, newOutInfo);
-
-          vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
-          retVal = retVal && this->ClipUsingSuperclass(request, &newInInfoVecPtr, newOutInfoVec);
-          currentInputDO = usGrid;
+          boxPlanes.push_back(plane);
         }
+      }
+      // This optimization has a small but constant overhead that depends on the number of the
+      // preserved planes. It should be used only if the dataset is big enough.
+      if (currentInputDO->GetNumberOfCells() >= VTK_MINIMUM_CELLS_TO_REORDER_PLANES)
+      {
+        ::ReorderPlanesBasedOnBounds(dataBounds, boxPlanes);
+      }
+      for (const auto& plane : boxPlanes)
+      {
+        this->ClipFunction = plane; // temporarily set it without changing MTime of the filter
+
+        // Creating new input information.
+        auto newInInfoVec = vtkSmartPointer<vtkInformationVector>::New();
+        vtkSmartPointer<vtkInformation> newInInfo = vtkSmartPointer<vtkInformation>::New();
+        newInInfo->Set(vtkDataObject::DATA_OBJECT(), currentInputDO);
+        newInInfoVec->SetInformationObject(0, newInInfo);
+
+        // Creating new output information.
+        auto usGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        auto newOutInfoVec = vtkSmartPointer<vtkInformationVector>::New();
+        auto newOutInfo = vtkSmartPointer<vtkInformation>::New();
+        newOutInfo->Set(vtkDataObject::DATA_OBJECT(), usGrid);
+        newOutInfoVec->SetInformationObject(0, newOutInfo);
+
+        vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
+        retVal = retVal && this->ClipUsingSuperclass(request, &newInInfoVecPtr, newOutInfoVec);
+        currentInputDO = usGrid;
       }
       vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
       outputDO->ShallowCopy(currentInputDO);
-      this->ClipFunction = clipFunction; // set back to original clip function
+      this->ClipFunction = pvBox; // set back to original clip function
       return retVal;
     }
   }
