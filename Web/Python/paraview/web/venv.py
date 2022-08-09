@@ -27,7 +27,12 @@ if not VENV_LOADED and VENV_BASE and os.path.exists(VENV_BASE):
     os.environ["PATH"] = os.pathsep.join([bin_dir] + os.environ.get("PATH", "").split(os.pathsep))
     os.environ["VIRTUAL_ENV"] = VENV_BASE
     prev_length = len(sys.path)
-    python_libs = os.path.join(VENV_BASE, f"lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages")
+
+    if sys.platform == "win32":
+        python_libs = os.path.join(VENV_BASE, "Lib/site-packages")
+    else:
+        python_libs = os.path.join(VENV_BASE, f"lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages")
+
     site.addsitedir(python_libs)
     sys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]
     sys.real_prefix = sys.prefix
