@@ -188,7 +188,11 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
     vtkSMPropertyHelper representationHelper(this->PreviousRepresentation, "Input", true);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(representationHelper.GetAsProxy());
     vtkSMSessionProxyManager* proxyManager = source->GetSessionProxyManager();
-    tooltipTextStream << "<b>" << proxyManager->GetProxyName("sources", source) << "</b>";
+    const char* name = proxyManager->GetProxyName("sources", source);
+    if (name)
+    {
+      tooltipTextStream << "<b>" << name << "</b>";
+    }
   }
 
   // composite name
