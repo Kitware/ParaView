@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 #include <QCursor>
 #include <QPointer>
+#include <QShortcut>
+#include <QString>
 #include <QTimer>
 
 class pqDataRepresentation;
@@ -191,6 +193,8 @@ private: // NOLINT(readability-redundant-access-specifiers)
   int MousePosition[2];
   bool DisablePreSelection = false;
   vtkSMPVRepresentationProxy* CurrentRepresentation = nullptr;
+  QShortcut* CopyToolTipShortcut = nullptr;
+  QString PlainTooltipText;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
 

@@ -161,9 +161,16 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
 
   return nullptr;
 }
-
 //----------------------------------------------------------------------------
 bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string& tooltipText)
+{
+  std::string unused;
+  return this->GetTooltipInfo(association, tooltipText, unused);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
+  int association, std::string& formatedTooltipText, std::string& plainTooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
   unsigned int extractOutputPort = extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
@@ -178,11 +185,8 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
     return false;
   }
 
-  std::ostringstream tooltipTextStream;
-
-  tooltipTextStream << "<p style='white-space:pre'>";
-
   // name of the filter which generated the selected dataset
+  std::string proxyName;
   if (this->PreviousRepresentation)
   {
     vtkSMPropertyHelper representationHelper(this->PreviousRepresentation, "Input", true);
@@ -191,9 +195,11 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
     const char* name = proxyManager->GetProxyName("sources", source);
     if (name)
     {
-      tooltipTextStream << "<b>" << name << "</b>";
+      proxyName = name;
     }
   }
+
+  std::ostringstream tooltipTextStream;
 
   // composite name
   if (compositeFound)
@@ -326,9 +332,9 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
     }
   }
 
-  tooltipTextStream << "</p>";
-
-  tooltipText = tooltipTextStream.str();
+  formatedTooltipText =
+    "<p style='white-space:pre'><b>" + proxyName + "</b>" + tooltipTextStream.str() + "</p>";
+  plainTooltipText = proxyName + tooltipTextStream.str();
 
   this->TooltipEnabled = false;
   return true;

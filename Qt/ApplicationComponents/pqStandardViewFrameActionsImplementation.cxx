@@ -537,8 +537,9 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
 
   if (this->isButtonVisible("HoveringSurfaceCells", renderView))
   {
-    QAction* hoveringSurfaceCellsAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqSurfaceHoveringCell.svg"), "Hover Cells On");
+    QAction* hoveringSurfaceCellsAction =
+      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceHoveringCell.svg"),
+        "Hover Cells On. Use Ctrl-C/Cmd-C to copy the content to clipboard.");
     hoveringSurfaceCellsAction->setObjectName("actionHoveringSurfaceCells");
     hoveringSurfaceCellsAction->setCheckable(true);
     new pqRenderViewSelectionReaction(hoveringSurfaceCellsAction, renderView,
@@ -551,8 +552,9 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
 
   if (this->isButtonVisible("HoveringSurfacePoints", renderView))
   {
-    QAction* hoveringSurfacePointsAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqSurfaceHoveringPoint.svg"), "Hover Points On");
+    QAction* hoveringSurfacePointsAction =
+      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceHoveringPoint.svg"),
+        "Hover Points On. Use Ctrl-C/Cmd-C to copy the content to clipboard.");
     hoveringSurfacePointsAction->setObjectName("actionHoveringSurfacePoints");
     hoveringSurfacePointsAction->setCheckable(true);
     new pqRenderViewSelectionReaction(hoveringSurfacePointsAction, renderView,
