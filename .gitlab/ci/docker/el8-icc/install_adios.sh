@@ -8,7 +8,7 @@ export CXX=icpx
 export FC=ifx
 
 readonly adios_repo="https://github.com/ornladios/ADIOS2"
-readonly adios_commit="v2.7.1"
+readonly adios_commit="v2.8.3"
 
 readonly adios_root="$HOME/adios"
 readonly adios_src="$adios_root/src"
