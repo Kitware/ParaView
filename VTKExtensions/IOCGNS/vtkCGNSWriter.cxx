@@ -710,13 +710,14 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   cgsize_t dim[9];
 
   // set the dimensions
-  int* pointDims = structuredGrid->GetDimensions();
+  int pointDims[3] = { -1 };
+  structuredGrid->GetDimensions(pointDims);
   int cellDims[3];
   int j;
 
   structuredGrid->GetCellDims(cellDims);
 
-  if (!pointDims)
+  if ((pointDims[0] < 0) || (pointDims[1] < 0) || (pointDims[2] < 0))
   {
     error = "Failed to get vertex dimensions.";
     return false;
@@ -785,7 +786,8 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
 {
   // get the structured grid IJK dimensions
   // and set CellDim to the correct value.
-  int* dims = structuredGrid->GetDimensions();
+  int dims[3] = { 0 };
+  structuredGrid->GetDimensions(dims);
   info.CellDim = 0;
   for (int n = 0; n < 3; n++)
   {
@@ -814,7 +816,8 @@ int vtkCGNSWriter::vtkPrivate::DetermineCellDimension(vtkPointSet* pointSet)
   vtkStructuredGrid* structuredGrid = vtkStructuredGrid::SafeDownCast(pointSet);
   if (structuredGrid)
   {
-    int* dims = structuredGrid->GetDimensions();
+    int dims[3] = { 0 };
+    structuredGrid->GetDimensions(dims);
     CellDim = 0;
     for (int n = 0; n < 3; n++)
     {
