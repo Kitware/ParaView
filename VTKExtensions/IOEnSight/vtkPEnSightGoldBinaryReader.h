@@ -176,8 +176,8 @@ protected:
   int ReadOrSkipCoordinates(vtkPoints* points, long offset, int partId, bool skip);
 
   /**
-   * Internal method to inject Coordinates and Global Ids at the end
-   * of a part read for Unstructured data.
+   * Internal method to inject coordinates at the end
+   * of a part read for unstructured data.
    */
   int InjectCoordinatesAtEnd(vtkUnstructuredGrid* output, long coordinatesOffset, int partId);
 
