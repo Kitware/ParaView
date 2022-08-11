@@ -32,6 +32,21 @@
           or stay in VTK-m format.
         </Documentation>
       </IntVectorProperty>
+      <StringVectorProperty
+            name="DataSourceIO"
+            command="SetDataSourceIO"
+            animateable="0"
+            element_types="2 2"
+            number_of_elements="0"
+            number_of_elements_per_command="2"
+            panel_visibility="never"
+            repeat_command="0">
+        <Documentation>
+          This property enables Fides to use the inline engine, where the writer and
+          reader must share an ADIOS IO object. The address to an ADIOS::IO object
+          must be passed using this property.
+        </Documentation>
+      </StringVectorProperty>
       <Property
             name="PrepareNextStep"
             command="PrepareNextStep"
@@ -88,7 +103,7 @@
       <StringVectorProperty
             name="FileName"
             animateable="0"
-            command="ParseDataModel"
+            command="SetFileName"
             number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
@@ -114,6 +129,55 @@
             panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <StringVectorProperty
+            name="DataSourceIO"
+            command="SetDataSourceIO"
+            animateable="0"
+            element_types="2 2"
+            number_of_elements="0"
+            number_of_elements_per_command="2"
+            panel_visibility="never"
+            repeat_command="0">
+        <Documentation>
+          This property enables Fides to use the inline engine, where the writer and
+          reader must share an ADIOS IO object. The address to an ADIOS::IO object
+          must be passed using this property.
+        </Documentation>
+      </StringVectorProperty>
+      <Property
+            name="PrepareNextStep"
+            command="PrepareNextStep"
+            label="PrepareNextStep"
+            panel_visibility="never"
+            repeat_command="1">
+        <Documentation>
+          This property has Fides/ADIOS prepare for reading the next time step when in
+          streaming mode.
+        </Documentation>
+      </Property>
+      <IntVectorProperty
+            command="GetNextStepStatus"
+            name="NextStepStatus"
+            number_of_elements="1"
+            default_values="1"
+            information_only="1"
+            panel_visibility="advanced">
+        <SimpleIntInformationHelper />
+        <Documentation>
+          This property returns the status of the next step to be read. 0 means the step is
+          ready to be read, 1 means it is not ready, and 2 means the end of the stream has
+          been reached.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+            name="TimestepValues"
+            repeatable="1"
+            information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="json"
                        file_description="Fides Data Model File (JSON)" />

@@ -22,11 +22,11 @@
 
 .fedora35:
     extends: .linux
-    image: "kitware/paraview:ci-fedora35-20220620"
+    image: "kitware/paraview:ci-fedora35-20220809"
 
 .el8_icc:
     extends: .linux
-    image: "kitware/paraview:ci-el8-icc-20220114"
+    image: "kitware/paraview:ci-el8-icc-20220809"
 
     variables:
         CC: icx

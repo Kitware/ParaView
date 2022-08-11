@@ -18,6 +18,7 @@ OPTIONAL_DEPENDS
   ParaView::PythonInitializer
   ParaView::RemotingLive
   VTK::IOCatalystConduit
+  VTK::IOFides
   VTK::IOIOSS
   VTK::ParallelMPI
   VTK::WrappingPythonCore
