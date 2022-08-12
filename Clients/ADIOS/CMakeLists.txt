@@ -24,7 +24,7 @@ target_include_directories(ParaViewADIOSInSituEngine PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")
 
-install(TARGETS ParaViewADIOSInSituEngine DESTINATION lib/ADIOS
+install(TARGETS ParaViewADIOSInSituEngine DESTINATION lib
   EXPORT ParaViewADIOSInSituEngineTargets)
 install(EXPORT ParaViewADIOSInSituEngineTargets
   FILE ParaViewADIOSInSituEngineTargets.cmake
