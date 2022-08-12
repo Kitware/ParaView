@@ -37,6 +37,7 @@
 #include "vtkOpenGLState.h"
 #include "vtkPVRenderView.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
@@ -92,6 +93,20 @@ public:
   }
 
   int InteractiveRender = 0;
+};
+
+class vtkFocalDistanceObserver : public vtkCommand
+{
+public:
+  static vtkFocalDistanceObserver* New() { return new vtkFocalDistanceObserver; }
+
+  void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(event),
+    void* vtkNotUsed(callData)) override
+  {
+    panel->resetFocalDistanceSliderRange();
+  }
+
+  pqLookingGlassDockPanel* panel = nullptr;
 };
 
 } // end anonymous namespace
@@ -209,6 +224,14 @@ void pqLookingGlassDockPanel::setView(pqView* view)
     this->View->getProxy()->RemoveObserver(this->ViewRenderObserver);
     this->ViewRenderObserver->Delete();
     this->ViewRenderObserver = nullptr;
+    this->View->getProxy()
+      ->GetProperty("CameraFocalPoint")
+      ->RemoveObserver(this->FocalDistanceObserver);
+    this->View->getProxy()
+      ->GetProperty("CameraPosition")
+      ->RemoveObserver(this->FocalDistanceObserver);
+    this->FocalDistanceObserver->Delete();
+    this->FocalDistanceObserver = nullptr;
   }
 
   this->View = renderView;
@@ -218,6 +241,19 @@ void pqLookingGlassDockPanel::setView(pqView* view)
 
     this->ViewRenderObserver = vtkViewRenderObserver::New();
     this->View->getProxy()->AddObserver(vtkCommand::StartEvent, this->ViewRenderObserver);
+
+    auto* focalDistanceObserver = vtkFocalDistanceObserver::New();
+    focalDistanceObserver->panel = this;
+    this->FocalDistanceObserver = focalDistanceObserver;
+
+    // When a property is modified that may result in the focal distance
+    // changing, reset the focal distance slider.
+    this->View->getProxy()
+      ->GetProperty("CameraFocalPoint")
+      ->AddObserver(vtkCommand::ModifiedEvent, this->FocalDistanceObserver);
+    this->View->getProxy()
+      ->GetProperty("CameraPosition")
+      ->AddObserver(vtkCommand::ModifiedEvent, this->FocalDistanceObserver);
 
     auto settings = this->getSettingsForView(this->View);
     settings->UpdateVTKObjects();
@@ -393,8 +429,6 @@ void pqLookingGlassDockPanel::resetToCenterOfRotation()
 
   this->View->getProxy()->UpdateVTKObjects();
   this->View->render();
-
-  resetFocalDistanceSliderRange();
 }
 
 void pqLookingGlassDockPanel::pushFocalPlaneBack()
@@ -432,8 +466,6 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
   //  focalPlaneMovementFactor * cameraDistance * (farClippingLimit - 1.0));
   viewProxy->UpdateVTKObjects();
   this->View->render();
-
-  resetFocalDistanceSliderRange();
 }
 
 void pqLookingGlassDockPanel::pullFocalPlaneForward()
@@ -471,8 +503,6 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
   //  focalPlaneMovementFactor * cameraDistance * (1.0 - nearClippingLimit));
   viewProxy->UpdateVTKObjects();
   this->View->render();
-
-  resetFocalDistanceSliderRange();
 }
 
 void pqLookingGlassDockPanel::updateEnableStates()
@@ -624,6 +654,13 @@ void pqLookingGlassDockPanel::resetFocalDistanceSliderRange()
     return;
   }
 
+  auto& ui = this->Internal->Ui;
+  if (this->sender() == ui.FocalDistance)
+  {
+    // If this was caused by the focal distance slider being edited, ignore it
+    return;
+  }
+
   double directionOfProjection[3];
   double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
 
@@ -631,7 +668,6 @@ void pqLookingGlassDockPanel::resetFocalDistanceSliderRange()
   this->Internal->FocalDistanceSliderRange[0] = distance * 3 / 4;
   this->Internal->FocalDistanceSliderRange[1] = distance * 5 / 4;
 
-  auto& ui = this->Internal->Ui;
   QSignalBlocker blocked(ui.FocalDistance);
 
   ui.FocalDistance->setMinimum(this->Internal->FocalDistanceSliderRange[0]);

@@ -57,6 +57,9 @@ public:
 
   ~pqLookingGlassDockPanel();
 
+  // Reset the focal distance slider range
+  void resetFocalDistanceSliderRange();
+
 protected Q_SLOTS:
   void setView(pqView* view);
   void onRender();
@@ -89,6 +92,7 @@ protected:
 
   vtkCommand* EndObserver = nullptr;
   vtkCommand* ViewRenderObserver = nullptr;
+  vtkCommand* FocalDistanceObserver = nullptr;
   vtkTextureObject* CopyTexture = nullptr;
   QVTKOpenGLWindow* Widget = nullptr;
   vtkLookingGlassInterface* Interface = nullptr;
@@ -108,9 +112,6 @@ protected:
   // file name, based upon the number of tiles. Example: "_qs5x9".
   // This communicates the tile information to the LG software.
   QString getQuiltFileSuffix();
-
-  // Reset the focal plane slider range
-  void resetFocalDistanceSliderRange();
 
   // Compute the focal distance and direction
   double computeFocalDistanceAndDirection(double directionOfProjection[3]);
