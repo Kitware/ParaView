@@ -34,11 +34,11 @@
 #include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 #include "vtkSmartPointer.h"
-#include "vtkUniformGridAMR.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <cmath>
@@ -103,8 +103,8 @@ int vtkPVContourFilter::RequestData(
     return 1;
   }
 
-  // Check if input is AMR data.
-  if (vtkUniformGridAMR::SafeDownCast(inDataObj))
+  // Check if input is non overlapping AMR data.
+  if (vtkNonOverlappingAMR::SafeDownCast(inDataObj))
   {
     // This is a lot to go through to get the name of the array to process.
     vtkInformation* inArrayInfo = this->GetInputArrayInformation(0);
@@ -220,7 +220,7 @@ int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  vtkUniformGridAMR* input = vtkUniformGridAMR::GetData(inInfo);
+  vtkNonOverlappingAMR* input = vtkNonOverlappingAMR::GetData(inInfo);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   if (input)
@@ -324,7 +324,7 @@ int vtkPVContourFilter::FillInputPortInformation(int port, vtkInformation* info)
 
   // According to the documentation this is the way to append additional
   // input data set type since VTK 5.2.
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUniformGridAMR");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkNonOverlappingAMR");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
 }

@@ -988,6 +988,7 @@ list(APPEND TESTS_WITH_BASELINES
   AccentuatedFilename.xml
   AdaptiveResampleToImage.xml
   AMRArraySelection.xml
+  AMRContour.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   AnimationUseCamera.xml

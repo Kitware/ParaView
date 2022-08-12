@@ -21,6 +21,8 @@
  * a particle index as part of the cell data of the output.  It computes
  * the volume of each particle from the volume fraction.
  *
+ * Input should be a vtkNonOverlappingAMR data.
+ *
  * This will turn on validation and debug i/o of the filter.
  * \code{.cpp}
  * #define vtkAMRDualContourDEBUG
