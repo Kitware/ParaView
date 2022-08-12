@@ -59,7 +59,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTooltipSelectionPipeline.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QSet>
+#include <QShortcut>
 #include <QToolTip>
 
 #include <cassert>
@@ -80,6 +83,7 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   , ZoomCursor(QCursor(QPixmap((const char**)zoom_xpm)))
   , MouseMovingTimer(this)
   , MouseMoving(false)
+  , CopyToolTipShortcut(new QShortcut(pqCoreUtilities::mainWidget()))
 {
   this->MousePosition[0] = 0;
   this->MousePosition[1] = 0;
@@ -122,6 +126,10 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
 
   this->MouseMovingTimer.setSingleShot(true);
   this->connect(&this->MouseMovingTimer, SIGNAL(timeout()), this, SLOT(onMouseStop()));
+
+  // Copy tooltip
+  QObject::connect(this->CopyToolTipShortcut, &QShortcut::activated,
+    [this]() { QApplication::clipboard()->setText(this->PlainTooltipText); });
 }
 
 //-----------------------------------------------------------------------------
@@ -879,8 +887,9 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
   bool showTooltip;
   if (pipeline->CanDisplayTooltip(showTooltip))
   {
-    std::string tooltipText;
-    if (showTooltip && !this->MouseMoving && pipeline->GetTooltipInfo(association, tooltipText))
+    std::string tooltipText, plainTooltipText;
+    if (showTooltip && !this->MouseMoving &&
+      pipeline->GetTooltipInfo(association, tooltipText, plainTooltipText))
     {
       QWidget* widget = this->View->widget();
 
@@ -892,9 +901,16 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
         this->MousePosition[0] / dpr, widget->size().height() - (this->MousePosition[1] / dpr)));
 
       QToolTip::showText(pos, tooltipText.c_str());
+
+      // Copy to clipboard mechanism
+      this->PlainTooltipText = QString::fromStdString(plainTooltipText);
+      this->CopyToolTipShortcut->setEnabled(true);
+      this->CopyToolTipShortcut->setKey(QKeySequence::Copy);
     }
     else
     {
+      this->CopyToolTipShortcut->setKey(0);
+      this->CopyToolTipShortcut->setEnabled(false);
       QToolTip::hideText();
     }
   }

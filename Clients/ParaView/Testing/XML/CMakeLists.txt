@@ -746,6 +746,13 @@ if (PARAVIEW_USE_PYTHON)
     MultipleNumberOfComponents.xml
     SpreadSheetNullArrayName.xml # needs programmable filter
   )
+
+  # This test rely on copy being Ctrl-C
+  if(NOT APPLE)
+    list(APPEND TESTS_WITHOUT_BASELINES
+      TooltipCopy.xml
+      )
+  endif()
 endif()
 
 SET (TESTS_WITH_INLINE_COMPARES
@@ -1676,6 +1683,7 @@ set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (TooltipCopy_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
