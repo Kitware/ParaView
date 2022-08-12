@@ -58,6 +58,9 @@ vtkPVZSpaceView::vtkPVZSpaceView()
 
   // Hide axes
   this->OrientationWidget->SetParentRenderer(nullptr);
+
+  // Set the zSpace SDK Manager render window
+  vtkZSpaceSDKManager::GetInstance()->SetRenderWindow(this->GetRenderWindow());
 }
 
 //----------------------------------------------------------------------------
@@ -69,7 +72,7 @@ void vtkPVZSpaceView::SetupInteractor(vtkRenderWindowInteractor* vtkNotUsed(rwi)
   this->Interactor = vtkSmartPointer<vtkZSpaceRenderWindowInteractor>::New();
   this->Interactor->SetRenderWindow(this->GetRenderWindow());
 
-  // this will set the interactor style.
+  // This will set the interactor style.
   int mode = this->InteractionMode;
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->SetInteractionMode(mode);

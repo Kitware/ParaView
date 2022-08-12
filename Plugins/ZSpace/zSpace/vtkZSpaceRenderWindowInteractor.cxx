@@ -44,7 +44,7 @@ vtkZSpaceRenderWindowInteractor::vtkZSpaceRenderWindowInteractor()
 //------------------------------------------------------------------------------
 void vtkZSpaceRenderWindowInteractor::ProcessEvents()
 {
-  vtkZSpaceSDKManager::GetInstance()->Update(this->GetRenderWindow());
+  vtkZSpaceSDKManager::GetInstance()->Update();
   this->HandleInteractions();
 }
 
@@ -52,7 +52,7 @@ void vtkZSpaceRenderWindowInteractor::ProcessEvents()
 void vtkZSpaceRenderWindowInteractor::HandleInteractions()
 {
   vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
-  sdkManager->Update(this->GetRenderWindow());
+  sdkManager->Update();
 
   // Compute stylus position and orientation
   vtkTransform* stylusT = sdkManager->GetStylusTransformRowMajor();
