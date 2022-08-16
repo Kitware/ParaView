@@ -1088,6 +1088,38 @@
         <ExposedProperties>
           <Property name="Input" />
           <Property name="FileType" />
+
+          <PropertyGroup label="Data Selection">
+            <Property name="ChooseArraysToWrite" panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" panel_visibility="advanced"/>
+            <Property name="CellDataArrays" panel_visibility="advanced"/>
+            <Property name="FieldDataArrays" panel_visibility="advanced"/>
+            <Property name="VertexDataArrays" panel_visibility="advanced"/>
+            <Property name="EdgeDataArrays" panel_visibility="advanced"/>
+            <Property name="RowDataArrays" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1"/>
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Parallel I/O Support">
+            <Property name="NumberOfIORanks" panel_visibility="advanced"/>
+            <Property name="RankAssignmentMode" panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Color Properties">
+            <Property name="EnableColoring" panel_visibility="advanced"/>
+            <Property name="EnableAlpha" panel_visibility="advanced"/>
+            <Property name="ColorArrayName" panel_visibility="advanced"/>
+            <Property name="LookupTable" panel_visibility="advanced"/>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 
