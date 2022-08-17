@@ -111,7 +111,7 @@ foreach (python_file IN LISTS python_files)
   if (BUILD_SHARED_LIBS)
     get_filename_component(python_file_directory "${python_file}" DIRECTORY)
     install(
-      FILES       "${python_file}"
+      FILES       "${output_python_file}"
       DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file_directory}"
       COMPONENT   "python")
   endif ()
