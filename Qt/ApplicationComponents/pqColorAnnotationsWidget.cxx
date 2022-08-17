@@ -134,12 +134,90 @@ std::vector<std::pair<QString, QString>> MergeAnnotations(
   return merged_pairs;
 }
 
+//-----------------------------------------------------------------------------
+// Custom proxy model used to apply global modifications (when editing the data from
+// the header of the table) to the sorted items only.
 class ColorAnnotationsFilterProxyModel : public QSortFilterProxyModel
 {
 public:
   explicit ColorAnnotationsFilterProxyModel(QObject* parent = nullptr)
     : QSortFilterProxyModel(parent)
   {
+  }
+
+  // Overriden to update the global checkbox based on filtered elements only.
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override
+  {
+    pqAnnotationsModel* sourceModel = qobject_cast<pqAnnotationsModel*>(this->sourceModel());
+    if (!sourceModel)
+    {
+      return false;
+    }
+
+    // Return the global visibility value based on the filtered element values only
+    if (orientation == Qt::Horizontal && role == Qt::CheckStateRole &&
+      section == pqAnnotationsModel::VISIBILITY)
+    {
+      // No items
+      if (this->rowCount() == 0)
+      {
+        return Qt::Unchecked;
+      }
+
+      int currentCheckState = this->data(this->index(0, section), role).toInt();
+      for (int row = 1; row < this->rowCount(); row++)
+      {
+        if (this->data(this->index(row, section), role).toInt() != currentCheckState)
+        {
+          currentCheckState = Qt::PartiallyChecked;
+          break;
+        }
+      }
+      return static_cast<Qt::CheckState>(currentCheckState);
+    }
+
+    // Forward to the source model in all other cases
+    return sourceModel->headerData(section, orientation, role);
+  }
+
+  // Overriden in order to set the visibility / opacity values on the filtered elements only.
+  bool setHeaderData(
+    int section, Qt::Orientation orientation, const QVariant& value, int role) override
+  {
+    pqAnnotationsModel* sourceModel = qobject_cast<pqAnnotationsModel*>(this->sourceModel());
+    if (!sourceModel)
+    {
+      return false;
+    }
+
+    if (orientation == Qt::Horizontal)
+    {
+      // Change the visibility values on filtered items only
+      if (role == Qt::CheckStateRole && section == pqAnnotationsModel::VISIBILITY)
+      {
+        for (int row = 0; row < this->rowCount(); row++)
+        {
+          this->setData(this->index(row, section), value, role);
+        }
+        Q_EMIT this->headerDataChanged(orientation, section, section);
+        return true;
+      }
+      // Change the opacity values on filtered items only
+      else if (role == Qt::EditRole && section == pqAnnotationsModel::OPACITY)
+      {
+        sourceModel->setGlobalOpacity(value.toDouble());
+
+        for (int row = 0; row < this->rowCount(); row++)
+        {
+          this->setData(this->index(row, section), value, role);
+        }
+        Q_EMIT this->headerDataChanged(orientation, section, section);
+        return true;
+      }
+    }
+
+    // Forward the call to the source model in all other cases
+    return sourceModel->setHeaderData(section, orientation, value, role);
   }
 
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
@@ -436,15 +514,19 @@ void pqColorAnnotationsWidget::execGlobalOpacityDialog()
   dialog.move(QCursor::pos());
   if (dialog.exec() == QDialog::Accepted)
   {
-    this->Internals->Model->setGlobalOpacity(dialog.globalOpacity());
+    QAbstractItemModel* model = this->Internals->Ui.AnnotationsTable->model();
 
+    // Set the global opacity
+    model->setHeaderData(
+      pqAnnotationsModel::OPACITY, Qt::Horizontal, dialog.globalOpacity(), Qt::EditRole);
+
+    // Set the opacity on selected elements
     QList<int> selectedRows;
     QItemSelectionModel* select = this->Internals->Ui.AnnotationsTable->selectionModel();
-    for (QModelIndex idx : select->selectedRows(1))
+    for (QModelIndex idx : select->selectedRows(pqAnnotationsModel::OPACITY))
     {
-      selectedRows.append(idx.row());
+      model->setData(idx, dialog.selectedOpacity(), Qt::EditRole);
     }
-    this->Internals->Model->setSelectedOpacity(selectedRows, dialog.selectedOpacity());
   }
 }
 
@@ -874,7 +956,8 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
 void pqColorAnnotationsWidget::removeAllAnnotations()
 {
   this->Internals->Model->removeAllAnnotations();
-  this->Internals->Model->setGlobalOpacity(1.0);
+  this->Internals->Model->setHeaderData(
+    pqAnnotationsModel::OPACITY, Qt::Horizontal, 1.0, Qt::EditRole);
   Q_EMIT this->annotationsChanged();
 }
 
