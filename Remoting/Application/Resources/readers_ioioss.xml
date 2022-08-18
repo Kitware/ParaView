@@ -19,13 +19,14 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty command="SetGroupNumericVectorFieldComponents"
-                         default_values="1"
+                         default_values="0"
                          name="GroupNumericVectorFieldComponents"
                          label="Group Numeric Vector Field Components"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Set whether the reader should treat numeric suffixes for a vector field as vector components.
+          Set whether the reader should treat numeric suffices for a vector field as vector components
+          of a vtkDataArray. By default, fields with numeric suffices are not grouped into a single vtkDataArray.
         </Documentation>
       </IntVectorProperty>
 
