@@ -23,9 +23,9 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 
-class vtkPolyData;
 class vtkCollection;
-class vtkMultiBlockDataSet;
+class vtkPartitionedDataSet;
+class vtkPolyData;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPlotEdges : public vtkMultiBlockDataSetAlgorithm
 {
@@ -43,9 +43,10 @@ protected:
   class Segment;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
-  // Usual data generation method
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
+  void ProcessMultiBlockDataSet(vtkMultiBlockDataSet* input, vtkMultiBlockDataSet* output);
+  void ProcessPartitionedDataSet(vtkPartitionedDataSet* input, vtkMultiBlockDataSet* output);
   void Process(vtkPolyData* input, vtkMultiBlockDataSet* output);
   static void ReducePolyData(vtkPolyData* polyData, vtkPolyData* output);
 
