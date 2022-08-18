@@ -73,6 +73,9 @@
            <height>40</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Select control point and press "Enter" or "Return" to change colors</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -275,6 +278,9 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Set the data value for the selected control point</string>
        </property>
       </widget>
      </item>
