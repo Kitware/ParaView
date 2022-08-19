@@ -1,0 +1,8 @@
+NAME
+  Prism
+DESCRIPTION
+ A custom view and representations to visualize EOS (Equation of State) files, such as sesame, for multi physics simulations.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel

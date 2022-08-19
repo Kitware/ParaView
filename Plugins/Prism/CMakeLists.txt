@@ -1,0 +1,6 @@
+paraview_add_plugin(Prism
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
+  VERSION "2.0"
+  XML_DOCUMENTATION OFF
+  )
