@@ -296,6 +296,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   auto& impl = *this->Implementation;
 
   impl.Ui.setupUi(this);
+  // remove do-nothing "?" title bar button on Windows.
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   // ensures that the favorites and the browser component are sized
   // proportionately.
   impl.Ui.mainSplitter->setStretchFactor(0, 1);

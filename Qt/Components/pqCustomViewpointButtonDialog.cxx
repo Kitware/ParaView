@@ -208,6 +208,7 @@ pqCustomViewpointButtonDialog::pqCustomViewpointButtonDialog(QWidget* Parent, Qt
 {
   this->ui = new pqCustomViewpointButtonDialogUI(this);
   this->ui->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->setToolTipsAndConfigurations(toolTips, configs);
   this->setCurrentConfiguration(curConfig);
   QObject::connect(this->ui->add, SIGNAL(clicked()), this, SLOT(appendRow()));

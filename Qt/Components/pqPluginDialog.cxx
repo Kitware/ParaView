@@ -70,6 +70,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
   , Server(server)
 {
   this->Ui->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->setupTreeWidget(this->Ui->remotePlugins);
   this->setupTreeWidget(this->Ui->localPlugins);
 

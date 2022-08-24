@@ -84,6 +84,7 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   this->OverwriteOK = false;
   this->Filter = nullptr;
   this->Model = model;
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->Form = new pqCustomFilterDefinitionWizardForm();
   this->Form->setupUi(this);
 

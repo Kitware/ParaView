@@ -323,6 +323,8 @@ pqProxyWidgetDialog::pqProxyWidgetDialog(
   : Superclass(parentObject, f)
   , Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this))
 {
+  // remove do-nothing "?" title bar button on Windows.
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 //-----------------------------------------------------------------------------
@@ -331,6 +333,7 @@ pqProxyWidgetDialog::pqProxyWidgetDialog(
   : Superclass(parentObject, f)
   , Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this, properties))
 {
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 //-----------------------------------------------------------------------------

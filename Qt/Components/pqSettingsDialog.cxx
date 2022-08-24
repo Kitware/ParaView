@@ -82,6 +82,8 @@ pqSettingsDialog::pqSettingsDialog(
 {
   Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.setupUi(this);
+  // remove do-nothing "?" title bar button on Windows.
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   ui.tabBar->setDocumentMode(false);
   ui.tabBar->setDrawBase(false);
   ui.tabBar->setExpanding(false);

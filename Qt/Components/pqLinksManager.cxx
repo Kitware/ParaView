@@ -58,6 +58,7 @@ pqLinksManager::pqLinksManager(QWidget* p)
   , Ui(new Ui::pqLinksManager())
 {
   this->Ui->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   this->Ui->treeView->setModel(model);
   QObject::connect(this->Ui->treeView, SIGNAL(clicked(const QModelIndex&)), this,

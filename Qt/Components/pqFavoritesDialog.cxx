@@ -165,6 +165,7 @@ pqFavoritesDialog::pqFavoritesDialog(const QVariant& filtersList, QWidget* p)
   , Ui(new Ui::pqFavoritesDialog())
 {
   this->Ui->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   this->Ui->availableFilters->setAcceptDrops(false);
   this->Ui->availableFilters->sortByColumn(0, Qt::AscendingOrder);

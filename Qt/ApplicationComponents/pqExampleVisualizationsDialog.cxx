@@ -19,6 +19,8 @@ pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObje
   , ui(new Ui::pqExampleVisualizationsDialog)
 {
   ui->setupUi(this);
+  // remove do-nothing "?" title bar button on Windows.
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   QObject::connect(
     this->ui->CanExampleButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
