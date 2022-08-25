@@ -49,14 +49,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSMSettingsProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
+#include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
 #include <QDebug>
 #include <QInputDialog>
 #include <QMap>
 
+#include <algorithm>
 #include <cassert>
+#include <string>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 pqLoadDataReaction::pqLoadDataReaction(QAction* parentObject)
@@ -94,9 +99,22 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
     readerFactory->GetSupportedFileTypesDetailed(server->session());
   QString filtersString;
 
+  // retrieve setting that limits the list of readers.
+  vtkSMSessionProxyManager* proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSMProxy* arrayListSettings =
+    proxyManager->GetProxy("settings", "RepresentedArrayListSettings");
+  vtkSMStringVectorProperty* readerSelection =
+    vtkSMStringVectorProperty::SafeDownCast(arrayListSettings->GetProperty("ReaderSelection"));
+  std::vector<std::string> excludedList;
+  if (readerSelection)
+  {
+    excludedList = readerSelection->GetElements();
+  }
+
   // When using a readerSet, rewrite the Supported Types extensions to only list wanted
   // supported files
-  if (!readerSet.isEmpty())
+  if (!readerSet.isEmpty() || !excludedList.empty())
   {
     FileTypeDetailed* supportedTypesDetailed = nullptr;
     std::vector<std::string> supportedTypesPattern;
@@ -108,7 +126,16 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
       {
         supportedTypesDetailed = &filterDetailed;
       }
-      else if (readerSet.contains(readerPair))
+      else if (!readerSet.isEmpty())
+      {
+        if (readerSet.contains(readerPair))
+        {
+          supportedTypesPattern.insert(supportedTypesPattern.end(),
+            filterDetailed.FilenamePatterns.begin(), filterDetailed.FilenamePatterns.end());
+        }
+      }
+      else if (std::find(excludedList.begin(), excludedList.end(), filterDetailed.Description) ==
+        excludedList.end())
       {
         supportedTypesPattern.insert(supportedTypesPattern.end(),
           filterDetailed.FilenamePatterns.begin(), filterDetailed.FilenamePatterns.end());
@@ -126,12 +153,16 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
   {
     // Check if reader pair is part of provided reader pair list
     // only if list is not empty and not a standard description
+    // Perform same check with ReaderSelection setting
     ReaderPair readerPair(
       QString::fromStdString(filterDetailed.Group), QString::fromStdString(filterDetailed.Name));
-    if (readerSet.isEmpty() ||
+    if ((readerSet.isEmpty() && excludedList.empty()) ||
       filterDetailed.Description == vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION ||
       filterDetailed.Description == vtkSMReaderFactory::ALL_FILES_DESCRIPTION ||
-      readerSet.contains(readerPair))
+      (!readerSet.isEmpty() && readerSet.contains(readerPair)) ||
+      (!excludedList.empty() &&
+        (std::find(excludedList.begin(), excludedList.end(), filterDetailed.Description) ==
+          excludedList.end())))
     {
       if (!first)
       {
