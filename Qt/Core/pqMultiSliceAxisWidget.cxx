@@ -144,7 +144,7 @@ void pqMultiSliceAxisWidget::setTitle(const QString& newTitle)
 // ----------------------------------------------------------------------------
 QString pqMultiSliceAxisWidget::title() const
 {
-  return QString(this->Internal->SliceItem->GetAxis()->GetTitle());
+  return QString(this->Internal->SliceItem->GetAxis()->GetTitle().c_str());
 }
 
 // ----------------------------------------------------------------------------

@@ -206,7 +206,7 @@ void addgridfield_(
   {
     vtkNew<vtkUnsignedCharArray> att;
     vtkStdString name(fname, *len);
-    att->SetName(name);
+    att->SetName(name.c_str());
     att->SetNumberOfComponents(1);
     att->SetNumberOfTuples(numCells);
     for (vtkIdType idx = 0; idx < numCells; ++idx)
@@ -219,7 +219,7 @@ void addgridfield_(
   {
     vtkNew<vtkFloatArray> att;
     vtkStdString name(fname, *len);
-    att->SetName(name);
+    att->SetName(name.c_str());
     att->SetNumberOfComponents(1);
     att->SetNumberOfTuples(numCells);
     for (vtkIdType idx = 0; idx < numCells; ++idx)
@@ -334,18 +334,19 @@ void addmarkerscalarfield_(char* fname, int* len, int* numberAdded, float* data)
 
   // Get the data array for this variable
   vtkStdString varName(fname, *len);
-  vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
+  vtkFloatArray* dataArray =
+    vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
 
   // If it doesn't exist, create and size, and refetch
   if (dataArray == nullptr)
   {
     vtkFloatArray* arr = vtkFloatArray::New();
-    arr->SetName(varName);
+    arr->SetName(varName.c_str());
     arr->SetNumberOfComponents(1);
     arr->Allocate(numberOfMarkers);
     ugrid->GetPointData()->AddArray(arr);
     arr->Delete();
-    dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
+    dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
   }
 
   // Fill with field data
@@ -370,18 +371,19 @@ void addmarkervectorfield_(
 
   // Get the data array for this variable
   vtkStdString varName(fname, *len);
-  vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
+  vtkFloatArray* dataArray =
+    vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
 
   // If it doesn't exist, create and size, and refetch
   if (dataArray == nullptr)
   {
     vtkFloatArray* arr = vtkFloatArray::New();
-    arr->SetName(varName);
+    arr->SetName(varName.c_str());
     arr->SetNumberOfComponents(3);
     arr->Allocate(numberOfMarkers);
     ugrid->GetPointData()->AddArray(arr);
     arr->Delete();
-    dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
+    dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
   }
 
   // Fill with field data
@@ -410,18 +412,19 @@ void addmarkertensorfield_(char* fname, int* len, int* numberAdded, float* data0
 
   // Get the data array for this variable
   vtkStdString varName(fname, *len);
-  vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
+  vtkFloatArray* dataArray =
+    vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
 
   // If it doesn't exist, create and size, and refetch
   if (dataArray == nullptr)
   {
     vtkFloatArray* arr = vtkFloatArray::New();
-    arr->SetName(varName);
+    arr->SetName(varName.c_str());
     arr->SetNumberOfComponents(6);
     arr->Allocate(numberOfMarkers);
     ugrid->GetPointData()->AddArray(arr);
     arr->Delete();
-    dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
+    dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName.c_str()));
   }
 
   // Fill with field data

@@ -182,7 +182,7 @@ void pqIntegrationModelSurfaceHelperWidget::resetSurfaceWidget(bool force)
         for (unsigned int j = 0; j < nLeafs; j++)
         {
           QStandardItem* item;
-          item = new QStandardItem(QString(leafNames->GetValue(j)));
+          item = new QStandardItem(QString(leafNames->GetValue(j).c_str()));
           item->setFlags(item->flags() & ~Qt::ItemIsEditable); // non editable
           model->setVerticalHeaderItem(j, item);
 
