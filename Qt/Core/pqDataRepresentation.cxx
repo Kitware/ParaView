@@ -280,7 +280,7 @@ void pqDataRepresentation::updateLookupTable()
 {
   // Only update the LookupTable when the setting tells us to
   vtkSMProxy* representationProxy = this->getProxy();
-  vtkSMProxy* lut = vtkSMPropertyHelper(representationProxy, "LookupTable").GetAsProxy();
+  vtkSMProxy* lut = vtkSMPropertyHelper(representationProxy, "LookupTable", true).GetAsProxy();
   if (!lut)
   {
     return;

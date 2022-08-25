@@ -60,6 +60,7 @@ set(classes
   vtkPVGridAxes3DRepresentation
   vtkPVHardwareSelector
   vtkPVHistogramChartRepresentation
+  vtkPVImageChartRepresentation
   vtkPVImageSliceMapper
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
