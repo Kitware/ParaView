@@ -79,6 +79,13 @@ pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject)
   , ReadOnly(false)
   , TabBarVisibility(true)
 {
+  // If annotation filters are enabled, it is possible to get into a situation
+  // where no layouts are visible. This means the new-layout tab ("+") is both
+  // visible and active – users cannot switch to it to create a new layout with
+  // a view-selector because it is already active. In that case, the connection
+  // below allows us to explicitly create a new layout.
+  QObject::connect(
+    this, &QTabWidget::tabBarClicked, this, &pqTabWidget::createViewSelectorTabIfNeeded);
 }
 
 //-----------------------------------------------------------------------------
@@ -180,6 +187,21 @@ void pqTabbedMultiViewWidget::pqTabWidget::setTabBarVisibility(bool val)
 {
   this->TabBarVisibility = val;
   this->tabBar()->setVisible(val);
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::pqTabWidget::createViewSelectorTabIfNeeded(int tabIndex)
+{
+  (void)tabIndex;
+  if (this->currentIndex() == 0 && this->count() == 1)
+  {
+    pqServer* server = pqActiveObjects::instance().activeServer();
+    auto* tmv = qobject_cast<pqTabbedMultiViewWidget*>(this->parent());
+    if (tmv)
+    {
+      tmv->createTab(server);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -369,11 +391,12 @@ public:
   void updateVisibleTabs()
   {
     // build a list of visible tabs and if they are different,
-    // that what's shown update the view.
+    // than what's shown, update the view.
     QList<QWidget*> visibleWidgets;
     for (const auto& widget : this->widgets())
     {
-      if (widget && this->isVisible(widget->layoutManager()))
+      if (widget &&
+        (this->isVisible(widget->layoutManager()) || widget->layoutManager()->GetViews().empty()))
       {
         visibleWidgets.push_back(widget);
       }
@@ -656,6 +679,7 @@ int pqTabbedMultiViewWidget::createTab(pqServer* server)
     vlayout->FastDelete();
     END_UNDO_SET();
 
+    this->updateVisibleTabs();
     return this->Internals->tabIndex(vlayout);
   }
   return -1;
