@@ -1,8 +1,10 @@
 set(modules
+  Prism::vtkPrismReaders
   Prism::vtkPrismServerManager
   )
 
 set(module_files
+  "${CMAKE_CURRENT_SOURCE_DIR}/Readers/vtk.module"
   "${CMAKE_CURRENT_SOURCE_DIR}/ServerManager/vtk.module"
   )
 

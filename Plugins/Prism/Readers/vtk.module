@@ -1,0 +1,13 @@
+NAME
+  Prism::vtkPrismReaders
+LIBRARY_NAME
+  vtkPrismReaders
+DEPENDS
+  ParaView::VTKExtensionsIOCore
+  Prism::vtkPrismServerManager
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonMisc
+  VTK::FiltersGeometry
