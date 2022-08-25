@@ -1,0 +1,11 @@
+NAME
+  Prism::vtkPrismServerManager
+LIBRARY_NAME
+  vtkPrismServerManager
+DEPENDS
+  ParaView::RemotingServerManager
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::RemotingCore
+  VTK::CommonCore
+  VTK::CommonDataModel
