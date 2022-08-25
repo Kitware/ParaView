@@ -449,7 +449,11 @@ QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
         {
           continue;
         }
-        macroList.push_back(dirPath + QDir::separator() + filePath);
+        // allows only ".py"
+        if (filePath.endsWith(".py"))
+        {
+          macroList.push_back(dirPath + QDir::separator() + filePath);
+        }
       }
     }
   }
