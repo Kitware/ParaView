@@ -206,17 +206,23 @@ QMap<QString, QString> pqPythonMacroSupervisor::getStoredMacros()
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::removeStoredMacro(const QString& filename)
 {
-  QDir dir = QFileInfo(filename).absoluteDir();
-  QString baseName = ".";
-  baseName += QFileInfo(filename).fileName().replace(".py", "");
+  pqPythonMacroSupervisor::hideFile(filename);
+}
+
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::hideFile(const QString& filename)
+{
+  QFileInfo file = QFileInfo(filename);
+  QDir dir = file.absoluteDir();
+  QString baseName = file.baseName();
+  QString suffix = file.completeSuffix();
 
   int index = 1;
-  QString newName = baseName;
-  newName += ".py";
+  QString pattern = "." + baseName + "%1%2." + suffix;
+  QString newName = pattern.arg("").arg("");
   while (dir.exists(newName))
   {
-    newName = baseName;
-    newName.append("-").append(QString::number(index)).append(".py");
+    newName = pattern.arg("-").arg(QString::number(index));
     index++;
   }
   QString newFilePath = dir.absolutePath() + QDir::separator() + newName;
@@ -289,6 +295,18 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   QAction* runAction = new QAction(macroName, this);
   runAction->setData(fileName);
   runAction->setEnabled(enable);
+
+  for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+  {
+    QString iconFile = QFileInfo(fileName).absoluteFilePath().replace(".py", extension);
+
+    if (QFileInfo::exists(iconFile))
+    {
+      runAction->setIcon(QIcon(iconFile));
+      break;
+    }
+  }
+
   this->Internal->RunActionMap.insert(fileName, runAction);
   this->connect(runAction, SIGNAL(triggered()), SLOT(onMacroTriggered()));
 
@@ -370,10 +388,25 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
       listOfMacroToDelete.append(filename);
     }
   }
-  Q_FOREACH (QString fileName, listOfMacroToDelete)
+
+  for (const QString& filename : listOfMacroToDelete)
   {
-    pqPythonMacroSupervisor::removeStoredMacro(fileName);
-    pqPythonMacroSupervisor::removeMacro(fileName);
+    // look for related file with same basename (as icon file)
+    QDir dir = QFileInfo(filename).absoluteDir();
+    QStringList filter;
+    filter << QFileInfo(filename).completeBaseName() + ".py";
+    for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+    {
+      filter << QFileInfo(filename).completeBaseName() + extension;
+    }
+    auto fileList = dir.entryInfoList(filter);
+
+    for (auto file : fileList)
+    {
+      pqPythonMacroSupervisor::hideFile(file.absoluteFilePath());
+    }
+
+    pqPythonMacroSupervisor::removeMacro(filename);
   }
 }
 //----------------------------------------------------------------------------
