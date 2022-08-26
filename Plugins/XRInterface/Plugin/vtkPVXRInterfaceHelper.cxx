@@ -424,7 +424,7 @@ void vtkPVXRInterfaceHelper::LoadCameraPose(int slot)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot)
 {
-  vtkVRCamera::Pose pose = this->SavedCameraPoses[slot];
+  vtkVRCamera::Pose& pose = this->SavedCameraPoses[slot];
   vtkRenderer* ren = static_cast<vtkRenderer*>(vr_rw->GetRenderers()->GetItemAsObject(0));
   vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
   cam->SetPoseFromCamera(&pose, vr_rw);
