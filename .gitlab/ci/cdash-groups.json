@@ -1,69 +1,64 @@
 {
-    "latest-master": [
+    "latest-release": [
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[el8_shared_icc_mpi_python]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[fedora35_static_mpi_offscreen_osmesa_python]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[fedora35_shared_mpi_python_qt]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[fedora35_shared_mpi_python_qt_tidy]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[fedora35_shared_mpi_python_qt_vtkmoverride]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[macos_arm64_python_qt]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[macos_x86_64_python_qt]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[windows_vs2019_kits_mpi_python_qt]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[windows_vs2019_qt]"
         },
         {
-            "group": "Nightly",
-            "site": "ANY",
-            "buildname": "ascent-gcc-osmesa"
-        },
-        {
-            "group": "master-packages",
+            "group": "release-packages",
             "site": "ANY",
             "buildname": "[paraview-spack-paraview+osmesa^mesa~glx^mpich]"
         }
     ],
-    "latest-master-editions": [
+    "latest-release-editions": [
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[fedora35_shared_mpi_core]"
         },
         {
-            "group": "master",
+            "group": "release",
             "site": "gitlab-ci",
             "buildname": "[fedora35_shared_mpi_python_core]"
         }
