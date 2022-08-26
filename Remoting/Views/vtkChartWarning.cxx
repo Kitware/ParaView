@@ -110,7 +110,7 @@ bool vtkChartWarning::Paint(vtkContext2D* painter)
   // float x = cbds.GetX() + dims[0] - lbds[0] + 0.5 * lbds[2];
   float x = cbds.GetX() + dims[0] - lbds[0] + 0.5 * (cbds.GetWidth() - dims[2] - dims[0]);
   float y = cbds.GetY() + dims[1] - lbds[1] + 0.5 * (cbds.GetHeight() - dims[3] - dims[1]);
-  if (this->Label)
+  if (!this->Label.empty())
   {
     painter->DrawString(x, y, this->Label);
   }
