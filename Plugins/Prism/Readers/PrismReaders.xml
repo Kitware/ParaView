@@ -116,4 +116,82 @@
       </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPrismSESAMEFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Prism: SESAME Reader"
+                 name="SESAMEReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads ASCII SESAME files."
+                     short_help="Reads SESAME files.">The SESAME reader reads ASCII.
+        The expected file extension is .asc. The output of this reader is a
+        vtkStructuredGrid dataset.
+      </Documentation>
+      <OutputPort index="0"
+                  name="SESAME Surface"/>
+      <OutputPort index="1"
+                  name="SESAME Curves"/>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="SESAMEReaderCore"/>
+        <ExposedProperties>
+          <Property name="TableId"/>
+          <PropertyGroup label="Axis Information">
+            <Property name="XArray"/>
+            <Property name="YArray"/>
+            <Property name="ZArray"/>
+          </PropertyGroup>
+          <PropertyGroup label="Curves">
+            <Property name="CurvesAvailable"/>
+            <Property name="ReadCurves"/>
+          </PropertyGroup>
+          <PropertyGroup label="Conversions">
+            <Property function="VariableConversionValues" name="VariableConversionValues"/>
+            <Property function="FlatArraysOfTables" name="FlatArraysOfTables"/>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader. If more than one file
+          is specified, the reader will switch to file series mode in which
+          it will pretend that it can support time and provide one file per time step.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <PipelineIcon port="0" name="GEOMETRY"/>
+        <View port="0" type="PrismView"/>
+
+        <PipelineIcon port="1" name="GEOMETRY"/>
+        <View port="1" type="None"/>
+
+        <ReaderFactory extensions="asc sesame ses" file_description="SESAME File Reader (Plugin)"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>
