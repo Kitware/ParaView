@@ -279,6 +279,9 @@ protected: // NOLINT(readability-redundant-access-specifiers)
     void setTabBarVisibility(bool);
     bool tabBarVisibility() const { return this->TabBarVisibility; }
     //@}
+  protected:
+    void createViewSelectorTabIfNeeded(int tabIndex);
+
   private:
     Q_DISABLE_COPY(pqTabWidget)
     bool ReadOnly;

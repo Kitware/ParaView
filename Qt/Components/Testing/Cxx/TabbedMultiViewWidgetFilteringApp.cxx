@@ -8,6 +8,7 @@
 #include <pqApplicationCore.h>
 #include <pqObjectBuilder.h>
 #include <pqServer.h>
+#include <pqServerManagerModel.h>
 #include <pqTabbedMultiViewWidget.h>
 #include <vtkSMViewLayoutProxy.h>
 
@@ -57,11 +58,19 @@ public:
     pqServer* server = ob->createServer(pqServerResource("builtin:"));
     pqActiveObjects::instance().setActiveServer(server);
 
+    QString viewType = "SpreadSheetView";
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
     QList<vtkSMViewLayoutProxy*> layouts;
     for (int cc = 0; cc < 4; ++cc)
     {
       this->TMVWidget->setCurrentTab(this->TMVWidget->createTab(server));
       layouts.push_back(this->TMVWidget->layoutProxy());
+      // Create a view for each layout as now empty layouts are shown even when filtering
+      // is enabled and the layout annotations don't match (so that it is possible to
+      // create a new view).
+      auto view = ob->createView(viewType, server);
+      auto layoutProxy = smmodel->findItem<pqProxy*>(this->TMVWidget->layoutProxy());
+      ob->addToLayout(view, layoutProxy);
     }
 
     this->ComboBox->addItem("Filter 1 (Layouts 1,2,4)", QString("Filter1"));
