@@ -180,8 +180,7 @@
         <BooleanDomain name="bool"/>
         <Documentation>
           Set whether Ghost interfaces will be removed. When you are rendering you want to remove ghost interfaces.
-          There are certain algorithms though that need the ghost interfaces. This flag is meaningful only for
-          vtkUnstructuredGrid/vtkUnstructuredGridBase.
+          There are certain algorithms though that need the ghost interfaces.
         </Documentation>
       </IntVectorProperty>
       <!-- End DataSetSurfaceFilter -->
