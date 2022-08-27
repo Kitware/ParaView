@@ -86,6 +86,9 @@ function(extract_version_components version_string var_prefix)
     set(patch_extra ${CMAKE_MATCH_5})
     set(branch "")
     if (patch_extra)
+      if (NOT source_dir)
+        set(source_dir "${ParaView_SOURCE_DIR}")
+      endif ()
       execute_process(
         COMMAND ${git_command}
                 name-rev
