@@ -44,6 +44,7 @@ pqShortcutDecorator::pqShortcutDecorator(pqPropertyWidget* parent)
   : Superclass(nullptr, parent)
   , m_pressed(false)
   , m_silent(false)
+  , m_allowRefocus(false)
 {
   parent->setLineWidth(2);
   parent->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
@@ -116,10 +117,11 @@ void pqShortcutDecorator::onShortcutEnabled()
   {
     if (shortcut)
     {
-      shortcut->setEnabled(true);
+      shortcut->setEnabled(true, m_allowRefocus);
     }
   }
   m_silent = false;
+  m_allowRefocus = false; // Always reset after use.
 
   // Set the visual style
   auto* propWidget = this->propertyWidget();
@@ -148,10 +150,11 @@ void pqShortcutDecorator::onShortcutDisabled()
   this->markFrame(false, QColor(0, 0, 0, 0));
 }
 
-void pqShortcutDecorator::setEnabled(bool enable)
+void pqShortcutDecorator::setEnabled(bool enable, bool refocusWhenEnabling)
 {
   if (enable)
   {
+    m_allowRefocus = refocusWhenEnabling; // This will be reset inside onShortcutEnabled.
     // This has the effect of turning all shortcuts on.
     this->onShortcutEnabled();
   }
@@ -200,7 +203,7 @@ bool pqShortcutDecorator::eventFilter(QObject* obj, QEvent* event)
               pqKeySequences::instance().reorder(shortcut);
             }
           }
-          this->setEnabled(!this->isEnabled());
+          this->setEnabled(!this->isEnabled(), true);
           // Eat this mouse event:
           return true;
         }

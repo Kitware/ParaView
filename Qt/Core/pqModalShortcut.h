@@ -61,7 +61,7 @@ public:
     QWidget* contextWidget, Qt::ShortcutContext contextArea = Qt::WidgetShortcut);
 
   bool isEnabled() const;
-  void setEnabled(bool);
+  void setEnabled(bool shouldEnable, bool changeFocus = true);
 
   QKeySequence keySequence() const;
 

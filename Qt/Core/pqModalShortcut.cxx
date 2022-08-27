@@ -116,7 +116,7 @@ bool pqModalShortcut::isEnabled() const
   return m_shortcut ? m_shortcut->isEnabled() : false;
 }
 
-void pqModalShortcut::setEnabled(bool enable)
+void pqModalShortcut::setEnabled(bool enable, bool changeFocus)
 {
   if (!m_shortcut)
   {
@@ -133,7 +133,7 @@ void pqModalShortcut::setEnabled(bool enable)
       // Now if we have a context widget, give it focus
       // so that users can immediately use the key.
       auto ctxt = m_shortcut->context();
-      if (ctxt == Qt::WidgetShortcut || ctxt == Qt::WidgetWithChildrenShortcut)
+      if ((ctxt == Qt::WidgetShortcut || ctxt == Qt::WidgetWithChildrenShortcut) && changeFocus)
       {
         auto* parent = dynamic_cast<QWidget*>(m_shortcut->parent());
         if (parent)
