@@ -106,6 +106,13 @@ public Q_SLOTS:
    */
   void useCameraNormal();
 
+  /**
+   * Set the X-,Y-, or Z-axis with user-specified values and update the other axes accordingly.
+   */
+  void setUserXAxis();
+  void setUserYAxis();
+  void setUserZAxis();
+
 protected Q_SLOTS:
   /**
    * Places the interactive widget using current data source information.
@@ -117,6 +124,9 @@ private Q_SLOTS:
   void setNormal(double x, double y, double z);
   void setDirection(double x, double y, double z);
   void currentIndexChangedLockAxis(int);
+
+protected:
+  void setUserAxis(int axis);
 
 Q_SIGNALS:
   // Note this reports a lock axis (-1, 0, 1, or 2), not a combo-box index (0, 1, 2, 3)

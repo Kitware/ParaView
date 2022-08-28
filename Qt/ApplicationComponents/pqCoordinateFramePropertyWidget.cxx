@@ -49,9 +49,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVectorOperators.h"
 
 #include <QComboBox>
+#include <QMenu>
 
 namespace
 {
+// Divide the vector by its length (if non-zero), returning true if non-zero.
+template <typename T, std::size_t N>
+bool normalize(std::array<T, N>& vec)
+{
+  T mag = 0.;
+  for (std::size_t ii = 0; ii < N; ++ii)
+  {
+    mag += vec[ii] * vec[ii];
+  }
+  mag = std::sqrt(mag);
+  if (mag < 1e-8)
+  {
+    return false;
+  }
+  for (std::size_t ii = 0; ii < N; ++ii)
+  {
+    vec[ii] /= mag;
+  }
+  return true;
+}
+
 // Avoid any dimension having an extent of 0;
 // ensure that each dimension has some thickness and then scale.
 static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
@@ -115,8 +137,8 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
         ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), originInfo, 2);
     }
     ui.labelOrigin->setText(origin->GetXMLLabel());
-    ui.pickLabel->setText(
-      ui.pickLabel->text().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
+    ui.actionButton->setToolTip(
+      ui.actionButton->toolTip().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
     QString tooltip = this->getTooltip(origin);
     ui.originX->setToolTip(tooltip);
     ui.originY->setToolTip(tooltip);
@@ -130,9 +152,18 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
 
   if (vtkSMProperty* xAxis = smgroup->GetProperty("XAxis"))
   {
-    this->addPropertyLink(ui.xAxisX, "text2", SIGNAL(textChangedAndEditingFinished()), xAxis, 0);
-    this->addPropertyLink(ui.xAxisY, "text2", SIGNAL(textChangedAndEditingFinished()), xAxis, 1);
-    this->addPropertyLink(ui.xAxisZ, "text2", SIGNAL(textChangedAndEditingFinished()), xAxis, 2);
+    this->addPropertyLink(ui.xAxisX, "text2", SIGNAL(blank()), xAxis, 0);
+    this->addPropertyLink(ui.xAxisY, "text2", SIGNAL(blank()), xAxis, 1);
+    this->addPropertyLink(ui.xAxisZ, "text2", SIGNAL(blank()), xAxis, 2);
+    QObject::connect(
+      ui.acceptXAxis, &QToolButton::clicked, this, &pqCoordinateFramePropertyWidget::setUserXAxis);
+    auto* xAxisInfo = dynamic_cast<vtkSMDoubleVectorProperty*>(smgroup->GetProperty("XAxisInfo"));
+    if (xAxisInfo)
+    {
+      this->addPropertyLink(ui.xAxisX, "text2", SIGNAL(blank()), xAxisInfo, 0);
+      this->addPropertyLink(ui.xAxisY, "text2", SIGNAL(blank()), xAxisInfo, 1);
+      this->addPropertyLink(ui.xAxisZ, "text2", SIGNAL(blank()), xAxisInfo, 2);
+    }
     ui.labelXAxis->setText(xAxis->GetXMLLabel());
     QString tooltip = this->getTooltip(xAxis);
     ui.xAxisX->setToolTip(tooltip);
@@ -147,9 +178,18 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
 
   if (vtkSMProperty* yAxis = smgroup->GetProperty("YAxis"))
   {
-    this->addPropertyLink(ui.yAxisX, "text2", SIGNAL(textChangedAndEditingFinished()), yAxis, 0);
-    this->addPropertyLink(ui.yAxisY, "text2", SIGNAL(textChangedAndEditingFinished()), yAxis, 1);
-    this->addPropertyLink(ui.yAxisZ, "text2", SIGNAL(textChangedAndEditingFinished()), yAxis, 2);
+    this->addPropertyLink(ui.yAxisX, "text2", SIGNAL(blank()), yAxis, 0);
+    this->addPropertyLink(ui.yAxisY, "text2", SIGNAL(blank()), yAxis, 1);
+    this->addPropertyLink(ui.yAxisZ, "text2", SIGNAL(blank()), yAxis, 2);
+    QObject::connect(
+      ui.acceptYAxis, &QToolButton::clicked, this, &pqCoordinateFramePropertyWidget::setUserYAxis);
+    auto* yAxisInfo = dynamic_cast<vtkSMDoubleVectorProperty*>(smgroup->GetProperty("XAxisInfo"));
+    if (yAxisInfo)
+    {
+      this->addPropertyLink(ui.yAxisX, "text2", SIGNAL(blank()), yAxisInfo, 0);
+      this->addPropertyLink(ui.yAxisY, "text2", SIGNAL(blank()), yAxisInfo, 1);
+      this->addPropertyLink(ui.yAxisZ, "text2", SIGNAL(blank()), yAxisInfo, 2);
+    }
     ui.labelYAxis->setText(yAxis->GetXMLLabel());
     QString tooltip = this->getTooltip(yAxis);
     ui.yAxisX->setToolTip(tooltip);
@@ -164,9 +204,18 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
 
   if (vtkSMProperty* zAxis = smgroup->GetProperty("ZAxis"))
   {
-    this->addPropertyLink(ui.zAxisX, "text2", SIGNAL(textChangedAndEditingFinished()), zAxis, 0);
-    this->addPropertyLink(ui.zAxisY, "text2", SIGNAL(textChangedAndEditingFinished()), zAxis, 1);
-    this->addPropertyLink(ui.zAxisZ, "text2", SIGNAL(textChangedAndEditingFinished()), zAxis, 2);
+    this->addPropertyLink(ui.zAxisX, "text2", SIGNAL(blank()), zAxis, 0);
+    this->addPropertyLink(ui.zAxisY, "text2", SIGNAL(blank()), zAxis, 1);
+    this->addPropertyLink(ui.zAxisZ, "text2", SIGNAL(blank()), zAxis, 2);
+    QObject::connect(
+      ui.acceptZAxis, &QToolButton::clicked, this, &pqCoordinateFramePropertyWidget::setUserZAxis);
+    auto* zAxisInfo = dynamic_cast<vtkSMDoubleVectorProperty*>(smgroup->GetProperty("XAxisInfo"));
+    if (zAxisInfo)
+    {
+      this->addPropertyLink(ui.zAxisX, "text2", SIGNAL(blank()), zAxisInfo, 0);
+      this->addPropertyLink(ui.zAxisY, "text2", SIGNAL(blank()), zAxisInfo, 1);
+      this->addPropertyLink(ui.zAxisZ, "text2", SIGNAL(blank()), zAxisInfo, 2);
+    }
     ui.labelZAxis->setText(zAxis->GetXMLLabel());
     QString tooltip = this->getTooltip(zAxis);
     ui.zAxisX->setToolTip(tooltip);
@@ -180,14 +229,24 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
   }
 
   // link a few buttons
-  this->connect(ui.useXNormal, SIGNAL(clicked()), SLOT(useXNormal()));
-  this->connect(ui.useYNormal, SIGNAL(clicked()), SLOT(useYNormal()));
-  this->connect(ui.useZNormal, SIGNAL(clicked()), SLOT(useZNormal()));
-  this->connect(ui.resetToWorldXYZ, SIGNAL(clicked()), SLOT(resetToWorldXYZ()));
-  this->connect(ui.useCameraNormal, SIGNAL(clicked()), SLOT(useCameraNormal()));
-  this->connect(ui.resetCameraToNormal, SIGNAL(clicked()), SLOT(resetCameraToNormal()));
-  ui.resetToDataBounds->hide();
-  this->connect(ui.resetToDataBounds, SIGNAL(clicked()), SLOT(resetToDataBounds()));
+  this->connect(ui.actionAlignToWorldX, SIGNAL(triggered()), SLOT(useXNormal()));
+  this->connect(ui.actionAlignToWorldY, SIGNAL(triggered()), SLOT(useYNormal()));
+  this->connect(ui.actionAlignToWorldZ, SIGNAL(triggered()), SLOT(useZNormal()));
+  this->connect(ui.actionAxisAlignWorld, SIGNAL(triggered()), SLOT(resetToWorldXYZ()));
+  this->connect(ui.actionAlignToCameraOut, SIGNAL(triggered()), SLOT(useCameraNormal()));
+  this->connect(ui.actionAlignCameraToAxis, SIGNAL(triggered()), SLOT(resetCameraToNormal()));
+  ui.actionRecenterOnBounds->setEnabled(false);
+  this->connect(ui.actionRecenterOnBounds, SIGNAL(triggered()), SLOT(resetToDataBounds()));
+
+  auto actionMenu = new QMenu("Coordinate frame utilities");
+  actionMenu->addAction(ui.actionAlignToWorldX);
+  actionMenu->addAction(ui.actionAlignToWorldY);
+  actionMenu->addAction(ui.actionAlignToWorldZ);
+  actionMenu->addAction(ui.actionAxisAlignWorld);
+  actionMenu->addAction(ui.actionAlignToCameraOut);
+  actionMenu->addAction(ui.actionAlignCameraToAxis);
+  // actionMenu->addAction(ui.actionRecenterOnBounds);
+  ui.actionButton->setMenu(actionMenu);
 
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
@@ -358,6 +417,56 @@ void pqCoordinateFramePropertyWidget::useCameraNormal()
     camera_normal[2] = -camera_normal[2];
     this->setNormal(camera_normal[0], camera_normal[1], camera_normal[2]);
   }
+}
+
+void pqCoordinateFramePropertyWidget::setUserXAxis()
+{
+  this->setUserAxis(0);
+}
+
+void pqCoordinateFramePropertyWidget::setUserYAxis()
+{
+  this->setUserAxis(1);
+}
+
+void pqCoordinateFramePropertyWidget::setUserZAxis()
+{
+  this->setUserAxis(2);
+}
+
+void pqCoordinateFramePropertyWidget::setUserAxis(int axisIndex)
+{
+  vtkSMProxy* wdgProxy = this->widgetProxy();
+  std::array<double, 3> axis;
+  switch (axisIndex)
+  {
+    default: // fall through
+    case 0:
+      axis[0] = this->findChild<pqDoubleLineEdit*>("xAxisX")->text().toDouble();
+      axis[1] = this->findChild<pqDoubleLineEdit*>("xAxisY")->text().toDouble();
+      axis[2] = this->findChild<pqDoubleLineEdit*>("xAxisZ")->text().toDouble();
+      normalize(axis);
+      vtkSMPropertyHelper(wdgProxy, "XAxis").Set(axis.data(), 3);
+      break;
+    case 1:
+      axis[0] = this->findChild<pqDoubleLineEdit*>("yAxisX")->text().toDouble();
+      axis[1] = this->findChild<pqDoubleLineEdit*>("yAxisY")->text().toDouble();
+      axis[2] = this->findChild<pqDoubleLineEdit*>("yAxisZ")->text().toDouble();
+      normalize(axis);
+      vtkSMPropertyHelper(wdgProxy, "YAxis").Set(axis.data(), 3);
+      break;
+    case 2:
+      axis[0] = this->findChild<pqDoubleLineEdit*>("zAxisX")->text().toDouble();
+      axis[1] = this->findChild<pqDoubleLineEdit*>("zAxisY")->text().toDouble();
+      axis[2] = this->findChild<pqDoubleLineEdit*>("zAxisZ")->text().toDouble();
+      normalize(axis);
+      vtkSMPropertyHelper(wdgProxy, "ZAxis").Set(axis.data(), 3);
+      break;
+  }
+  wdgProxy->UpdateVTKObjects();
+  wdgProxy->UpdatePropertyInformation();
+  Q_EMIT this->changeAvailable();
+  this->render();
 }
 
 void pqCoordinateFramePropertyWidget::setNormal(double wx, double wy, double wz)
