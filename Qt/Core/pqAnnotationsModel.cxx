@@ -294,7 +294,18 @@ bool pqAnnotationsModel::setData(const QModelIndex& idx, const QVariant& value, 
 //-----------------------------------------------------------------------------
 QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
 {
-  if (role == Qt::DecorationRole || role == Qt::DisplayRole)
+  if (role == Qt::DisplayRole)
+  {
+    int col = idx.column();
+    if (col == COLOR || col == OPACITY || col == VISIBILITY)
+    {
+      // Must be invalid in order to prevent pqTreeViewSelectionHelper to enable
+      // the sort / regex filters for this columns in the context menu
+      return QVariant();
+    }
+    return this->Internals->Items[idx.row()].data(col);
+  }
+  else if (role == Qt::DecorationRole)
   {
     return this->Internals->Items[idx.row()].data(idx.column());
   }

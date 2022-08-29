@@ -230,22 +230,17 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Dialog to set global and selected lines opacity
-class pqGlobalOpacityRangeDialog : public QDialog
+// Dialog to set opacity value(s)
+class pqOpacityRangeDialog : public QDialog
 {
 public:
-  pqGlobalOpacityRangeDialog(
-    double globalOpacity = 1.0, double selectedOpacity = 1.0, QWidget* parent = nullptr)
+  pqOpacityRangeDialog(double initialValue = 1.0, QWidget* parent = nullptr)
     : QDialog(parent)
   {
-    this->GlobalOpacityWidget = new pqDoubleRangeWidget(this);
-    this->GlobalOpacityWidget->setMinimum(0.0);
-    this->GlobalOpacityWidget->setMaximum(1.0);
-    this->GlobalOpacityWidget->setValue(globalOpacity);
-    this->SelectedOpacityWidget = new pqDoubleRangeWidget(this);
-    this->SelectedOpacityWidget->setMinimum(0.0);
-    this->SelectedOpacityWidget->setMaximum(1.0);
-    this->SelectedOpacityWidget->setValue(selectedOpacity);
+    this->OpacityWidget = new pqDoubleRangeWidget(this);
+    this->OpacityWidget->setMinimum(0.0);
+    this->OpacityWidget->setMaximum(1.0);
+    this->OpacityWidget->setValue(initialValue);
 
     QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -253,27 +248,67 @@ public:
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QHBoxLayout* widgetLayout = new QHBoxLayout;
-    widgetLayout->addWidget(new QLabel(tr("Global Opacity :"), this));
-    widgetLayout->addWidget(this->GlobalOpacityWidget);
-    QHBoxLayout* widgetLayout2 = new QHBoxLayout;
-    widgetLayout2->addWidget(new QLabel(tr("Selected Categories Opacity :"), this));
-    widgetLayout2->addWidget(this->SelectedOpacityWidget);
-
+    widgetLayout->addWidget(new QLabel(tr("Opacity value :"), this));
+    widgetLayout->addWidget(this->OpacityWidget);
     QVBoxLayout* layout_ = new QVBoxLayout;
     layout_->addLayout(widgetLayout);
-    layout_->addLayout(widgetLayout2);
     layout_->addWidget(buttonBox);
     this->setLayout(layout_);
   }
 
-  ~pqGlobalOpacityRangeDialog() override = default;
+  ~pqOpacityRangeDialog() override = default;
 
-  double globalOpacity() const { return this->GlobalOpacityWidget->value(); }
-  double selectedOpacity() const { return this->SelectedOpacityWidget->value(); }
+  double opacity() const { return this->OpacityWidget->value(); }
 
 private:
-  pqDoubleRangeWidget* GlobalOpacityWidget;
-  pqDoubleRangeWidget* SelectedOpacityWidget;
+  pqDoubleRangeWidget* OpacityWidget;
+};
+
+//-----------------------------------------------------------------------------
+// Custom pqTreeViewHelper used to set opacity values on selected items.
+class pqColorAnnotationsSelectionHelper : public pqTreeViewSelectionHelper
+{
+public:
+  explicit pqColorAnnotationsSelectionHelper(QAbstractItemView* view)
+    : pqTreeViewSelectionHelper(view, false)
+  {
+  }
+
+protected:
+  void execOpacityDialog()
+  {
+    pqOpacityRangeDialog dialog(1.0, nullptr);
+    dialog.setWindowTitle(tr("Set opacity of highlited items"));
+    dialog.move(QCursor::pos());
+    if (dialog.exec() == QDialog::Accepted)
+    {
+      // Set the opacity on selected elements
+      QAbstractItemModel* model = this->TreeView->model();
+      QItemSelectionModel* select = this->TreeView->selectionModel();
+      for (QModelIndex idx : select->selectedRows(pqAnnotationsModel::OPACITY))
+      {
+        model->setData(idx, dialog.opacity(), Qt::EditRole);
+      }
+    }
+  }
+
+  void buildupMenu(QMenu& menu, int section, const QPoint& pos) override
+  {
+    pqTreeViewSelectionHelper::buildupMenu(menu, section, pos);
+
+    if (section == pqAnnotationsModel::OPACITY)
+    {
+      // Add a menu section to set the opacity of the selected rows
+      if (!menu.isEmpty())
+      {
+        menu.addSeparator();
+      }
+      if (auto actn = menu.addAction(tr("Set opacity of highlighted items")))
+      {
+        QObject::connect(actn, &QAction::triggered, [this](bool) { this->execOpacityDialog(); });
+      }
+    }
+  }
 };
 }
 
@@ -396,8 +431,6 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
     SLOT(onHeaderDoubleClicked(int)));
   QObject::connect(ui.AnnotationsTable, SIGNAL(editPastLastRow()), this, SLOT(editPastLastRow()));
   ui.AnnotationsTable->setContextMenuPolicy(Qt::CustomContextMenu);
-  QObject::connect(ui.AnnotationsTable, SIGNAL(customContextMenuRequested(QPoint)), this,
-    SLOT(customMenuRequested(QPoint)));
 
   this->connect(ui.AnnotationsTable->selectionModel(),
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
@@ -416,6 +449,8 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
   proxyModel->setSourceModel(this->Internals->Model);
   ui.AnnotationsTable->setModel(proxyModel);
   ui.AnnotationsTable->setSortingEnabled(false);
+
+  new pqColorAnnotationsSelectionHelper(ui.AnnotationsTable);
 }
 
 //-----------------------------------------------------------------------------
@@ -509,24 +544,21 @@ void pqColorAnnotationsWidget::onHeaderDoubleClicked(int index)
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::execGlobalOpacityDialog()
 {
-  pqGlobalOpacityRangeDialog dialog(this->Internals->Model->globalOpacity(), 1.0, this);
-  dialog.setWindowTitle(tr("Set Global Opacity"));
+  QAbstractItemModel* model = this->Internals->Ui.AnnotationsTable->model();
+  if (!model)
+  {
+    return;
+  }
+  double globalOpacity =
+    model->headerData(pqAnnotationsModel::OPACITY, Qt::Horizontal, Qt::EditRole).toDouble();
+  pqOpacityRangeDialog dialog(globalOpacity, this);
+  dialog.setWindowTitle(tr("Set global opacity"));
   dialog.move(QCursor::pos());
   if (dialog.exec() == QDialog::Accepted)
   {
-    QAbstractItemModel* model = this->Internals->Ui.AnnotationsTable->model();
-
     // Set the global opacity
     model->setHeaderData(
-      pqAnnotationsModel::OPACITY, Qt::Horizontal, dialog.globalOpacity(), Qt::EditRole);
-
-    // Set the opacity on selected elements
-    QList<int> selectedRows;
-    QItemSelectionModel* select = this->Internals->Ui.AnnotationsTable->selectionModel();
-    for (QModelIndex idx : select->selectedRows(pqAnnotationsModel::OPACITY))
-    {
-      model->setData(idx, dialog.selectedOpacity(), Qt::EditRole);
-    }
+      pqAnnotationsModel::OPACITY, Qt::Horizontal, dialog.opacity(), Qt::EditRole);
   }
 }
 
@@ -1078,19 +1110,6 @@ void pqColorAnnotationsWidget::saveAsPreset(
 }
 
 //-----------------------------------------------------------------------------
-void pqColorAnnotationsWidget::customMenuRequested(QPoint pos)
-{
-  // Show a contextual menu to set global opacity and selected rows opacities
-  QMenu* menu = new QMenu(this);
-  Ui::ColorAnnotationsWidget& ui = this->Internals->Ui;
-  QAction* opacityAction = new QAction(tr("Set global and selected opacity"), this);
-  opacityAction->setEnabled(ui.EnableOpacityMapping->isChecked());
-  QObject::connect(opacityAction, SIGNAL(triggered(bool)), this, SLOT(execGlobalOpacityDialog()));
-  menu->addAction(opacityAction);
-  menu->popup(ui.AnnotationsTable->viewport()->mapToGlobal(pos));
-}
-
-//-----------------------------------------------------------------------------
 QModelIndex pqColorAnnotationsWidget::currentIndex()
 {
   auto table = this->Internals->Ui.AnnotationsTable;
@@ -1245,22 +1264,6 @@ void pqColorAnnotationsWidget::supportsOpacityMapping(bool val)
   Ui::ColorAnnotationsWidget& ui = this->Internals->Ui;
   ui.EnableOpacityMapping->setVisible(val);
   ui.EnableOpacityMapping->setChecked(val);
-
-  if (!val)
-  {
-    ui.AnnotationsTable->disconnect(SIGNAL(customContextMenuRequested(QPoint)));
-    new pqTreeViewSelectionHelper(ui.AnnotationsTable, false);
-  }
-  else
-  {
-    auto selectionHelper = this->findChild<pqTreeViewSelectionHelper*>();
-    if (selectionHelper)
-    {
-      selectionHelper->deleteLater();
-    }
-    QObject::connect(ui.AnnotationsTable, SIGNAL(customContextMenuRequested(QPoint)), this,
-      SLOT(customMenuRequested(QPoint)));
-  }
 }
 
 //-----------------------------------------------------------------------------
