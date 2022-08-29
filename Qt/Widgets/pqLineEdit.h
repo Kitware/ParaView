@@ -84,6 +84,18 @@ Q_SIGNALS:
    */
   void textChangedAndEditingFinished();
 
+  /**
+   * This signal is never fired.
+   * It exists so that you can add a unidirectional property link, where an
+   * information-only property updates the pqLineEdit contents, but user edits
+   * to the pqLineEdit never update the property.
+   *
+   * \sa pqCoordinateFramePropertyWidget which uses this so users can enter
+   * coordinates for an axis without the property being updated (which would
+   * cause other values to be modified, interrupting the user's edit).
+   */
+  void blank();
+
 public Q_SLOTS:
   /**
    * Same as QLineEdit::setText() except that it reset the cursor position to

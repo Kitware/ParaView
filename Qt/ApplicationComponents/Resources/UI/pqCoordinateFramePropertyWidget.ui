@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>442</height>
+    <width>400</width>
+    <height>221</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
         <string>Show the coordinate axes in the 3D render view.</string>
        </property>
        <property name="text">
-        <string>Show Frame</string>
+        <string>Show</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -43,32 +43,104 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="actionButton">
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>154</red>
+             <green>153</green>
+             <blue>150</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>154</red>
+             <green>153</green>
+             <blue>150</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>154</red>
+             <green>153</green>
+             <blue>150</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Use 'P' to pick a &amp;quot;Point&amp;quot; on the mesh or 'Ctrl+P' to snap to the closest mesh point. Use 'N' to align a vector with a surface  &amp;quot;Normal&amp;quot; ( 'Ctrl+N' to snap to the closest mesh point's normal), if availiable. Use 'T' ('Ctrl+T') to point an axis &amp;quot;Toward&amp;quot; the clicked point (or its nearest mesh point).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>↗</string>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QLabel" name="labelLockAxis">
        <property name="text">
-        <string>Lock axis:</string>
+        <string>Lock:</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QComboBox" name="lockAxis">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select an axis to lock (or &amp;quot;–&amp;quot; for none). When an axis is locked, editing other axes with the pointer will rotate them around the locked axis. When picking directions with a locked axis, the locked axis will always be modified (rather than the closest axis to the picked direction).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <item>
         <property name="text">
-         <string>None</string>
+         <string>–</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>X Axis</string>
+         <string>◉X</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Y Axis</string>
+         <string>◉Y</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Z Axis</string>
+         <string>◉Z</string>
         </property>
        </item>
       </widget>
@@ -77,6 +149,28 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelYAxis">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Y Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="pqDoubleLineEdit" name="originY"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="pqDoubleLineEdit" name="zAxisX"/>
+     </item>
+     <item row="3" column="3">
+      <widget class="pqDoubleLineEdit" name="zAxisZ"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqDoubleLineEdit" name="originZ"/>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="labelOrigin">
        <property name="text">
@@ -84,40 +178,11 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="pqDoubleLineEdit" name="originX"/>
-     </item>
-     <item row="0" column="2">
-      <widget class="pqDoubleLineEdit" name="originY"/>
-     </item>
-     <item row="0" column="3">
-      <widget class="pqDoubleLineEdit" name="originZ"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="labelXAxis">
-       <property name="text">
-        <string>X Axis</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="pqDoubleLineEdit" name="xAxisX"/>
+     <item row="2" column="1">
+      <widget class="pqDoubleLineEdit" name="yAxisX"/>
      </item>
      <item row="1" column="2">
       <widget class="pqDoubleLineEdit" name="xAxisY"/>
-     </item>
-     <item row="1" column="3">
-      <widget class="pqDoubleLineEdit" name="xAxisZ"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="labelYAxis">
-       <property name="text">
-        <string>Y Axis</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="pqDoubleLineEdit" name="yAxisX"/>
      </item>
      <item row="2" column="2">
       <widget class="pqDoubleLineEdit" name="yAxisY"/>
@@ -125,127 +190,338 @@
      <item row="2" column="3">
       <widget class="pqDoubleLineEdit" name="yAxisZ"/>
      </item>
+     <item row="3" column="2">
+      <widget class="pqDoubleLineEdit" name="zAxisY"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqDoubleLineEdit" name="originX"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqDoubleLineEdit" name="xAxisZ"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelXAxis">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>X Axis</string>
+       </property>
+      </widget>
+     </item>
      <item row="3" column="0">
       <widget class="QLabel" name="labelZAxis">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Z Axis</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="pqDoubleLineEdit" name="zAxisX"/>
-     </item>
-     <item row="3" column="2">
-      <widget class="pqDoubleLineEdit" name="zAxisY"/>
-     </item>
-     <item row="3" column="3">
-      <widget class="pqDoubleLineEdit" name="zAxisZ"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="pickLabel">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Note: Use 'P' to pick a &quot;Point&quot; on the mesh or 'Ctrl+P' to snap to the closest mesh point. Use 'N' to align a vector with a surface  &quot;Normal&quot; ( 'Ctrl+N' to snap to the closest mesh point's normal), if availiable. Use 'T' ('Ctrl+T') to point an axis &quot;Toward&quot; the clicked point (or its nearest mesh point).</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout">
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item row="1" column="0">
-      <widget class="QPushButton" name="useYNormal">
-       <property name="toolTip">
-        <string>Set the normal to the y-axis.</string>
-       </property>
-       <property name="text">
-        <string>&amp;Y Normal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QPushButton" name="useZNormal">
-       <property name="toolTip">
-        <string>Set the normal to the z-axis.</string>
-       </property>
-       <property name="text">
-        <string>&amp;Z Normal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="QPushButton" name="resetCameraToNormal">
-       <property name="toolTip">
-        <string>Reset the camera to look along the normal.</string>
-       </property>
-       <property name="text">
-        <string>Reset Camera to Normal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0" colspan="2">
-      <widget class="QPushButton" name="resetToDataBounds">
-       <property name="toolTip">
-        <string>Reset the frame based on the data bounds.</string>
-       </property>
-       <property name="text">
-        <string>Reset to Data Bounds</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="useXNormal">
-       <property name="toolTip">
-        <string>Set the normal to the x-axis.</string>
-       </property>
-       <property name="text">
-        <string>&amp;X Normal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="useCameraNormal">
-       <property name="toolTip">
-        <string>Set the normal to the camera's view direction.</string>
-       </property>
-       <property name="text">
-        <string>Camera Normal</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
-      <widget class="QPushButton" name="resetToWorldXYZ">
+      <widget class="pqDoubleLineEdit" name="xAxisX"/>
+     </item>
+     <item row="1" column="4">
+      <widget class="QToolButton" name="acceptXAxis">
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>224</red>
+             <green>27</green>
+             <blue>36</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>223</red>
+             <green>169</green>
+             <blue>171</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>224</red>
+             <green>27</green>
+             <blue>36</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>223</red>
+             <green>169</green>
+             <blue>171</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>149</green>
+             <blue>149</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>223</red>
+             <green>169</green>
+             <blue>171</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="toolTip">
+        <string>Normalize to unit length and set the X axis to point this direction.</string>
+       </property>
        <property name="text">
-        <string>Reset axes to world X, Y, Z</string>
+        <string>◉</string>
+       </property>
+       <property name="arrowType">
+        <enum>Qt::NoArrow</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="4">
+      <widget class="QToolButton" name="acceptYAxis">
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>245</red>
+             <green>194</green>
+             <blue>17</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>245</red>
+             <green>230</green>
+             <blue>180</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>245</red>
+             <green>194</green>
+             <blue>17</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>245</red>
+             <green>230</green>
+             <blue>180</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>149</green>
+             <blue>149</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>245</red>
+             <green>230</green>
+             <blue>180</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="toolTip">
+        <string>Normalize to unit length and set the Y axis to point this direction.</string>
+       </property>
+       <property name="text">
+        <string>◉</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="4">
+      <widget class="QToolButton" name="acceptZAxis">
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>38</red>
+             <green>162</green>
+             <blue>105</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>185</red>
+             <green>227</green>
+             <blue>208</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>38</red>
+             <green>162</green>
+             <blue>105</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>185</red>
+             <green>227</green>
+             <blue>208</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="ButtonText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>146</red>
+             <green>149</green>
+             <blue>149</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="HighlightedText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>185</red>
+             <green>227</green>
+             <blue>208</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="toolTip">
+        <string>Normalize to unit length and set the Z axis to point this direction.</string>
+       </property>
+       <property name="text">
+        <string>◉</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
   </layout>
+  <action name="actionAxisAlignWorld">
+   <property name="text">
+    <string>Align axes to world axes</string>
+   </property>
+   <property name="toolTip">
+    <string>Click to reset the coordinate frame axes to the world X, Y, and Z axes.</string>
+   </property>
+  </action>
+  <action name="actionAlignToCameraIn">
+   <property name="text">
+    <string>Align to Camera (In ⨂)</string>
+   </property>
+   <property name="toolTip">
+    <string>Align the locked (or nearest otherwise) axis to the camera normal, pointing into the screen.</string>
+   </property>
+  </action>
+  <action name="actionAlignToCameraOut">
+   <property name="text">
+    <string>Align to Camera (Out ⨀)</string>
+   </property>
+   <property name="toolTip">
+    <string>Align the locked (or nearest otherwise) axis to the camera normal, pointing out of the screen.</string>
+   </property>
+  </action>
+  <action name="actionRecenterOnBounds">
+   <property name="text">
+    <string>Recenter On Bounds</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset the origin of the frame to the center of the associated object's bounds and align the axes with the object's principal axes.</string>
+   </property>
+  </action>
+  <action name="actionUpdateToUserEntry">
+   <property name="text">
+    <string>Update with entered values</string>
+   </property>
+   <property name="toolTip">
+    <string>Normalize the values to the left and apply them to the axis.</string>
+   </property>
+  </action>
+  <action name="actionAlignToWorldX">
+   <property name="text">
+    <string>Align to world X</string>
+   </property>
+   <property name="toolTip">
+    <string>Align to the world coordinate X axis.</string>
+   </property>
+  </action>
+  <action name="actionAlignToWorldY">
+   <property name="text">
+    <string>Align to world Y</string>
+   </property>
+   <property name="toolTip">
+    <string>Align to the world coordinate Y axis.</string>
+   </property>
+  </action>
+  <action name="actionAlignToWorldZ">
+   <property name="text">
+    <string>Align to world Z</string>
+   </property>
+   <property name="toolTip">
+    <string>Align to the world coordinate Z axis.</string>
+   </property>
+  </action>
+  <action name="actionAlignCameraToAxis">
+   <property name="text">
+    <string>Make camera normal to axis</string>
+   </property>
+   <property name="toolTip">
+    <string>Align the camera looking down the locked or nearest axis toward the origin.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -256,6 +532,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>show3DWidget</tabstop>
+  <tabstop>actionButton</tabstop>
   <tabstop>lockAxis</tabstop>
   <tabstop>originX</tabstop>
   <tabstop>originY</tabstop>
@@ -263,19 +540,15 @@
   <tabstop>xAxisX</tabstop>
   <tabstop>xAxisY</tabstop>
   <tabstop>xAxisZ</tabstop>
+  <tabstop>acceptXAxis</tabstop>
   <tabstop>yAxisX</tabstop>
   <tabstop>yAxisY</tabstop>
   <tabstop>yAxisZ</tabstop>
+  <tabstop>acceptYAxis</tabstop>
   <tabstop>zAxisX</tabstop>
   <tabstop>zAxisY</tabstop>
   <tabstop>zAxisZ</tabstop>
-  <tabstop>useXNormal</tabstop>
-  <tabstop>useYNormal</tabstop>
-  <tabstop>useZNormal</tabstop>
-  <tabstop>useCameraNormal</tabstop>
-  <tabstop>resetToWorldXYZ</tabstop>
-  <tabstop>resetCameraToNormal</tabstop>
-  <tabstop>resetToDataBounds</tabstop>
+  <tabstop>acceptZAxis</tabstop>
  </tabstops>
  <resources/>
  <connections/>
