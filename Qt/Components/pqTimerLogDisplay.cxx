@@ -84,6 +84,7 @@ pqTimerLogDisplay::pqTimerLogDisplay(QWidget* p)
 {
   this->ui = new pqTimerLogDisplayUi;
   this->ui->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   int i;
   for (i = 0; i < NumThresholdChoices; i++)

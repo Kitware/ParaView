@@ -153,6 +153,7 @@ pqServerConnectDialog::pqServerConnectDialog(
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   this->Internals->Selector = selector;
 
   this->Internals->servers->horizontalHeader()->setObjectName("horz_header");

@@ -419,6 +419,7 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new pqInternals(this))
 {
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   connect(this->Internals->Ui.keySequenceEdit, &QKeySequenceEdit::editingFinished, this,
     &pqCustomizeShortcutsDialog::onEditingFinished);
   connect(this->Internals->Ui.treeView->selectionModel(), &QItemSelectionModel::selectionChanged,

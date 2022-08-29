@@ -317,6 +317,7 @@ pqExpressionsManagerDialog::pqExpressionsManagerDialog(QWidget* parent, const QS
   , Internals(new pqInternals(this, group))
 {
   Ui::pqExpressionsManagerDialog& ui = this->Internals->Ui;
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   QHeaderView* header = ui.expressions->horizontalHeader();
   header->setSortIndicatorShown(true);

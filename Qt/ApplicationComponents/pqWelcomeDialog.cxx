@@ -21,6 +21,8 @@ pqWelcomeDialog::pqWelcomeDialog(QWidget* parentObject)
   , ui(new Ui::pqWelcomeDialog)
 {
   ui->setupUi(this);
+  // remove do-nothing "?" title bar button on Windows.
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   QObject::connect(this->ui->DoNotShowAgainButton, SIGNAL(stateChanged(int)), this,
     SLOT(onDoNotShowAgainStateChanged(int)));

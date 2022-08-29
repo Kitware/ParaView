@@ -75,6 +75,7 @@ pqChangeInputDialog::pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* paren
   this->Internals->BlockSelectionChanged = false;
 
   this->Internals->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   this->Internals->PipelineModel = new pqPipelineModel(*smModel, this);

@@ -62,6 +62,7 @@ pqLockViewSizeCustomDialog::pqLockViewSizeCustomDialog(QWidget* _parent, Qt::Win
 {
   this->ui = new pqUI();
   this->ui->setupUi(this);
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   QIntValidator* validator = new QIntValidator(this);
   validator->setBottom(50);
