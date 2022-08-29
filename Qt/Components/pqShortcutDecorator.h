@@ -83,8 +83,14 @@ protected Q_SLOTS:
    * This is tied internally to pqPropertyWidget::widgetVisibilityUpdated, which passes
    * a boolean state so that shortcuts are disabled when the widget is not visible and
    * the widget grabs shortcuts when it becomes visible.
+   *
+   * If \a refocusWhenEnabling is true, and if an enabled shortcut has a context
+   * widget, the keyboard focus will shift to that widget (so that users can
+   * immediately use it). This parameter is false by default and should only be
+   * enabled when direct user interaction with the decorated frame is what causes
+   * the call to setEnabled().
    */
-  virtual void setEnabled(bool enable);
+  virtual void setEnabled(bool enable, bool refocusWhenEnabling = false);
 
 protected:
   /**
@@ -107,6 +113,15 @@ protected:
   bool m_pressed;
   // Prevent recursive signaling inside onShortcutEnabled/onShortcutDisabled.
   bool m_silent;
+  // Should shortcuts set the keyboard focus to their context widget?
+  // This is set to true when users explicitly click on the widget frame
+  // and false otherwise (so that programmatic changes to the widget made
+  // in response to other events do not interrupt a user; for example,
+  // using the arrow keys in the pipeline browser to change pipelines
+  // should not move the keyboard focus away from the pipeline browser).
+  // Note that this only applies when enabling shortcuts (since disabling
+  // a shortcut would never require a refocus).
+  bool m_allowRefocus;
 };
 
 #endif // pqShortcutDecorator_h
