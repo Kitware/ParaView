@@ -774,7 +774,7 @@ The `VTKExtensions/Conduit` module is now part of VTK, as `IO/CatalystConduit` m
 
 As a side effect, `Catalyst` (our `Conduit` provider) is no more a ThirdParty of ParaView but instead an external dependency of VTK.
 
-The CMake option `PARAVIEW_ENABLE_CATALYST` controls the build of the VTK module and of the ParaView Catalyst implementation (default OFF).
+The CMake option `PARAVIEW_ENABLE_CATALYST` controls the build of the VTK module and of the ParaView Catalyst implementation (default OFF). A local build of [Catalyst](https://gitlab.kitware.com/paraview/catalyst) should be provided (via `cmake -Dcatalyst_DIR`).
 
 ## Enable Catalyst to use Fides Reader
 
