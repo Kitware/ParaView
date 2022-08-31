@@ -149,7 +149,7 @@
             <Property name="CurvesAvailable"/>
             <Property name="ReadCurves"/>
           </PropertyGroup>
-          <PropertyGroup label="Conversions">
+          <PropertyGroup label="Conversions" panel_widget="SESAMEConversions">
             <Property function="VariableConversionValues" name="VariableConversionValues"/>
             <Property function="FlatArraysOfTables" name="FlatArraysOfTables"/>
           </PropertyGroup>
