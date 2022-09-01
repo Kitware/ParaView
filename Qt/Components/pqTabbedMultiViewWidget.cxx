@@ -850,7 +850,7 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
   int tabIndex = this->Internals->TabWidget->tabBar()->tabAt(point);
   pqMultiViewWidget* widget =
     qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->widget(tabIndex));
-  vtkSMProxy* vlayout = widget ? widget->layoutManager() : nullptr;
+  auto vlayout = widget ? vtkSMViewLayoutProxy::SafeDownCast(widget->layoutManager()) : nullptr;
   if (!vlayout)
   {
     return;
@@ -861,6 +861,11 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
   QMenu* menu = new QMenu(this);
   QAction* renameAction = menu->addAction("Rename");
   QAction* closeAction = menu->addAction(tr("Close layout"));
+  auto rearrangeMenu = menu->addMenu("Rearrange Views");
+  QAction* horizontalAction = rearrangeMenu->addAction(tr("Horizontally"));
+  rearrangeMenu->addAction(tr("Vertically"));
+  QAction* gridAction = rearrangeMenu->addAction(tr("Grid"));
+
   QAction* action = menu->exec(this->Internals->TabWidget->tabBar()->mapToGlobal(point));
   if (action == closeAction)
   {
@@ -884,6 +889,16 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
       proxy->rename(newName);
     }
   }
+  else if (action == gridAction)
+  {
+    vlayout->RearrangeViews();
+  }
+  else if (action)
+  {
+    vlayout->RearrangeViews(action == horizontalAction ? vtkSMViewLayoutProxy::HORIZONTAL
+                                                       : vtkSMViewLayoutProxy::VERTICAL);
+  }
+
   delete menu;
 }
 

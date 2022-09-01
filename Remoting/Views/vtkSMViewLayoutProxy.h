@@ -128,6 +128,16 @@ public:
   bool SetSplitFraction(int location, double fraction);
 
   /**
+   * Rearrange views so they appear evenly sized.
+   */
+  bool RearrangeViews();
+
+  /**
+   * Rearrange views so they appear evenly sized along direction.
+   */
+  bool RearrangeViews(Direction direction);
+
+  /**
    * One can maximize a particular (non-split) cell. Note the maximized state is
    * restored as soon as the layout is changed or when RestoreMaximizedState()
    * is called. Returns false if the cell at the location cannot be maximized
@@ -320,6 +330,12 @@ protected:
    * Starting with the root, finds a splittable cell. Assumes \c root is valid.
    */
   int GetSplittableCell(int root, Direction& suggested_direction);
+
+  /**
+   * Recompute SplitFraction recursively so cells appears evenly sized along direction.
+   * return the weight of the cell at location, i.e. the number of impacted children.
+   */
+  int ComputeSteadySplitFraction(int location, Direction direction);
 
   int MaximizedCell;
 

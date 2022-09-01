@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLockPanelsReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqPreviewMenuManager.h"
+#include "pqRearrangeLayoutReaction.h"
 #include "pqSetName.h"
 #include "pqTabbedMultiViewWidget.h"
 
@@ -127,6 +128,28 @@ void pqViewMenuManager::buildMenu()
   lockDockWidgetsAction->setToolTip("Toggle locking of dockable panels so they\
     cannot be moved");
   new pqLockPanelsReaction(lockDockWidgetsAction);
+
+  QMenu* reArrangeMenu = this->Menu->addMenu("Rearrange Views") << pqSetName("rearrangeViewsMenu");
+  QAction* rearrangeViewsHorizontallyAction = reArrangeMenu->addAction("Horizontally");
+  rearrangeViewsHorizontallyAction->setObjectName("rearrangeViewsHorizontallyAction");
+  rearrangeViewsHorizontallyAction->setToolTip(
+    "Rearrange layout so views are evenly sized horizontally");
+  new pqRearrangeLayoutReaction(
+    pqRearrangeLayoutReaction::Orientation::HORIZONTAL, rearrangeViewsHorizontallyAction);
+
+  QAction* rearrangeViewsVerticallyAction = reArrangeMenu->addAction("Vertically");
+  rearrangeViewsVerticallyAction->setObjectName("rearrangeViewsVerticallyAction");
+  rearrangeViewsVerticallyAction->setToolTip(
+    "Rearrange layout so views are evenly sized vertically");
+  new pqRearrangeLayoutReaction(
+    pqRearrangeLayoutReaction::Orientation::VERTICAL, rearrangeViewsVerticallyAction);
+
+  QAction* rearrangeViewsGridAction = reArrangeMenu->addAction("Grid");
+  rearrangeViewsGridAction->setObjectName("rearrangeViewsGridAction");
+  rearrangeViewsGridAction->setToolTip(
+    "Rearrange layout so views are evenly sized horizontally and vertically");
+  new pqRearrangeLayoutReaction(
+    pqRearrangeLayoutReaction::Orientation::BOTH, rearrangeViewsGridAction);
 }
 
 //-----------------------------------------------------------------------------

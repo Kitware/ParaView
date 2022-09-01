@@ -949,6 +949,46 @@ int vtkSMViewLayoutProxy::GetViewLocation(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::RearrangeViews()
+{
+  this->ComputeSteadySplitFraction(0, Direction::HORIZONTAL);
+  this->ComputeSteadySplitFraction(0, Direction::VERTICAL);
+  this->UpdateState();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::RearrangeViews(Direction direction)
+{
+  this->ComputeSteadySplitFraction(0, direction);
+  this->UpdateState();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::ComputeSteadySplitFraction(int location, Direction direction)
+{
+  vtkInternals::Cell& cell = this->Internals->KDTree[location];
+  if (!this->IsSplitCell(location))
+  {
+    return 1;
+  }
+
+  const int first = this->ComputeSteadySplitFraction(this->GetFirstChild(location), direction);
+  const int second = this->ComputeSteadySplitFraction(this->GetSecondChild(location), direction);
+
+  // if direction change, this cell counts for 1 in upstream split fraction.
+  if (cell.Direction != direction)
+  {
+    return 1;
+  }
+
+  cell.SplitFraction = static_cast<double>(first) / static_cast<double>(first + second);
+
+  return first + second;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 {
   if (val < 0.0 || val > 1.0)
