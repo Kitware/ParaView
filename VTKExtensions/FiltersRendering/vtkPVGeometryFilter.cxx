@@ -490,6 +490,7 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
 int vtkPVGeometryFilter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   if (vtkCompositeDataSet::SafeDownCast(input))
   {
@@ -537,7 +538,7 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
     output->ShallowCopy(this->FeatureEdgesFilter->GetOutput());
   }
   this->ExecuteCellNormals(output, doCommunicate);
-  this->RemoveGhostCells(output);
+  output->RemoveGhostCells();
   if (this->GenerateProcessIds && output)
   {
     // add process ids array.
@@ -1579,8 +1580,6 @@ void vtkPVGeometryFilter::PolyDataExecute(
       }
     }
 
-    output->RemoveGhostCells();
-
     if (this->Triangulate)
     {
       // Triangulate the polygonal mesh.
@@ -1764,16 +1763,6 @@ void vtkPVGeometryFilter::SetPassThroughPointIds(int newvalue)
   if (this->GeometryFilter)
   {
     this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::RemoveGhostCells(vtkPolyData* output)
-{
-  vtkDataArray* ghost = output->GetCellData()->GetArray(vtkDataSetAttributes::GhostArrayName());
-  if (ghost)
-  {
-    output->RemoveGhostCells();
   }
 }
 

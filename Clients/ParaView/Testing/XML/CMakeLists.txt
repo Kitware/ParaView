@@ -352,6 +352,16 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsLoaded.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsSkinned.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe4.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe5.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe6.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe7.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe8.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe9.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe10.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GlyphWithEmptyCells_A.png}"
@@ -1365,6 +1375,19 @@ if (PARAVIEW_USE_MPI)
     TEST_SCRIPTS GhostCellsGenerator.xml
     )
 
+  paraview_add_client_server_tests(
+#    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostFeatureEdgesAndWireframe.xml
+  )
+  paraview_add_client_server_render_tests(
+#    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostFeatureEdgesAndWireframe.xml
+  )
+
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS RemoveGhostInterfaces.xml
+  )
   paraview_add_client_server_render_tests(
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS RemoveGhostInterfaces.xml
