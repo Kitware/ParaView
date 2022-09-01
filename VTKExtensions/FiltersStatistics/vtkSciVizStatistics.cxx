@@ -17,6 +17,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStringArray.h"
@@ -268,6 +269,30 @@ int vtkSciVizStatistics::RequestData(
   else
   {
     modelObjOu->GetInformation()->Remove(MULTIPLE_MODELS());
+  }
+
+  // FIXME Temporary workaround.
+  // Currently the stats filters output a vtkMultiBlockDataSet on the model output port.
+  // If we copy the structure of an input vtkPartitionedDataSetCollection, it currently translates
+  // into a multiblock of partitioned data sets. Since later on, we compute the stats for each leaf,
+  // a multiblock (the output model) is injected in this partitioned data set, which is not allowed.
+  // You CANNOT have a partitioned data sets of multiblocks.
+  // To avoid this problem, we're converting partitioned data sets back to multi blocks when this
+  // happens.
+  //
+  // Ideally, we should make the statistic filters correctly handle partitioned data set inputs,
+  // and not output a multiblock.
+  if (auto ouModel = vtkMultiBlockDataSet::SafeDownCast(modelObjOu))
+  {
+    for (unsigned int blockId = 0; blockId < ouModel->GetNumberOfBlocks(); ++blockId)
+    {
+      if (auto pds = vtkPartitionedDataSet::SafeDownCast(ouModel->GetBlock(blockId)))
+      {
+        vtkNew<vtkMultiBlockDataSet> mbds;
+        mbds->SetNumberOfBlocks(pds->GetNumberOfPartitions());
+        ouModel->SetBlock(blockId, mbds);
+      }
+    }
   }
 
   // II. Create/update the output sci-viz data
