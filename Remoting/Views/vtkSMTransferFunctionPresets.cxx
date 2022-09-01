@@ -573,6 +573,33 @@ bool vtkSMTransferFunctionPresets::ImportPresets(
       return false;
     }
   }
+  else if (vtksys::SystemTools::LowerCase(
+             vtksys::SystemTools::GetFilenameLastExtension(filename)) == ".ct")
+  {
+    vtksys::ifstream in(filename);
+    if (in)
+    {
+      std::ostringstream contents;
+      contents << in.rdbuf();
+      in.close();
+      auto converted =
+        vtkSMTransferFunctionProxy::ConvertVisItColorMapXMLToJSON(contents.str().c_str());
+      if (!converted.empty())
+      {
+        // VisIt colormaps are named only by their filename
+        converted["Name"] = vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
+        Json::Value root(Json::arrayValue);
+        root.append(converted);
+        return this->ImportPresets(root);
+      }
+      return false;
+    }
+    else
+    {
+      vtkErrorMacro("Failed to open file: " << filename);
+      return false;
+    }
+  }
   else
   {
     return this->Internals->ImportPresets(filename, importedPresets);

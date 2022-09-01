@@ -883,8 +883,9 @@ bool pqPresetDialog::usePresetRange() const
 void pqPresetDialog::importPresets()
 {
   pqFileDialog dialog(nullptr, this, tr("Import Presets"), QString(),
-    "Supported Presets/Color Map Files (*.json *.xml);;"
-    "ParaView Color/Opacity Presets (*.json);;Legacy Color Maps (*.xml);;All Files (*)");
+    "Supported Presets/Color Map Files (*.json *.xml *.ct);;"
+    "ParaView Color/Opacity Presets (*.json);;Legacy Color Maps (*.xml);;VisIt Color Table "
+    "(*.ct);;All Files (*)");
   dialog.setObjectName("ImportPresets");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted && !dialog.getSelectedFiles().empty())

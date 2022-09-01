@@ -356,6 +356,14 @@ public:
 
   //@{
   /**
+   * Method to convert VisIt color map preset XML to JSON.
+   */
+  static Json::Value ConvertVisItColorMapXMLToJSON(vtkPVXMLElement* xml);
+  static Json::Value ConvertVisItColorMapXMLToJSON(const char* xmlcontents);
+  //@}
+
+  //@{
+  /**
    * Returns current transfer function data range. Returns false is a valid
    * range could not be determined.
    */

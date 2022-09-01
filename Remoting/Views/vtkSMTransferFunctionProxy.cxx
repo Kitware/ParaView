@@ -1374,6 +1374,142 @@ bool vtkSMTransferFunctionProxy::ConvertLegacyColorMapsToJSON(
 }
 
 //----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::ConvertVisItColorMapXMLToJSON(vtkPVXMLElement* xml)
+{
+  if (!xml || !xml->GetName() || strcmp(xml->GetName(), "Object") != 0)
+  {
+    vtkGenericWarningMacro("'Object' XML expected.");
+    return Json::Value();
+  }
+  if (std::string(xml->GetAttribute("name")) != "ColorTable")
+  {
+    vtkGenericWarningMacro("'ColorTable' XML name attribute expected.");
+    return Json::Value();
+  }
+
+  Json::Value json(Json::objectValue);
+
+  bool indexedLookup = false;
+
+  // So far, no reason to check the version string
+  // vtkPVXMLElement* versionElement = xml->FindNestedElementByName("Field");
+  vtkPVXMLElement* pointListElement = xml->FindNestedElementByName("Object");
+  if (!pointListElement ||
+    std::string(pointListElement->GetAttribute("name")) != "ColorControlPointList")
+  {
+    vtkGenericWarningMacro("'ColorControlPointList' XML name attribute expected.");
+    return Json::Value();
+  }
+
+  // Read the control points from the XML.
+  std::vector<vtkTuple<double, 4>> new_points;
+
+  for (unsigned int cc = 0; cc < pointListElement->GetNumberOfNestedElements(); cc++)
+  {
+    vtkPVXMLElement* pointElement = pointListElement->GetNestedElement(cc);
+    if (!pointElement)
+    {
+      continue;
+    }
+    if (std::string(pointElement->GetName()) == "Object" &&
+      std::string(pointElement->GetAttribute("name")) == "ColorControlPoint")
+    {
+      double xrgb[4];
+      xrgb[0] = cc; // provide dummy value just in case "position" is not available.
+      for (unsigned int ii = 0; ii < pointElement->GetNumberOfNestedElements(); ii++)
+      {
+        vtkPVXMLElement* fieldElement = pointElement->GetNestedElement(ii);
+        if (!fieldElement || std::string(fieldElement->GetName()) != "Field")
+        {
+          continue;
+        }
+        if (std::string(fieldElement->GetAttribute("name")) == "colors")
+        {
+          if (std::string(fieldElement->GetAttribute("type")) == "unsignedCharArray")
+          {
+            int rgba[4];
+            fieldElement->GetCharacterDataAsVector(4, &rgba[0]);
+            xrgb[1] = rgba[0] / 255.0;
+            xrgb[2] = rgba[1] / 255.0;
+            xrgb[3] = rgba[2] / 255.0;
+            // rgba[3], opacity, is ignored.
+          }
+        }
+        else if (std::string(fieldElement->GetAttribute("name")) == "position")
+        {
+          // assume type="float"
+          fieldElement->GetCharacterDataAsVector(1, &xrgb[0]);
+        }
+      }
+      new_points.push_back(vtkTuple<double, 4>(xrgb));
+    }
+    else if (std::string(pointElement->GetName()) == "Field" &&
+      std::string(pointElement->GetAttribute("name")) == "tags")
+    {
+      // possibly do something with tag list.
+    }
+    else if (std::string(pointElement->GetName()) == "Field" &&
+      std::string(pointElement->GetAttribute("name")) == "discrete")
+    {
+      if (std::string(pointElement->GetCharacterData()) == "true")
+      {
+        indexedLookup = true;
+      }
+    }
+  }
+  if (!indexedLookup)
+  {
+    // load color-space for only for non-categorical color maps. All seem to be RGB
+    json["ColorSpace"] = "RGB";
+  }
+  if (new_points.empty())
+  {
+    vtkGenericWarningMacro("'ColorControlPoint' items missing, no control point data.");
+    return Json::Value();
+  }
+
+  if (indexedLookup)
+  {
+    Json::Value rgbColors(Json::arrayValue);
+    for (int cc = 0, max = static_cast<int>(new_points.size()); cc < max; cc++)
+    {
+      rgbColors[3 * cc] = new_points[cc].GetData()[1];
+      rgbColors[3 * cc + 1] = new_points[cc].GetData()[2];
+      rgbColors[3 * cc + 2] = new_points[cc].GetData()[3];
+    }
+    json["IndexedColors"] = rgbColors;
+  }
+  else
+  {
+    // sort the points by x, just in case user didn't add them correctly.
+    std::sort(new_points.begin(), new_points.end(), StrictWeakOrdering());
+
+    Json::Value rgbColors(Json::arrayValue);
+    for (int cc = 0, max = static_cast<int>(new_points.size()); cc < max; cc++)
+    {
+      rgbColors[4 * cc] = new_points[cc].GetData()[0];
+      rgbColors[4 * cc + 1] = new_points[cc].GetData()[1];
+      rgbColors[4 * cc + 2] = new_points[cc].GetData()[2];
+      rgbColors[4 * cc + 3] = new_points[cc].GetData()[3];
+    }
+    json["RGBPoints"] = rgbColors;
+  }
+
+  return json;
+}
+
+//----------------------------------------------------------------------------
+Json::Value vtkSMTransferFunctionProxy::ConvertVisItColorMapXMLToJSON(const char* xmlcontents)
+{
+  vtkNew<vtkPVXMLParser> parser;
+  if (!parser->Parse(xmlcontents))
+  {
+    return Json::Value();
+  }
+  return vtkSMTransferFunctionProxy::ConvertVisItColorMapXMLToJSON(parser->GetRootElement());
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTransferFunctionProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
