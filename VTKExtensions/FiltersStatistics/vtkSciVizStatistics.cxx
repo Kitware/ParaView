@@ -322,6 +322,11 @@ int vtkSciVizStatistics::RequestData(
     stat = this->RequestData(dataObjOu, modelObjOu, dataObjIn, modelObjIn);
   }
 
+  if (this->Controller->GetLocalProcessId() != 0)
+  {
+    modelObjOu->Initialize();
+  }
+
   return stat;
 }
 
