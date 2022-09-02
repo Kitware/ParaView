@@ -68,6 +68,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy name="ExtractBlock"
+                 label="Extract Block"
                  class="vtkExtractBlockUsingDataAssembly">
       <Documentation long_help="Extract chosen blocks from composite datasets"
                      short_help="Extract block">
