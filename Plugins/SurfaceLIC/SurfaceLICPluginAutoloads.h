@@ -22,6 +22,7 @@
 
 void SurfaceLICPluginAutoloads()
 {
+  // PARAVIEW_DEPRECATED_IN_5_11_0
   vtkLog(WARNING, "SurfaceLIC is now built-in ParaView. There is no need to load this plugin.");
 }
 
