@@ -105,7 +105,7 @@ void pqMainWindowEventBehavior::onDrop(QDropEvent* event)
     return;
   }
 
-  QList<QString> files;
+  QStringList files;
 
   Q_FOREACH (QUrl url, urls)
   {
@@ -128,5 +128,5 @@ void pqMainWindowEventBehavior::onDrop(QDropEvent* event)
   {
     return;
   }
-  pqLoadDataReaction::loadData(files);
+  pqLoadDataReaction::loadFilesForSupportedTypes({ files });
 }
