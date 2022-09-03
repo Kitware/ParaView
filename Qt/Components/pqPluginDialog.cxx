@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqCore
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqPluginManager.h"
 #include "pqServer.h"
@@ -467,15 +468,25 @@ void pqPluginDialog::removeSelectedPlugins(
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoveSelectedRemotePlugin()
 {
-  this->removeSelectedPlugins(this->Ui->remotePlugins->selectedItems(), this->Server, true);
-  this->onRemoteSelectionChanged();
+  if (pqCoreUtilities::promptUser("pqPluginDialog::onRemoveSelectedRemotePlugin",
+        QMessageBox::Question, "Remove plugin?", tr("Are you sure you want to remove this plugin?"),
+        QMessageBox::Yes | QMessageBox::No))
+  {
+    this->removeSelectedPlugins(this->Ui->remotePlugins->selectedItems(), this->Server, true);
+    this->onRemoteSelectionChanged();
+  }
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoveSelectedLocalPlugin()
 {
-  this->removeSelectedPlugins(this->Ui->localPlugins->selectedItems(), this->Server, false);
-  this->onLocalSelectionChanged();
+  if (pqCoreUtilities::promptUser("pqPluginDialog::onRemoveSelectedRemotePlugin",
+        QMessageBox::Question, "Remove plugin?", tr("Are you sure you want to remove this plugin?"),
+        QMessageBox::Yes | QMessageBox::No))
+  {
+    this->removeSelectedPlugins(this->Ui->localPlugins->selectedItems(), this->Server, false);
+    this->onLocalSelectionChanged();
+  }
 }
 
 //----------------------------------------------------------------------------
