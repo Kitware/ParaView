@@ -1,5 +1,5 @@
 NAME
-  Prism::Filters
+  Prism::vtkPrismFilters
 LIBRARY_NAME
   vtkPrismFilters
 DEPENDS
