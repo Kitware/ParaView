@@ -105,6 +105,13 @@ public:
   static QList<pqPipelineSource*> loadData();
   ///@}
 
+  /**
+   * Called when the file dialog filter was on "Supported Types" or when dropping a file.
+   * First search for a matching reader in the default readers settings, and if none is found use
+   * the standard method to choose a reader.
+   */
+  static QVector<pqPipelineSource*> loadFilesForSupportedTypes(QList<QStringList> files);
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
@@ -139,13 +146,6 @@ protected:
 
   static pqPipelineSource* LoadFile(
     const QStringList& files, pqServer* server, const QPair<QString, QString>& readerInfo);
-
-  /**
-   * Called when the file dialog filter was on "Supported Types"
-   * First search for a matching reader in the default readers settings, and if none is found use
-   * the standard method to choose a reader.
-   */
-  static QVector<pqPipelineSource*> loadFilesForSupportedTypes(QList<QStringList> files);
 
   /**
    * Called when the file dialog filter was on "All Types"
