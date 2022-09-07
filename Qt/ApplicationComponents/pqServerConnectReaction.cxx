@@ -56,10 +56,12 @@ pqServerConnectReaction::pqServerConnectReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
   // needed to disable server connection while an animation is playing
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(beginPlay()), this,
-    SLOT(updateEnableState()));
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this,
-    SLOT(updateEnableState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay), this,
+    &pqServerConnectReaction::updateEnableState);
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay), this,
+    &pqServerConnectReaction::updateEnableState);
 }
 
 //-----------------------------------------------------------------------------
