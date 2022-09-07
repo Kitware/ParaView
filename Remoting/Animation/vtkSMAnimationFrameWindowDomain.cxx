@@ -50,6 +50,11 @@ void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
       case vtkCompositeAnimationPlayer::SEQUENCE:
       {
         int numFrames = vtkSMUncheckedPropertyHelper(scene, "NumberOfFrames").GetAsInt();
+        vtkSMProxy* timeKeeper = vtkSMUncheckedPropertyHelper(scene, "TimeKeeper").GetAsProxy();
+        if (vtkSMUncheckedPropertyHelper(timeKeeper, "TimestepValues").GetNumberOfElements() == 0)
+        {
+          numFrames = 1;
+        }
         values.push_back(vtkEntry(0, numFrames - 1));
       }
       break;
