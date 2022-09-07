@@ -1,5 +1,6 @@
 set(classes
   vtkSMPrismTableArraysDomain
+  vtkSMPrismThresholdRangeDomain
   )
 
 vtk_module_add_module(Prism::vtkPrismServerManager
