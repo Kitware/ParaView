@@ -277,6 +277,17 @@ documentation:build:
         - .doxygen_log_artifacts
         - .doxygen_only
 
+fedora35-doxygen:build:
+    extends:
+        - .fedora35
+        - .cmake_build_linux
+        - .linux_qt_builder_tags
+        - .cmake_doxygen_artifacts
+        - .run_manually
+
+    variables:
+        CMAKE_CONFIGURATION: fedora35_doxygen
+
 # Triggers
 
 ## Superbuild

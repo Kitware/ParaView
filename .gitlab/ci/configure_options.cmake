@@ -8,6 +8,9 @@ function (configuration_flag variable configuration)
   endif ()
 endfunction ()
 
+# doxygen
+configuration_flag(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "doxygen")
+
 # kits
 configuration_flag(PARAVIEW_BUILD_WITH_KITS "kits")
 

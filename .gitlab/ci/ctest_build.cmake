@@ -22,6 +22,26 @@ endif ()
 
 set(targets_to_build "all")
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "doxygen")
+  list(APPEND targets_to_build
+    ParaViewDoxygenDoc)
+
+  # Relocate the install tree.
+  set(ENV{DESTDIR} "${CTEST_BINARY_DIRECTORY}/install")
+  execute_process(
+    COMMAND "${CMAKE_COMMAND}"
+            -DCMAKE_INSTALL_COMPONENT=doxygen
+            -P "${CTEST_BINARY_DIRECTORY}/cmake_install.cmake"
+    RESULT_VARIABLE doxygen_result
+    OUTPUT_FILE "${CTEST_SOURCE_DIRECTORY}/doxygen_output.log"
+    ERROR_FILE  "${CTEST_SOURCE_DIRECTORY}/doxygen_output.log")
+
+  if (doxygen_result)
+    message("Doxygen failed to install")
+    set(build_result "${doxygen_result}")
+  endif ()
+endif ()
+
 set(num_warnings 0)
 foreach (target IN LISTS targets_to_build)
   set(build_args)
