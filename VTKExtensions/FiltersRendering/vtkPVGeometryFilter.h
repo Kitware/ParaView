@@ -336,9 +336,6 @@ protected:
    */
   int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  // Convenience method to purge ghost cells.
-  void RemoveGhostCells(vtkPolyData*);
-
   bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;
