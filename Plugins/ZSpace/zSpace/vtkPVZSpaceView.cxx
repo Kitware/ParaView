@@ -58,6 +58,9 @@ vtkPVZSpaceView::vtkPVZSpaceView()
 
   // Hide axes
   this->OrientationWidget->SetParentRenderer(nullptr);
+
+  // Set the zSpace SDK Manager render window
+  vtkZSpaceSDKManager::GetInstance()->SetRenderWindow(this->GetRenderWindow());
 }
 
 //----------------------------------------------------------------------------
@@ -69,7 +72,7 @@ void vtkPVZSpaceView::SetupInteractor(vtkRenderWindowInteractor* vtkNotUsed(rwi)
   this->Interactor = vtkSmartPointer<vtkZSpaceRenderWindowInteractor>::New();
   this->Interactor->SetRenderWindow(this->GetRenderWindow());
 
-  // this will set the interactor style.
+  // This will set the interactor style.
   int mode = this->InteractionMode;
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->SetInteractionMode(mode);
@@ -104,7 +107,7 @@ void vtkPVZSpaceView::ResetCamera()
   {
     double bounds[6];
     this->GeometryBounds.GetBounds(bounds);
-    // Find parameters computed by zSpace SDK
+    // Insure an optimal initial position of the geometry in the scene
     this->CalculateFit(bounds);
   }
 }
@@ -114,6 +117,7 @@ void vtkPVZSpaceView::ResetCamera(double bounds[6])
 {
   if (!this->LockBounds && this->DiscreteCameras == nullptr)
   {
+    // Insure an optimal initial position of the geometry in the scene
     this->CalculateFit(bounds);
   }
 }
@@ -188,12 +192,17 @@ void vtkPVZSpaceView::CalculateFit(double* bounds)
 //------------------------------------------------------------------------------
 void vtkPVZSpaceView::Render(bool interactive, bool skip_rendering)
 {
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+  sdkManager->BeginFrame();
+
   if (!this->GetMakingSelection())
   {
     vtkZSpaceRenderWindowInteractor::SafeDownCast(this->Interactor)->HandleInteractions();
   }
 
   this->Superclass::Render(interactive, skip_rendering || this->GetMakingSelection());
+
+  sdkManager->EndFrame();
 }
 
 //----------------------------------------------------------------------------

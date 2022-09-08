@@ -13,21 +13,31 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 /**
  * @class   vtkZSpaceSDKManager
- * @brief   zSpace SDK manager class
+ * @brief   Abstract zSpace SDK manager class.
  *
+ * Abstract class handling the interactions between the zSpace plugin
+ * and the zSpace SDK. The implementation of virtual functions depend
+ * of the version of the zSpace SDK currently used : "zSpace Core SDK"
+ * (older) and zSpace Core Compatibility SDK (newer).
  *
- * Encapsulates all the calls to the zSpace SDK :
+ * This class encapsulates all the calls to the zSpace SDK :
  *  - Initializes the zSpace SDK via InitializeZSpace(). This method looks
- *     for a zSpace device and optional trackers
- *  - Updates the zSpace SDK via Update(vtkRenderWindow)
- *     the viewport (position, interpupillary distance, near and far plane);
- *     the view and projection matrix for each eye;
- *     the trackers (head pose and trackers pose such as the stylus);
- *     and the state of the buttons of the stylus (Down, Pressed, Up or None).
+ *    for a zSpace device and optional trackers.
+ *  - Synchronizes the zSpace SDK and the plugin via the Update method.
+ *    This method corresponds to these succesive calls :
+ *    - UpdateViewport : send the viewport-relative informations to the
+ *      zSpace SDK (position, interpupillary distance, near and far plane)
+ *      in order to allow it to perform valid stereo frustum computations;
+ *    - UpdateViewAndProjectionMatrix : retrieve the the view and projection
+ *      matrix for each eye from the SDK (tied to the stereo frustum);
+ *    - UpdateTrackers : retrieve the head pose and the trackers pose
+ *      (such as the stylus) from the SDK;
+ *    - UpdateButtonState : retrieve the state of the buttons of the stylus
+ *      (Down, Pressed, Up or None) from the SDK.
  *
- *  For button states, the states Down/Up are set by this class; whereas the states
- *  Pressed/None should be set by the calling class when the state Down/Up has been processed, to
- *  ensure that the same input won't be processed multiple times.
+ * For button states, the states Down/Up are set by this class; whereas the states
+ * Pressed/None should be set by the calling class when the state Down/Up has been
+ * processed, to ensure that the same input won't be processed multiple times.
  */
 
 #ifndef vtkZSpaceSDKManager_h
@@ -37,8 +47,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObject.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 
-#include <vector>   // for std::vector
-#include <zspace.h> // zspace header
+#include <vector> // for std::vector
 
 class vtkRenderWindow;
 class vtkCamera;
@@ -49,12 +58,13 @@ class vtkPVZSpaceView;
 class VTKZSPACEVIEW_EXPORT vtkZSpaceSDKManager : public vtkObject
 {
 public:
-  static vtkZSpaceSDKManager* New();
   vtkTypeMacro(vtkZSpaceSDKManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Return the singleton instance with no reference counting.
+   * Return the singleton instance (with no reference counting)
+   * of a vtkZSpaceCoreSDKManager or vtkZSpaceCoreCompatibilitySDKManager
+   * depending on the curent zSpaceSDK in use.
    */
   static vtkZSpaceSDKManager* GetInstance();
 
@@ -62,34 +72,58 @@ public:
    * Initialize the zSpace SDK and check for zSpace devices :
    * the display, the stylus and the head trackers.
    */
-  void InitializeZSpace();
-
-  /**
-   * Update the viewport, the trackers and the camera matrix
-   * by calling the zSpace SDK.
-   */
-  void Update(vtkRenderWindow*);
+  virtual void InitializeZSpace() = 0;
 
   /**
    * Update the zSpace viewport position and size based
    * on the position and size of the application window.
    */
-  void UpdateViewport(vtkRenderWindow*);
+  virtual void UpdateViewport() = 0;
 
   /**
    * Update the position of the stylus and head trakers.
    */
-  void UpdateTrackers();
+  virtual void UpdateTrackers() = 0;
 
   /**
    * Update the zSpace view and projection matrix for each eye.
    */
-  void UpdateViewAndProjectionMatrix();
+  virtual void UpdateViewAndProjectionMatrix() = 0;
 
   /**
    * Update the stylus buttons state.
    */
-  void UpdateButtonState();
+  virtual void UpdateButtonState() = 0;
+
+  /**
+   * Let zSpace compute the viewer scale, camera position and camera view up from the
+   * input bounds.
+   */
+  virtual void CalculateFrustumFit(
+    const double bounds[6], double position[3], double viewUp[3]) = 0;
+
+  //@{
+  /**
+   * Notify the zSpace SDK for the begining/end of a frame
+   * (vtkZSpaceCoreCompatibility only)
+   */
+  virtual void BeginFrame() = 0;
+  virtual void EndFrame() = 0;
+  //@}
+
+  //@{
+  /**
+   * Set the render windwow the manager makes viewport computations
+   * from.
+   */
+  virtual void SetRenderWindow(vtkRenderWindow* renderWindow);
+  //@}
+
+  /**
+   * Update the viewport, the trackers and the camera matrix
+   * by calling the zSpace SDK.
+   */
+  void Update();
 
   /**
    * Get the x position of the upper left corner of the zSpace display
@@ -137,12 +171,6 @@ public:
   //@}
 
   /**
-   * Let zSpace compute the viewer scale, camera position and camera view up from the
-   * input bounds.
-   */
-  void CalculateFrustumFit(const double bounds[6], double position[3], double viewUp[3]);
-
-  /**
    * Set the near and far plane.
    */
   void SetClippingRange(const float nearPlane, const float farPlane);
@@ -161,19 +189,6 @@ public:
    * Get the far plane.
    */
   vtkGetMacro(FarPlane, float);
-
-  /**
-   * zSpace stores matrix in column-major format (as OpenGL). The matrix
-   * needs to be transposed to be used by VTK.
-   */
-  static void ConvertAndTransposeZSpaceMatrixToVTKMatrix(
-    ZSMatrix4 zSpaceMatrix, vtkMatrix4x4* vtkMatrix);
-
-  /**
-   * zSpace stores matrix in column-major format (as OpenGL). The matrix
-   * needs to be transposed to be used by VTK.
-   */
-  static void ConvertZSpaceMatrixToVTKMatrix(ZSMatrix4 zSpaceMatrix, vtkMatrix4x4* vtkMatrix);
 
   /**
    * Get the zSpace view matrix without stereo (eye set as EYE_CENTER)
@@ -264,12 +279,7 @@ protected:
   vtkZSpaceSDKManager();
   ~vtkZSpaceSDKManager() override;
 
-  ZCContext ZSpaceContext = nullptr;
-  ZCHandle DisplayHandle = nullptr;
-  ZCHandle BufferHandle = nullptr;
-  ZCHandle ViewportHandle = nullptr;
-  ZCHandle FrustumHandle = nullptr;
-  ZCHandle StylusHandle = nullptr;
+  vtkRenderWindow* RenderWindow;
 
   vtkNew<vtkMatrix4x4> CenterEyeViewMatrix;
   vtkNew<vtkMatrix4x4> LeftEyeViewMatrix;

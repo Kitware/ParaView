@@ -14,18 +14,18 @@
 =========================================================================*/
 /**
  * @class   vtkZSpaceRenderWindowInteractor
- * @brief   implements zSpace specific functions
- * required by vtkRenderWindowInteractor.
+ * @brief   Implements zSpace specific interactions.
  *
+ * This class implements the zSpace specific interactions, done
+ * with the stylus. Required by vtkRenderWindowInteractor.
  */
 
 #ifndef vtkZSpaceRenderWindowInteractor_h
 #define vtkZSpaceRenderWindowInteractor_h
 
+#include "vtkEventData.h" // For vtkEventDataDevice
 #include "vtkRenderWindowInteractor3D.h"
 #include "vtkZSpaceViewModule.h" // For export macro
-
-#include "vtkEventData.h"
 
 class vtkCamera;
 class VTKZSPACEVIEW_EXPORT vtkZSpaceRenderWindowInteractor : public vtkRenderWindowInteractor3D

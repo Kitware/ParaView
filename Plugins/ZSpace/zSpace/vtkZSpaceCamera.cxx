@@ -13,13 +13,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkZSpaceCamera.h"
-#include "vtkZSpaceSDKManager.h"
-
-#include "vtkObjectFactory.h"
 
 #include "vtkMatrix4x4.h"
+#include "vtkObjectFactory.h"
 #include "vtkPerspectiveTransform.h"
 #include "vtkTransform.h"
+#include "vtkZSpaceSDKManager.h"
 
 vtkStandardNewMacro(vtkZSpaceCamera);
 

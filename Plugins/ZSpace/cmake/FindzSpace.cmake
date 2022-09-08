@@ -37,14 +37,13 @@ Hints
 
 Set ``zSpace_DIR`` or ``zSpace_ROOT`` in the environment to specify the
 zSpace installation prefix.
-example : zSpace_DIR = C:/zSpace/zSpaceSdks/4.0.0.3
+example : set zSpace_DIR=C:/zSpace/zSpaceSdks/4.0.0.3
 #]=======================================================================]
-#
-# This makes the presumption that you are include zSpace.h like
-#
-#include "zSpace.h"
 
-find_path(zSpace_INCLUDE_DIR zSpace.h
+# Find zSpace headers folder
+find_path(zSpace_INCLUDE_DIR 
+  NAMES 
+    zSpace.h
   HINTS
     ${zSpace_ROOT}
     ENV zSpace_DIR
@@ -53,12 +52,15 @@ find_path(zSpace_INCLUDE_DIR zSpace.h
     zSpaceSdks
     include
     Inc
-  DOC "Path to the zSpace include directory"
+  DOC "Path to the zSpace Core SDK include directory"
 )
 mark_as_advanced(zSpace_INCLUDE_DIR)
 
+# Find zSpace library
 find_library(zSpace_LIBRARY
-  NAMES zSpaceApi64 zSpaceApi
+  NAMES
+    zSpaceApi64 
+    zSpaceApi
   HINTS
     ${zSpace_ROOT}
     ENV zSpace_DIR
@@ -67,22 +69,24 @@ find_library(zSpace_LIBRARY
     zSpaceSdks
     Lib/x64
     Lib/Win32
-  DOC "Path to the zSpace library"
+  DOC "Path to the zSpace Core SDK library"
 )
 mark_as_advanced(zSpace_LIBRARY)
 
+# Handle some find_package arguments like REQUIRED
+# and set the zSpace_FOUND variable
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(zSpace
     REQUIRED_VARS zSpace_LIBRARY zSpace_INCLUDE_DIR)
 
+# Setup the imported library target if necessary
 if (zSpace_FOUND)
-    set(zSpace_LIBRARIES ${zSpace_LIBRARY})
-    set(zSpace_INCLUDE_DIRS ${zSpace_INCLUDE_DIR})
-
-    if (NOT TARGET zSpace::zSpace)
-        add_library(zSpace::zSpace UNKNOWN IMPORTED)
-        set_target_properties(zSpace::zSpace PROPERTIES
-            IMPORTED_LOCATION "${zSpace_LIBRARY}"
-            INTERFACE_INCLUDE_DIRECTORIES "${zSpace_INCLUDE_DIR}")
-    endif ()
+  set(zSpace_LIBRARIES ${zSpace_LIBRARY})
+  set(zSpace_INCLUDE_DIRS ${zSpace_INCLUDE_DIR})
+  if (NOT TARGET zSpace::zSpace)
+    add_library(zSpace::zSpace UNKNOWN IMPORTED)
+    set_target_properties(zSpace::zSpace PROPERTIES
+      IMPORTED_LOCATION "${zSpace_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${zSpace_INCLUDE_DIR}")
+  endif ()
 endif ()

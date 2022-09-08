@@ -19,23 +19,21 @@ PURPOSE.  See the above copyright notice for more information.
  *
  * This class maps EventDataDevice3D device and input to an interaction state :
  *
- *  - LeftButton (LeftController + Trigger) maps to VTKIS_PICK. It asks vtkPVZSpaceView to use its
- *    own PVHardwareSelector to pick a cell or a point, depending on the value of
- * vtkPVZSpaceView::PickingFieldAssociation
- *    Then informations about picking is shown on the bottom left of the screen. A pick actor is
- * also shown to visualize
- *    the picked cell or picked point.
+ * - LeftButton (LeftController + Trigger) maps to VTKIS_PICK. It asks vtkPVZSpaceView to use its
+ *   own PVHardwareSelector to pick a cell or a point, depending on the value of
+ *   vtkPVZSpaceView::PickingFieldAssociation.
+ *   Then informations about picking is shown on the bottom left of the screen. A pick actor is
+ *   also shown to visualize the picked cell or picked point.
  *
- *  - MiddleButton (GenericTracker + Trigger) maps to VTKIS_POSITION_PROP. It allows the user to
- * grab the
- *    picked actor and move it with the stylus.
+ * - MiddleButton (GenericTracker + Trigger) maps to VTKIS_POSITION_PROP. It allows the user to
+ *   grab the picked actor and move it with the stylus.
  *
- *  - RightButton (RightController + Trigger) allows to position the widgets that respond to
+ * - RightButton (RightController + Trigger) allows to position the widgets that respond to
  *   this vtkEventDataDevice3D, such as vtkBoxWidget2, vtkHandleWidget, vtkImplicitPlaneWidget2 and
  *   vtkTensorWidget. It doesn't map to any VTKIS_XXX.
  *
- *  The move event will then call the method to position the current picked prop
- *  if the state is VTKIS_POSITION_PROP.
+ * The move event will then call the method to position the current picked prop
+ * if the state is VTKIS_POSITION_PROP.
  */
 
 #ifndef vtkZSpaceInteractorStyle_h
