@@ -108,6 +108,7 @@ public:
 
 protected:
   vtkWeakPointer<vtkCamera> Camera;
+  bool Interacting = false;
 };
 
 #endif
