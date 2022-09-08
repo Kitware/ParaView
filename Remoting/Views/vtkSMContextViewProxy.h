@@ -131,7 +131,7 @@ protected:
   /**
    * Overridden to return a location of vtkPVSession::CLIENT unless in
    * tile-display mode, in which case
-   * `vtkPVSession::CLIENT |vtkPVSession::RENDER_SERVER` is returned.
+   * `vtkPVSession::CLIENT | vtkPVSession::RENDER_SERVER` is returned.
    */
   vtkTypeUInt32 PreRender(bool interactive) override;
 

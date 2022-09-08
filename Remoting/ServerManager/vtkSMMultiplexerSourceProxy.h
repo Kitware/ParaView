@@ -109,7 +109,7 @@
  * If multiple proxies succeed at this test, current implementation
  * only selects the first one.
  *
- * @section Caveats Caveats and TODOs
+ * @section vtkSMMultiplexerSourceProxy_caveats Caveats
  *
  * While the implementation has some initial plumbing to support multiple
  * multiplexed proxies, currently we only support exactly one. In future, the
@@ -120,7 +120,7 @@
  * properties with same names between the chosen proxies since we cannot expose
  * a property with same name multiple times.
  *
- * @section PythonSupport Python Support
+ * @section python_support Python Support
  *
  * vtkSMMultiplexerSourceProxy currently suffers from lack of Python support.
  * ParaView's Python infrastructure is not capable of supporting different

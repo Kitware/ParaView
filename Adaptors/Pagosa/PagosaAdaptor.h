@@ -40,7 +40,7 @@ extern "C"
    * vtkNonOverlappingAMR is required for using the MaterialInterface filter
    * vtkUnstructuredGrid will hold the data currently written to .cosmo files.
    *
-   * @param mx,my,mx            number of grid cells in each logical direction
+   * @param mx,my,mz            number of grid cells in each logical direction
    * @param x0,y0,z0            origin on this Processor Element (PE)
    * @param dx,dy,dz            grid cell size
    * @param my_id               this PE number
@@ -113,7 +113,7 @@ extern "C"
    *
    * @param fname, len   Name of data, len(fname)
    * @param numberAdded  number of markers added on this PE
-   * @param data0,1,2    Data by marker
+   * @param data0, data1, data2    Data by marker
    */
   void VTKPVADAPTORSPAGOSA_EXPORT addmarkervectorfield_(
     char* fname, int* len, int* numberAdded, float* data0, float* data1, float* data2);
@@ -123,7 +123,7 @@ extern "C"
    *
    * @param fname, len   Name of data, len(fname)
    * @param numberAdded  number of markers added on this PE
-   * @param data0,..,5   Data by marker
+   * @param data0, data1, data2, data3, data4, data5   Data by marker
    */
   void VTKPVADAPTORSPAGOSA_EXPORT addmarkertensorfield_(char* fname, int* len, int* numberAdded,
     float* data0, float* data1, float* data2, float* data3, float* data4, float* data5);

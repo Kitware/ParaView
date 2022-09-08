@@ -67,7 +67,7 @@ Q_SIGNALS:
   /**
    * @brief Signal emitted when the label
    * is clicked (to mimic a push button)
-   * @param[in] w the widget attached to
+   * @param[in] widget the widget attached to
    * the pqClickableLabel
    */
   void onClicked(QWidget* widget);

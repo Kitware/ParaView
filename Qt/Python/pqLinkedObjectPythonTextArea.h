@@ -81,7 +81,7 @@ struct PQPYTHON_EXPORT pqLinkedObjectPythonTextArea : public pqLinkedObjectQText
   }
 
   /**
-   * Link this object to the \ref other.
+   * Link this object to the other.
    * Note that the link is established if and only if the given pqLinkedObjectInterface is no empty.
    */
   void link(pqLinkedObjectInterface* other) override;

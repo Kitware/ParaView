@@ -53,11 +53,13 @@ class vtkSMPropertyGroup;
  *  this widget as the `panel_widget`.
  *
  * Example:
+ * \verbatim
  *   <PropertyGroup name="DatabaseProperties", panel_widget="MetadataPropertyWidget">
  *     <Property name="Foo"/>
  *     <Property name="Bar"/>
  *     <Property name="VeryInterestingProperty"/>
  *   </PropertyGroup>
+ * \endverbatim
  *
  * Under the hood, it uses pqProxyWidget::createPropertyWidget` to auto generate
  * pq[Int,Double,String]VectorPropertyWidget instances for simple properties - (Int, Double,

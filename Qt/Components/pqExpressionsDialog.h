@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Already existing expressions are not duplicated.
  *
  * Expected formatting of the file:
+ * \verbatim
  * {
  *   "version": "<version>",
  *    "Expressions": [
@@ -57,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      }
  *    ],
  * }
+ * \endverbatim
  */
 class PQCOMPONENTS_EXPORT pqExpressionsManagerDialog : public QDialog
 {

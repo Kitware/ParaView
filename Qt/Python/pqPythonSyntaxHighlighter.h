@@ -92,7 +92,7 @@ public:
   QString Highlight(const QString& src) const;
 
   /**
-   * Connects the highlighter to \ref text.
+   * Connects the highlighter to text.
    * This is not automatically called by the constructor
    * as we might want to defer the connection to another widget.
    */
