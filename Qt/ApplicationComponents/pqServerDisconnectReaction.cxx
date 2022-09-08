@@ -57,10 +57,12 @@ pqServerDisconnectReaction::pqServerDisconnectReaction(QAction* parentObject)
   this->updateState();
 
   // needed to disable server disconnection while an animation is playing
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(beginPlay()), this,
-    SLOT(updateState()));
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this,
-    SLOT(updateState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay), this,
+    &pqServerDisconnectReaction::updateState);
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay), this,
+    &pqServerDisconnectReaction::updateState);
 }
 
 //-----------------------------------------------------------------------------

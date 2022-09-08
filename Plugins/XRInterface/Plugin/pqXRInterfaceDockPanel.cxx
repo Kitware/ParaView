@@ -93,10 +93,12 @@ void pqXRInterfaceDockPanel::constructor()
   QObject::connect(
     QCoreApplication::instance(), SIGNAL(lastWindowClosed()), this, SLOT(prepareForQuit()));
 
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(beginPlay()), this,
-    SLOT(beginPlay()));
-  QObject::connect(
-    pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this, SLOT(endPlay()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay), this,
+    &pqXRInterfaceDockPanel::beginPlay);
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay), this,
+    &pqXRInterfaceDockPanel::endPlay);
 
   if (this->Helper->GetCollaborationClient()->SupportsCollaboration())
   {

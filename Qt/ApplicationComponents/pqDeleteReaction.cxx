@@ -66,10 +66,12 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, DeleteModes mode /* = 
   : Superclass(parentObject)
 {
   // needed to disable server reset while an animation is playing
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(beginPlay()), this,
-    SLOT(updateEnableState()));
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this,
-    SLOT(updateEnableState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay), this,
+    &pqDeleteReaction::updateEnableState);
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay), this,
+    &pqDeleteReaction::updateEnableState);
 
   this->DeleteMode = mode;
   if (this->DeleteMode != ALL)
