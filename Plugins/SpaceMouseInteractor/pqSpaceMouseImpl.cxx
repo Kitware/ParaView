@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqRenderView.h"
 #include "vtkInitializationHelper.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 
@@ -84,10 +85,21 @@ void pqSpaceMouseImpl::setActiveView(pqView* view)
 
 void pqSpaceMouseImpl::render()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (view)
+  pqRenderView* rview = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  vtkSMRenderViewProxy* renPxy = rview ? rview->getRenderViewProxy() : nullptr;
+  vtkRenderWindowInteractor* interactor = renPxy ? renPxy->GetInteractor() : nullptr;
+  if (interactor)
   {
-    view->render();
+    // going through the interactor means we get LOD rendering while interacting.
+    if (this->Interacting)
+    {
+      interactor->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
+    }
+    interactor->InvokeEvent(vtkCommand::RenderEvent, nullptr);
+  }
+  else if (rview)
+  {
+    rview->render();
   }
 }
 
@@ -302,8 +314,22 @@ long pqSpaceMouseImpl::GetIsViewPerspective(navlib::bool_t& persp) const
 /// <param name="value">true when moving.</param>
 /// <returns>0 on success, otherwise an error.</returns>
 /// <description>The navlib sets this to true at the beginning of navigation.</description>
-long pqSpaceMouseImpl::SetMotionFlag(bool /*value*/)
+long pqSpaceMouseImpl::SetMotionFlag(bool value)
 {
+  if (value != this->Interacting)
+  {
+    this->Interacting = value;
+    pqRenderView* rview = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+    vtkSMRenderViewProxy* renPxy = rview ? rview->getRenderViewProxy() : nullptr;
+    vtkRenderWindowInteractor* interactor = renPxy ? renPxy->GetInteractor() : nullptr;
+    if (interactor)
+    {
+      // Tell the interactor helper to start/end interacting, so we get an interactive render
+      interactor->InvokeEvent(
+        this->Interacting ? vtkCommand::StartInteractionEvent : vtkCommand::EndInteractionEvent,
+        nullptr);
+    }
+  }
   return 0;
 }
 
