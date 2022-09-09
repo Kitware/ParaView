@@ -190,7 +190,7 @@ public Q_SLOTS:
 
   /**
    * Show any interactive widget linked to a specific output port
-   * this proxyWdiget has. See XML hint <WidgetVisibilityLink port="X" />.
+   * this proxyWdiget has. See XML hint \verbatim<WidgetVisibilityLink port="X" />\endverbatim.
    */
   void showLinkedInteractiveWidget(int portIndex, bool show);
 

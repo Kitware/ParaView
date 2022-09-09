@@ -69,7 +69,7 @@ struct PQCORE_EXPORT pqLinkedObjectInterface
   virtual std::unique_ptr<pqLinkedObjectInterface> clone() const noexcept = 0;
 
   /**
-   * Link this object to the \ref other. The expected behavior should be that when this object is
+   * Link this object to the other. The expected behavior should be that when this object is
    * updated, the other is too.
    */
   virtual void link(pqLinkedObjectInterface* other) = 0;

@@ -19,7 +19,7 @@
  *
  * vtkSMCSVProxiesInitializationHelper is an initialization helper for
  * the PCSVReader or PCSVWriter proxy that sets up the delimiter to use based on the
- * file extension. If the file extension is .txt or .tsv then '\t' is set as
+ * file extension. If the file extension is .txt or .tsv then \verbatim'\t'\endverbatim is set as
  * the delimiter.
  */
 

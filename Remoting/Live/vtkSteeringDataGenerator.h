@@ -78,7 +78,7 @@
  *
  * @endcode
  *
- * @section Caveats Caveats
+ * @section vtkSteeringDataGenerator_caveats Caveats
  *
  * This filter should ideally generated `vtkPartitionedDataSet`. However,
  * until `vtkPartitionedDataSet` is well supported, we are making it generate

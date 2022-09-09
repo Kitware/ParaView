@@ -404,8 +404,8 @@ jobs will generally be canceled automatically.
 Before the merge, all the jobs must be run and reviewed, see below.
 
 If you have any question about the CI process, do not hesitate to ask a CI maintainer:
- - @ben.boeckel
- - @mathieu.westphal
+ - ben.boeckel
+ - mwestphal
 
 [GitLab CI]: https://gitlab.kitware.com/help/ci/README.md
 [ParaView CDash Page]: https://open.cdash.org/index.php?project=ParaView

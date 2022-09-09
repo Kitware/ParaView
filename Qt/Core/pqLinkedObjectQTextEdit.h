@@ -84,7 +84,7 @@ struct PQCORE_EXPORT pqLinkedObjectQTextEdit : public pqLinkedObjectInterface
   }
 
   /**
-   * Link this object to the \ref other. Note that the link is established if and only if the given
+   * Link this object to the other. Note that the link is established if and only if the given
    * pqLinkedObjectInterface is not nullptr.
    */
   void link(pqLinkedObjectInterface* other) override;

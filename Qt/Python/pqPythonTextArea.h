@@ -62,17 +62,17 @@ class PQPYTHON_EXPORT pqPythonTextArea : public QWidget
 public:
   /**
    * @brief Construct a pqPythonTextArea
-   * @input[parent] the parent widget for the Qt ownership
+   * @param parent the parent widget for the Qt ownership
    */
   explicit pqPythonTextArea(QWidget* parent);
 
   /**
-   * @brief Returns the underlying \ref TextEdit
+   * @brief Returns the underlying text edit
    */
   const QTextEdit* getTextEdit() const { return this->TextEdit; }
 
   /**
-   * @brief Returns the underlying \ref TextEdit
+   * @brief Returns the underlying text edit
    */
   QTextEdit* getTextEdit() { return this->TextEdit; }
 
@@ -212,12 +212,12 @@ private:
   QPointer<pqPythonLineNumberArea> LineNumberArea;
 
   /**
-   * @brief The syntax highlighter used to color the \ref TextEdit
+   * @brief The syntax highlighter used to color the text edit
    */
   QPointer<pqPythonSyntaxHighlighter> SyntaxHighlighter;
 
   /**
-   * @brief The IO module used to save the \ref TextEdit
+   * @brief The IO module used to save the text edit
    */
   QPointer<pqPythonFileIO> FileIO;
 

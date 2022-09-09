@@ -68,7 +68,7 @@ struct pqPythonTextHistoryEntry
   QString content = "";
 
   /**
-   * @brief The absolute cursor position within \ref pqPythonUndoCommand::Text
+   * @brief The absolute cursor position within pqPythonUndoCommand::Text
    */
   std::int32_t cursorPosition = -1;
 
@@ -81,7 +81,7 @@ struct pqPythonTextHistoryEntry
 /**
  * @class pqPythonUndoCommand
  * @brief The python text editor undo/redo command
- * @detail The \ref pqPythonUndoCommand models the undo/redo framework needed for QUndoStack.
+ * @details The \ref pqPythonUndoCommand models the undo/redo framework needed for QUndoStack.
  * The actual storage of the \ref PythonTextHistory is external to the command: this avoids
  * duplicating entries.
  */

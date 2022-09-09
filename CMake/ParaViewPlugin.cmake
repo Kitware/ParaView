@@ -950,7 +950,7 @@ paraview_add_plugin(<name>
     if needed) to be invoked when the plugin is loaded. Each function must be
     callable with no arguments.
   * `EXTRA_INCLUDES`: Headers needed by the generated plugin code (such as `INITIALIZERS`).
-    Filename paths passed without quotes will be double-quoted (e.g., `#include "foo.h"`),
+    Filename paths passed without quotes will be double-quoted (e.g., \verbatim`#include "foo.h"`\endverbatim),
     while paths that start with angle- or double-quotes will not be.
   * `REQUIRED_PLUGINS`: Plugins which must be loaded for this plugin to
     function. These plugins do not need to be available at build time and are

@@ -91,7 +91,7 @@ struct EditorActionGroup
 /**
  * @struct PythonEditorActions
  * @brief Structs that contains the list of actions
- * available to the \ref PythonScriptEditor.
+ * available to the \ref pqPythonScriptEditor.
  *
  * @details Any actions related to the editor itself
  * (ie the text area) should be added here. The main
@@ -193,14 +193,14 @@ struct pqPythonEditorActions
   void FillQMenu(EnumArray<ScriptAction::Type, QMenu*> menus);
 
   /**
-   * @brief Connects the \ref PythonEditorActions
+   * @brief Connects the \ref pqPythonEditorActions
    * to the type T.
    */
   template <class T>
   static void connect(pqPythonEditorActions&, T*);
 
   /**
-   * @brief Disconnects the \ref PythonEditorActions
+   * @brief Disconnects the \ref pqPythonEditorActions
    * to the type T.
    */
   template <class T>

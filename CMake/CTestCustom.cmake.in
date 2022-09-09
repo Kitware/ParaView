@@ -32,6 +32,13 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
 
   # Visual Studio STL warnings.
   "VC.Tools.*include.*: warning"
+
+  # Doxygen warning exclusions
+  "<unknown>:1: warning: no matching .* member found for"
+  "vtkPVMessage.pb.h:.*: warning: no.*matching class member found for"
+  "paraview/tpl/cinemasci/viewers/readme.md:10: warning: unable to resolve reference to `doc/readme_view.md' for"
+  "warning: unable to resolve reference to `https:' for \ref command"
+  "md:.*: warning:" # Disable all warnings in .md files
 )
 
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
