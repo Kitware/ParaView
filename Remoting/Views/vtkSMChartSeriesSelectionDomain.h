@@ -78,12 +78,12 @@ public:
    */
   int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
-  //@{
+  ///@{
   /**
    * Get the default-mode that controls how SetDefaultValues() behaves.
    */
   vtkGetMacro(DefaultMode, int);
-  //@}
+  ///@}
 
   /**
    * Add/Remove series names to hide by default. These are regular expressions.
@@ -154,12 +154,12 @@ protected:
 
   int DefaultMode;
 
-  //@{
+  ///@{
   /**
    * Value used when DefaultMode==VALUE
    */
   char* DefaultValue;
-  //@}
+  ///@}
 
   /**
    * Specify if table components should be split.

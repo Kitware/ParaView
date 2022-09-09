@@ -71,7 +71,7 @@ public:
    */
   bool interpreterIsInitialized();
 
-  //@{
+  ///@{
   /**
    * Add a widget to be given macro actions.  QActions representing script macros
    * will be added to the widget.  This could be a QToolBar, QMenu, or other type
@@ -80,7 +80,7 @@ public:
   void addWidgetForRunMacros(QWidget* widget);
   void addWidgetForEditMacros(QWidget* widget);
   void addWidgetForDeleteMacros(QWidget* widget);
-  //@}
+  ///@}
 
   /**
    * Save the macro in ParaView configuration and update widget automatically

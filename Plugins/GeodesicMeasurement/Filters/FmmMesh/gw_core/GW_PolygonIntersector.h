@@ -36,10 +36,10 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_PolygonIntersector()
     {}
-    //@}
+    ///@}
 
     T_Vector2DList& PerformIntersection( const T_Vector2DList& P1, const T_Vector2DList& P2 )
     {

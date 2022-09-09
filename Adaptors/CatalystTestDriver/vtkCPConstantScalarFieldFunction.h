@@ -39,13 +39,13 @@ public:
   double ComputeComponenentAtPoint(
     unsigned int component, double* point, unsigned long timeStep, double time) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the constant value for the field.
    */
   vtkSetMacro(Constant, double);
   vtkGetMacro(Constant, double);
-  //@}
+  ///@}
 
 protected:
   vtkCPConstantScalarFieldFunction();
@@ -55,7 +55,7 @@ private:
   vtkCPConstantScalarFieldFunction(const vtkCPConstantScalarFieldFunction&) = delete;
   void operator=(const vtkCPConstantScalarFieldFunction&) = delete;
 
-  //@{
+  ///@{
   /**
    * The constant value for the scalar field.
    */

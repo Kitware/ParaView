@@ -44,14 +44,14 @@ public:
   vtkTypeMacro(vtkSMPreselectionPipeline, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Create the interactive selection representation
    */
   virtual vtkSMProxy* GetSelectionRepresentation() const;
   virtual vtkSMProxy* GetOrCreateSelectionRepresentation();
   virtual vtkSMProxy* CreateSelectionRepresentation(vtkSMSourceProxy* extract);
-  //@}
+  ///@}
 
   /**
    * Shows the interactive selection for 'selection' and 'sourceRepresentation'.

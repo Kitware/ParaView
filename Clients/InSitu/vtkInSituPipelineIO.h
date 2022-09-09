@@ -39,30 +39,30 @@ public:
   vtkTypeMacro(vtkInSituPipelineIO, vtkInSituPipeline);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the filename.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the channel name.
    */
   vtkSetStringMacro(ChannelName);
   vtkGetStringMacro(ChannelName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * vtkInSituPipeline API implementaton
    */
   bool Initialize() override;
   bool Execute(int timestep, double time) override;
   bool Finalize() override;
-  //@}
+  ///@}
 
   /**
    * Helper function to format a filename using current timestep and

@@ -92,7 +92,7 @@ public:
     EXECUTE_STREAM_TAG = 55630
   };
 
-  //@{
+  ///@{
   /**
    * Enable or Disable multi-connection support.
    * The MultipleConnection is only used inside the DATA_SERVER to support
@@ -102,9 +102,9 @@ public:
   vtkBooleanMacro(MultipleConnection, bool);
   vtkSetMacro(MultipleConnection, bool);
   vtkGetMacro(MultipleConnection, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable or Disable further connections in multiple connection mode.
    * By default, further connections are enabled. (this->DisableFurtherConnections = false)
@@ -112,16 +112,16 @@ public:
   vtkBooleanMacro(DisableFurtherConnections, bool);
   vtkGetMacro(DisableFurtherConnections, bool);
   void SetDisableFurtherConnections(bool disable);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the server connect-id.
    * Default is 0.
    */
   void SetConnectID(int newConnectID);
   int GetConnectID();
-  //@}
+  ///@}
 
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();

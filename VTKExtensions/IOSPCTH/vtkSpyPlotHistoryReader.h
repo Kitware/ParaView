@@ -35,30 +35,30 @@ public:
   vtkTypeMacro(vtkSpyPlotHistoryReader, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get and set the file name. It is either the name of the case file or the
    * name of the single binary file.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get and set the comment character for the file
    */
   vtkSetStringMacro(CommentCharacter);
   vtkGetStringMacro(CommentCharacter);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get and set the delimeter character for the file
    */
   vtkSetStringMacro(Delimeter);
   vtkGetStringMacro(Delimeter);
-  //@}
+  ///@}
 
 protected:
   vtkSpyPlotHistoryReader();
@@ -82,21 +82,21 @@ protected:
   char* Delimeter;
 
 private:
-  //@{
+  ///@{
   /**
    * Private storage of time information
    */
   class MetaInfo;
   MetaInfo* Info;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Private storage of cached output tables for each time step.
    */
   class CachedTables;
   CachedTables* CachedOutput;
-  //@}
+  ///@}
 
   vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&) = delete;
   void operator=(const vtkSpyPlotHistoryReader&) = delete;

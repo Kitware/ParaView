@@ -44,7 +44,7 @@ class VTKPVVTKEXTENSIONSIOSPCTH_EXPORT vtkSpyPlotBlock
 public:
   vtkSpyPlotBlock();
   ~vtkSpyPlotBlock();
-  //@{
+  ///@{
   /**
 
    */
@@ -73,7 +73,7 @@ public:
   static int Scan(vtkSpyPlotIStream* stream, unsigned char* isAllocated, int fileVersion);
   // For performance reasons, lets do 16 at a time.
   static int Scan16(vtkSpyPlotIStream* stream, unsigned char* isAllocated, int fileVersion);
-  //@}
+  ///@}
 
   int SetGeometry(int dir, const unsigned char* encodedInfo, int infoSize);
   int GetTotalSize() const;

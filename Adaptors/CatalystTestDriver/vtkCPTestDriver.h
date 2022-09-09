@@ -41,13 +41,13 @@ public:
    */
   virtual int Run();
 
-  //@{
+  ///@{
   /**
    * Set/get NumberOfTimeSteps.
    */
   vtkSetMacro(NumberOfTimeSteps, unsigned long);
   vtkGetMacro(NumberOfTimeSteps, unsigned long);
-  //@}
+  ///@}
 
   /**
    * Given a TimeStep, return the simulation time corresponding to
@@ -56,15 +56,15 @@ public:
    */
   virtual double GetTime(unsigned long timeStep);
 
-  //@{
+  ///@{
   /**
    * Set/get GridBuilder.
    */
   void SetGridBuilder(vtkCPBaseGridBuilder* gridBuilder);
   vtkCPBaseGridBuilder* GetGridBuilder();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the start and end times of the simulation.
    */
@@ -72,7 +72,7 @@ public:
   vtkGetMacro(StartTime, double);
   vtkSetMacro(EndTime, double);
   vtkGetMacro(EndTime, double);
-  //@}
+  ///@}
 
 protected:
   vtkCPTestDriver();
@@ -93,7 +93,7 @@ private:
    */
   unsigned long NumberOfTimeSteps;
 
-  //@{
+  ///@{
   /**
    * The start and end times of the simulation.
    */

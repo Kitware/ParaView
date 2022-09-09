@@ -58,24 +58,24 @@ public:
   vtkTypeMacro(vtkLiveInsituLink, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the port number. This is the port on which the root data-server node
    * will open a server-socket to accept connections from VTK InSitu Library.
    */
   vtkSetMacro(InsituPort, int);
   vtkGetMacro(InsituPort, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the host name.
    */
   vtkSetStringMacro(Hostname);
   vtkGetStringMacro(Hostname);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the link type i.e. whether the current process is the visualization
    * process or the insitu process.
@@ -87,9 +87,9 @@ public:
   };
   vtkSetClampMacro(ProcessType, int, LIVE, INSITU);
   vtkGetMacro(ProcessType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When instantiated on the ParaView visualization server side using a
    * vtkSMProxy, ProxyId is used to identify the proxy corresponding to this
@@ -98,16 +98,16 @@ public:
    */
   vtkSetMacro(ProxyId, unsigned int);
   vtkGetMacro(ProxyId, unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * 'SimulationPaused' is set/reset on Paraview Live and sent to Insitu
    * every time step.
    */
   vtkGetMacro(SimulationPaused, int);
   void SetSimulationPaused(int paused);
-  //@}
+  ///@}
 
   /**
    * Initializes the link. For in situ this returns true it there is a
@@ -139,7 +139,7 @@ public:
    */
   void InsituPostProcess(double time, vtkIdType timeStep);
 
-  //@{
+  ///@{
   /**
    * is called on the catalyst side. Insitu stops until the pipeline
    * is edited, an extract is added or removed or the user continues
@@ -149,7 +149,7 @@ public:
   int WaitForLiveChange();
   /// Description: Called on INSITU side when LIVE has changed
   void OnLiveChanged();
-  //@}
+  ///@}
 
   // **************************************************************************
 

@@ -74,30 +74,30 @@ public:
    */
   vtkIdType numberOfControlPoints() const;
 
-  //@{
+  ///@{
   /**
    * Switches the chart to use a log scaled X axis.
    */
   void SetLogScaleXAxis(bool logScale);
   bool GetLogScaleXAxis() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Provides access to vtkScalarsToColors and vtkPiecewiseFunction passed to
    * `initialize`.
    */
   vtkScalarsToColors* scalarsToColors() const;
   vtkPiecewiseFunction* piecewiseFunction() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the use of freehand drawing for the control points.
    */
   void SetControlPointsFreehandDrawing(bool use);
   bool GetControlPointsFreehandDrawing() const;
-  //@}
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

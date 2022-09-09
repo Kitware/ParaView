@@ -32,7 +32,7 @@ public:
   vtkTypeMacro(vtkSMTimeKeeperProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Track timesteps provided by a source. If \c suppress_input is true, before
    * adding the proxy, if the \c proxy has producers those will be removed from
@@ -44,9 +44,9 @@ public:
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
     return self ? self->AddTimeSource(proxy, suppress_input) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Remove a particular time source.
    */
@@ -56,9 +56,9 @@ public:
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
     return self ? self->RemoveTimeSource(proxy, unsuppress_input) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns true if the proxy has been added to time sources and not
    * suppressed.
@@ -69,9 +69,9 @@ public:
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
     return self ? self->IsTimeSourceTracked(proxy) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether to suppress a time source that has been added to the time
    * keeper. Suppressing a source results in its time being ignored by the time
@@ -83,9 +83,9 @@ public:
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
     return self ? self->SetSuppressTimeSource(proxy, suppress) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns a time value after snapping to a lower-bound in the current
    * timesteps.
@@ -96,9 +96,9 @@ public:
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
     return self ? self->GetLowerBoundTimeStep(value) : value;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the index for the lower bound of the time specified in current
    * timestep values, if possible. If there are no timestep values, returns 0.
@@ -109,9 +109,9 @@ public:
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
     return self ? self->GetLowerBoundTimeStepIndex(value) : 0;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Iterates over all sources providing time and calls
    * `vtkSMSourceProxy::UpdatePipelineInformation` on them. That ensures that
@@ -125,7 +125,7 @@ public:
       self->UpdateTimeInformation();
     }
   }
-  //@}
+  ///@}
 
 protected:
   vtkSMTimeKeeperProxy();

@@ -35,16 +35,16 @@ public:
   vtkTypeMacro(vtkSIProxyProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Command that can be used to remove inputs. If set, this
    * command is called before the main Command is called with
    * all the arguments.
    */
   vtkGetStringMacro(CleanCommand);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Remove command is the command called to remove the VTK
    * object on the server-side. If set, CleanCommand is ignored.
@@ -52,7 +52,7 @@ public:
    * previously pushed, the RemoveCommand is invoked.
    */
   vtkGetStringMacro(RemoveCommand);
-  //@}
+  ///@}
 
   // When set to true, the property will push a nullptr i.e. 0 when there are no
   // proxies in the property. Not used when CleanCommand or RemoveCommand is
@@ -73,7 +73,7 @@ protected:
    */
   bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) override;
 
-  //@{
+  ///@{
   /**
    * Command that can be used to remove inputs. If set, this
    * command is called before the main Command is called with
@@ -81,9 +81,9 @@ protected:
    */
   vtkSetStringMacro(CleanCommand);
   char* CleanCommand;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Remove command is the command called to remove the VTK
    * object on the server-side. If set, CleanCommand is ignored.
@@ -92,7 +92,7 @@ protected:
    */
   vtkSetStringMacro(RemoveCommand);
   char* RemoveCommand;
-  //@}
+  ///@}
 
   // When set to true, the property will push a nullptr i.e. 0 when there are no
   // proxies in the property. Not used when CleanCommand or RemoveCommand is

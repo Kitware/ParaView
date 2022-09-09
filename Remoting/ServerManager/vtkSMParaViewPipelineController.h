@@ -321,14 +321,14 @@ protected:
   vtkSMProxy* FindProxy(
     vtkSMSessionProxyManager* pxm, const char* reggroup, const char* xmlgroup, const char* xmltype);
 
-  //@{
+  ///@{
   /**
    * Creates new proxies for proxies referred in vtkSMProxyListDomain for any of
    * the properties for the given proxy.
    */
   virtual bool CreateProxiesForProxyListDomains(vtkSMProxy* proxy);
   virtual void RegisterProxiesForProxyListDomains(vtkSMProxy* proxy);
-  //@}
+  ///@}
 
   /**
    * Setup global properties links based on hints for properties in the XML.
@@ -354,13 +354,13 @@ protected:
    */
   vtkMTimeType GetInitializationTime(vtkSMProxy*);
 
-  //@{
+  ///@{
   /**
    * Proxies can specify custom initialization using XML hints. This method
    * calls those initialization helpers, if any.
    */
   void ProcessInitializationHelper(vtkSMProxy*, vtkMTimeType initializationTimeStamp);
-  //@}
+  ///@}
 
   /**
    * If the proxy has initialization helpers, let those classes also handle
@@ -376,7 +376,7 @@ protected:
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) = delete;
   void operator=(const vtkSMParaViewPipelineController&) = delete;
-  //@}
+  ///@}
 
   class vtkInternals;
   vtkInternals* Internals;

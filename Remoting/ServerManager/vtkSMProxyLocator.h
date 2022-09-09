@@ -47,22 +47,22 @@ public:
    */
   virtual vtkSMProxy* LocateProxy(vtkTypeUInt32 globalID);
 
-  //@{
+  ///@{
   /**
    * Get/Set the de-serializer to used to locate XMLs/Protobuf for unknown proxies
    * requested to be located using LocateProxy().
    */
   void SetDeserializer(vtkSMDeserializer*);
   vtkGetObjectMacro(Deserializer, vtkSMDeserializer);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the session.
    */
   virtual vtkSMSession* GetSession();
   virtual void SetSession(vtkSMSession* s);
-  //@}
+  ///@}
 
   /**
    * Clear the locator.

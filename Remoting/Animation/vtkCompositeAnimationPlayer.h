@@ -44,13 +44,13 @@ public:
     SNAP_TO_TIMESTEPS = 2
   };
 
-  //@{
+  ///@{
   /**
    * Get/Set the play mode
    */
   vtkSetMacro(PlayMode, int);
   vtkGetMacro(PlayMode, int);
-  //@}
+  ///@}
 
   /**
    * Forwarded to vtkSequenceAnimationPlayer
@@ -62,27 +62,27 @@ public:
    */
   void SetDuration(int val);
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkTimestepsAnimationPlayer.
    */
   void AddTimeStep(double val);
   void RemoveAllTimeSteps();
   void SetFramesPerTimestep(int val);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkTimestepsAnimationPlayer.and vtkSequenceAnimationPlayer.
    */
   void SetStride(int _val) override;
-  //@}
+  ///@}
 
 protected:
   vtkCompositeAnimationPlayer();
   ~vtkCompositeAnimationPlayer() override;
 
-  //@{
+  ///@{
   /**
    * Delegated to the active animation player.
    */
@@ -90,7 +90,7 @@ protected:
   void EndLoop() override;
   double GetNextTime(double currentime) override;
   double GetPreviousTime(double currenttime) override;
-  //@}
+  ///@}
 
   double GoToNext(double start, double end, double currenttime) override;
   double GoToPrevious(double start, double end, double currenttime) override;

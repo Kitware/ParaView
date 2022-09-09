@@ -75,7 +75,7 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
-  //@{
+  ///@{
   /**
    * Controller
    * If it is nullptr, nothing will be rendered and a warning will be emitted.
@@ -83,9 +83,9 @@ public:
    */
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController* controller);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the render pass used to do the actual rendering. The result of this
    * delete pass is what gets composited using IceT.
@@ -93,18 +93,18 @@ public:
    */
   void SetRenderPass(vtkRenderPass*);
   vtkGetObjectMacro(RenderPass, vtkRenderPass);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the tile dimensions. Default is (1, 1). If any of the dimensions is
    * > 1 than tile display mode is assumed.
    */
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the tile mullions. The mullions are measured in pixels. Use
    * negative numbers for overlap.
@@ -112,9 +112,9 @@ public:
    */
   vtkSetVector2Macro(TileMullions, int);
   vtkGetVector2Macro(TileMullions, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set to true if data is replicated on all processes. This will enable IceT
    * to minimize communications since data is available on all process. Off by
@@ -124,9 +124,9 @@ public:
   vtkSetMacro(DataReplicatedOnAllProcesses, bool);
   vtkGetMacro(DataReplicatedOnAllProcesses, bool);
   vtkBooleanMacro(DataReplicatedOnAllProcesses, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the image reduction factor. This can be used to speed up compositing.
    * When using vtkIceTCompositePass use this image reduction factor rather than
@@ -137,18 +137,18 @@ public:
    */
   vtkSetClampMacro(ImageReductionFactor, int, 1, 50);
   vtkGetMacro(ImageReductionFactor, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * partition ordering that gives processes ordering. Initial value is a nullptr pointer.
    * This is used only when UseOrderedCompositing is true.
    */
   vtkGetObjectMacro(OrderedCompositingHelper, vtkOrderedCompositingHelper);
   virtual void SetOrderedCompositingHelper(vtkOrderedCompositingHelper* helper);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable/disable rendering of empty images. Painters that use MPI global
    * collective communication need to enable this. Initial value is false.
@@ -156,9 +156,9 @@ public:
   vtkGetMacro(RenderEmptyImages, bool);
   vtkSetMacro(RenderEmptyImages, bool);
   vtkBooleanMacro(RenderEmptyImages, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set this to true, if compositing must be done in a specific order. This is
    * necessary when rendering volumes or translucent geometries. When
@@ -170,7 +170,7 @@ public:
   vtkGetMacro(UseOrderedCompositing, bool);
   vtkSetMacro(UseOrderedCompositing, bool);
   vtkBooleanMacro(UseOrderedCompositing, bool);
-  //@}
+  ///@}
 
   /**
    * Returns the last rendered tile from this process, if any.
@@ -184,13 +184,13 @@ public:
    */
   vtkFloatArray* GetLastRenderedDepths();
 
-  //@{
+  ///@{
   /**
    * Adjusts this pass to handle vtkValuePass::FLOATING_POINT, in which floating-
    * point values are rendered to vtkValuePass's internal FBO.
    */
   vtkSetMacro(EnableFloatValuePass, bool);
-  //@}
+  ///@}
 
   /**
    * Provides access to the last rendered float image in vtkValuePass, if any.
@@ -205,7 +205,7 @@ public:
    */
   void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
 
-  //@{
+  ///@{
   /**
    * When set to true, vtkIceTCompositePass will push back compositing results
    * to the display on ranks where the IceT generated a composited result.
@@ -219,27 +219,27 @@ public:
   vtkGetMacro(DisplayRGBAResults, bool);
   vtkSetMacro(DisplayDepthResults, bool);
   vtkGetMacro(DisplayDepthResults, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Internal callback. Don't use.
    */
   struct IceTDrawParams;
   void Draw(const vtkRenderState* render_state, const IceTDrawParams&);
-  //@}
+  ///@}
 
 protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass() override;
 
-  //@{
+  ///@{
   /**
    * Spits the different components for the rendering process.
    */
   virtual void SetupContext(const vtkRenderState*);
   virtual void CleanupContext(const vtkRenderState*);
-  //@}
+  ///@}
 
   /**
    * Create program (if needed) and prepare it for texture mapping.

@@ -71,21 +71,21 @@ public:
    */
   void Build(int dx, int dy);
 
-  //@{
+  ///@{
   /**
    * When set to true, all comparisons are shown in the same view. Otherwise,
    * they are tiled in separate views.
    */
   void SetOverlayAllComparisons(bool);
   vtkGetMacro(OverlayAllComparisons, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the dimensions used by the most recent Build() request.
    */
   vtkGetVector2Macro(Dimensions, int);
-  //@}
+  ///@}
 
   /**
    * Adds a representation proxy to this view.
@@ -109,14 +109,14 @@ public:
    */
   void GetViews(vtkCollection* collection);
 
-  //@{
+  ///@{
   /**
    * Returns the root view proxy.
    */
   vtkGetObjectMacro(RootView, vtkSMViewProxy);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * ViewSize, ViewPosition need to split up among all the component
    * views correctly.
@@ -127,9 +127,9 @@ public:
     this->ViewSize[1] = y;
     this->UpdateViewLayout();
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * ViewSize, ViewPosition need to split up among all the component
    * views correctly.
@@ -140,9 +140,9 @@ public:
     this->ViewPosition[1] = y;
     this->UpdateViewLayout();
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When saving screenshots with tiling, these methods get called.
    * Not to be confused with tile scale and viewport setup on tile display.
@@ -151,7 +151,7 @@ public:
    */
   void SetTileScale(int x, int y);
   void SetTileViewport(double x0, double y0, double x1, double y1);
-  //@}
+  ///@}
 
   /**
    * Satisfying vtkPVView API. We don't need to do anything here since the
@@ -159,23 +159,23 @@ public:
    */
   void SetPPI(int) {}
 
-  //@{
+  ///@{
   /**
    * Set spacing between views.
    */
   vtkSetVector2Macro(Spacing, int);
   vtkGetVector2Macro(Spacing, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add/Remove parameter cues.
    */
   void AddCue(vtkSMComparativeAnimationCueProxy*);
   void RemoveCue(vtkSMComparativeAnimationCueProxy*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the view time.
    */
@@ -189,7 +189,7 @@ public:
       this->MarkOutdated();
     }
   }
-  //@}
+  ///@}
 
   /**
    * Marks the view dirty i.e. on next Update() it needs to regenerate the

@@ -34,19 +34,19 @@ public:
   vtkTypeMacro(vtkPVAlgorithmPortsInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get number of outputs for a particular source.
    */
   vtkGetMacro(NumberOfOutputs, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the number of required inputs for a particular algorithm.
    */
   vtkGetMacro(NumberOfRequiredInputs, int);
-  //@}
+  ///@}
 
   /**
    * Transfer information about a single object into this object.
@@ -58,13 +58,13 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
 protected:
   vtkPVAlgorithmPortsInformation();

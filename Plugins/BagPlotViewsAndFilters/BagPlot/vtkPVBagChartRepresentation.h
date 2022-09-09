@@ -48,142 +48,142 @@ public:
    */
   vtkChartXY* GetChart();
 
-  //@{
+  ///@{
   /**
    * Set/get the line thickness for the plot.
    */
   vtkSetMacro(LineThickness, int);
   vtkGetMacro(LineThickness, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the line style for the plot.
    */
   vtkSetMacro(LineStyle, int);
   vtkGetMacro(LineStyle, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the points in the plot.
    */
   vtkSetVector3Macro(LineColor, double);
   vtkGetVector3Macro(LineColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the points in the plot.
    */
   void SetLookupTable(vtkScalarsToColors* lut);
   vtkGetObjectMacro(LookupTable, vtkScalarsToColors);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the bag in the plot.
    */
   vtkSetVector3Macro(BagColor, double);
   vtkGetVector3Macro(BagColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the bag in the plot.
    */
   vtkSetVector3Macro(SelectionColor, double);
   vtkGetVector3Macro(SelectionColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the opacity for the bag in the plot.
    */
   vtkSetMacro(Opacity, double);
   vtkGetMacro(Opacity, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the point size in the plot.
    */
   vtkSetMacro(PointSize, int);
   vtkGetMacro(PointSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the points in the plot.
    */
   vtkSetVector3Macro(PointColor, double);
   vtkGetVector3Macro(PointColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the line thickness for the plot.
    */
   vtkSetMacro(GridLineThickness, int);
   vtkGetMacro(GridLineThickness, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the line style for the plot.
    */
   vtkSetMacro(GridLineStyle, int);
   vtkGetMacro(GridLineStyle, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the user defined quartile isoline in the plot.
    */
   vtkSetVector3Macro(PUserColor, double);
   vtkGetVector3Macro(PUserColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color to used for the P50 isoline in the plot.
    */
   vtkSetVector3Macro(P50Color, double);
   vtkGetVector3Macro(P50Color, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the series to use as the X-axis.
    */
   vtkSetStringMacro(XAxisSeriesName);
   vtkGetStringMacro(XAxisSeriesName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get whether the index should be used for the x axis. When true, XSeriesName
    * is ignored.
    */
   vtkSetMacro(UseIndexForXAxis, bool);
   vtkGetMacro(UseIndexForXAxis, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the series to use as the density
    */
   vtkSetStringMacro(DensitySeriesName);
   vtkGetStringMacro(DensitySeriesName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the series to use as the Y-axis
    */
   vtkSetStringMacro(YAxisSeriesName);
   vtkGetStringMacro(YAxisSeriesName);
-  //@}
+  ///@}
 
 protected:
   vtkPVBagChartRepresentation();

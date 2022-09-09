@@ -40,7 +40,7 @@ public:
   vtkTypeMacro(vtkAttributeDataToTableFilter, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Select the attribute type. Accepted values are
    * \li vtkDataObject::FIELD_ASSOCIATION_POINTS,
@@ -54,9 +54,9 @@ public:
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * It is possible for this filter to add additional meta-data to the field
    * data such as point coordinates (when point attributes are selected and
@@ -66,9 +66,9 @@ public:
   vtkSetMacro(AddMetaData, bool);
   vtkGetMacro(AddMetaData, bool);
   vtkBooleanMacro(AddMetaData, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set (default) the vtkOriginalIndices array will be added to the
    * output. Can be overridden by setting this flag to 0.
@@ -76,16 +76,16 @@ public:
    */
   vtkSetMacro(GenerateOriginalIds, bool);
   vtkGetMacro(GenerateOriginalIds, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set (not the default) the connectivity of each cell will be added by
    * adding a new column for each point.
    */
   vtkSetMacro(GenerateCellConnectivity, bool);
   vtkGetMacro(GenerateCellConnectivity, bool);
-  //@}
+  ///@}
 
 protected:
   vtkAttributeDataToTableFilter();

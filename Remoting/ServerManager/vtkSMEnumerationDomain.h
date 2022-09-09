@@ -159,7 +159,7 @@ public:
    */
   void Update(vtkSMProperty* property) override;
 
-  //@{
+  ///@{
   /**
    * Overridden to ensure that the property's default value is valid for the
    * enumeration, if not it will be set to the first enumeration value.
@@ -169,7 +169,7 @@ public:
 protected:
   vtkSMEnumerationDomain();
   ~vtkSMEnumerationDomain() override;
-  //@}
+  ///@}
 
   /**
    * Set the appropriate ivars from the xml element. Should

@@ -66,13 +66,13 @@ public:
   pqApplyBehavior(QObject* parent = nullptr);
   ~pqApplyBehavior() override;
 
-  //@{
+  ///@{
   /**
    * Register/unregister pqPropertiesPanel instances to monitor.
    */
   void registerPanel(pqPropertiesPanel* panel);
   void unregisterPanel(pqPropertiesPanel* panel);
-  //@}
+  ///@}
 
 Q_SIGNALS:
   void triggerApply();

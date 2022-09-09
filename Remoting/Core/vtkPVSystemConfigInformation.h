@@ -77,13 +77,13 @@ public:
    */
   void AddInformation(vtkPVInformation* info) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream* css) override;
   void CopyFromStream(const vtkClientServerStream* css) override;
-  //@}
+  ///@}
 
   /**
    * Access managed information

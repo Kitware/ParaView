@@ -32,14 +32,14 @@ public:
   vtkTypeMacro(vtkAnimationPlayer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the animation scene that is to be played by this player.
    * Note that the animation scene is not reference counted to avoid loops.
    */
   virtual void SetAnimationScene(vtkSMAnimationScene*);
   vtkSMAnimationScene* GetAnimationScene();
-  //@}
+  ///@}
 
   /**
    * Start playing the animation.
@@ -60,13 +60,13 @@ public:
   int IsInPlay() { return this->InPlay ? 1 : 0; }
   vtkGetMacro(InPlay, bool);
 
-  //@{
+  ///@{
   /**
    * Set to true to play the animation in a loop.
    */
   vtkSetMacro(Loop, bool);
   vtkGetMacro(Loop, bool);
-  //@}
+  ///@}
 
   /**
    * Take the animation scene to next frame.
@@ -88,7 +88,7 @@ public:
    */
   void GoToLast();
 
-  //@{
+  ///@{
   /**
    * Get/Set the stride value fot the animation player. This will cause the player to skip
    * (n - 1) when GetNextTime, GoToNext and GoToPrevious are previous are called.
@@ -97,7 +97,7 @@ public:
    */
   vtkGetMacro(Stride, int);
   vtkSetClampMacro(Stride, int, 1, VTK_INT_MAX);
-  //@}
+  ///@}
 
 protected:
   vtkAnimationPlayer();

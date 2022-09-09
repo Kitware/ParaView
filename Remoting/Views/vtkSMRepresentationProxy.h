@@ -144,7 +144,7 @@ public:
    */
   vtkTypeUInt32 GetGlobalID() override;
 
-  //@{
+  ///@{
   /**
    * Set the representation type. Default implementation simply updates the
    * "Representation" property, if present with the value provided. Subclasses
@@ -159,7 +159,7 @@ public:
     vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
     return self ? self->SetRepresentationType(type) : false;
   }
-  //@}
+  ///@}
 
   void MarkDirty(vtkSMProxy* modifiedProxy) override;
 

@@ -50,21 +50,21 @@ public:
    */
   static const int RendererLayer = 1;
 
-  //@{
+  ///@{
   /**
    * Set/get the axes actor to be displayed in this 3D widget.
    */
   void SetAxesActor(vtkPVAxesActor* actor);
   vtkGetObjectMacro(AxesActor, vtkPVAxesActor);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the renderer this 3D widget will be contained in.
    */
   void SetParentRenderer(vtkRenderer* ren);
   vtkRenderer* GetParentRenderer();
-  //@}
+  ///@}
 
   /**
    * Overridden to add interaction observers.
@@ -82,39 +82,39 @@ public:
    */
   void SetEnabled(int) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the visibility. Note if visibility is off, Enabled state is ignored
    * and assumed off.
    */
   void SetVisibility(bool val);
   bool GetVisibility();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color of the outline of this widget.  The outline is visible
    * when (in interactive mode) the cursor is over this 3D widget.
    */
   void SetOutlineColor(double r, double g, double b);
   double* GetOutlineColor();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the color of the axis labels of this widget.
    */
   void SetAxisLabelColor(double r, double g, double b);
   double* GetAxisLabelColor();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the viewport to position/size this 3D widget.
    */
   void SetViewport(double minX, double minY, double maxX, double maxY);
   double* GetViewport();
-  //@}
+  ///@}
 
 protected:
   vtkPVAxesWidget();

@@ -85,7 +85,7 @@ public:
    */
   vtkGetMacro(NumberOfTuples, vtkTypeInt64);
 
-  //@{
+  ///@{
   /**
    * Returns component range. If component is `-1`, then the range of the
    * magnitude (L2 norm) over all components will be provided.
@@ -94,9 +94,9 @@ public:
    */
   const double* GetComponentRange(int comp) const VTK_SIZEHINT(2);
   void GetComponentRange(int comp, double range[2]) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the finite range for each component.
    * If component is `-1`, then the range of the
@@ -106,7 +106,7 @@ public:
    */
   const double* GetComponentFiniteRange(int component) const VTK_SIZEHINT(2);
   void GetComponentFiniteRange(int comp, double range[2]) const;
-  //@}
+  ///@}
 
   /**
    * This method return the Min and Max possible range of the native
@@ -116,16 +116,16 @@ public:
    */
   void GetDataTypeRange(double range[2]) const;
 
-  //@{
+  ///@{
   /**
    * If IsPartial is true, this array is in only some of the
    * parts of a multi-block dataset. By default, IsPartial is
    * set to 0.
    */
   vtkGetMacro(IsPartial, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get information on the InformationKeys of this array
    */
@@ -133,15 +133,15 @@ public:
   const char* GetInformationKeyLocation(int) const;
   const char* GetInformationKeyName(int) const;
   bool HasInformationKey(const char* location, const char* name) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For string arrays, this returns first few non-empty values.
    */
   int GetNumberOfStringValues();
   const char* GetStringValue(int);
-  //@}
+  ///@}
 
   void CopyFromArray(vtkAbstractArray* array);
   void CopyFromGenericAttribute(vtkGenericAttribute* array);
@@ -155,14 +155,14 @@ protected:
   friend class vtkPVDataSetAttributesInformation;
   friend class vtkPVDataInformation;
 
-  //@{
+  ///@{
   /**
    * API for vtkPVDataSetAttributesInformation.
    */
   void DeepCopy(vtkPVArrayInformation* info);
   void AddInformation(vtkPVArrayInformation*, int fieldAssociation);
   vtkSetMacro(IsPartial, bool);
-  //@}
+  ///@}
 
   vtkSetMacro(Name, std::string);
 

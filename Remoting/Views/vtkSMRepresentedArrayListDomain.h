@@ -47,7 +47,7 @@ public:
    */
   void Update(vtkSMProperty*) override;
 
-  //@{
+  ///@{
   /**
    * Set this to true (default) to let this domain use the
    * represented-data-information from the outer  most representation proxy.
@@ -60,7 +60,7 @@ public:
    * value.
    */
   vtkGetMacro(UseTrueParentForRepresentatedDataInformation, bool);
-  //@}
+  ///@}
 
 protected:
   vtkSMRepresentedArrayListDomain();

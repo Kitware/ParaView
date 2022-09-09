@@ -75,7 +75,7 @@ public:
    */
   pqView* activeView() const { return this->ActiveView; }
 
-  //@{
+  ///@{
   /**
    * Returns the active pipeline proxy e.g. a pqPipelineSource or pqExtractor.
    *
@@ -91,7 +91,7 @@ public:
    */
   pqProxy* activePipelineProxy() const { return this->ActivePipelineProxy; }
   pqPipelineSource* activeSource() const;
-  //@}
+  ///@}
 
   /**
    * Returns the active port.
@@ -146,7 +146,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void setActiveView(pqView* view);
 
-  //@{
+  ///@{
   /**
    * Set the active source. Changing the active source may lead to changes in
    * active port, and active representation.
@@ -157,7 +157,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setActivePipelineProxy(pqProxy* proxy);
   void setActiveSource(pqPipelineSource* source) { this->setActivePipelineProxy(source); }
   void setActivePort(pqOutputPort* port) { this->setActivePipelineProxy(port); }
-  //@}
+  ///@}
 
   /**
    * Set the active server. Changing the server typically leads to changes all

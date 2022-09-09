@@ -83,15 +83,15 @@ public:
    */
   void SetAnimationValue(vtkSMProperty*, int, double) override;
 
-  //@{
+  ///@{
   /**
    * Return the string that is used as "none_string" in XML configuration.
    */
   vtkGetStringMacro(NoneString);
   vtkSetStringMacro(NoneString);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * A vtkSMProperty is often defined with a default value in the
    * XML itself. However, many times, the default value must be determined
@@ -107,7 +107,7 @@ public:
 protected:
   vtkSMStringListDomain();
   ~vtkSMStringListDomain() override;
-  //@}
+  ///@}
 
   /**
    * Set the appropriate ivars from the xml element. Should
@@ -123,14 +123,14 @@ protected:
    */
   char* NoneString;
 
-  //@{
+  ///@{
   /**
    * Call to set the strings. Will fire DomainModifiedEvent if the domain values
    * have indeed changed.
    */
   virtual void SetStrings(const std::vector<std::string>& strings);
   const std::vector<std::string>& GetStrings();
-  //@}
+  ///@}
 
 private:
   vtkSMStringListDomain(const vtkSMStringListDomain&) = delete;

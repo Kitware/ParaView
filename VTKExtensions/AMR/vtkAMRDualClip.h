@@ -58,7 +58,7 @@ public:
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
 
-  //@{
+  ///@{
   /**
    * These are to evaluate performances. You can turn off degenerate cells
    * and multiprocess communication to see how they affect speed of execution.
@@ -72,9 +72,9 @@ public:
   vtkSetMacro(EnableMultiProcessCommunication, int);
   vtkGetMacro(EnableMultiProcessCommunication, int);
   vtkBooleanMacro(EnableMultiProcessCommunication, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This flag causes blocks to share locators so there are no
    * boundary edges between blocks. It does not eliminate
@@ -83,7 +83,7 @@ public:
   vtkSetMacro(EnableMergePoints, int);
   vtkGetMacro(EnableMergePoints, int);
   vtkBooleanMacro(EnableMergePoints, int);
-  //@}
+  ///@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);

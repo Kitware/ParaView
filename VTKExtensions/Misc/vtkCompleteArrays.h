@@ -39,13 +39,13 @@ public:
   vtkTypeMacro(vtkCompleteArrays, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The user can set the controller used for inter-process communication.
    */
   void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
 protected:
   vtkCompleteArrays();

@@ -49,37 +49,37 @@ public:
     Custom
   };
 
-  //@{
+  ///@{
   /**
    * Set/Get the destination projection.
    */
   vtkSetClampMacro(DestProjection, int, 0, Custom);
   vtkGetMacro(DestProjection, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the custom PROJ.4 destination projection string.
    */
   vtkGetMacro(CustomDestProjection, std::string);
   vtkSetMacro(CustomDestProjection, std::string);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the source projection.
    */
   vtkSetClampMacro(SourceProjection, int, 0, Custom);
   vtkGetMacro(SourceProjection, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the custom PROJ.4 source projection string.
    */
   vtkGetMacro(CustomSourceProjection, std::string);
   vtkSetMacro(CustomSourceProjection, std::string);
-  //@}
+  ///@}
 
 protected:
   vtkGeoMapConvertFilter() = default;

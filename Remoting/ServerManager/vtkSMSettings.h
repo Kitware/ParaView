@@ -142,7 +142,7 @@ public:
    */
   unsigned int GetSettingNumberOfElements(const char* settingName);
 
-  //@{
+  ///@{
   /**
    * Get a vector setting as a scalar value.
    * Shortcut for GetSettingAs...(settingName, 0, defaultValue)
@@ -150,9 +150,9 @@ public:
   int GetSettingAsInt(const char* settingName, int defaultValue);
   double GetSettingAsDouble(const char* settingName, double defaultValue);
   std::string GetSettingAsString(const char* settingName, const std::string& defaultValue);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get a single element of a vector setting.
    */
@@ -160,7 +160,7 @@ public:
   double GetSettingAsDouble(const char* settingName, unsigned int index, double defaultValue);
   std::string GetSettingAsString(
     const char* settingName, unsigned int index, const std::string& defaultValue);
-  //@}
+  ///@}
 
   /**
    * Set the property value from the setting collections.
@@ -213,7 +213,7 @@ public:
    */
   std::string GetSettingDescription(const char* settingName);
 
-  //@{
+  ///@{
   /**
    * Set setting of a given name in the highest priority collection.
    * Shortcut for SetSetting(settingName, 0, value). Useful for setting scalar values.
@@ -221,16 +221,16 @@ public:
   void SetSetting(const char* settingName, int value);
   void SetSetting(const char* settingName, double value);
   void SetSetting(const char* settingName, const std::string& value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set element of a vector setting at a location given by the setting name.
    */
   void SetSetting(const char* settingName, unsigned int index, int value);
   void SetSetting(const char* settingName, unsigned int index, double value);
   void SetSetting(const char* settingName, unsigned int index, const std::string& value);
-  //@}
+  ///@}
 
   /**
    * Save non-default settings in the current user settings.

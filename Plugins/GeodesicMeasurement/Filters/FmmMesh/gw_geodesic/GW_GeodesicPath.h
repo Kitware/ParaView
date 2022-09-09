@@ -44,10 +44,10 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_GeodesicPath();
     virtual ~GW_GeodesicPath();
-    //@}
+    ///@}
 
     T_GeodesicPointList& GetPointList();
 

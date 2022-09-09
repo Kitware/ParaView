@@ -33,13 +33,13 @@ public:
   vtkTypeMacro(vtkSIInputProperty, vtkSIProxyProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Controls which input port this property uses when making connections.
    * By default, this is 0.
    */
   vtkGetMacro(PortIndex, int);
-  //@}
+  ///@}
 
 protected:
   vtkSIInputProperty();

@@ -38,37 +38,37 @@ public:
   vtkTypeMacro(vtkGmshWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify the file name to be written.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if we write data arrays starting by "gmsh" (usually created by the Gmsh reader).
    */
   vtkSetMacro(WriteGmshSpecificArray, bool);
   vtkGetMacro(WriteGmshSpecificArray, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if all timesteps have to be saved for temporal data.
    */
   vtkSetMacro(WriteAllTimeSteps, bool);
   vtkGetMacro(WriteAllTimeSteps, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the input of this writer as an unstructured grid.
    */
   vtkUnstructuredGrid* GetInput();
   vtkUnstructuredGrid* GetInput(int port);
-  //@}
+  ///@}
 
 protected:
   vtkGmshWriter();

@@ -42,26 +42,26 @@ public:
   vtkGetMacro(ReadAsImageStack, bool);
   vtkBooleanMacro(ReadAsImageStack, bool);
 
-  //@{
+  ///@{
   /**
    * Overridden to directly call the internal reader after passing it the
    * correct filenames when ReadAsImageStack is true.
    */
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  //@}
+  ///@}
 
 protected:
   vtkImageFileSeriesReader();
   ~vtkImageFileSeriesReader() override;
 
-  //@{
+  ///@{
   /**
    * Update the reader extent if the image file format does not know
    * what it is (e.g. the raw format). Otherwise set it to all 0s
    * and have Reader set it automatically.
    */
   virtual void UpdateReaderDataExtent();
-  //@}
+  ///@}
 
   void UpdateFileNames();
 

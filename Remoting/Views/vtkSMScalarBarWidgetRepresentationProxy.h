@@ -42,7 +42,7 @@ public:
   vtkTypeMacro(vtkSMScalarBarWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Updates the scalar bar's component title using the data information to
    * determine component names if possible.
@@ -54,9 +54,9 @@ public:
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
     return self ? self->UpdateComponentTitle(dataInfo) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Attempt to place the scalar bar in the view based on the placement of other
    * currently shown and visible scalar bars.
@@ -68,7 +68,7 @@ public:
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
     return self ? self->PlaceInView(view) : false;
   }
-  //@}
+  ///@}
 
   /**
    * Add range to current scalar bar for a given representation proxy.
@@ -126,7 +126,7 @@ protected:
   ///@}
 
 private:
-  //@{
+  ///@{
   /**
    * Called when user starts/stops interacting with the scalar bar to move it.
    * We handle tracking of the property so that we can trace the changes to its
@@ -134,7 +134,7 @@ private:
    */
   void BeginTrackingPropertiesForTrace();
   void EndTrackingPropertiesForTrace();
-  //@}
+  ///@}
 
   /**
    * Synchronizes Position2 length definition of the scalar bar widget with the

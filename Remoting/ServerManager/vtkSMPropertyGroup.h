@@ -32,38 +32,38 @@ public:
   vtkTypeMacro(vtkSMPropertyGroup, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Sets the name of the property group to \p name.
    */
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Gets/Sets the name of the property group to \p name.
    */
   vtkSetStringMacro(XMLLabel);
   vtkGetStringMacro(XMLLabel);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Sets the name of the panel widget to use for the property group.
    */
   vtkSetStringMacro(PanelWidget);
   vtkGetStringMacro(PanelWidget);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Sets the panel visibility for the property group.
    * @sa vtkSMProperty::SetPanelVisibility()
    */
   vtkSetStringMacro(PanelVisibility);
   vtkGetStringMacro(PanelVisibility);
-  //@}
+  ///@}
 
   /**
    * Returns true if the property group contains zero properties.
@@ -111,7 +111,7 @@ public:
    */
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
-  //@{
+  ///@{
   /**
    * The server manager configuration XML may define `<Hints />` element
    * for a property-group. Hints are metadata associated with the property-group.
@@ -122,7 +122,7 @@ public:
    */
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
   void SetHints(vtkPVXMLElement* hints);
-  //@}
+  ///@}
 
 protected:
   vtkSMPropertyGroup();

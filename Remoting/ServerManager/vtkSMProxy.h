@@ -237,7 +237,7 @@ public:
    */
   virtual void RecreateVTKObjects();
 
-  //@{
+  ///@{
   /**
    * Update the value of one property (pushed to the server) if it is
    * modified.  If the object has not been created, it will be created
@@ -246,28 +246,28 @@ public:
    */
   bool UpdateProperty(const char* name) { return this->UpdateProperty(name, 0); }
   bool UpdateProperty(const char* name, int force);
-  //@}
+  ///@}
 
   /**
    * Convenience method equivalent to UpdateProperty(name, 1).
    */
   void InvokeCommand(const char* name) { this->UpdateProperty(name, 1); }
 
-  //@{
+  ///@{
   /**
    * Returns the type of object managed by the proxy.
    */
   vtkGetStringMacro(VTKClassName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * the type of object created by the proxy.
    * This is used only when creating the server objects. Once the server
    * object(s) have been created, changing this has no effect.
    */
   vtkSetStringMacro(VTKClassName);
-  //@}
+  ///@}
 
   /**
    * Returns a new (initialized) iterator of the properties.
@@ -313,25 +313,25 @@ public:
    */
   vtkSMProperty* GetProducerProperty(unsigned int idx);
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The name assigned in the XML
    * configuration. Can be used to figure out the origin of the
    * proxy.
    */
   vtkGetStringMacro(XMLName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The group in the XML configuration that
    * this proxy belongs to. Can be used to figure out the origin of the
    * proxy.
    */
   vtkGetStringMacro(XMLGroup);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The label assigned in the XML
    * configuration. This is a more user-friendly name
@@ -339,7 +339,7 @@ public:
    * proxy.
    */
   vtkGetStringMacro(XMLLabel);
-  //@}
+  ///@}
 
   /**
    * Updates all property information by calling UpdateInformation()
@@ -406,7 +406,7 @@ public:
     COPY_PROXY_PROPERTY_VALUES_BY_CLONING // < No longer supported!!!
   };
 
-  //@{
+  ///@{
   /**
    * Copies values of all the properties and sub-proxies from src.
    * \b NOTE: This does NOT create properties and sub-proxies. Only
@@ -423,21 +423,21 @@ public:
   void Copy(vtkSMProxy* src);
   void Copy(vtkSMProxy* src, const char* exceptionClass);
   virtual void Copy(vtkSMProxy* src, const char* exceptionClass, int proxyPropertyCopyFlag);
-  //@}
+  ///@}
 
   /**
    * Calls MarkDirty() and invokes ModifiedEvent.
    */
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
-  //@{
+  ///@{
   /**
    * Returns the documentation for this proxy.
    */
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The server manager configuration XML may define \p \<Hints/\> element for a
    * proxy. Hints are metadata associated with the proxy. The Server Manager
@@ -447,14 +447,14 @@ public:
    * if any, otherwise returns nullptr.
    */
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns if the VTK objects for this proxy have been created.
    */
   vtkGetMacro(ObjectsCreated, int);
-  //@}
+  ///@}
 
   /**
    * Given a source proxy, makes this proxy point to the same server-side
@@ -478,7 +478,7 @@ public:
    */
   vtkObjectBase* GetClientSideObject();
 
-  //@{
+  ///@{
   /**
    * Gathers information about this proxy.
    * On success, the \c information object is filled up with details about the
@@ -486,7 +486,7 @@ public:
    */
   bool GatherInformation(vtkPVInformation* information);
   bool GatherInformation(vtkPVInformation* information, vtkTypeUInt32 location);
-  //@}
+  ///@}
 
   /**
    * Saves the state of the proxy. This state can be reloaded
@@ -511,7 +511,7 @@ public:
    */
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
-  //@{
+  ///@{
   /**
    * Allow user to set the remote object to be discard for Undo/Redo
    * action. By default, any remote object is Undoable.
@@ -520,7 +520,7 @@ public:
   void PrototypeOn() override;
   void PrototypeOff() override;
   void SetPrototype(bool undo) override;
-  //@}
+  ///@}
 
   /**
    * This method call UpdateVTKObjects on the current pipeline by starting at
@@ -588,7 +588,7 @@ public:
    */
   size_t GetNumberOfPropertyGroups() const;
 
-  //@{
+  ///@{
   /**
    * Log name is a name for this proxy that will be used when logging status
    * messages. This helps make the log more user friendly by making sure it uses
@@ -606,7 +606,7 @@ public:
    */
   void SetLogName(const char* name);
   vtkGetStringMacro(LogName);
-  //@}
+  ///@}
 
   /**
    * A helper that makes up an default name if none is provided.
@@ -630,13 +630,13 @@ protected:
   // to the session.
   virtual void UpdateAndPushAnnotationState();
 
-  //@{
+  ///@{
   /**
    * Get the last result
    */
   virtual const vtkClientServerStream& GetLastResult();
   virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
-  //@}
+  ///@}
 
   /**
    * Add a property with the given key (name). The name can then
@@ -674,7 +674,7 @@ protected:
    */
   void MarkInputsAsDirty();
 
-  //@{
+  ///@{
   /**
    * These classes have been declared as friends to minimize the
    * public interface exposed by vtkSMProxy. Each of these classes
@@ -701,27 +701,27 @@ protected:
   friend class vtkSMStateLocator;
   friend class vtkSMUndoRedoStateLoader;
   friend class vtkSMViewProxy;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The name assigned in the XML
    * configuration. Can be used to figure out the origin of the
    * proxy.
    */
   vtkSetStringMacro(XMLName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The group in the XML configuration that
    * this proxy belongs to. Can be used to figure out the origin of the
    * proxy.
    */
   vtkSetStringMacro(XMLGroup);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The label assigned in the XML
    * configuration. This is a more user-friendly name
@@ -729,9 +729,9 @@ protected:
    * proxy.
    */
   vtkSetStringMacro(XMLLabel);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. It is used to figure out the origin
    * of the definition of that proxy.
@@ -740,7 +740,7 @@ protected:
    * retrieve the in-line definition of that proxy.
    */
   vtkSetStringMacro(XMLSubProxyName);
-  //@}
+  ///@}
 
   /**
    * Given a class name (by setting VTKClassName) and server ids (by
@@ -879,14 +879,14 @@ protected:
   // This is used to keep track of data information validity.
   bool NeedsUpdate;
 
-  //@{
+  ///@{
   /**
    * Creates a new property and initializes it by calling ReadXMLAttributes()
    * with the right XML element.
    */
   vtkSMProperty* NewProperty(const char* name);
   vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
-  //@}
+  ///@}
 
   /**
    * Links properties such that when inputProperty's checked or unchecked values
@@ -906,14 +906,14 @@ protected:
    */
   void AppendPropertyGroup(vtkSMPropertyGroup* group);
 
-  //@{
+  ///@{
   /**
    * Read attributes from an XML element.
    */
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
   void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement* element);
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement* element);
-  //@}
+  ///@}
 
   /**
    * Expose a subproxy property from the base proxy. The property with the name
@@ -956,14 +956,14 @@ protected:
   virtual void SetLogNameInternal(
     const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains);
 
-  //@{
+  ///@{
   /**
    * SIClassName identifies the classname for the helper on the server side.
    */
   vtkSetStringMacro(SIClassName);
   vtkGetStringMacro(SIClassName);
   char* SIClassName;
-  //@}
+  ///@}
 
   char* VTKClassName;
   char* XMLGroup;

@@ -71,18 +71,18 @@ public:
     QWidget* parent = nullptr);
   ~pqSplinePropertyWidget() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the points that form the spline.
    */
   QList<QVariant> points() const;
   void setPoints(const QList<QVariant>& points);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   int currentRow() const;
   void setCurrentRow(int idx);
-  //@}
+  ///@}
 Q_SIGNALS:
   /**
    * Signal fired whenever the points are changed.

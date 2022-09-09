@@ -46,16 +46,16 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_Vertex();
     ~GW_Vertex() override;
     virtual GW_Vertex& operator=(const GW_Vertex& v);
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Accessors */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void SetPosition( const GW_Vector3D& Position );
     GW_Vector3D& GetPosition();
     void SetNormal( GW_Vector3D& Normal );
@@ -76,31 +76,31 @@ public:
 
     GW_U32 GetNumberNeighbor();
     GW_Bool IsBoundaryVertex();
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Characteristic data management. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void BuildRawNormal();
     void BuildCurvatureData();
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Iterator management. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_FaceIterator BeginFaceIterator();
     GW_FaceIterator EndFaceIterator();
 
     GW_VertexIterator BeginVertexIterator();
     GW_VertexIterator EndVertexIterator();
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Curvature accessors. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_Float GetMinCurv();
     GW_Float GetMaxCurv();
     GW_Float GetGaussianCurv();
@@ -109,7 +109,7 @@ public:
     GW_Vector3D& GetNormal();
     GW_Vector3D& GetMinCurvDirection();
     GW_Vector3D& GetMaxCurvDirection();
-    //@}
+    ///@}
 
     void SetUserData( GW_SmartCounter* pUserData );
     GW_SmartCounter* GetUserData();
@@ -117,10 +117,10 @@ public:
     //-------------------------------------------------------------------------
     /** \name ID helpers */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     static GW_U32 ComputeUniqueId( const GW_Vertex& Vert0, const GW_Vertex& Vert1 );
     static GW_U32 ComputeUniqueId( const GW_Vertex& Vert0, const GW_Vertex& Vert1, const GW_Vertex& Vert2 );
-    //@}
+    ///@}
 
 
 private:

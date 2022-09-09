@@ -51,7 +51,7 @@ public:
    */
   vtkGetMacro(Dual, bool);
   vtkSetMacro(Dual, bool);
-  //@}
+  ///@}
 
   ///@{
   /**

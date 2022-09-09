@@ -33,13 +33,13 @@ public:
   vtkTypeMacro(vtkPVTextSource, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the text string to generate in the output.
    */
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
-  //@}
+  ///@}
 
 protected:
   vtkPVTextSource();

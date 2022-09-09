@@ -45,13 +45,13 @@ public:
    */
   void ThresholdBetween(double lower, double upper);
 
-  //@{
+  ///@{
   /**
    * Get the Upper and Lower thresholds.
    */
   vtkGetMacro(UpperThreshold, double);
   vtkGetMacro(LowerThreshold, double);
-  //@}
+  ///@}
 
 protected:
   vtkIsoVolume();

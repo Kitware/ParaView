@@ -57,40 +57,40 @@ public:
   vtkTypeMacro(vtkPVGeometryFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * This flag is set during the execute method.  It indicates
    * that the input was 3d and an outline representation was used.
    */
   vtkGetMacro(OutlineFlag, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get whether to produce outline (vs. surface).
    */
   vtkSetMacro(UseOutline, int);
   vtkGetMacro(UseOutline, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get whether to produce feature edges (vs. surface).
    * If both this and UseOutline are true, then an outline will be produced.
    */
   vtkSetMacro(GenerateFeatureEdges, bool);
   vtkGetMacro(GenerateFeatureEdges, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Determines the number of distinct values in vtkBlockColors
    */
   vtkSetMacro(BlockColorsDistinctValues, int);
   vtkGetMacro(BlockColorsDistinctValues, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When input is structured data, this flag will generate faces with
    * triangle strips.  This should render faster and use less memory, but no
@@ -123,9 +123,9 @@ public:
   PARAVIEW_DEPRECATED_IN_5_11_0(
     "Removed; the backing implementation has done nothing since VTK 9.1.0")
   virtual void ForceUseStripsOff() {}
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether to generate cell normals.  They can only be used
    * for poly cells now.  This option does nothing if the output
@@ -134,9 +134,9 @@ public:
   vtkSetMacro(GenerateCellNormals, int);
   vtkGetMacro(GenerateCellNormals, int);
   vtkBooleanMacro(GenerateCellNormals, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether to triangulate mesh for rendering. This parameter avoid
    * rendering issues of non-convex polygons.
@@ -146,9 +146,9 @@ public:
   vtkSetMacro(Triangulate, int);
   vtkGetMacro(Triangulate, int);
   vtkBooleanMacro(Triangulate, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Nonlinear faces are approximated with flat polygons.  This parameter
    * controls how many times to subdivide nonlinear surface cells.  Higher
@@ -158,17 +158,17 @@ public:
    */
   virtual void SetNonlinearSubdivisionLevel(int);
   vtkGetMacro(NonlinearSubdivisionLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and get the controller.
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If on, the output polygonal dataset will have a celldata array that
    * holds the cell index of the original 3D cell that produced each output
@@ -177,9 +177,9 @@ public:
   void SetPassThroughCellIds(int);
   vtkGetMacro(PassThroughCellIds, int);
   vtkBooleanMacro(PassThroughCellIds, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If on, the output polygonal dataset will have a pointdata array that
    * holds the point index of the original vertex that produced each output
@@ -188,18 +188,18 @@ public:
   void SetPassThroughPointIds(int);
   vtkGetMacro(PassThroughPointIds, int);
   vtkBooleanMacro(PassThroughPointIds, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If on, point arrays named vtkProcessId is added.
    */
   vtkSetMacro(GenerateProcessIds, bool);
   vtkGetMacro(GenerateProcessIds, bool);
   vtkBooleanMacro(GenerateProcessIds, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This property affects the way AMR outlines and faces are generated.
    * When set to true (default), internal data-set faces/outlines for datasets within
@@ -209,9 +209,9 @@ public:
   vtkSetMacro(HideInternalAMRFaces, bool);
   vtkGetMacro(HideInternalAMRFaces, bool);
   vtkBooleanMacro(HideInternalAMRFaces, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For overlapping AMR, this property controls affects the way AMR
    * outlines are generated. When set to true (default), it uses the
@@ -225,7 +225,7 @@ public:
   vtkSetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   vtkGetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
-  //@}
+  ///@}
 
   // These keys are put in the output composite-data metadata for multipieces
   // since this filter merges multipieces together.
@@ -239,7 +239,7 @@ protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter() override;
 
-  //@{
+  ///@{
   /**
    * Overridden to create vtkMultiBlockDataSet when input is a
    * composite-dataset and vtkPolyData when input is a vtkDataSet.
@@ -251,7 +251,7 @@ protected:
     vtkInformationVector* outputVector);
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
-  //@}
+  ///@}
 
   // Create a default executive.
   vtkExecutive* CreateDefaultExecutive() override;
@@ -348,7 +348,7 @@ private:
   void operator=(const vtkPVGeometryFilter&) = delete;
 
   void AddCompositeIndex(vtkPolyData* pd, unsigned int index);
-  //@{
+  ///@{
   /**
    * Adds a field array called "vtkBlockColors". The array is
    * added to each block only if the dataset is a composite
@@ -358,7 +358,7 @@ private:
   void AddBlockColors(vtkDataObject* pd, unsigned int index);
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
   class BoundsReductionOperation;
-  //@}
+  ///@}
 };
 
 #endif

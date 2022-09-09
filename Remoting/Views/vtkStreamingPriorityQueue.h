@@ -214,7 +214,7 @@ class VTK_WRAPEXCLUDE vtkStreamingPriorityQueue
       std::vector<vtkStreamingPriorityQueueItem>, Comparator>
 {
 public:
-  //@{
+  ///@{
   /**
    * Updates the priorities of items in the queue.
    */
@@ -223,7 +223,7 @@ public:
     bool clamp_bounds_initialized =
       (vtkMath::AreBoundsInitialized(const_cast<double*>(clamp_bounds)) != 0);
     vtkBoundingBox clampBox(const_cast<double*>(clamp_bounds));
-    //@}
+    ///@}
 
     vtkStreamingPriorityQueue current_queue;
     std::swap(current_queue, *this);

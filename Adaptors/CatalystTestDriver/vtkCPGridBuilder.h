@@ -41,13 +41,13 @@ public:
    */
   vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override = 0;
 
-  //@{
+  ///@{
   /**
    * Set/get the FieldBuilder.
    */
   void SetFieldBuilder(vtkCPBaseFieldBuilder* fieldBuilder);
   vtkCPBaseFieldBuilder* GetFieldBuilder();
-  //@}
+  ///@}
 
 protected:
   vtkCPGridBuilder();
@@ -57,7 +57,7 @@ private:
   vtkCPGridBuilder(const vtkCPGridBuilder&) = delete;
 
   void operator=(const vtkCPGridBuilder&) = delete;
-  //@{
+  ///@{
   /**
    * The field builder for creating the input fields to the coprocessing
    * library.

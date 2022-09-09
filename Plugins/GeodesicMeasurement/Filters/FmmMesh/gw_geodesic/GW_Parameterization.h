@@ -144,33 +144,33 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_Parameterization();
     virtual ~GW_Parameterization();
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Lloyd algorithm */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void PerformLloydAlgorithm( GW_GeodesicMesh& Mesh, T_GeodesicVertexList& VertList );
     GW_Bool PerformLloydIteration( GW_GeodesicMesh& Mesh, T_GeodesicVertexList& VertList );
     GW_GeodesicVertex& PerformCentering( GW_GeodesicVertex& Vert, GW_GeodesicMesh& Mesh );
     void PerformPseudoLloydIteration( GW_GeodesicMesh& Mesh, T_GeodesicVertexList& VertList );
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Segmentation. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void SegmentRegion( GW_GeodesicMesh& Mesh, GW_GeodesicVertex& Vert, T_TrissectorInfoMap* pTrissectorInfoMap = NULL );
     void SegmentAllRegions( GW_GeodesicMesh& Mesh, T_GeodesicVertexList& VertList, T_TrissectorInfoMap* pTrissectorInfoMap = NULL );
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Parameterization. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     enum T_ParameterizationType
     {
         kGeodesicConformal,
@@ -199,7 +199,7 @@ public:
 
     void ParameterizeRegion( GW_GeodesicVertex& Seed, GW_GeodesicMesh& BaseDomain );
     void ParameterizeAllRegions( T_GeodesicVertexList& VertList );
-    //@}
+    ///@}
 
     static void ExtractSubMeshes( GW_GeodesicMesh& Mesh, T_GeodesicVertexList& VertList,
                                 T_GeodesicMeshVector& MeshVector, T_U32Vector* pGlobal2LocalID = NULL );
@@ -208,10 +208,10 @@ public:
     //-------------------------------------------------------------------------
     /** \name Pretty helper. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     static void ExplodeRegion( GW_GeodesicVertex& Vert, GW_Float intensity, GW_Float normal_contrib );
     static void ExplodeAllRegions( T_GeodesicVertexList& VertList, GW_Float intensity = 0.1, GW_Float normal_contrib=0.5 );
-    //@}
+    ///@}
 
     static void PerformFastMarching( GW_GeodesicMesh& Mesh, T_GeodesicVertexList& VertList );
 

@@ -38,21 +38,21 @@ public:
   vtkTypeMacro(vtkPVPLYWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Enable coloring.
    */
   vtkSetMacro(EnableColoring, bool);
   vtkGetMacro(EnableColoring, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable alpha channel if coloring is enabled.
    */
   vtkSetMacro(EnableAlpha, bool);
   vtkGetMacro(EnableAlpha, bool);
-  //@}
+  ///@}
 
   /**
    * If the file type is binary, then the user can specify which

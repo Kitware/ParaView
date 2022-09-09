@@ -68,7 +68,7 @@ public:
   pqHeaderView(Qt::Orientation orientation, QWidget* parent = nullptr);
   ~pqHeaderView() override;
 
-  //@{
+  ///@{
   /**
    * For checkable section, this property controls if clicks on the entire
    * section should be treated as a request to toggle the check state or only
@@ -78,9 +78,9 @@ public:
    */
   void setToggleCheckStateOnSectionClick(bool val) { this->ToggleCheckStateOnSectionClick = val; }
   bool toggleCheckStateOnSectionClick() const { return this->ToggleCheckStateOnSectionClick; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This property holds if a custom indicator is shown for sections. The custom
    * indicator can be used to popup a custom menu or filtering options, for
@@ -91,9 +91,9 @@ public:
    */
   bool isCustomIndicatorShown() const { return this->CustomIndicatorShown; }
   void setCustomIndicatorShown(bool val);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When `showCustomIndicator` property is true, these are the icons
    * rendered. Icons are rendered in order from right to left i.e. first added
@@ -104,7 +104,7 @@ public:
   void addCustomIndicatorIcon(const QIcon& icon, const QString& role);
   void removeCustomIndicatorIcon(const QString& role);
   QIcon customIndicatorIcon(const QString& role) const;
-  //@}
+  ///@}
 
   /**
    * For testing purposes only. Returns the position of the painted checkbox in

@@ -110,33 +110,33 @@ public:
   vtkTypeMacro(vtkPLANLHaloFinder, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //@{
+  ///@{
   /**
    * Set the communicator object for interprocess communication
    */
   virtual vtkMultiProcessController* GetController();
   virtual void SetController(vtkMultiProcessController*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the number of seeded particles in one dimension (total = np^3)
    * (default 256)
    */
   vtkSetMacro(NP, int);
   vtkGetMacro(NP, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the physical box dimensions size (rL)
    * (default 100.0)
    */
   vtkSetMacro(RL, float);
   vtkGetMacro(RL, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the ghost cell spacing (in rL units)
    * (edge boundary of processor box)
@@ -144,106 +144,106 @@ public:
    */
   vtkSetMacro(Overlap, float);
   vtkGetMacro(Overlap, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the minimum number of particles for a halo (pmin)
    * (default 100)
    */
   vtkSetMacro(PMin, int);
   vtkGetMacro(PMin, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the linking length (bb)
    * (default .2)
    */
   vtkSetMacro(BB, float);
   vtkGetMacro(BB, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on calculation of SOD halos
    * (default off)
    */
   vtkSetMacro(ComputeSOD, int);
   vtkGetMacro(ComputeSOD, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the FOF center to use in SOD calculations
    * (0 = default, center of mass, 1 = average, 2 = MBP, 3 = MCP)
    */
   vtkSetMacro(CenterFindingMethod, int);
   vtkGetMacro(CenterFindingMethod, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify rho_c (critical density)
    * (default 2.77536627e11)
    */
   vtkSetMacro(RhoC, float);
   vtkGetMacro(RhoC, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the initial SOD mass
    * (default 1.0e14)
    */
   vtkSetMacro(SODMass, float);
   vtkGetMacro(SODMass, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the minimum radius factor
    * (default 0.5)
    */
   vtkSetMacro(MinRadiusFactor, float);
   vtkGetMacro(MinRadiusFactor, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the maximum radius factor
    * (default 2.0)
    */
   vtkSetMacro(MaxRadiusFactor, float);
   vtkGetMacro(MaxRadiusFactor, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the number of bins for SOD finding
    * (default 20)
    */
   vtkSetMacro(SODBins, int);
   vtkGetMacro(SODBins, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the minimum FOF size for an SOD halo
    * (default 1000)
    */
   vtkSetMacro(MinFOFSize, int);
   vtkGetMacro(MinFOFSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the minimum FOF mass for an SOD halo
    * (default 5.0e12)
    */
   vtkSetMacro(MinFOFMass, float);
   vtkGetMacro(MinFOFMass, float);
-  //@}
+  ///@}
 
 protected:
   vtkPLANLHaloFinder();

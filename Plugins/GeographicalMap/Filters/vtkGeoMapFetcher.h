@@ -59,33 +59,33 @@ public:
     BoundingBox = 1
   };
 
-  //@{
+  ///@{
   /**
    * Get/Set the fetching method to use between ZoomCenter and BoundingBox
    */
   vtkSetClampMacro(FetchingMethod, int, ZoomCenter, BoundingBox);
   vtkGetMacro(FetchingMethod, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the center point in latitude/longitude coordinates (in degrees).
    * Default is 0,0.
    */
   vtkSetVector2Macro(Center, double);
   vtkGetVector2Macro(Center, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the zoom level of the downloaded map.
    * Default is 4.
    */
   vtkSetClampMacro(ZoomLevel, unsigned short, 0, 18);
   vtkGetMacro(ZoomLevel, unsigned short);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the bounding box of the downloaded map.
    * Format is {latMin, latMax, longMin, longMax}
@@ -93,51 +93,51 @@ public:
    */
   vtkSetVector4Macro(MapBoundingBox, double);
   vtkGetVector4Macro(MapBoundingBox, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the dimension of the downloaded map.
    * Default is 500x500.
    */
   vtkSetVector2Macro(Dimension, unsigned short);
   vtkGetVector2Macro(Dimension, unsigned short);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Select the provider service used.
    * Default is MapQuest.
    */
   vtkSetClampMacro(Provider, int, GoogleMap, MapQuest);
   vtkGetMacro(Provider, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the type of the map.
    * Default is Satellite.
    */
   vtkSetClampMacro(Type, int, Road, Alternative);
   vtkGetMacro(Type, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the upscale flag. If enabled, the image will have twice the requested dimension.
    * Default is true.
    */
   vtkSetMacro(Upscale, bool);
   vtkGetMacro(Upscale, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the API key used for the selected provider.
    */
   vtkSetMacro(APIKey, std::string);
   vtkGetMacro(APIKey, std::string);
-  //@}
+  ///@}
 
 protected:
   vtkGeoMapFetcher();

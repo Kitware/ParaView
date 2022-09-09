@@ -47,37 +47,37 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkAMRConnectivity* New();
 
-  //@{
+  ///@{
   /**
    * Add to list of volume arrays to find connected fragments
    */
   void AddInputVolumeArrayToProcess(const char* name);
   void ClearInputVolumeArrayToProcess();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get / Set volume fraction value.
    */
   vtkGetMacro(VolumeFractionSurfaceValue, double);
   vtkSetMacro(VolumeFractionSurfaceValue, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get / Set where to resolve the regions between blocks
    */
   vtkGetMacro(ResolveBlocks, bool);
   vtkSetMacro(ResolveBlocks, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get / Set where to resolve the regions between blocks
    */
   vtkGetMacro(PropagateGhosts, bool);
   vtkSetMacro(PropagateGhosts, bool);
-  //@}
+  ///@}
 
 protected:
   vtkAMRConnectivity();

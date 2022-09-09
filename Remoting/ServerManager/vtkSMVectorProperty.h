@@ -45,16 +45,16 @@ public:
    */
   virtual void SetNumberOfElements(unsigned int num) = 0;
 
-  //@{
+  ///@{
   /**
    * API for setting unchecked element values.
    */
   virtual unsigned int GetNumberOfUncheckedElements() = 0;
   virtual void SetNumberOfUncheckedElements(unsigned int num) = 0;
   void ClearUncheckedElements() override = 0;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If RepeatCommand is true, the command is invoked multiple times,
    * each time with NumberOfElementsPerCommand values. For example, if
@@ -70,9 +70,9 @@ public:
   vtkGetMacro(RepeatCommand, int);
   vtkSetMacro(RepeatCommand, int);
   vtkBooleanMacro(RepeatCommand, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If RepeatCommand is true, the command is invoked multiple times,
    * each time with NumberOfElementsPerCommand values. For example, if
@@ -87,9 +87,9 @@ public:
    */
   vtkGetMacro(NumberOfElementsPerCommand, int);
   vtkSetMacro(NumberOfElementsPerCommand, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If UseIndex and RepeatCommand are true, the property will add
    * an index integer before each command. For example, if UseIndex and
@@ -105,9 +105,9 @@ public:
   vtkGetMacro(UseIndex, int);
   vtkSetMacro(UseIndex, int);
   vtkBooleanMacro(UseIndex, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Command that can be used to remove all values.
    * Typically used when RepeatCommand = 1. If set, the clean command
@@ -115,21 +115,21 @@ public:
    */
   vtkSetStringMacro(CleanCommand);
   vtkGetStringMacro(CleanCommand);
-  //@}
+  ///@}
 
   /**
    * Copy all property values.
    */
   void Copy(vtkSMProperty* src) override;
 
-  //@{
+  ///@{
   /**
    * If SetNumberCommand is set, it is called before Command
    * with the number of arguments as the parameter.
    */
   vtkSetStringMacro(SetNumberCommand);
   vtkGetStringMacro(SetNumberCommand);
-  //@}
+  ///@}
 
   vtkSetStringMacro(InitialString);
   vtkGetStringMacro(InitialString);

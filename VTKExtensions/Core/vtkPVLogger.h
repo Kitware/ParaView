@@ -55,7 +55,7 @@ public:
   vtkTypeMacro(vtkPVLogger, vtkLogger);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Use this verbosity level when logging messages that provide information
    * about pipeline update requests, etc.
@@ -66,9 +66,9 @@ public:
    */
   static vtkLogger::Verbosity GetPipelineVerbosity();
   static void SetPipelineVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Use this verbosity level when logging messages that provide information
    * about algorithm execution.
@@ -79,9 +79,9 @@ public:
    */
   static vtkLogger::Verbosity GetExecutionVerbosity();
   static void SetExecutionVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Use this verbosity level to for log message relating to ParaView's plugin
    * system.
@@ -92,9 +92,9 @@ public:
    */
   static vtkLogger::Verbosity GetPluginVerbosity();
   static void SetPluginVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Verbosity level for log messages related to data-movement e.g. moving data
    * between processes for rendering.
@@ -105,9 +105,9 @@ public:
    */
   static vtkLogger::Verbosity GetDataMovementVerbosity();
   static void SetDataMovementVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Verbosity level for log messages related to rendering.
    *
@@ -117,9 +117,9 @@ public:
    */
   static vtkLogger::Verbosity GetRenderingVerbosity();
   static void SetRenderingVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Verbosity level for log messages related to the application, gui, and
    * similar components.
@@ -130,9 +130,9 @@ public:
    */
   static vtkLogger::Verbosity GetApplicationVerbosity();
   static void SetApplicationVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Verbosity level for log messages related to Catalyst and other in situ
    * tasks.
@@ -143,9 +143,9 @@ public:
    */
   static vtkLogger::Verbosity GetCatalystVerbosity();
   static void SetCatalystVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Change default verbosity to use for all ParaView categories defined here if
    * no overrides are specified. This is intended to be used by ParaView-based
@@ -156,7 +156,7 @@ public:
    */
   static vtkLogger::Verbosity GetDefaultVerbosity();
   static void SetDefaultVerbosity(vtkLogger::Verbosity value);
-  //@}
+  ///@}
 protected:
   vtkPVLogger();
   ~vtkPVLogger() override;

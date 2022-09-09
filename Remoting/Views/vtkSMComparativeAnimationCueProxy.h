@@ -38,7 +38,7 @@ public:
   vtkTypeMacro(vtkSMComparativeAnimationCueProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Methods simply forwarded to vtkPVComparativeAnimationCue.
    * Any of these methods changing the state of the proxy, also call
@@ -56,7 +56,7 @@ public:
   double* GetValues(int x, int y, int dx, int dy, unsigned int& numValues);
   double GetValue(int x, int y, int dx, int dy);
   void UpdateAnimatedValue(int x, int y, int dx, int dy);
-  //@}
+  ///@}
 
   /**
    * Saves the state of the proxy. This state can be reloaded

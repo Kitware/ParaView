@@ -39,24 +39,24 @@ public:
   vtkTypeMacro(vtkPVHistogramChartRepresentation, vtkXYChartRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Controls which input data component should be binned, for input arrays
    * with more-than-one component
    */
   void SetComponent(int);
   int GetComponent();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls the number of bins N in the output histogram data
    */
   void SetBinCount(int);
   int GetBinCount();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set if first and last bins must be centered around the min and max
    * data. This is only used when UseCustomBinRanges is set to false.
@@ -64,25 +64,25 @@ public:
    */
   void SetCenterBinsAroundMinAndMax(bool);
   bool GetCenterBinsAroundMinAndMax();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set custom bin ranges to use. These are used only when
    * UseCustomBinRanges is set to true.
    */
   void SetCustomBinRanges(double min, double max);
   double* GetCustomBinRanges();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, CustomBinRanges will  be used instead of using the full
    * range for the selected array. By default, set to false.
    */
   void SetUseCustomBinRanges(bool);
   bool GetUseCustomBinRanges();
-  //@}
+  ///@}
 
   /**
    * Sets the color for the histograms.
@@ -109,14 +109,14 @@ public:
    */
   vtkSmartPointer<vtkDataObject> TransformInputData(vtkDataObject* data) override;
 
-  //@{
+  ///@{
   /**
    * Overload the vtkAlgorithm method to update after the change
    */
   void SetInputArrayToProcess(
     int idx, int port, int connection, int fieldAssociation, const char* name) override;
   using Superclass::SetInputArrayToProcess;
-  //@}
+  ///@}
 
   /**
    * Overridden to transform id-based selection produced by the histogram view

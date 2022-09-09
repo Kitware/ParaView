@@ -61,7 +61,7 @@ public:
   vtkTypeMacro(vtkSMExtractsController, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Information about current time/timestep.
    * This must be set correctly before using `Extract` to generate extracts.
@@ -70,9 +70,9 @@ public:
   vtkGetMacro(TimeStep, int);
   vtkSetMacro(Time, double);
   vtkGetMacro(Time, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the root directory to use for writing extracts.
    * This must be set correctly before using `Extract` to generate extracts.
@@ -84,7 +84,7 @@ public:
    */
   vtkSetStringMacro(ExtractsOutputDirectory);
   vtkGetStringMacro(ExtractsOutputDirectory);
-  //@}
+  ///@}
 
   /**
    * Returns the extract output directory to use. If
@@ -126,7 +126,7 @@ public:
    */
   bool Extract(vtkCollection* collection);
 
-  //@{
+  ///@{
   /**
    * Check if any of the extractors registered with the chosen
    * proxy-manager (or active proxy-manager, is none specified) has their
@@ -136,7 +136,7 @@ public:
   bool IsAnyTriggerActivated(vtkSMSessionProxyManager* pxm);
   bool IsAnyTriggerActivated();
   bool IsAnyTriggerActivated(vtkCollection* collection);
-  //@}
+  ///@}
 
   /**
    * Same as `IsAnyTriggerActivated` except only check the selected extractor's
@@ -165,13 +165,13 @@ public:
     return this->CanExtract(extractor, std::vector<vtkSMProxy*>{ input });
   }
 
-  //@{
+  ///@{
   /**
    * Creates, initializes and registers a new extractor of the chosen type.
    */
   vtkSMProxy* CreateExtractor(
     vtkSMProxy* proxy, const char* xmlname, const char* registrationName = nullptr) const;
-  //@}
+  ///@}
 
   /**
    * Returns true is the `extractor` is an extractor for the `proxy`.
@@ -206,7 +206,7 @@ public:
    */
   bool SaveSummaryTable(const std::string& fname, vtkSMSessionProxyManager* pxm);
 
-  //@{
+  ///@{
   /**
    * Called by vtkSMExtractWriterProxy subclasses to add an entry to the summary table.
    * Note, this must be called for every extract written out by the extract
@@ -215,7 +215,7 @@ public:
   using SummaryParametersT = std::map<std::string, std::string>;
   bool AddSummaryEntry(vtkSMExtractWriterProxy* writer, const std::string& filename,
     const SummaryParametersT& params = SummaryParametersT{});
-  //@}
+  ///@}
 
   /**
    * Returns true of the extractor is enabled.
@@ -231,7 +231,7 @@ protected:
   vtkSMExtractsController();
   ~vtkSMExtractsController() override;
 
-  //@{
+  ///@{
   /**
    * These methods are intended to be use by vtkSMExtractWriterProxy and
    * subclasses to ensure chosen output directories are created before
@@ -242,7 +242,7 @@ protected:
    */
   bool CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const;
   bool CreateDir(const std::string& dname, vtkSMSessionProxyManager* pxm) const;
-  //@}
+  ///@}
 
   /**
    * Returns a friendly name derived from the extract writer.

@@ -126,7 +126,7 @@ public:
    */
   unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag) override;
 
-  //@{
+  ///@{
   /**
    * These methods are a part of the newer API to add multiple rmi callbacks.
    * When the RMI is triggered, all the callbacks are called
@@ -140,7 +140,7 @@ public:
     return 1;
   }
   bool RemoveRMICallback(unsigned long observerTagId) override;
-  //@}
+  ///@}
 
   enum EventId
   {

@@ -104,7 +104,7 @@ public:
     return this->IceTCompositePass->GetImageReductionFactor();
   }
 
-  //@{
+  ///@{
   /**
    * Set the parallel message communicator. This is used to communicate among
    * processes.
@@ -114,15 +114,15 @@ public:
     this->Superclass::SetParallelController(cont);
     this->IceTCompositePass->SetController(cont);
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set an image processing pass to process the rendered images.
    */
   void SetImageProcessingPass(vtkImageProcessingPass*);
   vtkGetObjectMacro(ImageProcessingPass, vtkImageProcessingPass);
-  //@}
+  ///@}
 
   /**
    * Activates or de-activated the use of Depth Buffer
@@ -136,7 +136,7 @@ public:
    */
   void SetRenderEmptyImages(bool);
 
-  //@{
+  ///@{
   /**
    * Get/Set geometry rendering pass. This pass is used to render the geometry.
    * If none specified then default rendering pipeline is used. This is
@@ -146,15 +146,15 @@ public:
    */
   void SetRenderPass(vtkRenderPass*);
   vtkGetObjectMacro(RenderPass, vtkRenderPass);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Provides access to the internal vtkIceTCompositePass. Only use this if you
    * know what you're doing.
    */
   vtkGetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
-  //@}
+  ///@}
 
 protected:
   vtkIceTSynchronizedRenderers();

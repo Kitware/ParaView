@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkPVKeyFrameAnimationCue, vtkPVAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Forwarded to the internal vtkPVKeyFrameCueManipulator.
    */
@@ -41,7 +41,7 @@ public:
   int GetLastAddedKeyFrameIndex();
   void RemoveKeyFrame(vtkPVKeyFrame*);
   void RemoveAllKeyFrames();
-  //@}
+  ///@}
 
 protected:
   vtkPVKeyFrameAnimationCue();

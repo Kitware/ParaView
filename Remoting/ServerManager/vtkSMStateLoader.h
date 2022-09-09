@@ -49,16 +49,16 @@ public:
    */
   int LoadState(vtkPVXMLElement* rootElement, bool keepOriginalId = false);
 
-  //@{
+  ///@{
   /**
    * Get/Set the proxy locator to use. Default is
    * vtkSMProxyLocator will be used.
    */
   void SetProxyLocator(vtkSMProxyLocator* loc);
   vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Allow the loader to keep the mapping between the id from the loaded state
    * to the current proxy attributed id.
@@ -66,9 +66,9 @@ public:
   vtkSetMacro(KeepIdMapping, int);
   vtkGetMacro(KeepIdMapping, int);
   vtkBooleanMacro(KeepIdMapping, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return an array of ids. The ids are stored in the following order
    * and the size of the array is provided as argument.
@@ -80,7 +80,7 @@ public:
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader() override;
-  //@}
+  ///@}
 
   /**
    * The rootElement must be the \c \<ServerManagerState/\> xml element.
@@ -115,7 +115,7 @@ protected:
   int HandleLinks(vtkPVXMLElement* linksElement);
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 
-  //@{
+  ///@{
   /**
    * This method scans through the internal data structure built
    * during BuildProxyCollectionInformation() and registers the proxy.
@@ -125,7 +125,7 @@ protected:
    */
   virtual void RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
   virtual void RegisterProxyInternal(const char* group, const char* name, vtkSMProxy* proxy);
-  //@}
+  ///@}
 
   /**
    * Update a proxy's registration group and name before it gets registered.

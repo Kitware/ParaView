@@ -33,7 +33,7 @@ public:
    */
   static vtkInformationStringKey* TIME_LABEL_ANNOTATION();
 
-  //@{
+  ///@{
   /**
    * Key to store the bounding box of the entire data set in pipeline
    * information.

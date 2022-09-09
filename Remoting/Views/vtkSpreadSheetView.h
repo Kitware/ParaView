@@ -44,14 +44,14 @@ public:
   vtkTypeMacro(vtkSpreadSheetView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * A unique identifier for this vtkSpreadSheetView across all processes.
    *
    */
   vtkSetMacro(Identifier, vtkTypeUInt32);
   vtkGetMacro(Identifier, vtkTypeUInt32);
-  //@}
+  ///@}
 
   /**
    * Triggers a high-resolution render.
@@ -71,7 +71,7 @@ public:
    */
   void Update() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set if the view shows extracted selection only or the actual data.
    * false by default.
@@ -80,27 +80,27 @@ public:
   void SetShowExtractedSelection(bool);
   vtkBooleanMacro(ShowExtractedSelection, bool);
   vtkGetMacro(ShowExtractedSelection, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Allow user to enable/disable cell connectivity generation.
    */
   vtkSetMacro(GenerateCellConnectivity, bool);
   vtkGetMacro(GenerateCellConnectivity, bool);
   vtkBooleanMacro(GenerateCellConnectivity, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the field association for the data to be shown in the view.
    * This is passed on to the vtkSpreadSheetRepresentation in `Update` pass.
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This API enables the users to hide columns that should be shown.
    * Columns can be hidden using their names or labels.
@@ -112,7 +112,7 @@ public:
   void HideColumnByLabel(const char* columnLabel);
   bool IsColumnHiddenByLabel(const std::string& columnLabel);
   void ClearHiddenColumnsByLabel();
-  //@}
+  ///@}
 
   /**
    * Get the number of columns.
@@ -132,15 +132,15 @@ public:
    */
   virtual const char* GetColumnName(vtkIdType index);
 
-  //@{
+  ///@{
   /**
    * Returns true if the column is internal.
    */
   virtual bool IsColumnInternal(vtkIdType index);
   virtual bool IsColumnInternal(const char* columnName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the user-friendly label to use for the column
    * in the spreadsheet view.
@@ -152,7 +152,7 @@ public:
    */
   virtual std::string GetColumnLabel(vtkIdType index);
   virtual std::string GetColumnLabel(const char* columnName);
-  //@}
+  ///@}
 
   /**
    * Returns the column index for a column given its name.
@@ -165,7 +165,7 @@ public:
    */
   virtual bool GetColumnVisibility(vtkIdType index);
 
-  //@{
+  ///@{
   /**
    * Returns the value at given location. This may result in collective
    * operations is data is not available locally. This method can only be called
@@ -174,7 +174,7 @@ public:
    */
   virtual vtkVariant GetValue(vtkIdType row, vtkIdType col);
   virtual vtkVariant GetValueByName(vtkIdType row, const char* columnName);
-  //@}
+  ///@}
 
   /**
    * Returns true if the row is selected.

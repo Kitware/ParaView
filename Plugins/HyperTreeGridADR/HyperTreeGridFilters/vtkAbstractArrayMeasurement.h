@@ -131,7 +131,7 @@ public:
    */
   bool CanMeasure() const;
   virtual bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const = 0;
-  //@}
+  ///@}
 
   /**
    * Measures the accumulated data with the corresponding method.
@@ -145,7 +145,7 @@ public:
   bool Measure(double& value);
   virtual bool Measure(vtkAbstractAccumulator** accumulators, vtkIdType numberOfAccumulatedData,
     double totalWeight, double& value) = 0;
-  //@}
+  ///@}
 
   /**
    * Dynamically instanciates accumulators needed for measuring.
@@ -191,13 +191,13 @@ public:
    */
   virtual vtkIdType GetNumberOfAccumulators() const = 0;
 
-  //@{
+  ///@{
   /**
    * Accessor for inner accumulators.
    */
   virtual const std::vector<vtkAbstractAccumulator*>& GetAccumulators() const;
   virtual std::vector<vtkAbstractAccumulator*>& GetAccumulators();
-  //@}
+  ///@}
 
   /**
    * ShallowCopy implementation.
@@ -210,7 +210,7 @@ public:
   virtual void DeepCopy(vtkObject* o);
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructor and destructor
    *
@@ -218,7 +218,7 @@ protected:
    */
   vtkAbstractArrayMeasurement();
   ~vtkAbstractArrayMeasurement() override;
-  //@}
+  ///@}
 
   /**
    * Accumulators used to accumulate the input data.

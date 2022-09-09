@@ -99,7 +99,7 @@ public:
    */
   vtkSMSession* GetActiveSession();
 
-  //@{
+  ///@{
   /**
    * Set the active session. It's acceptable to set the active session as nullptr
    * (or 0 in case of sessionId), however GetActiveSession() may automatically
@@ -107,7 +107,7 @@ public:
    */
   void SetActiveSession(vtkSMSession* session);
   void SetActiveSession(vtkIdType sessionId);
-  //@}
+  ///@}
 
   /**
    * Convenient method to get the active vtkSMSessionProxyManager. If no
@@ -120,7 +120,7 @@ public:
    */
   vtkSMSessionProxyManager* GetSessionProxyManager(vtkSMSession* session);
 
-  //@{
+  ///@{
   /**
    * Calls forwarded to the active vtkSMSessionProxyManager, if any. Raises
    * errors if no active session manager can be determined (using
@@ -133,45 +133,45 @@ public:
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
   const char* GetProxyName(const char* groupname, unsigned int idx);
   const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
-  //@}
+  ///@}
 
   vtkSetMacro(BlockProxyDefinitionUpdates, bool);
   vtkGetMacro(BlockProxyDefinitionUpdates, bool);
   vtkBooleanMacro(BlockProxyDefinitionUpdates, bool);
   void UpdateProxyDefinitions();
 
-  //@{
+  ///@{
   /**
    * Get/Set the undo-stack builder if the application is using undo-redo
    * mechanism to track changes.
    */
   void SetUndoStackBuilder(vtkSMUndoStackBuilder* builder);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * PluginManager keeps track of plugins loaded on various sessions.
    * This provides access to the application-wide plugin manager.
    */
   vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Provides access to the reader factory. Before using the reader factory, it
    * is essential that it's configured correctly.
    */
   vtkGetObjectMacro(ReaderFactory, vtkSMReaderFactory);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Provides access to the writer factory. Before using the reader factory, it
    * is essential that it's configured correctly.
    */
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
-  //@}
+  ///@}
 
   enum eventId
   {

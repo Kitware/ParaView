@@ -92,7 +92,7 @@ public:
   bool Measure(vtkAbstractAccumulator** accumulators, vtkIdType numberOfAccumulatedData,
     double totalWeight, double& value) override;
 
-  //@{
+  ///@{
   /**
    * See the vtkAbstractArrayMeasurement API for description of this method.
    */
@@ -100,16 +100,16 @@ public:
   std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
   vtkIdType GetMinimumNumberOfAccumulatedData() const override;
   vtkIdType GetNumberOfAccumulators() const override;
-  //@}
+  ///@}
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructor and destructor
    */
   vtkMaxArrayMeasurement();
   ~vtkMaxArrayMeasurement() override = default;
-  //@}
+  ///@}
 
 private:
   vtkMaxArrayMeasurement(const vtkMaxArrayMeasurement&) = delete;

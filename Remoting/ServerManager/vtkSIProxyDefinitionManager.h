@@ -69,7 +69,7 @@ public:
    */
   static void PatchXMLProperty(vtkPVXMLElement* propElement);
 
-  //@{
+  ///@{
   /**
    * Returns a registered proxy definition or return a nullptr otherwise.
    * Moreover, error can be throw if the definition was not found if the
@@ -81,14 +81,14 @@ public:
     // We do throw an error by default
     return this->GetProxyDefinition(group, name, true);
   }
-  //@}
+  ///@}
 
   /**
    * Return true if the XML Definition was found
    */
   bool HasDefinition(const char* groupName, const char* proxyName);
 
-  //@{
+  ///@{
   /**
    * Returns the same thing as GetProxyDefinition in a flatten manner.
    * By flatten, we mean that the class hierarchy has been walked and merged
@@ -101,9 +101,9 @@ public:
   {
     return this->GetCollapsedProxyDefinition(group, name, subProxyName, true);
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add a custom proxy definition. Custom definitions are NOT ALLOWED to
    * overrive or overlap any ProxyDefinition that has been defined by parsing
@@ -117,7 +117,7 @@ public:
   void AddCustomProxyDefinition(const char* group, const char* name, vtkPVXMLElement* top);
   void AddCustomProxyDefinition(
     const char* groupName, const char* proxyName, const char* xmlcontents);
-  //@}
+  ///@}
 
   /**
    * Given its name, remove a custom proxy definition.
@@ -135,13 +135,13 @@ public:
    */
   void ClearCustomProxyDefinitions();
 
-  //@{
+  ///@{
   /**
    * Load custom proxy definitions and register them.
    */
   void LoadCustomProxyDefinitions(vtkPVXMLElement* root);
   void LoadCustomProxyDefinitionsFromString(const char* xmlContent);
-  //@}
+  ///@}
 
   /**
    * Save registered custom proxy definitions. The caller must release the
@@ -149,13 +149,13 @@ public:
    */
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
-  //@{
+  ///@{
   /**
    * Loads server-manager configuration xml.
    */
   bool LoadConfigurationXML(vtkPVXMLElement* root);
   bool LoadConfigurationXMLFromString(const char* xmlContent);
-  //@}
+  ///@}
 
   enum Events
   {
@@ -220,7 +220,7 @@ public:
    */
   void Pull(vtkSMMessage* msg) override;
 
-  //@{
+  ///@{
   /**
    * Information object used in Event notification
    */
@@ -237,7 +237,7 @@ public:
       this->CustomDefinition = isCustom;
     }
   };
-  //@}
+  ///@}
 
 protected:
   vtkSIProxyDefinitionManager();
@@ -257,7 +257,7 @@ protected:
    */
   void AttachShowInMenuHintsToProxyFromProxyGroups(vtkPVXMLElement* root);
 
-  //@{
+  ///@{
   /**
    * Loads server-manager configuration xml. Those method are protected
    * as they allow to automatically add some extra hints for those loaded
@@ -268,15 +268,15 @@ protected:
    */
   bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
   bool LoadConfigurationXMLFromString(const char* xmlContent, bool attachShowInMenuHints);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Callback called when a plugin is loaded.
    */
   void OnPluginLoaded(vtkObject* caller, unsigned long event, void* calldata);
   void HandlePlugin(vtkPVPlugin*);
-  //@}
+  ///@}
 
   /**
    * Called by the XML parser to add an element from which a proxy

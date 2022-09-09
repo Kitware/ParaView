@@ -91,173 +91,173 @@ public:
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqSeriesEditorPropertyWidget() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the visibility for series.
    */
   QList<QVariant> seriesVisibility() const;
   void setSeriesVisibility(const QList<QVariant>&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the color for each of the series.
    */
   QList<QVariant> seriesColor() const;
   void setSeriesColor(const QList<QVariant>&);
-  //@}
+  ///@}
 
   QList<QVariant> presetColor() const;
   void setPresetColor(const QList<QVariant>&);
 
-  //@{
+  ///@{
   /**
    * Get/Set the opacity for each of the series.
    */
   QList<QVariant> seriesOpacity() const;
   void setSeriesOpacity(const QList<QVariant>&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the label for each of the series.
    */
   QList<QVariant> seriesLabel() const;
   void setSeriesLabel(const QList<QVariant>&);
-  //@}
+  ///@}
 
   QList<QVariant> presetLabel() const;
   void setPresetLabel(const QList<QVariant>&);
 
-  //@{
+  ///@{
   /**
    * Get/Set the line-thickness for each of the series.
    */
   QList<QVariant> seriesLineThickness() const;
   void setSeriesLineThickness(const QList<QVariant>&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the line-style for each of the series.
    */
   QList<QVariant> seriesLineStyle() const;
   void setSeriesLineStyle(const QList<QVariant>&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the marker-style for each of the series.
    */
   QList<QVariant> seriesMarkerStyle() const;
   void setSeriesMarkerStyle(const QList<QVariant>&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the marker-size for each of the series.
    */
   QList<QVariant> seriesMarkerSize() const;
   void setSeriesMarkerSize(const QList<QVariant>&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the plot-corner for each of the series.
    */
   QList<QVariant> seriesPlotCorner() const;
   void setSeriesPlotCorner(const QList<QVariant>&);
-  //@}
+  ///@}
 
 Q_SIGNALS:
-  //@{
+  ///@{
   /**
    * Fired when the series visibility changes.
    */
   void seriesVisibilityChanged();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Fired when the series labels change.
    */
   void seriesLabelChanged();
-  //@}
+  ///@}
 
   void presetLabelChanged();
 
-  //@{
+  ///@{
   /**
    * Fired when the series colors change.
    */
   void seriesColorChanged();
-  //@}
+  ///@}
 
   void presetColorChanged();
 
-  //@{
+  ///@{
   /**
    * Fired when the series opacity changes.
    */
   void seriesOpacityChanged();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Fired when the series line thickness changes
    */
   void seriesLineThicknessChanged();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Fired when the series line style changes
    */
   void seriesLineStyleChanged();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Fired when the series marker style changes
    */
   void seriesMarkerStyleChanged();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Fired when the series marker size changes
    */
   void seriesMarkerSizeChanged();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Fired when the series plot corners change
    */
   void seriesPlotCornerChanged();
-  //@}
+  ///@}
 
 private Q_SLOTS:
-  //@{
+  ///@{
   /**
    * update all series-properties widgets using the "current" series.
    */
   void refreshPropertiesWidgets();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * update all selected series with the value from the sender widget.
    */
   void savePropertiesWidgets();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.
    */
   void domainModified(vtkObject* sender);
-  //@}
+  ///@}
 
   /**
    * called when the color preset is modified.

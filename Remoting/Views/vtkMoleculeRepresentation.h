@@ -48,14 +48,14 @@ public:
 
   void SetLookupTable(vtkScalarsToColors* lut);
 
-  //@{
+  ///@{
   /**
    * Forward corresponding actor property controls down.
    */
   virtual void SetOpacity(double val);
   virtual void SetSpecular(double val);
   virtual void SetSpecularPower(double val);
-  //@}
+  ///@}
 
   /**
    * Set if scalars are mapped through a color-map or are used directly as colors.
@@ -79,7 +79,7 @@ public:
    */
   vtkGetMacro(Actor, vtkActor*);
 
-  //@{
+  ///@{
   /**
    * Forward custom atom/bonds rendering parameters to the mapper.
    */
@@ -93,7 +93,7 @@ public:
   void SetRenderAtoms(bool render);
   void SetRenderBonds(bool render);
   void SetAtomicRadiusArray(const char* name);
-  //@}
+  ///@}
 
 protected:
   vtkMoleculeRepresentation();

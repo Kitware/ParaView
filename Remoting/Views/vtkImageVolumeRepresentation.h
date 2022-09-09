@@ -82,13 +82,13 @@ public:
   void SetAnisotropy(float);
   void SetSliceFunction(vtkImplicitFunction* slice);
 
-  //@{
+  ///@{
   /**
    * Methods to set isosurface values.
    */
   void SetIsosurfaceValue(int i, double value);
   void SetNumberOfIsosurfaces(int number);
-  //@}
+  ///@}
 
   //***************************************************************************
   // Forwarded to vtkSmartVolumeMapper/vtkMultiBlockVolumeMapper.
@@ -98,21 +98,21 @@ public:
   void SetGlobalIlluminationReach(float);
   void SetVolumetricScatteringBlending(float);
 
-  //@{
+  ///@{
   /**
    * Get/Set the cropping origin.
    */
   vtkSetVector3Macro(CroppingOrigin, double);
   vtkGetVector3Macro(CroppingOrigin, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the cropping scale.
    */
   vtkSetVector3Macro(CroppingScale, double);
   vtkGetVector3Macro(CroppingScale, double);
-  //@}
+  ///@}
 
   //***************************************************************************
   // For 2D transfer functions

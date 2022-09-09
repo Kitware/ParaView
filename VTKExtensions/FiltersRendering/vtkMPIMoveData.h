@@ -48,7 +48,7 @@ public:
    */
   virtual void InitializeForCommunicationForParaView();
 
-  //@{
+  ///@{
   /**
    * Objects for communication.
    * The controller is an MPI controller used to communicate
@@ -67,9 +67,9 @@ public:
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* sc);
   void SetClientDataServerSocketController(vtkMultiProcessController*);
   vtkGetObjectMacro(ClientDataServerSocketController, vtkMultiProcessController);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Tell the object on which client/server it resides.
    * Whether the sockets are set helps determine which servers are running.
@@ -79,7 +79,7 @@ public:
   void SetServerToRenderServer() { this->Server = vtkMPIMoveData::RENDER_SERVER; }
   vtkSetClampMacro(Server, int, vtkMPIMoveData::CLIENT, vtkMPIMoveData::RENDER_SERVER);
   vtkGetMacro(Server, int);
-  //@}
+  ///@}
 
   /**
    * Specify how the data is to be redistributed.
@@ -90,7 +90,7 @@ public:
   vtkSetClampMacro(
     MoveMode, int, vtkMPIMoveData::PASS_THROUGH, vtkMPIMoveData::COLLECT_AND_PASS_THROUGH);
 
-  //@{
+  ///@{
   /**
    * Controls the output type. This is required because processes receiving
    * data cannot know their output type in RequestDataObject without
@@ -101,9 +101,9 @@ public:
    */
   vtkSetMacro(OutputDataType, int);
   vtkGetMacro(OutputDataType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, zlib compression is used. False by default.
    * This value has any effect only on the data-sender processes. The receiver
@@ -111,7 +111,7 @@ public:
    */
   static void SetUseZLibCompression(bool b);
   static bool GetUseZLibCompression();
-  //@}
+  ///@}
 
   /**
    * vtkMPIMoveData doesn't necessarily generate a valid output data on all the
@@ -121,7 +121,7 @@ public:
    */
   bool GetOutputGeneratedOnProcess();
 
-  //@{
+  ///@{
   /**
    * When set, vtkMPIMoveData will skip the gather-to-root-node process
    * altogether. This is useful when the data is already cloned on the
@@ -129,7 +129,7 @@ public:
    */
   vtkSetMacro(SkipDataServerGatherToZero, bool);
   vtkGetMacro(SkipDataServerGatherToZero, bool);
-  //@}
+  ///@}
 
   enum MoveModes
   {

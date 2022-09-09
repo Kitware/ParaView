@@ -37,14 +37,14 @@ public:
   vtkTypeMacro(vtkPVRepresentationAnimationHelper, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Don't use directly. Use the corresponding properties instead.
    */
   void SetVisibility(int);
   void SetOpacity(double);
   void SetSourceProxy(vtkSMProxy* proxy);
-  //@}
+  ///@}
 
 protected:
   vtkPVRepresentationAnimationHelper();

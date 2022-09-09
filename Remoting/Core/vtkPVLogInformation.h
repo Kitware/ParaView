@@ -61,15 +61,15 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Serialize/Deserialize the parameters that control how/what information is
    * gathered. This are different from the ivars that constitute the gathered
@@ -78,7 +78,7 @@ public:
    */
   void CopyParametersToStream(vtkMultiProcessStream&) override;
   void CopyParametersFromStream(vtkMultiProcessStream&) override;
-  //@}
+  ///@}
 
   /**
    * Get the recorded logs.

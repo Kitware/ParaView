@@ -36,7 +36,7 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_GeometryCell_Template( GW_U32 nWidth = 0, GW_U32 nHeight = 0 )
     :    pData_( NULL )
     {
@@ -49,7 +49,7 @@ public:
     {
         GW_DELETEARRAY(pData_);
     }
-    //@}
+    ///@}
 
     void Reset( GW_U32 nWidth, GW_U32 nHeight )
     {

@@ -35,10 +35,10 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_GeometryAtlas();
     virtual ~GW_GeometryAtlas();
-    //@}
+    ///@}
 
     void InitSampling( std::vector<T_TrissectorInfoVector>& CyclicPositionCollection, GW_U32 n );
     void PositionateVertex( T_MeshVector& ParamMeshVector, T_MeshVector& RealMeshVector );

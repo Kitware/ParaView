@@ -52,7 +52,7 @@ public:
   vtkTypeMacro(vtkAMRDualGridHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * An option to turn off copying ghost values across process boundaries.
    * If the ghost values are already correct, then the extra communication is
@@ -62,9 +62,9 @@ public:
   vtkGetMacro(SkipGhostCopy, int);
   vtkSetMacro(SkipGhostCopy, int);
   vtkBooleanMacro(SkipGhostCopy, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the ability to create meshing between levels in the grid.  This
    * is on by default.  Set this before you call initialize.
@@ -72,9 +72,9 @@ public:
   vtkGetMacro(EnableDegenerateCells, int);
   vtkSetMacro(EnableDegenerateCells, int);
   vtkBooleanMacro(EnableDegenerateCells, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When this option is on (the default) and a controller that supports
    * asynchronous communication (like MPI) is detected, use asynchronous
@@ -84,15 +84,15 @@ public:
   vtkGetMacro(EnableAsynchronousCommunication, int);
   vtkSetMacro(EnableAsynchronousCommunication, int);
   vtkBooleanMacro(EnableAsynchronousCommunication, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The controller to use for communication.
    */
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);
-  //@}
+  ///@}
 
   int Initialize(vtkNonOverlappingAMR* input);
   int SetupData(vtkNonOverlappingAMR* input, const char* arrayName);
@@ -134,12 +134,12 @@ public:
    * Call this before adding regions to the queue.  It clears the queue.
    */
   void ClearRegionRemoteCopyQueue();
-  //@{
+  ///@{
   /**
    * It is convenient to get this here.
    */
   vtkGetStringMacro(ArrayName);
-  //@}
+  ///@}
 
 private:
   vtkAMRDualGridHelper();

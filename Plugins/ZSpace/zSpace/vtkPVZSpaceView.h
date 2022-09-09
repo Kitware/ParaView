@@ -72,7 +72,7 @@ public:
    */
   void ResetCamera();
   void ResetCamera(double bounds[6]);
-  //@}
+  ///@}
 
   /**
    * Overriden to give to the Interactor the zSpaceInteractorStyle.
@@ -109,7 +109,7 @@ public:
    */
   void SelectWithRay(const double pos[3]);
 
-  //@{
+  ///@{
   /**
    * Select the field association used when picking.
    * Default is vtkDataObject::FIELD_ASSOCIATION_CELLS.
@@ -117,7 +117,7 @@ public:
   vtkSetClampMacro(PickingFieldAssociation, int, vtkDataObject::FIELD_ASSOCIATION_POINTS,
     vtkDataObject::FIELD_ASSOCIATION_CELLS);
   vtkGetMacro(PickingFieldAssociation, int);
-  //@}
+  ///@}
 
   /**
    * All transformations applied to actors with the stylus can be

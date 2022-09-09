@@ -101,13 +101,13 @@ public:
    */
   int GetResolution();
 
-  //@{
+  ///@{
   /**
    * Returns if minimum/maximum bound is set for the domain.
    */
   bool GetMinimumExists(unsigned int idx);
   bool GetMaximumExists(unsigned int idx);
-  //@}
+  ///@}
 
   /**
    * Returns if a resolution is set for the domain.

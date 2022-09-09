@@ -43,7 +43,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPythonCalculator* New();
 
-  //@{
+  ///@{
   /**
    * Which field data to get the arrays from. See
    * vtkDataObject::FieldAssociations for choices. The default
@@ -51,9 +51,9 @@ public:
    */
   vtkSetMacro(ArrayAssociation, int);
   vtkGetMacro(ArrayAssociation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the text of the python expression to execute. This expression
    * must return a scalar value (which is converted to an array) or a
@@ -61,15 +61,15 @@ public:
    */
   vtkSetStringMacro(Expression);
   vtkGetStringMacro(Expression);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the name of the output array.
    */
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
-  //@}
+  ///@}
 
   /**
    * For internal use only.

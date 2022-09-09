@@ -89,7 +89,7 @@ class vtkSMVectorProperty;
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMPropertyHelper
 {
 public:
-  //@{
+  ///@{
   /**
    * If quiet is true, then no errors or warning are raised if the property is
    * missing or of incorrect type.
@@ -97,7 +97,7 @@ public:
   vtkSMPropertyHelper(vtkSMProxy* proxy, const char* name, bool quiet = false);
   vtkSMPropertyHelper(vtkSMProperty* property, bool quiet = false);
   ~vtkSMPropertyHelper();
-  //@}
+  ///@}
 
   /**
    * Updates the property value by fetching the value from the server. This only
@@ -142,7 +142,7 @@ public:
   template <class T>
   T GetAs(unsigned int index = 0) const;
 
-  //@{
+  ///@{
   /**
    * Set/Get methods with \c int API. Calling these method on
    * vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
@@ -154,9 +154,9 @@ public:
   int GetAsInt(unsigned int index = 0) const;
   unsigned int Get(int* values, unsigned int count = 1) const;
   std::vector<int> GetIntArray() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get methods with \c double API. Calling these method on
    * vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
@@ -168,10 +168,10 @@ public:
   double GetAsDouble(unsigned int index = 0) const;
   unsigned int Get(double* values, unsigned int count = 1) const;
   std::vector<double> GetDoubleArray() const;
-  //@}
+  ///@}
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
-  //@{
+  ///@{
   /**
    * Set/Get methods with \c vtkIdType API. Calling these method on
    * vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
@@ -184,9 +184,9 @@ public:
 #endif
   vtkIdType GetAsIdType(unsigned int index = 0) const;
   std::vector<vtkIdType> GetIdTypeArray() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get methods for vtkSMStringVectorProperty. Calling these methods on any
    * other type of property will raise errors.
@@ -197,9 +197,9 @@ public:
   void Set(const char* value) { this->Set(0, value); }
   void Set(unsigned int index, const char* value);
   const char* GetAsString(unsigned int index = 0) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get methods for vtkSMProxyProperty or vtkSMInputProperty.
    * Calling these methods on any other type of property will raise errors.
@@ -213,9 +213,9 @@ public:
   vtkSMProxy* GetAsProxy(unsigned int index = 0) const;
   unsigned int GetOutputPort(unsigned int index = 0) const;
   vtkSMOutputPort* GetAsOutputPort(unsigned int index = 0) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This API is useful for setting values on vtkSMStringVectorProperty that is
    * used for status where the first value is the name of the array (for
@@ -223,9 +223,9 @@ public:
    */
   void SetStatus(const char* key, int value);
   int GetStatus(const char* key, int default_value = 0) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This API is useful for setting values on vtkSMStringVectorProperty that is
    * used for status where the first value is the name of the array (for
@@ -233,9 +233,9 @@ public:
    */
   void SetStatus(const char* key, double* values, int num_values);
   bool GetStatus(const char* key, double* values, int num_values) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This API is useful for setting values on vtkSMIntVectorProperty that is
    * used for status where the first value is the id of the element (for
@@ -243,9 +243,9 @@ public:
    */
   void SetStatus(int key, int* values, int num_values);
   bool GetStatus(int key, int* values, int num_values) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This API is useful for setting values on vtkSMStringVectorProperty that is
    * used for status where the first value is the name of the array (for
@@ -253,7 +253,7 @@ public:
    */
   void SetStatus(const char* key, const char* value);
   const char* GetStatus(const char* key, const char* default_value) const;
-  //@}
+  ///@}
 
   /**
    * Removes the status value specified for the given key, if any. Applicable only to
@@ -262,7 +262,7 @@ public:
    */
   void RemoveStatus(const char* key);
 
-  //@{
+  ///@{
   /**
    * This API is useful for setting values on vtkSMIntVectorProperty that is
    * used for status where the first value is the id of the element (for
@@ -270,9 +270,9 @@ public:
    */
   void SetStatus(int key, int value);
   int GetStatus(int key, int default_value = 0) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For vtkSMStringVectorProperty that is used to setting input array to
    * process on algorithms, this provides a convenient API to get/set the
@@ -281,7 +281,7 @@ public:
   void SetInputArrayToProcess(int fieldAssociation, const char* arrayName);
   int GetInputArrayAssociation() const;
   const char* GetInputArrayNameToProcess() const;
-  //@}
+  ///@}
 
   /**
    * Get/Set whether to use unchecked properties.

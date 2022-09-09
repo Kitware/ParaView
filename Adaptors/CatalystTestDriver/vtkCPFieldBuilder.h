@@ -43,21 +43,21 @@ public:
    * virtual unsigned int GetHighestFieldOrder() = 0;
    */
 
-  //@{
+  ///@{
   /**
    * Set/get the name of the field array.
    */
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get TensorFieldFunction.
    */
   void SetTensorFieldFunction(vtkCPTensorFieldFunction* TFF);
   vtkCPTensorFieldFunction* GetTensorFieldFunction();
-  //@}
+  ///@}
 
 protected:
   vtkCPFieldBuilder();
@@ -72,7 +72,7 @@ private:
    */
   char* ArrayName;
 
-  //@{
+  ///@{
   /**
    * The function that actually computes the tensor field values at
    * specified points.

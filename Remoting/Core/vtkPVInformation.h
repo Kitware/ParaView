@@ -44,15 +44,15 @@ public:
    */
   virtual void AddInformation(vtkPVInformation*);
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   virtual void CopyToStream(vtkClientServerStream*) = 0;
   virtual void CopyFromStream(const vtkClientServerStream*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Serialize/Deserialize the parameters that control how/what information is
    * gathered. This are different from the ivars that constitute the gathered
@@ -61,14 +61,14 @@ public:
    */
   virtual void CopyParametersToStream(vtkMultiProcessStream&){};
   virtual void CopyParametersFromStream(vtkMultiProcessStream&){};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get whether to gather information only from the root.
    */
   vtkGetMacro(RootOnly, int);
-  //@}
+  ///@}
 
 protected:
   vtkPVInformation();

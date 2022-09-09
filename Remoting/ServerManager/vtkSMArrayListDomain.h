@@ -130,13 +130,13 @@ public:
    */
   int GetDomainAssociation(unsigned int idx);
 
-  //@{
+  ///@{
   /**
    * Return the attribute type. The values are listed in
    * vtkDataSetAttributes.h.
    */
   vtkGetMacro(AttributeType, int);
-  //@}
+  ///@}
 
   /**
    * A vtkSMProperty is often defined with a default value in the
@@ -162,7 +162,7 @@ public:
     REJECT_KEY
   };
 
-  //@{
+  ///@{
   /**
    * Adds a new InformationKey to the domain.
    * The default strategy is NEED_KEY if none is specified.
@@ -174,7 +174,7 @@ public:
   {
     return this->AddInformationKey(location, name, vtkSMArrayListDomain::NEED_KEY);
   }
-  //@}
+  ///@}
 
   /**
    * Removes an InformationKey from this domain.
@@ -191,14 +191,14 @@ public:
    */
   void RemoveAllInformationKeys();
 
-  //@{
+  ///@{
   /**
    * Returns the location/name/strategy of a given InformationKey
    */
   const char* GetInformationKeyLocation(unsigned int);
   const char* GetInformationKeyName(unsigned int);
   int GetInformationKeyStrategy(unsigned int);
-  //@}
+  ///@}
 
   /**
    * returns the mangled name for the component index that is passed in.
@@ -206,14 +206,14 @@ public:
    */
   static std::string CreateMangledName(vtkPVArrayInformation* arrayInfo, int component);
 
-  //@{
+  ///@{
   /**
    * returns the mangled name for the component index that is passed in.
 
    */
   static std::string ArrayNameFromMangledName(const char* name);
   static int ComponentIndexFromMangledName(vtkPVArrayInformation* info, const char* name);
-  //@}
+  ///@}
 
 protected:
   vtkSMArrayListDomain();
@@ -239,22 +239,22 @@ protected:
    */
   virtual bool IsFilteredArray(vtkPVDataInformation* info, int association, const char* arrayName);
 
-  //@{
+  ///@{
   /**
    * Set to an attribute type defined in vtkDataSetAttributes.
    */
   vtkSetMacro(AttributeType, int);
   int AttributeType;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * InputDomainName refers to a input property domain that describes
    * the type of array is needed by this property.
    */
   vtkGetStringMacro(InputDomainName);
   vtkSetStringMacro(InputDomainName);
-  //@}
+  ///@}
 
   char* InputDomainName;
 

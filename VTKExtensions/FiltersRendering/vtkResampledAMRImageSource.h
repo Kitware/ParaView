@@ -52,15 +52,15 @@ public:
   vtkTypeMacro(vtkResampledAMRImageSource, vtkTrivialProducer);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the maximum number of samples along each axis.
    */
   vtkSetVector3Macro(MaxDimensions, int);
   vtkGetVector3Macro(MaxDimensions, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When provided, the resampled image is set up to cover these bounds. If not
    * provided, data bounds are used. If provided, these bounds *MUST* fit
@@ -69,7 +69,7 @@ public:
    */
   vtkSetVector6Macro(SpatialBounds, double);
   vtkGetVector6Macro(SpatialBounds, double);
-  //@}
+  ///@}
 
   /**
    * To restart the incremental resample process, call this method. The output

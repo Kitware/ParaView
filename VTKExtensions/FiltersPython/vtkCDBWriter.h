@@ -34,14 +34,14 @@ public:
   vtkTypeMacro(vtkCDBWriter, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the path under which do generate the database.
    * This is expected to be a directory.
    */
   vtkSetStringMacro(Path);
   vtkGetStringMacro(Path);
-  //@}
+  ///@}
 
   /**
    * Causes the writer to write the input data.

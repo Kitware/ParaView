@@ -102,16 +102,16 @@ public:
    */
   virtual int SetDefaultValues(vtkSMProperty*, bool vtkNotUsed(use_unchecked_values)) { return 0; };
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The name assigned in the XML
    * configuration. Can be used to figure out the origin of the
    * domain.
    */
   vtkGetStringMacro(XMLName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When the IsOptional flag is set, IsInDomain() always returns true.
    * This is used by properties that use domains to provide information
@@ -119,14 +119,14 @@ public:
    * values.
    */
   vtkGetMacro(IsOptional, bool);
-  //@}
+  ///@}
 
   /**
    * Provides access to the vtkSMProperty on which this domain is hooked up.
    */
   vtkSMProperty* GetProperty();
 
-  //@{
+  ///@{
   /**
    * Helper methods to get vtkPVDataInformation from input proxy connected to the
    * required property with the given function and provided input index.
@@ -135,7 +135,7 @@ public:
     const char* function, unsigned int index = 0);
   virtual vtkPVDataInformation* GetInputSubsetDataInformation(
     unsigned int compositeIndex, const char* function, unsigned int index = 0);
-  //@}
+  ///@}
 
   /**
    * Helper method to get the number of input connections hence the number of available
@@ -155,7 +155,7 @@ protected:
   vtkSMDomain();
   ~vtkSMDomain() override;
 
-  //@{
+  ///@{
   /**
    * Add the header and creates a new vtkPVXMLElement for the
    * domain, fills it up with the common attributes. The newly
@@ -165,7 +165,7 @@ protected:
    */
   void SaveState(vtkPVXMLElement* parent, const char* uid);
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
-  //@}
+  ///@}
 
   /**
    * Load the state of the domain from the XML.
@@ -208,7 +208,7 @@ protected:
    */
   void AddRequiredProperty(vtkSMProperty* prop, const char* function);
 
-  //@{
+  ///@{
   /**
    * When the IsOptional flag is set, IsInDomain() always returns true.
    * This is used by properties that use domains to provide information
@@ -216,16 +216,16 @@ protected:
    * values.
    */
   vtkSetMacro(IsOptional, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The name assigned in the XML
    * configuration. Can be used to figure out the origin of the
    * domain.
    */
   vtkSetStringMacro(XMLName);
-  //@}
+  ///@}
 
   /**
    * Invokes DomainModifiedEvent. Note that this event *must* be fired after the

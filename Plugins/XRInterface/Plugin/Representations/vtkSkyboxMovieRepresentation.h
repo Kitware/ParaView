@@ -54,14 +54,14 @@ public:
 
   void SetPlay(bool);
 
-  //@{
+  ///@{
   /**
    * Methods farwarded to the skybox instance
    */
   virtual void SetFloorPlane(float, float, float, float);
   virtual void SetFloorRight(float, float, float);
   virtual void SetProjection(int);
-  //@}
+  ///@}
 
 protected:
   vtkSkyboxMovieRepresentation();

@@ -59,11 +59,11 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_VoronoiVertex();
     virtual ~GW_VoronoiVertex();
     using GW_Vertex::operator=;
-    //@}
+    ///@}
 
     GW_GeodesicVertex* GetBaseVertex();
     const GW_GeodesicVertex* GetBaseVertex() const;
@@ -72,13 +72,13 @@ public:
     //-------------------------------------------------------------------------
     /** \name Graph management. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void AddNeighbor( GW_VoronoiVertex& Node );
     void RemoveNeighbor( GW_VoronoiVertex& Node );
     GW_Bool IsNeighbor( GW_VoronoiVertex& Node );
     IT_VoronoiVertexList BeginNeighborIterator();
     IT_VoronoiVertexList EndNeighborIterator();
-    //@}
+    ///@}
 
 
 private:

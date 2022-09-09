@@ -42,7 +42,7 @@ public:
   vtkMaterialInterfaceProcessLoading() { this->Initialize(-1, 0); }
   //
   ~vtkMaterialInterfaceProcessLoading() { this->Initialize(-1, 0); }
-  //@{
+  ///@{
   /**
    * Set the id and load factor.
    */
@@ -51,7 +51,7 @@ public:
     this->Data[ID] = id;
     this->Data[LOADING] = loadFactor;
   }
-  //@}
+  ///@}
   /**
    * Comparison of two objects loading.
    */
@@ -95,7 +95,7 @@ public:
    * Return the load factor.
    */
   vtkIdType GetLoadFactor() const { return this->Data[LOADING]; }
-  //@{
+  ///@{
   /**
    * Add to the load factor.
    */

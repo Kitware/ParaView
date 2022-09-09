@@ -39,13 +39,13 @@ public:
   vtkTypeMacro(vtkWebPageRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the text widget.
    */
   void SetTextWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(TextWidgetRepresentation, vtk3DWidgetRepresentation);
-  //@}
+  ///@}
 
   ///@{
   /**

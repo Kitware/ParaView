@@ -35,13 +35,13 @@ public:
   vtkTypeMacro(vtkLogoSourceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the Logo widget.
    */
   void SetLogoWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(LogoWidgetRepresentation, vtk3DWidgetRepresentation);
-  //@}
+  ///@}
 
   /**
    * Set the visibility.
@@ -53,13 +53,13 @@ public:
    */
   void SetInteractivity(bool);
 
-  //@{
+  ///@{
   /**
    * Set the opacity of the logo
    */
   vtkSetMacro(Opacity, double);
   vtkGetMacro(Opacity, double);
-  //@}
+  ///@}
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is

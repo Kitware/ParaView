@@ -40,13 +40,13 @@ public:
    */
   void SetVisibility(bool visible) override;
 
-  //@{
+  ///@{
   /**
    * Set/Clear the properties for series/columns.
    */
   void SetSeriesVisibility(const char* series, bool visibility);
   void SetSeriesColor(const char* name, double r, double g, double b);
-  //@}
+  ///@}
 
   void ClearSeriesVisibilities();
   void ClearSeriesColors();
@@ -56,33 +56,33 @@ public:
    */
   vtkChartBox* GetChart();
 
-  //@{
+  ///@{
   /**
    * Sets the line thickness for the plot.
    */
   vtkSetMacro(LineThickness, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the line style for the plot.
    */
   vtkSetMacro(LineStyle, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the color to used for the lines in the plot.
    */
   vtkSetVector3Macro(Color, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the visibility of the legend (plot labels)
    */
   vtkSetMacro(Legend, bool);
-  //@}
+  ///@}
 
 protected:
   vtkPVBoxChartRepresentation();

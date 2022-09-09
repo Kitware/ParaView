@@ -35,13 +35,13 @@ public:
   vtkTypeMacro(vtkXMLPVAnimationWriter, vtkXMLPVDWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Add/Remove representations.
    */
   void AddRepresentation(vtkAlgorithm*, const char* groupname);
   void RemoveAllRepresentations();
-  //@}
+  ///@}
 
   /**
    * Start a new animation with the current set of inputs.

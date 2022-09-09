@@ -73,7 +73,7 @@ public:
   // Methods simply forwarded to the client-side vtkSIProxyDefinitionManager
   // instance.
 
-  //@{
+  ///@{
   /**
    * Returns a registered proxy definition or return a nullptr otherwise.
    * Moreover, error can be throw if the definition was not found if the
@@ -91,7 +91,7 @@ public:
       ? this->ProxyDefinitionManager->GetProxyDefinition(group, name)
       : nullptr;
   }
-  //@}
+  ///@}
 
   /**
    * Returns the same thing as GetProxyDefinition in a flatten manner.
@@ -128,7 +128,7 @@ public:
     }
   }
 
-  //@{
+  ///@{
   /**
    * Return a NEW instance of vtkPVProxyDefinitionIterator configured to
    * get through all the definition available for the requested scope.
@@ -148,9 +148,9 @@ public:
     return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator(scope)
                                         : nullptr;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return a new configured iterator for traversing a set of proxy definition
    * for only one GroupName.
@@ -169,36 +169,36 @@ public:
       ? this->ProxyDefinitionManager->NewSingleGroupIterator(groupName, scope)
       : nullptr;
   }
-  //@}
+  ///@}
 
   //***************************************************************************
   // Methods that ensure that the command takes effect on all instances of
   // vtkSIProxyDefinitionManager across all processes.
 
-  //@{
+  ///@{
   /**
    * Add/Remove/Clear custom proxy definitions.
    */
   void AddCustomProxyDefinition(const char* group, const char* name, vtkPVXMLElement* top);
   void RemoveCustomProxyDefinition(const char* group, const char* name);
   void ClearCustomProxyDefinitions();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Load custom proxy definitions and register them.
    */
   void LoadCustomProxyDefinitions(vtkPVXMLElement* root);
   void LoadCustomProxyDefinitionsFromString(const char* xmlContent);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Loads server-manager configuration xml.
    */
   bool LoadConfigurationXML(vtkPVXMLElement* root);
   bool LoadConfigurationXMLFromString(const char* xmlContent);
-  //@}
+  ///@}
 
   /**
    * This method is used to initialise the object to the given state

@@ -41,33 +41,33 @@ public:
    */
   const char* GetDefaultFileExtension() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the piece number to write.  The same piece number is used
    * for all inputs.
    */
   vtkGetMacro(Piece, int);
   vtkSetMacro(Piece, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of pieces into which the inputs are split.
    */
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of ghost levels to be written for unstructured
    * data.
    */
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When WriteAllTimeSteps is turned ON, the writer is executed once for
    * each timestep available from its input. The default is OFF.
@@ -75,21 +75,21 @@ public:
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
-  //@}
+  ///@}
 
   /**
    * Add an input of this algorithm.
    */
   void AddInputData(vtkDataObject*);
 
-  //@{
+  ///@{
   /**
    * Get/Set whether this instance will write the main collection
    * file.
    */
   vtkGetMacro(WriteCollectionFile, int);
   virtual void SetWriteCollectionFile(int flag);
-  //@}
+  ///@}
 
   // See the vtkAlgorithm for a description of what these do
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

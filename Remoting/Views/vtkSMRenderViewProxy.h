@@ -42,7 +42,7 @@ public:
   vtkTypeMacro(vtkSMRenderViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Makes a new selection source proxy.
    */
@@ -62,9 +62,9 @@ public:
   bool SelectPolygonCells(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections = false, int modifier = 0,
     bool selectBlocks = false);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the range for visible elements in the current view.
    */
@@ -72,7 +72,7 @@ public:
     int component, double range[]);
   bool ComputeVisibleScalarRange(
     int fieldAssociation, const char* scalarName, int component, double range[]);
-  //@}
+  ///@}
 
   /**
    * Convenience method to pick a location. Internally uses SelectSurfaceCells
@@ -109,7 +109,7 @@ public:
    */
   virtual bool IsSelectionAvailable();
 
-  //@{
+  ///@{
   /**
    * For backwards compatibility in Python scripts.
    */
@@ -117,21 +117,21 @@ public:
   void ResetCamera(double bounds[6], bool closest = false);
   void ResetCamera(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax,
     bool closest = false);
-  //@}
+  ///@}
 
   /**
    * Convenience method for zooming to a representation.
    */
   virtual void ZoomTo(vtkSMProxy* representation, bool closest = false);
 
-  //@{
+  ///@{
   /**
    * Similar to IsSelectionAvailable(), however, on failure returns the
    * error message otherwise 0.
    */
   virtual const char* IsSelectVisibleCellsAvailable();
   virtual const char* IsSelectVisiblePointsAvailable();
-  //@}
+  ///@}
 
   /**
    * A client process need to set the interactor to enable interactivity. Use
@@ -158,7 +158,7 @@ public:
     Azimuth,
     Zoom
   };
-  //@{
+  ///@{
   /**
    * Returns the client-side active camera object.
    * Helper methods to adjust its orientation and position.
@@ -179,7 +179,7 @@ public:
   void ResetActiveCameraToNegativeY();
   void ResetActiveCameraToPositiveZ();
   void ResetActiveCameraToNegativeZ();
-  //@}
+  ///@}
 
   /**
    * This method calls UpdateInformation on the Camera Proxy

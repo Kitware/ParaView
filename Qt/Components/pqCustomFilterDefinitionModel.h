@@ -78,7 +78,7 @@ public:
   /**
    * \name QAbstractItemModel Methods
    */
-  //@{
+  ///@{
   /**
    * \brief
    *   Gets the number of rows for a given index.
@@ -147,7 +147,7 @@ public:
    *   The flags for the given model index.
    */
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  //@}
+  ///@}
 
   /**
    * \brief

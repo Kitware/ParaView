@@ -48,21 +48,21 @@ public:
   vtkTypeMacro(vtkSMSelfGeneratingSourceProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Will extend this proxy to add properties using the XML definition provided.
    */
   virtual bool ExtendDefinition(const char* proxy_definition_xml);
   virtual bool ExtendDefinition(vtkPVXMLElement* xml);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Overridden to save information about extended definitions loaded.
    */
   vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) override;
   using Superclass::SaveXMLState;
-  //@}
+  ///@}
 
   /**
    * Overridden to process extended definition XML in the state file.

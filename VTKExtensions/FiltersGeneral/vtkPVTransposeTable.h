@@ -38,15 +38,15 @@ public:
   vtkTypeMacro(vtkPVTransposeTable, vtkTransposeTable);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Interface for preparing selection of arrays in ParaView.
    */
   void EnableAttributeArray(const char*);
   void ClearAttributeArrays();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Can be used to bypass the transposition code. The output
    * is then the table made with the selected columns.
@@ -54,7 +54,7 @@ public:
   vtkGetMacro(DoNotTranspose, bool);
   vtkSetMacro(DoNotTranspose, bool);
   vtkBooleanMacro(DoNotTranspose, bool);
-  //@}
+  ///@}
 
 protected:
   vtkPVTransposeTable();

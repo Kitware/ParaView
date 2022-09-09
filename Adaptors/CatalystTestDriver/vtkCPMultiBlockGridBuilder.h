@@ -91,7 +91,7 @@ private:
    */
   vtkMultiBlockDataSet* Grid;
 
-  //@{
+  ///@{
   /**
    * Internals used for storing the vtkCPGridBuilders.
    */

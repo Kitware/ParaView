@@ -86,7 +86,7 @@ public:
    */
   bool RemovePreset(unsigned int index);
 
-  //@{
+  ///@{
   /**
    * Returns a preset JSON given the name. Since multiple presets can have the
    * same name, this returns the 'first' preset with the specified name.
@@ -94,7 +94,7 @@ public:
    */
   const Json::Value& GetFirstPresetWithName(const char* name, int& idx);
   const Json::Value& GetFirstPresetWithName(const char* name);
-  //@}
+  ///@}
 
   /**
    * Returns a preset at a given index.
@@ -166,7 +166,7 @@ public:
    */
   bool RenamePreset(unsigned int index, const char* newname);
 
-  //@{
+  ///@{
   /**
    * Load presets from a file. All presets are added to "custom" presets list
    * and are considered as non-builtin.
@@ -177,7 +177,7 @@ public:
   bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets);
   bool ImportPresets(const Json::Value& presets);
   bool ImportPresets(const Json::Value& presets, std::vector<ImportedPreset>* importedPresets);
-  //@}
+  ///@}
 
   /**
    * Reload the presets from the configuration file.

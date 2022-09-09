@@ -47,14 +47,14 @@ public:
   vtkTypeMacro(vtkPMaterialClusterAnalysisFilter, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the label of the rockfill material. This material will be
    * ignored in the process. Default is 0.
    */
   vtkSetMacro(RockfillLabel, int);
   vtkGetMacro(RockfillLabel, int);
-  //@}
+  ///@}
 
 protected:
   vtkPMaterialClusterAnalysisFilter();

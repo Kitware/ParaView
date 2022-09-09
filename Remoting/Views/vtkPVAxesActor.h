@@ -55,14 +55,14 @@ public:
    */
   void GetActors(vtkPropCollection*) override;
 
-  //@{
+  ///@{
   /**
    * Support the standard render methods.
    */
   int RenderOpaqueGeometry(vtkViewport* viewport) override;
   int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) override;
   int HasTranslucentPolygonalGeometry() override;
-  //@}
+  ///@}
 
   /**
    * Shallow copy of an axes actor. Overloads the virtual vtkProp method.
@@ -76,14 +76,14 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow*) override;
 
-  //@{
+  ///@{
   /**
    * Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax). (The
    * method GetBounds(double bounds[6]) is available from the superclass.)
    */
   void GetBounds(double bounds[6]);
   double* GetBounds() override;
-  //@}
+  ///@}
 
   /**
    * Get the actors mtime plus consider its properties and texture if set.
@@ -98,34 +98,34 @@ public:
    */
   vtkMTimeType GetRedrawMTime() override;
 
-  //@{
+  ///@{
   /**
    * Set the total length of the axes in 3 dimensions.
    */
   void SetTotalLength(float v[3]) { this->SetTotalLength(v[0], v[1], v[2]); }
   void SetTotalLength(float x, float y, float z);
   vtkGetVectorMacro(TotalLength, float, 3);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the normalized (0-1) length of the shaft.
    */
   void SetNormalizedShaftLength(float v[3]) { this->SetNormalizedShaftLength(v[0], v[1], v[2]); }
   void SetNormalizedShaftLength(float x, float y, float z);
   vtkGetVectorMacro(NormalizedShaftLength, float, 3);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the normalized (0-1) length of the tip.
    */
   void SetNormalizedTipLength(float v[3]) { this->SetNormalizedTipLength(v[0], v[1], v[2]); }
   void SetNormalizedTipLength(float x, float y, float z);
   vtkGetVectorMacro(NormalizedTipLength, float, 3);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the resolution of the pieces of the axes actor
    */
@@ -135,9 +135,9 @@ public:
   vtkGetMacro(SphereResolution, int);
   vtkSetClampMacro(CylinderResolution, int, 3, 128);
   vtkGetMacro(CylinderResolution, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the radius of the pieces of the axes actor
    */
@@ -147,9 +147,9 @@ public:
   vtkGetMacro(SphereRadius, float);
   vtkSetClampMacro(CylinderRadius, float, 0, VTK_FLOAT_MAX);
   vtkGetMacro(CylinderRadius, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the positions of the axis labels
    */
@@ -159,7 +159,7 @@ public:
   vtkGetMacro(YAxisLabelPosition, float);
   vtkSetClampMacro(ZAxisLabelPosition, float, 0, 1);
   vtkGetMacro(ZAxisLabelPosition, float);
-  //@}
+  ///@}
 
   /**
    * Set the type of the shaft to a cylinder, line, or user defined geometry.
@@ -177,58 +177,58 @@ public:
   void SetTipTypeToSphere() { this->SetTipType(vtkPVAxesActor::SPHERE_TIP); }
   void SetTipTypeToUserDefined() { this->SetTipType(vtkPVAxesActor::USER_DEFINED_TIP); }
 
-  //@{
+  ///@{
   /**
    * Set the user defined tip polydata.
    */
   void SetUserDefinedTip(vtkPolyData*);
   vtkGetObjectMacro(UserDefinedTip, vtkPolyData);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the user defined shaft polydata.
    */
   void SetUserDefinedShaft(vtkPolyData*);
   vtkGetObjectMacro(UserDefinedShaft, vtkPolyData);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the tip properties.
    */
   vtkProperty* GetXAxisTipProperty();
   vtkProperty* GetYAxisTipProperty();
   vtkProperty* GetZAxisTipProperty();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the shaft properties.
    */
   vtkProperty* GetXAxisShaftProperty();
   vtkProperty* GetYAxisShaftProperty();
   vtkProperty* GetZAxisShaftProperty();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the label properties.
    */
   vtkProperty* GetXAxisLabelProperty();
   vtkProperty* GetYAxisLabelProperty();
   vtkProperty* GetZAxisLabelProperty();
-  //@}
+  ///@}
 
   //
-  //@{
+  ///@{
   /**
    * Set the label text.
    */
   vtkSetStringMacro(XAxisLabelText);
   vtkSetStringMacro(YAxisLabelText);
   vtkSetStringMacro(ZAxisLabelText);
-  //@}
+  ///@}
 
   enum
   {

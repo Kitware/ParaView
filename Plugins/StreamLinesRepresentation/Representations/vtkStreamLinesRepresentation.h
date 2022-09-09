@@ -99,7 +99,7 @@ public:
   virtual void SetInterpolateScalarsBeforeMapping(int val);
   virtual void SetLookupTable(vtkScalarsToColors* val);
 
-  //@{
+  ///@{
   /**
    * Sets if scalars are mapped through a color-map or are used
    * directly as colors.

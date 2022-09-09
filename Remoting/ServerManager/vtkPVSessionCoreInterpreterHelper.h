@@ -78,12 +78,12 @@ public:
    */
   void SetCore(vtkPVSessionCore*);
 
-  //@{
+  ///@{
   /**
    * Switch from 0:vtkErrorMacro to 1:vtkWarningMacro
    */
   vtkSetMacro(LogLevel, int);
-  //@}
+  ///@}
 
 protected:
   vtkPVSessionCoreInterpreterHelper();

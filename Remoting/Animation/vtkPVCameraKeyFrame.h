@@ -50,14 +50,14 @@ public:
   void SetKeyValue(double) override {}
   virtual double GetKeyValue(unsigned int) { return 0; }
 
-  //@{
+  ///@{
   /**
    * Get the camera i.e. the key value for this key frame.
    */
   vtkGetObjectMacro(Camera, vtkCamera);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to set the current camera value.
    */
@@ -66,9 +66,9 @@ public:
   void SetViewUp(double x, double y, double z);
   void SetViewAngle(double angle);
   void SetParallelScale(double scale);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkCameraInterpolator2.
    */
@@ -80,7 +80,7 @@ public:
   void SetPositionMode(int val);
   void SetClosedFocalPath(bool val);
   void SetClosedPositionPath(bool val);
-  //@}
+  ///@}
 
 protected:
   vtkPVCameraKeyFrame();

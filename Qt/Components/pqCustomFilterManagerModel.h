@@ -66,7 +66,7 @@ public:
   /**
    * \name QAbstractItemModel Methods
    */
-  //@{
+  ///@{
   /**
    * \brief
    *   Gets the number of rows for a given index.
@@ -108,12 +108,12 @@ public:
    *   The flags for the given model index.
    */
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  //@}
+  ///@}
 
   /**
    * \name Index Mapping Methods
    */
-  //@{
+  ///@{
   /**
    * \brief
    *   Gets the custom filter name for the given model index.
@@ -131,7 +131,7 @@ public:
    *   The model index for the given name.
    */
   QModelIndex getIndexFor(const QString& filter) const;
-  //@}
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

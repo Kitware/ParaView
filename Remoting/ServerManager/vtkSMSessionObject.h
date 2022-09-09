@@ -37,14 +37,14 @@ public:
   vtkTypeMacro(vtkSMSessionObject, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the session on wihch this object exists.
    * Note that session is not reference counted.
    */
   virtual void SetSession(vtkSMSession*);
   virtual vtkSMSession* GetSession();
-  //@}
+  ///@}
 
   /**
    * Return the corresponding ProxyManager if any.

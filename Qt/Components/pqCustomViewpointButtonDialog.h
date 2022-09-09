@@ -92,7 +92,7 @@ public:
    */
   void setToolTipsAndConfigurations(const QStringList& toolTips, const QStringList& configs);
 
-  //@{
+  ///@{
   /**
    * Set/get a list of tool tips, one for each button. The number of items in
    * the `toolTips` list must match the current number of tooltips being shown.
@@ -100,9 +100,9 @@ public:
    */
   void setToolTips(const QStringList& toolTips);
   QStringList getToolTips();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get a list of camera configurations, one for each button. The number of
    * items in `configs` must match the current number of configs.
@@ -110,15 +110,15 @@ public:
    */
   void setConfigurations(const QStringList& configs);
   QStringList getConfigurations();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the current camera configuration.
    */
   void setCurrentConfiguration(const QString& config);
   QString getCurrentConfiguration();
-  //@}
+  ///@}
 
 private Q_SLOTS:
   void appendRow();

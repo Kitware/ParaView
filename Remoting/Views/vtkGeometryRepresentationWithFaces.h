@@ -55,13 +55,13 @@ public:
    */
   void SetVisibility(bool val) override;
 
-  //@{
+  ///@{
   /**
    * Set the backface representation.
    */
   vtkSetClampMacro(BackfaceRepresentation, int, POINTS, CULL_FRONTFACE);
   vtkGetMacro(BackfaceRepresentation, int);
-  //@}
+  ///@}
 
   //***************************************************************************
   // Forwarded to vtkProperty(BackfaceProperty)

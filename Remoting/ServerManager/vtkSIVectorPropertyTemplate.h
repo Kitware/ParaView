@@ -31,7 +31,7 @@ public:
   vtkTypeMacro(vtkSIVectorPropertyTemplate, vtkSIVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * If ArgumentIsArray is true, multiple elements are passed in as
    * array arguments. For example, For example, if
@@ -45,7 +45,7 @@ public:
    * @endverbatim
    */
   vtkGetMacro(ArgumentIsArray, bool);
-  //@}
+  ///@}
 
 protected:
   vtkSIVectorPropertyTemplate();

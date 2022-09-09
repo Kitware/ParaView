@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkPVPluginsInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * API to iterate over the information collected for each plugin.
    */
@@ -49,15 +49,15 @@ public:
   bool GetRequiredOnClient(unsigned int);
   const char* GetDescription(unsigned int);
   bool GetAutoLoad(unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the plugin status message for a specific plugin
    */
   const char* GetPluginStatusMessage(unsigned int);
   void SetPluginStatusMessage(unsigned int, const char*);
-  //@}
+  ///@}
 
   /**
    * API to change auto-load status.
@@ -90,20 +90,20 @@ public:
    */
   void Update(vtkPVPluginsInformation* other);
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the plugin search path.
    */
   vtkGetStringMacro(SearchPaths);
-  //@}
+  ///@}
 
   /**
    * Method to validate if the plugin requirements are met across processes.

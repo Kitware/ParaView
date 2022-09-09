@@ -35,22 +35,22 @@ class vtkClientServerStreamInternals;
 class VTKREMOTINGCLIENTSERVERSTREAM_EXPORT vtkClientServerStream
 {
 public:
-  //@{
+  ///@{
   /**
    * Constructor/Destructor manage references of vtk objects stored in
    * the stream along with the rest of the stream data.
    */
   vtkClientServerStream(vtkObjectBase* owner = nullptr);
   ~vtkClientServerStream();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Copy constructor and assignment operator copy all stream data.
    */
   vtkClientServerStream(const vtkClientServerStream&, vtkObjectBase* owner = nullptr);
   vtkClientServerStream& operator=(const vtkClientServerStream&);
-  //@}
+  ///@}
 
   /**
    * Enumeration of message types that may be stored in a stream.
@@ -147,7 +147,7 @@ public:
    */
   vtkClientServerStream::Types GetArgumentType(int message, int argument) const;
 
-  //@{
+  ///@{
   /**
    * Get the value of the given argument in the given message.
    * Returns whether the argument could be converted to the requested
@@ -195,7 +195,7 @@ public:
   int GetArgument(int message, int argument, vtkClientServerStream* value) const;
   int GetArgument(int message, int argument, vtkClientServerID* value) const;
   int GetArgument(int message, int argument, vtkObjectBase** value) const;
-  //@}
+  ///@}
 
   /**
    * Get the value of the given argument in the given message.
@@ -221,7 +221,7 @@ public:
    */
   int GetArgumentObject(int message, int argument, vtkObjectBase** value, const char* type) const;
 
-  //@{
+  ///@{
   /**
    * Proxy-object returned by the two-argument form of GetArgument.
    * This is suitable to be stored in another stream.
@@ -231,7 +231,7 @@ public:
     const unsigned char* Data;
     size_t Size;
   };
-  //@}
+  ///@}
 
   /**
    * Get the given argument of the given message in a form that can be
@@ -251,7 +251,7 @@ public:
   //--------------------------------------------------------------------------
   // Stream writing methods:
 
-  //@{
+  ///@{
   /**
    * Proxy-object returned by InsertArray and used to insert
    * array data into the stream.
@@ -263,9 +263,9 @@ public:
     vtkTypeUInt32 Size;
     const void* Data;
   };
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Stream operators for special types.
    */
@@ -278,9 +278,9 @@ public:
   vtkClientServerStream& operator<<(vtkObjectBase*);
   vtkClientServerStream& operator<<(const vtkStdString&);
   vtkClientServerStream& operator<<(const vtkVariant&);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Stream operators for native types.
    */
@@ -303,9 +303,9 @@ public:
   vtkClientServerStream& operator<<(float value);
   vtkClientServerStream& operator<<(double value);
   vtkClientServerStream& operator<<(const char* value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Allow arrays to be passed into the stream.
    */
@@ -326,7 +326,7 @@ public:
 #endif
   static vtkClientServerStream::Array InsertArray(const float*, int);
   static vtkClientServerStream::Array InsertArray(const double*, int);
-  //@}
+  ///@}
 
   /**
    * Construct the entire stream from the given data.  This destroys
@@ -338,7 +338,7 @@ public:
   //--------------------------------------------------------------------------
   // Utility methods:
 
-  //@{
+  ///@{
   /**
    * Get a string describing the given type.  Returns "unknown" if the
    * type value is invalid.  If the type has multiple possible names,
@@ -348,7 +348,7 @@ public:
    */
   static const char* GetStringFromType(vtkClientServerStream::Types type);
   static const char* GetStringFromType(vtkClientServerStream::Types type, int index);
-  //@}
+  ///@}
 
   /**
    * Get the type named by the given string.  Returns
@@ -369,7 +369,7 @@ public:
    */
   static vtkClientServerStream::Commands GetCommandFromString(const char* name);
 
-  //@{
+  ///@{
   /**
    * Print the contents of the stream in a human-readable form.
    */
@@ -380,15 +380,15 @@ public:
   void PrintArgument(ostream&, int message, int argument) const;
   void PrintArgument(ostream&, int message, int argument, vtkIndent) const;
   void PrintArgumentValue(ostream&, int message, int argument) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Convert the stream to a string-based encoding.
    */
   const char* StreamToString() const;
   void StreamToString(ostream& os) const;
-  //@}
+  ///@}
 
   /**
    * Set the stream by parsing the given string.  The syntax of the

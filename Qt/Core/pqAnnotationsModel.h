@@ -69,7 +69,7 @@ public:
     OPACITY_DATA
   };
 
-  //@{
+  ///@{
   /**
    * Reimplements QAbstractTableModel
    */
@@ -86,7 +86,7 @@ public:
   QMimeData* mimeData(const QModelIndexList& indexes) const override;
   bool dropMimeData(const QMimeData* mime_data, Qt::DropAction action, int row, int column,
     const QModelIndex& parentIdx) override;
-  //@}
+  ///@}
 
   /**
    * Return the number of columns.
@@ -95,16 +95,16 @@ public:
 
   void setVisibilityDomain(vtkSMStringListDomain* domain);
 
-  //@{
+  ///@{
   /**
    * Add/remove annotations.
    */
   QModelIndex addAnnotation(const QModelIndex& after = QModelIndex());
   QModelIndex removeAnnotations(const QModelIndexList& toRemove = QModelIndexList());
   void removeAllAnnotations();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the value-annotation pairs.
    * Emit dataChanged signal, unless quiet is true.
@@ -112,51 +112,51 @@ public:
   void setAnnotations(
     const std::vector<std::pair<QString, QString>>& newAnnotations, bool quiet = false);
   std::vector<std::pair<QString, QString>> annotations() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the visibilities.
    */
   void setVisibilities(const std::vector<std::pair<QString, int>>& newVisibilities);
   std::vector<std::pair<QString, int>> visibilities() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the colors.
    */
   void setIndexedColors(const std::vector<QColor>& newColors);
   std::vector<QColor> indexedColors() const;
-  //@}
+  ///@}
 
   bool hasColors() const;
 
-  //@{
+  ///@{
   /**
    * Set/Get IndexedOpacities.
    */
   void setIndexedOpacities(const std::vector<double>& newOpacities);
   std::vector<double> indexedOpacities() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get Global opacity.
    */
   void setGlobalOpacity(double opacity);
   double globalOpacity() const { return this->GlobalOpacity; }
-  //@}
+  ///@}
 
   void setSelectedOpacity(QList<int> rows, double opacity);
 
-  //@{
+  ///@{
   /**
    * Set/Get SupportsReorder.
    */
   void setSupportsReorder(bool reorder);
   bool supportsReorder() const;
-  //@}
+  ///@}
 
   /**
    * Reorders the list of annotations, following the indexes given by newOrder.

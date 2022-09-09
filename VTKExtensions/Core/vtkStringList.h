@@ -34,13 +34,13 @@ public:
   vtkTypeMacro(vtkStringList, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Add a simple string.
    */
   void AddString(const char* str);
   void AddUniqueString(const char* str);
-  //@}
+  ///@}
 
   /**
    * Add a command and format it any way you like.

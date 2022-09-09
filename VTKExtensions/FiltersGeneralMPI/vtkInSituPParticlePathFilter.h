@@ -47,15 +47,15 @@ public:
    */
   void SetClearCache(bool);
 
-  //@{
+  ///@{
   /**
    * Provide support pre-pending previously computed particle paths.
    */
   void AddRestartConnection(vtkAlgorithmOutput* input);
   void RemoveAllRestarts();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get if the simulation has been restarted. If it is a restarted
    * simulation we may not necessarily want to inject/reinject particles
@@ -63,9 +63,9 @@ public:
    */
   vtkSetMacro(RestartedSimulation, bool);
   vtkGetMacro(RestartedSimulation, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the first time step that particle paths are computed.
    * This is useful for restarted simulations or when the simulation's
@@ -73,7 +73,7 @@ public:
    */
   vtkSetMacro(FirstTimeStep, int);
   vtkGetMacro(FirstTimeStep, int);
-  //@}
+  ///@}
 
 protected:
   vtkInSituPParticlePathFilter();
@@ -136,7 +136,7 @@ private:
    */
   bool RestartedSimulation;
 
-  //@{
+  ///@{
   /**
    * Specify the first simulation time step that particles are computed.
    * This is useful for restarted simulations as well as simulations or

@@ -34,22 +34,22 @@ public:
   vtkTypeMacro(vtkPVPlane, vtkPlane);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The origin is shifted in the direction of the normal
    * by the offset.
    */
   vtkSetMacro(Offset, double);
   vtkGetMacro(Offset, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If AxisAligned is true, sets axis to the nearest canonical axis.
    */
   void SetNormal(double x, double y, double z) override;
   void SetNormal(const double* x) override;
-  //@}
+  ///@}
 
   /**
    * Accessors for AxisAligned, which locks normal to plane to be aligned with x, y, or z axis.

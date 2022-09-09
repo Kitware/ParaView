@@ -148,7 +148,7 @@ public:
   vtkTypeMacro(vtkSMMultiplexerSourceProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Overridden to add/load meta-data about the chosen subproxy to ensure that when
    * the state is loaded, correct proxy is chosen.
@@ -157,7 +157,7 @@ public:
   vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) override;
   int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) override;
   void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) override;
-  //@}
+  ///@}
 
 protected:
   vtkSMMultiplexerSourceProxy();

@@ -71,7 +71,7 @@ public:
   virtual bool ProcessSelection(vtkSelection* rawSelection, vtkSMRenderViewProxy* viewProxy,
     bool multipleSelectionsAllowed, vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, int modifier, bool selectBlocks);
-  //@}
+  ///@}
 
 protected:
   vtkPVEncodeSelectionForServer();

@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkSMCameraProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Updates all property information by calling UpdateInformation()
    * and populating the values.
@@ -47,7 +47,7 @@ public:
 protected:
   vtkSMCameraProxy();
   ~vtkSMCameraProxy() override;
-  //@}
+  ///@}
 
 private:
   vtkSMCameraProxy(const vtkSMCameraProxy&) = delete;

@@ -113,18 +113,18 @@ public:
   /**
    * \name Model Setup Methods
    */
-  //@{
+  ///@{
   QAbstractItemModel* getModel() const { return this->Model; }
   void setModel(QAbstractItemModel* model);
 
   QModelIndex getRootIndex() const;
   void setRootIndex(const QModelIndex& index);
-  //@}
+  ///@}
 
   /**
    * \name Selection Setup Methods
    */
-  //@{
+  ///@{
   QItemSelectionModel* getSelectionModel() const { return this->Selection; }
   void setSelectionModel(QItemSelectionModel* selectionModel);
 
@@ -133,12 +133,12 @@ public:
 
   SelectionMode getSelectionMode() const { return this->Mode; }
   void setSelectionMode(SelectionMode mode);
-  //@}
+  ///@}
 
   /**
    * \name Column Management Methods
    */
-  //@{
+  ///@{
   QHeaderView* getHeader() const { return this->HeaderView; }
   void setHeader(QHeaderView* headerView);
 
@@ -163,47 +163,47 @@ public:
    *   pqFlatTreeView::isColumnSizeManaged()
    */
   void setColumnSizeManaged(bool managed);
-  //@}
+  ///@}
 
   /**
    * \name Drawing Options
    */
-  //@{
+  ///@{
   int getIconSize() const;
   void setIconSize(int iconSize);
-  //@}
+  ///@}
 
   /**
    * \name Index Location Methods
    */
-  //@{
+  ///@{
   bool isIndexHidden(const QModelIndex& index) const;
   void getVisibleRect(const QModelIndex& index, QRect& area) const;
   QModelIndex getIndexVisibleAt(const QPoint& point) const;
   QModelIndex getIndexCellAt(const QPoint& point) const;
   void getSelectionIn(const QRect& rect, QItemSelection& items) const;
-  //@}
+  ///@}
 
   /**
    * \name Index Navigation Methods
    */
-  //@{
+  ///@{
   bool isIndexExpanded(const QModelIndex& index) const;
   QModelIndex getNextVisibleIndex(
     const QModelIndex& index, const QModelIndex& root = QModelIndex()) const;
   QModelIndex getRelativeIndex(const QString& id, const QModelIndex& root = QModelIndex()) const;
   void getRelativeIndexId(
     const QModelIndex& index, QString& id, const QModelIndex& root = QModelIndex()) const;
-  //@}
+  ///@}
 
   /**
    * \name Editing Methods
    */
-  //@{
+  ///@{
   bool startEditing(const QModelIndex& index);
   void finishEditing();
   void cancelEditing();
-  //@}
+  ///@}
 
 Q_SIGNALS:
   void activated(const QModelIndex& index);
@@ -222,7 +222,7 @@ protected Q_SLOTS:
   /**
    * \name Model Change Handlers
    */
-  //@{
+  ///@{
   void insertRows(const QModelIndex& parent, int start, int end);
   void startRowRemoval(const QModelIndex& parent, int start, int end);
   void finishRowRemoval(const QModelIndex& parent, int start, int end);
@@ -230,33 +230,33 @@ protected Q_SLOTS:
   void startColumnRemoval(const QModelIndex& parent, int start, int end);
   void finishColumnRemoval(const QModelIndex& parent, int start, int end);
   void updateData(const QModelIndex& topLeft, const QModelIndex& bottomRight);
-  //@}
+  ///@}
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * \name Keyboard Event Handlers
    */
-  //@{
+  ///@{
   void keyPressEvent(QKeyEvent* e) override;
   void keyboardSearch(const QString& search);
-  //@}
+  ///@}
 
   /**
    * \name Mouse Event Handlers
    */
-  //@{
+  ///@{
   void mousePressEvent(QMouseEvent* e) override;
   void mouseMoveEvent(QMouseEvent* e) override;
   void mouseReleaseEvent(QMouseEvent* e) override;
   void mouseDoubleClickEvent(QMouseEvent* e) override;
-  //@}
+  ///@}
 
   /**
    * \name Event Handlers
    */
-  //@{
+  ///@{
   bool event(QEvent* e) override;
-  //@}
+  ///@}
 
   int horizontalOffset() const;
   int verticalOffset() const;
@@ -270,20 +270,20 @@ private Q_SLOTS:
   /**
    * \name Header Signal Handlers
    */
-  //@{
+  ///@{
   void handleSectionResized(int index, int oldSize, int newSize);
   void handleSectionMoved(int index, int oldVisual, int newVisual);
-  //@}
+  ///@}
 
   /**
    * \name Selection Signal Handlers
    */
-  //@{
+  ///@{
   void changeCurrent(const QModelIndex& current, const QModelIndex& previous);
   void changeCurrentRow(const QModelIndex& current, const QModelIndex& previous);
   void changeCurrentColumn(const QModelIndex& current, const QModelIndex& previous);
   void changeSelection(const QItemSelection& selected, const QItemSelection& deselected);
-  //@}
+  ///@}
 
 private: // NOLINT(readability-redundant-access-specifiers)
   void resetRoot();
@@ -292,7 +292,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * \name Layout Methods
    */
-  //@{
+  ///@{
   void layoutEditor();
   void layoutItems();
   void layoutItem(pqFlatTreeViewItem* item, int& point, const QFontMetrics& fm);
@@ -301,12 +301,12 @@ private: // NOLINT(readability-redundant-access-specifiers)
   bool updateContentsWidth();
   void updateScrollBars();
   void addChildItems(pqFlatTreeViewItem* item, int parentChildCount);
-  //@}
+  ///@}
 
   /**
    * \name Tree Navigation Methods
    */
-  //@{
+  ///@{
   bool getIndexRowList(const QModelIndex& index, pqFlatTreeViewItemRows& rowList) const;
   pqFlatTreeViewItem* getItem(const pqFlatTreeViewItemRows& rowList) const;
   pqFlatTreeViewItem* getItem(const QModelIndex& index) const;
@@ -315,7 +315,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
   pqFlatTreeViewItem* getNextVisibleItem(pqFlatTreeViewItem* item) const;
   pqFlatTreeViewItem* getPreviousVisibleItem(pqFlatTreeViewItem* item) const;
   pqFlatTreeViewItem* getLastVisibleItem() const;
-  //@}
+  ///@}
 
   void expandItem(pqFlatTreeViewItem* item);
 

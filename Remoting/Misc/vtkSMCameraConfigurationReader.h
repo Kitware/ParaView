@@ -48,7 +48,7 @@ public:
    */
   void SetRenderViewProxy(vtkSMProxy* rvProxy);
 
-  //@{
+  ///@{
   /**
    * Read the named file, and push the properties into the underying
    * managed render view proxy. This will make sure the renderview is
@@ -58,7 +58,7 @@ public:
   int ReadConfiguration(vtkPVXMLElement* x) override;
   // unhide
   int ReadConfiguration() override { return this->Superclass::ReadConfiguration(); }
-  //@}
+  ///@}
 
 protected:
   vtkSMCameraConfigurationReader();

@@ -190,7 +190,7 @@ public:
    */
   static void SetHideScalarBarOnHide(bool);
 
-  //@{
+  ///@{
   /**
    * Control whether representations try to maintain properties from an input
    * representation, if present. e.g. if you "Transform" the representation for
@@ -199,7 +199,7 @@ public:
    */
   static void SetInheritRepresentationProperties(bool);
   static bool GetInheritRepresentationProperties();
-  //@}
+  ///@}
 
   /**
    * Overridden to handle default ColorArrayName for representations correctly.

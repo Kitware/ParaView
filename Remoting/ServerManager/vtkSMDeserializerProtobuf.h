@@ -39,13 +39,13 @@ public:
   vtkTypeMacro(vtkSMDeserializerProtobuf, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the session.
    */
   vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
   virtual void SetStateLocator(vtkSMStateLocator*);
-  //@}
+  ///@}
 
 protected:
   vtkSMDeserializerProtobuf();

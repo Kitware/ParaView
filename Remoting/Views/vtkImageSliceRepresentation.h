@@ -42,7 +42,7 @@ public:
   vtkTypeMacro(vtkImageSliceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the input data arrays that this algorithm will process. Overridden to
    * pass the array selection to the mapper.
@@ -65,7 +65,7 @@ public:
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);
   }
-  //@}
+  ///@}
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -83,13 +83,13 @@ public:
    */
   void SetVisibility(bool val) override;
 
-  //@{
+  ///@{
   /**
    * Get set the slice number to extract.
    */
   virtual void SetSlice(unsigned int);
   vtkGetMacro(Slice, unsigned int);
-  //@}
+  ///@}
 
   enum
   {
@@ -98,13 +98,13 @@ public:
     XZ_PLANE = VTK_XZ_PLANE
   };
 
-  //@{
+  ///@{
   /**
    * Get/Set the direction in which to slice a 3D input data.
    */
   virtual void SetSliceMode(int);
   vtkGetMacro(SliceMode, int);
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   // Forwarded to Actor.

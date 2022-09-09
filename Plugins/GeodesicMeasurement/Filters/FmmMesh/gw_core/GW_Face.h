@@ -49,16 +49,16 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_Face();
     ~GW_Face() override;
     virtual GW_Face& operator=(const GW_Face& Face);
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Accessors */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void SetFaceNeighbor(GW_Face* pFace, GW_U32 nEdgeNum);
     void SetFaceNeighbor(GW_Face* pFace1, GW_Face* pFace2, GW_Face* pFace3);
     GW_Face* GetFaceNeighbor( GW_U32 nEdgeNum );
@@ -84,7 +84,7 @@ public:
 
     GW_Float GetArea();
     GW_Vector3D ComputeNormal();
-    //@}
+    ///@}
 
 private:
 

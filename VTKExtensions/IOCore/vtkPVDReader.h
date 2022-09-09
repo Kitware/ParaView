@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkPVDReader, vtkXMLCollectionReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the required value for the timestep attribute.  The value
    * should be referenced by its index.  Only data sets matching this
@@ -42,7 +42,7 @@ public:
    */
   void SetTimeStep(int index) override;
   int GetTimeStep() override;
-  //@}
+  ///@}
 
 protected:
   vtkPVDReader();

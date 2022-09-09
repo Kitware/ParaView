@@ -52,29 +52,29 @@ public:
    */
   virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
 
-  //@{
+  ///@{
   /**
    * Get the number of proxies that are involved in this link.
    */
   unsigned int GetNumberOfLinkedObjects() override;
   unsigned int GetNumberOfLinkedProxies();
-  //@}
+  ///@}
 
   /**
    * Get a proxy involved in this link.
    */
   vtkSMProxy* GetLinkedProxy(int index) override;
 
-  //@{
+  ///@{
   /**
    * Get the direction of a proxy involved in this link
    * (see vtkSMLink::UpdateDirections)
    */
   int GetLinkedObjectDirection(int index) override;
   int GetLinkedProxyDirection(int index);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * It is possible to exclude certain properties from being synchronized
    * by this link. This method can be used to add/remove the names for such
@@ -82,7 +82,7 @@ public:
    */
   void AddException(const char* propertyname);
   void RemoveException(const char* propertyname);
-  //@}
+  ///@}
 
   /**
    * Remove all links.

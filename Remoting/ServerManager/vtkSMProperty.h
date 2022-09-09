@@ -159,16 +159,16 @@ public:
   vtkTypeMacro(vtkSMProperty, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The command name used to set the value on the server object.
    * For example: SetThetaResolution
    */
   vtkSetStringMacro(Command);
   vtkGetStringMacro(Command);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If ImmediateUpdate is true, the value of the property will
    * be pushed to the server as soon as it is modified. Properties
@@ -176,7 +176,7 @@ public:
    */
   vtkSetMacro(ImmediateUpdate, int);
   vtkGetMacro(ImmediateUpdate, int);
-  //@}
+  ///@}
 
   /**
    * Returns true if all values are in all domains, false otherwise.
@@ -245,31 +245,31 @@ public:
    */
   unsigned int GetNumberOfDomains();
 
-  //@{
+  ///@{
   /**
    * Is InformationOnly is set to true, this property is used to
    * get information from server instead of setting values.
    */
   vtkGetMacro(InformationOnly, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If IgnoreSynchronization is set to true, this property is used to
    * prevent that property from being updated when changed remotely by another
    * collaborative client.
    */
   vtkGetMacro(IgnoreSynchronization, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the associated information property. This allows applications
    * to have access to both the in and out properties. The information
    * property has to be specified in the xml configuration file.
    */
   vtkGetObjectMacro(InformationProperty, vtkSMProperty);
-  //@}
+  ///@}
 
   /**
    * Properties can have one or more domains. These are assigned by
@@ -299,16 +299,16 @@ public:
    */
   virtual void RemoveFromSourceLink();
 
-  //@{
+  ///@{
   /**
    * Get/Set if the property is animateable. Non-animateable
    * properties are shown in the GUI only in advanced mode.
    */
   vtkSetMacro(Animateable, int);
   vtkGetMacro(Animateable, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set if the property is internal to server manager.
    * Internal properties are not saved in state and should not be
@@ -316,23 +316,23 @@ public:
    */
   vtkSetMacro(IsInternal, int);
   vtkGetMacro(IsInternal, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets whether the property should ignore custom default settings.
    */
   vtkSetMacro(NoCustomDefault, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Gets whether the property should ignore custom default settings.
    */
   vtkGetMacro(NoCustomDefault, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the panel visibility for the property. The value can be
    * one of:
@@ -344,58 +344,58 @@ public:
    * while information_only properties have "never" visibility.
    */
   vtkSetStringMacro(PanelVisibility);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the panel visibility for the property.
    */
   vtkGetStringMacro(PanelVisibility);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the panel visibility to default if the current
    * representation type matches \p representation.
    */
   vtkSetStringMacro(PanelVisibilityDefaultForRepresentation);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns which representation type the property will be shown by
    * default for.
    */
   vtkGetStringMacro(PanelVisibilityDefaultForRepresentation);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the name of the custom panel widget to use for the property.
    */
   vtkSetStringMacro(PanelWidget);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns name of the panel widget for the property.
    */
   vtkGetStringMacro(PanelWidget);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the tracing of sub property of this property
    */
   vtkSetStringMacro(DisableSubTrace);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the tracing state of the properties of this property
    */
   vtkGetStringMacro(DisableSubTrace);
-  //@}
+  ///@}
 
   /**
    * Copy all property values. This will copy both checked and unchecked values,
@@ -403,14 +403,14 @@ public:
    */
   virtual void Copy(vtkSMProperty* src);
 
-  //@{
+  ///@{
   /**
    * Returns the documentation for this proxy. The return value
    * may be nullptr if no documentation is defined in the XML
    * for this property.
    */
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
-  //@}
+  ///@}
 
   /**
    * Simply calls this->ResetToDomainDefaults() and if that returns false, calls
@@ -445,14 +445,14 @@ public:
    */
   virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
 
-  //@{
+  ///@{
   /**
    * The label assigned by the xml parser.
    */
   vtkGetStringMacro(XMLLabel);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The name assigned by the xml parser. Used to get the property
    * from a proxy. Note that the name used to obtain a property
@@ -460,18 +460,18 @@ public:
    * see the note on ExposedProperties for vtkSMProxy.
    */
   vtkGetStringMacro(XMLName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If repeatable, a property can have 1 or more values of the same kind.
    * This ivar is configured when the xml file is read and is mainly useful
    * for information (for example from python).
    */
   vtkGetMacro(Repeatable, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The server manager configuration XML may define \c \<Hints/\> element for
    * a property. Hints are metadata associated with the property. The
@@ -482,9 +482,9 @@ public:
    */
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
   void SetHints(vtkPVXMLElement* hints);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Overridden to support blocking of modified events.
    */
@@ -500,7 +500,7 @@ public:
       this->PendingModifiedEvents = false;
     }
   }
-  //@}
+  ///@}
 
   /**
    * Get the proxy to which this property belongs. Note that is this property is
@@ -572,7 +572,7 @@ protected:
    */
   virtual void UpdateAllInputs(){};
 
-  //@{
+  ///@{
   /**
    * The name assigned by the xml parser. Used to get the property
    * from a proxy. Note that the name used to obtain a property
@@ -580,7 +580,7 @@ protected:
    * see the note on ExposedProperties for vtkSMProxy.
    */
   vtkSetStringMacro(XMLName);
-  //@}
+  ///@}
 
   /**
    * Internal. Used during XML parsing to get a property with
@@ -676,7 +676,7 @@ protected:
 
   int Repeatable;
 
-  //@{
+  ///@{
   /**
    * Block/unblock modified events, returns the current state of the block flag.
    */
@@ -686,15 +686,15 @@ protected:
     this->BlockModifiedEvents = block;
     return prev;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns if any modified evetns are pending.
    * This gets cleared when Modified() is called.
    */
   vtkGetMacro(PendingModifiedEvents, bool);
-  //@}
+  ///@}
 
   // Proxy is not reference-counted to avoid reference loops.
   void SetParent(vtkSMProxy* proxy);

@@ -73,23 +73,23 @@ public:
   vtkTypeMacro(vtkResampleToHyperTreeGrid, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the multi-process controller.
    */
   vtkSetMacro(Controller, vtkMultiProcessController*);
   vtkGetMacro(Controller, vtkMultiProcessController*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the subdivision factor in the grid refinement scheme.
    */
   vtkSetClampMacro(BranchFactor, unsigned int, 2, 3);
   vtkGetMacro(BranchFactor, unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get for ArrayMeasurement. Use it to feed a pointer of any subclass of
    * vtkAbstractArrayMeasurement,
@@ -98,9 +98,9 @@ public:
    */
   vtkGetMacro(ArrayMeasurement, vtkAbstractArrayMeasurement*);
   vtkSetMacro(ArrayMeasurement, vtkAbstractArrayMeasurement*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get for ArrayMeasurement. Use it to feed a pointer of any subclass of
    * vtkAbstractArrayMeasurement,
@@ -114,17 +114,17 @@ public:
    */
   vtkGetMacro(ArrayMeasurementDisplay, vtkAbstractArrayMeasurement*);
   vtkSetMacro(ArrayMeasurementDisplay, vtkAbstractArrayMeasurement*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the maximum tree depth.
    */
   vtkSetMacro(MaxDepth, unsigned int);
   vtkGetMacro(MaxDepth, unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the maximum grid size of the hyper tree grid. All further resolution is creaded by
    * hyper trees.
@@ -132,41 +132,41 @@ public:
    */
   vtkSetVector3Macro(Dimensions, int);
   vtkGetVector3Macro(Dimensions, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Upper bound used to decide whether hyper tree grid should be refined or not
    * Default value is std::numeric_limits<double>infinity().
    */
   vtkGetMacro(Max, double);
   vtkSetMacro(Max, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets Max to infinity. Call this method to annihilate the upper bound.
    */
   void SetMaxToInfinity();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Lower bound used to decide whether hyper tree grid should be refined or not
    * Default value is -std::numeric_limits<double>::infinity().
    */
   vtkGetMacro(Min, double);
   vtkSetMacro(Min, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets Min to minus infinity. Call this method to annihilate the lower bound.
    */
   void SetMinToInfinity();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Accessors for NoEmptyCells. If this flag is turned off, there can be masked leaves
    * although the input has geometry in them, just because there is no point inside the leaf.
@@ -178,9 +178,9 @@ public:
    */
   vtkGetMacro(NoEmptyCells, bool);
   vtkSetMacro(NoEmptyCells, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Accessor for InRange. If set to true, the criterion for subdividing is true if the value is
    * within
@@ -188,9 +188,9 @@ public:
    */
   vtkGetMacro(InRange, bool);
   vtkSetMacro(InRange, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Accessor for MinimumNumberOfPointsInSubtree, which sets a minimum number of points per leaf.
    * Note that the minimum number of points per subtree can be greater depending of the minimum
@@ -198,7 +198,7 @@ public:
    */
   vtkGetMacro(MinimumNumberOfPointsInSubtree, vtkIdType);
   vtkSetMacro(MinimumNumberOfPointsInSubtree, vtkIdType);
-  //@}
+  ///@}
 
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
@@ -207,16 +207,16 @@ public:
 
   virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  //@{
+  ///@{
   /**
    * If state == false, sets Max / Min to infinity / -infinity. Else, sets Max / Min to the last non
    * infinite value.
    */
   void SetMaxState(bool state);
   void SetMinState(bool state);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Getter / Setter on the boolean flag Extrapolate.
    * It is set to true by default. If set to true, on point-based scalar input, cells of the
@@ -226,7 +226,7 @@ public:
   vtkGetMacro(Extrapolate, bool);
   vtkSetMacro(Extrapolate, bool);
   vtkBooleanMacro(Extrapolate, bool);
-  //@}
+  ///@}
 
   void AddDataArray(const char* name);
   void ClearDataArrays();
@@ -329,7 +329,7 @@ protected:
    */
   typedef std::vector<std::unordered_map<vtkIdType, GridElement>> MultiResGridType;
 
-  //@{
+  ///@{
   /**
    * Priority queue / element used for extrapolating empty leaves in the case of point based htg
    * resampling.
@@ -385,7 +385,7 @@ protected:
   };
 
   typedef std::priority_queue<PriorityQueueElement> PriorityQueue;
-  //@}
+  ///@}
 
   /**
    * Method extrapolating data on hyper tree grid leaves lacking data but intersecting the geometry
@@ -443,7 +443,7 @@ protected:
    */
   void CreateGridOfMultiResolutionGrids(std::vector<vtkDataSet*>& dataSet, int fieldAssociation);
 
-  //@{
+  ///@{
   /**
    * This method computes the intersection volume between a box and a vtkCell3D.
    */
@@ -451,7 +451,7 @@ protected:
     const double boxBounds[6], vtkVoxel* voxel, double volumeUnit, double& volume) const;
   bool IntersectedVolume(const double boxBounds[6], vtkCell3D* cell3D, double volumeUnit,
     double& volume, double* weights) const;
-  //@}
+  ///@}
 
   /**
    * Helper for easy access to the cells dimensions of the hyper tree grid.
@@ -463,13 +463,13 @@ protected:
    */
   vtkIdType NumberOfChildren;
 
-  //@{
+  ///@{
   /**
    * Output scalar/vector field
    */
   std::vector<vtkDoubleArray*> ScalarFields;
   vtkLongArray *NumberOfLeavesInSubtreeField, *NumberOfPointsInSubtreeField;
-  //@}
+  ///@}
 
   /**
    * Minimum number of points in a leaf for it to be subdivided.
@@ -516,7 +516,7 @@ protected:
    */
   std::size_t GridCoordinatesToIndex(vtkIdType i, vtkIdType j, vtkIdType k) const;
 
-  //@{
+  ///@{
   /**
    * 3D grid of multi-resolution grids.
    * this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(i,j,k)][depth][this->MultiResGridCoordinatesToIndex(ii,
@@ -527,7 +527,7 @@ protected:
    */
   typedef std::vector<MultiResGridType> GridOfMultiResGridsType;
   GridOfMultiResGridsType GridOfMultiResolutionGrids;
-  //@}
+  ///@}
 
   /**
    * Method which will forbid subdividing cells if they have an empty children intersecting

@@ -48,13 +48,13 @@ public:
 
   using Superclass::Add;
 
-  //@{
+  ///@{
   /**
    * Methods for adding data to the accumulator.
    */
   void Add(vtkAbstractAccumulator* accumulator) override;
   void Add(double value, double weight) override;
-  //@}
+  ///@}
 
   /**
    * Accessor to the accumulated value.
@@ -81,7 +81,7 @@ public:
    */
   bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
 
-  //@{
+  ///@{
   /**
    * Accessor/mutator on the function pointer specifying which function is applied to
    * the data to accumulate.
@@ -90,16 +90,16 @@ public:
    */
   const FunctorT& GetFunctor() const;
   void SetFunctor(const FunctorT&& f);
-  //@}
+  ///@}
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructor and destructor.
    */
   vtkArithmeticAccumulator();
   ~vtkArithmeticAccumulator() override = default;
-  //@}
+  ///@}
 
   /**
    * Accumulated value

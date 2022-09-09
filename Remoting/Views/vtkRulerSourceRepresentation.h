@@ -38,13 +38,13 @@ public:
   vtkTypeMacro(vtkRulerSourceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the text widget.
    */
   void SetDistanceRepresentation(vtkDistanceRepresentation2D*);
   vtkGetObjectMacro(DistanceRepresentation, vtkDistanceRepresentation2D);
-  //@}
+  ///@}
 
   /**
    * Set the text property for the printed distance.
@@ -73,7 +73,7 @@ public:
    */
   void SetLabelFormat(char* labelFormat);
 
-  //@{
+  ///@{
   /**
    * Enable or disable ruler mode. When enabled, the ticks on the distance
    * widget are separated by the amount specified by
@@ -83,9 +83,9 @@ public:
    */
   void SetRulerMode(int choice);
   int GetRulerMode();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the RulerDistance which indicates the spacing of the major ticks
    * in the unit space obtained after the Scale is applied (see SetScale()).
@@ -93,9 +93,9 @@ public:
    */
   void SetRulerDistance(double distance);
   double GetRulerDistance();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set scale factor to apply to the ruler graduation scale and the displayed
    * distance. Used to transform VTK world space units to a desired unit,
@@ -103,7 +103,7 @@ public:
    */
   void SetScale(double distance);
   double GetScale();
-  //@}
+  ///@}
 
   /**
    * Specify the number of major ruler ticks. Note: the number of ticks is the

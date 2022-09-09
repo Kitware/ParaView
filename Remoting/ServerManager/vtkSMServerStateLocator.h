@@ -37,14 +37,14 @@ public:
   vtkTypeMacro(vtkSMServerStateLocator, vtkSMStateLocator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get a parent locator to search which is used as a backup location
    * to search from if a given state was not found locally.
    */
   vtkSMSession* GetSession();
   void SetSession(vtkSMSession* session);
-  //@}
+  ///@}
 
   /**
    * Fill the provided State message with the state found inside the current

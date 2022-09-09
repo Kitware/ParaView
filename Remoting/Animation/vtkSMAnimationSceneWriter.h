@@ -41,13 +41,13 @@ public:
    */
   virtual void SetAnimationScene(vtkSMProxy*);
 
-  //@{
+  ///@{
   /**
    * Get/Set the animation scene that this writer will write.
    */
   virtual void SetAnimationScene(vtkSMAnimationScene*);
   vtkGetObjectMacro(AnimationScene, vtkSMAnimationScene);
-  //@}
+  ///@}
 
   /**
    * Begin the saving. This will result in playing of the animation.
@@ -55,23 +55,23 @@ public:
    */
   bool Save();
 
-  //@{
+  ///@{
   /**
    * Get/Set the filename.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the start file count.
    */
   vtkSetMacro(StartFileCount, int);
   vtkGetMacro(StartFileCount, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set time window that we want to write
    * If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
@@ -79,9 +79,9 @@ public:
    */
   vtkSetVector2Macro(PlaybackTimeWindow, double);
   vtkGetVector2Macro(PlaybackTimeWindow, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get The stride which is used to extract the next frame.
    * E.g. 1, 2, 3, would have stride = 1, while 1, 3, 5 would have stride = 2.
@@ -90,7 +90,7 @@ public:
    */
   vtkSetMacro(Stride, int);
   vtkGetMacro(Stride, int);
-  //@}
+  ///@}
 
 protected:
   vtkSMAnimationSceneWriter();

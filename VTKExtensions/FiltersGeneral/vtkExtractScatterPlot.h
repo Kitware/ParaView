@@ -39,39 +39,39 @@ public:
   vtkTypeMacro(vtkExtractScatterPlot, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Controls which input data component should be binned, for input arrays with more-than-one
    * component
    */
   vtkSetClampMacro(XComponent, int, 0, VTK_INT_MAX);
   vtkGetMacro(XComponent, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls which input data component should be binned, for input arrays
    * with more-than-one component
    */
   vtkSetClampMacro(YComponent, int, 0, VTK_INT_MAX);
   vtkGetMacro(YComponent, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls the number of bins along the X axis in the output histogram data
    */
   vtkSetClampMacro(XBinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(XBinCount, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls the number of bins along the Y axis in the output histogram data
    */
   vtkSetClampMacro(YBinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(YBinCount, int);
-  //@}
+  ///@}
 
 private:
   vtkExtractScatterPlot();

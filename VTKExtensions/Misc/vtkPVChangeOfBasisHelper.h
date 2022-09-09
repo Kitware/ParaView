@@ -45,23 +45,23 @@ public:
 
   static vtkSmartPointer<vtkMatrix4x4> GetChangeOfBasisMatrix(vtkDataObject* dataObject);
 
-  //@{
+  ///@{
   /**
    * Add basis titles to field data.
    */
   static bool AddBasisNames(
     vtkDataObject* dataObject, const char* utitle, const char* vtitle, const char* wtitle);
-  //@}
+  ///@}
 
   static void GetBasisName(
     vtkDataObject* dataObject, const char*& utitle, const char*& vtitle, const char*& wtitle);
 
-  //@{
+  ///@{
   /**
    * Add bounding box in model space.
    */
   static bool AddBoundingBoxInBasis(vtkDataObject* dataObject, const double bbox[6]);
-  //@}
+  ///@}
 
   static bool GetBoundingBoxInBasis(vtkDataObject* dataObject, double bbox[6]);
 };

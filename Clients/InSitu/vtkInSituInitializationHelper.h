@@ -113,14 +113,14 @@ public:
    */
   static void UpdateAllProducers(double time);
 
-  //@{
+  ///@{
   /**
    * This is provided as a convenience to indicate a particular producer has
    * been modified or has new data for current timestep.
    */
   static void MarkProducerModified(const std::string& channelName);
   static void MarkProducerModified(vtkSMSourceProxy* producer);
-  //@}
+  ///@}
 
   /**
    * Executes pipelines.
@@ -128,14 +128,14 @@ public:
   static bool ExecutePipelines(
     int timestep, double time, const std::vector<std::string>& parameters = {});
 
-  //@{
+  ///@{
   /**
    * Provides access to current time and timestep during `ExecutePipelines`
    * call. The value is not valid outside `ExecutePipelines`.
    */
   static int GetTimeStep();
   static double GetTime();
-  //@}
+  ///@}
 
   /**
    * Returns true if vtkInSituInitializationHelper has been initialized; which

@@ -40,61 +40,61 @@ public:
   std::string GetDefaultSeriesLabel(
     const std::string& tableName, const std::string& columnName) override;
 
-  //@{
+  ///@{
   /**
    * When set to true, q1/q3 region is rendered.
    */
   vtkSetMacro(QuartileVisibility, bool);
   vtkGetMacro(QuartileVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, min/max region is rendered.
    */
   vtkSetMacro(RangeVisibility, bool);
   vtkGetMacro(RangeVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, the avg curve is rendered.
    */
   vtkSetMacro(AverageVisibility, bool);
   vtkGetMacro(AverageVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, the med curve is rendered.
    */
   vtkSetMacro(MedianVisibility, bool);
   vtkGetMacro(MedianVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, the min curve is rendered.
    */
   vtkSetMacro(MinVisibility, bool);
   vtkGetMacro(MinVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, the max curve is rendered.
    */
   vtkSetMacro(MaxVisibility, bool);
   vtkGetMacro(MaxVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, the max curve is rendered.
    */
   vtkSetMacro(SumVisibility, bool);
   vtkGetMacro(SumVisibility, bool);
-  //@}
+  ///@}
 
 protected:
   vtkQuartileChartRepresentation();

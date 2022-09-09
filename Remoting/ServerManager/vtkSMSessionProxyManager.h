@@ -147,7 +147,7 @@ struct vtkClientServerID;
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMSessionProxyManager : public vtkSMSessionObject
 {
 public:
-  //@{
+  ///@{
   /**
    * vtkSMSessionProxyManager requires a session and cannot be created without
    * one.
@@ -155,7 +155,7 @@ public:
   static vtkSMSessionProxyManager* New(vtkSMSession* session);
   vtkTypeMacro(vtkSMSessionProxyManager, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Return the GlobalID that should be used to refer to the ProxyManager state
@@ -213,14 +213,14 @@ public:
    */
   std::string RegisterProxy(const char* groupname, vtkSMProxy* proxy);
 
-  //@{
+  ///@{
   /**
    * Given its name (and group) returns a proxy. If not a managed proxy,
    * returns 0.
    */
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   vtkSMProxy* GetProxy(const char* name);
-  //@}
+  ///@}
 
   /**
    * Returns all proxies registered under the given group with the given name.
@@ -285,14 +285,14 @@ public:
    */
   const char* IsProxyInGroup(vtkSMProxy* proxy, const char* groupname);
 
-  //@{
+  ///@{
   /**
    * Given its name, unregisters a proxy and removes it from the list
    * of managed proxies.
    */
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
   void UnRegisterProxy(const char* name);
-  //@}
+  ///@}
 
   /**
    * Given a proxy, unregisters it. This method unregisters the proxy
@@ -305,7 +305,7 @@ public:
    */
   void UnRegisterProxies();
 
-  //@{
+  ///@{
   /**
    * Calls UpdateVTKObjects() on all managed proxies.
    * If modified_only flag is set, then UpdateVTKObjects will be called
@@ -314,9 +314,9 @@ public:
    */
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
   void UpdateRegisteredProxies(int modified_only = 1);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Updates all registered proxies in order, respecting dependencies
    * among each other. This is used after loading state or after instantiating
@@ -326,7 +326,7 @@ public:
    */
   void UpdateRegisteredProxiesInOrder(int modified_only = 1);
   void UpdateProxyInOrder(vtkSMProxy* proxy);
-  //@}
+  ///@}
 
   /**
    * Get the number of registered links with the server manager.
@@ -397,20 +397,20 @@ public:
    */
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name);
 
-  //@{
+  ///@{
   /**
    * Load custom proxy definitions and register them.
    */
   void LoadCustomProxyDefinitions(const char* filename);
   void LoadCustomProxyDefinitions(vtkPVXMLElement* root);
-  //@}
+  ///@}
 
   /**
    * Save registered custom proxy definitions.
    */
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
-  //@{
+  ///@{
   /**
    * Loads the state of the server manager from XML.
    * If loader is not specified, a vtkSMStateLoader instance is used.
@@ -420,7 +420,7 @@ public:
   void LoadXMLState(const char* filename, vtkSMStateLoader* loader = nullptr);
   void LoadXMLState(
     vtkPVXMLElement* rootElement, vtkSMStateLoader* loader = nullptr, bool keepOriginalIds = false);
-  //@}
+  ///@}
 
   /**
    * Indicates if an XML state is currently being loaded. This may be used by
@@ -443,7 +443,7 @@ public:
    */
   vtkPVXMLElement* SaveXMLState();
 
-  //@{
+  ///@{
   /**
    * Returns the XML state for the proxy manager. If a non-empty set of proxies
    * is passed, then state is limited to those chosen proxies.
@@ -457,7 +457,7 @@ public:
   vtkSmartPointer<vtkPVXMLElement> GetXMLState() { return this->GetXMLState({}); }
   vtkSmartPointer<vtkPVXMLElement> GetXMLState(
     const std::set<vtkSMProxy*>& restrictionSet, bool forceRestriction = false);
-  //@}
+  ///@}
 
   /**
    * Save/Load registered link states.
@@ -492,7 +492,7 @@ public:
    */
   int AreProxiesModified();
 
-  //@{
+  ///@{
   /**
    * The server manager configuration XML may define \c \<Hints/\> element for
    * a proxy/property. Hints are metadata associated with the
@@ -504,9 +504,9 @@ public:
   vtkPVXMLElement* GetProxyHints(const char* xmlgroup, const char* xmlname);
   vtkPVXMLElement* GetPropertyHints(
     const char* groupName, const char* proxyName, const char* propertyName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Check if UpdateInputProxies flag is set.
    * This is used after loading state or after instantiating
@@ -515,21 +515,21 @@ public:
    * proxies as well if the flag is set.
    */
   vtkGetMacro(UpdateInputProxies, int);
-  //@}
+  ///@}
 
   /**
    * Loads server-manager configuration xml.
    */
   bool LoadConfigurationXML(const char* xmlcontents);
 
-  //@{
+  ///@{
   /**
    * Get the proxy definition manager.
    * Proxy definition manager maintains all the information about proxy
    * definitions.
    */
   vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
-  //@}
+  ///@}
 
   /**
    * Get a registered selection model. Will return nullptr if no such model is
@@ -548,7 +548,7 @@ public:
    */
   vtkSMProxySelectionModel* GetSelectionModelAt(int idx);
 
-  //@{
+  ///@{
   /**
    * Register/UnRegister a selection model. A selection model can be typically
    * used by applications to keep track of active sources, filters, views etc.
@@ -556,7 +556,7 @@ public:
    */
   void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
   void UnRegisterSelectionModel(const char* name);
-  //@}
+  ///@}
 
   /**
    * Method used to fetch the last state of the ProxyManager from the pvserver.
@@ -565,7 +565,7 @@ public:
    */
   void UpdateFromRemote();
 
-  //@{
+  ///@{
   /**
    * These methods allow the user to make atomic change set in the notification
    * collaboration in terms of set of proxy registration.
@@ -576,7 +576,7 @@ public:
   void DisableStateUpdateNotification();
   void EnableStateUpdateNotification();
   void TriggerStateUpdate();
-  //@}
+  ///@}
 
   /**
    * This method returns the full object state that can be used to create that
@@ -630,13 +630,13 @@ protected:
    */
   void RemovePrototype(const char* groupname, const char* proxyname);
 
-  //@{
+  ///@{
   /**
    * Mark/UnMark a proxy as modified.
    */
   void MarkProxyAsModified(vtkSMProxy*);
   void UnMarkProxyAsModified(vtkSMProxy*);
-  //@}
+  ///@}
 
   /**
    * Recursively collects all proxies referred by the proxy in the set.

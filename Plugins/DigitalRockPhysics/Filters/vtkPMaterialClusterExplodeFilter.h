@@ -57,7 +57,7 @@ public:
   vtkTypeMacro(vtkPMaterialClusterExplodeFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the explode factor.
    * This value determines how far the points will be moved.
@@ -67,16 +67,16 @@ public:
    */
   vtkSetMacro(ExplodeFactor, double);
   vtkGetMacro(ExplodeFactor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the label of the rockfill material. This material will be
    * ignored in the process. Default is 0.
    */
   vtkSetMacro(RockfillLabel, int);
   vtkGetMacro(RockfillLabel, int);
-  //@}
+  ///@}
 
 protected:
   vtkPMaterialClusterExplodeFilter();

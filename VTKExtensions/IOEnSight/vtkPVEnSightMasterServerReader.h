@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * This class uses MPI communication mechanisms to verify the
    * integrity of all case files in the master file.  The get method
@@ -47,20 +47,20 @@ public:
    */
   virtual vtkMultiProcessController* GetController();
   virtual void SetController(vtkMultiProcessController* controller);
-  //@}
+  ///@}
 
   /**
    * Return whether we can read the file given.
    */
   int CanReadFile(const char*) override;
 
-  //@{
+  ///@{
   /**
    * Get the number of pieces in the file.  Valid after
    * UpdateInformation.
    */
   vtkGetMacro(NumberOfPieces, int);
-  //@}
+  ///@}
 
 protected:
   vtkPVEnSightMasterServerReader();

@@ -207,7 +207,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
   Q_PROPERTY(QList<QVariant> selectorOpacities READ selectorOpacitiesAsVariantList WRITE
       setSelectorOpacities NOTIFY opacitiesChanged);
 
-  //@{
+  ///@{
   /**
    * These are similar to the selector-based variants, except, instead of a
    * selector, the composite index is used. This is used when supported
@@ -219,7 +219,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
       setCompositeIndexOpacities NOTIFY opacitiesChanged);
   Q_PROPERTY(QList<QVariant> compositeIndexColors READ compositeIndexColorsAsVariantList WRITE
       setCompositeIndexColors NOTIFY colorsChanged);
-  //@}
+  ///@}
 public:
   pqDataAssemblyPropertyWidget(
     vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
@@ -227,7 +227,7 @@ public:
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqDataAssemblyPropertyWidget() override;
 
-  //@{
+  ///@{
   /**
    * API for getting/setting selected/chosen path strings.
    */
@@ -235,17 +235,17 @@ public:
   const QStringList& selectors() const;
   void setSelectors(const QList<QVariant>& paths);
   QList<QVariant> selectorsAsVariantList() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * API for getting/settings composite indices.
    */
   void setCompositeIndices(const QList<QVariant>& values);
   QList<QVariant> compositeIndicesAsVariantList() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * API to get/set colors. Colors are specified either as a list of selectors
    * followed by corresponding RGB color or list of composite indices followed by
@@ -256,9 +256,9 @@ public:
 
   void setSelectorColors(const QList<QVariant>& values);
   QList<QVariant> selectorColorsAsVariantList() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * API to get/set opacities. Opacities are specified either as a list of selectors
    * followed by corresponding opacity or list of composite indices followed by
@@ -269,7 +269,7 @@ public:
 
   void setSelectorOpacities(const QList<QVariant>& values);
   QList<QVariant> selectorOpacitiesAsVariantList() const;
-  //@}
+  ///@}
 
   void updateWidget(bool showing_advanced_properties) override;
 

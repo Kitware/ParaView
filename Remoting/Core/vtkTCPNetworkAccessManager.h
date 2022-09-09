@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkTCPNetworkAccessManager, vtkNetworkAccessManager);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Creates a new connection given the url.
    * This call may block until the connection can be established. To keep
@@ -77,7 +77,7 @@ public:
   using vtkNetworkAccessManager::NewConnection;
   vtkMultiProcessController* NewConnection(
     const char* url, vtkNetworkAccessManager::ConnectionResult& result) override;
-  //@}
+  ///@}
 
   /**
    * Used to abort pending connection creation, if any. Refer to

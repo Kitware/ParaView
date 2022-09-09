@@ -303,14 +303,14 @@ public:
   PARAVIEW_DEPRECATED_IN_5_11_0("Use the resource directly instead")
   void setSessionServer(const pqServerResource&){};
 
-  //@{
+  ///@{
   /**
    * Operators comparing all elements of the resource
    */
   bool operator==(const pqServerResource&) const;
   bool operator!=(const pqServerResource&) const;
   bool operator<(const pqServerResource&) const;
-  //@}
+  ///@}
 
 private:
   class pqImplementation;

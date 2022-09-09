@@ -48,23 +48,23 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether the server was compiled with python support.
    */
   vtkSetMacro(PythonSupport, bool) vtkGetMacro(PythonSupport, bool);
   vtkBooleanMacro(PythonSupport, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If GetPythonSupport() is true, returns the version of python detected on
    * the server.
@@ -78,9 +78,9 @@ public:
     }
   }
   const std::string& GetPythonVersion() { return this->PythonVersion; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If GetPythonSupport() is true, returns the path to the python libraries
    * detected on the server.
@@ -94,17 +94,17 @@ public:
     }
   }
   const std::string& GetPythonPath() { return this->PythonPath; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether the numpy module is available on the server.
    */
   vtkSetMacro(NumpySupport, bool) vtkGetMacro(NumpySupport, bool);
   vtkBooleanMacro(NumpySupport, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If GetNumpySupport() is true, returns the version of numpy detected on the
    * server.
@@ -118,9 +118,9 @@ public:
     }
   }
   const std::string& GetNumpyVersion() { return this->NumpyVersion; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If GetNumpySupport() is true, returns the path to numpy detected on the
    * server.
@@ -134,18 +134,18 @@ public:
     }
   }
   const std::string& GetNumpyPath() { return this->NumpyPath; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether the matplotlib module is available on the server.
    */
   vtkSetMacro(MatplotlibSupport, bool);
   vtkGetMacro(MatplotlibSupport, bool);
   vtkBooleanMacro(MatplotlibSupport, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If GetMatplotlibSupport() is true, returns the version of matplotlib
    * detected on the server.
@@ -159,9 +159,9 @@ public:
     }
   }
   const std::string& GetMatplotlibVersion() { return this->MatplotlibVersion; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If GetMatplotlibSupport() is true, returns the path to matplotlib detected
    * on the server.
@@ -175,7 +175,7 @@ public:
     }
   }
   const std::string& GetMatplotlibPath() { return this->MatplotlibPath; }
-  //@}
+  ///@}
 
 protected:
   vtkPVPythonInformation();

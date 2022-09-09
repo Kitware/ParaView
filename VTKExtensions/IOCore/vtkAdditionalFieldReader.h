@@ -32,13 +32,13 @@ public:
   static vtkAdditionalFieldReader* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The file to open to retrieve field data arrays
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
 protected:
   vtkAdditionalFieldReader();

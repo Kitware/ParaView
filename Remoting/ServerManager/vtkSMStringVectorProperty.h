@@ -68,21 +68,21 @@ public:
    */
   int SetElements(const char* values[], unsigned int count);
 
-  //@{
+  ///@{
   /**
    * Sets multiple elements. The size of the property is changed to match count.
    */
   int SetElements(vtkStringList* newvalue);
   int SetElements(const std::vector<std::string>& newvalue);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the values of all the unchecked elements.
    */
   int SetUncheckedElements(const char* values[], unsigned int count);
   int SetUncheckedElements(const std::vector<std::string>& newvalue);
-  //@}
+  ///@}
 
   /**
    * Append the values. The vector is resized as necessary.
@@ -118,7 +118,7 @@ public:
    */
   unsigned int GetElementIndex(const char* value, int& exists);
 
-  //@{
+  ///@{
   /**
    * Set the cast type used when passing a value to the stream.
    * For example, if the type is INT, the string is converted
@@ -129,7 +129,7 @@ public:
    */
   void SetElementType(unsigned int idx, int type);
   int GetElementType(unsigned int idx);
-  //@}
+  ///@}
 
   /**
    * Returns the value of 1 unchecked element. These are used by
@@ -146,13 +146,13 @@ public:
    */
   void SetUncheckedElement(unsigned int idx, const char* value);
 
-  //@{
+  ///@{
   /**
    * Get/Set unchecked elements.
    */
   void GetUncheckedElements(vtkStringList* list);
   int SetUncheckedElements(vtkStringList* list);
-  //@}
+  ///@}
 
   /**
    * Returns the size of unchecked elements. Usually this is

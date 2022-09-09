@@ -76,7 +76,7 @@ public:
   vtkBooleanMacro(WriteAllTimeSteps, bool);
   ///@}
 
-  //@{
+  ///@{
   /**
    * Provides an option to pad the time step when writing out time series data.
    * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
@@ -86,7 +86,7 @@ public:
    */
   vtkGetStringMacro(FileNameSuffix);
   vtkSetStringMacro(FileNameSuffix);
-  //@}
+  ///@}
 
 protected:
   vtkCGNSWriter();

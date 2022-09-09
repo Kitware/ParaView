@@ -109,24 +109,24 @@ public:
     return this->GetInputDataObject(0, 0);
   }
 
-  //@{
+  ///@{
   /**
    * Set the update time.
    */
   virtual void SetUpdateTime(double time);
   vtkGetMacro(UpdateTime, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get whether the UpdateTime is valid. `ResetUpdateTime` can be used to clear
    * the UpdateTimeValid flag.
    */
   vtkGetMacro(UpdateTimeValid, bool);
   void ResetUpdateTime();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Generally, caching is within the purview of the vtkPVView (and subclasses).
    * However, a representation may choose to override that caching by forcing
@@ -138,7 +138,7 @@ public:
   virtual void SetForceUseCache(bool val) { this->ForceUseCache = val; }
   vtkGetMacro(ForcedCacheKey, double);
   vtkGetMacro(ForceUseCache, bool);
-  //@}
+  ///@}
 
   /**
    * Returns the cache-key the representation is currently using. This takes
@@ -146,14 +146,14 @@ public:
    */
   double GetCacheKey() const;
 
-  //@{
+  ///@{
   /**
    * Making these methods public. When constructing composite representations,
    * we need to call these methods directly on internal representations.
    */
   bool AddToView(vtkView* view) override;
   bool RemoveFromView(vtkView* view) override;
-  //@}
+  ///@}
 
   /**
    * Retrieves an output port for the input data object at the specified port
@@ -179,16 +179,16 @@ public:
    */
   vtkMTimeType GetPipelineDataTime();
 
-  //@{
+  ///@{
   /**
    * This is solely intended to simplify debugging and use for any other purpose
    * is vehemently discouraged.
    */
   virtual void SetLogName(const std::string& name) { this->LogName = name; }
   const std::string& GetLogName() const { return this->LogName; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This flag indicates if the representation is for a temporal pipeline. If
    * true, then calling `SetUpdateTime` will result in calling
@@ -202,7 +202,7 @@ public:
    */
   vtkGetMacro(HasTemporalPipeline, bool);
   vtkSetMacro(HasTemporalPipeline, bool);
-  //@}
+  ///@}
 
   /**
    * Returns true if the representation needs an update.
@@ -221,7 +221,7 @@ public:
     UpdateTimeChangedEvent,
   };
 
-  //@{
+  ///@{
   /**
    * Overridden to ensure that `MarkModified` is called.
    */
@@ -229,7 +229,7 @@ public:
   using Superclass::SetInputConnection;
   void AddInputConnection(int port, vtkAlgorithmOutput* input) override;
   using Superclass::AddInputConnection;
-  //@}
+  ///@}
 
   /**
    * Specify the array names used for the selection.

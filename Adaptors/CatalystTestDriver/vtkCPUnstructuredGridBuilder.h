@@ -61,14 +61,14 @@ public:
    */
   virtual void Allocate(vtkIdType numCells = 1000, int extSize = 1000);
 
-  //@{
+  ///@{
   /**
    * Insert/create cell in object by type and list of point
    * ids defining cell topology.
    */
   vtkIdType InsertNextCell(int type, vtkIdType npts, vtkIdType* pts);
   vtkIdType InsertNextCell(int type, vtkIdList* ptIds);
-  //@}
+  ///@}
 
 protected:
   vtkCPUnstructuredGridBuilder();
@@ -89,7 +89,7 @@ private:
   vtkCPUnstructuredGridBuilder(const vtkCPUnstructuredGridBuilder&) = delete;
   void operator=(const vtkCPUnstructuredGridBuilder&) = delete;
 
-  //@{
+  ///@{
   /**
    * The unstructured grid that is created.
    */

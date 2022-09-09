@@ -111,24 +111,24 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(MainWindowEventBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFavoritesBehavior);
 
-  //@{
+  ///@{
   /**
    * Controls whether `pqUsageLoggingBehavior` is created. Disabled by default
    * (except in the ParaView application itself).
    * @sa pqUsageLoggingBehavior.
    */
   PQ_BEHAVIOR_DEFINE_METHODS(UsageLoggingBehavior);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls whether `pqLiveSourceBehavior` is created.
    * @sa pqLiveSourceBehavior
    */
   PQ_BEHAVIOR_DEFINE_METHODS(LiveSourceBehavior);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * By default, widgets like QComboBox, QSlider handle wheel event even when
    * the widget doesn't have the focus. While that's handy, in many use-cases,
@@ -138,7 +138,7 @@ public:
    * QSlider, QAbstractSpinBox and subclasses.
    */
   PQ_BEHAVIOR_DEFINE_METHODS(WheelNeedsFocusBehavior);
-  //@}
+  ///@}
 
   pqParaViewBehaviors(QMainWindow* window, QObject* parent = nullptr);
   ~pqParaViewBehaviors() override;

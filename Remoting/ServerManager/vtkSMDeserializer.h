@@ -47,14 +47,14 @@ public:
    */
   void SetSession(vtkSMSession* session);
 
-  //@{
+  ///@{
   /**
    * Get/Set the proxy manager on which this deserializer is expected to
    * operate.
    */
   vtkSMSessionProxyManager* GetSessionProxyManager();
   void SetSessionProxyManager(vtkSMSessionProxyManager*);
-  //@}
+  ///@}
 
   /**
    * Provides access to the session. This is same as calling

@@ -39,22 +39,22 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVXMLElement* New();
 
-  //@{
+  ///@{
   /**
    * Set/Get the name of the element.  This is its XML tag.
    * (\c \<Name/\>).
    */
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the id of the element. This is assigned by the XML parser
    * and can be used as an identifier to an element.
    */
   vtkGetStringMacro(Id);
-  //@}
+  ///@}
 
   /**
    * Get the attribute with the given name.  If it doesn't exist,
@@ -82,7 +82,7 @@ public:
    */
   const char* GetCharacterData();
 
-  //@{
+  ///@{
   /**
    * Get the attribute with the given name converted to a scalar
    * value.  Returns 1 if a value was extracted.
@@ -93,9 +93,9 @@ public:
 #if defined(VTK_USE_64BIT_IDS)
   int GetScalarAttribute(const char* name, vtkIdType* value);
 #endif
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the attribute with the given name converted to a scalar
    * value.  Returns length of vector read.
@@ -106,9 +106,9 @@ public:
 #if defined(VTK_USE_64BIT_IDS)
   int GetVectorAttribute(const char* name, int length, vtkIdType* value);
 #endif
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the character data converted to a scalar
    * value.  Returns length of vector read.
@@ -119,7 +119,7 @@ public:
 #if defined(VTK_USE_64BIT_IDS)
   int GetCharacterDataAsVector(int length, vtkIdType* value);
 #endif
-  //@}
+  ///@}
 
   /**
    * Get the parent of this element.
@@ -173,7 +173,7 @@ public:
    */
   vtkPVXMLElement* LookupElement(const char* id);
 
-  //@{
+  ///@{
   /**
    * Given it's name and value, add an attribute.
    */
@@ -185,7 +185,7 @@ public:
 #if defined(VTK_USE_64BIT_IDS)
   void AddAttribute(const char* attrName, vtkIdType attrValue);
 #endif
-  //@}
+  ///@}
 
   /**
    * Remove the attribute from the current element
@@ -201,7 +201,7 @@ public:
    */
   void SetAttribute(const char* attrName, const char* attrValue);
 
-  //@{
+  ///@{
   /**
    * Add a sub-element. The parent element keeps a reference to
    * sub-element. If setParent is true, the nested element's parent
@@ -209,15 +209,15 @@ public:
    */
   void AddNestedElement(vtkPVXMLElement* element, int setPrent);
   void AddNestedElement(vtkPVXMLElement* element);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Serialize (as XML) in the given stream.
    */
   void PrintXML(ostream& os, vtkIndent indent);
   void PrintXML();
-  //@}
+  ///@}
 
   /**
    * Merges another element with this one, both having the same name.
@@ -229,7 +229,7 @@ public:
    */
   void Merge(vtkPVXMLElement* element, const char* attributeName);
 
-  //@{
+  ///@{
   /**
    * Similar to DOM specific getElementsByTagName().
    * Returns a list of vtkPVXMLElements with the given name in the order
@@ -239,7 +239,7 @@ public:
    */
   void GetElementsByName(const char* name, vtkCollection* elements);
   void GetElementsByName(const char* name, vtkCollection* elements, bool recursively);
-  //@}
+  ///@}
 
   /**
    * Encode a string.

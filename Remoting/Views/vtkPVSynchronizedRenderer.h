@@ -49,7 +49,7 @@ public:
   vtkTypeMacro(vtkPVSynchronizedRenderer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set this flag to true before calling Initialize() to disable using
    * vtkIceTSynchronizedRenderers for parallel rendering.
@@ -57,7 +57,7 @@ public:
    */
   vtkSetMacro(DisableIceT, bool);
   vtkGetMacro(DisableIceT, bool);
-  //@}
+  ///@}
 
   /**
    * Must be called once to initialize the instance. This will create
@@ -78,25 +78,25 @@ public:
    */
   void SetRenderer(vtkRenderer*);
 
-  //@{
+  ///@{
   /**
    * Enable/Disable parallel rendering.
    */
   virtual void SetEnabled(bool enabled);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the image reduction factor.
    * This needs to be set on all processes and must match up.
    */
   void SetImageReductionFactor(int);
   vtkGetMacro(ImageReductionFactor, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set to true if data is replicated on all processes. This will enable IceT
    * to minimize communications since data is available on all process. Off by
@@ -105,17 +105,17 @@ public:
   void SetDataReplicatedOnAllProcesses(bool);
   vtkGetMacro(DataReplicatedOnAllProcesses, bool);
   vtkBooleanMacro(DataReplicatedOnAllProcesses, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set an image processing pass to process the rendered images.
    */
   void SetImageProcessingPass(vtkImageProcessingPass*);
   vtkGetObjectMacro(ImageProcessingPass, vtkImageProcessingPass);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set geometry rendering pass. This pass is used to render the geometry.
    * If none specified then default rendering pipeline is used. This is
@@ -125,9 +125,9 @@ public:
    */
   void SetRenderPass(vtkRenderPass*);
   vtkGetObjectMacro(RenderPass, vtkRenderPass);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Passes the compressor configuration to the client-server synchronizer, if
    * any. This affects the image compression used to relay images back to the
@@ -137,7 +137,7 @@ public:
    */
   void ConfigureCompressor(const char* configuration);
   void SetLossLessCompression(bool);
-  //@}
+  ///@}
 
   /**
    * Activates or de-activated the use of Depth Buffer in an ImageProcessingPass
@@ -154,7 +154,7 @@ public:
    */
   void SetNVPipeSupport(bool);
 
-  //@{
+  ///@{
   /**
    * State flags to turn on specialized treatment for ray tracing.
    */
@@ -162,9 +162,9 @@ public:
   vtkGetMacro(EnableRayTracing, bool);
   void SetEnablePathTracing(bool val);
   vtkGetMacro(EnablePathTracing, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Not for the faint hearted. This internal vtkSynchronizedRenderers instances
    * are exposed for advanced users that want to do advanced tricks with
@@ -178,23 +178,23 @@ public:
    */
   vtkGetObjectMacro(ParallelSynchronizer, vtkSynchronizedRenderers);
   vtkGetObjectMacro(CSSynchronizer, vtkSynchronizedRenderers);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable/disable FXAA antialiasing.
    */
   virtual void SetUseFXAA(bool use);
   vtkGetMacro(UseFXAA, bool);
-  //@}
+  ///@}
 
-  //@
+  ///@{
   /**
    * Set/Get FXAA options.
    */
   vtkGetObjectMacro(FXAAOptions, vtkFXAAOptions);
   virtual void SetFXAAOptions(vtkFXAAOptions*);
-  //@}
+  ///@}
 
 protected:
   vtkPVSynchronizedRenderer();

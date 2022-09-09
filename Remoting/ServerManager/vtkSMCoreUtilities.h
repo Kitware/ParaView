@@ -59,7 +59,7 @@ public:
     return vtkSMCoreUtilities::SanitizeName(name.c_str());
   }
 
-  //@{
+  ///@{
   /**
    * Given a range, converts it to be a valid range to switch to log space. If
    * the range is changed, returns true, otherwise returns false.
@@ -73,9 +73,9 @@ public:
     rmax = range[1];
     return retVal;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Adjust the given range to make it suitable for use with color maps. The
    * current logic (which may change in future) does the following:
@@ -99,9 +99,9 @@ public:
     rmax = range[1];
     return retVal;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Compares \c val1 and \c val2 and returns true is the two numbers are within
    * \c ulpsDiff ULPs (units in last place) from each other.
@@ -112,14 +112,14 @@ public:
     double range[2] = { rmin, rmax };
     return vtkSMCoreUtilities::AlmostEqual(range, ulpsDiff);
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Given a proxy and a port number get the name of the input.
    */
   static const char* GetInputPropertyName(vtkSMProxy* proxy, int port = 0);
-  //@}
+  ///@}
 
   /**
    * Given a VTK cell type value from the enum in vtkCellTypes.h,

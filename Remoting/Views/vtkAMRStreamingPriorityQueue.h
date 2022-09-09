@@ -44,7 +44,7 @@ public:
   vtkTypeMacro(vtkAMRStreamingPriorityQueue, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * If the controller is specified, the queue can be used in parallel. So long
    * as Initialize(), Update() and Pop() methods are called on all processes
@@ -56,7 +56,7 @@ public:
    */
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   /**
    * Initializes the queue. All information about items in the is lost.
@@ -69,7 +69,7 @@ public:
    */
   void Reinitialize();
 
-  //@{
+  ///@{
   /**
    * Updates the priorities of blocks based on the new view frustum planes.
    * Information about blocks "popped" from the queue is preserved and those
@@ -77,7 +77,7 @@ public:
    */
   void Update(const double view_planes[24], const double clamp_bounds[6]);
   void Update(const double view_planes[24]);
-  //@}
+  ///@}
 
   /**
    * Returns if the queue is empty.

@@ -40,13 +40,13 @@ public:
    */
   void CopyFromObject(vtkObject*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
   /**
    * Get number of files contained in the ensemble.

@@ -59,7 +59,7 @@ public:
    */
   vtkSMProxy* GetLUTProxy(vtkSMProxy* view);
 
-  //@{
+  ///@{
   /**
    * Safely call GetUsingScalarColoring() after casting the proxy to appropriate
    * type.
@@ -69,7 +69,7 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->GetUsingScalarColoring() : false;
   }
-  //@}
+  ///@}
 
   /**
    * Updates the ranges shown in the scalar bar.
@@ -99,7 +99,7 @@ public:
    */
   virtual bool SetScalarColoring(const char* arrayname, int attribute_type, int component);
 
-  //@{
+  ///@{
   /**
    * Safely call SetScalarColoring() after casting the proxy to the appropriate
    * type.
@@ -109,9 +109,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->SetScalarColoring(arrayname, attribute_type) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Safely call SetScalarColoring() after casting the proxy to the appropriate
    * type, component version
@@ -122,7 +122,7 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->SetScalarColoring(arrayname, attribute_type, component) : false;
   }
-  //@}
+  ///@}
 
   /**
    * Rescales the color transfer function and opacity transfer function using the
@@ -156,7 +156,7 @@ public:
   virtual bool RescaleTransferFunctionToDataRange(
     const char* arrayname, int attribute_type, bool extend = false, bool force = true);
 
-  //@{
+  ///@{
   /**
    * Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
    * appropriate type.
@@ -167,9 +167,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->RescaleTransferFunctionToDataRange(extend, force) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
    * appropriate type.
@@ -181,7 +181,7 @@ public:
     return self ? self->RescaleTransferFunctionToDataRange(arrayname, attribute_type, extend, force)
                 : false;
   }
-  //@}
+  ///@}
 
   /**
    * Rescales the color transfer function and opacity transfer function using the
@@ -198,7 +198,7 @@ public:
   virtual bool RescaleTransferFunctionToDataRangeOverTime(
     const char* arrayname, int attribute_type);
 
-  //@{
+  ///@{
   /**
    * Safely call RescaleTransferFunctionToDataRangeOverTime() after casting the proxy to
    * appropriate type.
@@ -208,9 +208,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->RescaleTransferFunctionToDataRangeOverTime() : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Safely call RescaleTransferFunctionToDataRangeOverTime() after casting the proxy to
    * appropriate type.
@@ -222,9 +222,9 @@ public:
     return self ? self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type)
                 : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Rescales the color transfer function and the opacity transfer function
    * using the current data range, limited to the currernt visible elements.
@@ -232,9 +232,9 @@ public:
   virtual bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* view);
   virtual bool RescaleTransferFunctionToVisibleRange(
     vtkSMProxy* view, const char* arrayname, int attribute_type);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Safely call RescaleTransferFunctionToVisibleRange() after casting the proxy
    * to the appropriate type.
@@ -251,9 +251,9 @@ public:
     return self ? self->RescaleTransferFunctionToVisibleRange(view, arrayname, attribute_type)
                 : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the scalar bar visibility. This will create a new scalar bar as needed.
    * Scalar bar is only shown if scalar coloring is indeed being used.
@@ -264,9 +264,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->SetScalarBarVisibility(view, visible) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * While SetScalarBarVisibility can be used to hide a scalar bar, it will
    * always simply hide the scalar bar even if its being used by some other
@@ -280,9 +280,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(repr);
     return self ? self->HideScalarBarIfNotNeeded(view) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Check scalar bar visibility.  Return true if the scalar bar for this
    * representation and view is visible, return false otherwise.
@@ -293,9 +293,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(repr);
     return self ? self->IsScalarBarVisible(view) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the array information for the data array used for scalar coloring, from input data.
    * If checkRepresentedData is true, it will also check in the represented data. Default is true.
@@ -308,9 +308,9 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->GetArrayInformationForColorArray(checkRepresentedData) : nullptr;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Call vtkSMRepresentationProxy::GetProminentValuesInformation() for the
    * array used for scalar color, if any. Otherwise returns nullptr.
@@ -325,7 +325,7 @@ public:
       ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction, force)
       : nullptr;
   }
-  //@}
+  ///@}
 
   /**
    * Get an estimated number of annotation shown on this representation scalar bar
@@ -350,7 +350,7 @@ public:
    */
   bool GetVolumeIndependentRanges();
 
-  //@{
+  ///@{
   /**
    * Checks if the scalar bar of this representation in view
    * is sticky visible, i.e. should be visible whenever this representation
@@ -361,7 +361,7 @@ public:
    * it returns -1.
    */
   int IsScalarBarStickyVisible(vtkSMProxy* view);
-  //@}
+  ///@}
 
   /**
    * Called after the view updates.

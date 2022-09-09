@@ -35,13 +35,13 @@ public:
   vtkTypeMacro(vtkLagrangianHelperBase, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the integration model.
    */
   void SetIntegrationModel(vtkLagrangianBasicIntegrationModel* integrationModel);
   vtkGetObjectMacro(IntegrationModel, vtkLagrangianBasicIntegrationModel);
-  //@}
+  ///@}
 
   /**
    * Remove all arrays to generate, no more array will be generated

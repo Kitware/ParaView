@@ -35,16 +35,16 @@ public:
   vtkTypeMacro(vtkPythonAnimationCue, vtkAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Enable/Disable this cue.
    */
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the python script to execute. The script must have the following
    * functions:
@@ -54,20 +54,20 @@ public:
    */
   void SetScript(const std::string&);
   std::string GetScript() const;
-  //@}
+  ///@}
 
 protected:
   vtkPythonAnimationCue();
   ~vtkPythonAnimationCue() override;
 
-  //@{
+  ///@{
   /**
    * Callbacks that forward the call to corresponding Python function.
    */
   virtual void HandleStartCueEvent();
   virtual void HandleTickEvent();
   virtual void HandleEndCueEvent();
-  //@}
+  ///@}
 
   /**
    * Cleans the interpretor.

@@ -93,13 +93,13 @@ public:
    * Enable/disable processing on an array
    */
   void SetMaterialArrayStatus(const char* name, int status);
-  //@{
+  ///@{
   /**
    * Get enable./disable status for a given array
    */
   int GetMaterialArrayStatus(const char* name);
   int GetMaterialArrayStatus(int index);
-  //@}
+  ///@}
   /**
    * Query the number of available arrays
    */
@@ -126,13 +126,13 @@ public:
    * Enable/disable processing on an array
    */
   void SetMassArrayStatus(const char* name, int status);
-  //@{
+  ///@{
   /**
    * Get enable./disable status for a given array
    */
   int GetMassArrayStatus(const char* name);
   int GetMassArrayStatus(int index);
-  //@}
+  ///@}
   /**
    * Query the number of available arrays
    */
@@ -160,13 +160,13 @@ public:
    * Enable/disable processing on an array
    */
   void SetVolumeWtdAvgArrayStatus(const char* name, int status);
-  //@{
+  ///@{
   /**
    * Get enable./disable status for a given array
    */
   int GetVolumeWtdAvgArrayStatus(const char* name);
   int GetVolumeWtdAvgArrayStatus(int index);
-  //@}
+  ///@}
   /**
    * Query the number of available arrays
    */
@@ -194,13 +194,13 @@ public:
    * Enable/disable processing on an array
    */
   void SetMassWtdAvgArrayStatus(const char* name, int status);
-  //@{
+  ///@{
   /**
    * Get enable./disable status for a given array
    */
   int GetMassWtdAvgArrayStatus(const char* name);
   int GetMassWtdAvgArrayStatus(int index);
-  //@}
+  ///@}
   /**
    * Query the number of available arrays
    */
@@ -227,13 +227,13 @@ public:
    * Enable/disable processing on an array
    */
   void SetSummationArrayStatus(const char* name, int status);
-  //@{
+  ///@{
   /**
    * Get enable./disable status for a given array
    */
   int GetSummationArrayStatus(const char* name);
   int GetSummationArrayStatus(int index);
-  //@}
+  ///@}
   /**
    * Query the number of available arrays
    */
@@ -244,25 +244,25 @@ public:
   const char* GetSummationArrayName(int index);
 
   /// Volume Fraction
-  //@{
+  ///@{
   /**
    * Volume fraction which volxels are included in a frgament.
    */
   void SetMaterialFractionThreshold(double fraction);
   vtkGetMacro(MaterialFractionThreshold, double);
-  //@}
+  ///@}
 
   /// OBB
-  //@{
+  ///@{
   /**
    * Turn on/off OBB calculations
    */
   vtkSetMacro(ComputeOBB, bool);
   vtkGetMacro(ComputeOBB, bool);
-  //@}
+  ///@}
 
   /// Loading
-  //@{
+  ///@{
   /**
    * Set the upper bound(in number of polygons) that will
    * be used to exclude processes from work sharing
@@ -275,17 +275,17 @@ public:
    */
   void SetUpperLoadingBound(int nPolys);
   vtkGetMacro(UpperLoadingBound, int);
-  //@}
+  ///@}
 
   /// Output file
-  //@{
+  ///@{
   /**
    * Name the file to save a table of fragment attributes to.
    */
   vtkSetStringMacro(OutputBaseName);
   vtkGetStringMacro(OutputBaseName);
-  //@}
-  //@{
+  ///@}
+  ///@{
   /**
    * If true, save the results of the filter in a text file
    */
@@ -293,9 +293,9 @@ public:
   vtkGetMacro(WriteGeometryOutput, bool);
   vtkSetMacro(WriteStatisticsOutput, bool);
   vtkGetMacro(WriteStatisticsOutput, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Variable used to specify the number of ghost level
    * is available in each block.
@@ -303,29 +303,29 @@ public:
    */
   vtkSetMacro(BlockGhostLevel, unsigned char);
   vtkGetMacro(BlockGhostLevel, unsigned char);
-  //@}
+  ///@}
 
   /**
    * Sets modified if array selection changes.
    */
   static void SelectionModifiedCallback(vtkObject*, unsigned long, void* clientdata, void*);
 
-  //@{
+  ///@{
   /**
    * Set the clip function which can be a plane or a sphere
    */
   void SetClipFunction(vtkImplicitFunction* clipFunction);
   vtkGetObjectMacro(ClipFunction, vtkImplicitFunction);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Invert the volume fraction to extract the negative space.
    * This is useful for extracting a crater.
    */
   vtkSetMacro(InvertVolumeFraction, int);
   vtkGetMacro(InvertVolumeFraction, int);
-  //@}
+  ///@}
 
   /**
    * Return the mtime also considering the locator and clip function.

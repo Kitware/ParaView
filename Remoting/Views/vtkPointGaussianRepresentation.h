@@ -165,7 +165,7 @@ public:
    */
   void SelectOpacityArrayComponent(int component);
 
-  //@{
+  ///@{
   /**
    * Enables or disables setting opacity by an array.  Set which array
    * should be used for opacity with SelectOpacityArray, and set an
@@ -174,9 +174,9 @@ public:
   void SetOpacityByArray(bool newVal);
   vtkGetMacro(OpacityByArray, bool);
   vtkBooleanMacro(OpacityByArray, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enables or disables scaling by a data array vs. a constant factor.  Set
    * which data array with SelectScaleArray and SetSplatSize.
@@ -184,7 +184,7 @@ public:
   void SetScaleByArray(bool newVal);
   vtkGetMacro(ScaleByArray, bool);
   vtkBooleanMacro(ScaleByArray, bool);
-  //@}
+  ///@}
 
 protected:
   vtkPointGaussianRepresentation();

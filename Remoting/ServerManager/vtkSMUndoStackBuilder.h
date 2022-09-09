@@ -69,7 +69,7 @@ public:
    */
   virtual void End();
 
-  //@{
+  ///@{
   /**
    * Convenience method call End(); PushToStack(); in that order.
    */
@@ -78,7 +78,7 @@ public:
     this->End();
     this->PushToStack();
   }
-  //@}
+  ///@}
 
   /**
    * If any undoable changes were recorded by the builder, this will push
@@ -102,15 +102,15 @@ public:
    */
   virtual bool Add(vtkUndoElement* element);
 
-  //@{
+  ///@{
   /**
    * Get/Set the undo stack that this builder will build.
    */
   vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
   virtual void SetUndoStack(vtkSMUndoStack*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If IgnoreAllChanges is true, any server manager changes will be
    * ignored even if the changes happened within a Begin()-End() call.
@@ -120,7 +120,7 @@ public:
    */
   vtkSetMacro(IgnoreAllChanges, bool);
   vtkGetMacro(IgnoreAllChanges, bool);
-  //@}
+  ///@}
 
   // Record a state change on a RemoteObject
   virtual void OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,

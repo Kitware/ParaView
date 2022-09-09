@@ -62,7 +62,7 @@ public:
    */
   void HandleInteractions();
 
-  //@{
+  ///@{
   /**
    * LeftButton event function (invoke Button3DEvent)
    * Initiate a clip : choose a clipping plane origin
@@ -70,18 +70,18 @@ public:
    */
   void OnLeftButtonDown(vtkEventDataDevice3D*);
   void OnLeftButtonUp(vtkEventDataDevice3D*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * MiddleButton event function (invoke Button3DEvent)
    * Allows to position a prop with the stylus.
    */
   void OnMiddleButtonDown(vtkEventDataDevice3D*);
   void OnMiddleButtonUp(vtkEventDataDevice3D*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * LeftButton event function (invoke Button3DEvent)
    * Perform an hardware picking with the stylus
@@ -89,7 +89,7 @@ public:
    */
   void OnRightButtonDown(vtkEventDataDevice3D*);
   void OnRightButtonUp(vtkEventDataDevice3D*);
-  //@}
+  ///@}
 
 protected:
   vtkZSpaceRenderWindowInteractor();

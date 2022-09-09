@@ -37,13 +37,13 @@ public:
    */
   void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) override;
 
-  //@{
+  ///@{
   /**
    * Base to be used for exponential function.
    */
   vtkSetMacro(Base, double);
   vtkGetMacro(Base, double);
-  //@}
+  ///@}
 
   vtkSetMacro(StartPower, double);
   vtkGetMacro(StartPower, double);

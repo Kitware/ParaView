@@ -52,7 +52,7 @@ public:
     CONNECTION_FAILURE
   };
 
-  //@{
+  ///@{
   /**
    * Creates a new connection given the url.
    * This call may block until the connection can be established. To keep
@@ -87,7 +87,7 @@ public:
     return this->NewConnection(url, result);
   }
   virtual vtkMultiProcessController* NewConnection(const char* url, ConnectionResult& result) = 0;
-  //@}
+  ///@}
 
   /**
    * Used to abort pending connection creation, if any. Refer to

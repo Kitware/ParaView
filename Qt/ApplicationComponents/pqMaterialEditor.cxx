@@ -183,13 +183,13 @@ public:
    */
   int columnCount(const QModelIndex&) const override { return 2; }
 
-  //@{
+  ///@{
   /**
    * Query current material informations
    */
   std::string getMaterialType() const { return this->MaterialType; }
   std::string getMaterialName() const { return this->MaterialName; }
-  //@}
+  ///@}
 
   /**
    * Return the data at index with role

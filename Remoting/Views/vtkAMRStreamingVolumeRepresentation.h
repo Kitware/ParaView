@@ -54,7 +54,7 @@ public:
     RESAMPLE_USING_VIEW_FRUSTUM = 1
   };
 
-  //@{
+  ///@{
   /**
    * This control the logic used to determine how to place the resampling grid
    * within the AMR bounds.
@@ -65,7 +65,7 @@ public:
    */
   void SetResamplingMode(int val);
   vtkGetMacro(ResamplingMode, int);
-  //@}
+  ///@}
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -89,16 +89,16 @@ public:
    */
   void SetNumberOfSamples(int x, int y, int z);
 
-  //@{
+  ///@{
   /**
    * Set the number of blocks to request at a given time on a single process
    * when streaming.
    */
   vtkSetClampMacro(StreamingRequestSize, int, 1, 10000);
   vtkGetMacro(StreamingRequestSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the input data arrays that this algorithm will process.
    */
@@ -120,7 +120,7 @@ public:
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);
   }
-  //@}
+  ///@}
 
   //***************************************************************************
   // Scalar coloring API (forwarded for vtkSmartVolumeMapper.
@@ -198,20 +198,20 @@ protected:
    */
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  //@{
+  ///@{
   /**
    * Returns true when the input pipeline supports streaming. It is set in
    * RequestInformation().
    */
   vtkGetMacro(StreamingCapablePipeline, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns true when StreamingUpdate() is being processed.
    */
   vtkGetMacro(InStreamingUpdate, bool);
-  //@}
+  ///@}
 
   /**
    * Returns true if this representation has a "next piece" that it streamed.
@@ -249,7 +249,7 @@ protected:
    */
   vtkSmartPointer<vtkResampledAMRImageSource> Resampler;
 
-  //@{
+  ///@{
   /**
    * Rendering components.
    */
@@ -257,7 +257,7 @@ protected:
   vtkSmartPointer<vtkAMRVolumeMapper> AMRVolumeMapper;
   vtkSmartPointer<vtkVolumeProperty> Property;
   vtkSmartPointer<vtkPVLODVolume> Actor;
-  //@}
+  ///@}
 
   /**
    * Used to keep track of data bounds.

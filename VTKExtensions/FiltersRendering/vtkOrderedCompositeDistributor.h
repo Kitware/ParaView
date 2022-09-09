@@ -60,11 +60,11 @@ public:
   static vtkOrderedCompositeDistributor* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   void SetCuts(const std::vector<vtkBoundingBox>& boxes);
   void SetController(vtkMultiProcessController* controller);
   void SetBoundaryMode(int mode);
-  //@}
+  ///@}
 
   // These are kept consistent with vtkRedistributeDataSetFilter::BoundaryModes
   enum BoundaryModes

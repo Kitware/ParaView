@@ -50,13 +50,13 @@ public:
   vtkTypeMacro(vtkPVDataDeliveryManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the render-view. The view is not reference counted.
    */
   void SetView(vtkPVView*);
   vtkPVView* GetView() const;
-  //@}
+  ///@}
 
   /**
    * Returned a hash number that can be used to verify that both client and
@@ -64,7 +64,7 @@ public:
    */
   int GetSynchronizationMagicNumber();
 
-  //@{
+  ///@{
   /**
    * View uses these methods to register a representation with the storage. This
    * makes it possible for representations to communicate with the storage
@@ -74,9 +74,9 @@ public:
   void RegisterRepresentation(vtkPVDataRepresentation* repr);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
   vtkPVDataRepresentation* GetRepresentation(unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Representations (indirectly via vtkPVRenderView::SetPiece()) call this
    * method to register the geometry type they are rendering. Every
@@ -85,11 +85,11 @@ public:
    */
   void SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res,
     unsigned long trueSize = 0, int port = 0);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   bool HasPiece(vtkPVDataRepresentation* repr, bool low_res = false, int port = 0);
-  //@}
+  ///@}
 
   /**
    * Returns the local data object set by calling `SetPiece` (or from the
@@ -107,7 +107,7 @@ public:
    */
   void ClearCache(vtkPVDataRepresentation* repr);
 
-  //@{
+  ///@{
   /**
    * Provides access to the producer port for the geometry of a registered
    * representation. Representations use these methods (indirectly via
@@ -115,22 +115,22 @@ public:
    * the geometry producer for the geometry to be rendered.
    */
   vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*, bool low_res, int port = 0);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get meta-data container for the specific piece. Views can use it to
    * store arbitrary metadata for each piece.
    */
   vtkInformation* GetPieceInformation(vtkPVDataRepresentation* repr, bool low_res, int port = 0);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns number of known port for the representation.
    */
   int GetNumberOfPorts(vtkPVDataRepresentation* repr);
-  //@}
+  ///@}
 
   /**
    * Returns the size for all visible geometry. If low_res is true, and low-res

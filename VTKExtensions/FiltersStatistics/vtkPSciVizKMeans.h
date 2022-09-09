@@ -44,7 +44,7 @@ public:
   vtkTypeMacro(vtkPSciVizKMeans, vtkSciVizStatistics);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The number of cluster centers.
    * The initial centers will be chosen randomly.
@@ -53,25 +53,25 @@ public:
    */
   vtkSetMacro(K, int);
   vtkGetMacro(K, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The maximum number of iterations to perform when converging on cluster centers.
    * The default value is 50 iterations.
    */
   vtkSetMacro(MaxNumIterations, int);
   vtkGetMacro(MaxNumIterations, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The relative tolerance on cluster centers that will cause early termination of the algorithm.
    * The default value is 0.01: a 1 percent change in cluster coordinates.
    */
   vtkSetMacro(Tolerance, double);
   vtkGetMacro(Tolerance, double);
-  //@}
+  ///@}
 
 protected:
   vtkPSciVizKMeans();

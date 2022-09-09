@@ -36,33 +36,33 @@ public:
   vtkTypeMacro(vtkPVKeyFrameAnimationCueForProxies, vtkPVKeyFrameAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the animated proxy.
    */
   void SetAnimatedProxy(vtkSMProxy*);
   vtkGetObjectMacro(AnimatedProxy, vtkSMProxy);
-  //@}
+  ///@}
 
   void RemoveAnimatedProxy();
 
-  //@{
+  ///@{
   /**
    * Set/Get the animated property name.
    */
   vtkSetStringMacro(AnimatedPropertyName);
   vtkGetStringMacro(AnimatedPropertyName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the animated domain name.
    */
   vtkSetStringMacro(AnimatedDomainName);
   vtkGetStringMacro(AnimatedDomainName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Used to update the animated item. This API makes it possible for vtk-level
    * classes to update properties without actually linking with the
@@ -72,7 +72,7 @@ public:
   void BeginUpdateAnimationValues() override;
   void SetAnimationValue(int index, double value) override;
   void EndUpdateAnimationValues() override;
-  //@}
+  ///@}
 
 protected:
   vtkPVKeyFrameAnimationCueForProxies();

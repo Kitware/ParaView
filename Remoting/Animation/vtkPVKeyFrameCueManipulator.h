@@ -58,7 +58,7 @@ public:
    */
   int AddKeyFrame(vtkPVKeyFrame* keyframe);
 
-  //@{
+  ///@{
   /**
    * This method returns the index of the last added key frame.
    * Note that this index is valid only until none of the keyframes
@@ -66,7 +66,7 @@ public:
    * this value can be accessed via properties.
    */
   vtkGetMacro(LastAddedKeyFrameIndex, int);
-  //@}
+  ///@}
 
   /**
    * Removes a key frame at the specified time, if any.
@@ -84,7 +84,7 @@ public:
    */
   vtkPVKeyFrame* GetKeyFrame(double time);
 
-  //@{
+  ///@{
   /**
    * Given the current time, determine the key frames
    * between which the current time lies.
@@ -97,16 +97,16 @@ public:
    */
   vtkPVKeyFrame* GetStartKeyFrame(double time);
   vtkPVKeyFrame* GetEndKeyFrame(double time);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the next/previous key frame relative to argument key frame.
    * Returns nullptr when no next/previous frame exists.
    */
   vtkPVKeyFrame* GetNextKeyFrame(vtkPVKeyFrame* keyFrame);
   vtkPVKeyFrame* GetPreviousKeyFrame(vtkPVKeyFrame* keyFrame);
-  //@}
+  ///@}
 
   /**
    * Get the number of keyframes.
@@ -119,7 +119,7 @@ public:
    */
   vtkPVKeyFrame* GetKeyFrameAtIndex(int index);
 
-  //@{
+  ///@{
   /**
    * This method iterates over all added keyframe proxies and updates the
    * domains for all keyframes, such that for every keyframe J, with keytime
@@ -130,7 +130,7 @@ public:
 protected:
   vtkPVKeyFrameCueManipulator();
   ~vtkPVKeyFrameCueManipulator() override;
-  //@}
+  ///@}
 
   /**
    * This method is called when the AnimationCue's StartAnimationCueEvent is

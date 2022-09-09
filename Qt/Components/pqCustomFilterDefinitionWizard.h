@@ -165,7 +165,7 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * \name Page Navigation
    */
-  //@{
+  ///@{
   /**
    * Called when the user clicks the back button.
    */
@@ -187,12 +187,12 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * \param text The changed name text.
    */
   void clearNameOverwrite(const QString& text);
-  //@}
+  ///@}
 
   /**
    * \name Model Selection Updates
    */
-  //@{
+  ///@{
   /**
    * \brief
    *   Updates the input form fields for the newly selected source.
@@ -225,12 +225,12 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * \param previous The previously selected index.
    */
   void updatePropertyForm(const QModelIndex& current, const QModelIndex& previous);
-  //@}
+  ///@}
 
   /**
    * \name Input List Buttons
    */
-  //@{
+  ///@{
   /**
    * Adds an input to the list based on the form parameters.
    */
@@ -250,12 +250,12 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Moves the selected input down in the list.
    */
   void moveInputDown();
-  //@}
+  ///@}
 
   /**
    * \name Output List Buttons
    */
-  //@{
+  ///@{
   /**
    * Adds an output to the list based on the form parameters.
    */
@@ -275,12 +275,12 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Moves the selected output down in the list.
    */
   void moveOutputDown();
-  //@}
+  ///@}
 
   /**
    * \name Property List Buttons
    */
-  //@{
+  ///@{
   /**
    * Adds an property to the list based on the form parameters.
    */
@@ -300,12 +300,12 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Moves the selected property down in the list.
    */
   void movePropertyDown();
-  //@}
+  ///@}
 
   /**
    * \name List Selection Updates
    */
-  //@{
+  ///@{
   /**
    * \brief
    *   Updates the input list buttons for the newly selected index.
@@ -329,7 +329,7 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * \param previous The previously selected index.
    */
   void updatePropertyButtons(const QModelIndex& current, const QModelIndex& previous);
-  //@}
+  ///@}
 
 private:                                    // NOLINT(readability-redundant-access-specifiers)
   int CurrentPage;                          ///< Stores the current page.

@@ -50,23 +50,23 @@ public:
   static void SetEnableStreaming(bool);
   static bool GetEnableStreaming();
 
-  //@{
+  ///@{
   /**
    * Set the position on this view in the multiview configuration.
    * \note CallOnAllProcesses
    */
   virtual void SetPosition(int, int);
   vtkGetVector2Macro(Position, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the size of this view in the multiview configuration.
    * \note CallOnAllProcesses
    */
   virtual void SetSize(int, int);
   vtkGetVector2Macro(Size, int);
-  //@}
+  ///@}
 
   /**
    * Description:
@@ -89,7 +89,7 @@ public:
    */
   virtual void InteractiveRender() = 0;
 
-  //@{
+  ///@{
   /**
    * Get/Set the time this view is showing.
    *
@@ -97,9 +97,9 @@ public:
    */
   virtual void SetViewTime(double value);
   vtkGetMacro(ViewTime, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the cache key. When caching is enabled, this key is used to
    * identify what geometry cache to use for the current render. It is passed on
@@ -109,24 +109,24 @@ public:
    */
   vtkSetMacro(CacheKey, double);
   vtkGetMacro(CacheKey, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether caching is enabled.
    * \note CallOnAllProcesses
    */
   vtkSetMacro(UseCache, bool);
   vtkGetMacro(UseCache, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are used to setup the view for capturing screen shots.
    */
   virtual void PrepareForScreenshot();
   virtual void CleanupAfterScreenshot();
-  //@}
+  ///@}
 
   /**
    * Key used to pass the vtkPVView pointer to the representation during any of
@@ -197,7 +197,7 @@ public:
    */
   vtkRenderWindow* GetRenderWindow() { return this->RenderWindow; }
 
-  //@{
+  ///@{
   /**
    * Use this to indicate that the process should use
    * vtkGenericOpenGLRenderWindow rather than vtkRenderWindow when creating an
@@ -205,9 +205,9 @@ public:
    */
   static void SetUseGenericOpenGLRenderWindow(bool val);
   static bool GetUseGenericOpenGLRenderWindow();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When saving screenshots with tiling, these methods get called.
    * Not to be confused with tile scale and viewport setup on tile display.
@@ -216,16 +216,16 @@ public:
    */
   void SetTileScale(int x, int y);
   void SetTileViewport(double x0, double y0, double x1, double y1);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This is solely intended to simplify debugging and use for any other purpose
    * is vehemently discouraged.
    */
   virtual void SetLogName(const std::string& name) { this->LogName = name; }
   const std::string& GetLogName() const { return this->LogName; }
-  //@}
+  ///@}
 
   /**
    * vtkViewLayout calls this method to update the total viewport available for
@@ -246,13 +246,13 @@ public:
    */
   vtkMTimeType GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
 
-  //@{
+  ///@{
   /**
    * Provides access to data delivery & cache manager for this view.
    */
   void SetDeliveryManager(vtkPVDataDeliveryManager*);
   vtkGetObjectMacro(DeliveryManager, vtkPVDataDeliveryManager);
-  //@}
+  ///@}
 
   static void SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
     unsigned long trueSize = 0, int port = 0);
@@ -318,7 +318,7 @@ protected:
   void AllReduce(
     vtkTypeUInt64 source, vtkTypeUInt64& dest, int operation, bool skip_data_server = false);
 
-  //@{
+  ///@{
   /**
    * Overridden to assign IDs to each representation. This assumes that
    * representations will be added/removed in a consistent fashion across
@@ -329,9 +329,9 @@ protected:
    */
   void AddRepresentationInternal(vtkDataRepresentation* rep) override;
   void RemoveRepresentationInternal(vtkDataRepresentation* rep) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These are passed as arguments to
    * vtkDataRepresentation::ProcessViewRequest(). This avoid repeated creation
@@ -339,9 +339,9 @@ protected:
    */
   vtkInformation* RequestInformation;
   vtkInformationVector* ReplyInformationVector;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Subclasses can use this method to trigger a pass on all representations.
    * @returns the count for representations that processed the call and returned
@@ -349,7 +349,7 @@ protected:
    */
   int CallProcessViewRequest(
     vtkInformationRequestKey* passType, vtkInformation* request, vtkInformationVector* reply);
-  //@}
+  ///@}
 
   vtkPVSession* GetSession();
 

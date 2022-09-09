@@ -34,11 +34,11 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_Complex(T& a, T& b):std::complex<T>(a,b) {}
     GW_Complex(T& a):std::complex<T>(a,a) {}
     GW_Complex():std::complex<T>(0,0) {}
-    //@}
+    ///@}
 
     GW_Complex& operator=(const T& b)
     {

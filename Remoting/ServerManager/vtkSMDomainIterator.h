@@ -42,12 +42,12 @@ public:
    */
   void SetProperty(vtkSMProperty* property);
 
-  //@{
+  ///@{
   /**
    * Returns the property being iterated over.
    */
   vtkGetObjectMacro(Property, vtkSMProperty);
-  //@}
+  ///@}
 
   /**
    * Go to the first domain.

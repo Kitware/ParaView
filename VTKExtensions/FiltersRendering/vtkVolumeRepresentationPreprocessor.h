@@ -46,16 +46,16 @@ public:
   vtkTypeMacro(vtkVolumeRepresentationPreprocessor, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * When On, the internal triangle filter will cull all 1D and 2D cells from the output.
    * The default is Off.
    */
   vtkSetMacro(TetrahedraOnly, int);
   vtkGetMacro(TetrahedraOnly, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forwarded to internal vtkExtractBlockUsingDataAssembly to subset the input
    * composite dataset. This has no effect if input is not a composite dataset.
@@ -64,7 +64,7 @@ public:
   void SetSelector(const char* selector);
   void ClearSelectors();
   void SetAssemblyName(const char*);
-  //@}
+  ///@}
 
 protected:
   vtkVolumeRepresentationPreprocessor();

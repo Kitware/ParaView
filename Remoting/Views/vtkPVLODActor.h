@@ -61,13 +61,13 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow*) override;
 
-  //@{
+  ///@{
   /**
    * This sets the low res input.
    */
   virtual void SetLODMapper(vtkMapper*);
   vtkGetObjectMacro(LODMapper, vtkMapper);
-  //@}
+  ///@}
 
   /**
    * This is a bit of a hack.  This returns the last mapper used to render.
@@ -98,7 +98,7 @@ public:
   void SetEnableLOD(int val) { this->EnableLOD = val; }
   vtkGetMacro(EnableLOD, int);
 
-  //@{
+  ///@{
   /**
    * For OSPRay controls sizing of implicit spheres (points) and
    * cylinders (lines)
@@ -106,7 +106,7 @@ public:
   virtual void SetEnableScaling(int v);
   virtual void SetScalingArrayName(const char*);
   virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
-  //@}
+  ///@}
 
 protected:
   vtkPVLODActor();

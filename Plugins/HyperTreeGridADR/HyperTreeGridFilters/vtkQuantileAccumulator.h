@@ -82,13 +82,13 @@ public:
    */
   typedef std::shared_ptr<ListType> ListPointer;
 
-  //@{
+  ///@{
   /**
    * Methods for adding data to the accumulator.
    */
   void Add(vtkAbstractAccumulator* accumulator) override;
   void Add(double value, double weight = 1.0) override;
-  //@}
+  ///@}
 
   /**
    * Set object into initial state
@@ -120,13 +120,13 @@ public:
    */
   double GetValue() const override;
 
-  //@{
+  ///@{
   /**
    * Set / Get on the Percentile to compute.
    */
   vtkGetMacro(Percentile, double);
   vtkSetMacro(Percentile, double);
-  //@}
+  ///@}
 
   /**
    * Getter for the index of the percentile in the sorted list.

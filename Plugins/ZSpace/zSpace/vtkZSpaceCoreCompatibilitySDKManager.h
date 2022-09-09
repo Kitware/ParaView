@@ -93,22 +93,22 @@ public:
    */
   void CalculateFrustumFit(const double bounds[6], double position[3], double viewUp[3]) override;
 
-  //@{
+  ///@{
   /**
    * Notify the zSpace SDK for the begining/end of a frame.
    */
   void BeginFrame() override;
   void EndFrame() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the render windwow the manager makes viewport computations
    * from. Overriden to pass the related Windows window handle to
    * the SDK.
    */
   void SetRenderWindow(vtkRenderWindow*) override;
-  //@}
+  ///@}
 
 protected:
   vtkZSpaceCoreCompatibilitySDKManager();

@@ -31,16 +31,16 @@ public:
   vtkTypeMacro(vtkPVEnSightMasterServerTranslator, vtkExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the piece that should provide the data.  All other pieces
    * should provide empty data.
    */
   vtkGetMacro(ProcessId, int);
   vtkSetMacro(ProcessId, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Translates the piece matching ProcessId to the whole extent, and
    * all other pieces to empty.
@@ -51,7 +51,7 @@ public:
 protected:
   vtkPVEnSightMasterServerTranslator();
   ~vtkPVEnSightMasterServerTranslator() override;
-  //@}
+  ///@}
 
   // The process id on which this translator is running.
   int ProcessId;

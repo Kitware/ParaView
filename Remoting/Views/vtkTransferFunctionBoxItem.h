@@ -158,7 +158,7 @@ protected:
    */
   bool Hit(const vtkContextMouseEvent& mouse) override;
 
-  //@{
+  ///@{
   /**
    * \brief Interaction overrides.
    * The box item can be dragged around the chart area by clicking within
@@ -172,7 +172,7 @@ protected:
   bool MouseMoveEvent(const vtkContextMouseEvent& mouse) override;
   bool KeyPressEvent(const vtkContextKeyEvent& key) override;
   bool KeyReleaseEvent(const vtkContextKeyEvent& key) override;
-  //@}
+  ///@}
 
   /**
    * Highlight this box

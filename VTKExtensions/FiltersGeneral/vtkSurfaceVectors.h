@@ -44,7 +44,7 @@ public:
     PerpendicularScale
   };
 
-  //@{
+  ///@{
   /**
    * This mode determines whether this filter projects vectors to be
    * perpendicular to surface or parallel to surface.
@@ -61,7 +61,7 @@ public:
   {
     this->SetConstraintMode(vtkSurfaceVectors::PerpendicularScale);
   }
-  //@}
+  ///@}
 
 protected:
   vtkSurfaceVectors();

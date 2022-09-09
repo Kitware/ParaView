@@ -42,37 +42,37 @@ public:
   vtkPVAMRFragmentIntegration();
   ~vtkPVAMRFragmentIntegration() override;
 
-  //@{
+  ///@{
   /**
    * Add to list of volume arrays which are used for generating contours.
    */
   void AddInputVolumeArrayToProcess(const char* name);
   void ClearInputVolumeArrayToProcess();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add to list of mass arrays
    */
   void AddInputMassArrayToProcess(const char* name);
   void ClearInputMassArrayToProcess();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add to list of volume weighted arrays
    */
   void AddInputVolumeWeightedArrayToProcess(const char* name);
   void ClearInputVolumeWeightedArrayToProcess();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add to list of mass weighted arrays
    */
   void AddInputMassWeightedArrayToProcess(const char* name);
   void ClearInputMassWeightedArrayToProcess();
-  //@}
+  ///@}
 
   void SetContourConnection(vtkAlgorithmOutput*);
 

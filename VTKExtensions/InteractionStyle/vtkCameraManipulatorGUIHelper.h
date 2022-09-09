@@ -53,7 +53,7 @@ public:
    */
   virtual int GetActiveSourceBounds(double bounds[6]) = 0;
 
-  //@{
+  ///@{
   /**
    * Called to get/set the translation for the actor for the active
    * source in the active view. If applicable returns 1, otherwise
@@ -61,9 +61,9 @@ public:
    */
   virtual int GetActiveActorTranslate(double translate[3]) = 0;
   virtual int SetActiveActorTranslate(double translate[3]) = 0;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the center of rotation. Returns 0 if not applicable.
    */
@@ -72,7 +72,7 @@ public:
 protected:
   vtkCameraManipulatorGUIHelper();
   ~vtkCameraManipulatorGUIHelper() override;
-  //@}
+  ///@}
 
 private:
   vtkCameraManipulatorGUIHelper(const vtkCameraManipulatorGUIHelper&) = delete;

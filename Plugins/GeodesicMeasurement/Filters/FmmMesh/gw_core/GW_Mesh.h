@@ -45,16 +45,16 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
   GW_Mesh();
   virtual ~GW_Mesh();
     virtual GW_Mesh& operator=(const GW_Mesh& v);
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Resize manager. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void SetNbrFace( GW_U32 nNum );
     void SetNbrVertex( GW_U32 nNum );
 
@@ -62,12 +62,12 @@ public:
     GW_U32 GetNbrFace() const;
 
     void Reset();
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Vertex/Face management */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void AddFace( GW_Face& pFace );
     void SetFace( GW_U32 nNum, GW_Face* pFace );
     void SetVertex( GW_U32 nNum, GW_Vertex* pVert );
@@ -77,7 +77,7 @@ public:
     GW_Vertex* GetVertex( GW_U32 nNum );
     const GW_Face* GetFace( GW_U32 nNum ) const;
     const GW_Vertex* GetVertex( GW_U32 nNum ) const;
-    //@}
+    ///@}
 
     GW_Float GetBoundingRadius();
     void GetBoundingBox( GW_Vector3D& min, GW_Vector3D& max );
@@ -94,12 +94,12 @@ public:
     //-------------------------------------------------------------------------
     /** \name Boundary helpers */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void ExtractBoundary( GW_Vertex& seed, T_VertexList& boundary, T_VertexMap* pExtracted = NULL );
     void ExtractAllBoundaries( std::list<T_VertexList>& boundary_list );
     GW_Float GetPerimeter( GW_U32* nNbrBoundaries = NULL );
     static GW_Float GetPerimeter( T_VertexList& boundary, GW_Bool bCyclic = GW_True );
-    //@}
+    ///@}
 
 
     void SetStaticThis();
@@ -119,10 +119,10 @@ public:
     //-------------------------------------------------------------------------
     /** \name Class factory methods. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     virtual GW_Vertex& CreateNewVertex();
     virtual GW_Face& CreateNewFace();
-    //@}
+    ///@}
 
     typedef void (*VertexIterate_Callback)( GW_Vertex& vert );
     static void IterateConnectedComponent_Vertex( GW_Vertex& start_vert, VertexIterate_Callback pCallback );

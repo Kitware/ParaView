@@ -33,13 +33,13 @@ public:
   vtkTypeMacro(vtkPVWebExporter, vtkJSONSceneExporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify file name of the ParaViewGlance HTML file to use to embed the data in
    */
   vtkSetStringMacro(ParaViewGlanceHTML);
   vtkGetStringMacro(ParaViewGlanceHTML);
-  //@}
+  ///@}
 
 protected:
   vtkPVWebExporter();

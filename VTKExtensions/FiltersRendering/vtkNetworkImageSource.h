@@ -38,13 +38,13 @@ public:
   vtkTypeMacro(vtkNetworkImageSource, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the filename.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
   /**
    * Needs to be called to perform the actual image migration.

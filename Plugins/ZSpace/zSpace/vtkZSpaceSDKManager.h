@@ -102,22 +102,22 @@ public:
   virtual void CalculateFrustumFit(
     const double bounds[6], double position[3], double viewUp[3]) = 0;
 
-  //@{
+  ///@{
   /**
    * Notify the zSpace SDK for the begining/end of a frame
    * (vtkZSpaceCoreCompatibility only)
    */
   virtual void BeginFrame() = 0;
   virtual void EndFrame() = 0;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the render windwow the manager makes viewport computations
    * from.
    */
   virtual void SetRenderWindow(vtkRenderWindow* renderWindow);
-  //@}
+  ///@}
 
   /**
    * Update the viewport, the trackers and the camera matrix
@@ -162,13 +162,13 @@ public:
    */
   vtkGetMacro(SecondaryTargets, int);
 
-  //@{
+  ///@{
   /**
    * Get/Set the distance between the eyes in meters.
    */
   vtkGetMacro(InterPupillaryDistance, float);
   vtkSetClampMacro(InterPupillaryDistance, float, 0.f, 1.f);
-  //@}
+  ///@}
 
   /**
    * Set the near and far plane.
@@ -251,29 +251,29 @@ public:
     NumberOfStates = 4
   };
 
-  //@{
+  ///@{
   /**
    * Get/Set the state of the left button of the stylus.
    */
   vtkGetMacro(LeftButtonState, int);
   vtkSetEnumMacro(LeftButtonState, ButtonState);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the state of the middle button of the stylus.
    */
   vtkGetMacro(MiddleButtonState, int);
   vtkSetEnumMacro(MiddleButtonState, ButtonState);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the state of the right button of the stylus.
    */
   vtkGetMacro(RightButtonState, int);
   vtkSetEnumMacro(RightButtonState, ButtonState);
-  //@}
+  ///@}
 
 protected:
   vtkZSpaceSDKManager();

@@ -875,7 +875,7 @@ public:
   QPointer<pqDataAssemblyTreeModel> AssemblyTreeModel;
   QPointer<pqDAPModel> ProxyModel;
 
-  //@{
+  ///@{
   /**
    * Table models for advanced editing of the selectors + properties.
    * This is not supported in composite-indices mode.
@@ -883,9 +883,9 @@ public:
   QPointer<TableModel> SelectorsTableModel;
   QPointer<TableModel> ColorsTableModel;
   QPointer<TableModel> OpacitiesTableModel;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   // Cached values.
   QStringList Selectors;
   QList<QVariant> Colors;
@@ -894,7 +894,7 @@ public:
   QList<QVariant> CompositeIndices;
   QList<QVariant> CompositeIndexColors;
   QList<QVariant> CompositeIndexOpacities;
-  //@}
+  ///@}
 
   bool BlockUpdates = false;
 

@@ -74,12 +74,12 @@ public:
    */
   void* consoleLocals();
 
-  //@{
+  ///@{
   /**
    * Set/get the font size in points for the Python shell text.
    */
   void setFontSize(int fontSize);
-  //@}
+  ///@}
 
   enum PrintMode
   {

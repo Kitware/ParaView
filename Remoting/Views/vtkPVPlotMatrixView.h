@@ -60,14 +60,14 @@ public:
    */
   void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) override;
 
-  //@{
+  ///@{
   /**
    * Get/set the active plot in the scatter plot matrix.
    */
   void SetActivePlot(int i, int j);
   int GetActiveRow();
   int GetActiveColumn();
-  //@}
+  ///@}
 
   /**
    * Clear the animation path, ensuring it is empty.
@@ -89,7 +89,7 @@ public:
    */
   void AdvanceAnimationPath();
 
-  //@{
+  ///@{
   /**
    * Get/Set the font of the title.
    * These methods should not be called directly. They are made public only so
@@ -106,9 +106,9 @@ public:
   int GetTitleFontSize() override;
   int GetTitleFontBold() override;
   int GetTitleFontItalic() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the color of the title.
    * These methods should not be called directly. They are made public only so
@@ -117,9 +117,9 @@ public:
    */
   void SetTitleColor(double red, double green, double blue) override;
   double* GetTitleColor() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the alignement of the title.
    * These methods should not be called directly. They are made public only so
@@ -128,14 +128,14 @@ public:
    */
   void SetTitleAlignment(int alignment) override;
   int GetTitleAlignment() override;
-  //@}
+  ///@}
 
   /**
    * Set the number of animation frames used when changing the active scatterplot.
    */
   void SetNumberOfAnimationFrames(int value);
 
-  //@{
+  ///@{
   /**
    * Set the gutter that should be left between the charts in the matrix.
    * These methods should not be called directly. They are made public only so
@@ -145,16 +145,16 @@ public:
   virtual void SetGutter(float x, float y);
   void SetGutterX(float value);
   void SetGutterY(float value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the padding that applied an uniform padding on each charts.
    */
   virtual void SetPadding(float padding);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the borders of the chart matrix (space in pixels around each chart).
    * These methods should not be called directly. They are made public only so
@@ -166,9 +166,9 @@ public:
   virtual void SetBorderBottom(int value);
   virtual void SetBorderRight(int value);
   virtual void SetBorderTop(int value);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets whether or not the grid for the given axis is visible given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -179,9 +179,9 @@ public:
   void SetGridVisibility(int plotType, bool visible);
   GENERATE_PLOT_TYPE_DECLARATION(GridVisibility, bool);
   int GetGridVisibility(int plotType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the background color for the chart given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -193,9 +193,9 @@ public:
   void SetBackgroundColor(int plotType, double red, double green, double blue, double alpha);
   bool GetBackgroundColor(int plotType, double color[3]);
   GENERATE_PLOT_TYPE_DECLARATION4(BackgroundColor, double, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the color for the axes given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -207,9 +207,9 @@ public:
   void SetAxisColor(int plotType, double red, double green, double blue);
   bool GetAxisColor(int plotType, double color[3]);
   GENERATE_PLOT_TYPE_DECLARATION3(AxisColor, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the color for the axes given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -221,9 +221,9 @@ public:
   void SetGridColor(int plotType, double red, double green, double blue);
   bool GetGridColor(int plotType, double color[3]);
   GENERATE_PLOT_TYPE_DECLARATION3(GridColor, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets whether or not the labels for the axes are visible, given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -234,9 +234,9 @@ public:
   void SetAxisLabelVisibility(int plotType, bool visible);
   int GetAxisLabelVisibility(int plotType);
   GENERATE_PLOT_TYPE_DECLARATION(AxisLabelVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the axis label font for the axes given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -259,9 +259,9 @@ public:
   int GetAxisLabelFontSize(int plotType);
   int GetAxisLabelFontBold(int plotType);
   int GetAxisLabelFontItalic(int plotType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the axis label color for the axes given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -273,9 +273,9 @@ public:
   void SetAxisLabelColor(int plotType, double red, double green, double blue);
   GENERATE_PLOT_TYPE_DECLARATION3(AxisLabelColor, double, double, double);
   bool GetAxisLabelColor(int plotType, double color[3]);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the axis label notation for the axes given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -286,9 +286,9 @@ public:
   void SetAxisLabelNotation(int plotType, int notation);
   GENERATE_PLOT_TYPE_DECLARATION(AxisLabelNotation, int);
   int GetAxisLabelNotation(int plotType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the axis label precision for the axes given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -299,9 +299,9 @@ public:
   void SetAxisLabelPrecision(int plotType, int precision);
   GENERATE_PLOT_TYPE_DECLARATION(AxisLabelPrecision, int);
   int GetAxisLabelPrecision(int plotType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set chart's tooltip notation and precision, given a plot type, which refers to
    * vtkScatterPlotMatrix::{SCATTERPLOT, HISTOGRAM, ACTIVEPLOT}.
@@ -315,9 +315,9 @@ public:
   GENERATE_PLOT_TYPE_DECLARATION(TooltipPrecision, int);
   int GetTooltipNotation(int plotType);
   int GetTooltipPrecision(int plotType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the scatter plot title's color.
    * These methods should not be called directly. They are made public only so
@@ -327,9 +327,9 @@ public:
    */
   void SetScatterPlotSelectedRowColumnColor(double red, double green, double blue, double alpha);
   bool GetScatterPlotSelectedRowColumnColor(double color[3]);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the scatter plot title's color.
    * These methods should not be called directly. They are made public only so
@@ -339,14 +339,14 @@ public:
    */
   void SetScatterPlotSelectedActiveColor(double red, double green, double blue, double alpha);
   bool GetScatterPlotSelectedActiveColor(double color[3]);
-  //@}
+  ///@}
 
   /**
    * Update all the settings
    */
   void UpdateSettings();
 
-  //@{
+  ///@{
   /**
    * @deprecated in ParaView 5.10.
    * Use Get[...]Color([...], double color[3]) methods instead.
@@ -366,7 +366,7 @@ public:
   PARAVIEW_DEPRECATED_IN_5_10_0(
     "Use `vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor(double[3])` instead")
   double* GetScatterPlotSelectedActiveColor();
-  //@}
+  ///@}
 
 protected:
   vtkPVPlotMatrixView();

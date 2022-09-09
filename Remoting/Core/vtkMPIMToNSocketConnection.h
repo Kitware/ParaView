@@ -55,37 +55,37 @@ public:
    */
   void ConnectMtoN();
 
-  //@{
+  ///@{
   /**
    * Set the number of connections to be made.
    */
   void SetNumberOfConnections(int);
   vtkGetMacro(NumberOfConnections, int);
-  //@}
+  ///@}
 
   /**
    * Set up information about the remote connection.
    */
   void SetPortInformation(unsigned int processNumber, int portNumber, const char* hostName);
 
-  //@{
+  ///@{
   /**
    * Return the socket communicator for this process.
    */
   vtkGetObjectMacro(SocketCommunicator, vtkSocketCommunicator);
-  //@}
+  ///@}
 
   /**
    * Fill the port information values into the port information object.
    */
   void GetPortInformation(vtkMPIMToNSocketConnectionPortInformation*);
 
-  //@{
+  ///@{
   /**
    * Set port to use, if the value is 0, then the system will pick the port.
    */
   vtkGetMacro(PortNumber, int);
-  //@}
+  ///@}
 
 protected:
   vtkSetMacro(PortNumber, int);

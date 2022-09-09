@@ -45,7 +45,7 @@ public:
    */
   vtkPVXMLElement* GetRootElement();
 
-  //@{
+  ///@{
   /**
    * If on, then the Parse method will NOT report an error using vtkErrorMacro.
    * Rather, it will just return false.  This feature is useful when simply
@@ -55,7 +55,7 @@ public:
   vtkGetMacro(SuppressErrorMessages, int);
   vtkSetMacro(SuppressErrorMessages, int);
   vtkBooleanMacro(SuppressErrorMessages, int);
-  //@}
+  ///@}
 
   /**
    * Convenience method to parse XML contents. Will return nullptr is the

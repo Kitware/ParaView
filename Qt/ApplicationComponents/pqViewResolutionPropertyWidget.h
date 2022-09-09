@@ -62,7 +62,7 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqViewResolutionPropertyWidget() override;
 
-  //@{
+  ///@{
   /**
    * Overridden to clear the state for the highlight state for
    * "reset-to-domain" button. The implementation simply fires
@@ -70,16 +70,16 @@ public:
    */
   void apply() override;
   void reset() override;
-  //@}
+  ///@}
 
 Q_SIGNALS:
-  //@{
+  ///@{
   /**
    * internal signals used to highlight (or not) the "reset-to-domain" button.
    */
   void highlightResetButton();
   void clearHighlight();
-  //@}
+  ///@}
 
 private Q_SLOTS:
   void resetButtonClicked();

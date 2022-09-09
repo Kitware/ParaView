@@ -77,7 +77,7 @@ public:
    */
   QToolButton* abortButton() const { return this->AbortButton; }
 
-  //@{
+  ///@{
   /**
    * Set the text to use by default when the progress bar is not enabled
    * which typically corresponds to application not being busy.
@@ -85,9 +85,9 @@ public:
    */
   void setReadyText(const QString&);
   const QString& readyText() const { return this->ReadyText; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the text to use by default when the progress bar is enabled
    * which typically corresponds to application being busy.
@@ -95,7 +95,7 @@ public:
    */
   void setBusyText(const QString&);
   const QString& busyText() const { return this->BusyText; }
-  //@}
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

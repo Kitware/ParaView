@@ -42,7 +42,7 @@ public:
   vtkPVPythonAlgorithmPlugin(const char* pythonmodule);
   ~vtkPVPythonAlgorithmPlugin() override;
 
-  //@{
+  ///@{
   /// Implementation of the vtkPVPlugin interface.
   const char* GetPluginName() override;
   const char* GetPluginVersionString() override;
@@ -51,9 +51,9 @@ public:
   const char* GetRequiredPlugins() override { return ""; }
   const char* GetDescription() override { return ""; }
   const char* GetEULA() override { return nullptr; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// Implementation of the vtkPVServerManagerPluginInterface.
   void GetXMLs(std::vector<std::string>& xmls) override;
   vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
@@ -61,7 +61,7 @@ public:
   {
     return nullptr;
   }
-  //@}
+  ///@}
 
 private:
   vtkPVPythonAlgorithmPlugin(const vtkPVPythonAlgorithmPlugin&) = delete;

@@ -43,25 +43,25 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_GeodesicMesh();
     ~GW_GeodesicMesh() override;
-    //@}
+    ///@}
 
     using GW_Mesh::operator=;
 
     //-------------------------------------------------------------------------
     /** \name Class factory methods. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_Vertex& CreateNewVertex() override;
     GW_Face& CreateNewFace() override;
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Fast marching computations. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void ResetGeodesicMesh();
     void ResetParametrizationData();
     void AddStartVertex( GW_GeodesicVertex& StartVert );
@@ -70,7 +70,7 @@ public:
     GW_Bool PerformFastMarchingOneStep();
     void PerformFastMarchingFlush();
     GW_Bool IsFastMarchingFinished();
-    //@}
+    ///@}
 
     void SetUseUnfolding( GW_Bool bUseUnfolding );
     GW_Bool GetUseUnfolding( );
@@ -78,7 +78,7 @@ public:
     //-------------------------------------------------------------------------
     /** \name Callback management. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     typedef GW_Float (*T_WeightCallbackFunction)( GW_GeodesicVertex& Vert, void *calldata );
     void RegisterWeightCallbackFunction( T_WeightCallbackFunction pFunc );
     typedef GW_Bool (*T_FastMarchingCallbackFunction)( GW_GeodesicVertex& Vert, void *calldata );
@@ -89,7 +89,7 @@ public:
     void RegisterVertexInsersionCallbackFunction( T_VertexInsersionCallbackFunction pFunc );
     typedef GW_Float (*T_HeuristicToGoalCallbackFunction)( GW_GeodesicVertex& Vert );
     void RegisterHeuristicToGoalCallbackFunction( T_HeuristicToGoalCallbackFunction pFunc );
-    //@}
+    ///@}
 
     GW_Vertex* GetRandomVertex( GW_Bool bForceFar = GW_True );
 

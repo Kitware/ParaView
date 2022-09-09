@@ -53,7 +53,7 @@ protected:
   vtkSMGL2PSExporterProxy();
   ~vtkSMGL2PSExporterProxy() override;
 
-  //@{
+  ///@{
   /**
    * Type of view that this exporter is configured to export.
    */
@@ -64,7 +64,7 @@ protected:
     RenderView
   };
   int ViewType;
-  //@}
+  ///@}
 
 private:
   vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&) = delete;
