@@ -88,7 +88,7 @@ public:
   void toggleEnabledState(pqView* view);
 
 Q_SIGNALS:
-  //@{
+  ///@{
   /**
    * Fired when the producer changes. These signals are fired after the change
    * has been made i.e. `this->producer()` will return the new producer for both
@@ -96,7 +96,7 @@ Q_SIGNALS:
    */
   void producerAdded(pqServerManagerModelItem* producer, pqExtractor* self);
   void producerRemoved(pqServerManagerModelItem* producer, pqExtractor* self);
-  //@}
+  ///@}
 
   /**
    * Fired when the enabled state for the extractor changes.

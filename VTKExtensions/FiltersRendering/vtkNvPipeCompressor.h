@@ -36,7 +36,7 @@ public:
   vtkTypeMacro(vtkNvPipeCompressor, vtkImageCompressor);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the quality measure. The value can be between 1 and 5. 1 means
    * preserve input image quality while 5 emphasizes compression ratio at the
@@ -44,26 +44,26 @@ public:
    */
   vtkSetClampMacro(Quality, unsigned int, 1, 5);
   vtkGetMacro(Quality, unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   // Description:
   // Compress/Decompress data array on the objects input with results
   // in the objects output. See also Set/GetInput/Output.
   virtual int Compress();
   virtual int Decompress();
-  //@}
+  ///@}
 
   void SetImageResolution(int img_width, int img_height);
 
-  //@{
+  ///@{
   /// Description:
   /// Serialize/Restore compressor configuration (but not the data) into the stream.
   virtual void SaveConfiguration(vtkMultiProcessStream* stream);
   virtual bool RestoreConfiguration(vtkMultiProcessStream* stream);
   virtual const char* SaveConfiguration();
   virtual const char* RestoreConfiguration(const char* stream);
-  //@}
+  ///@}
 
 protected:
   vtkNvPipeCompressor();

@@ -62,7 +62,7 @@ public:
   virtual void apply();
   virtual void reset();
 
-  //@{
+  ///@{
   /**
    * These methods are called by pqPropertiesPanel when the panel for proxy
    * becomes active/deactive.
@@ -77,7 +77,7 @@ public:
   virtual void selectPort(int portIndex) { Q_UNUSED(portIndex); }
   virtual void deselect() { this->Selected = false; }
   bool isSelected() const { return this->Selected; }
-  //@}
+  ///@}
 
   // This method is called on pqPropertyWidget instances that pqProxyWidget
   // deems that should be shown in current configuration. Subclasses can

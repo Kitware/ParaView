@@ -49,10 +49,10 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_GeodesicPoint();
     virtual ~GW_GeodesicPoint();
-    //@}
+    ///@}
 
     void SetVertex1( GW_GeodesicVertex& Vert1 );
     void SetVertex2( GW_GeodesicVertex& Vert2 );

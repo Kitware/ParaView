@@ -56,13 +56,13 @@ public:
   vtkTypeMacro(vtkPCGNSWriter, vtkCGNSWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the MPI controller.
    */
   virtual void SetController(vtkMultiProcessController*);
   virtual vtkMultiProcessController* GetController();
-  //@}
+  ///@}
 
 protected:
   vtkPCGNSWriter();

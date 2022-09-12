@@ -50,14 +50,14 @@ public:
    */
   void SetSession(vtkSMSession*) override;
 
-  //@{
+  ///@{
   /**
    * Allow to synchronize the active object with master or just keep remote object
    * out-of-synch. Only the state from the master will be loaded.
    */
   void SetFollowingMaster(bool following);
   bool IsFollowingMaster();
-  //@}
+  ///@}
 
   /**
    * Type for selection.

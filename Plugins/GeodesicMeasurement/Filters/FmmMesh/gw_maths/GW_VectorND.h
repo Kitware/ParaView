@@ -47,13 +47,13 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_VectorND()                            :GW_TNTArray1D(){}
     explicit GW_VectorND(GW_U32 n)            :GW_TNTArray1D((int) n){}
     GW_VectorND(GW_U32 n,  GW_Float *a)        :GW_TNTArray1D((int) n,a){}
     GW_VectorND(GW_U32 n, const GW_Float &a):GW_TNTArray1D((int) n,a){}
     GW_VectorND(const GW_VectorND &A)        :GW_TNTArray1D(A){}
-    //@}
+    ///@}
 
     GW_U32 GetDim() const
     {

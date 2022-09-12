@@ -47,20 +47,20 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the id that correspond to the current client
    */
   vtkGetMacro(ClientId, int);
-  //@}
+  ///@}
 
   /**
    * Return the client id of the nth connected client.
@@ -68,26 +68,26 @@ public:
    */
   int GetClientId(int idx);
 
-  //@{
+  ///@{
   /**
    * Return the number of connected clients
    */
   vtkGetMacro(NumberOfClients, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return 1 if the server allow server client to connect to itself
    */
   vtkGetMacro(MultiClientEnable, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return the Id of the client that has been elected as master
    */
   vtkGetMacro(MasterId, int);
-  //@}
+  ///@}
 
 protected:
   vtkPVMultiClientsInformation();

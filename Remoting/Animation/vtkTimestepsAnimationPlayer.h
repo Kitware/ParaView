@@ -36,13 +36,13 @@ public:
   vtkTypeMacro(vtkTimestepsAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Add/Remove timesteps.
    */
   void AddTimeStep(double time);
   void RemoveTimeStep(double time);
-  //@}
+  ///@}
 
   /**
    * Remove all timesteps.
@@ -54,13 +54,13 @@ public:
    */
   unsigned int GetNumberOfTimeSteps();
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of frames per timstep.
    */
   vtkSetClampMacro(FramesPerTimestep, unsigned long, 1, VTK_UNSIGNED_LONG_MAX);
   vtkGetMacro(FramesPerTimestep, unsigned long);
-  //@}
+  ///@}
 
   /**
    * Returns the timestep value after the given timestep.
@@ -68,7 +68,7 @@ public:
    */
   double GetNextTimeStep(double time);
 
-  //@{
+  ///@{
   /**
    * Returns the timestep value before the given timestep.
    * If no value exists, returns the argument \c time itself.
@@ -78,7 +78,7 @@ public:
 protected:
   vtkTimestepsAnimationPlayer();
   ~vtkTimestepsAnimationPlayer() override;
-  //@}
+  ///@}
 
   void StartLoop(double, double, double, double*) override;
   void EndLoop() override{};

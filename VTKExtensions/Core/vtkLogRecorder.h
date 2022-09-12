@@ -61,7 +61,7 @@ public:
   vtkLogRecorder();
   ~vtkLogRecorder() override;
 
-  //@{
+  ///@{
   /**
    * Set/get the verbosity of the entries recorded from the log.
    * Any messages with verbosity less than or equal to this verbosity
@@ -69,16 +69,16 @@ public:
    */
   void SetVerbosity(int verbosity);
   vtkGetMacro(Verbosity, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set to enable or disable logging, only if the rank parameter is equal to the rank that
    * this log recorder is on.
    */
   void SetRankEnabled(int rank);
   void SetRankDisabled(int rank);
-  //@}
+  ///@}
 
   /**
    * Get the recorded logs.

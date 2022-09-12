@@ -40,31 +40,31 @@ public:
    */
   void AddFrustum(double vertices[32]);
 
-  //@{
+  ///@{
   /**
    * Add global IDs.
    */
   void AddGlobalID(vtkIdType id);
   void RemoveAllGlobalIDs();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add integer pedigree IDs in a particular domain.
    */
   void AddPedigreeID(const char* domain, vtkIdType id);
   void RemoveAllPedigreeIDs();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add string pedigree IDs in a particular domain.
    */
   void AddPedigreeStringID(const char* domain, const char* id);
   void RemoveAllPedigreeStringIDs();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add a (piece, id) to the selection set. The source will generate
    * only the ids for which piece == UPDATE_PIECE_NUMBER.
@@ -72,9 +72,9 @@ public:
    */
   void AddID(vtkIdType piece, vtkIdType id);
   void RemoveAllIDs();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add a (piece, value) to the selection set. The source will generate
    * only the values for which piece == UPDATE_PIECE_NUMBER.
@@ -82,9 +82,9 @@ public:
    */
   void AddValue(vtkIdType piece, vtkIdType value);
   void RemoveAllValues();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add IDs that will be added to the selection produced by the
    * selection source.
@@ -94,32 +94,32 @@ public:
    */
   void AddCompositeID(unsigned int composite_index, vtkIdType piece, vtkIdType id);
   void RemoveAllCompositeIDs();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The list of IDs that will be added to the selection produced by the
    * selection source.
    */
   void AddHierarhicalID(unsigned int level, unsigned int dataset, vtkIdType id);
   void RemoveAllHierarchicalIDs();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add a value range to threshold within.
    */
   void AddThreshold(double min, double max);
   void RemoveAllThresholds();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add the flat-index/composite index for a block.
    */
   void AddBlock(vtkIdType blockno);
   void RemoveAllBlocks();
-  //@}
+  ///@}
 
   /**
    * For threshold and value selection, this controls the name of the
@@ -127,13 +127,13 @@ public:
    */
   vtkSetStringMacro(ArrayName);
 
-  //@{
+  ///@{
   /**
    * Add a point in world space to probe at.
    */
   void AddLocation(double x, double y, double z);
   void RemoveAllLocations();
-  //@}
+  ///@}
 
   ///@{
   /**
@@ -144,16 +144,16 @@ public:
   void RemoveAllBlockSelectors();
   ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set which process to limit the selection to. `-1` is treated as
    * all processes.
    */
   vtkSetClampMacro(ProcessID, int, -1, VTK_INT_MAX);
   vtkGetMacro(ProcessID, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the field type for the generated selection.
    * Possible values are as defined by
@@ -161,39 +161,39 @@ public:
    */
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When extracting by points, extract the cells that contain the
    * passing points.
    */
   vtkSetMacro(ContainingCells, int);
   vtkGetMacro(ContainingCells, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   vtkSetMacro(Inverse, int);
   vtkGetMacro(Inverse, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the query expression string.
    */
   vtkSetStringMacro(QueryString);
   vtkGetStringMacro(QueryString);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify number of layers to extract connected to the selected elements.
    */
   vtkSetClampMacro(NumberOfLayers, int, 0, VTK_INT_MAX);
   vtkGetMacro(NumberOfLayers, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the flag the control if, when using the number of layers to extract connected elements,
    * the initial selection seed should be removed.
@@ -201,9 +201,9 @@ public:
    */
   vtkSetMacro(RemoveSeed, bool);
   vtkGetMacro(RemoveSeed, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the flag the control if, when using the number of layers to extract connected elements,
    * the intermediate layers should be removed.
@@ -211,7 +211,7 @@ public:
    */
   vtkSetMacro(RemoveIntermediateLayers, bool);
   vtkGetMacro(RemoveIntermediateLayers, bool);
-  //@}
+  ///@}
 protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource() override;

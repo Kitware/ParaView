@@ -49,13 +49,13 @@ public:
 
   const char* GetHelp();
 
-  //@{
+  ///@{
   /**
    * Was help selected?
    */
   vtkGetMacro(HelpSelected, int);
   vtkSetMacro(HelpSelected, int);
-  //@}
+  ///@}
 
   /**
    * Set/Get the type of the process for this set of options.
@@ -64,31 +64,31 @@ public:
   int GetProcessType() { return this->ProcessType; }
   void SetProcessType(int p) { this->ProcessType = p; }
 
-  //@{
+  ///@{
   /**
    * In case of unknown argument, set this variable with the unknown argument.
    */
   vtkGetStringMacro(UnknownArgument);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the error message if Parse returned 0.
    */
   vtkGetStringMacro(ErrorMessage);
-  //@}
+  ///@}
 
   /**
    * Get argv[0]
    */
   const char* GetArgv0();
 
-  //@{
+  ///@{
   /**
    * Get full path of executable (based on Argv0)
    */
   vtkGetStringMacro(ApplicationPath);
-  //@}
+  ///@}
 
   /**
    * Get the index of the last argument parsed.
@@ -117,7 +117,7 @@ protected:
    */
   typedef int (*CallbackType)(const char* argument, const char* value, void* call_data);
 
-  //@{
+  ///@{
   /**
    * Add a command line option.  For each argument added there is a long
    * version --long and a short version -l, a help string, and a variable
@@ -136,7 +136,7 @@ protected:
     const char* longarg, const char* shortarg, int* var, const char* help, int type = EVERYBODY);
   void AddArgument(
     const char* longarg, const char* shortarg, char** var, const char* help, int type = EVERYBODY);
-  //@}
+  ///@}
 
   void AddCallback(const char* longarg, const char* shortarg, CallbackType callback,
     void* call_data, const char* help, int type = EVERYBODY);

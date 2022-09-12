@@ -38,7 +38,7 @@ public:
    */
   virtual void GetXMLs(std::vector<std::string>& vtkNotUsed(xmls)) = 0;
 
-  //@{
+  ///@{
   /**
    * Returns the callback function to call to initialize the interpretor for the
    * new vtk/server-manager classes added by this plugin. Returning nullptr is

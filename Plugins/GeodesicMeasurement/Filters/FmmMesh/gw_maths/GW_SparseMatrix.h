@@ -133,7 +133,7 @@ public:
     //-------------------------------------------------------------------------
     /** \name accessors */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_Float GetData(GW_U32 i, GW_U32 j)
     {
         GW_ASSERT( i<this->GetDim() && j<this->GetDim() );
@@ -185,7 +185,7 @@ public:
         RowPosition_[i]++;
         Q_SetEntry(&M_, i+1, RowPosition_[i]-1, j+1, rVal);    // matrix, row, entry, col, val
     }
-    //@}
+    ///@}
 
     /** access element by element */
     GW_Float AccessEntry( GW_U32 i, GW_U32 entry, GW_U32& j )
@@ -202,7 +202,7 @@ public:
     //-------------------------------------------------------------------------
     /** \name multiplication methods (both optimised and non-optimised) */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_VectorND operator*(GW_VectorND& v)
     {
         GW_VectorND r(v.GetDim());
@@ -220,7 +220,7 @@ public:
         GW_SparseMatrix::Copy( r, v1 );
         V_Destr( &v1 );
     }
-    //@}
+    ///@}
 
     GW_SparseMatrix Transpose()
     {

@@ -53,13 +53,13 @@ public:
 
   using Superclass::Add;
 
-  //@{
+  ///@{
   /**
    * Methods for adding data to the accumulator
    */
   void Add(vtkAbstractAccumulator* accumulator) override;
   void Add(double value, double weight = 1.0) override;
-  //@}
+  ///@}
 
   /**
    * Clears the bins.
@@ -71,13 +71,13 @@ public:
    */
   BinsPointer GetBins() const;
 
-  //@{
+  ///@{
   /**
    * Accessor to the discretization step. This sets the Bins widths.
    */
   vtkGetMacro(DiscretizationStep, double);
   void SetDiscretizationStep(double);
-  //@}
+  ///@}
 
   /**
    * ShallowCopy implementation, both object then share the same Bins.
@@ -94,7 +94,7 @@ public:
    */
   bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
 
-  //@{
+  ///@{
   /**
    * Accessor/mutator on the function pointer specifying which quantity should be computed on the
    * bins. Bins are filled with the accumulated weight of the corresponding value range. The
@@ -102,18 +102,18 @@ public:
    */
   const FunctorT& GetFunctor() const;
   void SetFunctor(const FunctorT&);
-  //@}
+  ///@}
 
   double GetValue() const override;
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructor and destructor.
    */
   vtkBinsAccumulator();
   ~vtkBinsAccumulator() override = default;
-  //@}
+  ///@}
 
   /**
    * Bins where the data is stored

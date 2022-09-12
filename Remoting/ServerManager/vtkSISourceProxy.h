@@ -100,13 +100,13 @@ protected:
    */
   virtual bool CreateOutputPorts();
 
-  //@{
+  ///@{
   /**
    * Callbacks to add start/end events to the timer log.
    */
   void MarkStartEvent();
   void MarkEndEvent();
-  //@}
+  ///@}
 
   char* ExecutiveName;
   vtkSetStringMacro(ExecutiveName);

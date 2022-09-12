@@ -46,7 +46,7 @@ public:
     OUTPUT = 2
   };
 
-  //@{
+  ///@{
   /**
    * This flag determines if UpdateVTKObjects calls are to be propagated.
    * Set to 1 by default.
@@ -54,16 +54,16 @@ public:
   vtkSetMacro(PropagateUpdateVTKObjects, int);
   vtkGetMacro(PropagateUpdateVTKObjects, int);
   vtkBooleanMacro(PropagateUpdateVTKObjects, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set if the link is enabled.
    * (true by default).
    */
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
-  //@}
+  ///@}
 
   /**
    * Remove all links.

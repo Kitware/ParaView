@@ -51,29 +51,29 @@ public:
   vtkTypeMacro(vtkSMProxyConfigurationReader, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the file name.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the proxy to write out.
    */
   virtual void SetProxy(vtkSMProxy* proxy);
   vtkGetObjectMacro(Proxy, vtkSMProxy);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get file meta data.
    */
   vtkSetStringMacro(FileIdentifier);
   vtkGetStringMacro(FileIdentifier);
-  //@}
+  ///@}
 
   vtkSetStringMacro(FileDescription);
   vtkGetStringMacro(FileDescription);
@@ -81,7 +81,7 @@ public:
   vtkSetStringMacro(FileExtension);
   vtkGetStringMacro(FileExtension);
 
-  //@{
+  ///@{
   /**
    * Turns on/off proxy type validation. If on then the proxy's
    * type is compared with that found in the configuration file.
@@ -90,7 +90,7 @@ public:
    */
   vtkSetMacro(ValidateProxyType, int);
   vtkGetMacro(ValidateProxyType, int);
-  //@}
+  ///@}
 
   /**
    * Return the reader version.
@@ -102,7 +102,7 @@ public:
    */
   virtual bool CanReadVersion(const char* version);
 
-  //@{
+  ///@{
   /**
    * Read the configuration from the file. UpdateVTKObjects
    * is intentionally not called so that caller may have full
@@ -111,7 +111,7 @@ public:
    */
   virtual int ReadConfiguration();
   virtual int ReadConfiguration(const char* filename);
-  //@}
+  ///@}
   /**
    * Read the configuration from the stream. PV state machinery is
    * employed.

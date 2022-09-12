@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkLZ4Compressor, vtkImageCompressor);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the quality measure. The value can be between 0 and 5. 0 means preserve
    * input image quality while 5 means improve compression at the cost of image
@@ -46,18 +46,18 @@ public:
    */
   vtkSetClampMacro(Quality, int, 0, 5);
   vtkGetMacro(Quality, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Compress/Decompress data array on the objects input with results
    * in the objects output. See also Set/GetInput/Output.
    */
   int Compress() override;
   int Decompress() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
@@ -65,7 +65,7 @@ public:
   bool RestoreConfiguration(vtkMultiProcessStream* stream) override;
   const char* SaveConfiguration() override;
   const char* RestoreConfiguration(const char* stream) override;
-  //@}
+  ///@}
 
 protected:
   vtkLZ4Compressor();

@@ -63,7 +63,7 @@ public:
   vtkTypeMacro(vtkSquirtCompressor, vtkImageCompressor);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set Squirt compression level.
    * Level 0 is lossless compression, 1 through 5 are lossy compression
@@ -71,24 +71,24 @@ public:
    */
   vtkSetClampMacro(SquirtLevel, int, 0, 5);
   vtkGetMacro(SquirtLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Compress/Decompress data array on the objects input with results
    * in the objects output. See also Set/GetInput/Output.
    */
   int Compress() override;
   int Decompress() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
   void SaveConfiguration(vtkMultiProcessStream* stream) override;
   bool RestoreConfiguration(vtkMultiProcessStream* stream) override;
-  //@}
+  ///@}
 
   const char* SaveConfiguration() override;
   const char* RestoreConfiguration(const char* stream) override;

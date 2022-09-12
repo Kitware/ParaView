@@ -32,15 +32,15 @@ public:
   vtkTypeMacro(vtkRealtimeAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the duration for playing the animation in seconds.
    */
   vtkGetMacro(Duration, unsigned long);
   vtkSetMacro(Duration, unsigned long);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Setter is noop, getter return 1.
    *
@@ -48,7 +48,7 @@ public:
    */
   void SetStride(int) final {}
   int GetStride() final { return 1; }
-  //@}
+  ///@}
 
 protected:
   vtkRealtimeAnimationPlayer();

@@ -76,7 +76,7 @@ public:
   pqObjectBuilder(QObject* parent = nullptr);
   ~pqObjectBuilder() override;
 
-  //@{
+  ///@{
   /**
    * Create a server connection give a server resource.
    * By default, this method does not create a new connection if one already
@@ -99,7 +99,7 @@ public:
   }
   pqServer* createServer(const pqServerResource& resource, int connectionTimeout,
     vtkNetworkAccessManager::ConnectionResult& result);
-  //@}
+  ///@}
 
   /**
    * Destroy a server connection

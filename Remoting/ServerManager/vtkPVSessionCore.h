@@ -46,19 +46,19 @@ public:
   vtkTypeMacro(vtkPVSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Provides access to the interpreter.
    */
   vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Provides access to the proxy definition manager.
    */
   vtkGetObjectMacro(ProxyDefinitionManager, vtkSIProxyDefinitionManager);
-  //@}
+  ///@}
 
   /**
    * Push the state message.
@@ -133,7 +133,7 @@ public:
    */
   int GetNumberOfProcesses();
 
-  //@{
+  ///@{
   /**
    * Get/Set the socket connection used to communicate between data=server and
    * render-server processes. This is valid only on data-server and
@@ -141,7 +141,7 @@ public:
    */
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
   vtkGetObjectMacro(MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
-  //@}
+  ///@}
 
   /**
    * Provides the next available identifier. This implementation works locally.

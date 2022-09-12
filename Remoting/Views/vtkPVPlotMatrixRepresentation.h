@@ -65,7 +65,7 @@ public:
    */
   void SetVisibility(bool visible) override;
 
-  //@{
+  ///@{
   /**
    * Set series visibility given its name. The order in which
    * SetSeriesVisibility is called is used to determine the order for each of
@@ -73,7 +73,7 @@ public:
    */
   void SetSeriesVisibility(const char* series, bool visibility);
   void ClearSeriesVisibilities();
-  //@}
+  ///@}
 
   /**
    * Sets the color for the scatter plots in the plot matrix.

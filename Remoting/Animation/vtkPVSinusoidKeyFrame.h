@@ -42,30 +42,30 @@ public:
    */
   void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the phase for the sine wave.
    */
   vtkSetMacro(Phase, double);
   vtkGetMacro(Phase, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the frequency for the sine wave in number of cycles
    * for the entire length of this keyframe i.e. until the next key frame.
    */
   vtkSetMacro(Frequency, double);
   vtkGetMacro(Frequency, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the Wave offset.
    */
   vtkSetMacro(Offset, double);
   vtkGetMacro(Offset, double);
-  //@}
+  ///@}
 
 protected:
   vtkPVSinusoidKeyFrame();

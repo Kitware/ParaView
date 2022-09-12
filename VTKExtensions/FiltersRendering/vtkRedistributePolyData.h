@@ -54,7 +54,7 @@ public:
   vtkSetMacro(ColorProc, int);
   void SetColorProc() { this->ColorProc = 1; };
 
-  //@{
+  ///@{
   /**
    * These are here for ParaView compatibility. Not used.
    */
@@ -62,7 +62,7 @@ public:
   virtual void SetPassThrough(int){};
   virtual int GetPassThrough() { return 0; };
   vtkBooleanMacro(PassThrough, int);
-  //@}
+  ///@}
 
 protected:
   vtkRedistributePolyData();

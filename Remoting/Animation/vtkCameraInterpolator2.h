@@ -51,7 +51,7 @@ public:
     ORTHOGONAL
   };
 
-  //@{
+  ///@{
   /**
    * Mode for managing the focal point.
    * At least one of the two modes FocalPointMode or PositionMode must be PATH
@@ -59,9 +59,9 @@ public:
    */
   vtkSetClampMacro(FocalPointMode, int, PATH, ORTHOGONAL);
   vtkGetMacro(FocalPointMode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Mode for managing the camera position.
    * At least one of the two modes FocalPointMode or PositionMode must be PATH
@@ -69,7 +69,7 @@ public:
    */
   vtkSetClampMacro(PositionMode, int, PATH, ORTHOGONAL);
   vtkGetMacro(PositionMode, int);
-  //@}
+  ///@}
 
   enum PathInterpolationModes
   {
@@ -85,23 +85,23 @@ public:
   vtkSetClampMacro(FocalPathInterpolationMode, int, LINEAR, SPLINE);
   vtkGetMacro(FocalPathInterpolationMode, int);
 
-  //@{
+  ///@{
   /**
    * When set, the FocalPointPath is treated as a closed path.
    */
   vtkSetMacro(ClosedFocalPath, bool);
   vtkGetMacro(ClosedFocalPath, bool);
   vtkBooleanMacro(ClosedFocalPath, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set, the PositionPath is treated as a closed path.
    */
   vtkSetMacro(ClosedPositionPath, bool);
   vtkGetMacro(ClosedPositionPath, bool);
   vtkBooleanMacro(ClosedPositionPath, bool);
-  //@}
+  ///@}
 
   /**
    * \c u has to be in the range [0, 1].

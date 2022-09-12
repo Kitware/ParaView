@@ -38,13 +38,13 @@ public:
   vtkTypeMacro(vtkProgressBarSourceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the ProgressBar widget.
    */
   void SetProgressBarWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(ProgressBarWidgetRepresentation, vtk3DWidgetRepresentation);
-  //@}
+  ///@}
 
   /**
    * Set the visibility.

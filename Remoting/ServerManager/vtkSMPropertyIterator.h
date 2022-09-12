@@ -45,12 +45,12 @@ public:
    */
   virtual void SetProxy(vtkSMProxy* proxy);
 
-  //@{
+  ///@{
   /**
    * Return the proxy.
    */
   vtkGetObjectMacro(Proxy, vtkSMProxy);
-  //@}
+  ///@}
 
   /**
    * Go to the first property.
@@ -83,14 +83,14 @@ public:
    */
   virtual vtkSMProperty* GetProperty();
 
-  //@{
+  ///@{
   /**
    * If TraverseSubProxies is false, only the properties belonging
    * to the root proxy are returned. Default is true.
    */
   vtkSetMacro(TraverseSubProxies, int);
   vtkGetMacro(TraverseSubProxies, int);
-  //@}
+  ///@}
 
 protected:
   vtkSMPropertyIterator();

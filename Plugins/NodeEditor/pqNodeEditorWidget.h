@@ -70,14 +70,14 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   int zoom();
 
-  //@{
+  ///@{
   /**
    * Create/Remove the node corresponding to the given proxy
    */
   int createNodeForSource(pqPipelineSource* proxy);
   int createNodeForView(pqView* proxy);
   int removeNode(pqProxy* proxy);
-  //@}
+  ///@}
 
   /**
    * Given a consumer, set its input port @c idx to be connected with the

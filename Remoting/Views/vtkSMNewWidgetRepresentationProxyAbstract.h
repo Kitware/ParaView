@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkSMNewWidgetRepresentationProxyAbstract, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Called to link properties from a Widget to \c controlledProxy i.e. a
    * proxy whose properties are being manipulated using this Widget.
@@ -52,7 +52,7 @@ public:
    */
   bool LinkProperties(vtkSMProxy* controlledProxy, vtkSMPropertyGroup* controlledPropertyGroup);
   bool UnlinkProperties(vtkSMProxy* controlledProxy);
-  //@}
+  ///@}
 
 protected:
   vtkSMNewWidgetRepresentationProxyAbstract();

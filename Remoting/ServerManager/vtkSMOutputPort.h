@@ -65,7 +65,7 @@ public:
    */
   vtkPVDataInformation* GetRankDataInformation(int rank);
 
-  //@{
+  ///@{
   /**
    * For composite datasets, `GetDataInformation` returns summary data information for
    * all blocks combined. However, applications may require information about
@@ -79,7 +79,7 @@ public:
    */
   vtkPVDataInformation* GetSubsetDataInformation(
     const char* selector, const char* assemblyName = nullptr);
-  //@}
+  ///@}
 
   /**
    * A `GetSubsetDataInformation` overload that uses composite index. It is only
@@ -109,24 +109,24 @@ public:
    */
   virtual void InvalidateDataInformation();
 
-  //@{
+  ///@{
   /**
    * Returns the index of the port the output is obtained from.
    */
   vtkGetMacro(PortIndex, int);
-  //@}
+  ///@}
 
   /**
    * Provides access to the source proxy to which the output port belongs.
    */
   vtkSMSourceProxy* GetSourceProxy();
 
-  //@{
+  ///@{
   /** Overridden to forward to the source proxy.
    */
   vtkSMSession* GetSession() override;
   vtkSMSessionProxyManager* GetSessionProxyManager() override;
-  //@}
+  ///@}
 protected:
   vtkSMOutputPort();
   ~vtkSMOutputPort() override;

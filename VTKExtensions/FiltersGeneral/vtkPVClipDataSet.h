@@ -37,7 +37,7 @@ public:
 
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  //@{
+  ///@{
   /**
    * This filter uses vtkAMRDualClip for clipping AMR datasets. To disable that
    * behavior, turn this flag off.
@@ -45,16 +45,16 @@ public:
   vtkSetMacro(UseAMRDualClipForAMR, bool);
   vtkGetMacro(UseAMRDualClipForAMR, bool);
   vtkBooleanMacro(UseAMRDualClipForAMR, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For a vtkPVBlox implicit function we can do an exact clip of the exterior portion of the box.
    */
   vtkSetMacro(ExactBoxClip, bool);
   vtkGetMacro(ExactBoxClip, bool);
   vtkBooleanMacro(ExactBoxClip, bool);
-  //@}
+  ///@}
 
 protected:
   vtkPVClipDataSet(vtkImplicitFunction* cf = nullptr);
@@ -67,7 +67,7 @@ protected:
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;
 
-  //@{
+  ///@{
   /**
    * Uses superclass to clip the input. This also handles composite datasets
    * (since superclass does not handle composite datasets). This method loops
@@ -77,7 +77,7 @@ protected:
     vtkInformationVector* outputVector);
   int ClipUsingThreshold(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
-  //@}
+  ///@}
 
   bool UseAMRDualClipForAMR;
   bool ExactBoxClip;

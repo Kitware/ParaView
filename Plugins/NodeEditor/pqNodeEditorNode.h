@@ -155,7 +155,7 @@ public:
    */
   pqNodeEditorLabel* getLabel() { return this->label; }
 
-  //@{
+  ///@{
   /**
    * Get/Set the verbosity level of the node, that is the amount of properties
    * displayed in the node. It can be either empty, simple or advandeced (every properties).
@@ -163,7 +163,7 @@ public:
    */
   void setVerbosity(Verbosity v);
   Verbosity getVerbosity() { return this->verbosity; };
-  //@}
+  ///@}
 
   /**
    * Increment verbosity of the displayed properties of the node. If we try to increment
@@ -172,16 +172,16 @@ public:
    */
   void incrementVerbosity();
 
-  //@{
+  ///@{
   /**
    * Get/Set the type of the node. It can be either NORMAL (unselected), SELECTED_FILTER
    * (for the active source) or SELECTED_VIEW (for the active view). Update the style accordingly.
    */
   void setOutlineStyle(OutlineStyle style);
   OutlineStyle getOutlineStyle() { return this->outlineStyle; };
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the background style for this node, wether the filter is dirty or not.
    * Update the style accordingly.
@@ -189,7 +189,7 @@ public:
    */
   void setBackgroundStyle(BackgroundStyle style);
   BackgroundStyle getBackgroundStyle() { return this->backgroundStyle; };
-  //@}
+  ///@}
 
   /**
    * Get the bounding box of the node, which includes the border width and the label.

@@ -41,32 +41,32 @@ public:
   vtkTypeMacro(vtkPVComparativeAnimationCue, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the animated proxy.
    */
   void SetAnimatedProxy(vtkSMProxy*);
   vtkGetObjectMacro(AnimatedProxy, vtkSMProxy);
   void RemoveAnimatedProxy();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the animated property name.
    */
   vtkSetStringMacro(AnimatedPropertyName);
   vtkGetStringMacro(AnimatedPropertyName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the animated domain name.
    */
   vtkSetStringMacro(AnimatedDomainName);
   vtkGetStringMacro(AnimatedDomainName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The index of the element of the property this cue animates.
    * If the index is -1, the cue will animate all the elements
@@ -74,16 +74,16 @@ public:
    */
   vtkSetMacro(AnimatedElement, int);
   vtkGetMacro(AnimatedElement, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable/Disable the cue.
    */
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
-  //@}
+  ///@}
 
   /**
    * Methods use to fill up the values for the parameter over the comparative
@@ -98,7 +98,7 @@ public:
   void UpdateWholeRange(double mint, double maxt) { this->UpdateWholeRange(&mint, &maxt, 1); }
   void UpdateValue(int x, int y, double value) { this->UpdateValue(x, y, &value, 1); }
 
-  //@{
+  ///@{
   /**
    * Use these methods when the parameter can have multiple values eg. IsoValues
    * for the Contour filter. The "AnimatedElement" for such properties must be
@@ -112,7 +112,7 @@ public:
   }
   void UpdateWholeRange(double* mint, double* maxt, unsigned int numValues, bool vertical_first);
   void UpdateValue(int x, int y, double* value, unsigned int numValues);
-  //@}
+  ///@}
 
   /**
    * Update the animated property's value based on those specified using the
@@ -121,7 +121,7 @@ public:
    */
   void UpdateAnimatedValue(int x, int y, int dx, int dy);
 
-  //@{
+  ///@{
   /**
    * Computes the value for a particular location in the comparative grid.
    * (x,y) is the location in the comparative grid, while
@@ -137,7 +137,7 @@ public:
     }
     return -1.0;
   }
-  //@}
+  ///@}
 
   /**
    * NOTE: Returned values is only valid until the next call to this method.

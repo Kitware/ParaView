@@ -65,7 +65,7 @@ public:
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
 
-  //@{
+  ///@{
   /**
    * These are to evaluate performances. You can turn off capping, degenerate cells
    * and multiprocess communication to see how they affect speed of execution.
@@ -80,9 +80,9 @@ public:
   vtkSetMacro(EnableMultiProcessCommunication, int);
   vtkGetMacro(EnableMultiProcessCommunication, int);
   vtkBooleanMacro(EnableMultiProcessCommunication, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This flag causes blocks to share locators so there are no
    * boundary edges between blocks. It does not eliminate
@@ -91,18 +91,18 @@ public:
   vtkSetMacro(EnableMergePoints, int);
   vtkGetMacro(EnableMergePoints, int);
   vtkBooleanMacro(EnableMergePoints, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * A flag that causes the polygons on the capping surfaces to be triagulated.
    */
   vtkSetMacro(TriangulateCap, int);
   vtkGetMacro(TriangulateCap, int);
   vtkBooleanMacro(TriangulateCap, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * An option to turn off copying ghost values across process boundaries.
    * If the ghost values are already correct, then the extra communication is
@@ -112,7 +112,7 @@ public:
   vtkSetMacro(SkipGhostCopy, int);
   vtkGetMacro(SkipGhostCopy, int);
   vtkBooleanMacro(SkipGhostCopy, int);
-  //@}
+  ///@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);

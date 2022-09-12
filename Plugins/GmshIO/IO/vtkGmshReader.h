@@ -41,51 +41,51 @@ public:
   vtkTypeMacro(vtkGmshReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify file name of Gmsh geometry file to read.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if we create a cell data array containing Gmsh cell IDs.
    * Default is false.
    */
   vtkSetMacro(CreateGmshCellIDArray, bool);
   vtkGetMacro(CreateGmshCellIDArray, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if we create a point data array containing Gmsh node IDs.
    * Default is false.
    */
   vtkSetMacro(CreateGmshNodeIDArray, bool);
   vtkGetMacro(CreateGmshNodeIDArray, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if we create a cell data array containing Gmsh entity IDs.
    * Default is false.
    */
   vtkSetMacro(CreateGmshEntityIDArray, bool);
   vtkGetMacro(CreateGmshEntityIDArray, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if we create a field data array containing the dimension for a dataset.
    * Default is false.
    */
   vtkSetMacro(CreateGmshDimensionArray, bool);
   vtkGetMacro(CreateGmshDimensionArray, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true physical groups will be grouped by dimensions with a vtkMultiBlockDataSet
    * for each dimension. Else every physical group will be directly under the root node.
@@ -93,7 +93,7 @@ public:
    */
   vtkSetMacro(GroupByDimension, bool);
   vtkGetMacro(GroupByDimension, bool);
-  //@}
+  ///@}
 
 protected:
   vtkGmshReader();

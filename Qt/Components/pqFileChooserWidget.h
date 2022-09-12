@@ -131,14 +131,14 @@ public:
     this->setFilenames(this->filenames());
   }
 
-  //@{
+  ///@{
   /**
    * Get/set the title to use. If an empty string is specified, a default one is
    * created.
    */
   void setTitle(const QString& ttle) { this->Title = ttle; }
   const QString& title() const { return this->Title; }
-  //@}
+  ///@}
 
   /**
    * set server to work on.

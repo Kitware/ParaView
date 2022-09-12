@@ -54,13 +54,13 @@ public:
   void SetModeToInterpolateAtLocation() { this->SetMode(INTERPOLATE_AT_LOCATION); }
   void SetModeToExtractCellContainingLocation() { this->SetMode(EXTRACT_CELL_CONTAINING_LOCATION); }
 
-  //@{
+  ///@{
   /**
    * Get/Set the location to probe/pick at.
    */
   vtkSetVector3Macro(Location, double);
   vtkGetVector3Macro(Location, double);
-  //@}
+  ///@}
 
 protected:
   vtkHybridProbeFilter();

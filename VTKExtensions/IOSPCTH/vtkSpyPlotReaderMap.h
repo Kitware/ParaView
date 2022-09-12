@@ -62,7 +62,7 @@ private:
    */
   bool InitializeFromSpyFile(const char*);
 
-  //@{
+  ///@{
   /**
    * This does the updating of the meta data for a series, when no case file
    * provided. The main role of this method is to build the vtkSpyPlotReaderMap

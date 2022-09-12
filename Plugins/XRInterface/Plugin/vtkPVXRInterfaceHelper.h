@@ -170,7 +170,7 @@ public:
   // are we currently in VR
   bool InVR() { return this->Interactor != nullptr; }
 
-  //@{
+  ///@{
   /**
    * Add/remove crop planes and thick crops
    */
@@ -182,7 +182,7 @@ public:
   void collabUpdateThickCrop(int count, double* matrix);
   void SetCropSnapping(int val);
   void RemoveAllCropPlanesAndThickCrops();
-  //@}
+  ///@}
 
   // show the billboard with the provided text
   void ShowBillboard(std::string const& text, bool updatePosition, std::string const& tfile);
@@ -193,11 +193,11 @@ public:
   void AddPointToSource(double const* pnt);
   void collabAddPointToSource(std::string const& name, double const* pnt);
 
-  //@{
+  ///@{
   // set/show the pqOpenVRControls GUI elements
   void SetXRInterfaceControls(pqXRInterfaceControls* val) { this->XRInterfaceControls = val; }
   void ToggleShowControls();
-  //@}
+  ///@}
 
   // additional widgets in VR
   void SetDrawControls(bool);

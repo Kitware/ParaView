@@ -45,7 +45,7 @@ public:
   vtkTypeMacro(vtkMarkSelectedRows, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Select the field to process. Only selection associated with the chosen
    * field are considered.
@@ -61,7 +61,7 @@ public:
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
-  //@}
+  ///@}
 
 protected:
   vtkMarkSelectedRows();

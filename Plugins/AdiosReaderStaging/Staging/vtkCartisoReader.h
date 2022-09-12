@@ -28,31 +28,31 @@ public:
 
   static vtkCartisoReader* New();
 
-  //@{
+  ///@{
   /**
    * By default this filter uses the global controller,
    * but this method can be used to set another instead.
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the path of the input stream.
    */
   vtkSetStringMacro(StreamName);
   vtkGetStringMacro(StreamName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the time in seconds to wait for input stream to become available.
    * Values < 0 will result in wait forever. Default is 300 seconds.
    */
   vtkSetMacro(TimeOut, double);
   vtkGetMacro(TimeOut, double);
-  //@}
+  ///@}
 
   /**
    * Get the current step in the stream

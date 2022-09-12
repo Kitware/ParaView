@@ -39,15 +39,15 @@ public:
   vtkMetaReader();
   ~vtkMetaReader() override;
 
-  //@{
+  ///@{
   /**
    * Set/get the internal reader.
    */
   vtkSetObjectMacro(Reader, vtkAlgorithm);
   vtkGetObjectMacro(Reader, vtkAlgorithm);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/set the filename for the meta-file.
    * Description:
@@ -59,17 +59,17 @@ public:
     this->MetaFileNameMTime = this->vtkDataObjectAlgorithm::GetMTime();
   }
   char* GetMetaFileName() { return Get_MetaFileName(); }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the available range of file indexes. It is
    * 0, ..., GetNumberOfFiles () - 1.
    */
   vtkGetVector2Macro(FileIndexRange, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/set the index of the file to read.
    */
@@ -79,21 +79,21 @@ public:
     this->Set_FileIndex(i);
     this->FileIndexMTime = this->vtkDataObjectAlgorithm::GetMTime();
   }
-  //@}
+  ///@}
 
   /**
    * Return the MTime when also considering the internal reader.
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Name of the method used to set the file name of the internal
    * reader. By default, this is SetFileName.
    */
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
-  //@}
+  ///@}
 
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -137,7 +137,7 @@ protected:
   char* _MetaFileName;
   // File name modification time
   vtkMTimeType MetaFileNameMTime;
-  //@{
+  ///@{
   /**
    * Records the time when the meta-file was read.
    */

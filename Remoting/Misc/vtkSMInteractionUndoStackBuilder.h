@@ -40,22 +40,22 @@ public:
   vtkTypeMacro(vtkSMInteractionUndoStackBuilder, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the render view proxy for which we are monitoring the
    * interactions.
    */
   void SetRenderView(vtkSMRenderViewProxy*);
   vtkGetObjectMacro(RenderView, vtkSMRenderViewProxy);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the undo stack that this builder will build.
    */
   vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
   virtual void SetUndoStack(vtkSMUndoStack*);
-  //@}
+  ///@}
 
   /**
    * Clear the undo set currently being recorded.

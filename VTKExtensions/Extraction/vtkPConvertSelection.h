@@ -34,13 +34,13 @@ public:
   vtkTypeMacro(vtkPConvertSelection, vtkConvertSelection);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the parallel controller.
    */
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
 protected:
   vtkPConvertSelection();

@@ -65,21 +65,21 @@ public:
   vtkTypeMacro(vtkCSVExporter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the filename for the file.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the delimiter use to separate fields ("," by default.)
    */
   vtkSetStringMacro(FieldDelimiter);
   vtkGetStringMacro(FieldDelimiter);
-  //@}
+  ///@}
 
   enum ExporterModes
   {
@@ -87,7 +87,7 @@ public:
     STREAM_COLUMNS
   };
 
-  //@{
+  ///@{
   /**
    * Set a formatting to use when writing real numbers
    * (aka floating-point numbers) to csv.
@@ -96,9 +96,9 @@ public:
    */
   vtkSetMacro(Formatting, int);
   vtkGetMacro(Formatting, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set a precision to use when writing real numbers
    * (aka floating-point numbers) to csv.
@@ -107,9 +107,9 @@ public:
    */
   vtkSetMacro(Precision, int);
   vtkGetMacro(Precision, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * In STREAM_ROWS mode, this API can be used to change columns labels
    * when exporting.
@@ -117,7 +117,7 @@ public:
   void SetColumnLabel(const char* name, const char* label);
   void ClearColumnLabels();
   const char* GetColumnLabel(const char* name);
-  //@}
+  ///@}
 
   /**
    * Open the file and set mode in which the exporter is operating.
@@ -136,7 +136,7 @@ public:
    */
   void Abort();
 
-  //@{
+  ///@{
   /**
    * In STREAM_ROWS mode, use these methods to write column headers once using
    * WriteHeader and then use WriteData as many times as needed to write out
@@ -144,7 +144,7 @@ public:
    */
   void WriteHeader(vtkFieldData*);
   void WriteData(vtkFieldData*);
-  //@}
+  ///@}
 
   /**
    * In STREAM_COLUMNS mode, use this method to add a column (\c yarray). One
@@ -156,14 +156,14 @@ public:
   void AddColumn(
     vtkAbstractArray* yarray, const char* yarrayname = nullptr, vtkDataArray* xarray = nullptr);
 
-  //@{
+  ///@{
   /**
    * Whether to output to a string instead of to a file, which is the default.
    */
   vtkSetMacro(WriteToOutputString, bool);
   vtkGetMacro(WriteToOutputString, bool);
   vtkBooleanMacro(WriteToOutputString, bool);
-  //@}
+  ///@}
 
   /**
    * Get the exported data as string.

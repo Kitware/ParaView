@@ -36,7 +36,7 @@ public:
   vtkTypeMacro(vtkSMCameraLink, vtkSMProxyLink);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set if the link should synchronize interactive renders
    * as well. On by default.
@@ -44,7 +44,7 @@ public:
   vtkSetMacro(SynchronizeInteractiveRenders, int);
   vtkGetMacro(SynchronizeInteractiveRenders, int);
   vtkBooleanMacro(SynchronizeInteractiveRenders, int);
-  //@}
+  ///@}
 
   /**
    * Add a property to the link. updateDir determines whether a property of

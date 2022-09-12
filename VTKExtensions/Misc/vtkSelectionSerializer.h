@@ -42,16 +42,16 @@ public:
   vtkTypeMacro(vtkSelectionSerializer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Serialize the selection tree to a stream as xml.
    * For now, only keys of type vtkInformationIntegerKey are supported.
    */
   static void PrintXML(int printData, vtkSelection* selection);
   static void PrintXML(ostream& os, vtkIndent indent, int printData, vtkSelection* selection);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Parse an xml string to create a new selection tree.
    * The string is 0 terminated for the first version of this function,
@@ -61,7 +61,7 @@ public:
    */
   static void Parse(const char* xml, vtkSelection* root);
   static void Parse(const char* xml, unsigned int length, vtkSelection* root);
-  //@}
+  ///@}
 
   /**
    * ID of the dataset or algorithm that the selection belongs to. What

@@ -48,14 +48,14 @@ public:
    * to an initialized state.
    */
   vtkMaterialInterfacePieceTransactionMatrix(int nFragments, int nProcs);
-  //@{
+  ///@{
   /**
    * Free allocated resources and leave the object in an
    * un-initialized state.
    */
   ~vtkMaterialInterfacePieceTransactionMatrix();
   void Initialize(int nFragments, int nProcs);
-  //@}
+  ///@}
   /**
    * Free allocated resources and leave the object in an
    * un-initialized state.
@@ -77,7 +77,7 @@ public:
    */
   void PushTransaction(
     int fragmentId, int procId, vtkMaterialInterfacePieceTransaction& transaction);
-  //@{
+  ///@{
   /**
    * Send the transaction matrix on srcProc to all
    * other procs.
@@ -85,7 +85,7 @@ public:
   void Broadcast(vtkCommunicator* comm, int srcProc);
   //
   void Print();
-  //@}
+  ///@}
   /**
    * Tells how much memory the matrix has allocated.
    */
@@ -108,7 +108,7 @@ private:
    * This is used to send a subset of the TM.
    */
   vtkIdType PackPartial(int*& buffer, int* rows, int nRows);
-  //@{
+  ///@{
   /**
    * Load state from a buffer containing a Pack'ed
    * transaction matrix. 0 is returned on error.
@@ -133,7 +133,7 @@ vtkMaterialInterfacePieceTransactionMatrix::GetTransactions(int fragmentId, int 
 inline vtkIdType vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransactions(int procId)
 {
   size_t nTransactions = 0;
-  //@}
+  ///@}
 
   for (int fragmentId = 0; fragmentId < this->NFragments; ++fragmentId)
   {

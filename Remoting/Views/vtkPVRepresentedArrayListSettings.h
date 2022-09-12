@@ -51,39 +51,39 @@ public:
    */
   static vtkPVRepresentedArrayListSettings* GetInstance();
 
-  //@{
+  ///@{
   /**
    * Set/get the number of filter expressions.
    */
   virtual void SetNumberOfFilterExpressions(int n);
   virtual int GetNumberOfFilterExpressions();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the filter expression at index i. If the index is
    * outside the valid range, this call is a noop.
    */
   virtual void SetFilterExpression(int i, const char* expression);
   virtual const char* GetFilterExpression(int i);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the number of excluded name filters.
    */
   virtual void SetNumberOfExcludedNameFilters(int n);
   virtual int GetNumberOfExcludedNameFilters();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the excluded name filter at index i. If the index is
    * outside the valid range, this call is a noop.
    */
   virtual void SetExcludedNameFilter(int i, const char* expression);
   virtual const char* GetExcludedNameFilter(int i);
-  //@}
+  ///@}
 
   /// Provide the list of all name filters
   vtkStringArray* GetAllNameFilters();

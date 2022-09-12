@@ -98,24 +98,24 @@ public:
   vtkTypeMacro(vtkPCosmoReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //@{
+  ///@{
   /**
    * Specify the name of the cosmology particle binary file to read
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the physical box dimensions size (rL)
    * (default 100.0)
    */
   vtkSetMacro(RL, float);
   vtkGetMacro(RL, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the ghost cell spacing in Mpc (in rL units)
    * (edge boundary of processor box)
@@ -123,15 +123,15 @@ public:
    */
   vtkSetMacro(Overlap, float);
   vtkGetMacro(Overlap, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the read mode (0 = one-to-one, 1 = default, round-robin)
    */
   vtkSetMacro(ReadMode, int);
   vtkGetMacro(ReadMode, int);
-  //@}
+  ///@}
 
   /**
    * Set whether to byte-swap or not the data. Applicable only to Cosmo format.
@@ -140,22 +140,22 @@ public:
    * vtkGetMacro(ByteSwap,int);
    */
 
-  //@{
+  ///@{
   /**
    * Set the filetype to Gadget or Cosmo read mode
    * (0 = Gadget, 1 = default, Cosmo)
    */
   vtkSetMacro(CosmoFormat, int);
   vtkGetMacro(CosmoFormat, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the communicator object for interprocess communication
    */
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);
-  //@}
+  ///@}
 
 protected:
   vtkPCosmoReader();

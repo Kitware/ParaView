@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkSMSelectionLink, vtkSMLink);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Add a selection to the link. updateDir determines whether
    * the proxy used is an input or an output. When a selection of an input proxy
@@ -49,7 +49,7 @@ public:
    */
   void AddLinkedSelection(vtkSMProxy* proxy, int updateDir);
   void RemoveLinkedSelection(vtkSMProxy* proxy);
-  //@}
+  ///@}
 
   /**
    * Get the number of properties that are involved in this link.

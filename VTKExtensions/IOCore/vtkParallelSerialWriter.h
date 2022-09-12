@@ -46,76 +46,76 @@ public:
   vtkTypeMacro(vtkParallelSerialWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the internal writer.
    */
   void SetWriter(vtkAlgorithm*);
   vtkGetObjectMacro(Writer, vtkAlgorithm);
-  //@}
+  ///@}
 
   /**
    * Return the MTime also considering the internal writer.
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Name of the method used to set the file name of the internal
    * writer. By default, this is SetFileName.
    */
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the name of the output file.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
   /**
    * Invoke the writer.  Returns 1 for success, 0 for failure.
    */
   int Write();
 
-  //@{
+  ///@{
   /**
    * Get/Set the piece number to write.  The same piece number is used
    * for all inputs.
    */
   vtkGetMacro(Piece, int);
   vtkSetMacro(Piece, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of pieces into which the inputs are split.
    */
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of ghost levels to be written.
    */
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm
    * that runs on each node's data before it is sent to the root.
    */
   void SetPreGatherHelper(vtkAlgorithm*);
   vtkGetObjectMacro(PreGatherHelper, vtkAlgorithm);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the reduction helper. Reduction helper is an algorithm with
    * multiple input connections, that produces a single output as
@@ -124,9 +124,9 @@ public:
    */
   void SetPostGatherHelper(vtkAlgorithm*);
   vtkGetObjectMacro(PostGatherHelper, vtkAlgorithm);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Must be set to true to write all timesteps, otherwise only the current
    * timestep will be written out. Off by default.
@@ -134,14 +134,14 @@ public:
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
-  //@}
+  ///@}
 
   /**
    * Get/Set the interpreter to use to call methods on the writer.
    */
   void SetInterpreter(vtkClientServerInterpreter* interp) { this->Interpreter = interp; }
 
-  //@{
+  ///@{
   /**
    * Provides an option to pad the time step when writing out time series data.
    * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
@@ -151,9 +151,9 @@ public:
    */
   vtkGetStringMacro(FileNameSuffix);
   vtkSetStringMacro(FileNameSuffix);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * In parallel runs, this writer can consolidate output from multiple ranks to
    * a subset of ranks. This specifies the number of ranks that will do the final writing
@@ -163,7 +163,7 @@ public:
    */
   vtkSetClampMacro(NumberOfIORanks, int, 0, VTK_INT_MAX);
   vtkGetMacro(NumberOfIORanks, int);
-  //@}
+  ///@}
 
   enum
   {
@@ -171,7 +171,7 @@ public:
     ASSIGNMENT_MODE_ROUND_ROBIN
   };
 
-  //@{
+  ///@{
   /**
    * When `NumberOfIORanks` is greater than 1 and less than the number of MPI ranks,
    * this controls how the ranks that write to disk are determined. This also affects which
@@ -190,16 +190,16 @@ public:
   vtkSetClampMacro(
     RankAssignmentMode, int, ASSIGNMENT_MODE_CONTIGUOUS, ASSIGNMENT_MODE_ROUND_ROBIN);
   vtkGetMacro(RankAssignmentMode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the controller to use. By default initialized to
    * `vtkMultiProcessController::GetGlobalController` in the constructor.
    */
   void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
 protected:
   vtkParallelSerialWriter();

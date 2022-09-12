@@ -63,13 +63,13 @@ protected:
   vtkPVClientServerSynchronizedRenderers();
   ~vtkPVClientServerSynchronizedRenderers() override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the compressor object, it's setting can be manipulated directly.
    */
   void SetCompressor(vtkImageCompressor* comp);
   vtkGetObjectMacro(Compressor, vtkImageCompressor);
-  //@}
+  ///@}
 
   vtkUnsignedCharArray* Compress(vtkUnsignedCharArray*);
   void Decompress(vtkUnsignedCharArray* input, vtkUnsignedCharArray* outputBuffer);

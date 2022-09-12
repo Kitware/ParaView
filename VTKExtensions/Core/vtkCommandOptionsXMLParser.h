@@ -39,7 +39,7 @@ public:
   vtkTypeMacro(vtkCommandOptionsXMLParser, vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Add arguments to the xml parser.  These should be the
    * long arguments from the vtkCommandOptions class of the form
@@ -51,7 +51,7 @@ public:
   void SetPVOptions(vtkCommandOptions* o) { this->PVOptions = o; }
 
 protected:
-  //@}
+  ///@}
   /**
    * Default constructor.
    */

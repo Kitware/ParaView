@@ -75,7 +75,7 @@ public:
    */
   void setDirectoryItemFlags(const Qt::ItemFlags& flags);
 
-  //@{
+  ///@{
   /**
    * Get/Sets whether the dialog shows additional information about the files
    * like modification time and file size.  This information can be
@@ -84,7 +84,7 @@ public:
    */
   void setShowDetailedInfo(bool show);
   bool isShowingDetailedInfo();
-  //@}
+  ///@}
 
   /**
    * Sets the path that the file dialog will display.

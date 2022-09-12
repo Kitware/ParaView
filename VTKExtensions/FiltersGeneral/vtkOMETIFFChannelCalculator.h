@@ -41,14 +41,14 @@ public:
   vtkTypeMacro(vtkOMETIFFChannelCalculator, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Choose the channels to combine in this calculator.
    */
   vtkGetObjectMacro(ChannelSelection, vtkDataArraySelection);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the transfer functions to use to map scalars to colors.
    */
@@ -63,9 +63,9 @@ public:
   void SetChannel9LUT(vtkScalarsToColors* stc) { this->SetLUT("Channel_9", stc); }
   void SetChannel10LUT(vtkScalarsToColors* stc) { this->SetLUT("Channel_10", stc); }
   void SetLUT(const char* channelName, vtkScalarsToColors*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set weights for each of the channels.
    */
@@ -80,7 +80,7 @@ public:
   void SetChannel9Weight(double wght) { this->SetWeight("Channel_9", wght); }
   void SetChannel10Weight(double wght) { this->SetWeight("Channel_10", wght); }
   void SetWeight(const char* channelName, double weight);
-  //@}
+  ///@}
   vtkMTimeType GetMTime() override;
 
 protected:

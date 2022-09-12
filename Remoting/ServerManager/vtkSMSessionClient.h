@@ -44,7 +44,7 @@ public:
    */
   const char* GetURI() override { return this->URI; };
 
-  //@{
+  ///@{
   /**
    * Connects a remote server. URL can be of the following format:
    * cs://<pvserver-host>:<pvserver-port>
@@ -71,7 +71,7 @@ public:
   }
   virtual bool Connect(const char* url, int timeout, bool (*callback)(),
     vtkNetworkAccessManager::ConnectionResult& connectionResult);
-  //@}
+  ///@}
 
   /**
    * Returns true is this session is active/alive/valid.
@@ -109,7 +109,7 @@ public:
    */
   void Initialize() override;
 
-  //@{
+  ///@{
   /**
    * Push the state.
    */
@@ -118,9 +118,9 @@ public:
   void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
     bool ignore_errors = false) override;
   const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When Connect() is waiting for a server to connect back to the client (in
    * reverse connect mode), then it periodically fires ProgressEvent.
@@ -128,7 +128,7 @@ public:
    * it wants to abort the wait for the server.
    */
   vtkSetMacro(AbortConnect, bool);
-  //@}
+  ///@}
 
   /**
    * Gracefully exits the session.
@@ -190,14 +190,14 @@ public:
    */
   vtkSMCollaborationManager* GetCollaborationManager() override;
 
-  //@{
+  ///@{
   /**
    * Should be called to begin/end receiving progresses on this session.
    * Overridden to relay to the server(s).
    */
   void PrepareProgressInternal() override;
   void CleanupPendingProgressInternal() override;
-  //@}
+  ///@}
 
   /**
    * Return the connect id of this client.

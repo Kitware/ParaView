@@ -50,23 +50,23 @@ public:
    */
   void UpdatePipeline(double time) override;
 
-  //@{
+  ///@{
   /**
    * Flag indicating if the writer supports writing in parallel.
    * Not set by default.
    */
   vtkSetMacro(SupportsParallel, int);
   int GetSupportsParallel() { return this->SupportsParallel || this->ParallelOnly; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Flag indicating if the writer works only in parallel. If this is set,
    * SupportsParallel is always true.
    */
   vtkGetMacro(ParallelOnly, int);
   vtkSetMacro(ParallelOnly, int);
-  //@}
+  ///@}
 
 protected:
   vtkSMWriterProxy();

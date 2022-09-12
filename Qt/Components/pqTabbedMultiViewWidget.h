@@ -96,7 +96,7 @@ public:
    */
   pqMultiViewWidget* findTab(vtkSMViewLayoutProxy*) const;
 
-  //@{
+  ///@{
   /**
    * APIs for filtering of tab widgets. This matches the API exposed by
    * pqPipelineBrowserWidget.
@@ -104,7 +104,7 @@ public:
   void enableAnnotationFilter(const QString& annotationKey);
   void disableAnnotationFilter();
   void setAnnotationFilterMatching(bool matching);
-  //@}
+  ///@}
 
   /**
    * While generally not necessary to call this, if the annotations for the
@@ -136,7 +136,7 @@ public Q_SLOTS:
    */
   void setCurrentTab(int index);
 
-  //@{
+  ///@{
   /**
    * When set to false, all decorations including title frames, separators,
    * tab-bars are hidden.
@@ -144,7 +144,7 @@ public Q_SLOTS:
   void setDecorationsVisibility(bool);
   void showDecorations() { this->setDecorationsVisibility(true); }
   void hideDecorations() { this->setDecorationsVisibility(false); }
-  //@}
+  ///@}
 
   /**
    * toggles fullscreen state.
@@ -270,7 +270,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
      */
     QSize preview(const QSize&);
 
-    //@{
+    ///@{
     /**
      * Get/Set tab bar visibility. Use this instead of directly calling
      * `this->tabBar()->setVisible()` as that avoid interactions with preview
@@ -278,7 +278,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
      */
     void setTabBarVisibility(bool);
     bool tabBarVisibility() const { return this->TabBarVisibility; }
-    //@}
+    ///@}
   protected:
     void createViewSelectorTabIfNeeded(int tabIndex);
 

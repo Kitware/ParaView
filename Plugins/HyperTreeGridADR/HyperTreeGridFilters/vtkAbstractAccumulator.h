@@ -48,7 +48,7 @@ public:
 
   static vtkAbstractAccumulator* New();
 
-  //@{
+  ///@{
   /**
    * Methods for adding data to the accumulator.
    */
@@ -56,13 +56,13 @@ public:
   virtual void Add(const double* data, vtkIdType numberOfElements = 1, double weight = 1.0);
   virtual void Add(vtkAbstractAccumulator* accumulator) = 0;
   virtual void Add(double value, double weight) = 0;
-  //@}
+  ///@}
 
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this
    */
   virtual bool HasSameParameters(vtkAbstractAccumulator* accumulator) const = 0;
-  //@}
+  ///@}
 
   /**
    * Accessor on the accumulated value.
@@ -74,13 +74,13 @@ public:
   virtual void Initialize() {}
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructors and destructors
    */
   vtkAbstractAccumulator();
   ~vtkAbstractAccumulator() override = default;
-  //@}
+  ///@}
 
   /**
    * Lambda expression converting vectors to scalars. Default function is regular L2 norm.

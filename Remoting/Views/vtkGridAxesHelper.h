@@ -42,7 +42,7 @@ public:
   vtkTypeMacro(vtkGridAxesHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the bounding box defining the grid space. This, together with the
    * \c Face identify which planar surface this class is interested in. This
@@ -50,7 +50,7 @@ public:
    */
   vtkSetVector6Macro(GridBounds, double);
   vtkGetVector6Macro(GridBounds, double);
-  //@}
+  ///@}
 
   // These are in the same order as the faces of a vtkVoxel.
   enum Faces
@@ -63,13 +63,13 @@ public:
     MAX_XY
   };
 
-  //@{
+  ///@{
   /**
    * Indicate which face of the specified bounds is this class operating with.
    */
   vtkSetClampMacro(Face, int, MIN_YZ, MAX_XY);
   vtkGetMacro(Face, int);
-  //@}
+  ///@}
 
   /**
    * Valid values for LabelMask.
@@ -84,13 +84,13 @@ public:
     MAX_Z = 0x020
   };
 
-  //@{
+  ///@{
   /**
    * Set the axes to label.
    */
   vtkSetMacro(LabelMask, unsigned int);
   vtkGetMacro(LabelMask, unsigned int);
-  //@}
+  ///@}
 
   /**
    * Get the 4 points in world coordinates that define the grid plane. The
@@ -113,7 +113,7 @@ public:
    */
   vtkTuple<bool, 4> GetLabelVisibilities();
 
-  //@{
+  ///@{
   /**
    * Set the transform matrix to use to transform the points. The matrix's MTime
    * will be used to determine if the transformed points needed to be
@@ -121,7 +121,7 @@ public:
    */
   void SetMatrix(vtkMatrix4x4*);
   vtkGetObjectMacro(Matrix, vtkMatrix4x4);
-  //@}
+  ///@}
 
   /**
    * Get the 4 points of the plane transformed using the transformation matrix
@@ -172,12 +172,12 @@ public:
    */
   vtkTuple<vtkVector2d, 4> GetViewportNormals() const { return this->ViewportNormals; }
 
-  //@{
+  ///@{
   /**
    * Get if the face is facing backwards in the current viewport.
    */
   vtkGetMacro(Backface, bool);
-  //@}
+  ///@}
 
 protected:
   vtkGridAxesHelper();

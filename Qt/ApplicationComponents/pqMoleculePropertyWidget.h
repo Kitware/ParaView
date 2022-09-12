@@ -60,7 +60,7 @@ public:
   void updateWidget(bool showing_advanced_properties) override;
 
 protected Q_SLOTS:
-  //@{
+  ///@{
   /**
    * Show/hide widgets depending on the states of other widgets.
    * Handle advanced proprerties visibility.
@@ -69,7 +69,7 @@ protected Q_SLOTS:
   void updateAtomWidgetsVisibility();
   void updateAtomicRadiusWidgetsVisibility();
   void updateBondColorWidgetVisibility();
-  //@}
+  ///@}
 
   /**
    * Apply selected preset to the proxy
@@ -82,7 +82,7 @@ protected Q_SLOTS:
    */
   void resetPreset();
 
-  //@{
+  ///@{
   /**
    * Update the atom/bond radius sliders bounds.
    */
@@ -90,7 +90,7 @@ protected Q_SLOTS:
   void onResetAtomFactorToggled();
   void onScaleBondRadiusChanged(double scale);
   void onResetBondRadiusToggled();
-  //@}
+  ///@}
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**

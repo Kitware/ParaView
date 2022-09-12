@@ -82,13 +82,13 @@ public:
    */
   vtkObject* GetRemoteObject(vtkTypeUInt32 globalid);
 
-  //@{
+  ///@{
   /**
    * Get/Set the global id for this object.
    */
   vtkSetMacro(GlobalID, vtkTypeUInt32);
   vtkGetMacro(GlobalID, vtkTypeUInt32);
-  //@}
+  ///@}
 
 protected:
   vtkSIObject();

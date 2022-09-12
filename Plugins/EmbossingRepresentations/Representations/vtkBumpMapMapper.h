@@ -43,7 +43,7 @@ public:
   vtkTypeMacro(vtkBumpMapMapper, vtkCompositePolyDataMapper2);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the factor used to scale the bump mapping effect.
    * This factor scales the gradient vector magnitude computed, based on input array.
@@ -51,7 +51,7 @@ public:
    */
   vtkSetMacro(BumpMappingFactor, float);
   vtkGetMacro(BumpMappingFactor, float);
-  //@}
+  ///@}
 
 protected:
   vtkBumpMapMapper() = default;

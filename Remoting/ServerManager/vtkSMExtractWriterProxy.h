@@ -52,14 +52,14 @@ public:
    */
   virtual bool IsExtracting(vtkSMProxy* proxy) = 0;
 
-  //@{
+  ///@{
   /**
    * This is convenience method that gets called by vtkSMExtractsController to set the
    * extract writer to extract the given proxy.
    */
   virtual void SetInput(vtkSMProxy* proxy) = 0;
   virtual vtkSMProxy* GetInput() = 0;
-  //@}
+  ///@}
 protected:
   vtkSMExtractWriterProxy();
   ~vtkSMExtractWriterProxy() override;

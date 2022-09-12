@@ -34,30 +34,30 @@ public:
   vtkTypeMacro(vtkPVFilePathEncodingHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the path that will be used by the helper
    */
   vtkSetStringMacro(Path);
   vtkGetStringMacro(Path);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the secondary path that will potentially be used by the helper
    */
   vtkSetStringMacro(SecondaryPath);
   vtkGetStringMacro(SecondaryPath);
 
-  //@}
-  //@{
+  ///@}
+  ///@{
   /**
    * Get/Set the globalId of the vtkDirectory present of the server
    * that we will use to manipulate directories.
    */
   vtkGetMacro(ActiveGlobalId, int);
   vtkSetMacro(ActiveGlobalId, int);
-  //@}
+  ///@}
 
   /**
    * Create a directory named Path

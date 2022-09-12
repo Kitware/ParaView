@@ -48,13 +48,13 @@ public:
    */
   void AddInformation(vtkPVInformation* info) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
   /**
    * API to access the internal keys.

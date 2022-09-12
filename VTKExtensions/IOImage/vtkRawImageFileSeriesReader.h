@@ -34,35 +34,35 @@ public:
   vtkTypeMacro(vtkRawImageFileSeriesReader, vtkImageFileSeriesReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The number of dimensions stored in a file. This defaults to two.
    */
   vtkSetClampMacro(FileDimensionality, int, 2, 3);
   vtkGetMacro(FileDimensionality, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the extent of the data on disk.
    */
   vtkSetVector6Macro(DataExtent, int);
   vtkGetVector6Macro(DataExtent, int);
-  //@}
+  ///@}
 
 protected:
   vtkRawImageFileSeriesReader();
   ~vtkRawImageFileSeriesReader() override;
 
-  //@{
+  ///@{
   /**
    * Update the reader extent if the image file format does not know
    * what it is (e.g. the raw format). Here we pass in values set by the user.
    */
   void UpdateReaderDataExtent() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Raw files don't have any extent information in them and are required
    * to be set by the user. If we are reading a 2D raw image as a stack
@@ -72,15 +72,15 @@ protected:
    * time series.
    */
   int DataExtent[6];
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The dimensionality that we pass to the actual image reader.
    * Default is 2.
    */
   int FileDimensionality;
-  //@}
+  ///@}
 
 private:
   vtkRawImageFileSeriesReader(const vtkRawImageFileSeriesReader&) = delete;

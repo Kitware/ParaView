@@ -58,14 +58,14 @@ public:
   vtkTypeMacro(vtkSMViewProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Enable/Disable a view.
    */
   vtkSetMacro(Enable, bool);
   vtkGetMacro(Enable, bool);
   vtkBooleanMacro(Enable, bool);
-  //@}
+  ///@}
 
   /**
    * Renders the view using full resolution.
@@ -116,7 +116,7 @@ public:
    */
   virtual vtkSMRepresentationProxy* FindRepresentation(vtkSMSourceProxy* producer, int outputPort);
 
-  //@{
+  ///@{
   /**
    * Captures a image from this view. Default implementation returns nullptr.
    * Subclasses should override CaptureWindowInternal() to do the actual image
@@ -127,7 +127,7 @@ public:
     return this->CaptureWindow(magnification, magnification);
   }
   vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
-  //@}
+  ///@}
   /**
    * Returns the client-side vtkView, if any.
    */
@@ -148,14 +148,14 @@ public:
    */
   virtual bool HasDirtyRepresentation() { return this->GetNeedsUpdate(); }
 
-  //@{
+  ///@{
   /**
    * Returns true if the subsequent call to Update() will result in an actual
    * update. If returned true, it means that the view thinks its rendering is
    * obsolete and needs to be re-generated.
    */
   vtkGetMacro(NeedsUpdate, bool);
-  //@}
+  ///@}
 
   /**
    * Return the vtkRenderWindow used by this view, if any. Note, views like
@@ -194,15 +194,15 @@ public:
    */
   virtual bool MakeRenderWindowInteractor(bool quiet = false);
 
-  //@{
+  ///@{
   /**
    * Sets whether screenshots have a transparent background.
    */
   static void SetTransparentBackground(bool val);
   static bool GetTransparentBackground();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Method used to hide other representations if the view has a
    * `<ShowOneRepresentationAtATime/>` hint.
@@ -217,9 +217,9 @@ public:
   {
     return self ? self->HideOtherRepresentationsIfNeeded(repr) : false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Certain views maintain properties (or other state) that should be updated
    * when visibility of representations is changed e.g. SpreadSheetView needs to
@@ -242,7 +242,7 @@ public:
       self->RepresentationVisibilityChanged(repr, new_visibility);
     }
   }
-  //@}
+  ///@}
 
   /**
    * Helper method to locate a view to which the representation has been added.

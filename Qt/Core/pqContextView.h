@@ -89,7 +89,7 @@ public:
   void resetDisplay(bool closest = false) override;
 
 protected Q_SLOTS:
-  //@{
+  ///@{
   /**
    * Slots called when vtkCommand::StartInteractionEvent and
    * vtkCommand::EndInteractionEvent are fired by vtkSMContextViewProxy. We use
@@ -97,7 +97,7 @@ protected Q_SLOTS:
    */
   void startInteraction();
   void endInteraction();
-  //@}
+  ///@}
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**

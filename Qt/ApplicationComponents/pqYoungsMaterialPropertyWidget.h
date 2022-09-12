@@ -60,21 +60,21 @@ public:
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = nullptr);
   ~pqYoungsMaterialPropertyWidget() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the ordering arrays, linked to the SMProperty
    */
   void setOrderingArrays(const QList<QVariant>&);
   QList<QVariant> orderingArrays() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the normal arrays, linked to the SMProperty
    */
   void setNormalArrays(const QList<QVariant>&);
   QList<QVariant> normalArrays() const;
-  //@}
+  ///@}
 
 Q_SIGNALS:
 

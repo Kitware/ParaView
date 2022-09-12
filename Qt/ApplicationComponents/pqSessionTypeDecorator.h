@@ -63,13 +63,13 @@ public:
   pqSessionTypeDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
   ~pqSessionTypeDecorator() override;
 
-  //@{
+  ///@{
   /**
    * Methods overridden from pqPropertyWidget.
    */
   bool canShowWidget(bool show_advanced) const override;
   bool enableWidget() const override;
-  //@}
+  ///@}
 
 private:
   Q_DISABLE_COPY(pqSessionTypeDecorator);

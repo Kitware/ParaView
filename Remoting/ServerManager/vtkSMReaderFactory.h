@@ -81,23 +81,23 @@ public:
    */
   bool CanReadFile(const char* filename, vtkSMSession* session);
 
-  //@{
+  ///@{
   /**
    * Returns the xml-name for the reader that can read the file queried by the
    * most recent CanReadFile() call. This is valid only if CanReadFile()
    * returned true.
    */
   vtkGetStringMacro(ReaderName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the xml-group for the reader that can read the file queried by the
    * most recent CanReadFile() call. This is valid only if CanReadFile()
    * returned true.
    */
   vtkGetStringMacro(ReaderGroup);
-  //@}
+  ///@}
 
   /**
    * Get the list of readers that can possibly read the file. This is used when
@@ -149,7 +149,7 @@ public:
    */
   virtual std::vector<FileTypeDetailed> GetSupportedFileTypesDetailed(vtkSMSession* session);
 
-  //@{
+  ///@{
   /**
    * Helper method to check if the reader can read the given file. This is a
    * generic method that simply tries to call CanReadFile() on the reader. If
@@ -159,7 +159,7 @@ public:
   static bool CanReadFile(const char* filename, vtkSMProxy* reader);
   static bool CanReadFile(const char* filename, const char* readerxmlgroup,
     const char* readerxmlname, vtkSMSession* session);
-  //@}
+  ///@}
 
   /**
    * Returns the number of registered prototypes.
@@ -172,14 +172,14 @@ public:
    */
   virtual void UpdateAvailableReaders();
 
-  //@{
+  ///@{
   /**
    * Add/remove a group name to look for readers in. By default "source" is included.
    */
   void AddGroup(const char* groupName);
   void RemoveGroup(const char* groupName);
   void GetGroups(vtkStringList* groups);
-  //@}
+  ///@}
 
   /**
    * This function is for ParaView based applications that only wish to expose

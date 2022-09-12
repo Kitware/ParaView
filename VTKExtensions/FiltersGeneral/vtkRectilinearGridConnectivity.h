@@ -98,13 +98,13 @@ public:
   static vtkRectilinearGridConnectivity* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set / get the volume fraction value [0, 1] used for extracting fragments.
    */
   vtkSetClampMacro(VolumeFractionSurfaceValue, double, 0.0, 1.0);
   vtkGetMacro(VolumeFractionSurfaceValue, double);
-  //@}
+  ///@}
 
   /**
    * Remove all volume array names.

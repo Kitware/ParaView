@@ -41,29 +41,29 @@ public:
    */
   vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the FileName.
    */
   vtkGetStringMacro(FileName);
   vtkSetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get KeepPointData.
    */
   vtkGetMacro(KeepPointData, bool);
   vtkSetMacro(KeepPointData, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get KeepPointData.
    */
   vtkGetMacro(KeepCellData, bool);
   vtkSetMacro(KeepCellData, bool);
-  //@}
+  ///@}
 
   /**
    * Get the current grid.
@@ -101,7 +101,7 @@ private:
    */
   bool KeepCellData;
 
-  //@{
+  ///@{
   /**
    * The grid that is returned.
    */

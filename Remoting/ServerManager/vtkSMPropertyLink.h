@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkSMPropertyLink, vtkSMLink);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Add a property to the link. updateDir determines whether a property of
    * the proxy is read or written. When a property of an input proxy
@@ -49,15 +49,15 @@ public:
    */
   void AddLinkedProperty(vtkSMProxy* proxy, const char* propertyname, int updateDir);
   void RemoveLinkedProperty(vtkSMProxy* proxy, const char* propertyname);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the number of properties that are involved in this link.
    */
   unsigned int GetNumberOfLinkedObjects() override;
   unsigned int GetNumberOfLinkedProperties();
-  //@}
+  ///@}
 
   /**
    * Get a proxy involved in this link.
@@ -69,14 +69,14 @@ public:
    */
   const char* GetLinkedPropertyName(int index);
 
-  //@{
+  ///@{
   /**
    * Get the direction of a property involved in this link
    * (see vtkSMLink::UpdateDirections)
    */
   int GetLinkedObjectDirection(int index) override;
   int GetLinkedPropertyDirection(int index);
-  //@}
+  ///@}
 
   /**
    * Remove all links.

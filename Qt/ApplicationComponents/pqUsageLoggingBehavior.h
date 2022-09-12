@@ -97,14 +97,14 @@ public:
   pqUsageLoggingBehavior(QObject* parent = nullptr);
   ~pqUsageLoggingBehavior() override;
 
-  //@{
+  ///@{
   /**
    * Get/set the name of the configuration file. This must be set before
    * instantiating pqUsageLoggingBehavior. Default is `usage_logger.json`.
    */
   static void setConfigFileName(const QString& fname);
   static const QString& configFileName() { return pqUsageLoggingBehavior::ConfigFileName; }
-  //@}
+  ///@}
 private:
   Q_DISABLE_COPY(pqUsageLoggingBehavior);
 

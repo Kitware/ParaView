@@ -68,32 +68,32 @@ public:
   void setDataAssembly(vtkDataAssembly* assembly);
   vtkDataAssembly* dataAssembly() const;
 
-  //@{
+  ///@{
   /**
    * Get whether the model is user-checkable.
    */
   void setUserCheckable(bool);
   bool userCheckable() const { return this->UserCheckable; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Given a QModelIndex, returns the vtkDataAssembly node id, if any.
    * -1 is returned for invalid index.
    */
   int nodeId(const QModelIndex& idx) const;
   QList<int> nodeId(const QModelIndexList& idxes) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get a node id, returns the QModelIndex for the same.
    */
   QModelIndex index(int nodeId) const;
   QModelIndexList index(const QList<int>& nodeIds) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the check state for Qt::Checked for nodes selected using the path
    * names specified.
@@ -112,7 +112,7 @@ public:
    */
   void setCheckedNodes(const QStringList& paths);
   QStringList checkedNodes() const;
-  //@}
+  ///@}
 
   /**
    * For custom roles, use this function to convert that role into a role that
@@ -139,16 +139,16 @@ public:
     InheritedUntilOverridden,
   };
 
-  //@{
+  ///@{
   /**
    * Set properties for custom roles. If none specified, Standard is assumed.
    * For `Qt::CheckStateRole`, it is initialized to `Inherited`.
    */
   void setRoleProperty(int role, RoleProperties property);
   RoleProperties roleProperty(int role) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the values for a specific role using selectors. The values are
    * specified as a list of pairs which pair comprising of a selector and the
@@ -166,9 +166,9 @@ public:
    */
   bool setData(const QList<QPair<QString, QVariant>>& values, int role);
   QList<QPair<QString, QVariant>> data(int role) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * QAbstractItemModel interface implementation
    */
@@ -179,7 +179,7 @@ public:
   QVariant data(const QModelIndex& index, int role) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role) override;
-  //@}
+  ///@}
 Q_SIGNALS:
   /**
    * This signal is fired in `setData` if the data is changed. `setData`

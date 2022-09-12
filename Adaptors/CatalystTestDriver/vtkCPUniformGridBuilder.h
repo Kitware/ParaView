@@ -42,29 +42,29 @@ public:
    */
   vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the Dimensions of the uniform grid.
    */
   vtkSetVector3Macro(Dimensions, int);
   int* GetDimensions();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the Dimensions of the uniform grid.
    */
   vtkSetVector3Macro(Spacing, double);
   double* GetSpacing();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the Dimensions of the uniform grid.
    */
   vtkSetVector3Macro(Origin, double);
   double* GetOrigin();
-  //@}
+  ///@}
 
   /**
    * Get the UniformGrid.
@@ -105,7 +105,7 @@ private:
    */
   vtkUniformGrid* UniformGrid;
 
-  //@{
+  ///@{
   /**
    * Macro to set UniformGrid.
    */

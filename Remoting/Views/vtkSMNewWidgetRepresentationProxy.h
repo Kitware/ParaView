@@ -42,19 +42,19 @@ public:
   vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxyAbstract);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get the widget for the representation.
    */
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get Representation Proxy.
    */
   vtkGetObjectMacro(RepresentationProxy, vtkSMProxy);
-  //@}
+  ///@}
 
 protected:
   vtkSMNewWidgetRepresentationProxy();

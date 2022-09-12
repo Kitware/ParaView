@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkChartLogoRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   enum
   {
     AnyLocation = 0,
@@ -49,22 +49,22 @@ public:
     UpperCenter
   };
   vtkSetClampMacro(LogoLocation, int, AnyLocation, UpperCenter);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the position to use when `AnyLocation` is being used.
    */
   vtkGetVector2Macro(Position, double);
   vtkSetVector2Macro(Position, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   // Superclass overrides
   void SetVisibility(bool val) override;
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
-  //@}
+  ///@}
 
 protected:
   vtkChartLogoRepresentation();

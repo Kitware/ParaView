@@ -74,27 +74,27 @@ public:
     /*------------------------------------------------------------------------------*/
     /** \name Constructor and destructor */
     /*------------------------------------------------------------------------------*/
-    //@{
+    ///@{
     GW_VoronoiMesh();
     virtual ~GW_VoronoiMesh();
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Base mesh construction */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     static GW_U32 AddFurthestPoint( T_GeodesicVertexList& VertList, GW_GeodesicMesh& Mesh, GW_Bool bUseRandomStartVertex = GW_False );
     static GW_U32 AddFurthestPointsIterate( T_GeodesicVertexList& VertList, GW_GeodesicMesh& Mesh, GW_U32 nNbrIteration, GW_Bool bUseRandomStartVertex = GW_False, GW_Bool bUseProgressBar = GW_True );
     void BuildMesh( GW_GeodesicMesh& OriginalMesh, GW_Bool bFixHole = GW_True );
-    //@}
+    ///@}
 
     //-------------------------------------------------------------------------
     /** \name Parametrization construction. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void BuildGeodesicBoundaries( GW_GeodesicMesh& Mesh );
     void BuildGeodesicParametrization( GW_GeodesicMesh& Mesh );
-    //@}
+    ///@}
 
 
     void Reset();
@@ -115,20 +115,20 @@ public:
     //-------------------------------------------------------------------------
     /** \name Surface flattening. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     void GetNaturalNeighborWeights( T_FloatMap& Weights, GW_GeodesicMesh& Mesh, GW_GeodesicVertex& Vert );
     void FlattenBasePoints( GW_GeodesicMesh& Mesh, T_Vector2DMap& FlatteningMap );
     void GetReciprocicalDistanceWeights( T_FloatMap& Weights, GW_GeodesicMesh& Mesh, GW_GeodesicVertex& Vert );
-    //@}
+    ///@}
 
 
     //-------------------------------------------------------------------------
     /** \name Class factory methods. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     virtual GW_Vertex& CreateNewVertex();
     virtual GW_Face& CreateNewFace();
-    //@}
+    ///@}
 
     /* \todo Should be private */
     void PerformLocalFastMarching( GW_GeodesicMesh& Mesh, GW_VoronoiVertex& Vert );

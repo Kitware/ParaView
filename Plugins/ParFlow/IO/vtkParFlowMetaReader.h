@@ -247,17 +247,17 @@ protected:
   /// The time step (taken from the set of available TimeSteps) to load.
   int TimeStep;
   /// Cached data to avoid re-reads
-  //@{
+  ///@{
   /// Timestep used for last read of subsurface data
   int CacheTimeStep;
   /// Cache of subsurface data
   vtkSmartPointer<vtkDataObject> SubsurfaceCache;
   /// Cache of surface data
   vtkSmartPointer<vtkDataObject> SurfaceCache;
-  //@}
+  ///@}
 
   /// Metadata and user field-selections for the current ".pfmetadata" file.
-  //@{
+  ///@{
   /// The entire metadata structure.
   json Metadata;
 
@@ -285,7 +285,7 @@ protected:
   /// intersect the region-of-interest and to obtain the offset of each
   /// of those subgrids.
   std::vector<int> IJKDivs[2][3];
-  //@}
+  ///@}
 };
 
 template <int dimension>

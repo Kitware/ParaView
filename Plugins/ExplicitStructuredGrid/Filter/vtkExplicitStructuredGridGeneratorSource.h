@@ -34,38 +34,38 @@ public:
   vtkTypeMacro(vtkExplicitStructuredGridGeneratorSource, vtkExplicitStructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the generator mode using a value contained in the GeneratorType
    * enum.
    */
   vtkGetMacro(GeneratorMode, int);
   vtkSetMacro(GeneratorMode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the data extent.
    */
   vtkGetVector6Macro(DataExtent, int);
   vtkSetVector6Macro(DataExtent, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the pyramid step size for the GENERATOR_PYRAMID mode.
    */
   vtkGetMacro(PyramidStepSize, int);
   vtkSetMacro(PyramidStepSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of time steps to generate.
    */
   vtkGetMacro(NumberOfTimeSteps, int);
   vtkSetMacro(NumberOfTimeSteps, int);
-  //@}
+  ///@}
 
   enum GeneratorType
   {

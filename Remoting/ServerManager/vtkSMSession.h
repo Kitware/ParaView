@@ -62,12 +62,12 @@ public:
    */
   virtual const char* GetURI() { return "builtin:"; }
 
-  //@{
+  ///@{
   /**
    * Returns the vtkSMSessionProxyManager associated with this session.
    */
   vtkGetObjectMacro(SessionProxyManager, vtkSMSessionProxyManager);
-  //@}
+  ///@}
 
   /**
    * Returns the number of processes on the given server/s. If more than 1
@@ -111,7 +111,7 @@ public:
   // Undo/Redo related API.
   //---------------------------------------------------------------------------
 
-  //@{
+  ///@{
   /**
    * Provide an access to the session state locator that can provide the last
    * state of a given remote object that have been pushed.
@@ -119,7 +119,7 @@ public:
    * the UndoStackBuilder in vtkSMProxyManager is non-nullptr.
    */
   vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   // Superclass Implementations
@@ -176,7 +176,7 @@ public:
    */
   static vtkIdType ConnectToCatalyst();
 
-  //@{
+  ///@{
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
@@ -184,9 +184,9 @@ public:
    * This version is used to create a built-in session.
    */
   static vtkIdType ConnectToSelf();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
@@ -205,9 +205,9 @@ public:
   }
   static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout, bool (*callback)(),
     vtkNetworkAccessManager::ConnectionResult& result);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Same as ConnectToRemote() except that it waits for a reverse connection
    * for timeout seconds. One can optionally provide a callback that can be
@@ -228,9 +228,9 @@ public:
   }
   static vtkIdType ReverseConnectToRemote(
     int port, int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
@@ -250,9 +250,9 @@ public:
   }
   static vtkIdType ConnectToRemote(const char* dshost, int dsport, const char* rshost, int rsport,
     int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Same as ConnectToRemote() except that it waits for a reverse connection
    * for timeout seconds. One can optionally provide a callback that can be
@@ -273,9 +273,9 @@ public:
   }
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport, int timeout, bool (*callback)(),
     vtkNetworkAccessManager::ConnectionResult& result);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Use this method to disconnect from a session. This ensures that
    * appropriate cleanup happens before the disconnect such as unregistering
@@ -284,16 +284,16 @@ public:
    */
   static void Disconnect(vtkIdType sessionid);
   static void Disconnect(vtkSMSession* session);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
 
   /**
    * Deprecated. AutoMPI is no longer supported. This simply returns false.
    */
   PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
   bool GetIsAutoMPI() const;
-  //@}
+  ///@}
 
 protected:
   // Subclasses should set initialize_during_constructor to false so that

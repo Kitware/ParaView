@@ -124,7 +124,7 @@ public:
   /**
    * \name QAbstractItemModel Methods
    */
-  //@{
+  ///@{
   /**
    * \brief
    *   Gets the number of rows for a given index.
@@ -200,12 +200,12 @@ public:
    *   The flags for the given model index.
    */
   Qt::ItemFlags flags(const QModelIndex& index) const override;
-  //@}
+  ///@}
 
   /**
    * \name Object Mapping
    */
-  //@{
+  ///@{
 
   /**
    * Given the index, get the pqServerManagerModelItem it represents.
@@ -223,7 +223,7 @@ public:
    *   The type for the given index.
    */
   ItemType getTypeFor(const QModelIndex& index) const;
-  //@}
+  ///@}
 
   /**
    * \brief
@@ -361,21 +361,21 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void removeConnection(pqPipelineSource* source, pqPipelineSource* sink, int);
 
-  //@{
+  ///@{
   /**
    * Called to update extractor connections.
    */
   void addConnection(pqServerManagerModelItem* source, pqExtractor* sink);
   void removeConnection(pqServerManagerModelItem* source, pqExtractor* sink);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add/remove extractor.
    */
   void addExtractor(pqExtractor*);
   void removeExtractor(pqExtractor*);
-  //@}
+  ///@}
 
   /**
    * Updates the icons in the current window column.

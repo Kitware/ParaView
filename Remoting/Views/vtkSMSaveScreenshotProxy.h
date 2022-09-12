@@ -111,13 +111,13 @@ public:
    */
   static int ComputeMagnification(const vtkVector2i& targetSize, vtkVector2i& size);
 
-  //@{
+  ///@{
   /**
    * Convenience method to derive a QFileDialog friendly format string for
    * extensions supported by this proxy.
    */
   std::string GetFileFormatFilters();
-  //@}
+  ///@}
 
 protected:
   vtkSMSaveScreenshotProxy();
@@ -155,12 +155,12 @@ protected:
    */
   std::string GetStereoFileName(const std::string& filename, bool left);
 
-  //@{
+  ///@{
   // vtkSMRecolorableImageExtractWriterProxy uses experimental API
   // SetUseFloatingPointBuffers.
   friend class vtkSMRecolorableImageExtractWriterProxy;
   vtkSetMacro(UseFloatingPointBuffers, bool);
-  //@}
+  ///@}
 
 private:
   vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) = delete;

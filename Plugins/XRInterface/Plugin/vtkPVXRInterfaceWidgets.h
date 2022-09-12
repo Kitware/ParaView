@@ -72,7 +72,7 @@ public:
   void MoveToNextCell();
   void UpdateBillboard(bool updatePosition);
 
-  //@{
+  ///@{
   /**
    * Add/remove crop planes and thick crops
    */
@@ -87,7 +87,7 @@ public:
   void MoveThickCrops(bool forward);
   void SetCropSnapping(int val);
   bool GetCropSnapping() { return this->CropSnapping; }
-  //@}
+  ///@}
 
   size_t GetNumberOfCropPlanes() { return this->CropPlanes.size(); }
 

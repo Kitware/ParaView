@@ -37,34 +37,34 @@ public:
   vtkTypeMacro(vtkPVCameraAnimationCue, vtkPVKeyFrameAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the render view.
    */
   void SetView(vtkPVRenderView*);
   vtkGetObjectMacro(View, vtkPVRenderView);
-  //@}
+  ///@}
 
   /**
    * Returns the animated camera, if any.
    */
   vtkCamera* GetCamera();
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkPVCameraCueManipulator.
    */
   void SetMode(int mode);
   void SetInterpolationMode(int mode);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the animation timekeeper
    */
   vtkGetObjectMacro(TimeKeeper, vtkSMProxy);
   void SetTimeKeeper(vtkSMProxy*);
-  //@}
+  ///@}
 
   void BeginUpdateAnimationValues() override {}
   void SetAnimationValue(int, double) override {}

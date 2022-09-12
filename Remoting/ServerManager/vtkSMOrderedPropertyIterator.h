@@ -46,12 +46,12 @@ public:
    */
   void SetProxy(vtkSMProxy* proxy);
 
-  //@{
+  ///@{
   /**
    * Return the proxy.
    */
   vtkGetObjectMacro(Proxy, vtkSMProxy);
-  //@}
+  ///@}
 
   /**
    * Go to the first property.

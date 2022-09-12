@@ -72,7 +72,7 @@ public:
   pqHierarchicalGridLayout(QWidget* parent = nullptr);
   ~pqHierarchicalGridLayout() override;
 
-  //@{
+  ///@{
   /**
    * pure virtual methods from QLayout
    */
@@ -80,25 +80,25 @@ public:
   QLayoutItem* itemAt(int index) const override;
   QLayoutItem* takeAt(int index) override;
   int count() const override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * recommended overrides from QLayout
    */
   QSize minimumSize() const override;
   void setGeometry(const QRect& rect) override;
   QSize sizeHint() const override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns true if the location points to a valid reachable location.
    */
   bool isLocationValid(int location) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Adds a splitter item. \c location specified must be valid and reachable.
    */
@@ -112,23 +112,23 @@ public:
   {
     this->split(location, Qt::Horizontal, splitFraction);
   }
-  //@}
+  ///@}
 
   /**
    * Specify the split fraction for a location. \c location must be valid and
    * reachable.
    */
   void setSplitFraction(int location, double splitFraction);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Maximize any cell location. Set to 0 to return to default un-maximized state.
    * Invalid location i.e. negative or referring to a non-existent or
    * unreachable cell will be ignored with a warning message.
    */
   void maximize(int location);
-  //@}
+  ///@}
 
   class Item
   {

@@ -98,7 +98,7 @@ public:
   vtkTypeMacro(vtkSteeringDataGenerator, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Choose the type for a parition in the output vtkMultiBlockDataSet.
    * Accepted values are any non-composite dataset type know to
@@ -106,9 +106,9 @@ public:
    */
   vtkSetMacro(PartitionType, int);
   vtkGetMacro(PartitionType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Indicate the field association to which the specified data arrays are
    * added. The FieldAssociation must make sense for the chosen PartitionType
@@ -117,9 +117,9 @@ public:
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to add individual tuples to the data arrays. The number of
    * components and type of the array depends on the API overload used. The
@@ -138,7 +138,7 @@ public:
   void SetTuple3Int(const char* arrayname, vtkIdType index, int val0, int val1, int val2);
   void SetTuple3IdType(
     const char* arrayname, vtkIdType index, vtkIdType val0, vtkIdType val1, vtkIdType val3);
-  //@}
+  ///@}
 
   /**
    * Remove the array identified by the arrayname, if any.

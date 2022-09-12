@@ -50,7 +50,7 @@ public:
    */
   void SetAnimationValue(vtkSMProperty* property, int idx, double value) override;
 
-  //@{
+  ///@{
   /**
    * A vtkSMProperty is often defined with a default value in the
    * XML itself. However, many times, the default value must be determined
@@ -65,7 +65,7 @@ public:
 protected:
   vtkSMExtentDomain();
   ~vtkSMExtentDomain() override;
-  //@}
+  ///@}
 
   void Update(vtkSMProxyProperty* pp);
 

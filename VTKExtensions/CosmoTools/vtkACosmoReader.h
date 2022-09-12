@@ -90,44 +90,44 @@ public:
   vtkTypeMacro(vtkACosmoReader, vtkMultiBlockDataSetAlgorithm);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  //@{
+  ///@{
   /**
    * Add/Remove files to read. These files are treated as set in the adaptive
    * cosmo files.
    */
   void AddFileName(const char*);
   void RemoveAllFileNames();
-  //@}
+  ///@}
 
   // Set/Get the box size for the simulation (range along x,y,z)
   // Negative x,y,z values are subtracted from this for wraparound
   vtkSetMacro(BoxSize, double);
   vtkGetMacro(BoxSize, double);
 
-  //@{
+  ///@{
   /**
    * Set/Get the endian-ness of the binary file
    */
   vtkSetMacro(ByteSwap, int);
   vtkGetMacro(ByteSwap, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When false (default) 32-bit tags are read from the file.  When
    * on, 64-bit tags are read from the file.
    */
   vtkSetMacro(TagSize, int);
   vtkGetMacro(TagSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the level of resolution
    */
   vtkSetMacro(Level, int);
   vtkGetMacro(Level, int);
-  //@}
+  ///@}
 
 protected:
   vtkACosmoReader();

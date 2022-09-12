@@ -84,14 +84,14 @@ public:
    */
   void setAnimationScene(pqAnimationScene* animationScene);
 
-  //@{
+  ///@{
   /**
    * Get/Set the list of timestep. `QList<QVariant>` is a list of variants
    * convertible to double.
    */
   void setTimestepValues(const QList<QVariant>& list);
   const QList<QVariant>& timestepValues() const;
-  //@}
+  ///@}
 
   /**
    * Set the current animation time
@@ -110,30 +110,30 @@ public:
    */
   int precision() const;
 
-  //@{
+  ///@{
   /**
    * Get/set the animation playback mode.
    */
   void setPlayMode(const QString& mode);
   QString playMode() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/set whether the user should be able to change the animation
    * play mode using this widget.
    */
   void setPlayModeReadOnly(bool val);
   bool playModeReadOnly() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/set the label text to use for the "time" parameter.
    */
   void setTimeLabel(const QString& val);
   QString timeLabel() const;
-  //@}
+  ///@}
 
 Q_SIGNALS:
   void playModeChanged();

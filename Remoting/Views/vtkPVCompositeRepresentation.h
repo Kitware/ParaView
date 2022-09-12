@@ -77,7 +77,7 @@ public:
    */
   virtual void SetPolarAxesVisibility(bool visible);
 
-  //@{
+  ///@{
   /**
    * Passed on to internal representations as well.
    */
@@ -90,15 +90,15 @@ public:
   void AddInputConnection(vtkAlgorithmOutput* input) override;
   void RemoveInputConnection(int port, vtkAlgorithmOutput* input) override;
   void RemoveInputConnection(int port, int idx) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkSelectionRepresentation.
    */
   virtual void SetPointFieldDataArrayName(const char*);
   virtual void SetCellFieldDataArrayName(const char*);
-  //@}
+  ///@}
 
   /**
    * Override because of internal composite representations that need to be

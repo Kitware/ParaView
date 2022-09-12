@@ -81,14 +81,14 @@ public:
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
-  //@{
+  ///@{
   /**
    * Process property link hints on the given proxy.
    */
   static void ProcessPropertyLinks(vtkSMProxy* proxy);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add/Remove links. If `unlink_if_modified` is true, if a linked property on the target
    * proxy is modified independently, then the link is broken to avoid
@@ -97,7 +97,7 @@ public:
   void AddLink(const char* sourceProperty, vtkSMProxy* target, const char* targetProperty,
     bool unlink_if_modified);
   void RemoveLink(const char* sourceProperty, vtkSMProxy* target, const char* targetProperty);
-  //@}
+  ///@}
 
   /**
    * Returns the name of the sourceProperty, if any, with which the target
@@ -105,21 +105,21 @@ public:
    */
   const char* GetSourcePropertyName(vtkSMProxy* target, const char* targetProperty);
 
-  //@{
+  ///@{
   /**
    * Save/Load the state for links registered with this settings proxy.
    */
   void SaveLinksState(vtkPVXMLElement* root);
   void LoadLinksState(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether the settings proxy is serializable.
    */
   vtkSetMacro(IsSerializable, bool);
   vtkGetMacro(IsSerializable, bool);
-  //@}
+  ///@}
 
 protected:
   vtkSMSettingsProxy();

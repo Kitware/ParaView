@@ -40,20 +40,20 @@ public:
    */
   void CopyFromObject(vtkObject* object) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the value of an environment variable
    */
   vtkGetStringMacro(Variable);
-  //@}
+  ///@}
 
 protected:
   vtkPVEnvironmentInformation();

@@ -134,28 +134,28 @@ public:
   vtkTypeMacro(vtkPPhastaReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set and get the Phasta meta file name
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the step number for the geometry.
    */
   vtkSetClampMacro(TimeStepIndex, int, 0, VTK_INT_MAX);
   vtkGetMacro(TimeStepIndex, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The min and max values of timesteps.
    */
   vtkGetVector2Macro(TimeStepRange, int);
-  //@}
+  ///@}
 
   static int CanReadFile(const char* filename);
 

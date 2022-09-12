@@ -55,7 +55,7 @@ public:
    */
   void SetVisibility(bool val) override;
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkProperty
    */
@@ -70,9 +70,9 @@ public:
   void SetOpacity(double val);
   void SetLuminosity(double val);
   void SetRenderLinesAsTubes(bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkActor
    */
@@ -82,7 +82,7 @@ public:
   void SetPosition(double, double, double);
   void SetScale(double, double, double);
   void SetUserTransform(const double[16]);
-  //@}
+  ///@}
 
 protected:
   vtkAMROutlineRepresentation();
@@ -133,20 +133,20 @@ protected:
   int RequestData(vtkInformation* rqst, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  //@{
+  ///@{
   /**
    * Returns true when the input pipeline supports streaming. It is set in
    * RequestInformation().
    */
   vtkGetMacro(StreamingCapablePipeline, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns true when StreamingUpdate() is being processed.
    */
   vtkGetMacro(InStreamingUpdate, bool);
-  //@}
+  ///@}
 
   /**
    * Returns true if this representation has a "next piece" that it streamed.
@@ -183,13 +183,13 @@ protected:
    */
   vtkSmartPointer<vtkAMRStreamingPriorityQueue> PriorityQueue;
 
-  //@{
+  ///@{
   /**
    * Actor used to render the outlines in the view.
    */
   vtkSmartPointer<vtkCompositePolyDataMapper2> Mapper;
   vtkSmartPointer<vtkPVLODActor> Actor;
-  //@}
+  ///@}
 
   /**
    * Used to keep track of data bounds.

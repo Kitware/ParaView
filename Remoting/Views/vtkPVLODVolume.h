@@ -41,14 +41,14 @@ public:
 
   static vtkPVLODVolume* New();
 
-  //@{
+  ///@{
   /**
    * This method is used internally by the rendering process.
    */
   int RenderOpaqueGeometry(vtkViewport* viewport) override;
   int RenderVolumetricGeometry(vtkViewport* viewport) override;
   int RenderTranslucentPolygonalGeometry(vtkViewport*) override;
-  //@}
+  ///@}
 
   /**
    * Does this prop have some translucent polygonal geometry?
@@ -62,21 +62,21 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow*) override;
 
-  //@{
+  ///@{
   /**
    * Set the high res input.  Overloads the virtual vtkVolume method.
    */
   virtual void SetMapper(vtkAbstractVolumeMapper*);
   vtkAbstractVolumeMapper* GetMapper() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This sets the low res input.
    */
   virtual void SetLODMapper(vtkAbstractVolumeMapper*);
   virtual void SetLODMapper(vtkMapper*);
-  //@}
+  ///@}
 
   /**
    * Sets the volume property.  Overloads the virtual vtkVolume method.
@@ -98,7 +98,7 @@ public:
    */
   void SetAllocatedRenderTime(double t, vtkViewport* v) override;
 
-  //@{
+  ///@{
   /**
    * When set, LODMapper, if present it used, otherwise the regular mapper is
    * used.
@@ -111,7 +111,7 @@ public:
 protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume() override;
-  //@}
+  ///@}
 
   /**
    * Since volume mapper are notorious for segfaulting when the scalar array is

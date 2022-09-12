@@ -54,15 +54,15 @@ public:
   static vtkUnstructuredPOPReader* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The NetCDF file to open.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable subsampling in i,j and k dimensions for the topologically
    * structured input data. Note that if number of points in the
@@ -70,9 +70,9 @@ public:
    */
   vtkSetVector3Macro(Stride, int);
   vtkGetVector3Macro(Stride, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the VOI of for the topologically structured input data.
    * Note that if number of points in the z-direction are reduced
@@ -80,9 +80,9 @@ public:
    */
   vtkSetVector6Macro(VOI, int);
   vtkGetVector6Macro(VOI, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Variable array selection.
    */
@@ -90,27 +90,27 @@ public:
   virtual const char* GetVariableArrayName(int idx);
   virtual int GetVariableArrayStatus(const char* name);
   virtual void SetVariableArrayStatus(const char* name, int status);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the outer radius of the Earth. By default it is 6371000
    * which assumes the length is in meters.
    */
   vtkSetMacro(Radius, double);
   vtkGetMacro(Radius, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Determine whether or not the input data is being interpolated
    * at the U/vector points or T/scalar points.
    * 0 means unset, 2 means vector field, and 1 means scalar field.
    */
   vtkGetMacro(VectorGrid, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify whether or not to compute the vertical velocity component
    * from the horizontal velocity components.  Default is false
@@ -118,7 +118,7 @@ public:
    */
   vtkSetMacro(VerticalVelocity, bool);
   vtkGetMacro(VerticalVelocity, bool);
-  //@}
+  ///@}
 
 protected:
   vtkUnstructuredPOPReader();
@@ -138,13 +138,13 @@ protected:
    */
   char* FileName;
 
-  //@{
+  ///@{
   /**
    * If a file is opened, the file name of the opened file.
    */
   char* OpenedFileName;
   vtkSetStringMacro(OpenedFileName);
-  //@}
+  ///@}
 
   int Stride[3];
 
@@ -161,7 +161,7 @@ protected:
 
   int VOI[6];
 
-  //@{
+  ///@{
   /**
    * State variables so that we know whether or not we are only reading
    * in part of the grid. SubsettingXMin and SubsettingXMax are used
@@ -172,7 +172,7 @@ protected:
   bool SubsettingXMin;
   bool SubsettingXMax;
   bool ReducedHeightResolution;
-  //@}
+  ///@}
 
   /**
    * Specify whether the grid points are at the vector field (U_LAT and U_LON) locations

@@ -43,7 +43,7 @@ public:
    */
   static vtkPVGeneralSettings* GetInstance();
 
-  //@{
+  ///@{
   /**
    * Automatically convert data arrays as needed by filters including converting
    * cell arrays to point arrays, or vice versa, and extracting single components
@@ -52,9 +52,9 @@ public:
    */
   void SetAutoConvertProperties(bool val);
   bool GetAutoConvertProperties();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Determines the number of distinct values in
    * vtkBlockColors. This array is added to each block if
@@ -63,18 +63,18 @@ public:
    */
   vtkGetMacro(BlockColorsDistinctValues, int);
   vtkSetMacro(BlockColorsDistinctValues, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Automatically apply changes in the 'Properties' panel.
    * Default is false.
    */
   vtkGetMacro(AutoApply, bool);
   vtkSetMacro(AutoApply, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set delay for auto apply.
    * Not exposed in the UI.
@@ -82,18 +82,18 @@ public:
    */
   vtkGetMacro(AutoApplyDelay, int);
   vtkSetMacro(AutoApplyDelay, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Automatically apply changes in the 'Properties' panel.
    * Default is false.
    */
   vtkGetMacro(AutoApplyActiveOnly, bool);
   vtkSetMacro(AutoApplyActiveOnly, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Deprecated. AutoMPI is no longer supported.
    */
@@ -105,15 +105,15 @@ public:
   void SetAutoMPILimit(int val);
   PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
   int GetAutoMPILimit();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the default view type.
    */
   vtkGetStringMacro(DefaultViewType);
   vtkSetStringMacro(DefaultViewType);
-  //@}
+  ///@}
 
   /**
    * Enum for DefaultTimeStep
@@ -125,7 +125,7 @@ public:
     DEFAULT_TIME_STEP_LAST
   };
 
-  //@{
+  ///@{
   /**
    * Enum for ScalarBarMode.
    */
@@ -137,31 +137,31 @@ public:
   };
   vtkGetMacro(ScalarBarMode, int);
   void SetScalarBarMode(int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set when animation geometry caching is enabled.
    */
   void SetCacheGeometryForAnimation(bool val);
   bool GetCacheGeometryForAnimation();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the animation cache limit in KBs.
    */
   void SetAnimationGeometryCacheLimit(unsigned long val);
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the precision of the animation time toolbar.
    */
   vtkSetClampMacro(AnimationTimePrecision, int, 1, 17);
   vtkGetMacro(AnimationTimePrecision, int);
-  //@}
+  ///@}
 
   enum
   {
@@ -170,25 +170,25 @@ public:
     FIXED
   };
 
-  //@{
+  ///@{
   /**
    * Set the notation for the animation time toolbar.
    * Accepted values are MIXED, SCIENTIFIC, and FIXED.
    */
   vtkSetMacro(AnimationTimeNotation, int);
   vtkGetMacro(AnimationTimeNotation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set when animation shortcuts are shown.
    */
   vtkSetMacro(ShowAnimationShortcuts, bool);
   vtkGetMacro(ShowAnimationShortcuts, bool);
   vtkBooleanMacro(ShowAnimationShortcuts, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether to reset display when showing
    * a representation in an empty view.
@@ -196,9 +196,9 @@ public:
   vtkSetMacro(ResetDisplayEmptyViews, bool);
   vtkGetMacro(ResetDisplayEmptyViews, bool);
   vtkBooleanMacro(ResetDisplayEmptyViews, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This enum specifies which notations to use for displaying real number values.
    */
@@ -212,15 +212,15 @@ public:
    */
   vtkSetMacro(RealNumberDisplayedNotation, int);
   vtkGetMacro(RealNumberDisplayedNotation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the precision of real number displayed in widgets or views.
    */
   vtkSetMacro(RealNumberDisplayedPrecision, int);
   vtkGetMacro(RealNumberDisplayedPrecision, int);
-  //@}
+  ///@}
 
   /**
    * Forwarded for vtkSMParaViewPipelineControllerWithRendering.
@@ -240,96 +240,96 @@ public:
     SEPARATE_VIEW_PROPERTIES = 2,
     ALL_SEPARATE = 3
   };
-  //@{
+  ///@{
   /**
    * Properties panel configuration.
    */
   vtkSetMacro(PropertiesPanelMode, int);
   vtkGetMacro(PropertiesPanelMode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether to dock widgets into place.
    */
   vtkSetMacro(LockPanels, bool);
   vtkGetMacro(LockPanels, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Load all variables when loading a data set.
    */
   void SetLoadAllVariables(bool val);
   bool GetLoadAllVariables();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Load no variables when showing a 2D chart.
    */
   void SetLoadNoChartVariables(bool val);
   bool GetLoadNoChartVariables();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the GUI font size. This is used only if GUIOverrideFont is true.
    */
   vtkSetClampMacro(GUIFontSize, int, 8, VTK_INT_MAX);
   vtkGetMacro(GUIFontSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether the GUIFontSize should be used.
    */
   vtkSetMacro(GUIOverrideFont, bool);
   vtkGetMacro(GUIOverrideFont, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Console font size.
    */
   vtkSetClampMacro(ConsoleFontSize, int, 8, VTK_INT_MAX);
   vtkGetMacro(ConsoleFontSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    *  Automatically color by **vtkBlockColors** if array is present on `Apply`.
    */
   vtkSetMacro(ColorByBlockColorsOnApply, bool);
   vtkGetMacro(ColorByBlockColorsOnApply, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on streamed rendering.
    */
   void SetEnableStreaming(bool);
   vtkGetMacro(EnableStreaming, bool);
   vtkBooleanMacro(EnableStreaming, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable use of accelerated filters where available.
    */
   void SetUseAcceleratedFilters(bool);
   bool GetUseAcceleratedFilters();
   vtkBooleanMacro(UseAcceleratedFilters, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * ActiveSelection is hooked up in the MultiBlock Inspector such that a click on a/multiple
    * block(s) selects it/them. Default is true.
    */
   vtkGetMacro(SelectOnClickMultiBlockInspector, bool);
   vtkSetMacro(SelectOnClickMultiBlockInspector, bool);
-  //@}
+  ///@}
 
 protected:
   vtkPVGeneralSettings();

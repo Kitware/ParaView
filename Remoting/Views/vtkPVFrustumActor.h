@@ -40,13 +40,13 @@ public:
    */
   void SetFrustum(double corners[24]);
 
-  //@{
+  ///@{
   /**
    * Convenience method to set the color.
    */
   void SetColor(double r, double g, double b);
   void SetLineWidth(double r);
-  //@}
+  ///@}
 
 protected:
   vtkPVFrustumActor();

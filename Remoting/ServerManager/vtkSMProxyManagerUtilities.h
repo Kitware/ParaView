@@ -43,15 +43,15 @@ public:
   vtkTypeMacro(vtkSMProxyManagerUtilities, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the proxy manager to use.
    */
   void SetProxyManager(vtkSMSessionProxyManager* pxm);
   vtkGetObjectMacro(ProxyManager, vtkSMSessionProxyManager);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns a collection of proxies that have the specified annotations.
    *
@@ -73,16 +73,16 @@ public:
   {
     return this->GetProxiesWithAnnotations(annotations, false);
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Given a set of proxies, scans for all "dependent" proxies and returns a set
    * that includes the proxies together with all the dependent proxies. These proxies
    * are proxies that are used as helper proxies or proxies set on proxy properties.
    */
   std::set<vtkSMProxy*> CollectHelpersAndRelatedProxies(const std::set<vtkSMProxy*>& proxies);
-  //@}
+  ///@}
 
 protected:
   vtkSMProxyManagerUtilities();

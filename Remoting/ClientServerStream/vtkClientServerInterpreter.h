@@ -70,14 +70,14 @@ public:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&) = delete;
   vtkClientServerInterpreter& operator=(const vtkClientServerInterpreter&) = delete;
 
-  //@{
+  ///@{
   /**
    * Process all messages in a given vtkClientServerStream.  Return 1
    * if all messages succeeded, and 0 otherwise.
    */
   int ProcessStream(const unsigned char* msg, size_t msgLength);
   int ProcessStream(const vtkClientServerStream& css);
-  //@}
+  ///@}
 
   /**
    * Process the message with the given index in the given stream.
@@ -108,14 +108,14 @@ public:
    */
   vtkClientServerID GetIDFromObject(vtkObjectBase* key);
 
-  //@{
+  ///@{
   /**
    * Get/Set a stream to which an execution log is written.
    */
   void SetLogFile(const char* name);
   virtual void SetLogStream(ostream* ostr);
   vtkGetMacro(LogStream, ostream*);
-  //@}
+  ///@}
 
   /**
    * Called by generated code to register a new class instance.  Do
@@ -158,7 +158,7 @@ public:
   void AddNewInstanceFunction(const char* cname, vtkClientServerNewInstanceFunction f,
     void* ctx = nullptr, vtkContextFreeFunction ctx_free = nullptr);
 
-  //@{
+  ///@{
   /**
    * The callback data structure passed to observers looking for VTK
    * object creation and deletion events.
@@ -168,21 +168,21 @@ public:
     const char* Type;
     unsigned long ID;
   };
-  //@}
+  ///@}
 
   /**
    * Resets the LastResult stream.
    */
   void ClearLastResult();
 
-  //@{
+  ///@{
   /**
    * Dynamically load a wrapper module into the interpreter.  Returns
    * 1 for success and 0 for failure.
    */
   int Load(const char* moduleName);
   int Load(const char* moduleName, const char* const* optionalPaths);
-  //@}
+  ///@}
 
   /**
    * Return the next available Id that can be used to create a new object.

@@ -44,14 +44,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkSMTooltipSelectionPipeline* GetInstance();
 
-  //@{
+  ///@{
   /**
    * Re-implemented from vtkSMPreselectionPipeline
    */
   void Hide(vtkSMRenderViewProxy* view) override;
   void Show(vtkSMSourceProxy* sourceRepresentation, vtkSMSourceProxy* selection,
     vtkSMRenderViewProxy* view) override;
-  //@}
+  ///@}
 
   /**
    * Return true if a tooltip can be displayed according to the context,
@@ -60,7 +60,7 @@ public:
    */
   bool CanDisplayTooltip(bool& showTooltip);
 
-  //@{
+  ///@{
   /**
    * Get information about the tooltip to be displayed in a HTML formated string.
    * tooltipText received a HTML formatted string, while plainTooltipText receive a plain text
@@ -68,7 +68,7 @@ public:
    */
   bool GetTooltipInfo(int association, std::string& tooltipText);
   bool GetTooltipInfo(int association, std::string& tooltipText, std::string& plainTooltipText);
-  //@}
+  ///@}
 
 protected:
   vtkSMTooltipSelectionPipeline();

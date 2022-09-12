@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkPVInteractorStyle, vtkInteractorStyleTrackballCamera);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
@@ -53,9 +53,9 @@ public:
   void OnMiddleButtonUp() override;
   void OnRightButtonDown() override;
   void OnRightButtonUp() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Unlike mouse events, these are forwarded to all camera manipulators
    * since we don't have a mechanism to activate a manipulator by key presses
@@ -63,7 +63,7 @@ public:
    */
   void OnKeyDown() override;
   void OnKeyUp() override;
-  //@}
+  ///@}
 
   /**
    * Overrides superclass behaviors to only support the key codes that make
@@ -81,23 +81,23 @@ public:
    */
   void RemoveAllManipulators();
 
-  //@{
+  ///@{
   /**
    * Accessor for the collection of camera manipulators.
    */
   vtkGetObjectMacro(CameraManipulators, vtkCollection);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When enabled, mouse wheel  will zoom to the projected point under the cursor position.
    * There is no need to hold down Ctrl key to achieve this.
    */
   vtkSetMacro(MouseWheelZoomsToCursor, bool);
   vtkGetMacro(MouseWheelZoomsToCursor, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Propagates the center to the manipulators.
    * This simply sets an internal ivar.
@@ -109,9 +109,9 @@ public:
    */
   vtkSetVector3Macro(CenterOfRotation, double);
   vtkGetVector3Macro(CenterOfRotation, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Propagates the rotation factor to the manipulators.
    * This simply sets an internal ivar.
@@ -123,7 +123,7 @@ public:
    */
   vtkSetMacro(RotationFactor, double);
   vtkGetMacro(RotationFactor, double);
-  //@}
+  ///@}
 
   /**
    * Returns the chosen manipulator based on the modifiers.

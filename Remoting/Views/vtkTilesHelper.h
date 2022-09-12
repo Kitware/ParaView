@@ -35,31 +35,31 @@ public:
   vtkTypeMacro(vtkTilesHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the tile dimensions. Default is (1, 1).
    */
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the tile mullions in pixels. Use negative numbers to indicate overlap
    * between tiles.
    */
   vtkSetVector2Macro(TileMullions, int);
   vtkGetVector2Macro(TileMullions, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the tile size i.e. the size of the render window for a single tile. An assumption,
    * in ParaView is that all tiles will be of the same size.
    */
   vtkSetVector2Macro(TileWindowSize, int);
   vtkGetVector2Macro(TileWindowSize, int);
-  //@}
+  ///@}
 
   /**
    * For the specified `rank`, returns the tile size and origin of the tile

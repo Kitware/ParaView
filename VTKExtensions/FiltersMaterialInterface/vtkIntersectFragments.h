@@ -46,13 +46,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// PARAVIEW interface stuff
-  //@{
+  ///@{
   /**
    * Specify the implicit function to perform the cutting.
    */
   virtual void SetCutFunction(vtkImplicitFunction*);
   vtkGetObjectMacro(CutFunction, vtkImplicitFunction);
-  //@}
+  ///@}
   /**
    * Specify the geometry Input.
    */

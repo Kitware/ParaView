@@ -44,7 +44,7 @@ public:
   vtkTypeMacro(vtkPVDiscretizableColorTransferFunction, vtkDiscretizableColorTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Parallel API to API for annotated values to set/get the full list of annotations.
    * A subset of the full list will be used.
@@ -55,7 +55,7 @@ public:
   virtual vtkIdType SetAnnotationInFullSet(vtkVariant value, std::string annotation);
   virtual vtkIdType SetAnnotationInFullSet(std::string value, std::string annotation);
   virtual void ResetAnnotationsInFullSet();
-  //@}
+  ///@}
 
   void ResetActiveAnnotatedValues();
   void SetActiveAnnotatedValue(std::string value);
@@ -70,7 +70,7 @@ public:
   void SetIndexedOpacityInFullSet(unsigned int index, double alpha);
   void GetIndexedOpacityInFullSet(unsigned int index, double* alpha);
 
-  //@{
+  ///@{
   /**
    * Set whether to use restrict annotations to only the values
    * designated as active. Off by default.
@@ -78,7 +78,7 @@ public:
   vtkSetMacro(UseActiveValues, bool);
   vtkGetMacro(UseActiveValues, bool);
   vtkBooleanMacro(UseActiveValues, bool);
-  //@}
+  ///@}
 
   /**
    * Override to set only the active annotations
@@ -101,13 +101,13 @@ private:
   vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&) = delete;
   void operator=(const vtkPVDiscretizableColorTransferFunction&) = delete;
 
-  //@{
+  ///@{
   /**
    * All annotations.
    */
   vtkAbstractArray* AnnotatedValuesInFullSet;
   vtkStringArray* AnnotationsInFullSet;
-  //@}
+  ///@}
 
   vtkDoubleArray* IndexedColorsInFullSet;
   vtkDoubleArray* IndexedOpacitiesInFullSet;

@@ -63,29 +63,29 @@ public:
    */
   ~pqNodeEditorEdge() override;
 
-  //@{
+  ///@{
   /*
    * Get/Set the type of the edge (0:normal edge, 1: view edge). Update the style accordingly.
    */
   void setType(Type type);
   Type getType() { return this->type; };
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /*
    * Get the producer/consumer of this edge
    */
   pqNodeEditorNode* getProducer() { return this->producer; };
   pqNodeEditorNode* getConsumer() { return this->consumer; };
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /*
    * Get the producer/consumer port idx
    */
   int getProducerOutputPortIdx() { return this->producerOutputPortIdx; };
   int getConsumerInputPortIdx() { return this->consumerInputPortIdx; };
-  //@}
+  ///@}
 
   /*
    * Get edge information as string.

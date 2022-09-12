@@ -70,14 +70,14 @@ public:
 
   // *************************************************************************
 
-  //@{
+  ///@{
   /**
    * Set the field association for arrays to use. When changed, this will call
    * MarkModified().
    */
   void SetFieldAssociation(int);
   vtkGetMacro(FieldAssociation, int);
-  //@}
+  ///@}
 
   // methods to control block selection.
   // When changed, this will call MarkModified().
@@ -111,14 +111,14 @@ public:
   virtual std::string GetDefaultSeriesLabel(
     const std::string& tableName, const std::string& columnName);
 
-  //@{
+  ///@{
   /**
    * Flatten the table, i.e. split any multicomponent columns into separate
    * components.
    */
   vtkSetMacro(FlattenTable, int);
   vtkGetMacro(FlattenTable, int);
-  //@}
+  ///@}
 
   /**
    * This method is called on the client-side by the vtkPVContextView whenever a

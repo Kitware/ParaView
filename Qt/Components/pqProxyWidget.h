@@ -143,7 +143,7 @@ public:
    */
   static DocumentationType showProxyDocumentationInPanel(vtkSMProxy* proxy);
 
-  //@{
+  ///@{
   /**
    * pqProxyWidget shows widgets for properties in two configurations: basic and
    * advanced. Properties on Proxies can have `PanelVisibility` set to an
@@ -158,7 +158,7 @@ public:
    */
   const QSet<QString>& defaultVisibilityLabels() const { return this->DefaultVisibilityLabels; }
   const QSet<QString>& advancedVisibilityLabels() const { return this->AdvancedVisibilityLabels; }
-  //@}
+  ///@}
 
 Q_SIGNALS:
   /**

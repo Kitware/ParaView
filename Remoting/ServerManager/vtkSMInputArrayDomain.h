@@ -97,14 +97,14 @@ public:
    */
   int IsInDomain(vtkSMSourceProxy* proxy, unsigned int outputport = 0);
 
-  //@{
+  ///@{
   /**
    * Get the attribute type. Valid values are defined in AttributeTypes which
    * map to vtkDataObject::AttributeTypes.
    */
   vtkGetMacro(AttributeType, int);
   const char* GetAttributeTypeAsString();
-  //@}
+  ///@}
 
   /**
    * Get the AcceptableNumberOfComponents vector

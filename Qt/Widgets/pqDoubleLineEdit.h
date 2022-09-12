@@ -100,7 +100,7 @@ public:
    */
   bool useGlobalPrecisionAndNotation() const;
 
-  //@{
+  ///@{
   /**
    * Get/set the global precision and notation. All pqDoubleLineEdit instances
    * that have `useGlobalPrecisionAndNotation` property set to true will
@@ -109,7 +109,7 @@ public:
   static void setGlobalPrecisionAndNotation(int precision, RealNumberNotation notation);
   static int globalPrecision();
   static RealNumberNotation globalNotation();
-  //@}
+  ///@}
 
   /**
    * Returns the text being shown when the widget is not active or under mouse
@@ -117,7 +117,7 @@ public:
    */
   QString simplifiedText() const;
 
-  //@{
+  ///@{
   /**
    * Return a double formatted according to a QTextStream::RealNumberNotation and number
    * of digits of precision.
@@ -126,15 +126,15 @@ public:
     double value, QTextStream::RealNumberNotation notation, int precision);
   static QString formatDouble(
     double value, pqDoubleLineEdit::RealNumberNotation notation, int precision);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return a double formatted according to the values set for global precision
    * and notation.
    */
   static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
-  //@}
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

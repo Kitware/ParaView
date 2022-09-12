@@ -30,13 +30,13 @@ public:
   vtkTypeMacro(vtkCoreUtils, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Convert degrees into radians
    */
   static float RadiansFromDegrees(float degrees);
   static double RadiansFromDegrees(double degrees);
-  //@}
+  ///@}
 
   vtkCoreUtils(const vtkCoreUtils&) = delete;
   void operator=(const vtkCoreUtils&) = delete;

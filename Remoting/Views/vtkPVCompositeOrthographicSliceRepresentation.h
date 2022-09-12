@@ -57,7 +57,7 @@ public:
    */
   void SetVisibility(bool visible) override;
 
-  //@{
+  ///@{
   /**
    * Overridden to simply pass the input to the internal representations. We
    * won't need this if vtkDataRepresentation correctly respected in the
@@ -69,7 +69,7 @@ public:
   void AddInputConnection(vtkAlgorithmOutput* input) override;
   void RemoveInputConnection(int port, vtkAlgorithmOutput* input) override;
   void RemoveInputConnection(int port, int index) override;
-  //@}
+  ///@}
 
   /**
    * Propagate the modification to all internal representations.

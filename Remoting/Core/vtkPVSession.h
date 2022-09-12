@@ -96,20 +96,20 @@ public:
    */
   virtual bool IsMultiClients();
 
-  //@{
+  ///@{
   /**
    * Provides access to the progress handler.
    */
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Should be called to begin/end receiving progresses on this session.
    */
   void PrepareProgress();
   void CleanupPendingProgress();
-  //@}
+  ///@}
 
   /**
    * Returns true if the session is within a PrepareProgress() and
@@ -132,13 +132,13 @@ protected:
    */
   virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
-  //@{
+  ///@{
   /**
    * Virtual methods subclasses can override.
    */
   virtual void PrepareProgressInternal();
   virtual void CleanupPendingProgressInternal();
-  //@}
+  ///@}
 
   vtkPVProgressHandler* ProgressHandler;
 

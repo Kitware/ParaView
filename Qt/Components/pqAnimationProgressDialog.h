@@ -81,13 +81,13 @@ public:
   pqAnimationProgressDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~pqAnimationProgressDialog() override;
 
-  //@{
+  ///@{
   /**
    * Set the animation scene to monitor.
    */
   void setAnimationScene(pqAnimationScene*);
   void setAnimationScene(vtkSMProxy*);
-  //@}
+  ///@}
 
 private:
   Q_DISABLE_COPY(pqAnimationProgressDialog);

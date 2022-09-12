@@ -33,14 +33,14 @@ public:
   vtkTypeMacro(vtkPVCylinder, vtkCylinder);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the vector defining the direction of the cylinder.
    */
   void SetOrientedAxis(double x, double y, double z);
   void SetOrientedAxis(const double axis[3]);
   vtkGetVector3Macro(OrientedAxis, double);
-  //@}
+  ///@}
 
   // Reimplemented to update transform on change:
   void SetCenter(double x, double y, double z) override;

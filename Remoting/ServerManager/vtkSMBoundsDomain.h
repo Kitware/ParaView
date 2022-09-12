@@ -81,10 +81,10 @@ public:
    */
   void Update(vtkSMProperty*) override;
 
-  //@{
+  ///@{
   vtkSetClampMacro(Mode, int, 0, 3);
   vtkGetMacro(Mode, int);
-  //@}
+  ///@}
 
   /**
    * SCALED_EXTENT: is used for vtkPVScaleFactorEntry.

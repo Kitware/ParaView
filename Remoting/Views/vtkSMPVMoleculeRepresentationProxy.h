@@ -59,13 +59,13 @@ public:
     NbOfPresets
   };
 
-  //@{
+  ///@{
   /**
    * Set Preset onto properties. If preset is None or 0, does nothing.
    */
   void SetPreset(int preset);
   void SetPreset(const char* name);
-  //@}
+  ///@}
 
   /**
    * Get the preset name. This name can be used with `SetPreset()` method.

@@ -34,14 +34,14 @@ public:
   vtkTypeMacro(vtkPVRotateAroundOriginTransform, vtkPVTransform);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set Origin of rotation.
    */
   void SetOriginOfRotation(double xyz[3]);
   void SetOriginOfRotation(double x, double y, double z);
   vtkGetVector3Macro(OriginOfRotation, double);
-  //@}
+  ///@}
 
 protected:
   vtkPVRotateAroundOriginTransform() = default;

@@ -70,12 +70,12 @@ public:
    */
   virtual void UpdatePipeline(double time);
 
-  //@{
+  ///@{
   /**
    * Returns if the output port proxies have been created.
    */
   vtkGetMacro(OutputPortsCreated, int);
-  //@}
+  ///@}
 
   /**
    * Return the number of output ports.
@@ -113,7 +113,7 @@ public:
    */
   virtual const char* GetOutputPortName(unsigned int index);
 
-  //@{
+  ///@{
   /**
    * It is possible to provide some documentation for each output port in the
    * configuration xml. These methods provide access to the port specific
@@ -122,7 +122,7 @@ public:
    */
   vtkSMDocumentation* GetOutputPortDocumentation(unsigned int index);
   vtkSMDocumentation* GetOutputPortDocumentation(const char* portname);
-  //@}
+  ///@}
 
   /**
    * Creates the output port proxies for this filter.
@@ -131,7 +131,7 @@ public:
    */
   virtual void CreateOutputPorts();
 
-  //@{
+  ///@{
   /**
    * DataInformation is used by the source proxy to obtain information
    * on the output(s) from the server.
@@ -140,9 +140,9 @@ public:
    */
   vtkPVDataInformation* GetDataInformation() { return this->GetDataInformation(0); }
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For composite datasets, `GetDataInformation` returns summary data information for
    * all blocks combined. However, applications may require information about
@@ -158,7 +158,7 @@ public:
    */
   vtkPVDataInformation* GetSubsetDataInformation(
     unsigned int outputIdx, const char* selector, const char* assemblyName = nullptr);
-  //@}
+  ///@}
 
   /**
    * A `GetSubsetDataInformation` overload that uses composite index. It is only
@@ -191,13 +191,13 @@ public:
    */
   void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input, unsigned int outputPort);
 
-  //@{
+  ///@{
   /**
    * API to query selection input set using SetSelectionInput.
    */
   vtkSMSourceProxy* GetSelectionInput(unsigned int portIndex);
   unsigned int GetSelectionInputPort(unsigned int portIndex);
-  //@}
+  ///@}
 
   /**
    * Clean all selection inputs for the given port.
@@ -210,7 +210,7 @@ public:
    */
   vtkSMSourceProxy* GetSelectionOutput(unsigned int portIndex);
 
-  //@{
+  ///@{
   /**
    * This returns information about whether the VTK algorithm supports
    * multiple processes or not. SINGLE_PROCESS means that this algorithm
@@ -221,16 +221,16 @@ public:
    * Instead use MPISupport for that.
    */
   vtkGetMacro(ProcessSupport, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This returns information about whether the VTK algorithm explicitly
    * needs MPI to be initialized. It still may only run with a single
    * process. An example of this is a reader that uses MPI IO routines.
    */
   vtkGetMacro(MPIRequired, bool);
-  //@}
+  ///@}
 
   /**
    * Returns the number of output ports provided by the algorithm.
@@ -291,7 +291,7 @@ protected:
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
-  //@{
+  ///@{
   /**
    * Method to set an output port at the given index. Provided for subclasses to
    * add output ports. It replaces the output port at the given index, if any,
@@ -302,7 +302,7 @@ protected:
   void RemoveAllOutputPorts();
   void SetExtractSelectionProxy(unsigned int index, vtkSMSourceProxy* proxy);
   void RemoveAllExtractSelectionProxies();
-  //@}
+  ///@}
 
   /**
    * Overwritten from superclass to invoke

@@ -49,7 +49,7 @@ public:
   vtkTypeMacro(vtkExtrusionMapper, vtkCompositePolyDataMapper2);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the factor used to scale the extrusion. Its value is a percentage,
    * defined according to the maximum length of the bounding box of the mesh.
@@ -59,9 +59,9 @@ public:
    */
   void SetExtrusionFactor(float factor);
   vtkGetMacro(ExtrusionFactor, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the basis visibility flag. If disabled, the original cell is not drawn.
    * Default is disabeld.
@@ -69,9 +69,9 @@ public:
   vtkSetMacro(BasisVisibility, bool);
   vtkGetMacro(BasisVisibility, bool);
   vtkBooleanMacro(BasisVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the auto scaling flag. If disabled, user range is used.
    * Default is enabled.
@@ -79,26 +79,26 @@ public:
   vtkSetMacro(AutoScaling, bool);
   vtkGetMacro(AutoScaling, bool);
   vtkBooleanMacro(AutoScaling, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the user range.
    * Default is [0,1].
    */
   vtkSetVector2Macro(UserRange, float);
   vtkGetVector2Macro(UserRange, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the multi process controller object.
    */
   void SetController(vtkMultiProcessController* c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the data normalization flag.
    * Default is enabled.
@@ -106,9 +106,9 @@ public:
   vtkSetMacro(NormalizeData, bool);
   vtkGetMacro(NormalizeData, bool);
   vtkBooleanMacro(NormalizeData, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Override SetInputArrayToProcess to update data range and save field association.
    */
@@ -118,7 +118,7 @@ public:
   void SetInputArrayToProcess(
     int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) override;
   void SetInputArrayToProcess(int idx, vtkInformation* info) override;
-  //@}
+  ///@}
 
   void ResetDataRange();
 

@@ -49,15 +49,15 @@ public:
   vtkTypeMacro(vtkRemoteWriterHelper, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the Image writer
    */
   void SetWriter(vtkAlgorithm* writer);
   vtkGetObjectMacro(Writer, vtkAlgorithm);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the process on which the data must be written. Currently supported
    * values are vtkPVSession::CLIENT and vtkPVSession::DATA_SERVER_ROOT (or
@@ -67,9 +67,9 @@ public:
    */
   vtkSetMacro(OutputDestination, vtkTypeUInt32);
   vtkGetMacro(OutputDestination, vtkTypeUInt32);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the interpreter to use to call methods on the writer. Initialized to
    * `vtkClientServerInterpreterInitializer::GetGlobalInterpreter()` in the
@@ -77,7 +77,7 @@ public:
    */
   void SetInterpreter(vtkClientServerInterpreter* interp);
   vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
-  //@}
+  ///@}
 
   vtkRemoteWriterHelper(const vtkRemoteWriterHelper&) = delete;
   void operator=(const vtkRemoteWriterHelper&) = delete;

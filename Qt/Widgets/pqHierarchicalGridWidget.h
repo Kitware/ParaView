@@ -57,14 +57,14 @@ public:
   pqHierarchicalGridWidget(QWidget* parent = nullptr);
   ~pqHierarchicalGridWidget() override;
 
-  //@{
+  ///@{
   /**
    * Enable/disable interactive resizing of the layout.
    * Default is enabled.
    */
   void setUserResizability(bool);
   bool userResizability() const;
-  //@}
+  ///@}
 
   /**
    * handle cursor changes on mouse move

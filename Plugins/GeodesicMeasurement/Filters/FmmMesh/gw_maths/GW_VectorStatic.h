@@ -36,7 +36,7 @@ public:
     //-------------------------------------------------------------------------
     /** \name constructors/destructor  */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_VectorStatic()
     {
         for( GW_U32 i=0; i<v_size; ++i )
@@ -62,7 +62,7 @@ public:
         memcpy( aCoords_, v.aCoords_, v_size*sizeof(v_type) );
         return *this;
     }
-    //@}
+    ///@}
 
     /** Substraction
         \return The vector this minus the vector \a V

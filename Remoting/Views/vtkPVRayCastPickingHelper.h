@@ -46,29 +46,29 @@ public:
    */
   void SetSelection(vtkAlgorithm*);
 
-  //@{
+  ///@{
   /**
    * Set the point 1 that compose the ray
    */
   vtkSetVector3Macro(PointA, double);
   vtkGetVector3Macro(PointA, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the point 2 that compose the ray
    */
   vtkSetVector3Macro(PointB, double);
   vtkGetVector3Macro(PointB, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the flag to use directly selected points on mesh as intersection
    */
   vtkSetMacro(SnapOnMeshPoint, bool);
   vtkGetMacro(SnapOnMeshPoint, bool);
-  //@}
+  ///@}
 
   /**
    * Compute the intersection

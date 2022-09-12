@@ -36,10 +36,10 @@ public:
   std::map<double, std::pair<std::string, int>> Lines;
   int ColumnCount;
 
-  //@{
+  ///@{
   // Used in STREAM_ROWS mode.
   std::map<std::string, std::string> ColumnLabels;
-  //@}
+  ///@}
 
   vtkInternals()
     : ColumnCount(0)

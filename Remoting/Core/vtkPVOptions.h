@@ -114,12 +114,12 @@ public:
   int GetPrintMonitors();
   ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the verbosity level for stderr output chosen.
    * Is set to vtkLogger::VERBOSITY_INVALID if not specified.
    */
-  //@}
+  ///@}
 
   enum ProcessTypeEnum
   {

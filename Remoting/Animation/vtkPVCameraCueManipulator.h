@@ -48,7 +48,7 @@ public:
     FOLLOW_DATA
   };
 
-  //@{
+  ///@{
   /**
    * This manipulator has three modes:
    * \li CAMERA - the traditional mode using vtkCameraInterpolator where camera
@@ -63,16 +63,16 @@ public:
    */
   vtkSetClampMacro(Mode, int, CAMERA, FOLLOW_DATA);
   vtkGetMacro(Mode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the interpolation mode for the CAMERA mode.
    */
   vtkSetClampMacro(InterpolationMode, int, vtkCameraInterpolator::INTERPOLATION_TYPE_LINEAR,
     vtkCameraInterpolator::INTERPOLATION_TYPE_SPLINE);
   vtkGetMacro(InterpolationMode, int);
-  //@}
+  ///@}
 
   /**
    * Set the data source proxy. This is used when in the FOLLOW_DATA mode. The

@@ -98,7 +98,7 @@ public:
    */
   virtual void GetBinaryResources(std::vector<std::string>& resources);
 
-  //@{
+  ///@{
   /**
    * Used when import plugins programmatically.
    * This must only be called after the application has initialized, more
@@ -119,13 +119,13 @@ public:
    */
   typedef bool (*EULAConfirmationCallback)(vtkPVPlugin*);
 
-  //@{
+  ///@{
   /**
    * Get/Set the static callback to call to confirm EULA
    */
   static void SetEULAConfirmationCallback(EULAConfirmationCallback callback);
   static EULAConfirmationCallback GetEULAConfirmationCallback();
-  //@}
+  ///@}
 
 protected:
   /**

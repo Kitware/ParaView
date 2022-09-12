@@ -42,13 +42,13 @@ public:
 
   virtual bool CanReadFile(const char* fileName);
 
-  //@{
+  ///@{
   /**
    * Sets/Gets the filename to be read by this reader
    */
   void SetFileName(const char* fname);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
   void SetXAxisVariableName(const char* arg);
   vtkGetStringMacro(XAxisVariableName);
@@ -78,13 +78,13 @@ public:
    */
   void RemoveAllLevels();
 
-  //@{
+  ///@{
   /**
    * Get the data array selection tables used to configure which data
    * arrays are loaded by the reader
    */
   vtkGetObjectMacro(PointDataArraySelection, vtkDataArraySelection);
-  //@}
+  ///@}
 
   /**
    * Returns the number of arrays in the file

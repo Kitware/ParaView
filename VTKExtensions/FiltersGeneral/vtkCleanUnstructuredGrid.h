@@ -60,14 +60,14 @@ public:
   vtkSetClampMacro(AbsoluteTolerance, double, 0.0, VTK_DOUBLE_MAX);
   vtkGetMacro(AbsoluteTolerance, double);
 
-  //@{
+  ///@{
   /**
    * Set/Get a spatial locator for speeding the search process. By
    * default an instance of vtkMergePoints is used.
    */
   virtual void SetLocator(vtkIncrementalPointLocator* locator);
   vtkGetObjectMacro(Locator, vtkIncrementalPointLocator);
-  //@}
+  ///@}
 
   // Create default locator. Used to create one when none is specified.
   void CreateDefaultLocator(vtkDataSet* input = nullptr);
@@ -75,7 +75,7 @@ public:
   // Release locator
   void ReleaseLocator() { this->SetLocator(nullptr); }
 
-  //@{
+  ///@{
   /**
    * Set/get the desired precision for the output types. See the documentation
    * for the vtkAlgorithm::DesiredOutputPrecision enum for an explanation of
@@ -83,7 +83,7 @@ public:
    */
   vtkSetMacro(OutputPointsPrecision, int);
   vtkGetMacro(OutputPointsPrecision, int);
-  //@}
+  ///@}
 
   void PrintSelf(ostream& os, vtkIndent indent) override;
 

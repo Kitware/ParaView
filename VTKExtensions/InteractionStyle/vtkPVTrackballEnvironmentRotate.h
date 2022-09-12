@@ -32,13 +32,13 @@ public:
   static vtkPVTrackballEnvironmentRotate* New();
   vtkTypeMacro(vtkPVTrackballEnvironmentRotate, vtkCameraManipulator);
 
-  //@{
+  ///@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
   void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
-  //@}
+  ///@}
 
 protected:
   vtkPVTrackballEnvironmentRotate() = default;

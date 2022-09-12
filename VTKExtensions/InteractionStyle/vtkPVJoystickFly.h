@@ -34,7 +34,7 @@ public:
   vtkTypeMacro(vtkPVJoystickFly, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
@@ -42,15 +42,15 @@ public:
   void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
   void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
   void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and get the speed of flying.
    */
   vtkSetClampMacro(FlySpeed, double, 1, 30);
   vtkGetMacro(FlySpeed, double);
-  //@}
+  ///@}
 
 protected:
   vtkPVJoystickFly();

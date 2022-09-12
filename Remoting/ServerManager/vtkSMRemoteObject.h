@@ -44,14 +44,14 @@ public:
   vtkTypeMacro(vtkSMRemoteObject, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the location where the underlying VTK-objects are created. The
    * value can be constructed by or-ing vtkSMSession::ServerFlags
    */
   vtkSetMacro(Location, vtkTypeUInt32);
   vtkGetMacro(Location, vtkTypeUInt32);
-  //@}
+  ///@}
 
   /**
    * Override the SetSession so if the object already have an ID
@@ -59,14 +59,14 @@ public:
    */
   void SetSession(vtkSMSession*) override;
 
-  //@{
+  ///@{
   /**
    * Get the global unique id for this object. If none is set and the session is
    * valid, a new global id will be assigned automatically.
    */
   virtual vtkTypeUInt32 GetGlobalID();
   const char* GetGlobalIDAsString();
-  //@}
+  ///@}
 
   /**
    * Allow the user to test if the RemoteObject has already a GlobalID without
@@ -74,7 +74,7 @@ public:
    */
   bool HasGlobalID();
 
-  //@{
+  ///@{
   /**
    * Allow user to set the remote object to be discard for Undo/Redo
    * action. By default, any remote object is Undoable.
@@ -82,7 +82,7 @@ public:
   vtkBooleanMacro(Prototype, bool);
   bool IsPrototype() { return this->Prototype; }
   vtkSetMacro(Prototype, bool);
-  //@}
+  ///@}
 
   /**
    * This method return the full object state that can be used to create that
@@ -92,7 +92,7 @@ public:
    */
   virtual const vtkSMMessage* GetFullState() { return nullptr; }
 
-  //@{
+  ///@{
   /**
    * This method is used to initialise the object to the given state
    * If the definitionOnly Flag is set to True the proxy won't load the
@@ -105,7 +105,7 @@ public:
     (void)msg;
     (void)locator;
   }
-  //@}
+  ///@}
 
   /**
    * Allow to switch off any push of state change to the server for that

@@ -49,21 +49,21 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the selection. Selection is created and populated
    * at the end of GatherInformation.
    */
   vtkGetObjectMacro(Selection, vtkSelection);
-  //@}
+  ///@}
 
 protected:
   vtkPVSelectionInformation();

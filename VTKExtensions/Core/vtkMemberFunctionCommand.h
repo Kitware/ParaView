@@ -92,7 +92,7 @@ public:
     this->Superclass::PrintSelf(os, indent);
   }
 
-  //@{
+  ///@{
   /**
    * Set which class instance and member function will be called when a VTK
    * event is received.
@@ -102,7 +102,7 @@ public:
     this->Object = &object;
     this->Method = method;
   }
-  //@}
+  ///@}
 
   void SetCallback(ClassT& object, void (ClassT::*method2)(vtkObject*, unsigned long, void*))
   {

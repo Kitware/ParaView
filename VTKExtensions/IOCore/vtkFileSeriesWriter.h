@@ -35,42 +35,42 @@ public:
   vtkTypeMacro(vtkFileSeriesWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the internal writer.
    */
   virtual void SetWriter(vtkAlgorithm*);
   vtkGetObjectMacro(Writer, vtkAlgorithm);
-  //@}
+  ///@}
 
   /**
    * Return the MTime also considering the internal writer.
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Name of the method used to set the file name of the internal
    * writer. By default, this is SetFileName.
    */
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the name of the output file.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
   /**
    * Invoke the writer.  Returns 1 for success, 0 for failure.
    */
   int Write();
 
-  //@{
+  ///@{
   /**
    * If Off, which is the default, only the current timestep is written.
    * If true the writer will write every timestep, or at least those
@@ -79,9 +79,9 @@ public:
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Provides an option to pad the time step when writing out time series data.
    * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
@@ -91,17 +91,17 @@ public:
    */
   vtkGetStringMacro(FileNameSuffix);
   vtkSetStringMacro(FileNameSuffix);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets a minimum timestep constraint on WriteAllTimeSteps.
    */
   vtkGetMacro(MinTimeStep, int);
   vtkSetClampMacro(MinTimeStep, int, 0, VTK_INT_MAX);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets a maximum timestep constraint on WriteAllTimeSteps. If less than
    * MinTimeStep, then the MaxTimeStep constraint is ignored (i.e. all time steps
@@ -109,15 +109,15 @@ public:
    */
   vtkGetMacro(MaxTimeStep, int);
   vtkSetMacro(MaxTimeStep, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets a stride to write out time series.
    */
   vtkGetMacro(TimeStepStride, int);
   vtkSetClampMacro(TimeStepStride, int, 1, VTK_INT_MAX);
-  //@}
+  ///@}
 
   /**
    * see vtkAlgorithm for details

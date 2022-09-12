@@ -49,13 +49,13 @@ public:
    */
   void AddInformation(vtkPVInformation* other) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
   /**
    * Remove all gathered information.
@@ -67,9 +67,9 @@ protected:
   ~vtkPVCatalystChannelInformation() override;
 
   /// Information results
-  //@{
+  ///@{
   std::string ChannelName;
-  //@}
+  ///@}
 
   vtkPVCatalystChannelInformation(const vtkPVCatalystChannelInformation&) = delete;
   void operator=(const vtkPVCatalystChannelInformation&) = delete;

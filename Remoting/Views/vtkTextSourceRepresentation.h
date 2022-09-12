@@ -39,13 +39,13 @@ public:
   vtkTypeMacro(vtkTextSourceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the text widget.
    */
   void SetTextWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(TextWidgetRepresentation, vtk3DWidgetRepresentation);
-  //@}
+  ///@}
 
   /**
    * Set the visibility.
@@ -64,21 +64,21 @@ public:
    */
   void SetTextPropMode(int);
 
-  //@{
+  ///@{
   /**
    * Set the FlagpoleLabel
    */
   void SetFlagpoleLabel(vtkFlagpoleLabel* val);
   vtkGetObjectMacro(FlagpoleLabel, vtkFlagpoleLabel);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the BillboardTextActor
    */
   void SetBillboardTextActor(vtkBillboardTextActor3D* val);
   vtkGetObjectMacro(BillboardTextActor, vtkBillboardTextActor3D);
-  //@}
+  ///@}
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is

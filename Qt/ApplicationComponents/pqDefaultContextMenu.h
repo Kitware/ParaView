@@ -67,7 +67,7 @@ public:
   pqDefaultContextMenu(QObject* parent = nullptr);
   ~pqDefaultContextMenu() override;
 
-  //@{
+  ///@{
   /**
    * Create ParaView's default context menu.
    * It will always return false (i.e., allow lower-priority menus to append/modify
@@ -76,7 +76,7 @@ public:
   using pqContextMenuInterface::contextMenu;
   bool contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,
     pqRepresentation* dataContext, const QList<unsigned int>& dataBlockContext) const override;
-  //@}
+  ///@}
 
   /**
    * The priority is used to order calls to pqContextMenuInterface::contextMenu among

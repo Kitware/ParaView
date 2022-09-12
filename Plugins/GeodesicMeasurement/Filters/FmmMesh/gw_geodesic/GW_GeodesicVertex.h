@@ -49,7 +49,7 @@ public:
     void SetParameterVertex( GW_U32 nNum, GW_Float rParam );
     void SetParameterVertex( GW_Float a, GW_Float b, GW_Float c  );
     GW_VoronoiVertex* GetParameterVertex( GW_U32 nNum, GW_Float& pParam );
-    //@}
+    ///@}
 
     static void ComputeFrontIntersection( GW_GeodesicVertex& v1, GW_GeodesicVertex& v2, GW_Vector3D* pInter, GW_Float* pLambda );
     static void ComputeFrontIntersection( GW_GeodesicVertex& v1, GW_Float d1, GW_GeodesicVertex& v2, GW_Float d2, GW_Vector3D* pInter, GW_Float* pLambda );
@@ -119,12 +119,12 @@ private:
     //-------------------------------------------------------------------------
     /** \name specific for parametrization computation. */
     //-------------------------------------------------------------------------
-    //@{
+    ///@{
     GW_Float rParameter_[3];
     GW_VoronoiVertex* pParameterVert_[3];
     GW_Bool bIsStoppingVertex_;
     GW_Bool bBoundaryReached_;
-    //@}
+    ///@}
 
     /** to store overlap information */
     T_FrontOverlapInfo FrontOverlapInfo_;

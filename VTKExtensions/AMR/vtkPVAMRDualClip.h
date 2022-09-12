@@ -42,21 +42,21 @@ public:
   vtkPVAMRDualClip();
   ~vtkPVAMRDualClip() override;
 
-  //@{
+  ///@{
   /**
    * Add to list of cell arrays which are used for generating contours.
    */
   void AddInputCellArrayToProcess(const char* name);
   void ClearInputCellArrayToProcess();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get / Set volume fraction value.
    */
   vtkGetMacro(VolumeFractionSurfaceValue, double);
   vtkSetMacro(VolumeFractionSurfaceValue, double);
-  //@}
+  ///@}
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 

@@ -55,29 +55,29 @@ public:
 
   void ReleaseGraphicsResources(vtkWindow*) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the painter that does the actual rendering.
    */
   void SetPainter(vtkPainter*);
   vtkGetObjectMacro(Painter, vtkPainter);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the input data to map.
    */
   void SetInputData(vtkImageData* in);
   virtual vtkImageData* GetInput();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the current X/Y or Z slice number.
    */
   vtkSetMacro(Slice, int);
   vtkGetMacro(Slice, int);
-  //@}
+  ///@}
 
   enum
   {
@@ -86,7 +86,7 @@ public:
     XZ_PLANE = VTK_XZ_PLANE,
   };
 
-  //@{
+  ///@{
   /**
    * Set/Get the current slice mode: XY, XZ or YZ plane.
    *
@@ -100,9 +100,9 @@ public:
   void SetSliceModeToYZPlane() { this->SetSliceMode(YZ_PLANE); }
   void SetSliceModeToXZPlane() { this->SetSliceMode(XZ_PLANE); }
   void SetSliceModeToXYPlane() { this->SetSliceMode(XY_PLANE); }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set, the image slice is always rendered in the XY plane (Z==0)
    * irrespective of the image bounds. Default is Off.
@@ -110,7 +110,7 @@ public:
   vtkSetClampMacro(UseXYPlane, int, 0, 1);
   vtkBooleanMacro(UseXYPlane, int);
   vtkGetMacro(UseXYPlane, int);
-  //@}
+  ///@}
 
   /**
    * Update that sets the update piece first.
@@ -123,7 +123,7 @@ public:
   }
   int Update(vtkInformation* requests) override { return this->Superclass::Update(requests); }
 
-  //@{
+  ///@{
   /**
    * If you want only a part of the data, specify by setting the piece.
    */
@@ -133,24 +133,24 @@ public:
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfSubPieces, int);
   vtkGetMacro(NumberOfSubPieces, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the number of ghost cells to return.
    */
   vtkSetMacro(GhostLevel, int);
   vtkGetMacro(GhostLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return bounding box (array of six doubles) of data expressed as
    * (xmin,xmax, ymin,ymax, zmin,zmax).
    */
   double* GetBounds() override;
   void GetBounds(double bounds[6]) override { this->Superclass::GetBounds(bounds); };
-  //@}
+  ///@}
 
   /**
    * Make a shallow copy of this mapper.

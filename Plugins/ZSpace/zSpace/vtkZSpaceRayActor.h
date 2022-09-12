@@ -46,7 +46,7 @@ public:
    */
   void SetPick();
 
-  //@{
+  ///@{
   /**
    * Get/Set the color of the ray when nothing is
    * picked.
@@ -54,9 +54,9 @@ public:
    */
   vtkGetVector3Macro(NoPickColor, double);
   vtkSetVector3Macro(NoPickColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the color of the ray when something is
    * picked.
@@ -64,24 +64,24 @@ public:
    */
   vtkGetVector3Macro(PickColor, double);
   vtkSetVector3Macro(PickColor, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the thickness of the line.
    * Default is 1.0.
    */
   vtkGetMacro(LineWidth, double);
   vtkSetMacro(LineWidth, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the length of the ray.
    */
   vtkGetMacro(Length, double);
   vtkSetMacro(Length, double);
-  //@}
+  ///@}
 
 protected:
   vtkZSpaceRayActor();

@@ -34,13 +34,13 @@ public:
   vtkTypeMacro(vtkPVEnvironmentInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the environment variable that we want to get the value of
    */
   vtkSetStringMacro(Variable);
   vtkGetStringMacro(Variable);
-  //@}
+  ///@}
 
 protected:
   vtkPVEnvironmentInformationHelper();

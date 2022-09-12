@@ -31,7 +31,7 @@ public:
   vtkTypeMacro(vtkSIVectorProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * If RepeatCommand is true, the command is invoked multiple times,
    * each time with NumberOfElementsPerCommand values. For example, if
@@ -45,9 +45,9 @@ public:
    * @endverbatim
    */
   vtkGetMacro(NumberOfElementsPerCommand, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If UseIndex and RepeatCommand are true, the property will add
    * an index integer before each command. For example, if UseIndex and
@@ -61,24 +61,24 @@ public:
    * @endverbatim
    */
   vtkGetMacro(UseIndex, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Command that can be used to remove all values.
    * Typically used when RepeatCommand = 1. If set, the clean command
    * is called before the main Command.
    */
   vtkGetStringMacro(CleanCommand);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If SetNumberCommand is set, it is called before Command
    * with the number of arguments as the parameter.
    */
   vtkGetStringMacro(SetNumberCommand);
-  //@}
+  ///@}
 
   vtkGetStringMacro(InitialString);
 

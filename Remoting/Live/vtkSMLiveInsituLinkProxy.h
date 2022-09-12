@@ -41,29 +41,29 @@ public:
   vtkTypeMacro(vtkSMLiveInsituLinkProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Provides access to the a dummy proxy manager representing the
    * insitu visualization pipeline.
    */
   vtkSMSessionProxyManager* GetInsituProxyManager();
   void SetInsituProxyManager(vtkSMSessionProxyManager*);
-  //@}
+  ///@}
 
   bool HasExtract(const char* reg_group, const char* reg_name, int port_number);
 
-  //@{
+  ///@{
   vtkSMProxy* CreateExtract(const char* reg_group, const char* reg_name, int port_number);
   void RemoveExtract(vtkSMProxy*);
-  //@}
-  //@{
+  ///@}
+  ///@{
   /**
    * Wakes up Insitu side if simulation is paused. Handles correctly
    * several calls on the LIVE side.
    */
   void LiveChanged();
   vtkIdType GetTimeStep() { return this->TimeStep; }
-  //@}
+  ///@}
 
   /**
    * Overridden to handle server-notification messages.

@@ -62,15 +62,15 @@ public:
   vtkGetMacro(Operation, int);
   void SetOperation(const char* op);
 
-  //@{
+  ///@{
   /**
    * A diagnostic that should be zero.
    * One indicates that some array didn't match up exactly.
    */
   vtkGetMacro(MismatchOccurred, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Contains a flag for each component of each (Point or Cell) array
    * that indicates if any of the results were never initialized.
@@ -78,7 +78,7 @@ public:
   vtkGetStringMacro(FirstPasses);
   void FlagsForPoints();
   void FlagsForCells();
-  //@}
+  ///@}
 
   // temp for debugging
   const char* Name;

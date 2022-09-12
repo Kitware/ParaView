@@ -46,25 +46,25 @@ public:
    */
   void AddInformation(vtkPVInformation* info) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
   /**
    * Remove all information.  The next add will be like a copy.
    */
   void Initialize();
 
-  //@{
+  ///@{
   /**
    * Access to memory size information.
    */
   vtkGetMacro(MemorySize, int);
-  //@}
+  ///@}
 
 protected:
   vtkPVDataSizeInformation();

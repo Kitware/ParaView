@@ -44,16 +44,16 @@ public:
   vtkTypeMacro(vtkSMInputProperty, vtkSMProxyProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Should be set to true if the "input port" this property represents
    * can accept multiple inputs (for example, an append filter)
    */
   vtkSetMacro(MultipleInput, int);
   vtkGetMacro(MultipleInput, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Add a proxy to the list of input proxies. The outputPort controls
    * which outputPort will be used in connecting the pipeline.
@@ -62,37 +62,37 @@ public:
    */
   void AddInputConnection(vtkSMProxy* proxy, unsigned int outputPort);
   void SetInputConnection(unsigned int idx, vtkSMProxy* proxy, unsigned int outputPort);
-  //@}
+  ///@}
 
   void AddUncheckedInputConnection(vtkSMProxy* proxy, unsigned int outputPort);
   void SetUncheckedInputConnection(unsigned int idx, vtkSMProxy* proxy, unsigned int inputPort);
 
-  //@{
+  ///@{
   /**
    * Sets the value of the property to the list of proxies specified.
    */
   virtual void SetProxies(
     unsigned int numElements, vtkSMProxy* proxies[], unsigned int outputports[]);
   using Superclass::SetProxies;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Given an index for a connection (proxy), returns which output port
    * is used to connect the pipeline.
    */
   unsigned int GetOutputPortForConnection(unsigned int idx);
   unsigned int GetUncheckedOutputPortForConnection(unsigned int idx);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls which input port this property uses when making connections.
    * By default, this is 0.
    */
   vtkSetMacro(PortIndex, int);
   vtkGetMacro(PortIndex, int);
-  //@}
+  ///@}
 
 protected:
   vtkSMInputProperty();

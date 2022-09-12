@@ -44,29 +44,29 @@ public:
   vtkTypeMacro(vtkDataTabulator, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   void AddSelector(const char* selector);
   void ClearSelectors();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the name of the assembly you use together with the selectors to
    * subset. Default is Hierarchy.
    */
   vtkSetStringMacro(ActiveAssemblyForSelectors);
   vtkGetStringMacro(ActiveAssemblyForSelectors);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Allow user to enable/disable cell connectivity generation in the datamodel
    */
   vtkSetMacro(GenerateCellConnectivity, bool);
   vtkGetMacro(GenerateCellConnectivity, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Select the attribute type. Accepted values are
    * \li vtkDataObject::FIELD_ASSOCIATION_POINTS,
@@ -80,18 +80,18 @@ public:
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Flatten the table, i.e. split any multicomponent columns into separate
    * components, internally the vtkSplitColumnComponents filter is used.
    */
   vtkSetMacro(SplitComponents, int);
   vtkGetMacro(SplitComponents, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Corresponds to `vtkSplitColumnComponents::NamingMode`. Pick which mode to
    * use to name arrays when `SplitComponents` is true. Default is
@@ -100,29 +100,29 @@ public:
   vtkSetClampMacro(SplitComponentsNamingMode, int, vtkSplitColumnComponents::NUMBERS_WITH_PARENS,
     vtkSplitColumnComponents::NAMES_WITH_UNDERSCORES);
   vtkGetMacro(SplitComponentsNamingMode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set (default) the vtkOriginalIndices array will be added to the
    * output. Can be overridden by setting this flag to false.
    */
   vtkSetMacro(GenerateOriginalIds, bool);
   vtkGetMacro(GenerateOriginalIds, bool);
-  //@}
+  ///@}
 
   /**
    * Used to identify a node in composite datasets.
    */
   static vtkInformationIntegerKey* COMPOSITE_INDEX();
 
-  //@{
+  ///@{
   /**
    * Used to identify a dataset in a hiererchical box dataset.
    */
   static vtkInformationIntegerKey* HIERARCHICAL_LEVEL();
   static vtkInformationIntegerKey* HIERARCHICAL_INDEX();
-  //@}
+  ///@}
 
   /**
    * Helper to check if the vtkPartitionedDataSet produced by this filter

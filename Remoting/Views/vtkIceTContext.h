@@ -55,7 +55,7 @@ public:
   static vtkIceTContext* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Associate the context with the given controller.  Currently, this must
    * be a vtkMPIController.  The context is not valid until a controller is
@@ -63,14 +63,14 @@ public:
    */
   virtual void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   /**
    * Make this context the current one.
    */
   virtual void MakeCurrent();
 
-  //@{
+  ///@{
   /**
    * Turn this on to enable the OpenGL layer in IceT.  By default this is off.
    * Unless you explicitly plan to use the OpenGL layer, it should probably
@@ -80,7 +80,7 @@ public:
   vtkGetMacro(UseOpenGL, int);
   virtual void SetUseOpenGL(int flag);
   vtkBooleanMacro(UseOpenGL, int);
-  //@}
+  ///@}
 
   /**
    * Copy the state from the given context to this context.

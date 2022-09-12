@@ -56,7 +56,7 @@ public:
    */
   void Pull(vtkSMMessage* msg) override;
 
-  //@{
+  ///@{
   /**
    * Returns access to the VTKObject pointer, if any.
    * Note this is a raw pointer to the local instance of the VTK object. Any
@@ -65,37 +65,37 @@ public:
    */
   vtkObjectBase* GetVTKObject();
   void SetVTKObject(vtkObjectBase*);
-  //@}
+  ///@}
 
   /**
    * Provides access to the property helper.
    */
   vtkSIProperty* GetSIProperty(const char* name);
 
-  //@{
+  ///@{
   /**
    * Returns the VTKClassName.
    */
   vtkGetStringMacro(VTKClassName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The name assigned in the XML
    * configuration. Can be used to figure out the origin of the
    * proxy.
    */
   vtkGetStringMacro(XMLName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assigned by the XML parser. The group in the XML configuration that
    * this proxy belongs to. Can be used to figure out the origin of the
    * proxy.
    */
   vtkGetStringMacro(XMLGroup);
-  //@}
+  ///@}
 
   /**
    * Return true if that Proxy is supposed to have NO vtk class, which means
@@ -103,7 +103,7 @@ public:
    */
   bool IsNullProxy() { return (VTKClassName == nullptr); };
 
-  //@{
+  ///@{
   /**
    * These methods are called to add/remove input connections by
    * vtkSIInputProperty. This indirection makes it possible for subclasses to
@@ -111,7 +111,7 @@ public:
    */
   virtual void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method);
   virtual void CleanInputs(const char* method);
-  //@}
+  ///@}
 
   /**
    * Triggers UpdateInformation() on vtkObject if possible.
@@ -150,13 +150,13 @@ protected:
    */
   vtkSIProxy* GetSubSIProxy(const char* name);
 
-  //@{
+  ///@{
   /**
    * API to iterate over subproxy helpers.
    */
   unsigned int GetNumberOfSubSIProxys();
   vtkSIProxy* GetSubSIProxy(unsigned int cc);
-  //@}
+  ///@}
 
   /**
    * Provides access to the vtkSIProxyDefinitionManager held by the session.
@@ -191,14 +191,14 @@ protected:
    */
   bool InitializeAndCreateVTKObjects(vtkSMMessage* message);
 
-  //@{
+  ///@{
   /**
    * Parses the XML to create property/subproxy helpers.
    */
   virtual bool ReadXMLAttributes(vtkPVXMLElement* element);
   virtual bool ReadXMLProperty(vtkPVXMLElement* property_element);
   virtual bool ReadXMLSubProxy(vtkPVXMLElement* subproxy_element);
-  //@}
+  ///@}
 
   /**
    * Adds a vtkSMProperty's server-implementation.

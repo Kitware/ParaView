@@ -39,14 +39,14 @@ public:
   vtkTypeMacro(vtkSMStateLocator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get a parent locator to search which is used as a backup location
    * to search from if a given state was not found locally.
    */
   vtkSetObjectMacro(ParentLocator, vtkSMStateLocator);
   vtkGetObjectMacro(ParentLocator, vtkSMStateLocator);
-  //@}
+  ///@}
 
   /**
    * By initializing the garabage collector the stored state get removed once

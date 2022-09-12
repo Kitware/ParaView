@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkPVTrackballMoveActor, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
@@ -45,7 +45,7 @@ public:
   void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) override;
   void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) override;
   void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) override;
-  //@}
+  ///@}
 
 protected:
   vtkPVTrackballMoveActor();

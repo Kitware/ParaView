@@ -36,13 +36,13 @@ public:
 
   using Superclass::Add;
 
-  //@{
+  ///@{
   /**
    * Methods for adding data to the accumulator.
    */
   void Add(vtkAbstractAccumulator* accumulator) override;
   void Add(double value, double weight) override;
-  //@}
+  ///@}
 
   /**
    * Accessor to the accumulated value.
@@ -70,13 +70,13 @@ public:
   bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructor and destructor.
    */
   vtkMaxAccumulator();
   ~vtkMaxAccumulator() override = default;
-  //@}
+  ///@}
 
   /**
    * Accumulated value

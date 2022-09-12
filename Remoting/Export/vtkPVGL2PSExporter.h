@@ -33,14 +33,14 @@ public:
   vtkTypeMacro(vtkPVGL2PSExporter, vtkOpenGLGL2PSExporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the name of the output file.
    */
   vtkSetMacro(FileName, const char*) const char* GetFileName() { return this->FileName.c_str(); }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If Write3DPropsAsRasterImage is true, add all instances of
    * vtkCubeAxesActors to the RenderExclusions.
@@ -48,7 +48,7 @@ public:
   vtkSetMacro(ExcludeCubeAxesActorsFromRasterization, int);
   vtkGetMacro(ExcludeCubeAxesActorsFromRasterization, int);
   vtkBooleanMacro(ExcludeCubeAxesActorsFromRasterization, int);
-  //@}
+  ///@}
 
 protected:
   vtkPVGL2PSExporter();

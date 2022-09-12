@@ -101,7 +101,7 @@ public:
   void setupCustomHeader(bool use_pqHeaderView = false);
 
 protected:
-  //@{
+  ///@{
   /**
    * We need to change two things about how Qt manages toggling check state of
    * a selected item (see paraview/paraview#18150).
@@ -120,7 +120,7 @@ protected:
   QItemSelectionModel::SelectionFlags selectionCommand(
     const QModelIndex& index, const QEvent* event = nullptr) const override;
   bool edit(const QModelIndex& index, EditTrigger trigger, QEvent* event) override;
-  //@}
+  ///@}
 
 private Q_SLOTS:
   void invalidateLayout();

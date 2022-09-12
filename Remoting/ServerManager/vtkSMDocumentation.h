@@ -52,7 +52,7 @@ public:
    */
   const char* GetDescription();
 
-  //@{
+  ///@{
   /**
    * Get/Set the documentation XML element.
    */
@@ -62,7 +62,7 @@ public:
 protected:
   vtkSMDocumentation();
   ~vtkSMDocumentation() override;
-  //@}
+  ///@}
 
   vtkPVXMLElement* DocumentationElement;
 

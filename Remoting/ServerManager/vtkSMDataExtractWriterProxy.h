@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkSMDataExtractWriterProxy, vtkSMExtractWriterProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Implementation for vtkSMExtractWriterProxy API.
    */
@@ -42,7 +42,7 @@ public:
   bool IsExtracting(vtkSMProxy* proxy) override;
   void SetInput(vtkSMProxy* proxy) override;
   vtkSMProxy* GetInput() override;
-  //@}
+  ///@}
 
 protected:
   vtkSMDataExtractWriterProxy();

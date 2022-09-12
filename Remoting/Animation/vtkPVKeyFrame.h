@@ -40,7 +40,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVKeyFrame* New();
 
-  //@{
+  ///@{
   /**
    * Key time is the time at which this key frame is
    * associated. KeyTime ranges from [0,1], where 0 is the
@@ -49,9 +49,9 @@ public:
    */
   vtkSetMacro(KeyTime, double);
   vtkGetMacro(KeyTime, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the animated value at this key frame.
    * Note that is the number of values is adjusted to fit the index
@@ -61,20 +61,20 @@ public:
   virtual void SetKeyValue(unsigned int index, double val);
   double GetKeyValue() { return this->GetKeyValue(0); }
   double GetKeyValue(unsigned int index);
-  //@}
+  ///@}
 
   /**
    * Removes all key values.
    */
   virtual void RemoveAllKeyValues();
 
-  //@{
+  ///@{
   /**
    * Set/Get the number of key values this key frame currently stores.
    */
   unsigned int GetNumberOfKeyValues();
   virtual void SetNumberOfKeyValues(unsigned int num);
-  //@}
+  ///@}
 
   /**
    * This method will do the actual interpolation.

@@ -31,7 +31,7 @@ public:
   vtkTypeMacro(vtkSIWriterProxy, vtkSISourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * These methods are called to add/remove input connections by
    * vtkSIInputProperty. This indirection makes it possible for subclasses to
@@ -40,7 +40,7 @@ public:
    */
   void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method) override;
   void CleanInputs(const char* method) override;
-  //@}
+  ///@}
 
   /**
    * Update the requested time for the pipeline. This needs to be

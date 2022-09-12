@@ -43,23 +43,23 @@ public:
   static vtkPVPythonModule* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the full Python source for this module.
    */
   vtkGetStringMacro(Source);
   vtkSetStringMacro(Source);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the full name for this module (e.g. package.subpackage.module).
    */
   vtkGetStringMacro(FullName);
   vtkSetStringMacro(FullName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get a flag indicating whether this module is actually a package (which
    * can have submodules).
@@ -67,7 +67,7 @@ public:
   vtkGetMacro(IsPackage, int);
   vtkSetMacro(IsPackage, int);
   vtkBooleanMacro(IsPackage, int);
-  //@}
+  ///@}
 
   /**
    * Register the Python module.  Once registered, the module can be retrieved

@@ -134,16 +134,16 @@ public:
 
   const char* GetCurrentFileName();
 
-  //@{
+  ///@{
   /**
    * If true, then use the meta file.  False by default.
    */
   vtkGetMacro(UseMetaFile, int);
   vtkSetMacro(UseMetaFile, int);
   vtkBooleanMacro(UseMetaFile, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, then treat file series like it does not contain any time step
    * values. False by default.
@@ -151,7 +151,7 @@ public:
   vtkGetMacro(IgnoreReaderTime, bool);
   vtkSetMacro(IgnoreReaderTime, bool);
   vtkBooleanMacro(IgnoreReaderTime, bool);
-  //@}
+  ///@}
 
   // Expose number of files, first filename and current file number as
   // information keys for potential use in the internal reader

@@ -87,7 +87,7 @@ public:
    */
   vtkSMProxy* GetProxy();
 
-  //@{
+  ///@{
   /**
    * The traversal mode for the iterator. If the traversal mode is
    * set to GROUPS, each Next() will move to the next group, in
@@ -99,16 +99,16 @@ public:
   void SetModeToGroupsOnly() { this->SetMode(GROUPS_ONLY); }
   void SetModeToOneGroup() { this->SetMode(ONE_GROUP); }
   void SetModeToAll() { this->SetMode(ALL); }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true (default), the iterator will skip prototype proxies.
    */
   vtkSetMacro(SkipPrototypes, bool);
   vtkGetMacro(SkipPrototypes, bool);
   vtkBooleanMacro(SkipPrototypes, bool);
-  //@}
+  ///@}
 
   enum TraversalMode
   {

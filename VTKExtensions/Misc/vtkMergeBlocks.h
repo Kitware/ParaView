@@ -40,7 +40,7 @@ public:
   vtkTypeMacro(vtkMergeBlocks, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Turn on/off merging of coincidental points.  Frontend to
    * vtkAppendFilter::MergePoints. Default is on.
@@ -48,9 +48,9 @@ public:
   vtkSetMacro(MergePoints, bool);
   vtkGetMacro(MergePoints, bool);
   vtkBooleanMacro(MergePoints, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the tolerance to use to find coincident points when `MergePoints`
    * is `true`. Default is 0.0.
@@ -60,9 +60,9 @@ public:
    */
   vtkSetClampMacro(Tolerance, double, 0.0, VTK_DOUBLE_MAX);
   vtkGetMacro(Tolerance, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether Tolerance is treated as an absolute or relative tolerance.
    * The default is to treat it as an absolute tolerance.
@@ -70,9 +70,9 @@ public:
   vtkSetMacro(ToleranceIsAbsolute, bool);
   vtkGetMacro(ToleranceIsAbsolute, bool);
   vtkBooleanMacro(ToleranceIsAbsolute, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true, only vtkPartitionedDataSet and vtkMultiPieceDataSet
    * instances are merged into a since vtkUnstructuredGrid leaving parent
@@ -82,9 +82,9 @@ public:
   vtkSetMacro(MergePartitionsOnly, bool);
   vtkGetMacro(MergePartitionsOnly, bool);
   vtkBooleanMacro(MergePartitionsOnly, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the output type produced by this filter. Only blocks compatible with the output type
    * will be merged in the output. For example, if the output type is vtkPolyData, then
@@ -96,7 +96,7 @@ public:
    */
   vtkSetMacro(OutputDataSetType, int);
   vtkGetMacro(OutputDataSetType, int);
-  //@}
+  ///@}
 
 protected:
   vtkMergeBlocks();

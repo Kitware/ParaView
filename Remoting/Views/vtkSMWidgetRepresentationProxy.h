@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkSMWidgetRepresentationProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * These method forward the representation state of the client side
    * widget representation to the server.
@@ -43,7 +43,7 @@ public:
   virtual void OnStartInteraction();
   virtual void OnEndInteraction();
   virtual void OnInteraction();
-  //@}
+  ///@}
 
 protected:
   vtkSMWidgetRepresentationProxy();

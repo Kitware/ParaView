@@ -78,7 +78,7 @@ public:
   void SetInputArrayToProcess(
     int idx, int port, int connection, const char* fieldName, const char* fieldType) override;
 
-  //@{
+  ///@{
   /**
    * For clipping a box we will only get an approximate box from the vtkPVBox implicit function
    * which can give undesired results. In order to get the exact box geometry output we need
@@ -88,7 +88,7 @@ public:
   vtkSetMacro(ExactBoxClip, bool);
   vtkGetMacro(ExactBoxClip, bool);
   vtkBooleanMacro(ExactBoxClip, bool);
-  //@}
+  ///@}
 
   /**
    * Expose method from vtkClip

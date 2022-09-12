@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkPVTrackballRotate, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
@@ -41,9 +41,9 @@ public:
   void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
   void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
   void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are called on all registered manipulators, not just the
    * active one. Hence, these should just be used to record state and not
@@ -52,7 +52,7 @@ public:
    */
   void OnKeyUp(vtkRenderWindowInteractor* iren) override;
   void OnKeyDown(vtkRenderWindowInteractor* iren) override;
-  //@}
+  ///@}
 
   /**
    * Returns the currently pressed key code.

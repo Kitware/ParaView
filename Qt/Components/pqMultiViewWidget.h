@@ -146,14 +146,14 @@ public Q_SLOTS:
    */
   void makeFrameActive();
 
-  //@{
+  ///@{
   /**
    * Set the visibility for frame decorations and splitter handles.
    */
   void setDecorationsVisibility(bool);
   void showDecorations() { this->setDecorationsVisibility(true); }
   void hideDecorations() { this->setDecorationsVisibility(false); }
-  //@}
+  ///@}
 
   /**
    * Locks the maximum size for each view-frame to the given size.
@@ -211,14 +211,14 @@ protected Q_SLOTS:
    */
   void viewAdded(pqView*);
 
-  //@{
+  ///@{
   /**
    * If in preview mode, we need to update the widget's constraints based on the
    * current widget geometry. We do that in this overridden method which is
    * called when the geometry may have potentially changed.
    */
   void resizeEvent(QResizeEvent* evt) override;
-  //@}
+  ///@}
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**

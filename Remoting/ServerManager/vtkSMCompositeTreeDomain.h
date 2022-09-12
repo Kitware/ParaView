@@ -101,13 +101,13 @@ public:
    */
   void Update(vtkSMProperty* input) override;
 
-  //@{
+  ///@{
   /**
    * Get the vtkPVDataInformation which provides the tree structure for the
    * composite dataset.
    */
   vtkGetObjectMacro(Information, vtkPVDataInformation);
-  //@}
+  ///@}
 
   /**
    * Returns vtkDataAssembly representing the hierarchy
@@ -120,7 +120,7 @@ public:
    */
   int IsInDomain(vtkSMProperty* vtkNotUsed(property)) override { return 1; }
 
-  //@{
+  ///@{
   /**
    * Mode indicates if the property is interested in all nodes, leaves only or
    * non-leaves only. Can be configured in XML using the "mode" attribute.
@@ -128,7 +128,7 @@ public:
    */
   vtkGetMacro(Mode, int);
   vtkSetMacro(Mode, int);
-  //@}
+  ///@}
 
   enum
   {
@@ -145,7 +145,7 @@ public:
     NONEMPTY_LEAF = 1
   };
 
-  //@{
+  ///@{
   /**
    * DefaultMode controls how the default value for the property is set by
    * SetDefaultValues(). DEFAULT implies the default value is picked based on
@@ -154,7 +154,7 @@ public:
    */
   vtkGetMacro(DefaultMode, int);
   vtkSetMacro(DefaultMode, int);
-  //@}
+  ///@}
 
   /**
    * A vtkSMProperty is often defined with a default value in the

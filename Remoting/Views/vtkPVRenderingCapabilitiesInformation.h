@@ -110,7 +110,7 @@ public:
    */
   static vtkSmartPointer<vtkRenderWindow> NewOffscreenRenderWindow();
 
-  //@}
+  ///@}
   void CopyFromObject(vtkObject*) override;
   void AddInformation(vtkPVInformation*) override;
   void CopyToStream(vtkClientServerStream*) override;

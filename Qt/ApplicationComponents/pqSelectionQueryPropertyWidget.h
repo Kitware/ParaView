@@ -68,13 +68,13 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqSelectionQueryPropertyWidget() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the query string.
    */
   void setQuery(const QString&);
   const QString& query() const;
-  //@}
+  ///@}
 
 Q_SIGNALS:
   void queryChanged();

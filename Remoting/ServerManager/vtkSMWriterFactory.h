@@ -107,7 +107,7 @@ public:
    */
   void UpdateAvailableWriters();
 
-  //@{
+  ///@{
   /**
    * Add/remove a group name to look for writers in. By default
    * "writers" is included.
@@ -115,7 +115,7 @@ public:
   void AddGroup(const char* groupName);
   void RemoveGroup(const char* groupName);
   void GetGroups(vtkStringList* groups);
-  //@}
+  ///@}
 
   /**
    * This function is for ParaView based applications that only wish to expose

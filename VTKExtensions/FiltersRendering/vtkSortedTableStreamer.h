@@ -48,7 +48,7 @@ private:
 
 public:
   static void PrintInfo(vtkTable* input);
-  //@{
+  ///@{
   /**
    * Test the internal structure and make sure that they behave as expected.
    * Return true if everything is OK, false otherwise.
@@ -57,44 +57,44 @@ public:
   static vtkSortedTableStreamer* New();
   vtkTypeMacro(vtkSortedTableStreamer, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Only one input which is the table to sort
    */
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  //@{
+  ///@{
   /**
    * Block index used to select a data range
    */
   vtkGetMacro(Block, vtkIdType);
   vtkSetMacro(Block, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the block size. Default value is 1024
    */
   vtkGetMacro(BlockSize, vtkIdType);
   vtkSetMacro(BlockSize, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Choose on which column the sort operation should occur
    */
   vtkGetMacro(SelectedComponent, int);
   vtkSetMacro(SelectedComponent, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the MPI controller used for gathering.
    */
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   /**
    * Choose on which column the sort operation should occur
@@ -117,13 +117,13 @@ protected:
   void CreateInternalIfNeeded(vtkTable* input, vtkDataArray* data);
   vtkDataArray* GetDataArrayToProcess(vtkTable* input);
 
-  //@{
+  ///@{
   /**
    * Choose on which column the sort operation should occur
    */
   vtkGetStringMacro(ColumnToSort);
   vtkSetStringMacro(ColumnToSort);
-  //@}
+  ///@}
 
   vtkIdType Block;
   vtkIdType BlockSize;

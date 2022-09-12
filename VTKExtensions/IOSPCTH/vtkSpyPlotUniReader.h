@@ -51,14 +51,14 @@ public:
   static vtkSpyPlotUniReader* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set and get the Binary SpyPlot File name the reader will process
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   virtual void SetCellArraySelection(vtkDataArraySelection* da);
-  //@}
+  ///@}
 
   /**
    * Reads the basic information from the file such as the header, number
@@ -75,7 +75,7 @@ public:
   void PrintInformation();
   void PrintMemoryUsage();
 
-  //@{
+  ///@{
   /**
    * Set and get the current time step to process
    */
@@ -86,27 +86,27 @@ public:
 
   int SetCurrentTimeStep(int timeStep);
   vtkGetMacro(CurrentTimeStep, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and Get the time range for the simulation run
    */
   vtkGetVector2Macro(TimeStepRange, int);
   vtkGetVector2Macro(TimeRange, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   vtkSetMacro(NeedToCheck, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Functions that map from time to time step and vice versa
    */
   int GetTimeStepFromTime(double time);
   double GetTimeFromTimeStep(int timeStep);
-  //@}
+  ///@}
 
   vtkGetMacro(NumberOfCellFields, int);
 

@@ -71,7 +71,7 @@ public:
   pqTreeViewSelectionHelper(QAbstractItemView* view, bool customIndicator = true);
   ~pqTreeViewSelectionHelper() override;
 
-  //@{
+  ///@{
   /**
    * This property holds whether the tree view support filtering.
    *
@@ -79,7 +79,7 @@ public:
    */
   bool isFilterable() const { return this->Filterable; }
   void setFilterable(bool val) { this->Filterable = val; }
-  //@}
+  ///@}
 protected Q_SLOTS:
   virtual void showContextMenu(int section, const QPoint&);
 

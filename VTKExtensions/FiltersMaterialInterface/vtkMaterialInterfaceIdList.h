@@ -44,7 +44,7 @@ public:
    * these must be in ascending order.
    */
   void Initialize(const std::vector<int>& ids, bool preSorted = false);
-  //@{
+  ///@{
   /**
    * Given a global id, get the local id, or -1 if the
    * global id is not in the list.

@@ -499,21 +499,21 @@ public:
     ELEMENT = 2
   };
 
-  //@{
+  ///@{
   /**
    * Get the Measured file name. Made public to allow access from
    * apps requiring detailed info about the Data contents
    */
   vtkGetStringMacro(MeasuredFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the Match file name. Made public to allow access from
    * apps requiring detailed info about the Data contents
    */
   vtkGetStringMacro(MatchFileName);
-  //@}
+  ///@}
 
 protected:
   vtkPEnSightReader();
@@ -528,21 +528,21 @@ protected:
     vtkInformationVector *outputVector);
   */
 
-  //@{
+  ///@{
   /**
    * Set the Measured file name.
    */
   vtkSetStringMacro(MeasuredFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the Match file name.
    */
   vtkSetStringMacro(MatchFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Read the case file.  If an error occurred, 0 is returned; otherwise 1.
    */
@@ -551,7 +551,7 @@ protected:
   int ReadCaseFileVariable(char* line);
   int ReadCaseFileTime(char* line);
   int ReadCaseFileFile(char* line);
-  //@}
+  ///@}
 
   // set in UpdateInformation to value returned from ReadCaseFile
   int CaseFileRead;
@@ -673,14 +673,14 @@ protected:
    */
   vtkPEnSightReaderCellIds* GetCellIds(int index, int cellType);
 
-  //@{
+  ///@{
   /**
    * Distributed Read Only.
    * Get the vtkIdList for the given GLOBAL output index and cell type.
    */
   vtkIdType GetTotalNumberOfCellIds(int index);
   vtkIdType GetLocalTotalNumberOfCellIds(int index);
-  //@}
+  ///@}
 
   /**
    * Distributed Read Only.
@@ -705,7 +705,7 @@ protected:
    */
   void SetBlockName(vtkMultiBlockDataSet* output, unsigned int blockNo, const char* name);
 
-  //@{
+  ///@{
   /**
    * Merge InsertNextCell & GetId->InsertNextId
    * Take Distributed Read into account.
@@ -716,7 +716,7 @@ protected:
     const std::vector<vtkIdType>& faces = {});
   void InsertVariableComponent(vtkFloatArray* array, int i, int component, float* content,
     int partId, int ensightCellType, int insertionType);
-  //@}
+  ///@}
 
   /**
    * Convenience method to map the point ids from current rank to global ids.

@@ -58,27 +58,27 @@ public:
   vtkAlgorithmOutput* GetExtractedDataProducer();
   vtkAlgorithmOutput* GetSelectionProducer();
 
-  //@{
+  ///@{
   /**
    * Selectors to extract blocks.
    */
   void AddSelector(const char* selector);
   void ClearSelectors();
   void SetActiveAssemblyForSelectors(const char* name);
-  //@}
+  ///@}
 
 protected:
   vtkSpreadSheetRepresentation();
   ~vtkSpreadSheetRepresentation() override;
 
-  //@{
+  ///@{
   /**
    * This is called in `ProcessViewRequest` during the
    * `vtkPVView::REQUEST_UPDATE` pass.
    */
   void SetGenerateCellConnectivity(bool);
   void SetFieldAssociation(int val);
-  //@}
+  ///@}
 
   /**
    * Fill input port information.

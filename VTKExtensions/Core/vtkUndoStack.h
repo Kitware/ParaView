@@ -148,21 +148,21 @@ public:
    */
   void Clear();
 
-  //@{
+  ///@{
   /**
    * Returns if the stack is currently being undone.
    */
   vtkGetMacro(InUndo, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns if the stack is currently being redone.
    */
   vtkGetMacro(InRedo, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get set the maximum stack depth. As more entries are pushed on the stack,
    * if its size exceeds this limit then old entries will be removed.
@@ -174,7 +174,7 @@ public:
 protected:
   vtkUndoStack();
   ~vtkUndoStack() override;
-  //@}
+  ///@}
 
   vtkUndoStackInternal* Internal;
   int StackDepth;

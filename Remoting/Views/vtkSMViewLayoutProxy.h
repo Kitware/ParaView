@@ -98,14 +98,14 @@ public:
    */
   int AssignViewToAnyCell(vtkSMViewProxy* view, int location_hint);
 
-  //@{
+  ///@{
   /**
    * Removes a view. Returns the location of the cell emptied by the view, if
    * any, otherwise -1.
    */
   int RemoveView(vtkSMViewProxy* view);
   bool RemoveView(int index);
-  //@}
+  ///@}
 
   /**
    * Collapses a cell. Only leaf cells without any assigned views can be collapsed.
@@ -150,13 +150,13 @@ public:
    */
   void RestoreMaximizedState();
 
-  //@{
+  ///@{
   /**
    * Returns the maximized cell, if any. Returns -1 if no cell is currently
    * maximized.
    */
   vtkGetMacro(MaximizedCell, int);
-  //@}
+  ///@}
 
   /**
    * Returns true if the cell identified by the location is a split cell.
@@ -201,13 +201,13 @@ public:
    */
   int GetViewLocation(vtkSMViewProxy*);
 
-  //@{
+  ///@{
   /**
    * Returns if a view is contained in this layout.
    */
   bool ContainsView(vtkSMViewProxy* view) { return this->GetViewLocation(view) != -1; }
   bool ContainsView(vtkSMProxy* view);
-  //@}
+  ///@}
 
   /**
    * Updates positions for all views using the layout and current sizes.
@@ -223,7 +223,7 @@ public:
    */
   void ShowViewsOnTileDisplay();
 
-  //@{
+  ///@{
   /**
    * Captures an image from the layout (including all the views in the layout.
    */
@@ -232,7 +232,7 @@ public:
     return this->CaptureWindow(magnification, magnification);
   }
   vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
-  //@}
+  ///@}
 
   /**
    * Overridden to save custom XML state.
@@ -258,7 +258,7 @@ public:
    */
   void GetLayoutExtent(int extent[4]);
 
-  //@{
+  ///@{
   /**
    * Update the size for all the views in the layout assuming the new size
    * provided for the whole layout. This resizes and repositions each view based
@@ -270,7 +270,7 @@ public:
     const int size[] = { width, height };
     this->SetSize(size);
   }
-  //@}
+  ///@}
 
   /**
    * Returns the current size.
@@ -293,7 +293,7 @@ public:
    */
   std::vector<vtkSMViewProxy*> GetViews();
 
-  //@{
+  ///@{
   /**
    * This is only meant for testing and debugging purposes. This allows the
    * application to save the image rendered on the server side in certain
@@ -301,7 +301,7 @@ public:
    * testing.
    */
   void SaveAsPNG(int rank, const char* fname);
-  //@}
+  ///@}
 
 protected:
   vtkSMViewLayoutProxy();

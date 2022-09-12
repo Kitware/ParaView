@@ -40,15 +40,15 @@ public:
   vtkTypeMacro(vtkExplicitStructuredGridPythonExtractor, vtkExplicitStructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set a Python expression to evaluate for grid extraction.
    */
   vtkGetStringMacro(PythonExpression);
   vtkSetStringMacro(PythonExpression);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether to pass data to the Python script or not.
    * Passing the data to the script performs a copy operation of the data.
@@ -57,7 +57,7 @@ public:
   vtkGetMacro(PassDataToScript, bool);
   vtkSetMacro(PassDataToScript, bool);
   vtkBooleanMacro(PassDataToScript, bool);
-  //@}
+  ///@}
 
 protected:
   vtkExplicitStructuredGridPythonExtractor();

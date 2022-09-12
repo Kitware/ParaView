@@ -310,7 +310,7 @@ Q_SIGNALS:
   void preRepresentationRemoved(pqRepresentation*);
   void representationRemoved(pqRepresentation*);
 
-  //@{
+  ///@{
   /**
    * Signals figured for pqExtractor.
    */
@@ -318,7 +318,7 @@ Q_SIGNALS:
   void extractorAdded(pqExtractor*);
   void preExtractorRemoved(pqExtractor*);
   void extractorRemoved(pqExtractor*);
-  //@}
+  ///@}
   /**
    * Fired when the name of an item changes.
    */
@@ -342,13 +342,13 @@ Q_SIGNALS:
   void preConnectionRemoved(
     pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort);
 
-  //@{
+  ///@{
   /**
    * Signals fired to notify changes to extractor connections.
    */
   void connectionAdded(pqServerManagerModelItem* source, pqExtractor* consumer);
   void connectionRemoved(pqServerManagerModelItem* source, pqExtractor* consumer);
-  //@}
+  ///@}
 
   /**
    * Fired when a source indicates that data was updated i.e. the pipeline was

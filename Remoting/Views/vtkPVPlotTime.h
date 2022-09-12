@@ -40,21 +40,21 @@ public:
     Y_AXIS = 2
   };
 
-  //@{
+  ///@{
   /**
    * Set the Time axis mode.
    */
   vtkSetClampMacro(TimeAxisMode, int, NONE, Y_AXIS);
   vtkGetMacro(TimeAxisMode, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set time value.
    */
   vtkSetMacro(Time, double);
   vtkGetMacro(Time, double);
-  //@}
+  ///@}
 
   /**
    * Paint event for the axis, called whenever the axis needs to be drawn

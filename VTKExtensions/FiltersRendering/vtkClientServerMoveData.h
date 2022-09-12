@@ -43,7 +43,7 @@ public:
   vtkTypeMacro(vtkClientServerMoveData, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Controls the output type. This is required because processes receiving
    * data cannot know their output type in RequestDataObject without
@@ -55,9 +55,9 @@ public:
    */
   vtkSetMacro(OutputDataType, int);
   vtkGetMacro(OutputDataType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls the output WHOLE_EXTENT.  This is required because processes
    * receiving data cannot know their WHOLE_EXTENT in RequestInformation
@@ -68,18 +68,18 @@ public:
    */
   vtkSetVector6Macro(WholeExtent, int);
   vtkGetVector6Macro(WholeExtent, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Optionally, set the process type. If set to AUTO, then the process type is
    * tried to be determined using the active connection.
    */
   vtkSetMacro(ProcessType, int);
   vtkGetMacro(ProcessType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the controller to use. This is optional and needed only when
    * ProcessType is set to something other than AUTO. If AUTO, then the
@@ -87,7 +87,7 @@ public:
    */
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   enum ProcessTypes
   {

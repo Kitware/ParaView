@@ -118,21 +118,21 @@ public:
    */
   void suppress(const QStringList& substrs);
 
-  //@{
+  ///@{
   /**
    * Set the settings key that will be used to restore/save the state for
    * the "Show full messages" button. By default "pqOutputWidget" will be used.
    */
   void setSettingsKey(const QString& key);
   const QString& settingsKey() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the font size in points for the output console text.
    */
   void setFontSize(int fontSize);
-  //@}
+  ///@}
 
   /**
    * Get the state of the 'Always open for new messages' checkbox.

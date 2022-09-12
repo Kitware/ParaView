@@ -82,7 +82,7 @@ public:
   void SetChartTypeToFunctionalBag() { this->SetChartType("FunctionalBag"); }
   void SetChartTypeToParallelCoordinates() { this->SetChartType("ParallelCoordinates"); }
 
-  //@{
+  ///@{
   /**
    * Set the font of the title.
    * These methods should not be called directly. They are made public only so
@@ -99,9 +99,9 @@ public:
   int GetTitleFontSize() override;
   int GetTitleFontBold() override;
   int GetTitleFontItalic() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the color of the title.
    * These methods should not be called directly. They are made public only so
@@ -110,9 +110,9 @@ public:
    */
   void SetTitleColor(double red, double green, double blue) override;
   double* GetTitleColor() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the alignement of the title.
    * These methods should not be called directly. They are made public only so
@@ -121,7 +121,7 @@ public:
    */
   void SetTitleAlignment(int alignment) override;
   int GetTitleAlignment() override;
-  //@}
+  ///@}
 
   /**
    * Set the legend visibility.
@@ -174,7 +174,7 @@ public:
    */
   void SetLegendSymbolWidth(int width);
 
-  //@{
+  ///@{
   /**
    * Sets whether or not the grid for the given axis is visible.
    * These methods should not be called directly. They are made public only so
@@ -183,9 +183,9 @@ public:
    */
   void SetGridVisibility(int index, bool visible);
   GENERATE_AXIS_FUNCTIONS(GridVisibility, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the color for the given axis.
    * These methods should not be called directly. They are made public only so
@@ -194,9 +194,9 @@ public:
    */
   void SetAxisColor(int index, double red, double green, double blue);
   GENERATE_AXIS_FUNCTIONS3(AxisColor, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the color for the given axis.
    * These methods should not be called directly. They are made public only so
@@ -205,9 +205,9 @@ public:
    */
   void SetGridColor(int index, double red, double green, double blue);
   GENERATE_AXIS_FUNCTIONS3(GridColor, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets whether or not the labels for the given axis are visible.
    * These methods should not be called directly. They are made public only so
@@ -216,7 +216,7 @@ public:
    */
   void SetAxisLabelVisibility(int index, bool visible);
   GENERATE_AXIS_FUNCTIONS(AxisLabelVisibility, bool);
-  //@}
+  ///@}
 
   /**
    * Set the axis label font for the given axis.
@@ -226,47 +226,47 @@ public:
    */
   void SetAxisLabelFont(int index, const char* family, int pointSize, bool bold, bool italic);
 
-  //@{
+  ///@{
   /**
    * Set the axis label font family for the given axis.
    */
   void SetAxisLabelFontFamily(int index, const char* family);
   GENERATE_AXIS_FUNCTIONS(AxisLabelFontFamily, const char*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the axis label font file for the given axis.
    */
   void SetAxisLabelFontFile(int index, const char* file);
   GENERATE_AXIS_FUNCTIONS(AxisLabelFontFile, const char*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the axis label font size for the given axis.
    */
   void SetAxisLabelFontSize(int index, int pointSize);
   GENERATE_AXIS_FUNCTIONS(AxisLabelFontSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the axis label font bold for the given axis.
    */
   void SetAxisLabelBold(int index, bool bold);
   GENERATE_AXIS_FUNCTIONS(AxisLabelBold, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the axis label font italic for the given axis.
    */
   void SetAxisLabelItalic(int index, bool italic);
   GENERATE_AXIS_FUNCTIONS(AxisLabelItalic, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the axis label color for the given axis.
    * These methods should not be called directly. They are made public only so
@@ -275,9 +275,9 @@ public:
    */
   void SetAxisLabelColor(int index, double red, double green, double blue);
   GENERATE_AXIS_FUNCTIONS3(AxisLabelColor, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the axis label notation for the given axis.
    * These methods should not be called directly. They are made public only so
@@ -286,9 +286,9 @@ public:
    */
   void SetAxisLabelNotation(int index, int notation);
   GENERATE_AXIS_FUNCTIONS(AxisLabelNotation, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the axis label precision for the given axis.
    * These methods should not be called directly. They are made public only so
@@ -297,9 +297,9 @@ public:
    */
   void SetAxisLabelPrecision(int index, int precision);
   GENERATE_AXIS_FUNCTIONS(AxisLabelPrecision, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For axis ranges, ParaView overrides the VTK charts behavior.
    * Users can either specify an explicit range or let the VTK chart determine
@@ -310,9 +310,9 @@ public:
    */
   GENERATE_AXIS_FUNCTIONS(AxisRangeMinimum, double);
   GENERATE_AXIS_FUNCTIONS(AxisRangeMaximum, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether to use the range specified by SetAxisRange(..) (or variants) or
    * to let the chart determine the range automatically based on the data being
@@ -320,9 +320,9 @@ public:
    */
   void SetAxisUseCustomRange(int index, bool useCustomRange);
   GENERATE_AXIS_FUNCTIONS(AxisUseCustomRange, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets whether or not the given axis uses a log10 scale.
    * These methods should not be called directly. They are made public only so
@@ -331,9 +331,9 @@ public:
    */
   void SetAxisLogScale(int index, bool logScale);
   GENERATE_AXIS_FUNCTIONS(AxisLogScale, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title for the given index.
    * These methods should not be called directly. They are made public only so
@@ -342,7 +342,7 @@ public:
    */
   void SetAxisTitle(int index, const char* title);
   GENERATE_AXIS_FUNCTIONS(AxisTitle, const char*);
-  //@}
+  ///@}
 
   /**
    * Set the chart axis title's font for the given index.
@@ -352,7 +352,7 @@ public:
    */
   void SetAxisTitleFont(int index, const char* family, int pointSize, bool bold, bool italic);
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title's font family for the given index.
    * These methods should not be called directly. They are made public only so
@@ -361,9 +361,9 @@ public:
    */
   void SetAxisTitleFontFamily(int index, const char* family);
   GENERATE_AXIS_FUNCTIONS(AxisTitleFontFamily, const char*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title's font file for the given index.
    * These methods should not be called directly. They are made public only so
@@ -372,9 +372,9 @@ public:
    */
   void SetAxisTitleFontFile(int index, const char* file);
   GENERATE_AXIS_FUNCTIONS(AxisTitleFontFile, const char*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title's font size for the given index.
    * These methods should not be called directly. They are made public only so
@@ -383,9 +383,9 @@ public:
    */
   void SetAxisTitleFontSize(int index, int pointSize);
   GENERATE_AXIS_FUNCTIONS(AxisTitleFontSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title's font bold for the given index.
    * These methods should not be called directly. They are made public only so
@@ -394,9 +394,9 @@ public:
    */
   void SetAxisTitleBold(int index, bool bold);
   GENERATE_AXIS_FUNCTIONS(AxisTitleBold, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title's font italic for the given index.
    * These methods should not be called directly. They are made public only so
@@ -405,9 +405,9 @@ public:
    */
   void SetAxisTitleItalic(int index, bool italic);
   GENERATE_AXIS_FUNCTIONS(AxisTitleItalic, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the chart axis title's color for the given index.
    * These methods should not be called directly. They are made public only so
@@ -416,37 +416,37 @@ public:
    */
   void SetAxisTitleColor(int index, double red, double green, double blue);
   GENERATE_AXIS_FUNCTIONS3(AxisTitleColor, double, double, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether the chart uses custom labels or if the labels are placed
    * automatically.
    */
   void SetAxisUseCustomLabels(int index, bool useCustomLabels);
   GENERATE_AXIS_FUNCTIONS(AxisUseCustomLabels, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the number of labels for the supplied axis.
    */
   void SetAxisLabelsNumber(int axis, int number);
   GENERATE_AXIS_FUNCTIONS(AxisLabelsNumber, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the axis labels and positions for the supplied axis at the given index.
    */
   void SetAxisLabels(int axis, int index, const std::string& value, const std::string& label);
   GENERATE_AXIS_FUNCTIONS3(AxisLabels, int, const std::string&, const std::string&);
-  //@}
+  ///@}
 
   void SetTooltipNotation(int notation);
   void SetTooltipPrecision(int precision);
 
-  //@{
+  ///@{
   /**
    * Set the visibility for the time-marker in the view. Note, you cannot force
    * the time-marker to be shown. One can only hide it when the view would have
@@ -454,16 +454,16 @@ public:
    */
   vtkSetMacro(HideTimeMarker, bool);
   vtkGetMacro(HideTimeMarker, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether to sort the data in the chart by the x-axis array so that line
    * plot connectivity is from left to right rather than semi-randomly by index.
    */
   vtkGetMacro(SortByXAxis, bool);
   vtkSetMacro(SortByXAxis, bool);
-  //@}
+  ///@}
 
   /**
    * When plotting data with nonpositive values, ignore the standard warning
@@ -514,14 +514,14 @@ protected:
    */
   void Render(bool interactive) override;
 
-  //@{
+  ///@{
   /**
    * Pointer to the proxy's chart instance.
    */
   vtkChart* Chart;
   vtkPVPlotTime* PlotTime;
   vtkChartWarning* LogScaleWarningLabel;
-  //@}
+  ///@}
 
   void SelectionChanged();
 

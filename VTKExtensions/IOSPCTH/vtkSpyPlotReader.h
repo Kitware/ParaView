@@ -79,25 +79,25 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   void PrintBlockList(vtkNonOverlappingAMR* hbds, int myProcId);
 
-  //@{
+  ///@{
   /**
    * Get and set the file name. It is either the name of the case file or the
    * name of the single binary file.
    */
   virtual void SetFileName(const char* filename);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and get the time step. The time step is an index, NOT a time
    * given in seconds.
    */
   vtkSetMacro(TimeStep, int);
   vtkGetMacro(TimeStep, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader distributes files over processors. If false,
    * the reader distributes blocks over processors. Default is false.
@@ -108,9 +108,9 @@ public:
   vtkSetMacro(DistributeFiles, int);
   vtkGetMacro(DistributeFiles, int);
   vtkBooleanMacro(DistributeFiles, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader generate a cell array in each block that
    * stores the level in the hierarchy, starting from 0.
@@ -119,9 +119,9 @@ public:
   vtkSetMacro(GenerateLevelArray, int);
   vtkGetMacro(GenerateLevelArray, int);
   vtkBooleanMacro(GenerateLevelArray, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader generate a cell array in each block that
    * stores a unique but not necessarily contiguous id.
@@ -130,9 +130,9 @@ public:
   vtkSetMacro(GenerateBlockIdArray, int);
   vtkGetMacro(GenerateBlockIdArray, int);
   vtkBooleanMacro(GenerateBlockIdArray, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader generate a cell array in each block that
    * corresponds to the Active field in the file.
@@ -141,9 +141,9 @@ public:
   vtkSetMacro(GenerateActiveBlockArray, int);
   vtkGetMacro(GenerateActiveBlockArray, int);
   vtkBooleanMacro(GenerateActiveBlockArray, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader will extract tracer data at each time
    * step and include a field data array for the tracers at that
@@ -152,9 +152,9 @@ public:
   vtkSetMacro(GenerateTracerArray, int);
   vtkGetMacro(GenerateTracerArray, int);
   vtkBooleanMacro(GenerateTracerArray, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * if true, the reader will extract the marker data at each
    * time step and create a set of vtkPoints in the second
@@ -163,9 +163,9 @@ public:
   void SetGenerateMarkers(int gm);
   vtkGetMacro(GenerateMarkers, int);
   vtkBooleanMacro(GenerateMarkers, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader will convert volume fraction arrays to unsigned char.
    * True by default.
@@ -173,9 +173,9 @@ public:
   void SetDownConvertVolumeFraction(int vf);
   vtkGetMacro(DownConvertVolumeFraction, int);
   vtkBooleanMacro(DownConvertVolumeFraction, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader will calculate all derived variables it can given
    * which properties the user has selected
@@ -184,9 +184,9 @@ public:
   vtkSetMacro(ComputeDerivedVariables, int);
   vtkGetMacro(ComputeDerivedVariables, int);
   vtkBooleanMacro(ComputeDerivedVariables, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If true, the reader will merge scalar arrays named, for example, "X velocity"
    * "Y velocity" and "Z velocity" into a vector array named "velocity" with
@@ -197,16 +197,16 @@ public:
   void SetMergeXYZComponents(int merge);
   vtkGetMacro(MergeXYZComponents, int);
   vtkBooleanMacro(MergeXYZComponents, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the time step range.
    */
   vtkGetVector2Macro(TimeStepRange, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Cell array selection
    */
@@ -214,7 +214,7 @@ public:
   const char* GetCellArrayName(int idx);
   int GetCellArrayStatus(const char* name);
   void SetCellArrayStatus(const char* name, int status);
-  //@}
+  ///@}
 
   /**
    * Set the controller used to coordinate parallel reading.
@@ -360,13 +360,13 @@ protected:
   int ComputeDerivedVars(
     vtkCellData* data, vtkSpyPlotBlock* block, vtkSpyPlotUniReader* reader, const int& blockID);
 
-  //@{
+  ///@{
   /**
    * Get the data array selection tables used to configure which data
    * arrays are loaded by the reader.
    */
   vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
-  //@}
+  ///@}
 
   // vtkSpyPlotReaderMap needs access to GetCellDataArraySelection().
   friend class vtkSpyPlotReaderMap;

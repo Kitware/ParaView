@@ -53,14 +53,14 @@ public:
    */
   bool Initialize(const char* filename);
 
-  //@{
+  ///@{
   /**
    * Implementation for vtkCPPipeline API
    */
   int RequestDataDescription(vtkCPDataDescription* dataDescription) override;
   int CoProcess(vtkCPDataDescription* dataDescription) override;
   int Finalize() override;
-  //@}
+  ///@}
 
 protected:
   vtkCPPythonScriptV2Pipeline();

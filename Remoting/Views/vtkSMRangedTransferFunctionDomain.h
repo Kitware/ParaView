@@ -61,15 +61,15 @@ public:
    */
   double GetRangeMaximum(unsigned int idx, int& exists);
 
-  //@{
+  ///@{
   /**
    * Returns if range minimum/maximum bound is set for the domain.
    */
   bool GetRangeMinimumExists(unsigned int idx);
   bool GetRangeMaximumExists(unsigned int idx);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the range minimum/maximum value, is exists, otherwise
    * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
@@ -85,7 +85,7 @@ public:
     int not_used;
     return this->GetRangeMaximum(idx, not_used);
   }
-  //@}
+  ///@}
 
   /**
    * If prop is a vtkSMProxyProperty containing a vtkSMTransferFunctionProxy

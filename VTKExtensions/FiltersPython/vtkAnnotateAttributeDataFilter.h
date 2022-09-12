@@ -36,38 +36,38 @@ public:
   vtkTypeMacro(vtkAnnotateAttributeDataFilter, vtkPythonAnnotationFilter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the attribute array name to annotate with.
    */
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the element number to annotate with.
    */
   vtkSetMacro(ElementId, vtkIdType);
   vtkGetMacro(ElementId, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the rank to extract the data from.
    * Default is 0.
    */
   vtkSetMacro(ProcessId, int);
   vtkGetMacro(ProcessId, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the text prefix to display in front of the Field value
    */
   vtkSetStringMacro(Prefix);
   vtkGetStringMacro(Prefix);
-  //@}
+  ///@}
 
 protected:
   vtkAnnotateAttributeDataFilter();

@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkTimeToTextConvertor, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the format in which the to display the
    * input update time. Use fmt formatting.
@@ -43,23 +43,23 @@ public:
    */
   vtkSetStringMacro(Format);
   vtkGetStringMacro(Format);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Apply a translation to the time
    */
   vtkSetMacro(Shift, double);
   vtkGetMacro(Shift, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Apply a scale to the time.
    */
   vtkSetMacro(Scale, double);
   vtkGetMacro(Scale, double);
-  //@}
+  ///@}
 
 protected:
   vtkTimeToTextConvertor();

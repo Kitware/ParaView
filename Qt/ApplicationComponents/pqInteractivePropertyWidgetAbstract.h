@@ -90,7 +90,7 @@ public:
    */
   vtkSMProxy* dataSource() const;
 
-  //@{
+  ///@{
   /**
    * In these methods, we show/hide the widget since the interactive widget is not
    * supposed to be visible except when the panel is "active" or "selected".
@@ -100,7 +100,7 @@ public:
   void select() override;
   void deselect() override;
   void selectPort(int portIndex) final;
-  //@}
+  ///@}
 
   /**
    * Returns bounds from the dataSource, if possible. May return invalid bounds
@@ -168,7 +168,7 @@ Q_SIGNALS:
    */
   void widgetVisibilityUpdated(bool);
 
-  //@{
+  ///@{
   /**
    * Fired by the underlying interactive widget representation proxy, for each
    * respective events.
@@ -176,7 +176,7 @@ Q_SIGNALS:
   void startInteraction();
   void interaction();
   void endInteraction();
-  //@}
+  ///@}
 
 protected:
   /**

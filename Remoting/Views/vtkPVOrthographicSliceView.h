@@ -68,28 +68,28 @@ public:
   void SetInteractionMode(int mode) override;
   void SetupInteractor(vtkRenderWindowInteractor*) override;
 
-  //@{
+  ///@{
   /**
    * Set the slice position.
    */
   void SetSlicePosition(double x, double y, double z);
   vtkGetVector3Macro(SlicePosition, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set slice increments.
    */
   vtkSetVector3Macro(SliceIncrements, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether to show slice annotations.
    */
   vtkSetMacro(SliceAnnotationsVisibility, bool);
   vtkGetMacro(SliceAnnotationsVisibility, bool);
-  //@}
+  ///@}
 
   /**
    * To avoid confusion, we don't show the center axes at all in this view.

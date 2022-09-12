@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkXMLCollectionReader, vtkXMLReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the required value for a particular named attribute.
    * Only data sets matching this value will be read.  A nullptr value or
@@ -50,9 +50,9 @@ public:
    */
   virtual void SetRestriction(const char* name, const char* value);
   virtual const char* GetRestriction(const char* name);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/set the required value for a particular named attribute.  The
    * value should be referenced by its index.  Only data sets matching
@@ -62,7 +62,7 @@ public:
    */
   virtual void SetRestrictionAsIndex(const char* name, int index);
   virtual int GetRestrictionAsIndex(const char* name);
-  //@}
+  ///@}
 
   /**
    * Get the number of distinct attribute values present in the file.
@@ -88,7 +88,7 @@ public:
    */
   int GetNumberOfAttributeValues(int attribute);
 
-  //@{
+  ///@{
   /**
    * Get one of the possible values for a given attribute.  The order
    * of values for the attribute with respect to the index is not
@@ -97,16 +97,16 @@ public:
    */
   const char* GetAttributeValue(int attribute, int index);
   const char* GetAttributeValue(const char* name, int index);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the index of the attribute value with the given name.  Returns -1
    * if no such attribute or value exists.
    */
   int GetAttributeValueIndex(int attribute, const char* value);
   int GetAttributeValueIndex(const char* name, const char* value);
-  //@}
+  ///@}
 
   /**
    * Get the vtkXMLDataElement representing the collection element
@@ -116,7 +116,7 @@ public:
    */
   vtkXMLDataElement* GetOutputXMLDataElement(int index);
 
-  //@{
+  ///@{
   /**
    * If ForceOutputTypeToMultiBlock is set to 1, the output of this reader
    * will always be a multi-block dataset, even if there is 1 simple output.
@@ -124,7 +124,7 @@ public:
   vtkSetMacro(ForceOutputTypeToMultiBlock, int);
   vtkGetMacro(ForceOutputTypeToMultiBlock, int);
   vtkBooleanMacro(ForceOutputTypeToMultiBlock, int);
-  //@}
+  ///@}
 
 protected:
   vtkXMLCollectionReader();

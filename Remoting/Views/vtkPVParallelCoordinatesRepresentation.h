@@ -40,7 +40,7 @@ public:
    */
   void SetVisibility(bool visible) override;
 
-  //@{
+  ///@{
   /**
    * Set series visibility given its name. The order is currently ignored, but
    * in future we can add support to respect that as in
@@ -48,40 +48,40 @@ public:
    */
   void SetSeriesVisibility(const char* series, bool visibility);
   void ClearSeriesVisibilities();
-  //@}
+  ///@}
 
   /**
    * Provides access to the underlying VTK representation.
    */
   vtkChartParallelCoordinates* GetChart();
 
-  //@{
+  ///@{
   /**
    * Sets the line thickness for the plot.
    */
   vtkSetMacro(LineThickness, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the line style for the plot.
    */
   vtkSetMacro(LineStyle, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the color to used for the lines in the plot.
    */
   vtkSetVector3Macro(Color, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the opacity for the lines in the plot.
    */
   vtkSetMacro(Opacity, double);
-  //@}
+  ///@}
 
   /**
    * Called by vtkPVContextView::Export() to export the representation's data to

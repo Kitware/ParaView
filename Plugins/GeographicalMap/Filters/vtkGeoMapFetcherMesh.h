@@ -40,23 +40,23 @@ public:
   vtkTypeMacro(vtkGeoMapFetcherMesh, vtkStructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the mesh projection.
    */
   vtkSetClampMacro(MeshProjection, int, 0, vtkGeoMapConvertFilter::Custom);
   vtkGetMacro(MeshProjection, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the custom PROJ.4 mesh projection string.
    */
   vtkGetMacro(CustomMeshProjection, std::string);
   vtkSetMacro(CustomMeshProjection, std::string);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forward setter to the internal vtkGeoMapFetcher object.
    */
@@ -106,7 +106,7 @@ public:
     this->Fetcher->SetAPIKey(_arg);
     this->Modified();
   }
-  //@}
+  ///@}
 
 protected:
   vtkGeoMapFetcherMesh() = default;

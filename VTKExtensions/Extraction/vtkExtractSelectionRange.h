@@ -34,36 +34,36 @@ public:
   vtkTypeMacro(vtkExtractSelectionRange, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the name of the array used to compute the range.
    */
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the field type of the selection.
    */
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the component used to compute the range.
    */
   vtkSetMacro(Component, int);
   vtkGetMacro(Component, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the output range
    */
   vtkGetVector2Macro(Range, double);
-  //@}
+  ///@}
 
 protected:
   vtkExtractSelectionRange();

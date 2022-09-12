@@ -48,15 +48,15 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods provide access to OpenGL information.
    */
@@ -64,7 +64,7 @@ public:
   const std::string& GetVersion() const { return this->Version; }
   const std::string& GetRenderer() const { return this->Renderer; }
   const std::string& GetCapabilities() const { return this->Capabilities; }
-  //@}
+  ///@}
 
 protected:
   vtkPVOpenGLInformation();

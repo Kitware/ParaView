@@ -90,7 +90,7 @@ public:
   bool Measure(vtkAbstractAccumulator** accumulators, vtkIdType numberOfAccumulatedData,
     double totalWeight, double& value) override;
 
-  //@{
+  ///@{
   /**
    * See the vtkAbstractArrayMeasurement API for description of this method.
    */
@@ -98,24 +98,24 @@ public:
   std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
   vtkIdType GetMinimumNumberOfAccumulatedData() const override;
   vtkIdType GetNumberOfAccumulators() const override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Accessors on the DiscretizationStep used for calculating the entropy.
    */
   double GetDiscretizationStep() const;
   void SetDiscretizationStep(double);
-  //@}
+  ///@}
 
 protected:
-  //@{
+  ///@{
   /**
    * Default constructor and destructor
    */
   vtkEntropyArrayMeasurement();
   ~vtkEntropyArrayMeasurement() override = default;
-  //@}
+  ///@}
 
 private:
   vtkEntropyArrayMeasurement(const vtkEntropyArrayMeasurement&) = delete;

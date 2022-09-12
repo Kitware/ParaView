@@ -42,63 +42,63 @@ public:
   template <class T>
   void ReplaceAllStringPattern(std::string& input, const std::string& pIdentifier, const T& target);
 
-  //@{
+  ///@{
   /**
    * Specify file name of Gmsh geometry file to read.
    */
   vtkSetStringMacro(GeometryFileName);
   vtkGetStringMacro(GeometryFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify XML file name
    */
   vtkSetStringMacro(XMLFileName);
   vtkGetStringMacro(XMLFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify current time step
    */
   vtkSetMacro(TimeStep, int);
   vtkGetMacro(TimeStep, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify number of mesh partitions
    */
   vtkSetMacro(NumPieces, int);
   vtkGetMacro(NumPieces, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify number of partition files
    */
   vtkSetMacro(NumFiles, int);
   vtkGetMacro(NumFiles, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify part id
    */
   vtkSetMacro(PartID, int);
   vtkGetMacro(PartID, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify file id
    */
   vtkSetMacro(FileID, int);
   vtkGetMacro(FileID, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Clear/Set info. in FieldInfoMap for object of vtkGmshReaderInternal
    */
@@ -106,7 +106,7 @@ public:
   void SetAdaptInfo(int adaptLevel, double adaptTol);
   void SetFieldInfoPath(const std::string& addPath);
   int GetSizeFieldPathPattern();
-  //@}
+  ///@}
 
 protected:
   vtkGmshReader();

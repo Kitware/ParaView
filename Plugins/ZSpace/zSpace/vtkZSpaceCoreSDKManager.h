@@ -73,7 +73,7 @@ public:
    */
   void CalculateFrustumFit(const double bounds[6], double position[3], double viewUp[3]) override;
 
-  //@{
+  ///@{
   /**
    * Notify the zSpace SDK for the begining of a frame.
    * There is no "end frame" notification to make in the
@@ -81,7 +81,7 @@ public:
    */
   void BeginFrame() override;
   void EndFrame() override{};
-  //@}
+  ///@}
 
 protected:
   vtkZSpaceCoreSDKManager();

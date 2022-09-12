@@ -37,29 +37,29 @@ public:
   vtkTypeMacro(vtkEnsembleDataReader, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the filename of the ensemble (.pve extension).
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the current ensemble member to process.
    */
   vtkSetMacro(CurrentMember, unsigned int);
   vtkGetMacro(CurrentMember, unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the number of ensemble members
    */
   unsigned int GetNumberOfMembers() const;
   vtkGetVector2Macro(CurrentMemberRange, unsigned int);
-  //@}
+  ///@}
 
   /**
    * Get the file path associated with the specified row of the meta data

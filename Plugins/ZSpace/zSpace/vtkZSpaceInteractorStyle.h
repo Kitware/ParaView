@@ -60,7 +60,7 @@ public:
   vtkTypeMacro(vtkZSpaceInteractorStyle, vtkInteractorStyle3D);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Override generic event bindings to call the corresponding action.
    */
@@ -68,9 +68,9 @@ public:
   void OnPositionProp3D(vtkEventData* edata) override;
   void OnMove3D(vtkEventData* edata) override;
   void OnSelect3D(vtkEventData* edata) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Interaction mode entry points.
    */
@@ -78,17 +78,17 @@ public:
   virtual void EndPick(vtkEventDataDevice3D*);
   virtual void StartPositionProp(vtkEventDataDevice3D*);
   virtual void EndPositionProp(vtkEventDataDevice3D*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods for interaction.
    */
   void ProbeData(vtkEventDataDevice3D*);
   virtual void PositionProp(vtkEventData*, double* lwpos = nullptr, double* lwori = nullptr);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Indicates if picking should be updated every frame. If so, the interaction
    * picker will try to pick a prop and ray will be updated accordingly.
@@ -97,7 +97,7 @@ public:
   vtkSetMacro(InteractivePicking, bool);
   vtkGetMacro(InteractivePicking, bool);
   vtkBooleanMacro(InteractivePicking, bool);
-  //@}
+  ///@}
 
   /**
    * Use FindPickedActor to update the InteractionProp.
@@ -127,12 +127,12 @@ protected:
    */
   void EndPickCallback(vtkSelection* sel);
 
-  //@{
+  ///@{
   /** Utility routines
    */
   void StartAction(int VTKIS_STATE, vtkEventDataDevice3D* edata);
   void EndAction(int VTKIS_STATE, vtkEventDataDevice3D* edata);
-  //@}
+  ///@}
 
   /**
    * Delegate the selection to the PVHardwareSelector of ZSpaceView. If

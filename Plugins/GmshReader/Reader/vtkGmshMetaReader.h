@@ -45,28 +45,28 @@ public:
   vtkTypeMacro(vtkGmshMetaReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set and get the GMsh meta file name
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the step number for the geometry.
    */
   vtkSetClampMacro(TimeStepIndex, int, 0, VTK_INT_MAX);
   vtkGetMacro(TimeStepIndex, int);
-  //@}
+  ///@}
 
   /**
    * The min and max values of timesteps.
    */
   vtkGetVector2Macro(TimeStepRange, int);
 
-  //@{
+  ///@{
   /** The following methods allow selective reading of solutions fields. By
    * default, ALL point data fields are read,
    * but this can be modified (e.g. from the ParaView GUI).
@@ -78,25 +78,25 @@ public:
 
   void DisableAllPointArrays();
   void EnableAllPointArrays();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and get the adaptation level
    */
   vtkSetMacro(AdaptationLevel, int);
   vtkGetMacro(AdaptationLevel, int);
   vtkGetMacro(AdaptationLevelInfo, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and get the adaptation tolerance
    */
   vtkSetMacro(AdaptationTolerance, double);
   vtkGetMacro(AdaptationTolerance, double);
   vtkGetMacro(AdaptationToleranceInfo, double);
-  //@}
+  ///@}
 
   /**
    * Static method to know if a file can be read

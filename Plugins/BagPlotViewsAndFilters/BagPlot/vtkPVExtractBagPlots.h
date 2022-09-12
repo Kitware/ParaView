@@ -38,15 +38,15 @@ public:
   vtkTypeMacro(vtkPVExtractBagPlots, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Interface for preparing selection of arrays in ParaView.
    */
   void EnableAttributeArray(const char*);
   void ClearAttributeArrays();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get if the process must be done on the transposed of the input table
    * Default is TRUE.
@@ -54,27 +54,27 @@ public:
   vtkGetMacro(TransposeTable, bool);
   vtkSetMacro(TransposeTable, bool);
   vtkBooleanMacro(TransposeTable, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get if the PCA must be done in robust mode.
    * Default is FALSE.
    */
   vtkGetMacro(RobustPCA, bool);
   vtkSetMacro(RobustPCA, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the kernel width for the HDR filter.
    * Default is 1.0
    */
   vtkGetMacro(KernelWidth, double);
   vtkSetMacro(KernelWidth, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get if the kernel width must be automatically
    * computed using Silverman's rules (sigma*n^(-1/(d+4)))
@@ -83,18 +83,18 @@ public:
   vtkGetMacro(UseSilvermanRule, bool);
   vtkSetMacro(UseSilvermanRule, bool);
   vtkBooleanMacro(UseSilvermanRule, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the size of the grid to compute the PCA on.
    * Default is 100.
    */
   vtkGetMacro(GridSize, int);
   vtkSetMacro(GridSize, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the user quantile (in percent). Beyond this threshold, input
    * curves are considered as outliers.
@@ -102,16 +102,16 @@ public:
    */
   vtkGetMacro(UserQuantile, int);
   vtkSetClampMacro(UserQuantile, int, 0, 100);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the number of PCA projection axis.
    * Default and minimum is 2, maximum is 10.
    */
   vtkGetMacro(NumberOfProjectionAxes, int);
   vtkSetClampMacro(NumberOfProjectionAxes, int, 2, 10);
-  //@}
+  ///@}
 
 protected:
   vtkPVExtractBagPlots();

@@ -67,7 +67,7 @@ public:
   vtkTypeMacro(vtkSMViewProxyInteractorHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the view proxy.
    * This is a weak reference i.e. the view proxy's
@@ -75,9 +75,9 @@ public:
    */
   void SetViewProxy(vtkSMViewProxy* proxy);
   vtkSMViewProxy* GetViewProxy();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the interactor to "help" the view with.
    * This is a weak reference i.e. the interactor's
@@ -86,13 +86,13 @@ public:
   void SetupInteractor(vtkRenderWindowInteractor* iren);
   vtkRenderWindowInteractor* GetInteractor();
   void CleanupInteractor() { this->SetupInteractor(nullptr); }
-  //@}
+  ///@}
 
 protected:
   vtkSMViewProxyInteractorHelper();
   ~vtkSMViewProxyInteractorHelper() override;
 
-  //@{
+  ///@{
   /**
    * Handle event.
    */
@@ -100,7 +100,7 @@ protected:
   void Render();
   void CleanupTimer();
   void Resize();
-  //@}
+  ///@}
 
   vtkCommand* Observer;
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;

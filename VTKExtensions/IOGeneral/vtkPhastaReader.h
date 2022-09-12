@@ -42,30 +42,30 @@ public:
   vtkTypeMacro(vtkPhastaReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify file name of Phasta geometry file to read.
    */
   vtkSetStringMacro(GeometryFileName);
   vtkGetStringMacro(GeometryFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify file name of Phasta field file to read.
    */
   vtkSetStringMacro(FieldFileName);
   vtkGetStringMacro(FieldFileName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Clear/Set info. in FieldInfoMap for object of vtkPhastaReaderInternal
    */
   void ClearFieldInfo();
   void SetFieldInfo(const char* paraviewFieldTag, const char* phastaFieldTag, int index,
     int numOfComps, int dataDependency, const char* dataType);
-  //@}
+  ///@}
 
   void SetCachedGrid(vtkUnstructuredGrid*);
   vtkGetObjectMacro(CachedGrid, vtkUnstructuredGrid);

@@ -37,22 +37,22 @@ public:
   vtkTypeMacro(vtk2DWidgetRepresentation, vtkDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the representation.
    */
   vtkSetMacro(ContextItem, vtkContextItem*);
   virtual vtkContextItem* GetContextItem() const { return this->ContextItem; };
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether the widget is enabled.
    */
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
-  //@}
+  ///@}
 
 protected:
   vtk2DWidgetRepresentation();

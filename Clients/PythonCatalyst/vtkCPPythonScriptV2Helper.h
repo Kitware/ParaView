@@ -79,7 +79,7 @@ public:
    */
   bool CatalystExecute(int timestep, double time, const std::vector<std::string>& params = {});
 
-  //@{
+  ///@{
   /**
    * There are overloads intended for vtkCPPythonScriptV2Pipeline i.e. legacy
    * Catalyst adaptors that don't use Conduit.
@@ -88,9 +88,9 @@ public:
   bool CatalystInitialize(vtkCPDataDescription* desc);
   bool RequestDataDescription(vtkCPDataDescription* desc);
   bool CatalystExecute(vtkCPDataDescription* desc);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Internal methods. These are called by Python modules internal to ParaView
    * and may change without notice. Should not be considered as part of ParaView
@@ -105,7 +105,7 @@ public:
   vtkSMProxy* GetTrivialProducer(const char* inputname);
   vtkStringList* GetArgumentsAsStringList() const;
   vtkStringList* GetParametersAsStringList() const;
-  //@}
+  ///@}
 
 protected:
   vtkCPPythonScriptV2Helper();

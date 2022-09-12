@@ -105,7 +105,7 @@ public:
    */
   static int GetExitCode() { return vtkInitializationHelper::ExitCode; }
 
-  //@{
+  ///@{
   /**
    * Initialization for standalone executables linking against a PV
    * library. This is needed to insure that linker does not remove object
@@ -114,9 +114,9 @@ public:
    */
   static void StandaloneInitialize();
   static void StandaloneFinalize();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * During initialization, vtkInitializationHelper reads "settings" files for
    * configuring vtkSMSettings. To disable this processing of the settings file
@@ -124,25 +124,25 @@ public:
    */
   static void SetLoadSettingsFilesDuringInitialization(bool);
   static bool GetLoadSettingsFilesDuringInitialization();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the organization producing this application. This is
    * "ParaView" by default, but can be different for branded applications.
    */
   static void SetOrganizationName(const std::string& organizationName);
   static const std::string& GetOrganizationName();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Sets the name of the application. This is "ParaView" by default, but
    * can be different for branded applications.
    */
   static void SetApplicationName(const std::string& appName);
   static const std::string& GetApplicationName();
-  //@}
+  ///@}
 
   /**
    * Get directory for user settings file. The last character is always the

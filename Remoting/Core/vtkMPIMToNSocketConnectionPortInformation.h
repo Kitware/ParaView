@@ -46,13 +46,13 @@ public:
    */
   int GetNumberOfConnections();
 
-  //@{
+  ///@{
   /**
    * Access information about a particular process.
    */
   int GetProcessPort(unsigned int processNumber);
   const char* GetProcessHostName(unsigned int processNumber);
-  //@}
+  ///@}
 
   /**
    * Transfer information about a single object into this object.
@@ -64,13 +64,13 @@ public:
    */
   void AddInformation(vtkPVInformation*) override;
 
-  //@{
+  ///@{
   /**
    * Manage a serialized version of the information.
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  ///@}
 
 protected:
   vtkMPIMToNSocketConnectionPortInformation();
