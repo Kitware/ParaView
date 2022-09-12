@@ -140,7 +140,7 @@ pqArrayListWidget::pqArrayListWidget(QWidget* parent)
   this->TableView->setColumnHidden(pqAnnotationsModel::OPACITY, true);
   this->TableView->setColumnHidden(pqAnnotationsModel::VISIBILITY, true);
 
-  this->connect(this->TableView, SIGNAL(widgetModified), SLOT(updateProperty));
+  this->connect(this->TableView, SIGNAL(widgetModified), SLOT(updateProperty()));
   QObject::connect(
     this->Model, &pqArrayListModel::dataChanged, this, &pqArrayListWidget::updateProperty);
 }
