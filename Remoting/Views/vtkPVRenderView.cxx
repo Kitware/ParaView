@@ -158,6 +158,7 @@ public:
     (void)prop;
     (void)rep;
   }
+  void ClearSelectionProps() { this->PropMap.clear(); }
 
   vtkPVDataRepresentation* GetRepresentationForPropId(int id)
   {
@@ -372,7 +373,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->LastSelection = nullptr;
   this->UseInteractiveRenderingForScreenshots = false;
-  this->Selector = vtkPVHardwareSelector::New();
+  this->Selector = vtkSmartPointer<vtkPVHardwareSelector>::New();
   this->Selector->SetView(this); // not reference counted.
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
@@ -533,7 +534,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->GetRenderer()->SetRenderWindow(nullptr);
 
   this->SetLastSelection(nullptr);
-  this->Selector->Delete();
   this->SynchronizedRenderers->Delete();
   this->NonCompositedRenderer->Delete();
   this->RenderView->Delete();
@@ -3648,4 +3648,14 @@ void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* ma
     *maxPointId = static_cast<vtkIdType>(ptid);
     *maxCellId = static_cast<vtkIdType>(cellid);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetHardwareSelector(vtkPVHardwareSelector* selector)
+{
+  // Clear selection props registered with the previous hardware selector
+  this->Internals->ClearSelectionProps();
+
+  this->Selector = selector;
+  this->Selector->SetView(this); // not reference counted.
 }

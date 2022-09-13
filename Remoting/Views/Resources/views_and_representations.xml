@@ -3219,6 +3219,13 @@
                      default_values="None">
         <Documentation>Container for a set of material specifications.</Documentation>
       </ProxyProperty>
+      <ProxyProperty command="SetHardwareSelector"
+                     name="SetHardwareSelector">
+        <ProxyGroupDomain name="groups">
+          <Group name="HardwareSelectors" />
+        </ProxyGroupDomain>
+        <Documentation>Set the hardware selector hold by the view.</Documentation>
+      </ProxyProperty>
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
         <Property name="OrientationAxesInteractivity"/>

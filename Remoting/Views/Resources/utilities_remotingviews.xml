@@ -3385,4 +3385,12 @@
 
     <!-- end of "screenshot_writers" -->
   </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="HardwareSelectors">
+    <Proxy name="PVHardwareSelector"
+           class="vtkPVHardwareSelector">
+    </Proxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

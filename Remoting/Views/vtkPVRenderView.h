@@ -1057,6 +1057,11 @@ public:
    */
   void SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* maxCellId);
 
+  /**
+   *
+   */
+  void SetHardwareSelector(vtkPVHardwareSelector* selector);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;
@@ -1179,7 +1184,7 @@ protected:
   vtkInteractorStyleDrawPolygon* PolygonStyle;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
-  vtkPVHardwareSelector* Selector;
+  vtkSmartPointer<vtkPVHardwareSelector> Selector;
   vtkSelection* LastSelection;
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
   vtkNew<vtkSkybox> Skybox;

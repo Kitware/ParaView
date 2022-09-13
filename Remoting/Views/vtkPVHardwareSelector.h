@@ -47,9 +47,10 @@ public:
   void SetView(vtkPVRenderView* view);
 
   /**
-   * Overridden to avoid clearing of captured buffers.
+   * Perform the selection over the specified region.
+   * Avoid clearing of captured buffers.
    */
-  vtkSelection* Select(int region[4]);
+  virtual vtkSelection* Select(int region[4]);
 
   /**
    * Same as Select() above, except this one use a polygon, instead
