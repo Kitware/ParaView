@@ -1,6 +1,0 @@
-<VTKFile type="vtkMultiBlockDataSet" version="1.0" byte_order="LittleEndian" header_type="UInt64">
-  <vtkMultiBlockDataSet>
-    <DataSet index="0" name="HTG0" file="HTGMulti/HTGMulti_0_0.htg"/>
-    <DataSet index="1" name="HTG1" file="HTGMulti/HTGMulti_1_0.htg"/>
-  </vtkMultiBlockDataSet>
-</VTKFile>
