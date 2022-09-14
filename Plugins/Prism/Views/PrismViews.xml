@@ -1,0 +1,225 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="views">
+    <!--======================================================================-->
+    <PrismViewProxy base_proxygroup="views"
+                    base_proxyname="RenderView"
+                    class="vtkPrismView"
+                    name="PrismView"
+                    label="Prism View"
+                    processes="client|renderserver|dataserver">
+      <Documentation>
+        View proxy for 3D interactive Prism render view.
+      </Documentation>
+      <IntVectorProperty command="SetEnableThresholding"
+                         default_values="0"
+                         name="EnableThresholding"
+                         label="Enable Thresholding"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When on, Thresholding is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="PrismBounds"
+                            command="GetPrismBounds"
+                            information_only="1"
+                            default_values="0.0 -1.0 0.0 -1.0 0.0 -1.0"
+                            number_of_elements="6">
+        <SimpleDoubleInformationHelper/>
+        <Documentation>
+          Get the prism bounds.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLowerThresholdX"
+                            default_values="0"
+                            name="LowerThresholdX"
+                            label="Lower Threshold"
+                            number_of_elements="1">
+        <PrismThresholdRangeDomain name="range" default_mode="min" axis_id="0">
+          <RequiredProperties>
+            <Property function="Bounds"
+                      name="PrismBounds"/>
+          </RequiredProperties>
+        </PrismThresholdRangeDomain>
+        <Documentation>
+          The value of this property specifies the lower bound of the thresholding operation of X Axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EnableThresholding" value="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThresholdX"
+                            default_values="0"
+                            name="UpperThresholdX"
+                            label="Upper Threshold"
+                            number_of_elements="1">
+        <PrismThresholdRangeDomain name="range" default_mode="max" axis_id="0">
+          <RequiredProperties>
+            <Property function="Bounds"
+                      name="PrismBounds"/>
+          </RequiredProperties>
+        </PrismThresholdRangeDomain>
+        <Documentation>
+          The value of this property specifies the upper bound of the thresholding operation of X Axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EnableThresholding" value="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLowerThresholdY"
+                            default_values="0"
+                            name="LowerThresholdY"
+                            label="Lower Threshold"
+                            number_of_elements="1">
+        <PrismThresholdRangeDomain name="range" default_mode="min" axis_id="1">
+          <RequiredProperties>
+            <Property function="Bounds"
+                      name="PrismBounds"/>
+          </RequiredProperties>
+        </PrismThresholdRangeDomain>
+        <Documentation>
+          The value of this property specifies the lower bound of the thresholding operation of Y Axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EnableThresholding" value="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThresholdY"
+                            default_values="0"
+                            name="UpperThresholdY"
+                            label="Upper Threshold"
+                            number_of_elements="1">
+        <PrismThresholdRangeDomain name="range" default_mode="max" axis_id="1">
+          <RequiredProperties>
+            <Property function="Bounds"
+                      name="PrismBounds"/>
+          </RequiredProperties>
+        </PrismThresholdRangeDomain>
+        <Documentation>
+          The value of this property specifies the upper bound of the thresholding operation of Y Axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EnableThresholding" value="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLowerThresholdZ"
+                            default_values="0"
+                            name="LowerThresholdZ"
+                            label="Lower Threshold"
+                            number_of_elements="1">
+        <PrismThresholdRangeDomain name="range" default_mode="min" axis_id="2">
+          <RequiredProperties>
+            <Property function="Bounds"
+                      name="PrismBounds"/>
+          </RequiredProperties>
+        </PrismThresholdRangeDomain>
+        <Documentation>
+          The value of this property specifies the lower bound of the thresholding operation of Z Axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EnableThresholding" value="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThresholdZ"
+                            default_values="0"
+                            name="UpperThresholdZ"
+                            label="Upper Threshold"
+                            number_of_elements="1">
+        <PrismThresholdRangeDomain name="range" default_mode="max" axis_id="2">
+          <RequiredProperties>
+            <Property function="Bounds"
+                      name="PrismBounds"/>
+          </RequiredProperties>
+        </PrismThresholdRangeDomain>
+        <Documentation>
+          The value of this property specifies the upper bound of the thresholding operation of Z Axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EnableThresholding" value="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetLogScaleX"
+                         default_values="0"
+                         name="LogScaleX"
+                         label="Use log scaling"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When on, X axis is log scaled.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLogScaleY"
+                         default_values="0"
+                         name="LogScaleY"
+                         label="Use log scaling"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When on, Y axis is log scaled.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLogScaleZ"
+                         default_values="0"
+                         name="LogScaleZ"
+                         label="Use log scaling"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When on, Z axis is log scaled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="XAxisName"
+                            command="GetXAxisName"
+                            information_only="1">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty name="YAxisName"
+                            command="GetYAxisName"
+                            information_only="1">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty name="ZAxisName"
+                            command="GetZAxisName"
+                            information_only="1">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty animateable="1"
+                            command="SetAspectRatio"
+                            default_values="1.0 1.0 1.0"
+                            name="AspectRatio"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the aspect ratio of the data.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="X Axis">
+        <Property name="LowerThresholdX"/>
+        <Property name="UpperThresholdX"/>
+        <Property name="LogScaleX"/>
+      </PropertyGroup>
+      <PropertyGroup label="Y Axis">
+        <Property name="LowerThresholdY"/>
+        <Property name="UpperThresholdY"/>
+        <Property name="LogScaleY"/>
+      </PropertyGroup>
+      <PropertyGroup label="Z Axis">
+        <Property name="LowerThresholdZ"/>
+        <Property name="UpperThresholdZ"/>
+        <Property name="LogScaleZ"/>
+      </PropertyGroup>
+      <PropertyGroup label="Scaling">
+        <Property name="AspectRatio"/>
+      </PropertyGroup>
+    </PrismViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
