@@ -685,25 +685,27 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
     }
   }
 
-  vtkPVDataInformation* dataInformation = nullptr;
-  if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
   {
-    dataInformation = port->GetDataInformation();
-  }
-
-  // check if the data type is a vtkTable with a single row and column with
-  // a vtkStringArray named "Text". If it is, we render this in a render view
-  // with the value shown in the view.
-  if (dataInformation)
-  {
-    if (dataInformation->GetDataSetType() == VTK_TABLE)
+    vtkPVDataInformation* dataInformation = nullptr;
+    if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
     {
-      if (vtkPVArrayInformation* ai =
-            dataInformation->GetArrayInformation("Text", vtkDataObject::ROW))
+      dataInformation = port->GetDataInformation();
+    }
+
+    // check if the data type is a vtkTable with a single row and column with
+    // a vtkStringArray named "Text". If it is, we render this in a render view
+    // with the value shown in the view.
+    if (dataInformation)
+    {
+      if (dataInformation->GetDataSetType() == VTK_TABLE)
       {
-        if (ai->GetNumberOfComponents() == 1 && ai->GetNumberOfTuples() == 1)
+        if (vtkPVArrayInformation* ai =
+              dataInformation->GetArrayInformation("Text", vtkDataObject::ROW))
         {
-          return "TextSourceRepresentation";
+          if (ai->GetNumberOfComponents() == 1 && ai->GetNumberOfTuples() == 1)
+          {
+            return "TextSourceRepresentation";
+          }
         }
       }
     }
