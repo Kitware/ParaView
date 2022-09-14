@@ -1663,6 +1663,14 @@ found and the point will be rejected.</Documentation>
         triangles/lines to include in a triangle strip or
         polyline.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetJoinContiguousSegments"
+                         default_values="0"
+                         name="JoinContiguousSegments"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Connect contiguous lines into one polyline. Defaults to
+        off.</Documentation>
+      </IntVectorProperty>
       <!-- End Stripper -->
     </SourceProxy>
 
