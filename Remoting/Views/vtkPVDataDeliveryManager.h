@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program: ParaView
-  Module:  vtkPVDataDeliveryManager
+  Module:  vtkPVDataDeliveryManager.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

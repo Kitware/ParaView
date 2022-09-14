@@ -20,12 +20,14 @@ set(modules
   Prism::vtkPrismFilters
   Prism::vtkPrismReaders
   Prism::vtkPrismServerManager
+  Prism::vtkPrismViews
   )
 
 set(module_files
   "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
   "${CMAKE_CURRENT_SOURCE_DIR}/Readers/vtk.module"
   "${CMAKE_CURRENT_SOURCE_DIR}/ServerManager/vtk.module"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Views/vtk.module"
   )
 
 paraview_add_plugin(Prism

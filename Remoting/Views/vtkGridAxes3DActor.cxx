@@ -74,18 +74,6 @@ vtkGridAxes3DActor::vtkGridAxes3DActor()
   this->SetFaceMask(
     vtkGridAxes3DActor::MIN_XY | vtkGridAxes3DActor::MIN_YZ | vtkGridAxes3DActor::MIN_ZX);
   this->SetLabelMask(0xff);
-
-#if 0
-  const double cob[] = {
-    1,	0,	0,	0,
-    1,	0.9,	0.5,	0,
-    0,	0.5,	1,	0,
-    0,	0,	0,	1
-  };
-  vtkNew<vtkMatrix4x4> changeOfBasis;
-  changeOfBasis->DeepCopy(cob);
-  this->SetUserMatrix(changeOfBasis.GetPointer());
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -264,6 +252,22 @@ void vtkGridAxes3DActor::SetPrecision(int axis, int val)
     }
     this->Modified();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkGridAxes3DActor::SetTickLabelFunction(int axis, std::function<double(double)> func)
+{
+  for (int cc = 0; cc < 6; cc++)
+  {
+    this->GridAxes2DActors[cc]->SetTickLabelFunction(axis, func);
+  }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+std::function<double(double)> vtkGridAxes3DActor::GetTickLabelFunction(int axis)
+{
+  return this->GridAxes2DActors[0]->GetTickLabelFunction(axis);
 }
 
 //----------------------------------------------------------------------------
