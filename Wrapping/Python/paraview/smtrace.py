@@ -699,13 +699,17 @@ class PropertyTraceHelper(object):
                     ports = [myobject.GetOutputPortForConnection(x) for x in range(len(data))]
                     data = [src if port==0 else "OutputPort(%s,%d)" % (src,port) \
                             for src,port in zip(data, ports)]
-            try:
-                if len(data) > 1:
-                  return "[%s]" % (", ".join(data))
+
+            if len(data) > 1:
+                return "[%s]" % (", ".join(data))
+            elif len(data) == 0:
+                # Special case for repeatable, should return [] rather than None
+                if myobject.SMProperty.GetRepeatable():
+                    return "[]"
                 else:
-                  return data[0]
-            except IndexError:
-                return "None"
+                    return "None"
+            else:
+                return data[0]
         elif myobject.SMProperty.IsA("vtkSMStringVectorProperty") and not (fileListDomain and fileListDomain.GetIsOptional() == 0):
             # handle multiline properties (see #18480)
             # but, not if the property is a list of files (see #21100)
