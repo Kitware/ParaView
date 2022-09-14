@@ -261,11 +261,30 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          When checked, the reader will use pattern matching to detect FlowSolution_t
-          that are relevant for the current timestep. It rely on **FlowSolution_t**
-          nodes being labelled as **...AtStep[tsindex]** to locate
-          solution nodes for a specific timestep. Note, ***tsindex*** starts with 1.
+          When checked, the reader will use pattern matching to detect *FlowSolution_t*
+          nodes that are relevant for the current timestep. It relies on *FlowSolution_t*
+          nodes ending in *"...[tsIndex]"* to locate solution nodes for a specific timestep.
+          The starting index for *tsindex* should be specified with the property "First
+          Timestep Index For Unsteady Solution".
         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUnsteadySolutionStartTimestep"
+                         name="UnsteadySolutionStartTimestep"
+                         label="First Timestep Index For Unsteady Solution"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Starting timestep index when reading unsteady solutions.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseUnsteadyPattern"
+                                   value="1" />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="Use3DVector"
@@ -346,6 +365,7 @@
           <Property name="CreateEachSolutionAsBlock" />
           <Property name="IgnoreFlowSolutionPointers" />
           <Property name="UseUnsteadyPattern" />
+          <Property name="UnsteadySolutionStartTimestep" />
           <Property name="Use3DVector" />
         </ExposedProperties>
       </SubProxy>
