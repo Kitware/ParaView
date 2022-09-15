@@ -12,6 +12,7 @@ DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
   VTK::FiltersParallel
+  VTK::FiltersGeometryPreview
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsAMR
   ParaView::VTKExtensionsCore

@@ -3840,6 +3840,149 @@ Every Nth Point.
       <!-- End MergeVectorComponents -->
    </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointSetToOctreeImageFilter"
+                 name="PointSetToOctreeImage"
+                 label="PointSet To Octree Image">
+      <Documentation
+              long_help="Convert a point set to an octree image."
+              short_help="Convert a point set to an octree  image.">
+        PointSetToOctreeImage can be used to convert a point set to an image with a number of points per cell
+        target and an unsigned char octree cell array. Each bit of the unsigned char indicates if the point-set had a
+        point close to one of the 8 corners of the cell. It can optionally also output a cell array based on an input
+        point array. This array will have 1 or many components that represent different functions i.e. last value, min,
+        max, count, sum, mean.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="point_scalar_arrays"
+                          attribute_type="point"
+                          number_of_components="1"
+                          optional="1"/>
+      </InputProperty>
+      <IntVectorProperty command="SetNumberOfPointsPerCell"
+                         name="NumberOfPointsPerCell"
+                         default_values="1"
+                         number_of_elements="1">
+        <Documentation>
+          Set the average number of points in each cell of the output image.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProcessInputPointArray"
+                         name="ProcessInputPointArray"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if input point array should be processed.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeLastValue"
+                         name="ComputeLastValue"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the last value for each cell id of the point array will be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeMin"
+                         name="ComputeMin"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the min value for each cell id of the point array will be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeMax"
+                         name="ComputeMax"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the max value for each cell id of the point array will be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeCount"
+                         name="ComputeCount"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the count of the values for each cell id of the point array will be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeSum"
+                         name="ComputeSum"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the sum of the values for each cell id of the point array will be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeMean"
+                         name="ComputeMean"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if the mean value for each cell id of the point array will be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Point Array"
+                            name="SelectInputPointArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list" input_domain_name="point_scalar_arrays">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The value of this property contains the name of the scalar point array to be processed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputPointArray"
+                                   value="1"/>
+        </Hints>
+      </StringVectorProperty>
+    </SourceProxy>
+
    <!-- ==================================================================== -->
    <SourceProxy class="vtkMultiObjectMassProperties"
                 label="Compute Connected Surface Properties"
