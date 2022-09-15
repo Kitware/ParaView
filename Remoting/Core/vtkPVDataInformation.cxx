@@ -598,7 +598,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
   {
     return;
   }
-  if (this->DataSetType == -1)
+  if (this->CompositeDataSetType == -1 && this->DataSetType == -1)
   {
     this->DeepCopy(other);
     return;

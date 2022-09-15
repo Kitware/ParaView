@@ -685,12 +685,17 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
     }
   }
 
-  // check if the data type is a vtkTable with a single row and column with
-  // a vtkStringArray named "Text". If it is, we render this in a render view
-  // with the value shown in the view.
-  if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
   {
-    if (vtkPVDataInformation* dataInformation = port->GetDataInformation())
+    vtkPVDataInformation* dataInformation = nullptr;
+    if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
+    {
+      dataInformation = port->GetDataInformation();
+    }
+
+    // check if the data type is a vtkTable with a single row and column with
+    // a vtkStringArray named "Text". If it is, we render this in a render view
+    // with the value shown in the view.
+    if (dataInformation)
     {
       if (dataInformation->GetDataSetType() == VTK_TABLE)
       {
@@ -705,6 +710,21 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       }
     }
   }
+
+  // Default to "GeometryRepresentation" for composite datasets where we
+  // might not yet know the dataset type of the children at the time the
+  // representation is created.
+  if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
+  {
+    if (vtkPVDataInformation* dataInformation = port->GetDataInformation())
+    {
+      if (dataInformation->IsCompositeDataSet())
+      {
+        return "GeometryRepresentation";
+      }
+    }
+  }
+
   return nullptr;
 }
 
