@@ -37,6 +37,7 @@
 
 class vtkAlgorithmOutput;
 class vtkCamera;
+class vtkCameraOrientationWidget;
 class vtkCuller;
 class vtkExtentTranslator;
 class vtkFloatArray;
@@ -623,6 +624,13 @@ public:
   void SetOrientationAxesOutlineColor(double r, double g, double b);
 
   //*****************************************************************
+  // Forwarded to camera orientation widget.
+  void SetCameraOrientationWidgetVisibility(bool visible);
+  void SetCameraOrientationWidgetSize(int size);
+  void SetCameraOrientationWidgetPadding(int padding[2]);
+  void SetCameraOrientationWidgetAnchor(int anchor);
+
+  //*****************************************************************
   // Forwarded to center axes.
   virtual void SetCenterAxesVisibility(bool);
 
@@ -1183,6 +1191,7 @@ protected:
   vtkSelection* LastSelection;
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
   vtkNew<vtkSkybox> Skybox;
+  vtkNew<vtkCameraOrientationWidget> CameraOrientationWidget;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;

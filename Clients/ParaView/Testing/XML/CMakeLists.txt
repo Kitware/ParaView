@@ -851,6 +851,7 @@ endif()
 
 SET(TESTS_WITH_BASELINES
   BDFReader.xml
+  CameraOrientationWidget.xml
   DataAxesGrid.xml
   MergeVectorComponents.xml
   MoleculeScalarBar.xml
