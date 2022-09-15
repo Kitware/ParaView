@@ -1798,6 +1798,17 @@
           </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetKeepDeadTrails"
+                     panel_visibility="advanced"
+                     default_values="0"
+                     name="KeepDeadTrails"
+                     number_of_elements="1">
+          <BooleanDomain name="bool" />
+          <Documentation>Keep the trails of particles that leave the domain.
+          Use carefully as it may cause excessive memory consumption when generating many particle trails.
+          </Documentation>
+      </IntVectorProperty>
+
       <!-- End TemporalPathLineFilter -->
     </SourceProxy>
 
@@ -2481,7 +2492,6 @@
         </ArrayListDomain>
         <Documentation>Specify the displacement vectors array</Documentation>
       </StringVectorProperty>
-
 
       <IntVectorProperty command="GetModeShapesRange"
                          information_only="1"

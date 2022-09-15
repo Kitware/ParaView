@@ -876,6 +876,7 @@ SET(TESTS_WITH_BASELINES
   SeriesPreset.xml
   SeriesPresetRegexp.xml
   ShowMultiPieceFieldData.xml
+  TemporalParticleKeepDeadTrails.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
   TestResampleHyperTreeGridWithSphere.xml
