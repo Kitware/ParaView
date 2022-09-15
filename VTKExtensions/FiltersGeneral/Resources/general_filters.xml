@@ -3983,7 +3983,90 @@ Every Nth Point.
       </StringVectorProperty>
     </SourceProxy>
 
-   <!-- ==================================================================== -->
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkOctreeImageToPointSetFilter"
+                 name="OctreeImageToPointSet"
+                 label="Octree Image to PointSet">
+      <Documentation
+              long_help="Convert an octree image to point set."
+              short_help="Convert an octree image to point set.">
+        OctreeImageToPointSet can be used to convert an image with an unsigned char octree cell array to a point
+        set. Each bit of the unsigned char indicates if the cell had a point close to one of its 8 corners.
+        It can optionally also output a point array based on an input cell array. This array will have 1 of the
+        components of the input array.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="cell_arrays"
+                          attribute_type="cell"
+                          optional="1"/>
+      </InputProperty>
+      <IntVectorProperty command="SetCreateVerticesCellArray"
+                         default_values="1"
+                         name="CreateVerticesCellArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set whether a cell array of vertices will be created.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProcessInputCellArray"
+                         name="ProcessInputCellArray"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set if input cell array should be processed.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Cell Array"
+                            name="SelectInputCellArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The value of this property contains the name of the cell array to be processed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ProcessInputCellArray"
+                                   value="1"/>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetCellArrayComponent"
+                         default_values="0"
+                         name="Component"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="0">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="ArraySelection"
+                      name="SelectInputCellArray"/>
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          The value of this property specifies the array component
+          that will be extracted from the cell array.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
    <SourceProxy class="vtkMultiObjectMassProperties"
                 label="Compute Connected Surface Properties"
                 name="ComputeConnectedSurfaceProperties">

@@ -292,6 +292,7 @@
   <Proxy group="filters" name="MulticorrelativeStatistics" />
   <Proxy group="filters" name="NonOverlappingLevelIdScalars" />
   <Proxy group="filters" name="NormalGlyphs" />
+  <Proxy group="filters" name="OctreeImageToPointSet"/>
   <Proxy group="filters" name="OMETIFFChannelCalculator" />
   <Proxy group="filters" name="OTDensityMap" />
   <Proxy group="filters" name="OTKernelSmoothing" />
