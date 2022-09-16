@@ -215,7 +215,7 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   pqProxyWidgetDialog dialog(shProxy, pqCoreUtilities::mainWidget());
   dialog.setObjectName("SaveScreenshotDialog");
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle("Save Screenshot Options");
+  dialog.setWindowTitle(tr("Save Screenshot Options"));
   dialog.setEnableSearchBar(true);
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)

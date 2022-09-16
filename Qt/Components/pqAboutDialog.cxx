@@ -81,8 +81,8 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent)
   }
 
   // get extra information and put it in
-  this->Ui->VersionLabel->setText(
-    QString("<html><b>Version: <i>%1</i></b></html>").arg(QString(PARAVIEW_VERSION_FULL)));
+  this->Ui->VersionLabel->setText("<html><b>" + tr("Version: ") +
+    QString("<i>%1</i></b></html>").arg(QString(PARAVIEW_VERSION_FULL)));
   this->AddClientInformation();
   this->AddServerInformation();
 }
@@ -111,64 +111,66 @@ void pqAboutDialog::AddClientInformation()
 
   QTreeWidget* tree = this->Ui->ClientInformation;
 
-  ::addItem(tree, "Version", QString(PARAVIEW_VERSION_FULL));
-  ::addItem(tree, "VTK Version", QString(vtkVersion::GetVTKVersionFull()));
-  ::addItem(tree, "Qt Version", QT_VERSION_STR);
+  ::addItem(tree, tr("Version"), QString(PARAVIEW_VERSION_FULL));
+  ::addItem(tree, tr("VTK Version"), QString(vtkVersion::GetVTKVersionFull()));
+  ::addItem(tree, tr("Qt Version"), QT_VERSION_STR);
 
-  ::addItem(tree, "vtkIdType size", QString("%1bits").arg(8 * sizeof(vtkIdType)));
+  ::addItem(tree, tr("vtkIdType size"), tr("%1bits").arg(8 * sizeof(vtkIdType)));
 
   vtkNew<vtkPVPythonInformation> pythonInfo;
   pythonInfo->CopyFromObject(nullptr);
 
-  ::addItem(tree, "Embedded Python", pythonInfo->GetPythonSupport() ? "On" : "Off");
+  ::addItem(tree, tr("Embedded Python"), pythonInfo->GetPythonSupport() ? tr("On") : tr("Off"));
   if (pythonInfo->GetPythonSupport())
   {
-    ::addItem(tree, "Python Library Path", QString::fromStdString(pythonInfo->GetPythonPath()));
+    ::addItem(tree, tr("Python Library Path"), QString::fromStdString(pythonInfo->GetPythonPath()));
     ::addItem(
-      tree, "Python Library Version", QString::fromStdString(pythonInfo->GetPythonVersion()));
+      tree, tr("Python Library Version"), QString::fromStdString(pythonInfo->GetPythonVersion()));
 
-    ::addItem(tree, "Python Numpy Support", pythonInfo->GetNumpySupport() ? "On" : "Off");
+    ::addItem(
+      tree, tr("Python Numpy Support"), pythonInfo->GetNumpySupport() ? tr("On") : tr("Off"));
     if (pythonInfo->GetNumpySupport())
     {
-      ::addItem(tree, "Python Numpy Path", QString::fromStdString(pythonInfo->GetNumpyPath()));
+      ::addItem(tree, tr("Python Numpy Path"), QString::fromStdString(pythonInfo->GetNumpyPath()));
       ::addItem(
-        tree, "Python Numpy Version", QString::fromStdString(pythonInfo->GetNumpyVersion()));
+        tree, tr("Python Numpy Version"), QString::fromStdString(pythonInfo->GetNumpyVersion()));
     }
 
-    ::addItem(tree, "Python Matplotlib Support", pythonInfo->GetMatplotlibSupport() ? "On" : "Off");
+    ::addItem(tree, tr("Python Matplotlib Support"),
+      pythonInfo->GetMatplotlibSupport() ? tr("On") : tr("Off"));
     if (pythonInfo->GetMatplotlibSupport())
     {
-      ::addItem(
-        tree, "Python Matplotlib Path", QString::fromStdString(pythonInfo->GetMatplotlibPath()));
-      ::addItem(tree, "Python Matplotlib Version",
+      ::addItem(tree, tr("Python Matplotlib Path"),
+        QString::fromStdString(pythonInfo->GetMatplotlibPath()));
+      ::addItem(tree, tr("Python Matplotlib Version"),
         QString::fromStdString(pythonInfo->GetMatplotlibVersion()));
     }
   }
 
 #if defined(QT_TESTING_WITH_PYTHON)
-  ::addItem(tree, "Python Testing", "On");
+  ::addItem(tree, tr("Python Testing"), tr("On"));
 #else
-  ::addItem(tree, "Python Testing", "Off");
+  ::addItem(tree, tr("Python Testing"), tr("Off"));
 #endif
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
-  ::addItem(tree, "MPI Enabled", "On");
+  ::addItem(tree, tr("MPI Enabled"), tr("On"));
 #else
-  ::addItem(tree, "MPI Enabled", "Off");
+  ::addItem(tree, tr("MPI Enabled"), tr("Off"));
 #endif
 
 #ifdef PARAVIEW_BUILD_ID
-  ::addItem(tree, "ParaView Build ID", PARAVIEW_BUILD_ID);
+  ::addItem(tree, tr("ParaView Build ID"), PARAVIEW_BUILD_ID);
 #endif
 
   auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
   auto pqConfig = pqCoreConfiguration::instance();
-  ::addItem(tree, "Disable Registry", coreConfig->GetDisableRegistry() ? "On" : "Off");
-  ::addItem(tree, "Test Directory", QString::fromStdString(pqConfig->testDirectory()));
-  ::addItem(tree, "Data Directory", QString::fromStdString(pqConfig->dataDirectory()));
+  ::addItem(tree, tr("Disable Registry"), coreConfig->GetDisableRegistry() ? tr("On") : tr("Off"));
+  ::addItem(tree, tr("Test Directory"), QString::fromStdString(pqConfig->testDirectory()));
+  ::addItem(tree, tr("Data Directory"), QString::fromStdString(pqConfig->dataDirectory()));
 
-  ::addItem(tree, "SMP Backend", vtkSMPTools::GetBackend());
-  ::addItem(tree, "SMP Max Number of Threads", vtkSMPTools::GetEstimatedNumberOfThreads());
+  ::addItem(tree, tr("SMP Backend"), vtkSMPTools::GetBackend());
+  ::addItem(tree, tr("SMP Max Number of Threads"), vtkSMPTools::GetEstimatedNumberOfThreads());
 
   // For local OpenGL info, we ask Qt, as that's more truthful anyways.
   QOpenGLContext* ctx = QOpenGLContext::currentContext();
@@ -177,15 +179,15 @@ void pqAboutDialog::AddClientInformation()
     const char* glVendor = reinterpret_cast<const char*>(f->glGetString(GL_VENDOR));
     const char* glRenderer = reinterpret_cast<const char*>(f->glGetString(GL_RENDERER));
     const char* glVersion = reinterpret_cast<const char*>(f->glGetString(GL_VERSION));
-    ::addItem(tree, "OpenGL Vendor", glVendor);
-    ::addItem(tree, "OpenGL Version", glVersion);
-    ::addItem(tree, "OpenGL Renderer", glRenderer);
+    ::addItem(tree, tr("OpenGL Vendor"), glVendor);
+    ::addItem(tree, tr("OpenGL Version"), glVersion);
+    ::addItem(tree, tr("OpenGL Renderer"), glRenderer);
   }
 
 #if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VTKM_OVERRIDES
-  ::addItem(tree, "Accelerated filters overrides available", "Yes");
+  ::addItem(tree, tr("Accelerated filters overrides available"), tr("Yes"));
 #else
-  ::addItem(tree, "Accelerated filters overrides available", "No");
+  ::addItem(tree, tr("Accelerated filters overrides available"), tr("No"));
 #endif
 
   tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -210,7 +212,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   vtkPVServerInformation* serverInfo = server->getServerInformation();
   if (!server->isRemote())
   {
-    ::addItem(tree, "Remote Connection", "No");
+    ::addItem(tree, tr("Remote Connection"), tr("No"));
     return;
   }
 
@@ -218,54 +220,57 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   QString scheme = resource.scheme();
   bool separate_render_server = (scheme == "cdsrs" || scheme == "cdsrsrc");
   bool reverse_connection = (scheme == "csrc" || scheme == "cdsrsrc");
-  ::addItem(tree, "Remote Connection", "Yes");
-  ::addItem(tree, "Separate Render Server", separate_render_server ? "Yes" : "No");
-  ::addItem(tree, "Reverse Connection", reverse_connection ? "Yes" : "No");
+  ::addItem(tree, tr("Remote Connection"), tr("Yes"));
+  ::addItem(tree, tr("Separate Render Server"), separate_render_server ? tr("Yes") : tr("No"));
+  ::addItem(tree, tr("Reverse Connection"), reverse_connection ? tr("Yes") : tr("No"));
 
   // TODO: handle separate render server partitions.
-  ::addItem(tree, "Number of Processes", server->getNumberOfPartitions());
+  ::addItem(tree, tr("Number of Processes"), server->getNumberOfPartitions());
 
-  ::addItem(tree, "Disable Remote Rendering", serverInfo->GetRemoteRendering() ? "Off" : "On");
-  ::addItem(tree, "IceT", serverInfo->GetUseIceT() ? "On" : "Off");
+  ::addItem(
+    tree, tr("Disable Remote Rendering"), serverInfo->GetRemoteRendering() ? tr("Off") : tr("On"));
+  ::addItem(tree, tr("IceT"), qPrintable(serverInfo->GetUseIceT() ? tr("On") : tr("Off")));
 
   if (serverInfo->GetIsInTileDisplay())
   {
-    ::addItem(tree, "Tile Display", "On");
+    ::addItem(tree, tr("Tile Display"), tr("On"));
   }
   else
   {
-    ::addItem(tree, "Tile Display", "Off");
+    ::addItem(tree, tr("Tile Display"), tr("Off"));
   }
 
-  ::addItem(tree, "vtkIdType size", QString("%1bits").arg(serverInfo->GetIdTypeSize()));
+  ::addItem(tree, tr("vtkIdType size"), tr("%1bits").arg(serverInfo->GetIdTypeSize()));
 
-  ::addItem(tree, "SMP Backend", serverInfo->GetSMPBackendName().c_str());
-  ::addItem(tree, "SMP Max Number of Threads", serverInfo->GetSMPMaxNumberOfThreads());
+  ::addItem(tree, tr("SMP Backend"), serverInfo->GetSMPBackendName().c_str());
+  ::addItem(tree, tr("SMP Max Number of Threads"), serverInfo->GetSMPMaxNumberOfThreads());
 
   vtkSMSession* session = server->session();
   vtkNew<vtkPVPythonInformation> pythonInfo;
   session->GatherInformation(vtkPVSession::SERVERS, pythonInfo.GetPointer(), 0);
-  ::addItem(tree, "Embedded Python", pythonInfo->GetPythonSupport() ? "On" : "Off");
+  ::addItem(tree, tr("Embedded Python"), pythonInfo->GetPythonSupport() ? tr("On") : tr("Off"));
   if (pythonInfo->GetPythonSupport())
   {
-    ::addItem(tree, "Python Library Path", QString::fromStdString(pythonInfo->GetPythonPath()));
+    ::addItem(tree, tr("Python Library Path"), QString::fromStdString(pythonInfo->GetPythonPath()));
     ::addItem(
-      tree, "Python Library Version", QString::fromStdString(pythonInfo->GetPythonVersion()));
+      tree, tr("Python Library Version"), QString::fromStdString(pythonInfo->GetPythonVersion()));
 
-    ::addItem(tree, "Python Numpy Support", pythonInfo->GetNumpySupport() ? "On" : "Off");
+    ::addItem(
+      tree, tr("Python Numpy Support"), pythonInfo->GetNumpySupport() ? tr("On") : tr("Off"));
     if (pythonInfo->GetNumpySupport())
     {
-      ::addItem(tree, "Python Numpy Path", QString::fromStdString(pythonInfo->GetNumpyPath()));
+      ::addItem(tree, tr("Python Numpy Path"), QString::fromStdString(pythonInfo->GetNumpyPath()));
       ::addItem(
-        tree, "Python Numpy Version", QString::fromStdString(pythonInfo->GetNumpyVersion()));
+        tree, tr("Python Numpy Version"), QString::fromStdString(pythonInfo->GetNumpyVersion()));
     }
 
-    ::addItem(tree, "Python Matplotlib Support", pythonInfo->GetMatplotlibSupport() ? "On" : "Off");
+    ::addItem(tree, tr("Python Matplotlib Support"),
+      pythonInfo->GetMatplotlibSupport() ? tr("On") : tr("Off"));
     if (pythonInfo->GetMatplotlibSupport())
     {
-      ::addItem(
-        tree, "Python Matplotlib Path", QString::fromStdString(pythonInfo->GetMatplotlibPath()));
-      ::addItem(tree, "Python Matplotlib Version",
+      ::addItem(tree, tr("Python Matplotlib Path"),
+        QString::fromStdString(pythonInfo->GetMatplotlibPath()));
+      ::addItem(tree, tr("Python Matplotlib Version"),
         QString::fromStdString(pythonInfo->GetMatplotlibVersion()));
     }
   }
@@ -276,9 +281,9 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   {
     vtkNew<vtkPVOpenGLInformation> OpenGLInfo;
     session->GatherInformation(vtkPVSession::RENDER_SERVER, OpenGLInfo.GetPointer(), 0);
-    ::addItem(tree, "OpenGL Vendor", QString::fromStdString(OpenGLInfo->GetVendor()));
-    ::addItem(tree, "OpenGL Version", QString::fromStdString(OpenGLInfo->GetVersion()));
-    ::addItem(tree, "OpenGL Renderer", QString::fromStdString(OpenGLInfo->GetRenderer()));
+    ::addItem(tree, tr("OpenGL Vendor"), QString::fromStdString(OpenGLInfo->GetVendor()));
+    ::addItem(tree, tr("OpenGL Version"), QString::fromStdString(OpenGLInfo->GetVersion()));
+    ::addItem(tree, tr("OpenGL Renderer"), QString::fromStdString(OpenGLInfo->GetRenderer()));
 
     if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING))
     {
@@ -291,20 +296,20 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
       {
         headlessModes << "OSMesa";
       }
-      ::addItem(tree, "Headless support", QString::fromStdString(headlessModes.str()));
+      ::addItem(tree, tr("Headless support"), QString::fromStdString(headlessModes.str()));
     }
     else
     {
-      ::addItem(tree, "Headless support", "None");
+      ::addItem(tree, tr("Headless support"), tr("None"));
     }
   }
   else
   {
-    ::addItem(tree, "OpenGL", "Not supported");
+    ::addItem(tree, "OpenGL", tr("Not supported"));
   }
 
-  ::addItem(tree, "Accelerated filters overrides available",
-    serverInfo->GetAcceleratedFiltersOverrideAvailable() ? "Yes" : "No");
+  ::addItem(tree, tr("Accelerated filters overrides available"),
+    serverInfo->GetAcceleratedFiltersOverrideAvailable() ? tr("Yes") : tr("No"));
 }
 
 //-----------------------------------------------------------------------------
@@ -323,11 +328,11 @@ QString pqAboutDialog::formatToText(QTreeWidget* tree)
 //-----------------------------------------------------------------------------
 QString pqAboutDialog::formatToText()
 {
-  QString text = "Client Information:\n";
+  QString text = tr("Client Information:\n");
   QTreeWidget* tree = this->Ui->ClientInformation;
   text += this->formatToText(tree);
   tree = this->Ui->ServerInformation;
-  text += "\nConnection Information:\n";
+  text += tr("\nConnection Information:\n");
   text += this->formatToText(tree);
   return text;
 }
@@ -336,7 +341,7 @@ QString pqAboutDialog::formatToText()
 void pqAboutDialog::saveToFile()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save to File"), QString(),
-    "Text Files (*.txt);;All Files (*)");
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {

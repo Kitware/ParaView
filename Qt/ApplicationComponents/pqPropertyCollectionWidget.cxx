@@ -133,7 +133,7 @@ public:
       removeButton->setObjectName(QString::fromUtf8("removeButton"));
       removeButton->setIcon(QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete.svg")));
       removeButton->setToolTip(
-        QApplication::translate("PropertyCollectionWidget", "Remove", nullptr));
+        QCoreApplication::translate("PropertyCollectionWidget", "Remove", nullptr));
       removeButton->setProperty(
         "ParaView::PropertyCollectionWidget::index", static_cast<int>(this->Items.size()));
 

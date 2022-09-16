@@ -121,7 +121,7 @@ public:
       [self](int location, double fraction) {
         if (auto vlayout = self->layoutManager())
         {
-          BEGIN_UNDO_SET("Resize Frame");
+          BEGIN_UNDO_SET(QCoreApplication::translate("pqInternals", "Resize Frame"));
           vlayout->SetSplitFraction(location, fraction);
           END_UNDO_SET();
         }
@@ -756,7 +756,7 @@ void pqMultiViewWidget::standardButtonPressed(int button)
     case pqViewFrame::SplitVertical:
     case pqViewFrame::SplitHorizontal:
     {
-      BEGIN_UNDO_SET("Split View");
+      BEGIN_UNDO_SET(tr("Split View"));
       int new_index = this->layoutManager()->Split(index.toInt(),
         (button == pqViewFrame::SplitVertical ? vtkSMViewLayoutProxy::VERTICAL
                                               : vtkSMViewLayoutProxy::HORIZONTAL),
@@ -780,7 +780,7 @@ void pqMultiViewWidget::standardButtonPressed(int button)
 
     case pqViewFrame::Close:
     {
-      BEGIN_UNDO_SET("Close View");
+      BEGIN_UNDO_SET(tr("Close View"));
       vtkSmartPointer<vtkSMViewProxy> viewProxy = this->layoutManager()->GetView(index.toInt());
       if (viewProxy)
       {
@@ -810,7 +810,7 @@ void pqMultiViewWidget::standardButtonPressed(int button)
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::destroyAllViews()
 {
-  BEGIN_UNDO_SET("Destroy all views");
+  BEGIN_UNDO_SET(tr("Destroy all views"));
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   QList<vtkSMViewProxy*> views = this->viewProxies();
   Q_FOREACH (vtkSMViewProxy* view, views)
@@ -875,7 +875,7 @@ void pqMultiViewWidget::swapPositions(const QString& uid_str)
     return;
   }
 
-  BEGIN_UNDO_SET("Swap Views");
+  BEGIN_UNDO_SET(tr("Swap Views"));
   vlayout->SwapCells(id1, id2);
   END_UNDO_SET();
   this->reload();
@@ -955,7 +955,9 @@ QSize pqMultiViewWidget::preview(const QSize& nsize)
     }
     SM_SCOPED_TRACE(PropertiesModified)
       .arg("proxy", vlayout)
-      .arg("comment", nsize.isEmpty() ? "Exit preview mode" : "Enter preview mode");
+      .arg("comment",
+        nsize.isEmpty() ? qPrintable(tr("Exit preview mode"))
+                        : qPrintable(tr("Enter preview mode")));
 
     vtkSMPropertyHelper(vlayout, "PreviewMode").Set(resolution, 2);
     //< results in a call to "layoutPropertyModified" if changed.

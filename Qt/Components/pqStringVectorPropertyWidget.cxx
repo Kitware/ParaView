@@ -167,7 +167,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqFileChooserWidget`.");
     pqFileChooserWidget* chooser = new pqFileChooserWidget(this);
     chooser->setObjectName("FileChooser");
-    chooser->setTitle(QString("Select %1").arg(smProperty->GetXMLLabel()));
+    chooser->setTitle(tr("Select %1").arg(smProperty->GetXMLLabel()));
 
     // decide whether to allow multiple files
     if (smProperty->GetRepeatable())

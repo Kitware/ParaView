@@ -143,7 +143,7 @@ void pqAnimationShortcutWidget::onTriggered(QAction* action)
     this->Scene, this->Proxy, this->Property->GetXMLName(), 0);
   if (action->data().toInt() == 2)
   {
-    BEGIN_UNDO_SET("Remove Animation Track");
+    BEGIN_UNDO_SET(tr("Remove Animation Track"));
     this->Scene->removeCue(cue);
     END_UNDO_SET();
     return;
@@ -154,7 +154,7 @@ void pqAnimationShortcutWidget::onTriggered(QAction* action)
   if (!cue)
   {
     existingCue = false;
-    BEGIN_UNDO_SET("Add Animation Track");
+    BEGIN_UNDO_SET(tr("Add Animation Track"));
     cue = this->Scene->createCue(this->Proxy, this->Property->GetXMLName(), 0);
     END_UNDO_SET();
   }

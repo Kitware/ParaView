@@ -208,7 +208,7 @@ private:
 
     // Print the default Python interpreter greeting.
     this->Parent->printString(
-      QString("\nPython %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()), OUTPUT);
+      tr("\nPython %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()), OUTPUT);
 
     // Note that we assume each line of the preamble is a complete statement
     // (i.e., no multi-line statements):
@@ -454,8 +454,8 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
 //-----------------------------------------------------------------------------
 void pqPythonShell::runScript()
 {
-  pqFileDialog dialog(
-    nullptr, this, tr("Run Script"), QString(), QString(tr("Python Script (*.py);;All files (*)")));
+  pqFileDialog dialog(nullptr, this, tr("Run Script"), QString(),
+    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"));
   dialog.setObjectName("PythonShellRunScriptDialog");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted)

@@ -168,7 +168,7 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
     if (auto filterActn = new QWidgetAction(&menu))
     {
       searchLineEdit = new QLineEdit(&menu);
-      searchLineEdit->setPlaceholderText("Filter items (regex)");
+      searchLineEdit->setPlaceholderText(tr("Filter items (regex)"));
       searchLineEdit->setClearButtonEnabled(true);
       searchLineEdit->setText(sfmodel->filterRegExp().pattern());
 
@@ -195,15 +195,15 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
   if (user_checkable)
   {
     if (auto actn =
-          menu.addAction(QIcon(":/pqWidgets/Icons/pqChecked.svg"), "Check highlighted items"))
+          menu.addAction(QIcon(":/pqWidgets/Icons/pqChecked.svg"), tr("Check highlighted items")))
     {
       actn->setEnabled(selectionCount > 0);
       QObject::connect(
         actn, &QAction::triggered, [this](bool) { this->setSelectedItemsCheckState(Qt::Checked); });
     }
 
-    if (auto actn =
-          menu.addAction(QIcon(":/pqWidgets/Icons/pqUnchecked.svg"), "Uncheck highlighted items"))
+    if (auto actn = menu.addAction(
+          QIcon(":/pqWidgets/Icons/pqUnchecked.svg"), tr("Uncheck highlighted items")))
     {
       actn->setEnabled(selectionCount > 0);
       QObject::connect(actn, &QAction::triggered,
@@ -225,8 +225,8 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
     }
 
     if (auto actn = order == Qt::AscendingOrder
-        ? menu.addAction(QIcon(":/pqWidgets/Icons/pqSortAscend.svg"), "Sort (ascending)")
-        : menu.addAction(QIcon(":/pqWidgets/Icons/pqSortDescend.svg"), "Sort (descending)"))
+        ? menu.addAction(QIcon(":/pqWidgets/Icons/pqSortAscend.svg"), tr("Sort (ascending)"))
+        : menu.addAction(QIcon(":/pqWidgets/Icons/pqSortDescend.svg"), tr("Sort (descending)")))
     {
       actn->setEnabled(rowCount > 0);
       QObject::connect(actn, &QAction::triggered, [order, section, sfmodel, header](bool) {
@@ -236,7 +236,7 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
       });
     }
 
-    if (auto actn = menu.addAction(QIcon(":/pqWidgets/Icons/pqClearSort.svg"), "Clear sorting"))
+    if (auto actn = menu.addAction(QIcon(":/pqWidgets/Icons/pqClearSort.svg"), tr("Clear sorting")))
     {
       actn->setEnabled(sfmodel->sortColumn() != -1);
       QObject::connect(actn, &QAction::triggered, [order, sfmodel, header](bool) {

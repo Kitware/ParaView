@@ -151,7 +151,7 @@ void pqPropertyWidget::setPanelVisibility(const char* vis)
 //-----------------------------------------------------------------------------
 void pqPropertyWidget::apply()
 {
-  BEGIN_UNDO_SET("Property Changed");
+  BEGIN_UNDO_SET(tr("Property Changed"));
   this->Links.accept();
   END_UNDO_SET();
 }

@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QWidget>
 
@@ -125,7 +126,8 @@ void pqSpreadSheetColumnsVisibility::populateMenu(
     return;
   }
 
-  auto allCheckbox = addCheckableAction(menu, "All Columns", false);
+  auto allCheckbox = addCheckableAction(
+    menu, QCoreApplication::translate("pqSpreadSheetColumnsVisibility", "All Columns"), false);
   menu->addSeparator();
   auto checkboxes = std::make_shared<std::vector<QCheckBox*>>();
 

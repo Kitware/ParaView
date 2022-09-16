@@ -158,7 +158,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
     }
   }
 
-  BEGIN_UNDO_SET("Reset transfer function ranges using data range");
+  BEGIN_UNDO_SET(tr("Reset transfer function ranges using data range"));
   repr->resetLookupTableScalarRange();
   repr->renderViewEventually();
   if (vtkSMProxy* lut = lutProxy(repr))
@@ -232,7 +232,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool 
     }
     if (dialog.exec() == QDialog::Accepted)
     {
-      BEGIN_UNDO_SET("Reset transfer function ranges");
+      BEGIN_UNDO_SET(tr("Reset transfer function ranges"));
       range[0] = dialog.minimum();
       range[1] = dialog.maximum();
       tfProxy->RescaleTransferFunction(range[0], range[1]);
@@ -300,7 +300,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
   int retcode = dialog.exec();
   if (retcode != QDialog::Rejected)
   {
-    BEGIN_UNDO_SET("Reset transfer function ranges using temporal data range");
+    BEGIN_UNDO_SET(tr("Reset transfer function ranges using temporal data range"));
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
 
     // disable auto-rescale of transfer function since the user has set one
@@ -342,7 +342,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentat
     return false;
   }
 
-  BEGIN_UNDO_SET("Reset transfer function ranges to visible data range");
+  BEGIN_UNDO_SET(tr("Reset transfer function ranges to visible data range"));
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
     repr->getProxy(), view->getProxy());
   repr->renderViewEventually();

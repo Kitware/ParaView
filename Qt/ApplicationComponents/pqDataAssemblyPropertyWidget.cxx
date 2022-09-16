@@ -1231,7 +1231,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
             double opacity = model->data(idx, detail::OpacityRole).toDouble();
             pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
             dialog.setObjectName("OpacityDialog");
-            dialog.setWindowTitle("Select Opacity");
+            dialog.setWindowTitle(tr("Select Opacity"));
             dialog.setValue(opacity);
             if (dialog.exec() == QDialog::Accepted)
             {

@@ -255,7 +255,7 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
         auto editor = new QPushButton(parent);
         editor->setText(variant.value<QString>());
         QObject::connect(editor, &QPushButton::clicked, [editor](bool) {
-          const QString filters = "Image files (*.png *.jpg *.bmp *.ppm)";
+          const QString filters = tr("Image files") + " (*.png *.jpg *.bmp *.ppm)";
           pqServer* server = pqActiveObjects::instance().activeServer();
           pqFileDialog* dialog =
             new pqFileDialog(server, editor, tr("Open Texture:"), QString(), filters);

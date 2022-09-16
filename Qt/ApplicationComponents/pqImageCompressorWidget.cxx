@@ -63,7 +63,7 @@ pqImageCompressorWidget::pqImageCompressorWidget(
   ui.mainLayout->setContentsMargins(0, 0, 0, 0);
   ui.mainLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
-  QWidget* separator = pqProxyWidget::newGroupLabelWidget("Image Compression", this);
+  QWidget* separator = pqProxyWidget::newGroupLabelWidget(tr("Image Compression"), this);
   ui.mainLayout->insertWidget(0, separator, 1);
 
   this->connect(

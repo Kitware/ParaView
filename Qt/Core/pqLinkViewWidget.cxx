@@ -55,27 +55,27 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   QVBoxLayout* l = new QVBoxLayout(this);
   QLabel* label = new QLabel(this);
   l->addWidget(label);
-  label->setText("Click on another view to link with.");
+  label->setText(tr("Click on another view to link with."));
   label->setWordWrap(true);
   QHBoxLayout* hl = new QHBoxLayout;
   l->addLayout(hl);
-  label = new QLabel("Name:", this);
+  label = new QLabel(tr("Name:"), this);
   hl->addWidget(label);
   this->LineEdit = new QLineEdit(this);
   hl->addWidget(this->LineEdit);
-  this->InteractiveViewLinkCheckBox = new QCheckBox("Interactive View Link", this);
+  this->InteractiveViewLinkCheckBox = new QCheckBox(tr("Interactive View Link"), this);
   l->addWidget(this->InteractiveViewLinkCheckBox);
   QPushButton* button = new QPushButton(this);
   l->addWidget(button);
-  button->setText("Cancel");
+  button->setText(tr("Cancel"));
   QObject::connect(button, SIGNAL(clicked(bool)), this, SLOT(close()));
 
   int index = 0;
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  QString name = QString("CameraLink%1").arg(index);
+  QString name = tr("CameraLink%1").arg(index);
   while (model->getLink(name))
   {
-    name = QString("CameraLink%1").arg(++index);
+    name = tr("CameraLink%1").arg(++index);
   }
   this->LineEdit->setText(name);
   this->LineEdit->selectAll();

@@ -114,7 +114,7 @@ void pqSLACDataLoadManager::setupPipeline()
 
   pqSLACManager* manager = pqSLACManager::instance();
 
-  BEGIN_UNDO_SET("SLAC Data Load");
+  BEGIN_UNDO_SET(tr("SLAC Data Load"));
 
   // Determine the views.  Do this before deleting existing pipeline objects.
   pqView* meshView = manager->getMeshView();

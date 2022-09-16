@@ -106,14 +106,14 @@ public:
   {
     if (this->Type == vtkPVFileInformation::DIRECTORY)
     {
-      return QObject::tr("Folder");
+      return QCoreApplication::translate("pqFileDialogModel", "Folder");
     }
     else
     {
       return QString("%1%2%3")
         .arg(this->Extension)
         .arg(this->Extension.isEmpty() ? "" : " ")
-        .arg(QObject::tr("File"));
+        .arg(QCoreApplication::translate("pqFileDialogModel", "File"));
     }
   }
 
@@ -130,21 +130,26 @@ public:
 
     if (this->Size >= tb)
     {
-      return QString("%1 TB").arg(QLocale().toString(qreal(this->Size) / tb, 'f', 3));
+      return QCoreApplication::translate("pqFileDialogModel", "%1 TB")
+        .arg(QLocale().toString(qreal(this->Size) / tb, 'f', 3));
     }
     if (this->Size >= gb)
     {
-      return QString("%1 GB").arg(QLocale().toString(qreal(this->Size) / gb, 'f', 2));
+      return QCoreApplication::translate("pqFileDialogModel", "%1 GB")
+        .arg(QLocale().toString(qreal(this->Size) / gb, 'f', 2));
     }
     if (this->Size >= mb)
     {
-      return QString("%1 MB").arg(QLocale().toString(qreal(this->Size) / mb, 'f', 1));
+      return QCoreApplication::translate("pqFileDialogModel", "%1 MB")
+        .arg(QLocale().toString(qreal(this->Size) / mb, 'f', 1));
     }
     if (this->Size >= kb)
     {
-      return QString("%1 KB").arg(QLocale().toString(qreal(this->Size) / kb, 'f', 1));
+      return QCoreApplication::translate("pqFileDialogModel", "%1 KB")
+        .arg(QLocale().toString(qreal(this->Size) / kb, 'f', 1));
     }
-    return QString("%1 bytes").arg(QLocale().toString(static_cast<qulonglong>(this->Size)));
+    return QCoreApplication::translate("pqFileDialogModel", "%1 bytes")
+      .arg(QLocale().toString(static_cast<qulonglong>(this->Size)));
   }
 
   QString modificationTimeString() const
@@ -803,9 +808,9 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   info = this->Implementation->GetData(false, newPath, false, true);
   if (info->GetType() == oldType)
   {
-    QString message("Cannot rename to %1, which already exists");
+    QString message = tr("Cannot rename to %1, which already exists");
     message = message.arg(newname);
-    QMessageBox::warning(nullptr, "Error renaming", message);
+    QMessageBox::warning(nullptr, tr("Error renaming"), message);
     return false;
   }
 

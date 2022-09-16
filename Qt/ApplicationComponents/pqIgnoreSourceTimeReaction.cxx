@@ -85,7 +85,7 @@ void pqIgnoreSourceTimeReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqIgnoreSourceTimeReaction::ignoreSourceTime(bool ignore)
 {
-  BEGIN_UNDO_SET("Toggle Ignore Time");
+  BEGIN_UNDO_SET(tr("Toggle Ignore Time"));
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   if (source)
   {

@@ -441,7 +441,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(
     }
 
     // read the filegroup
-    BEGIN_UNDO_SET("Create 'Reader'");
+    BEGIN_UNDO_SET(tr("Create 'Reader'"));
     reader = pqLoadDataReaction::LoadFile(filegroup, server, readerInfo);
     END_UNDO_SET();
 

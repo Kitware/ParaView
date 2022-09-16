@@ -239,13 +239,13 @@ private:
 
         auto editMin = new pqLineEdit(this);
         editMin->setObjectName("value_min");
-        editMin->setPlaceholderText("minimum");
+        editMin->setPlaceholderText(tr("minimum"));
 
         auto editMax = new pqLineEdit(this);
         editMax->setObjectName("value_max");
-        editMax->setPlaceholderText("maximum");
+        editMax->setPlaceholderText(tr("maximum"));
 
-        auto label = new QLabel("and");
+        auto label = new QLabel(tr("and"));
         label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         hbox->addWidget(editMin, /*strech=*/1);
         hbox->addWidget(label);

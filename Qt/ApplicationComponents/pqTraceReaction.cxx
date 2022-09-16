@@ -74,9 +74,9 @@ pqTraceReaction::pqTraceReaction(
 #else
   this->parentAction()->setEnabled(false);
   this->parentAction()->setToolTip(
-    "Tracing unavailable since application built without Python support.");
+    tr("Tracing unavailable since application built without Python support."));
   this->parentAction()->setStatusTip(
-    "Tracing unavailable since application built without Python support.");
+    tr("Tracing unavailable since application built without Python support."));
 #endif
 }
 
@@ -117,7 +117,7 @@ void pqTraceReaction::start()
     vtkNew<vtkSMParaViewPipelineController> controller;
     controller->InitializeProxy(proxy);
     pqProxyWidgetDialog dialog(proxy);
-    dialog.setWindowTitle("Trace Options");
+    dialog.setWindowTitle(tr("Trace Options"));
     dialog.setObjectName("TraceOptionsDialog");
     dialog.setApplyChangesImmediately(true);
     if (dialog.exec() != QDialog::Accepted)
@@ -128,7 +128,7 @@ void pqTraceReaction::start()
   vtkSMTrace* trace = vtkSMTrace::StartTrace();
   if (QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()))
   {
-    mainWindow->statusBar()->showMessage("Recording python trace...");
+    mainWindow->statusBar()->showMessage(tr("Recording python trace..."));
   }
   if (proxy && trace)
   {

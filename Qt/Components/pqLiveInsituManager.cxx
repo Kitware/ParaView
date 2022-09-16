@@ -230,9 +230,9 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server,
     bool user_ok = false;
     if (portNumber == -1)
     {
-      portNumber = QInputDialog::getInt(pqCoreUtilities::mainWidget(), "Catalyst Server Port",
-        "Enter the port number to accept connections \nfrom Catalyst on:", 22222, 1024, 0x0fffffff,
-        1, &user_ok);
+      portNumber = QInputDialog::getInt(pqCoreUtilities::mainWidget(), tr("Catalyst Server Port"),
+        tr("Enter the port number to accept connections\nfrom Catalyst on:"), 22222, 1024,
+        0x0fffffff, 1, &user_ok);
       if (!user_ok)
       {
         // user cancelled.
@@ -244,11 +244,12 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server,
       new pqLiveInsituVisualizationManager(portNumber, server);
     QObject::connect(mgr, SIGNAL(insituDisconnected()), this, SLOT(onCatalystDisconnected()));
     this->Managers[server] = mgr;
-    QMessageBox* mBox = new QMessageBox(QMessageBox::Information, "Ready for Catalyst connections",
-      QString("Accepting connections from Catalyst Co-Processor \n"
-              "for live-coprocessing on port %1")
-        .arg(portNumber),
-      QMessageBox::Ok, pqCoreUtilities::mainWidget());
+    QMessageBox* mBox =
+      new QMessageBox(QMessageBox::Information, tr("Ready for Catalyst connections"),
+        QString(tr("Accepting connections from Catalyst Co-Processor\n"
+                   "for live-coprocessing on port %1"))
+          .arg(portNumber),
+        QMessageBox::Ok, pqCoreUtilities::mainWidget());
     mBox->open();
     QObject::connect(mgr, SIGNAL(insituConnected()), mBox, SLOT(close()));
     Q_EMIT connectionInitiated(server);
@@ -284,13 +285,13 @@ void pqLiveInsituManager::onCatalystDisconnected()
     return;
   }
 
-  QMessageBox::information(pqCoreUtilities::mainWidget(), "Catalyst Disconnected",
-    "Connection to Catalyst Co-Processor has been terminated involuntarily. "
-    "This implies either a communication error, or that the "
-    "Catalyst co-processor has terminated. "
-    "The Catalyst session will now be cleaned up. "
-    "You can start a new one if you want to monitor for additional Catalyst "
-    "connection requests.");
+  QMessageBox::information(pqCoreUtilities::mainWidget(), tr("Catalyst Disconnected"),
+    tr("Connection to Catalyst Co-Processor has been terminated involuntarily. "
+       "This implies either a communication error, or that the "
+       "Catalyst co-processor has terminated. "
+       "The Catalyst session will now be cleaned up. "
+       "You can start a new one if you want to monitor for additional Catalyst "
+       "connection requests."));
 
   mgr->deleteLater();
 

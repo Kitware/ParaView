@@ -438,7 +438,7 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
     this->Internals->FilterModel->setFilterRegExp(regex);
     this->Internals->Ui.treeView->expandAll();
   });
-  this->setWindowTitle("Customize Shortcuts");
+  this->setWindowTitle(tr("Customize Shortcuts"));
   this->onSelectionChanged();
 }
 

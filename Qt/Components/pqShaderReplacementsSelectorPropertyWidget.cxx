@@ -163,7 +163,7 @@ void pqShaderReplacementsSelectorPropertyWidget::textChangedAndEditingFinished()
 
   SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
 
-  BEGIN_UNDO_SET("Shader Replacements Change");
+  BEGIN_UNDO_SET(tr("Shader Replacements Change"));
   this->Internal->Property->SetElement(0, newValue.c_str());
   proxy()->UpdateVTKObjects();
   END_UNDO_SET();
@@ -193,7 +193,7 @@ void pqShaderReplacementsSelectorPropertyWidget::onLoad()
 {
   dynamic_cast<QToolButton*>(this->sender())->setChecked(false);
   // Popup load texture dialog.
-  QString filters = "Shader replacements files (*.json);;All files (*)";
+  QString filters = tr("Shader replacements files") + QString(" (*.json);;") + tr("All files (*)");
   pqFileDialog dialog(nullptr, this, tr("Open ShaderReplacements:"), QString(), filters);
   dialog.setObjectName("LoadShaderReplacementsDialog");
   dialog.setFileMode(pqFileDialog::ExistingFile);

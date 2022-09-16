@@ -198,7 +198,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       {
         action->setVisible(false);
       }
-      action->setStatusTip("Requires an input");
+      action->setStatusTip(tr("Requires an input"));
       continue;
     }
 
@@ -217,11 +217,11 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       }
       if (numProcs > 1)
       {
-        action->setStatusTip("Not supported in parallel");
+        action->setStatusTip(tr("Not supported in parallel"));
       }
       else
       {
-        action->setStatusTip("Supported only in parallel");
+        action->setStatusTip(tr("Supported only in parallel"));
       }
       continue;
     }
@@ -237,7 +237,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
         {
           action->setVisible(false);
         }
-        action->setStatusTip("Multiple inputs not support");
+        action->setStatusTip(tr("Multiple inputs not support"));
         continue;
       }
 
@@ -387,7 +387,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
     namedInputs = dialog.selectedInputs();
   }
 
-  BEGIN_UNDO_SET(QString("Create '%1'").arg(xmlname));
+  BEGIN_UNDO_SET(tr("Create '%1'").arg(xmlname));
   pqPipelineSource* filter = builder->createFilter("filters", xmlname, namedInputs, server);
   END_UNDO_SET();
   return filter;

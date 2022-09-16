@@ -99,7 +99,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
       if (proxy->HasDataFiles() && !dialogBlocked)
       {
         pqProxyWidgetDialog dialog(proxy);
-        dialog.setWindowTitle("Load State Options");
+        dialog.setWindowTitle(tr("Load State Options"));
         dialog.setObjectName("LoadStateOptionsDialog");
         dialog.setApplyChangesImmediately(true);
         if (dialog.exec() != QDialog::Accepted)
@@ -140,11 +140,13 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
 void pqLoadStateReaction::loadState()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
-    "ParaView state file (*.pvsm"
+    tr("ParaView state file") +
+      " (*.pvsm"
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-    " *.py"
+      " *.py"
 #endif
-    ");;All files (*)",
+      ");;" +
+      tr("All files") + " (*)",
     false /* groupFiles */);
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);

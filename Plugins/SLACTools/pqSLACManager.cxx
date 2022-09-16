@@ -741,7 +741,7 @@ void pqSLACManager::createPlotOverZ()
   if (!meshReader)
     return;
 
-  BEGIN_UNDO_SET("Plot Over Z");
+  BEGIN_UNDO_SET(tr("Plot Over Z"));
 
   // Determine view.  Do this before deleting existing pipeline objects.
   pqView* plotView = this->getPlotView();

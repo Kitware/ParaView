@@ -97,11 +97,11 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
 
   if (cbbox->count() > 0)
   {
-    cbbox->insertItem(0, "Select palette to load ...", -1);
+    cbbox->insertItem(0, tr("Select palette to load ..."), -1);
   }
   else
   {
-    cbbox->insertItem(0, "No palettes available.");
+    cbbox->insertItem(0, tr("No palettes available."));
     cbbox->setEnabled(false);
   }
   cbbox->setCurrentIndex(0);

@@ -78,7 +78,7 @@ bool pqEditScalarBarReaction::editScalarBar()
     pqRepresentation* repr = this->SBVReaction->representation();
 
     pqProxyWidgetDialog dialog(sbProxy);
-    dialog.setWindowTitle("Edit Color Legend Properties");
+    dialog.setWindowTitle(tr("Edit Color Legend Properties"));
     dialog.setObjectName("ColorLegendEditor");
     dialog.setEnableSearchBar(true);
     dialog.setSettingsKey("ColorLegendEditor");

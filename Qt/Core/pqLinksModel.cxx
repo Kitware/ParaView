@@ -614,7 +614,7 @@ void pqLinksModel::addCameraLink(
     .arg(inputProxy)
     .arg(outputProxy)
     .arg(name.toUtf8().data())
-    .arg("comment", "link cameras in two views");
+    .arg("comment", qPrintable(tr("link cameras in two views")));
 
   if (interactiveViewLink)
   {
@@ -703,7 +703,7 @@ void pqLinksModel::addSelectionLink(
     .arg(outputProxy)
     .arg(name.toUtf8().data())
     .arg(convertToIndices)
-    .arg("comment", "link selection between two objects");
+    .arg("comment", qPrintable(tr("link selection between two objects")));
 }
 
 void pqLinksModel::removeLink(const QModelIndex& idx)
@@ -733,7 +733,7 @@ void pqLinksModel::removeLink(const QString& name)
     SM_SCOPED_TRACE(CallFunction)
       .arg("RemoveLink")
       .arg(name.toUtf8().data())
-      .arg("comment", "Remove any link given its name");
+      .arg("comment", qPrintable(tr("Remove any link given its name")));
   }
 }
 

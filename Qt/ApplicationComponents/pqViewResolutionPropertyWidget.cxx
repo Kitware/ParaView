@@ -121,7 +121,7 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
                << "1920 x 1080 (FHD)"
                << "3840 x 2160 (4K UHD)";
   ui.presetResolution->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  ui.presetResolution->setToolTip("Presets");
+  ui.presetResolution->setToolTip(tr("Presets"));
   ui.presetResolution->setPopupMode(QToolButton::InstantPopup);
   Q_FOREACH (const QString& txt, defaultItems)
   {

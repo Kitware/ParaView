@@ -71,7 +71,8 @@ protected:
     assert(use_unchecked == false);
     Q_UNUSED(use_unchecked);
 
-    BEGIN_UNDO_SET("Change representation type");
+    BEGIN_UNDO_SET(
+      QCoreApplication::translate("PropertyLinksConnection", "Change representation type"));
     vtkSMProxy* reprProxy = this->proxySM();
     auto widget = qobject_cast<pqDisplayRepresentationWidget*>(this->objectQt());
     vtkSMViewProxy* view = widget->viewProxy();
@@ -185,7 +186,7 @@ void pqDisplayRepresentationWidget::setRepresentation(vtkSMProxy* proxy)
   this->Internal->comboBox->setEnabled(smproperty != nullptr);
   if (!smproperty)
   {
-    this->Internal->comboBox->addItem("Representation");
+    this->Internal->comboBox->addItem(tr("Representation"));
     this->Internal->comboBox->blockSignals(prev);
     return;
   }

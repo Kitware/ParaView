@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 // Qt includes
+#include <QCoreApplication>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
@@ -89,7 +90,8 @@ public:
     this->SliceItem->GetAxis()->SetPoint2(390, 10);
     this->SliceItem->GetAxis()->SetRange(-10, 10);
     this->SliceItem->GetAxis()->SetPosition(vtkAxis::TOP);
-    this->SliceItem->GetAxis()->SetTitle("Default title");
+    this->SliceItem->GetAxis()->SetTitle(
+      QCoreApplication::translate("pqMultiSliceAxisWidget", "Default title").toUtf8().data());
     this->SliceItem->GetAxis()->Update();
   }
 

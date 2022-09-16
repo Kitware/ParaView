@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void pqManageLinksReaction::manageLinks()
 {
   pqLinksManager dialog(pqCoreUtilities::mainWidget());
-  dialog.setWindowTitle("Link Manager");
+  dialog.setWindowTitle(tr("Link Manager"));
   dialog.setObjectName("pqLinksManager");
   dialog.exec();
 }

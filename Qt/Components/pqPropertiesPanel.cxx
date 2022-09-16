@@ -596,7 +596,7 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
   }
   else
   {
-    this->Internals->Ui.DisplayButton->setText("Display");
+    this->Internals->Ui.DisplayButton->setText(tr("Display"));
   }
 
   this->updateButtonEnableState();
@@ -823,7 +823,7 @@ void pqPropertiesPanel::apply()
 
   vtkTimerLog::MarkStartEvent("PropertiesPanel::Apply");
 
-  BEGIN_UNDO_SET("Apply");
+  BEGIN_UNDO_SET(tr("Apply"));
 
   bool onlyApplyCurrentPanel = vtkPVGeneralSettings::GetInstance()->GetAutoApplyActiveOnly();
 

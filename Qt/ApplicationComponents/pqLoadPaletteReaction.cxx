@@ -131,7 +131,7 @@ void pqLoadPaletteReaction::populateMenu()
       actn->setProperty("PV_XML_NAME", iter->GetProxyName());
     }
   }
-  menu->addAction("Edit Current Palette ...");
+  menu->addAction(tr("Edit Current Palette ..."));
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ void pqLoadPaletteReaction::actionTriggered(QAction* actn)
       pxm->GetPrototypeProxy("palettes", actn->property("PV_XML_NAME").toString().toUtf8().data());
     assert(palettePrototype);
 
-    BEGIN_UNDO_SET("Load color palette");
+    BEGIN_UNDO_SET(tr("Load color palette"));
     SM_SCOPED_TRACE(CallFunction)
       .arg("LoadPalette")
       .arg("paletteName", actn->property("PV_XML_NAME").toString().toUtf8().data());
@@ -164,6 +164,6 @@ void pqLoadPaletteReaction::actionTriggered(QAction* actn)
   }
   else
   {
-    pqApplicationSettingsReaction::showApplicationSettingsDialog("Color Palette");
+    pqApplicationSettingsReaction::showApplicationSettingsDialog(tr("Color Palette"));
   }
 }

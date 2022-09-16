@@ -124,10 +124,10 @@ void pqTextureComboBox::updateTextures()
   vtkSMProxy* currentTexture = reinterpret_cast<vtkSMProxy*>(this->currentData().value<void*>());
 
   this->clear();
-  this->addItem("None", QVariant("NONE"));
+  this->addItem(tr("None"), QVariant("NONE"));
   if (this->CanLoadNew)
   {
-    this->addItem("Load ...", QVariant("LOAD"));
+    this->addItem(tr("Load ..."), QVariant("LOAD"));
   }
 
   for (unsigned int i = 0; i < this->Domain->GetNumberOfProxies(); i++)

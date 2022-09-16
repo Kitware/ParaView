@@ -155,7 +155,7 @@ QString pqExportReaction::exportActiveView()
     if (proxyWidget->filterWidgets(true))
     {
       pqProxyWidgetDialog dialog(proxy, pqCoreUtilities::mainWidget());
-      dialog.setWindowTitle("Export Options");
+      dialog.setWindowTitle(tr("Export Options"));
       dialog.setApplyChangesImmediately(true);
       int dialogCode = dialog.exec();
       export_cancelled = (static_cast<QDialog::DialogCode>(dialogCode) != QDialog::Accepted);

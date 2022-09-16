@@ -329,12 +329,11 @@ bool pqPluginManager::confirmEULA(vtkPVPlugin* plugin)
   QDialog dialog(pqCoreUtilities::mainWidget());
   Ui::PluginEULADialog ui;
   ui.setupUi(&dialog);
-  ui.buttonBox->button(QDialogButtonBox::Yes)->setText("Accept");
-  ui.buttonBox->button(QDialogButtonBox::No)->setText("Decline");
+  ui.buttonBox->button(QDialogButtonBox::Yes)->setText(tr("Accept"));
+  ui.buttonBox->button(QDialogButtonBox::No)->setText(tr("Decline"));
   ui.buttonBox->button(QDialogButtonBox::No)->setDefault(true);
 
-  dialog.setWindowTitle(
-    QString("End User License Agreement for '%1'").arg(plugin->GetPluginName()));
+  dialog.setWindowTitle(tr("End User License Agreement for '%1'").arg(plugin->GetPluginName()));
   ui.textEdit->setText(plugin->GetEULA());
 
   if (dialog.exec() == QDialog::Accepted)

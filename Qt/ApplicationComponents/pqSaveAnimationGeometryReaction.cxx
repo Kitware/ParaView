@@ -112,9 +112,9 @@ void pqSaveAnimationGeometryReaction::saveAnimationGeometry(const QString& filen
   auto pqscene = mgr->getActiveScene();
 
   QProgressDialog progress(
-    "Save geometry progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
+    tr("Save geometry progress"), tr("Abort"), 0, 100, pqCoreUtilities::mainWidget());
   progress.setWindowModality(Qt::ApplicationModal);
-  progress.setWindowTitle("Saving Geometry ...");
+  progress.setWindowTitle(tr("Saving Geometry ..."));
   progress.show();
   QObject::connect(&progress, &QProgressDialog::canceled, [pqscene, &progress]() {
     progress.hide();

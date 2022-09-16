@@ -120,7 +120,7 @@ pqLightsEditor::~pqLightsEditor()
 //-----------------------------------------------------------------------------
 void pqLightsEditor::resetLights()
 {
-  BEGIN_UNDO_SET("Restore Default Lights");
+  BEGIN_UNDO_SET(tr("Restore Default Lights"));
   for (int i = 0; i < PROPERTY_COUNT; ++i)
   {
     vtkSMProperty* _property = this->propertyGroup()->GetProperty(PROPERTY_NAME[i]);

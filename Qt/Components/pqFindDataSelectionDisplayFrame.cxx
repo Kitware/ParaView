@@ -165,7 +165,7 @@ public:
     vtkPVDataSetAttributesInformation* attrInfo = this->attributeInformation(fieldAssociation);
     if (!attrInfo)
     {
-      menu.addAction("(not available)");
+      menu.addAction(tr("(not available)"));
       return;
     }
 
@@ -183,7 +183,7 @@ public:
       // from the selection ;).
       if (arrayInfo->GetIsPartial())
       {
-        QAction* action = menu.addAction(QString("%1 (partial)").arg(arrayInfo->GetName()));
+        QAction* action = menu.addAction(tr("%1 (partial)").arg(arrayInfo->GetName()));
         action->setData(arrayInfo->GetName());
       }
       else
@@ -246,7 +246,7 @@ public:
       (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS) ? "CellLabelVisibility"
                                                                    : "PointLabelVisibility";
 
-    BEGIN_UNDO_SET("Change labels");
+    BEGIN_UNDO_SET(QCoreApplication::translate("pqFindDataSelectionDisplayFrame", "Change labels"));
     {
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", selectionProxy);
       if (action->isChecked())
@@ -421,9 +421,9 @@ void pqFindDataSelectionDisplayFrame::editLabelPropertiesInteractiveSelection()
              << "PointLabelOpacity"
              << "PointLabelShadow";
 
-  BEGIN_UNDO_SET("Interactive selection label properties");
+  BEGIN_UNDO_SET(tr("Interactive selection label properties"));
   pqProxyWidgetDialog dialog(proxyISelectionRepresentation, properties, this);
-  dialog.setWindowTitle("Interactive Selection Label Properties");
+  dialog.setWindowTitle(tr("Interactive Selection Label Properties"));
   this->Internals->View->connect(&dialog, SIGNAL(accepted()), SLOT(render()));
   dialog.exec();
   END_UNDO_SET();
@@ -459,9 +459,9 @@ void pqFindDataSelectionDisplayFrame::editLabelPropertiesSelection()
              << "SelectionPointLabelOpacity"
              << "SelectionPointLabelShadow";
 
-  BEGIN_UNDO_SET("Change selection display properties");
+  BEGIN_UNDO_SET(tr("Change selection display properties"));
   pqProxyWidgetDialog dialog(repr->getProxy(), properties, this);
-  dialog.setWindowTitle("Selection Label Properties");
+  dialog.setWindowTitle(tr("Selection Label Properties"));
   this->Internals->View->connect(&dialog, SIGNAL(accepted()), SLOT(render()));
   dialog.exec();
   this->updateInteractiveSelectionLabelProperties();

@@ -90,7 +90,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(
 {
   // set the helper/information string
   this->Internal->setHeader(
-    QString("A reader for \"%1\" could not be found. Please choose one:").arg(file));
+    tr("A reader for \"%1\" could not be found. Please choose one:").arg(file));
 
   // populate the list view with readers
   vtkStringList* readers = readerFactory->GetPossibleReaders(file.toUtf8().data(), s->session());
@@ -105,7 +105,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(
 {
   // set the helper/information string
   this->Internal->setHeader(
-    QString("More than one reader for \"%1\" found. Please choose one:").arg(file));
+    tr("More than one reader for \"%1\" found. Please choose one:").arg(file));
 
   // populate the list view with readers
   this->Internal->updateList(list);

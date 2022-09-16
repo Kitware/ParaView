@@ -56,15 +56,15 @@ pqResetDefaultSettingsReaction::~pqResetDefaultSettingsReaction() = default;
 void pqResetDefaultSettingsReaction::resetSettingsToDefault()
 {
   QMessageBox mbox(pqCoreUtilities::mainWidget());
-  mbox.setWindowTitle("Reset to Default Settings");
+  mbox.setWindowTitle(tr("Reset to Default Settings"));
   mbox.setIcon(QMessageBox::Question);
-  mbox.setText("<b>Reset custom settings to default.</b>");
+  mbox.setText("<b>" + tr("Reset custom settings to default.") + "</b>");
   mbox.setInformativeText(
-    "All custom setting will be reset to their default values. Do you want to continue?");
+    tr("All custom setting will be reset to their default values. Do you want to continue?"));
   mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::Save | QMessageBox::Cancel);
 
-  mbox.button(QMessageBox::Yes)->setText("Yes");
-  mbox.button(QMessageBox::Save)->setText("Yes, and backup current settings");
+  mbox.button(QMessageBox::Yes)->setText(tr("Yes"));
+  mbox.button(QMessageBox::Save)->setText(tr("Yes, and backup current settings"));
   mbox.setDefaultButton(QMessageBox::Cancel);
 
   QString informativeText;

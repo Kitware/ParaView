@@ -53,12 +53,12 @@ pqKeyFrameTypeWidget::pqKeyFrameTypeWidget(QWidget* p)
   this->Internal->Offset->setValidator(validator);
   this->Internal->Frequency->setValidator(validator);
 
-  this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqRamp24.png"), "Ramp", "Ramp");
+  this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqRamp24.png"), "Ramp", tr("Ramp"));
   this->Internal->Type->addItem(
-    QIcon(":pqWidgets/Icons/pqExponential24.png"), "Exponential", "Exponential");
+    QIcon(":pqWidgets/Icons/pqExponential24.png"), "Exponential", tr("Exponential"));
   this->Internal->Type->addItem(
-    QIcon(":pqWidgets/Icons/pqSinusoidal24.png"), "Sinusoid", "Sinusoid");
-  this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqStep24.png"), "Step", "Boolean");
+    QIcon(":pqWidgets/Icons/pqSinusoidal24.png"), "Sinusoid", tr("Sinusoid"));
+  this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqStep24.png"), "Step", tr("Boolean"));
 
   QObject::connect(
     this->Internal->Type, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged()));

@@ -64,15 +64,15 @@ pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
   bool recoveryEnabled = settings->value("GeneralSettings.CrashRecovery", false).toBool();
   if (recoveryEnabled && QFile::exists(CrashRecoveryStateFile))
   {
-    int recover = QMessageBox::question(pqCoreUtilities::mainWidget(), "ParaView",
-      "A crash recovery state file has been found.\n"
-      "Would you like to save it?",
+    int recover = QMessageBox::question(pqCoreUtilities::mainWidget(), tr("ParaView"),
+      tr("A crash recovery state file has been found.\n"
+         "Would you like to save it?"),
       QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (recover == QMessageBox::Yes)
     {
-      QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
+      QString fileExt = tr("ParaView state file") + " (*.pvsm);;" + tr("All files") + " (*)";
       QString path = QFileDialog::getSaveFileName(
-        pqCoreUtilities::mainWidget(), "Save crash state file", QDir::currentPath(), fileExt);
+        pqCoreUtilities::mainWidget(), tr("Save crash state file"), QDir::currentPath(), fileExt);
       if (!path.isNull())
       {
         if (!path.endsWith(".pvsm"))
@@ -156,8 +156,8 @@ void pqCrashRecoveryBehavior::onServerDisconnect()
          "The application will now quit since it may be in an unrecoverable state.\n\n"
          "Would you like to save a ParaView state file?"),
       QMessageBox::NoButton, pqCoreUtilities::mainWidget());
-    mbox.addButton(QMessageBox::Yes)->setText("Save state and exit");
-    mbox.addButton(QMessageBox::No)->setText("Exit without saving state");
+    mbox.addButton(QMessageBox::Yes)->setText(tr("Save state and exit"));
+    mbox.addButton(QMessageBox::No)->setText(tr("Exit without saving state"));
     mbox.setDefaultButton(QMessageBox::Yes);
     if (mbox.exec() == QMessageBox::Yes)
     {

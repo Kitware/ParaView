@@ -337,12 +337,11 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
     [&internals](pqOutputPort* port) {
       if (port)
       {
-        internals.Ui.informationExpander->setText(
-          QString("Selected Data (%1)").arg(port->prettyName()));
+        internals.Ui.informationExpander->setText(tr("Selected Data (%1)").arg(port->prettyName()));
       }
       else
       {
-        internals.Ui.informationExpander->setText("Selected Data (none)");
+        internals.Ui.informationExpander->setText(tr("Selected Data (none)"));
       }
     });
 

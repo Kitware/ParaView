@@ -77,8 +77,8 @@ void pqServerConnectReaction::connectToServerWithWarning()
   {
     int ret =
       QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Disconnect from current server?"),
-        tr("Before connecting to a new server, \n"
-           "the current connection will be closed and \n"
+        tr("Before connecting to a new server,\n"
+           "the current connection will be closed and\n"
            "the state will be discarded.\n\n"
            "Are you sure you want to continue?"),
         QMessageBox::Yes | QMessageBox::No);

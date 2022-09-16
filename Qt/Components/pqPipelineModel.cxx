@@ -899,7 +899,7 @@ bool pqPipelineModel::setData(const QModelIndex& idx, const QVariant& value, int
   auto proxy = qobject_cast<pqProxy*>(this->getItemFor(idx));
   if (proxy && proxy->getSMName() != name)
   {
-    BEGIN_UNDO_SET(QString("Rename %1 to %2").arg(proxy->getSMName()).arg(name));
+    BEGIN_UNDO_SET(tr("Rename %1 to %2").arg(proxy->getSMName()).arg(name));
     proxy->rename(name);
     END_UNDO_SET();
     return true;

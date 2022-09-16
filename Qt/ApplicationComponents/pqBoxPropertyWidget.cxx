@@ -50,7 +50,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 
   vtkSMProxy* wdgProxy = this->widgetProxy();
 
-  ui.translateX->setToolTip("hi");
+  ui.translateX->setToolTip(tr("hi"));
   // Let's link some of the UI elements that only affect the interactive widget
   // properties without affecting properties on the main proxy.
   this->WidgetLinks.addPropertyLink(ui.enableTranslation, "checked", SIGNAL(toggled(bool)),

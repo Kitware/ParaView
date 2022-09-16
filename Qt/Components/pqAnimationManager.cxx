@@ -232,7 +232,7 @@ bool pqAnimationManager::saveGeometry(const QString& filename, pqView* view)
     .arg("WriteAnimationGeometry")
     .arg(filename.toUtf8().data())
     .arg("view", view->getProxy())
-    .arg("comment", "save animation geometry from a view");
+    .arg("comment", qPrintable(tr("save animation geometry from a view")));
 
   vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
@@ -247,7 +247,7 @@ bool pqAnimationManager::saveGeometry(const QString& filename, pqView* view)
 //-----------------------------------------------------------------------------
 void pqAnimationManager::onTick(int progress)
 {
-  Q_EMIT this->saveProgress("Saving Animation", progress);
+  Q_EMIT this->saveProgress(qPrintable(tr("Saving Animation")), progress);
 }
 
 //-----------------------------------------------------------------------------

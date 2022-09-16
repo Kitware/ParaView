@@ -78,7 +78,7 @@ void pqLinksManager::addLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   pqLinksEditor editor(nullptr, this);
-  editor.setWindowTitle("Add Link");
+  editor.setWindowTitle(tr("Add Link"));
   if (editor.exec() == QDialog::Accepted)
   {
     if (editor.linkType() == pqLinksModel::Proxy)
@@ -114,7 +114,7 @@ void pqLinksManager::editLink()
   QModelIndex idx = this->Ui->treeView->selectionModel()->currentIndex();
   vtkSMLink* link = model->getLink(idx);
   pqLinksEditor editor(link, this);
-  editor.setWindowTitle("Edit Link");
+  editor.setWindowTitle(tr("Edit Link"));
   if (editor.exec() == QDialog::Accepted)
   {
     model->removeLink(idx);

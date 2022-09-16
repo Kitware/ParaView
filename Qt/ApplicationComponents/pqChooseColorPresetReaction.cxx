@@ -175,7 +175,7 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
     return;
   }
 
-  BEGIN_UNDO_SET("Apply color preset");
+  BEGIN_UNDO_SET(tr("Apply color preset"));
   if (dialog->loadColors() || dialog->loadOpacities())
   {
     vtkSMProxy* sof = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();

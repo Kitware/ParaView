@@ -136,8 +136,8 @@ void pqAxesToolbar::showOrientationAxes(bool show_axes)
 
   SM_SCOPED_TRACE(PropertiesModified)
     .arg("proxy", renderView->getProxy())
-    .arg(
-      "comment", QString(" %1 orientation axes").arg(show_axes ? "Show" : "Hide").toUtf8().data());
+    .arg("comment",
+      qPrintable(show_axes ? tr(" Show orientation axes") : tr(" Hide orientation axes")));
   renderView->setOrientationAxesVisibility(show_axes);
   renderView->render();
 }
@@ -153,7 +153,7 @@ void pqAxesToolbar::showCenterAxes(bool show_axes)
 
   SM_SCOPED_TRACE(PropertiesModified)
     .arg("proxy", renderView->getProxy())
-    .arg("comment", QString(" %1 center axes").arg(show_axes ? "Show" : "Hide").toUtf8().data());
+    .arg("comment", qPrintable(show_axes ? tr(" Show center axes") : tr(" Hide center axes")));
   renderView->setCenterAxesVisibility(show_axes);
   renderView->render();
 }
@@ -171,7 +171,7 @@ void pqAxesToolbar::resetCenterOfRotationToCenterOfCurrentData()
 
   SM_SCOPED_TRACE(PropertiesModified)
     .arg("proxy", renderView->getProxy())
-    .arg("comment", " update center of rotation");
+    .arg("comment", qPrintable(tr(" update center of rotation")));
 
   double bounds[6];
   if (repr->getDataBounds(bounds))
@@ -197,7 +197,7 @@ void pqAxesToolbar::pickCenterOfRotation(int posx, int posy)
     vtkSMRenderViewProxy* proxy = rm->getRenderViewProxy();
     SM_SCOPED_TRACE(PropertiesModified)
       .arg("proxy", proxy)
-      .arg("comment", " update center of rotation");
+      .arg("comment", qPrintable(tr(" update center of rotation")));
     proxy->ConvertDisplayToPointOnSurface(posxy, center, normal);
     if (!std::isnan(center[0]) || !std::isnan(center[1]) || !std::isnan(center[2]))
     {

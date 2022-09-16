@@ -92,13 +92,13 @@ void pqExampleVisualizationsDialog::onButtonPressed()
       if (!fdataPath.isDir())
       {
         QString msg =
-          QString("Your installation doesn't have datasets to load the example visualizations. "
-                  "You can manually download the datasets from paraview.org and then "
-                  "place them under the following path for examples to work:\n\n'%1'")
+          tr("Your installation doesn't have datasets to load the example visualizations. "
+             "You can manually download the datasets from paraview.org and then "
+             "place them under the following path for examples to work:\n\n'%1'")
             .arg(fdataPath.absoluteFilePath());
         // dump to cout for easy copy/paste.
         cout << msg.toUtf8().data() << endl;
-        QMessageBox::warning(this, "Missing data", msg, QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Missing data"), msg, QMessageBox::Ok);
         return;
       }
       dataPath = fdataPath.absoluteFilePath();
@@ -111,7 +111,7 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
       QMessageBox box(this);
-      box.setText("Loading example visualization, please wait ...");
+      box.setText(tr("Loading example visualization, please wait ..."));
       box.setStandardButtons(QMessageBox::NoButton);
       box.show();
 

@@ -129,7 +129,7 @@ void pqPipelineTimeKeyFrameEditor::readKeyFrameData()
 //-----------------------------------------------------------------------------
 void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
 {
-  BEGIN_UNDO_SET("Edit Keyframes");
+  BEGIN_UNDO_SET(tr("Edit Keyframes"));
 
   vtkSMProxy* cueProxy = this->Internal->Cue->getProxy();
   if (this->Internal->Ui.variableRadio->isChecked())

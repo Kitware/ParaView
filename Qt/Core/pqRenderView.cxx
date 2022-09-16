@@ -804,7 +804,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
       .arg("SelectSurfacePoints")
       .arg("Rectangle", rectVector)
       .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-      .arg("comment", "create a surface points selection");
+      .arg("comment", qPrintable(tr("create a surface points selection")));
   }
   else
   {
@@ -820,7 +820,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
         .arg("SelectSurfaceBlocks")
         .arg("Rectangle", rectVector)
         .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-        .arg("comment", "create a block selection");
+        .arg("comment", qPrintable(tr("create a block selection")));
     }
     else
     {
@@ -828,7 +828,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
         .arg("SelectSurfaceCells")
         .arg("Rectangle", rectVector)
         .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-        .arg("comment", "create a surface cells selection");
+        .arg("comment", qPrintable(tr("create a surface cells selection")));
     }
   }
 
@@ -895,7 +895,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
       .arg("SelectSurfacePoints")
       .arg("Polygon", polygonVector)
       .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-      .arg("comment", "create a surface points polygon selection");
+      .arg("comment", qPrintable(tr("create a surface points polygon selection")));
   }
   else
   {
@@ -909,7 +909,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
       .arg("SelectSurfaceCells")
       .arg("Polygon", polygonVector)
       .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-      .arg("comment", "create a surface cells polygon selection");
+      .arg("comment", qPrintable(tr("create a surface cells polygon selection")));
   }
 
   END_UNDO_EXCLUDE();
@@ -946,7 +946,7 @@ void pqRenderView::selectFrustumCells(int rect[4], int selectionModifier)
     .arg("SelectCellsThrough")
     .arg("Rectangle", rectVector)
     .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-    .arg("comment", "create a frustum selection of cells");
+    .arg("comment", qPrintable(tr("create a frustum selection of cells")));
 
   END_UNDO_EXCLUDE();
 
@@ -982,7 +982,7 @@ void pqRenderView::selectFrustumPoints(int rect[4], int selectionModifier)
     .arg("SelectPointsThrough")
     .arg("Rectangle", rectVector)
     .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-    .arg("comment", "create a frustum selection of points");
+    .arg("comment", qPrintable(tr("create a frustum selection of points")));
 
   END_UNDO_EXCLUDE();
 
@@ -1058,7 +1058,7 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   // FIXME: move this logic to server-manager.
   SM_SCOPED_TRACE(PropertiesModified)
     .arg(this->getProxy())
-    .arg("comment", "changing interaction mode based on data extents");
+    .arg("comment", qPrintable(tr("changing interaction mode based on data extents")));
   if (is2DDataSet)
   {
     // Update camera position

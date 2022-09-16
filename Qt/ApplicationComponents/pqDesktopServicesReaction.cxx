@@ -60,13 +60,13 @@ bool pqDesktopServicesReaction::openUrl(const QUrl& url)
   {
     QString filename = QFileInfo(url.toLocalFile()).absoluteFilePath();
     QString msg =
-      QString("The requested file is not available in your installation. "
-              "You can manually obtain and place the file (or ask your administrators) at the "
-              "following location for this to work.\n\n'%1'")
+      tr("The requested file is not available in your installation. "
+         "You can manually obtain and place the file (or ask your administrators) at the "
+         "following location for this to work.\n\n'%1'")
         .arg(filename);
     // dump to cout for easy copy/paste.
     std::cout << msg.toUtf8().data() << std::endl;
-    QMessageBox::warning(pqCoreUtilities::mainWidget(), "Missing file", msg, QMessageBox::Ok);
+    QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Missing file"), msg, QMessageBox::Ok);
     return false;
   }
   if (!QDesktopServices::openUrl(url))

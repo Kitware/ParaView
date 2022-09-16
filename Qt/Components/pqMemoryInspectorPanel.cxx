@@ -535,7 +535,8 @@ void HostData::InitializeMemoryUseWidget()
   l->setContentsMargins(2, 2, 2, 2);
   l->setSpacing(2);
 
-  l->addRow("System Total", this->TotalMemoryUseWidget);
+  l->addRow(QCoreApplication::translate("pqMemoryInspectorPanel", "System Total"),
+    this->TotalMemoryUseWidget);
   l->addRow(this->GroupName.c_str(), this->GroupMemoryUseWidget);
 
   QLabel* label = new QLabel;
@@ -1481,18 +1482,18 @@ void pqMemoryInspectorPanel::ExecuteRemoteCommand()
       break;
 
       default:
-        QMessageBox ebx(QMessageBox::Information, "Error",
-          "No process selected. Select a specific process first by "
-          "clicking on its entry in the tree view widget.");
+        QMessageBox ebx(QMessageBox::Information, tr("Error"),
+          tr("No process selected. Select a specific process first by "
+             "clicking on its entry in the tree view widget."));
         ebx.exec();
         break;
     }
   }
   else
   {
-    QMessageBox ebx(QMessageBox::Information, "Error",
-      "No process selected. Select a specific process first by "
-      "clicking on its entry in the tree view widget.");
+    QMessageBox ebx(QMessageBox::Information, tr("Error"),
+      tr("No process selected. Select a specific process first by "
+         "clicking on its entry in the tree view widget."));
     ebx.exec();
   }
 }
@@ -1594,22 +1595,13 @@ void pqMemoryInspectorPanel::ShowHostPropertiesDialog()
     QString cpu = item->data(0, ITEM_KEY_HOST_CPU).toString();
     QString mem = item->data(0, ITEM_KEY_HOST_MEM).toString();
 
-    QString descr;
-    descr += "<h2>";
-    descr += (type == ITEM_DATA_CLIENT_HOST ? "Client" : "Server");
-    descr += " System Properties</h2><hr><table>";
-    descr += "<tr><td><b>Host:</b></td><td>";
-    descr += host;
-    descr += "</td></tr>";
-    descr += "<tr><td><b>OS:</b></td><td>";
-    descr += os;
-    descr += "</td></tr>";
-    descr += "<tr><td><b>CPU:</b></td><td>";
-    descr += cpu;
-    descr += "</td></tr>";
-    descr += "<tr><td><b>Memory:</b></td><td>";
-    descr += mem;
-    descr += "</td></tr></table><hr>";
+    QString descr = "<h2>" +
+      (ITEM_DATA_CLIENT_HOST ? tr("Client System Properties") : tr("Server System Properties")) +
+      "</h2><hr><table>" + "<tr><td><b>" + tr("Host:") +
+      QString("</b></td><td>%1</td></tr>").arg(host) + "<tr><td><b>" + tr("OS:") +
+      QString("</b></td><td>%1</td></tr>").arg(os) + "<tr><td><b>" + tr("CPU:") +
+      QString("</b></td><td>%1</td></tr>").arg(cpu) + "<tr><td><b>" + tr("Memory:") +
+      QString("</b></td><td>%1</td></tr></table><hr>").arg(mem);
 
     QMessageBox props(QMessageBox::Information, "", descr, QMessageBox::Ok, this);
     props.exec();
@@ -1641,7 +1633,7 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint& position)
         QTreeWidgetItem* child = item->child(0);
         if (child == nullptr)
           return;
-        context.addAction("properties...", this, SLOT(ShowHostPropertiesDialog()));
+        context.addAction(tr("properties..."), this, SLOT(ShowHostPropertiesDialog()));
         int sysType = child->data(0, ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
         if (!ok)
           return;
@@ -1652,15 +1644,15 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint& position)
             return;
 
           this->AddEnableStackTraceMenuAction(serverType, context);
-          context.addAction("remote command...", this, SLOT(ExecuteRemoteCommand()));
+          context.addAction(tr("remote command..."), this, SLOT(ExecuteRemoteCommand()));
         }
       }
       break;
 
       case ITEM_DATA_SERVER_GROUP:
       {
-        context.addAction("show only nodes", this, SLOT(ShowOnlyNodes()));
-        context.addAction("show all ranks", this, SLOT(ShowAllRanks()));
+        context.addAction(tr("show only nodes"), this, SLOT(ShowOnlyNodes()));
+        context.addAction(tr("show all ranks"), this, SLOT(ShowAllRanks()));
 
         QTreeWidgetItem* child = item->child(0);
         if (child == nullptr)
@@ -1681,34 +1673,34 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint& position)
       case ITEM_DATA_CLIENT_HOST:
       case ITEM_DATA_CLIENT_RANK:
       {
-        context.addAction("properties...", this, SLOT(ShowHostPropertiesDialog()));
+        context.addAction(tr("properties..."), this, SLOT(ShowHostPropertiesDialog()));
         int sysType = item->data(0, ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
         if (!ok)
           return;
         if (sysType == ITEM_DATA_UNIX_SYSTEM)
         {
-          context.addAction("remote command...", this, SLOT(ExecuteRemoteCommand()));
+          context.addAction(tr("remote command..."), this, SLOT(ExecuteRemoteCommand()));
         }
       }
       break;
 
       case ITEM_DATA_SERVER_HOST:
       {
-        context.addAction("properties...", this, SLOT(ShowHostPropertiesDialog()));
+        context.addAction(tr("properties..."), this, SLOT(ShowHostPropertiesDialog()));
       }
       break;
 
       case ITEM_DATA_SERVER_RANK:
       {
-        context.addAction("show only nodes", this, SLOT(ShowOnlyNodes()));
-        context.addAction("show all ranks", this, SLOT(ShowAllRanks()));
+        context.addAction(tr("show only nodes"), this, SLOT(ShowOnlyNodes()));
+        context.addAction(tr("show all ranks"), this, SLOT(ShowAllRanks()));
 
         int sysType = item->data(0, ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
         if (!ok)
           return;
         if (sysType == ITEM_DATA_UNIX_SYSTEM)
         {
-          context.addAction("remote command...", this, SLOT(ExecuteRemoteCommand()));
+          context.addAction(tr("remote command..."), this, SLOT(ExecuteRemoteCommand()));
         }
       }
       break;
@@ -1722,7 +1714,7 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint& position)
 void pqMemoryInspectorPanel::AddEnableStackTraceMenuAction(int serverType, QMenu& context)
 {
   QAction* action = new QAction(this);
-  action->setText("stack trace signal handler");
+  action->setText(tr("stack trace signal handler"));
   action->setCheckable(true);
   switch (serverType)
   {

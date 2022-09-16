@@ -58,8 +58,8 @@ pqCatalystExportReaction::pqCatalystExportReaction(QAction* parentObject)
   parentObject->setEnabled(true);
 #else
   parentObject->setEnabled(false);
-  parentObject->setToolTip("Needs Python support");
-  parentObject->setStatusTip("Needs Python support");
+  parentObject->setToolTip(tr("Needs Python support"));
+  parentObject->setStatusTip(tr("Needs Python support"));
 #endif
 }
 
@@ -70,7 +70,7 @@ pqCatalystExportReaction::~pqCatalystExportReaction() = default;
 QString pqCatalystExportReaction::exportScript()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Catalyst State:"),
-    QString(), "Python file (*.py);;All files (*)");
+    QString(), tr("Python file") + QString(" (*.py);;") + tr("All files") + QString(" (*)"));
   fileDialog.setObjectName("SaveCatalystStateFileDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (!fileDialog.exec())
@@ -96,7 +96,7 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
   auto proxy = vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("coprocessing", "CatalystOptions"));
   controller->InitializeProxy(proxy);
   pqProxyWidgetDialog dialog(proxy, pqCoreUtilities::mainWidget());
-  dialog.setWindowTitle("Save Catalyst State Options");
+  dialog.setWindowTitle(tr("Save Catalyst State Options"));
   dialog.setSettingsKey("CatalystOptions");
   dialog.setEnableSearchBar(true);
   if (dialog.exec() != QDialog::Accepted)

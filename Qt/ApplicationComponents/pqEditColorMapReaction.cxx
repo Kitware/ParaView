@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 
 #include <QColorDialog>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDockWidget>
 
@@ -95,7 +96,9 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
   {
     // Get the color property.
     vtkSMProxy* proxy = repr->getProxy();
-    SM_SCOPED_TRACE(PropertiesModified).arg(proxy).arg("comment", " change solid color");
+    SM_SCOPED_TRACE(PropertiesModified)
+      .arg(proxy)
+      .arg("comment", qPrintable(tr(" change solid color")));
 
     vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
     vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
@@ -112,14 +115,14 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
 
       // Let the user pick a new color.
       auto color = QColorDialog::getColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]),
-        pqCoreUtilities::mainWidget(), "Pick Solid Color", QColorDialog::DontUseNativeDialog);
+        pqCoreUtilities::mainWidget(), tr("Pick Solid Color"), QColorDialog::DontUseNativeDialog);
       if (color.isValid())
       {
         // Set the properties to the new color.
         rgb[0] = color.redF();
         rgb[1] = color.greenF();
         rgb[2] = color.blueF();
-        BEGIN_UNDO_SET("Changed Solid Color");
+        BEGIN_UNDO_SET(tr("Changed Solid Color"));
         vtkSMPropertyHelper(diffuse, /*quiet=*/true).Set(rgb, 3);
         vtkSMPropertyHelper(ambient, /*quiet=*/true).Set(rgb, 3);
         proxy->UpdateVTKObjects();

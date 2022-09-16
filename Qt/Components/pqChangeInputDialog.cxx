@@ -194,7 +194,7 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
   }
 
   QRadioButton* radioButton = qobject_cast<QRadioButton*>(this->sender());
-  this->Internals->selectInputLabel->setText(QString("Select <b>%1</b>").arg(radioButton->text()));
+  this->Internals->selectInputLabel->setText(tr("Select <b>%1</b>").arg(radioButton->text()));
 
   QModelIndexList selected_indexes;
   QString input_prop_name = radioButton->objectName();

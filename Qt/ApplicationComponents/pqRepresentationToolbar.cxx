@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 void pqRepresentationToolbar::constructor()
 {
-  this->setWindowTitle("Representation Toolbar");
+  this->setWindowTitle(tr("Representation Toolbar"));
   pqDisplayRepresentationWidget* widget = new pqDisplayRepresentationWidget(this)
     << pqSetName("displayRepresentation");
   this->addWidget(widget);

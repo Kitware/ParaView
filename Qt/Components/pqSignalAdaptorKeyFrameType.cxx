@@ -124,10 +124,10 @@ void pqSignalAdaptorKeyFrameType::onTypeChanged()
 
   if (type == vtkPVCompositeKeyFrame::SINUSOID && this->Internals->ValueLabel)
   {
-    this->Internals->ValueLabel->setText("Amplitude");
+    this->Internals->ValueLabel->setText(tr("Amplitude"));
   }
   else if (this->Internals->ValueLabel)
   {
-    this->Internals->ValueLabel->setText("Value");
+    this->Internals->ValueLabel->setText(tr("Value"));
   }
 }

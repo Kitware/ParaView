@@ -265,13 +265,13 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
   QAbstractButton* okButton = mbox.button(QMessageBox::Ok);
   if (yesButton && remember)
   {
-    remember->setText("Yes, and don't ask again");
+    remember->setText(tr("Yes, and don't ask again"));
     remember->setObjectName("YesAndSave");
     remember->setIcon(mbox.button(QMessageBox::Yes)->icon());
   }
   else if (okButton && remember)
   {
-    remember->setText("OK, and don't ask again");
+    remember->setText(tr("OK, and don't ask again"));
     remember->setObjectName("OkAndSave");
     remember->setIcon(mbox.button(QMessageBox::Ok)->icon());
   }
@@ -398,8 +398,8 @@ void pqCoreUtilities::removeRecursively(QDir dir)
   const bool success = dir.removeRecursively();
   if (!success)
   {
-    QMessageBox(QMessageBox::Warning, QObject::tr("File IO Warning"),
-      QObject::tr("Unable to delete some files in %1").arg(dir.absolutePath()),
+    QMessageBox(QMessageBox::Warning, tr("File IO Warning"),
+      tr("Unable to delete some files in %1").arg(dir.absolutePath()),
       QMessageBox::StandardButton::Ok, pqCoreUtilities::mainWidget())
       .exec();
   }
@@ -414,9 +414,9 @@ void pqCoreUtilities::remove(const QString& filePath)
   const bool success = dir.remove(fileName);
   if (!success)
   {
-    QMessageBox(QMessageBox::Warning, QObject::tr("File IO Warning"),
-      QObject::tr("Unable to delete %1").arg(finfo.absoluteFilePath()),
-      QMessageBox::StandardButton::Ok, pqCoreUtilities::mainWidget())
+    QMessageBox(QMessageBox::Warning, tr("File IO Warning"),
+      tr("Unable to delete %1").arg(finfo.absoluteFilePath()), QMessageBox::StandardButton::Ok,
+      pqCoreUtilities::mainWidget())
       .exec();
   }
 }
