@@ -97,10 +97,11 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   // if view == nullptr, we track the active view.
   if (view == nullptr)
   {
-    QObject::connect(
-      &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setView(pqView*)));
+    pqActiveObjects* activeObjects = &pqActiveObjects::instance();
+    this->connect(activeObjects, SIGNAL(viewChanged(pqView*)), this, SLOT(setView(pqView*)));
+
     // this ensure that the enabled-state is set correctly.
-    this->setView(nullptr);
+    this->setView(activeObjects->activeView());
   }
 
   if (this->Mode == CLEAR_SELECTION || this->Mode == GROW_SELECTION ||

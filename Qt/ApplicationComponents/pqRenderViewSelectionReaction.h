@@ -90,14 +90,24 @@ public:
    */
   pqRenderViewSelectionReaction(QAction* parentAction, pqRenderView* view, SelectionMode mode,
     QActionGroup* modifierGroup = nullptr);
+
+  /**
+   * Call CleanupObservers on destruction
+   */
   ~pqRenderViewSelectionReaction() override;
 
 Q_SIGNALS:
+
+  ///@{
+  /**
+   * Signals emitted when the event happens
+   */
   void selectedCustomBox(int xmin, int ymin, int xmax, int ymax);
   void selectedCustomBox(const int region[4]);
   void selectedCustomPolygon(vtkIntArray* polygon);
+  ///@}
 
-private Q_SLOTS:
+protected Q_SLOTS:
   /**
    * For checkable actions, this calls this->beginSelection() or
    * this->endSelection() is val is true or false, respectively. For
@@ -115,8 +125,9 @@ private Q_SLOTS:
   /**
    * Called when this object was created with nullptr as the view and the active
    * view changes.
+   * Please note that this method will cast the pqView to a pqRenderView.
    */
-  void setView(pqView* view);
+  virtual void setView(pqView* view);
 
   /**
    * Called when the active representation changes.
@@ -126,59 +137,73 @@ private Q_SLOTS:
   /**
    * starts the selection i.e. setup render view in selection mode.
    */
-  void beginSelection();
+  virtual void beginSelection();
 
   /**
    * finishes the selection. Doesn't cause the selection, just returns the
    * render view to previous interaction mode.
    */
-  void endSelection();
+  virtual void endSelection();
 
   /**
    * makes the pre-selection.
    */
-  void preSelection();
+  virtual void preSelection();
 
   /**
    * makes fast pre-selection.
    */
-  void fastPreSelection();
+  virtual void fastPreSelection();
 
   /**
    * callback called for mouse stop events when in 'interactive selection'
    * modes.
    */
-  void onMouseStop();
+  virtual void onMouseStop();
 
-private: // NOLINT(readability-redundant-access-specifiers)
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * callback called when the vtkPVRenderView is done with selection.
    */
-  void selectionChanged(vtkObject*, unsigned long, void* calldata);
+  virtual void selectionChanged(vtkObject*, unsigned long, void* calldata);
 
   /**
    * callback called for mouse move events when in 'interactive selection'
    * modes.
    */
-  void onMouseMove();
+  virtual void onMouseMove();
 
+  ///@{
   /**
    * callback called for click events when in 'interactive selection' modes.
    */
-  void onLeftButtonRelease();
-  void onWheelRotate();
-  void onRightButtonPressed();
-  void onRightButtonRelease();
+  virtual void onLeftButtonRelease();
+  virtual void onWheelRotate();
+  virtual void onRightButtonPressed();
+  virtual void onRightButtonRelease();
+  ///@}
 
-  // Get the current state of selection modifier
+  /**
+   * Get the current state of selection modifier
+   */
   int getSelectionModifier() override;
 
-  // Check this selection is compatible with another type of selection
-  bool isCompatible(SelectionMode mode);
+  /**
+   * Check this selection is compatible with another type of selection
+   */
+  virtual bool isCompatible(SelectionMode mode);
 
-  // Display/hide the tooltip of the selected point in mode SELECT_SURFACE_POINTS_TOOLTIP.
-  void UpdateTooltip();
+  /**
+   *  Display/hide the tooltip of the selected point in mode SELECT_SURFACE_POINTS_TOOLTIP.
+   */
+  virtual void UpdateTooltip();
 
+  /**
+   * cleans up observers.
+   */
+  virtual void cleanupObservers();
+
+private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
   QPointer<pqDataRepresentation> Representation;
@@ -197,11 +222,6 @@ private: // NOLINT(readability-redundant-access-specifiers)
   QString PlainTooltipText;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
-
-  /**
-   * cleans up observers.
-   */
-  void cleanupObservers();
 };
 
 #endif
