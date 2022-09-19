@@ -27,9 +27,11 @@ vtkStandardNewMacro(vtkPVCatalystChannelInformation);
 
 namespace
 {
-// this should probably be coming from vtkCPProcessor::GetInputArrayName()
-// but I don't want to introduce a dependency on that module
-const std::string InputArrayName = "__CatalystChannel__";
+// Unfortunately we have two separate naming conventions for
+// which field data array the channel name is coming from.
+// Below are the two possibilities that we need to deal with.
+const std::string InputArrayNameLegacyAPI = "__CatalystChannel__";
+const std::string InputArrayNameV2API = "channel";
 }
 
 //----------------------------------------------------------------------------
@@ -60,7 +62,16 @@ void vtkPVCatalystChannelInformation::CopyFromObject(vtkObject* obj)
     if (vtkDataObject* dobj = algo->GetOutputDataObject(0))
     {
       if (vtkStringArray* array = vtkStringArray::SafeDownCast(
-            dobj->GetFieldData()->GetAbstractArray(InputArrayName.c_str())))
+            dobj->GetFieldData()->GetAbstractArray(InputArrayNameLegacyAPI.c_str())))
+      {
+        if (array->GetNumberOfTuples() > 0)
+        {
+          this->ChannelName = array->GetValue(0);
+          return;
+        }
+      }
+      if (vtkStringArray* array = vtkStringArray::SafeDownCast(
+            dobj->GetFieldData()->GetAbstractArray(InputArrayNameV2API.c_str())))
       {
         if (array->GetNumberOfTuples() > 0)
         {
