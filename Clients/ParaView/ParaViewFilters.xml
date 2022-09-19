@@ -292,6 +292,7 @@
   <Proxy group="filters" name="MulticorrelativeStatistics" />
   <Proxy group="filters" name="NonOverlappingLevelIdScalars" />
   <Proxy group="filters" name="NormalGlyphs" />
+  <Proxy group="filters" name="OctreeImageToPointSet"/>
   <Proxy group="filters" name="OMETIFFChannelCalculator" />
   <Proxy group="filters" name="OTDensityMap" />
   <Proxy group="filters" name="OTKernelSmoothing" />
@@ -309,6 +310,7 @@
   <Proxy group="filters" name="ParticleTracer" />
   <Proxy group="filters" name="PartitionBalancer" />
   <Proxy group="filters" name="PassArrays" />
+  <Proxy group="filters" name="PointSetToOctreeImage" />
   <Proxy group="filters" name="PlotAttributes" />
   <Proxy group="filters" name="PlotDataOverTime" />
   <Proxy group="filters" name="PlotOnIntersectionCurves" />

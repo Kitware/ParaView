@@ -1139,6 +1139,7 @@ list(APPEND TESTS_WITH_BASELINES
   NormalGlyphs.xml
   NumberOfComponentsDomain.xml
   NonConvexPolygon.xml
+  OctreeImageFilters.xml
   OMETIFFChannelCalculator.xml
   OpenSaveData.xml
   OrderedGroupDatasets.xml
