@@ -530,7 +530,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   actionPBDeleteTree->setObjectName(QStringLiteral("actionPBDeleteTree"));
   actionPBDeleteTree->setIcon(icon);
   actionPBDeleteTree->setText(QApplication::translate(
-    "pqPipelineBrowserContextMenu", "Delete This and Downstream Filters", Q_NULLPTR));
+    "pqPipelineBrowserContextMenu", "Delete Downstream Pipeline", Q_NULLPTR));
 #ifndef QT_NO_STATUSTIP
   actionPBDeleteTree->setStatusTip(QApplication::translate(
     "pqPipelineBrowserContextMenu", "Delete selection and all downstream filters", Q_NULLPTR));
