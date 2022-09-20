@@ -162,7 +162,7 @@
      <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
    </property>
    <property name="text">
-    <string>Delete This and Downstream Filters</string>
+    <string>Delete Downstream Pipeline</string>
    </property>
    <property name="statusTip">
     <string>Delete selection and all downstream filters</string>
