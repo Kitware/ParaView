@@ -408,8 +408,7 @@ endif()
 
 if (TARGET VTK::IOIOSS)
   list(APPEND xml_files
-    Resources/readers_ioioss.xml
-    Resources/writers_ioioss.xml)
+    Resources/readers_ioioss.xml)
 endif()
 
 if (TARGET VTK::IOOpenVDB)
