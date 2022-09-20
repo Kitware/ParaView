@@ -575,11 +575,11 @@ When opening some file formats, ParaView needs help to determine which reader to
 
 You can now change the file of a reader by right-clicking on it in the *Pipeline Browser*, and then clicking on `Change File` in the menu.
 
-A `Delete This and Downstream Filters` option has been added to the context menu and _Edit_ menu. When selected, this will delete the selection and all downstream filters, eliminating the need to delete each filter individually.
+A `Delete Downstream Pipeline` option has been added to the context menu and _Edit_ menu. When selected, this will delete the selection and all downstream filters, eliminating the need to delete each filter individually.
 
 > ![pipeline browser context menu items](img/5.11.0/context-menu-new-items.png)
 >
-> The "Delete This and Downstream Filters" and "Change File" items are new options in the _Pipeline Browser_ context menu.
+> The "Delete Downstream Pipeline" and "Change File" items are new options in the _Pipeline Browser_ context menu.
 
 ## Light Controls toolbar
 
