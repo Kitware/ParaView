@@ -1,4 +1,5 @@
 set(classes
+  vtkSMPrismIsSimulationDataDomain
   vtkSMPrismTableArraysDomain
   vtkSMPrismThresholdRangeDomain
   )

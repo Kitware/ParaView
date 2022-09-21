@@ -1107,6 +1107,13 @@ int vtkPrismSESAMEReader::RequestInformation(vtkInformation* vtkNotUsed(request)
 void vtkPrismSESAMEReader::RequestCurvesData(
   std::FILE* file, vtkPartitionedDataSetCollection* curves)
 {
+  // This array is needed to be able to identify  if IsSimulationData is true or not for
+  // vtkPrismGeometryRepresentation.
+  vtkNew<vtkUnsignedCharArray> prismData;
+  prismData->SetName("PRISM_DATA");
+  prismData->InsertNextValue(1);
+  curves->GetFieldData()->AddArray(prismData);
+
   const auto numberOfCurves = static_cast<unsigned int>(this->CurveTableIds->GetNumberOfValues());
   curves->SetNumberOfPartitionedDataSets(numberOfCurves);
   for (unsigned int curveIndex = 0; curveIndex < numberOfCurves; ++curveIndex)
@@ -1446,6 +1453,13 @@ int vtkPrismSESAMEReader::RequestData(
     }
   });
   surfaceOutput->GetPoints()->Modified();
+
+  // This array is needed to be able to identify  if IsSimulationData is true or not for
+  // vtkPrismGeometryRepresentation.
+  vtkNew<vtkUnsignedCharArray> prismData;
+  prismData->SetName("PRISM_DATA");
+  prismData->InsertNextValue(1);
+  surfaceOutput->GetFieldData()->AddArray(prismData);
 
   // set the arrays names as field data
 
