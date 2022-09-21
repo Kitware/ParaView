@@ -358,6 +358,9 @@ Less common, but potentially useful variables are:
   * `PARAVIEW_USE_VTKM` (default `ON`): Whether VTK-m based filters are enabled.
   * `PARAVIEW_USE_FORTRAN` (default `ON` if Fortran compiler found): Enable
      Fortran support for Catalyst libraries.
+  * `PARAVIEW_USE_CUDA` (default `OFF`): Enable CUDA support in ParaView.
+  * `PARAVIEW_USE_HIP` (default `OFF`, requires CMake >= 3.21 and NOT
+    `PARAVIEW_USE_CUDA`): Enable HIP support in ParaView.
 
 #### Feature settings
 
