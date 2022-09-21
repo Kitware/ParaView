@@ -45,6 +45,9 @@ protected:
 
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
+  int ThresholdUsingSuperclassInstance(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
 private:
   vtkPVThreshold(const vtkPVThreshold&) = delete;
   void operator=(const vtkPVThreshold&) = delete;
