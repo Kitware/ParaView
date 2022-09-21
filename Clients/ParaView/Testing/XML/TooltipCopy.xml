@@ -1,8 +1,21 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- Create cube -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="CubeSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Add block information -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ConvertToPartitionedDataSetCollection" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Add field data -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MeshQuality" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Hover over cell to display tooltip -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionHoveringSurfaceCells" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.514509,0.350806,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.514509,0.350806,1,0,0)" />
@@ -13,7 +26,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsOpenScriptEditor" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="Edit" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/Edit" command="activate" arguments="Paste" />
-  <pqcheck object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" property="plainText" arguments="Box1&#xA;Id: 5&#xA;Type: Quad" />
+  <pqcheck object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" property="plainText" arguments="MeshQuality1&#xA;&lt;b&gt;  Block: unnamed_block_0&lt;/b&gt;&#xA;  Id: 5&#xA;  Type: Quad&#xA;  Quality: 1&lt;hr&gt;&#xA;  Mesh Triangle Quality: (0, 0, 0, 0, 0)&#xA;  Mesh Quadrilateral Quality: (1, 1, 1, 0, 6)&#xA;  Mesh Tetrahedron Quality: (0, 0, 0, 0, 0)&#xA;  Mesh Pyramid Quality: (0, 0, 0, 0, 0)&#xA;  Mesh Wedge Quality: (0, 0, 0, 0, 0)&#xA;  Mesh Hexahedron Quality: (0, 0, 0, 0, 0)" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="&amp;Save" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/file.py" />
 </pqevents>
