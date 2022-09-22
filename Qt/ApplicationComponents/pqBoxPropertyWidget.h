@@ -89,6 +89,8 @@ private:
   Q_DISABLE_COPY(pqBoxPropertyWidget)
   pqPropertyLinks WidgetLinks;
   bool BoxIsRelativeToInput;
+
+  QMetaObject::Connection PlaceWidgetConnection;
 };
 
 #endif
