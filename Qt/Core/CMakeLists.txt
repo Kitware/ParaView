@@ -54,6 +54,7 @@ set(classes
   pqFileDialogEventTranslator
   pqFileDialogFavoriteModel
   pqFileDialogFilter
+  pqFileDialogLocationModel
   pqFileDialogModel
   pqFileDialogRecentDirsModel
   pqFileUtilitiesEventPlayer

@@ -224,6 +224,7 @@ private Q_SLOTS:
   void onClickedFile(const QModelIndex&);
 
   void onActivateFavorite(const QModelIndex&);
+  void onActivateLocation(const QModelIndex&);
   void onActivateRecent(const QModelIndex&);
   void onDoubleClickFile(const QModelIndex&);
 

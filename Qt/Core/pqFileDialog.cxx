@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqFileDialogFavoriteModel.h"
 #include "pqFileDialogFilter.h"
+#include "pqFileDialogLocationModel.h"
 #include "pqFileDialogModel.h"
 #include "pqFileDialogRecentDirsModel.h"
 #include "pqQtDeprecated.h"
@@ -133,6 +134,7 @@ class pqFileDialog::pqImplementation : public QObject
 public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
+  pqFileDialogLocationModel* const LocationModel;
   pqFileDialogRecentDirsModel* const RecentModel;
   QSortFilterProxyModel* proxyFavoriteModel;
   pqFileDialogFilter FileFilter;
@@ -159,6 +161,7 @@ public:
     : QObject(p)
     , Model(new pqFileDialogModel(server, nullptr))
     , FavoriteModel(new pqFileDialogFavoriteModel(Model, server, nullptr))
+    , LocationModel(new pqFileDialogLocationModel(Model, server, nullptr))
     , RecentModel(new pqFileDialogRecentDirsModel(Model, server, nullptr))
     , FileFilter(this->Model)
     , Completer(new QCompleter(&this->FileFilter, nullptr))
@@ -176,6 +179,7 @@ public:
   ~pqImplementation() override
   {
     delete this->RecentModel;
+    delete this->LocationModel;
     delete this->FavoriteModel;
     delete this->Model;
     delete this->Completer;
@@ -236,6 +240,7 @@ public:
       this->LocalFilePath = p;
     }
     this->Ui.Favorites->clearSelection();
+    this->Ui.Locations->clearSelection();
     this->Ui.Recent->clearSelection();
     this->Ui.Files->setFocus(Qt::OtherFocusReason);
   }
@@ -371,6 +376,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.Favorites->setModel(impl.proxyFavoriteModel);
   impl.Ui.Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
+  impl.Ui.Locations->setModel(impl.LocationModel);
   impl.Ui.Recent->setModel(impl.RecentModel);
 
   this->setFileMode(ExistingFile);
@@ -395,6 +401,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedRecent(const QModelIndex&)));
+  QObject::connect(impl.Ui.Locations, SIGNAL(clicked(const QModelIndex&)), this,
+    SLOT(onClickedRecent(const QModelIndex&)));
 
   QObject::connect(impl.Ui.Files, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedFile(const QModelIndex&)));
@@ -406,6 +414,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QObject::connect(impl.Ui.Favorites, SIGNAL(activated(const QModelIndex&)), this,
     SLOT(onActivateFavorite(const QModelIndex&)));
 
+  QObject::connect(impl.Ui.Locations, SIGNAL(activated(const QModelIndex&)), this,
+    SLOT(onActivateLocation(const QModelIndex&)));
   QObject::connect(impl.Ui.Recent, SIGNAL(activated(const QModelIndex&)), this,
     SLOT(onActivateRecent(const QModelIndex&)));
 
@@ -1109,9 +1119,21 @@ void pqFileDialog::onClickedFile(const QModelIndex& vtkNotUsed(index))
 void pqFileDialog::onActivateFavorite(const QModelIndex& index)
 {
   auto& impl = *this->Implementation;
-  if (impl.FavoriteModel->isDir(index))
+  if (impl.FavoriteModel->isDirectory(index))
   {
     QString file = impl.FavoriteModel->filePath(index);
+    this->onNavigate(file);
+    impl.Ui.EntityName->selectAll();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onActivateLocation(const QModelIndex& index)
+{
+  auto& impl = *this->Implementation;
+  if (impl.LocationModel->isDirectory(index))
+  {
+    QString file = impl.LocationModel->filePath(index);
     this->onNavigate(file);
     impl.Ui.EntityName->selectAll();
   }

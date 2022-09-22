@@ -367,6 +367,7 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->Extension = nullptr;
   this->Size = 0;
   this->GroupFileSequences = true;
+  this->IncludeExamples = true;
 #ifdef _WIN32
   this->ModificationTime = _time64(nullptr);
 #else
@@ -409,6 +410,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
   }
 
   this->GroupFileSequences = helper->GetGroupFileSequences();
+  this->IncludeExamples = helper->GetExamplesInSpecialDirectories();
 
   if (helper->GetSpecialDirectories())
   {
@@ -472,6 +474,21 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetSpecialDirectories()
 {
+  // Always add the "Examples" dir, with a placeholder path
+  // This is using `_examples_path_` as a placeholder because storing the absolute path to the
+  // `Examples` directory causes issues when switching to another ParaView version, because this
+  // path would still point to the previous version's examples. This entry is added even if the
+  // `Examples` directory is not present.
+  vtkSmartPointer<vtkPVFileInformation> info;
+  if (this->IncludeExamples)
+  {
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info->SetFullPath("_examples_path_");
+    info->SetName("Examples");
+    info->Type = DIRECTORY;
+    this->Contents->AddItem(info);
+  }
+
 #if defined(_WIN32)
   // Return favorite directories ...
 
@@ -481,7 +498,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   if (SUCCEEDED(SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_PERSONAL, false)))
   {
     tmp = szPath;
-    vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath(vtksys::Encoding::ToNarrow(tmp).c_str());
     info->SetName("My Documents");
     info->Type = DIRECTORY;
@@ -491,7 +508,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   if (SUCCEEDED(SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_DESKTOPDIRECTORY, false)))
   {
     tmp = szPath;
-    vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath(vtksys::Encoding::ToNarrow(tmp).c_str());
     info->SetName("Desktop");
     info->Type = DIRECTORY;
@@ -501,7 +518,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   if (SUCCEEDED(SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_FAVORITES, false)))
   {
     tmp = szPath;
-    vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath(vtksys::Encoding::ToNarrow(tmp).c_str());
     info->SetName("Favorites");
     info->Type = DIRECTORY;
@@ -517,7 +534,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
       std::string driveLetter;
       driveLetter += 'A' + i;
       driveLetter += ":\\";
-      vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
+      info = vtkSmartPointer<vtkPVFileInformation>::New();
       info->SetFullPath(driveLetter.c_str());
       info->SetName(driveLetter.c_str());
       info->Type = DRIVE;
@@ -525,7 +542,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     }
   }
 
-  vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
+  info = vtkSmartPointer<vtkPVFileInformation>::New();
   info->SetFullPath(WindowsNetworkRoot.c_str());
   info->SetName("Windows Network");
   info->Type = NETWORK_ROOT;
@@ -536,7 +553,6 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
   // Add special directories
   vtkNew<vtkPVMacFileInformationHelper> helper;
-  vtkSmartPointer<vtkPVFileInformation> info;
 
   std::string homeDirectory = helper->GetHomeDirectory();
   if (homeDirectory != "")
@@ -605,11 +621,36 @@ void vtkPVFileInformation::GetSpecialDirectories()
 #else
   if (const char* home = getenv("HOME"))
   {
-    vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath(home);
     info->SetName("Home");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
+
+    // add typical locations for auto-mounted drives
+    // Ubuntu /media/username/HASH, fedora/mint /run/media/username/HASH
+    std::string username;
+    const char* envUser = getenv("USER") ? getenv("USER") : getenv("USERNAME");
+    if (envUser)
+    {
+      username = envUser;
+    }
+    if (!username.empty())
+    {
+      std::vector<std::string> paths = { "/media/" + username, "/run/media/" + username };
+      for (std::string path : paths)
+      {
+        if (vtksys::SystemTools::FileIsDirectory(path))
+        {
+          info = vtkSmartPointer<vtkPVFileInformation>::New();
+          info->SetFullPath(path.c_str());
+          info->SetName("Media");
+          info->Type = DIRECTORY;
+          this->Contents->AddItem(info);
+          break;
+        }
+      }
+    }
   }
 #endif
 #endif // !_WIN32

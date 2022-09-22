@@ -143,7 +143,7 @@ QString pqFileDialogFavoriteModel::filePath(const QModelIndex& index) const
 }
 
 //-----------------------------------------------------------------------------
-bool pqFileDialogFavoriteModel::isDir(const QModelIndex& index) const
+bool pqFileDialogFavoriteModel::isDirectory(const QModelIndex& index) const
 {
   if (index.row() >= this->FavoriteList.size())
   {
@@ -268,8 +268,14 @@ void pqFileDialogFavoriteModel::addToFavorites(QString const& dirPath)
 
   int type = this->FileDialogModel->fileType(dirPath);
   this->beginInsertRows(QModelIndex(), favoriteList.size(), favoriteList.size());
-  favoriteList.push_back(
-    pqFileDialogFavoriteModelFileInfo{ QFileInfo(dirPath).baseName(), cleanDirPath, type });
+  // a bare drive in Windows might have an empty baseName()
+  QString label = QFileInfo(dirPath).baseName();
+  if (label.isEmpty())
+  {
+    // cleanPath() switches \ for / on windows.
+    label = this->FileDialogModel->absoluteFilePath(dirPath);
+  }
+  favoriteList.push_back(pqFileDialogFavoriteModelFileInfo{ label, cleanDirPath, type });
   this->endInsertRows();
 }
 
@@ -337,38 +343,31 @@ Qt::ItemFlags pqFileDialogFavoriteModel::flags(const QModelIndex& index) const
 //-----------------------------------------------------------------------------
 void pqFileDialogFavoriteModel::LoadFavoritesFromSystem()
 {
-  vtkPVFileInformation* information = vtkPVFileInformation::New();
+  vtkNew<vtkPVFileInformation> information;
 
   if (this->Server)
   {
     vtkSMSessionProxyManager* pxm = this->Server->proxyManager();
 
-    vtkSMProxy* helper = pxm->NewProxy("misc", "FileInformationHelper");
+    vtkSmartPointer<vtkSMProxy> helper;
+    helper.TakeReference(pxm->NewProxy("misc", "FileInformationHelper"));
     pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"), true);
+    pqSMAdaptor::setElementProperty(helper->GetProperty("ExamplesInSpecialDirectories"),
+      pqFileDialogFavoriteModel::AddExamplesInFavorites);
     helper->UpdateVTKObjects();
     helper->GatherInformation(information);
-    helper->Delete();
   }
   else
   {
-    vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
+    vtkNew<vtkPVFileInformationHelper> helper;
     helper->SetSpecialDirectories(1);
+    helper->SetExamplesInSpecialDirectories(pqFileDialogFavoriteModel::AddExamplesInFavorites);
     information->CopyFromObject(helper);
-    helper->Delete();
   }
 
   this->FavoriteList.clear();
-  if (pqFileDialogFavoriteModel::AddExamplesInFavorites)
-  {
-    // Adds the Examples entry in the favorites
-    // This is using `_examples_path_` as a placeholder because storing the absolute path to the
-    // `Examples` directory causes issues when switching to another ParaView version, because this
-    // path would still point to the previous version's examples. This entry is added even if the
-    // `Examples` directory is not present.
-    this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo{
-      "Examples", "_examples_path_", vtkPVFileInformation::DIRECTORY });
-  }
-  vtkCollectionIterator* iter = information->GetContents()->NewIterator();
+  vtkSmartPointer<vtkCollectionIterator> iter;
+  iter.TakeReference(information->GetContents()->NewIterator());
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkPVFileInformation* cur_info = vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
@@ -379,7 +378,4 @@ void pqFileDialogFavoriteModel::LoadFavoritesFromSystem()
     this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo{
       cur_info->GetName(), QDir::cleanPath(cur_info->GetFullPath()), cur_info->GetType() });
   }
-
-  iter->Delete();
-  information->Delete();
 }

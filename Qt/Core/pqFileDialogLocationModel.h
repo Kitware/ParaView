@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqFileDialogFavoriteModel.h
+   Module:    pqFileDialogLocationModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pqFileDialogFavoriteModel_h
-#define pqFileDialogFavoriteModel_h
+#ifndef pqFileDialogLocationModel_h
+#define pqFileDialogLocationModel_h
 
 #include "pqCoreModule.h"
 #include <QAbstractListModel>
@@ -45,12 +45,12 @@ class pqServer;
 class QModelIndex;
 
 /**
-pqFileDialogFavoriteModel allows remote browsing of a connected ParaView server's
-filesystem, as well as browsing of the local file system.
+pqFileDialogLocationModel lists "special" locations, either remote from a connected ParaView
+server's filesystem, or the local file system.
 
 \sa pqFileDialog, pqFileDialogModel
 */
-class PQCORE_EXPORT pqFileDialogFavoriteModel : public QAbstractListModel
+class PQCORE_EXPORT pqFileDialogLocationModel : public QAbstractListModel
 {
   typedef QAbstractListModel Superclass;
 
@@ -61,11 +61,11 @@ public:
    * server is the server for which we need the listing.
    * if the server is nullptr, we get file listings from the builtin server
    */
-  pqFileDialogFavoriteModel(pqFileDialogModel* model, pqServer* server, QObject* Parent);
-  ~pqFileDialogFavoriteModel() override;
+  pqFileDialogLocationModel(pqFileDialogModel* model, pqServer* server, QObject* Parent);
+  ~pqFileDialogLocationModel() override = default;
 
   /**
-   * return the path to the favorites item
+   * return the path to the item
    */
   QString filePath(const QModelIndex&) const;
   /**
@@ -84,55 +84,28 @@ public:
   int rowCount(const QModelIndex& idx) const override;
 
   /**
-   * used by the view to edit the label of the favorite
-   */
-  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
-
-  /**
-   * return the flags for a specific item
-   */
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-  /**
    * return header data
    */
   QVariant headerData(int section, Qt::Orientation, int role) const override;
 
   /**
-   * Adds a directory to the favorites
+   * Resets to the system default
    */
-  virtual void addToFavorites(QString const& dirPath);
-
-  /**
-   * Removes a directory from the favorites
-   */
-  virtual void removeFromFavorites(QString const& dirPath);
-
-  /**
-   * Resets the favorites to the system default
-   */
-  virtual void resetFavoritesToDefault();
-
-  /**
-   * Flag to indicate if the ParaView Examples directory must be added when creating the settings
-   * for the first time, or when reseting it to the default value.
-   */
-  static bool AddExamplesInFavorites;
+  virtual void resetToDefault();
 
 protected:
-  struct pqFileDialogFavoriteModelFileInfo
+  struct pqFileDialogLocationModelFileInfo
   {
     QString Label;
     QString FilePath;
     int Type;
   };
 
-  void LoadFavoritesFromSystem();
+  void LoadSpecialsFromSystem();
 
   QPointer<pqFileDialogModel> FileDialogModel;
   pqServer* Server = nullptr;
-  QList<pqFileDialogFavoriteModelFileInfo> FavoriteList;
-  QString SettingsKey;
+  QList<pqFileDialogLocationModelFileInfo> LocationList;
 };
 
-#endif // !pqFileDialogFavoriteModel_h
+#endif // !pqFileDialogLocationModel_h

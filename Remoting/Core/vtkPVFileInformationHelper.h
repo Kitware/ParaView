@@ -90,6 +90,16 @@ public:
 
   ///@{
   /**
+   * Get/Set if special directories includes the Examples placeholder.
+   * On by default.
+   */
+  vtkGetMacro(ExamplesInSpecialDirectories, bool);
+  vtkSetMacro(ExamplesInSpecialDirectories, bool);
+  vtkBooleanMacro(ExamplesInSpecialDirectories, bool);
+  ///@}
+
+  ///@{
+  /**
    * When on, while listing a directory,
    * whenever a group of files is encountered, we verify
    * the type/accessibility of only the first file in the group
@@ -149,6 +159,7 @@ protected:
   int SpecialDirectories;
   int FastFileTypeDetection;
   bool GroupFileSequences;
+  bool ExamplesInSpecialDirectories;
 
   bool ReadDetailedFileInformation;
   char* PathSeparator;

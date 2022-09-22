@@ -216,6 +216,7 @@ protected:
   int FastFileTypeDetection;
   bool ReadDetailedFileInformation;
   bool GroupFileSequences;
+  bool IncludeExamples;
 
 private:
   vtkPVFileInformation(const vtkPVFileInformation&) = delete;
