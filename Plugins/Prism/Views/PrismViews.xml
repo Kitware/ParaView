@@ -222,4 +222,198 @@
       </PropertyGroup>
     </PrismViewProxy>
   </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="representations">
+    <!-- ==================================================================== -->
+    <RepresentationProxy base_proxygroup="internal_representations"
+                         base_proxyname="SurfaceRepresentationBase"
+                         class="vtkPrismGeometryRepresentationWithFaces"
+                         name="PrismSurfaceRepresentation"
+                         processes="client|renderserver|dataserver">
+      <Documentation>
+        Prism representation to show any dataset in a 3D Prism view.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array_any"/>
+        <InputArrayDomain name="scalar_array"
+                          number_of_components="1"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell_1"
+                          number_of_components="1"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_1"
+                          number_of_components="1"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_2"
+                          number_of_components="2"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell_3"
+                          number_of_components="3"
+                          optional="1"/>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_3"
+                          number_of_components="3"
+                          optional="1"/>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetBackfaceRepresentation"
+                         default_values="400"
+                         name="BackfaceRepresentation"
+                         number_of_elements="1">
+        <Documentation>
+          Choose the representation type for the backface.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Follow Frontface"
+                 value="400"/>
+          <Entry text="Cull Backface"
+                 value="401"/>
+          <Entry text="Cull Frontface"
+                 value="402"/>
+          <Entry text="Points"
+                 value="0"/>
+          <Entry text="Wireframe"
+                 value="1"/>
+          <Entry text="Surface"
+                 value="2"/>
+          <Entry text="Surface With Edges"
+                 value="3"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBackfaceOpacity"
+                            default_values="1.0"
+                            name="BackfaceOpacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackfaceAmbientColor"
+                            default_values="1.0 1.0 1.0"
+                            name="BackfaceAmbientColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackfaceDiffuseColor"
+                            default_values="1.0 1.0 1.0"
+                            name="BackfaceDiffuseColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range"/>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <!--  Prism related properties  -->
+      <IntVectorProperty command="SetIsSimulationData"
+                         default_values="0"
+                         name="IsSimulationData"
+                         number_of_elements="1">
+        <PrismIsSimulationDataDomain name="bool">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </PrismIsSimulationDataDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAttributeType"
+                         default_values="1"
+                         name="AttributeType"
+                         number_of_elements="1">
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="IsSimulationData" value="1"/>
+        </Hints>
+        <Documentation>
+          Control which AttributeType the filter operates on.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetXArrayName"
+                            name="XArrayName"
+                            label="X Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scalar_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="AttributeType"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="IsSimulationData" value="1"/>
+        </Hints>
+        <Documentation>
+          The name of the array to use as the X coordinate.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYArrayName"
+                            name="YArrayName"
+                            label="Y Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scalar_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="AttributeType"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="IsSimulationData" value="1"/>
+        </Hints>
+        <Documentation>
+          The name of the array to use as the Y coordinate.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetZArrayName"
+                            name="ZArrayName"
+                            label="Z Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scalar_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="AttributeType"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="IsSimulationData" value="1"/>
+        </Hints>
+        <Documentation>
+          The name of the array to use as the Z coordinate.
+        </Documentation>
+      </StringVectorProperty>
+    </RepresentationProxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>

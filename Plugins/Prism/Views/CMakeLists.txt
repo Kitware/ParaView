@@ -1,5 +1,6 @@
 set(classes
   vtkPrismGeometryRepresentation
+  vtkPrismGeometryRepresentationWithFaces
   vtkPrismView
   vtkSMPrismViewProxy
   )
