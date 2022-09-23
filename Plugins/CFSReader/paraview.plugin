@@ -1,0 +1,9 @@
+NAME
+  CFSReader
+DESCRIPTION
+  Reader for openCFS result files
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::vtksys
+  VTK::hdf5
