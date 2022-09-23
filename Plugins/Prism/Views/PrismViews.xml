@@ -415,5 +415,308 @@
         </Documentation>
       </StringVectorProperty>
     </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkPrismSelectionRepresentation"
+                         name="PrismSelectionRepresentation"
+                         processes="client|renderserver|dataserver"
+                         si_class="vtkSIProxy">
+      <Documentation>
+        This is the representation for the selection in the PrismView.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <InputArrayDomain name="input_array_any"/>
+        <InputArrayDomain name="scalar_array"
+                          number_of_components="1"/>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Get/Set the visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View
+          and representations cache based on what the view tells it. However in
+          some cases we may want to force a representation to cache irrespective
+          of the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View
+          and representations cache based on what the view tells it. However in
+          some cases we may want to force a representation to cache irrespective
+          of the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetColor"
+                            default_values="1.0 0.0 1.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range"/>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="SelectionColor" unlink_if_modified="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLineWidth"
+                            default_values="2.0"
+                            name="LineWidth"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPointSize"
+                            default_values="5.0"
+                            name="PointSize"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range"/>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRenderLinesAsTubes"
+                         default_values="0"
+                         name="RenderLinesAsTubes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set, all lines are rendered as 3D tubes, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRenderPointsAsSpheres"
+                         default_values="0"
+                         name="RenderPointsAsSpheres"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set, all points are rendered as 3D spheres, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRepresentation"
+                         default_values="1"
+                         name="Representation"
+                         panel_widget="display_representation_selector"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Points"
+                 value="0"/>
+          <Entry text="Wireframe"
+                 value="1"/>
+          <Entry text="Surface"
+                 value="2"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseOutline"
+                         default_values="0"
+                         name="UseOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetUserTransform"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="UserTransform"
+                            number_of_elements="16">
+        <Documentation>
+          In addition to the instance variables such as position and
+          orientation, you can add an additional transformation for your own
+          use. This transformation is concatenated with the actor's internal
+          transformation, which you implicitly create through the use of
+          Position, Origin, Orientation. The value is 4x4 matrix for the linear
+          transform to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <SubProxy command="SetLabelRepresentation">
+        <Proxy name="LabelRepresentation"
+               proxygroup="representations"
+               proxyname="DataLabelRepresentation"/>
+        <ExposedProperties>
+          <Property name="CellFieldDataArrayName"/>
+          <Property name="CellLabelBold"/>
+          <Property name="CellLabelColor"/>
+          <Property name="CellLabelFontFamily"/>
+          <Property name="CellLabelFontFile"/>
+          <Property name="CellLabelFontSize"/>
+          <Property name="CellLabelFormat"/>
+          <Property name="CellLabelItalic"/>
+          <Property name="CellLabelJustification"/>
+          <Property name="CellLabelOpacity"/>
+          <Property name="CellLabelShadow"/>
+          <Property name="CellLabelVisibility"/>
+          <Property name="PointFieldDataArrayName"/>
+          <Property name="PointLabelBold"/>
+          <Property name="PointLabelColor"/>
+          <Property name="PointLabelFontFamily"/>
+          <Property name="PointLabelFontFile"/>
+          <Property name="PointLabelFontSize"/>
+          <Property name="PointLabelFormat"/>
+          <Property name="PointLabelItalic"/>
+          <Property name="PointLabelJustification"/>
+          <Property name="PointLabelOpacity"/>
+          <Property name="PointLabelShadow"/>
+          <Property name="PointLabelVisibility"/>
+          <Property name="MaximumNumberOfLabels"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+        <Property name="CellLabelBold" function="Bold"/>
+        <Property name="CellLabelColor" function="Color"/>
+        <Property name="CellLabelFontFamily" function="Family"/>
+        <Property name="CellLabelFontFile" function="File"/>
+        <Property name="CellLabelFontSize" function="Size"/>
+        <Property name="CellLabelItalic" function="Italics"/>
+        <Property name="CellLabelJustification" function="Justification"/>
+        <Property name="CellLabelOpacity" function="Opacity"/>
+        <Property name="CellLabelShadow" function="Shadow"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+        <Property name="PointLabelBold" function="Bold"/>
+        <Property name="PointLabelColor" function="Color"/>
+        <Property name="PointLabelFontFamily" function="Family"/>
+        <Property name="PointLabelFontFile" function="File"/>
+        <Property name="PointLabelFontSize" function="Size"/>
+        <Property name="PointLabelItalic" function="Italics"/>
+        <Property name="PointLabelJustification" function="Justification"/>
+        <Property name="PointLabelOpacity" function="Opacity"/>
+        <Property name="PointLabelShadow" function="Shadow"/>
+      </PropertyGroup>
+
+      <!--  Prism related properties  -->
+      <IntVectorProperty command="SetIsSimulationData"
+                         default_values="0"
+                         name="IsSimulationData"
+                         number_of_elements="1">
+        <PrismIsSimulationDataDomain name="bool">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </PrismIsSimulationDataDomain>
+        <Documentation>
+          When on, the simulation data will be converted to the prism space.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAttributeType"
+                         default_values="1"
+                         name="AttributeType"
+                         number_of_elements="1">
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          Control which AttributeType the filter operates on.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetXArrayName"
+                            name="XArrayName"
+                            label="X Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scalar_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="AttributeType"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The name of the array to use as the X coordinate.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYArrayName"
+                            name="YArrayName"
+                            label="Y Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scalar_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="AttributeType"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The name of the array to use as the Y coordinate.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetZArrayName"
+                            name="ZArrayName"
+                            label="Z Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scalar_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="AttributeType"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The name of the array to use as the Z coordinate.
+        </Documentation>
+      </StringVectorProperty>
+    </RepresentationProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

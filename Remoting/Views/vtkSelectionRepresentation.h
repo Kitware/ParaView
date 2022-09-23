@@ -153,7 +153,7 @@ protected:
   /**
    * Fires UpdateDataEvent
    */
-  void TriggerUpdateDataEvent();
+  virtual void TriggerUpdateDataEvent();
 
   vtkGeometryRepresentation* GeometryRepresentation;
   vtkDataLabelRepresentation* LabelRepresentation;
