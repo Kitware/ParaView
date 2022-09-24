@@ -30,6 +30,7 @@ vtkPVFileInformationHelper::vtkPVFileInformationHelper()
   , WorkingDirectory(nullptr)
   , DirectoryListing(0)
   , SpecialDirectories(0)
+  , ExamplesInSpecialDirectories(true)
   , FastFileTypeDetection(1)
   , GroupFileSequences(true)
   , ReadDetailedFileInformation(false)
@@ -73,6 +74,7 @@ void vtkPVFileInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "DirectoryListing: " << this->DirectoryListing << endl;
   os << indent << "SpecialDirectories: " << this->SpecialDirectories << endl;
+  os << indent << "ExamplesInSpecialDirectories: " << this->ExamplesInSpecialDirectories << endl;
   os << indent << "PathSeparator: " << (this->PathSeparator ? this->PathSeparator : "(null)")
      << endl;
   os << indent << "FastFileTypeDetection: " << this->FastFileTypeDetection << endl;
