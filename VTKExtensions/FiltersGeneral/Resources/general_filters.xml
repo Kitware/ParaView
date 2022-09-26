@@ -1705,6 +1705,55 @@ Every Nth Point.
           In two dimensions, the X and Y dimensions are used.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetHTGMode"
+                         default_values="0"
+                         name="HTGMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Unlimited"
+                 value="0" />
+          <Entry text="Unstructured"
+                 value="1" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility" />
+        </Hints>
+        <Documentation>
+          Specify how to compute the gradient on a Hypertree Grid.
+          'Unlimited' handles the resolution change by virtually subdividing
+          coarser cells and eventually applyging a ratio.
+          'Unstructured' operate like the AMR like if it was an unstructured
+          mesh, which may give a higher weight to coarser cells.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHTGExtensiveComputation"
+                         default_values="0"
+                         name="ExtensiveComputation"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility" />
+
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="HTGMode"
+                                       value="0"
+                                       mode="enabled_state" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Use the extensive ratio during the Hyper Tree Grid gradient computation.
+          This property only work in UNLIMITED mode.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetComputeGradient"
                          default_values="1"
                          name="ComputeGradient"
