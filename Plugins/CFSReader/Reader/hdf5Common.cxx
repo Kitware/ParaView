@@ -384,12 +384,11 @@ std::string MapUnknownTypeAsString(EntityType t)
   return definedOn;
 }
 
-template void H5CFS::ReadArray<unsigned int>(
+template void ReadArray<unsigned int>(
   hid_t loc, const std::string& name, std::vector<unsigned int>& data);
-template void H5CFS::ReadArray<int>(hid_t loc, const std::string& name, std::vector<int>& data);
-template void H5CFS::ReadArray<double>(
-  hid_t loc, const std::string& name, std::vector<double>& data);
-template unsigned int H5CFS::ReadDataSet<unsigned int>(hid_t loc, const std::string& name);
-template std::string H5CFS::ReadDataSet<std::string>(hid_t loc, const std::string& name);
+template void ReadArray<int>(hid_t loc, const std::string& name, std::vector<int>& data);
+template void ReadArray<double>(hid_t loc, const std::string& name, std::vector<double>& data);
+template unsigned int ReadDataSet<unsigned int>(hid_t loc, const std::string& name);
+template std::string ReadDataSet<std::string>(hid_t loc, const std::string& name);
 
 } // end of namespace H5CFS
