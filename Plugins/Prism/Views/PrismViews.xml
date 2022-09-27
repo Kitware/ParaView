@@ -719,4 +719,509 @@
       </StringVectorProperty>
     </RepresentationProxy>
   </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="internal_representations">
+    <!-- ==================================================================== -->
+    <PVRepresentationProxy class="vtkPrismCompositeRepresentation"
+                           name="PrismRepresentationBase"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        Prism's default representation for showing any type of dataset in the prism view.
+      </Documentation>
+      <InputProperty command="SetSelectionConnection"
+                     name="Selection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the selection.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View
+          and representations cache based on what the view tells it. However in
+          some cases we may want to force a representation to cache irrespective
+          of the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View
+          and representations cache based on what the view tells it. However in
+          some cases we may want to force a representation to cache irrespective
+          of the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSelectionVisibility"
+                         default_values="1"
+                         name="SelectionVisibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set the visibility for the selection, if any.
+        </Documentation>
+      </IntVectorProperty>
+      <RepresentationType subproxy="PrismSurfaceRepresentation"
+                          subtype="Points"
+                          text="Points"/>
+      <RepresentationType subproxy="PrismSurfaceRepresentation"
+                          subtype="Wireframe"
+                          text="Wireframe"/>
+      <RepresentationType subproxy="PrismSurfaceRepresentation"
+                          subtype="Surface"
+                          text="Surface"/>
+      <RepresentationType subproxy="PrismSurfaceRepresentation"
+                          subtype="Surface With Edges"
+                          text="Surface With Edges"/>
+      <StringVectorProperty command="GetRepresentationTypes"
+                            information_only="1"
+                            name="RepresentationTypesInfo"
+                            si_class="vtkSIDataArrayProperty">
+        <Documentation>
+          Property that lists the available representation types. This is used by the domain for
+          "Representation" to setup the list of types available correctly.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetActiveRepresentation"
+                            default_values="Surface"
+                            name="Representation"
+                            number_of_elements="1"
+                            panel_visibility="default"
+                            panel_widget="display_representation_selector">
+        <Documentation>
+          Choose the type for the representation.
+        </Documentation>
+        <RepresentationTypeDomain name="list">
+          <RequiredProperties>
+            <Property function="StringList"
+                      name="RepresentationTypesInfo"/>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </RepresentationTypeDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellFieldDataArrayName"
+                            default_values="vtkOriginalCellIds"
+                            name="SelectionCellFieldDataArrayName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <ArrayListDomain input_domain_name="input_array_cell"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointFieldDataArrayName"
+                            default_values="vtkOriginalPointIds"
+                            name="SelectionPointFieldDataArrayName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <ArrayListDomain input_domain_name="input_array_point"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PrismSurfaceRepresentation"
+               proxygroup="representations"
+               proxyname="PrismSurfaceRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <PropertyGroup panel_visibility="default"
+                         panel_widget="ColorEditor"
+                         label="Coloring">
+            <Property name="AmbientColor"/>
+            <Property name="ColorArrayName"/>
+            <Property name="DiffuseColor"/>
+            <Property name="LookupTable"/>
+            <Property name="UseSeparateColorMap"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Scalar Coloring">
+            <Property name="MapScalars"
+                      panel_visibility="advanced"/>
+            <Property name="MultiComponentsMapping"
+                      panel_visibility="advanced"/>
+            <Property name="InterpolateScalarsBeforeMapping"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Styling">
+            <Property name="Opacity"
+                      panel_visibility="default"/>
+            <Property name="PointSize"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points"/>
+            <Property name="LineWidth"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="wireframe"/>
+            <Property name="RenderLinesAsTubes"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="wireframe"/>
+            <Property name="RenderPointsAsSpheres"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points"/>
+            <Hints>
+              <!--Hide for volume representation-->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume"
+                                       inverse="1"/>
+            </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Lighting">
+            <Property name="Interpolation"
+                      panel_visibility="advanced"/>
+            <Property name="Specular"
+                      panel_visibility="default"/>
+            <Property name="SpecularColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"/>
+            <Property name="InteractiveSelectionColor"
+                      panel_visibility="never"/>
+            <Property name="SpecularPower"
+                      panel_visibility="advanced"/>
+            <Property name="Luminosity"
+                      panel_visibility="advanced"/>
+            <Property name="Ambient" panel_visibility="advanced"/>
+            <Property name="Diffuse" panel_visibility="advanced"/>
+            <Property name="Roughness" panel_visibility="advanced"/>
+            <Property name="Metallic" panel_visibility="advanced"/>
+            <Property name="EdgeTint"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"/>
+            <Property name="Anisotropy" panel_visibility="advanced"/>
+            <Property name="AnisotropyRotation" panel_visibility="advanced"/>
+            <Property name="BaseIOR" panel_visibility="advanced"/>
+            <Property name="CoatStrength" panel_visibility="advanced"/>
+            <Property name="CoatIOR" panel_visibility="advanced"/>
+            <Property name="CoatRoughness" panel_visibility="advanced"/>
+            <Property name="CoatColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"/>
+            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
+            <Property name="SelectNormalArray" panel_visibility="advanced"/>
+            <Property name="SelectTangentArray" panel_visibility="advanced"/>
+            <Property name="Texture" panel_visibility="advanced"/>
+            <Property name="RepeatTextures" panel_visibility="advanced"/>
+            <Property name="InterpolateTextures" panel_visibility="advanced"/>
+            <Property name="SeamlessU" panel_visibility="advanced"/>
+            <Property name="SeamlessV" panel_visibility="advanced"/>
+            <Property name="UseMipmapTextures" panel_visibility="advanced"/>
+            <Property name="ShowTexturesOnBackface" panel_visibility="advanced"/>
+            <Property name="BaseColorTexture" panel_visibility="advanced"/>
+            <Property name="NormalTexture" panel_visibility="advanced"/>
+            <Property name="NormalScale" panel_visibility="advanced"/>
+            <Property name="CoatNormalTexture" panel_visibility="advanced"/>
+            <Property name="CoatNormalScale" panel_visibility="advanced"/>
+            <Property name="MaterialTexture" panel_visibility="advanced"/>
+            <Property name="OcclusionStrength" panel_visibility="advanced"/>
+            <Property name="AnisotropyTexture" panel_visibility="advanced"/>
+            <Property name="EmissiveTexture" panel_visibility="advanced"/>
+            <Property name="EmissiveFactor" panel_visibility="advanced"/>
+            <Property name="FlipTextures" panel_visibility="advanced"/>
+            <Hints>
+              <!--Hide for volume representation-->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume"
+                                       inverse="1"/>
+            </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Edge Styling">
+            <Property name="EdgeColor"
+                      panel_widget="color_selector_with_palette"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="Surface With Edges"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Backface Styling">
+            <Property name="BackfaceRepresentation"
+                      panel_visibility="advanced"/>
+            <Property name="BackfaceAmbientColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"/>
+            <Property name="BackfaceDiffuseColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"/>
+            <Property name="BackfaceOpacity"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Transforming">
+            <Property name="Position"
+                      panel_visibility="advanced"/>
+            <Property name="Scale"
+                      panel_visibility="advanced"/>
+            <Property name="Orientation"
+                      panel_visibility="advanced"/>
+            <Property name="Origin"
+                      panel_visibility="advanced"/>
+            <Property name="CoordinateShiftScaleMethod"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Miscellaneous">
+            <Property name="Pickable"
+                      panel_visibility="advanced"/>
+            <Property name="StaticMode"
+                      panel_visibility="never"/>
+            <Property name="SuppressLOD"
+                      panel_visibility="never"/>
+            <Property name="UserTransform"
+                      panel_visibility="never"/>
+            <Property name="Triangulate"
+                      panel_visibility="advanced"/>
+            <Property name="UseShaderReplacements"
+                      panel_visibility="advanced"/>
+            <Property name="ShaderReplacements"
+                      panel_visibility="advanced"/>
+            <Property name="NonlinearSubdivisionLevel"
+                      panel_visibility="advanced"/>
+            <Property name="BlockColorsDistinctValues"
+                      panel_visibility="advanced"/>
+            <Property name="UseDataPartitions"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup panel_visibility="advanced"
+                         label="Ray Tracing">
+            <Property name="OSPRayUseScaleArray"/>
+            <Property name="OSPRayScaleArray"/>
+            <Property name="OSPRayScaleFunction"/>
+            <Property name="OSPRayMaterial"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Blocks"
+                         panel_widget="DataAssemblyEditor"
+                         panel_visibility="multiblock_inspector">
+            <!--
+               place holder for future work
+               <Property name="Assembly"       function="ActiveAssembly" />
+            -->
+            <Property name="BlockSelectors" function="Selectors"/>
+            <Property name="BlockColors" function="Colors"/>
+            <Property name="BlockOpacities" function="Opacities"/>
+            <Hints>
+              <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
+            </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Prism Parameters">
+            <Property name="IsSimulationData"/>
+            <Property name="AttributeType"/>
+            <Property name="XArrayName"/>
+            <Property name="YArrayName"/>
+            <Property name="ZArrayName"/>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
+        <Proxy name="SelectionRepresentation"
+               proxygroup="representations"
+               proxyname="PrismSelectionRepresentation"/>
+        <ShareProperties subproxy="PrismSurfaceRepresentation">
+          <Exception name="Input"/>
+          <Exception name="Visibility"/>
+          <Exception name="Representation"/>
+          <Exception name="Color"/>
+          <Exception name="LineWidth"/>
+          <Exception name="Opacity"/>
+          <Exception name="PointSize"/>
+        </ShareProperties>
+        <ExposedProperties>
+          <Property exposed_name="SelectionColor" name="Color" panel_visibility="never"/>
+          <Property exposed_name="SelectionOpacity" name="Opacity" panel_visibility="never"/>
+          <Property exposed_name="SelectionUseOutline" name="UseOutline" panel_visibility="never"/>
+          <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never"/>
+          <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never"/>
+          <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never"/>
+          <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" panel_visibility="never"/>
+          <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
+            <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionCellLabelFontFile" name="CellLabelFontFile" function="File"/>
+            <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification"
+                      function="Justification"/>
+            <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
+          </PropertyGroup>
+          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" panel_visibility="never"/>
+          <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
+          <Property exposed_name="SelectionMaximumNumberOfLabels" name="MaximumNumberOfLabels"
+                    panel_visibility="never"/>
+          <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
+            <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionPointLabelFontFile" name="PointLabelFontFile" function="File"/>
+            <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification"
+                      function="Justification"/>
+            <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
+          </PropertyGroup>
+          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat" panel_visibility="never"/>
+        </ExposedProperties>
+      </SubProxy>
+    </PVRepresentationProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="representations">
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PrismRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="PrismGeometryRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        ParaView's default representation for showing any type of dataset in the Prism view.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkGenericDataSet"/>
+
+          <!-- for MB, we want to match if any of the leaf nodes is of the following type -->
+          <DataType value="vtkDataObjectTree" child_match="any">
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkGenericDataSet"/>
+          </DataType>
+
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1">
+        </InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PrismRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="PrismUnstructuredGridRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        This representation is used to show unstructured grid as Surface/Outline/Points/Wireframe.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+          <DataType value="vtkUnstructuredGridBase"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1">
+        </InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PrismRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="PrismStructuredGridRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        This representation is used to show structured grid as Surface/Outline/Points/Wireframe
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkStructuredGrid"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PrismRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="PrismUniformGridRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        This representation is used to show image data as Surface/Outline/Points/Wireframe.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkImageData"/>
+          <DataType value="vtkRectilinearGrid"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+    </PVRepresentationProxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>
