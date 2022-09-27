@@ -166,6 +166,7 @@
   <Proxy group="filters" name="AdaptiveResampleToImage" />
   <Proxy group="filters" name="AddFieldArrays" />
   <Proxy group="filters" name="AggregateDataSet" />
+  <Proxy group="filters" name="AlignImageOrigin" />
   <Proxy group="filters" name="AngularPeriodicFilter" />
   <Proxy group="filters" name="AnnotateAttributeData" />
   <Proxy group="filters" name="AnnotateGlobalData" />

@@ -1761,5 +1761,38 @@
       <!-- End of PlotDataOverTime -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAlignImageDataSetFilter"
+                 label="Align Image Origins"
+                 name="AlignImageOrigin">
+      <Documentation long_help="Assign consistent origins to input images in a composite dataset."
+                     short_help="Make image origins consistent.">The Align Image Origins filter
+                     treats input images as parts of a whole, and sets the same origin. Each
+                     block's extent is set relative to that origin.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet" child_match="any">
+            <DataType value="vtkImageData" />
+          </DataType>
+          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkPartitionedDataSet"/>
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Align Image Origins
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetMinimumExtent"
+                         default_values="0 0 0"
+                         name="MinimumExtent"
+                         number_of_elements="3">
+        <Documentation>Specify the global minimum extent to use.</Documentation>
+      </IntVectorProperty>
+      <!-- End AlignImageOrigin -->
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
