@@ -535,6 +535,9 @@ public:
   /**
    * Given the string, this method will create and set a well-formated
    * string as XMLLabel and returns it. Need to be deleted after use.
+   * Add space:
+   (1) - before every uppercase letter succeded by a lowercase letter
+   (2) - after every lowercase letter succeded by an uppercase letter
    */
   static const char* CreateNewPrettyLabel(const char* name);
 

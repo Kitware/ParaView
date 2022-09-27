@@ -26,6 +26,7 @@ vtk_add_test_cxx(vtkRemotingServerManagerCxxTests tests
   TestSelfGeneratingSourceProxy.cxx
   TestSessionProxyManager.cxx
   TestSettings.cxx
+  TestSMPropertyLabel.cxx
   TestValidateProxies.cxx
   TestXMLSaveLoadState.cxx)
 
