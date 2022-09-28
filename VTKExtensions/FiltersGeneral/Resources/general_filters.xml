@@ -2568,7 +2568,9 @@ Every Nth Point.
         <Documentation>The values in this property specify a list of current
         offset values. This can be used to create multiple slices with
         different centers. Each entry represents a new slice with its center
-        shifted by the offset value.</Documentation>
+        shifted by the offset value. The 'Values Range' information is the
+        range based on the global bounding box, not necessarily on the current
+        slice geometry configuration.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="PreserveInputCells" function="boolean_invert" />
