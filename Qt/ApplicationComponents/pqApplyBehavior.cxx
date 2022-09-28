@@ -283,7 +283,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
     SM_SCOPED_TRACE(CallMethod)
       .arg(view->getViewProxy())
       .arg("Update")
-      .arg("comment", "update the view to ensure updated data information");
+      .arg("comment", qPrintable(tr("update the view to ensure updated data information")));
     view->getViewProxy()->Update();
   }
 

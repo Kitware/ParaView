@@ -80,10 +80,13 @@ public:
       arow.IndexLabel = new QLabel(QString::number(cc + 1), this->Parent);
       arow.IndexLabel->setAlignment(Qt::AlignCenter);
       arow.ToolTipEdit = new QLineEdit(this->Parent);
-      arow.ToolTipEdit->setToolTip("This text will be set to the buttons tool tip.");
+      arow.ToolTipEdit->setToolTip(QCoreApplication::translate(
+        "pqCustomViewpointButtonDialogUI", "This text will be set to the buttons tool tip."));
       arow.ToolTipEdit->setText(::pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP);
       arow.ToolTipEdit->setObjectName(QString("toolTip%1").arg(cc));
-      arow.AssignButton = new QPushButton("Current Viewpoint", this->Parent);
+      arow.AssignButton = new QPushButton(
+        QCoreApplication::translate("pqCustomViewpointButtonDialogUI", "Current Viewpoint"),
+        this->Parent);
       arow.AssignButton->setProperty("pqCustomViewpointButtonDialog_INDEX", cc);
       arow.AssignButton->setObjectName(QString("currentViewpoint%1").arg(cc));
       this->Parent->connect(arow.AssignButton, SIGNAL(clicked()), SLOT(assignCurrentViewpoint()));
@@ -196,7 +199,8 @@ public:
 };
 
 //------------------------------------------------------------------------------
-const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP = QString("Unnamed Viewpoint");
+const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP =
+  QCoreApplication::translate("pqCustomViewpointButtonFileInfo", "Unnamed Viewpoint");
 const int pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS = 0;
 const int pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS = 30;
 
@@ -311,9 +315,10 @@ void pqCustomViewpointButtonDialog::importConfigurations()
   pqCustomViewpointButtonFileInfo fileInfo;
 
   QString filters =
-    QString("%1 (*%2);;All Files (*.*)").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension);
+    QString("%1 (*%2);;").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension) +
+    tr("All Files") + " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, "Load Custom Viewpoints Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Load Custom Viewpoints Configuration"), "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -425,9 +430,10 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
   pqCustomViewpointButtonFileInfo fileInfo;
 
   QString filters =
-    QString("%1 (*%2);;All Files (*.*)").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension);
+    QString("%1 (*%2);;").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension) + "All Files" +
+    " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, "Save Custom Viewpoints Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Save Custom Viewpoints Configuration"), "", filters);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -497,7 +503,7 @@ void pqCustomViewpointButtonDialog::assignCurrentViewpoint()
     this->Configurations[row] = this->CurrentConfiguration;
     if (this->ui->toolTip(row) == pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP)
     {
-      this->ui->setToolTip(row, "Current Viewpoint " + QString::number(row + 1));
+      this->ui->setToolTip(row, tr("Current Viewpoint %1").arg(QString::number(row + 1)));
     }
   }
 }

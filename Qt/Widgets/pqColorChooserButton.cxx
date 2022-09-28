@@ -181,7 +181,7 @@ void pqColorChooserButton::chooseColor()
     opts |= QColorDialog::ShowAlphaChannel;
   }
 
-  this->setChosenColor(QColorDialog::getColor(this->chosenColor(), this, "Select Color", opts));
+  this->setChosenColor(QColorDialog::getColor(this->chosenColor(), this, tr("Select Color"), opts));
 }
 
 //-----------------------------------------------------------------------------

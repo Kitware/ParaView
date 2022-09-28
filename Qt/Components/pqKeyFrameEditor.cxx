@@ -562,7 +562,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
   int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
   int newNumber = this->Internal->Model.rowCount();
 
-  BEGIN_UNDO_SET("Edit Keyframes");
+  BEGIN_UNDO_SET(tr("Edit Keyframes"));
   SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->Internal->Cue->getProxy());
 
   if (camera)

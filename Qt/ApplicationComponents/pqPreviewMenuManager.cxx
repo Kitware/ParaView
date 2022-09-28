@@ -122,7 +122,7 @@ void pqPreviewMenuManager::init(const QStringList& defaultItems, QMenu* menu)
   {
     menu->addSeparator();
   }
-  menu->addAction("Custom ...", this, SLOT(addCustom()));
+  menu->addAction(tr("Custom ..."), this, SLOT(addCustom()));
 
   this->Timer.setSingleShot(true);
   this->Timer.setInterval(500);

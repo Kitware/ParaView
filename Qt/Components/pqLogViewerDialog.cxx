@@ -135,8 +135,8 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
       this->LogRecorderProxies[RENDER_SERVER_PROCESS]->SetLocation(vtkSMSession::RENDER_SERVER);
       this->LogRecorderProxies[RENDER_SERVER_PROCESS]->UpdateVTKObjects();
 
-      this->Ui->processComboBox->addItem("Data Server");
-      this->Ui->processComboBox->addItem("Render Server");
+      this->Ui->processComboBox->addItem(tr("Data Server"));
+      this->Ui->processComboBox->addItem(tr("Render Server"));
 
       server->session()->GatherInformation(vtkSMSession::DATA_SERVER, serverInfo, 0);
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
@@ -149,7 +149,7 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
       this->LogRecorderProxies[SERVER_PROCESS]->SetLocation(vtkSMSession::SERVERS);
       this->LogRecorderProxies[SERVER_PROCESS]->UpdateVTKObjects();
 
-      this->Ui->processComboBox->addItem("Server");
+      this->Ui->processComboBox->addItem(tr("Server"));
 
       server->session()->GatherInformation(vtkPVSession::SERVERS, serverInfo, 0);
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
@@ -371,8 +371,8 @@ void pqLogViewerDialog::appendLogView(pqSingleLogViewerWidget* logView)
   int tabIndex = this->Ui->logTabWidget->addTab(logView, tabTitle);
   QLabel* label = new QLabel();
   label->setObjectName("close");
-  label->setToolTip("Close log");
-  label->setStatusTip("Close log");
+  label->setToolTip(tr("Close log"));
+  label->setStatusTip(tr("Close log"));
   label->setPixmap(
     label->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(PIXMAP_SIZE, PIXMAP_SIZE));
   this->Ui->logTabWidget->tabBar()->setTabButton(tabIndex, QTabBar::RightSide, label);
@@ -418,11 +418,11 @@ void pqLogViewerDialog::initializeVerbosityComboBoxes()
 //----------------------------------------------------------------------------
 void pqLogViewerDialog::initializeVerbosities(QComboBox* combobox)
 {
-  combobox->addItem("OFF");
-  combobox->addItem("ERROR");
-  combobox->addItem("WARNING");
-  combobox->addItem("INFO");
-  combobox->addItem("TRACE");
+  combobox->addItem(tr("OFF"));
+  combobox->addItem(tr("ERROR"));
+  combobox->addItem(tr("WARNING"));
+  combobox->addItem(tr("INFO"));
+  combobox->addItem(tr("TRACE"));
 
   for (int i = 0; i <= 9; i++)
   {

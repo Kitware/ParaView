@@ -69,13 +69,13 @@ bool pqSaveExtractsReaction::generateExtracts()
     controller->PostInitializeProxy(exporter);
 
     pqProxyWidgetDialog dialog(exporter, pqCoreUtilities::mainWidget());
-    dialog.setWindowTitle("Save Extracts Options");
+    dialog.setWindowTitle(tr("Save Extracts Options"));
     dialog.setSettingsKey("SaveAnimationExtracts");
     if (dialog.exec() == QDialog::Accepted)
     {
       pqAnimationProgressDialog progress(
         "Save Extracts Progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
-      progress.setWindowTitle("Saving Extracts ...");
+      progress.setWindowTitle(tr("Saving Extracts ..."));
       progress.setAnimationScene(scene);
       progress.show();
 

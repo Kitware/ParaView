@@ -113,9 +113,8 @@ public:
   {
     if (this->IsInteractiveDelayActive)
     {
-      QString txt = "Full resolution render in: ";
-      txt += QString::number(this->TimeLeftBeforeFullResolution);
-      txt += " s";
+      QString txt = tr("Full resolution render in: %1 s")
+                      .arg(QString::number(this->TimeLeftBeforeFullResolution));
       this->writeToStatusBar(txt.toUtf8().data());
       this->TimeLeftBeforeFullResolution -= 0.1;
     }

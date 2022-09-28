@@ -106,7 +106,7 @@ void pqCopyReaction::copy(vtkSMProxy* dest, vtkSMProxy* source)
 {
   if (dest && source)
   {
-    BEGIN_UNDO_SET("Copy Properties");
+    BEGIN_UNDO_SET(tr("Copy Properties"));
 
     vtkNew<vtkSMProxyClipboard> clipboard;
     clipboard->Copy(source);

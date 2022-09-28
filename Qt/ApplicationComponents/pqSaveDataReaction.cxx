@@ -156,10 +156,10 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
       // Let's try to warn separately for each type of writer.
       QString("SerialWriterWarning_%1").arg(writer->GetXMLName()), QMessageBox::Warning,
       tr("Serial Writer Warning"),
-      QString(tr("This writer (%1) will collect all of the data to the first node before "
-                 "writing because it does not support parallel IO. This may cause the "
-                 "first node to run out of memory if the data is large.\n"
-                 "Are you sure you want to continue?"))
+      tr("This writer (%1) will collect all of the data to the first node before "
+         "writing because it does not support parallel IO. This may cause the "
+         "first node to run out of memory if the data is large.\n"
+         "Are you sure you want to continue?")
         .arg(writer->GetXMLLabel()),
       QMessageBox::Yes | QMessageBox::No | QMessageBox::Save, pqCoreUtilities::mainWidget());
     if (!result)
@@ -172,7 +172,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
   dialog.setObjectName("WriterSettingsDialog");
   dialog.setEnableSearchBar(dialog.hasAdvancedProperties());
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle(QString("Configure Writer (%1)").arg(writer->GetXMLLabel()));
+  dialog.setWindowTitle(tr("Configure Writer (%1)").arg(writer->GetXMLLabel()));
 
   // Check to see if this writer has any properties that can be configured by
   // the user. If it does, display the dialog.

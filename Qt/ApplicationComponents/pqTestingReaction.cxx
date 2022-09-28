@@ -58,11 +58,11 @@ pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode, Qt::Conne
 void pqTestingReaction::recordTest()
 {
   QString filters;
-  filters += "XML Files (*.xml);;";
+  filters += tr("XML Files") + QString(" (*.xml);;");
 #ifdef QT_TESTING_WITH_PYTHON
-  filters += "Python Files (*.py);;";
+  filters += tr("Python Files") + QString(" (*.py);;");
 #endif
-  filters += "All Files (*)";
+  filters += tr("All Files") + QString(" (*)");
   pqFileDialog fileDialog(
     nullptr, pqCoreUtilities::mainWidget(), tr("Record Test"), QString(), filters);
   fileDialog.setObjectName("ToolsRecordTestDialog");
@@ -87,11 +87,11 @@ void pqTestingReaction::recordTest(const QString& filename)
 void pqTestingReaction::playTest()
 {
   QString filters;
-  filters += "XML Files (*.xml);;";
+  filters += tr("XML Files") + QString(" (*.xml);;");
 #ifdef QT_TESTING_WITH_PYTHON
-  filters += "Python Files (*.py);;";
+  filters += tr("Python Files") + QString(" (*.py);;");
 #endif
-  filters += "All Files (*)";
+  filters += tr("All Files") + QString(" (*)");
   pqFileDialog fileDialog(
     nullptr, pqCoreUtilities::mainWidget(), tr("Play Test"), QString(), filters);
   fileDialog.setObjectName("ToolsPlayTestDialog");

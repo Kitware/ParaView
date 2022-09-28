@@ -54,7 +54,6 @@ using json = nlohmann::json;
 
 constexpr const char* DEFAULT_GROUP_NAME = pqExpressionsManager::EXPRESSION_GROUP();
 constexpr const char* ALL_GROUP_NAME = "All";
-constexpr const char* BROWSE_FILE_FILTER = "ParaView Expressions (*.json);;All Files (*)";
 
 constexpr const char* JSON_FILE_VERSION = "1.0";
 constexpr const char* JSON_FILE_VERSION_KEY = "version";
@@ -403,7 +402,7 @@ void pqExpressionsManagerDialog::filterGroup()
 void pqExpressionsManagerDialog::removeAllExpressions()
 {
   QMessageBox dialog;
-  dialog.setText("Remove all expressions ?");
+  dialog.setText(tr("Remove all expressions ?"));
   dialog.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
   dialog.setDefaultButton(QMessageBox::Cancel);
   if (dialog.exec() == QMessageBox::Ok)
@@ -482,7 +481,8 @@ void pqExpressionsManagerDialog::onClose()
 //----------------------------------------------------------------------------
 void pqExpressionsManagerDialog::exportToFile()
 {
-  pqFileDialog dialog(nullptr, this, tr("Export Expressions(s)"), QString(), BROWSE_FILE_FILTER);
+  pqFileDialog dialog(nullptr, this, tr("Export Expressions(s)"), QString(),
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"));
   dialog.setObjectName("ExportExpressions");
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -522,7 +522,8 @@ void pqExpressionsManagerDialog::exportToFile()
 //----------------------------------------------------------------------------
 bool pqExpressionsManagerDialog::importFromFile()
 {
-  pqFileDialog dialog(nullptr, this, tr("Import Expressions(s)"), QString(), BROWSE_FILE_FILTER);
+  pqFileDialog dialog(nullptr, this, tr("Import Expressions(s)"), QString(),
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"));
   dialog.setObjectName("ImportExpressions");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())

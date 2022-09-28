@@ -184,7 +184,7 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
     }
     delete box;
   }
-  BEGIN_UNDO_SET("Toggle Color Legend Visibility");
+  BEGIN_UNDO_SET(tr("Toggle Color Legend Visibility"));
   vtkSMPVRepresentationProxy::SetScalarBarVisibility(
     repr->getProxy(), repr->getView()->getProxy(), visible);
   END_UNDO_SET();

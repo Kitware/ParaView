@@ -23,9 +23,9 @@ class MainWindow : public QMainWindow
 public:
   MainWindow()
   {
-    auto tb = this->addToolBar("Toolbar");
+    auto tb = this->addToolBar(tr("Toolbar"));
     this->ComboBox = new QComboBox();
-    this->ComboBox->addItem("No filtering", QString());
+    this->ComboBox->addItem(tr("No filtering"), QString());
     tb->addWidget(this->ComboBox);
 
     this->TMVWidget = new pqTabbedMultiViewWidget(this);
@@ -73,12 +73,12 @@ public:
       ob->addToLayout(view, layoutProxy);
     }
 
-    this->ComboBox->addItem("Filter 1 (Layouts 1,2,4)", QString("Filter1"));
+    this->ComboBox->addItem(tr("Filter 1 (Layouts 1,2,4)"), QString("Filter1"));
     layouts[0]->SetAnnotation("Filter1", "1");
     layouts[1]->SetAnnotation("Filter1", "1");
     layouts[3]->SetAnnotation("Filter1", "1");
 
-    this->ComboBox->addItem("Filter 2 (Layouts 3,4)", QString("Filter2"));
+    this->ComboBox->addItem(tr("Filter 2 (Layouts 3,4)"), QString("Filter2"));
     layouts[2]->SetAnnotation("Filter2", "1");
     layouts[3]->SetAnnotation("Filter2", "1");
   }

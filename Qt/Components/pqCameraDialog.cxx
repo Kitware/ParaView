@@ -121,7 +121,8 @@ public:
     // Add + bouton
     this->PlusButton = new QToolButton();
     this->PlusButton->setObjectName("AddButton");
-    this->PlusButton->setToolTip(QToolButton::tr("Add Current Viewpoint"));
+    this->PlusButton->setToolTip(
+      QCoreApplication::translate("pqCameraDialog", "Add Current Viewpoint"));
     this->PlusButton->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
     this->PlusButton->setMinimumSize(QSize(34, 34));
   }
@@ -845,11 +846,11 @@ void pqCameraDialog::saveCameraConfiguration()
   vtkSMCameraConfigurationWriter* writer = vtkSMCameraConfigurationWriter::New();
   writer->SetRenderViewProxy(this->Internal->RenderModule->getRenderViewProxy());
 
-  QString filters = QString("%1 (*%2);;All Files (*.*)")
-                      .arg(writer->GetFileDescription())
-                      .arg(writer->GetFileExtension());
+  QString filters =
+    QString("%1 (*%2);;").arg(writer->GetFileDescription()).arg(writer->GetFileExtension()) +
+    tr("All Files") + " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, "Save Camera Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Save Camera Configuration"), "", filters);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -872,11 +873,11 @@ void pqCameraDialog::loadCameraConfiguration()
   vtkSMCameraConfigurationReader* reader = vtkSMCameraConfigurationReader::New();
   reader->SetRenderViewProxy(this->Internal->RenderModule->getRenderViewProxy());
 
-  QString filters = QString("%1 (*%2);;All Files (*.*)")
-                      .arg(reader->GetFileDescription())
-                      .arg(reader->GetFileExtension());
+  QString filters =
+    QString("%1 (*%2);;").arg(reader->GetFileDescription()).arg(reader->GetFileExtension()) +
+    tr("All Files") + " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, "Load Camera Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Load Camera Configuration"), "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)

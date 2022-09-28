@@ -277,7 +277,7 @@ int pqContextView::selectionAction()
 //-----------------------------------------------------------------------------
 void pqContextView::startInteraction()
 {
-  BEGIN_UNDO_SET("Interaction");
+  BEGIN_UNDO_SET(tr("Interaction"));
 }
 
 //-----------------------------------------------------------------------------

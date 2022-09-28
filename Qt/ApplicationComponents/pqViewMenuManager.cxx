@@ -89,7 +89,7 @@ void pqViewMenuManager::buildMenu()
   this->Menu->clear();
 
   // Add invariant items to the menu.
-  this->ToolbarsMenu = this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqToolbar.svg"), "Toolbars")
+  this->ToolbarsMenu = this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqToolbar.svg"), tr("Toolbars"))
     << pqSetName("Toolbars");
   this->DockPanelSeparators[0] = this->Menu->addSeparator();
   this->DockPanelSeparators[1] = this->Menu->addSeparator();
@@ -104,17 +104,17 @@ void pqViewMenuManager::buildMenu()
   if (viewManager)
   {
     new pqPreviewMenuManager(
-      (this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqPreview.svg"), "Preview")
+      (this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqPreview.svg"), tr("Preview"))
         << pqSetName("Preview")));
 
     QAction* fullscreen =
-      this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqFullscreen.svg"), "Full Screen");
+      this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqFullscreen.svg"), tr("Full Screen"));
     fullscreen->setObjectName("actionFullScreen");
     fullscreen->setShortcut(QKeySequence("F11"));
     QObject::connect(
       fullscreen, &QAction::triggered, viewManager, &pqTabbedMultiViewWidget::toggleFullScreen);
 
-    auto showDecorations = this->Menu->addAction("Show Frame Decorations");
+    auto showDecorations = this->Menu->addAction(tr("Show Frame Decorations"));
     showDecorations->setCheckable(true);
     showDecorations->setChecked(viewManager->decorationsVisibility());
     QObject::connect(showDecorations, &QAction::triggered, viewManager,
@@ -123,31 +123,32 @@ void pqViewMenuManager::buildMenu()
   }
 
   QAction* lockDockWidgetsAction =
-    this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqToggleLock.svg"), "Toggle Lock Panels");
+    this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqToggleLock.svg"), tr("Toggle Lock Panels"));
   lockDockWidgetsAction->setObjectName("actionLockDockWidgets");
-  lockDockWidgetsAction->setToolTip("Toggle locking of dockable panels so they\
-    cannot be moved");
+  lockDockWidgetsAction->setToolTip(tr("Toggle locking of dockable panels so they\
+    cannot be moved"));
   new pqLockPanelsReaction(lockDockWidgetsAction);
 
-  QMenu* reArrangeMenu = this->Menu->addMenu("Rearrange Views") << pqSetName("rearrangeViewsMenu");
-  QAction* rearrangeViewsHorizontallyAction = reArrangeMenu->addAction("Horizontally");
+  QMenu* reArrangeMenu = this->Menu->addMenu(tr("Rearrange Views"))
+    << pqSetName("rearrangeViewsMenu");
+  QAction* rearrangeViewsHorizontallyAction = reArrangeMenu->addAction(tr("Horizontally"));
   rearrangeViewsHorizontallyAction->setObjectName("rearrangeViewsHorizontallyAction");
   rearrangeViewsHorizontallyAction->setToolTip(
-    "Rearrange layout so views are evenly sized horizontally");
+    tr("Rearrange layout so views are evenly sized horizontally"));
   new pqRearrangeLayoutReaction(
     pqRearrangeLayoutReaction::Orientation::HORIZONTAL, rearrangeViewsHorizontallyAction);
 
-  QAction* rearrangeViewsVerticallyAction = reArrangeMenu->addAction("Vertically");
+  QAction* rearrangeViewsVerticallyAction = reArrangeMenu->addAction(tr("Vertically"));
   rearrangeViewsVerticallyAction->setObjectName("rearrangeViewsVerticallyAction");
   rearrangeViewsVerticallyAction->setToolTip(
-    "Rearrange layout so views are evenly sized vertically");
+    tr("Rearrange layout so views are evenly sized vertically"));
   new pqRearrangeLayoutReaction(
     pqRearrangeLayoutReaction::Orientation::VERTICAL, rearrangeViewsVerticallyAction);
 
-  QAction* rearrangeViewsGridAction = reArrangeMenu->addAction("Grid");
+  QAction* rearrangeViewsGridAction = reArrangeMenu->addAction(tr("Grid"));
   rearrangeViewsGridAction->setObjectName("rearrangeViewsGridAction");
   rearrangeViewsGridAction->setToolTip(
-    "Rearrange layout so views are evenly sized horizontally and vertically");
+    tr("Rearrange layout so views are evenly sized horizontally and vertically"));
   new pqRearrangeLayoutReaction(
     pqRearrangeLayoutReaction::Orientation::BOTH, rearrangeViewsGridAction);
 }

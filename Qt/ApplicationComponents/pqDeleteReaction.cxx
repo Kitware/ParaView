@@ -334,11 +334,11 @@ void pqDeleteReaction::deleteSources(const QSet<pqProxy*>& argSources)
   if (sources.size() == 1)
   {
     auto source = (*sources.begin());
-    BEGIN_UNDO_SET(QString("Delete %1").arg(source->getSMName()));
+    BEGIN_UNDO_SET(tr("Delete %1").arg(source->getSMName()));
   }
   else
   {
-    BEGIN_UNDO_SET("Delete Selection");
+    BEGIN_UNDO_SET(tr("Delete Selection"));
   }
 
   /// loop attempting to delete each source.
@@ -453,7 +453,7 @@ void pqDeleteReaction::onTriggered()
   {
     if (pqCoreUtilities::promptUser("pqDeleteReaction::onTriggered", QMessageBox::Question,
           "Delete All?",
-          tr("The current visualization will be reset \n"
+          tr("The current visualization will be reset\n"
              "and the state will be discarded.\n\n"
              "Are you sure you want to continue?"),
           QMessageBox::Yes | QMessageBox::No))

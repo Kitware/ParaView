@@ -77,8 +77,9 @@ private:
  * pqCoreUtilities is a collection of arbitrary utility functions that can be
  * used by the application.
  */
-class PQCORE_EXPORT pqCoreUtilities
+class PQCORE_EXPORT pqCoreUtilities : public QObject
 {
+  Q_OBJECT
 public:
   /**
    * When popuping up dialogs, it's generally better if we set the parent

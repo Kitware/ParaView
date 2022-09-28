@@ -80,7 +80,7 @@ void pqRenameProxyReaction::onTriggered()
   }
 
   bool ok;
-  QString group = dynamic_cast<pqView*>(proxy) ? "View" : "Proxy";
+  QString group = dynamic_cast<pqView*>(proxy) ? tr("View") : tr("Proxy");
   QString oldName = proxy->getSMName();
   QString newName = QInputDialog::getText(
     this->ParentWidget ? this->ParentWidget.data() : pqCoreUtilities::mainWidget(),

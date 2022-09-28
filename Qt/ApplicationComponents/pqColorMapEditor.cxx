@@ -169,7 +169,7 @@ void pqColorMapEditor::updateActive()
 
   this->setDataRepresentation(repr);
 
-  QString arrayNameLabel("Array Name: ");
+  QString arrayNameLabel(tr("Array Name: "));
 
   // Set the current LUT proxy to edit.
   if (repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
@@ -187,7 +187,7 @@ void pqColorMapEditor::updateActive()
   else
   {
     this->setColorTransferFunction(nullptr);
-    arrayNameLabel.append("<none>");
+    arrayNameLabel.append(tr("<none>"));
   }
 
   this->Internals->Ui.ArrayLabel->setText(arrayNameLabel);
@@ -368,7 +368,7 @@ void pqColorMapEditor::restoreDefaults()
   std::string arrayName =
     vtkSMCoreUtilities::SanitizeName(colorArrayHelper.GetInputArrayNameToProcess());
 
-  BEGIN_UNDO_SET("Reset color map to defaults");
+  BEGIN_UNDO_SET(tr("Reset color map to defaults"));
   if (vtkSMProxy* lutProxy = vtkSMPropertyHelper(proxy, "LookupTable").GetAsProxy())
   {
     // Load array-specific preset, if specified.

@@ -194,7 +194,7 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
   {
     return;
   }
-  BEGIN_UNDO_SET("Parameter Changed");
+  BEGIN_UNDO_SET(tr("Parameter Changed"));
   QString text = this->item(rowno, colno)->text();
   if (this->acceptsMultipleValues())
   {
@@ -278,7 +278,7 @@ void pqComparativeCueWidget::editRange()
     return;
   }
 
-  BEGIN_UNDO_SET("Update Parameter Values");
+  BEGIN_UNDO_SET(tr("Update Parameter Values"));
 
   vtkSMComparativeAnimationCueProxy* acueProxy = this->cue();
 

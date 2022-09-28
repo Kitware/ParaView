@@ -202,14 +202,14 @@ void pqColorAnnotationsPropertyWidget::updateIndexedLookupState()
         {
           QString promptMessage;
           QTextStream qs(&promptMessage);
-          qs << "Could not initialize annotations for categorical coloring. There may be too many "
-             << "discrete values in your data, (more than " << vtkAbstractArray::MAX_DISCRETE_VALUES
-             << ") "
-             << "or you may be coloring by a floating point data array. Please "
-             << "add annotations manually.";
+          qs << tr("Could not initialize annotations for categorical coloring. There may be too "
+                   "many discrete values in your data, (more than %1) or you may be coloring by a "
+                   "floating point data array. Please add annotations manually.")
+                  .arg(vtkAbstractArray::MAX_DISCRETE_VALUES);
           pqCoreUtilities::promptUser("pqColorAnnotationsPropertyWidget::updatedIndexedLookupState",
-            QMessageBox::Information, "Could not determine discrete values to use for annotations",
-            promptMessage, QMessageBox::Ok | QMessageBox::Save);
+            QMessageBox::Information,
+            tr("Could not determine discrete values to use for annotations"), promptMessage,
+            QMessageBox::Ok | QMessageBox::Save);
         }
         else
         {

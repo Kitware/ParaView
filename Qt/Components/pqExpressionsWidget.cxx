@@ -82,12 +82,12 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
   auto addToList = new QToolButton(this);
   addToList->setObjectName("AddToList");
   addToList->setIcon(QIcon(":/pqWidgets/Icons/pqSave.svg"));
-  addToList->setToolTip("Save expression");
+  addToList->setToolTip(tr("Save expression"));
   grid->addWidget(addToList, 1, 2);
   auto openManager = new QToolButton(this);
   openManager->setObjectName("OpenManager");
   openManager->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
-  openManager->setToolTip("Open Expressions Manager");
+  openManager->setToolTip(tr("Open Expressions Manager"));
   grid->addWidget(openManager, 1, 3);
 
   QObject::connect(chooser, SIGNAL(expressionSelected(const QString&)), this->OneLiner,
@@ -96,7 +96,7 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
   this->connect(addToList, &QToolButton::clicked, [=]() {
     bool saved =
       pqExpressionsManager::addExpressionToSettings(groupName, this->OneLiner->toPlainText());
-    statusLine->setText(saved ? "Saved! " : "Already Exists");
+    statusLine->setText(saved ? tr("Saved! ") : tr("Already Exists"));
     statusLine->show();
     QTimer::singleShot(5000, [=]() { statusLine->hide(); });
   });

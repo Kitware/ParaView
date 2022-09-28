@@ -89,8 +89,8 @@ void pqSetBreakpointDialog::onAccepted()
     }
   }
   QMessageBox message(this);
-  message.setText("Breakpoint time is invalid or "
-                  "it is smaller than current time");
+  message.setText(tr("Breakpoint time is invalid or "
+                     "it is smaller than current time"));
   message.exec();
 }
 

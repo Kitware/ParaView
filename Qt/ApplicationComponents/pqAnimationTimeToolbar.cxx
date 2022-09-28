@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::constructor()
 {
-  this->setWindowTitle("Current Time Controls");
+  this->setWindowTitle(tr("Current Time Controls"));
   this->AnimationTimeWidget = new pqAnimationTimeWidget(this);
   this->AnimationTimeWidget->setPlayModeReadOnly(true);
   this->addWidget(this->AnimationTimeWidget);

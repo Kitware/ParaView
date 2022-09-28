@@ -57,7 +57,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   : pqPropertyWidget(smProxy, pWidget)
 {
   this->setProperty(smProperty);
-  this->setToolTip("Select/Load texture to apply.");
+  this->setToolTip(tr("Select/Load texture to apply."));
 
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
@@ -111,7 +111,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 void pqTextureSelectorPropertyWidget::onTextureChanged(vtkSMProxy* texture)
 {
   SM_SCOPED_TRACE(ChooseTexture).arg(this->proxy()).arg(texture).arg(this->property());
-  BEGIN_UNDO_SET("Texture Change");
+  BEGIN_UNDO_SET(tr("Texture Change"));
   vtkSMPropertyHelper(this->property()).Set(texture);
   this->proxy()->UpdateVTKObjects();
   END_UNDO_SET();
@@ -142,13 +142,13 @@ void pqTextureSelectorPropertyWidget::checkAttributes(bool tcoords, bool tangent
       if (tcoords && pdInfo->GetAttributeInformation(vtkDataSetAttributes::TCOORDS) == nullptr)
       {
         enable = false;
-        this->setToolTip("No tcoords present in the data. Cannot apply texture.");
+        this->setToolTip(tr("No tcoords present in the data. Cannot apply texture."));
       }
       else if (tangents &&
         pdInfo->GetAttributeInformation(vtkDataSetAttributes::TANGENTS) == nullptr)
       {
         enable = false;
-        this->setToolTip("No tangents present in the data. Cannot apply texture.");
+        this->setToolTip(tr("No tangents present in the data. Cannot apply texture."));
       }
     }
   }

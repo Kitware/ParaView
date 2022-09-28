@@ -268,7 +268,7 @@ public:
 
     // source
     this->SourceInfo->setEnabled(false);
-    this->SourceInfo->setText("(none)");
+    this->SourceInfo->setText(tr("(none)"));
 
     // element type
     this->ElementTypeInfo->setEnabled(false);
@@ -454,7 +454,7 @@ void pqSelectionEditor::onAboutToRemoveSource(pqPipelineSource* source)
     if (this->Internal->SourceInfo->isEnabled())
     {
       this->Internal->SourceInfo->setEnabled(false);
-      this->Internal->SourceInfo->setText("(none)");
+      this->Internal->SourceInfo->setText(tr("(none)"));
       this->removeAllSelections(vtkDataObject::POINT);
     }
   }

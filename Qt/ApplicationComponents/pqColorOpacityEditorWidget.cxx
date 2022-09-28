@@ -1177,7 +1177,7 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
     return;
   }
 
-  BEGIN_UNDO_SET("Reset transfer function ranges using visible data");
+  BEGIN_UNDO_SET(tr("Reset transfer function ranges using visible data"));
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
   this->Internals->render();
   END_UNDO_SET();
@@ -1210,7 +1210,7 @@ void pqColorOpacityEditorWidget::resetRangeToCustom()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::invertTransferFunctions()
 {
-  BEGIN_UNDO_SET("Invert transfer function");
+  BEGIN_UNDO_SET(tr("Invert transfer function"));
   vtkSMTransferFunctionProxy::InvertTransferFunction(this->proxy());
 
   Q_EMIT this->changeFinished();
@@ -1247,7 +1247,7 @@ void pqColorOpacityEditorWidget::updateDefaultPresetsList()
   defaultPresetsComboBox->clear();
   // QComboBox::setPlaceHolder is a Qt5.15 function, so until the
   // minimum version is upgraded, we have to do this workaround.
-  defaultPresetsComboBox->addItem("Select a color map from default presets", -1);
+  defaultPresetsComboBox->addItem(tr("Select a color map from default presets"), -1);
   QStandardItemModel* model = qobject_cast<QStandardItemModel*>(defaultPresetsComboBox->model());
   QStandardItem* item = model->item(0);
   // Disable the "placeholder"

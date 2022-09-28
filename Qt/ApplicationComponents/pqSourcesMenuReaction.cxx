@@ -98,11 +98,11 @@ bool pqSourcesMenuReaction::warnOnCreate(
         ? prototype->GetHints()->FindNestedElementByName("WarnOnCreate")
         : nullptr)
     {
-      const char* title = hints->GetAttributeOrDefault("title", "Are you sure?");
+      const char* title = hints->GetAttributeOrDefault("title", qPrintable(tr("Are you sure?")));
       QString txt = hints->GetCharacterData();
       if (txt.isEmpty())
       {
-        txt = QString("Creating '%1'. Do you want to continue?").arg(prototype->GetXMLLabel());
+        txt = tr("Creating '%1'. Do you want to continue?").arg(prototype->GetXMLLabel());
       }
       return pqCoreUtilities::promptUser(QString("WarnOnCreate/%1/%2").arg(xmlgroup).arg(xmlname),
         QMessageBox::Information, QString::fromStdString(pqProxy::rstToHtml(title)),
@@ -119,7 +119,7 @@ pqPipelineSource* pqSourcesMenuReaction::createSource(const QString& group, cons
   {
     pqApplicationCore* core = pqApplicationCore::instance();
     pqObjectBuilder* builder = core->getObjectBuilder();
-    BEGIN_UNDO_SET(QString("Create '%1'").arg(name));
+    BEGIN_UNDO_SET(tr("Create '%1'").arg(name));
     pqPipelineSource* source =
       builder->createSource(group, name, pqActiveObjects::instance().activeServer());
     END_UNDO_SET();

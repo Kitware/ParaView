@@ -52,8 +52,8 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
   vbox->setMargin(0);
   vbox->addWidget(this->ComboBox);
 
-  this->ComboBox->addItem("None", QVariant("None"));
-  this->ComboBox->addItem("Empty", QVariant("Empty"));
+  this->ComboBox->addItem(tr("None"), QVariant("None"));
+  this->ComboBox->addItem(tr("Empty"), QVariant("Empty"));
 
   // fill combo-box.
   vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().activeServer()

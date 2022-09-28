@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 #include <QAbstractButton>
+#include <QCoreApplication>
 #include <QMessageBox>
 #include <QtDebug>
 
@@ -56,16 +57,20 @@ bool PromptForNewFiles(vtkSMSourceProxy* reader)
     return pqreader->property("pqReloadFilesReaction::CachedState").toBool();
   }
 
-  QMessageBox mbox(QMessageBox::Question, QObject::tr("Reload Options"),
-    QObject::tr("This reader supports file series. Do you want to look for new files "
-                "in the series and load those, or reload the existing files?"),
+  QMessageBox mbox(QMessageBox::Question,
+    QCoreApplication::translate("pqReloadFilesReaction", "Reload Options"),
+    QCoreApplication::translate("pqReloadFilesReaction",
+      "This reader supports file series. Do you want to look for new files "
+      "in the series and load those, or reload the existing files?"),
     QMessageBox::Yes | QMessageBox::No, pqCoreUtilities::mainWidget());
   mbox.setObjectName("reloadOptionsMessageBox");
   mbox.button(QMessageBox::Yes)->setObjectName("findNewFilesButton");
-  mbox.button(QMessageBox::Yes)->setText(QObject::tr("Find new files"));
+  mbox.button(QMessageBox::Yes)
+    ->setText(QCoreApplication::translate("pqReloadFilesReaction", "Find new files"));
 
   mbox.button(QMessageBox::No)->setObjectName("reloadExistingButton");
-  mbox.button(QMessageBox::No)->setText(QObject::tr("Reload existing file(s)"));
+  mbox.button(QMessageBox::No)
+    ->setText(QCoreApplication::translate("pqReloadFilesReaction", "Reload existing file(s)"));
   mbox.exec();
 
   bool retval = mbox.clickedButton() == mbox.button(QMessageBox::Yes);

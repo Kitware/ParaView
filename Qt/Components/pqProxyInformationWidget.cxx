@@ -416,8 +416,8 @@ public:
     }
     else
     {
-      this->Ui.filename->setText("(n/a)");
-      this->Ui.path->setText("(n/a)");
+      this->Ui.filename->setText(tr("(n/a)"));
+      this->Ui.path->setText(tr("(n/a)"));
       this->Ui.filename->setVisible(false);
       this->Ui.path->setVisible(false);
       this->Ui.labelFilename->setVisible(false);
@@ -517,11 +517,10 @@ public:
     auto& ui = this->Ui;
     ui.dataType->setEnabled(dinfo && !dinfo->IsNull());
     ui.labelDataType->setEnabled(dinfo && !dinfo->IsNull());
-    ui.dataType->setText(dinfo ? dinfo->GetPrettyDataTypeString() : "(n/a)");
+    ui.dataType->setText(dinfo ? dinfo->GetPrettyDataTypeString() : tr("(n/a)"));
     ui.labelDataStatistics->setText((dinfo && dinfo->GetNumberOfDataSets() > 1)
-        ? QString("Data Statistics (# of datasets: %1)")
-            .arg(l.toString(dinfo->GetNumberOfDataSets()))
-        : QString("Data Statistics"));
+        ? tr("Data Statistics (# of datasets: %1)").arg(l.toString(dinfo->GetNumberOfDataSets()))
+        : tr("Data Statistics"));
 
     std::map<int, std::pair<QLabel*, QLabel*>> labelMap;
     labelMap[vtkDataObject::POINT] = std::make_pair(ui.labelPointCount, ui.pointCount);
@@ -546,7 +545,7 @@ public:
       }
       else
       {
-        item.second.second->setText("(n/a)");
+        item.second.second->setText(tr("(n/a)"));
         item.second.first->setVisible(false);
         item.second.second->setVisible(false);
       }
@@ -554,15 +553,15 @@ public:
 
     ui.memory->setEnabled(dinfo != nullptr);
     ui.labelMemory->setEnabled(dinfo != nullptr);
-    ui.memory->setText(dinfo ? formatMemory(dinfo->GetMemorySize()) : QString("(n/a)"));
+    ui.memory->setText(dinfo ? formatMemory(dinfo->GetMemorySize()) : tr("(n/a)"));
 
     if (dinfo && vtkMath::AreBoundsInitialized(dinfo->GetBounds()))
     {
       double bds[6];
       dinfo->GetBounds(bds);
-      ui.bounds->setText(QString("%1 to %2 (delta: %3)\n"
-                                 "%4 to %5 (delta: %6)\n"
-                                 "%7 to %8 (delta: %9)")
+      ui.bounds->setText(tr("%1 to %2 (delta: %3)\n"
+                            "%4 to %5 (delta: %6)\n"
+                            "%7 to %8 (delta: %9)")
                            .arg(bds[0])
                            .arg(bds[1])
                            .arg(bds[1] - bds[0])
@@ -577,7 +576,7 @@ public:
     }
     else
     {
-      ui.bounds->setText("(n/a)\n(n/a)\n(n/a)");
+      ui.bounds->setText(QString("%1\n%2\n%3").arg(tr("(n/a)")).arg(tr("(n/a)")).arg(tr("(n/a)")));
       ui.labelBounds->setVisible(false);
       ui.bounds->setVisible(false);
     }
@@ -586,9 +585,9 @@ public:
     {
       int exts[6];
       dinfo->GetExtent(exts);
-      ui.extents->setText(QString("%1 to %2 (dimension: %3)\n"
-                                  "%4 to %5 (dimension: %6)\n"
-                                  "%7 to %8 (dimension: %9)")
+      ui.extents->setText(tr("%1 to %2 (dimension: %3)\n"
+                             "%4 to %5 (dimension: %6)\n"
+                             "%7 to %8 (dimension: %9)")
                             .arg(l.toString(exts[0]))
                             .arg(l.toString(exts[1]))
                             .arg(l.toString(exts[1] - exts[0] + 1))
@@ -604,7 +603,7 @@ public:
     }
     else
     {
-      ui.extents->setText("(n/a)\n(n/a)\n(n/a)");
+      ui.extents->setText(QString("%1\n%2\n%3").arg(tr("(n/a)")).arg(tr("(n/a)")).arg(tr("(n/a)")));
       ui.labelExtents->setVisible(false);
       ui.extents->setVisible(false);
     }
@@ -620,7 +619,7 @@ public:
     ui.currentTime->setVisible(dinfo && dinfo->GetHasTime());
     if (dinfo && dinfo->GetHasTime())
     {
-      ui.currentTime->setText(QString("%1 (range: [%2, %3])")
+      ui.currentTime->setText(tr("%1 (range: [%2, %3])")
                                 .arg(formatTime(dinfo->GetTime()))
                                 .arg(dinfo->GetTimeRange()[0])
                                 .arg(dinfo->GetTimeRange()[1]));

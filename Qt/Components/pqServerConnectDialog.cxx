@@ -69,11 +69,12 @@ QString getPVSCSourcesFromSettings()
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return settings
     ->value("PVSC_SOURCES",
-      QString("# Enter list of URLs to obtain server configurations from.\n"
-              "# Syntax:\n"
-              "#    pvsc <url> <userfriendly-name>\n\n"
-              "# Official Kitware Server Configurations\n"
-              "pvsc http://www.paraview.org/files/pvsc Kitware Inc.\n"))
+      QCoreApplication::translate("pqServerConnectDialog",
+        "# Enter list of URLs to obtain server configurations from.\n"
+        "# Syntax:\n"
+        "#    pvsc <url> <userfriendly-name>\n\n"
+        "# Official Kitware Server Configurations\n"
+        "pvsc http://www.paraview.org/files/pvsc Kitware Inc.\n"))
     .toString();
 }
 
@@ -252,24 +253,24 @@ void pqServerConnectDialog::updateDialogTitle(int page_number)
   switch (page_number)
   {
     case 1:
-      this->setWindowTitle("Edit Server Configuration");
+      this->setWindowTitle(tr("Edit Server Configuration"));
       break;
 
     case 2:
-      this->setWindowTitle("Edit Server Launch Configuration");
+      this->setWindowTitle(tr("Edit Server Launch Configuration"));
       break;
 
     case 3:
-      this->setWindowTitle("Fetch Server Configurations");
+      this->setWindowTitle(tr("Fetch Server Configurations"));
       break;
 
     case 4:
-      this->setWindowTitle("Edit Server Configuration Sources");
+      this->setWindowTitle(tr("Edit Server Configuration Sources"));
       break;
 
     case 0:
     default:
-      this->setWindowTitle("Choose Server Configuration");
+      this->setWindowTitle(tr("Choose Server Configuration"));
       break;
   }
 }
@@ -324,7 +325,7 @@ void pqServerConnectDialog::onServerSelected()
 void pqServerConnectDialog::addServer()
 {
   // Edit an empty server configuration with a non already existing name
-  QString originalName = "My Server";
+  QString originalName = tr("My Server");
   QString name = originalName;
   if (this->serverNameExists(name))
   {
@@ -667,8 +668,8 @@ void pqServerConnectDialog::deleteServer()
   assert(original_index >= 0 && original_index < this->Internals->Configurations.size());
 
   const pqServerConfiguration& config = this->Internals->Configurations[original_index];
-  if (QMessageBox::question(this, "Delete Server Configuration",
-        QString("Are you sure you want to delete \"%1\"?").arg(config.name()),
+  if (QMessageBox::question(this, tr("Delete Server Configuration"),
+        tr("Are you sure you want to delete \"%1\"?").arg(config.name()),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
   {
     pqApplicationCore::instance()->serverConfigurations().removeConfiguration(config.name());
@@ -683,7 +684,7 @@ void pqServerConnectDialog::deleteAllServers()
 {
 
   QMessageBox::StandardButton ret =
-    QMessageBox::question(this, "Delete All", "All servers will be deleted. Are you sure?");
+    QMessageBox::question(this, tr("Delete All"), tr("All servers will be deleted. Are you sure?"));
   if (ret == QMessageBox::StandardButton::Yes)
   {
     pqApplicationCore::instance()->serverConfigurations().removeUserConfigurations();
@@ -850,7 +851,7 @@ void pqServerConnectDialog::fetchServers()
   QDialog dialog(this);
   QFormLayout* flayout = new QFormLayout();
   dialog.setLayout(flayout);
-  dialog.setWindowTitle("Fetching configurations ...");
+  dialog.setWindowTitle(tr("Fetching configurations ..."));
 
   QDialogButtonBox* buttons =
     new QDialogButtonBox(QDialogButtonBox::Abort, Qt::Horizontal, &dialog);
@@ -871,17 +872,17 @@ void pqServerConnectDialog::authenticationRequired(
   QFormLayout* flayout = new QFormLayout();
   dialog.setLayout(flayout);
 
-  dialog.setWindowTitle("Authenticate Connection");
+  dialog.setWindowTitle(tr("Authenticate Connection"));
   QLabel* label =
-    new QLabel(QString("%1 at %2").arg(authenticator->realm()).arg(reply->url().host()), &dialog);
+    new QLabel(tr("%1 at %2").arg(authenticator->realm()).arg(reply->url().host()), &dialog);
   QLineEdit* username = new QLineEdit(reply->url().userName(), &dialog);
   QLineEdit* password = new QLineEdit(reply->url().password(), &dialog);
-  QPushButton* okButton = new QPushButton("Accept");
+  QPushButton* okButton = new QPushButton(tr("Accept"));
   QObject::connect(okButton, SIGNAL(clicked()), &dialog, SLOT(accept()));
   password->setEchoMode(QLineEdit::Password);
   flayout->addRow(label);
-  flayout->addRow("Username", username);
-  flayout->addRow("Password", password);
+  flayout->addRow(tr("Username"), username);
+  flayout->addRow(tr("Password"), password);
   dialog.adjustSize();
   if (dialog.exec() == QDialog::Accepted)
   {

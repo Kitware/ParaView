@@ -45,7 +45,7 @@ pqExpressionChooserButton::pqExpressionChooserButton(QWidget* parent, const QStr
   , Group(group)
 {
   this->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->setToolTip("Choose Expression");
+  this->setToolTip(tr("Choose Expression"));
   this->setPopupMode(QToolButton::InstantPopup);
 
   QMenu* menuList = new QMenu(this);

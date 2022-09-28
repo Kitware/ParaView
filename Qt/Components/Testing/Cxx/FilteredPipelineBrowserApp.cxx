@@ -45,7 +45,7 @@ MainPipelineWindow::MainPipelineWindow()
     SLOT(updateSelectedFilter(int)), Qt::QueuedConnection);
 
   this->InvertMatching = new QCheckBox();
-  this->InvertMatching->setText("display matching sources");
+  this->InvertMatching->setText(tr("display matching sources"));
   this->InvertMatching->setChecked(true);
   QObject::connect(this->InvertMatching, SIGNAL(stateChanged(int)), this,
     SLOT(invertFilterMatching(int)), Qt::QueuedConnection);
@@ -70,10 +70,10 @@ MainPipelineWindow::MainPipelineWindow()
 
   QTimer::singleShot(100, this, SLOT(processTest()));
 
-  QToolBar* tb = new QToolBar("Options", this);
+  QToolBar* tb = new QToolBar(tr("Options"), this);
   this->addToolBar(tb);
 
-  QAction* actn = tb->addAction("Settings");
+  QAction* actn = tb->addAction(tr("Settings"));
   this->connect(actn, SIGNAL(triggered()), SLOT(showSettings()));
 }
 

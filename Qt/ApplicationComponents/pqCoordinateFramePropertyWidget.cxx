@@ -238,7 +238,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
   ui.actionRecenterOnBounds->setEnabled(false);
   this->connect(ui.actionRecenterOnBounds, SIGNAL(triggered()), SLOT(resetToDataBounds()));
 
-  auto actionMenu = new QMenu("Coordinate frame utilities");
+  auto actionMenu = new QMenu(tr("Coordinate frame utilities"));
   actionMenu->addAction(ui.actionAlignToWorldX);
   actionMenu->addAction(ui.actionAlignToWorldY);
   actionMenu->addAction(ui.actionAlignToWorldZ);

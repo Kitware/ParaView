@@ -121,10 +121,10 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
     this->PickedRepresentation = repr;
 
     QAction* action;
-    action = menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeballClosed.svg"), "Hide");
+    action = menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeballClosed.svg"), tr("Hide"));
     QObject::connect(action, &QAction::triggered, this, &pqDefaultContextMenu::hide);
 
-    QMenu* reprMenu = menu->addMenu("Representation") << pqSetName("Representation");
+    QMenu* reprMenu = menu->addMenu(tr("Representation")) << pqSetName("Representation");
 
     // populate the representation types menu.
     QList<QVariant> rTypes =
@@ -147,30 +147,30 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
     if (pipelineRepr)
     {
       QMenu* colorFieldsMenu =
-        menu->addMenu(QIcon(":/pqWidgets/Icons/explicit_color.png"), "Color By")
+        menu->addMenu(QIcon(":/pqWidgets/Icons/explicit_color.png"), tr("Color By"))
         << pqSetName("ColorBy");
       this->buildColorFieldsMenu(pipelineRepr, colorFieldsMenu);
     }
 
-    action = menu->addAction(QIcon(":/pqWidgets/Icons/pqEditColor.svg"), "Edit Color");
+    action = menu->addAction(QIcon(":/pqWidgets/Icons/pqEditColor.svg"), tr("Edit Color"));
     new pqEditColorMapReaction(action);
 
     menu->addSeparator();
   }
   else
   {
-    QAction* showAllBlocksAction = menu->addAction("Show All Blocks");
+    QAction* showAllBlocksAction = menu->addAction(tr("Show All Blocks"));
     this->connect(showAllBlocksAction, SIGNAL(triggered()), this, SLOT(showAllBlocks()));
   }
 
   // Even when nothing was picked, show the "link camera" and
   // possibly the frame decoration menu items.
-  menu->addAction("Link Camera...", viewContext, SLOT(linkToOtherView()));
+  menu->addAction(tr("Link Camera..."), viewContext, SLOT(linkToOtherView()));
 
   if (auto tmvwidget = qobject_cast<pqTabbedMultiViewWidget*>(
         pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET")))
   {
-    auto actn = menu->addAction("Show Frame Decorations");
+    auto actn = menu->addAction(tr("Show Frame Decorations"));
     actn->setCheckable(true);
     actn->setChecked(tmvwidget->decorationsVisibility());
     QObject::connect(
@@ -190,7 +190,7 @@ void pqDefaultContextMenu::buildColorFieldsMenu(
   QIcon pointDataIcon(":/pqWidgets/Icons/pqPointData.svg");
   QIcon solidColorIcon(":/pqWidgets/Icons/pqSolidColor.svg");
 
-  menu->addAction(solidColorIcon, "Solid Color")->setData(convert(QPair<int, QString>()));
+  menu->addAction(solidColorIcon, tr("Solid Color"))->setData(convert(QPair<int, QString>()));
   vtkSMProperty* prop = pipelineRepr->getProxy()->GetProperty("ColorArrayName");
   if (!prop)
   {
@@ -244,7 +244,7 @@ void pqDefaultContextMenu::showAllBlocks() const
       }
 
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
-      BEGIN_UNDO_SET("Show All Blocks");
+      BEGIN_UNDO_SET(tr("Show All Blocks"));
       smProperty->SetElements(std::vector<std::string>({ "/" }));
       proxy->UpdateVTKObjects();
       END_UNDO_SET();
@@ -259,7 +259,7 @@ void pqDefaultContextMenu::colorMenuTriggered(QAction* action)
   QPair<int, QString> array = convert(action->data());
   if (this->PickedRepresentation)
   {
-    BEGIN_UNDO_SET("Change coloring");
+    BEGIN_UNDO_SET(tr("Change coloring"));
     vtkSMViewProxy* view = pqActiveObjects::instance().activeView()->getViewProxy();
     vtkSMProxy* reprProxy = this->PickedRepresentation->getProxy();
 
@@ -311,7 +311,7 @@ void pqDefaultContextMenu::reprTypeChanged(QAction* action)
   if (repr)
   {
     SM_SCOPED_TRACE(PropertiesModified).arg("proxy", repr->getProxy());
-    BEGIN_UNDO_SET("Representation Type Changed");
+    BEGIN_UNDO_SET(tr("Representation Type Changed"));
     pqSMAdaptor::setEnumerationProperty(
       repr->getProxy()->GetProperty("Representation"), action->text());
     repr->getProxy()->UpdateVTKObjects();
@@ -327,7 +327,7 @@ void pqDefaultContextMenu::hide()
   if (repr)
   {
     SM_SCOPED_TRACE(PropertiesModified).arg("proxy", repr->getProxy());
-    BEGIN_UNDO_SET("Visibility Changed");
+    BEGIN_UNDO_SET(tr("Visibility Changed"));
     repr->setVisible(false);
     repr->renderViewEventually();
     END_UNDO_SET();

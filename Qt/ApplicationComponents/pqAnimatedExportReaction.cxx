@@ -113,9 +113,9 @@ void pqAnimatedExportReaction::Export(const QString& filename)
   }
 
   QProgressDialog progress(
-    "Export animated scene progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
+    tr("Export animated scene progress"), tr("Abort"), 0, 100, pqCoreUtilities::mainWidget());
   progress.setWindowModality(Qt::ApplicationModal);
-  progress.setWindowTitle("Saving animated scene ...");
+  progress.setWindowTitle(tr("Saving animated scene ..."));
   progress.show();
   QObject::connect(&progress, &QProgressDialog::canceled, [scene, &progress]() {
     progress.hide();

@@ -64,7 +64,7 @@ pqScalarBarRepresentation::~pqScalarBarRepresentation() = default;
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::startInteraction()
 {
-  BEGIN_UNDO_SET("Move Color Legend");
+  BEGIN_UNDO_SET(tr("Move Color Legend"));
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("ScalarBarLength");

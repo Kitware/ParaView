@@ -104,8 +104,10 @@ public:
     std::string* strData = reinterpret_cast<std::string*>(calldata);
     bool ok;
     QString inputText = QInputDialog::getText(pqCoreUtilities::mainWidget(),
-      QCoreApplication::translate("pqPythonManager", "Enter Input requested by Python"),
-      QCoreApplication::translate("pqPythonManager", "Input: "), QLineEdit::Normal, QString(), &ok);
+      QCoreApplication::translate(
+        "pqPythonManagerRawInputHelper", "Enter Input requested by Python"),
+      QCoreApplication::translate("pqPythonManagerRawInputHelper", "Input: "), QLineEdit::Normal,
+      QString(), &ok);
     if (ok)
     {
       *strData = inputText.toStdString();

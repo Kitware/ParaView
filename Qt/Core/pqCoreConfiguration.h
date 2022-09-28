@@ -50,8 +50,9 @@ class vtkCLIOptions;
  * @sa vtkCLIOptions, vtkRemotingCoreConfiguration,
  * vtkProcessModuleConfiguration
  */
-class PQCORE_EXPORT pqCoreConfiguration
+class PQCORE_EXPORT pqCoreConfiguration : public QObject
 {
+  Q_OBJECT
 public:
   /**
    * Provides access to the singleton.

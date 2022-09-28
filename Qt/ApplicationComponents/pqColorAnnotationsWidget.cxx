@@ -650,15 +650,17 @@ void pqColorAnnotationsWidget::addActiveAnnotations()
 {
   if (!this->addActiveAnnotations(false))
   {
-    QString warningTitle("Could not determine discrete values");
+    QString warningTitle(tr("Could not determine discrete values"));
     QString warningMessage;
     QTextStream qs(&warningMessage);
-    qs << "Could not automatically determine annotation values. Usually this means "
-       << "too many discrete values (more than " << vtkAbstractArray::MAX_DISCRETE_VALUES << ") "
-       << "are available in the data produced by the "
-       << "current source/filter. This can happen if the data array type is floating "
-       << "point. Please add annotations manually or force generation. Forcing the "
-       << "generation will automatically hide the Scalar Bar.";
+    qs << tr("Could not automatically determine annotation values. Usually this means "
+             "too many discrete values (more than %1) "
+             "are available in the data produced by the "
+             "current source/filter.")
+            .arg(vtkAbstractArray::MAX_DISCRETE_VALUES)
+       << tr(" This can happen if the data array type is floating "
+             "point. Please add annotations manually or force generation. Forcing the "
+             "generation will automatically hide the Scalar Bar.");
     QMessageBox* box = new QMessageBox(this);
     box->setWindowTitle(warningTitle);
     box->setText(warningMessage);
@@ -733,15 +735,17 @@ void pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources()
 {
   if (!this->addActiveAnnotationsFromVisibleSources(false))
   {
-    QString warningTitle("Could not determine discrete values");
+    QString warningTitle(tr("Could not determine discrete values"));
     QString warningMessage;
     QTextStream qs(&warningMessage);
-    qs << "Could not automatically determine annotation values. Usually this means "
-       << "too many discrete values (more than " << vtkAbstractArray::MAX_DISCRETE_VALUES << ") "
-       << "are available in the data produced by the "
-       << "current source/filter. This can happen if the data array type is floating "
-       << "point. Please add annotations manually or force generation. Forcing the "
-       << "generation will automatically hide the Scalar Bar.";
+    qs << tr("Could not automatically determine annotation values. Usually this means "
+             "too many discrete values (more than %1) "
+             "are available in the data produced by the "
+             "current source/filter.")
+            .arg(vtkAbstractArray::MAX_DISCRETE_VALUES)
+       << tr(" This can happen if the data array type is floating "
+             "point. Please add annotations manually or force generation. Forcing the "
+             "generation will automatically hide the Scalar Bar.");
 
     QMessageBox* box = new QMessageBox(this);
     box->setWindowTitle(warningTitle);
@@ -891,14 +895,14 @@ void pqColorAnnotationsWidget::saveAsNewPreset()
   auto name =
     this->Internals->Model->headerData(pqAnnotationsModel::LABEL, Qt::Horizontal, Qt::DisplayRole)
       .toString();
-  ui.saveAnnotations->setText(QString("Save %1s").arg(name));
+  ui.saveAnnotations->setText(QString(tr("Save %1s")).arg(name));
 
   // For now, let's not provide an option to not save colors. We'll need to fix
   // the pqPresetToPixmap to support rendering only opacities.
   ui.saveColors->setChecked(true);
   ui.saveColors->setEnabled(false);
   ui.saveColors->hide();
-  ui.presetName->setText("Preset");
+  ui.presetName->setText(tr("Preset"));
 
   if (dialog.exec() != QDialog::Accepted)
   {

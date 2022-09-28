@@ -93,8 +93,8 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
   }
 
   // add header for block name.
-  const QString title = blockNames.size() == 1 ? QString("Block '%1'").arg(blockNames[0].c_str())
-                                               : QString("%1 Blocks").arg(blockNames.size());
+  const QString title = blockNames.size() == 1 ? tr("Block '%1'").arg(blockNames[0].c_str())
+                                               : tr("%1 Blocks").arg(blockNames.size());
   menu->addAction(title);
   menu->addSeparator();
 
@@ -105,7 +105,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
     : vtkSMStringVectorProperty::SafeDownCast(reprProxy->GetProperty("BlockSelectors"));
   if (auto smProperty = visibilityProperty)
   {
-    menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeballClosed.svg"), "Hide Block", [=]() {
+    menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeballClosed.svg"), tr("Hide Block"), [=]() {
       // use pqDataAssemblyTreeModel to avoid having to handle the complexity of
       // updating properties respecting hierarchical relationships.
       const auto hierarchy = dataInfo->GetHierarchy();
@@ -161,7 +161,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       }
 
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-      BEGIN_UNDO_SET("Hide Block");
+      BEGIN_UNDO_SET(tr("Hide Block"));
       smProperty->SetElements(value);
       reprProxy->UpdateVTKObjects();
       END_UNDO_SET();
@@ -169,20 +169,20 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       delete model;
     });
 
-    menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeball.svg"), "Show Only Block",
+    menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeball.svg"), tr("Show Only Block"),
       [dataBlockContext, smProperty, reprProxy, repr]() {
         SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-        BEGIN_UNDO_SET("Show Only Block");
+        BEGIN_UNDO_SET(tr("Show Only Block"));
         smProperty->SetElements(dataBlockContext);
         reprProxy->UpdateVTKObjects();
         END_UNDO_SET();
         repr->renderViewEventually();
       });
 
-    menu->addAction(
-      QIcon(":/pqWidgets/Icons/pqEyeball.svg"), "Show All Blocks", [smProperty, reprProxy, repr]() {
+    menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeball.svg"), tr("Show All Blocks"),
+      [smProperty, reprProxy, repr]() {
         SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-        BEGIN_UNDO_SET("Show All Blocks");
+        BEGIN_UNDO_SET(tr("Show All Blocks"));
         smProperty->SetElements(std::vector<std::string>({ "/" }));
         reprProxy->UpdateVTKObjects();
         END_UNDO_SET();
@@ -193,7 +193,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
   }
   if (auto smProperty = reprProxy->GetProperty("BlockColors"))
   {
-    menu->addAction(QIcon(":/pqWidgets/Icons/explicit_color.png"), "Set Block Color", [=]() {
+    menu->addAction(QIcon(":/pqWidgets/Icons/explicit_color.png"), tr("Set Block Color"), [=]() {
       // it's potentially expensive to get the current color and hence I am just
       // using QColor here as the default color for the QColorDialog.
       QColor color = QColorDialog::getColor(QColor(), pqCoreUtilities::mainWidget(),
@@ -203,7 +203,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
         double colorF[3] = { color.redF(), color.greenF(), color.blueF() };
         vtkSMPropertyHelper helper(smProperty);
         SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-        BEGIN_UNDO_SET("Set Block Color");
+        BEGIN_UNDO_SET(tr("Set Block Color"));
         for (const auto& selector : dataBlockContext)
         {
           helper.SetStatus(selector.c_str(), colorF, 3);
@@ -213,9 +213,9 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
         repr->renderViewEventually();
       }
     });
-    menu->addAction(QIcon(":/pqWidgets/Icons/inherited_color.png"), "Unset Block Color", [=]() {
+    menu->addAction(QIcon(":/pqWidgets/Icons/inherited_color.png"), tr("Unset Block Color"), [=]() {
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-      BEGIN_UNDO_SET("Unset Block Color");
+      BEGIN_UNDO_SET(tr("Unset Block Color"));
       vtkSMPropertyHelper helper(smProperty);
       for (const auto& selector : dataBlockContext)
       {
@@ -229,39 +229,41 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
   }
   if (auto smProperty = reprProxy->GetProperty("BlockOpacities"))
   {
-    menu->addAction(QIcon(":/pqWidgets/Icons/explicit_opacity.png"), "Set Block Opacity", [=]() {
-      pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, pqCoreUtilities::mainWidget());
-      dialog.setObjectName("OpacityDialog");
-      dialog.setWindowTitle("Set Block Opacity");
-      dialog.setValue(1.0);
-      if (dialog.exec() == QDialog::Accepted)
-      {
-        double opacity = qBound(0.0, dialog.value(), 1.0);
-        vtkSMPropertyHelper helper(smProperty);
+    menu->addAction(
+      QIcon(":/pqWidgets/Icons/explicit_opacity.png"), tr("Set Block Opacity"), [=]() {
+        pqDoubleRangeDialog dialog(tr("Opacity:"), 0.0, 1.0, pqCoreUtilities::mainWidget());
+        dialog.setObjectName("OpacityDialog");
+        dialog.setWindowTitle(tr("Set Block Opacity"));
+        dialog.setValue(1.0);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+          double opacity = qBound(0.0, dialog.value(), 1.0);
+          vtkSMPropertyHelper helper(smProperty);
+          SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
+          BEGIN_UNDO_SET(tr("Set Block Opacity"));
+          for (const auto& selector : dataBlockContext)
+          {
+            helper.SetStatus(selector.c_str(), &opacity, 1);
+          }
+          reprProxy->UpdateVTKObjects();
+          END_UNDO_SET();
+          repr->renderViewEventually();
+        }
+      });
+
+    menu->addAction(
+      QIcon(":/pqWidgets/Icons/inherited_opacity.png"), tr("Unset Block Opacity"), [=]() {
         SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-        BEGIN_UNDO_SET("Set Block Opacity");
+        BEGIN_UNDO_SET(tr("Unset Block Opacity"));
+        vtkSMPropertyHelper helper(smProperty);
         for (const auto& selector : dataBlockContext)
         {
-          helper.SetStatus(selector.c_str(), &opacity, 1);
+          helper.RemoveStatus(selector.c_str());
         }
         reprProxy->UpdateVTKObjects();
         END_UNDO_SET();
         repr->renderViewEventually();
-      }
-    });
-
-    menu->addAction(QIcon(":/pqWidgets/Icons/inherited_opacity.png"), "Unset Block Opacity", [=]() {
-      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
-      BEGIN_UNDO_SET("Unset Block Opacity");
-      vtkSMPropertyHelper helper(smProperty);
-      for (const auto& selector : dataBlockContext)
-      {
-        helper.RemoveStatus(selector.c_str());
-      }
-      reprProxy->UpdateVTKObjects();
-      END_UNDO_SET();
-      repr->renderViewEventually();
-    });
+      });
     menu->addSeparator();
   }
   return false;

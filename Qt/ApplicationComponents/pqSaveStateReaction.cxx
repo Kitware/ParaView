@@ -76,9 +76,11 @@ void pqSaveStateReaction::updateEnableState()
 bool pqSaveStateReaction::saveState()
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-  QString fileExt = tr("ParaView state file (*.pvsm);;Python state file (*.py);;All files (*)");
+  QString fileExt = tr("ParaView state file") + QString(" (*.pvsm);;") + tr("Python state file") +
+    QString(" (*.py);;") + tr("All Files") + QString(" (*)");
 #else
-  QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
+  QString fileExt =
+    tr("ParaView state file") + QString(" (*.pvsm);;") + tr("All Files") + QString(" (*)");
 #endif
   pqFileDialog fileDialog(
     nullptr, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt);
@@ -135,7 +137,7 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
   controller->InitializeProxy(options);
 
   pqProxyWidgetDialog dialog(options);
-  dialog.setWindowTitle("Python State Options");
+  dialog.setWindowTitle(tr("Python State Options"));
   dialog.setObjectName("StateOptionsDialog");
   dialog.setApplyChangesImmediately(true);
   if (dialog.exec() != QDialog::Accepted)

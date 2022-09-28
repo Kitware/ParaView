@@ -50,7 +50,7 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
 {
   this->setShowLabel(false);
 
-  QPushButton* button = new QPushButton("Edit", this);
+  QPushButton* button = new QPushButton(tr("Edit"), this);
   button->setObjectName("PushButton");
   this->connect(button, SIGNAL(clicked()), SLOT(buttonClicked()));
   button->setEnabled(false);

@@ -132,7 +132,7 @@ void pqExtractorsMenuReaction::updateEnableState(bool)
     {
       actn->setEnabled(false);
       actn->setVisible(this->HideDisabledActions ? false : true);
-      actn->setStatusTip("Requires an input");
+      actn->setStatusTip(tr("Requires an input"));
     }
 
     else if (controller->CanExtract(prototype, ports) || controller->CanExtract(prototype, view))
@@ -161,7 +161,7 @@ void pqExtractorsMenuReaction::updateEnableState(bool)
         }
         else // No Input
         {
-          actn->setStatusTip("Requires an input");
+          actn->setStatusTip(tr("Requires an input"));
         }
       }
     }
@@ -199,7 +199,7 @@ pqExtractor* pqExtractorsMenuReaction::createExtractor(
     return nullptr;
   }
 
-  BEGIN_UNDO_SET(QString("Create Extract Generator '%1'").arg(name));
+  BEGIN_UNDO_SET(tr("Create Extract Generator '%1'").arg(name));
   auto generator = controller->CreateExtractor(input, name.toUtf8());
   END_UNDO_SET();
   auto smmodel = pqApplicationCore::instance()->getServerManagerModel();

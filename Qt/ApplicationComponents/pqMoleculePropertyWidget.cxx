@@ -83,7 +83,7 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
   QObject::connect(ui.resetAtomicRadiusFactor, &QToolButton::released, this,
     &pqMoleculePropertyWidget::onResetAtomFactorToggled);
   QAction* resetAtomicRadiusAction = new QAction(ui.resetAtomicRadiusFactor);
-  resetAtomicRadiusAction->setToolTip("Reset the range values");
+  resetAtomicRadiusAction->setToolTip(tr("Reset the range values"));
   resetAtomicRadiusAction->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   ui.resetAtomicRadiusFactor->addAction(resetAtomicRadiusAction);
   ui.resetAtomicRadiusFactor->setDefaultAction(resetAtomicRadiusAction);
@@ -120,7 +120,7 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
     ui.preset->addItem(molproxy->GetPresetDisplayName(i));
   }
   QObject::connect(ui.preset, SIGNAL(currentIndexChanged(int)), this, SLOT(onPresetChanged(int)));
-  ui.preset->setToolTip("Apply a preset to display properties, including advanced ones.");
+  ui.preset->setToolTip(tr("Apply a preset to display properties, including advanced ones."));
 
   this->addPropertyLink(ui.showBonds, "RenderBonds");
   this->setDocumentationAsTooltip(smgroup->GetProperty("RenderBonds"), ui.showBonds);
@@ -141,7 +141,7 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
   QObject::connect(ui.resetBondRadius, &QToolButton::released, this,
     &pqMoleculePropertyWidget::onResetBondRadiusToggled);
   QAction* resetBondRadiusAction = new QAction(ui.resetBondRadius);
-  resetBondRadiusAction->setToolTip("Reset the range values");
+  resetBondRadiusAction->setToolTip(tr("Reset the range values"));
   resetBondRadiusAction->setIcon(
     ui.resetBondRadius->style()->standardIcon(QStyle::SP_BrowserReload));
   ui.resetBondRadius->addAction(resetBondRadiusAction);

@@ -53,14 +53,14 @@ void pqShowHideAllReaction::act(ActionType action)
   vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : nullptr;
   if (action == ActionType::Show)
   {
-    BEGIN_UNDO_SET("Show All");
+    BEGIN_UNDO_SET(tr("Show All"));
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
     controller->ShowAll(viewProxy);
     END_UNDO_SET();
   }
   else
   {
-    BEGIN_UNDO_SET("Hide All");
+    BEGIN_UNDO_SET(tr("Hide All"));
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
     controller->HideAll(viewProxy);
     END_UNDO_SET();

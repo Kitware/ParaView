@@ -352,8 +352,8 @@ void pqLogViewerWidget::toggleAdvanced()
 void pqLogViewerWidget::exportLog()
 {
   QString text = this->Internals->Ui.details->toPlainText();
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save log", QString(),
-    "Text Files (*.txt);;All Files (*)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save log"), QString(),
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {

@@ -71,7 +71,7 @@ pqScaleByButton::~pqScaleByButton() = default;
 void pqScaleByButton::constructor(const QMap<double, QString>& scaleFactors)
 {
   this->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->setToolTip("Scale by ...");
+  this->setToolTip(tr("Scale by ..."));
   this->setPopupMode(QToolButton::InstantPopup);
 
   int index = 0;

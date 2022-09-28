@@ -310,7 +310,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);
     resetButton->setObjectName("Reset");
     QAction* resetActn = new QAction(resetButton);
-    resetActn->setToolTip("Reset using current data values");
+    resetActn->setToolTip(tr("Reset using current data values"));
     resetActn->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
     resetButton->addAction(resetActn);
     resetButton->setDefaultAction(resetActn);
@@ -342,7 +342,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
         auto actn = new QAction(tb);
         tb->addAction(actn);
         tb->setDefaultAction(actn);
-        tb->setToolTip("Reset to active data bounds");
+        tb->setToolTip(tr("Reset to active data bounds"));
         tb->setIcon(QIcon(":/pqWidgets/Icons/pqZoomToData.svg"));
         QObject::connect(
           tb, &QToolButton::clicked, this, &pqDoubleVectorPropertyWidget::resetToActiveDataBounds);

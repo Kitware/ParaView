@@ -399,7 +399,7 @@ void pqProxyGroupMenuManager::populateFavoritesMenu()
     this->Internal->FavoritesMenu->clear();
 
     QAction* manageFavoritesAction =
-      this->Internal->FavoritesMenu->addAction("&Manage Favorites...")
+      this->Internal->FavoritesMenu->addAction(tr("&Manage Favorites..."))
       << pqSetName("actionManage_Favorites");
     new pqManageFavoritesReaction(manageFavoritesAction, this);
 
@@ -457,7 +457,7 @@ QAction* pqProxyGroupMenuManager::getAddToCategoryAction(const QString& path)
   QAction* actionAddToFavorites = new QAction(this);
   actionAddToFavorites->setObjectName(QString("actionAddTo:%1").arg(path));
   actionAddToFavorites->setText(
-    QApplication::translate("pqPipelineBrowserContextMenu", "&Add current filter", Q_NULLPTR));
+    QCoreApplication::translate("pqPipelineBrowserContextMenu", "&Add current filter", Q_NULLPTR));
   actionAddToFavorites->setData(path);
 
   // get filters list for current category
@@ -554,23 +554,23 @@ void pqProxyGroupMenuManager::populateMenu()
   {
 #if defined(Q_WS_MAC) || defined(Q_OS_MAC)
     this->Internal->SearchAction =
-      _menu->addAction("Search...\tAlt+Space", this, SLOT(quickLaunch()));
+      _menu->addAction(tr("Search...\tAlt+Space"), this, SLOT(quickLaunch()));
 #else
     this->Internal->SearchAction =
-      _menu->addAction("Search...\tCtrl+Space", this, SLOT(quickLaunch()));
+      _menu->addAction(tr("Search...\tCtrl+Space"), this, SLOT(quickLaunch()));
 #endif
   }
 
   if (this->RecentlyUsedMenuSize > 0)
   {
-    auto* rmenu = _menu->addMenu("&Recent") << pqSetName("Recent");
+    auto* rmenu = _menu->addMenu(tr("&Recent")) << pqSetName("Recent");
     this->Internal->RecentMenu = rmenu;
     this->connect(rmenu, SIGNAL(aboutToShow()), SLOT(populateRecentlyUsedMenu()));
   }
 
   if (this->EnableFavorites)
   {
-    auto* bmenu = _menu->addMenu("&Favorites") << pqSetName("Favorites");
+    auto* bmenu = _menu->addMenu(tr("&Favorites")) << pqSetName("Favorites");
     this->Internal->FavoritesMenu = bmenu;
     this->connect(_menu, SIGNAL(aboutToShow()), SLOT(populateFavoritesMenu()));
   }
@@ -581,7 +581,7 @@ void pqProxyGroupMenuManager::populateMenu()
   QMenu* alphabeticalMenu = _menu;
   if (!this->Internal->Categories.empty() || this->RecentlyUsedMenuSize > 0)
   {
-    alphabeticalMenu = _menu->addMenu("&Alphabetical") << pqSetName("Alphabetical");
+    alphabeticalMenu = _menu->addMenu(tr("&Alphabetical")) << pqSetName("Alphabetical");
   }
 
   pqInternal::ProxyInfoMap::iterator proxyIter = this->Internal->Proxies.begin();

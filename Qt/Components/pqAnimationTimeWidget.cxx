@@ -230,7 +230,7 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
     auto idx = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), state.time());
     ui.timestepValue->setValue(idx);
     ui.timestepValue->setSuffix(state.timeSteps()[idx] == state.time() ? "" : " (?)");
-    ui.timestepCountLabel->setText(QString("max is %1").arg(count - 1));
+    ui.timestepCountLabel->setText(tr("max is %1").arg(count - 1));
   }
   else
   {

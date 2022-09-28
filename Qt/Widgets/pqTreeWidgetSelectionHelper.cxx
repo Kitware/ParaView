@@ -91,8 +91,8 @@ void pqTreeWidgetSelectionHelper::showContextMenu(const QPoint& pos)
   {
     QMenu menu;
     menu.setObjectName("TreeWidgetCheckMenu");
-    QAction* check = new QAction("Check", &menu);
-    QAction* uncheck = new QAction("Uncheck", &menu);
+    QAction* check = new QAction(tr("Check"), &menu);
+    QAction* uncheck = new QAction(tr("Uncheck"), &menu);
     menu.addAction(check);
     menu.addAction(uncheck);
     QAction* result = menu.exec(this->TreeWidget->mapToGlobal(pos));

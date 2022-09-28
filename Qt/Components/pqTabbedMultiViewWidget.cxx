@@ -142,8 +142,8 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(
 
   label = new QLabel();
   label->setObjectName("close");
-  label->setToolTip("Close layout");
-  label->setStatusTip("Close layout");
+  label->setToolTip(tr("Close layout"));
+  label->setStatusTip(tr("Close layout"));
   label->setPixmap(label->style()
                      ->standardIcon(QStyle::SP_TitleBarCloseButton)
                      .pixmap(PQTABBED_WIDGET_PIXMAP_SIZE, PQTABBED_WIDGET_PIXMAP_SIZE));
@@ -638,7 +638,7 @@ void pqTabbedMultiViewWidget::closeTab(int index)
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
-    BEGIN_UNDO_SET("Remove View Tab");
+    BEGIN_UNDO_SET(tr("Remove View Tab"));
     // first remove each of the views in the tab layout.
     widget->destroyAllViews();
 
@@ -668,7 +668,7 @@ int pqTabbedMultiViewWidget::createTab(pqServer* server)
 {
   if (server)
   {
-    BEGIN_UNDO_SET("Add View Tab");
+    BEGIN_UNDO_SET(tr("Add View Tab"));
     auto pxm = server->proxyManager();
     auto vlayout = pxm->NewProxy("misc", "ViewLayout");
     Q_ASSERT(vlayout != nullptr);
@@ -712,7 +712,7 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject* obj, QEvent* evt)
         this->Internals->TabWidget->tabButtonIndex(qobject_cast<QWidget*>(obj), QTabBar::RightSide);
       if (index != -1)
       {
-        BEGIN_UNDO_SET("Close Tab");
+        BEGIN_UNDO_SET(tr("Close Tab"));
         this->closeTab(index);
         END_UNDO_SET();
         return true;
@@ -859,9 +859,9 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
   pqProxy* proxy = smmodel->findItem<pqProxy*>(vlayout);
 
   QMenu* menu = new QMenu(this);
-  QAction* renameAction = menu->addAction("Rename");
+  QAction* renameAction = menu->addAction(tr("Rename"));
   QAction* closeAction = menu->addAction(tr("Close layout"));
-  auto rearrangeMenu = menu->addMenu("Rearrange Views");
+  auto rearrangeMenu = menu->addMenu(tr("Rearrange Views"));
   QAction* horizontalAction = rearrangeMenu->addAction(tr("Horizontally"));
   rearrangeMenu->addAction(tr("Vertically"));
   QAction* gridAction = rearrangeMenu->addAction(tr("Grid"));
@@ -869,7 +869,7 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
   QAction* action = menu->exec(this->Internals->TabWidget->tabBar()->mapToGlobal(point));
   if (action == closeAction)
   {
-    BEGIN_UNDO_SET("Close Tab");
+    BEGIN_UNDO_SET(tr("Close Tab"));
     this->closeTab(tabIndex);
     END_UNDO_SET();
   }

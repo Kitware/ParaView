@@ -95,12 +95,12 @@ void pqSelectionInputWidget::updateLabels()
 {
   if (!this->AppendSelections)
   {
-    this->Ui->label->setText("No selection");
+    this->Ui->label->setText(tr("No selection"));
     this->Ui->textBrowser->setText("");
     return;
   }
 
-  this->Ui->label->setText("Copied Selection");
+  this->Ui->label->setText(tr("Copied Selection"));
 
   // the selection source should be an appendSelections
   auto& appendSelections = this->AppendSelections;
@@ -111,11 +111,12 @@ void pqSelectionInputWidget::updateLabels()
   QTextStream columnValues(&text, QIODevice::ReadWrite);
   if (numInputs > 0)
   {
-    columnValues << "Number of Selections: " << numInputs << QT_ENDL;
-    columnValues << "Selection Expression: "
+    columnValues << tr("Number of Selections: ") << numInputs << QT_ENDL;
+    columnValues << tr("Selection Expression: ")
                  << vtkSMPropertyHelper(appendSelections, "Expression").GetAsString() << QT_ENDL;
-    columnValues << "Invert Selection: "
-                 << (vtkSMPropertyHelper(appendSelections, "InsideOut").GetAsInt() ? "Yes" : "No")
+    columnValues << tr("Invert Selection: ")
+                 << (vtkSMPropertyHelper(appendSelections, "InsideOut").GetAsInt() ? tr("Yes")
+                                                                                   : tr("No"))
                  << QT_ENDL;
     // using the first selection source is sufficient because all the selections source
     // will have the same fieldType/ElementType
@@ -132,16 +133,16 @@ void pqSelectionInputWidget::updateLabels()
       fieldTypeAsString =
         vtkSMFieldDataDomain::GetElementTypeAsString(vtkSMPropertyHelper(smproperty).GetAsInt());
     }
-    columnValues << "Elements: " << fieldTypeAsString << QT_ENDL;
+    columnValues << tr("Elements: ") << fieldTypeAsString << QT_ENDL;
     for (unsigned int i = 0; i < numInputs; ++i)
     {
       auto selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i);
       auto selectionName = vtkSMPropertyHelper(appendSelections, "SelectionNames").GetAsString(i);
       const auto proxyXMLName = selectionSource->GetXMLName();
-      columnValues << QT_ENDL << selectionName << ")" << QT_ENDL << "Type: ";
+      columnValues << QT_ENDL << selectionName << ")" << QT_ENDL << tr("Type: ");
       if (strcmp(proxyXMLName, "FrustumSelectionSource") == 0)
       {
-        columnValues << "Frustum Selection" << QT_ENDL << QT_ENDL << "Values:" << QT_ENDL
+        columnValues << tr("Frustum Selection") << QT_ENDL << QT_ENDL << tr("Values:") << QT_ENDL
                      << QT_ENDL;
         vtkSMProperty* dvp = selectionSource->GetProperty("Frustum");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(dvp);
@@ -160,9 +161,9 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "ValueSelectionSource") == 0)
       {
-        columnValues << "Values Selection" << QT_ENDL << QT_ENDL << "Array Name: "
+        columnValues << tr("Values Selection") << QT_ENDL << QT_ENDL << tr("Array Name: ")
                      << vtkSMPropertyHelper(selectionSource, "ArrayName").GetAsString() << QT_ENDL
-                     << QT_ENDL << "Values" << QT_ENDL << QT_ENDL;
+                     << QT_ENDL << tr("Values") << QT_ENDL << QT_ENDL;
         vtkSMProperty* dvp = selectionSource->GetProperty("Values");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(dvp);
         for (int cc = 0; cc < values.size(); cc++)
@@ -180,14 +181,12 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "PedigreeIDSelectionSource") == 0)
       {
-        columnValues << "Pedigree ID Selection" << QT_ENDL << QT_ENDL;
+        columnValues << tr("Pedigree ID Selection") << QT_ENDL << QT_ENDL;
         vtkSMProperty* dsivp = selectionSource->GetProperty("StringIDs");
         QList<QVariant> stringIdValues = pqSMAdaptor::getMultipleElementProperty(dsivp);
         if (!stringIdValues.empty())
         {
-          columnValues << "Pedigree Domain"
-                       << "\t"
-                       << "String ID" << QT_ENDL << QT_ENDL;
+          columnValues << tr("Pedigree Domain") << "\t" << tr("String ID") << QT_ENDL << QT_ENDL;
           for (int cc = 0; cc < stringIdValues.size(); cc++)
           {
             if (cc % 2 != 1)
@@ -205,9 +204,7 @@ void pqSelectionInputWidget::updateLabels()
         QList<QVariant> IdValues = pqSMAdaptor::getMultipleElementProperty(divp);
         if (!IdValues.empty())
         {
-          columnValues << "Pedigree Domain"
-                       << "\t"
-                       << "ID" << QT_ENDL << QT_ENDL;
+          columnValues << tr("Pedigree Domain") << "\t" << tr("ID") << QT_ENDL << QT_ENDL;
           for (int cc = 0; cc < IdValues.size(); cc++)
           {
             if (cc % 2 != 1)
@@ -224,8 +221,8 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "GlobalIDSelectionSource") == 0)
       {
-        columnValues << "Global ID Selection" << QT_ENDL << QT_ENDL << "Global ID" << QT_ENDL
-                     << QT_ENDL;
+        columnValues << tr("Global ID Selection") << QT_ENDL << QT_ENDL << tr("Global ID")
+                     << QT_ENDL << QT_ENDL;
         QList<QVariant> value =
           pqSMAdaptor::getMultipleElementProperty(selectionSource->GetProperty("IDs"));
         Q_FOREACH (QVariant val, value)
@@ -236,9 +233,8 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "IDSelectionSource") == 0)
       {
-        columnValues << "ID Selection" << QT_ENDL << QT_ENDL << "Process ID"
-                     << "\t"
-                     << "Index" << QT_ENDL << QT_ENDL;
+        columnValues << tr("ID Selection") << QT_ENDL << QT_ENDL << tr("Process ID") << "\t"
+                     << tr("Index") << QT_ENDL << QT_ENDL;
         vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(idvp);
         for (int cc = 0; cc < values.size(); cc++)
@@ -256,11 +252,8 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "CompositeDataIDSelectionSource") == 0)
       {
-        columnValues << "ID Selection" << QT_ENDL << QT_ENDL << "Composite ID"
-                     << "\t"
-                     << "Process ID"
-                     << "\t"
-                     << "Index" << QT_ENDL << QT_ENDL;
+        columnValues << tr("ID Selection") << QT_ENDL << QT_ENDL << tr("Composite ID") << "\t"
+                     << tr("Process ID") << "\t" << tr("Index") << QT_ENDL << QT_ENDL;
         vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(idvp);
         for (int cc = 0; cc < values.size(); cc++)
@@ -278,12 +271,9 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "HierarchicalDataIDSelectionSource") == 0)
       {
-        columnValues << "ID Selection" << QT_ENDL << QT_ENDL;
-        columnValues << "Level"
-                     << "\t"
-                     << "Dataset"
-                     << "\t"
-                     << "Index" << QT_ENDL << QT_ENDL;
+        columnValues << tr("ID Selection") << QT_ENDL << QT_ENDL;
+        columnValues << tr("Level") << "\t" << tr("Dataset") << "\t" << tr("Index") << QT_ENDL
+                     << QT_ENDL;
         vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(idvp);
         for (int cc = 0; cc < values.size(); cc++)
@@ -301,8 +291,8 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "LocationSelectionSource") == 0)
       {
-        columnValues << "Location-based Selection" << QT_ENDL << QT_ENDL << "Probe Locations"
-                     << QT_ENDL << QT_ENDL;
+        columnValues << tr("Location-based Selection") << QT_ENDL << QT_ENDL
+                     << tr("Probe Locations") << QT_ENDL << QT_ENDL;
         vtkSMProperty* idvp = selectionSource->GetProperty("Locations");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(idvp);
         for (int cc = 0; cc < values.size(); cc++)
@@ -320,7 +310,8 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "BlockSelectionSource") == 0)
       {
-        columnValues << "Block Selection" << QT_ENDL << QT_ENDL << "Blocks" << QT_ENDL << QT_ENDL;
+        columnValues << tr("Block Selection") << QT_ENDL << QT_ENDL << tr("Blocks") << QT_ENDL
+                     << QT_ENDL;
         vtkSMProperty* prop = selectionSource->GetProperty("Blocks");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
         Q_FOREACH (const QVariant& value, values)
@@ -332,9 +323,9 @@ void pqSelectionInputWidget::updateLabels()
       else if (strcmp(proxyXMLName, "BlockSelectorsSelectionSource") == 0)
       {
         columnValues
-          << "Block Selectors Selection" << QT_ENDL << QT_ENDL << "Assembly Name: "
+          << tr("Block Selectors Selection") << QT_ENDL << QT_ENDL << tr("Assembly Name: ")
           << vtkSMPropertyHelper(selectionSource, "BlockSelectorsAssemblyName").GetAsString()
-          << QT_ENDL << QT_ENDL << "Block Selectors" << QT_ENDL << QT_ENDL;
+          << QT_ENDL << QT_ENDL << tr("Block Selectors") << QT_ENDL << QT_ENDL;
         vtkSMProperty* prop = selectionSource->GetProperty("BlockSelectors");
         QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
         Q_FOREACH (const QVariant& value, values)
@@ -345,9 +336,9 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "ThresholdSelectionSource") == 0)
       {
-        columnValues << "Threshold Selection" << QT_ENDL << QT_ENDL << "Array Name: "
+        columnValues << tr("Threshold Selection") << QT_ENDL << QT_ENDL << tr("Array Name: ")
                      << vtkSMPropertyHelper(selectionSource, "ArrayName").GetAsString() << QT_ENDL
-                     << QT_ENDL << "Thresholds" << QT_ENDL << QT_ENDL;
+                     << QT_ENDL << tr("Thresholds") << QT_ENDL << QT_ENDL;
         QList<QVariant> values =
           pqSMAdaptor::getMultipleElementProperty(selectionSource->GetProperty("Thresholds"));
         for (int cc = 0; cc < values.size(); cc++)
@@ -365,7 +356,7 @@ void pqSelectionInputWidget::updateLabels()
       }
       else if (strcmp(proxyXMLName, "SelectionQuerySource") == 0)
       {
-        columnValues << "Query Selection" << QT_ENDL << QT_ENDL << "Query: "
+        columnValues << tr("Query Selection") << QT_ENDL << QT_ENDL << tr("Query: ")
                      << vtkSMPropertyHelper(selectionSource, "QueryString").GetAsString()
                      << QT_ENDL;
       }
@@ -377,7 +368,7 @@ void pqSelectionInputWidget::updateLabels()
   }
   else
   {
-    columnValues << "Number of Selections: 0" << QT_ENDL;
+    columnValues << tr("Number of Selections: 0") << QT_ENDL;
   }
 
   this->Ui->textBrowser->setText(text);
@@ -441,7 +432,7 @@ void pqSelectionInputWidget::onActiveSelectionChanged()
 {
   // The selection has changed, either a new selection was created
   // or an old one cleared.
-  this->Ui->label->setText("Copied Selection (Active Selection Changed)");
+  this->Ui->label->setText(tr("Copied Selection (Active Selection Changed)"));
 }
 
 //-----------------------------------------------------------------------------

@@ -176,8 +176,8 @@ void pqPythonTabWidget::loadFile(const QString& fileName)
   QFile file(fileName);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
-    QMessageBox::warning(pqCoreUtilities::mainWidget(), QString("Sorry!"),
-      QString("Cannot open file %1:\n%2.").arg(fileName).arg(file.errorString()));
+    QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Sorry!"),
+      tr("Cannot open file %1:\n%2.").arg(fileName).arg(file.errorString()));
     return;
   }
 
@@ -296,7 +296,7 @@ void pqPythonTabWidget::createNewEmptyTab()
 void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
 {
   QPixmap closePixmap = this->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(16, 16);
-  QString label = "Close Tab";
+  QString label = tr("Close Tab");
   pqClickableLabel* cLabel =
     new pqClickableLabel(widget, label, label, label, &closePixmap, widget);
   this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, cLabel);
@@ -423,9 +423,9 @@ void pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget, QString&
 
   if (fileName.isEmpty())
   {
-    tabName += "New File";
+    tabName += tr("New File");
     elidedTabName = tabName;
-    unstyledTabName += "New File";
+    unstyledTabName += tr("New File");
   }
   else
   {

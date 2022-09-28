@@ -177,7 +177,7 @@ void pqDataInformationWidget::showBodyContextMenu(const QPoint& _pos)
 {
   QMenu menu;
   menu.setObjectName("DataInformationBodyContextMenu");
-  QAction* action = menu.addAction("Column Titles") << pqSetName("ColumnTitles");
+  QAction* action = menu.addAction(tr("Column Titles")) << pqSetName("ColumnTitles");
   action->setCheckable(true);
   action->setChecked(this->View->horizontalHeader()->isVisible());
   if (menu.exec(this->View->mapToGlobal(_pos)) == action)

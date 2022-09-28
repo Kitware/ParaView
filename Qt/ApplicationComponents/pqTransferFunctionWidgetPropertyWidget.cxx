@@ -100,7 +100,7 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   }
 
   QAction* resetActn = new QAction(this->Internals->Ui.resetButton);
-  resetActn->setToolTip("Reset using current data values");
+  resetActn->setToolTip(tr("Reset using current data values"));
   resetActn->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   this->Internals->Ui.resetButton->addAction(resetActn);
   this->Internals->Ui.resetButton->setDefaultAction(resetActn);

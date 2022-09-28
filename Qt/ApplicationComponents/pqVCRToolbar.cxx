@@ -97,15 +97,15 @@ pqVCRToolbar::~pqVCRToolbar()
 //-----------------------------------------------------------------------------
 void pqVCRToolbar::setTimeRanges(double start, double end)
 {
-  this->UI->actionVCRFirstFrame->setToolTip(QString("First Frame (%1)").arg(start, 0, 'g'));
-  this->UI->actionVCRLastFrame->setToolTip(QString("Last Frame (%1)").arg(end, 0, 'g'));
+  this->UI->actionVCRFirstFrame->setToolTip(tr("First Frame (%1)").arg(start, 0, 'g'));
+  this->UI->actionVCRLastFrame->setToolTip(tr("Last Frame (%1)").arg(end, 0, 'g'));
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRToolbar::onPlaying(bool playing, bool reversed)
 {
   QAction* const actn = reversed ? this->UI->actionVCRReverse : this->UI->actionVCRPlay;
-  const char* actnName = reversed ? "Reverse" : "Play";
+  QString actnName = reversed ? tr("Reverse") : tr("Play");
   const char* slotFn = reversed ? SLOT(onReverse()) : SLOT(onPlay());
 
   // goal of action depends on context. ex: play/reverse vs pause
@@ -115,7 +115,7 @@ void pqVCRToolbar::onPlaying(bool playing, bool reversed)
     disconnect(actn, SIGNAL(triggered()), this->Controller, slotFn);
     connect(actn, SIGNAL(triggered()), this->Controller, SLOT(onPause()));
     actn->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPause.svg"));
-    actn->setText("Pa&use");
+    actn->setText(tr("Pa&use"));
   }
   else
   {

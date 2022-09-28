@@ -216,7 +216,7 @@ int pqNodeEditorWidget::initializeSignals()
           }
           else
           {
-            BEGIN_UNDO_SET(QString("Change Input for %1").arg(to->getSMName()));
+            BEGIN_UNDO_SET(tr("Change Input for %1").arg(to->getSMName()));
             ip->RemoveAllProxies();
             ip->AddInputConnection(from->getProxy(), fromPort);
             END_UNDO_SET();
@@ -735,7 +735,7 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
     return 1;
   }
 
-  BEGIN_UNDO_SET(QString("Change Input for %1").arg(consumerAsFilter->getSMName()));
+  BEGIN_UNDO_SET(tr("Change Input for %1").arg(consumerAsFilter->getSMName()));
 
   std::vector<vtkSMProxy*> inputPtrs;
   std::vector<unsigned int> inputPorts;

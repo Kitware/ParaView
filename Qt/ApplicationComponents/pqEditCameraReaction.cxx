@@ -79,7 +79,7 @@ void pqEditCameraReaction::editCamera(pqView* view)
   if (!dialog)
   {
     dialog = new pqCameraDialog(pqCoreUtilities::mainWidget());
-    dialog->setWindowTitle("Adjust Camera");
+    dialog->setWindowTitle(tr("Adjust Camera"));
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->setRenderModule(renModule);
     dialog->show();

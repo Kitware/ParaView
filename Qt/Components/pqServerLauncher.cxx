@@ -245,7 +245,9 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
 
   QFormLayout* formLayout = new QFormLayout();
   dialog.setLayout(formLayout);
-  dialog.setWindowTitle(QString("Connection Options for \"%1\"").arg(configuration.name()));
+  dialog.setWindowTitle(
+    QCoreApplication::translate("pqServerLauncher", "Connection Options for \"%1\"")
+      .arg(configuration.name()));
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
@@ -633,18 +635,18 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
 
       if (timeout < 0)
       {
-        ui.message->setText(QString("Establishing connection to '%1' \n"
-                                    "Waiting for server to connect.")
+        ui.message->setText(tr("Establishing connection to '%1'\n"
+                               "Waiting for server to connect.")
                               .arg(this->Internals->Configuration.name()));
-        dialog.setWindowTitle("Waiting for Server Connection");
+        dialog.setWindowTitle(tr("Waiting for Server Connection"));
       }
       else
       {
-        ui.message->setText(QString("Establishing connection to '%1' \n"
-                                    "Waiting %2 seconds for connection to server.")
+        ui.message->setText(tr("Establishing connection to '%1'\n"
+                               "Waiting %2 seconds for connection to server.")
                               .arg(this->Internals->Configuration.name())
                               .arg(timeout));
-        dialog.setWindowTitle("Waiting for Connection to Server");
+        dialog.setWindowTitle(tr("Waiting for Connection to Server"));
       }
 
       dialog.setModal(true);
@@ -660,8 +662,8 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
     pqEventDispatcher::processEventsAndWait(100);
 
   } while (result == vtkNetworkAccessManager::ConnectionResult::CONNECTION_TIMEOUT &&
-    QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
-      QString("Unable to connect sucessfully. Try again for %1 seconds ?").arg(timeout)) ==
+    QMessageBox::question(pqCoreUtilities::mainWidget(), tr("Connection Failed"),
+      tr("Unable to connect sucessfully. Try again for %1 seconds ?").arg(timeout)) ==
       QMessageBox::Yes);
 
   return this->Internals->Server != nullptr;
@@ -763,7 +765,7 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
   Ui::pqServerLauncherDialog ui;
   ui.setupUi(&dialog);
   ui.cancel->hide();
-  ui.message->setText(QString("Launching server '%1'").arg(this->Internals->Configuration.name()));
+  ui.message->setText(tr("Launching server '%1'").arg(this->Internals->Configuration.name()));
   if (show_status_dialog)
   {
     dialog.show();

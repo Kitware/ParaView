@@ -535,9 +535,9 @@ void pqRemoteCommandDialog::FindXTermExecutable()
 //------------------------------------------------------------------------------
 string pqRemoteCommandDialog::LocateFile()
 {
-  QString filters = QString("All Files (*)");
+  QString filters = tr("All Files") + QString(" (*)");
 
-  pqFileDialog dialog(nullptr, this, "Find file", "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Find file"), "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)

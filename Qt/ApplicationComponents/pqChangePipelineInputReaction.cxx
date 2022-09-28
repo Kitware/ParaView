@@ -92,7 +92,7 @@ void pqChangePipelineInputReaction::changeInput()
     return;
   }
 
-  BEGIN_UNDO_SET(QString("Change Input for %1").arg(filter->getSMName()));
+  BEGIN_UNDO_SET(tr("Change Input for %1").arg(filter->getSMName()));
   SM_SCOPED_TRACE(PropertiesModified).arg("proxy", filter->getProxy());
 
   const QMap<QString, QList<pqOutputPort*>> input_map = dialog.selectedInputs();

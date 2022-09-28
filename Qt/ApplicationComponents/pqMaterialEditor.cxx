@@ -570,7 +570,7 @@ void pqMaterialEditor::addMaterial()
   }
 
   pqNewMaterialDialog* dialog = new pqNewMaterialDialog(pqCoreUtilities::mainWidget());
-  dialog->setWindowTitle("New Material");
+  dialog->setWindowTitle(tr("New Material"));
   dialog->setMaterialLibrary(ml);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
@@ -875,14 +875,12 @@ void pqMaterialEditor::updateCurrentMaterial(const std::string& label)
   }
 
   // material type name label update
-  std::string materialTypeLabel = "Material Type: ";
-  std::string matType = ml->LookupImplName(label);
+  QString matType = QString(ml->LookupImplName(label));
   if (matType.empty())
   {
-    matType = "<none>";
+    matType = tr("<none>");
   }
-  materialTypeLabel += matType;
-  this->Internals->Ui.TypeLabel->setText(materialTypeLabel.c_str());
+  this->Internals->Ui.TypeLabel->setText(tr("Material Type: %1").arg(matType));
 
   this->Internals->AttributesModel.setMaterial(ml, label);
   this->propertyChanged(QModelIndex(), QModelIndex());

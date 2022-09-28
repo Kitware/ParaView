@@ -60,19 +60,19 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
 {
   auto app = options->GetCLI11App();
 
-  auto groupTesting = app->add_option_group("Testing", "Testing specific options");
+  auto groupTesting = app->add_option_group("Testing", qPrintable(tr("Testing specific options")));
 
   groupTesting
     ->add_option("--baseline-directory", this->BaselineDirectory,
-      "Baseline directory where test recorder will store baseline images.")
+      qPrintable(tr("Baseline directory where test recorder will store baseline images.")))
     ->envname("PARAVIEW_TEST_BASELINE_DIR");
   groupTesting
     ->add_option("--test-directory", this->TestDirectory,
-      "Temporary directory used to output test results and other temporary files.")
+      qPrintable(tr("Temporary directory used to output test results and other temporary files.")))
     ->envname("PARAVIEW_TEST_DIR");
   groupTesting
-    ->add_option(
-      "--data-directory", this->DataDirectory, "Directory containing data files for tests.")
+    ->add_option("--data-directory", this->DataDirectory,
+      qPrintable(tr("Directory containing data files for tests.")))
     ->envname("PARAVIEW_DATA_ROOT");
   groupTesting
     ->add_option(
@@ -92,7 +92,7 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
         }
         return true;
       },
-      "Test scripts to execute in order specified on the command line.")
+      qPrintable(tr("Test scripts to execute in order specified on the command line.")))
     ->type_name("TEXT:filename ...")
     ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
@@ -114,7 +114,7 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
         }
         return true;
       },
-      "Test baseline for tests script provided.")
+      qPrintable(tr("Test baseline for tests script provided.")))
     ->type_name("TEXT:filename ...")
     ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
@@ -136,42 +136,44 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
         }
         return true;
       },
-      "Test image comparison threshold for test scripts provided.")
+      qPrintable(tr("Test image comparison threshold for test scripts provided.")))
     ->type_name("INT ...")
     ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
-  groupTesting->add_flag(
-    "--exit", this->ExitAppWhenTestsDone, "Exit application when tests are finished.");
+  groupTesting->add_flag("--exit", this->ExitAppWhenTestsDone,
+    qPrintable(tr("Exit application when tests are finished.")));
 
+  groupTesting->add_flag("--test-master", this->TestMaster,
+    qPrintable(tr("Test collaboration 'master' configuration.")));
   groupTesting->add_flag(
-    "--test-master", this->TestMaster, "Test collaboration 'master' configuration.");
-  groupTesting->add_flag(
-    "--test-slave", this->TestSlave, "Test collaboration 'slave' configuration.");
+    "--test-slave", this->TestSlave, qPrintable(tr("Test collaboration 'slave' configuration.")));
 
   CLI::deprecate_option(groupTesting, "--test-master");
   CLI::deprecate_option(groupTesting, "--test-slave");
 
-  auto groupStartup =
-    app->add_option_group("Startup", "Options controls actions on application launch");
+  auto groupStartup = app->add_option_group(
+    "Startup", qPrintable(tr("Options controls actions on application launch")));
   groupStartup->add_option("--state", this->StateFileName,
-    "State file (.pvsm or .py) to load when the application starts.");
+    qPrintable(tr("State file (.pvsm or .py) to load when the application starts.")));
   groupStartup
-    ->add_option(
-      "--script", this->PythonScript, "Python script to execute when the application starts.")
+    ->add_option("--script", this->PythonScript,
+      qPrintable(tr("Python script to execute when the application starts.")))
     ->excludes("--state");
   groupStartup
     ->add_option("--data", this->DataFileNames,
-      "Load the specified data file(s) when the client starts. To choose a file series, "
-      "replace the numeral with a '.', for example,  my0.vtk, my1.vtk...myN.vtk becomes my..vtk, "
-      "etc.")
+      qPrintable(tr(
+        "Load the specified data file(s) when the client starts. To choose a file series, "
+        "replace the numeral with a '.', for example,  my0.vtk, my1.vtk...myN.vtk becomes my..vtk, "
+        "etc.")))
     ->excludes("--state")
     ->excludes("--script");
 
   groupStartup
     ->add_option("filenames", this->PositionalFileNames,
-      "Positional arguments may be used to pass either data (--data), state (--state), "
-      "or script (--script) files. `.pvsm` files are treated as state files, `.py` are treated "
-      "as scripts and all others are treated as data files.")
+      qPrintable(tr(
+        "Positional arguments may be used to pass either data (--data), state (--state), "
+        "or script (--script) files. `.pvsm` files are treated as state files, `.py` are treated "
+        "as scripts and all others are treated as data files.")))
     ->excludes("--state")
     ->excludes("--script")
     ->excludes("--data")
@@ -192,7 +194,7 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
 
   groupStartup
     ->add_option("--live", this->CatalystLivePort,
-      "Connect to Catalyst Live session at the specified port number.")
+      qPrintable(tr("Connect to Catalyst Live session at the specified port number.")))
     ->default_val(-1);
 
   return true;

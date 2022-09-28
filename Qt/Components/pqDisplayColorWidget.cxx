@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QtDebug>
@@ -139,7 +140,7 @@ protected:
     int association = val.first;
     const QString& arrayName = val.second;
 
-    BEGIN_UNDO_SET("Change coloring");
+    BEGIN_UNDO_SET(QCoreApplication::translate("PropertyLinksConnection", "Change coloring"));
     vtkSMProxy* reprProxy = this->proxySM();
 
     // before changing scalar color, save the LUT being used so we can hide the
@@ -454,7 +455,7 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   this->Internals->OutOfDomainEntryIndex = -1;
 
   // add solid color.
-  this->Variables->addItem(*this->SolidColorIcon, "Solid Color", QVariant());
+  this->Variables->addItem(*this->SolidColorIcon, tr("Solid Color"), QVariant());
 
   vtkSMArrayListDomain* domain = this->Internals->Domain;
   assert(domain);
@@ -553,7 +554,7 @@ void pqDisplayColorWidget::componentNumberChanged()
 {
   if (this->ColorTransferFunction)
   {
-    BEGIN_UNDO_SET("Change color component");
+    BEGIN_UNDO_SET(tr("Change color component"));
     int number = this->componentNumber();
     QPair<int, QString> val = this->arraySelection();
     int association = val.first;

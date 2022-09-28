@@ -407,7 +407,7 @@ bool pqCoreTestUtility::CompareImage(const QString& testPNGImage, const QString&
   vtkNew<vtkPNGReader> reader;
   if (!reader->CanReadFile(testPNGImage.toUtf8().data()))
   {
-    output << "Cannot read file : " << testPNGImage.toUtf8().data() << endl;
+    output << qPrintable(tr("Cannot read file : %1").arg(testPNGImage)) << endl;
     return false;
   }
   reader->SetFileName(testPNGImage.toUtf8().data());

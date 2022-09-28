@@ -159,15 +159,15 @@ void pqSaveAnimationReaction::saveAnimation()
   pqProxyWidgetDialog dialog(ahProxy, pqCoreUtilities::mainWidget());
   dialog.setObjectName("SaveAnimationDialog");
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle("Save Animation Options");
+  dialog.setWindowTitle(tr("Save Animation Options"));
   dialog.setEnableSearchBar(true);
   dialog.setSettingsKey("SaveAnimationDialog");
 
   if (dialog.exec() == QDialog::Accepted)
   {
     pqAnimationProgressDialog progress(
-      "Save animation progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
-    progress.setWindowTitle("Saving Animation ...");
+      tr("Save animation progress"), tr("Abort"), 0, 100, pqCoreUtilities::mainWidget());
+    progress.setWindowTitle(tr("Saving Animation ..."));
     progress.setAnimationScene(scene);
     progress.show();
 

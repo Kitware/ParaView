@@ -363,13 +363,13 @@ void pqComparativeVisPanel::addParameter()
   if (realProxy)
   {
     BEGIN_UNDO_SET(
-      QString("Add parameter %1 : %2")
+      tr("Add parameter %1 : %2")
         .arg(pqComparativeVisPanelNS::getName(realProxy))
         .arg(pqComparativeVisPanelNS::getName(realProxy, pname.toUtf8().data(), pindex)));
   }
   else
   {
-    BEGIN_UNDO_SET("Add parameter Time");
+    BEGIN_UNDO_SET(tr("Add parameter Time"));
   }
 
   // Add new cue.
@@ -441,7 +441,7 @@ void pqComparativeVisPanel::removeParameter(int index)
   QTableWidgetItem* item = this->Internal->activeParameters->item(index, 0);
   assert(item);
 
-  BEGIN_UNDO_SET("Remove Parameter");
+  BEGIN_UNDO_SET(tr("Remove Parameter"));
 
   vtkSMSessionProxyManager* pxm = this->view()->proxyManager();
   vtkSmartPointer<vtkSMProxy> cue =

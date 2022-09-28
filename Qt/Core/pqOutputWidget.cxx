@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 
 #include <QClipboard>
+#include <QCoreApplication>
 #include <QDockWidget>
 #include <QMutexLocker>
 #include <QPointer>
@@ -403,7 +404,7 @@ public:
 private:
   QString tr(const QString& sourceText) const
   {
-    return QApplication::translate("pqOutputWidget", sourceText.toUtf8().data());
+    return QCoreApplication::translate("pqOutputWidget", sourceText.toUtf8().data());
   }
   QString SettingsKey;
   QMutex SuppressionMutex;
@@ -415,7 +416,7 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   , Internals(new pqOutputWidget::pqInternals(this))
 {
   // Setup Qt message pattern
-  qSetMessagePattern("%{type}: In %{file}, line %{line}\n%{type}: %{message}");
+  qSetMessagePattern(tr("%{type}: In %{file}, line %{line}\n%{type}: %{message}"));
 
   pqInternals& internals = (*this->Internals);
 
@@ -452,8 +453,8 @@ void pqOutputWidget::suppress(const QStringList& substrs)
 void pqOutputWidget::saveToFile()
 {
   QString text = this->Internals->Ui.consoleWidget->text();
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save output", QString(),
-    "Text Files (*.txt);;All Files (*)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save output"), QString(),
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {
