@@ -391,7 +391,7 @@ public:
     {
       QPalette palette = this->PropertyWidget->palette();
       auto styleSheet =
-        tr(":disabled { color: %1; background-color: %2 }")
+        QString(":disabled { color: %1; background-color: %2 }")
           .arg(palette.color(QPalette::Active, QPalette::WindowText).name(QColor::HexArgb))
           .arg(palette.color(QPalette::Active, QPalette::Base).name(QColor::HexArgb));
       this->PropertyWidget->setStyleSheet(styleSheet);

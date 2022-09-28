@@ -69,12 +69,14 @@ QString getPVSCSourcesFromSettings()
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return settings
     ->value("PVSC_SOURCES",
-      QCoreApplication::translate("pqServerConnectDialog",
-        "# Enter list of URLs to obtain server configurations from.\n"
-        "# Syntax:\n"
-        "#    pvsc <url> <userfriendly-name>\n\n"
-        "# Official Kitware Server Configurations\n"
-        "pvsc http://www.paraview.org/files/pvsc Kitware Inc.\n"))
+      QString("# %1\n# %2\n# %3\n#   pvsc <url> <%4>\n\n# %5\n%6")
+        .arg(QCoreApplication::translate(
+          "pqServerConnectDialog", "Enter list of URLs to obtain server configurations from."))
+        .arg(QCoreApplication::translate("pqServerConnectDialog", "Syntax:"))
+        .arg(QCoreApplication::translate("pqServerConnectDialog", "userfriendly-name"))
+        .arg(QCoreApplication::translate(
+          "pqServerConnectDialog", "Official Kitware Server Configurations"))
+        .arg("pvsc http://www.paraview.org/files/pvsc Kitware Inc.\n"))
     .toString();
 }
 
