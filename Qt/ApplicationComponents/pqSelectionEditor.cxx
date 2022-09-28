@@ -268,7 +268,7 @@ public:
 
     // source
     this->SourceInfo->setEnabled(false);
-    this->SourceInfo->setText(tr("(none)"));
+    this->SourceInfo->setText(QString("(%1)").arg(tr("none")));
 
     // element type
     this->ElementTypeInfo->setEnabled(false);

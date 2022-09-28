@@ -81,8 +81,9 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent)
   }
 
   // get extra information and put it in
-  this->Ui->VersionLabel->setText("<html><b>" + tr("Version: ") +
-    QString("<i>%1</i></b></html>").arg(QString(PARAVIEW_VERSION_FULL)));
+  this->Ui->VersionLabel->setText(QString("<html><b>%1: <i>%2</i></b></html>")
+                                    .arg(tr("Version"))
+                                    .arg(QString(PARAVIEW_VERSION_FULL)));
   this->AddClientInformation();
   this->AddServerInformation();
 }

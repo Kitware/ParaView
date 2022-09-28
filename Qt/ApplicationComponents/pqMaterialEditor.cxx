@@ -875,10 +875,10 @@ void pqMaterialEditor::updateCurrentMaterial(const std::string& label)
   }
 
   // material type name label update
-  QString matType = QString(ml->LookupImplName(label));
-  if (matType.empty())
+  QString matType = QString(ml->LookupImplName(label).c_str());
+  if (matType.isEmpty())
   {
-    matType = tr("<none>");
+    matType = QString("<%1>").arg(tr("none"));
   }
   this->Internals->Ui.TypeLabel->setText(tr("Material Type: %1").arg(matType));
 

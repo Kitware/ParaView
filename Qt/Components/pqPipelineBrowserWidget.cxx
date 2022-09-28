@@ -278,12 +278,12 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, const QModelIndexList&
         if (indexes.size() == 1)
         {
           source = port->getSource();
-          BEGIN_UNDO_SET(
-            QString("%1 %2").arg(visible ? tr("Show") : tr("Hide")).arg(source->getSMName()));
+          BEGIN_UNDO_SET((visible ? tr("Show %1").arg(source->getSMName())
+                                  : tr("Hide %1").arg(source->getSMName())));
         }
         else
         {
-          BEGIN_UNDO_SET(tr("%1 Selected").arg(visible ? tr("Show") : tr("Hide")));
+          BEGIN_UNDO_SET((visible ? tr("Show Selected") : tr("Hide Selected")));
         }
       }
       pqPipelineBrowserWidget::setVisibility(visible, port);
