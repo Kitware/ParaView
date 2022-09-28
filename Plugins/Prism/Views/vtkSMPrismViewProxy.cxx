@@ -169,3 +169,25 @@ const char* vtkSMPrismViewProxy::GetRepresentationType(vtkSMSourceProxy* produce
 
   return nullptr;
 }
+
+//----------------------------------------------------------------------------
+void vtkSMPrismViewProxy::CopySelectionRepresentationProperties(
+  vtkSMProxy* fromSelectionRep, vtkSMProxy* toSelectionRep)
+{
+  if (!fromSelectionRep || !toSelectionRep)
+  {
+    return;
+  }
+  if (strcmp(fromSelectionRep->GetXMLName(), this->GetSelectionRepresentationProxyName()) == 0 &&
+    strcmp(toSelectionRep->GetXMLName(), this->GetSelectionRepresentationProxyName()) == 0)
+  {
+    toSelectionRep->GetProperty("IsSimulationData")
+      ->Copy(fromSelectionRep->GetProperty("IsSimulationData"));
+    toSelectionRep->GetProperty("AttributeType")
+      ->Copy(fromSelectionRep->GetProperty("AttributeType"));
+    toSelectionRep->GetProperty("XArrayName")->Copy(fromSelectionRep->GetProperty("XArrayName"));
+    toSelectionRep->GetProperty("YArrayName")->Copy(fromSelectionRep->GetProperty("YArrayName"));
+    toSelectionRep->GetProperty("ZArrayName")->Copy(fromSelectionRep->GetProperty("ZArrayName"));
+    toSelectionRep->UpdateVTKObjects();
+  }
+}

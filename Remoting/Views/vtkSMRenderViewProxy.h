@@ -236,6 +236,19 @@ public:
    */
   vtkFloatArray* CaptureDepthBuffer();
 
+  /**
+   * Get the SelectionRepresentation proxy name.
+   */
+  virtual const char* GetSelectionRepresentationProxyName() { return "SelectionRepresentation"; }
+
+  /**
+   * Function to copy selection representation properties.
+   */
+  virtual void CopySelectionRepresentationProperties(
+    vtkSMProxy* vtkNotUsed(fromSelectionRep), vtkSMProxy* vtkNotUsed(toSelectionRep))
+  {
+  }
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;

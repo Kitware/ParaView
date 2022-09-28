@@ -22,6 +22,8 @@
 #include "vtkPVRenderView.h"
 #include "vtkPrismViewsModule.h" // needed for exports
 
+class vtkPVLODActor;
+
 class VTKPRISMVIEWS_EXPORT vtkPrismView : public vtkPVRenderView
 {
 public:
@@ -176,6 +178,26 @@ public:
    */
   void Update() override;
 
+  ///@{
+  /**
+   * Compute/Get the prism bounds.
+   */
+  vtkSetMacro(EnableNonSimulationDataSelection, bool);
+  vtkGetMacro(EnableNonSimulationDataSelection, bool);
+  vtkBooleanMacro(EnableNonSimulationDataSelection, bool);
+  ///@}
+
+  /**
+   * Prepare for selection.
+   * Returns false if it is currently generating a selection.
+   */
+  bool PrepareSelect(int fieldAssociation, const char* array = nullptr) override;
+
+  /**
+   * Post process after selection.
+   */
+  void PostSelect(vtkSelection* sel, const char* array = nullptr) override;
+
 protected:
   vtkPrismView();
   ~vtkPrismView() override;
@@ -204,6 +226,10 @@ protected:
   vtkBoundingBox PrismBoundsBBox;
   double PrismBounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
     VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
+
+  bool EnableNonSimulationDataSelection = false;
+
+  std::vector<vtkPVLODActor*> NonSimulationPropsToHideForSelection;
 
 private:
   vtkPrismView(const vtkPrismView&) = delete;

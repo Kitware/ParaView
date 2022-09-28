@@ -202,6 +202,17 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty command="SetEnableNonSimulationDataSelection"
+                         default_values="0"
+                         name="EnableNonSimulationDataSelection"
+                         label="Enable Non Simulation Data Selection"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When on, Non Simulation Data can also be selected.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="X Axis">
         <Property name="LowerThresholdX"/>
         <Property name="UpperThresholdX"/>
@@ -219,6 +230,9 @@
       </PropertyGroup>
       <PropertyGroup label="Scaling">
         <Property name="AspectRatio"/>
+      </PropertyGroup>
+      <PropertyGroup label="Selections">
+        <Property name="EnableNonSimulationDataSelection"/>
       </PropertyGroup>
     </PrismViewProxy>
   </ProxyGroup>

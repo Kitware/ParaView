@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkGeometryRepresentation.cxx
+  Module:    vtkGeometryRepresentationInternal.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

@@ -839,7 +839,7 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
       strcmp(modifiedProxy->GetXMLName(), "PVExtractSelection") == 0;
     const bool isSelectionRepresentation =
       strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
-      strcmp(modifiedProxy->GetXMLName(), "SelectionRepresentation") == 0;
+      strcmp(modifiedProxy->GetXMLName(), this->GetSelectionRepresentationProxyName()) == 0;
 
     const bool isFastPreSelection = strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
       vtkPVRenderViewSettings::GetInstance()->GetEnableFastPreselection();

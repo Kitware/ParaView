@@ -20,7 +20,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGridAxes3DActor.h"
+#include "vtkPVLODActor.h"
 #include "vtkPVSession.h"
+#include "vtkPrismGeometryRepresentation.h"
 #include "vtkTransform.h"
 
 #include <cmath>
@@ -54,9 +56,6 @@ vtkPrismView::~vtkPrismView()
 void vtkPrismView::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "XAxisName: " << (this->XAxisName ? this->XAxisName : "(none)") << endl;
-  os << indent << "YAxisName: " << (this->YAxisName ? this->YAxisName : "(none)") << endl;
-  os << indent << "ZAxisName: " << (this->ZAxisName ? this->ZAxisName : "(none)") << endl;
   os << indent << "EnableThresholding: " << (this->EnableThresholding ? "On" : "Off") << endl;
   os << indent << "Threshold Bounds: " << this->LowerThresholdX << " " << this->UpperThresholdX
      << " " << this->LowerThresholdX << " " << this->UpperThresholdX << " " << this->LowerThresholdX
@@ -70,6 +69,8 @@ void vtkPrismView::PrintSelf(std::ostream& os, vtkIndent indent)
   os << indent << "PrismBounds: " << this->PrismBounds[0] << ", " << this->PrismBounds[1] << ", "
      << this->PrismBounds[2] << ", " << this->PrismBounds[3] << ", " << this->PrismBounds[4] << ", "
      << this->PrismBounds[5] << endl;
+  os << indent << "EnableNonSimulationDataSelection: "
+     << (this->EnableNonSimulationDataSelection ? "On" : "Off") << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -303,4 +304,46 @@ void vtkPrismView::Update()
   // now call update data on all representations to get the geometry data
   this->RequestDataMode = RequestDataModes::REQUEST_DATA;
   this->Superclass::Update();
+}
+
+//----------------------------------------------------------------------------
+bool vtkPrismView::PrepareSelect(int fieldAssociation, const char* array)
+{
+  if (!this->EnableNonSimulationDataSelection)
+  {
+    for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
+    {
+      auto repr = vtkPrismGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
+      if (repr)
+      {
+        auto prop = repr->GetRenderedProp();
+        if (prop)
+        {
+          if (!repr->GetIsSimulationData() && repr->GetVisibility() && prop->GetPickable())
+          {
+            this->NonSimulationPropsToHideForSelection.push_back(prop);
+            prop->SetPickable(false);
+          }
+        }
+      }
+    }
+  }
+  return this->Superclass::PrepareSelect(fieldAssociation, array);
+}
+
+//----------------------------------------------------------------------------
+void vtkPrismView::PostSelect(vtkSelection* sel, const char* array)
+{
+  if (!this->EnableNonSimulationDataSelection)
+  {
+    for (auto prop : this->NonSimulationPropsToHideForSelection)
+    {
+      if (prop)
+      {
+        prop->SetPickable(true);
+      }
+    }
+    this->NonSimulationPropsToHideForSelection.clear();
+  }
+  this->Superclass::PostSelect(sel, array);
 }

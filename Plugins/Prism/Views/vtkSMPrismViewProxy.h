@@ -45,6 +45,20 @@ public:
    */
   const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) override;
 
+  /**
+   * Get the Selection Representation proxy name.
+   */
+  const char* GetSelectionRepresentationProxyName() override
+  {
+    return "PrismSelectionRepresentation";
+  }
+
+  /**
+   * Function to copy selection representation properties.
+   */
+  void CopySelectionRepresentationProperties(
+    vtkSMProxy* fromSelectionRep, vtkSMProxy* toSelectionRep) override;
+
 protected:
   vtkSMPrismViewProxy();
   ~vtkSMPrismViewProxy() override;

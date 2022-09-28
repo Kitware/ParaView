@@ -1164,12 +1164,12 @@ protected:
    * Prepare for selection.
    * Returns false if it is currently generating a selection.
    */
-  bool PrepareSelect(int fieldAssociation, const char* array = nullptr);
+  virtual bool PrepareSelect(int fieldAssociation, const char* array = nullptr);
 
   /**
    * Post process after selection.
    */
-  void PostSelect(vtkSelection* sel, const char* array = nullptr);
+  virtual void PostSelect(vtkSelection* sel, const char* array = nullptr);
 
   /**
    * Updates background color. If no renderer is specified, then the default

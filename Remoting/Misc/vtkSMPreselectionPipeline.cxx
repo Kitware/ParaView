@@ -121,14 +121,15 @@ vtkSMSourceProxy* vtkSMPreselectionPipeline::ConnectPVExtractSelection(
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPreselectionPipeline::CreateSelectionRepresentation(vtkSMSourceProxy* extract)
+vtkSMProxy* vtkSMPreselectionPipeline::CreateSelectionRepresentation(
+  vtkSMSourceProxy* extract, vtkSMRenderViewProxy* view)
 {
   if (!this->SelectionRepresentation)
   {
     vtkSMSessionProxyManager* proxyManager =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    vtkSMProxy* representation =
-      proxyManager->NewProxy("representations", "SelectionRepresentation");
+    vtkSMProxy* representation = proxyManager->NewProxy("representations",
+      view ? view->GetSelectionRepresentationProxyName() : "SelectionRepresentation");
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
     settings->GetProxySettings(representation);
 
@@ -225,14 +226,22 @@ void vtkSMPreselectionPipeline::Show(
     {
       this->ClearCache();
     }
+    // Clear Cache when then render view type has changed
+    if (this->PreviousView && strcmp(this->PreviousView->GetXMLName(), view->GetXMLName()) != 0)
+    {
+      this->ClearCache();
+    }
 
-    this->CreateSelectionRepresentation(extract);
+    this->CreateSelectionRepresentation(extract, view);
     if (this->PreviousView)
     {
       vtkSMPropertyHelper(this->PreviousView, "Representations")
         .Remove(this->SelectionRepresentation);
       this->PreviousView->UpdateVTKObjects();
     }
+    auto selectionRepresentation = representation->GetSubProxy("SelectionRepresentation");
+    view->CopySelectionRepresentationProperties(
+      selectionRepresentation, this->SelectionRepresentation);
     vtkSMPropertyHelper(view, "Representations").Add(this->SelectionRepresentation);
     view->UpdateVTKObjects();
     view->StillRender();
