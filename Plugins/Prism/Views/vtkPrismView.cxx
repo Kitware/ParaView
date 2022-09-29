@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPrismView.h"
 
+#include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkMatrix4x4.h"
@@ -23,7 +24,9 @@
 #include "vtkPVLODActor.h"
 #include "vtkPVSession.h"
 #include "vtkPrismGeometryRepresentation.h"
+#include "vtkRenderer.h"
 #include "vtkTransform.h"
+#include "vtkWidgetRepresentation.h"
 
 #include <cmath>
 #ifndef M_E
@@ -181,6 +184,38 @@ void vtkPrismView::SetPrismBounds(vtkInformation* info, const double* bounds)
     return;
   }
   this->PrismBoundsBBox.AddBounds(bounds);
+}
+
+//----------------------------------------------------------------------------
+void vtkPrismView::SynchronizeGeometryBounds()
+{
+  // to allow interactive change of threshold bounds, we need to only consider
+  // the widget bounds when this->GetRenderer()->ComputeVisiblePropBounds(prop_bounds)
+  // is called inside this->Superclass::SynchronizeGeometryBounds()
+  std::vector<vtkProp*> propsToHide;
+  if (this->GetLocalProcessDoesRendering(/*using_distributed_rendering*/ false))
+  {
+    vtkProp* prop;
+    auto props = this->GetRenderer()->GetViewProps();
+    vtkCollectionSimpleIterator pit;
+    for (props->InitTraversal(pit); (prop = props->GetNextProp(pit));)
+    {
+
+      if (prop && !vtkWidgetRepresentation::SafeDownCast(prop) && prop->GetVisibility() &&
+        prop->GetUseBounds())
+      {
+        prop->SetUseBounds(0);
+        propsToHide.push_back(prop);
+      }
+    }
+  }
+
+  this->Superclass::SynchronizeGeometryBounds();
+
+  for (auto prop : propsToHide)
+  {
+    prop->SetUseBounds(1);
+  }
 }
 
 //------------------------------------------------------------------------------

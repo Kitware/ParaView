@@ -204,6 +204,8 @@ protected:
 
   void AllReduceString(const std::string& axisNameSource, std::string& axisNameDestination);
 
+  void SynchronizeGeometryBounds() override;
+
   bool EnableThresholding = false;
   double UpperThresholdX = VTK_DOUBLE_MIN;
   double LowerThresholdX = VTK_DOUBLE_MAX;

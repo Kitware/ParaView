@@ -1108,7 +1108,7 @@ protected:
    * Synchronizes bounds information on all nodes.
    * \note CallOnAllProcesses
    */
-  void SynchronizeGeometryBounds();
+  virtual void SynchronizeGeometryBounds();
 
   /**
    * Set the last selection object.
