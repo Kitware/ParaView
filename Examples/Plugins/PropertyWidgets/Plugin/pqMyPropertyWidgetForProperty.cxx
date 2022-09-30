@@ -51,10 +51,10 @@ pqMyPropertyWidgetForProperty::pqMyPropertyWidgetForProperty(
   gridLayout->setColumnStretch(0, 0);
   gridLayout->setColumnStretch(1, 1);
 
-  QLabel* customLabel = new QLabel("Custom Widget", this);
+  QLabel* customLabel = new QLabel(tr("Custom Widget"), this);
   gridLayout->addWidget(customLabel);
 
-  QCheckBox* checkbox = new QCheckBox("<-- pqMyPropertyWidgetForProperty", this);
+  QCheckBox* checkbox = new QCheckBox(tr("<-- pqMyPropertyWidgetForProperty"), this);
   checkbox->setObjectName("Checkbox");
   this->addPropertyLink(checkbox, "checked", SIGNAL(toggled(bool)), smproperty);
   gridLayout->addWidget(checkbox);

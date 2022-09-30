@@ -96,7 +96,7 @@ void pqBlotDialog::open(const QStringList& filenames)
 //-----------------------------------------------------------------------------
 void pqBlotDialog::runScript()
 {
-  QString filters = tr("BLOT Script (*.blot *.bl);;All files (*)");
+  QString filters = QString("%1 (*.blot *.bl);;%2 (*)").arg(tr("BLOT Script")).arg(tr("All files"));
   pqFileDialog* const dialog =
     new pqFileDialog(nullptr, this, tr("Run BLOT Script"), QString(), filters);
 

@@ -44,14 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqSaveStateAndScreenshotActions::pqSaveStateAndScreenshotActions(QWidget* p)
-  : QToolBar("Save State and Screenshot", p)
+  : QToolBar(tr("Save State and Screenshot"), p)
 {
   QIcon saveIcon = qApp->style()->standardIcon(QStyle::SP_DriveFDIcon);
-  QAction* saveAction = new QAction(saveIcon, "Save State and Screenshot", this);
+  QAction* saveAction = new QAction(saveIcon, tr("Save State and Screenshot"), this);
   this->addAction(saveAction);
 
   QIcon settingsIcon = qApp->style()->standardIcon(QStyle::SP_DirHomeIcon);
-  QAction* settingsAction = new QAction(settingsIcon, "Configure Save", this);
+  QAction* settingsAction = new QAction(settingsIcon, tr("Configure Save"), this);
   this->addAction(settingsAction);
 
   this->setObjectName("SaveStateAndScreenshot");

@@ -165,7 +165,8 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
 void pqSaveStateAndScreenshotReaction::onSettings()
 {
   // Configure directory and name
-  QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
+  QString fileExt =
+    QString("%1 (*.pvsm);;%2 (*)").arg(tr("ParaView state file")).arg(tr("All files"));
   pqFileDialog fileDialog(
     nullptr, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"), QString(), fileExt);
 
@@ -255,7 +256,7 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   pqProxyWidgetDialog dialog(shProxy, pqCoreUtilities::mainWidget());
   dialog.setObjectName("SaveScreenshotDialog");
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle("Save Screenshot Options");
+  dialog.setWindowTitle(tr("Save Screenshot Options"));
   dialog.setEnableSearchBar(true);
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)

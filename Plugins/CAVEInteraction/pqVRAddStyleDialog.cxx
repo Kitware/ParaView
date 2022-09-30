@@ -165,7 +165,7 @@ pqVRAddStyleDialog::~pqVRAddStyleDialog()
 void pqVRAddStyleDialog::setInteractorStyle(vtkVRInteractorStyle* style, const QString& name)
 {
   this->Internals->Style = style;
-  this->Internals->infoLabel->setText(QString("Configuring style %1.").arg(name));
+  this->Internals->infoLabel->setText(tr("Configuring style %1.").arg(name));
 
   // Create gui
   vtkNew<vtkStringList> roles;

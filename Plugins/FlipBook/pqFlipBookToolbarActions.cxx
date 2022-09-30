@@ -40,17 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqFlipBookToolbarActions::pqFlipBookToolbarActions(QWidget* p)
-  : QToolBar("Iterative Visibility", p)
+  : QToolBar(tr("Iterative Visibility"), p)
 {
-  QAction* toggleFlipBookToggleAction =
-    new QAction(QIcon(":/pqFlipBook/Icons/pqFlipBook.png"), "Toggle iterative visibility", this);
+  QAction* toggleFlipBookToggleAction = new QAction(
+    QIcon(":/pqFlipBook/Icons/pqFlipBook.png"), tr("Toggle iterative visibility"), this);
   toggleFlipBookToggleAction->setCheckable(true);
 
-  QAction* toggleFlipBookPlayAction = new QAction(
-    QIcon(":/pqFlipBook/Icons/pqFlipBookPlay.png"), "Toggle automatic iterative visibility", this);
+  QAction* toggleFlipBookPlayAction = new QAction(QIcon(":/pqFlipBook/Icons/pqFlipBookPlay.png"),
+    tr("Toggle automatic iterative visibility"), this);
 
   QAction* toggleFlipBookStepAction = new QAction(QIcon(":/pqFlipBook/Icons/pqFlipBookForward.png"),
-    "Toggle visibility (shortcut: <SPACE>)", this);
+    QString("%1 (%2)").arg(tr("Toggle visibility")).arg(tr("shortcut: <SPACE>")), this);
 
   QSpinBox* playDelay = new QSpinBox(this);
   playDelay->setMaximumSize(70, 30);

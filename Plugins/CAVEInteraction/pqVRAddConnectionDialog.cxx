@@ -284,21 +284,18 @@ void pqVRAddConnectionDialog::updateConnection()
 
 void pqVRAddConnectionDialog::accept()
 {
-  QString missingVar;
   if (this->Internals->connectionName->text().isEmpty())
   {
-    missingVar = "Connection name";
+    QMessageBox::critical(this, tr("Missing connection name"), tr("Connection name is not set!"));
+    return;
   }
   if (this->Internals->connectionAddress->text().isEmpty())
   {
-    missingVar = "Connection address";
-  }
-
-  if (!missingVar.isEmpty())
-  {
-    QMessageBox::critical(this, "Missing value", QString("%1 is not set!").arg(missingVar));
+    QMessageBox::critical(
+      this, tr("Missing connection adress"), tr("Connection address is not set!"));
     return;
   }
+
   this->Superclass::accept();
 }
 
@@ -328,20 +325,14 @@ void pqVRAddConnectionDialog::keyPressEvent(QKeyEvent* event)
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::addInput()
 {
-
-  QString missingVar;
   if (this->Internals->inputName->text().isEmpty())
   {
-    missingVar = "Input name";
+    QMessageBox::critical(this, tr("Missing input name"), tr("Input name is not set!"));
+    return;
   }
   if (this->Internals->inputId->text().isEmpty())
   {
-    missingVar = "Input id";
-  }
-
-  if (!missingVar.isEmpty())
-  {
-    QMessageBox::critical(this, "Missing value", QString("%1 is not set!").arg(missingVar));
+    QMessageBox::critical(this, tr("Missing input id"), tr("Input id is not set!"));
     return;
   }
 
