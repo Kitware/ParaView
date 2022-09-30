@@ -20,6 +20,8 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
+#include "vtkCameraOrientationRepresentation.h"
+#include "vtkCameraOrientationWidget.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
@@ -118,6 +120,7 @@ namespace
 {
 struct ValuePassStateT
 {
+  bool CameraOrientationWidgetVisibility;
   bool OrientationAxesVisibility;
   bool AnnotationVisibility;
   bool CenterAxesVisibility;
@@ -483,6 +486,9 @@ vtkPVRenderView::vtkPVRenderView()
     observer3->Delete();
   }
 
+  this->CameraOrientationWidget->SetParentRenderer(this->GetRenderer());
+  this->CameraOrientationWidget->AnimateOff(); // animation doesn't work with QVTKOpenGL*Widget.
+
   this->OrientationWidget->SetParentRenderer(this->GetRenderer());
   this->OrientationWidget->SetViewport(0, 0, 0.25, 0.25);
 
@@ -668,15 +674,25 @@ void vtkPVRenderView::SetupInteractor(vtkRenderWindowInteractor* iren)
   if (this->Interactor != iren)
   {
     this->Interactor = iren;
+
     this->OrientationWidget->SetInteractor(this->Interactor);
+    this->CameraOrientationWidget->SetInteractor(this->Interactor);
+
     if (this->Interactor)
     {
       this->Interactor->SetRenderWindow(this->GetRenderWindow());
+
+      // Enable camera manipulator
+      this->CameraOrientationWidget->On();
 
       // this will set the interactor style.
       int mode = this->InteractionMode;
       this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
       this->SetInteractionMode(mode);
+    }
+    else
+    {
+      this->CameraOrientationWidget->Off();
     }
 
     this->Modified();
@@ -1675,6 +1691,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   }
   this->OrientationWidget->GetRenderer()->SetUseFXAA(use_fxaa);
   this->OrientationWidget->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
+  this->CameraOrientationWidget->GetDefaultRenderer()->SetUseFXAA(use_fxaa);
+  this->CameraOrientationWidget->GetDefaultRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
 
   // Configure SSAO
   this->RenderView->GetRenderer()->SetUseSSAO(this->UseSSAO);
@@ -2364,6 +2382,60 @@ void vtkPVRenderView::SetOrientationAxesLabelColor(double r, double g, double b)
 void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double b)
 {
   this->OrientationWidget->SetOutlineColor(r, g, b);
+}
+
+//*****************************************************************
+// Forwarded to camera orientation widget.
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCameraOrientationWidgetVisibility(bool visible)
+{
+  this->CameraOrientationWidget->GetRepresentation()->SetVisibility(visible);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCameraOrientationWidgetSize(int size)
+{
+  auto rep = vtkCameraOrientationRepresentation::SafeDownCast(
+    this->CameraOrientationWidget->GetRepresentation());
+  rep->SetSize(size, size);
+  this->CameraOrientationWidget->SquareResize();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCameraOrientationWidgetPadding(int padding[2])
+{
+  auto rep = vtkCameraOrientationRepresentation::SafeDownCast(
+    this->CameraOrientationWidget->GetRepresentation());
+  rep->SetPadding(padding);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCameraOrientationWidgetAnchor(int anchor)
+{
+  auto rep = vtkCameraOrientationRepresentation::SafeDownCast(
+    this->CameraOrientationWidget->GetRepresentation());
+  if (anchor >= 0 && anchor <= 3)
+  {
+    auto corner = static_cast<vtkCameraOrientationRepresentation::AnchorType>(anchor);
+    switch (corner)
+    {
+      case vtkCameraOrientationRepresentation::AnchorType::LowerLeft:
+        rep->AnchorToLowerLeft();
+        break;
+      case vtkCameraOrientationRepresentation::AnchorType::UpperLeft:
+        rep->AnchorToUpperLeft();
+        break;
+      case vtkCameraOrientationRepresentation::AnchorType::LowerRight:
+        rep->AnchorToLowerRight();
+        break;
+      case vtkCameraOrientationRepresentation::AnchorType::UpperRight:
+        rep->AnchorToUpperRight();
+        break;
+      default:
+        break;
+    }
+  }
+  this->CameraOrientationWidget->SquareResize();
 }
 
 //*****************************************************************
@@ -3136,6 +3208,8 @@ bool vtkPVRenderView::BeginValuePassForRendering(
   // hide various annotations since they interfere with value pass;
   // preserve state so we can store it.
   internals.ValuePassState.reset(new ValuePassStateT());
+  internals.ValuePassState->CameraOrientationWidgetVisibility =
+    this->CameraOrientationWidget->GetRepresentation()->GetVisibility();
   internals.ValuePassState->OrientationAxesVisibility = this->OrientationWidget->GetVisibility();
   internals.ValuePassState->CenterAxesVisibility = (this->CenterAxes->GetVisibility() != 0);
   internals.ValuePassState->AnnotationVisibility = this->ShowAnnotation;
@@ -3174,6 +3248,8 @@ void vtkPVRenderView::EndValuePassForRendering()
   internals.SavedRenderPass = nullptr;
 
   // restore annotation state
+  this->SetCameraOrientationWidgetVisibility(
+    internals.ValuePassState->CameraOrientationWidgetVisibility);
   this->SetOrientationAxesVisibility(internals.ValuePassState->OrientationAxesVisibility);
   this->SetCenterAxesVisibility(internals.ValuePassState->CenterAxesVisibility);
   this->SetShowAnnotation(internals.ValuePassState->AnnotationVisibility);

@@ -1840,6 +1840,45 @@
         </Hints>
       </ProxyProperty>
 
+      <!-- Camera Orientation Widget -->
+      <IntVectorProperty command="SetCameraOrientationWidgetVisibility"
+                         name="CameraOrientationWidgetVisibility"
+                         label="Visible"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the camera orientation widget.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCameraOrientationWidgetSize"
+                         name="CameraOrientationWidgetSize"
+                         label="Size"
+                         default_values="100"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="10" max="512" name="range" resolution="10" />
+        <Documentation>Size of the camera orientation widget.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraOrientationWidgetVisibility" value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCameraOrientationWidgetAnchor"
+                         name="CameraOrientationWidgetAnchor"
+                         label="Location"
+                         default_values="3"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Top Left"     value="1" />
+          <Entry text="Top Right"    value="3" />
+          <Entry text="Bottom Left"  value="0" />
+          <Entry text="Bottom Right" value="2" />
+        </EnumerationDomain>
+        <Documentation>Location of the camera orientation widget.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraOrientationWidgetVisibility" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
       <!-- Center and Orientation Axes -->
       <IntVectorProperty command="SetCenterAxesVisibility"
                          default_values="0"
@@ -3231,6 +3270,11 @@
         <Property name="OrientationAxesInteractivity"/>
         <Property name="OrientationAxesLabelColor"/>
         <Property name="OrientationAxesOutlineColor"/>
+      </PropertyGroup>
+      <PropertyGroup label="Camera Orientation Widget">
+        <Property name="CameraOrientationWidgetVisibility"/>
+        <Property name="CameraOrientationWidgetSize"/>
+        <Property name="CameraOrientationWidgetAnchor"/>
       </PropertyGroup>
       <PropertyGroup label="Render Passes">
         <Property name="UseToneMapping"/>
@@ -12244,6 +12288,11 @@
                       panel_visibility="advanced"/>
             <Property name="OrientationAxesOutlineColor"
                       panel_visibility="advanced"/>
+          </PropertyGroup>
+          <PropertyGroup label="Camera Orientation Widget">
+            <Property name="CameraOrientationWidgetVisibility"/>
+            <Property name="CameraOrientationWidgetSize" panel_visibility="advanced"/>
+            <Property name="CameraOrientationWidgetAnchor" panel_visibility="advanced"/>
           </PropertyGroup>
           <PropertyGroup label="Lights" panel_visibility="never">
             <!-- Light Kit -->
