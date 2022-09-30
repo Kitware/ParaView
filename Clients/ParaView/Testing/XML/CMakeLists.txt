@@ -868,9 +868,10 @@ SET(TESTS_WITH_BASELINES
   BDFReader.xml
   CameraOrientationWidget.xml
   DataAxesGrid.xml
+  EmptyInitialCompositeReader.xml # Issue #21293
   MergeVectorComponents.xml
   MoleculeScalarBar.xml
-  EmptyInitialCompositeReader.xml # Issue #21293
+  ParticleTracerGlyph.xml
   PassArrays.xml
   PerlinNoise.xml
   ResampleToLine.xml
