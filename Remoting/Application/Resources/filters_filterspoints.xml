@@ -23,7 +23,7 @@
         ConvertToPointCloud filter.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetCellGenerationMode"
-                         default_values="1"
+                         default_values="2"
                          number_of_elements="1"
                          name="CellGenerationMode"
                          panel_visibility="default">
