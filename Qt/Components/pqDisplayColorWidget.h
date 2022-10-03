@@ -56,6 +56,7 @@ class vtkSMViewProxy;
 class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 {
   Q_OBJECT
+  Q_PROPERTY(QString representationText READ representationText WRITE setRepresentationText);
   typedef QWidget Superclass;
 
 public:
@@ -86,17 +87,32 @@ public:
    */
   static void updateScalarBarVisibility(vtkSMViewProxy* view, vtkSMProxy* reprProxy);
 
+  /**
+   * Returns the selected representation type as a string.
+   */
+  QString representationText() const { return this->RepresentationText; }
+
 Q_SIGNALS:
   /**
    * fired to indicate the array-name changed.
    */
   void arraySelectionChanged();
 
+  /**
+   * fired to indicate the representation type changed, allowing us to update.
+   */
+  void representationTextChanged(const QString& text);
+
 public Q_SLOTS:
   /**
    * Set the representation to control the scalar coloring properties on.
    */
   void setRepresentation(pqDataRepresentation* display);
+
+  /**
+   * set representation type.
+   */
+  void setRepresentationText(const QString& text);
 
 private Q_SLOTS:
   /**
@@ -167,6 +183,7 @@ private:
   QComboBox* Components;
   QPointer<pqDataRepresentation> Representation;
   QPointer<pqScalarsToColors> ColorTransferFunction;
+  QString RepresentationText;
 
   // This is maintained to detect when the representation has changed.
   void* CachedRepresentation;

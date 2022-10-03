@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
@@ -57,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QStandardItemModel>
 #include <QtDebug>
 
 #include <cassert>
@@ -235,6 +237,7 @@ public:
   vtkNew<vtkEventQtSlotConnect> Connector;
   vtkWeakPointer<vtkSMArrayListDomain> Domain;
   int OutOfDomainEntryIndex;
+  QSet<QString> NoSolidColor;
 
   pqInternals()
     : OutOfDomainEntryIndex(-1)
@@ -278,6 +281,11 @@ pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   this->connect(this->Components, SIGNAL(currentIndexChanged(int)), SLOT(componentNumberChanged()));
 
   this->connect(&this->Internals->Links, SIGNAL(qtWidgetChanged()), SLOT(renderActiveView()));
+
+  this->connect(this, &pqDisplayColorWidget::representationTextChanged, [this](const QString&) {
+    // The representation type, like Slice or Volume, can disable some entries.
+    this->refreshColorArrayNames();
+  });
 }
 
 //-----------------------------------------------------------------------------
@@ -331,6 +339,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   this->Variables->setEnabled(false);
   this->Components->setEnabled(false);
   this->Internals->Links.clear();
+  this->Internals->NoSolidColor.clear();
   this->Internals->Connector->Disconnect();
   this->Internals->Domain = nullptr;
   this->Variables->clear();
@@ -368,7 +377,22 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
 
   this->Internals->Links.addPropertyLink<PropertyLinksConnection>(
     this, "notused", SIGNAL(arraySelectionChanged()), proxy, prop);
-
+  // add a link to representation, because some representations don't like Solid Color
+  vtkSMProperty* reprProperty = proxy->GetProperty("Representation");
+  if (reprProperty)
+  {
+    this->Internals->Links.addPropertyLink(this, "representationText", "", proxy, reprProperty);
+    // process hints to see which representation types skip "Solid Color".
+    vtkPVXMLElement* hints = proxy->GetHints();
+    for (unsigned int cc = 0; cc < (hints ? hints->GetNumberOfNestedElements() : 0); cc++)
+    {
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      if (child && child->GetName() && strcmp(child->GetName(), "NoSolidColor") == 0)
+      {
+        this->Internals->NoSolidColor.insert(child->GetAttributeOrEmpty("representation"));
+      }
+    }
+  }
   this->updateColorTransferFunction();
 }
 
@@ -454,8 +478,14 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   this->Variables->clear();
   this->Internals->OutOfDomainEntryIndex = -1;
 
-  // add solid color.
+  // add solid color, but disable for some representations.
   this->Variables->addItem(*this->SolidColorIcon, tr("Solid Color"), QVariant());
+  if (this->Representation && this->Internals->NoSolidColor.contains(this->representationText()))
+  {
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(this->Variables->model());
+    QStandardItem* item = model->item(0);
+    item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+  }
 
   vtkSMArrayListDomain* domain = this->Internals->Domain;
   assert(domain);
@@ -691,5 +721,15 @@ void pqDisplayColorWidget::pruneOutOfDomainEntries()
     // Yay! Prune that entry!
     this->Variables->removeItem(this->Internals->OutOfDomainEntryIndex);
     this->Internals->OutOfDomainEntryIndex = -1;
+  }
+}
+
+void pqDisplayColorWidget::setRepresentationText(const QString& text)
+{
+  if (this->RepresentationText != text)
+  {
+    this->RepresentationText = text;
+    // this lets us disable Solid Color based on the representation type changing.
+    Q_EMIT this->representationTextChanged(text);
   }
 }

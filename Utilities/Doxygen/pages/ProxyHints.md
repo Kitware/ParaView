@@ -365,3 +365,19 @@ into an existing category or a new category, as well as set the icon.
         <ShowInMenu category="Category" icon=":/path/to/resource/icon.png" />
       </Hints>
     </SourceProxy>
+
+NoSolidColor
+--------------------------
+Disable the "Solid Color" option for a specific representation type.
+
+This is used to indicate to the pqDisplayColorWidget to disable the
+"Solid Color" option because this representation type doesn't handle it
+usefully.
+
+    <RepresentationProxy ...>
+      ...
+      <Hints>
+        <NoSolidColor representation="Slice" />
+        <NoSolidColor representation="Volume" />
+      </Hints>
+    </RepresentationProxy>
