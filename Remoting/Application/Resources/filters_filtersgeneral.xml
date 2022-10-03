@@ -2183,6 +2183,21 @@
         and the displacement is along the Z axis. This is useful for creating
         carpet plots.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateEnclosure"
+                         default_values="0"
+                         name="GenerateEnclosure"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkPointSet"
+                                   mode="visibility" />
+        </Hints>
+        <Documentation>If this value is checked and the active data set is a
+        2D surface, generate a water-tight enclosure containing the initial
+        surface, the warped surface and "side walls". </Documentation>
+      </IntVectorProperty>
       <!-- End WarpScalar -->
     </SourceProxy>
 
