@@ -1042,6 +1042,7 @@ list(APPEND TESTS_WITH_BASELINES
   CheckableHeader.xml
   Clip.xml
   CrinkleClip.xml
+  ColorAnnotationsVisibilitiesAndOpacities.xml
   ColorEditorControls.xml
   ColorEditorVolumeControls.xml
   ColorLegendMinMaxLabels.xml

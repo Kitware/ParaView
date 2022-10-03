@@ -51,6 +51,7 @@ class vtkSMStringListDomain;
 // visibilities)
 class PQCORE_EXPORT pqAnnotationsModel : public QAbstractTableModel
 {
+  Q_OBJECT
   typedef QAbstractTableModel Superclass;
 
 public:
@@ -142,13 +143,18 @@ public:
 
   ///@{
   /**
-   * Set/Get Global opacity.
+   * Set/Get the global opacity value.
    */
-  void setGlobalOpacity(double opacity);
+  void setGlobalOpacity(double opacity) { this->GlobalOpacity = opacity; };
   double globalOpacity() const { return this->GlobalOpacity; }
   ///@}
 
+  ///@{
+  /**
+   * Set the opacity for the given rows.
+   */
   void setSelectedOpacity(QList<int> rows, double opacity);
+  ///@}
 
   ///@{
   /**

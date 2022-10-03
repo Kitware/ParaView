@@ -294,7 +294,18 @@ bool pqAnnotationsModel::setData(const QModelIndex& idx, const QVariant& value, 
 //-----------------------------------------------------------------------------
 QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
 {
-  if (role == Qt::DecorationRole || role == Qt::DisplayRole)
+  if (role == Qt::DisplayRole)
+  {
+    int col = idx.column();
+    if (col == COLOR || col == OPACITY || col == VISIBILITY)
+    {
+      // Must be invalid in order to prevent pqTreeViewSelectionHelper to enable
+      // the sort / regex filters for this columns in the context menu
+      return QVariant();
+    }
+    return this->Internals->Items[idx.row()].data(col);
+  }
+  else if (role == Qt::DecorationRole)
   {
     return this->Internals->Items[idx.row()].data(idx.column());
   }
@@ -370,6 +381,10 @@ QVariant pqAnnotationsModel::headerData(int section, Qt::Orientation orientation
   {
     return createOpacitySwatch(this->GlobalOpacity);
   }
+  else if (orientation == Qt::Horizontal && role == Qt::EditRole && section == OPACITY)
+  {
+    return this->GlobalOpacity;
+  }
   else if (orientation == Qt::Horizontal && role == Qt::CheckStateRole && section == VISIBILITY)
   {
     if (this->Internals->Items.empty())
@@ -399,9 +414,19 @@ bool pqAnnotationsModel::setHeaderData(
   {
     for (int row = 0; row < this->rowCount(); row++)
     {
-      this->setData(this->index(row, VISIBILITY), value, role);
+      this->setData(this->index(row, section), value, role);
     }
-
+    Q_EMIT this->headerDataChanged(orientation, section, section);
+    return true;
+  }
+  else if (orientation == Qt::Horizontal && role == Qt::EditRole && section == OPACITY)
+  {
+    this->GlobalOpacity = value.toDouble();
+    for (int row = 0; row < this->rowCount(); row++)
+    {
+      this->setData(this->index(row, section), value, role);
+    }
+    Q_EMIT this->headerDataChanged(orientation, section, section);
     return true;
   }
 
@@ -820,26 +845,6 @@ std::vector<double> pqAnnotationsModel::indexedOpacities() const
     opacities.push_back(item.Opacity);
   }
   return opacities;
-}
-
-//-----------------------------------------------------------------------------
-void pqAnnotationsModel::setGlobalOpacity(double opacity)
-{
-  this->GlobalOpacity = opacity;
-  bool opacityFlag = false;
-  for (std::size_t cc = 0; cc < this->Internals->Items.size(); cc++)
-  {
-    if (this->Internals->Items[cc].Opacity == -1 || this->Internals->Items[cc].Opacity != opacity)
-    {
-      this->Internals->Items[cc].setData(OPACITY, opacity);
-      opacityFlag = true;
-    }
-  }
-  if (opacityFlag)
-  {
-    Q_EMIT this->dataChanged(this->index(0, OPACITY),
-      this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
-  }
 }
 
 //-----------------------------------------------------------------------------

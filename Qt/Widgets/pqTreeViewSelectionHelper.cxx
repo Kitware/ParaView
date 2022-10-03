@@ -138,8 +138,10 @@ void pqTreeViewSelectionHelper::setSelectedItemsCheckState(Qt::CheckState state)
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
+void pqTreeViewSelectionHelper::buildupMenu(QMenu& menu, int section, const QPoint& pos)
 {
+  Q_UNUSED(pos);
+
   auto tree = this->TreeView;
   auto model = tree->model();
   auto header = genericHeader(tree);
@@ -154,16 +156,23 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
     }
   }
 
-  const bool user_checkable =
+  const bool isUserCheckable =
     model->headerData(section, header->orientation(), Qt::CheckStateRole).isValid();
+  QModelIndex itemIndex = this->TreeView->indexAt(pos);
+
+  bool isItemFilterable = false;
+  bool isItemSortable = false;
+  if (sfmodel != nullptr)
+  {
+    isItemFilterable = model->data(itemIndex, sfmodel->filterRole()).isValid();
+    isItemSortable = model->data(itemIndex, sfmodel->sortRole()).isValid();
+  }
+
   const int selectionCount = selectedIndexes.size();
   const int rowCount = model->rowCount();
 
-  QMenu menu;
-  menu.setObjectName("TreeViewCheckMenu");
-
   QLineEdit* searchLineEdit = nullptr;
-  if (this->Filterable && sfmodel != nullptr)
+  if (this->Filterable && isItemFilterable)
   {
     if (auto filterActn = new QWidgetAction(&menu))
     {
@@ -192,7 +201,7 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
     menu.addSeparator();
   }
 
-  if (user_checkable)
+  if (isUserCheckable)
   {
     if (auto actn =
           menu.addAction(QIcon(":/pqWidgets/Icons/pqChecked.svg"), tr("Check highlighted items")))
@@ -211,9 +220,9 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
     }
   }
 
-  if (sfmodel != nullptr)
+  if (isItemSortable)
   {
-    if (user_checkable)
+    if (isUserCheckable)
     {
       menu.addSeparator();
     }
@@ -250,5 +259,19 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
   {
     searchLineEdit->setFocus();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
+{
+  QMenu menu;
+  menu.setObjectName("TreeViewCheckMenu");
+
+  this->buildupMenu(menu, section, pos);
+  if (menu.isEmpty())
+  {
+    return;
+  }
+
   menu.exec(this->TreeView->mapToGlobal(pos));
 }

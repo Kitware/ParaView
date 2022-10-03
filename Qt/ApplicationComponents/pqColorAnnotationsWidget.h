@@ -285,11 +285,6 @@ private Q_SLOTS:
   void onHeaderDoubleClicked(int section);
 
   /**
-   * Called when user right click on table
-   */
-  void customMenuRequested(QPoint pos);
-
-  /**
    * Called when global and selected opacity should be set
    */
   void execGlobalOpacityDialog();

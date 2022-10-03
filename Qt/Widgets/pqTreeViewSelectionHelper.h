@@ -79,7 +79,12 @@ public:
    */
   bool isFilterable() const { return this->Filterable; }
   void setFilterable(bool val) { this->Filterable = val; }
-  ///@}
+  //@}
+
+protected:
+  virtual void buildupMenu(QMenu& menu, int section, const QPoint& pos);
+  QAbstractItemView* TreeView;
+
 protected Q_SLOTS:
   virtual void showContextMenu(int section, const QPoint&);
 
@@ -87,7 +92,6 @@ private:
   Q_DISABLE_COPY(pqTreeViewSelectionHelper);
 
   void setSelectedItemsCheckState(Qt::CheckState state);
-  QAbstractItemView* TreeView;
   bool Filterable;
 };
 
