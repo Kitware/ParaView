@@ -84,11 +84,11 @@ void pqShaderReplacementsComboBox::populate()
   QStringList plist = paths.split(QDir::listSeparator());
   if (plist.empty() || (plist.size() == 1 && plist[0] == ""))
   {
-    this->addItem(tr("(No preset)"), "");
+    this->addItem(QString("(%1)").arg("No preset"), "");
   }
   else
   {
-    this->addItem(tr("(Select a preset)"), "");
+    this->addItem(QString("(%1)").arg("Select a preset"), "");
     QSet<QString> pathSet;
     Q_FOREACH (QString p, plist)
     {

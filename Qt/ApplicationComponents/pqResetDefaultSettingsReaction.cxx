@@ -106,7 +106,7 @@ void pqResetDefaultSettingsReaction::resetSettingsToDefault()
   QMessageBox mbox2(pqCoreUtilities::mainWidget());
   mbox2.setWindowTitle(tr("Reset to Default Settings"));
   mbox2.setIcon(QMessageBox::Information);
-  mbox2.setText(tr("<b>Settings reset to default</b>"));
+  mbox2.setText(QString("<b>%1</b>").arg(tr("Settings reset to default")));
   mbox2.setInformativeText(informativeText);
   mbox2.setStandardButtons(QMessageBox::Ok);
   mbox2.setDefaultButton(QMessageBox::Ok);

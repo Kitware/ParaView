@@ -165,7 +165,7 @@ public:
     vtkPVDataSetAttributesInformation* attrInfo = this->attributeInformation(fieldAssociation);
     if (!attrInfo)
     {
-      menu.addAction(tr("(not available)"));
+      menu.addAction(QString("(%1)").arg(tr("not available")));
       return;
     }
 

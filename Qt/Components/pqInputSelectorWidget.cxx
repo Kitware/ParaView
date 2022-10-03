@@ -153,7 +153,7 @@ void pqInputSelectorWidget::updateComboBox()
 {
   const QSignalBlocker blocker(this->ComboBox);
   this->ComboBox->clear();
-  this->ComboBox->addItem(tr("(none)"), QVariant::fromValue<void*>(nullptr));
+  this->ComboBox->addItem(QString("(%1)").arg(tr("none")), QVariant::fromValue<void*>(nullptr));
 
   auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
   auto smproxy = this->proxy();
