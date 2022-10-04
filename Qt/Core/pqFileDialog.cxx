@@ -670,9 +670,8 @@ void pqFileDialog::onRemoveSelectedDirectoriesFromFavorites()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onResetFavoritesToSystemDefault()
 {
-  int const ret = QMessageBox::warning(this, tr("Reset favorites"),
-    tr(
-      "This will reset the favorites to their default value.\nAre you sure you want to continue ?"),
+  int const ret = QMessageBox::warning(this, tr("Clear favorites"),
+    tr("This will clear the favorites list.\nAre you sure you want to continue ?"),
     QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::No);
 
   if (ret == QMessageBox::StandardButton::Yes)

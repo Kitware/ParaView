@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 
-#include "vtkSetGet.h" // for VTK_LEGACY.
+#include "vtkParaViewDeprecation.h" // for deprecation
+#include "vtkSetGet.h"              // for VTK_LEGACY.
 
 #include <QFlags>
 #include <QObject>
@@ -109,7 +110,10 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(PythonShellResetBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CustomShortcutBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(MainWindowEventBehavior);
+
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use AddExamplesInFileDialogBehavior instead")
   PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFavoritesBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFileDialogBehavior);
 
   ///@{
   /**
@@ -177,7 +181,9 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(CustomShortcutBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(MainWindowEventBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(UsageLoggingBehavior);
+  // PARAVIEW_DEPRECATED_IN_5_11_0
   PQ_BEHAVIOR_DECLARE_FLAG(AddExamplesInFavoritesBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(AddExamplesInFileDialogBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

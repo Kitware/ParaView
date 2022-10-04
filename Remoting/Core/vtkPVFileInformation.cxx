@@ -28,9 +28,8 @@
 #include "vtkVersion.h"
 
 #if defined(_WIN32)
-#include <cstring>   // for strcasecmp
 #include <direct.h>  // _getcwd
-#include <shlobj.h>  // SHGetFolderPath
+#include <shlobj.h>  // SHGetKnownFolderPath
 #include <windows.h> // FindFirstFile, FindNextFile, FindClose, ...
 #define vtkPVServerFileListingGetCWD _getcwd
 #else
@@ -478,34 +477,25 @@ void vtkPVFileInformation::GetSpecialDirectories()
   // This is using `_examples_path_` as a placeholder because storing the absolute path to the
   // `Examples` directory causes issues when switching to another ParaView version, because this
   // path would still point to the previous version's examples. This entry is added even if the
-  // `Examples` directory is not present.
+  // `Examples` directory is not present, but is marked invalid.
   vtkSmartPointer<vtkPVFileInformation> info;
   if (this->IncludeExamples)
   {
     info = vtkSmartPointer<vtkPVFileInformation>::New();
     info->SetFullPath("_examples_path_");
     info->SetName("Examples");
-    info->Type = DIRECTORY;
+    std::string realPath = vtkPVFileInformation::GetParaViewExampleFilesDirectory();
+    info->Type = vtkPVFileInformationGetType(realPath.c_str());
     this->Contents->AddItem(info);
   }
 
 #if defined(_WIN32)
   // Return favorite directories ...
 
-  wchar_t szPath[MAX_PATH];
+  PWSTR szPath = NULL;
   std::wstring tmp;
 
-  if (SUCCEEDED(SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_PERSONAL, false)))
-  {
-    tmp = szPath;
-    info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(vtksys::Encoding::ToNarrow(tmp).c_str());
-    info->SetName("My Documents");
-    info->Type = DIRECTORY;
-    this->Contents->AddItem(info);
-  }
-
-  if (SUCCEEDED(SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_DESKTOPDIRECTORY, false)))
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Desktop, 0, nullptr, &szPath)))
   {
     tmp = szPath;
     info = vtkSmartPointer<vtkPVFileInformation>::New();
@@ -513,9 +503,32 @@ void vtkPVFileInformation::GetSpecialDirectories()
     info->SetName("Desktop");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
+    CoTaskMemFree(szPath);
   }
 
-  if (SUCCEEDED(SHGetSpecialFolderPathW(nullptr, szPath, CSIDL_FAVORITES, false)))
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Downloads, 0, nullptr, &szPath)))
+  {
+    tmp = szPath;
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info->SetFullPath(vtksys::Encoding::ToNarrow(tmp).c_str());
+    info->SetName("Downloads");
+    info->Type = DIRECTORY;
+    this->Contents->AddItem(info);
+    CoTaskMemFree(szPath);
+  }
+
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &szPath)))
+  {
+    tmp = szPath;
+    info = vtkSmartPointer<vtkPVFileInformation>::New();
+    info->SetFullPath(vtksys::Encoding::ToNarrow(tmp).c_str());
+    info->SetName("Documents");
+    info->Type = DIRECTORY;
+    this->Contents->AddItem(info);
+    CoTaskMemFree(szPath);
+  }
+
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Favorites, 0, nullptr, &szPath)))
   {
     tmp = szPath;
     info = vtkSmartPointer<vtkPVFileInformation>::New();
@@ -523,6 +536,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     info->SetName("Favorites");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
+    CoTaskMemFree(szPath);
   }
 
   // Return drive letters ...
