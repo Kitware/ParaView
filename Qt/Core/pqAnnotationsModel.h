@@ -33,14 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqAnnotationsModel_h
 
 #include "pqCoreModule.h"
-#include <QAbstractTableModel>
 
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
+#include "vtkSmartPointer.h"
+
+#include <QAbstractTableModel>
 #include <QColor>
 #include <QIcon>
 
 #include <vector>
-
-#include "vtkSmartPointer.h"
 
 class QModelIndex;
 
@@ -143,7 +144,11 @@ public:
 
   ///@{
   /**
-   * Set/Get the global opacity value.
+   * Set/Get the global opacity value. Default is 1.0.
+   * GlobalOpacity corresponds to a cached value only used to draw the
+   * global opacity swatch. The opacity value of each items is modified using
+   * the setHeaderData method. Note that setHeaderData can also modify the
+   * GlobalOpacity value.
    */
   void setGlobalOpacity(double opacity) { this->GlobalOpacity = opacity; };
   double globalOpacity() const { return this->GlobalOpacity; }
@@ -158,7 +163,7 @@ public:
 
   ///@{
   /**
-   * Set/Get SupportsReorder.
+   * Set/Get SupportsReorder. Default is false.
    */
   void setSupportsReorder(bool reorder);
   bool supportsReorder() const;
@@ -170,10 +175,11 @@ public:
   void reorder(std::vector<int> newOrder);
 
 protected:
+  PARAVIEW_DEPRECATED_IN_5_12_0("Unused protected member variable.")
   QIcon MissingColorIcon;
-  double GlobalOpacity;
+  double GlobalOpacity = 1.0;
   vtkSmartPointer<vtkSMStringListDomain> VisibilityDomain;
-  bool SupportsReorder;
+  bool SupportsReorder = false;
 
 private:
   Q_DISABLE_COPY(pqAnnotationsModel)
