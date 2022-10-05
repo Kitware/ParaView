@@ -412,7 +412,9 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
     0, 0, 0, this->GetInputArrayAssociation(0, input), this->ComponentArrayCache[0]->GetName());
   gf->Update();
 
-  const auto gradientArray = gf->GetOutput()->GetPointData()->GetArray("Gradient");
+  const auto gradientArray = gf->GetOutput()
+                               ->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, input))
+                               ->GetArray("Gradient");
   const auto gradientArrRange = vtk::DataArrayTupleRange(gradientArray);
   const vtk::TupleIdType numTuples = gradientArrRange.size();
 
