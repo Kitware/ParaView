@@ -141,7 +141,7 @@ class smproperty(object):
             attrs["default_values"] = "None"
         else:
             # confirm number_of_elements == len(default_values)
-            assert attrs["number_of_elements"] == _count(attrs["default_values"])
+            assert int(attrs["number_of_elements"]) == _count(attrs["default_values"])
 
         # if repeat_command, set number_of_elements_per_command
         # if not set.
