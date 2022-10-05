@@ -479,8 +479,9 @@ void pqVRDockPanel::setActiveView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::saveState()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save CAVE Interaction template",
-    QString(), "CAVE Interaction template files (*.pvvr)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(),
+    tr("Save CAVE Interaction template"), QString(),
+    QString("%1 (*.pvvr)").arg(tr("CAVE Interaction template files")));
 
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
@@ -511,8 +512,10 @@ void pqVRDockPanel::saveState()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::restoreState()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Load CAVE Interaction template",
-    QString(), "CAVE Interaction template files (*.pvvr);;ParaView state files (*.pvsm)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(),
+    tr("Load CAVE Interaction template"), QString(),
+    QString("%1 (*.pvvr);;%2 (*.pvsm)")
+      .arg(tr("CAVE Interaction template files").arg(tr("ParaView state files"))));
 
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
 

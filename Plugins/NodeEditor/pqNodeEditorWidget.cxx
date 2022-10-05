@@ -110,7 +110,7 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
 
 // ----------------------------------------------------------------------------
 pqNodeEditorWidget::pqNodeEditorWidget(QWidget* parent)
-  : pqNodeEditorWidget("Node Editor", parent)
+  : pqNodeEditorWidget(tr("Node Editor"), parent)
 {
 }
 
@@ -260,13 +260,13 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     return 1;
   };
 
-  addButton("Apply", this->actionApply);
-  addButton("Reset", this->actionReset);
+  addButton(tr("Apply"), this->actionApply);
+  addButton(tr("Reset"), this->actionReset);
   addSeparator();
 
-  addButton("Zoom", this->actionZoom);
+  addButton(tr("Zoom"), this->actionZoom);
   { // addButton "Layout"
-    auto button = new QPushButton("Layout");
+    auto button = new QPushButton(tr("Layout"));
     button->setObjectName("LayoutButton");
     this->connect(button, &QPushButton::released, [this]() {
       this->actionLayout->trigger();
@@ -275,7 +275,7 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     toolbarLayout->addWidget(button);
   };
   { // add checkbox auto layout
-    auto checkBox = new QCheckBox("Auto Layout");
+    auto checkBox = new QCheckBox(tr("Auto Layout"));
     checkBox->setObjectName("AutoLayoutCheckbox");
     checkBox->setCheckState(this->autoUpdateLayout ? Qt::Checked : Qt::Unchecked);
     this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
@@ -287,9 +287,9 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
   }
   addSeparator();
 
-  addButton("Cycle Verbosity", this->actionCycleNodeVerbosity);
+  addButton(tr("Cycle Verbosity"), this->actionCycleNodeVerbosity);
   { // add checkbox view nodes
-    auto checkBox = new QCheckBox("View Nodes");
+    auto checkBox = new QCheckBox(tr("View Nodes"));
     checkBox->setObjectName("ViewNodesCheckbox");
     checkBox->setCheckState(this->showViewNodes ? Qt::Checked : Qt::Unchecked);
     this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {

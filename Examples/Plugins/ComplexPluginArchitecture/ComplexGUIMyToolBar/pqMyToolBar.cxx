@@ -50,7 +50,7 @@ pqMyToolBar::pqMyToolBar(const QString& title, QWidget* parentW)
 pqMyToolBar::pqMyToolBar(QWidget* parentW)
   : Superclass(parentW)
 {
-  this->setWindowTitle("My Toolbar (Examples)");
+  this->setWindowTitle(tr("My Toolbar (Examples)"));
   this->constructor();
 }
 
@@ -58,10 +58,11 @@ pqMyToolBar::pqMyToolBar(QWidget* parentW)
 void pqMyToolBar::constructor()
 {
   this->setObjectName("MyToolBar");
-  this->addWidget(new QLabel("Custom Toolbar", this));
-  this->addAction(qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation), "My Action", []() {
-    QMessageBox::information(nullptr, "MyAction",
-      QString("Did you know that Pi value in degrees is ") +
-        QString::number(vtkSharedUtils::DegreesFromRadians(vtkSharedUtils::Pi())) + " ?");
-  });
+  this->addWidget(new QLabel(tr("Custom Toolbar"), this));
+  this->addAction(
+    qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("My Action"), []() {
+      QMessageBox::information(nullptr, tr("MyAction"),
+        tr("Did you know that Pi value in degrees is %1 ?")
+          .arg(QString::number(vtkSharedUtils::DegreesFromRadians(vtkSharedUtils::Pi()))));
+    });
 }

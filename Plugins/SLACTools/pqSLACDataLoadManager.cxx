@@ -60,9 +60,10 @@ pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f /*=0*
   this->ui->modeFile->setForceSingleFile(false);
   this->ui->particlesFile->setForceSingleFile(false);
 
-  this->ui->meshFile->setExtension("SLAC Mesh Files (*.ncdf *.nc)");
-  this->ui->modeFile->setExtension("SLAC Mode Files (*.mod *.m?)");
-  this->ui->particlesFile->setExtension("SLAC Particle Files (*.ncdf *.netcdf)");
+  this->ui->meshFile->setExtension(QString("%1 (*.ncdf *.nc)").arg(tr("SLAC Mesh Files")));
+  this->ui->modeFile->setExtension(QString("%1 (*.mod *.m?)").arg(tr("SLAC Mode Files")));
+  this->ui->particlesFile->setExtension(
+    QString("%1 (*.ncdf *.netcdf)").arg(tr("SLAC Particle Files")));
 
   pqPipelineSource* meshReader = manager->getMeshReader();
   pqPipelineSource* particlesReader = manager->getParticlesReader();

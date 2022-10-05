@@ -416,8 +416,8 @@ public:
     }
     else
     {
-      this->Ui.filename->setText(tr("(n/a)"));
-      this->Ui.path->setText(tr("(n/a)"));
+      this->Ui.filename->setText(QString("(%1)").arg(tr("n/a")));
+      this->Ui.path->setText(QString("(%1)").arg(tr("n/a")));
       this->Ui.filename->setVisible(false);
       this->Ui.path->setVisible(false);
       this->Ui.labelFilename->setVisible(false);
@@ -517,7 +517,7 @@ public:
     auto& ui = this->Ui;
     ui.dataType->setEnabled(dinfo && !dinfo->IsNull());
     ui.labelDataType->setEnabled(dinfo && !dinfo->IsNull());
-    ui.dataType->setText(dinfo ? dinfo->GetPrettyDataTypeString() : tr("(n/a)"));
+    ui.dataType->setText(dinfo ? dinfo->GetPrettyDataTypeString() : QString("(%1)").arg(tr("n/a")));
     ui.labelDataStatistics->setText((dinfo && dinfo->GetNumberOfDataSets() > 1)
         ? tr("Data Statistics (# of datasets: %1)").arg(l.toString(dinfo->GetNumberOfDataSets()))
         : tr("Data Statistics"));
@@ -545,7 +545,7 @@ public:
       }
       else
       {
-        item.second.second->setText(tr("(n/a)"));
+        item.second.second->setText(QString("(%1)").arg(tr("n/a")));
         item.second.first->setVisible(false);
         item.second.second->setVisible(false);
       }
@@ -553,7 +553,8 @@ public:
 
     ui.memory->setEnabled(dinfo != nullptr);
     ui.labelMemory->setEnabled(dinfo != nullptr);
-    ui.memory->setText(dinfo ? formatMemory(dinfo->GetMemorySize()) : tr("(n/a)"));
+    ui.memory->setText(
+      dinfo ? formatMemory(dinfo->GetMemorySize()) : QString("(%1)").arg(tr("n/a")));
 
     if (dinfo && vtkMath::AreBoundsInitialized(dinfo->GetBounds()))
     {
@@ -576,7 +577,10 @@ public:
     }
     else
     {
-      ui.bounds->setText(QString("%1\n%2\n%3").arg(tr("(n/a)")).arg(tr("(n/a)")).arg(tr("(n/a)")));
+      ui.bounds->setText(QString("%1\n%2\n%3")
+                           .arg(QString("(%1)").arg(tr("n/a")))
+                           .arg(QString("(%1)").arg(tr("n/a")))
+                           .arg(QString("(%1)").arg(tr("n/a"))));
       ui.labelBounds->setVisible(false);
       ui.bounds->setVisible(false);
     }
@@ -603,7 +607,10 @@ public:
     }
     else
     {
-      ui.extents->setText(QString("%1\n%2\n%3").arg(tr("(n/a)")).arg(tr("(n/a)")).arg(tr("(n/a)")));
+      ui.extents->setText(QString("%1\n%2\n%3")
+                            .arg(QString("(%1)").arg(tr("n/a")))
+                            .arg(QString("(%1)").arg(tr("n/a")))
+                            .arg(QString("(%1)").arg(tr("n/a"))));
       ui.labelExtents->setVisible(false);
       ui.extents->setVisible(false);
     }

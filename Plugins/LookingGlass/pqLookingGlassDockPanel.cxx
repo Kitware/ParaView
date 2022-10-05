@@ -534,8 +534,9 @@ void pqLookingGlassDockPanel::saveQuilt()
   // Don't confirm overwrite, since we will be checking that later, after
   // we ensure the right suffix is attached...
   QString extension = ".png";
-  auto filepath = QFileDialog::getSaveFileName(this, "Save Quilt Image", "",
-    QString("Images (*%1)").arg(extension), nullptr, QFileDialog::DontConfirmOverwrite);
+  auto filepath = QFileDialog::getSaveFileName(this, tr("Save Quilt Image"), "",
+    QString("%1 (*%2)").arg(tr("Images")).arg(extension), nullptr,
+    QFileDialog::DontConfirmOverwrite);
   if (filepath.isEmpty())
   {
     // User canceled
@@ -557,10 +558,10 @@ void pqLookingGlassDockPanel::saveQuilt()
 
   if (QFile(filepath).exists())
   {
-    auto title = QString("Overwrite file?");
-    auto text = QString("\"%1\" already exists.\n\n"
-                        "Would you like to overwrite it?")
-                  .arg(filepath);
+    QString title = tr("Overwrite file?");
+    QString text = tr("\"%1\" already exists.").arg(filepath);
+    text += "\n\n";
+    text += tr("Would you like to overwrite it?");
     if (QMessageBox::question(this, title, text) == QMessageBox::No)
     {
       // User does not want to over-write the file...
@@ -571,8 +572,8 @@ void pqLookingGlassDockPanel::saveQuilt()
   // Update the interface with the GUI values
   this->Interface->SaveQuilt(filepath.toUtf8().data());
 
-  auto text = QString("Saved to \"%1\"").arg(filepath);
-  QMessageBox::information(this, "Quilt Saved", filepath);
+  auto text = tr("Saved to \"%1\"").arg(filepath);
+  QMessageBox::information(this, tr("Quilt Saved"), filepath);
 }
 
 void pqLookingGlassDockPanel::onRecordQuiltClicked()
@@ -592,11 +593,11 @@ void pqLookingGlassDockPanel::onRecordQuiltClicked()
   // if the recording state actually changed.
   if (this->IsRecording)
   {
-    ui.RecordQuilt->setText("Stop Recording Quilt");
+    ui.RecordQuilt->setText(tr("Stop Recording Quilt"));
   }
   else
   {
-    ui.RecordQuilt->setText("Record Quilt");
+    ui.RecordQuilt->setText(tr("Record Quilt"));
   }
 }
 
@@ -726,8 +727,9 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
 
   // Don't confirm overwrite, since we will be checking that later, after
   // we ensure the right suffix is attached...
-  auto filepath = QFileDialog::getSaveFileName(this, "Save Quilt Movie", "",
-    QString("Movies (*%1)").arg(extension), nullptr, QFileDialog::DontConfirmOverwrite);
+  auto filepath = QFileDialog::getSaveFileName(this, tr("Save Quilt Movie"), "",
+    QString("%1 (*%2)").arg(tr("Movies")).arg(extension), nullptr,
+    QFileDialog::DontConfirmOverwrite);
   if (filepath.isEmpty())
   {
     // User canceled
@@ -749,10 +751,10 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
 
   if (QFile(filepath).exists())
   {
-    auto title = QString("Overwrite file?");
-    auto text = QString("\"%1\" already exists.\n\n"
-                        "Would you like to overwrite it?")
-                  .arg(filepath);
+    auto title = tr("Overwrite file?");
+    auto text = tr("\"%1\" already exists.").arg(filepath);
+    text += "\n\n";
+    text += tr("Would you like to overwrite it?");
     if (QMessageBox::question(this, title, text) == QMessageBox::No)
     {
       // User does not want to over-write the file...
@@ -788,8 +790,8 @@ void pqLookingGlassDockPanel::stopRecordingQuilt()
   auto filepath = this->MovieFilepath;
   this->MovieFilepath.clear();
 
-  auto text = QString("Saved to \"%1\"").arg(filepath);
-  QMessageBox::information(this, "Quilt Saved", text);
+  auto text = tr("Saved to \"%1\"").arg(filepath);
+  QMessageBox::information(this, tr("Quilt Saved"), text);
 }
 
 vtkSMProxy* pqLookingGlassDockPanel::getActiveCamera()
