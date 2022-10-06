@@ -867,6 +867,7 @@ endif()
 SET(TESTS_WITH_BASELINES
   BDFReader.xml
   CameraOrientationWidget.xml
+  CleanToGridRemovePoints.xml
   DataAxesGrid.xml
   EmptyInitialCompositeReader.xml # Issue #21293
   MergeVectorComponents.xml
