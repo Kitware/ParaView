@@ -4759,6 +4759,8 @@
              BUG #15117
         -->
         <WarnOnRepresentationChange value="Volume" />
+        <!-- pqDisplayColorWidget disables "Solid Color" for this representation type -->
+        <NoSolidColor representation="Volume" />
       </Hints>
       <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
@@ -4820,6 +4822,8 @@
              BUG #15117
         -->
         <WarnOnRepresentationChange value="Volume" />
+        <!-- pqDisplayColorWidget disables "Solid Color" for this representation type -->
+        <NoSolidColor representation="Volume" />
       </Hints>
       <!-- End of StructuredGridRepresentation -->
     </PVRepresentationProxy>
@@ -4977,6 +4981,9 @@
              BUG #15117
         -->
         <WarnOnRepresentationChange value="Volume" />
+        <!-- pqDisplayColorWidget disables "Solid Color" for this representation type -->
+        <NoSolidColor representation="Slice" />
+        <NoSolidColor representation="Volume" />
       </Hints>
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
@@ -5051,6 +5058,8 @@
              BUG #15117
         -->
         <WarnOnRepresentationChange value="Volume" />
+        <!-- pqDisplayColorWidget disables "Solid Color" for this representation type -->
+        <NoSolidColor representation="Volume" />
       </Hints>
 
       <!-- End of AMRRepresentation -->
