@@ -124,18 +124,34 @@ int vtkCleanUnstructuredGrid::RequestData(vtkInformation* vtkNotUsed(request),
   {
     progressStep = 1;
   }
+
+  vtkNew<vtkIdList> pointCells;
   for (id = 0; id < num; ++id)
   {
     if (id % progressStep == 0)
     {
       this->UpdateProgress(0.8 * ((float)id / num));
     }
-    input->GetPoint(id, pt);
-    if (this->Locator->InsertUniquePoint(pt, newId))
+
+    bool insert = true;
+    if (this->RemovePointsWithoutCells)
     {
-      output->GetPointData()->CopyData(input->GetPointData(), id, newId);
+      input->GetPointCells(id, pointCells);
+      if (pointCells->GetNumberOfIds() == 0)
+      {
+        insert = false;
+      }
     }
-    ptMap[id] = newId;
+
+    if (insert)
+    {
+      input->GetPoint(id, pt);
+      if (this->Locator->InsertUniquePoint(pt, newId))
+      {
+        output->GetPointData()->CopyData(input->GetPointData(), id, newId);
+      }
+      ptMap[id] = newId;
+    }
   }
   output->SetPoints(newPts);
   newPts->Delete();

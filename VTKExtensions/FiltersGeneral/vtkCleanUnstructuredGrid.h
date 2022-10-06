@@ -85,6 +85,15 @@ public:
   vtkGetMacro(OutputPointsPrecision, int);
   ///@}
 
+  /**
+   * Set/Get wether to remove points that do not
+   * have any cells associated with it.
+   * Default is false
+   */
+  vtkSetMacro(RemovePointsWithoutCells, bool);
+  vtkGetMacro(RemovePointsWithoutCells, bool);
+  vtkBooleanMacro(RemovePointsWithoutCells, bool);
+
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
@@ -95,6 +104,7 @@ protected:
   bool ToleranceIsAbsolute = false;
   double Tolerance = 0.0;
   double AbsoluteTolerance = 1.0;
+  bool RemovePointsWithoutCells = false;
   vtkIncrementalPointLocator* Locator = nullptr;
   int OutputPointsPrecision = vtkAlgorithm::DEFAULT_PRECISION;
 
