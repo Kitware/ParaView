@@ -76,9 +76,11 @@ endif()
 # state of various other settings may not be what user expects.
 if (DEFINED _paraview_build_edition_cached AND
     NOT _paraview_build_edition_cached STREQUAL PARAVIEW_BUILD_EDITION)
-  message(WARNING "Changing `PARAVIEW_BUILD_EDITION` after first configure will not "
-    "setup defaults for others settings correctly e.g. plugins enabled. It is recommended that you start "
-    "with a clean build directory and pass the option to CMake using "
+  message(WARNING
+    "Changing `PARAVIEW_BUILD_EDITION` after first configure will not setup "
+    "defaults for others settings correctly e.g. plugins enabled. It is "
+    "recommended that you start with a clean build directory and pass the "
+    "option to CMake using "
     "'-DPARAVIEW_BUILD_EDITION:STRING=${PARAVIEW_BUILD_EDITION}'.")
 endif()
 set(_paraview_build_edition_cached "${PARAVIEW_BUILD_EDITION}" CACHE INTERNAL "")
