@@ -93,6 +93,11 @@ public:
    */
   virtual void resetToDefault();
 
+  /**
+   * Flag to indicate if the ParaView Examples directory should be added to the list.
+   */
+  static bool AddExamplesInLocations;
+
 protected:
   struct pqFileDialogLocationModelFileInfo
   {

@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 
+// PARAVIEW_DEPRECATED_IN_5_11_0
 bool pqFileDialogFavoriteModel::AddExamplesInFavorites = true;
 
 /////////////////////////////////////////////////////////////////////
@@ -111,10 +112,7 @@ pqFileDialogFavoriteModel::pqFileDialogFavoriteModel(
         fileInfoList[0].toString(), fileInfoList[1].toString(), type });
     }
   }
-  else
-  {
-    this->LoadFavoritesFromSystem();
-  }
+  // else favorites are empty on startup.
   this->SettingsKey = key;
 }
 
@@ -169,7 +167,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
   {
     // FIXME when the shared resources dir is not found, this is equal to `/examples`. This might be
     // confusing for people without the `Examples` directory (mostly ParaView devs). This directory
-    // can be hidden by setting the `AddExamplesInFavoritesBehavior` to `false`.
+    // can be hidden by setting the `AddExamplesInFileDialogBehavior` to `false`.
     dir = QString::fromStdString(vtkPVFileInformation::GetParaViewExampleFilesDirectory());
   }
 
@@ -310,7 +308,7 @@ void pqFileDialogFavoriteModel::removeFromFavorites(QString const& dirPath)
 void pqFileDialogFavoriteModel::resetFavoritesToDefault()
 {
   this->beginResetModel();
-  this->LoadFavoritesFromSystem();
+  this->FavoriteList.clear();
   this->endResetModel();
 }
 
@@ -338,44 +336,4 @@ Qt::ItemFlags pqFileDialogFavoriteModel::flags(const QModelIndex& index) const
   }
 
   return Superclass::flags(index);
-}
-
-//-----------------------------------------------------------------------------
-void pqFileDialogFavoriteModel::LoadFavoritesFromSystem()
-{
-  vtkNew<vtkPVFileInformation> information;
-
-  if (this->Server)
-  {
-    vtkSMSessionProxyManager* pxm = this->Server->proxyManager();
-
-    vtkSmartPointer<vtkSMProxy> helper;
-    helper.TakeReference(pxm->NewProxy("misc", "FileInformationHelper"));
-    pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"), true);
-    pqSMAdaptor::setElementProperty(helper->GetProperty("ExamplesInSpecialDirectories"),
-      pqFileDialogFavoriteModel::AddExamplesInFavorites);
-    helper->UpdateVTKObjects();
-    helper->GatherInformation(information);
-  }
-  else
-  {
-    vtkNew<vtkPVFileInformationHelper> helper;
-    helper->SetSpecialDirectories(1);
-    helper->SetExamplesInSpecialDirectories(pqFileDialogFavoriteModel::AddExamplesInFavorites);
-    information->CopyFromObject(helper);
-  }
-
-  this->FavoriteList.clear();
-  vtkSmartPointer<vtkCollectionIterator> iter;
-  iter.TakeReference(information->GetContents()->NewIterator());
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-  {
-    vtkPVFileInformation* cur_info = vtkPVFileInformation::SafeDownCast(iter->GetCurrentObject());
-    if (!cur_info)
-    {
-      continue;
-    }
-    this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo{
-      cur_info->GetName(), QDir::cleanPath(cur_info->GetFullPath()), cur_info->GetType() });
-  }
 }

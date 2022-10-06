@@ -170,7 +170,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Reset favorites to system default</string>
+             <string>Clear favorites</string>
             </property>
             <property name="text">
              <string/>
@@ -271,7 +271,7 @@
         <item>
          <widget class="QListView" name="Locations">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>1</horstretch>
             <verstretch>1</verstretch>
            </sizepolicy>

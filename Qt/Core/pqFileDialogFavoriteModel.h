@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqFileDialogFavoriteModel_h
 
 #include "pqCoreModule.h"
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 #include <QAbstractListModel>
 #include <QList>
 #include <QObject>
@@ -115,8 +117,9 @@ public:
 
   /**
    * Flag to indicate if the ParaView Examples directory must be added when creating the settings
-   * for the first time, or when reseting it to the default value.
+   * for the first time, or when reseting it to the default value. Deprecated.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use pqFileDialogLocationModel::AddExamplesInLocations instead")
   static bool AddExamplesInFavorites;
 
 protected:
@@ -126,8 +129,6 @@ protected:
     QString FilePath;
     int Type;
   };
-
-  void LoadFavoritesFromSystem();
 
   QPointer<pqFileDialogModel> FileDialogModel;
   pqServer* Server = nullptr;

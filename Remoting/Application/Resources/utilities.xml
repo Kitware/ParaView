@@ -504,6 +504,12 @@
                          number_of_elements="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+      <IntVectorProperty command="SetExamplesInSpecialDirectories"
+                         default_values="0"
+                         name="ExamplesInSpecialDirectories"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <IntVectorProperty command="SetGroupFileSequences"
                          default_values="1"
                          name="GroupFileSequences"
@@ -598,7 +604,6 @@
            name="EnvironmentInformationHelper">
       <StringVectorProperty command="SetVariable"
                             name="Variable"/>
-      <!-- End of FileInformationHelper -->
     </Proxy>
     <TimeKeeperProxy class="vtkSMTimeKeeper"
                      name="TimeKeeper"

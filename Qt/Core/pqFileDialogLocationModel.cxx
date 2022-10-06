@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogLocationModel.h"
 
-#include <pqFileDialogFavoriteModel.h>
 #include <pqFileDialogModel.h>
 #include <pqSMAdaptor.h>
 #include <pqServer.h>
@@ -55,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QFont>
 #include <QStyle>
+
+bool pqFileDialogLocationModel::AddExamplesInLocations = true;
 
 /////////////////////////////////////////////////////////////////////
 // Icons
@@ -104,7 +105,7 @@ QVariant pqFileDialogLocationModel::data(const QModelIndex& idx, int role) const
   {
     // FIXME when the shared resources dir is not found, this is equal to `/examples`. This might be
     // confusing for people without the `Examples` directory (mostly ParaView devs). This directory
-    // can be hidden by setting the `AddExamplesInFavoritesBehavior` to `false`.
+    // can be hidden by setting the `AddExamplesInFileDialogBehavior` to `false`.
     dir = QString::fromStdString(vtkPVFileInformation::GetParaViewExampleFilesDirectory());
   }
 
@@ -199,7 +200,7 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
     helper.TakeReference(pxm->NewProxy("misc", "FileInformationHelper"));
     pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"), true);
     pqSMAdaptor::setElementProperty(helper->GetProperty("ExamplesInSpecialDirectories"),
-      pqFileDialogFavoriteModel::AddExamplesInFavorites);
+      pqFileDialogLocationModel::AddExamplesInLocations);
     helper->UpdateVTKObjects();
     helper->GatherInformation(information);
   }
@@ -207,7 +208,7 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
   {
     vtkNew<vtkPVFileInformationHelper> helper;
     helper->SetSpecialDirectories(1);
-    helper->SetExamplesInSpecialDirectories(pqFileDialogFavoriteModel::AddExamplesInFavorites);
+    helper->SetExamplesInSpecialDirectories(pqFileDialogLocationModel::AddExamplesInLocations);
     information->CopyFromObject(helper);
   }
 
