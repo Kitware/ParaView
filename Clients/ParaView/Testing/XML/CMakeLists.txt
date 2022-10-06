@@ -874,6 +874,7 @@ SET(TESTS_WITH_BASELINES
   ParticleTracerGlyph.xml
   PassArrays.xml
   PerlinNoise.xml
+  PickCenter.xml
   ResampleToLine.xml
   ReverseSense.xml
   SelectionByArray.xml
@@ -886,6 +887,7 @@ SET(TESTS_WITH_BASELINES
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   TransferFunction2DYScalars.xml
+  ZoomToBox.xml
   ZoomToData.xml
   ZoomToEmptyData.xml
 )
