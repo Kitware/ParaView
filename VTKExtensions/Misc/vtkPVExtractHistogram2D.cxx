@@ -244,27 +244,15 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
                       "is only supported for vtkDataSet and subclasses.");
         return;
       }
-      if (this->GetInputArrayAssociation(0, inputVector) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-      {
-        inputDS->GetPointData()->AddArray(this->ComponentArrayCache[0]);
-      }
-      else
-      {
-        inputDS->GetCellData()->AddArray(this->ComponentArrayCache[0]);
-      }
+      inputDS->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, inputVector))
+        ->AddArray(this->ComponentArrayCache[0]);
     }
     this->ComputeGradient(input);
 
     if (this->ComponentArrayCache[0] != inputArray0)
     {
-      if (this->GetInputArrayAssociation(0, inputVector) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-      {
-        inputDS->GetPointData()->RemoveArray("Magnitude");
-      }
-      else
-      {
-        inputDS->GetCellData()->RemoveArray("Magnitude");
-      }
+      inputDS->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, inputVector))
+        ->RemoveArray("Magnitude");
     }
   }
   else
@@ -412,7 +400,9 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
     0, 0, 0, this->GetInputArrayAssociation(0, input), this->ComponentArrayCache[0]->GetName());
   gf->Update();
 
-  const auto gradientArray = gf->GetOutput()->GetPointData()->GetArray("Gradient");
+  const auto gradientArray = gf->GetOutput()
+                               ->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, input))
+                               ->GetArray("Gradient");
   const auto gradientArrRange = vtk::DataArrayTupleRange(gradientArray);
   const vtk::TupleIdType numTuples = gradientArrRange.size();
 
