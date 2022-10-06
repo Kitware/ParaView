@@ -1019,16 +1019,18 @@ bool pqRenderViewSelectionReaction::isCompatible(SelectionMode mode)
     return true;
   }
   else if ((this->Mode == SELECT_SURFACE_CELLS || this->Mode == SELECT_SURFACE_CELLS_POLYGON ||
-             this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY) &&
+             this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY ||
+             this->Mode == SELECT_FRUSTUM_CELLS) &&
     (mode == SELECT_SURFACE_CELLS || mode == SELECT_SURFACE_CELLS_POLYGON ||
-      mode == SELECT_SURFACE_CELLS_INTERACTIVELY))
+      mode == SELECT_SURFACE_CELLS_INTERACTIVELY || mode == SELECT_FRUSTUM_CELLS))
   {
     return true;
   }
   else if ((this->Mode == SELECT_SURFACE_POINTS || this->Mode == SELECT_SURFACE_POINTS_POLYGON ||
-             this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY) &&
+             this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY ||
+             this->Mode == SELECT_FRUSTUM_POINTS) &&
     (mode == SELECT_SURFACE_POINTS || mode == SELECT_SURFACE_POINTS_POLYGON ||
-      mode == SELECT_SURFACE_POINTS_INTERACTIVELY))
+      mode == SELECT_SURFACE_POINTS_INTERACTIVELY || mode == SELECT_FRUSTUM_POINTS))
   {
     return true;
   }

@@ -1033,6 +1033,7 @@ list(APPEND TESTS_WITH_BASELINES
   ColorOpacityTableEditing.xml
   ColorOpacityEditorFreehandDrawing.xml
   ColorOpacityEditorRangeHandles.xml
+  CombineFrustumSelections.xml
   CategoricalAutomaticAnnotations.xml
   CategoricalColors.xml
   CategoricalOpacities.xml
@@ -1642,6 +1643,7 @@ set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
 set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
+set(CombineFrustumSelections_DISABLE_CRS TRUE) # yes, this test does a selection
 
 # ZoomToData is not working as well in crs
 set(ZoomToData_DISABLE_CRS TRUE)
