@@ -47,24 +47,24 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
         self.Modified()
 
     # In most cases, one can simply use available decorators.
-    @smproperty.doublevector(name="Scale", default_values=[1, 1, 1])
+    @smproperty.doublevector(name="Scale", default_values=["1", "1", "1"])
     @smdomain.doublerange()
     def SetScale(self, x, y, z):
         self._realAlgorithm.SetScale(x,y,z)
         self.Modified()
 
-    @smproperty.intvector(name="ThetaResolution", default_values=16)
+    @smproperty.intvector(name="ThetaResolution", number_of_elements="1", default_values="16")
     def SetThetaResolution(self, x):
         self._realAlgorithm.SetThetaResolution(x)
         self.Modified()
 
-    @smproperty.intvector(name="PhiResolution", default_values=16)
+    @smproperty.intvector(name="PhiResolution", default_values="16")
     @smdomain.intrange(min=0, max=1000)
     def SetPhiResolution(self, x):
         self._realAlgorithm.SetPhiResolution(x)
         self.Modified()
 
-    @smproperty.doublevector(name="Thickness", default_values=0.3333)
+    @smproperty.doublevector(name="Thickness", number_of_elements="1", default_values="0.3333")
     @smdomain.doublerange(min=1e-24, max=1.0)
     def SetThickness(self, x):
         self._realAlgorithm.SetThickness(x)
@@ -79,7 +79,7 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
         print("getting range: (0, 100)")
         return (0, 100)
 
-    @smproperty.doublevector(name="Value", default_values=[0.0])
+    @smproperty.doublevector(name="Value", default_values=["0.0"])
     @smdomain.xml(\
         """<DoubleRangeDomain name="range" default_mode="mid">
                 <RequiredProperties>
