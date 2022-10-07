@@ -86,7 +86,7 @@ endforeach ()
 # used in paraview/modules/__init__.py when wrapping with BUILD_STATIC=ON
 set(_paraview_modules_static_import "_load_paraview_modules_static()")
 if (BUILD_SHARED_LIBS)
-    string(PREPEND _paraview_modules_static_import "#")
+  string(PREPEND _paraview_modules_static_import "#")
 endif ()
 
 set(python_copied_modules)
