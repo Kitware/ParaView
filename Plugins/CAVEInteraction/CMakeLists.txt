@@ -133,7 +133,7 @@ target_link_libraries(CAVEInteraction
     VTK::CommonTransforms
     VTK::RenderingCore
     Qt5::Network)
-  target_compile_definitions(CAVEInteraction PRIVATE QT_NO_KEYWORDS)
+target_compile_definitions(CAVEInteraction PRIVATE QT_NO_KEYWORDS)
 
 if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
   target_link_libraries(CAVEInteraction
