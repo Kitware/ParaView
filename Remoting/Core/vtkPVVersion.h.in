@@ -25,6 +25,6 @@
 #define PARAVIEW_VERSION_CHECK(major, minor, build)                                                     \
   (10000000000ULL * major + 100000000ULL * minor + build)
 #define PARAVIEW_VERSION_NUMBER                                                                         \
-  PARAVIEW_VERSION_CHECK(PARAVIEW_MAJOR_VERSION, PARAVIEW_MINOR_VERSION, PARAVIEW_BUILD_VERSION)
+  PARAVIEW_VERSION_CHECK(PARAVIEW_VERSION_MAJOR, PARAVIEW_VERSION_MINOR, PARAVIEW_VERSION_PATCH)
 
 #endif
