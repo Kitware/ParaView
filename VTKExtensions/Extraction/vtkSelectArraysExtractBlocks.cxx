@@ -14,13 +14,14 @@
 =========================================================================*/
 #include "vtkSelectArraysExtractBlocks.h"
 
+#include "vtkCompositeDataSet.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
+#include "vtkInformation.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPassSelectedArrays.h"
+
 #include <algorithm>
-#include <vtkCompositeDataSet.h>
-#include <vtkExtractBlockUsingDataAssembly.h>
-#include <vtkInformation.h>
-#include <vtkNew.h>
-#include <vtkObjectFactory.h>
-#include <vtkPassSelectedArrays.h>
 
 class vtkSelectArraysExtractBlocks::vtkInternals
 {
