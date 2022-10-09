@@ -14,13 +14,15 @@
 =========================================================================*/
 #include "vtkSelectArraysExtractBlocks.h"
 
+#include "vtkCompositeDataSet.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPassSelectedArrays.h"
+
 #include <algorithm>
-#include <vtkCompositeDataSet.h>
-#include <vtkExtractBlockUsingDataAssembly.h>
-#include <vtkInformation.h>
-#include <vtkNew.h>
-#include <vtkObjectFactory.h>
-#include <vtkPassSelectedArrays.h>
 
 class vtkSelectArraysExtractBlocks::vtkInternals
 {
@@ -108,7 +110,25 @@ int vtkSelectArraysExtractBlocks::RequestData(vtkInformation* vtkNotUsed(request
 int vtkSelectArraysExtractBlocks::RequestDataObject(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  return this->Internals->ExtractBlocks->ProcessRequest(request, inputVector, outputVector);
+  // If extract blocks is disabled, output type is the same as input type.
+  if (!this->ExtractBlocksEnabled)
+  {
+    auto input = vtkCompositeDataSet::GetData(inputVector[0], 0);
+    auto output = vtkCompositeDataSet::GetData(outputVector, 0);
+    if (output == nullptr || output->GetDataObjectType() != input->GetDataObjectType())
+    {
+      output = input->NewInstance();
+      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
+      output->FastDelete();
+    }
+    return 1;
+  }
+  // If extract blocks is enabled, output type is defined by ExtractBlocks. We do that to handle
+  // vtkOverlappingAMR properly.
+  else
+  {
+    return this->Internals->ExtractBlocks->ProcessRequest(request, inputVector, outputVector);
+  }
 }
 
 //----------------------------------------------------------------------------

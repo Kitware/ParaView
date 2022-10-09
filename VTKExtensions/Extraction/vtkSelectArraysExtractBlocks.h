@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSelectArraysExtractBlocks - combines vtkPassSelectedArrays and
-// vtkExtractBlockUsingDataAssembly
-// .SECTION Description vtkSelectArraysExtractBlocks is a meta-filter combining the
-// vtkPassSelectedArrays and vtkExtractBlockUsingDataAssembly filters. It is intended to be used as
-// a pre-processing filter for certain composite writers. It adds the possibility to choose the
-// blocks to write, in addition to the data arrays.
+/**
+ * @class   vtkSelectArraysExtractBlocks
+ * @brief   Selects arrays and extracts blocks.
+ *
+ * vtkSelectArraysExtractBlocks is a meta-filter combining the
+ * vtkPassSelectedArrays and vtkExtractBlockUsingDataAssembly filters. It is intended to be used as
+ * a pre-processing filter for certain composite writers. It adds the possibility to choose the
+ * blocks to write, in addition to the data arrays.
+ */
 
 #ifndef vtkSelectArraysExtractBlocks_h
 #define vtkSelectArraysExtractBlocks_h

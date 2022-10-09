@@ -1072,7 +1072,7 @@
           RequestUpdateExtent() pass. However, when down-stream doesn't provide
           any specific keys, the default behavior can be setup to read at-most N
           levels by default. The number of levels read can be set using this
-          method.  Set this to 0 to imply no limit. Default is 0.
+          method.  Set this to 0 to imply no limit. Default is 1.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty information_only="1"
