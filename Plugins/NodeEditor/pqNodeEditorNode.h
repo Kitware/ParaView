@@ -33,6 +33,8 @@ class pqView;
 class QGraphicsScene;
 class QGraphicsSceneMous;
 
+class QSettings;
+
 /**
  * Every instance of this class corresponds to a node representing either a source,
  * a filter or a render view. They have severals input and output pqNodeEditorPort,
@@ -196,6 +198,14 @@ public:
    */
   QRectF boundingRect() const override;
 
+  ///@{
+  /**
+   * Import / Export layout from a Qt settings instance.
+   */
+  void importLayout(const QSettings& settings);
+  void exportLayout(QSettings& settings);
+  ///@}
+
 Q_SIGNALS:
   void nodeResized();
   void nodeMoved();
@@ -209,6 +219,12 @@ protected:
    *  Update the size of the node to fit its contents.
    */
   int updateSize();
+
+  /**
+   * Return the node key used to store its layout.
+   * Key is "node.<SMGroup>.<SMName>"
+   */
+  QString getNodeKey() const;
 
 private:
   /**

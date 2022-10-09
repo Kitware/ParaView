@@ -259,6 +259,8 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
 void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqServer* server)
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
+  Q_EMIT this->aboutToReadState(filename);
+
   pqPythonManager* pythonMgr = this->pythonManager();
   this->clearViewsForLoadingState(server);
   // comment in pqApplicationCore says this->LoadingState is unreliable, but it is still

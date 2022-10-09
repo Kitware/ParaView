@@ -157,6 +157,9 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
     qWarning() << "Could not open file:" << filename;
     return false;
   }
+
+  Q_EMIT pqApplicationCore::instance()->aboutToWriteState(filename);
+
   QTextStream out(&file);
   out << state.c_str();
   pqServer* server = pqActiveObjects::instance().activeServer();

@@ -52,6 +52,7 @@ pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
 {
 }
 
+// ----------------------------------------------------------------------------
 QPointF pqNodeEditorScene::snapToGrid(const qreal& x, const qreal& y, const qreal& resolution)
 {
   const auto gridSize = pqNodeEditorUtils::CONSTS::GRID_SIZE * resolution;

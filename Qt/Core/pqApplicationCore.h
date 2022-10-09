@@ -345,6 +345,18 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 Q_SIGNALS:
   /**
+   * Fired before a state file, either python or XML, is written. Note that writing
+   * can still fail at this point.
+   */
+  void aboutToWriteState(QString filename);
+
+  /**
+   * Fired before a state file, either python or XML, is read. Note that loading can
+   * still fail at this point.
+   */
+  void aboutToReadState(QString filename);
+
+  /**
    * Fired before a state xml is being loaded. One can add slots for this signal
    * and modify the fired xml-element as part of pre-processing before
    * attempting to load the state xml. Note that never attempt to connect to

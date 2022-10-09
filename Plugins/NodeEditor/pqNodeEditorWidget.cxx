@@ -54,11 +54,15 @@
 
 #include <QAction>
 #include <QCheckBox>
+#include <QDebug>
+#include <QDir>
 #include <QEvent>
+#include <QFileInfo>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QSettings>
 #include <QSpacerItem>
 #include <QVBoxLayout>
 
@@ -284,6 +288,8 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
       return 1;
     });
     toolbarLayout->addWidget(checkBox);
+
+    this->autoLayoutCheckbox = checkBox;
   }
   addSeparator();
 
@@ -319,28 +325,36 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   auto smm = appCore->getServerManagerModel();
 
   // state loaded
-  this->connect(appCore, &pqApplicationCore::stateLoaded, this,
-    [this](vtkPVXMLElement* /*root*/, vtkSMProxyLocator* /*locator*/) {
-      this->actionLayout->trigger();
-      this->actionZoom->trigger();
-    });
+  QObject::connect(appCore, &pqApplicationCore::aboutToReadState, this,
+    [this](QString filename) { this->processedStateFile = filename; });
+
+  QObject::connect(appCore, &pqApplicationCore::stateLoaded, this,
+    [this](vtkPVXMLElement* /*root*/, vtkSMProxyLocator* /*locator*/) { this->importLayout(); });
+
+  // state saved
+  QObject::connect(appCore, &pqApplicationCore::aboutToWriteState, this,
+    [this](QString filename) { this->processedStateFile = filename; });
+
+  QObject::connect(appCore, &pqApplicationCore::stateSaved, this,
+    [this](vtkPVXMLElement* /*root*/) { this->exportLayout(); });
 
   // source/filter creation
-  this->connect(
+  QObject::connect(
     smm, &pqServerManagerModel::sourceAdded, this, &pqNodeEditorWidget::createNodeForSource);
 
   // source/filter deletion
-  this->connect(smm, &pqServerManagerModel::sourceRemoved, this, &pqNodeEditorWidget::removeNode);
+  QObject::connect(
+    smm, &pqServerManagerModel::sourceRemoved, this, &pqNodeEditorWidget::removeNode);
 
   // view creation
-  this->connect(
+  QObject::connect(
     smm, &pqServerManagerModel::viewAdded, this, &pqNodeEditorWidget::createNodeForView);
 
   // view deletion
-  this->connect(smm, &pqServerManagerModel::viewRemoved, this, &pqNodeEditorWidget::removeNode);
+  QObject::connect(smm, &pqServerManagerModel::viewRemoved, this, &pqNodeEditorWidget::removeNode);
 
   // edge removed
-  this->connect(smm,
+  QObject::connect(smm,
     static_cast<void (pqServerManagerModel::*)(pqPipelineSource*, pqPipelineSource*, int)>(
       &pqServerManagerModel::connectionRemoved),
     this, [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/) {
@@ -348,7 +362,7 @@ int pqNodeEditorWidget::attachServerManagerListeners()
     });
 
   // edge creation
-  this->connect(smm,
+  QObject::connect(smm,
     static_cast<void (pqServerManagerModel::*)(pqPipelineSource*, pqPipelineSource*, int)>(
       &pqServerManagerModel::connectionAdded),
     this, [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/) {
@@ -359,11 +373,11 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   auto activeObjects = &pqActiveObjects::instance();
 
   // update proxy selections
-  this->connect(activeObjects, &pqActiveObjects::selectionChanged, this,
+  QObject::connect(activeObjects, &pqActiveObjects::selectionChanged, this,
     &pqNodeEditorWidget::updateActiveSourcesAndPorts);
 
   // update view selection
-  this->connect(
+  QObject::connect(
     activeObjects, &pqActiveObjects::viewChanged, this, &pqNodeEditorWidget::updateActiveView);
 
   // init node editor scene with existing proxies
@@ -529,7 +543,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
   // left + ctrl : add to selection
   // middle click : delete node
   auto* nodeLabel = node->getLabel();
-  nodeLabel->setMousePressEventCallback([node, proxy, this](QGraphicsSceneMouseEvent* event) {
+  nodeLabel->setMousePressEventCallback([node, proxy](QGraphicsSceneMouseEvent* event) {
     if (event->button() == Qt::MouseButton::RightButton)
     {
       node->incrementVerbosity();
@@ -649,7 +663,7 @@ int pqNodeEditorWidget::createNodeForView(pqView* proxy)
   // left click : select as active view
   // right click : increment verbosity
   auto* nodeLabel = node->getLabel();
-  nodeLabel->setMousePressEventCallback([this, node, proxy](QGraphicsSceneMouseEvent* event) {
+  nodeLabel->setMousePressEventCallback([node, proxy](QGraphicsSceneMouseEvent* event) {
     if (event->button() == Qt::MouseButton::RightButton)
     {
       node->incrementVerbosity();
@@ -989,3 +1003,73 @@ int pqNodeEditorWidget::updatePipelineEdges(pqPipelineFilter* consumer)
 
   return 1;
 };
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorWidget::importLayout()
+{
+  const QString filename = this->constructLayoutFilename();
+
+  if (!QFileInfo::exists(filename))
+  {
+    this->actionLayout->trigger();
+    this->actionZoom->trigger();
+  }
+  else
+  {
+    // We want to deactivate the auto layout when we import a layout to be sure to
+    // not mess with it
+    this->autoLayoutCheckbox->setCheckState(Qt::CheckState::Unchecked);
+
+    QSettings settings(filename, QSettings::Format::NativeFormat);
+    for (auto node : this->nodeRegistry)
+    {
+      node.second->importLayout(settings);
+    }
+
+    this->actionZoom->trigger();
+  }
+}
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorWidget::exportLayout()
+{
+  const QString filename = this->constructLayoutFilename();
+
+  // If autolayout is disabled no need to export the layout. We should even delete
+  // the existing layout if any.
+  if (this->autoUpdateLayout)
+  {
+    if (QFileInfo::exists(filename))
+    {
+      QFile::remove(filename);
+    }
+    return;
+  }
+
+  QSettings settings(filename, QSettings::Format::NativeFormat);
+  if (!settings.isWritable())
+  {
+    qWarning("NodeEditor: coudln't create a writable settings file, aborting");
+    return;
+  }
+
+  settings.clear();
+  for (auto node : this->nodeRegistry)
+  {
+    node.second->exportLayout(settings);
+  }
+}
+
+// ----------------------------------------------------------------------------
+QString pqNodeEditorWidget::constructLayoutFilename() const
+{
+  if (this->processedStateFile.isEmpty())
+  {
+    return "";
+  }
+  else
+  {
+    const QFileInfo file(this->processedStateFile);
+    return file.absoluteDir().filePath("." + file.baseName() + ".pvne");
+  }
+}

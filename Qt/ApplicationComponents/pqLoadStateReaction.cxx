@@ -91,6 +91,8 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
     vtkSMPropertyHelper(proxy, "DataDirectory")
       .Set(vtksys::SystemTools::GetParentDirectory(filename.toUtf8().toStdString()).c_str());
 
+    Q_EMIT pqPVApplicationCore::instance()->aboutToReadState(filename);
+
     if (proxy && proxy->PrepareToLoad(filename.toUtf8().data()))
     {
       vtkNew<vtkSMParaViewPipelineController> controller;
@@ -127,6 +129,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
   else
   { // python file
 #if VTK_MODULE_ENABLE_ParaView_pqPython
+    // pqPVApplicationCore::loadStateFromPythonFile already emits aboutToReadState
     pqPVApplicationCore::instance()->loadStateFromPythonFile(filename, server);
     pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
       server, filename);

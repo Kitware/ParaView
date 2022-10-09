@@ -332,6 +332,8 @@ bool pqApplicationCore::saveState(const QString& filename)
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
+  Q_EMIT this->aboutToWriteState(filename);
+
   return pxm->SaveXMLState(filename.toUtf8().data());
 }
 
@@ -354,6 +356,8 @@ void pqApplicationCore::loadState(const char* filename, pqServer* server, vtkSMS
   {
     return;
   }
+
+  Q_EMIT this->aboutToReadState(filename);
 
   QFile qfile(filename);
   if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -432,6 +436,9 @@ void pqApplicationCore::loadStateIncremental(
   {
     return;
   }
+
+  Q_EMIT aboutToReadState(filename);
+
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename.toUtf8().data());
   parser->Parse();

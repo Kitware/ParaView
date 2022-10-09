@@ -45,8 +45,10 @@
 #include <QLabel>
 #include <QPainter>
 #include <QPushButton>
+#include <QSettings>
 #include <QSplitter>
 #include <QStyleOptionGraphicsItem>
+#include <QTransform>
 #include <QVBoxLayout>
 
 // The pqDoubleLineEdit.h file is only included to handle the issue that the
@@ -54,6 +56,48 @@
 // working correctly in QT Graphics View Framework and therefore needs to be
 // explicitly disabled.
 #include <pqDoubleLineEdit.h>
+
+namespace details
+{
+/**
+ * Simple implementation of something like `std::optional`
+ * XXX(c++17): remove this in favor of std::optional
+ */
+template <typename T>
+struct Optional
+{
+  Optional()
+    : Value{}
+    , Valid{ false }
+  {
+  }
+  Optional(T arg)
+    : Value{ arg }
+    , Valid{ true }
+  {
+  }
+
+  operator bool() const { return Valid; }
+
+  const T Value;
+  const bool Valid;
+};
+
+template <typename T>
+Optional<T> safeGetValue(const QSettings& settings, const QString& key)
+{
+  if (settings.contains(key))
+  {
+    QVariant value = settings.value(key);
+    if (value.isValid() && value.canConvert<T>())
+    {
+      return Optional<T>{ value.value<T>() };
+    }
+  }
+
+  return Optional<T>();
+}
+};
 
 pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
   pqNodeEditorNode::Verbosity::NORMAL
@@ -366,4 +410,45 @@ void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
     this->backgroundStyle == BackgroundStyle::DIRTY ? pqNodeEditorUtils::CONSTS::COLOR_BASE_GREEN
                                                     : pqNodeEditorUtils::CONSTS::COLOR_BASE);
   painter->drawPath(path);
+}
+
+// ----------------------------------------------------------------------------
+QString pqNodeEditorNode::getNodeKey() const
+{
+  return "node." + this->proxy->getSMGroup() + "." + this->proxy->getSMName();
+}
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorNode::importLayout(const QSettings& settings)
+{
+  const QString nodeName = this->getNodeKey();
+
+  if (auto verbos = details::safeGetValue<int>(settings, nodeName + ".verbosity"))
+  {
+    this->setVerbosity(static_cast<Verbosity>(verbos.Value));
+  }
+  if (auto transfo = details::safeGetValue<QTransform>(settings, nodeName + ".transform"))
+  {
+    this->setTransform(transfo.Value);
+  }
+  if (auto pos = details::safeGetValue<QPointF>(settings, nodeName + ".pos"))
+  {
+    this->setPos(pos.Value);
+  }
+}
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorNode::exportLayout(QSettings& settings)
+{
+  const QString nodeName = this->getNodeKey();
+
+  auto exportProperty = [&](const char* name, QVariant value) {
+    settings.setValue(nodeName + name, value);
+  };
+
+  exportProperty(".verbosity", static_cast<int>(this->verbosity));
+
+  exportProperty(".transform", this->transform());
+
+  exportProperty(".pos", this->pos());
 }
