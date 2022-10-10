@@ -75,6 +75,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # Some X sync issue causing the images to be capture with
     # incorrect size, ignore for now.
     "\\.MultiSliceMultiBlock$"
+
+    # Random segfault that would require deep investigation
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
+    "\\.ColorOpacityTableEditing$"
     )
 endif ()
 
