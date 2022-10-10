@@ -15,7 +15,7 @@ from vtkmodules.numpy_interface.algorithms import *
 
 from paraview.vtk import vtkDataObject, vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
 from paraview.modules import vtkPVVTKExtensionsFiltersPython
-
+from paraview.vtk.util.numpy_support import get_numpy_array_type
 import sys
 
 if sys.version_info >= (3,):
@@ -212,9 +212,19 @@ def execute(self, expression):
     retVal = compute(inputs, expression, ns=variables)
 
     if retVal is not None:
+        vtkRet = retVal
+        # Convert the result array type if requested.
+        if self.GetResultArrayType() != -1:
+            # handles VTKArray and VTKCompositeDataArray
+            if hasattr(retVal, "astype"):
+                vtkRet = retVal.astype(get_numpy_array_type(self.GetResultArrayType()))
+            else:
+                # we can also get a scalar, convert to single element array of correct type
+                vtkRet = numpy.asarray(retVal, get_numpy_array_type(self.GetResultArrayType()))
+
         if hasattr(retVal, "Association"):
-            output.GetAttributes(retVal.Association).append(retVal, self.GetArrayName())
+            output.GetAttributes(retVal.Association).append(vtkRet, self.GetArrayName())
         else:
             # if somehow the association was removed we
             # fall back to the input array association
-            output.GetAttributes(self.GetArrayAssociation()).append(retVal, self.GetArrayName())
+            output.GetAttributes(self.GetArrayAssociation()).append(vtkRet, self.GetArrayName())

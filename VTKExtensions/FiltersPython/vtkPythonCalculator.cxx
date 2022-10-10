@@ -53,6 +53,7 @@ vtkPythonCalculator::vtkPythonCalculator()
   this->SetArrayName("result");
   this->SetExecuteMethod(vtkPythonCalculator::ExecuteScript, this);
   this->ArrayAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+  this->ResultArrayType = VTK_DOUBLE;
 }
 
 //----------------------------------------------------------------------------
@@ -210,6 +211,8 @@ void vtkPythonCalculator::Exec(const char* expression)
   vtkSmartPyObject pyexpression(PyString_FromString(orgscript.c_str()));
 
   // call `paraview.detail.calculator.execute(self)`
+  // calculator.py references ArrayName, ArrayAssociation and ResultArrayType to create the output
+  // array.
   vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
     modCalculator, fname.GetPointer(), self.GetPointer(), pyexpression.GetPointer(), nullptr));
 

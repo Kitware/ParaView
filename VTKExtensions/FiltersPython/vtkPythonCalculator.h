@@ -71,6 +71,15 @@ public:
   vtkGetStringMacro(ArrayName);
   ///@}
 
+  ///@{
+  /**
+   * Type of the result array.
+   * Initial value is VTK_DOUBLE.
+   */
+  vtkGetMacro(ResultArrayType, int);
+  vtkSetMacro(ResultArrayType, int);
+  ///@}
+
   /**
    * For internal use only.
    */
@@ -101,6 +110,7 @@ protected:
   char* Expression;
   char* ArrayName;
   int ArrayAssociation;
+  int ResultArrayType;
 
 private:
   vtkPythonCalculator(const vtkPythonCalculator&) = delete;

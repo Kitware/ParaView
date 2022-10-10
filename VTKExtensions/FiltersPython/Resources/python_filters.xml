@@ -78,6 +78,43 @@
         <Documentation>If this property is set to true, all the cell and point
         arrays from first input are copied to the output.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetResultArrayType"
+                         default_values="11"
+                         label="Result Array Type"
+                         name="ResultArrayType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Same as Input"
+                 value="-1" />
+          <Entry text="Char"
+                 value="2" />
+          <Entry text="Signed Char"
+                 value="15" />
+          <Entry text="Unsigned Char"
+                 value="3" />
+          <Entry text="Short"
+                 value="4" />
+          <Entry text="Unsigned Short"
+                 value="5" />
+          <Entry text="Int"
+                 value="6" />
+          <Entry text="Unsigned Int"
+                 value="7" />
+          <Entry text="Long"
+                 value="8" />
+          <Entry text="Unsigned Long"
+                 value="9" />
+          <Entry text="Float"
+                 value="10" />
+          <Entry text="Double"
+                 value="11" />
+          <Entry text="Id Type"
+                 value="12" />
+        </EnumerationDomain>
+        <Documentation>This property determines what array type to output.
+        The default is a vtkDoubleArray.</Documentation>
+      </IntVectorProperty>
       <!-- End PythonCalculator -->
     </SourceProxy>
 
