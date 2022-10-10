@@ -119,7 +119,7 @@ public:
    * Flag to indicate if the ParaView Examples directory must be added when creating the settings
    * for the first time, or when reseting it to the default value. Deprecated.
    */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use pqFileDialogLocationModel::AddExamplesInLocations instead")
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use pqFileDialogLocationModel::AddExamplesInLocations instead")
   static bool AddExamplesInFavorites;
 
 protected:

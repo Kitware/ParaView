@@ -162,7 +162,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(LiveSourceBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CustomShortcutBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(MainWindowEventBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(UsageLoggingBehavior, false);
-// PARAVIEW_DEPRECATED_IN_5_11_0
+// PARAVIEW_DEPRECATED_IN_5_12_0
 PQ_BEHAVIOR_DEFINE_FLAG(AddExamplesInFavoritesBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(AddExamplesInFileDialogBehavior, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
@@ -197,7 +197,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   pqFileDialogLocationModel::AddExamplesInLocations =
     PQ_IS_BEHAVIOR_ENABLED(AddExamplesInFileDialogBehavior);
 
-  // PARAVIEW_DEPRECATED_IN_5_11_0
+  // PARAVIEW_DEPRECATED_IN_5_12_0
   pqFileDialogLocationModel::AddExamplesInLocations &=
     PQ_IS_BEHAVIOR_ENABLED(AddExamplesInFavoritesBehavior);
 
