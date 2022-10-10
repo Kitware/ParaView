@@ -17,7 +17,6 @@
 #define vtkPVPlotMatrixView_h
 
 #include "vtkPVContextView.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 class vtkScatterPlotMatrix;
@@ -345,28 +344,6 @@ public:
    * Update all the settings
    */
   void UpdateSettings();
-
-  ///@{
-  /**
-   * @deprecated in ParaView 5.10.
-   * Use Get[...]Color([...], double color[3]) methods instead.
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkPVPlotMatrixView::Get(int, double[3])` instead")
-  double* GetBackgroundColor(int plotType);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkPVPlotMatrixView::GetGridColor(int, double[3])` instead")
-  double* GetGridColor(int plotType);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkPVPlotMatrixView::GetAxisColor(int, double[3])` instead")
-  double* GetAxisColor(int plotType);
-  PARAVIEW_DEPRECATED_IN_5_10_0(
-    "Use `vtkPVPlotMatrixView::GetAxisLabelColor(int, double[3])` instead")
-  double* GetAxisLabelColor(int plotType);
-  PARAVIEW_DEPRECATED_IN_5_10_0(
-    "Use `vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor(double[3])` instead")
-  double* GetScatterPlotSelectedRowColumnColor();
-  PARAVIEW_DEPRECATED_IN_5_10_0(
-    "Use `vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor(double[3])` instead")
-  double* GetScatterPlotSelectedActiveColor();
-  ///@}
 
 protected:
   vtkPVPlotMatrixView();

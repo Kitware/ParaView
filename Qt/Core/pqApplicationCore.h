@@ -33,8 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
-#include "vtkSmartPointer.h"        // for vtkSmartPointer
+#include "vtkSmartPointer.h" // for vtkSmartPointer
 #include <QObject>
 #include <QPointer>
 #include <exception> // for std::exception
@@ -43,7 +42,6 @@ class pqInterfaceTracker;
 class pqLinksModel;
 class pqMainWindowEventManager;
 class pqObjectBuilder;
-class pqOptions;
 class pqPipelineSource;
 class pqPluginManager;
 class pqProgressManager;
@@ -111,17 +109,6 @@ public:
    */
   pqApplicationCore(int& argc, char** argv, vtkCLIOptions* options = nullptr,
     bool addStandardArgs = true, QObject* parent = nullptr);
-
-  ///@{
-  /**
-   * @deprecated in ParaView 5.10. pqOptions has been replaced by vtkCLIOptions
-   * based command line parsing.
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
-  pqApplicationCore(int& argc, char** argv, pqOptions* options, QObject* parent = nullptr);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
-  pqOptions* getOptions() const;
-  ///@}
 
   /**
    * Get the Object Builder. Object Buider must be used
@@ -422,10 +409,6 @@ private Q_SLOTS:
 protected:
   bool LoadingState;
 
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
-  vtkSmartPointer<pqOptions> Options;
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
-  void setOptions(pqOptions* options);
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;

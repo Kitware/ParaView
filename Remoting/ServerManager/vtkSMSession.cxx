@@ -13,9 +13,6 @@
 
 =========================================================================*/
 
-// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "vtkSMSession.h"
 
 #include "vtkCommand.h"
@@ -400,11 +397,4 @@ void vtkSMSession::ProcessNotification(const vtkSMMessage* message)
     remoteObj->DisableLocalPushOnly();
     this->StopProcessingRemoteNotification(previousValue);
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSession::GetIsAutoMPI() const
-{
-  VTK_LEGACY_BODY(vtkMyClass::GetIsAutoMPI, "ParaView 5.10");
-  return false;
 }

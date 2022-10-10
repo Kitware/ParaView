@@ -29,9 +29,8 @@
 #include "vtkDataObject.h" // for vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES
 #include "vtkNew.h"        // for vtkNew
 #include "vtkPVInformation.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
-#include "vtkRemotingCoreModule.h"  //needed for exports
-#include "vtkSmartPointer.h"        // for vtkSmartPointer
+#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkSmartPointer.h"       // for vtkSmartPointer
 
 #include <vector> // for std::vector
 
@@ -468,30 +467,6 @@ public:
    * Calling this on a non-AMR dataset will simply return 0.
    */
   unsigned int ComputeCompositeIndexForAMR(unsigned int level, unsigned int index) const;
-
-  ///@{
-  /**
-   * Deprecated in ParaView 5.10
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetNumberOfCells()` instead")
-  vtkTypeUInt64 GetPolygonCount();
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
-  void* GetCompositeDataInformation();
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
-  vtkPVDataInformation* GetDataInformationForCompositeIndex(int);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
-  unsigned int GetNumberOfBlockLeafs(bool skipEmpty);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
-  vtkPVDataInformation* GetDataInformationForCompositeIndex(int*);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetTimeRange()` instead")
-  double* GetTimeSpan();
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetTimeRange()` instead")
-  void GetTimeSpan(double&, double&);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetTimeRange()` instead")
-  void GetTimeSpan(double[2]);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
-  static void RegisterHelper(const char*, const char*);
-  ///@}
 
 protected:
   vtkPVDataInformation();

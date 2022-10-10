@@ -25,6 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
 #include "vtkPVSessionCore.h"
+#include "vtkPVVersion.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkReservedRemoteObjectIds.h"

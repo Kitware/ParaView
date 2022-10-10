@@ -13,9 +13,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "vtkInitializationHelper.h"
 
 #include "vtkCLIOptions.h"
@@ -26,7 +23,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkOutputWindow.h"
 #include "vtkPVInitializer.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
 #include "vtkPVStringFormatter.h"
@@ -156,12 +152,6 @@ bool vtkInitializationHelper::Initialize(const char* executable, int type)
   argv.push_back(vtksys::SystemTools::DuplicateString(executable));
   argv.push_back(nullptr);
   return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, &argv[0], type);
-}
-
-//----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPVOptions*)
-{
-  vtkInitializationHelper::Initialize(executable, type);
 }
 
 //----------------------------------------------------------------------------
@@ -360,12 +350,6 @@ bool vtkInitializationHelper::InitializeMiscellaneous(int type)
 
   vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
   return true;
-}
-
-//----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVOptions*)
-{
-  vtkInitializationHelper::Initialize(argc, argv, type);
 }
 
 //----------------------------------------------------------------------------
