@@ -24,7 +24,8 @@
 #include "pqNodeEditorAnnotationItem.h"
 #include "pqNodeEditorEdge.h"
 #include "pqNodeEditorLabel.h"
-#include "pqNodeEditorNode.h"
+#include "pqNodeEditorNSource.h"
+#include "pqNodeEditorNView.h"
 #include "pqNodeEditorPort.h"
 #include "pqNodeEditorScene.h"
 #include "pqNodeEditorUtils.h"
@@ -558,7 +559,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
     return 0;
   }
 
-  auto* node = new pqNodeEditorNode(this->scene, proxy);
+  auto* node = new pqNodeEditorNSource(this->scene, proxy);
   this->initializeNode(node, pqNodeEditorUtils::getID(proxy));
 
   // node label events
@@ -566,8 +567,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
   // left click : select node
   // left + ctrl : add to selection
   // middle click : delete node
-  auto* nodeLabel = node->getLabel();
-  nodeLabel->setMousePressEventCallback([node, proxy](QGraphicsSceneMouseEvent* event) {
+  node->getLabel()->setMousePressEventCallback([node, proxy](QGraphicsSceneMouseEvent* event) {
     if (event->button() == Qt::MouseButton::RightButton)
     {
       node->incrementVerbosity();
@@ -675,7 +675,7 @@ int pqNodeEditorWidget::createNodeForView(pqView* proxy)
     return 0;
   }
 
-  auto* node = new pqNodeEditorNode(this->scene, proxy);
+  auto* node = new pqNodeEditorNView(this->scene, proxy);
   this->initializeNode(node, pqNodeEditorUtils::getID(proxy));
 
   // update representation link

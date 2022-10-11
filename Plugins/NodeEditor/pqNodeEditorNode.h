@@ -26,13 +26,10 @@
 
 class pqNodeEditorLabel;
 class pqNodeEditorPort;
-class pqPipelineSource;
 class pqProxy;
 class pqProxyWidget;
-class pqView;
 class QGraphicsScene;
 class QGraphicsSceneMous;
-
 class QSettings;
 
 /**
@@ -110,18 +107,6 @@ public:
   };
 
   /**
-   * Creates a node for the given pqPipelineSource instance. This will also create the input/ouput
-   * ports on the left/right of the node.
-   */
-  pqNodeEditorNode(
-    QGraphicsScene* scene, pqPipelineSource* source, QGraphicsItem* parent = nullptr);
-
-  /**
-   *  Create a node and its input port representing the given @c view.
-   */
-  pqNodeEditorNode(QGraphicsScene* scene, pqView* view, QGraphicsItem* parent = nullptr);
-
-  /**
    * Remove the node from the scene it has been added to.
    */
   ~pqNodeEditorNode() override;
@@ -168,12 +153,10 @@ public:
    */
   void incrementVerbosity();
 
-  ///@{
   /**
    * Get the type of the node. It can be either SOURCE, VIEW or ANNOTATION.
    */
-  NodeType getNodeType() { return this->nodeType; };
-  ///@}
+  virtual NodeType getNodeType() const = 0;
 
   ///@{
   /**
@@ -213,7 +196,9 @@ Q_SIGNALS:
 protected:
   QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) final;
+
+  virtual void setupPaintTools(QPen& pen, QBrush& brush) = 0;
 
   /**
    *  Update the size of the node to fit its contents.
