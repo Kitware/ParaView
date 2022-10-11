@@ -40,6 +40,7 @@
 #include <pqProxySelection.h>
 #include <pqProxyWidget.h>
 #include <pqServerManagerModel.h>
+#include <pqSettings.h>
 #include <pqUndoStack.h>
 #include <pqView.h>
 
@@ -84,6 +85,13 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
   : QDockWidget(title, parent)
   , applyBehavior(new pqNodeEditorApplyBehavior(this))
 {
+  // Restore previous behavior for auto layout
+  // XXX: ideally we'd really want to have a more flexible architecture if we want to restore
+  // every behaviors : having a `.ui` file for the ui and instanciating a QDataWidgetMapper to
+  // synchronize the UI with an actual Qt model would be nice
+  auto* settings = pqApplicationCore::instance()->settings();
+  this->autoUpdateLayout = settings->value("NodeEditor.autoUpdateLayout", false).toBool();
+
   // create widget
   auto widget = new QWidget(this);
   widget->setObjectName("nodeEditorWidget");
@@ -116,6 +124,13 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
 pqNodeEditorWidget::pqNodeEditorWidget(QWidget* parent)
   : pqNodeEditorWidget(tr("Node Editor"), parent)
 {
+}
+
+// ----------------------------------------------------------------------------
+pqNodeEditorWidget::~pqNodeEditorWidget()
+{
+  auto* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("NodeEditor.autoUpdateLayout", this->autoUpdateLayout);
 }
 
 // ----------------------------------------------------------------------------

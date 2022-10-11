@@ -54,7 +54,7 @@ class pqNodeEditorWidget : public QDockWidget
 public:
   pqNodeEditorWidget(QWidget* parent = nullptr);
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
-  ~pqNodeEditorWidget() override = default;
+  ~pqNodeEditorWidget() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
