@@ -19,6 +19,7 @@
 #include "pqNodeEditorNode.h"
 
 class pqPipelineSource;
+class pqOutputPort;
 
 class pqNodeEditorNSource : public pqNodeEditorNode
 {
@@ -30,6 +31,10 @@ public:
   ~pqNodeEditorNSource() override = default;
 
   NodeType getNodeType() const final { return NodeType::SOURCE; }
+
+Q_SIGNALS:
+  void inputPortClicked(int port, bool clear);
+  void showOutputPort(pqOutputPort* port, bool exclusive);
 
 protected:
   void setupPaintTools(QPen& pen, QBrush& brush) override;

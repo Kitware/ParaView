@@ -15,14 +15,17 @@
 
 #include "pqNodeEditorNSource.h"
 
+#include "pqActiveObjects.h"
+#include "pqDeleteReaction.h"
+#include "pqNodeEditorLabel.h"
 #include "pqNodeEditorPort.h"
 #include "pqNodeEditorUtils.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqProxyWidget.h"
 
-#include <QPainter>
-#include <QPainterPath>
+#include <QBrush>
+#include <QGraphicsSceneMouseEvent>
 #include <QPen>
 
 // ----------------------------------------------------------------------------
@@ -55,7 +58,19 @@ pqNodeEditorNSource::pqNodeEditorNSource(
     }
   }
 
-  // create property widgets
+  // ... and output ports
+  int offsetFromTop = this->labelHeight;
+  for (int i = 0; i < source->getNumberOfOutputPorts(); i++)
+  {
+    auto oPort = new pqNodeEditorPort(
+      pqNodeEditorPort::Type::OUTPUT, proxyId, i, source->getOutputPort(i)->getPortName(), this);
+    oPort->setPos(br.right(), offsetFromTop + portRadius);
+    this->oPorts.push_back(oPort);
+    offsetFromTop +=
+      pqNodeEditorUtils::CONSTS::PORT_PADDING + pqNodeEditorUtils::CONSTS::PORT_HEIGHT;
+  }
+
+  // what to do once properties have changed
   QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [this]() {
     if (this->proxy->modifiedState() != pqProxy::UNINITIALIZED)
     {
@@ -69,6 +84,106 @@ pqNodeEditorNSource::pqNodeEditorNSource(
     this->setNodeState(dirty ? NodeState::DIRTY : NodeState::NORMAL);
     return 1;
   });
+
+  // handle label events
+  // right click : increment verbosity
+  // left click : select node
+  // left + ctrl : add to selection
+  // middle click : delete node
+  this->getLabel()->setMousePressEventCallback([this](QGraphicsSceneMouseEvent* event) {
+    if (event->button() == Qt::MouseButton::RightButton)
+    {
+      this->incrementVerbosity();
+    }
+    else if (event->button() == Qt::MouseButton::LeftButton)
+    {
+      auto* activeObjects = &pqActiveObjects::instance();
+      if (event->modifiers() == Qt::NoModifier)
+      {
+        activeObjects->setSelection({ this->proxy }, this->proxy);
+      }
+      else if (event->modifiers() == Qt::ControlModifier)
+      {
+        auto sel = activeObjects->selection();
+        pqServerManagerModelItem* newActive = proxy;
+        if (sel.count(proxy))
+        {
+          sel.removeAll(proxy);
+          newActive = sel.empty() ? nullptr : sel[0];
+        }
+        else
+        {
+          sel.push_back(proxy);
+        }
+        activeObjects->setSelection(sel, newActive);
+      }
+    }
+    else if (event->button() == Qt::MouseButton::MiddleButton)
+    {
+      pqDeleteReaction::deleteSources({ proxy });
+      // Important so no further events are processed on the destroyed widget
+      event->accept();
+    }
+  });
+
+  // input port label events, if any
+  // middle click : clear all incoming connections
+  // left click + ctrl : set all incoming selected ports as input
+  if (dynamic_cast<pqPipelineFilter*>(this->proxy))
+  {
+    int index = 0;
+    for (auto* inPort : this->iPorts)
+    {
+      inPort->getLabel()->setMousePressEventCallback(
+        [this, index](QGraphicsSceneMouseEvent* event) {
+          if (event->button() == Qt::MouseButton::MiddleButton)
+          {
+            Q_EMIT this->inputPortClicked(static_cast<int>(index), true);
+          }
+          else if (event->button() == Qt::MouseButton::LeftButton &&
+            (event->modifiers() & Qt::ControlModifier))
+          {
+            Q_EMIT this->inputPortClicked(static_cast<int>(index), false);
+          }
+        });
+
+      index++;
+    }
+  }
+
+  // output port label events
+  // left click: set output port as active selection
+  // left click + ctrl: add output port to active selection
+  // left click + shift: toggle visibility in active view
+  // left click + ctrl + shift: hide all but port in active view
+  int index = 0;
+  for (auto* outPort : this->oPorts)
+  {
+    outPort->getLabel()->setMousePressEventCallback(
+      [this, source, index](QGraphicsSceneMouseEvent* event) {
+        if (event->button() == Qt::MouseButton::LeftButton)
+        {
+          auto* activeObjects = &pqActiveObjects::instance();
+          auto* portProxy = source->getOutputPort(index);
+
+          if (event->modifiers() & Qt::ShiftModifier)
+          {
+            const bool hideAll = (event->modifiers() & Qt::ControlModifier);
+            Q_EMIT this->showOutputPort(portProxy, hideAll);
+          }
+          else if (event->modifiers() == Qt::NoModifier)
+          {
+            activeObjects->setActivePort(portProxy);
+          }
+          else if (event->modifiers() == Qt::ControlModifier)
+          {
+            pqProxySelection sel = activeObjects->selection();
+            sel.push_back(portProxy);
+            activeObjects->setSelection(sel, portProxy);
+          }
+        }
+      });
+  }
 }
 
 // ----------------------------------------------------------------------------

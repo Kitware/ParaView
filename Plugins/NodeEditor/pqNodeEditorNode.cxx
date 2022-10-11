@@ -29,22 +29,18 @@
 #include <pqOutputPort.h>
 #include <pqPipelineFilter.h>
 #include <pqPipelineSource.h>
-#include <pqProxiesWidget.h>
 #include <pqProxyWidget.h>
 #include <pqServerManagerModel.h>
 
-#include <vtkSMPropertyGroup.h>
-#include <vtkSMProxy.h>
-
-#include <QApplication>
+#include <QBrush>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
 #include <QLabel>
+#include <QPainter>
+#include <QPen>
 #include <QPushButton>
 #include <QSettings>
 #include <QSplitter>
-#include <QTransform>
 #include <QVBoxLayout>
 
 // The pqDoubleLineEdit.h file is only included to handle the issue that the

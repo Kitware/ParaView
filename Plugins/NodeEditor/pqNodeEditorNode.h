@@ -29,7 +29,6 @@ class pqNodeEditorPort;
 class pqProxy;
 class pqProxyWidget;
 class QGraphicsScene;
-class QGraphicsSceneMous;
 class QSettings;
 
 /**

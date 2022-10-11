@@ -562,107 +562,14 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
   auto* node = new pqNodeEditorNSource(this->scene, proxy);
   this->initializeNode(node, pqNodeEditorUtils::getID(proxy));
 
-  // node label events
-  // right click : increment verbosity
-  // left click : select node
-  // left + ctrl : add to selection
-  // middle click : delete node
-  node->getLabel()->setMousePressEventCallback([node, proxy](QGraphicsSceneMouseEvent* event) {
-    if (event->button() == Qt::MouseButton::RightButton)
-    {
-      node->incrementVerbosity();
-    }
-    else if (event->button() == Qt::MouseButton::LeftButton)
-    {
-      auto* activeObjects = &pqActiveObjects::instance();
-      if (event->modifiers() == 0)
-      {
-        activeObjects->setSelection({ proxy }, proxy);
-      }
-      else if (event->modifiers() == Qt::ControlModifier)
-      {
-        auto sel = activeObjects->selection();
-        pqServerManagerModelItem* newActive = proxy;
-        if (sel.count(proxy))
-        {
-          sel.removeAll(proxy);
-          newActive = sel.empty() ? nullptr : sel[0];
-        }
-        else
-        {
-          sel.push_back(proxy);
-        }
-        activeObjects->setSelection(sel, newActive);
-      }
-    }
-    else if (event->button() == Qt::MouseButton::MiddleButton)
-    {
-      pqDeleteReaction::deleteSources({ proxy });
-      // Important so no further events are processed on the destroyed widget
-      event->accept();
-    }
-  });
-
-  // input port label events
-  // middle click : clear all incoming connections
-  // left click + ctrl : set all incoming selected ports as input
-  if (auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
-  {
-    for (size_t idx = 0; idx < node->getInputPorts().size(); idx++)
-    {
-      auto* label = node->getInputPorts()[idx]->getLabel();
-      label->setMousePressEventCallback(
-        [this, proxyAsFilter, idx](QGraphicsSceneMouseEvent* event) {
-          if (event->button() == Qt::MouseButton::MiddleButton)
-          {
-            this->setInput(proxyAsFilter, static_cast<int>(idx), true);
-            pqApplicationCore::instance()->render();
-          }
-          else if (event->button() == Qt::MouseButton::LeftButton &&
-            (event->modifiers() & Qt::ControlModifier))
-          {
-            this->setInput(proxyAsFilter, static_cast<int>(idx), false);
-          }
-        });
-    }
-  }
-
-  // output port label events
-  // left click: set output port as active selection
-  // left click + ctrl: add output port to active selection
-  // left click + shift: toggle visibility in active view
-  // left click + ctrl + shift: hide all but port in active view
-  for (size_t idx = 0; idx < node->getOutputPorts().size(); idx++)
-  {
-    auto* label = node->getOutputPorts()[idx]->getLabel();
-
-    label->setMousePressEventCallback([this, proxy, idx](QGraphicsSceneMouseEvent* event) {
-      if (event->button() == Qt::MouseButton::LeftButton)
-      {
-        auto* activeObjects = &pqActiveObjects::instance();
-        auto* portProxy = proxy->getOutputPort(static_cast<int>(idx));
-
-        if (event->modifiers() & Qt::ShiftModifier)
-        {
-          if (event->modifiers() & Qt::ControlModifier)
-          {
-            this->hideAllInActiveView();
-          }
-          this->toggleInActiveView(proxy->getOutputPort(static_cast<int>(idx)));
-        }
-        else if (event->modifiers() == 0)
-        {
-          activeObjects->setActivePort(portProxy);
-        }
-        else if (event->modifiers() == Qt::ControlModifier)
-        {
-          pqProxySelection sel = activeObjects->selection();
-          sel.push_back(portProxy);
-          activeObjects->setSelection(sel, portProxy);
-        }
-      }
+  QObject::connect(
+    node, &pqNodeEditorNSource::inputPortClicked, [this, proxy](int port, bool clear) {
+      this->setInput(proxy, port, clear);
+      pqApplicationCore::instance()->render();
     });
-  }
+
+  QObject::connect(
+    node, &pqNodeEditorNSource::showOutputPort, this, &pqNodeEditorWidget::toggleInActiveView);
 
   return 1;
 };
@@ -682,21 +589,6 @@ int pqNodeEditorWidget::createNodeForView(pqView* proxy)
   QObject::connect(proxy, &pqView::representationVisibilityChanged, node,
     [=](
       pqRepresentation* /*rep*/, bool /*visible*/) { return this->updateVisibilityEdges(proxy); });
-
-  // node label events
-  // left click : select as active view
-  // right click : increment verbosity
-  auto* nodeLabel = node->getLabel();
-  nodeLabel->setMousePressEventCallback([node, proxy](QGraphicsSceneMouseEvent* event) {
-    if (event->button() == Qt::MouseButton::RightButton)
-    {
-      node->incrementVerbosity();
-    }
-    else if (event->button() == Qt::MouseButton::LeftButton)
-    {
-      pqActiveObjects::instance().setActiveView(proxy);
-    }
-  });
 
   return 1;
 };
@@ -819,8 +711,13 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
 };
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorWidget::toggleInActiveView(pqOutputPort* port)
+int pqNodeEditorWidget::toggleInActiveView(pqOutputPort* port, bool exclusive)
 {
+  if (exclusive)
+  {
+    this->hideAllInActiveView();
+  }
+
   auto aView = pqActiveObjects::instance().activeView();
   if (!aView)
   {

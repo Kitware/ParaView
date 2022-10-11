@@ -15,6 +15,8 @@
 
 #include "pqNodeEditorNView.h"
 
+#include "pqActiveObjects.h"
+#include "pqNodeEditorLabel.h"
 #include "pqNodeEditorPort.h"
 #include "pqNodeEditorUtils.h"
 #include "pqOutputPort.h"
@@ -22,8 +24,8 @@
 #include "pqProxyWidget.h"
 #include "pqView.h"
 
-#include <QPainter>
-#include <QPainterPath>
+#include <QBrush>
+#include <QGraphicsSceneMouseEvent>
 #include <QPen>
 
 // ----------------------------------------------------------------------------
@@ -48,6 +50,20 @@ pqNodeEditorNView::pqNodeEditorNView(QGraphicsScene* qscene, pqView* view, QGrap
     this->proxy->setModifiedState(pqProxy::MODIFIED);
     this->proxyProperties->apply();
     qobject_cast<pqView*>(this->proxy)->render();
+  });
+
+  // label events
+  // left click : select as active view
+  // right click : increment verbosity
+  this->getLabel()->setMousePressEventCallback([this, view](QGraphicsSceneMouseEvent* event) {
+    if (event->button() == Qt::MouseButton::RightButton)
+    {
+      this->incrementVerbosity();
+    }
+    else if (event->button() == Qt::MouseButton::LeftButton)
+    {
+      pqActiveObjects::instance().setActiveView(view);
+    }
   });
 }
 

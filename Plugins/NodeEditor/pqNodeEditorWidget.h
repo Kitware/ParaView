@@ -90,8 +90,9 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * Toggle the visibility of the given output port int the active view.
+   * if exclusive == true then only the given port will be shown.
    */
-  int toggleInActiveView(pqOutputPort* port);
+  int toggleInActiveView(pqOutputPort* port, bool exclusive = false);
 
   /**
    * Hide every actors in the active view
