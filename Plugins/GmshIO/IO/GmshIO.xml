@@ -149,7 +149,7 @@
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-        <WriterFactory extensions="msh" file_description="Gmsh File Format"/>
+        <WriterFactory extensions="msh msh2" file_description="Gmsh File Format"/>
       </Hints>
     </WriterProxy>
   </ProxyGroup>
@@ -226,7 +226,7 @@
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-        <WriterFactory extensions="msh" file_description="Gmsh File Format"/>
+        <WriterFactory extensions="msh msh2" file_description="Gmsh File Format"/>
         <UseDocumentationForLabels />
       </Hints>
     </PSWriterProxy>
