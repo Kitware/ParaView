@@ -12,6 +12,9 @@
 
 =========================================================================*/
 
+// Hide PARAVIEW_DEPRECATED_IN_5_12_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkPVOptions.h"
 
 #include "vtkLegacy.h"
