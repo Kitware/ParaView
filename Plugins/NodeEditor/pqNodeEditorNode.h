@@ -82,17 +82,11 @@ public:
     ADVANCED
   };
 
-  /**
-   * Enum for the outline style of the nodes in the node editor scene.
-   * NORMAL : node is not selected
-   * SELECTED_FILTER : node represent a filter and is selected
-   * SELECTED_VIEW : node represent a view and is selected
-   */
-  enum class OutlineStyle : int
+  enum class NodeType : int
   {
-    NORMAL = 0,
-    SELECTED_FILTER,
-    SELECTED_VIEW
+    SOURCE = 0,
+    VIEW,
+    ANNOTATION
   };
 
   /**
@@ -100,7 +94,7 @@ public:
    * NORMAL : node has not been modified since last Apply
    * DIRTY : node properties has been modified
    */
-  enum class BackgroundStyle : int
+  enum class NodeState : int
   {
     NORMAL = 0,
     DIRTY
@@ -176,21 +170,27 @@ public:
 
   ///@{
   /**
-   * Get/Set the type of the node. It can be either NORMAL (unselected), SELECTED_FILTER
-   * (for the active source) or SELECTED_VIEW (for the active view). Update the style accordingly.
+   * Get the type of the node. It can be either SOURCE, VIEW or ANNOTATION.
    */
-  void setOutlineStyle(OutlineStyle style);
-  OutlineStyle getOutlineStyle() { return this->outlineStyle; };
+  NodeType getNodeType() { return this->nodeType; };
   ///@}
 
   ///@{
   /**
-   * Get/Set the background style for this node, wether the filter is dirty or not.
+   * Get/Set wether or not the node is active / selected.
+   */
+  void setNodeActive(bool active);
+  bool isNodeActive() { return this->nodeActive; };
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the state for this node, wether the filter is dirty or not.
    * Update the style accordingly.
    * 0: BackgroundStyle::NORMAL, 1: BackgroundStyle::DIRTY
    */
-  void setBackgroundStyle(BackgroundStyle style);
-  BackgroundStyle getBackgroundStyle() { return this->backgroundStyle; };
+  void setNodeState(NodeState state);
+  NodeState getNodeState() { return this->nodeState; };
   ///@}
 
   /**
@@ -226,7 +226,6 @@ protected:
    */
   QString getNodeKey() const;
 
-private:
   /**
    * Internal constructor used by the public ones for initializing the node regardless
    * of what the proxy represents. Initialize things such as the dimensions, the label, etc.
@@ -242,8 +241,9 @@ private:
   std::vector<pqNodeEditorPort*> iPorts;
   std::vector<pqNodeEditorPort*> oPorts;
 
-  OutlineStyle outlineStyle{ OutlineStyle::NORMAL };
-  BackgroundStyle backgroundStyle{ BackgroundStyle::NORMAL };
+  bool nodeActive{ false };
+  NodeType nodeType{ NodeType::SOURCE };
+  NodeState nodeState{ NodeState::NORMAL };
   Verbosity verbosity{ Verbosity::EMPTY };
 
   // Height of the headline of the node.
@@ -251,6 +251,7 @@ private:
   int headlineHeight{ 0 };
   int labelHeight{ 0 };
 
+private:
   /**
    * Static property that controls the verbosity of nodes upon creation.
    */

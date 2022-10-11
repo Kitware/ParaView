@@ -173,6 +173,7 @@ pqNodeEditorNode::pqNodeEditorNode(
   QGraphicsScene* qscene, pqPipelineSource* source, QGraphicsItem* parent)
   : pqNodeEditorNode(qscene, (pqProxy*)source, parent)
 {
+  this->nodeType = NodeType::SOURCE;
   this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
 
   // create ports
@@ -221,7 +222,7 @@ pqNodeEditorNode::pqNodeEditorNode(
   QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this, [this]() {
     bool dirty = this->proxy->modifiedState() == pqProxy::ModifiedState::MODIFIED ||
       this->proxy->modifiedState() == pqProxy::ModifiedState::UNINITIALIZED;
-    this->setBackgroundStyle(dirty ? BackgroundStyle::DIRTY : BackgroundStyle::NORMAL);
+    this->setNodeState(dirty ? NodeState::DIRTY : NodeState::NORMAL);
     return 1;
   });
 }
@@ -230,6 +231,7 @@ pqNodeEditorNode::pqNodeEditorNode(
 pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqView* view, QGraphicsItem* parent)
   : pqNodeEditorNode(qscene, (pqProxy*)view, parent)
 {
+  this->nodeType = NodeType::VIEW;
   this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER);
 
   auto br = this->boundingRect();
@@ -268,18 +270,17 @@ int pqNodeEditorNode::updateSize()
 }
 
 // ----------------------------------------------------------------------------
-void pqNodeEditorNode::setOutlineStyle(OutlineStyle style)
+void pqNodeEditorNode::setNodeActive(bool active)
 {
-  this->outlineStyle = style;
-  this->setZValue(style == OutlineStyle::NORMAL ? pqNodeEditorUtils::CONSTS::NODE_LAYER
-                                                : pqNodeEditorUtils::CONSTS::NODE_LAYER + 1);
+  this->nodeActive = active;
+  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER + static_cast<int>(active));
   this->update(this->boundingRect());
 }
 
 // ----------------------------------------------------------------------------
-void pqNodeEditorNode::setBackgroundStyle(BackgroundStyle style)
+void pqNodeEditorNode::setNodeState(NodeState style)
 {
-  this->backgroundStyle = style;
+  this->nodeState = style;
   this->update(this->boundingRect());
 }
 
@@ -349,25 +350,23 @@ void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
 
   QPen pen;
   pen.setWidth(pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH);
-  switch (this->outlineStyle)
+  if (!this->nodeActive)
   {
-    case OutlineStyle::NORMAL:
-      pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_CONSTRAST);
-      break;
-    case OutlineStyle::SELECTED_FILTER:
-      pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_HIGHLIGHT);
-      break;
-    case OutlineStyle::SELECTED_VIEW:
-      pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_BASE_ORANGE);
-      break;
-    default:
-      break;
+    pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_CONSTRAST);
+  }
+  else if (this->nodeType == NodeType::SOURCE)
+  {
+    pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_HIGHLIGHT);
+  }
+  else
+  {
+    pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_BASE_ORANGE);
   }
 
   painter->setPen(pen);
   painter->fillPath(path,
-    this->backgroundStyle == BackgroundStyle::DIRTY ? pqNodeEditorUtils::CONSTS::COLOR_BASE_GREEN
-                                                    : pqNodeEditorUtils::CONSTS::COLOR_BASE);
+    this->nodeState == NodeState::DIRTY ? pqNodeEditorUtils::CONSTS::COLOR_BASE_GREEN
+                                        : pqNodeEditorUtils::CONSTS::COLOR_BASE);
   painter->drawPath(path);
 }
 

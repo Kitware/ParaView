@@ -202,7 +202,8 @@ void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
     painter->drawPath(this->path);
     painter->setPen(edgePipelinePen);
   }
-  else if (this->consumer->getOutlineStyle() == pqNodeEditorNode::OutlineStyle::SELECTED_VIEW)
+  else if (this->consumer->getNodeType() == pqNodeEditorNode::NodeType::VIEW &&
+    this->consumer->isNodeActive())
   {
     painter->setPen(activeViewPen);
   }

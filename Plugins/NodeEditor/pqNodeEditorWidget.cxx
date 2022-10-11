@@ -430,9 +430,9 @@ int pqNodeEditorWidget::updateActiveView()
 
   for (auto it : this->nodeRegistry)
   {
-    if (dynamic_cast<pqView*>(it.second->getProxy()))
+    if (it.second->getNodeType() == pqNodeEditorNode::NodeType::VIEW)
     {
-      it.second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::NORMAL);
+      it.second->setNodeActive(false);
       it.second->setVisible(this->showViewNodes);
     }
     else
@@ -453,7 +453,7 @@ int pqNodeEditorWidget::updateActiveView()
     return 1;
   }
 
-  nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_VIEW);
+  nodeIt->second->setNodeActive(true);
 
   // force redraw of edges
   for (auto edgesPerNodeIt : this->edgeRegistry)
@@ -475,15 +475,13 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
   // unselect all nodes
   for (auto it : this->nodeRegistry)
   {
-    if (!dynamic_cast<pqPipelineSource*>(it.second->getProxy()))
+    if (it.second->getNodeType() == pqNodeEditorNode::NodeType::SOURCE)
     {
-      continue;
-    }
-
-    it.second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::NORMAL);
-    for (auto oPort : it.second->getOutputPorts())
-    {
-      oPort->setMarkedAsSelected(false);
+      it.second->setNodeActive(false);
+      for (auto oPort : it.second->getOutputPorts())
+      {
+        oPort->setMarkedAsSelected(false);
+      }
     }
   }
 
@@ -500,7 +498,7 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
         continue;
       }
 
-      nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_FILTER);
+      nodeIt->second->setNodeActive(true);
 
       auto oPorts = nodeIt->second->getOutputPorts();
       if (!oPorts.empty())
@@ -516,7 +514,7 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
         continue;
       }
 
-      nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_FILTER);
+      nodeIt->second->setNodeActive(true);
       nodeIt->second->getOutputPorts()[port->getPortNumber()]->setMarkedAsSelected(true);
     }
   }
@@ -1116,7 +1114,7 @@ void pqNodeEditorWidget::annotateNodes(bool del)
     for (const auto& nodeR : this->nodeRegistry)
     {
       auto* node = nodeR.second;
-      if (node->getOutlineStyle() == pqNodeEditorNode::OutlineStyle::SELECTED_FILTER)
+      if (node->isNodeActive())
       {
         bbox = bbox.united(node->boundingRect().translated(node->pos()));
       }
