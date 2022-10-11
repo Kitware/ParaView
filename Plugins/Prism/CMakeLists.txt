@@ -42,3 +42,7 @@ paraview_add_plugin(Prism
   MODULE_FILES ${module_files}
   XML_DOCUMENTATION OFF
   )
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()
