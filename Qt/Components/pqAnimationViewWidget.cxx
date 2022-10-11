@@ -193,7 +193,7 @@ public:
 
       vtkSMProxy* pxy = cue->getAnimatedProxy();
       vtkSMProperty* pty = cue->getAnimatedProperty();
-      QString p = pty->GetXMLLabel();
+      QString p = QCoreApplication::translate("ServerManagerXML", pty->GetXMLLabel());
       if (pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
       {
         p = QString("%1 (%2)").arg(p).arg(cue->getAnimatedPropertyIndex());
@@ -211,12 +211,15 @@ public:
         vtkSMProperty* prop = pqproxy->getProxy()->GetProperty(helper_key.toUtf8().data());
         if (prop)
         {
-          return QString("%1 - %2 - %3").arg(pqproxy->getSMName()).arg(prop->GetXMLLabel()).arg(p);
+          return QString("%1 - %2 - %3")
+            .arg(pqproxy->getSMName())
+            .arg(QCoreApplication::translate("ServerManagerXML", prop->GetXMLLabel()))
+            .arg(p);
         }
         return QString("%1 - %2").arg(pqproxy->getSMName()).arg(p);
       }
     }
-    return QString("<unrecognized>");
+    return QString("<%1>").arg(tr("unrecognized"));
   }
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)

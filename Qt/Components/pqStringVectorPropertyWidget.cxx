@@ -83,6 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <QCoreApplication>
 #include <cassert>
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
@@ -167,7 +168,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqFileChooserWidget`.");
     pqFileChooserWidget* chooser = new pqFileChooserWidget(this);
     chooser->setObjectName("FileChooser");
-    chooser->setTitle(tr("Select %1").arg(smProperty->GetXMLLabel()));
+    chooser->setTitle(
+      tr("Select %1")
+        .arg(QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel())));
 
     // decide whether to allow multiple files
     if (smProperty->GetRepeatable())
@@ -239,7 +242,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
       auto selectorWidget = new pqArraySelectionWidget(this);
       selectorWidget->setObjectName("ArraySelectionWidget");
-      selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+      selectorWidget->setHeaderLabel(
+        QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel()));
       selectorWidget->setMaximumRowCountBeforeScrolling(
         pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
@@ -275,7 +279,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArraySelectionWidget`.");
     auto selectorWidget = new pqArraySelectionWidget(this);
     selectorWidget->setObjectName("ArraySelectionWidget");
-    selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+    selectorWidget->setHeaderLabel(
+      QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel()));
     selectorWidget->setMaximumRowCountBeforeScrolling(
       pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
@@ -315,7 +320,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     QHBoxLayout* hbox = new QHBoxLayout(this);
     hbox->setMargin(0);
     hbox->setSpacing(0);
-    QLabel* label = new QLabel(smProperty->GetXMLLabel(), w);
+    QLabel* label =
+      new QLabel(QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel()), w);
     hbox->addWidget(label);
     hbox->addStretch();
 
@@ -355,7 +361,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       vtkVLogF(
         PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Python not enabled, no syntax highlighter support.");
       pqPopOutWidget* popOut = new pqPopOutWidget(textEdit,
-        QString("%1 - %2").arg(smProperty->GetParent()->GetXMLLabel(), smProperty->GetXMLLabel()),
+        QString("%1 - %2").arg(
+          QCoreApplication::translate("ServerManagerXML", smProperty->GetParent()->GetXMLLabel()),
+          QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel())),
         this);
       QPushButton* popToDialogButton = new QPushButton(this);
       popOut->setPopOutButton(popToDialogButton);

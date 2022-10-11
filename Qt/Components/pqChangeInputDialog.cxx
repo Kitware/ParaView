@@ -157,7 +157,7 @@ void pqChangeInputDialog::buildPortWidgets()
     vtkSMProperty* smproperty = this->Internals->Proxy->GetProperty(input_prop_name);
     QRadioButton* rb = new QRadioButton(this->Internals->buttonFrame);
     rb->setObjectName(input_prop_name);
-    rb->setText(smproperty->GetXMLLabel());
+    rb->setText(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
     if (smproperty->GetDocumentation())
     {
       rb->setToolTip(QString(smproperty->GetDocumentation()->GetDescription()).trimmed());

@@ -70,7 +70,8 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
       ui.translateY, "text2", SIGNAL(textChangedAndEditingFinished()), position, 1);
     this->addPropertyLink(
       ui.translateZ, "text2", SIGNAL(textChangedAndEditingFinished()), position, 2);
-    ui.labelTranslate->setText(position->GetXMLLabel());
+    ui.labelTranslate->setText(
+      QCoreApplication::translate("ServerManagerXML", position->GetXMLLabel()));
     QString tooltip = this->getTooltip(position);
     ui.translateX->setToolTip(tooltip);
     ui.translateY->setToolTip(tooltip);
@@ -97,7 +98,8 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
       ui.rotateY, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 1);
     this->addPropertyLink(
       ui.rotateZ, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 2);
-    ui.labelRotate->setText(rotation->GetXMLLabel());
+    ui.labelRotate->setText(
+      QCoreApplication::translate("ServerManagerXML", rotation->GetXMLLabel()));
     QString tooltip = this->getTooltip(rotation);
     ui.rotateX->setToolTip(tooltip);
     ui.rotateY->setToolTip(tooltip);
@@ -121,7 +123,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     this->addPropertyLink(ui.scaleX, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 0);
     this->addPropertyLink(ui.scaleY, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 1);
     this->addPropertyLink(ui.scaleZ, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 2);
-    ui.labelScale->setText(scale->GetXMLLabel());
+    ui.labelScale->setText(QCoreApplication::translate("ServerManagerXML", scale->GetXMLLabel()));
     QString tooltip = this->getTooltip(scale);
     ui.scaleX->setToolTip(tooltip);
     ui.scaleY->setToolTip(tooltip);

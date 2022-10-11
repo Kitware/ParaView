@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 #include <QCheckBox>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QtDebug>
@@ -63,7 +64,8 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
       : nullptr)
   {
     this->Checkbox = new QCheckBox(this);
-    this->Checkbox->setText(tr(smproperty->GetXMLLabel()));
+    this->Checkbox->setText(
+      QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
     this->Checkbox->setEnabled(false);
     this->Checkbox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->PropertyName = hints->GetAttributeOrDefault("property", "");

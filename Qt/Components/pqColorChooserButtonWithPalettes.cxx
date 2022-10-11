@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QMenu>
 
+#include <QCoreApplication>
 #include <cassert>
 
 //-----------------------------------------------------------------------------
@@ -114,7 +115,8 @@ void pqColorChooserButtonWithPalettes::updateMenu()
       QColor qcolor;
       qcolor.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
 
-      QAction* action = popupMenu->addAction(this->renderColorSwatch(qcolor), dvp->GetXMLLabel());
+      QAction* action = popupMenu->addAction(this->renderColorSwatch(qcolor),
+        QCoreApplication::translate("ServerManagerXML", dvp->GetXMLLabel()));
       action << pqSetName(iter->GetKey());
       action->setData(QVariant(iter->GetKey()));
       action->setCheckable(true);

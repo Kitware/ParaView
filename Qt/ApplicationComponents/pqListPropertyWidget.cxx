@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProperty.h"
 
+#include <QCoreApplication>
 #include <QDoubleValidator>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -90,7 +91,7 @@ pqListPropertyWidget::pqListPropertyWidget(
   this->TableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
   QStringList headerLabels;
-  headerLabels << smproperty->GetXMLLabel();
+  headerLabels << QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel());
   this->TableWidget->setHorizontalHeaderLabels(headerLabels);
 
   QHBoxLayout* hbox = new QHBoxLayout(this);

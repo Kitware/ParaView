@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 // Qt Includes.
+#include <QCoreApplication>
 #include <QtDebug>
 
 // ParaView Includes.
@@ -193,7 +194,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(
     {
       int index = collapseVectors ? -1 : static_cast<int>(cc);
       QString label = labelPrefix.isEmpty() ? "" : labelPrefix + " - ";
-      label += iter->GetProperty()->GetXMLLabel();
+      label += QCoreApplication::translate("ServerManagerXML", iter->GetProperty()->GetXMLLabel());
       label = (num_elems > 1) ? label + " (" + QString::number(cc) + ")" : label;
 
       this->addSMPropertyInternal(label, proxy, iter->GetKey(), index);
@@ -211,7 +212,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(
       if (child_proxy)
       {
         QString newPrefix = labelPrefix.isEmpty() ? "" : labelPrefix + ":";
-        newPrefix += smproperty->GetXMLLabel();
+        newPrefix += QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel());
         this->buildPropertyListInternal(child_proxy, newPrefix);
 
         // if this property's value changes, we'll have to rebuild

@@ -85,9 +85,9 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
     this->addPropertyLink(ui.originX, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 0);
     this->addPropertyLink(ui.originY, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 1);
     this->addPropertyLink(ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 2);
-    ui.labelOrigin->setText(origin->GetXMLLabel());
-    ui.pickLabel->setText(
-      ui.pickLabel->text().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
+    ui.labelOrigin->setText(QCoreApplication::translate("ServerManagerXML", origin->GetXMLLabel()));
+    ui.pickLabel->setText(ui.pickLabel->text().arg(
+      QCoreApplication::translate("ServerManagerXML", origin->GetXMLLabel())));
     QString tooltip = this->getTooltip(origin);
     ui.originX->setToolTip(tooltip);
     ui.originY->setToolTip(tooltip);
@@ -97,6 +97,7 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
   else
   {
     qCritical("Missing required property for function 'Origin'.");
+    ui.pickLabel->setText(ui.pickLabel->text().arg(tr("Origin")));
   }
 
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
@@ -104,7 +105,7 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
     this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
     this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
     this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
-    ui.labelNormal->setText(normal->GetXMLLabel());
+    ui.labelNormal->setText(QCoreApplication::translate("ServerManagerXML", normal->GetXMLLabel()));
     QString tooltip = this->getTooltip(normal);
     ui.normalX->setToolTip(tooltip);
     ui.normalY->setToolTip(tooltip);

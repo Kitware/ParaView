@@ -34,6 +34,7 @@
 #include "pqProxyWidget.h"
 
 #include <QCheckBox>
+#include <QCoreApplication>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
@@ -86,7 +87,8 @@ pqEqualizerPropertyWidget::pqEqualizerPropertyWidget(
 
   if (samplingFreqProp)
   {
-    auto* samplingFreqLabel = new QLabel(samplingFreqProp->GetXMLLabel(), this);
+    auto* samplingFreqLabel = new QLabel(
+      QCoreApplication::translate("ServerManagerXML", samplingFreqProp->GetXMLLabel()), this);
     auto* samplingFreqWidget =
       pqProxyWidget::createWidgetForProperty(samplingFreqProp, proxy, this);
     QObject::connect(samplingFreqWidget, &pqPropertyWidget::changeAvailable, this,

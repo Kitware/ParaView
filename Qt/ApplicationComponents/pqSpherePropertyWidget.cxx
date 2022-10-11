@@ -51,9 +51,9 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
     this->addPropertyLink(ui.centerX, "text2", SIGNAL(textChangedAndEditingFinished()), center, 0);
     this->addPropertyLink(ui.centerY, "text2", SIGNAL(textChangedAndEditingFinished()), center, 1);
     this->addPropertyLink(ui.centerZ, "text2", SIGNAL(textChangedAndEditingFinished()), center, 2);
-    ui.centerLabel->setText(center->GetXMLLabel());
-    ui.pickLabel->setText(
-      ui.pickLabel->text().replace("'Center'", QString("'%1'").arg(center->GetXMLLabel())));
+    ui.centerLabel->setText(QCoreApplication::translate("ServerManagerXML", center->GetXMLLabel()));
+    ui.pickLabel->setText(ui.pickLabel->text().arg(
+      QCoreApplication::translate("ServerManagerXML", center->GetXMLLabel())));
     QString tooltip = this->getTooltip(center);
     ui.centerX->setToolTip(tooltip);
     ui.centerY->setToolTip(tooltip);
@@ -63,6 +63,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
   else
   {
     qCritical("Missing required property for function 'Center'.");
+    ui.pickLabel->setText(ui.pickLabel->text().arg(tr("Center")));
   }
 
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
@@ -70,7 +71,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
     this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
     this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
     this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
-    ui.normalLabel->setText(normal->GetXMLLabel());
+    ui.normalLabel->setText(QCoreApplication::translate("ServerManagerXML", normal->GetXMLLabel()));
     QString tooltip = this->getTooltip(normal);
     ui.normalX->setToolTip(tooltip);
     ui.normalY->setToolTip(tooltip);
@@ -88,7 +89,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
   if (vtkSMProperty* radius = smgroup->GetProperty("Radius"))
   {
     this->addPropertyLink(ui.radius, "text2", SIGNAL(textChangedAndEditingFinished()), radius);
-    ui.radiusLabel->setText(radius->GetXMLLabel());
+    ui.radiusLabel->setText(QCoreApplication::translate("ServerManagerXML", radius->GetXMLLabel()));
     QString tooltip = this->getTooltip(radius);
     ui.radius->setToolTip(tooltip);
     ui.radiusLabel->setToolTip(tooltip);

@@ -56,13 +56,15 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
       ui.worldPositionY, "text2", SIGNAL(textChangedAndEditingFinished()), worldPosition, 1);
     this->addPropertyLink(
       ui.worldPositionZ, "text2", SIGNAL(textChangedAndEditingFinished()), worldPosition, 2);
-    ui.pointLabel->setText(worldPosition->GetXMLLabel());
-    ui.pickLabel->setText(
-      ui.pickLabel->text().replace("'Point'", QString("'%1'").arg(worldPosition->GetXMLLabel())));
+    ui.pointLabel->setText(
+      QCoreApplication::translate("ServerManagerXML", worldPosition->GetXMLLabel()));
+    ui.pickLabel->setText(ui.pickLabel->text().arg(
+      QCoreApplication::translate("ServerManagerXML", worldPosition->GetXMLLabel())));
   }
   else
   {
     qCritical("Missing required property for function 'WorldPosition'");
+    ui.pickLabel->setText(ui.pickLabel->text().arg(tr("Point")));
   }
 
   if (smgroup->GetProperty("Input"))

@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include <pqSMAdaptor.h>
 
+#include <QCoreApplication>
 #include <cassert>
 
 namespace
@@ -264,15 +265,16 @@ void pqComboBoxDomain::internalDomainChanged()
     QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(this->Internal->Property);
     Q_FOREACH (vtkSMProxy* pxy, proxies)
     {
-      texts.append(pxy->GetXMLLabel());
-      data.append(pxy->GetXMLLabel());
+      texts.append(QCoreApplication::translate("ServerManagerXML", pxy->GetXMLLabel()));
+      data.append(QCoreApplication::translate("ServerManagerXML", pxy->GetXMLLabel()));
       infos.append(QString());
       icons.append(QIcon());
     }
     pqSMProxy cur_value = pqSMAdaptor::getProxyProperty(this->Internal->Property);
     if (cur_value)
     {
-      cur_property_value = cur_value->GetXMLLabel();
+      cur_property_value =
+        QCoreApplication::translate("ServerManagerXML", cur_value->GetXMLLabel());
     }
   }
 
@@ -350,7 +352,8 @@ void pqComboBoxDomain::internalDomainChanged()
           pqSMProxy cur_value = pqSMAdaptor::getProxyProperty(this->Internal->Property);
           if (cur_value)
           {
-            cur_property_value = cur_value->GetXMLLabel();
+            cur_property_value =
+              QCoreApplication::translate("ServerManagerXML", cur_value->GetXMLLabel());
           }
         }
         break;

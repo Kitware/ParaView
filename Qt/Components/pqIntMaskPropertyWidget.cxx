@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 
 #include <QAction>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QPushButton>
@@ -71,7 +72,8 @@ pqIntMaskPropertyWidget::pqIntMaskPropertyWidget(
   , Internals(new pqInternals(this))
 {
   this->setShowLabel(false);
-  this->Internals->Button->setText(smproperty->GetXMLLabel());
+  this->Internals->Button->setText(
+    QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
 
   vtkPVXMLElement* hints =
     smproperty->GetHints() ? smproperty->GetHints()->FindNestedElementByName("Mask") : nullptr;

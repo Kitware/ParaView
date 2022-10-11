@@ -104,11 +104,14 @@ QString getName(vtkSMProxy* proxy)
     vtkSMProperty* prop = pq_proxy->getProxy()->GetProperty(helper_key.toUtf8().data());
     if (prop)
     {
-      return QString("%1 - %2").arg(pq_proxy->getSMName()).arg(prop->GetXMLLabel());
+      return QString("%1 - %2")
+        .arg(pq_proxy->getSMName())
+        .arg(QApplication::translate("pqComparativeVisPanelNS", prop->GetXMLLabel()));
     }
     return pq_proxy->getSMName();
   }
-  return "<unrecognized-proxy>";
+  return QString("<%1>").arg(
+    QApplication::translate("pqComparativeVisPanelNS", "unrecognized-proxy"));
 }
 
 QString getName(vtkSMProxy* proxy, const char* pname, int index)
@@ -116,7 +119,8 @@ QString getName(vtkSMProxy* proxy, const char* pname, int index)
   vtkSMVectorProperty* smproperty = vtkSMVectorProperty::SafeDownCast(proxy->GetProperty(pname));
   if (!smproperty)
   {
-    return "<unrecognized-property>";
+    return QString("<%1>").arg(
+      QApplication::translate("pqComparativeVisPanelNS", "unrecognized-property"));
   }
 
   unsigned int num_elems = smproperty->GetNumberOfElements();
@@ -127,9 +131,11 @@ QString getName(vtkSMProxy* proxy, const char* pname, int index)
 
   if (num_elems == 1 || index == -1)
   {
-    return smproperty->GetXMLLabel();
+    return QApplication::translate("pqComparativeVisPanelNS", smproperty->GetXMLLabel());
   }
-  return QString("%1 (%2)").arg(smproperty->GetXMLLabel()).arg(index);
+  return QString("%1 (%2)")
+    .arg(QApplication::translate("pqComparativeVisPanelNS", smproperty->GetXMLLabel()))
+    .arg(index);
 }
 
 QTableWidgetItem* newItem(vtkSMProxy* proxy, const char* pname, int index)

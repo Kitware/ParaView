@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QVBoxLayout>
 
+#include <QCoreApplication>
 #include <array>
 #include <cassert>
 #include <string>
@@ -72,7 +73,8 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
   {
     if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", str.c_str()))
     {
-      cbbox->addItem(prototype->GetXMLLabel(), str.c_str());
+      cbbox->addItem(
+        QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()), str.c_str());
     }
     else
     {
@@ -91,7 +93,8 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
     if (std::find(mainPalettes.cbegin(), mainPalettes.cend(), iter->GetProxyName()) ==
       mainPalettes.cend())
     {
-      cbbox->addItem(prototype->GetXMLLabel(), prototype->GetXMLName());
+      cbbox->addItem(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()),
+        prototype->GetXMLName());
     }
   }
 

@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include <vtksys/SystemTools.hxx>
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QList>
@@ -117,7 +118,8 @@ pqReaderSelectionPropertyWidget::pqReaderSelectionPropertyWidget(
 {
   auto selectorWidget = new pqArraySelectionWidget(this);
   selectorWidget->setObjectName("ReaderSelectionWidget");
-  selectorWidget->setHeaderLabel(smproperty->GetXMLLabel());
+  selectorWidget->setHeaderLabel(
+    QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
   selectorWidget->setMaximumRowCountBeforeScrolling(
     pqPropertyWidget::hintsWidgetHeightNumberOfRows(smproperty->GetHints()));
 

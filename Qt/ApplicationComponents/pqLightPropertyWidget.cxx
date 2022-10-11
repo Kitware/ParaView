@@ -137,7 +137,8 @@ pqLightPropertyWidget::pqLightPropertyWidget(
   {
     if (lightColor->GetNumberOfElements() == 3)
     {
-      ui.colorButton->setText(lightColor->GetXMLLabel());
+      ui.colorButton->setText(
+        QCoreApplication::translate("ServerManagerXML", lightColor->GetXMLLabel()));
       ui.colorButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
       ui.colorButton->setShowAlphaChannel(false);
       this->addPropertyLink(

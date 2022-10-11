@@ -510,7 +510,7 @@ void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex& current,
             name = iter->GetKey();
           }
           this->Form->LabelToNamePropertyMap[source->getSMName()][name] = iter->GetKey();
-          this->Form->InputCombo->addItem(name);
+          this->Form->InputCombo->addItem(tr(name));
         }
       }
 
@@ -576,7 +576,7 @@ void pqCustomFilterDefinitionWizard::updatePropertyForm(
             name = iter->GetKey();
           }
           this->Form->LabelToNamePropertyMap[source->getSMName()][name] = iter->GetKey();
-          this->Form->PropertyCombo->addItem(name);
+          this->Form->PropertyCombo->addItem(tr(name));
         }
       }
 

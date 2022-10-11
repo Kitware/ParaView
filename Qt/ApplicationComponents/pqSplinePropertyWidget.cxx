@@ -272,7 +272,7 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
   if (vtkSMProperty* closed = smgroup->GetProperty("Closed"))
   {
     this->addPropertyLink(ui.Closed, "checked", SIGNAL(toggled(bool)), closed);
-    ui.Closed->setText(closed->GetXMLLabel());
+    ui.Closed->setText(QCoreApplication::translate("ServerManagerXML", closed->GetXMLLabel()));
   }
   else
   {

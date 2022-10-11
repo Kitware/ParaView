@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QtDebug>
@@ -49,7 +50,8 @@ pqCommandPropertyWidget::pqCommandPropertyWidget(
     return;
   }
 
-  QPushButton* button = new QPushButton(smproperty->GetXMLLabel(), this);
+  QPushButton* button = new QPushButton(
+    QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()), this);
   button->setObjectName("PushButton");
   QObject::connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
 

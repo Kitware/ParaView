@@ -79,6 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShowEvent>
 #include <QVBoxLayout>
 
+#include <QCoreApplication>
 #include <cassert>
 #include <cmath>
 #include <list>
@@ -145,7 +146,7 @@ void add_decorators(pqPropertyWidget* widget, vtkPVXMLElement* hints)
 std::string get_group_label(vtkSMPropertyGroup* smgroup)
 {
   assert(smgroup != nullptr);
-  auto label = smgroup->GetXMLLabel();
+  char* label = smgroup->GetXMLLabel();
   if (label && label[0] != '\0')
   {
     return std::string(label);
@@ -778,8 +779,7 @@ QString pqProxyWidget::documentationText(vtkSMProperty* smProperty, Documentatio
     smProperty ? vtkGetDocumentation(smProperty->GetDocumentation(), dtype) : nullptr;
   if (!xmlDocumentation || xmlDocumentation[0] == 0)
   {
-    const char* xmlLabel = smProperty->GetXMLLabel();
-    return xmlLabel;
+    return QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel());
   }
   else
   {
@@ -1092,14 +1092,16 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
             }
             gwidget->setObjectName(wdgName);
 
-            auto item = pqProxyWidgetItem::newGroupItem(
-              gwidget, QString(smgroup->GetXMLLabel()), this->ShowHeadersFooters, this);
+            auto item = pqProxyWidgetItem::newGroupItem(gwidget,
+              QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()),
+              this->ShowHeadersFooters, this);
             item->Advanced = (smgroup->GetPanelVisibility() &&
               strcmp(smgroup->GetPanelVisibility(), "advanced") == 0);
             item->SearchTags << smgroup->GetPanelWidget();
             if (smgroup->GetXMLLabel())
             {
-              item->SearchTags << smgroup->GetXMLLabel();
+              item->SearchTags << QCoreApplication::translate(
+                "ServerManagerXML", smgroup->GetXMLLabel());
             }
             // FIXME: Maybe SearchTags should have the labels for all the properties
             // in this group.
@@ -1143,13 +1145,16 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     pwidget->setObjectName(QString(smkey.c_str()).remove(' '));
 
     const QString itemLabel = this->UseDocumentationForLabels
-      ? QString("<p><b>%1</b>: %2</p>").arg(xmllabel).arg(xmlDocumentation)
-      : QString(xmllabel);
+      ? QString("<p><b>%1</b>: %2</p>")
+          .arg(QCoreApplication::translate("ServerManagerXML", xmllabel))
+          .arg(xmlDocumentation)
+      : QCoreApplication::translate("ServerManagerXML", xmllabel);
 
     auto item = (smgroup == nullptr)
       ? pqProxyWidgetItem::newItem(pwidget, QString(itemLabel), this)
       : pqProxyWidgetItem::newMultiItemGroupItem(
-          smgroup->GetXMLLabel(), pwidget, QString(itemLabel), this->ShowHeadersFooters, this);
+          QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()), pwidget,
+          QString(itemLabel), this->ShowHeadersFooters, this);
 
     // save record of the property widget and containing widget
     item->SearchTags << xmllabel << xmlDocumentation << smkey.c_str();
@@ -1170,7 +1175,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       if (smgroup->GetXMLLabel())
       {
         // see #18498
-        item->SearchTags << smgroup->GetXMLLabel();
+        item->SearchTags << QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel());
       }
     }
 

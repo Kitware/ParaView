@@ -136,9 +136,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
       this->addPropertyLink(
         ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), originInfo, 2);
     }
-    ui.labelOrigin->setText(origin->GetXMLLabel());
-    ui.actionButton->setToolTip(
-      ui.actionButton->toolTip().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
+    ui.labelOrigin->setText(QCoreApplication::translate("ServerManagerXML", origin->GetXMLLabel()));
     QString tooltip = this->getTooltip(origin);
     ui.originX->setToolTip(tooltip);
     ui.originY->setToolTip(tooltip);
@@ -164,7 +162,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
       this->addPropertyLink(ui.xAxisY, "text2", SIGNAL(blank()), xAxisInfo, 1);
       this->addPropertyLink(ui.xAxisZ, "text2", SIGNAL(blank()), xAxisInfo, 2);
     }
-    ui.labelXAxis->setText(xAxis->GetXMLLabel());
+    ui.labelXAxis->setText(QCoreApplication::translate("ServerManagerXML", xAxis->GetXMLLabel()));
     QString tooltip = this->getTooltip(xAxis);
     ui.xAxisX->setToolTip(tooltip);
     ui.xAxisY->setToolTip(tooltip);
@@ -190,7 +188,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
       this->addPropertyLink(ui.yAxisY, "text2", SIGNAL(blank()), yAxisInfo, 1);
       this->addPropertyLink(ui.yAxisZ, "text2", SIGNAL(blank()), yAxisInfo, 2);
     }
-    ui.labelYAxis->setText(yAxis->GetXMLLabel());
+    ui.labelYAxis->setText(QCoreApplication::translate("ServerManagerXML", yAxis->GetXMLLabel()));
     QString tooltip = this->getTooltip(yAxis);
     ui.yAxisX->setToolTip(tooltip);
     ui.yAxisY->setToolTip(tooltip);
@@ -216,7 +214,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
       this->addPropertyLink(ui.zAxisY, "text2", SIGNAL(blank()), zAxisInfo, 1);
       this->addPropertyLink(ui.zAxisZ, "text2", SIGNAL(blank()), zAxisInfo, 2);
     }
-    ui.labelZAxis->setText(zAxis->GetXMLLabel());
+    ui.labelZAxis->setText(QCoreApplication::translate("ServerManagerXML", zAxis->GetXMLLabel()));
     QString tooltip = this->getTooltip(zAxis);
     ui.zAxisX->setToolTip(tooltip);
     ui.zAxisY->setToolTip(tooltip);
