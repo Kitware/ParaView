@@ -676,7 +676,7 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
     vtkSmartPointer<vtkDataObjectTree> cdsCopy;
     cdsCopy.TakeReference(outputDT->NewInstance());
-    cdsCopy->ShallowCopy(cds);
+    cdsCopy->CompositeShallowCopy(cds);
 
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cdsCopy->NewIterator());

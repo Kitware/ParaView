@@ -192,12 +192,12 @@ int vtkAMRFragmentsFilter::RequestData(vtkInformation* vtkNotUsed(request),
     if (UseWatertightSurface)
     {
       this->Contour->Update();
-      mbdsOutput1->ShallowCopy(this->Contour->GetOutput());
+      mbdsOutput1->CompositeShallowCopy(this->Contour->GetOutput());
     }
     else
     {
       this->Extract->Update();
-      mbdsOutput1->ShallowCopy(this->Extract->GetOutput());
+      mbdsOutput1->CompositeShallowCopy(this->Extract->GetOutput());
     }
   }
   else
@@ -208,7 +208,7 @@ int vtkAMRFragmentsFilter::RequestData(vtkInformation* vtkNotUsed(request),
   if (this->IntegrateFragments)
   {
     this->Integration->Update();
-    mbdsOutput0->ShallowCopy(this->Integration->GetOutput());
+    mbdsOutput0->CompositeShallowCopy(this->Integration->GetOutput());
   }
 
   return 1;

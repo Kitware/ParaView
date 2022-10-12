@@ -1136,7 +1136,7 @@ int vtkAMRDualClip::RequestData(vtkInformation* vtkNotUsed(request),
 
   if (out)
   {
-    mbdsOutput0->ShallowCopy(out);
+    mbdsOutput0->CompositeShallowCopy(out);
     out->Delete();
   }
   else

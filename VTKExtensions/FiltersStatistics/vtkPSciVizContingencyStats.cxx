@@ -39,7 +39,8 @@ int vtkPSciVizContingencyStats::LearnAndDerive(vtkMultiBlockDataSet* modelDO, vt
   stats->Update();
 
   // Copy the output of the statistics filter to our output
-  modelDO->ShallowCopy(stats->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
+  modelDO->CompositeShallowCopy(vtkMultiBlockDataSet::SafeDownCast(
+    stats->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL)));
   stats->Delete();
 
   return 1;
