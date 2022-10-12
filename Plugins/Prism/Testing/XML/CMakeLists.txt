@@ -1,10 +1,13 @@
 if (BUILD_SHARED_LIBS)
   ExternalData_Expand_Arguments("ParaViewData" _
-    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/proxium.asc}")
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/proxium.asc}"
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/proxium.ses.mat.1.301}"
+    )
 
   set(paraview_prism_baseline_dir "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline")
 
   set(prism_test_scripts
+    LANLLoadSESAME.xml
     SandiaLoadSESAME.xml
     )
 
