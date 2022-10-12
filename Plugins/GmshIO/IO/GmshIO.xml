@@ -173,6 +173,10 @@
         <LinkProperties>
           <Property name="Input" with_property="Input" />
         </LinkProperties>
+        <ExposedProperties>
+          <Property name="WriteGmshSpecificArray" />
+          <Property name="WriteAllTimeSteps"/>
+        </ExposedProperties>
       </SubProxy>
 
       <InputProperty name="Input"
@@ -186,28 +190,6 @@
         </DataTypeDomain>
       </InputProperty>
 
-      <IntVectorProperty
-        name="WriteGmshSpecificArray"
-        command="SetWriteGmshSpecificArray"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Specify if we write data arrays starting by "gmsh" (usually created by the Gmsh reader).
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="WriteAllTimeSteps"
-        command="SetWriteAllTimeSteps"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Specify if all timesteps have to be saved for temporal data.
-        </Documentation>
-      </IntVectorProperty>
-
       <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -220,7 +202,7 @@
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
-               proxyname="AppendPolyData" />
+               proxyname="Append" />
       </SubProxy>
 
       <Hints>
