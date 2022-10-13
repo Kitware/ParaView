@@ -59,6 +59,13 @@
         relative (a percentage of the bounding box) tolerance when performing
         point merging.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetRemovePointsWithoutCells"
+                         default_values="0"
+                         name="RemovePointsWithoutCells"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End CleanUnstructuredGrid -->
     </SourceProxy>
 
