@@ -83,12 +83,6 @@ foreach (_paraview_python_module IN LISTS paraview_python_wrapped_modules)
     "    \'${_paraview_python_library_name}\',\n")
 endforeach ()
 
-# used in paraview/modules/__init__.py when wrapping with BUILD_STATIC=ON
-set(_paraview_modules_static_import "_load_paraview_modules_static()")
-if (BUILD_SHARED_LIBS)
-  string(PREPEND _paraview_modules_static_import "#")
-endif ()
-
 set(python_copied_modules)
 foreach (python_file IN LISTS python_files)
   set(output_python_file
