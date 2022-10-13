@@ -34,6 +34,9 @@ class QAction;
  */
 class pqNodeEditorView : public QGraphicsView
 {
+  Q_OBJECT
+  typedef QGraphicsView Superclass;
+
 public:
   /**
    * Create a view for the specified scene. Also construct a new pqDeleteReaction
@@ -44,6 +47,12 @@ public:
   void triggerDeleteAction() const;
 
   ~pqNodeEditorView() override = default;
+
+Q_SIGNALS:
+  /**
+   * Triggered when user ask for creating / deleting annotation nodes. Current key is 'N'.
+   */
+  void annotate(bool del);
 
 protected:
   void wheelEvent(QWheelEvent* event) override;

@@ -26,6 +26,7 @@
 #include <QColor>
 #include <QObject>
 #include <QPalette>
+#include <QSettings>
 
 #include "vtkType.h"
 
@@ -57,8 +58,8 @@ const QColor COLOR_BASE = QApplication::palette().window().color();
 const QColor COLOR_GRID = QApplication::palette().mid().color();
 const QColor COLOR_HIGHLIGHT = QApplication::palette().highlight().color();
 const QColor COLOR_BASE_DEEP = COLOR_BASE.lighter(COLOR_BASE.lightness() * 0.7 + 10);
-const QColor COLOR_CONSTRAST = QColor::fromHslF(
-  COLOR_BASE.hueF(), COLOR_BASE.saturationF(), 0.5 + 0.2 * (COLOR_BASE.lightnessF() - 0.5));
+const QColor COLOR_CONSTRAST = QColor::fromHslF(COLOR_BASE.hueF(), COLOR_BASE.saturationF(),
+  COLOR_BASE.lightnessF() > 0.5 ? COLOR_BASE.lightnessF() - 0.5 : COLOR_BASE.lightnessF() + 0.5);
 const QColor COLOR_BASE_GREEN = QColor::fromHslF(0.361, 0.666, COLOR_BASE.lightnessF() * 0.4 + 0.2);
 const QColor COLOR_BASE_ORANGE = QColor::fromHslF(0.07, 0.666, COLOR_HIGHLIGHT.lightnessF());
 const QColor COLOR_DULL_ORANGE = QColor::fromHslF(
@@ -72,6 +73,48 @@ constexpr int FOREGROUND_LAYER = 40;
 constexpr int VIEW_NODE_LAYER = 50;
 };
 
+// ----------------------------------------------------------------------------
+/**
+ * Simple implementation of something like `std::optional`
+ * XXX(c++17): remove this in favor of std::optional
+ */
+template <typename T>
+struct Optional
+{
+  Optional()
+    : Value{}
+    , Valid{ false }
+  {
+  }
+  Optional(T arg)
+    : Value{ arg }
+    , Valid{ true }
+  {
+  }
+
+  operator bool() const { return Valid; }
+
+  const T Value;
+  const bool Valid;
+};
+
+// ----------------------------------------------------------------------------
+template <typename T>
+Optional<T> safeGetValue(const QSettings& settings, const QString& key)
+{
+  if (settings.contains(key))
+  {
+    QVariant value = settings.value(key);
+    if (value.isValid() && value.canConvert<T>())
+    {
+      return Optional<T>{ value.value<T>() };
+    }
+  }
+
+  return Optional<T>();
+}
+
+// ----------------------------------------------------------------------------
 template <typename F>
 /**
  * Intercept all events from a particular QObject and process them using the
@@ -100,6 +143,7 @@ protected:
   F functor;
 };
 
+// ----------------------------------------------------------------------------
 /**
  * Create a new Interceptor instance.
  */
@@ -109,8 +153,10 @@ Interceptor<F>* createInterceptor(QObject* parent, F functor)
   return new Interceptor<F>(parent, functor);
 };
 
+// ----------------------------------------------------------------------------
 vtkIdType getID(pqProxy* proxy);
 
+// ----------------------------------------------------------------------------
 std::string getLabel(pqProxy* proxy);
 };
 
