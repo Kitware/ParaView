@@ -776,6 +776,7 @@ if (PARAVIEW_USE_PYTHON)
       CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
       LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
       USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
+      HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/vtkpythonmodules"
       WRAPPED_MODULES vtk_python_wrapped_modules
       TARGET          VTK::vtkpythonmodules)
 
@@ -814,6 +815,7 @@ if (PARAVIEW_USE_PYTHON)
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
     LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
+    HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/pvpythonmodules"
     WRAPPED_MODULES paraview_python_wrapped_modules
     TARGET          ParaView::pvpythonmodules
     DEPENDS         VTK::vtkpythonmodules)
