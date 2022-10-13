@@ -81,7 +81,6 @@ set(private_headers
   vtkProcessModuleInternals.h)
 
 set(headers
-  vtkParaViewDeprecation.h
   vtkReservedRemoteObjectIds.h)
 if (APPLE)
   list(APPEND sources
@@ -145,13 +144,6 @@ if (PARAVIEW_PLUGIN_LOADER_PATHS)
     PROPERTIES
       COMPILE_DEFINITIONS PARAVIEW_PLUGIN_LOADER_PATHS=\"${PARAVIEW_PLUGIN_LOADER_PATHS}\")
 endif ()
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVVersion.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVersion.h"
-  @ONLY)
-list(APPEND headers
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVersion.h")
 
 if (NOT PARAVIEW_BUILD_LEGACY_REMOVE)
   # Based on state of VTK modules, set up some variables that paraview needs to

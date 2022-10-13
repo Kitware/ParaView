@@ -1,0 +1,6 @@
+NAME
+  ParaView::Versioning
+LIBRARY_NAME
+  vtkPVVersioning
+GROUPS
+  PARAVIEW_CORE

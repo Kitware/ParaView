@@ -12,8 +12,8 @@ IMPLEMENTS
   ParaView::RemotingServerManager
 IMPLEMENTABLE
 DEPENDS
-  ParaView::RemotingCore
   ParaView::RemotingServerManager
+  ParaView::Versioning
   VTK::ChartsCore
   VTK::CommonExecutionModel
   VTK::RenderingAnnotation
@@ -23,6 +23,7 @@ DEPENDS
   VTK::ViewsContext2D
   VTK::ViewsCore
 PRIVATE_DEPENDS
+  ParaView::RemotingCore
   ParaView::VTKExtensionsExtraction
   ParaView::VTKExtensionsFiltersRendering
   ParaView::VTKExtensionsInteractionStyle
