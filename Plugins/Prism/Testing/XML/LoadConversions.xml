@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/Prism/Testing/Data/SymmetricImpact/proxium.asc"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SESAMEConversions/ConversionFileButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/OpenConversionFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/Prism/Testing/Data/SymmetricImpact/SESAMEConversions.xml" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SESAMEConversions/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="5.1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SESAMEConversions/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="5.1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SESAMEConversions/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="5.1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SESAMEConversions/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Speed - km/s to m/s" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents" command="mousePress" arguments="1,1,0,454,530" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents" command="mouseRelease" arguments="1,0,0,454,530" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments=""/>
+</pqevents>
