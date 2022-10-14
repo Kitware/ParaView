@@ -316,6 +316,10 @@ public:
     : Separator(0)
     , Server(server)
   {
+    // Always create a client side helper as it may be needed
+    this->FileInformationHelper = vtkSmartPointer<vtkPVFileInformationHelper>::New();
+    this->FileInformationHelper->SetReadDetailedFileInformation(
+      getShowDetailedInformationSetting());
 
     // if we are doing remote browsing
     if (server)
@@ -336,17 +340,24 @@ public:
     }
     else
     {
-      vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
-      this->FileInformationHelper = helper;
-      helper->Delete();
-      helper->SetReadDetailedFileInformation(getShowDetailedInformationSetting());
-      this->Separator = helper->GetPathSeparator()[0];
+      this->Separator = this->FileInformationHelper->GetPathSeparator()[0];
     }
 
-    this->FileInformation.TakeReference(vtkPVFileInformation::New());
+    this->FileInformation = vtkSmartPointer<vtkPVFileInformation>::New();
 
-    // current path
-    vtkPVFileInformation* info = this->GetData(false, "", ".", false, true);
+    // Recover client side current path
+    vtkPVFileInformation* info = this->GetData(false, "", ".", false, true, true);
+    if (server)
+    {
+      // When browsing remote, try to use the client current path as default path
+      info = this->GetData(false, "", info->GetFullPath(), false, true);
+      if (info->GetType() == vtkPVFileInformation::INVALID)
+      {
+        // Client current path does not exit server-side
+        // Use server current path instead
+        info = this->GetData(false, "", ".", false, true);
+      }
+    }
     this->CurrentPath = info->GetFullPath();
   }
 
@@ -369,9 +380,9 @@ public:
 
   /// query the file system for information
   vtkPVFileInformation* GetData(bool dirListing, const QString& workingDir, const QString& path,
-    bool specialDirs, bool groupFiles)
+    bool specialDirs, bool groupFiles, bool forceClient = false)
   {
-    if (this->FileInformationHelperProxy)
+    if (this->FileInformationHelperProxy && !forceClient)
     {
       // send data to server
       vtkSMProxy* helper = this->FileInformationHelperProxy;
