@@ -11,6 +11,7 @@ if (BUILD_SHARED_LIBS)
     LANLLoadSESAME.xml
     LoadConversions.xml
     SandiaLoadSESAME.xml
+    SESAMEContouring.xml
     )
 
   paraview_add_client_tests(
