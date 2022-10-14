@@ -2,21 +2,6 @@ r"""
 This is the package for paraview's extension modules.
 """
 
-import sys
-
-
-#------------------------------------------------------------------------------
-# This little trick is for static builds of Paraview. In such builds, if
-# the user imports this Python package into a Python interpreter other than
-# pvpython or Paraview itself, i.e. into an executable doesn't statically
-# link the modules, then we import the static components importer module.
-def _load_paraview_modules_static():
-    if 'paraview_modules_vtkRemotingCore' not in sys.builtin_module_names:
-        import _paraview_modules_static
-
-@_paraview_modules_static_import@
-
-
 #------------------------------------------------------------------------------
 # list the contents
 __all__ = [
