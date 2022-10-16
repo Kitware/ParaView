@@ -17,7 +17,6 @@
 
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkHyperTreeGridGradient.h"
 #include "vtkImageData.h"
 #include "vtkImageGradient.h"
 #include "vtkInformation.h"
@@ -31,7 +30,9 @@ vtkStandardNewMacro(vtkPVGradientFilter);
 void vtkPVGradientFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Dimensionality: " << this->Dimensionality << "\n";
+  os << indent << "Dimensionality: " << this->Dimensionality << std::endl;
+  os << indent << "HTG Mode: " << this->HTGMode << std::endl;
+  os << indent << "HTG Extensive Computation: " << this->HTGExtensiveComputation << std::endl;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +119,8 @@ int vtkPVGradientFilter::RequestData(
     htgGradient->SetInputData(0, inHTG);
     htgGradient->SetResultArrayName(this->ResultArrayName);
     htgGradient->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+    htgGradient->SetMode(this->HTGMode);
+    htgGradient->SetExtensiveComputation(this->HTGExtensiveComputation);
     htgGradient->Update();
     outDataObj->ShallowCopy(htgGradient->GetOutput(0));
 
