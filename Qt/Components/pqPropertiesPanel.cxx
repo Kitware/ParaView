@@ -641,7 +641,9 @@ void pqPropertiesPanel::updateViewPanel(pqView* argView)
     vtkSMViewProxy* proxy = _view->getViewProxy();
     const char* label = proxy->GetXMLLabel();
     this->Internals->Ui.ViewButton->setText(
-      tr("View") + QString(" (%1)").arg(label != nullptr ? label : _view->getViewType()));
+      tr("View (%1)")
+        .arg(label != nullptr ? QCoreApplication::translate("ServerManagerXML", label)
+                              : _view->getViewType()));
     this->Internals->ViewWidgets->showWidgets(
       this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());

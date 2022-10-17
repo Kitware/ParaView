@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
+#include <QCoreApplication>
 #include <array>
 #include <cassert>
 #include <string>
@@ -103,7 +104,8 @@ void pqLoadPaletteReaction::populateMenu()
     const char* name = str.c_str();
     if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", name))
     {
-      QAction* actn = menu->addAction(prototype->GetXMLLabel());
+      QAction* actn =
+        menu->addAction(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()));
       actn->setProperty("PV_XML_GROUP", "palettes");
       actn->setProperty("PV_XML_NAME", name);
     }
@@ -126,7 +128,8 @@ void pqLoadPaletteReaction::populateMenu()
         // skip main palettes since already added.
         continue;
       }
-      QAction* actn = menu->addAction(prototype->GetXMLLabel());
+      QAction* actn =
+        menu->addAction(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()));
       actn->setProperty("PV_XML_GROUP", "palettes");
       actn->setProperty("PV_XML_NAME", iter->GetProxyName());
     }

@@ -198,7 +198,8 @@ pqPropertyCollectionWidget::pqPropertyCollectionWidget(
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
   internals.Ui.groupLabel->setText(
-    QString("<b>%1</b>").arg(smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : smgroup->GetName()));
+    QString("<b>%1</b>")
+      .arg(QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel())));
 
   auto hints = smgroup->GetHints()
     ? smgroup->GetHints()->FindNestedElementByName("PropertyCollectionWidgetPrototype")
@@ -223,7 +224,8 @@ pqPropertyCollectionWidget::pqPropertyCollectionWidget(
     return;
   }
 
-  internals.ItemLabel = prototype->GetXMLLabel();
+  internals.ItemLabel =
+    QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()).toStdString();
 
   for (unsigned int cc = 0, max = smgroup->GetNumberOfProperties(); cc < max; ++cc)
   {

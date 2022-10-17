@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include <QCoreApplication>
+
 //-----------------------------------------------------------------------------
 pqSourcesMenuReaction::pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManager)
   : Superclass(menuManager)
@@ -102,7 +104,8 @@ bool pqSourcesMenuReaction::warnOnCreate(
       QString txt = hints->GetCharacterData();
       if (txt.isEmpty())
       {
-        txt = tr("Creating '%1'. Do you want to continue?").arg(prototype->GetXMLLabel());
+        txt = tr("Creating '%1'. Do you want to continue?")
+                .arg(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()));
       }
       return pqCoreUtilities::promptUser(QString("WarnOnCreate/%1/%2").arg(xmlgroup).arg(xmlname),
         QMessageBox::Information, QString::fromStdString(pqProxy::rstToHtml(title)),

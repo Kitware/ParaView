@@ -84,7 +84,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Note: Use 'P' to a 'Center' on mesh or 'Ctrl+P' to snap to the closest mesh point</string>
+      <string>Note: Use 'P' to a '%1' on mesh or 'Ctrl+P' to snap to the closest mesh point</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

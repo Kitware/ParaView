@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QIntValidator>
 
@@ -99,8 +100,10 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
   if (vtkSMBooleanDomain::SafeDownCast(domain))
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use checkbox for boolean property.");
-    QCheckBox* checkBox =
-      new QCheckBox(useDocumentationForLabels ? "" : smproperty->GetXMLLabel(), this);
+    QCheckBox* checkBox = new QCheckBox(useDocumentationForLabels
+        ? ""
+        : QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()),
+      this);
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
     this->setChangeAvailableAsChangeFinished(true);
@@ -108,9 +111,10 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
 
     if (useDocumentationForLabels)
     {
-      pqLabel* label = new pqLabel(QString("<p><b>%1</b>: %2</p>")
-                                     .arg(smproperty->GetXMLLabel())
-                                     .arg(pqProxyWidget::documentationText(smproperty)));
+      pqLabel* label = new pqLabel(
+        QString("<p><b>%1</b>: %2</p>")
+          .arg(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()))
+          .arg(pqProxyWidget::documentationText(smproperty)));
       label->setObjectName("CheckBoxLabel");
       label->setWordWrap(true);
       label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -135,7 +139,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
       treeWidget->setMaximumRowCountBeforeScrolling(smproperty);
 
       QTreeWidgetItem* header = new QTreeWidgetItem();
-      header->setData(0, Qt::DisplayRole, smproperty->GetXMLLabel());
+      header->setData(0, Qt::DisplayRole,
+        QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
       treeWidget->setHeaderItem(header);
 
       // helper makes it easier to select multiple entries.

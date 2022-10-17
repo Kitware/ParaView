@@ -942,7 +942,8 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   // Setup proxy model to add check-state support in the header.
   internals.ProxyModel = new pqDAPModel(iconSize, this);
   internals.ProxyModel->setSourceModel(internals.AssemblyTreeModel);
-  internals.ProxyModel->setHeaderText(smgroup->GetXMLLabel());
+  internals.ProxyModel->setHeaderText(
+    QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()));
 
   int useInputNameAsHeader = 0;
   if (groupHints &&

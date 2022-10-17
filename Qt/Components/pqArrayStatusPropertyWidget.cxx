@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QtDebug>
@@ -125,7 +126,8 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 
   auto selectorWidget = new pqArraySelectionWidget(customColumnCount + 1, this);
   selectorWidget->setObjectName("SelectionWidget");
-  selectorWidget->setHeaderLabel(smgroup->GetXMLLabel());
+  selectorWidget->setHeaderLabel(
+    QCoreApplication::translate("ServerManagerXML", smgroup->GetXMLLabel()));
   selectorWidget->setMaximumRowCountBeforeScrolling(
     pqPropertyWidget::hintsWidgetHeightNumberOfRows(smgroup->GetHints()));
   selectorWidget->header()->setDefaultSectionSize(20);
@@ -201,7 +203,8 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 {
   auto selectorWidget = new pqArraySelectionWidget(this);
   selectorWidget->setObjectName("SelectionWidget");
-  selectorWidget->setHeaderLabel(smproperty->GetXMLLabel());
+  selectorWidget->setHeaderLabel(
+    QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
   selectorWidget->setMaximumRowCountBeforeScrolling(
     pqPropertyWidget::hintsWidgetHeightNumberOfRows(smproperty->GetHints()));
 

@@ -155,6 +155,10 @@ int vtkSMPropertyGroup::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* gr
   {
     this->SetXMLLabel(groupLabel);
   }
+  else
+  {
+    this->SetXMLLabel(this->Name);
+  }
 
   // this is deprecated attribute that's replaced by "panel_widget". We still
   // process it for backwards compatibility.

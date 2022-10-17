@@ -676,7 +676,7 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(pgroup.toUtf8().data(), pname.toUtf8().data());
   if (prototype)
   {
-    QString label = prototype->GetXMLLabel() ? prototype->GetXMLLabel() : pname;
+    QString label = QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel());
     QAction* action = iter.value().Action;
     if (!action)
     {

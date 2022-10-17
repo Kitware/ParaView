@@ -172,7 +172,8 @@ void pqTransferFunctionWidgetPropertyWidget::editButtonClicked()
   vtkPiecewiseFunction* transferFunction = vtkPiecewiseFunction::SafeDownCast(object);
 
   this->Dialog = new pqTransferFunctionWidgetPropertyDialog(
-    this->property()->GetXMLLabel(), transferFunction, this, pqCoreUtilities::mainWidget());
+    QCoreApplication::translate("ServerManagerXML", this->property()->GetXMLLabel()),
+    transferFunction, this, pqCoreUtilities::mainWidget());
   this->Dialog->setObjectName(this->property()->GetXMLName());
   this->Dialog->show();
 }

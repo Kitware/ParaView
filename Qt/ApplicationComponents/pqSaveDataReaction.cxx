@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QMessageBox>
 
@@ -160,7 +161,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
          "writing because it does not support parallel IO. This may cause the "
          "first node to run out of memory if the data is large.\n"
          "Are you sure you want to continue?")
-        .arg(writer->GetXMLLabel()),
+        .arg(QCoreApplication::translate("ServerManagerXML", writer->GetXMLLabel())),
       QMessageBox::Yes | QMessageBox::No | QMessageBox::Save, pqCoreUtilities::mainWidget());
     if (!result)
     {
@@ -172,7 +173,9 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
   dialog.setObjectName("WriterSettingsDialog");
   dialog.setEnableSearchBar(dialog.hasAdvancedProperties());
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle(tr("Configure Writer (%1)").arg(writer->GetXMLLabel()));
+  dialog.setWindowTitle(
+    tr("Configure Writer (%1)")
+      .arg(QCoreApplication::translate("ServerManagerXML", writer->GetXMLLabel())));
 
   // Check to see if this writer has any properties that can be configured by
   // the user. If it does, display the dialog.

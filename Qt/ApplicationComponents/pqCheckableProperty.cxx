@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -94,7 +95,8 @@ pqCheckableProperty::pqCheckableProperty(
   // Trailing checkbox -----------------------------------------
   auto* checkBox = new QCheckBox(this);
   checkBox->setObjectName("CheckBox");
-  checkBox->setToolTip(PropertyCheckBox->GetXMLLabel());
+  checkBox->setToolTip(
+    QCoreApplication::translate("ServerManagerXML", PropertyCheckBox->GetXMLLabel()));
   layoutLocal->addWidget(checkBox);
 
   this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), PropertyCheckBox);

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMTrace.h"
 
+#include <QCoreApplication>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -50,7 +51,8 @@ pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(
   l->setSpacing(0);
   l->setMargin(0);
 
-  QPushButton* button = new QPushButton(proxyProperty->GetXMLLabel());
+  QPushButton* button =
+    new QPushButton(QCoreApplication::translate("ServerManagerXML", proxyProperty->GetXMLLabel()));
   connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
   l->addWidget(button);
 

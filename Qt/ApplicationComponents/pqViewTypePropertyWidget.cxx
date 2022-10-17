@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QVBoxLayout>
 
 //-----------------------------------------------------------------------------
@@ -72,7 +73,8 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
       vtkSMProxy* prototype = pxm->GetPrototypeProxy("views", proxyName);
       if (prototype)
       {
-        valuesMap.insert(prototype->GetXMLLabel(), iter->GetProxyName());
+        valuesMap.insert(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()),
+          iter->GetProxyName());
       }
     }
     iter->Delete();

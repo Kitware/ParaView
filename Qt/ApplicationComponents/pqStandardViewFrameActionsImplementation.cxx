@@ -679,7 +679,7 @@ pqStandardViewFrameActionsImplementation::availableViewTypes()
     if (prototype)
     {
       ViewType info;
-      info.Label = prototype->GetXMLLabel();
+      info.Label = QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel());
       info.Name = iter->GetProxyName();
       views.push_back(info);
     }

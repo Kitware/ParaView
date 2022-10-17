@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include <QCoreApplication>
 #include <algorithm>
 
 namespace
@@ -220,7 +221,8 @@ pqIndexSelectionWidget::pqIndexSelectionWidget(
   : Superclass(pxy, parentW)
   , PropertyUpdatePending(false)
   , IgnorePushPropertyUpdates(false)
-  , GroupBox(new QGroupBox(QString(pushProp->GetXMLLabel()), this))
+  , GroupBox(
+      new QGroupBox(QCoreApplication::translate("ServerManagerXML", pushProp->GetXMLLabel()), this))
   , VBox(new QVBoxLayout(this))
   , Form(new QFormLayout(this->GroupBox))
   , Internals(new pqInternals())

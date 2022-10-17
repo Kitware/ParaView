@@ -114,7 +114,8 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   : Superclass(smproxy, parentObject)
   , Internal(new pqProxySelectionWidget::pqInternal(this))
 {
-  this->Internal->Ui.label->setText(smproperty->GetXMLLabel());
+  this->Internal->Ui.label->setText(
+    QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
   this->Internal->Domain = smproperty->FindDomain<vtkSMProxyListDomain>();
 
   // This widget is intended to be used for properties with ProxyListDomains

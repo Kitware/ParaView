@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
+#include <QCoreApplication>
 #include <QLabel>
 #include <QVBoxLayout>
 
@@ -73,7 +74,7 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
     button = new pqColorChooserButton(this);
   }
   button->setObjectName("ColorButton");
-  button->setText(smProperty->GetXMLLabel());
+  button->setText(QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel()));
   button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
   if (vtkSMPropertyHelper(smProperty).GetNumberOfElements() == 3)

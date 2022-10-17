@@ -158,7 +158,8 @@ pqSettingsDialog::pqSettingsDialog(
     // show panel widgets
     widget->updatePanel();
 
-    int tabIndex = ui.tabBar->addTab(proxy->GetXMLLabel());
+    int tabIndex =
+      ui.tabBar->addTab(QCoreApplication::translate("ServerManagerXML", proxy->GetXMLLabel()));
     int stackIndex = ui.stackedWidget->addWidget(scrollArea);
     this->Internals->TabToStackedWidgets[tabIndex] = stackIndex;
 

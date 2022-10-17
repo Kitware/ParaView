@@ -71,8 +71,9 @@ public:
     pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
     auto server = browseLocalFileSystem ? nullptr : smModel->findServer(session);
 
-    pqFileDialog dialog(
-      server, self, QString("Select %1").arg(property->GetXMLLabel()), QString(), filter);
+    pqFileDialog dialog(server, self,
+      tr("Select %1").arg(QCoreApplication::translate("ServerManagerXML", property->GetXMLLabel())),
+      QString(), filter);
     if (directoryMode)
     {
       dialog.setFileMode(pqFileDialog::Directory);
@@ -106,7 +107,9 @@ pqFileListPropertyWidget::pqFileListPropertyWidget(
   vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using pqFileListPropertyWidget.");
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
-  internals.Ui.label->setText(QString("<b>%1</b>").arg(smproperty->GetXMLLabel()));
+  internals.Ui.label->setText(
+    QString("<b>%1</b>")
+      .arg(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel())));
 
   QObject::connect(&internals.Model, &QAbstractItemModel::dataChanged, this,
     &pqFileListPropertyWidget::fileNamesChanged);

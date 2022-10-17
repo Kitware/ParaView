@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLiveSourceBehavior.h"
 
+#include <QCoreApplication>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -45,7 +46,8 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
   l->setSpacing(0);
   l->setMargin(0);
 
-  auto button = new QPushButton(smproperty->GetXMLLabel());
+  auto button =
+    new QPushButton(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
   button->setCheckable(true);
   l->addWidget(button);
 
