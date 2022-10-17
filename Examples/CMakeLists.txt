@@ -50,6 +50,8 @@ else ()
   endif ()
 
   find_package(ParaView REQUIRED)
+  include(CTest)
+  enable_testing()
 
   macro (add_example dir)
     add_subdirectory("${dir}")
