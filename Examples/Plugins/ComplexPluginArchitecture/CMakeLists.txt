@@ -33,7 +33,7 @@ vtk_module_build(
 foreach (module IN LISTS required_modules)
   if (NOT TARGET "${module}")
     message(#FATAL_ERROR
-      "Skipping example ${CMAKE_PROJECT_NAME}: Missing required module: "
+      "Skipping example ${PROJECT_NAME}: Missing required module: "
       "${module}")
     return ()
   endif ()

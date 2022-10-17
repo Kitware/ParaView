@@ -16,7 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(MPI COMPONENTS C CXX)
 if (NOT MPI_FOUND)
   message(STATUS
-    "Skipping example: ${CMAKE_PROJECT_NAME} requires MPI.")
+    "Skipping example: ${PROJECT_NAME} requires MPI.")
   return ()
 endif ()
 
