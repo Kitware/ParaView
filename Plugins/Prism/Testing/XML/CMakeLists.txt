@@ -12,6 +12,7 @@ if (BUILD_SHARED_LIBS)
     LoadConversions.xml
     SandiaLoadSESAME.xml
     SESAMEContouring.xml
+    ViewAspectRatio.xml
     ViewLogScaling.xml
     )
 
