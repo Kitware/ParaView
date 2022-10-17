@@ -27,6 +27,9 @@ endif ()
 set_property(TARGET FortranPoissonSolver
   PROPERTY
     LINKER_LANGUAGE Fortran)
+set_property(TARGET FortranPoissonSolver
+  PROPERTY
+    POSITION_INDEPENDENT_CODE "${BUILD_SHARED_LIBS}")
 
 if (BUILD_TESTING)
   configure_file(
