@@ -6,7 +6,7 @@ find_package(ParaView REQUIRED)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 enable_testing()
 
-# Required for python testing  
+# Required for python testing
 set(_vtk_build_TEST_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary)
 
 include(GNUInstallDirs)
