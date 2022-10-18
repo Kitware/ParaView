@@ -85,6 +85,9 @@ protected Q_SLOTS:
 private:
   void constructor();
 
+  bool XREnabled = false;
+  bool Attached = false;
+
   class pqInternals;
   pqInternals* Internals;
 };
