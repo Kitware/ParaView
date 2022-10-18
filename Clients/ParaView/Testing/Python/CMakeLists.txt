@@ -114,6 +114,7 @@ set(PVBATCH_TESTS
   PLYWriter.py
   VolumeCellSelection.py
   SaveDataWithArraySelection.py,NO_VALID
+  NoParaViewInit.py,NO_VALID
   # SaveDataWithArrayAndBlockSelection.py,NO_VALID # BUG #21419
 )
 if(NOT APPLE)
