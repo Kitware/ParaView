@@ -14,6 +14,7 @@ if (BUILD_SHARED_LIBS)
     SESAMEContouring.xml
     ViewAspectRatio.xml
     ViewLogScaling.xml
+    ViewThresholding.xml
     )
 
   paraview_add_client_tests(
