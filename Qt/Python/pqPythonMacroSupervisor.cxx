@@ -101,7 +101,7 @@ void addPlaceHolderIfNeeded(QWidget* widget)
   QMenu* menu = qobject_cast<QMenu*>(widget);
   if (menu && menu->isEmpty())
   {
-    menu->addAction("empty")->setEnabled(0);
+    menu->addAction(QCoreApplication::translate("pqPythonMacroSupervisor", "empty"))->setEnabled(0);
   }
 }
 void removePlaceHolderIfNeeded(QWidget* widget)
@@ -110,8 +110,8 @@ void removePlaceHolderIfNeeded(QWidget* widget)
   if (menu && menu->actions().size() == 1)
   {
     QAction* act = menu->actions()[0];
-    // It's a placeholder if its name is 'empty' and has empty data().
-    if (act->text() == "empty" && act->data().toString().length() == 0)
+    // It's a placeholder if it is disabled and has empty data().
+    if (!act->isEnabled() && act->data().toString().length() == 0)
     {
       menu->removeAction(act);
       delete act;

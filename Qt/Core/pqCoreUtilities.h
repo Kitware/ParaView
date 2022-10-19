@@ -82,7 +82,7 @@ class PQCORE_EXPORT pqCoreUtilities : public QObject
   Q_OBJECT
 public:
   /**
-   * When popuping up dialogs, it's generally better if we set the parent
+   * When popping up dialogs, it's generally better if we set the parent
    * widget for those dialogs to be the QMainWindow so that the dialogs show up
    * centered correctly in the application. For that purpose this convenience
    * method is provided. It locates a QMainWindow and returns it.

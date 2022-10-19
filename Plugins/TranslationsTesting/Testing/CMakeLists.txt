@@ -1,0 +1,32 @@
+find_package(Qt5 REQUIRED QUIET COMPONENTS LinguistTools)
+find_package(Python3 REQUIRED QUIET COMPONENTS Interpreter)
+
+
+set(TS_TEMPORARY_DIR "${CMAKE_BINARY_DIR}/Testing/Temporary/TranslationsTest")
+set(DESTINATION_QM "${TS_TEMPORARY_DIR}/paraview_fa_IR.qm")
+set(PYTHON3_INTERPRETER "$<TARGET_FILE:Python3::Interpreter>")
+set(PYTHON3_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/TranslationsFilling.py")
+set(LCONVERT_EXECUTABLE "$<TARGET_FILE:Qt5::lconvert>")
+
+add_custom_command(
+  OUTPUT ${DESTINATION_QM}
+  DEPENDS localization
+  COMMAND ${CMAKE_COMMAND}
+  -DTS_TEMPORARY_DIR="${TS_TEMPORARY_DIR}"
+  -DPARAVIEW_TRANSLATIONS_DIRECTORY="${PARAVIEW_TRANSLATIONS_DIRECTORY}"
+  -DLCONVERT_EXECUTABLE="${LCONVERT_EXECUTABLE}"
+  -DPYTHON3_INTERPRETER="${PYTHON3_INTERPRETER}"
+  -DPYTHON3_SCRIPT="${PYTHON3_SCRIPT}"
+  -P "${CMAKE_CURRENT_SOURCE_DIR}/TranslationsTesting.cmake"
+)
+
+add_custom_target("startTranslationsTesting" ALL DEPENDS "${DESTINATION_QM}")
+
+# Plugin is not loaded with LOAD_PLUGINS because the EULA popup is blocking CTest execution
+paraview_add_client_tests(
+  TEST_DIRECTORY "${TS_TEMPORARY_DIR}"
+  TEST_SCRIPTS "LoadTranslationsTestingPlugin.xml"
+  ENVIRONMENT
+  PV_TRANSLATIONS_DIR=${TS_TEMPORARY_DIR}
+  PV_TRANSLATIONS_LOCALE=fa_IR
+)

@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSelectionQueryDomain.h"
 
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -147,6 +148,8 @@ class pqSelectionQueryPropertyWidget::pqValueWidget : public QWidget
 {
   QList<pqLineEdit*> LineEdits;
 
+  Q_DECLARE_TR_FUNCTIONS(pqValueWidget);
+
 public:
   pqValueWidget(pqSelectionQueryPropertyWidget::pqQueryWidget* prnt);
 
@@ -227,7 +230,14 @@ private:
         edit->setObjectName("value");
         vbox->addWidget(edit);
 
-        edit->setPlaceholderText(this->Type == SINGLE_VALUE ? "value" : "comma separated values");
+        if (this->Type == SINGLE_VALUE)
+        {
+          edit->setPlaceholderText(tr("value"));
+        }
+        else
+        {
+          edit->setPlaceholderText(tr("comma separated values"));
+        }
       }
       break;
 
@@ -264,13 +274,13 @@ private:
         grid->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
         auto editX = new pqDoubleLineEdit(this);
         editX->setObjectName("value_x");
-        editX->setPlaceholderText("X coordinate");
+        editX->setPlaceholderText(tr("X coordinate"));
         auto editY = new pqDoubleLineEdit(this);
         editY->setObjectName("value_y");
-        editY->setPlaceholderText("Y coordinate");
+        editY->setPlaceholderText(tr("Y coordinate"));
         auto editZ = new pqDoubleLineEdit(this);
         editZ->setObjectName("value_z");
-        editZ->setPlaceholderText("Z coordinate");
+        editZ->setPlaceholderText(tr("Z coordinate"));
         grid->addWidget(editX, 0, 0);
         grid->addWidget(editY, 0, 1);
         grid->addWidget(editZ, 0, 2);
@@ -281,7 +291,7 @@ private:
         {
           auto editTolerance = new pqDoubleLineEdit(this);
           editTolerance->setObjectName("value_tolerance");
-          editTolerance->setPlaceholderText("within epsilon");
+          editTolerance->setPlaceholderText(tr("within epsilon"));
           grid->addWidget(editTolerance, 1, 0, 1, 3);
           this->LineEdits.push_back(editTolerance);
         }

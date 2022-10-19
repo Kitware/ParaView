@@ -101,6 +101,20 @@
         </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="InterfaceLanguage"
+        number_of_elements="1"
+        default_values="en_US"
+        command="SetInterfaceLanguage"
+        panel_widget="language_selector">
+        <Documentation>
+          Set ParaView language.
+        </Documentation>
+        <Hints>
+          <SaveInQSettings />
+          <RestartRequired />
+        </Hints>
+      </StringVectorProperty>
+
       <IntVectorProperty name="ScreenPixelsPerInch"
         number_of_elements="1"
         default_values="72"
@@ -498,6 +512,10 @@
         <Property name="AnimationTimePrecision" />
         <Property name="AnimationTimeNotation" />
         <Property name="ShowAnimationShortcuts" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Interface language">
+        <Property name="InterfaceLanguage" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">

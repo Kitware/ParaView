@@ -1286,6 +1286,12 @@ std::string vtkPVFileInformation::GetParaViewDocDirectory()
 }
 
 //-----------------------------------------------------------------------------
+std::string vtkPVFileInformation::GetParaViewTranslationsDirectory()
+{
+  return vtkPVFileInformation::GetParaViewSharedResourcesDirectory() + "/translations";
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVFileInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

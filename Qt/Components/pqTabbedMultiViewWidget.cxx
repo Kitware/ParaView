@@ -154,10 +154,10 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(
 }
 
 //-----------------------------------------------------------------------------
-const char* pqTabbedMultiViewWidget::pqTabWidget::popoutLabelText(bool popped_out)
+QString pqTabbedMultiViewWidget::pqTabWidget::popoutLabelText(bool popped_out)
 {
-  return popped_out ? "Bring popped out window back to the frame"
-                    : "Pop out layout in separate window";
+  return popped_out ? tr("Bring popped out window back to the frame")
+                    : tr("Pop out layout in separate window");
 }
 
 //-----------------------------------------------------------------------------

@@ -30,6 +30,8 @@
 #include "vtkRemotingSettingsModule.h" //needed for exports
 #include "vtkSmartPointer.h"           // needed for vtkSmartPointer.
 
+#include <string>
+
 class VTKREMOTINGSETTINGS_EXPORT vtkPVGeneralSettings : public vtkObject
 {
 public:
@@ -98,6 +100,15 @@ public:
    */
   vtkGetStringMacro(DefaultViewType);
   vtkSetStringMacro(DefaultViewType);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the default interface language.
+   * Default is en_US
+   */
+  vtkGetMacro(InterfaceLanguage, std::string);
+  vtkSetMacro(InterfaceLanguage, std::string);
   ///@}
 
   /**
@@ -325,6 +336,7 @@ protected:
   int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
+  std::string InterfaceLanguage = "en_US";
   int ScalarBarMode;
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;

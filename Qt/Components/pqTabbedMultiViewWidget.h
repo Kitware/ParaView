@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqTabbedMultiViewWidget_h
 
 #include "pqComponentsModule.h"
-#include "vtkType.h"  // needed for vtkIdType
+#include "vtkType.h" // needed for vtkIdType
+#include <QCoreApplication>
 #include <QStyle>     // needed for QStyle:StandardPixmap
 #include <QTabBar>    // needed for QTabBar::ButtonPosition
 #include <QTabWidget> // needed for QTabWidget.
@@ -224,6 +225,8 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   {
     typedef QTabWidget Superclass;
 
+    Q_DECLARE_TR_FUNCTIONS(pqTabWidget);
+
   public:
     pqTabWidget(QWidget* parentWdg = nullptr);
     ~pqTabWidget() override;
@@ -251,7 +254,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
      * Returns the label/tooltip to use for the popout button given the
      * popped_out state.
      */
-    static const char* popoutLabelText(bool popped_out);
+    static QString popoutLabelText(bool popped_out);
 
     /**
      * Returns the icon to use for the popout button given the popped_out state.

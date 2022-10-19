@@ -119,6 +119,7 @@ set(classes
   pqInteractiveProperty2DWidget
   pqInteractivePropertyWidget
   pqInteractivePropertyWidgetAbstract
+  pqLanguageChooserWidget
   pqLightPropertyWidget
   pqLightToolbar
   pqLinePropertyWidget

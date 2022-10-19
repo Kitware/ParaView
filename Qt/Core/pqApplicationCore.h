@@ -301,6 +301,22 @@ public:
   pqServer* getActiveServer() const;
 
   /**
+   * returns a path to a translation binary file located in a path specified by
+   * the PV_TRANSLATIONS_DIR environment variable or in the resources directory.
+   * The binary file returned is the first one to have a name matching the locale
+   * given in the user settings.
+   */
+  QString getTranslationsPathFromInterfaceLanguage(QString);
+
+  /**
+   * returns interface language in use in a locale code form.
+   * It is first read from PV_INTERFACE_LANGUAGE environment
+   * variable if defined, then recovered from user settings.
+   * If not set, return `en_US`.
+   */
+  QString getInterfaceLanguage();
+
+  /**
    * Destructor.
    */
   ~pqApplicationCore() override;

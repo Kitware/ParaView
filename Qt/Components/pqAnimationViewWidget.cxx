@@ -1106,8 +1106,8 @@ void pqAnimationViewWidget::onTimeLabelChanged()
   }
 
   // Update labels
-  this->Internal->StartTimeLabel->setText(QString("Start %1:").arg(timeName));
-  this->Internal->EndTimeLabel->setText(QString("End %1:").arg(timeName));
+  this->Internal->StartTimeLabel->setText(tr("Start %1:").arg(timeName));
+  this->Internal->EndTimeLabel->setText(tr("End %1:").arg(timeName));
 }
 
 //-----------------------------------------------------------------------------
