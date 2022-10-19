@@ -4,6 +4,7 @@ if (BUILD_SHARED_LIBS)
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/proxium.ses.mat.1.301}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/SESAMEConversions.xml}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/SymmetricImpact2.exo}"
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/SymmetricImpact/SymmetricImpact3.exo}"
     )
 
   set(paraview_prism_baseline_dir "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline")
@@ -14,6 +15,7 @@ if (BUILD_SHARED_LIBS)
     SandiaLoadSESAME.xml
     SESAMEContouring.xml
     SimulationData1.xml
+    SimulationData2.xml
     ViewAspectRatio.xml
     ViewLogScaling.xml
     ViewThresholding.xml
