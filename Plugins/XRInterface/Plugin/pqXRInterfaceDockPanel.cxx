@@ -279,25 +279,24 @@ void pqXRInterfaceDockPanel::fieldValuesChanged(const QString& text)
 
 void pqXRInterfaceDockPanel::sendToXRInterface()
 {
-  if (this->Internals->sendToXRButton->text() == "Send to XR")
+  if (!this->XREnabled)
   {
     pqView* view = pqActiveObjects::instance().activeView();
 
     if (view)
     {
       vtkSMViewProxy* smview = view->getViewProxy();
-      if (this->Internals->cConnectButton->text() != "Connect")
-      {
-        this->Internals->cConnectButton->setText("Connect");
-      }
+      this->Internals->cConnectButton->setText("Connect");
       this->Internals->attachToCurrentViewButton->setEnabled(false);
       this->Internals->showXRViewButton->setEnabled(true);
       this->Internals->sendToXRButton->setText("Quit XR");
+      this->XREnabled = true;
       this->Internals->cConnectButton->setEnabled(true);
       this->Helper->SendToXR(smview);
       this->Internals->cConnectButton->setEnabled(false);
       this->Internals->cConnectButton->setText("Connect");
       this->Internals->sendToXRButton->setText("Send to XR");
+      this->XREnabled = false;
       this->Internals->attachToCurrentViewButton->setEnabled(true);
     }
   }
@@ -316,24 +315,23 @@ void pqXRInterfaceDockPanel::showXRView()
 
 void pqXRInterfaceDockPanel::attachToCurrentView()
 {
-  if (this->Internals->attachToCurrentViewButton->text() == "Attach to Current View")
+  if (!this->Attached)
   {
     pqView* view = pqActiveObjects::instance().activeView();
 
     if (view)
     {
       vtkSMViewProxy* smview = view->getViewProxy();
-      if (this->Internals->cConnectButton->text() != "Connect")
-      {
-        this->Internals->cConnectButton->setText("Connect");
-      }
+      this->Internals->cConnectButton->setText("Connect");
       this->Internals->cConnectButton->setEnabled(true);
       this->Internals->sendToXRButton->setEnabled(false);
       this->Internals->attachToCurrentViewButton->setText("Detach from View");
+      this->Attached = true;
       this->Helper->AttachToCurrentView(smview);
       this->Internals->cConnectButton->setEnabled(false);
       this->Internals->cConnectButton->setText("Connect");
       this->Internals->attachToCurrentViewButton->setText("Attach to Current View");
+      this->Attached = false;
       this->Internals->sendToXRButton->setEnabled(true);
     }
   }
