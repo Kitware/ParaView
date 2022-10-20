@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqUndoStack.h"
 #include "vtkFileSequenceParser.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -49,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSMSettingsProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
 #include <vtksys/RegularExpression.hxx>
@@ -217,6 +219,21 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
         {
           sources << source;
         }
+    }
+  }
+
+  for (auto& source : sources)
+  {
+    vtkSMProxy* proxy = source->getSourceProxy();
+    vtkSMProperty* nameProperty = proxy->GetProperty("RegistrationName");
+    if (nameProperty)
+    {
+      std::string newName = vtkSMPropertyHelper(nameProperty).GetAsString();
+      newName = vtkSMCoreUtilities::SanitizeName(newName);
+      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+      vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
+      newName = spxm->GetUniqueProxyName(source->getSMGroup().toUtf8(), newName.c_str(), false);
+      source->rename(QString::fromStdString(newName));
     }
   }
   return sources;
