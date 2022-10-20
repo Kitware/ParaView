@@ -29,6 +29,7 @@ extern "C"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSessionIterator.h"
 
 #include <vector>
 #include <vtksys/SystemTools.hxx>
@@ -140,6 +141,14 @@ inline int Run(int processType, int argc, char* argv[])
 
     ret_val =
       vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front());
+
+    // Make sure all RMI loop are aborted if paraview stack was not initialised
+    // https://gitlab.kitware.com/paraview/paraview/-/issues/21546
+    auto iter = vtk::TakeSmartPointer(pm->NewSessionIterator());
+    if (iter->IsDoneWithTraversal())
+    {
+      pm->GetGlobalController()->TriggerBreakRMIs();
+    }
   }
 
   // Free python args
