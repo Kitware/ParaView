@@ -16,6 +16,7 @@ if (BUILD_SHARED_LIBS)
     SESAMEContouring.xml
     SimulationData1.xml
     SimulationData2.xml
+    SimulationDataSelections.xml
     ViewAspectRatio.xml
     ViewLogScaling.xml
     ViewThresholding.xml
@@ -28,6 +29,9 @@ if (BUILD_SHARED_LIBS)
     TEST_SCRIPTS "${prism_test_scripts}")
 
   if (PARAVIEW_USE_MPI)
+    # Selections don't work in crs mode.
+    set(SimulationDataSelections_DISABLE_CRS TRUE)
+
     paraview_add_client_server_tests(
       LOAD_PLUGIN "Prism"
       BASELINE_DIR "${paraview_prism_baseline_dir}"
