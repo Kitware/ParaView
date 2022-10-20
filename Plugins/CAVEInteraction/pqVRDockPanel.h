@@ -65,6 +65,7 @@ private Q_SLOTS:
 
   void addStyle();
   void removeStyle();
+  void initStyles();
   void updateStyles();
   void editStyle(QListWidgetItem* item = nullptr);
   void updateStyleButtons(int row);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRStylusStyle.cxx
+   Module:  vtkSMVRStylusStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRStylusStyle.h"
+#include "vtkSMVRStylusStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -45,11 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // -----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRStylusStyle);
+vtkStandardNewMacro(vtkSMVRStylusStyleProxy);
 
 // -----------------------------------------------------------------------------
 // Constructor method
-vtkVRStylusStyle::vtkVRStylusStyle()
+vtkSMVRStylusStyleProxy::vtkSMVRStylusStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Rotate world");
@@ -63,7 +63,7 @@ vtkVRStylusStyle::vtkVRStylusStyle()
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRStylusStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRStylusStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -73,7 +73,7 @@ void vtkVRStylusStyle::PrintSelf(ostream& os, vtkIndent indent)
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRStylusStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRStylusStyleProxy::HandleButton(const vtkVREvent& event)
 {
   this->PositionRecorded = false;
 
@@ -90,7 +90,7 @@ void vtkVRStylusStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRStylusStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRStylusStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   if (this->GetTrackerRole(event.name) == "Tracker")
   {

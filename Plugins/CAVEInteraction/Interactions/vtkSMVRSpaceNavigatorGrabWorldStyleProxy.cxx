@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRSpaceNavigatorGrabWorldStyle.cxx
+   Module:  vtkSMVRSpaceNavigatorGrabWorldStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRSpaceNavigatorGrabWorldStyle.h"
+#include "vtkSMVRSpaceNavigatorGrabWorldStyleProxy.h"
 
 #include "vtkCamera.h" /* needed by vtkSMRenderViewProxy.h */
 #include "vtkMath.h"   /* needed for Cross product function */
@@ -44,11 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRSpaceNavigatorGrabWorldStyle);
+vtkStandardNewMacro(vtkSMVRSpaceNavigatorGrabWorldStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
+vtkSMVRSpaceNavigatorGrabWorldStyleProxy::vtkSMVRSpaceNavigatorGrabWorldStyleProxy()
   : Superclass()
 {
   this->AddAnalogRole("Move");
@@ -56,18 +56,18 @@ vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle() = default;
+vtkSMVRSpaceNavigatorGrabWorldStyleProxy::~vtkSMVRSpaceNavigatorGrabWorldStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRSpaceNavigatorGrabWorldStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 // ----------------------------------------------------------------------------
 // HandleAnalog() method
-void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREvent& event)
+void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleAnalog(const vtkVREvent& event)
 {
   std::string role = this->GetAnalogRole(event.name);
 

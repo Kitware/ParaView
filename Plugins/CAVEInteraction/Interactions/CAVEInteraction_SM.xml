@@ -1,0 +1,76 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="cave_interaction">
+    <VRTrackStyleProxy name="Track"
+                       processes="client|renderserver|dataserver">
+      <Documentation>
+        Implements head tracking
+      </Documentation>
+    </VRTrackStyleProxy>
+    <VRGrabWorldStyleProxy name="GrabWorld"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        Grab World
+      </Documentation>
+    </VRGrabWorldStyleProxy>
+    <VRVirtualHandStyleProxy name="VirtualHand"
+                             processes="client">
+      <Documentation>
+        Virtual Hand
+      </Documentation>
+    </VRVirtualHandStyleProxy>
+    <VRStylusStyleProxy name="Stylus"
+                        processes="client|renderserver|dataserver">
+      <Documentation>
+        Stylus
+      </Documentation>
+    </VRStylusStyleProxy>
+    <VRSpaceNavigatorGrabWorldStyleProxy name="SpaceNavigatorGrabWorld"
+                                         processes="client|renderserver|dataserver">
+      <Documentation>
+        Space Navigator GrabWorld
+      </Documentation>
+    </VRSpaceNavigatorGrabWorldStyleProxy>
+    <VRGrabPointStyleProxy name="GrabPoint"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        Grab Point
+      </Documentation>
+    </VRGrabPointStyleProxy>
+    <VRControlSliceOrientationStyleProxy name="ControlSliceOrientation"
+                                         processes="client|renderserver|dataserver">
+      <Documentation>
+        Control Slice Orientation
+      </Documentation>
+    </VRControlSliceOrientationStyleProxy>
+    <VRControlSlicePositionStyleProxy name="ControlSlicePosition"
+                                      processes="client|renderserver|dataserver">
+      <Documentation>
+        Control Slice Position
+      </Documentation>
+    </VRControlSlicePositionStyleProxy>
+    <VRSkeletonStyleProxy name="Skeleton"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Skeleton
+      </Documentation>
+    </VRSkeletonStyleProxy>
+    <VRMovePointStyleProxy name="MovePoint"
+                           processes="client|renderserver|dataserver">
+      <Documentation>
+        Move Point
+      </Documentation>
+    </VRMovePointStyleProxy>
+    <VRResetTransformStyleProxy name="ResetTransform"
+                                processes="client|renderserver|dataserver">
+      <Documentation>
+        Reset Transform
+      </Documentation>
+    </VRResetTransformStyleProxy>
+    <VRGrabTransformStyleProxy name="GrabTransform"
+                               processes="client|renderserver|dataserver">
+      <Documentation>
+        Grab Transform
+      </Documentation>
+    </VRGrabTransformStyleProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

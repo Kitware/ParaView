@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRMovePointStyle.cxx
+   Module:    vtkSMVRMovePointStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRMovePointStyle.h"
+#include "vtkSMVRMovePointStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -48,10 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // -----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRMovePointStyle);
+vtkStandardNewMacro(vtkSMVRMovePointStyleProxy);
 
 // -----------------------------------------------------------------------------
-vtkVRMovePointStyle::vtkVRMovePointStyle()
+vtkSMVRMovePointStyleProxy::vtkSMVRMovePointStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Move");
@@ -59,7 +59,7 @@ vtkVRMovePointStyle::vtkVRMovePointStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRMovePointStyle::HandleButton(const vtkVREvent& data)
+void vtkSMVRMovePointStyleProxy::HandleButton(const vtkVREvent& data)
 {
   this->PositionRecorded = false;
 
@@ -71,7 +71,7 @@ void vtkVRMovePointStyle::HandleButton(const vtkVREvent& data)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRMovePointStyle::HandleTracker(const vtkVREvent& data)
+void vtkSMVRMovePointStyleProxy::HandleTracker(const vtkVREvent& data)
 {
   if (this->GetTrackerRole(data.name) != "Tracker")
   {
@@ -145,7 +145,7 @@ void vtkVRMovePointStyle::HandleTracker(const vtkVREvent& data)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRMovePointStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRMovePointStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRSkeletonStyle.cxx
+   Module:  vtkSMVRSkeletonStyleProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRSkeletonStyle.h"
+#include "vtkSMVRSkeletonStyleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
@@ -50,11 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRSkeletonStyle);
+vtkStandardNewMacro(vtkSMVRSkeletonStyleProxy);
 
 // ----------------------------------------------------------------------------
 // Constructor method
-vtkVRSkeletonStyle::vtkVRSkeletonStyle()
+vtkSMVRSkeletonStyleProxy::vtkSMVRSkeletonStyleProxy()
   : Superclass()
 {
   this->AddButtonRole("Rotate Tracker");
@@ -72,11 +72,11 @@ vtkVRSkeletonStyle::vtkVRSkeletonStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRSkeletonStyle::~vtkVRSkeletonStyle() = default;
+vtkSMVRSkeletonStyleProxy::~vtkSMVRSkeletonStyleProxy() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
-void vtkVRSkeletonStyle::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMVRSkeletonStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -89,7 +89,7 @@ void vtkVRSkeletonStyle::PrintSelf(ostream& os, vtkIndent indent)
 
 // ----------------------------------------------------------------------------
 // HandleButton() method
-void vtkVRSkeletonStyle::HandleButton(const vtkVREvent& event)
+void vtkSMVRSkeletonStyleProxy::HandleButton(const vtkVREvent& event)
 {
   std::string role = this->GetButtonRole(event.name);
 
@@ -113,7 +113,7 @@ void vtkVRSkeletonStyle::HandleButton(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleAnalog() method
-void vtkVRSkeletonStyle::HandleAnalog(const vtkVREvent& event)
+void vtkSMVRSkeletonStyleProxy::HandleAnalog(const vtkVREvent& event)
 {
   std::string role = this->GetAnalogRole(event.name);
 
@@ -126,7 +126,7 @@ void vtkVRSkeletonStyle::HandleAnalog(const vtkVREvent& event)
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method
-void vtkVRSkeletonStyle::HandleTracker(const vtkVREvent& event)
+void vtkSMVRSkeletonStyleProxy::HandleTracker(const vtkVREvent& event)
 {
   std::string role = this->GetTrackerRole(event.name);
 

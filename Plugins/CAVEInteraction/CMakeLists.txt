@@ -30,34 +30,8 @@ set(sources
   pqVRQueueHandler.h
   pqVRStarter.cxx
   pqVRStarter.h
-  vtkVRControlSliceOrientationStyle.cxx
-  vtkVRControlSliceOrientationStyle.h
-  vtkVRControlSlicePositionStyle.cxx
-  vtkVRControlSlicePositionStyle.h
-  vtkVRGrabPointStyle.cxx
-  vtkVRGrabPointStyle.h
-  vtkVRGrabTransformStyle.cxx
-  vtkVRGrabTransformStyle.h
-  vtkVRGrabWorldStyle.cxx
-  vtkVRGrabWorldStyle.h
-  vtkVRInteractorStyle.cxx
-  vtkVRInteractorStyle.h
   vtkVRInteractorStyleFactory.cxx
   vtkVRInteractorStyleFactory.h
-  vtkVRMovePointStyle.cxx
-  vtkVRMovePointStyle.h
-  vtkVRQueue.cxx
-  vtkVRQueue.h
-  vtkVRSkeletonStyle.cxx
-  vtkVRSkeletonStyle.h
-  vtkVRSpaceNavigatorGrabWorldStyle.cxx
-  vtkVRSpaceNavigatorGrabWorldStyle.h
-  vtkVRStylusStyle.cxx
-  vtkVRStylusStyle.h
-  vtkVRTrackStyle.cxx
-  vtkVRTrackStyle.h
-  vtkVRVirtualHandStyle.cxx
-  vtkVRVirtualHandStyle.h
   "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVRConfig.h")
 
 
@@ -113,10 +87,14 @@ list(APPEND sources
 
 paraview_add_plugin(CAVEInteraction
   REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   UI_FILES ${ui_files}
-  SOURCES ${sources})
+  SOURCES ${sources}
+  MODULES CAVEInteraction::Styles
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Interactions/vtk.module"
+  XML_DOCUMENTATION OFF)
 
 target_include_directories(CAVEInteraction
   PRIVATE

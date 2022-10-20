@@ -35,13 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-class vtkVRInteractorStyle;
+class vtkSMVRInteractorStyleProxy;
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 
 /// pqVRQueueHandler is a class that process events stacked on to vtkVRQueue
-/// one by one. One adds vtkVRInteractorStyles to the handler to do any actual
+/// one by one. One adds vtkSMVRInteractorStyleProxys to the handler to do any actual
 /// work with these events.
 class pqVRQueueHandler : public QObject
 {
@@ -53,11 +53,11 @@ public:
   virtual ~pqVRQueueHandler();
 
   /// Add/remove interactor style.
-  void add(vtkVRInteractorStyle* style);
-  void remove(vtkVRInteractorStyle* style);
+  void add(vtkSMVRInteractorStyleProxy* style);
+  void remove(vtkSMVRInteractorStyleProxy* style);
   void clear();
 
-  QList<vtkVRInteractorStyle*> styles();
+  QList<vtkSMVRInteractorStyleProxy*> styles();
 
   static pqVRQueueHandler* instance();
 

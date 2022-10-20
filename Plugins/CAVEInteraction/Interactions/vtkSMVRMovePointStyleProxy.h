@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRMovePointStyle.h
+   Module:    vtkSMVRMovePointStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 /**
- * @class   vtkVRMovePointStyle
+ * @class   vtkSMVRMovePointStyleProxy
  * @brief   an interaction style to control the position of a point with a stylus
  *
- * vtkVRMovePointStyle is an interaction style that uses the position of the
+ * vtkSMVRMovePointStyleProxy is an interaction style that uses the position of the
  * tracker in screen space to modify the position of a 3D point.
  */
-#ifndef vtkVRMovePointStyle_h
-#define vtkVRMovePointStyle_h
+#ifndef vtkSMVRMovePointStyleProxy_h
+#define vtkSMVRMovePointStyleProxy_h
 
-#include "vtkVRTrackStyle.h"
+#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkSMVRTrackStyleProxy.h"
 
 struct vtkVREvent;
 
-class vtkVRMovePointStyle : public vtkVRTrackStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRMovePointStyleProxy : public vtkSMVRTrackStyleProxy
 {
 public:
-  static vtkVRMovePointStyle* New();
-  vtkTypeMacro(vtkVRMovePointStyle, vtkVRTrackStyle);
+  static vtkSMVRMovePointStyleProxy* New();
+  vtkTypeMacro(vtkSMVRMovePointStyleProxy, vtkSMVRTrackStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   int GetControlledPropertySize() override { return 3; }
 
 protected:
-  vtkVRMovePointStyle();
-  ~vtkVRMovePointStyle() override = default;
+  vtkSMVRMovePointStyleProxy();
+  ~vtkSMVRMovePointStyleProxy() override = default;
 
   void HandleButton(const vtkVREvent& data) override;
   void HandleTracker(const vtkVREvent& data) override;
@@ -62,11 +63,11 @@ protected:
   bool EnableMovePoint;
 
 private:
-  vtkVRMovePointStyle(const vtkVRMovePointStyle&) = delete;
-  void operator=(const vtkVRMovePointStyle&) = delete;
+  vtkSMVRMovePointStyleProxy(const vtkSMVRMovePointStyleProxy&) = delete;
+  void operator=(const vtkSMVRMovePointStyleProxy&) = delete;
 
   double LastRecordedPosition[3];
   bool PositionRecorded;
 };
 
-#endif // vtkVRMovePointStyle_h
+#endif // vtkSMVRMovePointStyleProxy_h

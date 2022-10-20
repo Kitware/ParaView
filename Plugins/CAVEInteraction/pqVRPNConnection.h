@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMatrix4x4.h"
 #include "vtkTransform.h"
-#include "vtkVRQueue.h"
 
 #include <QtCore/QMutex>
 
@@ -47,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 class pqVRPNEventListener;
+class vtkVRQueue;
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;

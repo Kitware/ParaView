@@ -36,11 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkVRGrabWorldStyle.h"
-#include "vtkVRInteractorStyle.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 #include "vtkVRInteractorStyleFactory.h"
 #include "vtkVRQueue.h"
-#include "vtkVRTrackStyle.h"
 #include "vtkWeakPointer.h"
 
 #include "pqActiveObjects.h"
@@ -100,7 +98,7 @@ pqVRQueueHandler::~pqVRQueueHandler()
 }
 
 //----------------------------------------------------------------------------
-void pqVRQueueHandler::add(vtkVRInteractorStyle* style)
+void pqVRQueueHandler::add(vtkSMVRInteractorStyleProxy* style)
 {
   if (!this->Internals->Styles->IsItemPresent(style))
   {
@@ -111,7 +109,7 @@ void pqVRQueueHandler::add(vtkVRInteractorStyle* style)
 }
 
 //----------------------------------------------------------------------------
-void pqVRQueueHandler::remove(vtkVRInteractorStyle* style)
+void pqVRQueueHandler::remove(vtkSMVRInteractorStyleProxy* style)
 {
   this->Internals->Styles->RemoveItem(style);
   Q_EMIT stylesChanged();
@@ -128,13 +126,13 @@ void pqVRQueueHandler::clear()
 }
 
 //----------------------------------------------------------------------public
-QList<vtkVRInteractorStyle*> pqVRQueueHandler::styles()
+QList<vtkSMVRInteractorStyleProxy*> pqVRQueueHandler::styles()
 {
-  vtkVRInteractorStyle* style;
-  QList<vtkVRInteractorStyle*> result;
+  vtkSMVRInteractorStyleProxy* style;
+  QList<vtkSMVRInteractorStyleProxy*> result;
   for (this->Internals->Styles->InitTraversal();
-       (style =
-           vtkVRInteractorStyle::SafeDownCast(this->Internals->Styles->GetNextItemAsObject()));)
+       (style = vtkSMVRInteractorStyleProxy::SafeDownCast(
+          this->Internals->Styles->GetNextItemAsObject()));)
   {
     result << style;
   }
@@ -166,10 +164,10 @@ void pqVRQueueHandler::processEvents()
   {
     vtkVREvent event = events.front(); /* get first event on the queue */
     events.pop();
-    vtkVRInteractorStyle* style;
+    vtkSMVRInteractorStyleProxy* style;
     for (this->Internals->Styles->InitTraversal();
-         (style =
-             vtkVRInteractorStyle::SafeDownCast(this->Internals->Styles->GetNextItemAsObject()));)
+         (style = vtkSMVRInteractorStyleProxy::SafeDownCast(
+            this->Internals->Styles->GetNextItemAsObject()));)
     {
       if (style->HandleEvent(event))
       {
@@ -180,10 +178,10 @@ void pqVRQueueHandler::processEvents()
 
   // There should be an explicit update for each handler. Otherwise the server
   // side updates will not happen
-  vtkVRInteractorStyle* style;
+  vtkSMVRInteractorStyleProxy* style;
   for (this->Internals->Styles->InitTraversal();
-       (style =
-           vtkVRInteractorStyle::SafeDownCast(this->Internals->Styles->GetNextItemAsObject()));)
+       (style = vtkSMVRInteractorStyleProxy::SafeDownCast(
+          this->Internals->Styles->GetNextItemAsObject()));)
   {
     if (style->Update())
     {
@@ -243,7 +241,7 @@ void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* 
       if (child && child->GetName() && strcmp(child->GetName(), "Style") == 0)
       {
         const char* class_name = child->GetAttributeOrEmpty("class");
-        vtkVRInteractorStyle* style = factory->NewInteractorStyleFromClassName(class_name);
+        vtkSMVRInteractorStyleProxy* style = factory->NewInteractorStyleFromClassName(class_name);
         if (style)
         {
           if (style->Configure(child, locator))
@@ -277,10 +275,10 @@ void pqVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
 
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRInteractorStyles");
-  vtkVRInteractorStyle* style;
+  vtkSMVRInteractorStyleProxy* style;
   for (this->Internals->Styles->InitTraversal();
-       (style =
-           vtkVRInteractorStyle::SafeDownCast(this->Internals->Styles->GetNextItemAsObject()));)
+       (style = vtkSMVRInteractorStyleProxy::SafeDownCast(
+          this->Internals->Styles->GetNextItemAsObject()));)
   {
     vtkPVXMLElement* child = style->SaveConfiguration();
     if (child)

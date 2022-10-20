@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRVirtualHandStyle.h
+   Module:  vtkSMVRControlSlicePositionStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,47 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRVirtualHandStyle_h
-#define vtkVRVirtualHandStyle_h
+#ifndef vtkSMVRControlSlicePositionStyleProxy_h
+#define vtkSMVRControlSlicePositionStyleProxy_h
 
+#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
-#include "vtkVRTrackStyle.h" // WRS-TODO: why include "vtkVRTrackStyle.h" and not "vtkVRInteractorStyle.h"?  Test the latter
+#include "vtkSMVRInteractorStyleProxy.h"
 
-class vtkCamera;
+class vtkTransform;
 class vtkMatrix4x4;
-class vtkSMRenderViewProxy;
-class vtkSMDoubleVectorProperty;
-class vtkSMIntVectorProperty;
-struct vtkVREvent;
 
-class vtkVRVirtualHandStyle : public vtkVRTrackStyle
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRControlSlicePositionStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
-  static vtkVRVirtualHandStyle* New();
-  vtkTypeMacro(vtkVRVirtualHandStyle, vtkVRTrackStyle);
+  static vtkSMVRControlSlicePositionStyleProxy* New();
+  vtkTypeMacro(vtkSMVRControlSlicePositionStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  int GetControlledPropertySize() override { return 3; }
+
+  /// Update() called to update all the remote vtkObjects and perhaps even to render.
+  ///   Typically processing intensive operations go here. The method should not
+  ///   be called from within the handler and is reserved to be called from an
+  ///   external interaction style manager.
+  bool Update() override;
+
 protected:
-  vtkVRVirtualHandStyle();
-  ~vtkVRVirtualHandStyle(); // WRS-TODO: no "override" here?  Others have it.
+  vtkSMVRControlSlicePositionStyleProxy();
+  ~vtkSMVRControlSlicePositionStyleProxy() override;
 
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
-  bool CurrentButton;
-  bool PrevButton;
-
-  bool EventPress;
-  bool EventRelease;
-
-  vtkNew<vtkMatrix4x4> CurrentTrackerMatrix;
-  vtkNew<vtkMatrix4x4> InverseTrackerMatrix;
-  vtkNew<vtkMatrix4x4> CachedModelMatrix;
-  vtkNew<vtkMatrix4x4> NewModelMatrix;
+  bool Enabled;
+  bool InitialPositionRecorded;
+  double Origin[4];
+  vtkNew<vtkMatrix4x4> InitialInvertedPose;
 
 private:
-  vtkVRVirtualHandStyle(const vtkVRVirtualHandStyle&) = delete;
-  void operator=(const vtkVRVirtualHandStyle&) = delete;
+  vtkSMVRControlSlicePositionStyleProxy(
+    const vtkSMVRControlSlicePositionStyleProxy&) = delete;              // Not implemented
+  void operator=(const vtkSMVRControlSlicePositionStyleProxy&) = delete; // Not implemented
 };
 
-#endif // vtkVRVirtualHandStyle_h
+#endif // vtkSMVRControlSlicePositionStyleProxy_h

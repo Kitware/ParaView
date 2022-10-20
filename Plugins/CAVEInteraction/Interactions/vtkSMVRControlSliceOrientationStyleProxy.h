@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRStylusStyle.h
+   Module:  vtkSMVRControlSliceOrientationStyleProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-/**
- * @class   vtkVRStylusStyle
- * @brief   an interaction style to control translation and rotation with a stylus
- *
- * vtkVRStylusStyle is an interaction style that uses the position of the
- * stylus in screen space (for example the stylus of the zSpace) to modify a 4x4 matrix.
- * Only the location of the stylus is used, the rotation has no effect.
- * Only works with RenderView proxy.
- */
-#ifndef vtkVRStylusStyle_h
-#define vtkVRStylusStyle_h
+#ifndef vtkSMVRControlSliceOrientationStyleProxy_h
+#define vtkSMVRControlSliceOrientationStyleProxy_h
 
-#include "vtkVRTrackStyle.h"
-struct vtkVREvent;
+#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkNew.h"
+#include "vtkSMVRInteractorStyleProxy.h"
 
-class vtkVRStylusStyle : public vtkVRTrackStyle
+class vtkMatrix4x4;
+
+class VTKINTERACTIONSTYLES_EXPORT vtkSMVRControlSliceOrientationStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
-  static vtkVRStylusStyle* New();
-  vtkTypeMacro(vtkVRStylusStyle, vtkVRTrackStyle);
+  static vtkSMVRControlSliceOrientationStyleProxy* New();
+  vtkTypeMacro(vtkSMVRControlSliceOrientationStyleProxy, vtkSMVRInteractorStyleProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  int GetControlledPropertySize() override { return 3; }
+
+  /// Update() called to update all the remote vtkObjects and perhaps even to render.
+  ///   Typically processing intensive operations go here. The method should not
+  ///   be called from within the handler and is reserved to be called from an
+  ///   external interaction style manager.
+  bool Update() override;
+
 protected:
-  vtkVRStylusStyle();
-  ~vtkVRStylusStyle() override = default;
+  vtkSMVRControlSliceOrientationStyleProxy();
+  ~vtkSMVRControlSliceOrientationStyleProxy() override;
 
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
-  bool EnableTranslate;
-  bool EnableRotate;
+  bool Enabled;
+  bool InitialOrientationRecorded;
+
+  double InitialQuat[4];
+  double InitialTrackerQuat[4];
+  double UpdatedQuat[4];
+  double Normal[4];
+
+  vtkNew<vtkMatrix4x4> InitialInvertedPose;
 
 private:
-  vtkVRStylusStyle(const vtkVRStylusStyle&) = delete;
-  void operator=(const vtkVRStylusStyle&) = delete;
-
-  double LastRecordedPosition[3];
-  bool PositionRecorded;
+  vtkSMVRControlSliceOrientationStyleProxy(
+    const vtkSMVRControlSliceOrientationStyleProxy&) = delete;              // Not implemented
+  void operator=(const vtkSMVRControlSliceOrientationStyleProxy&) = delete; // Not implemented
 };
 
-#endif // vtkVRStylusStyle_h
+#endif // vtkSMVRControlSliceOrientationStyleProxy_h
