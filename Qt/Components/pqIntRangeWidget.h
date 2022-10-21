@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqIntRangeWidget_h
 
 #include "pqComponentsModule.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkSmartPointer.h"
 #include <QWidget>
 
@@ -51,8 +50,6 @@ class PQCOMPONENTS_EXPORT pqIntRangeWidget : public QWidget
   Q_PROPERTY(int value READ value WRITE setValue USER true)
   Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
-  // PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
-  Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange);
 
 public:
   /**
@@ -70,12 +67,6 @@ public:
   int minimum() const;
   // get the max range value
   int maximum() const;
-
-  /**
-   * @deprecated strictRange is deprecated and is not working as intended
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
-  bool strictRange() const;
 
   // Sets the range domain to monitor. This will automatically update
   // the widgets range when the domain changes.
@@ -105,12 +96,6 @@ public Q_SLOTS:
   // set the max range value
   void setMaximum(int);
 
-  /**
-   * @deprecated strictRange is deprecated and is not working as intended
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
-  void setStrictRange(bool);
-
 private Q_SLOTS:
   void sliderChanged(int);
   void textChanged(const QString&);
@@ -129,8 +114,6 @@ private: // NOLINT(readability-redundant-access-specifiers)
   QSlider* Slider;
   pqLineEdit* LineEdit;
   bool BlockUpdate;
-  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
-  bool StrictRange = false;
   vtkSmartPointer<vtkSMIntRangeDomain> Domain;
   vtkEventQtSlotConnect* DomainConnection;
   bool InteractingWithSlider;

@@ -30,9 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "pqApplicationCore.h"
 
 #include "pqQtConfig.h" // for PARAVIEW_USE_QTHELP
@@ -62,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "pqMainWindowEventManager.h"
 #include "pqObjectBuilder.h"
-#include "pqOptions.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
@@ -80,7 +76,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCLIOptions.h"
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
-#include "vtkLegacy.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
@@ -123,21 +118,6 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqApplicationCore::pqApplicationCore(
-  int& argc, char** argv, pqOptions* options, QObject* parentObject)
-  : pqApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, parentObject)
-{
-  this->setOptions(options);
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setOptions(pqOptions* options)
-{
-  this->Options = options;
-  vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
-}
-
-//-----------------------------------------------------------------------------
 pqApplicationCore::pqApplicationCore(int& argc, char** argv, vtkCLIOptions* options /*=nullptr*/,
   bool addStandardArgs /*=true*/, QObject* parentObject /*=nullptr*/)
   : QObject(parentObject)
@@ -163,9 +143,6 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, vtkCLIOptions* opti
     // initialization short-circuited. throw exception to exit the application.
     throw pqApplicationCoreExitCode(vtkInitializationHelper::GetExitCode());
   }
-
-  this->Options = vtk::TakeSmartPointer(pqOptions::New());
-  vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
 
   this->constructor();
 }
@@ -303,13 +280,6 @@ pqApplicationCore::~pqApplicationCore()
   }
 
   vtkInitializationHelper::Finalize();
-}
-
-//-----------------------------------------------------------------------------
-pqOptions* pqApplicationCore::getOptions() const
-{
-  VTK_LEGACY_BODY(pqApplicationCore::getOptions, "ParaView 5.10");
-  return this->Options;
 }
 
 //-----------------------------------------------------------------------------

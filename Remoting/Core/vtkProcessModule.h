@@ -24,9 +24,8 @@
 #define vtkProcessModule_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
-#include "vtkRemotingCoreModule.h"  //needed for exports
-#include "vtkSmartPointer.h"        // needed for vtkSmartPointer.
+#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkSmartPointer.h"       // needed for vtkSmartPointer.
 
 #include <string> // for std::string
 
@@ -34,7 +33,6 @@ class vtkInformation;
 class vtkMultiProcessController;
 class vtkNetworkAccessManager;
 class vtkProcessModuleInternals;
-class vtkPVOptions;
 class vtkSession;
 class vtkSessionIterator;
 
@@ -191,18 +189,6 @@ public:
    * after Initialize().
    */
   static vtkProcessModule* GetProcessModule();
-
-  ///@{
-  /**
-   * @deprecated in ParaView 5.10. vtkPVOptions is now replaced by
-   * vtkCLIOptions for command line parsing and various configuration e.g
-   * vtkProcessModuleConfiguration, vtkRemotingCoreConfiguration, etc.
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
-  vtkPVOptions* GetOptions();
-  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
-  void SetOptions(vtkPVOptions*);
-  ///@}
 
   //********** ACCESSORS FOR VARIOUS HELPERS *****************************
 
@@ -362,8 +348,6 @@ private:
 
   static int DefaultMinimumGhostLevelsToRequestForStructuredPipelines;
   static int DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines;
-
-  vtkPVOptions* Options;
 };
 
 #endif // vtkProcessModule_h

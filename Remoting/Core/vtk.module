@@ -8,6 +8,7 @@ KIT
   ParaView::CoreKit
 DEPENDS
   ParaView::RemotingClientServerStream
+  ParaView::Versioning
   ParaView::VTKExtensionsCore
   VTK::CommonCore
   VTK::CommonMisc

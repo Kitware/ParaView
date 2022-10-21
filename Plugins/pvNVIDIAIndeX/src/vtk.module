@@ -3,7 +3,6 @@ NAME
 LIBRARY_NAME
   vtkIndeXRepresentations
 DEPENDS
-  ParaView::RemotingCore
   ParaView::RemotingServerManager
   ParaView::RemotingViews
   VTK::CommonCore
@@ -15,6 +14,7 @@ DEPENDS
   VTK::RenderingVolume
   VTK::RenderingVolumeOpenGL2
 PRIVATE_DEPENDS
+  ParaView::RemotingCore
   ParaView::RemotingSettings
   ParaView::VTKExtensionsFiltersRendering
   VTK::CommonDataModel

@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 #include "pqApplicationComponentsModule.h" // for exports
-#include "vtkParaViewDeprecation.h"        // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include <QList>
 #include <QPointer>
 
@@ -60,12 +59,6 @@ public:
   pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* options = nullptr,
     bool addStandardArgs = true, QObject* parent = nullptr);
   ~pqPVApplicationCore() override;
-
-  /**
-   * @deprecated in ParaView 5.10.
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Use the `vtkCLIOptions` overload")
-  pqPVApplicationCore(int& argc, char** argv, pqOptions* options);
 
   /**
    * Returns the pqPVApplicationCore instance. If no pqPVApplicationCore has been

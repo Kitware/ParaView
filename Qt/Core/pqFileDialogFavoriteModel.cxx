@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 
-// PARAVIEW_DEPRECATED_IN_5_11_0
+// PARAVIEW_DEPRECATED_IN_5_12_0
 bool pqFileDialogFavoriteModel::AddExamplesInFavorites = true;
 
 /////////////////////////////////////////////////////////////////////

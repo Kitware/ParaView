@@ -30,9 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "pqPVApplicationCore.h"
 
 #include "pqActiveObjects.h"
@@ -63,13 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QFileOpenEvent>
 #include <QList>
-
-//-----------------------------------------------------------------------------
-pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
-  : pqPVApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, nullptr)
-{
-  this->setOptions(options);
-}
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* options,

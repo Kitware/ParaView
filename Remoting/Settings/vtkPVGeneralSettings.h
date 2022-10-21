@@ -27,7 +27,6 @@
 #define vtkPVGeneralSettings_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h"    // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkRemotingSettingsModule.h" //needed for exports
 #include "vtkSmartPointer.h"           // needed for vtkSmartPointer.
 
@@ -91,20 +90,6 @@ public:
    */
   vtkGetMacro(AutoApplyActiveOnly, bool);
   vtkSetMacro(AutoApplyActiveOnly, bool);
-  ///@}
-
-  ///@{
-  /**
-   * Deprecated. AutoMPI is no longer supported.
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
-  void SetEnableAutoMPI(bool);
-  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
-  bool GetEnableAutoMPI();
-  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
-  void SetAutoMPILimit(int val);
-  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
-  int GetAutoMPILimit();
   ///@}
 
   ///@{

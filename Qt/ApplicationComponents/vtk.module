@@ -9,10 +9,12 @@ GROUPS
 DEPENDS
   ParaView::pqComponents
   ParaView::qttesting
+  ParaView::Versioning
   VTK::GUISupportQt
 PRIVATE_DEPENDS
   ParaView::RemotingAnimation
   ParaView::RemotingApplication
+  ParaView::RemotingCore
   ParaView::RemotingExport
   ParaView::RemotingLive
   ParaView::RemotingMisc

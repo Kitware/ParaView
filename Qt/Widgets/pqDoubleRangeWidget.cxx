@@ -30,9 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "pqDoubleRangeWidget.h"
 
 // Qt includes
@@ -113,26 +110,5 @@ void pqDoubleRangeWidget::setMinimum(double val)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::updateValidator()
 {
-  if (this->StrictRange)
-  {
-    this->setValidator(new QDoubleValidator(this->minimum(), this->maximum(), 100, this));
-  }
-  else
-  {
-    this->setValidator(new QDoubleValidator(this));
-  }
-}
-
-//-----------------------------------------------------------------------------
-bool pqDoubleRangeWidget::strictRange() const
-{
-  const QDoubleValidator* dv = this->validator();
-  return dv->bottom() == this->minimum() && dv->top() == this->maximum();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::setStrictRange(bool s)
-{
-  this->StrictRange = s;
-  this->updateValidator();
+  this->setValidator(new QDoubleValidator(this));
 }

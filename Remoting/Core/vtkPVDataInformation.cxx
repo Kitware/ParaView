@@ -13,9 +13,6 @@
 
 =========================================================================*/
 
-// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "vtkPVDataInformation.h"
 
 #include "vtkAlgorithm.h"
@@ -1351,62 +1348,4 @@ unsigned int vtkPVDataInformation::ComputeCompositeIndexForAMR(
   }
 
   return (compositeIndex + index);
-}
-
-//============================================================================
-vtkTypeUInt64 vtkPVDataInformation::GetPolygonCount()
-{
-  VTK_LEGACY_REPLACED_BODY(
-    vtkPVDataInformation::GetPolygonCount, "ParaView 5.10", vtkPVDataInformation::GetNumberOfCells);
-  return this->GetNumberOfCells();
-}
-
-void* vtkPVDataInformation::GetCompositeDataInformation()
-{
-  VTK_LEGACY_BODY(vtkPVDataInformation::GetCompositeDataInformation, "ParaView 5.10");
-  return nullptr;
-}
-
-vtkPVDataInformation* vtkPVDataInformation::GetDataInformationForCompositeIndex(int)
-{
-  VTK_LEGACY_BODY(vtkPVDataInformation::GetDataInformationForCompositeIndex, "ParaView 5.10");
-  return nullptr;
-}
-
-unsigned int vtkPVDataInformation::GetNumberOfBlockLeafs(bool)
-{
-  VTK_LEGACY_BODY(vtkPVDataInformation::GetNumberOfBlockLeafs, "ParaView 5.10");
-  return 0;
-}
-
-vtkPVDataInformation* vtkPVDataInformation::GetDataInformationForCompositeIndex(int*)
-{
-  VTK_LEGACY_BODY(vtkPVDataInformation::GetDataInformationForCompositeIndex, "ParaView 5.10");
-  return nullptr;
-}
-
-double* vtkPVDataInformation::GetTimeSpan()
-{
-  VTK_LEGACY_REPLACED_BODY(
-    vtkPVDataInformation::GetTimeSpan, "ParaView 5.10", vtkPVDataInformation::GetTimeRange);
-  return this->GetTimeRange();
-}
-
-void vtkPVDataInformation::GetTimeSpan(double& x, double& y)
-{
-  VTK_LEGACY_REPLACED_BODY(
-    vtkPVDataInformation::GetTimeSpan, "ParaView 5.10", vtkPVDataInformation::GetTimeRange);
-  this->GetTimeRange(x, y);
-}
-
-void vtkPVDataInformation::GetTimeSpan(double val[2])
-{
-  VTK_LEGACY_REPLACED_BODY(
-    vtkPVDataInformation::GetTimeSpan, "ParaView 5.10", vtkPVDataInformation::GetTimeRange);
-  this->GetTimeRange(val);
-}
-
-void vtkPVDataInformation::RegisterHelper(const char*, const char*)
-{
-  VTK_LEGACY_BODY(vtkPVDataInformation::RegisterHelper, "ParaView 5.10");
 }

@@ -111,7 +111,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(CustomShortcutBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(MainWindowEventBehavior);
 
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use AddExamplesInFileDialogBehavior instead")
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use AddExamplesInFileDialogBehavior instead")
   PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFavoritesBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFileDialogBehavior);
 
@@ -181,7 +181,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(CustomShortcutBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(MainWindowEventBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(UsageLoggingBehavior);
-  // PARAVIEW_DEPRECATED_IN_5_11_0
+  // PARAVIEW_DEPRECATED_IN_5_12_0
   PQ_BEHAVIOR_DECLARE_FLAG(AddExamplesInFavoritesBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(AddExamplesInFileDialogBehavior);
 };

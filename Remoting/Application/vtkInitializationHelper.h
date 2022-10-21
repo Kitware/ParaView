@@ -26,11 +26,9 @@
 #define vtkInitializationHelper_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h"       // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkRemotingApplicationModule.h" // needed for exports
 #include <string>                         // needed for std::string
 
-class vtkPVOptions;
 class vtkCLIOptions;
 class vtkStringList;
 
@@ -154,15 +152,6 @@ public:
    * Get file path for the user settings file.
    */
   static std::string GetUserSettingsFilePath();
-
-  /**
-   * @deprecated in ParaView 5.10. `vtkPVOptions` is deprecated in ParaView 5.10
-   * and hence these functions are also deprecated.
-   */
-  PARAVIEW_DEPRECATED_IN_5_10_0("Use the `vtkCLIOptions` overload")
-  static void Initialize(const char* executable, int type, vtkPVOptions* options);
-  PARAVIEW_DEPRECATED_IN_5_10_0("Use the `vtkCLIOptions` overload")
-  static void Initialize(int argc, char** argv, int type, vtkPVOptions* options);
 
 protected:
   vtkInitializationHelper() = default;
