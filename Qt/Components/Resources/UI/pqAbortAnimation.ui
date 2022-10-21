@@ -38,7 +38,7 @@
        <property name="statusTip" >
         <string>Interrupts the saving of animation and aborts it.</string>
        </property>
-       <property name="whatsThis" >
+       <property name="toolTip" >
         <string>Interrupts the saving of animation and aborts it.</string>
        </property>
        <property name="text" >

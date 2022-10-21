@@ -88,9 +88,6 @@
      <property name="statusTip">
       <string>Toggle fixed-point representation (always show #Precision digits)</string>
      </property>
-     <property name="whatsThis">
-      <string>Toggle fixed-point representation (always show #Precision digits)</string>
-     </property>
      <property name="text">
       <string>FixedRep</string>
      </property>
@@ -109,9 +106,6 @@
       <string>Show only selected elements.</string>
      </property>
      <property name="statusTip">
-      <string>Show only selected elements.</string>
-     </property>
-     <property name="whatsThis">
       <string>Show only selected elements.</string>
      </property>
      <property name="text">
@@ -135,9 +129,6 @@
       <string>Toggle column visibility</string>
      </property>
      <property name="statusTip">
-      <string>Toggle column visibility</string>
-     </property>
-     <property name="whatsThis">
       <string>Toggle column visibility</string>
      </property>
      <property name="text">

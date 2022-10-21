@@ -214,9 +214,6 @@
    <property name="statusTip">
     <string>Disregard this source/filter's time from animations</string>
    </property>
-   <property name="whatsThis">
-    <string>Disregard this source/filter's time from animations</string>
-   </property>
   </action>
   <action name="actionEditSettings">
    <property name="icon">

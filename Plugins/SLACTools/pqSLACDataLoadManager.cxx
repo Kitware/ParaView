@@ -52,6 +52,9 @@ pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f /*=0*
   this->ui = new pqSLACDataLoadManager::pqUI;
   this->ui->setupUi(this);
 
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
+
   this->ui->meshFile->setServer(this->Server);
   this->ui->modeFile->setServer(this->Server);
   this->ui->particlesFile->setServer(this->Server);

@@ -75,6 +75,7 @@ pqChangeInputDialog::pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* paren
   this->Internals->BlockSelectionChanged = false;
 
   this->Internals->setupUi(this);
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();

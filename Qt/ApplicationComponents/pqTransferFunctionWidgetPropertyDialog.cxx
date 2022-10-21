@@ -62,6 +62,9 @@ pqTransferFunctionWidgetPropertyDialog::pqTransferFunctionWidgetPropertyDialog(c
 
   QObject::connect(this->Internals->Ui.TransferFunctionEditor, SIGNAL(controlPointsModified()),
     this->PropertyWidget, SLOT(propagateProxyPointsProperty()));
+
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 pqTransferFunctionWidgetPropertyDialog::~pqTransferFunctionWidgetPropertyDialog() = default;

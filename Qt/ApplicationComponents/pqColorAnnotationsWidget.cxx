@@ -254,6 +254,9 @@ public:
     layout_->addLayout(widgetLayout);
     layout_->addWidget(buttonBox);
     this->setLayout(layout_);
+
+    // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
+    this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
   }
 
   ~pqOpacityRangeDialog() override = default;

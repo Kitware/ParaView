@@ -71,7 +71,7 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent)
 {
   this->Ui->setupUi(this);
   this->setObjectName("pqAboutDialog");
-  // remove do-nothing "?" title bar button on Windows.
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   QString spashImage = QString(":/%1/SplashImage.img").arg(QApplication::applicationName());

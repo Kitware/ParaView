@@ -36,6 +36,9 @@ pqDialog::pqDialog(QWidget* _parent /*=0*/, Qt::WindowFlags f /*=0*/)
   : QDialog(_parent, f)
 {
   this->UndoLabel = "Dialog";
+
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 //-----------------------------------------------------------------------------
