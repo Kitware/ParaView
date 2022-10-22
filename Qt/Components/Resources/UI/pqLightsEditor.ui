@@ -56,9 +56,6 @@
       <item>
        <widget class="QCheckBox" name="LightKit">
         <property name="toolTip">
-         <string>A simple lighting kit</string>
-        </property>
-        <property name="whatsThis">
          <string>Turn on or off all the lights in the lighting kit.</string>
         </property>
         <property name="text">
@@ -100,9 +97,6 @@
       <item row="3" column="0">
        <widget class="QLabel" name="backLabel">
         <property name="toolTip">
-         <string>Back Light Parameters</string>
-        </property>
-        <property name="whatsThis">
          <string>The two back lights, one on the left of the object as seen from the observer and one on the right, fill on the high-contrast areas behind the object. </string>
         </property>
         <property name="text">
@@ -119,9 +113,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key-to-Head Ratio</string>
-        </property>
-        <property name="whatsThis">
          <string>Set the Key-to-Head ratio. Similar to the Key-to-Fill ratio, this ratio controls how bright the headlight light is compared to the key light: larger values correspond to a dimmer headlight light. The headlight is special kind of fill light, lighting only the parts of the object that the camera can see. As such, a headlight tends to reduce the contrast of a scene. It can be used to fill in &quot;shadows&quot; of the object missed by the key and fill lights. The headlight should always be significantly dimmer than the key light: ratios of 2 to 15 are typical.</string>
         </property>
         <property name="minimum">
@@ -135,9 +126,6 @@
       <item row="2" column="1">
        <widget class="QLabel" name="fillWarmthLabel">
         <property name="toolTip">
-         <string>Fill Light Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Fill Light. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="text">
@@ -148,9 +136,6 @@
       <item row="2" column="7">
        <widget class="QLabel" name="fillAzimuthLabel">
         <property name="toolTip">
-         <string>Fill Light Azimuth</string>
-        </property>
-        <property name="whatsThis">
          <string>The Fill Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="text">
@@ -161,9 +146,6 @@
       <item row="1" column="7">
        <widget class="QLabel" name="keyAzimuthLabel">
         <property name="toolTip">
-         <string>Key Light Azimuth</string>
-        </property>
-        <property name="whatsThis">
          <string>The Key Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="text">
@@ -180,9 +162,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Back Light Elevation</string>
-        </property>
-        <property name="whatsThis">
          <string>The Back Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="decimals">
@@ -208,9 +187,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key Light Intensity</string>
-        </property>
-        <property name="whatsThis">
          <string>The Intensity of the Key Light.  0 = off and 1 = full intensity.</string>
         </property>
         <property name="maximum">
@@ -230,9 +206,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key-to-Back Ratio</string>
-        </property>
-        <property name="whatsThis">
          <string>Set the Key-to-Back Ratio. This ratio controls how bright the back lights are compared to the key light: larger values correspond to dimmer back lights. The back lights fill in the remaining high-contrast regions behind the object. Values between 2 and 10 are good.</string>
         </property>
         <property name="minimum">
@@ -246,9 +219,6 @@
       <item row="4" column="1">
        <widget class="QLabel" name="headWarmthLabel">
         <property name="toolTip">
-         <string>Headlight Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Headlight. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="text">
@@ -265,9 +235,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key Light Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Key Light. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="buttonSymbols">
@@ -284,10 +251,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="fillLabel">
         <property name="toolTip">
-         <string>Fill Light Parameters</string>
-        </property>
-        <property name="whatsThis">
-         <string>The fill light is usually positioned across from or opposite from the key light (though still on the same side of the object as the camera) in order to simulate diffuse reflections from other objects in the scene.</string>
+         <string>The Fill Light is usually positioned across from or opposite from the key light (though still on the same side of the object as the camera) in order to simulate diffuse reflections from other objects in the scene.</string>
         </property>
         <property name="text">
          <string>Fill</string>
@@ -303,9 +267,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Fill Light Azimuth</string>
-        </property>
-        <property name="whatsThis">
          <string>The Fill Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="decimals">
@@ -331,9 +292,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Fill Light Elevation</string>
-        </property>
-        <property name="whatsThis">
          <string>The Fill Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="decimals">
@@ -359,9 +317,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key Light Elevation</string>
-        </property>
-        <property name="whatsThis">
          <string>The Key Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="decimals">
@@ -381,9 +336,6 @@
       <item row="1" column="0">
        <widget class="QLabel" name="keyLabel">
         <property name="toolTip">
-         <string>Key Light Parameters</string>
-        </property>
-        <property name="whatsThis">
          <string>The Key Light is the main light.  It is usually positioned so that it appears like an overhead light (like the sun or a ceiling light).  It is generally positioned to shine down from about a 45 degree angle vertically and at least a little offset side to side.  The key light is usually at least about twice as bright as the total of all other lights in the scene to provide good modeling of object features.</string>
         </property>
         <property name="text">
@@ -400,9 +352,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key Light Azimuth</string>
-        </property>
-        <property name="whatsThis">
          <string>The Key Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="decimals">
@@ -422,9 +371,6 @@
       <item row="4" column="3">
        <widget class="QLabel" name="headRatioLabel">
         <property name="toolTip">
-         <string>Key-to-Head Ratio</string>
-        </property>
-        <property name="whatsThis">
          <string>Set the Key-to-Head ratio. Similar to the Key-to-Fill ratio, this ratio controls how bright the headlight light is compared to the key light: larger values correspond to a dimmer headlight light. The headlight is special kind of fill light, lighting only the parts of the object that the camera can see. As such, a headlight tends to reduce the contrast of a scene. It can be used to fill in &quot;shadows&quot; of the object missed by the key and fill lights. The headlight should always be significantly dimmer than the key light: ratios of 2 to 15 are typical.</string>
         </property>
         <property name="text">
@@ -441,9 +387,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Headlight Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Headlight. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="maximum">
@@ -457,9 +400,6 @@
       <item row="2" column="5">
        <widget class="QLabel" name="fillElevationLabel">
         <property name="toolTip">
-         <string>Fill Light Elevation</string>
-        </property>
-        <property name="whatsThis">
          <string>The Fill Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="text">
@@ -470,9 +410,6 @@
       <item row="2" column="3">
        <widget class="QLabel" name="fillRatioLabel">
         <property name="toolTip">
-         <string>Key-to-Fill Ratio</string>
-        </property>
-        <property name="whatsThis">
          <string>Set the Key-to-Fill Ratio. This ratio controls how bright the fill light is compared to the key light: larger values correspond to a dimmer fill light. The purpose of the fill light is to light parts of the object not lit by the key light, while still maintaining contrast. This type of lighting may correspond to indirect illumination from the key light, bounced off a wall, floor, or other object. The fill light should never be brighter than the key light: a good range for the key-to-fill ratio is between 2 and 10.</string>
         </property>
         <property name="text">
@@ -483,9 +420,6 @@
       <item row="1" column="3">
        <widget class="QLabel" name="keyIntensityLabel">
         <property name="toolTip">
-         <string>Key Light Intensity</string>
-        </property>
-        <property name="whatsThis">
          <string>The Intensity of the Key Light.  0 = off and 1 = full intensity.</string>
         </property>
         <property name="text">
@@ -496,9 +430,6 @@
       <item row="4" column="0">
        <widget class="QLabel" name="headLabel">
         <property name="toolTip">
-         <string>Headlight Parameters</string>
-        </property>
-        <property name="whatsThis">
          <string>The headlight, always located at the position of the camera, reduces the contrast between areas lit by the key and fill light. </string>
         </property>
         <property name="text">
@@ -515,9 +446,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Fill Light Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Fill Light. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="maximum">
@@ -537,9 +465,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Back Light Azimuth</string>
-        </property>
-        <property name="whatsThis">
          <string>The Back Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="decimals">
@@ -559,9 +484,6 @@
       <item row="3" column="5">
        <widget class="QLabel" name="backElevationLabel">
         <property name="toolTip">
-         <string>Back Light Elevation</string>
-        </property>
-        <property name="whatsThis">
          <string>The Back Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="text">
@@ -572,9 +494,6 @@
       <item row="3" column="3">
        <widget class="QLabel" name="backRatioLabel">
         <property name="toolTip">
-         <string>Key-to-Back Ratio</string>
-        </property>
-        <property name="whatsThis">
          <string>Set the Key-to-Back Ratio. This ratio controls how bright the back lights are compared to the key light: larger values correspond to dimmer back lights. The back lights fill in the remaining high-contrast regions behind the object. Values between 2 and 10 are good.</string>
         </property>
         <property name="text">
@@ -585,9 +504,6 @@
       <item row="1" column="5">
        <widget class="QLabel" name="keyElevationLabel">
         <property name="toolTip">
-         <string>Key Light Elevation</string>
-        </property>
-        <property name="whatsThis">
          <string>The Key Light Elevation. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="text">
@@ -598,9 +514,6 @@
       <item row="1" column="1">
        <widget class="QLabel" name="keyWarmthLabel">
         <property name="toolTip">
-         <string>Key Light Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Key Light. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="text">
@@ -611,9 +524,6 @@
       <item row="3" column="1">
        <widget class="QLabel" name="backWarmthLabel">
         <property name="toolTip">
-         <string>Back Light Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Back Light. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="text">
@@ -624,9 +534,6 @@
       <item row="3" column="7">
        <widget class="QLabel" name="backAzimuthLabel">
         <property name="toolTip">
-         <string>Back Light Azimuth</string>
-        </property>
-        <property name="whatsThis">
          <string>The Back Light Azimuth. For simplicity, the position of lights in the LightKit can only be specified using angles: the elevation (latitude) and azimuth (longitude) of each light with respect to the camera, expressed in degrees. (Lights always shine on the camera's lookat point.) For example, a light at (elevation=0, azimuth=0) is located at the camera (a headlight). A light at (elevation=90, azimuth=0) is above the lookat point, shining down. Negative azimuth values move the lights clockwise as seen above, positive values counter-clockwise. So, a light at (elevation=45, azimuth=-20) is above and in front of the object and shining slightly from the left side.</string>
         </property>
         <property name="text">
@@ -637,9 +544,6 @@
       <item row="5" column="0" colspan="4">
        <widget class="QCheckBox" name="MaintainLuminance">
         <property name="toolTip">
-         <string>Toggle constant perceptual brightness.</string>
-        </property>
-        <property name="whatsThis">
          <string>If Maintain Luminance is set, the LightKit will attempt to maintain the apparent intensity of lights based on their perceptual brightnesses.</string>
         </property>
         <property name="text">
@@ -656,9 +560,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Back Light Warmth</string>
-        </property>
-        <property name="whatsThis">
          <string>The &quot;Warmth&quot; of the Back Light. Warmth is a parameter that varies from 0 to 1, where 0 is &quot;cold&quot; (looks icy or lit by a very blue sky), 1 is &quot;warm&quot; (the red of a very red sunset, or the embers of a campfire), and 0.5 is a neutral white. The warmth scale is non-linear. Warmth values close to 0.5 are subtly &quot;warmer&quot; or &quot;cooler,&quot; much like a warmer tungsten incandescent bulb, a cooler halogen, or daylight (cooler still). Moving further away from 0.5, colors become more quickly varying towards blues and reds. With regards to aesthetics, extremes of warmth should be used sparingly. </string>
         </property>
         <property name="maximum">
@@ -678,9 +579,6 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>Key-to-Fill Ratio</string>
-        </property>
-        <property name="whatsThis">
          <string>Set the Key-to-Fill Ratio. This ratio controls how bright the fill light is compared to the key light: larger values correspond to a dimmer fill light. The purpose of the fill light is to light parts of the object not lit by the key light, while still maintaining contrast. This type of lighting may correspond to indirect illumination from the key light, bounced off a wall, floor, or other object. The fill light should never be brighter than the key light: a good range for the key-to-fill ratio is between 2 and 10.</string>
         </property>
         <property name="minimum">

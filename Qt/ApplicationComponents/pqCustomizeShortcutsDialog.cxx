@@ -440,6 +440,9 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
   });
   this->setWindowTitle(tr("Customize Shortcuts"));
   this->onSelectionChanged();
+
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
+  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 pqCustomizeShortcutsDialog::~pqCustomizeShortcutsDialog() = default;

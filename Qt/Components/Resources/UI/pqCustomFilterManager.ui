@@ -24,7 +24,7 @@
    </property>
    <item rowspan="5" row="0" column="0" >
     <widget class="QListView" name="CustomFilterList" >
-     <property name="whatsThis" >
+     <property name="toolTip" >
       <string>Displays the list of registered custom filter definitions.</string>
      </property>
      <property name="selectionMode" >
@@ -63,7 +63,7 @@
    </item>
    <item row="2" column="1" >
     <widget class="QPushButton" name="RemoveButton" >
-     <property name="whatsThis" >
+     <property name="toolTip" >
       <string>Removes the selected custom filter definitions.</string>
      </property>
      <property name="text" >
@@ -73,7 +73,7 @@
    </item>
    <item row="1" column="1" >
     <widget class="QPushButton" name="ExportButton" >
-     <property name="whatsThis" >
+     <property name="toolTip" >
       <string>Exports the selected custom filter definitions to a file.</string>
      </property>
      <property name="text" >
@@ -83,7 +83,7 @@
    </item>
    <item row="0" column="1" >
     <widget class="QPushButton" name="ImportButton" >
-     <property name="whatsThis" >
+     <property name="toolTip" >
       <string>Imports custom filter definitions from a file.</string>
      </property>
      <property name="text" >

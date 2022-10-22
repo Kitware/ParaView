@@ -73,9 +73,6 @@
      <property name="statusTip">
       <string>Toggle column visibility</string>
      </property>
-     <property name="whatsThis">
-      <string>Toggle column visibility</string>
-     </property>
      <property name="text">
       <string>Toggle column visibility</string>
      </property>

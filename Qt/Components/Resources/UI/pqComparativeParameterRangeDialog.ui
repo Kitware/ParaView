@@ -60,9 +60,6 @@ However number of values in both entires must match.</string>
      <property name="statusTip">
       <string>Controls the direction in which the parameter is varied.</string>
      </property>
-     <property name="whatsThis">
-      <string>Controls the direction in which the parameter is varied.</string>
-     </property>
      <item>
       <property name="text">
        <string>Vary horizontally first</string>

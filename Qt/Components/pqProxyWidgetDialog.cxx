@@ -115,6 +115,9 @@ public:
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
+    // remove do-nothing "?" title bar button on Windows.
+    self->setWindowFlags(self->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
+
     ui.SearchBox->setVisible(this->SearchEnabled);
     ui.SearchBox->setAdvancedSearchEnabled(!this->HideAdvancedProperties);
     ui.SearchBox->setAdvancedSearchActive(false);
@@ -323,8 +326,6 @@ pqProxyWidgetDialog::pqProxyWidgetDialog(
   : Superclass(parentObject, f)
   , Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this))
 {
-  // remove do-nothing "?" title bar button on Windows.
-  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 //-----------------------------------------------------------------------------
@@ -333,7 +334,6 @@ pqProxyWidgetDialog::pqProxyWidgetDialog(
   : Superclass(parentObject, f)
   , Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this, properties))
 {
-  this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 }
 
 //-----------------------------------------------------------------------------

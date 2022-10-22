@@ -28,7 +28,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Enter the thickness for the line.</string>
      </property>
      <property name="minimum">
@@ -57,7 +57,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Select the line style for the series.</string>
      </property>
      <item>
@@ -160,7 +160,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Enter the size for the marker.</string>
      </property>
      <property name="decimals">
@@ -199,7 +199,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Select the chart axes for the line series.</string>
      </property>
      <item>

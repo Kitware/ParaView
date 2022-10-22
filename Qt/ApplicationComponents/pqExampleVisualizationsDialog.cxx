@@ -19,7 +19,7 @@ pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObje
   , ui(new Ui::pqExampleVisualizationsDialog)
 {
   ui->setupUi(this);
-  // remove do-nothing "?" title bar button on Windows.
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   QObject::connect(

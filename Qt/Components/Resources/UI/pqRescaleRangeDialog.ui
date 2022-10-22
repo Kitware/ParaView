@@ -23,7 +23,7 @@
    </item>
    <item row="3" column="0">
     <widget class="pqDoubleLineEdit" name="MinimumOpacityScalar">
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Enter the new range minimum for the opacity map here.</string>
      </property>
      <property name="text">
@@ -122,7 +122,7 @@
    </item>
    <item row="1" column="0">
     <widget class="pqDoubleLineEdit" name="MinimumScalar">
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Enter the new range minimum for the color map here.</string>
      </property>
      <property name="placeholderText">
@@ -145,7 +145,7 @@
    </item>
    <item row="1" column="3">
     <widget class="pqDoubleLineEdit" name="MaximumScalar">
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Enter the new range maximum for the color map here.</string>
      </property>
      <property name="placeholderText">
@@ -155,7 +155,7 @@
    </item>
    <item row="3" column="3">
     <widget class="pqDoubleLineEdit" name="MaximumOpacityScalar">
-     <property name="whatsThis">
+     <property name="toolTip">
       <string>Enter the new range maximum for the opacity map here.</string>
      </property>
      <property name="text">

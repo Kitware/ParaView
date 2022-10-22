@@ -165,6 +165,7 @@ pqFavoritesDialog::pqFavoritesDialog(const QVariant& filtersList, QWidget* p)
   , Ui(new Ui::pqFavoritesDialog())
 {
   this->Ui->setupUi(this);
+  // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
   this->Ui->availableFilters->setAcceptDrops(false);
