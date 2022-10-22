@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqStandardPropertyWidgetInterface.h"
 
+#include "pqAnglePropertyWidget.h"
 #include "pqAnimationShortcutDecorator.h"
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
@@ -285,6 +286,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "TextLocationEditor")
   {
     return new pqTextLocationWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveAngle")
+  {
+    return new pqAnglePropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractivePlane")
   {

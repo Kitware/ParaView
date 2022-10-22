@@ -22,5 +22,6 @@
   <Proxy group="sources" name="TextSource" />
   <Proxy group="sources" name="TimeSource" />
   <Proxy group="sources" name="Ruler" />
+  <Proxy group="sources" name="Protractor" />
   <Proxy group="sources" name="RTAnalyticSource" />
 </ParaViewSources>
