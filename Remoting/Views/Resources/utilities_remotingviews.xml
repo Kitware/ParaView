@@ -1054,7 +1054,17 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
-        <Documentation>Color used for showing interactive widget.</Documentation>
+        <Documentation>Color used for showing widget handles when interacting.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            label="Widget"
+                            name="WidgetColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for showing widget handles that are available for interaction.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetBackgroundColorMode"
                          name="BackgroundColorMode"

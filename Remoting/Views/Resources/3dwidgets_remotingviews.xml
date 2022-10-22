@@ -16,6 +16,8 @@
                proxygroup="3d_widget_representations"
                proxyname="HandleRepresentation"></Proxy>
         <ExposedProperties>
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
           <Property name="Visibility" />
           <Property name="WorldPositionInfo" />
           <Property name="WorldPosition" />
@@ -82,6 +84,8 @@
           <Property name="Point2WorldPositionInfo" />
           <Property name="Point2WorldPosition" />
           <Property name="LineColor" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -167,12 +171,15 @@
           <Property name="DrawIntersectionEdges" />
           <Property name="ConstrainToWidgetBounds" />
           <Property name="ConstrainMaximumSizeToWidgetBounds" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
           <Property name="OutlineTranslation" />
           <Property name="OriginInfo" />
           <Property name="Origin" />
           <Property name="NormalInfo" />
           <Property name="Normal" />
           <Property name="WidgetBounds" />
+          <Property name="WidgetColor" />
           <Property name="Visibility" />
           <Property name="PlaceFactor" />
           <Property name="Reset" />
@@ -313,6 +320,8 @@
           <Property name="RotationInfo" />
           <Property name="Scale" />
           <Property name="ScaleInfo" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -357,6 +366,9 @@
           <Property name="RadialLine" />
           <Property name="CenterCursor" />
           <Property name="HandleDirection" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
+          <Property name="WidgetColor" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -399,6 +411,9 @@
           <Property name="OutlineTranslation" />
           <Property name="OutsideBounds" />
           <Property name="ScaleEnabled" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
+          <Property name="WidgetColor" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -463,6 +478,8 @@
           <Property name="HandlePositionsInfo" />
           <Property name="Closed" />
           <Property name="LineColor" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
           <Property name="CurrentHandleIndex" />
           <Property name="CurrentHandleIndexInfo" />
         </ExposedProperties>
@@ -499,6 +516,8 @@
           <Property name="HandlePositionsInfo" />
           <Property name="Closed" />
           <Property name="LineColor" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
           <Property name="CurrentHandleIndex" />
           <Property name="CurrentHandleIndexInfo" />
         </ExposedProperties>
@@ -1032,6 +1051,30 @@
                            min="0 0 0"
                            name="range" />
       </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the widget</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty name="CurrentHandleIndexInfo"
         command="GetCurrentHandleIndex"
         information_only="1"/>
@@ -1102,6 +1145,30 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the widget</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty name="CurrentHandleIndexInfo"
         command="GetCurrentHandleIndex"
@@ -1280,6 +1347,42 @@
         the center of the sphere. This may affect the position of the handle
         and the radius of the sphere.</Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            name="WidgetColor"
+                            command="SetHandleColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="WidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
       <!-- End of SphereRepresentation -->
     </Proxy>
     <!-- ================================================================== -->
@@ -1315,6 +1418,30 @@
           <Property name="ScaleInfo" />
         </ExposedProperties>
       </SubProxy>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring interactive handles and outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
       <!-- End of BoxRepresentation -->
     </BoxRepresentationProxy>
     <!-- ================================================================== -->
@@ -1449,7 +1576,43 @@
         <Documentation>Enable/disable the ability to scale the widget with the
         mouse.</Documentation>
       </IntVectorProperty>
-      <!-- End of SphereRepresentation -->
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            name="WidgetColor"
+                            command="SetHandleColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="WidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- End of ImplicitCylinderRepresentation -->
     </Proxy>
     <!-- ================================================================== -->
     <Proxy class="vtkDistanceRepresentation2D"
@@ -1700,6 +1863,42 @@
                             number_of_elements="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            name="WidgetColor"
+                            command="SetHandleColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="WidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
     </DisplaySizedImplicitPlaneRepresentationProxy>
     <!-- ================================================================== -->
     <Proxy class="vtkCoordinateFrameRepresentation"
@@ -1896,6 +2095,30 @@
                            min="0 0 0"
                            name="range" />
       </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the widget</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
     <Proxy class="vtkPointHandleRepresentation3D"
@@ -1919,6 +2142,30 @@
                             information_only="1"
                             name="WorldPositionInfo">
         <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the widget</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
       </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
