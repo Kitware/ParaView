@@ -31,16 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnnotationsModel.h"
 
+#include "vtkSMStringListDomain.h"
+
 #include <QMimeData>
 #include <QPainter>
 #include <QPixmap>
 
-#include "vtkSMStringListDomain.h"
-
 #include <cassert>
 #include <set>
-
-#include <cassert>
 
 static const int SWATCH_RADIUS = 17;
 namespace
@@ -220,9 +218,7 @@ public:
 //=============================================================================
 pqAnnotationsModel::pqAnnotationsModel(QObject* parentObject)
   : Superclass(parentObject)
-  , MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png")
-  , GlobalOpacity(1.0)
-  , SupportsReorder(false)
+  , MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png") // PARAVIEW_DEPRECATED_IN_5_12_0
   , Internals(new pqInternals())
 {
 }
