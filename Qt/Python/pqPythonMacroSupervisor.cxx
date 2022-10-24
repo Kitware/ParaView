@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonMacroSupervisor.h"
 #include "pqApplicationCore.h"
 #include "pqServer.h"
-#include "pqSettings.h"
 
 #include "pqCoreUtilities.h"
 #include "pqPythonManager.h"
@@ -194,18 +193,6 @@ void pqPythonMacroSupervisor::addWidgetForMacros(QWidget* widget, int actionType
 //----------------------------------------------------------------------------
 QMap<QString, QString> pqPythonMacroSupervisor::getStoredMacros()
 {
-  //  pqSettings* settings = pqApplicationCore::instance()->settings();
-  //  QStringList fileNames = settings->value("PythonMacros/FileNames").toStringList();
-  //  QStringList macroNames = settings->value("PythonMacros/Names").toStringList();
-
-  //  if (fileNames.size() != macroNames.size())
-  //    {
-  //    qWarning() << "Lookup of macro filenames is corrupted.  Stored macros will be reset.";
-  //    settings->remove("PythonMacros");
-  //    fileNames.clear();
-  //    macroNames.clear();
-  //    }
-
   QStringList fileNames = getMacrosFilePaths();
 
   QMap<QString, QString> macros;
@@ -234,12 +221,6 @@ void pqPythonMacroSupervisor::removeStoredMacro(const QString& filename)
   }
   QString newFilePath = dir.absolutePath() + QDir::separator() + newName;
   QFile::rename(filename, newFilePath);
-
-  //  QMap<QString, QString> macros = pqPythonMacroSupervisor::getStoredMacros();
-  //  macros.remove(filename);
-  //  pqSettings* settings = pqApplicationCore::instance()->settings();
-  //  settings->setValue("PythonMacros/FileNames", QStringList(macros.keys()));
-  //  settings->setValue("PythonMacros/Names", QStringList(macros.values()));
 }
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::updateMacroList()
