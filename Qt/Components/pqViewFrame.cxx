@@ -88,20 +88,22 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
 
   // Create standard buttons.
   this->StandardToolButtons[SplitVertical] = this->createButton(
-    new QAction(QIcon(":/pqWidgets/Icons/pqSplitVertical.svg"), "Split Vertical Axis", this)
+    new QAction(QIcon(":/pqWidgets/Icons/pqSplitVertical.svg"), tr("Split Vertical Axis"), this)
     << pqSetName("SplitVertical"));
   this->StandardToolButtons[SplitHorizontal] = this->createButton(
-    new QAction(QIcon(":/pqWidgets/Icons/pqSplitHorizontal.svg"), "Split Horizontal Axis", this)
+    new QAction(QIcon(":/pqWidgets/Icons/pqSplitHorizontal.svg"), tr("Split Horizontal Axis"), this)
     << pqSetName("SplitHorizontal"));
-  this->StandardToolButtons[Maximize] = this->createButton(
-    new QAction(QIcon(this->style()->standardIcon(QStyle::SP_TitleBarMaxButton)), "Maximize", this)
-    << pqSetName("Maximize"));
+  this->StandardToolButtons[Maximize] =
+    this->createButton(new QAction(QIcon(this->style()->standardIcon(QStyle::SP_TitleBarMaxButton)),
+                         tr("Maximize"), this)
+      << pqSetName("Maximize"));
   this->StandardToolButtons[Restore] = this->createButton(
     new QAction(
-      QIcon(this->style()->standardIcon(QStyle::SP_TitleBarNormalButton)), "Restore", this)
+      QIcon(this->style()->standardIcon(QStyle::SP_TitleBarNormalButton)), tr("Restore"), this)
     << pqSetName("Minimize"));
   this->StandardToolButtons[Close] = this->createButton(
-    new QAction(QIcon(this->style()->standardIcon(QStyle::SP_TitleBarCloseButton)), "Close", this)
+    new QAction(
+      QIcon(this->style()->standardIcon(QStyle::SP_TitleBarCloseButton)), tr("Close"), this)
     << pqSetName("Close"));
 
   // Setup the title bar.

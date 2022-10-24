@@ -38,9 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QScopedValueRollback>
 #include <QVBoxLayout>
+#include <QtCore>
 
 class pqArrayListModel : public pqAnnotationsModel
 {
+  // Enable the use of the tr() method in a class without Q_OBJECT macro
+  Q_DECLARE_TR_FUNCTIONS(pqArrayListModel)
   typedef pqAnnotationsModel Superclass;
 
 public:

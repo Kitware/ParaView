@@ -300,9 +300,9 @@ void pqPreviewMenuManager::lockResolution(int dx, int dy, QAction* target)
   if (requestedSize != previewSize)
   {
     pqCoreUtilities::promptUser("pqPreviewMenuManager/LockResolutionPrompt",
-      QMessageBox::Information, "Requested resolution too big for window",
-      "The resolution requested is too big for the current window. Fitting to aspect ratio "
-      "instead.",
+      QMessageBox::Information, tr("Requested resolution too big for window"),
+      tr("The resolution requested is too big for the current window. Fitting to aspect ratio "
+         "instead."),
       QMessageBox::Ok | QMessageBox::Save, pqCoreUtilities::mainWidget());
   }
 }

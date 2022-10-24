@@ -2,6 +2,7 @@
 #include <QComboBox>
 #include <QMainWindow>
 #include <QToolBar>
+#include <QtCore>
 #include <QtDebug>
 
 #include <pqActiveObjects.h>
@@ -17,6 +18,8 @@ namespace
 
 class MainWindow : public QMainWindow
 {
+  // Enable the use of the tr() method in a class without Q_OBJECT macro
+  Q_DECLARE_TR_FUNCTIONS(MainWindow)
   QComboBox* ComboBox;
   pqTabbedMultiViewWidget* TMVWidget;
 

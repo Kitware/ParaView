@@ -187,7 +187,7 @@ void pqColorMapEditor::updateActive()
   else
   {
     this->setColorTransferFunction(nullptr);
-    arrayNameLabel.append(tr("<none>"));
+    arrayNameLabel.append(QString("<%1>").arg("none"));
   }
 
   this->Internals->Ui.ArrayLabel->setText(arrayNameLabel);

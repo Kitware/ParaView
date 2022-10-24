@@ -374,7 +374,8 @@ public:
 
   void clearScalarRangeLabel()
   {
-    this->Ui.ScalarRangeLabel->setText(this->DefaultText.arg(tr("<unknown>")).arg(tr("<unknown>")));
+    this->Ui.ScalarRangeLabel->setText(this->DefaultText.arg(QString("<%1>").arg(tr("unknown")))
+                                         .arg(QString("<%1>").arg(tr("unknown"))));
   }
 };
 

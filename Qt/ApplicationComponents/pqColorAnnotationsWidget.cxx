@@ -233,6 +233,8 @@ public:
 // Dialog to set opacity value(s)
 class pqOpacityRangeDialog : public QDialog
 {
+  // Enable the use of the tr() method in a class without Q_OBJECT macro
+  Q_DECLARE_TR_FUNCTIONS(pqOpacityRangeDialog)
 public:
   pqOpacityRangeDialog(double initialValue = 1.0, QWidget* parent = nullptr)
     : QDialog(parent)
@@ -271,6 +273,8 @@ private:
 // Custom pqTreeViewHelper used to set opacity values on selected items.
 class pqColorAnnotationsSelectionHelper : public pqTreeViewSelectionHelper
 {
+  // Enable the use of the tr() method in a class without Q_OBJECT macro
+  Q_DECLARE_TR_FUNCTIONS(pqColorAnnotationsSelectionHelper)
 public:
   explicit pqColorAnnotationsSelectionHelper(QAbstractItemView* view)
     : pqTreeViewSelectionHelper(view, false)

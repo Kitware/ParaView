@@ -157,11 +157,11 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
   l->addWidget(this->OpenButton);
   this->EmitLabel = new QLabel(this);
   this->EmitLabel->setObjectName("EmitLabel");
-  this->EmitLabel->setText(tr("(nul)"));
+  this->EmitLabel->setText(QString("(%1)").arg(tr("null")));
   l->addWidget(this->EmitLabel);
   this->ReturnLabel = new QLabel(this);
   this->ReturnLabel->setObjectName("ReturnLabel");
-  this->ReturnLabel->setText(tr("(nul)"));
+  this->ReturnLabel->setText(QString("(%1)").arg(tr("null")));
   l->addWidget(this->ReturnLabel);
   QObject::connect(this->OpenButton, SIGNAL(clicked(bool)), this, SLOT(openFileDialog()));
 }

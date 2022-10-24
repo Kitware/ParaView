@@ -153,7 +153,7 @@ public:
     for (size_t j = 0; j < ngroups; ++j)
     {
       vtkSMPropertyGroup* smGroup = view->GetPropertyGroup(j);
-      if (smGroup->GetXMLLabel() == std::string("Lights"))
+      if (smGroup->GetName() != nullptr && smGroup->GetName() == std::string("Lights"))
       {
         lightkitGroup = smGroup;
         break;

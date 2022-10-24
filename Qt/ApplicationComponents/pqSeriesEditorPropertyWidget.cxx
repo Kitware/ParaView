@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqSeriesAnnotationsModel : public pqAnnotationsModel
 {
+  // Enable the use of the tr() method in a class without Q_OBJECT macro
+  Q_DECLARE_TR_FUNCTIONS(pqSeriesAnnotationsModel)
   typedef pqAnnotationsModel Superclass;
 
 public:
