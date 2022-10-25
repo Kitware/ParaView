@@ -10,7 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
 find_package(MPI COMPONENTS C)
 if (NOT MPI_FOUND)
   message(STATUS
-    "Skipping example: ${CMAKE_PROJECT_NAME} requires MPI.")
+    "Skipping example: ${PROJECT_NAME} requires MPI.")
   return ()
 endif ()
 

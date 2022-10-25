@@ -16,6 +16,9 @@ target_link_libraries(Fortran90FullExample
 set_property(TARGET Fortran90FullExample
   PROPERTY
     LINKER_LANGUAGE Fortran)
+set_property(TARGET Fortran90FullExample
+  PROPERTY
+    POSITION_INDEPENDENT_CODE "${BUILD_SHARED_LIBS}")
 
 if (BUILD_TESTING)
   configure_file(
