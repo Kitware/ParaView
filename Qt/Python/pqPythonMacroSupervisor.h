@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPythonMacroSupervisor_h
 
 #include "pqPythonModule.h"
+
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 #include <QList>
 #include <QMap>
 #include <QObject>
@@ -72,19 +75,34 @@ public:
   QAction* getMacro(const QString& fileName);
 
   // Description:
-  // Looks in pqSettings to get the stored macros.  In the returned map,
-  // the keys are filenames and values are macro names.
+  // Get macros from known macro directories (see getMacrosFilePaths)
+  // In the returned map, the keys are filenames and values are macro names.
   static QMap<QString, QString> getStoredMacros();
 
   // Description:
-  // Removes a macro with the given filename from pqSettings, if it exists.
+  // Hide file by prepending a `.` to its name.
+  // Hidden file in macro directory are not loaded.
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use hideFile instead.")
   static void removeStoredMacro(const QString& filename);
+
+  // Description:
+  // Hide file by prepending a `.` to its name.
+  // Hidden file in macro directory are not loaded.
+  static void hideFile(const QString& filename);
 
   // Description:
   // Get a macro name from the fileName
   static QString macroNameFromFileName(const QString& filename);
 
+  // Description:
+  // Get a list a "*.py" files from macro directories.
   static QStringList getMacrosFilePaths();
+
+  static QStringList getSupportedIconFormats()
+  {
+    return QStringList() << ".svg"
+                         << ".png";
+  }
 
 Q_SIGNALS:
 
@@ -101,14 +119,14 @@ public Q_SLOTS:
   // Description:
   // Add an action with the given name and filename.  If there is already
   // a macro with the given filename it's macroname will be updated to the
-  // one given.  Macro names do not have to be unique.  Note, this does not
-  // store the macro in pqSettings, you must still call storeMacro yourself.
+  // one given.  Macro names do not have to be unique.
   void addMacro(const QString& macroName, const QString& filename);
   void addMacro(const QString& filename);
 
   // Description:
-  // Remove an action with the given filename.  Note, this does not remove
-  // the macro from pqSettings, you must call removeStoredMacro yourself.
+  // Remove an action from the UI, with the given filename. Note, this does not
+  // remove the macro from a future load, you must call hideFile yourself
+  // (or manually remove the file from the settings dir).
   void removeMacro(const QString& filename);
 
   // Description:
