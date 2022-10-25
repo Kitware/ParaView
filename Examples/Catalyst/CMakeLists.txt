@@ -10,7 +10,7 @@ if (USE_CATALYST)
 
   if (NOT TARGET ParaView::PythonCatalyst)
     message(STATUS
-      "Skipping example: ${CMAKE_PROJECT_NAME} requires ParaView to be built "
+      "Skipping example: ${PROJECT_NAME} requires ParaView to be built "
       "with Catalyst and Python support enabled. Please rebuild ParaView (or "
       "point to a different build of ParaView) with PARAVIEW_USE_PYTHON set "
       "to TRUE")
@@ -19,7 +19,7 @@ if (USE_CATALYST)
 
   if (NOT PARAVIEW_USE_MPI)
     message(STATUS
-      "Skipping example: ${CMAKE_PROJECT_NAME} requires ParaView to be built "
+      "Skipping example: ${PROJECT_NAME} requires ParaView to be built "
       "with MPI support enabled. Please rebuild ParaView (or point to a "
       "different build of ParaView) with PARAVIEW_USE_MPI set to TRUE")
     return ()
@@ -31,7 +31,7 @@ else ()
   find_package(MPI COMPONENTS C)
   if (NOT MPI_FOUND)
     message(STATUS
-      "Skipping example: ${CMAKE_PROJECT_NAME} requires MPI support, but none "
+      "Skipping example: ${PROJECT_NAME} requires MPI support, but none "
       "was found.")
     return ()
   endif ()

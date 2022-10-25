@@ -11,7 +11,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
 # Enable the plugin with the same name as the project
-set("_paraview_plugin_default_${CMAKE_PROJECT_NAME}" ON)
+set("_paraview_plugin_default_${PROJECT_NAME}" ON)
 
 paraview_plugin_scan(
   PLUGIN_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/paraview.plugin"
@@ -20,8 +20,8 @@ paraview_plugin_scan(
 
 foreach (module IN LISTS required_modules)
   if (NOT TARGET "${module}")
-    message(FATAL_ERROR
-      "Skipping example ${CMAKE_PROJECT_NAME}: Missing required module: "
+    message(#FATAL_ERROR
+      "Skipping example ${PROJECT_NAME}: Missing required module: "
       "${module}")
     return ()
   endif ()
