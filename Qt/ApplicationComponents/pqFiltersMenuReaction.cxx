@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QMap>
 #include <string>
@@ -255,7 +256,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
         action->setVisible(true);
         some_enabled = true;
         const char* help = prototype->GetDocumentation()->GetShortHelp();
-        action->setStatusTip(help ? help : "");
+        action->setStatusTip(help ? QCoreApplication::translate("ServerManagerXML", help) : "");
       }
       else
       {

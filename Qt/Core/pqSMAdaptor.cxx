@@ -79,6 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqSMProxy.h"
 
+#include <QCoreApplication>
 #include <algorithm>
 #include <cassert>
 #include <set>
@@ -601,7 +602,8 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(
 
     if (Index < EnumerationDomain->GetNumberOfEntries())
     {
-      ret.append(EnumerationDomain->GetEntryText(Index));
+      ret.append(
+        QCoreApplication::translate("ServerManagerXML", EnumerationDomain->GetEntryText(Index)));
       if (values.contains(EnumerationDomain->GetEntryValue(Index)))
       {
         ret.append(1);
@@ -816,7 +818,8 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
     unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
     for (unsigned int i = 0; i < numEntries; i++)
     {
-      ret.append(EnumerationDomain->GetEntryText(i));
+      ret.append(
+        QCoreApplication::translate("ServerManagerXML", EnumerationDomain->GetEntryText(i)));
     }
   }
   else if (StringListDomain && VProperty->GetRepeatable())
@@ -922,7 +925,7 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property, PropertyVa
     {
       if (EnumerationDomain->GetEntryValue(i) == val)
       {
-        var = EnumerationDomain->GetEntryText(i);
+        var = QCoreApplication::translate("ServerManagerXML", EnumerationDomain->GetEntryText(i));
         break;
       }
     }
@@ -1159,7 +1162,8 @@ QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(vtkSMProperty* Propert
     unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
     for (unsigned int i = 0; i < numEntries; i++)
     {
-      enumerations.push_back(EnumerationDomain->GetEntryText(i));
+      enumerations.push_back(
+        QCoreApplication::translate("ServerManagerXML", EnumerationDomain->GetEntryText(i)));
     }
   }
   else if (ProxyGroupDomain)

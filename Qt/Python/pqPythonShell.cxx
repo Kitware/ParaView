@@ -188,7 +188,7 @@ public:
   {
     if (this->isInterpreterInitialized())
     {
-      this->Parent->printString("\nresetting ...\n", pqPythonShell::ERROR);
+      this->Parent->printString(QString("\n%1 ...\n").arg(tr("resetting")), pqPythonShell::ERROR);
       this->initializeInterpreter();
     }
   }

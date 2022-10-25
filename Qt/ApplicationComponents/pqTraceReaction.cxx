@@ -62,7 +62,7 @@ private:
 
 //-----------------------------------------------------------------------------
 pqTraceReaction::pqTraceReaction(
-  QAction* parentObject, const char* start_trace_label, const char* stop_trace_label)
+  QAction* parentObject, QString start_trace_label, QString stop_trace_label)
   : Superclass(parentObject)
   , StartTraceLabel(start_trace_label)
   , StopTraceLabel(stop_trace_label)
