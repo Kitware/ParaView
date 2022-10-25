@@ -471,7 +471,34 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
       return retVal;
     }
   }
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
+
+  vtkNew<Superclass> instance;
+  instance->SetInsideOut(this->GetInsideOut());
+  instance->SetValue(this->GetValue());
+  instance->SetUseValueAsOffset(this->GetUseValueAsOffset());
+  instance->SetClipFunction(this->GetClipFunction());
+  instance->SetGenerateClipScalars(this->GetGenerateClipScalars());
+  instance->SetMergeTolerance(this->GetMergeTolerance());
+  instance->SetGenerateClippedOutput(this->GetGenerateClippedOutput());
+  instance->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
+  instance->SetBatchSize(this->GetBatchSize());
+
+  instance->SetInputDataObject(inputDO);
+  instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+  if (instance->GetExecutive()->Update())
+  {
+    outputDO->ShallowCopy(instance->GetOutput());
+    if (instance->GetClippedOutput())
+    {
+      this->GetClippedOutput()->ShallowCopy(instance->GetClippedOutput());
+    }
+    return 1;
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------

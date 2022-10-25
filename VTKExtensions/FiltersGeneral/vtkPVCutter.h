@@ -55,6 +55,8 @@ protected:
   int FillInputPortInformation(int, vtkInformation* info) override;
   int FillOutputPortInformation(int, vtkInformation* info) override;
 
+  int CutUsingSuperclassInstance(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
   bool Dual = false;
   vtkNew<vtkPVPlaneCutter> PlaneCutter;
 

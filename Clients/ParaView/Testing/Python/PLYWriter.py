@@ -72,6 +72,8 @@ fooply = PLYReader(FileNames=[plyfilename])
 # show data in view
 fooplyDisplay = Show(fooply, renderView1)
 fooplyDisplay.MapScalars = 0
+fooplyDisplay.Interpolation = "Flat"
+renderView1.OrientationAxesVisibility = 0
 
 # reset view to fit data
 Render()
@@ -88,6 +90,8 @@ fooply.UpdatePipeline()
 # show data in view
 fooplyDisplay = Show(fooply, renderView1)
 fooplyDisplay.MapScalars = 0
+fooplyDisplay.Interpolation = "Flat"
+renderView1.OrientationAxesVisibility = 0
 
 # reset view to fit data
 Render()
