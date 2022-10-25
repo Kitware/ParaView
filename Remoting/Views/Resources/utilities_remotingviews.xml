@@ -931,7 +931,7 @@
                             number_of_elements_per_command="3"
                             repeat_command="1">
         <Documentation>
-          List of file patterns, names and underling filter to use by default when selecting a file with the "Supported Files" filter selected.
+          List of file patterns, names and underlying filter to use by default when selecting a file with the "Supported Files" filter selected.
         </Documentation>
         <Hints>
           <ShowLabel />
