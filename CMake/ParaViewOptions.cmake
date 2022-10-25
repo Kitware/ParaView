@@ -33,7 +33,8 @@ mark_as_advanced(PARAVIEW_BUILD_ALL_MODULES)
 set(_vtk_module_reason_WANT_BY_DEFAULT
   "via `PARAVIEW_BUILD_ALL_MODULES`")
 
-option(PARAVIEW_BUILD_EXAMPLES "Enable ParaView examples" OFF)
+vtk_deprecated_setting(examples_default PARAVIEW_ENABLE_EXAMPLES PARAVIEW_BUILD_EXAMPLES "OFF")
+option(PARAVIEW_ENABLE_EXAMPLES "Enable ParaView examples" "${examples_default}")
 set(PARAVIEW_BUILD_TESTING "OFF"
   CACHE STRING "Enable testing")
 set_property(CACHE PARAVIEW_BUILD_TESTING
@@ -43,6 +44,9 @@ set_property(CACHE PARAVIEW_BUILD_TESTING
 cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "Enable VTK testing" OFF
   "PARAVIEW_BUILD_TESTING" OFF)
 option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Generate ParaView C++/Python docs" "${doc_default}")
+
+option(PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION "Forcefully disable XML documentation generation" OFF)
+mark_as_advanced(PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION)
 
 set(PARAVIEW_BUILD_EDITION "CANONICAL"
   CACHE STRING "Enable ParaView components essential for requested capabilities.")
@@ -72,9 +76,11 @@ endif()
 # state of various other settings may not be what user expects.
 if (DEFINED _paraview_build_edition_cached AND
     NOT _paraview_build_edition_cached STREQUAL PARAVIEW_BUILD_EDITION)
-  message(WARNING "Changing `PARAVIEW_BUILD_EDITION` after first configure will not "
-    "setup defaults for others settings correctly e.g. plugins enabled. It is recommended that you start "
-    "with a clean build directory and pass the option to CMake using "
+  message(WARNING
+    "Changing `PARAVIEW_BUILD_EDITION` after first configure will not setup "
+    "defaults for others settings correctly e.g. plugins enabled. It is "
+    "recommended that you start with a clean build directory and pass the "
+    "option to CMake using "
     "'-DPARAVIEW_BUILD_EDITION:STRING=${PARAVIEW_BUILD_EDITION}'.")
 endif()
 set(_paraview_build_edition_cached "${PARAVIEW_BUILD_EDITION}" CACHE INTERNAL "")
@@ -203,6 +209,8 @@ option(PARAVIEW_ENABLE_LOOKINGGLASS "Enable LookingGlass displays" OFF)
 
 option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 
+option(PARAVIEW_ENABLE_CATALYST "Enable ParaViewCatalyst implementation" OFF)
+
 # default to ON for CANONICAL builds, else OFF.
 set(xdmf2_default OFF)
 if (PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL)
@@ -216,8 +224,7 @@ option(PARAVIEW_ENABLE_ADIOS2 "Enable ADIOS 2.x support." OFF)
 
 option(PARAVIEW_ENABLE_FIDES "Enable Fides support." OFF)
 
-cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
-  "UNIX" OFF)
+option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 
 # If building on Unix with MPI enabled, we will present another option to
 # enable building of CosmoTools VTK extensions. This option is by default
@@ -225,6 +232,16 @@ cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
 cmake_dependent_option(PARAVIEW_ENABLE_COSMOTOOLS
   "Build ParaView with CosmoTools VTK Extensions" OFF
   "UNIX;PARAVIEW_USE_MPI" OFF)
+
+# PARAVIEW_ENABLE_CGNS_* option is only shown when PARAVIEW_ENABLE_NONESSENTIAL is
+# OFF and then it defaults to OFF. If PARAVIEW_ENABLE_NONESSENTIAL is ON, then
+# PARAVIEW_ENABLE_CGNS_* is set to ON as well and presented to the user at all.
+cmake_dependent_option(PARAVIEW_ENABLE_CGNS_READER
+  "Enable CGNS Reader Support" OFF
+  "NOT PARAVIEW_ENABLE_NONESSENTIAL" ON)
+cmake_dependent_option(PARAVIEW_ENABLE_CGNS_WRITER
+  "Enable CGNS Reader Support" OFF
+  "NOT PARAVIEW_ENABLE_NONESSENTIAL" ON)
 
 #========================================================================
 # MISCELLANEOUS OPTIONS:
@@ -252,7 +269,6 @@ vtk_obsolete_setting(PARAVIEW_ENABLE_COMMANDLINE_TOOLS)
 vtk_obsolete_setting(PARAVIEW_FREEZE_PYTHON)
 vtk_obsolete_setting(PARAVIEW_USE_MPI_SSEND)
 vtk_obsolete_setting(PARAVIEW_USE_ICE_T)
-vtk_obsolete_setting(PARAVIEW_ENABLE_CATALYST)
 
 #========================================================================================
 # Build up list of required and rejected modules
@@ -430,6 +446,21 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CGNS_READER
+  MODULES   VTK::IOCGNSReader
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CGNS_WRITER
+  MODULES   ParaView::VTKExtensionsIOCGNSWriter
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CGNS_WRITER AND PARAVIEW_USE_MPI
+  MODULES   ParaView::VTKExtensionsIOParallelCGNSWriter
+  EXCLUSIVE)
+
+paraview_require_module(
   CONDITION PARAVIEW_ENABLE_WEB AND PARAVIEW_USE_PYTHON
   MODULES   VTK::WebCore
             VTK::WebPython
@@ -477,7 +508,6 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOAMR
-            VTK::IOCGNSReader
             VTK::IOCityGML
             VTK::IOCONVERGECFD
             VTK::IOIOSS
@@ -513,7 +543,7 @@ paraview_require_module(
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
-  MODULES  VTK::IOParallelNetCDF)
+  MODULES   VTK::IOParallelNetCDF)
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_NONESSENTIAL
@@ -527,17 +557,29 @@ paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON
   MODULES   ParaView::CinemaPython)
 
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CATALYST
+  MODULES   VTK::IOCatalystConduit
+  EXCLUSIVE)
+
 if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
   # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
   set(nonessential_modules
-    VTK::cgns
-    VTK::hdf5
     VTK::netcdf
     VTK::ogg
     VTK::theora
     VTK::xdmf2
     VTK::xdmf3)
+
+  # PARAVIEW_ENABLE_CGNS_* are the only options that can force the need for cgns and
+  # hdf5 TPLs when PARAVIEW_ENABLE_NONESSENTIAL is true.
+  if (NOT PARAVIEW_ENABLE_CGNS_READER AND NOT PARAVIEW_ENABLE_CGNS_WRITER)
+    list(APPEND nonessential_modules
+      VTK::cgns
+      VTK::hdf5)
+  endif()
+
   list(APPEND paraview_rejected_modules
     ${nonessential_modules})
   foreach (nonessential_module IN LISTS nonessential_modules)

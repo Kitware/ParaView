@@ -52,6 +52,7 @@ public:
   QMap<QString, QListWidgetItem> Items;
   QString SearchString;
   QPointer<QAction> ActiveAction;
+  bool QuickApply = false;
 };
 
 namespace
@@ -274,10 +275,18 @@ void pqQuickLaunchDialog::currentRowChanged(int row)
 //-----------------------------------------------------------------------------
 void pqQuickLaunchDialog::accept()
 {
+  this->Internal->QuickApply = false;
   if (this->Internal->ActiveAction && this->Internal->ActiveAction->isEnabled())
   {
     this->Internal->ActiveAction->trigger();
+    this->Internal->QuickApply = QApplication::keyboardModifiers() & Qt::ShiftModifier;
   }
   // Trigger selected action.
   this->Superclass::accept();
+}
+
+//-----------------------------------------------------------------------------
+bool pqQuickLaunchDialog::quickApply()
+{
+  return this->Internal->QuickApply;
 }

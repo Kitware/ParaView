@@ -55,7 +55,7 @@ public:
    * Constructor that modify the widget if conditions are met.
    */
   pqAnimationShortcutDecorator(pqPropertyWidget* parent);
-  virtual ~pqAnimationShortcutDecorator();
+  ~pqAnimationShortcutDecorator() override;
 
   /**
    * Return true if the widget is considered valid by this decorator

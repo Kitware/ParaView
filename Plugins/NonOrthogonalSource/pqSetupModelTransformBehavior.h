@@ -40,8 +40,8 @@ class pqSetupModelTransformBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqSetupModelTransformBehavior(QObject* parent = 0);
-  virtual ~pqSetupModelTransformBehavior();
+  pqSetupModelTransformBehavior(QObject* parent = nullptr);
+  ~pqSetupModelTransformBehavior() override;
 
 private:
   Q_DISABLE_COPY(pqSetupModelTransformBehavior)

@@ -8,11 +8,38 @@ class VTKHandler(logging.Handler):
         try:
             from vtkmodules.vtkCommonCore import vtkLogger
             msg = self.format(record)
+            lvl = self.get_vtk_level(record.levelno)
             vtkLogger.Log(\
-                    self.get_vtk_level(record.levelno),
+                    lvl,
                     record.filename,
                     record.lineno,
                     msg)
+
+            from vtkmodules.vtkCommonCore import vtkOutputWindow as win
+            outputWindow = win.GetInstance()
+            if outputWindow:
+                # do not duplicate on standard output
+                prevMode = outputWindow.GetDisplayMode()
+                outputWindow.SetDisplayModeToNever()
+
+                if lvl == vtkLogger.VERBOSITY_ERROR:
+                    lvlText = 'ERR: '
+                    fullMsg = f"{record.filename}:{record.lineno} {lvlText}{msg}\n"
+                    outputWindow.DisplayErrorText(fullMsg)
+                elif lvl == vtkLogger.VERBOSITY_WARNING:
+                    lvlText = 'WARN: '
+                    fullMsg = f"{record.filename}:{record.lineno} {lvlText}{msg}\n"
+                    outputWindow.DisplayWarningText(fullMsg)
+                elif lvl == vtkLogger.VERBOSITY_DEBUG:
+                    lvlText = 'DEBUG: '
+                    fullMsg = f"{record.filename}:{record.lineno} {lvlText}{msg}\n"
+                    outputWindow.DisplayDebugText(fullMsg)
+                else:
+                    fullMsg = f"{record.filename}:{record.lineno} {msg}\n"
+                    outputWindow.DisplayText(fullMsg)
+
+                outputWindow.SetDisplayMode(prevMode)
+
         except Exception:
             self.handleError(record)
 

@@ -49,7 +49,7 @@ time = timesteps[5]
 
 # Annotation filter
 annotation = PythonAnnotation()
-annotation.Expression = '"%f %f %f" % (xmom, ymom, zmom)'
+annotation.Expression = '"%f %f %f" % (XMOM, YMOM, ZMOM)'
 
 # Update time and trigger pipeline execution
 time = timesteps[5]

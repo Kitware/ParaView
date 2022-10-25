@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkSMExtractTriggerProxy();
-  ~vtkSMExtractTriggerProxy();
+  ~vtkSMExtractTriggerProxy() override;
 
 private:
   vtkSMExtractTriggerProxy(const vtkSMExtractTriggerProxy&) = delete;

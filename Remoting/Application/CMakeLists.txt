@@ -182,6 +182,11 @@ if (TARGET VTK::ImagingSources)
     Resources/sources_imagingsources.xml)
 endif ()
 
+if (TARGET VTK::ImagingStatistics)
+  list(APPEND xml_files
+    Resources/filters_imagingstatistics.xml)
+endif ()
+
 if (TARGET VTK::FiltersParallelDIY2)
   list(APPEND xml_files
     Resources/filters_filtersparalleldiy2.xml)
@@ -355,7 +360,12 @@ endif()
 
 if (TARGET VTK::IOCGNSReader)
   list(APPEND xml_files
-    Resources/readers_iocgnsreader.xml)
+    Resources/readers_iocgns.xml)
+endif()
+
+if (TARGET ParaView::VTKExtensionsIOCGNSWriter)
+  list(APPEND xml_files
+    Resources/writers_iocgns.xml)
 endif()
 
 if (TARGET VTK::FiltersOpenTURNS)
@@ -403,13 +413,21 @@ endif()
 
 if (TARGET VTK::IOOpenVDB)
   list(APPEND xml_files
+    Resources/readers_ioopenvdb.xml
     Resources/writers_ioopenvdb.xml)
+endif()
+
+if (TARGET VTK::IOCatalystConduit)
+  list(APPEND xml_files
+    Resources/proxies_conduit.xml)
 endif()
 
 if (PARAVIEW_USE_PYTHON)
   list(APPEND xml_files
     Resources/readers_openpmd.xml
     Resources/readers_savg.xml)
+  list(APPEND xml_files
+    Resources/extractors_python.xml)
 endif()
 
 paraview_add_server_manager_xmls(

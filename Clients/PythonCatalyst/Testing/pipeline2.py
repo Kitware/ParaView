@@ -154,10 +154,24 @@ SetActiveSource(pNG1)
 from paraview import catalyst
 options = catalyst.Options()
 
-# init the 'TimeStep' selected for 'GlobalTrigger'
-options.GlobalTrigger.UseStartTimeStep = 1
-options.GlobalTrigger.StartTimeStep = 2
-options.GlobalTrigger.Frequency = 7
+# init the 'Python' selected for 'GlobalTrigger'
+options.GlobalTrigger = 'Python'
+options.GlobalTrigger.Script = """\
+def is_activated(controller):
+    from os.path import basename
+    from paraview import print_info
+    from paraview.catalyst import get_script_filename
+    timestep = controller.GetTimeStep()
+    time = controller.GetTime()
+    if timestep < 2:
+        # start from timestep 2
+        return False
+    if (timestep - 2) % 7 != 0:
+        # frequency 7
+        return False
+    print_info("'%s' activated for timestep %d." % (basename(get_script_filename()), timestep))
+    return True
+"""
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

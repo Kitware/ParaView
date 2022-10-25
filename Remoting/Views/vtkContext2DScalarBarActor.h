@@ -110,6 +110,49 @@ public:
 
   //@{
   /**
+   * Enable drawing an outline around the scalar bar.
+   */
+  vtkSetMacro(DrawScalarBarOutline, bool);
+  vtkGetMacro(DrawScalarBarOutline, bool);
+  vtkBooleanMacro(DrawScalarBarOutline, bool);
+  //@}
+
+  //@{
+  /**
+   * Set the RGB color of the scalar bar outline.
+   */
+  vtkSetVector3Macro(ScalarBarOutlineColor, double);
+  vtkGetVector3Macro(ScalarBarOutlineColor, double);
+  //@}
+
+  //@{
+  /**
+   * Set the thickness of the scalar bar outline.
+   */
+  vtkSetClampMacro(ScalarBarOutlineThickness, int, 0, VTK_INT_MAX);
+  vtkGetMacro(ScalarBarOutlineThickness, int);
+  //@}
+
+  //@{
+  /**
+   * Set color of background to draw behind the color bar. First three components,
+   * specify RGB color components, opacity is the fourth element.
+   */
+  //@}
+  vtkSetVector4Macro(BackgroundColor, double);
+  vtkGetVector4Macro(BackgroundColor, double);
+
+  //@{
+  /**
+   * Set the padding to add to the background rectangle past the contents of
+   * the color legend contents.
+   */
+  //@}
+  vtkSetMacro(BackgroundPadding, double);
+  vtkGetMacro(BackgroundPadding, double);
+
+  //@{
+  /**
    * Set whether the scalar bar is reversed ie from high
    * to low instead of from low to high. Default is false;
    */
@@ -176,6 +219,14 @@ public:
 
   //@{
   /**
+   * Printf format for range labels.
+   */
+  vtkSetStringMacro(DataRangeLabelFormat);
+  vtkGetStringMacro(DataRangeLabelFormat);
+  //@}
+
+  //@{
+  /**
    * Set number of custom labels.
    */
   void SetNumberOfCustomLabels(vtkIdType numLabels);
@@ -223,9 +274,57 @@ public:
    */
   int GetEstimatedNumberOfAnnotations();
 
+  ///@{
+  /**
+   * If true, the ranges of the arrays linked to the scalar bar are displayed
+   * in the widget. By default, it is set to false.
+   */
+  vtkSetMacro(DrawDataRange, bool);
+  vtkGetMacro(DrawDataRange, bool);
+  vtkBooleanMacro(DrawDataRange, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the minimum value of arrays linked to this scalar bar actor.
+   * This value can be set to a minimum value that is not the same as the LUT range and is displayed
+   * in the color legend when `"DrawDataRange"` is set to `true`.
+   */
+  vtkSetMacro(DataRangeMin, double);
+  vtkGetMacro(DataRangeMin, double);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the maximum value of arrays linked to this scalar bar actor.
+   * This value can be set to a minimum value that is not the same as the LUT range and is displayed
+   * in the color legend when `"DrawDataRange"` is set to `true`.
+   */
+  vtkSetMacro(DataRangeMax, double);
+  vtkGetMacro(DataRangeMax, double);
+  ///@}
+
 protected:
   vtkContext2DScalarBarActor();
   ~vtkContext2DScalarBarActor() override;
+
+  /**
+   * Flag to show the range on the scalar bar.
+   */
+  bool DrawDataRange;
+
+  ///@{
+  /**
+   * Range to be displayed.
+   */
+  double DataRangeMin = 0;
+  double DataRangeMax = 0;
+  ///@}
+
+  /**
+   * Offset applied to scalar bar when `DrawDataRange` is true.
+   */
+  int VerticalOffset = 0;
 
 private:
   vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) = delete;
@@ -242,9 +341,24 @@ private:
   bool ForceHorizontalTitle;
 
   /**
+   * Color of the scalar bar outline.
+   */
+  double ScalarBarOutlineColor[3];
+
+  /**
    * Thickness of the color bar.
    */
   int ScalarBarThickness;
+
+  /**
+   * Background Color. Includes opacity in the fourth element.
+   */
+  double BackgroundColor[4];
+
+  /**
+   * Padding to add to the background rectangle around the contents of the color legend.
+   */
+  double BackgroundPadding;
 
   /**
    * Length of the color bar.
@@ -257,11 +371,17 @@ private:
   int AutomaticAnnotations;
   int AddRangeAnnotations;
   char* RangeLabelFormat;
+  char* DataRangeLabelFormat;
 
   /**
    * Flag that controls whether an outline is drawn around the scalar bar.
    */
-  int OutlineScalarBar;
+  bool DrawScalarBarOutline;
+
+  /**
+   * Thickness of color bar outline.
+   */
+  int ScalarBarOutlineThickness;
 
   /**
    * Spacer between color swatches in the long dimension of the scalar
@@ -297,6 +417,20 @@ private:
   vtkAxis* Axis;
 
   /**
+   * Keep track of whether we are currently computing the bounds.
+   */
+  bool InGetBoundingRect;
+
+  /**
+   * Stores the rect containing the full scalar bar actor.
+   * This needs to be computed before painting to figure out how large a
+   * background rectangle should be, but computing it during painting
+   * leads to an infinite recursion, so we compute it in RenderOverlay()
+   * before painting.
+   */
+  vtkRectf CurrentBoundingRect;
+
+  /**
    * Update the image data used to display the colors in a continuous
    * color map.
    */
@@ -314,7 +448,7 @@ private:
    * the rect containing only the color map, not the out-of-range
    * or NaN color swatches.
    */
-  vtkRectf GetColorBarRect(double size[2]);
+  vtkRectf GetColorBarRect(double size[2], bool includeSwatch = true);
 
   /**
    * Compute the rect that contains the out-of-range color swatches
@@ -356,9 +490,14 @@ private:
   void PaintAxis(vtkContext2D* painter, double size[2]);
 
   /**
-   * Set up the axis title.
+   * Set up the axis title. Returns the bounding rect of all elements in the color legend.
    */
   void PaintTitle(vtkContext2D* painter, double size[2]);
+
+  /**
+   * Adds the min and max range of the displayed representations on the scalar bar.
+   */
+  void PaintRange(vtkContext2D* painter, double size[2]);
 
   class vtkAnnotationMap;
 
@@ -380,6 +519,16 @@ private:
    */
   void PaintAnnotationsHorizontally(
     vtkContext2D* painter, double size[2], const vtkAnnotationMap& map);
+
+  /**
+   * Annotation height when the scalar bar is in horizontal mode.
+   */
+  float HorizontalAnnotationHeight;
+
+  /**
+   * Range data height.
+   */
+  float VerticalRangeDataHeight;
 };
 
 #endif // vtkContext2DScalarBarActor_h

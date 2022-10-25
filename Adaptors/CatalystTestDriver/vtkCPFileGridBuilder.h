@@ -39,7 +39,7 @@ public:
    * that were returned were already built before.
    * vtkCPFileGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
+  vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   //@{
   /**
@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkCPFileGridBuilder();
-  ~vtkCPFileGridBuilder();
+  ~vtkCPFileGridBuilder() override;
 
   /**
    * Function to set the grid and take care of the reference counting.

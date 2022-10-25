@@ -55,10 +55,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QString>
+#include <QStringList>
 #include <QtDebug>
 
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqInterfaceTracker.h"
 #include "pqOutputPort.h"
@@ -79,6 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #endif
 
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 
@@ -235,30 +239,10 @@ pqPipelineSource* pqObjectBuilder::createReader(
     return nullptr;
   }
 
-  unsigned int numFiles = files.size();
-  QString reg_name = QFileInfo(files[0]).fileName();
-
-  if (numFiles > 1)
-  {
-    // Find the largest prefix that matches all filenames, and then append a '*'
-    // to signify that it is a collection of files.  If they all start with
-    // something different, just give up and add the '*' anyway.
-    for (unsigned int i = 1; i < numFiles; i++)
-    {
-      QString nextFile = QFileInfo(files[i]).fileName();
-      if (nextFile.startsWith(reg_name))
-        continue;
-      QString commonPrefix = reg_name;
-      do
-      {
-        commonPrefix.chop(1);
-      } while (!nextFile.startsWith(commonPrefix) && !commonPrefix.isEmpty());
-      if (commonPrefix.isEmpty())
-        break;
-      reg_name = commonPrefix;
-    }
-    reg_name += '*';
-  }
+  std::vector<std::string> filesStd(files.size());
+  std::transform(files.constBegin(), files.constEnd(), filesStd.begin(),
+    [](const QString& str) -> std::string { return str.toStdString(); });
+  QString reg_name = QString(vtkSMCoreUtilities::FindLargestPrefix(filesStd).c_str());
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
@@ -287,7 +271,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
       use_dir = true;
     }
 
-    if (numFiles == 1 || !prop->GetRepeatCommand())
+    if (files.size() == 1 || !prop->GetRepeatCommand())
     {
       pqSMAdaptor::setElementProperty(prop, pqObjectBuilderGetPath(files[0], use_dir));
     }
@@ -646,9 +630,6 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
 
   pqObjectBuilderNS::ContinueWaiting = true;
 
-  // Create a modified version of the resource that only contains server information
-  const pqServerResource server_resource = resource.schemeHostsPorts();
-
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
   if (!vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport())
@@ -657,7 +638,20 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
     // new server if no already connected and ensure that any previously
     // connected servers are disconnected.
     // determine if we're already connected to this server.
-    pqServer* server = smModel->findServer(server_resource);
+    pqServer* server = nullptr;
+
+    // If a server name is set, use it to find the server, if not, use the schemehostsports instead
+    if (resource.serverName().isEmpty())
+    {
+      // Create a modified version of the resource that only contains server information
+      const pqServerResource server_resource = resource.schemeHostsPorts();
+      server = smModel->findServer(server_resource);
+    }
+    else
+    {
+      server = smModel->findServer(resource.serverName());
+    }
+
     if (server)
     {
       return server;
@@ -677,42 +671,42 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
 
   // Based on the server resource, create the correct type of server ...
   vtkIdType id = 0;
-  if (server_resource.scheme() == "builtin")
+  if (resource.scheme() == "builtin")
   {
     id = vtkSMSession::ConnectToSelf();
     result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
   }
-  else if (server_resource.scheme() == "cs")
+  else if (resource.scheme() == "cs")
   {
     id = vtkSMSession::ConnectToRemote(resource.host().toUtf8().data(), resource.port(11111),
       connectionTimeout, &pqObjectBuilderNS::processEvents, result);
   }
-  else if (server_resource.scheme() == "csrc")
+  else if (resource.scheme() == "csrc")
   {
     id = vtkSMSession::ReverseConnectToRemote(
-      server_resource.port(11111), connectionTimeout, &pqObjectBuilderNS::processEvents, result);
+      resource.port(11111), connectionTimeout, &pqObjectBuilderNS::processEvents, result);
   }
-  else if (server_resource.scheme() == "cdsrs")
+  else if (resource.scheme() == "cdsrs")
   {
-    id = vtkSMSession::ConnectToRemote(server_resource.dataServerHost().toUtf8().data(),
-      server_resource.dataServerPort(11111), server_resource.renderServerHost().toUtf8().data(),
-      server_resource.renderServerPort(22221), connectionTimeout, &pqObjectBuilderNS::processEvents,
+    id = vtkSMSession::ConnectToRemote(resource.dataServerHost().toUtf8().data(),
+      resource.dataServerPort(11111), resource.renderServerHost().toUtf8().data(),
+      resource.renderServerPort(22221), connectionTimeout, &pqObjectBuilderNS::processEvents,
       result);
   }
-  else if (server_resource.scheme() == "cdsrsrc")
+  else if (resource.scheme() == "cdsrsrc")
   {
-    id = vtkSMSession::ReverseConnectToRemote(server_resource.dataServerPort(11111),
-      server_resource.renderServerPort(22221), connectionTimeout, &pqObjectBuilderNS::processEvents,
+    id = vtkSMSession::ReverseConnectToRemote(resource.dataServerPort(11111),
+      resource.renderServerPort(22221), connectionTimeout, &pqObjectBuilderNS::processEvents,
       result);
   }
-  else if (server_resource.scheme() == "catalyst")
+  else if (resource.scheme() == "catalyst")
   {
     id = vtkSMSession::ConnectToCatalyst();
     result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
   }
   else
   {
-    qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";
+    qCritical() << "Unknown server type: " << resource.scheme() << "\n";
     result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_FAILURE;
   }
 

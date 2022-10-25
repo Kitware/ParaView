@@ -21,7 +21,7 @@ public:
 
 protected:
   vtkDataMineDrillHoleReader();
-  ~vtkDataMineDrillHoleReader();
+  ~vtkDataMineDrillHoleReader() override;
 
   void Read(vtkPoints* points, vtkCellArray* cells) override;
   // submethods depending on file type

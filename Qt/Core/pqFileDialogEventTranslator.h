@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqFileDialogEventTranslator : public pqWidgetEventTranslator
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqFileDialogEventTranslator(QObject* p = 0);
+  pqFileDialogEventTranslator(QObject* p = nullptr);
 
   using Superclass::translateEvent;
   bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
@@ -62,7 +62,7 @@ private:
 
   QPointer<pqFileDialog> CurrentObject;
 
-private Q_SLOTS:
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onFilesSelected(const QString&);
   void onCancelled();
 };

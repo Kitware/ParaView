@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>312</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,20 @@
       <string>Render Active View on Looking Glass</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="TargetDeviceLayout">
+     <item>
+      <widget class="QLabel" name="TargetDeviceLabel">
+       <property name="text">
+        <string>Target Device:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="TargetDeviceComboBox"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QPushButton" name="ResetToCenterOfRotationButton">
@@ -57,37 +71,16 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="QuiltExportMagnificationLayout">
+    <layout class="QHBoxLayout" name="FocalDistanceLayout">
      <item>
-      <widget class="QLabel" name="QuiltExportMagnificationLabel">
-       <property name="toolTip">
-        <string>Set the magnification for saving/recording quilts.
-
-Higher magnification will produce higher resolution files.
-
-The default is 2.</string>
-       </property>
+      <widget class="QLabel" name="FocalDistanceLabel">
        <property name="text">
-        <string>Quilt Export Magnification:</string>
+        <string>Focal Distance:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="QuiltExportMagnification">
-       <property name="toolTip">
-        <string>Set the magnification for saving/recording quilts.
-
-Higher magnification will produce higher resolution files.
-
-The default is 2.</string>
-       </property>
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>2</number>
-       </property>
-      </widget>
+      <widget class="pqDoubleRangeWidget" name="FocalDistance" native="true"/>
      </item>
     </layout>
    </item>
@@ -106,6 +99,14 @@ The default is 2.</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

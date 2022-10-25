@@ -165,22 +165,7 @@ protected:
 
     if (!arrayName.isEmpty())
     {
-      // we could now respect some application setting to determine if the LUT is
-      // to be reset.
-      vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
-        reprProxy, /*extend*/ true, /*force*/ false);
-
-      /// BUG #0011858. Users often do silly things!
-      bool reprVisibility =
-        vtkSMPropertyHelper(reprProxy, "Visibility", /*quiet*/ true).GetAsInt() == 1;
-
-      // now show used scalar bars if applicable.
-      if (reprVisibility &&
-        gsettings->GetScalarBarMode() ==
-          vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
-      {
-        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
-      }
+      pqDisplayColorWidget::updateScalarBarVisibility(view, reprProxy);
     }
     END_UNDO_SET();
   }
@@ -218,6 +203,28 @@ protected:
 private:
   Q_DISABLE_COPY(PropertyLinksConnection)
 };
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::updateScalarBarVisibility(vtkSMViewProxy* view, vtkSMProxy* reprProxy)
+{
+  // we could now respect some application setting to determine if the LUT is
+  // to be reset.
+  vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
+    reprProxy, /*extend*/ true, /*force*/ false);
+
+  /// BUG #0011858. Users often do silly things!
+  bool reprVisibility =
+    vtkSMPropertyHelper(reprProxy, "Visibility", /*quiet*/ true).GetAsInt() == 1;
+
+  vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
+
+  // now show used scalar bars if applicable.
+  if (reprVisibility &&
+    gsettings->GetScalarBarMode() == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+  {
+    vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
+  }
+}
 
 //=============================================================================
 class pqDisplayColorWidget::pqInternals

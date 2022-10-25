@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqPipelineContextMenuBehavior.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -60,7 +60,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPipelineContextMenuBehavior : public QObj
   typedef QObject Superclass;
 
 public:
-  pqPipelineContextMenuBehavior(QObject* parent = 0);
+  pqPipelineContextMenuBehavior(QObject* parent = nullptr);
   ~pqPipelineContextMenuBehavior() override;
 
 protected Q_SLOTS:
@@ -71,7 +71,7 @@ protected Q_SLOTS:
    */
   void onViewAdded(pqView*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called to build the context menu for the given representation. If the
    * picked representation was a composite data set the block index of the

@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 #include <QCursor>
 #include <QPointer>
+#include <QShortcut>
+#include <QString>
 #include <QTimer>
 
 class pqDataRepresentation;
@@ -148,7 +150,7 @@ private Q_SLOTS:
    */
   void onMouseStop();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * callback called when the vtkPVRenderView is done with selection.
    */
@@ -165,6 +167,8 @@ private:
    */
   void onLeftButtonRelease();
   void onWheelRotate();
+  void onRightButtonPressed();
+  void onRightButtonRelease();
 
   // Get the current state of selection modifier
   int getSelectionModifier() override;
@@ -175,21 +179,22 @@ private:
   // Display/hide the tooltip of the selected point in mode SELECT_SURFACE_POINTS_TOOLTIP.
   void UpdateTooltip();
 
-private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
   QPointer<pqDataRepresentation> Representation;
   QMetaObject::Connection RepresentationConnection;
   SelectionMode Mode;
-  bool DisableSelectionModifiers;
   int PreviousRenderViewMode;
   vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverIds[4];
+  unsigned long ObserverIds[6];
   QCursor ZoomCursor;
   QTimer MouseMovingTimer;
   bool MouseMoving;
   int MousePosition[2];
+  bool DisablePreSelection = false;
   vtkSMPVRepresentationProxy* CurrentRepresentation = nullptr;
+  QShortcut* CopyToolTipShortcut = nullptr;
+  QString PlainTooltipText;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
 

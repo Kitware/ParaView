@@ -26,7 +26,6 @@ set(ui_files
   myMainWindow.ui)
 set(xml_files
   ParaViewFilters.xml
-  #ParaViewReaders.xml
   ParaViewSources.xml)
 
 paraview_client_add(
@@ -34,11 +33,6 @@ paraview_client_add(
   VERSION "1.1.1"
   SOURCES ${sources} ${ui_files}
   APPLICATION_XMLS ${xml_files}
-
   MAIN_WINDOW_CLASS myMainWindow
-
   ORGANIZATION "Kitware, Inc."
   TITLE "ParaView (ReVisEd)")
-target_link_libraries(paraview_clone2
-  PRIVATE
-    ParaView::pqApplicationComponents)

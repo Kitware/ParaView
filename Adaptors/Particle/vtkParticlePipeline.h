@@ -86,7 +86,7 @@ public:
 
 protected:
   vtkParticlePipeline();
-  virtual ~vtkParticlePipeline();
+  ~vtkParticlePipeline() override;
 
   void SetupPipeline();
 

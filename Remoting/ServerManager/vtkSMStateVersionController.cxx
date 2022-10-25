@@ -246,18 +246,7 @@ struct Process_5_4_to_5_5
       }
       else
       {
-        if (this->Session)
-        {
-          vtkSMSessionProxyManager* pxm = this->Session->GetSessionProxyManager();
-          vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
-          int globalResetMode =
-            vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
-          element.attribute("value").set_value(toString(globalResetMode).c_str());
-        }
-        else
-        {
-          vtkGenericWarningMacro("Could not get TransferFunctionResetMode from settings.");
-        }
+        element.attribute("value").set_value('0');
       }
     }
 
@@ -602,47 +591,6 @@ struct Process_5_4_to_5_5
   }
 
   vtkWeakPointer<vtkSMSession> Session;
-};
-
-//===========================================================================
-struct Process_5_5_to_5_6
-{
-  bool operator()(xml_document& document) { return ConvertGlyphFilter(document); }
-
-  static bool ConvertGlyphFilter(xml_document& document)
-  {
-    bool warn = false;
-    //-------------------------------------------------------------------------
-    // Convert "Glyph" to "GlyphLegacy" and "GlyphWithCustomSource" to
-    // "GlyphWithCustomSourceLegacy". We don't explicitly convert those filters to the
-    // new ones, we just create the old proxies for now.
-    //-------------------------------------------------------------------------
-    pugi::xpath_node_set glyph_elements =
-      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Glyph']");
-    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
-         iter != glyph_elements.end(); ++iter)
-    {
-      iter->node().attribute("type").set_value("GlyphLegacy");
-      warn = true;
-    }
-    glyph_elements = document.select_nodes(
-      "//ServerManagerState/Proxy[@group='filters' and @type='GlyphWithCustomSource']");
-    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
-         iter != glyph_elements.end(); ++iter)
-    {
-      iter->node().attribute("type").set_value("GlyphWithCustomSourceLegacy");
-      warn = true;
-    }
-    if (warn)
-    {
-      vtkGenericWarningMacro(
-        "The state file uses the old 'Glyph' filter implementation. "
-        "The implementation has changed in ParaView 5.6. "
-        "Consider replacing the Glyph filter with a new Glyph filter. The old implementation "
-        "is still available as 'Glyph Legacy' and will be used for loading this state file.");
-    }
-    return true;
-  }
 };
 
 //===========================================================================
@@ -1238,13 +1186,7 @@ struct Process_5_9_to_5_10
     //   - Property LowerThreshold for the lower threshold value
     //   - Property UpperThreshold for the upper threshold value
     //   - Property ThresholdMethod for the thresholding function
-    pugi::xpath_node_set xpath_set =
-      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Threshold']");
-
-    for (auto xpath_node : xpath_set)
-    {
-      auto node = xpath_node.node();
-
+    auto fixup_threshold = [](pugi::xml_node node) {
       if (!node.select_nodes("./Property[@name='ThresholdBetween']").empty())
       {
         const std::string id(node.attribute("id").value());
@@ -1291,6 +1233,20 @@ struct Process_5_9_to_5_10
         elementNode.append_attribute("index").set_value(0);
         elementNode.append_attribute("value").set_value(0);
       }
+    };
+
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Threshold']");
+    for (auto xpath_node : xpath_set)
+    {
+      fixup_threshold(xpath_node.node());
+    }
+
+    pugi::xpath_node_set xpath_set_vtkm = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='VTKmThreshold']");
+    for (auto xpath_node : xpath_set_vtkm)
+    {
+      fixup_threshold(xpath_node.node());
     }
 
     return true;
@@ -1474,6 +1430,32 @@ struct Process_5_9_to_5_10
   }
 };
 
+struct Process_5_10_to_5_11
+{
+  bool operator()(xml_document& document) { return HandleDataSetSurfaceFilter(document); }
+
+  static bool HandleDataSetSurfaceFilter(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='DataSetSurfaceFilter']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      for (auto child : node.children())
+      {
+        // remove UseGeometryFilter flag
+        if (std::string(child.attribute("name").as_string()) == "UseGeometryFilter")
+        {
+          node.remove_child(child);
+        }
+      }
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -1553,13 +1535,6 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     version = vtkSMVersion(5, 5, 0);
   }
 
-  if (status && (version < vtkSMVersion(5, 6, 0)))
-  {
-    Process_5_5_to_5_6 converter;
-    status = converter(document);
-    version = vtkSMVersion(5, 6, 0);
-  }
-
   if (status && (version < vtkSMVersion(5, 7, 0)))
   {
     Process_5_6_to_5_7 converter;
@@ -1586,6 +1561,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_9_to_5_10 converter;
     status = converter(document);
     version = vtkSMVersion(5, 10, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 11, 0)))
+  {
+    Process_5_10_to_5_11 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 11, 0);
   }
 
   if (status)

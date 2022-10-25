@@ -91,6 +91,23 @@ double vtkTimestepsAnimationPlayer::GetNextTime(double currentime)
 }
 
 //-----------------------------------------------------------------------------
+double vtkTimestepsAnimationPlayer::GetPreviousTime(double currentime)
+{
+  this->Count += this->GetStride();
+  if (this->Count < this->FramesPerTimestep)
+  {
+    return currentime;
+  }
+  this->Count = 0;
+  if (currentime <= this->PlaybackWindow[0])
+  {
+    return VTK_DOUBLE_MIN;
+  }
+
+  return this->GetPreviousTimeStep(currentime);
+}
+
+//-----------------------------------------------------------------------------
 double vtkTimestepsAnimationPlayer::GetNextTimeStep(double timestep)
 {
   return this->GetNextInternal(timestep, timestep);

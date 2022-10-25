@@ -1,4 +1,5 @@
 paraview_add_plugin(MooseXfemClip
+  REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   VERSION "1.0"
   MODULES MooseXfemClip::vtkMooseXfemClip

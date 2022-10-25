@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystRemoveBreakpointReaction.h"
 #include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
+#include "pqChangeFileNameReaction.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
 #include "pqCopyReaction.h"
@@ -70,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpReaction.h"
 #endif
 #include "pqIgnoreSourceTimeReaction.h"
+#include "pqLightToolbar.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadMaterialsReaction.h"
@@ -78,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLogViewerReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
+#include "pqManageExpressionsReaction.h"
 #include "pqManageFavoritesReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
@@ -113,8 +116,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMacroReaction.h"
 #include "pqTraceReaction.h"
 
+#include <pqPythonMacroSupervisor.h>
 #include <pqPythonManager.h>
 #include <pqPythonScriptEditorReaction.h>
+#include <pqPythonTabWidget.h>
 #endif
 
 #include <QApplication>
@@ -208,10 +213,12 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqCameraUndoRedoReaction(ui.actionEditCameraUndo, true);
   new pqCameraUndoRedoReaction(ui.actionEditCameraRedo, false);
   new pqChangePipelineInputReaction(ui.actionChangeInput);
+  new pqChangeFileNameReaction(ui.actionChangeFile);
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
-  new pqDeleteReaction(ui.actionDelete_All, true);
+  new pqDeleteReaction(ui.actionDeleteTree, pqDeleteReaction::DeleteModes::TREE);
+  new pqDeleteReaction(ui.actionDelete_All, pqDeleteReaction::DeleteModes::ALL);
   new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
   new pqShowHideAllReaction(ui.actionHide_All, pqShowHideAllReaction::ActionType::Hide);
   new pqSaveScreenshotReaction(ui.actionCopyScreenshotToClipboard, true);
@@ -341,6 +348,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 
   new pqCustomizeShortcutsReaction(
     menu.addAction("Customize Shortcuts...") << pqSetName("actionCustomize"));
+
+  new pqManageExpressionsReaction(
+    menu.addAction("Manage Expressions") << pqSetName("actionToolsManageExpressions"));
 
   menu.addSeparator(); // --------------------------------------------------
 
@@ -472,6 +482,15 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
     "Reload data files in case they were changed externally.", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 
+  QAction* actionPBChangeFile = new QAction(menu.parent());
+  actionPBChangeFile->setObjectName(QStringLiteral("actionPBChangeFile"));
+  actionPBChangeFile->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change File", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBChangeFile->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change File", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
   QAction* actionPBIgnoreTime = new QAction(menu.parent());
   actionPBIgnoreTime->setObjectName(QStringLiteral("actionPBIgnoreTime"));
   actionPBIgnoreTime->setCheckable(true);
@@ -506,6 +525,16 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
     QObject::connect(
       menu.parent(), SIGNAL(deleteKey()), actionPBDelete, SLOT(trigger()), Qt::QueuedConnection);
   }
+
+  QAction* actionPBDeleteTree = new QAction(menu.parent());
+  actionPBDeleteTree->setObjectName(QStringLiteral("actionPBDeleteTree"));
+  actionPBDeleteTree->setIcon(icon);
+  actionPBDeleteTree->setText(QApplication::translate(
+    "pqPipelineBrowserContextMenu", "Delete Downstream Pipeline", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBDeleteTree->setStatusTip(QApplication::translate(
+    "pqPipelineBrowserContextMenu", "Delete selection and all downstream filters", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
 
   QAction* actionPBCreateCustomFilter = new QAction(menu.parent());
   actionPBCreateCustomFilter->setObjectName(QStringLiteral("actionPBCreateCustomFilter"));
@@ -544,8 +573,10 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   menu.addAction(actionPBPaste);
   menu.addSeparator();
   menu.addAction(actionPBDelete);
+  menu.addAction(actionPBDeleteTree);
   menu.addAction(actionPBRename);
   menu.addAction(actionPBReloadFiles);
+  menu.addAction(actionPBChangeFile);
   menu.addAction(actionPBIgnoreTime);
   menu.addSeparator();
   menu.addAction(actionPBChangeInput);
@@ -567,9 +598,11 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   new pqReloadFilesReaction(actionPBReloadFiles);
   new pqIgnoreSourceTimeReaction(actionPBIgnoreTime);
   new pqDeleteReaction(actionPBDelete);
+  new pqDeleteReaction(actionPBDeleteTree, pqDeleteReaction::DeleteModes::TREE);
   new pqCreateCustomFilterReaction(actionPBCreateCustomFilter);
   new pqLinkSelectionReaction(actionPBLinkSelection);
   new pqRenameProxyReaction(actionPBRename, mainWindow);
+  new pqChangeFileNameReaction(actionPBChangeFile);
 }
 
 //-----------------------------------------------------------------------------
@@ -582,8 +615,26 @@ void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
   if (manager)
   {
     new pqMacroReaction(menu.addAction("Import new macro...") << pqSetName("actionMacroCreate"));
-    QMenu* editMenu = menu.addMenu("Edit...");
-    QMenu* deleteMenu = menu.addMenu("Delete...");
+    QMenu* editMenu = menu.addMenu("Edit...") << pqSetName("menuMacroEdit");
+    QMenu* deleteMenu = menu.addMenu("Delete...") << pqSetName("menuMacroDelete");
+    QAction* deleteAllAction = menu.addAction(QObject::tr("Delete All"));
+    QObject::connect(deleteAllAction, &QAction::triggered, []() {
+      QMessageBox::StandardButton ret = QMessageBox::question(
+        pqCoreUtilities::mainWidget(), "Delete All", "All macros will be deleted. Are you sure?");
+      if (ret == QMessageBox::StandardButton::Yes)
+      {
+        // The script editor shows macros about to be deleted. remove those tabs.
+        pqPythonTabWidget* const tWidget =
+          pqPythonScriptEditor::getUniqueInstance()->findChild<pqPythonTabWidget*>();
+        for (int i = tWidget->count() - 1; i >= 0; --i)
+        {
+          Q_EMIT tWidget->tabCloseRequested(i);
+        }
+        // remove user Macros dir
+        pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getMacrosDir());
+        pqPVApplicationCore::instance()->pythonManager()->updateMacroList();
+      }
+    });
     menu.addSeparator();
     manager->addWidgetForRunMacros(&menu);
     manager->addWidgetForEditMacros(editMenu);
@@ -639,19 +690,19 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   menu.addSeparator();
 
   // ParaView Tutorial
-  QString tutorialURL = QString("https://www.paraview.org/paraview-downloads/"
-                                "download.php?submit=Download&version=v%1.%2&type=binary&os="
-                                "Sources&downloadFile=ParaViewTutorial-%1.%2.%3.pdf")
-                          .arg(vtkSMProxyManager::GetVersionMajor())
-                          .arg(vtkSMProxyManager::GetVersionMinor())
-                          .arg(vtkSMProxyManager::GetVersionPatch());
-  new pqDesktopServicesReaction(QUrl(tutorialURL),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Self-directed Tutorial")
-      << pqSetName("actionTutorialNotes")));
+  QString selfDirectedTutorialURL =
+    QString("https://docs.paraview.org/en/v%1/Tutorials/SelfDirectedTutorial/index.html")
+      .arg(versionString);
+  new pqDesktopServicesReaction(QUrl(selfDirectedTutorialURL),
+    (menu.addAction("ParaView Self-directed Tutorial")
+      << pqSetName("actionSelfDirectedTutorialNotes")));
 
-  // Sandia National Labs Tutorials
-  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/Wiki/ParaView_Classroom_Tutorials"),
-    (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorial")));
+  // Classroom Tutorials by Sandia National Laboratories
+  QString classroomTutorialsURL =
+    QString("https://docs.paraview.org/en/v%1/Tutorials/ClassroomTutorials/index.html")
+      .arg(versionString);
+  new pqDesktopServicesReaction(QUrl(classroomTutorialsURL),
+    (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorials")));
 
   // Example Data Sets
 
@@ -758,6 +809,10 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   QToolBar* axesToolbar = new pqAxesToolbar(&mainWindow) << pqSetName("axesToolbar");
   axesToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, axesToolbar);
+
+  QToolBar* lightingToolbar = new pqLightToolbar(&mainWindow) << pqSetName("lightingToolbar");
+  lightingToolbar->layout()->setSpacing(0);
+  mainWindow.addToolBar(Qt::TopToolBarArea, lightingToolbar);
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   // Give the macros menu to the pqPythonMacroSupervisor

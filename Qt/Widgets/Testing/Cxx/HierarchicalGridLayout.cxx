@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTest>
 #include <QWidget>
 
+// NOLINTNEXTLINE(performance-no-int-to-ptr)
 Q_DECLARE_METATYPE(pqHierarchicalGridLayout::Item);
 
 void HierarchicalGridLayoutTester::addWidget_data()

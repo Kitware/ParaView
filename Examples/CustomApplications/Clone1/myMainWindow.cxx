@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include "pqQtConfig.h"
+#include <pqQtConfig.h>
 
 #ifdef PARAVIEW_USE_QTHELP
-#include "pqHelpReaction.h"
+#include <pqHelpReaction.h>
 #endif
-#include "pqParaViewBehaviors.h"
-#include "pqParaViewMenuBuilders.h"
+#include <pqParaViewBehaviors.h>
+#include <pqParaViewMenuBuilders.h>
 
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow
 {

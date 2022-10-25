@@ -4,6 +4,18 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.11
+---------------
+
+###pqDeleteReaction###
+
+To add support for deleting a filter and its downstream filters from the pipeline browser,
+the constructor of `pqDeleteReaction` was changed. Instead of a bool `delete_all` param to
+determine if everything should be deleted or only the selection, there is now as
+`pqDeleteReaction::DeleteModes` enum. `DeleteModes::SELECTED` and `DeleteModes::ALL`
+are passed to enable deleting only the selection or deleting everything, respectively.
+`DeleteModes::TREE` enables the new functionality added to `pqDeleteReaction`.
+
 Changes in 5.10
 ----------------
 

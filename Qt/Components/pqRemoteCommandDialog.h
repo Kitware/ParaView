@@ -61,12 +61,11 @@ private Q_SLOTS:
   void FindXTermExecutable();
   void FindSshExecutable();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   void Save();
   void Restore();
   string LocateFile();
 
-private:
   pqRemoteCommandDialogUI* Ui;
 
   string CommandSetName;

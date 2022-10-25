@@ -1,6 +1,5 @@
 #ifndef vtkSpyPlotBlockIterator_h
 #define vtkSpyPlotBlockIterator_h
-#ifndef __VTK_WRAP__
 
 #include "vtkPVVTKExtensionsIOSPCTHModule.h" //needed for exports
 #include "vtkSpyPlotReaderMap.h"             // for vtkSpyPlotReaderMap iterator
@@ -66,7 +65,7 @@ public:
   // Return the id of this processor
   int GetProcessorId() const;
 
-  virtual ~vtkSpyPlotBlockIterator() {}
+  virtual ~vtkSpyPlotBlockIterator() = default;
 
 protected:
   vtkSpyPlotBlockIterator();
@@ -96,8 +95,8 @@ class VTKPVVTKEXTENSIONSIOSPCTH_EXPORT vtkSpyPlotBlockDistributionBlockIterator
   : public vtkSpyPlotBlockIterator
 {
 public:
-  vtkSpyPlotBlockDistributionBlockIterator() {}
-  ~vtkSpyPlotBlockDistributionBlockIterator() override {}
+  vtkSpyPlotBlockDistributionBlockIterator() = default;
+  ~vtkSpyPlotBlockDistributionBlockIterator() override = default;
   void Start() override;
   int GetNumberOfBlocksToProcess() override;
 
@@ -110,7 +109,7 @@ class VTKPVVTKEXTENSIONSIOSPCTH_EXPORT vtkSpyPlotFileDistributionBlockIterator
 {
 public:
   vtkSpyPlotFileDistributionBlockIterator();
-  ~vtkSpyPlotFileDistributionBlockIterator() override {}
+  ~vtkSpyPlotFileDistributionBlockIterator() override = default;
   void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
     vtkSpyPlotReaderMap* fileMap, int currentTimeStep) override;
   void Start() override;
@@ -174,7 +173,6 @@ inline int vtkSpyPlotBlockIterator::GetNumberOfFields() const
   return this->NumberOfFields;
 }
 
-#endif
 #endif
 
 // VTK-HeaderTest-Exclude: vtkSpyPlotBlockIterator.h

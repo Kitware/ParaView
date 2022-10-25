@@ -64,7 +64,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSelectionQueryPropertyWidget : public pqP
   Q_PROPERTY(QString query READ query WRITE setQuery NOTIFY queryChanged);
 
 public:
-  pqSelectionQueryPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  pqSelectionQueryPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqSelectionQueryPropertyWidget() override;
 
   //@{

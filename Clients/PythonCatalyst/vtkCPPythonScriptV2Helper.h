@@ -46,6 +46,11 @@ public:
   bool PrepareFromScript(const std::string& fname);
 
   /**
+   * Returns the name of the script passed in to PrepareFromScript.
+   */
+  const std::string& GetScriptFileName() const;
+
+  /**
    * Returns if the package/module has been imported.
    */
   bool IsImported() const;
@@ -104,7 +109,7 @@ public:
 
 protected:
   vtkCPPythonScriptV2Helper();
-  ~vtkCPPythonScriptV2Helper();
+  ~vtkCPPythonScriptV2Helper() override;
 
   bool IsActivated(int timestep, double time);
   bool IsLiveActivated();

@@ -68,6 +68,7 @@ public:
   //@{
   /**
    * Automatically apply changes in the 'Properties' panel.
+   * Default is false.
    */
   vtkGetMacro(AutoApply, bool);
   vtkSetMacro(AutoApply, bool);
@@ -75,7 +76,18 @@ public:
 
   //@{
   /**
+   * Get/Set delay for auto apply.
+   * Not exposed in the UI.
+   * Default is 0.
+   */
+  vtkGetMacro(AutoApplyDelay, int);
+  vtkSetMacro(AutoApplyDelay, int);
+  //@}
+
+  //@{
+  /**
    * Automatically apply changes in the 'Properties' panel.
+   * Default is false.
    */
   vtkGetMacro(AutoApplyActiveOnly, bool);
   vtkSetMacro(AutoApplyActiveOnly, bool);
@@ -112,14 +124,6 @@ public:
     DEFAULT_TIME_STEP_FIRST,
     DEFAULT_TIME_STEP_LAST
   };
-
-  //@{
-  /**
-   * Get/Set the transfer function reset mode.
-   */
-  vtkGetMacro(TransferFunctionResetMode, int);
-  vtkSetMacro(TransferFunctionResetMode, int);
-  //@}
 
   //@{
   /**
@@ -309,15 +313,33 @@ public:
   vtkBooleanMacro(EnableStreaming, bool);
   //@}
 
+  //@{
+  /**
+   * Enable use of accelerated filters where available.
+   */
+  void SetUseAcceleratedFilters(bool);
+  bool GetUseAcceleratedFilters();
+  vtkBooleanMacro(UseAcceleratedFilters, bool);
+  //@}
+
+  //@{
+  /**
+   * ActiveSelection is hooked up in the MultiBlock Inspector such that a click on a/multiple
+   * block(s) selects it/them. Default is true.
+   */
+  vtkGetMacro(SelectOnClickMultiBlockInspector, bool);
+  vtkSetMacro(SelectOnClickMultiBlockInspector, bool);
+  //@}
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings() override;
 
   int BlockColorsDistinctValues;
   bool AutoApply;
+  int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
-  int TransferFunctionResetMode;
   int ScalarBarMode;
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
@@ -334,6 +356,7 @@ protected:
   bool ColorByBlockColorsOnApply;
   int AnimationTimeNotation;
   bool EnableStreaming;
+  bool SelectOnClickMultiBlockInspector;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;

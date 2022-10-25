@@ -16,6 +16,7 @@
 
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -23,23 +24,24 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 
+#include <map>
 #include <set>
 #include <vector>
 
 class vtkPVSelectionSource::vtkInternal
 {
 public:
-  struct IDType
+  struct PieceIdType
   {
     vtkIdType Piece;
     vtkIdType ID;
-    IDType(vtkIdType piece, vtkIdType id)
+    PieceIdType(vtkIdType piece, vtkIdType id)
+      : Piece(piece)
+      , ID(id)
     {
-      this->Piece = piece;
-      this->ID = id;
     }
 
-    bool operator<(const IDType& other) const
+    bool operator<(const PieceIdType& other) const
     {
       if (this->Piece == other.Piece)
       {
@@ -49,133 +51,67 @@ public:
     }
   };
 
-  struct CompositeIDType
-  {
-    unsigned int CompositeIndex;
-    vtkIdType Piece;
-    vtkIdType ID;
-    CompositeIDType(unsigned int ci, vtkIdType piece, vtkIdType id)
-    {
-      this->CompositeIndex = ci;
-      this->Piece = piece;
-      this->ID = id;
-    }
-    bool operator<(const CompositeIDType& other) const
-    {
-      if (this->CompositeIndex == other.CompositeIndex)
-      {
-        if (this->Piece == other.Piece)
-        {
-          return (this->ID < other.ID);
-        }
-        return (this->Piece < other.Piece);
-      }
-      return (this->CompositeIndex < other.CompositeIndex);
-    }
-  };
-
   struct HierarchicalIDType
   {
     unsigned int Level;
     unsigned int DataSet;
-    vtkIdType ID;
-    HierarchicalIDType(unsigned int level, unsigned int ds, vtkIdType id)
+    HierarchicalIDType(unsigned int level, unsigned int ds)
+      : Level(level)
+      , DataSet(ds)
     {
-      this->Level = level;
-      this->DataSet = ds;
-      this->ID = id;
     }
     bool operator<(const HierarchicalIDType& other) const
     {
       if (this->Level == other.Level)
       {
-        if (this->DataSet == other.DataSet)
-        {
-          return (this->ID < other.ID);
-        }
         return (this->DataSet < other.DataSet);
       }
       return (this->Level < other.Level);
     }
   };
 
-  struct PedigreeIDType
-  {
-    std::string Domain;
-    vtkIdType ID;
-    PedigreeIDType(std::string domain, vtkIdType id)
-    {
-      this->Domain = domain;
-      this->ID = id;
-    }
-    bool operator<(const PedigreeIDType& other) const
-    {
-      if (this->Domain == other.Domain)
-      {
-        return (this->ID < other.ID);
-      }
-      return (this->Domain < other.Domain);
-    }
-  };
-
-  struct PedigreeStringIDType
-  {
-    std::string Domain;
-    std::string ID;
-    PedigreeStringIDType(std::string domain, std::string id)
-    {
-      this->Domain = domain;
-      this->ID = id;
-    }
-    bool operator<(const PedigreeStringIDType& other) const
-    {
-      if (this->Domain == other.Domain)
-      {
-        return (this->ID < other.ID);
-      }
-      return (this->Domain < other.Domain);
-    }
-  };
-
-  typedef std::set<vtkIdType> SetOfIDs;
-  typedef std::set<IDType> SetOfIDType;
-  typedef std::set<CompositeIDType> SetOfCompositeIDType;
-  typedef std::set<HierarchicalIDType> SetOfHierarchicalIDType;
-  typedef std::set<PedigreeIDType> SetOfPedigreeIDType;
-  typedef std::set<PedigreeStringIDType> SetOfPedigreeStringIDType;
-  typedef std::vector<double> VectorOfDoubles;
+  using IdType = vtkIdType;
+  using StringIDType = std::string;
+  using DomainType = std::string;
+  using CompositeIDType = unsigned int;
+  using SetOfIDs = std::set<vtkIdType>;
+  using SetOfPieceIDs = std::set<PieceIdType>;
+  using MapOfCompositeIDs = std::map<CompositeIDType, std::set<PieceIdType>>;
+  using MapOfHierarchicalIDs = std::map<HierarchicalIDType, std::set<IdType>>;
+  using SetOfPedigreeIDs = std::map<DomainType, std::set<IdType>>;
+  using SetOfPedigreeStringIDs = std::map<DomainType, std::set<StringIDType>>;
+  using VectorOfDoubles = std::vector<double>;
+  using VectorOfStrings = std::vector<std::string>;
 
   SetOfIDs GlobalIDs;
   SetOfIDs Blocks;
-  SetOfIDType IDs;
-  SetOfIDType Values;
-  SetOfCompositeIDType CompositeIDs;
-  SetOfHierarchicalIDType HierarchicalIDs;
-  SetOfPedigreeIDType PedigreeIDs;
-  SetOfPedigreeStringIDType PedigreeStringIDs;
+  SetOfPieceIDs IDs;
+  SetOfPieceIDs Values;
+  MapOfCompositeIDs CompositeIDs;
+  MapOfHierarchicalIDs HierarchicalIDs;
+  SetOfPedigreeIDs PedigreeIDs;
+  SetOfPedigreeStringIDs PedigreeStringIDs;
   VectorOfDoubles Locations;
   VectorOfDoubles Thresholds;
-  std::vector<std::string> BlockSelectors;
+  VectorOfStrings BlockSelectors;
 };
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionSource);
+
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
+  : Mode(Modes::ID)
+  , FieldType(vtkSelectionNode::CELL)
+  , ContainingCells(0)
+  , Inverse(0)
+  , ArrayName(nullptr)
+  , NumberOfLayers(0)
+  , ProcessID(-1)
+  , Internal(new vtkInternal())
 {
+  memset(this->Frustum, 0.0, sizeof(double) * 32);
   this->SetNumberOfInputPorts(0);
-  this->SetNumberOfOutputPorts(1);
-
-  this->Internal = new vtkInternal();
-  this->Mode = ID;
-  this->ContainingCells = 1;
-  this->Inverse = 0;
-  this->ArrayName = nullptr;
-  for (int cc = 0; cc < 32; cc++)
-  {
-    this->Frustum[cc] = 0;
-  }
-  this->FieldType = vtkSelectionNode::CELL;
-  this->NumberOfLayers = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -213,7 +149,7 @@ void vtkPVSelectionSource::RemoveAllGlobalIDs()
 void vtkPVSelectionSource::AddPedigreeID(const char* domain, vtkIdType id)
 {
   this->Mode = PEDIGREEIDS;
-  this->Internal->PedigreeIDs.insert(vtkInternal::PedigreeIDType(domain, id));
+  this->Internal->PedigreeIDs[domain].insert(id);
   this->Modified();
 }
 
@@ -229,7 +165,7 @@ void vtkPVSelectionSource::RemoveAllPedigreeIDs()
 void vtkPVSelectionSource::AddPedigreeStringID(const char* domain, const char* id)
 {
   this->Mode = PEDIGREEIDS;
-  this->Internal->PedigreeStringIDs.insert(vtkInternal::PedigreeStringIDType(domain, id));
+  this->Internal->PedigreeStringIDs[domain].insert(id);
   this->Modified();
 }
 
@@ -249,7 +185,7 @@ void vtkPVSelectionSource::AddID(vtkIdType piece, vtkIdType id)
     piece = -1;
   }
   this->Mode = ID;
-  this->Internal->IDs.insert(vtkInternal::IDType(piece, id));
+  this->Internal->IDs.insert(vtkInternal::PieceIdType(piece, id));
   this->Modified();
 }
 
@@ -269,7 +205,7 @@ void vtkPVSelectionSource::AddValue(vtkIdType piece, vtkIdType value)
     piece = -1;
   }
   this->Mode = VALUES;
-  this->Internal->Values.insert(vtkInternal::IDType(piece, value));
+  this->Internal->Values.insert(vtkInternal::PieceIdType(piece, value));
   this->Modified();
 }
 
@@ -291,7 +227,7 @@ void vtkPVSelectionSource::AddCompositeID(
   }
 
   this->Mode = COMPOSITEID;
-  this->Internal->CompositeIDs.insert(vtkInternal::CompositeIDType(composite_index, piece, id));
+  this->Internal->CompositeIDs[composite_index].insert(vtkInternal::PieceIdType(piece, id));
   this->Modified();
 }
 
@@ -307,7 +243,7 @@ void vtkPVSelectionSource::RemoveAllCompositeIDs()
 void vtkPVSelectionSource::AddHierarhicalID(unsigned int level, unsigned int dataset, vtkIdType id)
 {
   this->Mode = HIERARCHICALID;
-  this->Internal->HierarchicalIDs.insert(vtkInternal::HierarchicalIDType(level, dataset, id));
+  this->Internal->HierarchicalIDs[vtkInternal::HierarchicalIDType(level, dataset)].insert(id);
   this->Modified();
 }
 
@@ -413,34 +349,35 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   }
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
   {
-
     npieces = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
   }
 
-  vtkSelectionSource* source = vtkSelectionSource::New();
+  vtkNew<vtkSelectionSource> source;
   source->SetFieldType(this->FieldType);
+  source->SetProcessID(this->ProcessID);
   source->SetContainingCells(this->ContainingCells);
   source->SetInverse(this->Inverse);
   source->SetNumberOfLayers(this->NumberOfLayers);
+  source->SetRemoveSeed(this->RemoveSeed);
+  source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
 
   switch (this->Mode)
   {
     case FRUSTUM:
+    {
       source->SetContentType(vtkSelectionNode::FRUSTUM);
       source->SetFrustum(this->Frustum);
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
-      break;
+    }
+    break;
 
     case GLOBALIDS:
     {
       source->SetContentType(vtkSelectionNode::GLOBALIDS);
-      source->RemoveAllIDs();
-      vtkInternal::SetOfIDs::iterator iter;
-      for (iter = this->Internal->GlobalIDs.begin(); iter != this->Internal->GlobalIDs.end();
-           ++iter)
+      for (const auto& globalId : this->Internal->GlobalIDs)
       {
-        source->AddID(-1, *iter);
+        source->AddID(-1, globalId);
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
@@ -449,146 +386,104 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
     case PEDIGREEIDS:
     {
-      source->SetContentType(vtkSelectionNode::INDICES);
-
       // Add integer IDs
-      source->RemoveAllIDs();
-      vtkInternal::SetOfPedigreeIDType::iterator iter;
-      for (iter = this->Internal->PedigreeIDs.begin(); iter != this->Internal->PedigreeIDs.end();
-           ++iter)
-      {
-        if (iter == this->Internal->PedigreeIDs.begin() || !source->GetArrayName() ||
-          source->GetArrayName() != iter->Domain)
-        {
-          if (iter != this->Internal->PedigreeIDs.begin())
-          {
-            source->UpdatePiece(piece, npieces, 0);
-            vtkSelectionNode* clone = vtkSelectionNode::New();
-            clone->ShallowCopy(source->GetOutput()->GetNode(0));
-            clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
-            output->AddNode(clone);
-            clone->Delete();
-          }
-
-          source->RemoveAllIDs();
-          source->SetArrayName(iter->Domain.c_str());
-        }
-        source->AddID(-1, iter->ID);
-      }
       if (!this->Internal->PedigreeIDs.empty())
       {
-        source->UpdatePiece(piece, npieces, 0);
-        vtkSelectionNode* clone = vtkSelectionNode::New();
-        clone->ShallowCopy(source->GetOutput()->GetNode(0));
-        clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
-        output->AddNode(clone);
-        clone->Delete();
-      }
-
-      // Add string IDs
-      source->RemoveAllStringIDs();
-      vtkInternal::SetOfPedigreeStringIDType::iterator siter;
-      for (siter = this->Internal->PedigreeStringIDs.begin();
-           siter != this->Internal->PedigreeStringIDs.end(); ++siter)
-      {
-        if (siter == this->Internal->PedigreeStringIDs.begin() || !source->GetArrayName() ||
-          source->GetArrayName() != siter->Domain)
+        source->SetNumberOfNodes(static_cast<unsigned int>(this->Internal->PedigreeIDs.size()));
+        unsigned int nodeId = 0;
+        for (const auto& idsOfSpecificPedigree : this->Internal->PedigreeIDs)
         {
-          if (siter != this->Internal->PedigreeStringIDs.begin())
+          source->SetContentType(nodeId, vtkSelectionNode::PEDIGREEIDS);
+          source->SetContainingCells(nodeId, this->ContainingCells);
+          source->SetInverse(nodeId, this->Inverse);
+          source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+          source->SetRemoveSeed(this->RemoveSeed);
+          source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
+          source->SetArrayName(nodeId, idsOfSpecificPedigree.first.c_str());
+          for (const auto& id : idsOfSpecificPedigree.second)
           {
-            source->UpdatePiece(piece, npieces, 0);
-            vtkSelectionNode* clone = vtkSelectionNode::New();
-            clone->ShallowCopy(source->GetOutput()->GetNode(0));
-            clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
-            output->AddNode(clone);
-            clone->Delete();
+            source->AddID(nodeId, -1, id);
           }
-
-          source->RemoveAllIDs();
-          source->SetArrayName(siter->Domain.c_str());
+          ++nodeId;
         }
-        source->AddStringID(-1, siter->ID.c_str());
-      }
-      if (!this->Internal->PedigreeStringIDs.empty())
-      {
         source->UpdatePiece(piece, npieces, 0);
-        vtkSelectionNode* clone = vtkSelectionNode::New();
-        clone->ShallowCopy(source->GetOutput()->GetNode(0));
-        clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
-        output->AddNode(clone);
-        clone->Delete();
+        output->ShallowCopy(source->GetOutput());
+      }
+      // Add String IDs
+      else if (!this->Internal->PedigreeStringIDs.empty())
+      {
+        source->SetNumberOfNodes(
+          static_cast<unsigned int>(this->Internal->PedigreeStringIDs.size()));
+        unsigned int nodeId = 0;
+        for (const auto& stringIdsOfSpecificPedigree : this->Internal->PedigreeStringIDs)
+        {
+          source->SetContentType(nodeId, vtkSelectionNode::PEDIGREEIDS);
+          source->SetContainingCells(nodeId, this->ContainingCells);
+          source->SetInverse(nodeId, this->Inverse);
+          source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+          source->SetRemoveSeed(this->RemoveSeed);
+          source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
+          source->SetArrayName(nodeId, stringIdsOfSpecificPedigree.first.c_str());
+          for (const auto& stringId : stringIdsOfSpecificPedigree.second)
+          {
+            source->AddStringID(nodeId, -1, stringId.c_str());
+          }
+          ++nodeId;
+        }
+        source->UpdatePiece(piece, npieces, 0);
+        output->ShallowCopy(source->GetOutput());
       }
     }
     break;
 
     case COMPOSITEID:
     {
-      source->SetContentType(vtkSelectionNode::INDICES);
-      vtkInternal::SetOfCompositeIDType::iterator iter;
-      for (iter = this->Internal->CompositeIDs.begin(); iter != this->Internal->CompositeIDs.end();
-           ++iter)
+      source->SetNumberOfNodes(static_cast<int>(this->Internal->CompositeIDs.size()));
+      unsigned int nodeId = 0;
+      for (const auto& pieceIdsOfSpecificCompositeId : this->Internal->CompositeIDs)
       {
-        if (iter == this->Internal->CompositeIDs.begin() ||
-          source->GetCompositeIndex() != static_cast<int>(iter->CompositeIndex))
+        source->SetContentType(nodeId, vtkSelectionNode::INDICES);
+        source->SetContainingCells(nodeId, this->ContainingCells);
+        source->SetInverse(nodeId, this->Inverse);
+        source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+        source->SetRemoveSeed(this->RemoveSeed);
+        source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
+        source->SetCompositeIndex(nodeId, static_cast<int>(pieceIdsOfSpecificCompositeId.first));
+        for (const auto& pieceId : pieceIdsOfSpecificCompositeId.second)
         {
-          if (iter != this->Internal->CompositeIDs.begin())
-          {
-            source->UpdatePiece(piece, npieces, 0);
-            vtkSelectionNode* clone = vtkSelectionNode::New();
-            clone->ShallowCopy(source->GetOutput()->GetNode(0));
-            output->AddNode(clone);
-            clone->Delete();
-          }
-
-          source->RemoveAllIDs();
-          source->SetCompositeIndex(static_cast<int>(iter->CompositeIndex));
+          source->AddID(nodeId, pieceId.Piece, pieceId.ID);
         }
-        source->AddID(iter->Piece, iter->ID);
+        ++nodeId;
       }
-      if (!this->Internal->CompositeIDs.empty())
-      {
-        source->UpdatePiece(piece, npieces, 0);
-        vtkSelectionNode* clone = vtkSelectionNode::New();
-        clone->ShallowCopy(source->GetOutput()->GetNode(0));
-        output->AddNode(clone);
-        clone->Delete();
-      }
+      source->UpdatePiece(piece, npieces, 0);
+      output->ShallowCopy(source->GetOutput());
     }
     break;
 
     case HIERARCHICALID:
     {
-      source->SetContentType(vtkSelectionNode::INDICES);
-      vtkInternal::SetOfHierarchicalIDType::iterator iter;
-      for (iter = this->Internal->HierarchicalIDs.begin();
-           iter != this->Internal->HierarchicalIDs.end(); ++iter)
+      source->SetNumberOfNodes(static_cast<int>(this->Internal->HierarchicalIDs.size()));
+      unsigned int nodeId = 0;
+      for (const auto& idsOfSpecificHierarchicalId : this->Internal->HierarchicalIDs)
       {
-        if (source->GetHierarchicalLevel() != static_cast<int>(iter->Level) ||
-          source->GetHierarchicalIndex() != static_cast<int>(iter->DataSet))
+        source->SetContentType(nodeId, vtkSelectionNode::INDICES);
+        source->SetContainingCells(nodeId, this->ContainingCells);
+        source->SetInverse(nodeId, this->Inverse);
+        source->SetNumberOfLayers(nodeId, this->NumberOfLayers);
+        source->SetRemoveSeed(this->RemoveSeed);
+        source->SetRemoveIntermediateLayers(this->RemoveIntermediateLayers);
+        source->SetHierarchicalLevel(
+          nodeId, static_cast<int>(idsOfSpecificHierarchicalId.first.Level));
+        source->SetHierarchicalIndex(
+          nodeId, static_cast<int>(idsOfSpecificHierarchicalId.first.DataSet));
+        for (const auto& id : idsOfSpecificHierarchicalId.second)
         {
-          if (iter != this->Internal->HierarchicalIDs.begin())
-          {
-            source->UpdatePiece(piece, npieces, 0);
-            vtkSelectionNode* clone = vtkSelectionNode::New();
-            clone->ShallowCopy(source->GetOutput()->GetNode(0));
-            output->AddNode(clone);
-            clone->Delete();
-          }
-
-          source->RemoveAllIDs();
-          source->SetHierarchicalLevel(static_cast<int>(iter->Level));
-          source->SetHierarchicalIndex(static_cast<int>(iter->DataSet));
+          source->AddID(nodeId, -1, id);
         }
-        source->AddID(-1, iter->ID);
+        ++nodeId;
       }
-      if (!this->Internal->HierarchicalIDs.empty())
-      {
-        source->UpdatePiece(piece, npieces, 0);
-        vtkSelectionNode* clone = vtkSelectionNode::New();
-        clone->ShallowCopy(source->GetOutput()->GetNode(0));
-        output->AddNode(clone);
-        clone->Delete();
-      }
+      source->UpdatePiece(piece, npieces, 0);
+      output->ShallowCopy(source->GetOutput());
     }
     break;
 
@@ -596,14 +491,11 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     {
       source->SetContentType(vtkSelectionNode::THRESHOLDS);
       source->SetArrayName(this->ArrayName);
-      vtkInternal::VectorOfDoubles::iterator iter;
-      for (iter = this->Internal->Thresholds.begin(); iter != this->Internal->Thresholds.end();)
+      for (size_t thresholdId = 0; thresholdId < this->Internal->Thresholds.size();
+           thresholdId += 2)
       {
-        double min = *iter;
-        iter++;
-        double max = *iter;
-        iter++;
-        source->AddThreshold(min, max);
+        const double* threshold = &this->Internal->Thresholds[thresholdId];
+        source->AddThreshold(threshold[0], threshold[1]);
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
@@ -613,16 +505,10 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     case LOCATIONS:
     {
       source->SetContentType(vtkSelectionNode::LOCATIONS);
-      vtkInternal::VectorOfDoubles::iterator iter;
-      for (iter = this->Internal->Locations.begin(); iter != this->Internal->Locations.end();)
+      for (size_t locationId = 0; locationId < this->Internal->Locations.size(); locationId += 3)
       {
-        double x = *iter;
-        iter++;
-        double y = *iter;
-        iter++;
-        double z = *iter;
-        iter++;
-        source->AddLocation(x, y, z);
+        const double* location = &this->Internal->Locations[locationId];
+        source->AddLocation(location[0], location[1], location[2]);
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
@@ -632,10 +518,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     case BLOCKS:
     {
       source->SetContentType(vtkSelectionNode::BLOCKS);
-      vtkInternal::SetOfIDs::iterator iter;
-      for (iter = this->Internal->Blocks.begin(); iter != this->Internal->Blocks.end(); ++iter)
+      for (const auto& block : this->Internal->Blocks)
       {
-        source->AddBlock(*iter);
+        source->AddBlock(block);
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
@@ -645,6 +530,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     case BLOCK_SELECTORS:
     {
       source->SetContentType(vtkSelectionNode::BLOCK_SELECTORS);
+      source->SetArrayName(this->ArrayName);
       for (const auto& selector : this->Internal->BlockSelectors)
       {
         source->AddBlockSelector(selector.c_str());
@@ -667,11 +553,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     {
       source->SetContentType(vtkSelectionNode::VALUES);
       source->SetArrayName(this->ArrayName);
-      source->RemoveAllIDs();
-      vtkInternal::SetOfIDType::iterator iter;
-      for (iter = this->Internal->Values.begin(); iter != this->Internal->Values.end(); ++iter)
+      for (const auto& value : this->Internal->Values)
       {
-        source->AddID(iter->Piece, iter->ID);
+        source->AddID(value.Piece, value.ID);
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
@@ -682,18 +566,15 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     default:
     {
       source->SetContentType(vtkSelectionNode::INDICES);
-      source->RemoveAllIDs();
-      vtkInternal::SetOfIDType::iterator iter;
-      for (iter = this->Internal->IDs.begin(); iter != this->Internal->IDs.end(); ++iter)
+      for (const auto& idType : this->Internal->IDs)
       {
-        source->AddID(iter->Piece, iter->ID);
+        source->AddID(idType.Piece, idType.ID);
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
     }
     break;
   }
-  source->Delete();
   return 1;
 }
 
@@ -701,5 +582,20 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 void vtkPVSelectionSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Mode: " << this->Mode << endl;
+  os << indent << "ProcessID: " << this->ProcessID << endl;
+  os << indent << "FieldType: " << this->FieldType << endl;
+  os << indent << "ContainingCells: " << this->ContainingCells << endl;
+  os << indent << "Inverse: " << this->Inverse << endl;
+  os << indent << "Frustum: " << endl;
+  for (int i = 0; i < 32; i += 4)
+  {
+    os << indent << indent << this->Frustum[i] << ", " << this->Frustum[i + 1] << ", "
+       << this->Frustum[i + 2] << ", " << this->Frustum[i + 3] << endl;
+  }
+  os << indent << "ArrayName: " << (this->ArrayName ? this->ArrayName : "(null)") << endl;
+  os << indent << "QueryString: " << (this->QueryString ? this->QueryString : "(null)") << endl;
   os << indent << "NumberOfLayers: " << this->NumberOfLayers << endl;
+  os << indent << "RemoveSeed: " << this->RemoveSeed << endl;
+  os << indent << "RemoveIntermediateLayers: " << this->RemoveIntermediateLayers << endl;
 }

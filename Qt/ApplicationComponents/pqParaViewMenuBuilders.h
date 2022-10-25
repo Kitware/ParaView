@@ -64,7 +64,7 @@ public:
    * If you want to automatically add toolbars for sources as requested in the
    * configuration pass in a non-null main window.
    */
-  static void buildSourcesMenu(QMenu& menu, QMainWindow* mainWindow = 0);
+  static void buildSourcesMenu(QMenu& menu, QMainWindow* mainWindow = nullptr);
 
   /**
    * Builds "Filters" menu.
@@ -74,8 +74,8 @@ public:
    * maintained by pqApplicationCore (see pqPVApplicationCore::registerForQuicklaunch),
    * then pass quickLaunchable == false.
    */
-  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0, bool hideDisabled = false,
-    bool quickLaunchable = true);
+  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = nullptr,
+    bool hideDisabled = false, bool quickLaunchable = true);
 
   /**
    * Builds "Extractors" menu.

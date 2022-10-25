@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqFindDataSelectionDisplayFrame.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,16 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqFindDataSelectionDisplayFrame.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyLinks.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqRenderViewBase.h"
-#include "pqSelectionManager.h"
 #include "pqSignalAdaptors.h"
 #include "pqUndoStack.h"
+
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -50,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInteractiveSelectionPipeline.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -64,9 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqFindDataSelectionDisplayFrame::pqInternals
 {
-  vtkSmartPointer<vtkSMProxy> FrustumWidget;
-  QPointer<pqView> FrustumView;
-
 public:
   QPointer<pqView> View;
   QPointer<pqOutputPort> Port;
@@ -108,13 +103,11 @@ public:
       this->Ui.labelPropertiesSelection, SIGNAL(clicked()), SLOT(editLabelPropertiesSelection()));
     self->connect(this->Ui.labelPropertiesInteractiveSelection, SIGNAL(clicked()),
       SLOT(editLabelPropertiesInteractiveSelection()));
-    self->connect(this->Ui.showFrustumButton, SIGNAL(clicked(bool)), SLOT(showFrustum(bool)));
   }
 
   //---------------------------------------------------------------------------
   void updatePanel(pqFindDataSelectionDisplayFrame* self)
   {
-    // this->Ui.labels->setPort(this->Port);
     try
     {
       this->Links.clear();
@@ -132,7 +125,6 @@ public:
     catch (bool)
     {
       self->setEnabled(false);
-      this->destroyFrustum();
       return;
     }
 
@@ -151,7 +143,6 @@ public:
         SIGNAL(chosenColorChanged(const QColor&)), colorPalette,
         colorPalette->GetProperty("InteractiveSelectionColor"));
     }
-    this->showFrustum(this->Ui.showFrustumButton->isChecked());
   }
 
   //---------------------------------------------------------------------------
@@ -216,14 +207,12 @@ public:
         vtkSMPropertyHelper(repr->getProxy(), pname.toUtf8().data(), /*quiet=*/true).GetAsString();
     }
 
-    bool found = false;
     for (QAction* action : menu.actions())
     {
       action->setCheckable(true);
       if (arrayName.isEmpty() == false && action->data().toString() == arrayName)
       {
         action->setChecked(true);
-        found = true;
       }
     }
   }
@@ -296,105 +285,6 @@ public:
 
     this->View->render();
   }
-  //---------------------------------------------------------------------------
-  void destroyFrustum()
-  {
-    if (this->FrustumWidget)
-    {
-      if (this->FrustumView)
-      {
-        vtkSMPropertyHelper(this->FrustumView->getProxy(), "HiddenProps", true)
-          .Remove(this->FrustumWidget);
-        this->FrustumView->getProxy()->UpdateVTKObjects();
-        this->FrustumView->render();
-      }
-    }
-    this->FrustumWidget = nullptr;
-    this->FrustumView = nullptr;
-  }
-
-  //---------------------------------------------------------------------------
-  // create the frustum widget if none exists. Add it to the current view  and
-  // update it's visibility.
-  void showFrustum(bool val)
-  {
-    if (!this->View || !this->Port)
-    {
-      return;
-    }
-
-    vtkSMSourceProxy* selSource = this->Port->getSelectionInput();
-    if (!selSource || strcmp(selSource->GetXMLName(), "FrustumSelectionSource") != 0)
-    {
-      val = false; // cannot show frustum.
-      this->Ui.showFrustumButton->setEnabled(false);
-    }
-    else
-    {
-      this->Ui.showFrustumButton->setEnabled(true);
-    }
-
-    // we are connecting showFrustum() slot to clicked(bool) signal hence, this
-    // doesn't result in calling this method again.
-    this->Ui.showFrustumButton->setChecked(val);
-
-    if (this->FrustumWidget == nullptr && val == true)
-    {
-      vtkSMSessionProxyManager* pxm = this->View->proxyManager();
-      this->FrustumWidget.TakeReference(pxm->NewProxy("representations", "FrustumWidget"));
-      if (this->FrustumWidget)
-      {
-        this->FrustumWidget->PrototypeOn();
-        this->FrustumWidget->UpdateVTKObjects();
-      }
-    }
-
-    if (this->FrustumWidget == nullptr)
-    {
-      // nothing to do.
-      return;
-    }
-
-    pqView* targetView = val ? this->View : nullptr;
-    if (targetView != this->FrustumView)
-    {
-      if (this->FrustumView)
-      {
-        vtkSMPropertyHelper(this->FrustumView->getProxy(), "HiddenProps", true)
-          .Remove(this->FrustumWidget);
-        this->FrustumView->getProxy()->UpdateVTKObjects();
-        this->FrustumView->render();
-        this->FrustumView = nullptr;
-      }
-
-      if (targetView)
-      {
-        this->FrustumView = targetView;
-        vtkSMPropertyHelper(this->FrustumView->getProxy(), "HiddenProps", true)
-          .Add(this->FrustumWidget);
-        this->FrustumView->getProxy()->UpdateVTKObjects();
-        this->FrustumView->render();
-      }
-    }
-
-    if (targetView)
-    {
-      // update rendered frustum.
-      vtkSMPropertyHelper frustum(selSource, "Frustum");
-      double values[24];
-      int index = 0;
-      for (int cc = 0; cc < 8; cc++)
-      {
-        for (int kk = 0; kk < 3; kk++)
-        {
-          values[index] = frustum.GetAsDouble(4 * cc + kk);
-          index++;
-        }
-      }
-      vtkSMPropertyHelper(this->FrustumWidget, "Frustum").Set(values, 24);
-      this->FrustumWidget->UpdateVTKObjects();
-    }
-  }
 };
 
 //-----------------------------------------------------------------------------
@@ -425,32 +315,10 @@ pqFindDataSelectionDisplayFrame::~pqFindDataSelectionDisplayFrame()
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::setView(pqView* view)
 {
-  if (this->Internals->View)
+  if (view != this->Internals->View)
   {
-    this->disconnect(this->Internals->View, SIGNAL(selectionModeChanged(bool)), this,
-      SLOT(onSelectionModeChanged(bool)));
+    this->Internals->View = view;
   }
-
-  this->Internals->View = view;
-  if (this->Internals->View)
-  {
-    this->connect(this->Internals->View, SIGNAL(selectionModeChanged(bool)), this,
-      SLOT(onSelectionModeChanged(bool)));
-  }
-
-  this->Internals->updatePanel(this);
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::onSelectionModeChanged(bool frustum)
-{
-  // Only change visibility of the frustum if we should turn it off.
-  // We don't want to turn it on automatically.
-  if (!frustum)
-  {
-    this->showFrustum(frustum);
-  }
-
   this->Internals->updatePanel(this);
 }
 
@@ -476,12 +344,6 @@ void pqFindDataSelectionDisplayFrame::setSelectedPort(pqOutputPort* port)
     this->connect(
       port, SIGNAL(visibilityChanged(pqOutputPort*, pqDataRepresentation*)), SLOT(updatePanel()));
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::showFrustum(bool val)
-{
-  this->Internals->showFrustum(val);
 }
 
 //-----------------------------------------------------------------------------

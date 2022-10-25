@@ -1,8 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="cell_locators">
-     <Proxy class="vtkModifiedBSPTree"
-            name="ModifiedBSPTree"
-            label="BSP Tree Cell Locator"/>
+    <Proxy class="vtkModifiedBSPTree"
+           name="ModifiedBSPTree"
+           label="BSP Tree Cell Locator"/>
   </ProxyGroup>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
@@ -11,37 +11,39 @@
                  name="EvenlySpacedStreamlines2D">
       <Documentation long_help="Produce evenly spaced streamlines in a 2D vector field."
                      short_help="Produce evenly spaced streamlines in a 2D vector field.">
-                     This filter generates evenly spaced streamlines in a 2D
-                     vector field from a start position. Production of
-                     streamlines terminates if a streamline crosses the
-                     exterior boundary of the input dataset
-                     (ReasonForTermination=1), an initialization issue (ReasonForTermination=2),
-                     computing an unexpected value (ReasonForTermination=3),
-                     reached the Maximum Streamline Length input value
-                     (ReasonForTermination=4), reached the Maximum Steps
-                     input value (ReasonForTermination=5), velocity was
-                     lower than the Terminal Speed input value
-                     (ReasonForTermination=6), a streamline formed a loop
-                     (ReasonForTermination=7), and the streamline was too close to
-                     other streamlines (ReasonForTermination=8). This filter
-                     operates on a 2D dataset aligned with plane XY with
-                     point-centered vectors aligned with plane XY.
-                     The output is polygonal data containing polylines.
+        This filter generates evenly spaced streamlines in a 2D
+        vector field from a start position. Production of
+        streamlines terminates if a streamline crosses the
+        exterior boundary of the input dataset
+        (ReasonForTermination=1), an initialization issue (ReasonForTermination=2),
+        computing an unexpected value (ReasonForTermination=3),
+        reached the Maximum Streamline Length input value
+        (ReasonForTermination=4), reached the Maximum Steps
+        input value (ReasonForTermination=5), velocity was
+        lower than the Terminal Speed input value
+        (ReasonForTermination=6), a streamline formed a loop
+        (ReasonForTermination=7), and the streamline was too close to
+        other streamlines (ReasonForTermination=8). This filter
+        operates on a 2D dataset aligned with plane XY with
+        point-centered vectors aligned with plane XY.
+        The output is polygonal data containing polylines.
       </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
-                          number_of_components="3" />
-        <Documentation>This property specifies the input to the filter.</Documentation>
+                          number_of_components="3"/>
+        <Documentation>
+          This property specifies the input to the filter.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -53,27 +55,29 @@
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>This property contains the name of the vector array from
-        which to generate streamlines.</Documentation>
+        <Documentation>
+          This property contains the name of the vector array from which to generate streamlines.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetInterpolatorType"
                          default_values="0"
                          name="InterpolatorType"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Interpolator with Point Locator"
-                 value="0" />
+                 value="0"/>
           <Entry text="Interpolator with Cell Locator"
-                 value="1" />
+                 value="1"/>
         </EnumerationDomain>
-        <Documentation>This property determines which interpolator to use for
-        evaluating the velocity vector field. The first is faster though the
-        second is more robust in locating cells during streamline
-        integration.</Documentation>
+        <Documentation>
+          This property determines which interpolator to use for
+          evaluating the velocity vector field. The first is faster though the
+          second is more robust in locating cells during streamline integration.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegratorType"
                          default_values="1"
@@ -81,12 +85,13 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Runge-Kutta 2"
-                 value="0" />
+                 value="0"/>
           <Entry text="Runge-Kutta 4"
-                 value="1" />
+                 value="1"/>
         </EnumerationDomain>
-        <Documentation>This property determines which integrator (with
-        increasing accuracy) to use for creating streamlines.</Documentation>
+        <Documentation>
+          This property determines which integrator (with increasing accuracy) to use for creating streamlines.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationStepUnit"
                          default_values="2"
@@ -96,27 +101,29 @@
                          panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Length"
-                 value="1" />
+                 value="1"/>
           <Entry text="Cell Length"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property specifies the unit for
-        Initial integration step size. The Length unit refers
-        to the arc length that a particle travels/advects within a single step.
-        The Cell Length unit represents the step size as a number of
-        cells.</Documentation>
+        <Documentation>
+          This property specifies the unit for
+          Initial integration step size. The Length unit refers
+          to the arc length that a particle travels/advects within a single step.
+          The Cell Length unit represents the step size as a number of cells.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetInitialIntegrationStep"
                             default_values="0.2"
                             label="Initial Step Length"
                             name="InitialIntegrationStep"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the initial integration step
-        size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
-        it is fixed (always equal to this initial value) throughout the
-        integration.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the initial integration step
+          size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
+          it is fixed (always equal to this initial value) throughout the integration.
+        </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfSteps"
                          default_values="2000"
@@ -124,89 +131,97 @@
                          name="MaximumNumberOfSteps"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the maximum number of steps,
-        beyond which streamline integration is terminated.</Documentation>
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the maximum number of steps, beyond which streamline integration is terminated.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetSeparatingDistance"
                             default_values="2"
                             label="Separating Distance"
                             name="SeparatingDistance"
                             number_of_elements="1"
-                            panel_visibility="default" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>Specify the separating distance between
-        streamlines expressed in IntegrationStepUnit.</Documentation>
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Specify the separating distance between streamlines expressed in IntegrationStepUnit.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSeparatingDistanceRatio"
                             default_values="0.4"
                             label="Separating Distance Ratio"
                             name="SeparatingDistanceRatio"
                             number_of_elements="1"
-                            panel_visibility="default" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>Specifies SeparatingDistanceRatio. If streamlines
-        get closer than SeparatingDistance * SeparatingDistanceRatio to
-        other streamlines integration stops.</Documentation>
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Specifies SeparatingDistanceRatio. If streamlines get closer than
+          SeparatingDistance * SeparatingDistanceRatio to other streamlines integration stops.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetClosedLoopMaximumDistance"
                             default_values="0.2"
                             label="Closed Loop Maximum Distance"
                             name="ClosedLoopMaximumDistance"
                             number_of_elements="1"
-                            panel_visibility="default" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>Loops are considered closed if the have two points at
-        distance less than this. This is expressed in IntegrationStepUnit.</Documentation>
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Loops are considered closed if the have two points at
+          distance less than this. This is expressed in IntegrationStepUnit.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetStartPosition"
                             default_values="0 0 0 "
                             label="Start Position"
                             name="StartPosition"
                             number_of_elements="3"
-                            panel_visibility="default" >
+                            panel_visibility="default">
         <BoundsDomain default_mode="mid" mode="normal" name="range">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>Specify the starting point (seed) of the first streamline
-        in the global coordinate system.</Documentation>
+        <Documentation>
+          Specify the starting point (seed) of the first streamline in the global coordinate system.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetTerminalSpeed"
                             default_values="0.000000000001"
                             label="Terminal Speed"
                             name="TerminalSpeed"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the terminal speed, below which
-        particle advection/integration is terminated.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the terminal speed, below which particle advection/integration is terminated.
+        </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
-        <BooleanDomain name="bool" />
-        <Documentation>Specify whether or not to compute
-        vorticity.</Documentation>
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify whether to compute vorticity.
+        </Documentation>
       </IntVectorProperty>
 
       <PropertyGroup label="Streamline Parameters">
-        <Property name="StartPosition" />
-        <Property name="SeparatingDistance" />
-        <Property name="SeparatingDistanceRatio" />
-        <Property name="ClosedLoopMaximumDistance" />
-        <Property name="IntegratorType" />
-        <Property name="IntegrationStepUnit" />
-        <Property name="InitialIntegrationStep" />
-        <Property name="MaximumNumberOfSteps" />
-        <Property name="TerminalSpeed" />
+        <Property name="StartPosition"/>
+        <Property name="SeparatingDistance"/>
+        <Property name="SeparatingDistanceRatio"/>
+        <Property name="ClosedLoopMaximumDistance"/>
+        <Property name="IntegratorType"/>
+        <Property name="IntegrationStepUnit"/>
+        <Property name="InitialIntegrationStep"/>
+        <Property name="MaximumNumberOfSteps"/>
+        <Property name="TerminalSpeed"/>
       </PropertyGroup>
 
       <Hints>
-        <Visibility replace_input="2" />
+        <Visibility replace_input="2"/>
       </Hints>
       <!-- End EvenlySpacedStreamlines2D -->
     </SourceProxy>
@@ -216,39 +231,41 @@
                  name="ParticlePath">
       <Documentation long_help="Trace Particle Paths through time in a vector field."
                      short_help="Trace Particle Paths through time in a vector field.">
-                     The Particle Trace filter generates pathlines in a vector
-                     field from a collection of seed points. The vector field
-                     used is selected from the Vectors menu, so the input data
-                     set is required to have point-centered vectors. The Seed
-                     portion of the interface allows you to select whether the
-                     seed points for this integration lie in a point cloud or
-                     along a line. Depending on which is selected, the
-                     appropriate 3D widget (point or line widget) is displayed
-                     along with traditional user interface controls for
-                     positioning the point cloud or line within the data set.
-                     Instructions for using the 3D widgets and the
-                     corresponding manual controls can be found in section 7.4.
-                     This filter operates on any type of data set, provided it
-                     has point-centered vectors. The output is polygonal data
-                     containing polylines. This filter is available on the
-                     Toolbar.</Documentation>
+        The Particle Trace filter generates pathlines in a vector
+        field from a collection of seed points. The vector field
+        used is selected from the Vectors menu, so the input data
+        set is required to have point-centered vectors. The Seed
+        portion of the interface allows you to select whether the
+        seed points for this integration lie in a point cloud or
+        along a line. Depending on which is selected, the
+        appropriate 3D widget (point or line widget) is displayed
+        along with traditional user interface controls for
+        positioning the point cloud or line within the data set.
+        Instructions for using the 3D widgets and the
+        corresponding manual controls can be found in section 7.4.
+        This filter operates on any type of data set, provided it
+        has point-centered vectors. The output is polygonal data
+        containing polylines. This filter is available on the
+        Toolbar.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
-                          number_of_components="3" />
-        <Documentation>Specify which is the Input of the StreamTracer
-        filter.</Documentation>
+                          number_of_components="3"/>
+        <Documentation>
+          Specify which is the Input of the StreamTracer filter.
+        </Documentation>
       </InputProperty>
       <InputProperty clean_command="RemoveAllSources"
                      command="AddSourceConnection"
@@ -256,61 +273,85 @@
                      multiple_input="1"
                      name="Source">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
-        <Documentation>Specify the seed dataset. Typically from where the
-        vector field integration should begin. Usually a point/radius or a line
-        with a given resolution.</Documentation>
+        <Documentation>
+          Specify the seed dataset. Typically, from where the vector field integration should begin.
+          Usually a point/radius or a line with a given resolution.
+        </Documentation>
       </InputProperty>
       <DoubleVectorProperty command="SetTerminationTime"
                             default_values="0.0"
                             name="TerminationTime"
                             number_of_elements="1"
                             panel_visibility="default">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Setting TerminationTime to a positive value will cause
-        particles to terminate when the time is reached. The units of time
-        should be consistent with the primary time variable.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
+          The units of time should be consistent with the primary time variable.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
-        <TimeStepsInformationHelper />
+        <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetForceReinjectionEveryNSteps"
                          default_values="0"
                          name="ForceReinjectionEveryNSteps"
                          number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>When animating particles, it is nice to inject new ones
-        every Nth step to produce a continuous flow. Setting
-        ForceReinjectionEveryNSteps to a non zero value will cause the particle
-        source to reinject particles every Nth step even if it is otherwise
-        unchanged. Note that if the particle source is also animated, this flag
-        will be redundant as the particles will be reinjected whenever the
-        source changes anyway</Documentation>
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          When animating particles, it is nice to inject new ones every Nth step to produce a continuous flow.
+          Setting ForceReinjectionEveryNSteps to a non zero value will cause the particle source to reinject
+          particles every Nth step even if it is otherwise unchanged. Note that if the particle source is also animated,
+          this flag will be redundant as the particles will be reinjected whenever the source changes anyway.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetStaticSeeds"
                          default_values="0"
                          name="StaticSeeds"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If the input seeds are not changing, then this
-        can be set to 1 to avoid having to do a repeated grid search
-        that would return the exact same result.
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the input seeds are not changing, then this can be set to 1 to avoid having to do a repeated grid search
+          that would return the exact same result.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetStaticMesh"
+      <IntVectorProperty command="SetMeshOverTime"
                          default_values="0"
-                         name="StaticMesh"
+                         name="MeshOverTime"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If the input grid is not changing, then this
-        can be set to 1 to avoid having to create cell locators for
-        each update.
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
+        <Documentation>
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
@@ -323,29 +364,32 @@
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Specify which vector array should be used for the
-        integration through that filter.</Documentation>
+        <Documentation>
+          Specify which vector array should be used for the integration through that filter.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Compute vorticity and angular rotation of particles as
-        they progress</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute vorticity and angular rotation of particles as they progress
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetTerminalSpeed"
                             default_values="0.000000000001"
                             label="Terminal Speed"
                             name="TerminalSpeed"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the terminal speed, below which
-        particle advection/integration is terminated.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the terminal speed, below which particle advection/integration is terminated.
+        </Documentation>
       </DoubleVectorProperty>
     </SourceProxy>
 
@@ -354,39 +398,41 @@
                  name="ParticleTracer">
       <Documentation long_help="Trace Particles through time in a vector field."
                      short_help="Trace Particles through time in a vector field.">
-                     The Particle Trace filter generates pathlines in a vector
-                     field from a collection of seed points. The vector field
-                     used is selected from the Vectors menu, so the input data
-                     set is required to have point-centered vectors. The Seed
-                     portion of the interface allows you to select whether the
-                     seed points for this integration lie in a point cloud or
-                     along a line. Depending on which is selected, the
-                     appropriate 3D widget (point or line widget) is displayed
-                     along with traditional user interface controls for
-                     positioning the point cloud or line within the data set.
-                     Instructions for using the 3D widgets and the
-                     corresponding manual controls can be found in section 7.4.
-                     This filter operates on any type of data set, provided it
-                     has point-centered vectors. The output is polygonal data
-                     containing polylines. This filter is available on the
-                     Toolbar.</Documentation>
+        The Particle Trace filter generates pathlines in a vector
+        field from a collection of seed points. The vector field
+        used is selected from the Vectors menu, so the input data
+        set is required to have point-centered vectors. The Seed
+        portion of the interface allows you to select whether the
+        seed points for this integration lie in a point cloud or
+        along a line. Depending on which is selected, the
+        appropriate 3D widget (point or line widget) is displayed
+        along with traditional user interface controls for
+        positioning the point cloud or line within the data set.
+        Instructions for using the 3D widgets and the
+        corresponding manual controls can be found in section 7.4.
+        This filter operates on any type of data set, provided it
+        has point-centered vectors. The output is polygonal data
+        containing polylines. This filter is available on the
+        Toolbar.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
-                          number_of_components="3" />
-        <Documentation>Specify which is the Input of the StreamTracer
-        filter.</Documentation>
+                          number_of_components="3"/>
+        <Documentation>
+          Specify which is the Input of the StreamTracer filter.
+        </Documentation>
       </InputProperty>
       <InputProperty clean_command="RemoveAllSources"
                      command="AddSourceConnection"
@@ -394,95 +440,76 @@
                      multiple_input="1"
                      name="Source">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
-        <Documentation>Specify the seed dataset. Typically from where the
-        vector field integration should begin. Usually a point/radius or a line
-        with a given resolution.</Documentation>
+        <Documentation>
+          Specify the seed dataset. Typically, from where the vector field integration should begin.
+          Usually a point/radius or a line with a given resolution.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetStaticSeeds"
                          default_values="0"
                          name="StaticSeeds"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If the input seeds are not changing, then this
-        can be set to 1 to avoid having to do a repeated grid search
-        that would return the exact same result.
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the input seeds are not changing, then this can be set to 1 to avoid having to do a repeated grid search
+          that would return the exact same result.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetStaticMesh"
+      <IntVectorProperty command="SetMeshOverTime"
                          default_values="0"
-                         name="StaticMesh"
+                         name="MeshOverTime"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If the input grid is not changing, then this
-        can be set to 1 to avoid having to create cell locators for
-        each update.
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
+        <Documentation>
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
         </Documentation>
       </IntVectorProperty>
-      <!--
-     <DoubleVectorProperty
-        name="TimeStepResolution"
-        command="SetTimeStepResolution"
-        number_of_elements="1"
-        default_values="1.0" >
-       <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
--->
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
-        <TimeStepsInformationHelper />
+        <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
-      <!-- <IntVectorProperty -->
-      <!--       name="StaticSeeds" -->
-      <!--       command="SetStaticSeeds" -->
-      <!--       number_of_elements="1" -->
-      <!--       default_values="1" > -->
-      <!--   <BooleanDomain name="bool"/> -->
-      <!--   <Documentation> -->
-      <!--        Force the use of static seed optimizations -->
-      <!--  </Documentation> -->
-      <!-- </IntVectorProperty> -->
-      <!-- <IntVectorProperty -->
-      <!--       name="StaticMesh" -->
-      <!--       command="SetStaticMesh" -->
-      <!--       number_of_elements="1" -->
-      <!--       default_values="0" > -->
-      <!--   <BooleanDomain name="bool"/> -->
-      <!--   <Documentation> -->
-      <!--        Force the use of static mesh optimizations -->
-      <!--   </Documentation> -->
-      <!-- </IntVectorProperty> -->
-      <!-- <DoubleVectorProperty -->
-      <!--      name="InitialIntegrationStep" -->
-      <!--      command="SetInitialIntegrationStep" -->
-      <!--      number_of_elements="1" -->
-      <!--      default_values="0.25" > -->
-      <!--      <DoubleRangeDomain name="range"/> -->
-      <!--      <Documentation> -->
-      <!--        Specify the Initial step size used for line integration, expressed in: -->
-      <!--        LENGTH_UNIT      = 1 -->
-      <!--        CELL_LENGTH_UNIT = 2 -->
-      <!--        (either the starting size for an adaptive integrator, e.g., RK45, -->
-      <!--        or the constant / fixed size for non-adaptive ones, i.e., RK2 and RK4) -->
-      <!--      </Documentation> -->
-      <!-- </DoubleVectorProperty> -->
       <IntVectorProperty command="SetForceReinjectionEveryNSteps"
                          default_values="0"
                          name="ForceReinjectionEveryNSteps"
                          number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>When animating particles, it is nice to inject new ones
-        every Nth step to produce a continuous flow. Setting
-        ForceReinjectionEveryNSteps to a non zero value will cause the particle
-        source to reinject particles every Nth step even if it is otherwise
-        unchanged. Note that if the particle source is also animated, this flag
-        will be redundant as the particles will be reinjected whenever the
-        source changes anyway</Documentation>
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          When animating particles, it is nice to inject new ones every Nth step to produce a continuous flow.
+          Setting ForceReinjectionEveryNSteps to a non zero value will cause the particle source to reinject particles
+          every Nth step even if it is otherwise unchanged. Note that if the particle source is also animated, this flag
+          will be redundant as the particles will be reinjected whenever the source changes anyway.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -494,19 +521,21 @@
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Specify which vector array should be used for the
-        integration through that filter.</Documentation>
+        <Documentation>
+          Specify which vector array should be used for the integration through that filter.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Compute vorticity and angular rotation of particles as
-        they progress</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute vorticity and angular rotation of particles as they progress.
+        </Documentation>
       </IntVectorProperty>
       <!-- End ParticleTracer -->
     </SourceProxy>
@@ -516,58 +545,83 @@
                  name="StreakLine">
       <Documentation long_help="Trace Streak lines through time in a vector field."
                      short_help="Trace Streak lines through time in a vector field.">
-                     The Particle Trace filter generates pathlines in a vector
-                     field from a collection of seed points. The vector field
-                     used is selected from the Vectors menu, so the input data
-                     set is required to have point-centered vectors. The Seed
-                     portion of the interface allows you to select whether the
-                     seed points for this integration lie in a point cloud or
-                     along a line. Depending on which is selected, the
-                     appropriate 3D widget (point or line widget) is displayed
-                     along with traditional user interface controls for
-                     positioning the point cloud or line within the data set.
-                     Instructions for using the 3D widgets and the
-                     corresponding manual controls can be found in section 7.4.
-                     This filter operates on any type of data set, provided it
-                     has point-centered vectors. The output is polygonal data
-                     containing polylines. This filter is available on the
-                     Toolbar.</Documentation>
+        The Particle Trace filter generates pathlines in a vector
+        field from a collection of seed points. The vector field
+        used is selected from the Vectors menu, so the input data
+        set is required to have point-centered vectors. The Seed
+        portion of the interface allows you to select whether the
+        seed points for this integration lie in a point cloud or
+        along a line. Depending on which is selected, the
+        appropriate 3D widget (point or line widget) is displayed
+        along with traditional user interface controls for
+        positioning the point cloud or line within the data set.
+        Instructions for using the 3D widgets and the
+        corresponding manual controls can be found in section 7.4.
+        This filter operates on any type of data set, provided it
+        has point-centered vectors. The output is polygonal data
+        containing polylines. This filter is available on the
+        Toolbar.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
-                          number_of_components="3" />
-        <Documentation>Specify which is the Input of the StreamTracer
-        filter.</Documentation>
+                          number_of_components="3"/>
+        <Documentation>
+          Specify which is the Input of the StreamTracer filter.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetStaticSeeds"
                          default_values="0"
                          name="StaticSeeds"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If the input seeds are not changing, then this
-        can be set to 1 to avoid having to do a repeated grid search
-        that would return the exact same result.
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the input seeds are not changing, then this can be set to 1 to avoid having to do a repeated grid search
+          that would return the exact same result.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetStaticMesh"
+      <IntVectorProperty command="SetMeshOverTime"
                          default_values="0"
-                         name="StaticMesh"
+                         name="MeshOverTime"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If the input grid is not changing, then this
-        can be set to 1 to avoid having to create cell locators for
-        each update.
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
+        <Documentation>
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
         </Documentation>
       </IntVectorProperty>
       <InputProperty clean_command="RemoveAllSources"
@@ -576,42 +630,43 @@
                      multiple_input="1"
                      name="Source">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
-        <Documentation>Specify the seed dataset. Typically from where the
-        vector field integration should begin. Usually a point/radius or a line
-        with a given resolution.</Documentation>
+        <Documentation>
+          Specify the seed dataset. Typically, from where the vector field integration should begin. Usually a
+          point/radius or a line with a given resolution.
+        </Documentation>
       </InputProperty>
       <DoubleVectorProperty command="SetTerminationTime"
                             default_values="0.0"
                             name="TerminationTime"
                             number_of_elements="1"
                             panel_visibility="default">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Setting TerminationTime to a positive value will cause
-        particles to terminate when the time is reached. The units of time
-        should be consistent with the primary time variable.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
+          The units of time should be consistent with the primary time variable.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
-        <TimeStepsInformationHelper />
+        <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetForceReinjectionEveryNSteps"
                          default_values="1"
                          name="ForceReinjectionEveryNSteps"
                          number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>When animating particles, it is nice to inject new ones
-        every Nth step to produce a continuous flow. Setting
-        ForceReinjectionEveryNSteps to a non zero value will cause the particle
-        source to reinject particles every Nth step even if it is otherwise
-        unchanged. Note that if the particle source is also animated, this flag
-        will be redundant as the particles will be reinjected whenever the
-        source changes anyway</Documentation>
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          When animating particles, it is nice to inject new ones every Nth step to produce a continuous flow.
+          Setting ForceReinjectionEveryNSteps to a non zero value will cause the particle source to reinject particles
+          every Nth step even if it is otherwise unchanged. Note that if the particle source is also animated, this flag
+          will be redundant as the particles will be reinjected whenever the source changes anyway.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -623,28 +678,31 @@
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Specify which vector array should be used for the
-        integration through that filter.</Documentation>
+        <Documentation>
+          Specify which vector array should be used for the integration through that filter.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Compute vorticity and angular rotation of particles as
-        they progress</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute vorticity and angular rotation of particles as they progress
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetDisableResetCache"
                          default_values="0"
                          name="DisableResetCache"
                          number_of_elements="1"
                          panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>Prevents cache from getting reset so that new computation
-          always start from previous results.</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Prevents cache from getting reset so that new computation always start from previous results.
+        </Documentation>
       </IntVectorProperty>
     </SourceProxy>
 
@@ -654,36 +712,37 @@
                  name="StreamTracer">
       <Documentation long_help="Integrate streamlines in a vector field."
                      short_help="Integrate streamlines in a vector field.">The
-                     Stream Tracer filter generates streamlines in a vector
-                     field from a collection of seed points. Production of
-                     streamlines terminates if a streamline crosses the
-                     exterior boundary of the input dataset
-                     (ReasonForTermination=1). Other reasons for termination
-                     include an initialization issue (ReasonForTermination=2),
-                     computing an unexpected value (ReasonForTermination=3),
-                     reached the Maximum Streamline Length input value
-                     (ReasonForTermination=4), reached the Maximum Steps
-                     input value (ReasonForTermination=5), and velocity was
-                     lower than the Terminal Speed input value
-                     (ReasonForTermination=6). This filter operates on any
-                     type of dataset, provided it has point-centered vectors.
-                     The output is polygonal data containing polylines.
+        Stream Tracer filter generates streamlines in a vector
+        field from a collection of seed points. Production of
+        streamlines terminates if a streamline crosses the
+        exterior boundary of the input dataset
+        (ReasonForTermination=1). Other reasons for termination
+        include an initialization issue (ReasonForTermination=2),
+        computing an unexpected value (ReasonForTermination=3),
+        reached the Maximum Streamline Length input value
+        (ReasonForTermination=4), reached the Maximum Steps
+        input value (ReasonForTermination=5), and velocity was
+        lower than the Terminal Speed input value
+        (ReasonForTermination=6). This filter operates on any
+        type of dataset, provided it has point-centered vectors.
+        The output is polygonal data containing polylines.
       </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
-                          number_of_components="3" />
-        <Documentation>This property specifies the input to the Stream Tracer
-        filter.</Documentation>
+                          number_of_components="3"/>
+        <Documentation>
+          This property specifies the input to the Stream Tracer filter.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -695,36 +754,38 @@
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>This property contains the name of the vector array from
-        which to generate streamlines.</Documentation>
+        <Documentation>
+          This property contains the name of the vector array from which to generate streamlines.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetInterpolatorType"
                          default_values="0"
                          name="InterpolatorType"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Interpolator with Point Locator"
-                 value="0" />
+                 value="0"/>
           <Entry text="Interpolator with Cell Locator"
-                 value="1" />
+                 value="1"/>
         </EnumerationDomain>
-        <Documentation>This property determines which interpolator to use for
-        evaluating the velocity vector field. The first is faster though the
-        second is more robust in locating cells during streamline
-        integration.</Documentation>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetSurfaceStreamlines"
                          default_values="0"
                          name="Surface Streamlines"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
-        <BooleanDomain name="bool" />
-        <Documentation>Specify whether or not to compute surface
-        streamlines.</Documentation>
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify whether to compute surface streamlines.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationDirection"
                          default_values="2"
@@ -732,14 +793,15 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="FORWARD"
-                 value="0" />
+                 value="0"/>
           <Entry text="BACKWARD"
-                 value="1" />
+                 value="1"/>
           <Entry text="BOTH"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property determines in which direction(s) a
-        streamline is generated.</Documentation>
+        <Documentation>
+          This property determines in which direction(s) a streamline is generated.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegratorType"
                          default_values="2"
@@ -747,14 +809,15 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Runge-Kutta 2"
-                 value="0" />
+                 value="0"/>
           <Entry text="Runge-Kutta 4"
-                 value="1" />
+                 value="1"/>
           <Entry text="Runge-Kutta 4-5"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property determines which integrator (with
-        increasing accuracy) to use for creating streamlines.</Documentation>
+        <Documentation>
+          This property determines which integrator (with increasing accuracy) to use for creating streamlines.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationStepUnit"
                          default_values="2"
@@ -764,39 +827,42 @@
                          panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Length"
-                 value="1" />
+                 value="1"/>
           <Entry text="Cell Length"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property specifies the unit for
-        Minimum/Initial/Maximum integration step size. The Length unit refers
-        to the arc length that a particle travels/advects within a single step.
-        The Cell Length unit represents the step size as a number of
-        cells.</Documentation>
+        <Documentation>
+          This property specifies the unit for
+          Minimum/Initial/Maximum integration step size. The Length unit refers
+          to the arc length that a particle travels/advects within a single step.
+          The Cell Length unit represents the step size as a number of cells.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetInitialIntegrationStep"
                             default_values="0.2"
                             label="Initial Step Length"
                             name="InitialIntegrationStep"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the initial integration step
-        size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
-        it is fixed (always equal to this initial value) throughout the
-        integration. For an adaptive integrator (Runge-Kutta 4-5), the actual
-        step size varies such that the numerical error is less than a specified
-        threshold.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the initial integration step
+          size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
+          it is fixed (always equal to this initial value) throughout the
+          integration. For an adaptive integrator (Runge-Kutta 4-5), the actual
+          step size varies such that the numerical error is less than a specified threshold.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMinimumIntegrationStep"
                             default_values="0.01"
                             label="Minimum Step Length"
                             name="MinimumIntegrationStep"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
-        specifies the minimum integration step size.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          When using the Runge-Kutta 4-5 integrator, this property specifies the minimum integration step size.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumIntegrationStep"
                             default_values="0.5"
@@ -804,9 +870,10 @@
                             name="MaximumIntegrationStep"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
-        specifies the maximum integration step size.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          When using the Runge-Kutta 4-5 integrator, this property specifies the maximum integration step size.
+        </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfSteps"
                          default_values="2000"
@@ -814,9 +881,10 @@
                          name="MaximumNumberOfSteps"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the maximum number of steps,
-        beyond which streamline integration is terminated.</Documentation>
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the maximum number of steps, beyond which streamline integration is terminated.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetMaximumPropagation"
                             default_values="1.0"
@@ -829,42 +897,47 @@
                       scale_factor="1.0">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>This property specifies the maximum streamline length
-        (i.e., physical arc length), beyond which line integration is
-        terminated.</Documentation>
+        <Documentation>
+          This property specifies the maximum streamline length (i.e., physical arc length), beyond which line
+          integration is terminated.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetTerminalSpeed"
                             default_values="0.000000000001"
                             label="Terminal Speed"
                             name="TerminalSpeed"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the terminal speed, below which
-        particle advection/integration is terminated.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the terminal speed, below which particle advection/integration is terminated.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumError"
                             default_values="0.000001"
                             name="MaximumError"
                             number_of_elements="1"
-                            panel_visibility="advanced" >
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the maximum error (for
-        Runge-Kutta 4-5) tolerated throughout streamline integration. The
-        Runge-Kutta 4-5 integrator tries to adjust the step size such that the
-        estimated error is less than this threshold.</Documentation>
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the maximum error (for
+          Runge-Kutta 4-5) tolerated throughout streamline integration. The
+          Runge-Kutta 4-5 integrator tries to adjust the step size such that the
+          estimated error is less than this threshold.
+        </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
-        <BooleanDomain name="bool" />
-        <Documentation>Specify whether or not to compute
-        vorticity.</Documentation>
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify whether to compute vorticity.
+        </Documentation>
       </IntVectorProperty>
 
       <InputProperty command="SetSourceConnection"
@@ -872,37 +945,51 @@
                      name="Source"
                      panel_visibility="default">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
+          <Group name="sources"/>
         </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
           <Group name="seed_sources"/>
         </ProxyListDomain>
-        <Documentation>The value of this property determines how the seeds for
-        the streamlines will be generated.</Documentation>
+        <Documentation>
+          The value of this property determines how the seeds for the streamlines will be generated.
+        </Documentation>
       </InputProperty>
 
+      <IntVectorProperty command="SetUseLocalSeedSource"
+                         number_of_elements="1"
+                         default_values="0"
+                         name="UseLocalSeedSource"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If true the filter considers that the whole seed source is available on all ranks.
+          Else the filter will aggregate all seed sources from all ranks and merge their points.
+          WARNING: do not set this value to true unless you know what you're doing.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="Seeds">
-        <Property name="Source" />
+        <Property name="Source"/>
       </PropertyGroup>
 
       <PropertyGroup label="Integration Parameters">
-        <Property name="IntegrationDirection" />
-        <Property name="IntegratorType" />
-        <Property name="IntegrationStepUnit" />
-        <Property name="InitialIntegrationStep" />
-        <Property name="MinimumIntegrationStep" />
-        <Property name="MaximumIntegrationStep" />
-        <Property name="MaximumError" />
+        <Property name="IntegrationDirection"/>
+        <Property name="IntegratorType"/>
+        <Property name="IntegrationStepUnit"/>
+        <Property name="InitialIntegrationStep"/>
+        <Property name="MinimumIntegrationStep"/>
+        <Property name="MaximumIntegrationStep"/>
+        <Property name="MaximumError"/>
       </PropertyGroup>
 
-      <PropertyGroup label="Streamline Parameters" >
-        <Property name="MaximumNumberOfSteps" />
-        <Property name="MaximumPropagation" />
-        <Property name="TerminalSpeed" />
+      <PropertyGroup label="Streamline Parameters">
+        <Property name="MaximumNumberOfSteps"/>
+        <Property name="MaximumPropagation"/>
+        <Property name="TerminalSpeed"/>
       </PropertyGroup>
 
       <Hints>
-        <Visibility replace_input="2" />
+        <Visibility replace_input="2"/>
       </Hints>
       <!-- End StreamTracer -->
     </SourceProxy>
@@ -913,38 +1000,40 @@
                  name="ArbitrarySourceStreamTracer">
       <Documentation long_help="Integrate streamlines in a vector field."
                      short_help="Integrate streamlines in a vector field.">The
-                     Stream Tracer With Custom Source filter generates streamlines
-                     in a vector field from a collection of seed points. Production
-                     of streamlines terminates if a streamline crosses the
-                     exterior boundary of the input dataset
-                     (ReasonForTermination=1). Other reasons for termination
-                     include an initialization issue (ReasonForTermination=2),
-                     computing an unexpected value (ReasonForTermination=3),
-                     reached the Maximum Streamline Length input value
-                     (ReasonForTermination=4), reached the Maximum Steps
-                     input value (ReasonForTermination=5), and velocity was
-                     lower than the Terminal Speed input value
-                     (ReasonForTermination=6). This filter operates on any
-                     type of dataset, provided it has point-centered vectors.
-                     The output is polygonal data containing polylines.
-                     This filter takes a Source input
-                     that provides the seed points.</Documentation>
+        Stream Tracer With Custom Source filter generates streamlines
+        in a vector field from a collection of seed points. Production
+        of streamlines terminates if a streamline crosses the
+        exterior boundary of the input dataset
+        (ReasonForTermination=1). Other reasons for termination
+        include an initialization issue (ReasonForTermination=2),
+        computing an unexpected value (ReasonForTermination=3),
+        reached the Maximum Streamline Length input value
+        (ReasonForTermination=4), reached the Maximum Steps
+        input value (ReasonForTermination=5), and velocity was
+        lower than the Terminal Speed input value
+        (ReasonForTermination=6). This filter operates on any
+        type of dataset, provided it has point-centered vectors.
+        The output is polygonal data containing polylines.
+        This filter takes a Source input
+        that provides the seed points.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
-                          number_of_components="3" />
-        <Documentation>This property specifies the input to the Stream Tracer
-        filter.</Documentation>
+                          number_of_components="3"/>
+        <Documentation>
+          This property specifies the input to the Stream Tracer filter.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -956,36 +1045,39 @@
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>This property contains the name of the vector array from
-        which to generate streamlines.</Documentation>
+        <Documentation>
+          This property contains the name of the vector array from which to generate streamlines.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetInterpolatorType"
                          default_values="0"
                          name="InterpolatorType"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Interpolator with Point Locator"
-                 value="0" />
+                 value="0"/>
           <Entry text="Interpolator with Cell Locator"
-                 value="1" />
+                 value="1"/>
         </EnumerationDomain>
-        <Documentation>This property determines which interpolator to use for
-        evaluating the velocity vector field. The first is faster though the
-        second is more robust in locating cells during streamline
-        integration.</Documentation>
+        <Documentation>
+          This property determines which interpolator to use for
+          evaluating the velocity vector field. The first is faster though the
+          second is more robust in locating cells during streamline integration.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetSurfaceStreamlines"
                          default_values="0"
                          name="Surface Streamlines"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
-        <BooleanDomain name="bool" />
-        <Documentation>Specify whether or not to compute surface
-        streamlines.</Documentation>
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify whether to compute surface streamlines.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationDirection"
                          default_values="2"
@@ -993,14 +1085,15 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="FORWARD"
-                 value="0" />
+                 value="0"/>
           <Entry text="BACKWARD"
-                 value="1" />
+                 value="1"/>
           <Entry text="BOTH"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property determines in which direction(s) a
-        streamline is generated.</Documentation>
+        <Documentation>
+          This property determines in which direction(s) a streamline is generated.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegratorType"
                          default_values="2"
@@ -1008,14 +1101,15 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Runge-Kutta 2"
-                 value="0" />
+                 value="0"/>
           <Entry text="Runge-Kutta 4"
-                 value="1" />
+                 value="1"/>
           <Entry text="Runge-Kutta 4-5"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property determines which integrator (with
-        increasing accuracy) to use for creating streamlines.</Documentation>
+        <Documentation>
+          This property determines which integrator (with increasing accuracy) to use for creating streamlines.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIntegrationStepUnit"
                          default_values="2"
@@ -1025,15 +1119,16 @@
                          panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Length"
-                 value="1" />
+                 value="1"/>
           <Entry text="Cell Length"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>This property specifies the unit for
-        Minimum/Initial/Maximum integration step size. The Length unit refers
-        to the arc length that a particle travels/advects within a single step.
-        The Cell Length unit represents the step size as a number of
-        cells.</Documentation>
+        <Documentation>
+          This property specifies the unit for
+          Minimum/Initial/Maximum integration step size. The Length unit refers
+          to the arc length that a particle travels/advects within a single step.
+          The Cell Length unit represents the step size as a number of cells.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetInitialIntegrationStep"
                             default_values="0.2"
@@ -1041,13 +1136,14 @@
                             name="InitialIntegrationStep"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the initial integration step
-        size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
-        it is fixed (always equal to this initial value) throughout the
-        integration. For an adaptive integrator (Runge-Kutta 4-5), the actual
-        step size varies such that the numerical error is less than a specified
-        threshold.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the initial integration step
+          size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
+          it is fixed (always equal to this initial value) throughout the
+          integration. For an adaptive integrator (Runge-Kutta 4-5), the actual
+          step size varies such that the numerical error is less than a specified threshold.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMinimumIntegrationStep"
                             default_values="0.01"
@@ -1055,9 +1151,10 @@
                             name="MinimumIntegrationStep"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
-        specifies the minimum integration step size.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          When using the Runge-Kutta 4-5 integrator, this property specifies the minimum integration step size.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumIntegrationStep"
                             default_values="0.5"
@@ -1065,9 +1162,10 @@
                             name="MaximumIntegrationStep"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
-        specifies the maximum integration step size.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          When using the Runge-Kutta 4-5 integrator, this property specifies the maximum integration step size.
+        </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfSteps"
                          default_values="2000"
@@ -1075,9 +1173,10 @@
                          name="MaximumNumberOfSteps"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the maximum number of steps,
-        beyond which streamline integration is terminated.</Documentation>
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the maximum number of steps, beyond which streamline integration is terminated.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetMaximumPropagation"
                             default_values="1.0"
@@ -1090,12 +1189,13 @@
                       scale_factor="1.0">
           <RequiredProperties>
             <Property function="Input"
-                      name="Input" />
+                      name="Input"/>
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>This property specifies the maximum streamline length
-        (i.e., physical arc length), beyond which line integration is
-        terminated.</Documentation>
+        <Documentation>
+          This property specifies the maximum streamline length
+          (i.e., physical arc length), beyond which line integration is terminated.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetTerminalSpeed"
                             default_values="0.000000000001"
@@ -1103,51 +1203,67 @@
                             name="TerminalSpeed"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the terminal speed, below which
-        particle advection/integration is terminated.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the terminal speed, below which particle advection/integration is terminated.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumError"
                             default_values="0.000001"
                             name="MaximumError"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the maximum error (for
-        Runge-Kutta 4-5) tolerated throughout streamline integration. The
-        Runge-Kutta 4-5 integrator tries to adjust the step size such that the
-        estimated error is less than this threshold.</Documentation>
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the maximum error (for Runge-Kutta 4-5) tolerated throughout streamline integration.
+          The Runge-Kutta 4-5 integrator tries to adjust the step size such that the
+          estimated error is less than this threshold.
+        </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>Specify whether or not to compute
-        vorticity.</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify whether to compute vorticity.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseLocalSeedSource"
+                         number_of_elements="1"
+                         default_values="0"
+                         name="UseLocalSeedSource"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If true the filter considers that the whole seed source is available on all ranks.
+          Else the filter will aggregate all seed sources from all ranks and merge their points.
+          WARNING: do not set this value to true unless you know what you're doing.
+        </Documentation>
       </IntVectorProperty>
       <InputProperty command="SetSourceConnection"
                      label="Seed Source"
                      name="Source">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
+          <Group name="sources"/>
         </ProxyGroupDomain>
-        <Documentation>This property specifies the input used to obtain the
-        seed points.</Documentation>
+        <Documentation>
+          This property specifies the input used to obtain the seed points.
+        </Documentation>
       </InputProperty>
       <Hints>
-        <Visibility replace_input="2" />
+        <Visibility replace_input="2"/>
       </Hints>
       <!-- End StreamTracer -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
     <SourceProxy name="VortexCores"
-      class="vtkVortexCore"
-      label="Vortex Cores">
+                 class="vtkVortexCore"
+                 label="Vortex Cores">
       <Documentation long_help="Compute vortex cores"
-        short_help="Compute vortex cores of a vector field">
+                     short_help="Compute vortex cores of a vector field">
         Compute vortex core lines using the parallel vectors method. By default, the "Higher-Order"
         approach of computing the parallel vector lines between the flow field's velocity and jerk
         is disabled in favor of computing the parallel vector lines between the velocity and
@@ -1158,41 +1274,43 @@
       </Documentation>
 
       <InputProperty command="SetInputConnection"
-        name="Input">
+                     name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array1"
                           number_of_components="3"
-                          optional="0" />
-        <Documentation>The input.</Documentation>
+                          optional="0"/>
+        <Documentation>
+          The input.
+        </Documentation>
       </InputProperty>
 
       <StringVectorProperty name="SelectInputArray"
-       command="SetInputArrayToProcess"
-       number_of_elements="5"
-       element_types="0 0 0 0 2"
-       label="Vector Field" >
-       <ArrayListDomain name="array_list" attribute_type="Vectors"
-         input_domain_name="input_array1">
-         <RequiredProperties>
-           <Property name="Input" function="Input" />
-         </RequiredProperties>
-       </ArrayListDomain>
-       <Documentation>
-         This property indicates the name of the vector array from which to compute vortex cores.
-       </Documentation>
-     </StringVectorProperty>
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Vector Field">
+        <ArrayListDomain name="array_list" attribute_type="Vectors"
+                         input_domain_name="input_array1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the vector array from which to compute vortex cores.
+        </Documentation>
+      </StringVectorProperty>
 
       <IntVectorProperty command="SetHigherOrderMethod"
-        name="UseHigherOrderMethod"
-        default_values="0"
-        number_of_elements="1">
-        <BooleanDomain name="bool" />
+                         name="UseHigherOrderMethod"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Use the flow field's jerk instead of acceleration as the second vector field during the
           parallel vector operation. Disabled by default.
@@ -1200,10 +1318,10 @@
       </IntVectorProperty>
 
       <IntVectorProperty command="SetFasterApproximation"
-        name="FasterApproximation"
-        default_values="0"
-        number_of_elements="1">
-        <BooleanDomain name="bool" />
+                         name="FasterApproximation"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
         <Documentation>
           When this option is enabled, the gradient filter used to compute vortex cores will provide
           a less accurate algorithm that performs fewer derivative calculations and is therefore faster.
@@ -1211,6 +1329,6 @@
       </IntVectorProperty>
 
     </SourceProxy>
-      <!-- End VortexCores -->
+    <!-- End VortexCores -->
   </ProxyGroup>
 </ServerManagerConfiguration>

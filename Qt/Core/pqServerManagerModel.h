@@ -55,19 +55,19 @@ class vtkSMSession;
 class pqServerManagerModel;
 
 template <class T>
-inline QList<T> pqFindItems(const pqServerManagerModel* const model);
+inline QList<T> pqFindItems(const pqServerManagerModel* model);
 template <class T>
-inline QList<T> pqFindItems(const pqServerManagerModel* const model, pqServer* server);
+inline QList<T> pqFindItems(const pqServerManagerModel* model, pqServer* server);
 template <class T>
-inline T pqFindItem(const pqServerManagerModel* const model, const QString& name);
+inline T pqFindItem(const pqServerManagerModel* model, const QString& name);
 template <class T>
-inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy);
+inline T pqFindItem(const pqServerManagerModel* model, vtkSMProxy* proxy);
 template <class T>
-inline T pqFindItem(const pqServerManagerModel* const model, vtkTypeUInt32 id);
+inline T pqFindItem(const pqServerManagerModel* model, vtkTypeUInt32 id);
 template <class T>
-inline int pqGetNumberOfItems(const pqServerManagerModel* const model);
+inline int pqGetNumberOfItems(const pqServerManagerModel* model);
 template <class T>
-inline T pqGetItemAtIndex(const pqServerManagerModel* const model, int index);
+inline T pqGetItemAtIndex(const pqServerManagerModel* model, int index);
 
 /**
  * pqServerManagerModel is the model for the Server Manager.
@@ -88,7 +88,7 @@ public:
    * \c observer  :- instance of pqServerManagerObserver observing the server
    *                 manager.
    */
-  pqServerManagerModel(pqServerManagerObserver* observer, QObject* parent = 0);
+  pqServerManagerModel(pqServerManagerObserver* observer, QObject* parent = nullptr);
   ~pqServerManagerModel() override;
 
   /**
@@ -108,6 +108,11 @@ public:
    * Given a server resource, locates the pqServer instance for it, if any.
    */
   pqServer* findServer(const pqServerResource& resource) const;
+
+  /**
+   * Given a server name, locates the pqServer instance with this name, if any.
+   */
+  pqServer* findServer(const QString& name) const;
 
   /**
    * Book end events for removing a server.
@@ -198,26 +203,26 @@ public:
   /**
    * Internal method.
    */
-  static void findItemsHelper(const pqServerManagerModel* const model, const QMetaObject& mo,
-    QList<void*>* list, pqServer* server = 0);
+  static void findItemsHelper(const pqServerManagerModel* model, const QMetaObject& mo,
+    QList<void*>* list, pqServer* server = nullptr);
 
   /**
    * Internal method.
    */
   static pqServerManagerModelItem* findItemHelper(
-    const pqServerManagerModel* const model, const QMetaObject& mo, vtkSMProxy* proxy);
+    const pqServerManagerModel* model, const QMetaObject& mo, vtkSMProxy* proxy);
 
   /**
    * Internal method.
    */
   static pqServerManagerModelItem* findItemHelper(
-    const pqServerManagerModel* const model, const QMetaObject& mo, vtkTypeUInt32 id);
+    const pqServerManagerModel* model, const QMetaObject& mo, vtkTypeUInt32 id);
 
   /**
    * Internal method.
    */
   static pqServerManagerModelItem* findItemHelper(
-    const pqServerManagerModel* const model, const QMetaObject& mo, const QString& name);
+    const pqServerManagerModel* model, const QMetaObject& mo, const QString& name);
 
 Q_SIGNALS:
   /**
@@ -393,17 +398,17 @@ private:
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline QList<T> pqFindItems(const pqServerManagerModel* const model)
+inline QList<T> pqFindItems(const pqServerManagerModel* model)
 {
   QList<T> list;
   pqServerManagerModel::findItemsHelper(
-    model, ((T)0)->staticMetaObject, reinterpret_cast<QList<void*>*>(&list), 0);
+    model, ((T)0)->staticMetaObject, reinterpret_cast<QList<void*>*>(&list), nullptr);
   return list;
 }
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline QList<T> pqFindItems(const pqServerManagerModel* const model, pqServer* server)
+inline QList<T> pqFindItems(const pqServerManagerModel* model, pqServer* server)
 {
   QList<T> list;
   pqServerManagerModel::findItemsHelper(
@@ -413,7 +418,7 @@ inline QList<T> pqFindItems(const pqServerManagerModel* const model, pqServer* s
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy)
+inline T pqFindItem(const pqServerManagerModel* model, vtkSMProxy* proxy)
 {
   return qobject_cast<T>(
     pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, proxy));
@@ -421,14 +426,14 @@ inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy)
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline T pqFindItem(const pqServerManagerModel* const model, vtkTypeUInt32 id)
+inline T pqFindItem(const pqServerManagerModel* model, vtkTypeUInt32 id)
 {
   return qobject_cast<T>(pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, id));
 }
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline T pqFindItem(const pqServerManagerModel* const model, const QString& name)
+inline T pqFindItem(const pqServerManagerModel* model, const QString& name)
 {
   return qobject_cast<T>(
     pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, name));
@@ -436,14 +441,14 @@ inline T pqFindItem(const pqServerManagerModel* const model, const QString& name
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline int pqGetNumberOfItems(const pqServerManagerModel* const model)
+inline int pqGetNumberOfItems(const pqServerManagerModel* model)
 {
   return pqFindItems<T>(model).size();
 }
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline T pqGetItemAtIndex(const pqServerManagerModel* const model, int index)
+inline T pqGetItemAtIndex(const pqServerManagerModel* model, int index)
 {
   QList<T> items = pqFindItems<T>(model);
   if (index < items.size())

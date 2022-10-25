@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqInterfaceTracker : public QObject
   typedef QObject Superclass;
 
 public:
-  pqInterfaceTracker(QObject* parent = 0);
+  pqInterfaceTracker(QObject* parent = nullptr);
   ~pqInterfaceTracker() override;
 
   /**
@@ -106,7 +106,6 @@ protected:
    */
   void onPluginLoaded(vtkObject*, unsigned long, void* calldata);
 
-protected:
   QObjectList Interfaces;
   QObjectList RegisteredInterfaces;
   unsigned long ObserverID;

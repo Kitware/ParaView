@@ -65,7 +65,12 @@ int vtkPVDataRepresentationPipeline::ProcessRequest(
     }
   }
 
-  return this->Superclass::ProcessRequest(request, inInfo, outInfo);
+  int ret = this->Superclass::ProcessRequest(request, inInfo, outInfo);
+  if (request->Has(REQUEST_DATA_OBJECT()) && !ret)
+  {
+    this->Algorithm->InvokeEvent(vtkCommand::UpdateDataEvent);
+  }
+  return ret;
 }
 
 //----------------------------------------------------------------------------

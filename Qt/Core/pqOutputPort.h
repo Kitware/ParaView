@@ -181,7 +181,7 @@ public:
    */
   QString prettyName() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * This method updates all render modules to which all
    * representations for this source belong, if force is true, it for an
@@ -222,7 +222,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
   void onRepresentationVisibilityChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   friend class pqPipelineFilter;
   friend class pqDataRepresentation;
 

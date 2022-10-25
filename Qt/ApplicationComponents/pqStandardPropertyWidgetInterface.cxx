@@ -46,11 +46,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCompositePropertyWidgetDecorator.h"
+#include "pqCoordinateFramePropertyWidget.h"
 #include "pqCylinderPropertyWidget.h"
 #include "pqDataAssemblyPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
+#include "pqDisplaySizedImplicitPlanePropertyWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
+#include "pqEqualizerPropertyWidget.h"
 #include "pqFileListPropertyWidget.h"
 #include "pqFileNamePropertyWidget.h"
 #include "pqFontPropertyWidget.h"
@@ -66,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLightPropertyWidget.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
+#include "pqMetaDataPropertyWidget.h"
 #include "pqMoleculePropertyWidget.h"
 #include "pqMultiComponentsDecorator.h"
 #include "pqOMETransferFunctionsPropertyWidget.h"
@@ -279,7 +283,15 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   }
   else if (panelWidget == "InteractivePlane")
   {
+    return new pqDisplaySizedImplicitPlanePropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractivePlane2")
+  {
     return new pqImplicitPlanePropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveFrame")
+  {
+    return new pqCoordinateFramePropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractiveBox")
   {
@@ -333,6 +345,15 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   {
     return new pqCheckableProperty(proxy, group, parentWidget);
   }
+  else if (panelWidget == "EqualizerPropertyWidget")
+  {
+    return new pqEqualizerPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "MetaDataPropertyWidget")
+  {
+    return new pqMetaDataPropertyWidget(proxy, group, parentWidget);
+  }
+
   // *** NOTE: When adding new types, please update the header documentation ***
 
   return nullptr;

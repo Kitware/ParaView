@@ -103,6 +103,13 @@ public:
   vtkGetMacro(Timeout, int);
   //@}
 
+  //@{
+  /**
+   * Get the timeout command used by the server to retrieve remaining time.
+   */
+  const std::string& GetTimeoutCommand() const { return this->TimeoutCommand; }
+  //@}
+
   /**
    * When in tile display mode, returns the tile dimensions.
    */
@@ -156,6 +163,13 @@ public:
   vtkGetMacro(SMPMaxNumberOfThreads, int);
   //@}
 
+  //@{
+  /**
+   * Return true if VTK-m accelerated filters override is enabled in this build.
+   */
+  vtkGetMacro(AcceleratedFiltersOverrideAvailable, int);
+  //@}
+
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation() override;
@@ -167,6 +181,7 @@ protected:
   bool NVPipeSupport;
   int RemoteRendering;
   int Timeout;
+  std::string TimeoutCommand;
   int UseIceT;
   int MultiClientsEnable;
   int ClientId;
@@ -176,6 +191,7 @@ protected:
   int TileDimensions[2];
   std::string SMPBackendName;
   int SMPMaxNumberOfThreads;
+  bool AcceleratedFiltersOverrideAvailable;
 
 private:
   vtkPVServerInformation(const vtkPVServerInformation&) = delete;

@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include <vtksys/SystemTools.hxx>
 
 #include <QApplication>
 #include <QDebug>
@@ -196,6 +197,7 @@ void pqCommandLineOptionsBehavior::processData()
 
     // We don't directly set the data file name instead use the dialog. This
     // makes it possible to select a file group.
+    // This also resolve relative path into a canonical one.
     pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
       tr("Internal Open File"), QString(), QString());
     dialog.setFileMode(pqFileDialog::ExistingFiles);
@@ -220,11 +222,23 @@ void pqCommandLineOptionsBehavior::processData()
 void pqCommandLineOptionsBehavior::processState()
 {
   auto cConfig = pqCoreConfiguration::instance();
-  const auto& fname = cConfig->stateFileName();
-  if (!fname.empty())
+  std::string fullPath;
+  if (!cConfig->stateFileName().empty())
   {
-    // Load state file without fix-filenames dialog.
-    pqLoadStateReaction::loadState(QString::fromStdString(fname), true);
+    fullPath = vtksys::SystemTools::CollapseFullPath(cConfig->stateFileName());
+  }
+  if (!fullPath.empty())
+  {
+    QFileInfo fileInfo(QString::fromStdString(fullPath));
+    if (fileInfo.exists())
+    {
+      // Load state file using canonical path without fix-filenames dialog.
+      pqLoadStateReaction::loadState(fileInfo.canonicalFilePath(), true);
+    }
+    else
+    {
+      qCritical() << "Specified state file does not exists: '" << fullPath.c_str() << "'";
+    }
   }
 }
 

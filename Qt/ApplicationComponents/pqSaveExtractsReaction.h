@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveExtractsReaction : public pqReaction
 
 public:
   pqSaveExtractsReaction(QAction* parent);
-  ~pqSaveExtractsReaction();
+  ~pqSaveExtractsReaction() override;
 
   /**
    * Generates exports.

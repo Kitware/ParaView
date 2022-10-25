@@ -76,13 +76,12 @@ protected Q_SLOTS:
    */
   void updateViewWidgets();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Create the QWidget for this view.
    */
   QWidget* createWidget() override;
 
-protected:
   /**
    * Constructor:
    * \c type  :- view type.

@@ -49,7 +49,7 @@ class vtkPVInitializerPlugin
   }
 };
 
-void paraview_initialize()
+inline void paraview_initialize()
 {
   static vtkPVInitializerPlugin instance;
   vtkPVPlugin::ImportPlugin(&instance);

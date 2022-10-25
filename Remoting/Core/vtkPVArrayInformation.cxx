@@ -225,11 +225,11 @@ void vtkPVArrayInformation::GetDataTypeRange(double range[2]) const
       break;
     case VTK_UNSIGNED_LONG:
       range[0] = VTK_UNSIGNED_LONG_MIN;
-      range[1] = VTK_UNSIGNED_LONG_MAX;
+      range[1] = static_cast<double>(VTK_UNSIGNED_LONG_MAX);
       break;
     case VTK_LONG:
       range[0] = VTK_LONG_MIN;
-      range[1] = VTK_LONG_MAX;
+      range[1] = static_cast<double>(VTK_LONG_MAX);
       break;
     case VTK_FLOAT:
       range[0] = VTK_FLOAT_MIN;

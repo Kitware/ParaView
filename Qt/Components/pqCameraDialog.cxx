@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraDialog.h"
 #include "ui_pqCameraDialog.h"
 
+#include "pqScaledSpinBox.h"
+
 // VTK / ParaView Server Manager includes.
 #include "vtkCamera.h"
 #include "vtkCollection.h"
@@ -70,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // STL
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #define QT_ENDL endl
@@ -83,47 +86,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-void RotateElevation(vtkCamera* camera, double angle)
-{
-  vtkNew<vtkTransform> transform;
-
-  double scale = vtkMath::Norm(camera->GetPosition());
-  if (scale <= 0.0)
-  {
-    scale = vtkMath::Norm(camera->GetFocalPoint());
-    if (scale <= 0.0)
-    {
-      scale = 1.0;
-    }
-  }
-  double* temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0] / scale, temp[1] / scale, temp[2] / scale);
-  temp = camera->GetPosition();
-  camera->SetPosition(temp[0] / scale, temp[1] / scale, temp[2] / scale);
-
-  double v2[3];
-  // translate to center
-  // we rotate around 0,0,0 rather than the center of rotation
-  transform->Identity();
-
-  // elevation
-  camera->OrthogonalizeViewUp();
-  double* viewUp = camera->GetViewUp();
-  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
-  transform->RotateWXYZ(-angle, v2[0], v2[1], v2[2]);
-
-  // translate back
-  // we are already at 0,0,0
-
-  camera->ApplyTransform(transform.GetPointer());
-  camera->OrthogonalizeViewUp();
-
-  // For rescale back.
-  temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
-  temp = camera->GetPosition();
-  camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
-}
 
 QStringList getListOfStrings(pqSettings* settings, const QString& defaultTxt, int min, int max)
 {
@@ -237,15 +199,24 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=nullptr*/, Qt::WindowFlags f /*=0*
     this->Internal->viewZPlus, SIGNAL(clicked()), this, SLOT(resetViewDirectionPosZ()));
   QObject::connect(
     this->Internal->viewZMinus, SIGNAL(clicked()), this, SLOT(resetViewDirectionNegZ()));
+  QObject::connect(
+    this->Internal->viewIsometric, SIGNAL(clicked()), this, SLOT(applyIsometricView()));
 
   QObject::connect(this->Internal->AutoResetCenterOfRotation, SIGNAL(toggled(bool)), this,
     SLOT(resetRotationCenterWithCamera()));
 
-  QObject::connect(this->Internal->rollButton, SIGNAL(clicked()), this, SLOT(applyCameraRoll()));
   QObject::connect(
-    this->Internal->elevationButton, SIGNAL(clicked()), this, SLOT(applyCameraElevation()));
+    this->Internal->rollPlusButton, SIGNAL(clicked()), this, SLOT(applyCameraRollPlus()));
   QObject::connect(
-    this->Internal->azimuthButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuth()));
+    this->Internal->rollMinusButton, SIGNAL(clicked()), this, SLOT(applyCameraRollMinus()));
+  QObject::connect(
+    this->Internal->elevationPlusButton, SIGNAL(clicked()), this, SLOT(applyCameraElevationPlus()));
+  QObject::connect(this->Internal->elevationMinusButton, SIGNAL(clicked()), this,
+    SLOT(applyCameraElevationMinus()));
+  QObject::connect(
+    this->Internal->azimuthPlusButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuthPlus()));
+  QObject::connect(
+    this->Internal->azimuthMinusButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuthMinus()));
   QObject::connect(
     this->Internal->zoomInButton, SIGNAL(clicked()), this, SLOT(applyCameraZoomIn()));
   QObject::connect(
@@ -463,11 +434,14 @@ void pqCameraDialog::SetCameraGroupsEnabled(bool enabled)
   internal.loadCameraConfiguration->setEnabled(enabled);
   internal.saveCameraConfiguration->setEnabled(enabled);
 
-  internal.rollButton->setEnabled(enabled);
+  internal.rollPlusButton->setEnabled(enabled);
+  internal.rollMinusButton->setEnabled(enabled);
   internal.rollAngle->setEnabled(enabled);
-  internal.elevationButton->setEnabled(enabled);
+  internal.elevationPlusButton->setEnabled(enabled);
+  internal.elevationMinusButton->setEnabled(enabled);
   internal.elevationAngle->setEnabled(enabled);
-  internal.azimuthButton->setEnabled(enabled);
+  internal.azimuthPlusButton->setEnabled(enabled);
+  internal.azimuthMinusButton->setEnabled(enabled);
   internal.azimuthAngle->setEnabled(enabled);
   internal.zoomInButton->setEnabled(enabled);
   internal.zoomFactor->setEnabled(enabled);
@@ -487,106 +461,135 @@ void pqCameraDialog::resetViewDirection(
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionPosX()
 {
-  this->resetViewDirection(1, 0, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToPositiveX();
+  }
 }
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionNegX()
 {
-  this->resetViewDirection(-1, 0, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToNegativeX();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionPosY()
 {
-  this->resetViewDirection(0, 1, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToPositiveY();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionNegY()
 {
-  this->resetViewDirection(0, -1, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToNegativeY();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionPosZ()
 {
-  this->resetViewDirection(0, 0, 1, 0, 1, 0);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToPositiveZ();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionNegZ()
 {
-  this->resetViewDirection(0, 0, -1, 0, 1, 0);
-}
-
-//-----------------------------------------------------------------------------
-void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double value)
-{
   if (this->Internal->RenderModule)
   {
-    vtkSMRenderViewProxy* proxy = this->Internal->RenderModule->getRenderViewProxy();
-    proxy->SynchronizeCameraProperties();
-    vtkCamera* camera = proxy->GetActiveCamera();
-    if (!camera)
-    {
-      return;
-    }
-    if (enType == pqCameraDialog::Roll)
-    {
-      camera->Roll(value);
-    }
-    else if (enType == pqCameraDialog::Elevation)
-    {
-      RotateElevation(camera, value);
-    }
-    else if (enType == pqCameraDialog::Azimuth)
-    {
-      camera->Azimuth(value);
-    }
-    else if (enType == pqCameraDialog::Zoom)
-    {
-      if (camera->GetParallelProjection())
-      {
-        camera->SetParallelScale(camera->GetParallelScale() / value);
-      }
-      else
-      {
-        camera->Dolly(value);
-      }
-    } // if (pqCameraDialog::Zoom)
-    proxy->SynchronizeCameraProperties();
-    this->Internal->RenderModule->render();
+    this->Internal->RenderModule->resetViewDirectionToNegativeZ();
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCameraRoll()
+void pqCameraDialog::applyIsometricView()
 {
-  this->adjustCamera(pqCameraDialog::Roll, this->Internal->rollAngle->value());
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->applyIsometricView();
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCameraElevation()
+void pqCameraDialog::applyCameraRollPlus()
 {
-  this->adjustCamera(pqCameraDialog::Elevation, this->Internal->elevationAngle->value());
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustRoll(this->Internal->rollAngle->value());
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCameraAzimuth()
+void pqCameraDialog::applyCameraRollMinus()
 {
-  this->adjustCamera(pqCameraDialog::Azimuth, this->Internal->azimuthAngle->value());
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustRoll(-this->Internal->rollAngle->value());
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraElevationPlus()
+{
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustElevation(this->Internal->elevationAngle->value());
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraElevationMinus()
+{
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustElevation(-this->Internal->elevationAngle->value());
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraAzimuthPlus()
+{
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustAzimuth(this->Internal->azimuthAngle->value());
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraAzimuthMinus()
+{
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustAzimuth(-this->Internal->azimuthAngle->value());
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraZoomIn()
 {
-  this->adjustCamera(pqCameraDialog::Zoom, this->Internal->zoomFactor->value());
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustZoom(this->Internal->zoomFactor->value());
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraZoomOut()
 {
-  this->adjustCamera(pqCameraDialog::Zoom, 1.0 / this->Internal->zoomFactor->value());
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->adjustZoom(1.0 / this->Internal->zoomFactor->value());
+  }
 }
 
 //-----------------------------------------------------------------------------

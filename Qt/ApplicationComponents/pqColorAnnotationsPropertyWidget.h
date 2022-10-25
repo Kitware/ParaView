@@ -55,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget : public p
 
 public:
   pqColorAnnotationsPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqColorAnnotationsPropertyWidget() override;
 
   //@{
@@ -122,7 +122,7 @@ private Q_SLOTS:
    */
   void updateIndexedLookupState();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorAnnotationsPropertyWidget)
 
   class pqInternals;

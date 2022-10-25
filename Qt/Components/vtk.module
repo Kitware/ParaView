@@ -10,6 +10,7 @@ DEPENDS
   ParaView::pqCore
   ParaView::qttesting
   VTK::jsoncpp
+  VTK::nlohmannjson
 PRIVATE_DEPENDS
   ParaView::RemotingAnimation
   ParaView::RemotingApplication
@@ -23,6 +24,7 @@ PRIVATE_DEPENDS
   VTK::pugixml
   VTK::vtksys
 OPTIONAL_DEPENDS
+  VTK::AcceleratorsVTKmFilters
   VTK::ParallelMPI
 
   # These affect the public API.

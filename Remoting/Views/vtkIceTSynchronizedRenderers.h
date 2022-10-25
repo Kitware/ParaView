@@ -51,7 +51,7 @@ public:
    * renderer on each processes. You can create multiple instances on
    * vtkSynchronizedRenderers to synchronize multiple renderers.
    */
-  virtual void SetRenderer(vtkRenderer*) override;
+  void SetRenderer(vtkRenderer*) override;
 
   /**
    * Set the tile dimensions. Default is (1, 1).
@@ -98,8 +98,8 @@ public:
   /**
    * Set the image reduction factor. Overrides superclass implementation.
    */
-  virtual void SetImageReductionFactor(int val) override;
-  virtual int GetImageReductionFactor() override
+  void SetImageReductionFactor(int val) override;
+  int GetImageReductionFactor() override
   {
     return this->IceTCompositePass->GetImageReductionFactor();
   }
@@ -109,7 +109,7 @@ public:
    * Set the parallel message communicator. This is used to communicate among
    * processes.
    */
-  virtual void SetParallelController(vtkMultiProcessController* cont) override
+  void SetParallelController(vtkMultiProcessController* cont) override
   {
     this->Superclass::SetParallelController(cont);
     this->IceTCompositePass->SetController(cont);
@@ -158,7 +158,7 @@ public:
 
 protected:
   vtkIceTSynchronizedRenderers();
-  ~vtkIceTSynchronizedRenderers();
+  ~vtkIceTSynchronizedRenderers() override;
 
   /**
    * Overridden to capture image from icet buffers instead of the screen.

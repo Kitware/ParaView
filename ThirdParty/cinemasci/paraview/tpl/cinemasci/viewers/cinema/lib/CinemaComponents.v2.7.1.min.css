@@ -1,0 +1,479 @@
+.CINEMA_COMPONENT.GLYPH .axes path {
+	stroke-opacity: 0.4;
+	stroke: black;
+}
+
+.CINEMA_COMPONENT.GLYPH .axes text {
+	text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+.CINEMA_COMPONENT.GLYPH .glyph {
+	fill: rgba(0, 0, 0, 0.034);
+	stroke: rgba(95, 153, 201, 0.747);
+	stroke-width: 5px;
+	stroke-linejoin: round;
+}.CINEMA_COMPONENT.IMAGE_SPREAD .header {
+	background: #e2e2e2;
+	padding: 5px 20px;
+	border-bottom: 3px solid dimgray;
+	box-sizing: border-box;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .controlPanel {
+	margin: 0px 10px;
+	display: inline-table;
+	color: black;
+	font-size: 14px;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .controlPanel.imageSize {
+	float: right;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .dataDisplay {
+	display: inline-block;
+	margin: 5px;
+	padding: 2px;
+	border: 4px solid black;
+	background-color: lightgray;
+	box-shadow: 1px 1px 2px black;
+}
+.CINEMA_COMPONENT.IMAGE_SPREAD .dataDisplay:hover {
+	box-shadow: 2px 4px 8px black;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay {
+	display: inline-block;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay .display {
+	margin: 2px;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay .display.image {
+	border: 2px solid black;
+	line-height: 0;
+	cursor: pointer;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay .display.image:hover {
+	border: 2px solid rgb(23, 165, 221);
+	box-shadow: 1px 1px 2px black;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay .displayLabel {
+	font-size: 12px;
+	text-align: center;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay .display.text {
+	text-align: center;
+	padding: 5px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .fileDisplay .display.image img {
+	line-height: 0;
+}
+
+.modalBackground {
+	position: fixed;
+	z-index: 3;
+	padding-top: 100px;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0,0,0,0.9);
+}
+
+.modalImg {
+	margin: auto;
+	display: block;
+}
+
+.modalViewer {
+    margin: auto;
+    width: 50%;
+    height: 80%;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageNavWrapper {
+	padding: initial;
+	z-index: 2;
+	position: fixed;
+	bottom: 30px;
+	left: 50%;
+	width: auto;
+	height: auto;
+	transform: translate(-50%,-50%);
+	border: 2px solid lightgray;
+	border-radius: 3px;
+	box-shadow: 3px 3px 10px dimgray;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageNav {
+	margin: initial;
+	padding: initial;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageButton {
+	cursor: pointer;
+	color: white;
+	font-size: 14px;
+	display: inline-flex;
+	background-color: rgba(25,25,25,0.85);
+	padding: 10px;
+}
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageButton:hover {
+	background-color: rgba(50,50,50,0.85);
+}
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageButton[mode='selected'],
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageButton[mode='selected']:hover {
+	color: white;
+	background-color: rgba(100,100,100,0.85);
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .pageReadout {
+	background-color: rgba(25,25,25,0.85);
+	color: white;
+	text-align: center;
+	font-size: 12px;
+	padding: 3px;
+}
+
+.CINEMA_COMPONENT.IMAGE_SPREAD .noFileWarning {
+	padding: 10px;
+	width: 35%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	text-align: center;
+	background: rgb(201, 201, 201);
+	border: solid #333 5px;
+	border-radius: 10px;
+	box-shadow: 2px 2px 5px dimgray;
+
+	color: black;
+	font-weight: bold;
+	font-size: 24px;
+
+}
+.CINEMA_COMPONENT.LINE_CHART {
+	background: #e2e2e2;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .mainContainer {
+	background-color: white;
+	border: 2px solid black;
+	border-width: 2px 2px 0px 0px;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .dimensionSelect.x {
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 10px;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .tableContainer {
+	background-color: #eaeaea;
+	width: 135px;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .lineSelect.y td {
+	background-color: #eaeaea;
+	width: 135px;
+	white-space: nowrap;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .lineSelect.yGroup td {
+	background-color: #eaeaea;
+	width: 135px;
+	white-space: nowrap;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .lineSelect.checkboxtext{
+	font-size: 10px;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .lineGroupSelect.checkboxtext{
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .lineChart {
+	font: 10px sans-serif;
+	background-color: whitesmoke;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .axisContainer {
+	pointer-events: none;
+	overflow: visible;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .axis line,
+.CINEMA_COMPONENT.LINE_CHART .axis path {
+	fill: none;
+	stroke: black;
+	stroke-width: 2px;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.LINE_CHART .axis text {
+	fill: black;
+}
+CINEMA_COMPONENT.PCOORD.CANVAS .brush .extent {
+	fill-opacity: .3;
+	stroke: #fff;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.PCOORD.CANVAS .axis line,
+.CINEMA_COMPONENT.PCOORD.CANVAS .axis path {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.PCOORD.CANVAS .axisLabel rect {
+	fill: whitesmoke;
+}
+
+.CINEMA_COMPONENT.PCOORD.CANVAS .axisLabel text {
+	fill: black;
+	cursor: move;
+}
+
+.CINEMA_COMPONENT.PCOORD.CANVAS .axis path.NaNExtension,
+.CINEMA_COMPONENT.PCOORD.CANVAS .axis .NaNExtensionTick line {
+	stroke: rgb(196, 23, 57);
+}
+.CINEMA_COMPONENT.PCOORD.CANVAS .axis .NaNExtensionTick text{
+	fill: rgb(196, 23, 57);
+}
+
+.CINEMA_COMPONENT.PCOORD.CANVAS .loadingIndicator {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+
+	color: white;
+	font-size: 12px;
+	background: rgba(0, 0, 0, 0.671);
+	border-radius: 5px;
+	padding: 5px;
+}.CINEMA_COMPONENT.PCOORD.SVG {
+	font: 10px sans-serif;
+	background-color: whitesmoke;
+}
+
+/*.CINEMA_COMPONENT.PCOORD.SVG .pathContainer,
+.CINEMA_COMPONENT.PCOORD.SVG .pathContainer svg,
+.CINEMA_COMPONENT.PCOORD.SVG .pathContainer svg .selectedPaths {
+	pointer-events: none;
+}*/
+
+.CINEMA_COMPONENT.PCOORD.SVG .selectedPaths path {
+	fill: none;
+	stroke-width: 2px;
+	stroke: lightgray;
+	stroke-opacity: 0.3;
+	vector-effect: non-scaling-stroke;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .highlightedPaths path {
+	pointer-events: none;
+	fill: none;
+	stroke-width: 4px;
+	stroke: lightskyblue;
+	stroke-opacity: 1;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .overlayPaths path {
+	fill: none;
+	pointer-events: none;
+	stroke-dasharray: 20, 10;
+	stroke: crimson;
+	stroke-width: 3px;
+	stroke-opacity: 1;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .brush .extent {
+	fill-opacity: .3;
+	stroke: #fff;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .axis line,
+.CINEMA_COMPONENT.PCOORD.SVG .axis path {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .axisLabel rect {
+	fill: whitesmoke;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .axisLabel text {
+	fill: black;
+	cursor: move;
+}
+
+.CINEMA_COMPONENT.PCOORD.SVG .axis path.NaNExtension,
+.CINEMA_COMPONENT.PCOORD.SVG .axis .NaNExtensionTick line {
+	stroke: rgb(196, 23, 57);
+}
+.CINEMA_COMPONENT.PCOORD.SVG .axis .NaNExtensionTick text{
+	fill: rgb(196, 23, 57);
+}.CINEMA_COMPONENT.QUERY {
+	font-size: 14px;
+	color: white;
+}
+
+.CINEMA_COMPONENT.QUERY .thresholdInput {
+	width: 50px;
+}
+
+.CINEMA_COMPONENT.QUERY .thresholdLabel,
+.CINEMA_COMPONENT.QUERY .readout {
+	margin: 0px 10px;
+}
+
+.CINEMA_COMPONENT.QUERY .inputRow {
+	height: 25px;
+	position: relative;
+	font-size: 14px;
+	margin: 5px;
+	border-bottom: 1px solid dimgray;
+}
+.CINEMA_COMPONENT.QUERY .inputRow .label {
+	text-align: center;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.CINEMA_COMPONENT.QUERY .inputRow input {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.CINEMA_COMPONENT.QUERY .inputRow input[type="range"] {
+	right: 10px;
+	width: 150px;
+}
+.CINEMA_COMPONENT.QUERY .inputRow input[type="checkbox"] {
+	right: 180px;
+	transform: translateY(-100%);
+}.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .loadingIndicator {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+
+	color: white;
+	font-size: 12px;
+	background: rgba(0, 0, 0, 0.671);
+	border-radius: 5px;
+	padding: 5px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .pointContainer {
+	background: white;
+	border: 2px solid black;
+	border-width: 2px 2px 0px 0px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .dimensionSelect.x {
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 10px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .dimensionSelect.y {
+	top: 50%;
+	transform: translateY(-50%);
+	left: 10px;
+	max-width: 100px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .axisContainer {
+	pointer-events: none;
+	overflow: visible;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .axis line,
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .axis path {
+	fill: none;
+	stroke: black;
+	stroke-width: 2px;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .axis text {
+	fill: black;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.CANVAS .warningReadout {
+	bottom: 10px;
+	right: 10px;
+	font-size: 12px;
+	color: darkred;
+}.CINEMA_COMPONENT.SCATTER_PLOT.SVG .pointContainer {
+	background: white;
+	border: 2px solid black;
+	border-width: 2px 2px 0px 0px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .dimensionSelect.x {
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 10px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .dimensionSelect.y {
+	top: 50%;
+	transform: translateY(-50%);
+	left: 10px;
+	max-width: 100px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .axisContainer {
+	pointer-events: none;
+	overflow: visible;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .axis line,
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .axis path {
+	fill: none;
+	stroke: black;
+	stroke-width: 2px;
+	shape-rendering: crispEdges;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .axis text {
+	fill: black;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .selectedPoints circle {
+	fill: rgba(82, 137, 163, 0.521);
+	stroke: rgb(69, 121, 153);
+	stroke-width: 2px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT.SVG .highlightedPoints circle {
+	pointer-events: none;
+	fill: rgb(252, 127, 127);
+	stroke: rgb(153, 80, 80);
+	stroke-width: 3px;
+}
+
+.CINEMA_COMPONENT.SCATTER_PLOT .warningReadout {
+	bottom: 10px;
+	right: 10px;
+	font-size: 12px;
+	color: darkred;
+}

@@ -69,7 +69,7 @@ class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqAnimationTimeWidget(QWidget* parent = 0);
+  pqAnimationTimeWidget(QWidget* parent = nullptr);
   ~pqAnimationTimeWidget() override;
   using RealNumberNotation = pqDoubleLineEdit::RealNumberNotation;
 

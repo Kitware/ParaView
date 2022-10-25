@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqOutputPortComboBox : public QComboBox
   typedef QComboBox Superclass;
 
 public:
-  pqOutputPortComboBox(QWidget* parent = 0);
+  pqOutputPortComboBox(QWidget* parent = nullptr);
   ~pqOutputPortComboBox() override;
 
   /**
@@ -76,7 +76,7 @@ public:
    */
   void fillExistingPorts();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Sets the current index to be the one representing the indicated port.
    */

@@ -31,6 +31,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
           <DataType value="vtkTable" />
         </DataTypeDomain>
         <Documentation>Set the input of the filter.</Documentation>
@@ -38,6 +39,9 @@
       <StringVectorProperty command="SetExpression"
                             name="Expression"
                             number_of_elements="1">
+        <Hints>
+          <Widget type="one_liner_wrapped" syntax="python" />
+        </Hints>
         <Documentation>The Python expression evaluated during
         execution. Set of potentially available variables [inputs, points, t_value,
         t_index, FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
@@ -208,6 +212,9 @@ annotation text.
       <StringVectorProperty command="SetExpression"
                             name="Expression"
                             number_of_elements="1">
+        <Hints>
+          <Widget type="one_liner_wrapped" syntax="python" />
+        </Hints>
         <Documentation>The Python expression evaluated during execution.
         FieldData arrays are directly available through their name. Set of
         potentially available variables [inputs, points, t_value, t_steps,

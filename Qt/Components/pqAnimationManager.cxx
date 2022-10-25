@@ -111,8 +111,12 @@ pqAnimationManager::pqAnimationManager(QObject* _parent /*=0*/)
   QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)), this, SLOT(onProxyAdded(pqProxy*)));
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)), this, SLOT(onProxyRemoved(pqProxy*)));
 
-  QObject::connect(this, SIGNAL(beginPlay()), this, SLOT(onBeginPlay()));
-  QObject::connect(this, SIGNAL(endPlay()), this, SLOT(onEndPlay()));
+  QObject::connect(this,
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay), this,
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::onBeginPlay));
+  QObject::connect(this,
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay), this,
+    QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::onEndPlay));
 }
 
 //-----------------------------------------------------------------------------
@@ -163,8 +167,12 @@ void pqAnimationManager::onActiveServerChanged(pqServer* server)
   pqAnimationScene* activeScene = this->getActiveScene();
   if (activeScene)
   {
-    QObject::disconnect(activeScene, SIGNAL(beginPlay()), this, SIGNAL(beginPlay()));
-    QObject::disconnect(activeScene, SIGNAL(endPlay()), this, SIGNAL(endPlay()));
+    QObject::disconnect(activeScene,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationScene::beginPlay), this,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay));
+    QObject::disconnect(activeScene,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationScene::endPlay), this,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay));
   }
 
   this->Internals->ActiveServer = server;
@@ -174,8 +182,12 @@ void pqAnimationManager::onActiveServerChanged(pqServer* server)
 
   if (activeScene)
   {
-    QObject::connect(activeScene, SIGNAL(beginPlay()), this, SIGNAL(beginPlay()));
-    QObject::connect(activeScene, SIGNAL(endPlay()), this, SIGNAL(endPlay()));
+    QObject::connect(activeScene,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationScene::beginPlay), this,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::beginPlay));
+    QObject::connect(activeScene,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationScene::endPlay), this,
+      QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay));
   }
 }
 
@@ -246,6 +258,20 @@ void pqAnimationManager::onBeginPlay()
 
 //-----------------------------------------------------------------------------
 void pqAnimationManager::onEndPlay()
+{
+  this->Internals->AnimationPlaying = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onBeginPlay(
+  vtkObject* /*caller*/, unsigned long /*event_id*/, void*, void* /*reversed*/)
+{
+  this->Internals->AnimationPlaying = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onEndPlay(
+  vtkObject* /*caller*/, unsigned long /*event_id*/, void*, void* /*reversed*/)
 {
   this->Internals->AnimationPlaying = false;
 }

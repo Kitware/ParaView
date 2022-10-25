@@ -35,7 +35,6 @@
 //#include "vtkEnzoReader.h"
 #include "vtkEquivalenceSet.h"
 #include "vtkExodusFileSeriesReader.h"
-#include "vtkExtractHistogram.h"
 #include "vtkExtractScatterPlot.h"
 #include "vtkFileSequenceParser.h"
 #include "vtkFileSeriesReader.h"
@@ -128,11 +127,9 @@
 #include "vtkPlotEdges.h"
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPolyLineToRectilinearGridFilter.h"
-#include "vtkQuerySelectionSource.h"
 #include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
 #include "vtkSciVizStatistics.h"
-#include "vtkSelectionConverter.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSortedTableStreamer.h"
 #include "vtkSpyPlotBlock.h"
@@ -211,7 +208,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
   // PRINT_SELF(vtkEnzoReader);
   PRINT_SELF(vtkEquivalenceSet);
   PRINT_SELF(vtkExodusFileSeriesReader);
-  PRINT_SELF(vtkExtractHistogram);
   PRINT_SELF(vtkExtractScatterPlot);
   PRINT_SELF(vtkFileSequenceParser);
   PRINT_SELF(vtkFileSeriesReader);
@@ -308,7 +304,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
   PRINT_SELF(vtkRectilinearGridConnectivity);
   PRINT_SELF(vtkReductionFilter);
   PRINT_SELF(vtkSciVizStatistics);
-  PRINT_SELF(vtkSelectionConverter);
   PRINT_SELF(vtkSelectionSerializer);
   PRINT_SELF(vtkSortedTableStreamer);
   // PRINT_SELF(vtkSpyPlotBlock);

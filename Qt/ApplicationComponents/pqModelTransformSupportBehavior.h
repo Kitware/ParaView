@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqModelTransformSupportBehavior : public QO
   typedef QObject Superclass;
 
 public:
-  pqModelTransformSupportBehavior(QObject* parent = 0);
+  pqModelTransformSupportBehavior(QObject* parent = nullptr);
   ~pqModelTransformSupportBehavior() override;
 
   static vtkTuple<double, 16> getChangeOfBasisMatrix(
@@ -64,7 +64,7 @@ protected Q_SLOTS:
   virtual void viewAdded(pqView*);
   virtual void viewUpdated();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   virtual void enableModelTransform(pqView*, vtkSMSourceProxy*);
   virtual void disableModelTransform(pqView*);
 

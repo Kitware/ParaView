@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta app="Cinema:Simple" version="2.2">
+    <meta charset="utf-8">
+    <link rel='stylesheet' href='cinema/lib/2.2/common.css'>
+
+    <!-- Begin: Cinema Local File Install -->
+    <!--
+    <script src='cinema/lib/d3.v4.min.js'></script>
+    -->
+    <!-- End:   Cinema Local File Install -->
+    <!-- Begin: Cinema External Access Install -->
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- End:   Cinema External Access Install -->
+</head>
+
+<body>
+<div class="container">
+<header>
+    <!-- Begin: Cinema Viewer Title -->
+    Cinema:Simple
+    <!-- End:   Cinema Viewer Title -->
+</header>
+
+<div id="resultsArea">
+    <div class="imageArea flex-container" id="imageArea"></div>
+    <div class="sliderArea">
+        <div id="imgSize">
+                <p>Image Size:</p>
+                <input type="range" min="1" max="100" id="imageSize" class="slidecontainer" step="1">
+        </div>
+        <div id="sliderContainer" class="sliderContainer">
+        </div>
+    </div>
+    </div>
+</div>
+
+<footer><img src="cinema/lib/2.2/img/cinema_logo_filmreel_named_100px_white.png" height=30px></img></footer>
+
+</div>
+
+<script> 
+var EMPTY_IMAGE_PATH = "cinema/lib/2.2/img/empty.png"; 
+function onlyUnique(value, index, self) { return self.indexOf(value) === index; } 
+function getLookupKey(keys, query) { var key = ""; keys.forEach(function(item, index) { key += query[item] + "_"; }); return key; }
+
+// CINEMA_DB_START: add code to manage databases to view 
+var dataSets = ["data/sphere.cdb"];
+// CINEMA_DB_END:   add code to manage databases to view 
+
+var dataResults = null;
+var dataValues = null;
+var query = {};
+var images = [];
+
+var q = d3.queue();
+dataSets.forEach(function(item, index) {
+    q.defer(d3.csv, item + "/data.csv");
+});
+
+q.awaitAll(function(error, results) {
+    var values = {};
+    results.forEach(function(item, index) {
+        var keys = Object.keys(item[0]).filter(function(d) {
+            return !isNaN(+item[0][d]);
+        });
+
+        var lookup = {};
+
+        item.forEach(function(result, index) {
+            keys.forEach(function(key, index) {
+                if (!(key in values)) {
+                    values[key] = [];
+                }
+
+                values[key].push(result[key]);
+            });
+
+            lookup[getLookupKey(keys, result)] = result;
+        })
+
+        results[index] = {keys: keys, results: results[index], lookup: lookup};
+    });
+
+    var keys = Object.keys(values);
+    keys.forEach(function(key, index) {
+        values[key] = values[key].filter(onlyUnique);
+        values[key] = values[key].sort(function(a, b){return (+a)-(+b)});
+    });
+
+    doneLoading(results, values);
+});
+
+function updateResults() 
+{
+    // Called when sliders are moved
+    dataResults.forEach(function(result, index) {
+        var imgSrcKey = getLookupKey(result.keys, query);
+        if (imgSrcKey in result.lookup) {
+            var imgSrc = dataSets[index] + "/" +result.lookup[imgSrcKey]["FILE"];
+            images[index].img.attr("src", imgSrc);
+        }
+        else {
+            images[index].img.attr("src", EMPTY_IMAGE_PATH);
+        }
+    });
+}
+
+function doneLoading(results, values) 
+{
+    var imageSizeSlider = d3.select("#imageSize")
+        .property("value", (100/dataSets.length)-1)
+        .on("input", function() {
+            images.forEach(function(item, index) {
+                item.img.style("width","" + imageSizeSlider.node().value + "%");
+                item.img.attr("height", null);
+            });
+        });
+
+    dataResults = results;
+    dataValues = values;
+
+    var keys = Object.keys(values);
+    keys.forEach(function(key, index) {
+        var sliderDiv = d3.select("#sliderContainer").append("div");
+        sliderDiv.append("div")
+            .html(key)
+            .style("padding", "5px");
+        var slider = sliderDiv.append("div")
+            .append("input")
+                .attr("type","range")
+                .attr("min", "0")
+                .attr("max", values[key].length - 1)
+                .property("value", "0")
+                .style("float", "left");
+        var sliderText = sliderDiv.append("input")
+                .attr("type","text")
+                .attr("value", values[key][0])
+                .style("width", "40px")
+                .on("input", function() {
+                    query[key] = this.value;
+                    var index = values[key].indexOf(this.value);
+                    slider.property("value", index);
+                    updateResults();
+                });
+
+        slider.on("input", function() {
+                var val = values[key][+this.value];
+                sliderText.property("value", val);
+                query[key] = val;
+                updateResults();
+            });
+
+        query[key] = values[key][0];
+    });
+
+    dataResults.forEach(function(result, index) {
+        var imgSrcKey = getLookupKey(result.keys, query);
+
+        var img = d3.select("#imageArea").append("img")
+            .attr("class", "cinemaImage")
+            .attr("src", EMPTY_IMAGE_PATH) 
+            .style("width","" + imageSizeSlider.node().value + "%")
+            .on("load", function() {
+                if (this.src != EMPTY_IMAGE_PATH) {
+                    images[index].height = this.height;
+                }
+            })
+            .on("error", function() {
+                this.src=EMPTY_IMAGE_PATH;
+                this.height = images[index].height;
+            });
+
+        images.push({img: img});
+
+        if (imgSrcKey in result.lookup) {
+            var imgSrc = dataSets[index] + "/" + result.lookup[imgSrcKey]["FILE"];
+            images[index].img.attr("src", imgSrc);
+        }
+        else {
+            images[index].img.attr("src", EMPTY_IMAGE_PATH);
+        }
+
+    });
+}
+
+</script>
+   </body>
+</html>

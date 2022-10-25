@@ -44,13 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
-  : QWidget(parentObject)
+  : QFrame(parentObject)
   , Proxy(smProxy)
   , Property(nullptr)
   , ChangeAvailableAsChangeFinished(true)
   , Selected(false)
   , Timer(new pqTimer())
 {
+  this->setFrameShape(QFrame::NoFrame);
   this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
   this->Links.setUseUncheckedProperties(true);

@@ -63,6 +63,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
   Q_PROPERTY(
     QList<QVariant> seriesColor READ seriesColor WRITE setSeriesColor NOTIFY seriesColorChanged)
 
+  Q_PROPERTY(QList<QVariant> seriesOpacity READ seriesOpacity WRITE setSeriesOpacity NOTIFY
+      seriesOpacityChanged)
+
   Q_PROPERTY(
     QList<QVariant> presetColor READ presetColor WRITE setPresetColor NOTIFY presetColorChanged)
 
@@ -84,7 +87,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqSeriesEditorPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqSeriesEditorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqSeriesEditorPropertyWidget() override;
 
   //@{
@@ -105,6 +109,15 @@ public:
 
   QList<QVariant> presetColor() const;
   void setPresetColor(const QList<QVariant>&);
+
+  //@{
+  /**
+   * Get/Set the opacity for each of the series.
+   */
+  QList<QVariant> seriesOpacity() const;
+  void setSeriesOpacity(const QList<QVariant>&);
+  //@}
+
   //@{
   /**
    * Get/Set the label for each of the series.
@@ -184,6 +197,13 @@ Q_SIGNALS:
 
   //@{
   /**
+   * Fired when the series opacity changes.
+   */
+  void seriesOpacityChanged();
+  //@}
+
+  //@{
+  /**
    * Fired when the series line thickness changes
    */
   void seriesLineThicknessChanged();
@@ -244,7 +264,7 @@ private Q_SLOTS:
    */
   void onPresetChanged(const QString& name);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSeriesEditorPropertyWidget)
 
   class pqInternals;

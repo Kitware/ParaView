@@ -17,7 +17,9 @@
 #include "vtkArrayDispatch.h"
 #include "vtkCPCxxHelper.h"
 #include "vtkCallbackCommand.h"
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
 #include "vtkConduitSource.h"
+#endif
 #include "vtkDataArrayAccessor.h"
 #include "vtkFieldData.h"
 #include "vtkInSituPipelinePython.h"
@@ -71,6 +73,9 @@ public:
   };
 
   vtkSmartPointer<vtkCPCxxHelper> CPCxxHelper;
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  vtkSmartPointer<vtkMPIController> MPIController;
+#endif
   std::map<std::string, vtkSmartPointer<vtkSMSourceProxy>> Producers;
   std::vector<PipelineInfo> Pipelines;
   std::map<vtkSMProxy*, std::string> SteerableProxies;
@@ -126,7 +131,12 @@ vtkInSituInitializationHelper::~vtkInSituInitializationHelper() = default;
 //----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
 {
+  vtkInSituInitializationHelper::Internals = new vtkInternals();
+  auto& internals = (*vtkInSituInitializationHelper::Internals);
+
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  int isMPIInitialized = 0;
+  if (MPI_Initialized(&isMPIInitialized) == MPI_SUCCESS && isMPIInitialized)
   {
     vtkVLogScopeF(
       PARAVIEW_LOG_CATALYST_VERBOSITY(), "Initializing MPI communicator using 'comm' (%llu)", comm);
@@ -135,9 +145,9 @@ void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
     vtkMPICommunicatorOpaqueComm opaqueComm(&mpicomm);
     vtkNew<vtkMPICommunicator> mpiCommunicator;
     mpiCommunicator->InitializeExternal(&opaqueComm);
-    vtkNew<vtkMPIController> controller;
-    controller->SetCommunicator(mpiCommunicator);
-    vtkMultiProcessController::SetGlobalController(controller);
+    internals.MPIController = vtkSmartPointer<vtkMPIController>::New();
+    internals.MPIController->SetCommunicator(mpiCommunicator);
+    vtkMultiProcessController::SetGlobalController(internals.MPIController);
   }
 #else
   vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
@@ -166,8 +176,6 @@ void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
 
   vtkInSituInitializationHelper::WasInitializedOnce = 1;
 
-  vtkInSituInitializationHelper::Internals = new vtkInternals();
-  auto& internals = (*vtkInSituInitializationHelper::Internals);
   // for now, I am using vtkCPCxxHelper; that class should be removed when we
   // deprecate Legacy Catalyst API.
   internals.CPCxxHelper.TakeReference(vtkCPCxxHelper::New());
@@ -418,6 +426,7 @@ int vtkInSituInitializationHelper::GetAttributeTypeFromString(const std::string&
 //----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::UpdateSteerableProxies()
 {
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
   auto& internals = (*vtkInSituInitializationHelper::Internals);
 
   for (auto& steerable_proxies : internals.SteerableProxies)
@@ -542,6 +551,9 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
       }
     }
   }
+#else
+  vtkErrorWithObjectMacro(nullptr, << "module IOCatalystConduit is disabled, cannot use steering.");
+#endif
 }
 
 //----------------------------------------------------------------------------

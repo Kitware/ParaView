@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqServerLauncher : public QObject
   typedef QObject Superclass;
 
 public:
-  pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = 0);
+  pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = nullptr);
   ~pqServerLauncher() override;
 
   /**
@@ -101,7 +101,7 @@ protected Q_SLOTS:
   void readStandardError();
   void launchServerForReverseConnection();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Request the user for user-configurable options, if any. Returns false if
    * the user cancelled the dialog asking the options. Returns true if there

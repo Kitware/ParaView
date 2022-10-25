@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqServerConnectDialog.h"
+#include "pqCoreUtilities.h"
 #include "pqQtDeprecated.h"
 #include "ui_pqServerConnectDialog.h"
 
@@ -171,6 +172,8 @@ pqServerConnectDialog::pqServerConnectDialog(
 
   QObject::connect(this->Internals->editServer, SIGNAL(clicked()), this, SLOT(editServer()));
 
+  QObject::connect(this->Internals->deleteAll, SIGNAL(clicked()), this, SLOT(deleteAllServers()));
+
   QObject::connect(
     this->Internals->name, SIGNAL(textChanged(const QString&)), this, SLOT(onNameChanged()));
 
@@ -287,7 +290,7 @@ void pqServerConnectDialog::updateConfigurations()
   Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
   {
     QTableWidgetItem* item1 = new QTableWidgetItem(config.name());
-    QTableWidgetItem* item2 = new QTableWidgetItem(config.resource().toURI());
+    QTableWidgetItem* item2 = new QTableWidgetItem(config.resource().schemeHostsPorts().toURI());
 
     // setup tooltips.
     item1->setToolTip(item1->text());
@@ -319,7 +322,28 @@ void pqServerConnectDialog::onServerSelected()
 //-----------------------------------------------------------------------------
 void pqServerConnectDialog::addServer()
 {
-  this->editConfiguration(pqServerConfiguration());
+  // Edit an empty server configuration with a non already existing name
+  QString originalName = "My Server";
+  QString name = originalName;
+  if (this->serverNameExists(name))
+  {
+    bool found = false;
+    for (unsigned int i = 1; i < std::numeric_limits<unsigned int>::max(); i++)
+    {
+      name = originalName + QString::number(i);
+      if (!this->serverNameExists(name))
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      name = pqServerConfiguration::defaultName();
+    }
+  }
+
+  this->editConfiguration(pqServerConfiguration(name));
   Q_EMIT serverAdded();
 }
 
@@ -343,18 +367,21 @@ void pqServerConnectDialog::updateButtons()
     // Convert the row number to original index (since servers can be sorted).
     int original_index = this->Internals->servers->item(row, 0)->data(Qt::UserRole).toInt();
 
-    bool is_mutable = false;
+    bool isMutable = false;
+    bool isReverse = false;
     if (original_index >= 0 && original_index < this->Internals->servers->rowCount())
     {
-      is_mutable = this->Internals->Configurations[original_index].isMutable();
+      isMutable = this->Internals->Configurations[original_index].isMutable();
+      isReverse = this->Internals->Configurations[original_index].resource().isReverse();
     }
-    this->Internals->editServer->setEnabled(is_mutable);
-    this->Internals->deleteServer->setEnabled(is_mutable);
+    this->Internals->editServer->setEnabled(isMutable);
+    this->Internals->deleteServer->setEnabled(isMutable);
+    this->Internals->timeoutSpinBox->setEnabled(isMutable);
     this->Internals->connect->setEnabled(true);
     this->Internals->timeoutLabel->setVisible(true);
     this->Internals->timeoutSpinBox->setVisible(true);
     this->Internals->timeoutSpinBox->setValue(
-      this->Internals->Configurations[original_index].connectionTimeout());
+      this->Internals->Configurations[original_index].connectionTimeout(isReverse ? -1 : 60));
   }
 }
 
@@ -433,22 +460,28 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
 }
 
 //-----------------------------------------------------------------------------
+bool pqServerConnectDialog::serverNameExists(const QString& name)
+{
+  Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
+  {
+    if (config.name() == name)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void pqServerConnectDialog::onNameChanged()
 {
   bool acceptable = true;
   QString current_name = this->Internals->name->text();
   if (current_name != this->Internals->OriginalName)
   {
-    Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
-    {
-      if (config.name() == current_name)
-      {
-        acceptable = false;
-        break;
-      }
-    }
+    acceptable = !this->serverNameExists(current_name);
   }
-  else if (current_name.trimmed().isEmpty() || current_name == "unknown")
+  else if (current_name.trimmed().isEmpty() || current_name == pqServerConfiguration::defaultName())
   {
     acceptable = false;
   }
@@ -645,6 +678,18 @@ void pqServerConnectDialog::deleteServer()
 }
 
 //-----------------------------------------------------------------------------
+void pqServerConnectDialog::deleteAllServers()
+{
+
+  QMessageBox::StandardButton ret =
+    QMessageBox::question(this, "Delete All", "All servers will be deleted. Are you sure?");
+  if (ret == QMessageBox::StandardButton::Yes)
+  {
+    pqApplicationCore::instance()->serverConfigurations().removeUserConfigurations();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqServerConnectDialog::saveServers()
 {
   QString filters;
@@ -706,23 +751,50 @@ bool pqServerConnectDialog::selectServer(pqServerConfiguration& selected_configu
 {
   // see if only 1 server matched the selector (if valid). In that case, no
   // need to popup the dialog.
+  bool useResource = false;
   if (!selector.scheme().isEmpty())
   {
-    QList<pqServerConfiguration> configs =
-      pqApplicationCore::instance()->serverConfigurations().configurations(selector);
-    if (configs.size() == 1)
+    pqServerConfigurationCollection& configsCollection =
+      pqApplicationCore::instance()->serverConfigurations();
+
+    if (!selector.serverName().isEmpty())
     {
-      selected_configuration = configs[0];
-      return true;
+      const pqServerConfiguration* config =
+        configsCollection.configuration(selector.serverName().toUtf8().data());
+      if (config)
+      {
+        selected_configuration = *config;
+        return true;
+      }
+      else
+      {
+        useResource = true;
+      }
     }
-    else if (configs.empty())
+    else
     {
-      // Ne configs found, still add resource so config can be used somehow
-      selected_configuration.setResource(selector);
-      return true;
+      QList<pqServerConfiguration> configs = configsCollection.configurations(selector);
+      if (configs.size() == 1)
+      {
+        selected_configuration = configs[0];
+        return true;
+      }
+      else if (configs.empty())
+      {
+        useResource = true;
+      }
     }
   }
 
+  if (useResource)
+  {
+    // No configs found for a valid resource, try to use the provided resource to connnect to a
+    // server anyway
+    selected_configuration.setResource(selector);
+    return true;
+  }
+
+  // No unique server configuration identified, show the dialog
   pqServerConnectDialog dialog(dialogParent, selector);
   if (dialog.exec() == QDialog::Accepted)
   {

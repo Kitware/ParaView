@@ -274,6 +274,7 @@
                  name="XMLDataObjectWriterBase">
       <Documentation>Base for all XML-based file-series
       writers.</Documentation>
+
       <SubProxy>
         <Proxy name="Writer"
                proxygroup="internal_writers"
@@ -707,7 +708,7 @@
 
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
-                 base_proxyname="FileSeriesWriter"
+                 base_proxyname="FileSeriesWriterComposite"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLMultiBlockDataWriter"
@@ -715,6 +716,7 @@
       <Documentation short_help="Write a multiblock in a xml-based vtk data file.">
       Writer to write a multiblock dataset in a xml-based vtk data file. Can be
       used for parallel writing as well as serial writing.</Documentation>
+
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
@@ -756,6 +758,7 @@
       <Documentation short_help="Write a multiblock in a xml-based vtk data file.">
       Writer to write a multiblock dataset in a xml-based vtk data file. Can be
       used for parallel writing as well as serial writing.</Documentation>
+
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
@@ -798,6 +801,7 @@
       <Documentation>
         Write a vtkPartitionedDataSet to a xml-based vtk data file.
       </Documentation>
+
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
@@ -831,7 +835,7 @@
 
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
-                 base_proxyname="FileSeriesWriter"
+                 base_proxyname="FileSeriesWriterComposite"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLPartitionedDataSetCollectionWriter"
@@ -839,6 +843,7 @@
       <Documentation>
         Write a vtkPartitionedDataSetCollection to a xml-based vtk data file.
       </Documentation>
+
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
@@ -872,7 +877,7 @@
 
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
-                 base_proxyname="FileSeriesWriter"
+                 base_proxyname="FileSeriesWriterComposite"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLUniformGridAMRWriter"
@@ -881,6 +886,7 @@
       Writer to write an AMR data-set (overlapping/non-overlapping)
       in a xml-based vtk data file. Can be used for parallel writing as well as
       serial writing.</Documentation>
+
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
@@ -1082,6 +1088,38 @@
         <ExposedProperties>
           <Property name="Input" />
           <Property name="FileType" />
+
+          <PropertyGroup label="Data Selection">
+            <Property name="ChooseArraysToWrite" panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" panel_visibility="advanced"/>
+            <Property name="CellDataArrays" panel_visibility="advanced"/>
+            <Property name="FieldDataArrays" panel_visibility="advanced"/>
+            <Property name="VertexDataArrays" panel_visibility="advanced"/>
+            <Property name="EdgeDataArrays" panel_visibility="advanced"/>
+            <Property name="RowDataArrays" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1"/>
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Parallel I/O Support">
+            <Property name="NumberOfIORanks" panel_visibility="advanced"/>
+            <Property name="RankAssignmentMode" panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Color Properties">
+            <Property name="EnableColoring" panel_visibility="advanced"/>
+            <Property name="EnableAlpha" panel_visibility="advanced"/>
+            <Property name="ColorArrayName" panel_visibility="advanced"/>
+            <Property name="LookupTable" panel_visibility="advanced"/>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 

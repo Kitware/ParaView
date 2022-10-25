@@ -40,6 +40,7 @@ set(classes
   pqAnimationTimeWidget
   pqAnimationViewWidget
   pqArrayListDomain
+  pqArrayListWidget
   pqArraySelectionWidget
   pqArraySelectorPropertyWidget
   pqArrayStatusPropertyWidget
@@ -74,11 +75,17 @@ set(classes
   pqDisplayRepresentationWidget
   pqDockWindowInterface
   pqDoubleVectorPropertyWidget
+  pqExpressionChooserButton
+  pqExpressionsDialog
+  pqExpressionsManager
+  pqExpressionsTableModel
+  pqExpressionsWidget
   pqFavoritesDialog
   pqFavoritesTreeWidget
   pqFileChooserWidget
   pqFindDataCurrentSelectionFrame
   pqFindDataSelectionDisplayFrame
+  pqSpreadSheetColumnsVisibility
   pqHighlightItemDelegate
   pqImageTip
   pqIndexSelectionWidget
@@ -103,6 +110,7 @@ set(classes
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
   pqMultiViewWidget
+  pqOneLinerTextEdit
   pqOrbitCreatorDialog
   pqOutputPortComboBox
   pqPipelineAnnotationFilterModel
@@ -150,6 +158,7 @@ set(classes
   pqSettingsDialog
   pqShaderReplacementsComboBox
   pqShaderReplacementsSelectorPropertyWidget
+  pqShortcutDecorator
   pqSignalAdaptorKeyFrameType
   pqSignalAdaptorSelectionTreeWidget
   pqSignalAdaptorTreeWidget
@@ -161,13 +170,15 @@ set(classes
   pqToolBarInterface
   pqToolTipTrapper
   pqTransferFunctionWidget
+  pqTransferFunction2DWidget
   pqTriggerOnIdleHelper
   pqUndoStackBuilder
   pqVCRController
   pqViewFrame
   pqViewFrameActionsInterface
   pqViewManager
-  pqWidgetRangeDomain)
+  pqWidgetRangeDomain
+  vtkPVColorTransferControlPointsItem)
 
 set_property(SOURCE pqComponentsInit.cxx APPEND
   PROPERTY
@@ -199,6 +210,7 @@ set(ui_files
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewpointButtonDialog.ui
+  Resources/UI/pqExpressionsDialog.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui

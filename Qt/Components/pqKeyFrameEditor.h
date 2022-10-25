@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqAnimationCue;
 class pqAnimationScene;
+class QStandardItem;
 
 /**
  * editor for editing animation key frames
@@ -62,7 +63,7 @@ public:
   void setValuesOnly(bool);
   bool valuesOnly() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * read the key frame data and display it
    */
@@ -72,14 +73,27 @@ public Q_SLOTS:
    */
   void writeKeyFrameData();
 
+Q_SIGNALS:
+  void modified();
+
 private Q_SLOTS:
   void newKeyFrame();
   void deleteKeyFrame();
   void deleteAllKeyFrames();
-  void useCurrentCamera(QObject*);
-  void updateCurrentCamera(QObject*);
 
-private:
+  void updateButtons();
+
+  /**
+   * Specific to Camera Cues.
+   */
+  void useCurrentCamera(QStandardItem* item);
+  void useCurrentCameraForSelected();
+  void updateCurrentCamera(QStandardItem* item);
+  void updateCurrentCameraWithSelected();
+  void createOrbitalKeyFrame();
+  void updateSplineMode();
+
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternal;
   pqInternal* Internal;
 };

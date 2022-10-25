@@ -263,6 +263,11 @@
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
+      <!-- This property without associated command is used to store the source filename containing the texture, as we lose this information when loading the texture from a vtkTexture directly -->
+      <StringVectorProperty animateable="0"
+                            name="FileName"
+                            number_of_elements="1">
+      </StringVectorProperty>
     </SourceProxy>
     <Proxy class="vtkTexture"
            name="ImageTexture"
@@ -498,6 +503,39 @@
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetInteriorLinesVisibility"
+                         name="InteriorLinesVisibility"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide interior lines between cells. Only valid for multi cell text.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetInteriorLinesWidth"
+                         name="InteriorLinesWidth"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Set the width (in pixels) of the interior lines between cells. Only valid for multi cell text.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetInteriorLinesColor"
+                            name="InteriorLinesColor"
+                            default_values="0.0 0.0 0.0"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain name="range"
+                           min="0.0 0.0 0.0"
+                           max="1.0 1.0 1.0" />
+        <Documentation>
+          Set the color of the interior lines between cells. Only valid for multi cell text.
+        </Documentation>
+      </DoubleVectorProperty>
       <!-- End of TextProperty -->
     </Proxy>
 
@@ -517,6 +555,10 @@
             unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
+      <ExposedProperties>
+        <Property name="LineSpacing" />
+        <Property name="CellOffset" />
+      </ExposedProperties>
     </Proxy>
 
     <Proxy class="vtkTextProperty" name="ChartTextProperty"

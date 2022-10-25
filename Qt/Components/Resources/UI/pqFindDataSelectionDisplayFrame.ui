@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>216</width>
-    <height>274</height>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,23 +121,6 @@
      </property>
      <property name="text">
       <string>Selection Color</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="showFrustumButton">
-     <property name="toolTip">
-      <string>&lt;p&gt;For frustum based selections, show the frustum used to select the elements&lt;/p&gt;</string>
-     </property>
-     <property name="text">
-      <string>Show frustum</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell.svg</normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell.svg</iconset>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
      </property>
     </widget>
    </item>

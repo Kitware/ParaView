@@ -13,9 +13,6 @@
 
 =========================================================================*/
 
-// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (vtkVariantExtract).
-#define VTK_DEPRECATION_LEVEL 0
-
 #include "vtkClientServerStream.h"
 
 #include "vtkAbstractArray.h"

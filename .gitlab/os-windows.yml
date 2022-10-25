@@ -67,10 +67,11 @@
 ## Windows-specific scripts
 
 .before_script_windows: &before_script_windows
-    - Invoke-Expression -Command .gitlab/ci/cmake.ps1
-    - Invoke-Expression -Command .gitlab/ci/ninja.ps1
     - $pwdpath = $pwd.Path
-    - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab;$pwdpath\.gitlab\cmake\bin;$env:PATH"
+    - powershell -File ".gitlab/ci/cmake.ps1"
+    - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\cmake\bin;$env:PATH"
+    - powershell -File ".gitlab/ci/ninja.ps1"
+    - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab;$env:PATH"
     - cmake --version
     - ninja --version
     # Support submodule references to the user's fork.
@@ -89,6 +90,7 @@
 
 .cmake_build_windows:
     stage: build
+    extends: .warning_policy
 
     script:
         - *before_script_windows
@@ -98,16 +100,15 @@
         # This may be necessary when running manually.
         # Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
         - . .\build\ci-venv\Scripts\Activate.ps1
-        - pip install -qq -r $pwdpath\.gitlab\ci\requirements-phase1.txt
-        - pip install -qq -r $pwdpath\.gitlab\ci\requirements-phase2.txt
-        - Set-Item -Force -Path "env:PATH" -Value "$env:PATH;$env:SCCACHE_PATH"
+        - pip install -qq -r $pwdpath\.gitlab\ci\requirements.txt
+        - Invoke-Expression -Command .gitlab/ci/buildcache.ps1
+        - Set-Item -Force -Path "env:PATH" -Value "$env:PATH;$pwdpath\.gitlab\buildcache\bin"
         - Invoke-Expression -Command .gitlab/ci/vcvarsall.ps1
-        - sccache --start-server
-        - sccache --show-stats
+        - buildcache --show-stats
         - ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - ctest -VV -S .gitlab/ci/ctest_build.cmake | Out-File -FilePath compile_output.log
-        - sccache --show-stats
-        - sccache --stop-server
+        - buildcache --show-stats
+        - .gitlab\ci\check_warnings.ps1 -BuildPath . # This will call exit in case of warnings
     interruptible: true
 
 .cmake_test_windows:

@@ -1,0 +1,15 @@
+NAME
+  CAVEInteraction
+DESCRIPTION
+  Interaction with Cave Automatic Virtual Environments
+CONDITION
+  PARAVIEW_USE_QT
+REQUIRES_MODULES
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
+  ParaView::pqApplicationComponents
+  VTK::CommonCore
+  VTK::CommonMath
+  VTK::CommonTransforms
+  VTK::RenderingCore

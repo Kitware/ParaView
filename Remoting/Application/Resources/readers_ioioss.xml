@@ -18,6 +18,26 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
 
+      <IntVectorProperty command="SetGroupNumericVectorFieldComponents"
+                         default_values="0"
+                         name="GroupNumericVectorFieldComponents"
+                         label="Group Numeric Vector Field Components"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether the reader should treat numeric suffices for a vector field as vector components
+          of a vtkDataArray. By default, fields with numeric suffices are not grouped into a single vtkDataArray.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetFieldSuffixSeparator"
+                            default_values=""
+                            name="FieldSuffixSeparator"
+                            number_of_elements="1">
+        <Documentation>Set the character used to separate suffix from the field.
+        </Documentation>
+      </StringVectorProperty>
+
       <IntVectorProperty name="AssemblyTag"
         command="GetAssemblyTag"
         information_only="1">
@@ -60,6 +80,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="EdgeBlocksIdInfo"
+        command="GetEdgeBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="EdgeBlocks"
         command="GetEdgeBlockSelection"
         information_property="EdgeBlockInfo"
@@ -83,6 +109,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FaceBlocksIdInfo"
+        command="GetFaceBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="FaceBlocks"
         command="GetFaceBlockSelection"
@@ -108,6 +140,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="ElementBlocksIdInfo"
+        command="GetElementBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="ElementBlocks"
         command="GetElementBlockSelection"
         information_property="ElementBlockInfo"
@@ -132,6 +170,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="StructuredBlocksIdInfo"
+        command="GetStructuredBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="StructuredBlocks"
         command="GetStructuredBlockSelection"
@@ -277,6 +321,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="NodeSetsIdInfo"
+        command="GetNodeSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="NodeSets"
         command="GetNodeSetSelection"
         information_property="NodeSetInfo"
@@ -300,6 +350,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="EdgeSetsIdInfo"
+        command="GetEdgeSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="EdgeSets"
         command="GetEdgeSetSelection"
@@ -325,6 +381,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="FaceSetsIdInfo"
+        command="GetFaceSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="FaceSets"
         command="GetFaceSetSelection"
         information_property="FaceSetInfo"
@@ -349,6 +411,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="ElementSetsIdInfo"
+        command="GetElementSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="ElementSets"
         command="GetElementSetSelection"
         information_property="ElementSetInfo"
@@ -372,6 +440,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="SideSetsIdInfo"
+        command="GetSideSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="SideSets"
         command="GetSideSetSelection"
@@ -561,6 +635,14 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty command="SetDisplacementMagnitude"
+                            default_values="1"
+                            name="DisplacementMagnitude"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>When displacements are being applied, they are scaled by
+        this amount. Set to 1 for no scaling.</Documentation>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="RemoveUnusedPoints"
         command="SetRemoveUnusedPoints"
@@ -623,6 +705,13 @@
         </Documentation>
       </IntVectorProperty>
 
+      <PropertyGroup name="DatabaseProperties"
+        label="Database Properties"
+        panel_widget="MetaDataPropertyWidget">
+        <Property name="GroupNumericVectorFieldComponents"/>
+        <Property name="FieldSuffixSeparator"/>
+      </PropertyGroup>
+
       <PropertyGroup label="Blocks"
         name="Blocks"
         panel_widget="ArrayStatus">
@@ -630,6 +719,17 @@
         <Property name="StructuredBlocks" />
         <Property name="EdgeBlocks" />
         <Property name="FaceBlocks" />
+
+        <Hints>
+          <ArrayStatusPropertyWidget customColumnCount="1">
+            <Column label="id" align="right">
+              <Property key="ElementBlocks"    name="ElementBlocksIdInfo" />
+              <Property key="StructuredBlocks" name="StructuredBlocksIdInfo" />
+              <Property key="EdgeBlocks"       name="EdgeBlocksIdInfo" />
+              <Property key="FaceBlocks"       name="FaceBlocksIdInfo" />
+            </Column>
+          </ArrayStatusPropertyWidget>
+        </Hints>
       </PropertyGroup>
 
       <PropertyGroup label="Block Arrays"
@@ -650,6 +750,19 @@
         <Property name="FaceSets" />
         <Property name="ElementSets" />
         <Property name="SideSets" />
+
+        <Hints>
+          <ArrayStatusPropertyWidget customColumnCount="1">
+            <Column label="id" align="right">
+              <Property key="NodeSets"    name="NodeSetsIdInfo" />
+              <Property key="EdgeSets"    name="EdgeSetsIdInfo" />
+              <Property key="FaceSets"    name="FaceSetsIdInfo" />
+              <Property key="ElementSets" name="ElementSetsIdInfo" />
+              <Property key="SideSets"    name="SideSetsIdInfo" />
+            </Column>
+          </ArrayStatusPropertyWidget>
+        </Hints>
+
       </PropertyGroup>
 
       <PropertyGroup label="Set Arrays"
@@ -669,6 +782,7 @@
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">
+        <Property name="DisplacementMagnitude" />
         <Property name="ApplyDisplacements" />
         <Property name="RemoveUnusedPoints" />
         <Property name="GenerateFileId" />
@@ -680,7 +794,7 @@
       <Hints>
         <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii ex-timeseries cgns"
                        file_description="IOSS Files"
-                       filename_patterns="*.e-s*" />
+                       filename_patterns="*.e-s* *.exo-s*" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>

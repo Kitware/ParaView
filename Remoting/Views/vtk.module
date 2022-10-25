@@ -39,6 +39,7 @@ PRIVATE_DEPENDS
   VTK::jsoncpp
   VTK::ParallelCore
   VTK::RenderingContextOpenGL2
+  VTK::RenderingLICOpenGL2
   VTK::RenderingLabel
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeAMR

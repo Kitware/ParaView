@@ -72,7 +72,7 @@ protected Q_SLOTS:
   void onTriggered() override;
   void updateEnableState() override;
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqProxy* Proxy;
   QPointer<QWidget> ParentWidget;
 };

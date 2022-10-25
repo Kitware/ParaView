@@ -129,7 +129,6 @@ private:
 //-----------------------------------------------------------------------------
 pqProgressWidget::pqProgressWidget(QWidget* _parent /*=0*/)
   : Superclass(_parent, Qt::FramelessWindowHint)
-  , ReadyText()
   , BusyText("Busy")
 {
   QHBoxLayout* hbox = new QHBoxLayout(this);

@@ -48,15 +48,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <sstream>
 
-#define SERVER_CONFIGURATION_DEFAULT_NAME "unknown"
+static constexpr const char* SERVER_CONFIGURATION_DEFAULT_NAME = "unknown";
 
 //-----------------------------------------------------------------------------
 pqServerConfiguration::pqServerConfiguration()
 {
-  vtkNew<vtkPVXMLParser> parser;
-  parser->Parse("<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME
-                "' configuration=''><ManualStartup/></Server>");
-  this->constructor(parser->GetRootElement());
+  this->constructor(SERVER_CONFIGURATION_DEFAULT_NAME);
+}
+
+//-----------------------------------------------------------------------------
+pqServerConfiguration::pqServerConfiguration(const QString& name)
+{
+  this->constructor(name);
 }
 
 //-----------------------------------------------------------------------------
@@ -66,12 +69,19 @@ pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml)
 }
 
 //-----------------------------------------------------------------------------
+void pqServerConfiguration::constructor(const QString& name)
+{
+  QString xml = QString("<Server name='") + name + "' configuration=''><ManualStartup/></Server>";
+  vtkNew<vtkPVXMLParser> parser;
+  parser->Parse(xml.toUtf8().data());
+  this->constructor(parser->GetRootElement());
+}
+
+//-----------------------------------------------------------------------------
 void pqServerConfiguration::constructor(vtkPVXMLElement* xml)
 {
   assert(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
   this->XML = xml;
-  this->Mutable = true;
-  this->parseSshPortForwardingXML();
 }
 
 //-----------------------------------------------------------------------------
@@ -90,14 +100,23 @@ QString pqServerConfiguration::name() const
 }
 
 //-----------------------------------------------------------------------------
+QString pqServerConfiguration::defaultName()
+{
+  return SERVER_CONFIGURATION_DEFAULT_NAME;
+}
+
+//-----------------------------------------------------------------------------
 bool pqServerConfiguration::isNameDefault() const
 {
   return this->name() == SERVER_CONFIGURATION_DEFAULT_NAME;
 }
 
 //-----------------------------------------------------------------------------
-pqServerResource pqServerConfiguration::actualResource() const
+pqServerResource pqServerConfiguration::actualResource()
 {
+  // Update the actual URI
+  this->parseSshPortForwardingXML();
+
   return pqServerResource(this->ActualURI, *this);
 }
 
@@ -110,7 +129,7 @@ pqServerResource pqServerConfiguration::resource() const
 //-----------------------------------------------------------------------------
 QString pqServerConfiguration::URI() const
 {
-  return this->resource().toURI();
+  return this->resource().schemeHostsPorts().toURI();
 }
 
 //-----------------------------------------------------------------------------
@@ -123,15 +142,14 @@ void pqServerConfiguration::setResource(const pqServerResource& arg_resource)
 void pqServerConfiguration::setResource(const QString& str)
 {
   this->XML->SetAttribute("resource", str.toUtf8().data());
-
-  // Make sure this->ActualURI is correctly updated if needed
-  this->parseSshPortForwardingXML();
 }
 
 //-----------------------------------------------------------------------------
-int pqServerConfiguration::connectionTimeout() const
+int pqServerConfiguration::connectionTimeout(int defaultTimeout) const
 {
-  return QString(this->XML->GetAttributeOrDefault("timeout", "60")).toInt();
+  return QString(
+    this->XML->GetAttributeOrDefault("timeout", QString::number(defaultTimeout).toUtf8().data()))
+    .toInt();
 }
 
 //-----------------------------------------------------------------------------
@@ -319,7 +337,7 @@ QString pqServerConfiguration::lookForCommand(QString command)
 void pqServerConfiguration::parseSshPortForwardingXML()
 {
   pqServerResource resource = this->resource();
-  this->ActualURI = resource.toURI();
+  this->ActualURI = resource.schemeHostsPorts().toURI();
   this->PortForwarding = false;
   this->SSHCommand = false;
   vtkPVXMLElement* commandStartup = this->XML->FindNestedElementByName("CommandStartup");
@@ -355,7 +373,7 @@ void pqServerConfiguration::parseSshPortForwardingXML()
             {
               resource.setHost("localhost");
               resource.setPort(this->PortForwardingLocalPort.toInt());
-              this->ActualURI = resource.toURI();
+              this->ActualURI = resource.schemeHostsPorts().toURI();
             }
           }
         }

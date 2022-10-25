@@ -49,7 +49,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Type to search. &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Enter&lt;/span&gt; to select. &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Esc &lt;/span&gt;to cancel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Type to search. &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Enter&lt;/span&gt; to create selected source/filter. &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Shift + Enter&lt;/span&gt; to create and apply selected source/filter. &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Esc &lt;/span&gt;to cancel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

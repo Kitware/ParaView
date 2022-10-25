@@ -101,16 +101,20 @@ paraview_add_test_python(
   LoadStateWithDataSets.py
   Plot3DReader.py
   SaveDataWithArraySelection.py
+  SaveDataWithArrayAndBlockSelection.py
   ReadTimeArray.py
+  ReplaceReaderFileName.py
 )
 
 # These tests could run safely in serial and parallel.
 set(PVBATCH_TESTS
   BatchAxesGrid.py
+  TestXYChartOpacity.py
   FontSize.py # BUG #19816
   PLYWriter.py
   VolumeCellSelection.py
   SaveDataWithArraySelection.py,NO_VALID
+  # SaveDataWithArrayAndBlockSelection.py,NO_VALID # BUG #21419
 )
 if(NOT APPLE)
   # temporarily disable on mac due to bugs in
@@ -214,3 +218,14 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
   unset(_vtk_testing_python_exe)
   unset(_vtk_test_python_args)
 endif()
+
+#------------------------------------------------------------------------------
+# Add a test using python plugin and a python script
+
+paraview_add_test_python(
+  NO_DATA NO_RT
+  TestPV_PLUGIN_PATH.py
+)
+
+set_tests_properties(paraviewPython-TestPV_PLUGIN_PATH
+        PROPERTIES ENVIRONMENT "PV_PLUGIN_PATH=${CMAKE_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/")

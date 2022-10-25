@@ -4,7 +4,7 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  name="ProbeLineLegacy">
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         This has been replaced by 'ProbeLine'. Please consider
         using that instead.
       </Deprecated>
@@ -133,6 +133,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the dataset from which to obtain
@@ -394,7 +395,7 @@
                      point, whether or not it lies at an input point. The Probe
                      filter operates on any type of data and produces polygonal
                      output (a line).</Documentation>
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         This has been replaced by 'ProbeLine'. Please consider
         using that instead.
       </Deprecated>
@@ -479,175 +480,6 @@
           always be false for this filter.
         </Documentation>
       </IntVectorProperty>
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkPProbeFilter"
-                 label="Legacy Resample With Dataset"
-                 name="Probe">
-      <Documentation long_help="Sample data attributes at the points of a dataset."
-                     short_help="Sample data values at the points of a dataset.">
-                     Probe is a filter that computes point attributes at
-                     specified point positions. The filter has two inputs: the
-                     Input and Source.  The 'Source' geometric structure is passed
-                     through the filter. The point attributes are computed at
-                     the 'Source' point positions by interpolating into the
-                     'Input' data. For example, we can compute data values on a plane
-                     (plane specified as Source) from a volume (Input). The
-                     cell data of the Input data is copied to the output based
-                     on in which Input cell each Source point is. If an array
-                     of the same name exists both in Input's point and cell
-                     data, only the one from the point data is
-                     probed. This is the implementation of the
-                     'Resample With Dataset' filter available in ParaView
-                     version 5.1 and earlier. </Documentation>
-      <Deprecated deprecated_in="5.2" to_remove_in="5.3">
-        This has been replaced by 'Resample With Dataset'. Please consider
-        using that instead.
-      </Deprecated>
-      <InputProperty command="SetSourceConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-          <DataType value="vtkCompositeDataSet" />
-        </DataTypeDomain>
-        <InputArrayDomain name="input_array" />
-        <Documentation>This property specifies the dataset from which to obtain
-        probe values. The data attributes come from this dataset.</Documentation>
-      </InputProperty>
-      <InputProperty command="SetInputConnection"
-                     name="Source">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the dataset whose geometry will
-        be used in determining positions to probe. The mesh comes from this
-        dataset.</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetPassCellArrays"
-                         default_values="0"
-                         name="PassCellArrays"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <Documentation>
-        When set the input's cell data arrays are shallow copied to the output.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetPassPointArrays"
-                         default_values="0"
-                         name="PassPointArrays"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <Documentation>
-        When set the input's point data arrays are shallow copied to the output.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetPassFieldArrays"
-                         default_values="1"
-                         name="PassFieldArrays"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <Documentation>
-        Set whether to pass the field-data arrays from the Input i.e. the input
-        providing the geometry to the output. On by default.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetComputeTolerance"
-                         default_values="1"
-                         name="ComputeTolerance"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <Documentation>
-        Set whether to compute the tolerance or to use a user provided
-        value. On by default.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <DoubleVectorProperty command="SetTolerance"
-                            default_values="2.2204460492503131e-16"
-                            name="Tolerance"
-                            number_of_elements="1"
-                            panel_visibility="advanced">
-        <DoubleRangeDomain min="2.2204460492503131e-16"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="ComputeTolerance" function="boolean_invert" />
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>Set the tolerance to use for
-        vtkDataSet::FindCell</Documentation>
-      </DoubleVectorProperty>
-
-      <Hints>
-        <Visibility replace_input="1" />
-      </Hints>
-      <!-- End Probe -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkPResampleFilter"
-                 name="ImageResampling">
-      <Documentation long_help="Sample data attributes using a 3D image as probing mesh."
-                     short_help="Sample data values using a 3D image."/>
-      <Deprecated deprecated_in="5.1" to_remove_in="5.2">Please use "Resample To Image" instead instead of "ImageResampling" filter.</Deprecated>
-      <InputProperty command="SetInputConnection" name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-          <DataType value="vtkCompositeDataSet" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the dataset whose data will
-        be probed</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetSamplingDimension"
-                         default_values="10 10 10"
-                         name="SamplingDimension"
-                         number_of_elements="3"
-                         panel_visibility="default">
-                         <IntRangeDomain name="range" min="2 2 2" max="10000 10000 10000"/>
-        <Documentation>
-        How many linear resampling we want along each axis
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseInputBounds"
-                         default_values="1"
-                         name="UseInputBounds"
-                         number_of_elements="1"
-                         panel_visibility="default">
-        <Documentation>
-        Do we use input bounds or custom ones?
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetCustomSamplingBounds"
-                         default_values="0 1 0 1 0 1"
-                         name="CustomSamplingBounds"
-                         number_of_elements="6"
-                         panel_visibility="default">
-        <Documentation>
-        Custom probing bounds if needed
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <!-- End ImageResampling -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -1050,9 +882,19 @@
                  name="IntegrateAttributes">
       <Documentation long_help="This filter integrates cell and point attributes."
                      short_help="Integrates over lines, surfaces or vectors.">
-                     The Integrate Attributes filter integrates point and cell
-                     data over lines and surfaces. It also computes length of
-                     lines, area of surface, or volume.</Documentation>
+                     The Integrate Attributes filter integrates all point and cell data
+                     attributes while computing the total length, area or volume. This filter
+                     does not integrate point and cell data for 0-D cells (vertex and polyvertex).
+                     If the input dataset has mixed dimensionality, only the cells of highest dimension
+                     will be used for integration. Ex: In a dataset with lines, triangles
+                     and hexahedra, the integration process will ignore contribution from
+                     lines and triangles. When the highest dimension is 1, the sum
+                     variable corresponds to the total length. Similarly, for 2-D and 3-D
+                     integration the sum variable is the total area and total volume respectively.
+                     The output of this filter is a single point and vertex. The attributes
+                     for this point and vertex will contain the integration results for
+                     the corresponding input attributes and the sum variable.
+                     </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -1070,9 +912,10 @@
                          default_values="0"
                          number_of_elements="1">
         <Documentation>
-          This property specifies if the output data will be divided by the
-          volume/area computed for the integrated cells.  If it is on, then each
-          value in the output cell data will be divided by the area/volume.
+          This option concerns the output cell data. If it is turned on, then each
+          value in the output cell data will be divided by the total length/area/volume.
+          If the dataset is distributed among MPI nodes, the total length/volume/area
+          is is the sum of the individual total contributions from all pieces.
         </Documentation>
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -1087,7 +930,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPCellDataToPointData"
+    <SourceProxy class="vtkCellDataToPointData"
                  label="Cell Data to Point Data"
                  name="CellDataToPointData">
       <Documentation long_help="Create point attributes by averaging cell attributes."
@@ -1739,86 +1582,6 @@
         information filter. This filter operates only on unstructured grids
         and polydata since it removes the ghost cells.</Documentation>
       </InputProperty>
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkUnstructuredGridGhostCellsGenerator"
-                 label="Legacy Ghost Cells Generator"
-                 name="LegacyGhostCellsGenerator">
-      <Documentation long_help="Generate ghost cells for unstructured grids."
-                     short_help="Generate ghost cells for unstructured grids.">
-                     The GhostCellGenerator operates on unstructured grids only.
-                     This filter does not redistribute the input data, it only
-                     generates ghost cells at processor boundaries by fetching
-                     topological and geometrical information of those cells on
-                     neighbor ranks. The filter can take advantage of global point
-                     ids if they are available - if so it will perform faster,
-                     otherwise point coordinates will be exchanged and processed.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
-          <DataType value="vtkUnstructuredGrid" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input to the ghost cells
-        generator.</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetBuildIfRequired"
-                         default_values="0"
-                         name="BuildIfRequired"
-                         number_of_elements="1">
-        <Documentation>Specify if the filter must generate the ghost cells only
-          if required by the pipeline downstream. To force at least a fixed level
-          of ghosts, this must be set to 0 (unchecked).</Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMinimumNumberOfGhostLevels"
-                         number_of_elements="1"
-                         default_values="1"
-                         name="MinimumNumberOfGhostLevels">
-        <IntRangeDomain name="range" min="1" max="10" />
-        <Documentation>
-          When **BuildIfRequired** if off, use this to specify the minimum number of
-          ghost cells to request. The filter may request more ghost levels than indicated if a
-          downstream filter asked for more ghost levels.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="enabled_state"
-                                   property="BuildIfRequired"
-                                   value="0" />
-          <!-- if BuildIfRequired !=0 , we disable this property -->
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseGlobalPointIds"
-                         default_values="1"
-                         name="UseGlobalIds"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <Documentation>Specify if the filter must take benefit of global point
-        ids if they exist or if point coordinates should be used instead.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <StringVectorProperty command="SetGlobalPointIdsArrayName"
-                            default_values="GlobalNodeIds"
-                            name="GlobalPointIdsArrayName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <Documentation>This property provides the name for the input array
-        containing the global point ids if the GlobalIds array of the point
-        data if not set. Default is GlobalNodeIds.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="UseGlobalIds" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
-      <!-- End vtkPUnstructuredGridGhostCellsGenerator -->
     </SourceProxy>
 
     <!-- ==================================================================== -->

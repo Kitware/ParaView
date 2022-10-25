@@ -72,7 +72,7 @@ public:
       return plot;
     }
     else if ((role == "avg") || (role == "med") || (role == "min") || (role == "max") ||
-      role.empty())
+      (role == "sum") || role.empty())
     {
       assert(self);
       vtkChartXY* chartXY = self->GetChart();
@@ -187,7 +187,8 @@ protected:
       (role == "avg" && qcr->GetAverageVisibility() == false) ||
       (role == "med" && (qcr->GetMedianVisibility() == false || qcr->HasOnlyOnePoint)) ||
       (role == "min" && (qcr->GetMinVisibility() == false || qcr->HasOnlyOnePoint)) ||
-      (role == "max" && (qcr->GetMaxVisibility() == false || qcr->HasOnlyOnePoint)))
+      (role == "max" && (qcr->GetMaxVisibility() == false || qcr->HasOnlyOnePoint)) ||
+      (role == "sum" && (qcr->GetSumVisibility() == false || qcr->HasOnlyOnePoint)))
     {
       plot->SetVisible(false);
       return false;
@@ -225,6 +226,10 @@ protected:
       {
         plot->GetPen()->SetLineType(vtkPen::DASH_LINE);
       }
+      else if (role == "sum")
+      {
+        plot->GetPen()->SetLineType(vtkPen::DASH_LINE);
+      }
       if (!qcr->HasOnlyOnePoint)
       {
         plot->SetLabel(role + " " + plot->GetLabel());
@@ -239,6 +244,7 @@ vtkStandardNewMacro(vtkQuartileChartRepresentation);
 vtkQuartileChartRepresentation::vtkQuartileChartRepresentation()
   : AverageVisibility(true)
   , HasOnlyOnePoint(false)
+  , SumVisibility(false)
   , MaxVisibility(false)
   , MedianVisibility(true)
   , MinVisibility(false)
@@ -299,6 +305,7 @@ void vtkQuartileChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AverageVisibility: " << this->AverageVisibility << endl;
+  os << indent << "SumVisibility: " << this->SumVisibility << endl;
   os << indent << "MaxVisibility: " << this->MinVisibility << endl;
   os << indent << "MedianVisibility: " << this->MedianVisibility << endl;
   os << indent << "MinVisibility: " << this->MaxVisibility << endl;

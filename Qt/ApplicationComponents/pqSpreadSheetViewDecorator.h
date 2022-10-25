@@ -110,7 +110,7 @@ protected Q_SLOTS:
   void toggleFixedRepresentation(bool);
   void copyToClipboard();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqSpreadSheetView* Spreadsheet;
 
 private:

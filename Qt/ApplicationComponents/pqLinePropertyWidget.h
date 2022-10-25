@@ -61,13 +61,14 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLinePropertyWidget : public pqInteractive
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqLinePropertyWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void useXAxis() { this->useAxis(0); }
   void useYAxis() { this->useAxis(1); }
   void useZAxis() { this->useAxis(2); }
+  void flipP2();
   void centerOnBounds();
 
   /**
@@ -87,6 +88,7 @@ protected Q_SLOTS:
   void pick(double x, double y, double z);
   void pickPoint1(double x, double y, double z);
   void pickPoint2(double x, double y, double z);
+  void pickNormal(double x, double y, double z, double nx, double ny, double nz);
 
   /**
    * Updates the length label.

@@ -50,13 +50,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTemporalExportReaction : public pqReactio
 
 public:
   pqTemporalExportReaction(QAction* parent);
-  ~pqTemporalExportReaction();
+  ~pqTemporalExportReaction() override;
 
 protected Q_SLOTS:
   /**
    * Called when the action is triggered.
    */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqTemporalExportReaction)

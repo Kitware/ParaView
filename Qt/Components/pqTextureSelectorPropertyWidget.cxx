@@ -62,18 +62,19 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
 
-  // Recover domain and sanity check
-  this->Domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
-  if (!this->Domain || this->Domain->GetNumberOfGroups() != 1 ||
-    strcmp(this->Domain->GetGroup(0), pqTextureComboBox::TEXTURES_GROUP.c_str()) != 0)
+  // Create the combobox selector and set its value
+  auto* domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
+  bool canLoadNew = true;
+  vtkPVXMLElement* hints = smProperty->GetHints()
+    ? smProperty->GetHints()->FindNestedElementByName("TextureSelectorWidget")
+    : nullptr;
+  if (hints)
   {
-    qCritical() << "pqTextureSelectorPropertyWidget can only be used with a ProxyProperty"
-                   " with a ProxyGroupDomain containing only the \""
-                << QString(pqTextureComboBox::TEXTURES_GROUP.c_str()) << "\" group";
+    QString attr = hints->GetAttributeOrDefault("can_load_new", "1");
+    canLoadNew = static_cast<bool>(attr.toInt());
   }
 
-  // Create the combobox selector and set its value
-  this->Selector = new pqTextureComboBox(this->Domain, this);
+  this->Selector = new pqTextureComboBox(domain, canLoadNew, this);
   this->onPropertyChanged();
   l->addWidget(this->Selector);
   this->setLayout(l);
@@ -88,9 +89,6 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 
   // If check_tcoords="1" is specified, we enabled the widget only if tcoords are available
   // Valid only for a RepresentationProxy
-  vtkPVXMLElement* hints = smProperty->GetHints()
-    ? smProperty->GetHints()->FindNestedElementByName("TextureSelectorWidget")
-    : nullptr;
   if (hints)
   {
     bool checkTCoords = strcmp(hints->GetAttributeOrDefault("check_tcoords", ""), "1") == 0;
@@ -104,8 +102,8 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 
       QObject::connect(this->Representation, &pqDataRepresentation::attrArrayNameModified, this,
         [=] { this->checkAttributes(checkTCoords, checkTangents); });
+      this->checkAttributes(checkTCoords, checkTangents);
     }
-    this->checkAttributes(checkTCoords, checkTangents);
   }
 }
 

@@ -55,41 +55,41 @@
 
 namespace
 {
-struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*, bool>
+bool OrderByNames(vtkAbstractArray* a1, vtkAbstractArray* a2)
 {
-  bool operator()(vtkAbstractArray* a1, vtkAbstractArray* a2)
+  const char* order[] = { "vtkBlockNameIndices", "vtkOriginalProcessIds", "vtkCompositeIndexArray",
+    "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds", "vtkOriginalRowIds",
+    "Structured Coordinates", nullptr };
+  std::string a1Name = a1->GetName() ? a1->GetName() : "";
+  std::string a2Name = a2->GetName() ? a2->GetName() : "";
+  int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
+  for (int cc = 0; order[cc] != nullptr; cc++)
   {
-    const char* order[] = { "vtkBlockNameIndices", "vtkOriginalProcessIds",
-      "vtkCompositeIndexArray", "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds",
-      "vtkOriginalRowIds", "Structured Coordinates", nullptr };
-    std::string a1Name = a1->GetName() ? a1->GetName() : "";
-    std::string a2Name = a2->GetName() ? a2->GetName() : "";
-    int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
-    for (int cc = 0; order[cc] != nullptr; cc++)
+    if (a1Index == VTK_INT_MAX && a1Name == order[cc])
     {
-      if (a1Index == VTK_INT_MAX && a1Name == order[cc])
-      {
-        a1Index = cc;
-      }
-      if (a2Index == VTK_INT_MAX && a2Name == order[cc])
-      {
-        a2Index = cc;
-      }
+      a1Index = cc;
     }
-    if (a1Index < a2Index)
+    if (a2Index == VTK_INT_MAX && a2Name == order[cc])
     {
-      return true;
+      a2Index = cc;
     }
-    if (a2Index < a1Index)
-    {
-      return false;
-    }
-    // we can reach here only when both array names are not in the "priority"
-    // set or they are the same (which does happen, see BUG #9808).
-    assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
-    return (a1Name < a2Name);
   }
-};
+  if (a1Index < a2Index)
+  {
+    return true;
+  }
+  if (a2Index < a1Index)
+  {
+    return false;
+  }
+  // we can reach here only when both array names are not in the "priority"
+  // set or they are the same (which does happen, see BUG #9808).
+  assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
+
+  std::transform(a1Name.begin(), a1Name.end(), a1Name.begin(), ::tolower);
+  std::transform(a2Name.begin(), a2Name.end(), a2Name.begin(), ::tolower);
+  return (a1Name < a2Name);
+}
 
 vtkSmartPointer<vtkAbstractArray> MapBlockNames(vtkAbstractArray* aa_ids, vtkStringArray* names)
 {
@@ -439,7 +439,7 @@ public:
       }
     }
     // if block-names are present in field-data, create an array
-    std::sort(arrays.begin(), arrays.end(), OrderByNames());
+    std::sort(arrays.begin(), arrays.end(), OrderByNames);
     for (const auto& column : arrays)
     {
       clone->AddColumn(column);

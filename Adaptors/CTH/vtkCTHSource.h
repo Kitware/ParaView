@@ -42,7 +42,7 @@ public:
   // Description:
   // Initialize block parameters for block_id
   void InitializeBlock(int block_id, int Nx, int Ny, int Nz, double* x, double* y, double* z,
-    int active, int active1, int level);
+    int allocated, int active, int level);
   // Description:
   // Initialize field parameters for field_id
   void SetCellFieldName(int field_id, char* field_name, char* comment, int matid);
@@ -53,7 +53,7 @@ public:
   void SetMaterialFieldPointer(int block_id, int field_id, int mat, int k, int j, double* istrip);
   // Description:
   // Update block parameters for block_id (due to refinement/coarsening)
-  void UpdateBlock(int block_id, int active, int active1, int level, int max_level, int bxbot,
+  void UpdateBlock(int block_id, int allocated, int active, int level, int max_level, int bxbot,
     int bxtop, int bybot, int bytop, int bzbot, int bztop, int* neighb_proc, int* neighb_block);
 
   virtual int FillInputData(vtkCPInputDataDescription* input);

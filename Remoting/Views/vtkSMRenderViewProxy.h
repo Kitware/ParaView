@@ -33,7 +33,6 @@ class vtkFloatArray;
 class vtkIntArray;
 class vtkRenderer;
 class vtkRenderWindow;
-class vtkRenderWinwInteractor;
 class vtkSMViewProxyInteractorHelper;
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
@@ -94,12 +93,14 @@ public:
 
   /**
    * Given a location is display coordinates (pixels), tries to compute and
-   * return the world location on a surface, if possible. Returns true if the
-   * conversion was successful, else returns false.
-   * If Snap on mesh point is true, it will return a point from the mesh only
+   * return the world location and normal on a surface, if possible. Returns true if the
+   * conversion was successful, else assigns the focal point and plane normal and returns false.
+   * If Snap on mesh point is true, it will return a point and normal from the mesh only.
+   * If point or normal were not available, they will have a vector of
+   * std::numeric_limits<double>::quiet_NaN().
    */
-  bool ConvertDisplayToPointOnSurface(
-    const int display_position[2], double world_position[3], bool snapOnMeshPoint = false);
+  bool ConvertDisplayToPointOnSurface(const int display_position[2], double world_position[3],
+    double world_normal[3], bool snapOnMeshPoint = false);
 
   /**
    * Checks if color depth is sufficient to support selection.
@@ -150,10 +151,35 @@ public:
    */
   vtkRenderer* GetRenderer();
 
+  enum class CameraAdjustmentType : int
+  {
+    Roll = 0,
+    Elevation,
+    Azimuth,
+    Zoom
+  };
+  //@{
   /**
-   * Returns the client-side camera object.
+   * Returns the client-side active camera object.
+   * Helper methods to adjust its orientation and position.
    */
   vtkCamera* GetActiveCamera();
+  void AdjustActiveCamera(const CameraAdjustmentType&, const double&);
+  void AdjustActiveCamera(const int&, const double&);
+  void AdjustAzimuth(const double& value);
+  void AdjustElevation(const double& value);
+  void AdjustRoll(const double& value);
+  void AdjustZoom(const double& value);
+  void ApplyIsometricView();
+  void ResetActiveCameraToDirection(const double& look_x, const double& look_y,
+    const double& look_z, const double& up_x, const double& up_y, const double& up_z);
+  void ResetActiveCameraToPositiveX();
+  void ResetActiveCameraToNegativeX();
+  void ResetActiveCameraToPositiveY();
+  void ResetActiveCameraToNegativeY();
+  void ResetActiveCameraToPositiveZ();
+  void ResetActiveCameraToNegativeZ();
+  //@}
 
   /**
    * This method calls UpdateInformation on the Camera Proxy

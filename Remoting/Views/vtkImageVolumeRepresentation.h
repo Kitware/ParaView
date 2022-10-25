@@ -36,7 +36,7 @@
 #define vtkImageVolumeRepresentation_h
 
 #include "vtkNew.h"                 // needed for vtkNew.
-#include "vtkRemotingViewsModule.h" //needed for exports
+#include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 #include "vtkVolumeRepresentation.h"
 
@@ -49,9 +49,10 @@ class vtkFixedPointVolumeRayCastMapper;
 class vtkImageData;
 class vtkImplicitFunction;
 class vtkOutlineSource;
+class vtkPVLODVolume;
+class vtkPVTransferFunction2D;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
-class vtkPVLODVolume;
 class vtkVolumeMapper;
 class vtkVolumeProperty;
 
@@ -78,6 +79,7 @@ public:
   void SetSpecular(double);
   void SetSpecularPower(double);
   void SetShade(bool);
+  void SetAnisotropy(float);
   void SetSliceFunction(vtkImplicitFunction* slice);
 
   //@{
@@ -93,6 +95,8 @@ public:
   void SetRequestedRenderMode(int);
   void SetBlendMode(int);
   void SetCropping(int);
+  void SetGlobalIlluminationReach(float);
+  void SetVolumetricScatteringBlending(float);
 
   //@{
   /**
@@ -109,6 +113,14 @@ public:
   vtkSetVector3Macro(CroppingScale, double);
   vtkGetVector3Macro(CroppingScale, double);
   //@}
+
+  //***************************************************************************
+  // For 2D transfer functions
+  void SetUseTransfer2D(bool);
+  void SetUseGradientForTransfer2D(bool);
+  void SelectColorArray2(int, int, int, int, const char* name);
+  void SelectColorArray2Component(int component);
+  void SetTransferFunction2D(vtkPVTransferFunction2D* transfer2d);
 
 protected:
   vtkImageVolumeRepresentation();
@@ -153,6 +165,14 @@ protected:
   int WholeExtent[6] = { 0, -1, 0, -1, 0, -1 };
   double CroppingOrigin[3] = { 0, 0, 0 };
   double CroppingScale[3] = { 1, 1, 1 };
+
+  // 2D transfer function support
+  bool UseTransfer2D = false;
+  bool UseGradientForTransfer2D = true;
+  vtkPVTransferFunction2D* TransferFunction2D = nullptr;
+  int ColorArray2FieldAssociation = -1;
+  int ColorArray2Component = -1;
+  std::string ColorArray2Name;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;

@@ -62,6 +62,20 @@
     <string>Ctrl+G</string>
    </property>
   </action>
+  <action name="actionChangeFile">
+   <property name="text">
+    <string>Change File...</string>
+   </property>
+   <property name="iconText">
+    <string>Change File...</string>
+   </property>
+   <property name="toolTip">
+    <string>Change File</string>
+   </property>
+   <property name="statusTip">
+    <string>Change File</string>
+   </property>
+  </action>
   <action name="actionChangeInput">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -140,6 +154,18 @@
    </property>
    <property name="statusTip">
     <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionDeleteTree">
+   <property name="icon">
+    <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+     <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Downstream Pipeline</string>
+   </property>
+   <property name="statusTip">
+    <string>Delete selection and all downstream filters</string>
    </property>
   </action>
   <action name="actionDelete_All">
@@ -278,6 +304,7 @@
   <addaction name="actionPaste"/>
   <addaction name="separator"/>
   <addaction name="actionDelete"/>
+  <addaction name="actionDeleteTree"/>
   <addaction name="actionRename"/>
   <addaction name="actionChangeInput"/>
   <addaction name="actionIgnoreTime"/>

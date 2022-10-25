@@ -56,7 +56,7 @@ void pqMainControlsToolbar::constructor()
   new pqSaveDataReaction(ui.actionSaveData);
   new pqServerConnectReaction(ui.actionServerConnect);
   new pqServerDisconnectReaction(ui.actionServerDisconnect);
-  new pqDeleteReaction(ui.actionDelete, true);
+  new pqDeleteReaction(ui.actionDelete, pqDeleteReaction::DeleteModes::ALL);
   new pqUndoRedoReaction(ui.actionUndo, true);
   new pqUndoRedoReaction(ui.actionRedo, false);
   new pqAutoApplyReaction(ui.actionAutoApply);

@@ -1,0 +1,26 @@
+NAME
+  ParaView::VTKExtensionsIOCGNSWriter
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOCGNSWriter
+IMPLEMENTABLE
+KIT
+  ParaView::CoreKit
+GROUPS
+  VTK::IO
+DEPENDS
+  VTK::IOCore
+PRIVATE_DEPENDS
+  VTK::cgns
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
+TEST_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::TestingCore
+  VTK::TestingDataModel
+  ParaView::VTKExtensionsCore
+TEST_OPTIONAL_DEPENDS
+  VTK::IOCGNSReader
+  VTK::IOIOSS

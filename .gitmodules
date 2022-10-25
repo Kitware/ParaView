@@ -1,6 +1,7 @@
 [submodule "VTK"]
 	path = VTK
 	url = https://gitlab.kitware.com/vtk/vtk.git
+	branch = paraview/release
 [submodule "Utilities/VisItBridge"]
 	path = Utilities/VisItBridge
 	url = https://gitlab.kitware.com/paraview/visitbridge.git
@@ -12,6 +13,3 @@
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = https://gitlab.kitware.com/paraview/qttesting.git
 	branch = for/paraview
-[submodule "ThirdParty/catalyst/vtkcatalyst/catalyst"]
-	path = ThirdParty/catalyst/vtkcatalyst/catalyst
-	url = https://gitlab.kitware.com/paraview/catalyst.git

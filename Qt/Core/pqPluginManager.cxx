@@ -306,9 +306,8 @@ bool pqPluginManager::verifyPlugins(pqServer* activeServer)
     return true;
   }
 
-  vtkPVPluginsInformation* local_info = this->loadedExtensions(activeServer, false);
-  vtkPVPluginsInformation* remote_info = this->loadedExtensions(activeServer, true);
-  return vtkPVPluginsInformation::PluginRequirementsSatisfied(local_info, remote_info);
+  vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
+  return mgr->FulfillPluginRequirements(activeServer->session());
 }
 
 //-----------------------------------------------------------------------------

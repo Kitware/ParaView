@@ -216,8 +216,8 @@ template <GridType gridType>
 class Grid<gridType>::Internals
 {
 public:
-  Internals() {}
-  ~Internals() {}
+  Internals() = default;
+  ~Internals() = default;
   typedef std::map<size_t, vtkIdType> MapType;
   std::map<size_t, vtkIdType> CellId2d;  // lon x lat -> cellId
   std::map<size_t, vtkIdType> PointId2d; // lon x lat -> pointId
@@ -260,10 +260,7 @@ Grid<gridType>::Grid()
 template <GridType gridType>
 Grid<gridType>::~Grid()
 {
-  if (this->Lev)
-  {
-    delete[] this->Lev;
-  }
+  delete[] this->Lev;
   delete this->Impl;
 }
 

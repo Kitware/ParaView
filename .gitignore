@@ -4,4 +4,6 @@
 *.pyc
 .ExternalData/config/
 .ExternalData/SHA512/
+.ExternalData_SHA512_*
 .DS_Store
+CMakeUserPresets.json

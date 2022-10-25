@@ -266,6 +266,7 @@ public:
   std::map<int, vtkSMMessage> LocalCameraStateCache;
   unsigned long ObserverTag;
   bool DisableFurtherConnections;
+  std::string LastReceivedMessage;
 };
 //****************************************************************************
 vtkStandardNewMacro(vtkSMCollaborationManager);
@@ -320,6 +321,11 @@ void vtkSMCollaborationManager::LoadState(
     // For Observers
     vtkSMMessage* msgCopy = new vtkSMMessage();
     msgCopy->CopyFrom(*msg);
+    if (msg->HasExtension(ChatMessage::txt))
+    {
+      this->Internal->LastReceivedMessage = msg->GetExtension(ChatMessage::txt);
+      this->InvokeEvent(LastMessageUpdated, msgCopy);
+    }
     this->InvokeEvent(CollaborationNotification, msgCopy);
   }
 }
@@ -490,4 +496,10 @@ void vtkSMCollaborationManager::SetSession(vtkSMSession* session)
 {
   this->Superclass::SetSession(session);
   this->Internal->Init();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMCollaborationManager::GetLastReceivedMessage() const
+{
+  return this->Internal->LastReceivedMessage.c_str();
 }

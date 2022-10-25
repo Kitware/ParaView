@@ -118,7 +118,7 @@ public:
 
 protected:
   vtkPVRenderingCapabilitiesInformation();
-  ~vtkPVRenderingCapabilitiesInformation();
+  ~vtkPVRenderingCapabilitiesInformation() override;
 
   vtkTypeUInt32 Capabilities;
 

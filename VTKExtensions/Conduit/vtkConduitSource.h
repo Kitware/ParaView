@@ -55,6 +55,16 @@ public:
   vtkBooleanMacro(UseMultiMeshProtocol, bool);
   ///@}
 
+  ///@{
+  /**
+   * vtkConduitSource supports output vtkMultiBlock instead of vtkPartitionedDataSetCollection
+   * Set this to true if the source should output vtkMultiBlock (default is false).
+   */
+  vtkSetMacro(OutputMultiBlock, bool);
+  vtkGetMacro(OutputMultiBlock, bool);
+  vtkBooleanMacro(OutputMultiBlock, bool);
+  ///@}
+
   //@{
   /**
    * Get/Set the conduit_node. This must be the node satisfying the Conduit Mesh
@@ -84,7 +94,7 @@ public:
 
 protected:
   vtkConduitSource();
-  ~vtkConduitSource();
+  ~vtkConduitSource() override;
 
   int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
@@ -98,6 +108,7 @@ private:
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
   bool UseMultiMeshProtocol;
+  bool OutputMultiBlock;
 };
 
 #endif

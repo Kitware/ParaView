@@ -47,13 +47,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditCameraReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqEditCameraReaction(QAction* parent, pqView* view = 0);
+  pqEditCameraReaction(QAction* parent, pqView* view = nullptr);
 
   /**
    * Shows the dialog for the view.
    */
   static void editCamera(pqView*);
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */

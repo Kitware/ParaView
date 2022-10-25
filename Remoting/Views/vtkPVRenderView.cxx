@@ -27,7 +27,6 @@
 #include "vtkDataRepresentation.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
-#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
@@ -848,9 +847,9 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation, const char* array)
   {
     for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
     {
-      vtkGeometryRepresentation* geom =
-        vtkGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
-      if (geom)
+      vtkPVDataRepresentation* repr =
+        vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(i));
+      if (repr)
       {
         const char* pointIdArray = nullptr;
         const char* cellIdArray = nullptr;
@@ -863,7 +862,7 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation, const char* array)
           cellIdArray = array;
         }
         // any existing custom array id names are overwritten
-        geom->SetArrayIdNames(pointIdArray, cellIdArray);
+        repr->SetArrayIdNames(pointIdArray, cellIdArray);
       }
     }
   }
@@ -913,12 +912,12 @@ void vtkPVRenderView::PostSelect(vtkSelection* sel, const char* array)
   // restore ids
   for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
   {
-    vtkGeometryRepresentation* geom =
-      vtkGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
-    if (geom)
+    vtkPVDataRepresentation* repr =
+      vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(i));
+    if (repr)
     {
       // restore the array id names to the original ones
-      geom->SetArrayIdNames(nullptr, nullptr);
+      repr->SetArrayIdNames(nullptr, nullptr);
     }
   }
 
@@ -1091,7 +1090,7 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
 double* vtkPVRenderView::ComputeVisibleBounds(vtkPVDataRepresentation* pvrepr)
 {
   // Reset RepresentationVisibleBounds
-  vtkBoundingBox bbox(-1, 1, -1, 1, -1, 1);
+  vtkBoundingBox bbox(1, -1, 1, -1, 1, -1);
   bbox.GetBounds(this->LastRepresentationVisibleBounds);
 
   // Get the active representation from composite repr if any
@@ -1119,7 +1118,7 @@ double* vtkPVRenderView::ComputeVisibleBounds(vtkPVDataRepresentation* pvrepr)
   this->AllReduce(bbox, result);
   if (!result.IsValid())
   {
-    result.SetBounds(-1, 1, -1, 1, -1, 1);
+    result.SetBounds(1, -1, 1, -1, 1, -1);
   }
 
   result.GetBounds(this->LastRepresentationVisibleBounds);
@@ -1385,7 +1384,6 @@ void vtkPVRenderView::Update()
   this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
   const double geometry_size = gsize / 1024.0;
 
-  // cout << "Full Geometry size: " << geometry_size << endl;
   // Update decisions about lod-rendering and remote-rendering.
   this->UseLODForInteractiveRender = this->ShouldUseLODRendering(geometry_size);
   this->UseDistributedRenderingForRender =
@@ -1451,7 +1449,6 @@ void vtkPVRenderView::UpdateLOD()
   vtkTypeUInt64 gsize;
   this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
   const double geometry_size = gsize / 1024.0;
-  // cout << "LOD Geometry size: " << geometry_size << endl;
 
   this->UseDistributedRenderingForLODRender =
     this->ShouldUseDistributedRendering(geometry_size, /*using_lod=*/true);
@@ -1517,6 +1514,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Update background.
   this->UpdateBackground();
 
+  auto rvsettings = vtkPVRenderViewSettings::GetInstance();
+  this->GetRenderer()->SetTwoSidedLighting(rvsettings->GetTwoSidedLighting());
+
   if ((!interactive && this->UseDistributedRenderingForRender) ||
     (interactive && this->UseDistributedRenderingForLODRender))
   {
@@ -1574,8 +1574,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   {
     this->RequestInformation->Set(USE_LOD(), 1);
   }
-
-  // cout << "Using remote rendering: " << use_distributed_rendering << endl;
 
   // Decide if we are doing remote rendering or local rendering.
   bool use_distributed_rendering = use_lod_rendering
@@ -2994,8 +2992,39 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetReverseMouseWheelZoomDirection(bool reverse)
+{
+  this->ReverseMouseWheelZoomDirection = reverse;
+
+  // Always give positive factors to the SetXXXMotionFactor functions
+  if (this->TwoDInteractorStyle)
+  {
+    double factor = this->TwoDInteractorStyle->GetMouseWheelMotionFactor();
+    this->SetCamera2DMouseWheelMotionFactor(factor < 0 ? -factor : factor);
+  }
+  if (this->ThreeDInteractorStyle)
+  {
+    double factor = this->ThreeDInteractorStyle->GetMouseWheelMotionFactor();
+    this->SetCamera3DMouseWheelMotionFactor(factor < 0 ? -factor : factor);
+  }
+}
+
+void vtkPVRenderView::SetMouseWheelZoomsToCursor(bool value)
+{
+  if (this->TwoDInteractorStyle)
+  {
+    this->TwoDInteractorStyle->SetMouseWheelZoomsToCursor(value);
+  }
+  if (this->ThreeDInteractorStyle)
+  {
+    this->ThreeDInteractorStyle->SetMouseWheelZoomsToCursor(value);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetCamera2DMouseWheelMotionFactor(double factor)
 {
+  factor *= this->ReverseMouseWheelZoomDirection ? -1 : 1;
   if (this->TwoDInteractorStyle)
   {
     this->TwoDInteractorStyle->SetMouseWheelMotionFactor(factor);
@@ -3005,6 +3034,7 @@ void vtkPVRenderView::SetCamera2DMouseWheelMotionFactor(double factor)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetCamera3DMouseWheelMotionFactor(double factor)
 {
+  factor *= this->ReverseMouseWheelZoomDirection ? -1 : 1;
   if (this->ThreeDInteractorStyle)
   {
     this->ThreeDInteractorStyle->SetMouseWheelMotionFactor(factor);
@@ -3283,9 +3313,12 @@ bool vtkPVRenderView::GetEnableOSPRay()
 void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkRenderer* ren = this->GetRenderer();
-  vtkOSPRayRendererNode::SetMaterialLibrary(
-    vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
+  if (ml)
+  {
+    vtkRenderer* ren = this->GetRenderer();
+    vtkOSPRayRendererNode::SetMaterialLibrary(
+      vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
+  }
 #else
   (void)ml;
 #endif

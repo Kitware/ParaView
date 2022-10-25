@@ -31,6 +31,7 @@
 set(classes
   pqAnimationCue
   pqAnimationScene
+  pqAnnotationsModel
   pqApplicationCore
   pqAutoStartInterface
   pqBoxChartView
@@ -62,12 +63,14 @@ set(classes
   pqImageUtil
   pqInteractiveViewLink
   pqInterfaceTracker
+  pqKeySequences
   pqLinkedObjectInterface
   pqLinkedObjectQTextEdit
   pqLinkViewWidget
   pqLinksModel
   pqLogViewerWidget
   pqMainWindowEventManager
+  pqModalShortcut
   pqMultiSliceAxisWidget
   pqMultiSliceView
   pqNonEditableStyledItemDelegate
@@ -129,7 +132,8 @@ set(classes
   pqXYHistogramChartView
   vtkPVGUIPluginInterface)
 
-set(headers)
+set(headers
+    pqQVTKWidgetBase.h)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/pqQtConfig.h.in"

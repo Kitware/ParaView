@@ -160,6 +160,27 @@
     <string>Set view direction to -Z</string>
    </property>
   </action>
+  <action name="actionIsometricView">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqIsometricView.svg</normaloff>:/pqWidgets/Icons/pqIsometricView.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Isometric</string>
+   </property>
+   <property name="toolTip">
+    <string>Apply isometric view</string>
+   </property>
+   <property name="statusTip">
+    <string>Apply isometric view</string>
+   </property>
+   <property name="whatsThis">
+    <string>Apply isometric view</string>
+   </property>
+  </action>
   <action name="actionRotate90degCW">
    <property name="enabled">
     <bool>false</bool>
@@ -264,6 +285,7 @@
   <addaction name="actionNegativeY"/>
   <addaction name="actionPositiveZ"/>
   <addaction name="actionNegativeZ"/>
+  <addaction name="actionIsometricView"/>
   <addaction name="actionRotate90degCW"/>
   <addaction name="actionRotate90degCCW"/>
  </widget>

@@ -76,7 +76,18 @@ int vtkPExtractHistogram::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // All processes generate the histogram.
-  if (!this->Superclass::RequestData(request, inputVector, outputVector))
+  // However we want to avoid the super class to normalize/accumulate the results, hence temporarily
+  // disable these functionalities.
+  bool tempNormalize = this->Normalize;
+  this->Normalize = false;
+  bool tempAccumulation = this->Accumulation;
+  this->Accumulation = false;
+
+  int superRequestData = this->Superclass::RequestData(request, inputVector, outputVector);
+
+  this->Normalize = tempNormalize;
+  this->Accumulation = tempAccumulation;
+  if (superRequestData == 0)
   {
     return 0;
   }
@@ -88,7 +99,8 @@ int vtkPExtractHistogram::RequestData(
   // Handle > 1 ranks
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
   {
-    vtkSmartPointer<vtkDataArray> oldExtents = output->GetRowData()->GetArray("bin_extents");
+    vtkSmartPointer<vtkDataArray> oldExtents =
+      output->GetRowData()->GetArray(this->BinExtentsArrayName);
     if (oldExtents == nullptr)
     {
       // Nothing to do if there is no data
@@ -114,18 +126,18 @@ int vtkPExtractHistogram::RequestData(
     reduceFilter->Update();
     if (isRoot)
     {
-      // We save the old bin_extents and then revert to be restored later since
-      // the reduction reduces the bin_extents as well.
+      // We save the old bin extents and then revert to be restored later since
+      // the reduction reduces the bin extents as well.
       output->ShallowCopy(reduceFilter->GetOutput());
       if (output->GetRowData()->GetNumberOfArrays() == 0)
       {
         vtkErrorMacro(<< "Reduced data has 0 arrays");
         return 0;
       }
-      output->GetRowData()->GetArray("bin_extents")->DeepCopy(oldExtents);
+      output->GetRowData()->GetArray(this->BinExtentsArrayName)->DeepCopy(oldExtents);
       if (this->CalculateAverages)
       {
-        vtkDataArray* bin_values = output->GetRowData()->GetArray("bin_values");
+        vtkDataArray* bin_values = output->GetRowData()->GetArray(this->BinValuesArrayName);
         vtksys::RegularExpression reg_ex("^(.*)_average$");
         int numArrays = output->GetRowData()->GetNumberOfArrays();
         for (int i = 0; i < numArrays; i++)
@@ -154,32 +166,16 @@ int vtkPExtractHistogram::RequestData(
     }
   }
 
-  if (this->Normalize && isRoot)
+  if (isRoot)
   {
-    auto rowData = output->GetRowData();
-    vtkDataArray* bin_values = rowData->GetArray("bin_values");
-    vtkNew<vtkDoubleArray> normalized_values;
-    normalized_values->SetName("bin_values");
-    normalized_values->SetNumberOfComponents(bin_values->GetNumberOfComponents());
-    normalized_values->SetNumberOfTuples(bin_values->GetNumberOfTuples());
-
-    auto bin_range = vtk::DataArrayValueRange<1>(bin_values);
-    int sum = 0;
-    for (auto bin_val : bin_range)
+    if (this->Normalize)
     {
-      sum += bin_val;
+      this->Superclass::NormalizeBins(output);
     }
-
-    auto normalized_range = vtk::DataArrayValueRange<1>(normalized_values);
-    auto bin_iter = bin_range.begin();
-    auto normalized_iter = normalized_range.begin();
-    for (; bin_iter != bin_range.end(); ++bin_iter, ++normalized_iter)
+    if (this->Accumulation)
     {
-      *normalized_iter = static_cast<double>(bin_iter[0]) / sum;
+      this->Superclass::AccumulateBins(output);
     }
-
-    // Replace the previous bin_values array with the normalized version.
-    rowData->AddArray(normalized_values);
   }
 
   return 1;

@@ -38,7 +38,7 @@ class VTKSLACFILTERS_EXPORT vtkSLACPlaneGlyphs : public vtkPolyDataAlgorithm
 public:
   vtkTypeMacro(vtkSLACPlaneGlyphs, vtkPolyDataAlgorithm);
   static vtkSLACPlaneGlyphs* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // The location of the center of the plane.  A point is guaranteed to be here.
@@ -58,15 +58,15 @@ public:
 
 protected:
   vtkSLACPlaneGlyphs();
-  ~vtkSLACPlaneGlyphs();
+  ~vtkSLACPlaneGlyphs() override;
 
   double Center[3];
   double Normal[3];
   int Resolution;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
 private:

@@ -29,7 +29,7 @@
     <number>6</number>
    </property>
    <property name="verticalSpacing" >
-    <number>6</number>
+    <number>7</number>
    </property>
    <item row="0" column="0" colspan="2" >
     <widget class="QLabel" name="label" >
@@ -38,7 +38,7 @@
      </property>
     </widget>
    </item>
-   <item rowspan="4" row="1" column="0" >
+   <item rowspan="7" row="1" column="0" >
     <widget class="QTableView" name="tableView" >
      <property name="selectionMode" >
       <enum>QAbstractItemView::SingleSelection</enum>
@@ -53,12 +53,18 @@
      <property name="text" >
       <string>New</string>
      </property>
+     <property name="toolTip" >
+      <string>Add a new keyframe before selected</string>
+     </property>
     </widget>
    </item>
    <item row="2" column="1" >
     <widget class="QPushButton" name="pbDelete" >
      <property name="text" >
       <string>Delete</string>
+     </property>
+     <property name="toolTip" >
+      <string>Delete selected keyframe</string>
      </property>
     </widget>
    </item>
@@ -67,9 +73,52 @@
      <property name="text" >
       <string>Delete All</string>
      </property>
+     <property name="toolTip" >
+      <string>Delete all keyframe</string>
+     </property>
+    </widget>
+   </item>
+   <item rowspan="4" row="4" column="1" >
+    <widget class="QPushButton" name="pbCreateOrbit" >
+     <property name="text" >
+      <string>Create Orbit</string>
+     </property>
+     <property name="toolTip" >
+      <string>Create an orbit path for selected keyframe, starting with current camera.</string>
+     </property>
     </widget>
    </item>
    <item row="4" column="1" >
+    <widget class="QPushButton" name="pbApplyToCamera" >
+     <property name="text" >
+      <string>Apply to Camera</string>
+     </property>
+     <property name="toolTip" >
+      <string>Apply selected keyframe configuration to the current view camera</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QPushButton" name="pbUseCurrentCamera" >
+     <property name="text" >
+      <string>Use current Camera</string>
+     </property>
+     <property name="toolTip" >
+      <string>Use current camera for selected keyframe</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" >
+    <widget class="QCheckBox" name="pbUseSpline" >
+     <property name="text" >
+      <string>Spline Interpolation</string>
+     </property>
+     <property name="toolTip" >
+      <string>Use spline interpolation for this cue</string>
+     </property>
+    </widget>
+    </item>
+   <item row="7" column="1" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>

@@ -35,15 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 
+#include "pqQtConfig.h" // for PARAVIEW_USE_QTHELP
+
 #include <vtksys/SystemTools.hxx>
 
 // Qt includes.
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
-#ifdef PARAVIEW_USE_QTHELP
-#include <QHelpEngine>
-#endif
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
@@ -102,6 +101,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <cassert>
+
+#ifdef PARAVIEW_USE_QTHELP
+#include <QHelpEngine>
+#endif
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -178,9 +181,7 @@ void pqApplicationCore::constructor()
   this->RecentlyUsedResourcesList = nullptr;
   this->ServerConfigurations = nullptr;
   this->Settings = nullptr;
-#ifdef PARAVIEW_USE_QTHELP
   this->HelpEngine = nullptr;
-#endif
 
   // initialize statics in case we're a static library
   pqCoreInit();
@@ -275,15 +276,15 @@ pqApplicationCore::~pqApplicationCore()
   delete this->Settings;
   this->Settings = nullptr;
 
-#ifdef PARAVIEW_USE_QTHELP
   if (this->HelpEngine)
   {
+#ifdef PARAVIEW_USE_QTHELP
     QString collectionFile = this->HelpEngine->collectionFile();
     delete this->HelpEngine;
     QFile::remove(collectionFile);
+#endif
   }
   this->HelpEngine = nullptr;
-#endif
 
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
@@ -649,10 +650,7 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
   // processing everytime the session startsup?
   vtkPVXMLElement* root = parser->GetRootElement();
 
-  // Load configuration files for server manager components since they don't
-  // listen to Qt signals.
-  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->UpdateAvailableReaders();
-  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->UpdateAvailableWriters();
+  this->updateAvailableReadersAndWriters();
 
   // Give a warning that if there is ParaViewReaders or ParaViewWriters in root
   // that it has been changed and people should change their code accordingly.
@@ -671,6 +669,15 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
 }
 
 //-----------------------------------------------------------------------------
+void pqApplicationCore::updateAvailableReadersAndWriters()
+{
+  // Load configuration files for server manager components since they don't
+  // listen to Qt signals.
+  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->UpdateAvailableReaders();
+  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->UpdateAvailableWriters();
+}
+
+//-----------------------------------------------------------------------------
 pqTestUtility* pqApplicationCore::testUtility()
 {
   if (!this->TestUtility)
@@ -686,10 +693,10 @@ void pqApplicationCore::onHelpEngineWarning(const QString& msg)
   qWarning() << msg;
 }
 
-#ifdef PARAVIEW_USE_QTHELP
 //-----------------------------------------------------------------------------
 QHelpEngine* pqApplicationCore::helpEngine()
 {
+#ifdef PARAVIEW_USE_QTHELP
   if (!this->HelpEngine)
   {
     QTemporaryFile tFile;
@@ -720,10 +727,10 @@ QHelpEngine* pqApplicationCore::helpEngine()
     }
     this->HelpEngine->setupData();
   }
+#endif
 
   return this->HelpEngine;
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::registerDocumentation(const QString& filename)
@@ -745,6 +752,8 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
   {
     engine->registerDocumentation(filename);
   }
+#else
+  (void)filename;
 #endif
 }
 

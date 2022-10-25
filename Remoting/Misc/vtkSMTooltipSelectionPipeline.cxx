@@ -45,6 +45,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSelectionNode.h"
+#include "vtkStringArray.h"
 
 #include <sstream>
 
@@ -160,9 +161,16 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
 
   return nullptr;
 }
-
 //----------------------------------------------------------------------------
 bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string& tooltipText)
+{
+  std::string unused;
+  return this->GetTooltipInfo(association, tooltipText, unused);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
+  int association, std::string& formatedTooltipText, std::string& plainTooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
   unsigned int extractOutputPort = extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
@@ -177,18 +185,21 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
     return false;
   }
 
-  std::ostringstream tooltipTextStream;
-
-  tooltipTextStream << "<p style='white-space:pre'>";
-
   // name of the filter which generated the selected dataset
+  std::string proxyName;
   if (this->PreviousRepresentation)
   {
     vtkSMPropertyHelper representationHelper(this->PreviousRepresentation, "Input", true);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(representationHelper.GetAsProxy());
     vtkSMSessionProxyManager* proxyManager = source->GetSessionProxyManager();
-    tooltipTextStream << "<b>" << proxyManager->GetProxyName("sources", source) << "</b>";
+    const char* name = proxyManager->GetProxyName("sources", source);
+    if (name)
+    {
+      proxyName = name;
+    }
   }
+
+  std::ostringstream tooltipTextStream;
 
   // composite name
   if (compositeFound)
@@ -235,7 +246,7 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
 
   if (fieldData)
   {
-    // point attributes
+    // point or cell attributes
     vtkIdType nbArrays = fieldData->GetNumberOfArrays();
     for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
     {
@@ -245,11 +256,12 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
         continue;
       }
       tooltipTextStream << "\n" << array->GetName() << ": ";
-      if (array->GetNumberOfComponents() > 1)
+      vtkIdType nbComps = array->GetNumberOfComponents();
+
+      if (nbComps > 1)
       {
         tooltipTextStream << "(";
       }
-      vtkIdType nbComps = array->GetNumberOfComponents();
       for (vtkIdType i_comp = 0; i_comp < nbComps; i_comp++)
       {
         tooltipTextStream << array->GetTuple(0)[i_comp];
@@ -258,16 +270,71 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string&
           tooltipTextStream << ", ";
         }
       }
-      if (array->GetNumberOfComponents() > 1)
+      if (nbComps > 1)
       {
         tooltipTextStream << ")";
       }
     }
   }
 
-  tooltipTextStream << "</p>";
+  // Add field data arrays with one tuple
+  fieldData = ds->GetFieldData();
 
-  tooltipText = tooltipTextStream.str();
+  if (fieldData)
+  {
+    for (vtkIdType i_arr = 0; i_arr < fieldData->GetNumberOfArrays(); i_arr++)
+    {
+      vtkAbstractArray* array = fieldData->GetAbstractArray(i_arr);
+      if (!array || array->GetNumberOfTuples() != 1)
+      {
+        continue;
+      }
+
+      tooltipTextStream << "\n" << array->GetName() << ": ";
+
+      // String arrays are not data arrays
+      vtkStringArray* strArray = vtkStringArray::SafeDownCast(array);
+      vtkDataArray* dataArray = vtkDataArray::SafeDownCast(array);
+
+      if (strArray)
+      {
+        tooltipTextStream << strArray->GetValue(0);
+      }
+      else if (dataArray)
+      {
+        vtkIdType nbComps = array->GetNumberOfComponents();
+        vtkIdType maxDisplayedComp = 9;
+
+        if (nbComps > 1)
+        {
+          tooltipTextStream << "(";
+        }
+
+        for (vtkIdType i_comp = 0; i_comp < std::min(nbComps, maxDisplayedComp); i_comp++)
+        {
+          tooltipTextStream << dataArray->GetTuple(0)[i_comp];
+
+          if (i_comp + 1 < nbComps && i_comp < maxDisplayedComp)
+          {
+            tooltipTextStream << ", ";
+          }
+        }
+
+        if (nbComps > 1)
+        {
+          if (nbComps > maxDisplayedComp)
+          {
+            tooltipTextStream << "...";
+          }
+          tooltipTextStream << ")";
+        }
+      }
+    }
+  }
+
+  formatedTooltipText =
+    "<p style='white-space:pre'><b>" + proxyName + "</b>" + tooltipTextStream.str() + "</p>";
+  plainTooltipText = proxyName + tooltipTextStream.str();
 
   this->TooltipEnabled = false;
   return true;

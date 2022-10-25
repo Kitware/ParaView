@@ -131,12 +131,11 @@ protected Q_SLOTS:
   void onSourceAdded(pqPipelineSource* source);
   void onDataUpdated(pqPipelineSource* source);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqLiveInsituManager();
   bool isTimeBreakpointHit() const;
   bool isTimeStepBreakpointHit() const;
 
-protected:
   double BreakpointTime;
   double Time;
   vtkIdType BreakpointTimeStep;

@@ -47,7 +47,6 @@ set(classes
   vtkPVRecoverGeometryWireframe
   vtkRedistributePolyData
   vtkResampledAMRImageSource
-  vtkSelectionConverter
   vtkSelectionDeliveryFilter
   vtkSortedTableStreamer
   vtkSquirtCompressor

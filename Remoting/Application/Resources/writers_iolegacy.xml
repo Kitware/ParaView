@@ -22,6 +22,7 @@
       <Documentation short_help="Write any type of data object in a legacy vtk data file.">
       Writer to write any type of data object in a legacy vtk data file. Cannot
       be used for parallel writing.</Documentation>
+
       <SubProxy>
         <Proxy name="Writer"
                proxygroup="internal_writers"

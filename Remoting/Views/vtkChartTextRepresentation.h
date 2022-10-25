@@ -22,8 +22,8 @@
  * `vtkContextScene` maintained by the `vtkPVContextView` to render the text.
  *
  * In theory, we can support interacting with the label to place it
- * interactively. As a first pass, however, we only support anchoring the label
- * at one of the predefined anchor locations.
+ * interactively. For now, we only support anchoring the label at one of the
+ * predefined anchor locations or specifying normalized coordinates manually.
  */
 
 #ifndef vtkChartTextRepresentation_h
@@ -33,7 +33,6 @@
 #include "vtkPVDataRepresentation.h"
 
 class vtkBlockItem;
-class vtkPolyData;
 class vtkTextProperty;
 
 class VTKREMOTINGVIEWS_EXPORT vtkChartTextRepresentation : public vtkPVDataRepresentation
@@ -43,7 +42,7 @@ public:
   vtkTypeMacro(vtkChartTextRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   enum
   {
     AnyLocation = 0,
@@ -55,40 +54,41 @@ public:
     UpperCenter
   };
   void SetLabelLocation(int location);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
-   * Get/Set the position to use when `AnyLocation` is being used.
+   * Get/Set the normalized text position in the scene when `AnyLocation` is used.
+   * Default is { 0.05, 0.05 }.
    */
   vtkGetVector2Macro(Position, double);
   vtkSetVector2Macro(Position, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the interactivity.
    */
   void SetInteractivity(bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Forwarded to vtkBlockItem
    */
   void SetTextProperty(vtkTextProperty*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   // Superclass overrides
   void SetVisibility(bool val) override;
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
-  //@}
+  ///@}
 
 protected:
   vtkChartTextRepresentation();
-  ~vtkChartTextRepresentation();
+  ~vtkChartTextRepresentation() override = default;
 
   /**
    * Fill input port information.
@@ -122,8 +122,8 @@ private:
 
   vtkNew<vtkBlockItem> BlockItem;
   vtkNew<vtkTable> PreparedData;
-  double Position[2];
-  int LabelLocation;
+  double Position[2] = { 0.05, 0.05 };
+  int LabelLocation = vtkChartTextRepresentation::AnyLocation;
 };
 
 #endif

@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h"
 #include <QWidget>
 
-class vtkScalarsToColors;
 class vtkPiecewiseFunction;
+class vtkScalarsToColors;
 class vtkTable;
 
 /**
@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqTransferFunctionWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqTransferFunctionWidget(QWidget* parent = 0);
+  pqTransferFunctionWidget(QWidget* parent = nullptr);
   ~pqTransferFunctionWidget() override;
 
   /**
@@ -99,7 +99,7 @@ public:
   bool GetControlPointsFreehandDrawing() const;
   //@}
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the current point. Set to -1 clear the current point.
    */
@@ -174,7 +174,7 @@ protected Q_SLOTS:
    */
   void editColorAtCurrentControlPoint();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * callback called when vtkControlPointsItem fires
    * vtkControlPointsItem::CurrentPointEditEvent.

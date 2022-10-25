@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqMaterialEditor.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 #include "pqLoadMaterialsReaction.h"
 #include "pqMaterialAttributesDelegate.h"
 #include "pqNewMaterialDialog.h"
@@ -482,6 +483,8 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
     &pqMaterialEditor::loadMaterials);
   QObject::connect(this->Internals->Ui.AttachMaterial, &QPushButton::clicked, this,
     &pqMaterialEditor::attachMaterial);
+  QObject::connect(this->Internals->Ui.SaveMaterials, &QPushButton::clicked, this,
+    &pqMaterialEditor::saveMaterials);
 
   // attributes
   QObject::connect(this->Internals->Ui.SelectMaterial,
@@ -665,6 +668,30 @@ void pqMaterialEditor::attachMaterial()
   else
   {
     vtkGenericWarningMacro("No representation for selected source in the selected view.");
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqMaterialEditor::saveMaterials()
+{
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  QString extension = ".json";
+  auto filepath = pqFileDialog::getSaveFileName(
+    server, this, "Save Materials As", "", QString("OSPRay material library (*%1)").arg(extension));
+  if (filepath.isEmpty())
+  {
+    // User canceled
+    return;
+  }
+
+  if (!filepath.endsWith(".json"))
+  {
+    filepath.append(".json");
+  }
+
+  if (auto mlp = this->Internals->MaterialLibrary)
+  {
+    mlp->WriteFile(filepath.toStdString());
   }
 }
 

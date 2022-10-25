@@ -20,19 +20,18 @@
     variables:
         LAUNCHER: "scl enable devtoolset-7 --"
 
-.fedora33:
+.fedora35:
     extends: .linux
-    image: "kitware/paraview:ci-fedora33-20210903"
+    image: "kitware/paraview:ci-fedora35-20220809"
 
-.fedora31_icc:
+.el8_icc:
     extends: .linux
-    # XXX(icc): See note below about git-lfs. That can be removed once this
-    # image contains git-lfs in it.
-    image: "kitware/paraview:ci-fedora31-icc-20201014"
+    image: "kitware/paraview:ci-el8-icc-20220809"
 
     variables:
-        CC: icc
-        CXX: icpc
+        CC: icx
+        CXX: icpx
+        FC: ifx
 
 .fedora_mpich_addon:
     variables:
@@ -49,55 +48,68 @@
         OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
         MODULES: mpi/openmpi-x86_64
 
-.fedora31_shared_icc_mpi_python:
+.el8_intelmpi_addon:
+    variables:
+        CMAKE_PREFIX_PATH: /usr/local/intelmpi
+        # Disable shared memory; it doesn't work so well inside of containers.
+        I_MPI_SHM: disable
+
+.el8_shared_icc_mpi_python:
     extends:
-        - .fedora31_icc
-        - .fedora_openmpi_addon
+        - .el8_icc
+        - .el8_intelmpi_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora31_shared_icc_mpi_python
+        CMAKE_CONFIGURATION: el8_shared_icc_mpi_python
 
-.fedora33_static_mpi_offscreen_osmesa_python:
+.fedora35_static_mpi_offscreen_osmesa_python:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_static_mpi_offscreen_osmesa_python
+        CMAKE_CONFIGURATION: fedora35_static_mpi_offscreen_osmesa_python
 
-.fedora33_shared_mpi_core:
+.fedora35_shared_mpi_core:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_core
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_core
 
-.fedora33_shared_mpi_python_core:
+.fedora35_shared_mpi_python_core:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_core
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_core
 
-.fedora33_shared_debug_mpi_python_qt:
+.fedora35_shared_debug_mpi_python_qt:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt
         CMAKE_BUILD_TYPE: Debug
 
-.fedora33_tidy:
+.fedora35_shared_mpi_python_qt_vtkmoverride:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt_tidy
-        CTEST_NO_WARNINGS_ALLOWED: 1
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_vtkmoverride
+
+.fedora35_tidy:
+    extends:
+        - .fedora35
+        - .fedora_mpich_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_tidy
 
 .linux_builder_tags:
     tags:
@@ -140,9 +152,6 @@
     - cmake --version
     - ninja --version
     - doxygen --version
-    # XXX(icc): The icc container lacks git-lfs. A rebuild of the container
-    # will be necessary.
-    - '[ "$CC" = "icc" ] && dnf install --setopt=install_weak_deps=False -y git-lfs'
     - "git submodule update --init --recursive || :"
     - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
@@ -150,10 +159,11 @@
     # Load any modules that may be necessary.
     - '[ -n "$MODULES" ] && . /etc/profile.d/modules.sh && module load $MODULES'
     # Enable the Intel compiler if required.
-    - '[ "$CC" = "icc" ] && source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true'
+    - '[ "$CC" = "icx" ] && source /opt/intel/oneapi/setvars.sh || true'
 
 .cmake_build_linux:
     stage: build
+    extends: .warning_policy
 
     script:
         - *before_script_linux
@@ -162,6 +172,7 @@
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
         - sccache --show-stats
+        - exec .gitlab/ci/check_warnings.sh .
 
     interruptible: true
 

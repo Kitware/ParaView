@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderView.h
+   Module:  pqRenderView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqRenderView_h
 
 #include "pqRenderViewBase.h"
-#include <QColor> // needed for return type.
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATION
+#include <QColor>                   // needed for return type.
 
 class pqDataRepresentation;
 class QAction;
@@ -137,12 +138,14 @@ public:
    */
   bool supportsUndo() const override { return true; }
 
+  ///@{
   /**
    * Returns if the view module can undo/redo interaction given the current
    * state of the interaction undo stack.
    */
   bool canUndo() const override;
   bool canRedo() const override;
+  ///@}
 
   /**
    * Returns if this view module can support image capture. Returns false by
@@ -150,6 +153,7 @@ public:
    */
   bool supportsCapture() const override { return true; }
 
+  ///@{
   /**
    * For linking of interaction undo stacks.
    * This method is used by pqLinksModel to link interaction undo stack for
@@ -157,6 +161,7 @@ public:
    */
   virtual void linkUndoStack(pqRenderView* other);
   virtual void unlinkUndoStack(pqRenderView* other);
+  ///@}
 
   /**
    * Clears interaction undo stack of this view (and all linked views, if any).
@@ -164,10 +169,22 @@ public:
   virtual void clearUndoStack();
 
   /**
-   * Reset camera view direction
+   * Reset/Adjust camera view direction.
    */
   virtual void resetViewDirection(
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
+  virtual void adjustView(const int& adjustType, const double& angle);
+  virtual void adjustAzimuth(const double& value);
+  virtual void adjustElevation(const double& value);
+  virtual void adjustRoll(const double& value);
+  virtual void adjustZoom(const double& value);
+  virtual void applyIsometricView();
+  virtual void resetViewDirectionToPositiveX();
+  virtual void resetViewDirectionToNegativeX();
+  virtual void resetViewDirectionToPositiveY();
+  virtual void resetViewDirectionToNegativeY();
+  virtual void resetViewDirectionToPositiveZ();
+  virtual void resetViewDirectionToNegativeZ();
 
   /**
    * Let internal class handle which internal widget should change its cursor
@@ -177,14 +194,22 @@ public:
    */
   virtual void setCursor(const QCursor&);
 
+  ///@{
   /**
    * Creates a new surface selection given the rectangle in display
    * coordinates.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use selectCellsOnSurface instead.")
   virtual void selectOnSurface(int rectangle[4],
+    int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr)
+  {
+    this->selectCellsOnSurface(rectangle, selectionModifier, array);
+  }
+  virtual void selectCellsOnSurface(int rectangle[4],
     int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr);
   virtual void selectPointsOnSurface(int rectangle[4],
     int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr);
+  ///@}
 
   /**
    * Picks the representation at the given position.
@@ -205,12 +230,18 @@ public:
    */
   virtual pqDataRepresentation* pickBlock(int pos[2], unsigned int& flatIndex, int& rank);
 
+  ///@{
   /**
    * Creates a new frustum selection given the rectangle in display
    * coordinates.
    */
-  virtual void selectFrustum(int rectangle[4]);
-  virtual void selectFrustumPoints(int rectangle[4]);
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use selectFrustumCells instead.")
+  virtual void selectFrustum(int rectangle[4]) { this->selectFrustumCells(rectangle); }
+  virtual void selectFrustumCells(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  virtual void selectFrustumPoints(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  ///@}
 
   /**
    * Creates a "block" selection given the rectangle in display coordinates.
@@ -218,19 +249,16 @@ public:
    */
   virtual void selectBlock(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
+  ///@{
   /**
-   * Creates a new surface points selection given the polygon in display
+   * Creates a new surface selection given the polygon in display
    * coordinates.
    */
   virtual void selectPolygonPoints(
     vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
-
-  /**
-   * Creates a new surface cells selection given the polygon in display
-   * coordinates.
-   */
   virtual void selectPolygonCells(
     vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  ///@}
 
 Q_SIGNALS:
   // Triggered when interaction mode change underneath
@@ -288,13 +316,13 @@ public Q_SLOTS:
    * Called to undo interaction.
    * View modules supporting interaction undo must override this method.
    */
-  virtual void undo() override;
+  void undo() override;
 
   /**
    * Called to redo interaction.
    * View modules supporting interaction undo must override this method.
    */
-  virtual void redo() override;
+  void redo() override;
 
   /**
    * Resets center of rotation if this->ResetCenterWithCamera is true.
@@ -326,7 +354,7 @@ protected Q_SLOTS:
    */
   virtual void onUndoStackChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates undo stack without actually performing the undo/redo actions.
    */

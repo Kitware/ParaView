@@ -4,13 +4,15 @@
     <SourceProxy class="vtkMeshQuality"
                  label="Mesh Quality"
                  name="MeshQuality">
-      <Documentation long_help="This filter creates a new cell array containing a geometric measure of each cell's fitness. Different quality measures can be chosen for different cell shapes."
-                     short_help="Evaluate geometric mesh quality.">This filter
-                     creates a new cell array containing a geometric measure of
-                     each cell's fitness. Different quality measures can be
-                     chosen for different cell shapes. Supported shapes include linear
-                     triangles, quadrilaterals, tetrahedra, and hexahedra. For
-                     other shapes, a value of 0 is assigned.</Documentation>
+      <Documentation long_help="This filter creates a new cell array containing a geometric measure of each cell's
+                     fitness. Different quality measures can be chosen for different cell shapes."
+                     short_help="Evaluate geometric mesh quality.">
+        This filter creates a new cell array containing a geometric measure of
+        each cell's fitness. Different quality measures can be
+        chosen for different cell shapes. Supported shapes include linear
+        triangles, quadrilaterals, tetrahedra, pyramids, wedges, and hexahedra.
+        For other shapes, a value of 0 is assigned.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -20,8 +22,9 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input to the Mesh Quality
-        filter.</Documentation>
+        <Documentation>
+          This property specifies the input to the Mesh Quality filter.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetTriangleQualityMeasure"
                          default_values="2"
@@ -40,26 +43,28 @@
                  value="15" />
           <Entry text="Edge Ratio"
                  value="0" />
+          <Entry text="Equiangle Skew"
+                 value="29" />
           <Entry text="Maximum Angle"
                  value="8" />
           <Entry text="Minimum Angle"
                  value="6" />
-          <Entry text="Scaled Jacobian"
-                 value="10" />
+          <Entry text="Normalized Inradius"
+                 value="35" />
           <Entry text="Radius Ratio"
                  value="2" />
           <Entry text="Relative Size Squared"
                  value="12" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
           <Entry text="Shape"
                  value="13" />
           <Entry text="Shape and Size"
                  value="14" />
         </EnumerationDomain>
-        <Documentation>This property indicates which quality measure will be
-        used to evaluate triangle quality. The radius ratio is the size of a
-        circle circumscribed by a triangle's 3 vertices divided by the size of
-        a circle tangent to a triangle's 3 edges. The edge ratio is the ratio
-        of the longest edge length to the shortest edge length.</Documentation>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate triangle quality.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetQuadQualityMeasure"
                          default_values="0"
@@ -76,6 +81,8 @@
                  value="15" />
           <Entry text="Edge Ratio"
                  value="0" />
+          <Entry text="Equiangle Skew"
+                 value="29" />
           <Entry text="Jacobian"
                  value="25" />
           <Entry text="Maximum Aspect Frobenius"
@@ -113,18 +120,15 @@
           <Entry text="Warpage"
                  value="26" />
         </EnumerationDomain>
-        <Documentation>This property indicates which quality measure will be
-        used to evaluate quadrilateral quality.</Documentation>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate quadrilateral quality.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetTetQualityMeasure"
                          default_values="2"
                          name="TetQualityMeasure"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Edge Ratio"
-                 value="0" />
-          <Entry text="Aspect Beta"
-                 value="29" />
           <Entry text="Aspect Gamma"
                  value="27" />
           <Entry text="Aspect Frobenius"
@@ -137,10 +141,20 @@
                  value="9" />
           <Entry text="Distortion"
                  value="15" />
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Equiangle Skew"
+                 value="29" />
+          <Entry text="Equivolume Skew"
+                 value="30" />
           <Entry text="Jacobian"
                  value="25" />
+          <Entry text="Mean Ratio"
+                 value="33" />
           <Entry text="Minimum Dihedral Angle"
                  value="6" />
+          <Entry text="Normalized Inradius"
+                 value="35" />
           <Entry text="Radius Ratio"
                  value="2" />
           <Entry text="Relative Size Squared"
@@ -151,17 +165,66 @@
                  value="13" />
           <Entry text="Shape and Size"
                  value="14" />
+          <Entry text="Squish Index"
+                 value="36" />
           <Entry text="Volume"
                  value="19" />
         </EnumerationDomain>
-        <Documentation>This property indicates which quality measure will be
-        used to evaluate tetrahedral quality. The radius ratio is the size of a
-        sphere circumscribed by a tetrahedron's 4 vertices divided by the size
-        of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the
-        ratio of the longest edge length to the shortest edge length. The
-        collapse ratio is the minimum ratio of height of a vertex above the
-        triangle opposite it divided by the longest edge of the opposing
-        triangle across all vertex/triangle pairs.</Documentation>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate tetrahedral quality.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPyramidQualityMeasure"
+                         default_values="13"
+                         name="PyramidQualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Equiangle Skew"
+                 value="29" />
+          <Entry text="Jacobian"
+                 value="25" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Shape"
+                 value="13" />
+          <Entry text="Volume"
+                 value="19" />
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate pyramidal quality.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWedgeQualityMeasure"
+                         default_values="0"
+                         name="WedgeQualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Condition"
+                 value="9" />
+          <Entry text="Distortion"
+                 value="15" />
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Equiangle Skew"
+                 value="29" />
+          <Entry text="Jacobian"
+                 value="25" />
+          <Entry text="Maximum Aspect Frobenius"
+                 value="5" />
+          <Entry text="Maximum Stretch"
+                 value="31" />
+          <Entry text="Mean Aspect Frobenius"
+                 value="32" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Shape"
+                 value="14" />
+          <Entry text="Volume"
+                 value="19" />
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate wedge's quality.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetHexQualityMeasure"
                          default_values="5"
@@ -176,6 +239,8 @@
                  value="15" />
           <Entry text="Edge Ratio"
                  value="0" />
+          <Entry text="Equiangle Skew"
+                 value="29" />
           <Entry text="Jacobian"
                  value="25" />
           <Entry text="Maximum Edge Ratio"
@@ -184,6 +249,8 @@
                  value="5" />
           <Entry text="Mean Aspect Frobenius"
                  value="4" />
+          <Entry text="Nodal Jacobian Ratio"
+                 value="34" />
           <Entry text="Oddy"
                  value="23" />
           <Entry text="Relative Size Squared"
@@ -207,8 +274,20 @@
           <Entry text="Volume"
                  value="19" />
         </EnumerationDomain>
-        <Documentation>This property indicates which quality measure will be
-        used to evaluate hexahedral quality.</Documentation>
+        <Documentation>
+          This property indicates which quality measure will be used to evaluate hexahedral quality.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLinearApproximation"
+                         default_values="0"
+                         name="LinearApproximation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If turned on, then non-linear cells quantities will be computed
+          by taking their linear approximate, i.e. ignoring their faces' curvature
+          in a second output array named "Quality (Linear Approx)".
+        </Documentation>
       </IntVectorProperty>
       <!-- End MeshQuality -->
     </SourceProxy>

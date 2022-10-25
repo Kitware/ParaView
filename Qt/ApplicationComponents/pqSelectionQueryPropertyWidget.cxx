@@ -44,17 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSelectionQueryDomain.h"
-#include "vtkSMUncheckedPropertyHelper.h"
 
 #include <QComboBox>
 #include <QGridLayout>
-#include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSignalBlocker>
-#include <QVBoxLayout>
 
 #include <map>
 #include <tuple>
@@ -107,6 +103,12 @@ QString fmt(QString str, const std::map<QString, QString>& map)
 {
   for (const auto& pair : map)
   {
+    // this is needed in case the user has not filled any information
+    // so that pqFindDataWidget can handle not filled queries.
+    if (pair.first.isEmpty() || pair.second.isEmpty())
+    {
+      return QString("");
+    }
     str.replace(QString("{%1}").arg(pair.first), pair.second);
   }
   return str;
@@ -122,7 +124,7 @@ QRegularExpression fmtRegEx(QString str, const std::map<QString, QString>& map)
     // by \g{$key}.
     if (index != -1)
     {
-      str.replace(index, key.size(), QString("(?<%1>%2)").arg(pair.first).arg(pair.second));
+      str.replace(index, key.size(), QString("(?<%1>%2)").arg(pair.first, pair.second));
     }
     str.replace(key, QString("\\g{%1}").arg(pair.first));
   }
@@ -294,8 +296,7 @@ private:
 
     for (const auto& lineEdit : this->LineEdits)
     {
-      QObject::connect(
-        lineEdit, &pqLineEdit::textChangedAndEditingFinished, this, &pqValueWidget::modified);
+      QObject::connect(lineEdit, &pqLineEdit::textChanged, this, &pqValueWidget::modified);
     }
   }
 };
@@ -528,8 +529,7 @@ bool pqSelectionQueryPropertyWidget::pqQueryWidget::populateTerms(vtkSMProperty*
           QString("mag(%1)").arg(sanitizedArrayName.c_str()));
         for (int comp = 0; comp < numComponents; ++comp)
         {
-          this->addTerm(icon,
-            QString("%1 (%2)").arg(arrayName).arg(arrayInfo->GetComponentName(comp)),
+          this->addTerm(icon, QString("%1 (%2)").arg(arrayName, arrayInfo->GetComponentName(comp)),
             TermType::ARRAY, QString("%1[:,%2]").arg(sanitizedArrayName.c_str()).arg(comp));
         }
       }
@@ -745,9 +745,15 @@ public:
       {
         exprs.push_back(QString("(%1)").arg(singleQuery));
       }
+      else
+      {
+        // this is needed in case one of the queries is empty
+        // so that pqFindDataWidget can handle not filled queries.
+        this->Query = QString("");
+        return this->Query;
+      }
     }
     this->Query = exprs.join("&");
-    // vtkLogF(INFO, "expr = %s", this->Query.toStdString().c_str());
     return this->Query;
   }
 

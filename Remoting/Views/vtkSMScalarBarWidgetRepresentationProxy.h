@@ -24,10 +24,15 @@
 
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMNewWidgetRepresentationProxy.h"
-#include "vtkSMTrace.h" // needed for vtkSMTrace::TraceItem
+#include "vtkSMTrace.h"     // needed for vtkSMTrace::TraceItem
+#include "vtkWeakPointer.h" // For Proxies
 
-class vtkSMViewProxy;
+#include <unordered_map> // For Proxies
+
 class vtkPVArrayInformation;
+class vtkSMProxy;
+class vtkSMPVRepresentationProxy;
+class vtkSMViewProxy;
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMScalarBarWidgetRepresentationProxy
   : public vtkSMNewWidgetRepresentationProxy
@@ -65,6 +70,30 @@ public:
   }
   //@}
 
+  /**
+   * Add range to current scalar bar for a given representation proxy.
+   * This allows to display the combined range
+   * of multiple data sets that hold the same array.
+   */
+  void AddRange(vtkSMPVRepresentationProxy* proxy);
+
+  /**
+   * Remove range to current scalar bar for a given representation proxy.
+   * This allows to display the combined range
+   * of multiple data sets that hold the same array.
+   */
+  void RemoveRange(vtkSMPVRepresentationProxy* proxy);
+
+  /**
+   * Get the current range of the scalar bar.
+   */
+  void GetRange(double range[2]);
+
+  /**
+   * Clears all data held by the scalar bar concerning range.
+   */
+  void ClearRange();
+
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
   ~vtkSMScalarBarWidgetRepresentationProxy() override;
@@ -81,6 +110,20 @@ protected:
   void ExecuteEvent(unsigned long event) override;
 
   vtkSMProxy* ActorProxy;
+
+  ///@{
+  /**
+   * Storing a list of proxies linked to this scalar bar.
+   *
+   * @note
+   * We need 2 instances of `vtkSMPVRepresentation*` per item, as the proxy can become unused before
+   * this class is aware of it. The weak pointer helps not interfere with the life span of this
+   * proxy, and the raw pointer is used as key because of its constness: the weak pointer can become
+   * `nullptr` and would invalidate the container is used as key.
+   */
+  std::unordered_map<vtkSMPVRepresentationProxy*, vtkWeakPointer<vtkSMPVRepresentationProxy>>
+    Proxies;
+  ///@}
 
 private:
   //@{
@@ -103,7 +146,6 @@ private:
   // Used in StartTrackingPropertiesForTrace/EndTrackingPropertiesForTrace.
   vtkSMTrace::TraceItem* TraceItem;
 
-private:
   vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
   void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
 };

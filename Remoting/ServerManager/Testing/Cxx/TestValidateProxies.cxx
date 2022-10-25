@@ -49,6 +49,8 @@ int TestValidateProxies(int argc, char* argv[])
   using PairType = std::pair<std::string, std::string>;
   std::set<PairType> exceptions;
   exceptions.insert(PairType("internal_writers", "FileSeriesWriter"));
+  exceptions.insert(PairType("internal_writers", "FileSeriesWriterSimple"));
+  exceptions.insert(PairType("internal_writers", "FileSeriesWriterComposite"));
   exceptions.insert(PairType("internal_writers", "ParallelFileSeriesWriter"));
   exceptions.insert(PairType("internal_writers", "ParallelSerialWriter"));
   exceptions.insert(PairType("internal_writers", "ParallelWriterBase"));

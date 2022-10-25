@@ -34,9 +34,7 @@ vtkSMRangeDomainTemplate<T>::vtkSMRangeDomainTemplate()
 
 //-----------------------------------------------------------------------------
 template <class T>
-vtkSMRangeDomainTemplate<T>::~vtkSMRangeDomainTemplate()
-{
-}
+vtkSMRangeDomainTemplate<T>::~vtkSMRangeDomainTemplate() = default;
 
 //-----------------------------------------------------------------------------
 template <class T>
@@ -334,7 +332,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
       }
       // else leave values unchanged.
     }
-    if (values.size() > 0)
+    if (!values.empty())
     {
       helper.Set(&values[0], static_cast<unsigned int>(values.size()));
       return 1;

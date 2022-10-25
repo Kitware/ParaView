@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqLoadDataReaction_h
 
 #include "pqReaction.h"
+
 #include <QList>
 
 class QStringList;
@@ -89,9 +90,29 @@ public:
     const QString& readergroup = QString(), const QString& readername = QString(),
     pqServer* server = nullptr);
 
-  static QList<pqPipelineSource*> loadData();
+  typedef QPair<QString, QString> ReaderPair;
+  typedef QSet<ReaderPair> ReaderSet;
 
-public Q_SLOTS:
+  ///@{
+  /**
+   * Convenience static method that shows a file dialog,
+   * let user select files and opens the selected files.
+   * readerSet is a set of `readergroup`, `readername` pair to restrict the proposed types
+   * of files shown to the user, not using it let the user choose between all files.
+   * Returns the list of opened file in the pipeline.
+   */
+  static QList<pqPipelineSource*> loadData(const ReaderSet& readerSet);
+  static QList<pqPipelineSource*> loadData();
+  ///@}
+
+  /**
+   * Called when the file dialog filter was on "Supported Types" or when dropping a file.
+   * First search for a matching reader in the default readers settings, and if none is found use
+   * the standard method to choose a reader.
+   */
+  static QVector<pqPipelineSource*> loadFilesForSupportedTypes(QList<QStringList> files);
+
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
@@ -125,13 +146,6 @@ protected:
 
   static pqPipelineSource* LoadFile(
     const QStringList& files, pqServer* server, const QPair<QString, QString>& readerInfo);
-
-  /**
-   * Called when the file dialog filter was on "Supported Types"
-   * First search for a matching reader in the default readers settings, and if none is found use
-   * the standard method to choose a reader.
-   */
-  static QVector<pqPipelineSource*> loadFilesForSupportedTypes(QList<QStringList> files);
 
   /**
    * Called when the file dialog filter was on "All Types"

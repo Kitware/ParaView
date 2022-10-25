@@ -31,10 +31,12 @@
 set(classes
   vtkExtractSelectionRange
   vtkPConvertSelection
+  vtkExtractCellsAlongLine
+  vtkPVExtractCellsByType
   vtkPVExtractSelection
   vtkPVSelectionSource
   vtkPVSingleOutputExtractSelection
-  vtkQuerySelectionSource)
+  vtkSelectArraysExtractBlocks)
 
 vtk_module_add_module(ParaView::VTKExtensionsExtraction
   CLASSES ${classes})

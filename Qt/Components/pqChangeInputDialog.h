@@ -58,7 +58,7 @@ public:
    * The values from the input properties of the \c filterProxy are used as the
    * default values shown by this dialog.
    */
-  pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* parent = 0);
+  pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* parent = nullptr);
   ~pqChangeInputDialog() override;
 
   /**
@@ -74,7 +74,7 @@ protected Q_SLOTS:
   void inputPortToggled(bool);
   void selectionChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void buildPortWidgets();
 
 private:

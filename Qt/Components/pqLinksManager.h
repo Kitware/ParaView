@@ -55,13 +55,13 @@ public:
   /**
    * create this dialog with a parent
    */
-  pqLinksManager(QWidget* p = 0);
+  pqLinksManager(QWidget* p = nullptr);
   /**
    * destroy this dialog
    */
   ~pqLinksManager() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * add a link
    */
@@ -78,7 +78,7 @@ public Q_SLOTS:
 private Q_SLOTS:
   void selectionChanged(const QModelIndex& idx);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   QScopedPointer<Ui::pqLinksManager> Ui;
 };
 

@@ -37,7 +37,7 @@ public:
 
 protected:
   vtkCPCxxHelper();
-  virtual ~vtkCPCxxHelper();
+  ~vtkCPCxxHelper() override;
 
 private:
   vtkCPCxxHelper(const vtkCPCxxHelper&) = delete;

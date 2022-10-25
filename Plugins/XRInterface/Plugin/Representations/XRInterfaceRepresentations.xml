@@ -1,0 +1,146 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy class="vtkSkyboxRepresentation"
+      name="SkyboxRepresentation"
+      processes="client|renderserver|dataserver">
+      <Documentation>Representation to show 2D images as a skybox.</Documentation>
+      <InputProperty command="SetInputConnection"
+        name="Input">
+        <Documentation>Set the input to the representation. Must be a
+        vtkImageData producer.</Documentation>
+        <DataTypeDomain composite_data_supported="0"
+          name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+          name="input_array_any"></InputArrayDomain>
+      </InputProperty>
+      <DoubleVectorProperty command="SetFloorPlane"
+        default_values="0 1.0 0.0 0.0"
+        name="FloorPlane"
+        number_of_elements="4">
+        <Documentation>Set the plane equation for the floor, or the up vector for other projections.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFloorRight"
+        default_values="1.0 0.0 0.0"
+        name="FloorRight"
+        number_of_elements="3">
+        <Documentation>Set the right vector for the projections.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+          min="0 0 0"
+          name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetProjection"
+        default_values="1"
+        label="Skybox Projection"
+        name="Projection"
+        number_of_elements="1">
+        <Documentation>Determines how to project the skybox image.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Cube"
+            value="0" />
+          <Entry text="Sphere"
+            value="1" />
+          <Entry text="Floor"
+            value="2" />
+          <Entry text="Stereo Sphere"
+            value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetVisibility"
+        default_values="1"
+        name="Visibility"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for this
+        representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+        default_values="0"
+        is_internal="1"
+        name="ForceUseCache"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+        default_values="none"
+        is_internal="1"
+        name="ForcedCacheKey"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+        element_types="0 0 0 0 2"
+        name="ColorArrayName"
+        no_custom_default="1"
+        number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input"
+              name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+      <!-- End of SkyboxRepresentation -->
+    </RepresentationProxy>
+
+    <Extension name="UniformGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        SkyboxRepresentation as a new type of representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="SkyboxRepresentation"
+        text="Skybox View" />
+
+      <SubProxy>
+        <Proxy name="SkyboxRepresentation"
+          proxygroup="representations"
+          proxyname="SkyboxRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Skybox">
+            <Property name="FloorPlane"
+              panel_visibility="advanced"
+              panel_visibility_default_for_representation="skybox" />
+            <Property name="FloorRight"
+              panel_visibility="advanced"
+              panel_visibility_default_for_representation="skybox" />
+            <Property name="Projection"
+              panel_visibility="advanced"
+              panel_visibility_default_for_representation="skybox" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                mode="visibility"
+                property="Representation"
+                value="Skybox View" />
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

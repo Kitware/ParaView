@@ -44,7 +44,7 @@ public:
 
 protected:
   vtkPResourceFileLocator();
-  ~vtkPResourceFileLocator();
+  ~vtkPResourceFileLocator() override;
 
 private:
   vtkPResourceFileLocator(const vtkPResourceFileLocator&) = delete;

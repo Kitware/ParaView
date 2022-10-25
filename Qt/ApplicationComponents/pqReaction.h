@@ -76,7 +76,7 @@ protected Q_SLOTS:
   virtual void updateEnableState() {}
   virtual void updateMasterEnableState(bool);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool IsMaster;
 
 private:

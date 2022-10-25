@@ -23,12 +23,8 @@ else ()
     "${catalyst_rel_rpath}")
 endif ()
 
+# setup this property so other place in the code can use catalyst (c.f. Examples)
 set_property(GLOBAL PROPERTY paraview_catalyst_directory "${catalyst_library_destination}")
-
-# Transport the variable needed for Catalyst's CMake API from
-# `ThirdParty/catalyst/CMakeLists.txt`.
-get_property(_catalyst_macro_directory GLOBAL
-  PROPERTY paraview_catalyst_macro_directory)
 
 catalyst_implementation(
   NAME    paraview
@@ -39,14 +35,14 @@ catalyst_implementation(
     ParaViewCatalyst.cxx
     vtkCatalystBlueprint.cxx
     vtkCatalystBlueprint.h
-  CATALYST_TARGET ParaView::vtkcatalyst)
+  CATALYST_TARGET catalyst::catalyst)
 add_library(ParaView::catalyst-paraview ALIAS catalyst-paraview)
 
 target_link_libraries(catalyst-paraview
   PRIVATE
     ParaView::InSitu
     ParaView::VTKExtensionsCore
-    ParaView::VTKExtensionsConduit
+    VTK::IOCatalystConduit
     ParaView::RemotingServerManager)
 
 if (TARGET VTK::ParallelMPI)
@@ -61,10 +57,17 @@ if (TARGET VTK::IOIOSS)
       VTK::IOIOSS)
 endif ()
 
+if (TARGET VTK::IOFides)
+  target_link_libraries(catalyst-paraview
+    PRIVATE
+      VTK::IOFides)
+endif ()
+
 target_compile_definitions(catalyst-paraview
   PRIVATE
     "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<TARGET_EXISTS:VTK::ParallelMPI>"
-    "VTK_MODULE_ENABLE_VTK_IOIOSS=$<TARGET_EXISTS:VTK::IOIOSS>")
+    "VTK_MODULE_ENABLE_VTK_IOIOSS=$<TARGET_EXISTS:VTK::IOIOSS>"
+    "VTK_MODULE_ENABLE_VTK_IOFides=$<TARGET_EXISTS:VTK::IOFides>")
 
 if (TARGET VTK::Python)
   # Simulations loading the ParaView Catalyst implementation might not have

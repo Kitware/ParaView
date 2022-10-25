@@ -35,10 +35,9 @@
 #ifndef vtkPVScalarBarActor_h
 #define vtkPVScalarBarActor_h
 
+#include "vtkNew.h"                 // For ivars
 #include "vtkRemotingViewsModule.h" // needed for export macro
 #include "vtkScalarBarActor.h"
-
-#include "vtkNew.h"          // For ivars
 #include "vtkSmartPointer.h" // For ivars
 #include <vector>            // For ivars
 

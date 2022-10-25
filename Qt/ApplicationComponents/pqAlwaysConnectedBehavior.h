@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAlwaysConnectedBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqAlwaysConnectedBehavior(QObject* parent = 0);
+  pqAlwaysConnectedBehavior(QObject* parent = nullptr);
   ~pqAlwaysConnectedBehavior() override;
 
   /**
@@ -61,7 +61,7 @@ public:
 protected Q_SLOTS:
   void serverCheck();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqServerResource DefaultServer;
   pqTimer Timer;
 

@@ -261,7 +261,7 @@ public:
 
 protected:
   vtkCTHDataArray();
-  ~vtkCTHDataArray();
+  ~vtkCTHDataArray() override;
 
   int Dimensions[3];
 

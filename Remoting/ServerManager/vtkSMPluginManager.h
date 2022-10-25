@@ -94,6 +94,15 @@ public:
   void LoadPluginConfigurationXMLFromString(
     const char* xmlcontents, vtkSMSession* session, bool remote);
 
+  /**
+   * Method to load remote plugins in order to meet plugin requirement across processes.
+   * This also updates the "StatusMessage" for all the plugins. If StatusMessage
+   * is empty for a loaded plugin, it implies that everything is fine. If some
+   * requirement is not met, the StatusMessage includes the error message.
+   * Set onlyCheck to true to only check and set status without loading plugins.
+   */
+  bool FulfillPluginRequirements(vtkSMSession* session, bool onlyCheck = false);
+
   enum
   {
     PluginLoadedEvent = 100000,
@@ -109,6 +118,15 @@ protected:
   void OnPluginRegistered();
   void OnPluginAvailable();
   void UpdateLocalPluginInformation();
+
+  /**
+   * Protected method used by FulfillPluginRequirements to check and load
+   * client/server plugin requirements
+   */
+  bool FulfillPluginClientServerRequirements(vtkSMSession* session,
+    const std::map<std::string, unsigned int>& inputMap, vtkPVPluginsInformation* inputPluginInfo,
+    const std::map<std::string, unsigned int>& outputMap, vtkPVPluginsInformation* outputPluginInfo,
+    bool inputClient, bool onlyCheck);
 
   vtkPVPluginsInformation* LocalInformation;
 

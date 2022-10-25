@@ -308,3 +308,61 @@ The snippet below shows these hints in use.
           <HideResetButton/>
         </Hints>
     </DoubleVectorProperty>
+
+TextureSelectorPropertyWidget
+-------------------------------
+
+Customize the `pqTextureSelectorPropertyWidget` with the `TextureSelectorWidget` hint using the following attribute:
+
+* `can_load_new` - if 0 then user will not be able to load new texture from the drop down. Default is 1.
+* `check_tcoords` - if 1 then user will be able to use a texture only if the source has texture coordinates. Default is 0.
+* `check_tangents` - if 1 then user will be able to use a texture only if the source has tangents. Default is 0.
+
+The snippet below shows these hints in use.
+
+```xml
+<ProxyProperty command="SetTexture"
+                  name="Texture"
+                  panel_widget="texture_selector"
+                  null_on_empty="1" >
+    <ProxyGroupDomain name="groups">
+      <Group name="myTextureGroup" />
+    </ProxyGroupDomain>
+    <Hints>
+      <TextureSelectorWidget
+        can_load_new="0"
+        check_tcoords="1"/>
+    </Hints>
+  </ProxyProperty>
+```
+
+Widget
+------
+
+Enable specific features on a text entry widget.
+
+For `StringVectorProperty` elements asking for a free input, the default
+one-line text entry can be enhanced using one of the following hint attributes.
+
+**Attribute `type`**
+
+Set it to `multi_line` to allow line breaks, useful to enter a script.
+
+The other possible value is `one_liner_wrapped`, when line breaks should be avoid in the text
+but text wrapping is enabled for reading purpose. This also enable the integration with the
+Expression Manager, to easily save and reuse entered property text.
+
+**Attribute `syntax`**
+Set it to `python` to ask for syntax highlighting when `type` is set to `multi_line` (`pygments` python module should be found).
+With `one_liner_wrapped`, the tools button for Expression Manager are configured for `Python` expression type.
+
+```xml
+<StringVectorProperty command="SetScript"
+                      name="Script"
+                      number_of_elements="1"
+                      panel_visibility="default">
+  <Hints>
+    <Widget type="multi_line" syntax="python" />
+  </Hints>
+</StringVectorProperty>
+```

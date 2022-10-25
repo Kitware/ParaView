@@ -344,7 +344,7 @@ protected:
    * Overwritten to avoid hiding.
    */
   int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
-    const int extents[6] = 0) override
+    const int extents[6] = nullptr) override
   {
     return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);
   }

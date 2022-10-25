@@ -25,6 +25,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkPEnSightSparseMode.h"
 #include "vtkPointSet.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
@@ -2150,8 +2151,10 @@ vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetCellIds(int i
     {
       (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReaderCellIds(IMPLICIT_STRUCTURED_MODE);
     }
+#ifdef VTK_ENSIGHT_SPARSE_MODE
     else if (this->GetMultiProcessNumberOfProcesses() > 12)
       (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReaderCellIds(SPARSE_MODE);
+#endif
     else
       (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReaderCellIds(NON_SPARSE_MODE);
   }
@@ -2195,8 +2198,10 @@ vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetPointIds(int 
     {
       (*this->PointIds)[index] = new vtkPEnSightReaderCellIds(IMPLICIT_STRUCTURED_MODE);
     }
+#ifdef VTK_ENSIGHT_SPARSE_MODE
     else if (this->GetMultiProcessNumberOfProcesses() > 12)
       (*this->PointIds)[index] = new vtkPEnSightReaderCellIds(SPARSE_MODE);
+#endif
     else
       (*this->PointIds)[index] = new vtkPEnSightReaderCellIds(NON_SPARSE_MODE);
   }

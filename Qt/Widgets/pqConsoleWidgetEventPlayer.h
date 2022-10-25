@@ -45,7 +45,7 @@ class PQWIDGETS_EXPORT pqConsoleWidgetEventPlayer : public pqWidgetEventPlayer
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqConsoleWidgetEventPlayer(QObject* parent = 0);
+  pqConsoleWidgetEventPlayer(QObject* parent = nullptr);
   ~pqConsoleWidgetEventPlayer() override;
 
   /**

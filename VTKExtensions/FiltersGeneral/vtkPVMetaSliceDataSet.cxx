@@ -27,7 +27,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCutter.h"
 #include "vtkPVPlane.h"
-#include "vtkPlane.h"
 #include "vtkSmartPointer.h"
 
 class vtkPVMetaSliceDataSet::vtkInternals
@@ -59,8 +58,6 @@ vtkPVMetaSliceDataSet::vtkPVMetaSliceDataSet()
 
   this->RegisterFilter(this->Internal->Cutter.GetPointer());
   this->RegisterFilter(this->Internal->ExtractCells.GetPointer());
-
-  this->AxisCut = false;
 
   this->ImplicitFunctions[METASLICE_DATASET] = nullptr;
   this->ImplicitFunctions[METASLICE_HYPERTREEGRID] = nullptr;
@@ -163,8 +160,9 @@ int vtkPVMetaSliceDataSet::RequestDataObject(
     return 0;
   }
 
-  if (vtkHyperTreeGrid::SafeDownCast(
-        inputVector[0]->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT())))
+  vtkInformation* info = inputVector[0]->GetInformationObject(0);
+
+  if (info && vtkHyperTreeGrid::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
   {
     this->Internal->Cutter->SetCutFunction(this->ImplicitFunctions[METASLICE_HYPERTREEGRID]);
     this->Internal->ExtractCells->SetImplicitFunction(

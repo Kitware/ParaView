@@ -38,11 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 
 class pqDataRepresentation;
+class pqModalShortcut;
 class pqPipelineModel;
 class pqRepresentation;
 class pqView;
-
-class QShortcut;
 
 /**
  * @ingroup Reactions
@@ -57,7 +56,7 @@ public:
   pqFlipBookReaction(QAction* parent, QAction* playAction, QAction* stepAction, QSpinBox* autoVal);
   ~pqFlipBookReaction() override = default;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
@@ -91,7 +90,7 @@ protected Q_SLOTS:
 
   void representationVisibilityChanged(pqRepresentation*, bool);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool hasEnoughVisibleRepresentations();
 
   int getNumberOfVisibleRepresentations();
@@ -110,7 +109,7 @@ private:
 
   QPointer<pqView> View;
   QTimer* Timer;
-  QPointer<QShortcut> ShortCutNext;
+  QPointer<pqModalShortcut> StepActionMode;
 
   QList<QPointer<pqDataRepresentation>> VisibleRepresentations;
   int VisibilityIndex;

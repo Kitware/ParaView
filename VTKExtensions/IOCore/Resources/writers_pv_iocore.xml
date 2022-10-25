@@ -1,71 +1,4 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="internal_writers">
-    <!-- ================================================================= -->
-    <Proxy class="vtkCSVWriter" name="CSVWriter">
-      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
-      delimited files from a table. If the file extension is tsv it uses the tab character
-      for the delimiter. Otherwise it uses a comma.</Documentation>
-
-      <InputProperty name="DummyInput" panel_visibility="never">
-      </InputProperty>
-
-      <IntVectorProperty command="SetPrecision"
-                         default_values="5"
-                         name="Precision"
-                         number_of_elements="1">
-        <IntRangeDomain min="0"
-                        name="range" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseScientificNotation"
-                         default_values="0"
-                         name="UseScientificNotation"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <StringVectorProperty command="SetFieldDelimiter"
-                            name="FieldDelimiter"
-                            default_values=","
-                            number_of_elements="1">
-        <Documentation>Used to set the delimiter character. This is hidden from the user
-        and set automatically based on the file extension. An extension of .tsv will set
-        the delimiter character to a tab. Otherwise a comma will be used as the delimiter.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetFieldAssociation"
-                         default_values="0"
-                         name="FieldAssociation"
-                         number_of_elements="1">
-        <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain name="enum" enable_field_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="DummyInput" />
-          </RequiredProperties>
-        </FieldDataDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAddMetaData"
-                         default_values="1"
-                         name="AddMetaData"
-                         number_of_elements="1">
-        <Documentation>It is possible for this filter to add additional
-        meta-data to the field data such as point coordinates (when point
-        attributes are selected and input is pointset) or structured
-        coordinates etc. To enable this addition of extra information, turn
-        this flag on.</Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAddTime"
-                         default_values="0"
-                         name="AddTime"
-                         number_of_elements="1">
-        <Documentation>When set, the writer will add a "Time" column to the generated
-          file indicating the current dataset time, if any.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <!-- End of CSVWriter -->
-    </Proxy>
-    <!-- end of "internal_writers" -->
-  </ProxyGroup>
-
   <!-- =================================================================== -->
   <ProxyGroup name="writers">
     <!-- ================================================================= -->
@@ -73,30 +6,32 @@
                   base_proxyname="ParallelWriterBase"
                   class="vtkXMLPVDWriter"
                   name="XMLPVDWriter">
-      <Documentation short_help="Write ParaView data files (pvd).">Writer to
-      write ParaView data files (pvd). It is used to save all pieces of a
-      source/filter to a file with pieces spread across the server
-      processes.</Documentation>
+      <Documentation short_help="Write ParaView data files (pvd).">
+        Writer to write ParaView data files (pvd). It is used to save all pieces
+        of a source/filter to a file with pieces spread across the server processes.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
-          <DataType value="vtkDataSet" />
-          <DataType value="vtkTable" />
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to
-        written to the files.</Documentation>
+        <Documentation>
+          The input filter/source whose output dataset is written to the files.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetHeaderType"
                          default_values="64"
                          name="HeaderType"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="UInt32" value="32" />
-          <Entry text="UInt64" value="64" />
+          <Entry text="UInt32" value="32"/>
+          <Entry text="UInt64" value="64"/>
         </EnumerationDomain>
-        <Documentation>Set the binary data header word type.  The default is
-        UInt32. Set to UInt64 when storing arrays requiring 64-bit indexing.
+        <Documentation>
+          Set the binary data header word type. The default is UInt32. Set to UInt64
+          when storing arrays requiring 64-bit indexing.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetDataMode"
@@ -105,23 +40,25 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Ascii"
-                 value="0" />
+                 value="0"/>
           <Entry text="Binary"
-                 value="1" />
+                 value="1"/>
           <Entry text="Appended"
-                 value="2" />
+                 value="2"/>
         </EnumerationDomain>
-        <Documentation>The mode uses for writing the file's data i.e. ascii,
-        binary, appended binary.</Documentation>
+        <Documentation>
+          The mode uses for writing the file's data i.e. ascii, binary, appended binary.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetEncodeAppendedData"
                          default_values="0"
                          name="EncodeAppendedData"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When EncodeAppendedData is turned ON, the writer uses
-        base64 encoding when writing binary data (only if appended mode is
-        selected).</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When EncodeAppendedData is turned ON, the writer uses base64 encoding
+          when writing binary data (only if appended mode is selected).
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompressorType"
                          default_values="0"
@@ -133,18 +70,20 @@
                  info="fastest write"/>
           <Entry text="LZ4"
                  value="2"
-                 info="fastest compressed write" />
+                 info="fastest compressed write"/>
           <Entry text="ZLib"
                  value="1"
-                 info="balanced performance" />
+                 info="balanced performance"/>
           <Entry text="LZMA"
                  value="3"
-                 info="smallest filesize" />
+                 info="smallest filesize"/>
         </EnumerationDomain>
-        <Documentation>The compression algorithm used to compress binary data
-        (appended mode only). None offers fastest write, LZ4 offers fastest
-        compressed write, ZLib offers balanced performance, LZMA offers
-        smallest compressed filesize.</Documentation>
+        <Documentation>
+          The compression algorithm used to compress binary data
+          (appended mode only). None offers fastest write, LZ4 offers the fastest
+          compressed write, ZLib offers balanced performance, LZMA offers
+          smallest compressed filesize.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompressionLevel"
                          default_values="6"
@@ -155,94 +94,122 @@
                  value="1"
                  info="fastest write"/>
           <Entry text="2"
-                 value="2" />
+                 value="2"/>
           <Entry text="3"
-                 value="3" />
+                 value="3"/>
           <Entry text="4"
-                 value="4" />
+                 value="4"/>
           <Entry text="5"
                  value="5"
-                 info="balanced performance" />
+                 info="balanced performance"/>
           <Entry text="6"
-                 value="6" />
+                 value="6"/>
           <Entry text="7"
-                 value="7" />
+                 value="7"/>
           <Entry text="8"
-                 value="8" />
+                 value="8"/>
           <Entry text="9"
                  value="9"
                  info="smallest filesize"/>
         </EnumerationDomain>
-        <Documentation>A compression performance parameter from 1 (faster/larger
-         compressed filesize) to 9 (slower/smaller compressed filesize).</Documentation>
+        <Documentation>
+          A compression performance parameter from 1 (faster/larger
+          compressed filesize) to 9 (slower/smaller compressed filesize).
+        </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="enabled_state"
                                    property="CompressorType"
                                    value="0"
-                                   inverse="1" />
+                                   inverse="1"/>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
                          name="WriteTimeSteps"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When WriteTimeSteps is turned ON, the writer is
+          executed once for each timestep available from its input.
+        </Documentation>
       </IntVectorProperty>
       <Hints>
         <Property name="Input"
-                  show="0" />
+                  show="0"/>
         <Property name="FileName"
-                  show="0" />
+                  show="0"/>
         <Property name="HeaderType"
-                  show="0" />
+                  show="0"/>
         <Property name="UseSubdirectory"
-                  show="1" />
+                  show="1"/>
         <Property name="WriteAllTimeSteps"
-                  show="1" />
+                  show="1"/>
         <WriterFactory extensions="pvd"
-                       file_description="ParaView Data Files" />
+                       file_description="ParaView Data Files"/>
       </Hints>
       <!-- End of XMLPVDWriter -->
     </PWriterProxy>
 
     <!-- ================================================================= -->
-    <PWriterProxy class="vtkFileSeriesWriter"
-                 file_name_method="SetFileName"
-                 name="CSVWriter">
-      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
-      delimited files from any dataset. Set FieldAssociation to choose whether cell
-      data/point data needs to be saved. If the file extension is tsv it uses the tab character
-      for the delimiter. Otherwise it uses a comma.</Documentation>
+    <PWriterProxy class="vtkCSVWriter"
+                  file_name_method="SetFileName"
+                  name="CSVWriter">
+      <Documentation short_help="Writer to write CSV files">
+        Writer to write comma or tab delimited files from any dataset. Set FieldAssociation to
+        choose whether cell data/point data needs to be saved. If the file extension is tsv it
+        uses the tab character for the delimiter. Otherwise, it uses a comma.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-          <DataType value="vtkTable" />
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to be
-        written to the file.</Documentation>
+        <Documentation>
+          The input filter/source whose output dataset is to be written to the file.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty command="SetFileName"
                             name="FileName"
                             panel_visibility="never"
                             number_of_elements="1">
-        <Documentation>The name of the file to be written.</Documentation>
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
                          name="WriteTimeSteps"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When WriteTimeSteps is turned ON, the writer is
+          executed once for each timestep available from its input.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeStepsSeparately"
+                         default_values="0"
+                         name="WriteTimeStepsSeparately"
+                         number_of_elements="1">
+        <Documentation>
+          When WriteTimeSteps is turned ON, the writer is
+          executed once for each timestep available from its input,
+          and the timesteps can be written to separate files, otherwise,
+          the timesteps are written in one file.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean"/>
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="SetFileNameSuffix"
                             default_values="_%d"
-                            label = "File name suffix"
+                            label="File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
@@ -253,71 +220,137 @@
           FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="WriteTimeSteps" function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="WriteTimeSteps" function="boolean"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="WriteTimeStepsSeparately" function="boolean"/>
+              </PropertyWidgetDecorator>
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
 
       <SubProxy>
-        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays"/>
         <ExposedProperties>
           <Property name="ChooseArraysToWrite"/>
           <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
-            <Property name="PointDataArrays" />
-            <Property name="CellDataArrays" />
-            <Property name="FieldDataArrays" />
-            <Property name="VertexDataArrays" />
-            <Property name="EdgeDataArrays" />
-            <Property name="RowDataArrays" />
+            <Property name="PointDataArrays"/>
+            <Property name="CellDataArrays"/>
+            <Property name="FieldDataArrays"/>
+            <Property name="VertexDataArrays"/>
+            <Property name="EdgeDataArrays"/>
+            <Property name="RowDataArrays"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
                                        property="ChooseArraysToWrite"
-                                       value="1" />
+                                       value="1"/>
               <!-- show this widget when ChooseArraysToWrite==1 -->
             </Hints>
           </PropertyGroup>
         </ExposedProperties>
         <LinkProperties>
-          <Property name="Input" with_property="Input" />
+          <Property name="Input" with_property="Input"/>
         </LinkProperties>
       </SubProxy>
 
-      <SubProxy>
-        <Proxy name="Writer"
-               proxygroup="internal_writers"
-               proxyname="CSVWriter"></Proxy>
-        <ExposedProperties>
-          <PropertyGroup label="CSV Writer Parameters">
-            <Property name="Precision" />
-            <Property name="FieldDelimiter"
-                      panel_visibility="never"/>
-            <Property name="UseScientificNotation" />
-            <Property name="FieldAssociation" />
-            <Property name="AddMetaData" />
-            <Property name="AddTime" />
-          </PropertyGroup>
-        </ExposedProperties>
-        <LinkProperties>
-          <Property name="DummyInput" with_property="Input" />
-        </LinkProperties>
-      </SubProxy>
+      <IntVectorProperty command="SetPrecision"
+                         default_values="5"
+                         name="Precision"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFieldDelimiter"
+                            name="FieldDelimiter"
+                            default_values=","
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>
+          Used to set the delimiter character. This is hidden from the user
+          and set automatically based on the file extension. An extension of .tsv will set
+          the delimiter character to a tab. Otherwise a comma will be used as the delimiter.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseScientificNotation"
+                         default_values="0"
+                         name="UseScientificNotation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>
+          Select the attribute data to pass.
+        </Documentation>
+        <FieldDataDomain name="enum" enable_field_data="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddMetaData"
+                         default_values="1"
+                         name="AddMetaData"
+                         number_of_elements="1">
+        <Documentation>
+          It is possible for this filter to add additional meta-data to the field
+          data such as point coordinates (when point attributes are selected and
+          input is point-set) or structured coordinates etc. To enable this addition
+          of extra information, turn this flag on.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddTimeStep"
+                         default_values="0"
+                         name="AddTimeStep"
+                         number_of_elements="1">
+        <Documentation>
+          When set, the writer will add a "TimeStep" column to the generated
+          file indicating the current dataset time step, if any.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddTime"
+                         default_values="0"
+                         name="AddTime"
+                         number_of_elements="1">
+        <Documentation>
+          When set, the writer will add a "Time" column to the generated
+          file indicating the current dataset time, if any.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <PropertyGroup label="CSV Writer Parameters">
+        <Property name="Precision"/>
+        <Property name="FieldDelimiter"/>
+        <Property name="UseScientificNotation"/>
+        <Property name="FieldAssociation"/>
+        <Property name="AddMetaData"/>
+        <Property name="AddTimeStep"/>
+        <Property name="AddTime"/>
+      </PropertyGroup>
 
       <Hints>
         <WriterFactory extensions="csv txt tsv"
-                       file_description="Comma or Tab Delimited Files" />
-        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
+                       file_description="Comma or Tab Delimited Files"/>
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper"/>
       </Hints>
       <!-- End of CSVWriter -->
     </PWriterProxy>
 
     <!-- ================================================================= -->
-    <PWriterProxy class="vtkFileSeriesWriter"
-                 file_name_method="SetFileName"
-                 name="DataSetCSVWriter"
-                 base_proxygroup="writers"
-                 base_proxyname="CSVWriter">
+    <PWriterProxy class="vtkCSVWriter"
+                  file_name_method="SetFileName"
+                  name="DataSetCSVWriter"
+                  base_proxygroup="writers"
+                  base_proxyname="CSVWriter">
       <!-- keeping this around for old state files / traces that may be directly
            using the DataSetCSVWriter -->
     </PWriterProxy>
@@ -341,19 +374,20 @@
         </Documentation>
       </StringVectorProperty>
       <SubProxy>
-        <Proxy name="Writer" proxygroup="writers" proxyname="CSVWriter" />
+        <Proxy name="Writer" proxygroup="writers" proxyname="CSVWriter"/>
         <ExposedProperties>
-          <Property name="Input" />
-          <Property name="FieldAssociation" />
+          <Property name="Input"/>
+          <Property name="FieldAssociation"/>
           <Property name="Precision" panel_visibility="advanced"/>
           <Property name="UseScientificNotation" panel_visibility="advanced"/>
           <Property name="AddMetaData" panel_visibility="advanced"/>
+          <Property name="AddTimeStep" panel_visibility="advanced"/>
           <Property name="AddTime" panel_visibility="advanced"/>
         </ExposedProperties>
       </SubProxy>
 
       <Hints>
-        <ShowInMenu category="Data" />
+        <ShowInMenu category="Data"/>
       </Hints>
     </DataExtractWriterProxy>
 

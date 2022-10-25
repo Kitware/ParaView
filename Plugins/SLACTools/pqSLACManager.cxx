@@ -23,6 +23,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -201,21 +202,8 @@ QAction* pqSLACManager::actionCurrentTimeResetRange()
 //-----------------------------------------------------------------------------
 pqServer* pqSLACManager::getActiveServer()
 {
-  pqApplicationCore* app = pqApplicationCore::instance();
-  pqServerManagerModel* smModel = app->getServerManagerModel();
-  pqServer* server = smModel->getItemAtIndex<pqServer*>(0);
-  return server;
-}
-
-//-----------------------------------------------------------------------------
-QWidget* pqSLACManager::getMainWindow()
-{
-  Q_FOREACH (QWidget* topWidget, QApplication::topLevelWidgets())
-  {
-    if (qobject_cast<QMainWindow*>(topWidget))
-      return topWidget;
-  }
-  return nullptr;
+  auto& objects = pqActiveObjects::instance();
+  return objects.activeServer();
 }
 
 //-----------------------------------------------------------------------------
@@ -340,7 +328,7 @@ void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqSLACManager::showDataLoadManager()
 {
-  pqSLACDataLoadManager* dialog = new pqSLACDataLoadManager(this->getMainWindow());
+  pqSLACDataLoadManager* dialog = new pqSLACDataLoadManager(pqCoreUtilities::mainWidget());
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(checkActionEnabled()));
   QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(showEField()));

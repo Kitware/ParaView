@@ -59,6 +59,7 @@ void pqVCRToolbar::constructor()
   // action-reaction friendly implementation. But for now, I am simply reusing
   // the old code.
   QObject::connect(ui.actionVCRPlay, SIGNAL(triggered()), controller, SLOT(onPlay()));
+  QObject::connect(ui.actionVCRReverse, SIGNAL(triggered()), controller, SLOT(onReverse()));
   QObject::connect(ui.actionVCRFirstFrame, SIGNAL(triggered()), controller, SLOT(onFirstFrame()));
   QObject::connect(
     ui.actionVCRPreviousFrame, SIGNAL(triggered()), controller, SLOT(onPreviousFrame()));
@@ -67,6 +68,7 @@ void pqVCRToolbar::constructor()
   QObject::connect(ui.actionVCRLoop, SIGNAL(toggled(bool)), controller, SLOT(onLoop(bool)));
 
   QObject::connect(controller, SIGNAL(enabled(bool)), ui.actionVCRPlay, SLOT(setEnabled(bool)));
+  QObject::connect(controller, SIGNAL(enabled(bool)), ui.actionVCRReverse, SLOT(setEnabled(bool)));
   QObject::connect(
     controller, SIGNAL(enabled(bool)), ui.actionVCRFirstFrame, SLOT(setEnabled(bool)));
   QObject::connect(
@@ -79,7 +81,7 @@ void pqVCRToolbar::constructor()
   QObject::connect(
     controller, SIGNAL(timeRanges(double, double)), this, SLOT(setTimeRanges(double, double)));
   QObject::connect(controller, SIGNAL(loop(bool)), ui.actionVCRLoop, SLOT(setChecked(bool)));
-  QObject::connect(controller, SIGNAL(playing(bool)), this, SLOT(onPlaying(bool)));
+  QObject::connect(controller, SIGNAL(playing(bool, bool)), this, SLOT(onPlaying(bool, bool)));
 
   this->Controller->setAnimationScene(
     pqPVApplicationCore::instance()->animationManager()->getActiveScene());
@@ -100,21 +102,28 @@ void pqVCRToolbar::setTimeRanges(double start, double end)
 }
 
 //-----------------------------------------------------------------------------
-void pqVCRToolbar::onPlaying(bool playing)
+void pqVCRToolbar::onPlaying(bool playing, bool reversed)
 {
+  QAction* const actn = reversed ? this->UI->actionVCRReverse : this->UI->actionVCRPlay;
+  const char* actnName = reversed ? "Reverse" : "Play";
+  const char* slotFn = reversed ? SLOT(onReverse()) : SLOT(onPlay());
+
+  // goal of action depends on context. ex: play/reverse vs pause
   if (playing)
   {
-    disconnect(this->UI->actionVCRPlay, SIGNAL(triggered()), this->Controller, SLOT(onPlay()));
-    connect(this->UI->actionVCRPlay, SIGNAL(triggered()), this->Controller, SLOT(onPause()));
-    this->UI->actionVCRPlay->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPause.svg"));
-    this->UI->actionVCRPlay->setText("Pa&use");
+    // remap the signals to controller
+    disconnect(actn, SIGNAL(triggered()), this->Controller, slotFn);
+    connect(actn, SIGNAL(triggered()), this->Controller, SLOT(onPause()));
+    actn->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPause.svg"));
+    actn->setText("Pa&use");
   }
   else
   {
-    connect(this->UI->actionVCRPlay, SIGNAL(triggered()), this->Controller, SLOT(onPlay()));
-    disconnect(this->UI->actionVCRPlay, SIGNAL(triggered()), this->Controller, SLOT(onPause()));
-    this->UI->actionVCRPlay->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPlay.svg"));
-    this->UI->actionVCRPlay->setText("&Play");
+    // remap the signals to controller
+    connect(actn, SIGNAL(triggered()), this->Controller, slotFn);
+    disconnect(actn, SIGNAL(triggered()), this->Controller, SLOT(onPause()));
+    actn->setIcon(QIcon(QString(":/pqWidgets/Icons/pqVcr%1.svg").arg(actnName)));
+    actn->setText(QString("&%1").arg(actnName));
   }
 
   // this becomes a behavior.

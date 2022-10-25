@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultViewBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqDefaultViewBehavior(QObject* parent = 0);
+  pqDefaultViewBehavior(QObject* parent = nullptr);
 
 protected Q_SLOTS:
   void onServerCreation(pqServer*);

@@ -17,12 +17,9 @@
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkExecutive.h"
-//#include "vtkExecutivePortKey.h"
 #include "vtkGraph.h"
-#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationExecutivePortKey.h"
@@ -34,6 +31,7 @@
 #include "vtkSelector.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
+#include "vtkUniformGridAMRDataIterator.h"
 
 #if VTK_MODULE_ENABLE_ParaView_VTKExtensionsExtractionPython
 #include "vtkPythonSelector.h"
@@ -136,20 +134,7 @@ int vtkPVExtractSelection::RequestData(
     return 1;
   }
 
-  // make an ids selection for the second output
-  // we can do this because all of the extractSelectedX filters produce
-  // arrays called "vtkOriginalXIds" that record what input cells produced
-  // each output cell, at least as long as PRESERVE_TOPOLOGY is off
-  // when we start allowing PreserveTopology, this will have to instead run
-  // through the vtkInsidedNess arrays, and for every on entry, record the
-  // entries index
-  //
-  // TODO: The ExtractSelectedGraph filter does not produce the vtkOriginalXIds,
-  // so to add support for vtkGraph selection in ParaView the filter will have
-  // to be extended. This requires test cases in ParaView to confirm it functions
-  // as expected.
   vtkSelection* output = vtkSelection::GetData(outputVector, 1);
-
   output->Initialize();
 
   // If input selection content type is vtkSelectionNode::BLOCKS, then we simply
@@ -179,20 +164,17 @@ int vtkPVExtractSelection::RequestData(
       }
     }
 
-    // For composite datasets, the output of this filter is
-    // vtkSelectionNode::SELECTIONS instance with vtkSelection instances for some
-    // nodes in the composite dataset. COMPOSITE_INDEX() or
-    // HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on each of the
-    // vtkSelection instances correctly to help identify the block they came
-    // from.
+    // COMPOSITE_INDEX() or HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on
+    // each of the vtkSelection instances correctly to help identify the block they came from.
     vtkCompositeDataIterator* iter = cdInput->NewIterator();
-    vtkHierarchicalBoxDataIterator* hbIter = vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
+    vtkUniformGridAMRDataIterator* hierIter = vtkUniformGridAMRDataIterator::SafeDownCast(iter);
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkSelectionNode* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(), sel);
-      if (!curSel && hbIter)
+      if (!curSel && hierIter)
       {
-        curSel = this->LocateSelection(hbIter->GetCurrentLevel(), hbIter->GetCurrentIndex(), sel);
+        curSel =
+          this->LocateSelection(hierIter->GetCurrentLevel(), hierIter->GetCurrentIndex(), sel);
       }
 
       outputDO = vtkDataObject::SafeDownCast(cdOutput->GetDataSet(iter));
@@ -203,20 +185,18 @@ int vtkPVExtractSelection::RequestData(
         this->RequestDataInternal(curOVector, outputDO, curSel);
       }
 
-      for (vtkSelectionNodeVector::iterator giter = non_composite_nodes.begin();
-           giter != non_composite_nodes.end(); ++giter)
+      for (const auto& nonCompositeNode : non_composite_nodes)
       {
-        this->RequestDataInternal(curOVector, outputDO, giter->GetPointer());
+        this->RequestDataInternal(curOVector, outputDO, nonCompositeNode);
       }
 
-      for (vtkSelectionNodeVector::iterator viter = curOVector.begin(); viter != curOVector.end();
-           ++viter)
+      for (const auto& curO : curOVector)
       {
         // RequestDataInternal() will not set COMPOSITE_INDEX() for
         // hierarchical datasets.
-        viter->GetPointer()->GetProperties()->Set(
+        curO->GetProperties()->Set(
           vtkSelectionNode::COMPOSITE_INDEX(), iter->GetCurrentFlatIndex());
-        oVector.push_back(viter->GetPointer());
+        oVector.push_back(curO);
       }
     }
     iter->Delete();
@@ -230,10 +210,9 @@ int vtkPVExtractSelection::RequestData(
     }
   }
 
-  vtkSelectionNodeVector::iterator iter;
-  for (iter = oVector.begin(); iter != oVector.end(); ++iter)
+  for (const auto& o : oVector)
   {
-    output->AddNode(iter->GetPointer());
+    output->AddNode(o);
   }
 
   return 1;

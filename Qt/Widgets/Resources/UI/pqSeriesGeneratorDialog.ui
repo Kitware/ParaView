@@ -63,6 +63,17 @@
      <item>
       <widget class="pqDoubleLineEdit" name="max"/>
      </item>
+     <item>
+      <widget class="pqHighlightableToolButton" name="reset">
+       <property name="icon">
+        <iconset resource="../../../Components/Resources/pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+       </property>
+       <property name="toolTip">
+        <string>Reset using current data range values</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="3" column="0">
@@ -185,6 +196,11 @@
    <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
    <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqHighlightableToolButton</class>
+   <extends>QToolButton</extends>
+   <header>pqHighlightableToolButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

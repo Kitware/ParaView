@@ -76,7 +76,18 @@ bool pqObjectPickingBehavior::eventFilter(QObject* caller, QEvent* e)
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
     if (me->button() & Qt::LeftButton)
     {
-      this->Position = me->pos();
+      pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+      if (view)
+      {
+        int mode = vtkSMPropertyHelper(view->getProxy(), "InteractionMode").GetAsInt();
+        // check if the view is currently doing a selection, in that case,
+        // ignore the "pick".
+        if (mode == vtkPVRenderView::INTERACTION_MODE_3D ||
+          mode == vtkPVRenderView::INTERACTION_MODE_2D)
+        {
+          this->Position = me->pos();
+        }
+      }
     }
   }
   else if (e->type() == QEvent::MouseButtonRelease)

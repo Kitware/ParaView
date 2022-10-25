@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqServerConfigurationImporter : public QObject
   typedef QObject Superclass;
 
 public:
-  pqServerConfigurationImporter(QObject* parent = 0);
+  pqServerConfigurationImporter(QObject* parent = nullptr);
   ~pqServerConfigurationImporter() override;
 
   enum SourceMode
@@ -105,7 +105,7 @@ public:
    */
   const QList<Item>& configurations() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Use this method to fetch server configurations from urls specified.
    * This call blocks until all configurations are fetched. It uses a
@@ -174,7 +174,7 @@ private Q_SLOTS:
    */
   void readCurrentData();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqServerConfigurationImporter)
 
   class pqInternals;

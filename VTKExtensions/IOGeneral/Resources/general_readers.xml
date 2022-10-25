@@ -221,6 +221,27 @@
       </Hints>
     </EnsembleDataReaderProxy>
     <!-- End Ensemble Data Reader -->
-
+    <SourceProxy class="vtkNastranBDFReader"
+                 label="BDF Reader"
+                 name="BDFReader">
+      <Documentation long_help="Reads the Nastran Bulk Data free format."
+        short_help="Read the Nastran BDF format.">This reads data from
+        Nastran Bulk Data File format. It supports only the "free field format"
+        and a subset of "Entries".
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the BDF
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="bdf"
+                       file_description="Nastran BDF Files" />
+      </Hints>
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

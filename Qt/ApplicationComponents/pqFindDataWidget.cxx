@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelectionNode.h"
 
 #include <QMessageBox>
-#include <QPalette>
 #include <QPushButton>
 #include <QScopedValueRollback>
 
@@ -127,8 +126,10 @@ void pqFindDataWidget::pqInternals::findData() const
   auto pxm = helper->GetSessionProxyManager();
   Q_ASSERT(pxm != nullptr);
 
-  auto selSource = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "SelectionQuerySource"));
-  if (!selSource)
+  vtkSmartPointer<vtkSMSourceProxy> selectionSource;
+  selectionSource.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "SelectionQuerySource")));
+  if (!selectionSource)
   {
     qCritical("Failed to create 'SelectionQuerySource' proxy. "
               "Cannot create selection.");
@@ -137,20 +138,24 @@ void pqFindDataWidget::pqInternals::findData() const
 
   // We've intentionally named the properties on the `FindDataHelper` proxy
   // and "SelectionQuerySource" similarly, so we can use 'vtkSMProxy::Copy'.
-  selSource->Copy(helper);
-  selSource->UpdateVTKObjects();
-  producer->SetSelectionInput(port, selSource, 0);
-  selSource->Delete();
+  selectionSource->Copy(helper);
+  selectionSource->UpdateVTKObjects();
+  // create a new append Selections filter and append the selection source
+  vtkSmartPointer<vtkSMSourceProxy> appendSelections;
+  appendSelections.TakeReference(vtkSMSourceProxy::SafeDownCast(
+    vtkSMSelectionHelper::NewAppendSelectionsFromSelectionSource(selectionSource)));
+  // set selection input
+  producer->SetSelectionInput(port, appendSelections, 0);
 
   auto fieldType =
     vtkSelectionNode::GetFieldTypeAsString(vtkSelectionNode::ConvertAttributeTypeToSelectionField(
-      vtkSMPropertyHelper(selSource, "ElementType").GetAsInt()));
+      vtkSMPropertyHelper(selectionSource, "ElementType").GetAsInt()));
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("QuerySelect")
-    .arg("QueryString", vtkSMPropertyHelper(selSource, "QueryString").GetAsString())
+    .arg("QueryString", vtkSMPropertyHelper(selectionSource, "QueryString").GetAsString())
     .arg("FieldType", fieldType)
-    .arg("InsideOut", vtkSMPropertyHelper(selSource, "InsideOut").GetAsInt())
+    .arg("InsideOut", vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt())
     .arg("comment", "create a query selection");
 
   // ugliness with selection manager -- need a better way of doing this!
@@ -173,49 +178,61 @@ void pqFindDataWidget::pqInternals::freeze() const
   auto port = selManager->getSelectedPort();
   Q_ASSERT(port != nullptr);
 
-  auto selSource = vtkSMSourceProxy::SafeDownCast(port->getSelectionInput());
-  if (!selSource)
+  auto appendSelections = vtkSMSourceProxy::SafeDownCast(port->getSelectionInput());
+  if (!appendSelections)
   {
     return;
   }
 
   if (port->getServer()->isRemote())
   {
-    // BUG: 6783. Warn user when converting a Frustum|Threshold|Query selection to
-    // an id based selection.
-    if (strcmp(selSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
-      strcmp(selSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
-      strcmp(selSource->GetXMLName(), "SelectionQuerySource") == 0)
+    unsigned int numInputs = vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements();
+    for (unsigned int i = 0; i < numInputs; ++i)
     {
-      // We need to determine how many ids are present approximately.
-      auto dataSource = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
-      auto selInfo = dataSource->GetSelectionOutput(port->getPortNumber())->GetDataInformation();
-      const auto elemType = pqInternals::selectedElementType(selSource);
-      if (selInfo->GetNumberOfElements(elemType) > 10000)
+      auto selectionSource = vtkSMSourceProxy::SafeDownCast(
+        vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i));
+      // BUG: 6783. Warn user when converting a Frustum|Threshold|Query selection to
+      // an id based selection.
+      if (strcmp(selectionSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
+        strcmp(selectionSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
+        strcmp(selectionSource->GetXMLName(), "SelectionQuerySource") == 0)
       {
-        if (QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Convert Selection"),
+        // We need to determine how many ids are present approximately.
+        auto dataSource = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+        auto selInfo = dataSource->GetSelectionOutput(port->getPortNumber())->GetDataInformation();
+        const auto elemType = pqInternals::selectedElementType(selectionSource);
+        if (selInfo->GetNumberOfElements(elemType) > 10000)
+        {
+          auto userAnswer =
+            QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Convert Selection"),
               tr("This selection conversion can potentially result in fetching a "
                  "large amount of data to the client.\n"
                  "Are you sure you want to continue?"),
-              QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) != QMessageBox::Ok)
-        {
-          return;
+              QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+          if (userAnswer == QMessageBox::Ok)
+          {
+            // Showing the warning once is enough
+            break;
+          }
+          else
+          {
+            return;
+          }
         }
       }
     }
   }
 
-  auto frozenSource = vtkSMSourceProxy::SafeDownCast(
-    vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::INDICES, selSource,
-      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber()));
-  if (frozenSource)
+  // Convert selection input to indices based selection
+  bool selectionChanged;
+  vtkSmartPointer<vtkSMSourceProxy> newAppendSelections;
+  newAppendSelections.TakeReference(vtkSMSourceProxy::SafeDownCast(
+    vtkSMSelectionHelper::ConvertAppendSelections(vtkSelectionNode::INDICES, appendSelections,
+      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber(),
+      selectionChanged)));
+  if (selectionChanged)
   {
-    if (frozenSource != selSource)
-    {
-      frozenSource->UpdateVTKObjects();
-      port->setSelectionInput(frozenSource, 0);
-    }
-    frozenSource->Delete();
+    port->setSelectionInput(newAppendSelections, 0);
   }
 }
 
@@ -296,7 +313,7 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
     internals.Ui.clear->setEnabled(false);
   });
 
-  QObject::connect(internals.Ui.findData, &QAbstractButton::clicked, [this, &internals](bool) {
+  QObject::connect(internals.Ui.findData, &QAbstractButton::clicked, [&internals](bool) {
     if (internals.ProxyWidget)
     {
       internals.ProxyWidget->apply();
@@ -395,9 +412,13 @@ void pqFindDataWidget::setServer(pqServer* aserver)
   // enable buttons on modification.
   QObject::connect(
     internals.ProxyWidget.data(), &pqProxyWidget::changeAvailable, [&internals, proxy]() {
-      vtkSMUncheckedPropertyHelper helper(proxy, "Input");
-      const bool hasInput = (helper.GetAsProxy(0) != nullptr);
-      internals.Ui.findData->setEnabled(hasInput);
+      vtkSMUncheckedPropertyHelper inputHelper(proxy, "Input");
+      const bool hasInput = (inputHelper.GetAsProxy(0) != nullptr);
+      vtkSMUncheckedPropertyHelper queryStringHelper(proxy, "QueryString");
+      const bool hasQueryString =
+        (queryStringHelper.GetAsString() != nullptr ? strlen(queryStringHelper.GetAsString()) : 0) >
+        0;
+      internals.Ui.findData->setEnabled(hasInput && hasQueryString);
 
       internals.Ui.reset->setEnabled(true);
       internals.Ui.clear->setEnabled(true);

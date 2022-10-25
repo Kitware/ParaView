@@ -86,18 +86,29 @@ add_example(CustomApplications/Demo0)
 add_example(CustomApplications/Demo1)
 add_example(CustomApplications/MultiServerClient)
 add_example(CustomApplications/SimpleParaView)
-# TODO Update this custom application to load only specific data types.
-# add_example(CustomApplications/Spreadsheet)
+add_example(CustomApplications/Spreadsheet)
 
 # increate timeout for this test since it builds multiple executables
 # which be timeconsuming on static builds.
 add_example(Catalyst
   TEST_TIMEOUT 600)
 
-add_example(Catalyst2/CFullExample)
-add_example(Catalyst2/CxxFullExample)
-add_example(Catalyst2/CxxImageDataExample)
-add_example(Catalyst2/CxxMultiChannelInputExample)
-add_example(Catalyst2/CxxPolyhedra)
-add_example(Catalyst2/CxxMultimesh)
-add_example(Catalyst2/CxxSteeringExample)
+if (TARGET VTK::IOCatalystConduit)
+  add_example(Catalyst2/CFullExample)
+  add_example(Catalyst2/CxxFullExample)
+  add_example(Catalyst2/CxxImageDataExample)
+  add_example(Catalyst2/CxxMultiChannelInputExample)
+  add_example(Catalyst2/CxxPolyhedra)
+  add_example(Catalyst2/CxxMultimesh)
+  add_example(Catalyst2/CxxSteeringExample)
+endif ()
+
+add_custom_target(paraview-examples
+  COMMAND
+    "${CMAKE_CTEST_COMMAND}"
+    --test-dir "${CMAKE_BINARY_DIR}"
+    --tests-regex "ParaViewExample-"
+    --extra-verbose
+    -C "$<CONFIGURATION>"
+  USES_TERMINAL
+  COMMENT "Running ParaView Examples")

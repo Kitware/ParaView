@@ -101,8 +101,7 @@ public:
     SessionFilterRole = 34
   };
 
-public:
-  pqPipelineModel(QObject* parent = 0);
+  pqPipelineModel(QObject* parent = nullptr);
 
   /**
    * \brief
@@ -110,7 +109,7 @@ public:
    * \param other The pipeline model to copy.
    * \param parent The parent object.
    */
-  pqPipelineModel(const pqPipelineModel& other, QObject* parent = 0);
+  pqPipelineModel(const pqPipelineModel& other, QObject* parent = nullptr);
 
   /**
    * \brief
@@ -118,7 +117,7 @@ public:
    * \param other Used to build a pipeline model.
    * \param parent The parent object.
    */
-  pqPipelineModel(const pqServerManagerModel& other, QObject* parent = 0);
+  pqPipelineModel(const pqServerManagerModel& other, QObject* parent = nullptr);
 
   ~pqPipelineModel() override;
 
@@ -275,7 +274,7 @@ public:
    *   An index to the next item in the tree or an invalid index
    *   when the end of the tree is reached.
    */
-  QModelIndex getNextIndex(const QModelIndex index, const QModelIndex& root = QModelIndex()) const;
+  QModelIndex getNextIndex(QModelIndex index, const QModelIndex& root = QModelIndex()) const;
 
   /**
    * Provides access to the view.
@@ -328,7 +327,7 @@ public:
    */
   void disableFilterSession();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when a new server connection is detected. Adds the connection to the
    * list.
@@ -388,6 +387,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   void firstChildAdded(const QModelIndex& index);
+  void childWithChildrenAdded(const QModelIndex& index);
 
 private Q_SLOTS:
   void onInsituConnectionInitiated(pqServer* server);
@@ -412,7 +412,7 @@ private Q_SLOTS:
   void updateData(pqServerManagerModelItem*, ItemType type = Proxy);
   void updateDataServer(pqServer* server);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   friend class pqPipelineModelDataItem;
 
   // Add an item as a child under the parent at the given index.
@@ -450,7 +450,6 @@ private:
    */
   bool checkAndLoadPipelinePixmap(const QString& iconType);
 
-private:
   pqPipelineModelInternal* Internal; ///< Stores the pipeline representation.
   QMap<QString, QPixmap> PixmapMap;  ///< Stores the item icons.
   QPointer<pqView> View;

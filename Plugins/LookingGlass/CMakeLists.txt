@@ -18,7 +18,10 @@ list(APPEND sources
 )
 
 paraview_add_plugin(LookingGlass
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.3"
+  EULA "EULA.txt"
   UI_FILES
     pqLookingGlassDockPanel.ui
   UI_INTERFACES ${interfaces}
@@ -27,6 +30,9 @@ paraview_add_plugin(LookingGlass
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Settings/vtk.module"
 )
 
+target_compile_definitions(LookingGlass
+  PRIVATE
+    QT_NO_KEYWORDS)
 target_link_libraries(LookingGlass
   PRIVATE
     ParaView::pqApplicationComponents

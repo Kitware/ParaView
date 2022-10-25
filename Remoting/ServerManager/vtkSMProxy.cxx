@@ -1691,12 +1691,14 @@ int vtkSMProxy::CreateSubProxiesAndProperties(
           vtkSMProxy* subproxy = nullptr;
           if (pname && gname)
           {
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             subproxy = pm->NewProxy(gname, pname);
           }
           else
           {
             gname = this->XMLGroup;
             pname = this->XMLName;
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             subproxy = pm->NewProxy(subElement, gname, pname, name);
           }
           if (!subproxy)

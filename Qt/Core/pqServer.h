@@ -273,6 +273,7 @@ private:
   pqServerResource Resource;
   vtkIdType ConnectionID;
   vtkWeakPointer<vtkSMSession> Session;
+  vtkSmartPointer<vtkSMProxy> ExecutableRunnerProxy;
 
   pqTimer IdleCollaborationTimer;
 

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqExpandableTableView::pqExpandableTableView(QWidget* parentObject)
   : Superclass(parentObject)
+  , PasteEnabled(true)
   , MoveToNextEditableItem(false)
 {
 }
@@ -109,9 +110,15 @@ void pqExpandableTableView::closeEditor(QWidget* editor, QAbstractItemDelegate::
 }
 
 //-----------------------------------------------------------------------------
+void pqExpandableTableView::setPasteEnabled(bool enabled)
+{
+  this->PasteEnabled = enabled;
+}
+
+//-----------------------------------------------------------------------------
 void pqExpandableTableView::keyPressEvent(QKeyEvent* e)
 {
-  if (e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_V)
+  if (this->PasteEnabled && e->matches(QKeySequence::Paste))
   {
     // Get text from the clipboard. Text is expected to be tabular in form,
     // delimited by arbitrary whitespace.

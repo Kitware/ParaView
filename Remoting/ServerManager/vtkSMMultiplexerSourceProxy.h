@@ -161,7 +161,7 @@ public:
 
 protected:
   vtkSMMultiplexerSourceProxy();
-  ~vtkSMMultiplexerSourceProxy();
+  ~vtkSMMultiplexerSourceProxy() override;
 
   void CreateVTKObjects() override;
 

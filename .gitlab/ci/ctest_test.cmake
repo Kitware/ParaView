@@ -19,6 +19,11 @@ set(CTEST_TEST_TIMEOUT 100)
 
 set(test_exclusions)
 
+list(APPEND test_exclusions
+  # see paraview/paraview#21440
+  "\\.TraceExodus$"
+  )
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
   # tests that have issues in parallel
   list(APPEND test_exclusions
@@ -50,6 +55,15 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.VariableSelector1$"
     "\\.VolumeCrop$"
 
+    # Image corruption.
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21429
+    "^pv\\.StreamLinesRepresentationThick$"
+    "^pv\\.StreamLinesRepresentationTransform$"
+
+    # Transfer function image corruption
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21428
+    "\\.TransferFunction2DYScalars$"
+
     # "Structure does not match. You must use CopyStructure before calling this
     # method."
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20692
@@ -77,7 +91,19 @@ endif ()
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
-    "^pv\\.ExtrusionRepresentationCellData$")
+    "^pv\\.ExtrusionRepresentationCellData$"
+    # paraview/paraview/#21397
+    "^pv\\.TextSourceBorder$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
+    "\\.UndoRedo1")
+
+endif ()
+
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
+  list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
+    "\\.PythonEditorRun$")
+
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
@@ -121,15 +147,29 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     # Fails sporadically (paraview/paraview#20702)
     "^pv\\.TestPythonConsole$"
 
+    # Flaky with timeouts
+    "^pvcs\\.UndoRedo1"
+
     # Fails consistently, needs debugging (paraview/paraview#20742)
     "^pv\\.PythonAlgorithmPlugin$"
     )
 endif ()
 
-if ("$ENV{CC}" STREQUAL "icc")
+if ("$ENV{CC}" STREQUAL "icx")
   list(APPEND test_exclusions
+    # OpenMPI outputs text that ends up getting detected as a test failure.
+    "^ParaViewExample-Catalyst2/CxxImageDataExample$"
+
     # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/20108
-    "^ParaViewExample-Catalyst$")
+    "^ParaViewExample-Catalyst$"
+
+    # Shared memory limitations.
+    "^Catalyst::WaveletMiniApp.package_test$"
+    "^Catalyst::WaveletMiniApp.package_test_zip$"
+    "^ParaView::RemotingServerManagerPython-TestGlobbing$"
+    "^SurfaceLIC-OfficeContour-Batch$"
+    "^SurfaceLIC-OfficeSlices-Batch$"
+    )
 endif ()
 
 string(REPLACE ";" "|" test_exclusions "${test_exclusions}")

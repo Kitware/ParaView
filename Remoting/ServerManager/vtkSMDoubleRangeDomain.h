@@ -52,7 +52,7 @@ public:
    * exists is set to 1. Otherwise, it is set to 0.
    * An unspecified min. is equivalent to -inf
    */
-  double GetMinimum(unsigned int idx, int& exists)
+  virtual double GetMinimum(unsigned int idx, int& exists)
   {
     return this->RealSuperclass::GetMinimum(idx, exists);
   }
@@ -62,7 +62,7 @@ public:
    * exists is set to 1. Otherwise, it is set to 0.
    * An unspecified max. is equivalent to +inf
    */
-  double GetMaximum(unsigned int idx, int& exists)
+  virtual double GetMaximum(unsigned int idx, int& exists)
   {
     return this->RealSuperclass::GetMaximum(idx, exists);
   }
@@ -70,11 +70,11 @@ public:
   /**
    * Returns if minimum/maximum bound is set for the domain.
    */
-  int GetMinimumExists(unsigned int idx)
+  virtual int GetMinimumExists(unsigned int idx)
   {
     return this->RealSuperclass::GetMinimumExists(idx) ? 1 : 0;
   }
-  int GetMaximumExists(unsigned int idx)
+  virtual int GetMaximumExists(unsigned int idx)
   {
     return this->RealSuperclass::GetMaximumExists(idx) ? 1 : 0;
   }
@@ -84,13 +84,13 @@ public:
    * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
    * the bound is set.
    */
-  double GetMinimum(unsigned int idx) { return this->RealSuperclass::GetMinimum(idx); }
-  double GetMaximum(unsigned int idx) { return this->RealSuperclass::GetMaximum(idx); }
+  virtual double GetMinimum(unsigned int idx) { return this->RealSuperclass::GetMinimum(idx); }
+  virtual double GetMaximum(unsigned int idx) { return this->RealSuperclass::GetMaximum(idx); }
 
   /**
    * Returns the resolution.
    */
-  int GetResolution() { return this->RealSuperclass::GetResolution(); }
+  virtual int GetResolution() { return this->RealSuperclass::GetResolution(); }
 
 protected:
   vtkSMDoubleRangeDomain();

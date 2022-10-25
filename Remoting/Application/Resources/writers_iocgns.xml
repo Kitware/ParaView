@@ -1,0 +1,160 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+    <PWriterProxy base_proxygroup="internal_writers"
+                  name="CGNSWriter"
+                  class="vtkCGNSWriter">
+      <Documentation short_help="Write a dataset in CGNS format."
+                     long_help="Write files stored in CGNS format.">
+        The CGNS writer writes files stored in CGNS format.
+        The file extension is .cgns. The input of this reader is
+        a structured grid, polygon data, unstructured grid or a multi-block
+        dataset containing these data types.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is written to the file.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseHDF5"
+                         number_of_elements="1"
+                         name="UseHDF5"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When UseHDF5 is turned ON, the CGNS file will use HDF5 as
+          the underlying file format. When turned OFF, the file will use ADF as the
+          underlying file format. HDF5 is preferred and default.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When WriteAllTimeSteps is turned ON, the writer is
+          executed once for each time step available from the reader.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label="File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+          The suffix to append to the file name when writing files at different timesteps.
+          (File extensions such as .csv should be excluded.)
+          The % format specifiers are used. For example, _%d will write files as FileName_0,
+          FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteAllTimeSteps" function="boolean"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup label="File Series">
+        <Property name="WriteAllTimeSteps"/>
+        <Property name="FileNameSuffix"/>
+      </PropertyGroup>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="UseHDF5" show="0"/>
+        <WriterFactory extensions="cgns" file_description="CGNS Files"/>
+      </Hints>
+      <!-- End of "CGNSWriter" -->
+    </PWriterProxy>
+    <!-- End of "writers" -->
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="extract_writers">
+    <DataExtractWriterProxy name="CGNS">
+      <Documentation>
+        Extract writer to write data using the CGNS file format.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_{timestep:06d}.cgns">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="CGNSWriter"/>
+        <ExposedProperties>
+          <Property name="Input"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data"/>
+      </Hints>
+      <!-- End of "CGNS" -->
+    </DataExtractWriterProxy>
+    <!-- End of "extract_writers" -->
+  </ProxyGroup>
+
+  <!-- Catalyst client only proxies, used to generate a coprocessing script
+       and to modify writer filename and frequency through ParaView Live -->
+
+  <!-- ================================================================= -->
+  <ProxyGroup name="insitu_writer_parameters">
+    <SourceProxy name="CGNSWriter" class="vtkPVNullSource"
+                 label="CGNS Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.vtm">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <PipelineIcon name=":pqComponents/pqSave32.png"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="CGNSWriter"/>
+      </Hints>
+      <!-- End of "CGNSWriter" -->
+    </SourceProxy>
+    <!-- End of "insitu_writer_parameters" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

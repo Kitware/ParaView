@@ -52,8 +52,14 @@ class PQWIDGETS_EXPORT pqExpandableTableView : public pqTableView
   typedef pqTableView Superclass;
 
 public:
-  pqExpandableTableView(QWidget* parent = 0);
+  pqExpandableTableView(QWidget* parent = nullptr);
   ~pqExpandableTableView() override;
+
+  /**
+   * Enable pasting in table from clipboard.
+   * Default is true.
+   */
+  void setPasteEnabled(bool enable);
 
 Q_SIGNALS:
   /**
@@ -81,6 +87,8 @@ protected:
    * Overridden to capture Ctrl-V for pasting table data into the table.
    */
   void keyPressEvent(QKeyEvent* event) override;
+
+  bool PasteEnabled;
 
 private:
   Q_DISABLE_COPY(pqExpandableTableView)

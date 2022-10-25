@@ -64,7 +64,7 @@ class PQWIDGETS_EXPORT pqProgressWidget : public QWidget
   Q_PROPERTY(QString readyText READ readyText WRITE setReadyText)
   Q_PROPERTY(QString busyText READ busyText WRITE setBusyText)
 public:
-  pqProgressWidget(QWidget* parent = 0);
+  pqProgressWidget(QWidget* parent = nullptr);
   ~pqProgressWidget() override;
 
   /**
@@ -97,7 +97,7 @@ public:
   const QString& busyText() const { return this->BusyText; }
   //@}
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the progress. Progress must be enabled by calling 'enableProgress`
    * otherwise this method will have no effect.

@@ -37,7 +37,7 @@ public:
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(
+  double ComputeComponenentAtPoint(
     unsigned int component, double point[3], unsigned long timeStep, double time) override;
 
   //@{
@@ -82,7 +82,7 @@ public:
 
 protected:
   vtkCPLinearScalarFieldFunction();
-  ~vtkCPLinearScalarFieldFunction();
+  ~vtkCPLinearScalarFieldFunction() override;
 
 private:
   vtkCPLinearScalarFieldFunction(const vtkCPLinearScalarFieldFunction&) = delete;

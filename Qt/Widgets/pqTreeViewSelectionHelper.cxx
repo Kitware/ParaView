@@ -232,19 +232,17 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
       QObject::connect(actn, &QAction::triggered, [order, section, sfmodel, header](bool) {
         sfmodel->sort(section, order);
         header->setSortIndicatorShown(true);
-        // this needs to be inverted to match the icons we use in other places
-        // like SpreadSheetView.
-        header->setSortIndicator(
-          section, order == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder);
+        header->setSortIndicator(section, order);
       });
     }
 
     if (auto actn = menu.addAction(QIcon(":/pqWidgets/Icons/pqClearSort.svg"), "Clear sorting"))
     {
       actn->setEnabled(sfmodel->sortColumn() != -1);
-      QObject::connect(actn, &QAction::triggered, [sfmodel, header](bool) {
-        sfmodel->sort(-1);
-        header->setSortIndicatorShown(false);
+      QObject::connect(actn, &QAction::triggered, [order, sfmodel, header](bool) {
+        // this clears the indicator, and sets the underlying model to not sort
+        sfmodel->sort(-1, order);
+        header->setSortIndicator(-1, order);
       });
     }
   }

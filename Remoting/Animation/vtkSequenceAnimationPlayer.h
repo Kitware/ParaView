@@ -46,6 +46,11 @@ protected:
    */
   double GetNextTime(double currentime) override;
 
+  /**
+   * Return the previous time given the current time.
+   */
+  double GetPreviousTime(double currenttime) override;
+
   double GoToNext(double start, double end, double currenttime) override;
   double GoToPrevious(double start, double end, double currenttime) override;
 

@@ -242,7 +242,7 @@ protected:
   /**
    * Overridden here where the library has link access to rendering classes.
    */
-  virtual void DoMaterialSetup(vtkSMProxy* proxy) override;
+  void DoMaterialSetup(vtkSMProxy* proxy) override;
 
 private:
   vtkSMParaViewPipelineControllerWithRendering(

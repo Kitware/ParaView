@@ -109,7 +109,7 @@ protected:
 private Q_SLOTS:
   void producerChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqExtractor);
 
   class pqInternals;

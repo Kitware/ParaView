@@ -125,7 +125,8 @@ protected:
 private:
   Q_DISABLE_COPY(pqHeaderView);
 
-  void mouseClickEvent(QMouseEvent* event);
+  // return true if we handled the event.
+  bool mouseClickEvent(QMouseEvent* event);
 
   bool ToggleCheckStateOnSectionClick;
   QPoint PressPosition;

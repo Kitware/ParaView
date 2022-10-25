@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataTimeStepBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqDataTimeStepBehavior(QObject* parent = 0);
+  pqDataTimeStepBehavior(QObject* parent = nullptr);
 
 protected Q_SLOTS:
   /**

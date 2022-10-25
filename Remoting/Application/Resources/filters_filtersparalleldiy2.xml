@@ -129,7 +129,7 @@
           ghost cells to request. The filter may request more ghost levels than indicated if a
           downstream filter asked for more ghost levels.
         </Documentation>
-        <IntRangeDomain name="range" min="1" max="100"/>
+        <IntRangeDomain name="range" min="0" max="100"/>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"

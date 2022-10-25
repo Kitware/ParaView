@@ -46,7 +46,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraManipulatorWidget : public pqProper
   Q_PROPERTY(QList<QVariant> manipulatorTypes READ manipulatorTypes WRITE setManipulatorTypes);
 
 public:
-  pqCameraManipulatorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqCameraManipulatorWidget(
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqCameraManipulatorWidget() override;
 
   /**
@@ -55,7 +56,7 @@ public:
    */
   QList<QVariant> manipulatorTypes() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the manipulator types selection. This must have exactly 9 items or
    * less. Any missing items are treated as "None".

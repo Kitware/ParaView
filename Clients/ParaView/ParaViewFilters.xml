@@ -23,11 +23,15 @@
   </Category>
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1" hide_for_tests="1">
     <Proxy group="filters" name="Calculator" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractCellsAlongLine" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractCellsAlongLineCustom" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractCellsByType" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractFieldDataOverTime" />
     <Proxy group="filters" name="ExtractSelection" />
     <Proxy group="filters" name="ExtractSelectionOverTime" />
     <Proxy group="filters" name="ExtractHistogram" />
+    <Proxy group="filters" name="ExtractHistogram2D" omit_from_toolbar="1" />
     <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1" />
-    <Proxy group="filters" name="ExtractFieldDataOverTime" />
     <Proxy group="filters" name="ProbeLine" />
     <Proxy group="filters" name="ProbePoint" />
     <Proxy group="filters" name="PlotAttributes" omit_from_toolbar="1" />
@@ -38,7 +42,7 @@
     <Proxy group="filters" name="ComputeQuartiles" />
     <Proxy group="filters" name="ExtractLocation" omit_from_toolbar="1" />
     <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
-    <Proxy group="filters" name="ThresholdTable" />
+    <Proxy group="filters" name="ThresholdTable" omit_from_toolbar="1" />
   </Category>
   <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
     <Proxy group="filters" name="Clip" />
@@ -60,12 +64,15 @@
     <Proxy group="filters" name="KMeans" />
     <Proxy group="filters" name="MulticorrelativeStatistics" />
     <Proxy group="filters" name="PCAStatistics" />
+    <Proxy group="filters" name="TemporalStatistics" />
   </Category>
 
   <Category name="Temporal" menu_label="&amp;Temporal">
     <Proxy group="filters" name="AnimateModes" />
+    <Proxy group="filters" name="ExtractParticlesOverTime" />
     <Proxy group="filters" name="ExtractTimeSteps" />
     <Proxy group="filters" name="ForceTime" />
+    <Proxy group="filters" name="GenerateTimeSteps" />
     <Proxy group="filters" name="GroupTimeSteps" />
     <Proxy group="filters" name="MergeTime" />
     <Proxy group="filters" name="ParticlePath" />
@@ -99,18 +106,16 @@
   </Category>
   <Category name="AMR" menu_label="&amp;AMR">
     <Proxy group="filters" name="AMRConnectivity" />
-    <Proxy group="filters" name="AMRCutPlane" />
     <Proxy group="filters" name="AMRDualClip" />
     <Proxy group="filters" name="AMRDualContour" />
     <Proxy group="filters" name="AMRFragmentsFilter" />
     <Proxy group="filters" name="AMRFragmentIntegration" />
     <Proxy group="filters" name="AMRResampleFilter" />
-    <Proxy group="filters" name="AMRSlice" />
     <Proxy group="filters" name="AMRToMultiBlock" />
-    <Proxy group="filters" name="AMRCutPlane" />
     <Proxy group="filters" name="OverlappingLevelIdScalars" />
     <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
+    <Proxy group="filters" name="SliceWithPlane"/>
   </Category>
   <Category name="Quadrature Points" menu_label="&amp;Quadrature Points">
     <Proxy group="filters" name="QuadraturePointInterpolator" />
@@ -150,13 +155,11 @@
 
   <!-- This section list all filters that can be available in ParaView and their icons -->
   <Proxy group="filters" name="AMRConnectivity" />
-  <Proxy group="filters" name="AMRCutPlane" />
   <Proxy group="filters" name="AMRDualClip" />
   <Proxy group="filters" name="AMRDualContour" />
   <Proxy group="filters" name="AMRFragmentIntegration" />
   <Proxy group="filters" name="AMRFragmentsFilter" />
   <Proxy group="filters" name="AMRResampleFilter" />
-  <Proxy group="filters" name="AMRSlice" />
   <Proxy group="filters" name="AMRToMultiBlock" />
   <Proxy group="filters" name="ANLHaloFinder" />
   <Proxy group="filters" name="ANLSubhaloFinder" />
@@ -201,7 +204,6 @@
   <Proxy group="filters" name="CountCellVertices" />
   <Proxy group="filters" name="Curvatures" />
   <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg" />
-  <Proxy group="filters" name="CutEverything" />
   <Proxy group="filters" name="D3" />
   <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   <Proxy group="filters" name="DataSetSurfaceFilter" />
@@ -216,8 +218,12 @@
   <Proxy group="filters" name="DistributePoints" />
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EnvironmentAnnotation" />
+  <Proxy group="filters" name="EqualizerFilter"/>
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
+  <Proxy group="filters" name="ExtractCellsAlongLine" />
+  <Proxy group="filters" name="ExtractCellsAlongLineCustom" />
+  <Proxy group="filters" name="ExtractCellsByType" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
   <Proxy group="filters" name="ExtractEnclosedPoints" />
@@ -227,17 +233,21 @@
   <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid.svg" />
   <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   <Proxy group="filters" name="ExtractHistogram" icon=":/pqWidgets/Icons/pqHistogram24.png" />
+  <Proxy group="filters" name="ExtractHistogram2D" />
   <Proxy group="filters" name="ExtractLocation" />
+  <Proxy group="filters" name="ExtractParticlesOverTime" />
   <Proxy group="filters" name="ExtractSelection" icon=":/pqWidgets/Icons/pqExtractSelection.svg" />
   <Proxy group="filters" name="ExtractSelectionOverTime" icon=":/pqWidgets/Icons/pqPlotSelectionOverTime.svg" />
   <Proxy group="filters" name="ExtractSubsetWithSeed" />
   <Proxy group="filters" name="ExtractTimeSteps" />
+  <Proxy group="filters" name="FiniteElementFieldDistributor" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="ForceTime" />
   <Proxy group="filters" name="GaussianSplatter" />
   <Proxy group="filters" name="GenerateGlobalIds" />
   <Proxy group="filters" name="GenerateIdScalars" />
+  <Proxy group="filters" name="GenerateTimeSteps" />
   <Proxy group="filters" name="GenericClip" />
   <Proxy group="filters" name="GenericContour" />
   <Proxy group="filters" name="GenericCut" />
@@ -328,8 +338,10 @@
   <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="RedistributeDataSet" />
   <Proxy group="filters" name="ReflectionFilter" icon=":/pqWidgets/Icons/pqReflect.svg" />
+  <Proxy group="filters" name="RenameArrays" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="ResampleToImage" />
+  <Proxy group="filters" name="ResampleToLine" />
   <Proxy group="filters" name="ResampleWithDataset" />
   <Proxy group="filters" name="ReverseSense" />
   <Proxy group="filters" name="RibbonFilter" />

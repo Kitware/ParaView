@@ -101,6 +101,8 @@ invocation.
   0.0 is assumed.
 * catalyst/state/parameters: (optional) list of optional runtime parameters. If present,
   they must be of type 'list' with each child node of type 'string'.
+* catalyst/state/multiblock: (optional) integral value. When present and set to 1,
+  output will be a legacy vtkMultiBlockDataSet.
 
 **channels**: channels are used to communicate simulation data. The **channels**
 node can have one or more children, each corresponding to a named channel. A
@@ -127,12 +129,18 @@ The 'channel' protocol is as follows:
   data on this channel. This node must match the protocol requirements
   identified by the 'channel/type'.
 
+* channel/data/state/fields/[field-name]: (optional) defines extra field associated to the current mesh.
+  The field is not associated to any topology and it could be a string, a numerical array or an array following the
+  [MCArray Blueprint](https://llnl-conduit.readthedocs.io/en/latest/blueprint_mcarray.html) protocol.
+  In ParaView Catalyst, the field will be added as Field Data array to the generated VTK object.
+
 * channel/state: (optional) fields to optionally override the catalyst/state temporal information
-  channel/state/timestep: (optional) if present, overrides catalyst/state/timestep for this channel
-  channel/state/cycle: (optional) if present, overrides catalyst/state/cycle for this channel
-  channel/state/time: (optional) if present, overrides catalyst/state/time for this channel
+* channel/state/timestep: (optional) if present, overrides catalyst/state/timestep for this channel
+* channel/state/cycle: (optional) if present, overrides catalyst/state/cycle for this channel
+* channel/state/time: (optional) if present, overrides catalyst/state/time for this channel
   a channel will default to using the catalyst/state/ values for these parameters for each
   channel/state parameter not specified.
+* channel/state/multiblock: (optional) if present, overrides catalyst/state/multiblock for this channel
 
 ### protocol: 'finalize'
 

@@ -54,7 +54,7 @@ public:
    * Note: parent is assumed to be a subclass of QMainWindow, e.g.,
    * ParaViewMainWindow.
    */
-  pqLockPanelsBehavior(QObject* parent = 0);
+  pqLockPanelsBehavior(QObject* parent = nullptr);
   ~pqLockPanelsBehavior() override;
 
   /**

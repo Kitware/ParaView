@@ -14,11 +14,11 @@
                      name="Input"
                      port_index="0">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
         <Documentation>
           The input from which the selection is
@@ -29,11 +29,11 @@
                      name="Selection"
                      port_index="1">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkSelection" />
+          <DataType value="vtkSelection"/>
         </DataTypeDomain>
         <Documentation>
           The input that provides the selection
@@ -74,10 +74,299 @@
       </DoubleVectorProperty>
       <!-- End ExtractSelectionRange -->
     </SourceProxy>
-    <!-- end of internal_filters -->
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSelectArraysExtractBlocks" name="SelectArraysExtractBlocks">
+      <Documentation long_help="The SelectArraysExtractBlocks filter is a meta-filter combining
+                     the PassArray filter and the ExtractBlock filter."
+                     short_help="Combines the PassArray and the ExtractBlock filter.">
+                     The SelectArraysExtractBlocks filter is a meta-filter combining the PassArray
+                     filter and the ExtractBlock filter. It's intended to be used as a pre-processing
+                     filter for MultiBlockDataSet, UniformGridAMR and PartitionedDataSetCollection
+                     writers. It allows to select specific data arrays and/or blocks to write.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkUniformGridAMR"/>
+          <DataType value="vtkPartitionedDataSetCollection"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <InputArrayDomain name="field_arrays" attribute_type="field" optional="1" />
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
+        <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+      </InputProperty>
+
+      <IntVectorProperty name="ChooseArraysToWrite"
+        command="SetPassArraysEnabled"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Explicitly choose which arrays to write.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty
+          name="PointDataArrays"
+          command="GetPointDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the point data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="point"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="CellDataArrays"
+          command="GetCellDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the cell data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="cell"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="FieldDataArrays"
+          command="GetFieldDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="field_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the field data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="field"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="VertexDataArrays"
+          command="GetVertexDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the vertex data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="vertex"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="EdgeDataArrays"
+          command="GetEdgeDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the edge data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="edge"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="RowDataArrays"
+          command="GetRowDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the row data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ChooseBlocksToWrite"
+        command="SetExtractBlocksEnabled"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Explicitly choose which blocks to write.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="Assembly"
+                            command="SetAssemblyName"
+                            number_of_elements="1"
+                            default_values="Hierarchy">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specifying selectors
+          to choose blocks to extract.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="Selectors"
+                            command="AddSelector"
+                            clean_command="ClearSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to extract from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="Selectors" function="Selectors"/>
+      </PropertyGroup>
+    </SourceProxy>
+    <!-- End of internal_filters -->
   </ProxyGroup>
 
   <ProxyGroup name="filters">
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractCellsAlongLine"
+                 label="Extract Cells Along Line"
+                 name="ExtractCellsAlongLine">
+      <Documentation short_help="Extract cells along input line.">
+        This filter extract the cells intersected by a line.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkCompositeDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          This property controls the coordinates of the first endpoint of the line.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          This property controls the coordinates of the second endpoint of the line.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="Point1"/>
+        <Property function="Point2WorldPosition" name="Point2"/>
+      </PropertyGroup>
+      <!-- End ExtractCellsAlongLine -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractCellsAlongPolyLine"
+                 label="Extract Cells Along Lines Custom Source"
+                 name="ExtractCellsAlongLineCustom">
+      <Documentation short_help="Extract cells along input lines from custom source">
+        The Extract Cells Along Lines From Custom Source filter
+        extracts cells from the input data set that intersect lines from a custom source.
+        This source can be either an Unstructured Grid or a Poly Data. Any cells other
+        than lines or poly lines are ignored in the source.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkCompositeDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the dataset composed of the lines and poly lines used
+          to extract cells in the input.
+        </Documentation>
+      </InputProperty>
+      <!-- End ExtractCellsAlongLineCustom -->
+    </SourceProxy>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVExtractSelection"
@@ -94,30 +383,28 @@
                      command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <Documentation>
-          The input from which the selection is
-          extracted.
+          The input from which the selection is extracted.
         </Documentation>
       </InputProperty>
       <InputProperty clean_command="RemoveAllSelectionsInputs"
                      command="SetSelectionConnection"
                      name="Selection">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkSelection" />
+          <DataType value="vtkSelection"/>
         </DataTypeDomain>
         <Documentation>
-          The input that provides the selection
-          object.
+          The input that provides the selection object.
         </Documentation>
       </InputProperty>
       <!-- End ExtractSelection -->
@@ -126,47 +413,51 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPConvertSelection"
                  name="ConvertSelection">
-      <Documentation>Converts a selection from one type to
-      another.</Documentation>
+      <Documentation>
+        Converts a selection from one type to another.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="DataInput"
                      port_index="1">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
-        <Documentation>Set the vtkDataObject input used to convert the
-        selection.</Documentation>
+        <Documentation>
+          Set the vtkDataObject input used to convert the selection.
+        </Documentation>
       </InputProperty>
       <InputProperty command="SetInputConnection"
                      name="Input"
                      port_index="0">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkSelection" />
+          <DataType value="vtkSelection"/>
         </DataTypeDomain>
-        <Documentation>Set the selection to convert.</Documentation>
+        <Documentation>
+          Set the selection to convert.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetOutputType"
                          default_values="5"
                          name="OutputType"
                          number_of_elements="1">
-        <Documentation>Set the ContentType for the output.</Documentation>
+        <Documentation>
+          Set the ContentType for the output.
+        </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="SELECTIONS"
-                 value="0" />
           <Entry text="GLOBALIDs"
-                 value="1" />
+                 value="0"/>
           <Entry text="PEDIGREEIDS"
-                 value="2" />
+                 value="1"/>
           <Entry text="VALUES"
-                 value="3" />
+                 value="2"/>
           <Entry text="INDICES"
-                 value="4" />
+                 value="3"/>
           <Entry text="FRUSTUM"
-                 value="5" />
-          <Entry text="LOCATION"
-                 value="6" />
+                 value="4"/>
+          <Entry text="LOCATIONS"
+                 value="5"/>
           <Entry text="THRESHOLDS"
-                 value="7" />
+                 value="6"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <StringVectorProperty clean_command="ClearArrayNames"
@@ -174,18 +465,18 @@
                             element_types="2"
                             name="ArrayNames"
                             number_of_elements_per_command="1"
-                            repeat_command="1" />
+                            repeat_command="1"/>
       <IntVectorProperty command="SetMatchAnyValues"
                          default_values="0"
                          name="MatchAnyValues"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty command="SetAllowMissingArray"
                          default_values="0"
                          name="AllowMissingArray"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <!-- End of ConvertSelection -->
     </SourceProxy>
@@ -195,12 +486,73 @@
                  label="Extract Selection"
                  name="ExtractSelection">
       <Documentation long_help="Extract different type of selections."
-                     short_help="Extract different type of selections.">This
-                     filter extracts a set of cells/points given a selection.
-                     The selection can be obtained from a rubber-band selection
-                     (either cell, visible or in a frustum) or threshold
-                     selection and passed to the filter or specified by
-                     providing an ID list.</Documentation>
+                     short_help="Extract different type of selections.">
+        This filter extracts a set of cells/points given a selection.
+        The selection can be obtained from a rubber-band selection
+        (either cell, visible or in a frustum) or threshold
+        selection and passed to the filter or specified by
+        providing an ID list.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input from which the selection is extracted.
+        </Documentation>
+      </InputProperty>
+      <InputProperty command="SetSelectionConnection"
+                     name="Selection"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input that provides the selection object.
+        </Documentation>
+        <Hints>
+          <!-- This tag alerts the auto-generated panels and input selection
+              that this input is a selection.  It should use the special
+              selection GUI. -->
+          <SelectionInput/>
+        </Hints>
+      </InputProperty>
+      <IntVectorProperty command="SetPreserveTopology"
+                         default_values="0"
+                         name="PreserveTopology"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1 the output preserves the topology of its input and adds
+          an insidedness array to mark which cells are inside or out. If 0 then the output is
+          an unstructured grid which contains only the subset of cells that are inside.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper"/>
+      </Hints>
+      <!-- End of ExtractSelection -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractCellsByType"
+                 label="Extract Cells By Type"
+                 name="ExtractCellsByType">
+      <Documentation short_help="Extract cells based on their type.">
+        This filter extracts cells of the selected types.
+        If the data set does not contain cells of the chosen types, the output is empty.
+      </Documentation>
+
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -209,84 +561,159 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
-          <DataType value="vtkTable" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input from which the
-        selection is extracted.</Documentation>
+        <Documentation>
+          This property specifies the input of the filter.
+        </Documentation>
       </InputProperty>
-      <InputProperty command="SetSelectionConnection"
-                     name="Selection"
-                     panel_visibility="default">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkSelection" />
-        </DataTypeDomain>
-        <Documentation>The input that provides the selection
-        object.</Documentation>
-        <Hints>
-          <!-- This tag alerts the auto-generated panels and input selection
-              that this input is a selection.  It should use the special
-              selection GUI. -->
-          <SelectionInput />
-        </Hints>
-      </InputProperty>
-      <IntVectorProperty command="SetPreserveTopology"
-                         default_values="0"
-                         name="PreserveTopology"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If this property is set to 1 the output preserves the
-        topology of its input and adds an insidedness array to mark which cells
-        are inside or out. If 0 then the output is an unstructured grid which
-        contains only the subset of cells that are inside.</Documentation>
-      </IntVectorProperty>
-      <Hints>
-        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper" />
-      </Hints>
-      <!-- End of ExtractSelection -->
+
+      <StringVectorProperty name="CellTypeSelectionInfo"
+                            command="GetCellTypeSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellTypes"
+                            command="GetCellTypeSelection"
+                            information_property="CellTypeSelectionInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellTypeSelectionInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Select the cell types to extract.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End of ExtractCellsByType -->
     </SourceProxy>
 
-    <!-- end of filters -->
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendSelection"
+                 name="AppendSelections"
+                 processes="client|renderserver|dataserver">
+      <Documentation long_help="Append selections"
+                     short_help="Append multiple selections into one selection.">
+        Append multiple selections with one or many nodes, with the same fieldType,
+        and possibly different content type, to create a combined selection. Each
+        selection has a name and a boolean expression can be set using the selection
+        names to define the relation between the selections.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property indicates the inputs to the AppendSelections filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="AppendByUnion"
+                         command="SetAppendByUnion"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Allows by default to not append by union, so that an expression can be used.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="Expression"
+                            animateable="0"
+                            command="SetExpression"
+                            number_of_elements="1">
+        <Documentation>
+          This property specifies the expression which defines the relation between the input selections.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetInverse"
+                         default_values="0"
+                         name="InsideOut"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When this property is false the selection describes everything that should be extracted.
+          When this is true the selection describes everything that should NOT be extracted.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="SelectionNames"
+                            command="SetInputName"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            clean_command="RemoveAllInputNames">
+        <Documentation>
+          Specify names to use for each input selection.
+        </Documentation>
+        <RegistrationNamesDomain name="names_list" registration_group="sources">
+          <RequiredProperties>
+            <Property name="Input" function="Proxies"/>
+          </RequiredProperties>
+        </RegistrationNamesDomain>
+      </StringVectorProperty>
+      <Hints>
+        <Visibility replace_input="1"/>
+      </Hints>
+      <!-- End of AppendSelections -->
+    </SourceProxy>
+    <!-- End of filters -->
   </ProxyGroup>
 
   <ProxyGroup name="sources">
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkQuerySelectionSource"
+    <SourceProxy class="vtkSelectionSource"
                  name="SelectionQuerySource">
+      <IntVectorProperty command="SetContentType"
+                         default_values="9"
+                         name="ContentType"
+                         number_of_elements="1">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFieldTypeOption"
+                         default_values="1"
+                         name="FieldTypeOption"
+                         number_of_elements="1">
+      </IntVectorProperty>
       <IntVectorProperty command="SetElementType"
                          default_values="1"
                          name="ElementType"
                          number_of_elements="1">
-        <Documentation>Select the type of elements to select.</Documentation>
-        <FieldDataDomain name="enum" />
+        <Documentation>
+          Select the type of elements to select.
+        </Documentation>
+        <FieldDataDomain name="enum"/>
       </IntVectorProperty>
       <StringVectorProperty command="SetQueryString"
                             default_values=""
                             name="QueryString"
                             number_of_elements="1"
-                            panel_visibility="default"></StringVectorProperty>
-      <IntVectorProperty command="SetAMRLevel"
+                            panel_visibility="default">
+      </StringVectorProperty>
+      <IntVectorProperty command="SetHierarchicalLevel"
                          default_values="-1"
                          name="HierarchicalLevel"
-                         number_of_elements="1"></IntVectorProperty>
-      <IntVectorProperty command="SetAMRIndex"
+                         number_of_elements="1">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHierarchicalIndex"
                          default_values="-1"
                          name="HierarchicalIndex"
-                         number_of_elements="1"></IntVectorProperty>
+                         number_of_elements="1">
+      </IntVectorProperty>
       <IntVectorProperty command="SetProcessID"
                          default_values="-1"
                          name="ProcessID"
-                         number_of_elements="1"></IntVectorProperty>
-      <StringVectorProperty command="GetUserFriendlyText"
-                            information_only="1"
-                            name="UserFriendlyText">
-        <SimpleStringInformationHelper />
-        <Documentation>Reconstructs the query as a user friendly text, e.g., "IDs
-        &gt;= 12".</Documentation>
-      </StringVectorProperty>
+                         number_of_elements="1">
+      </IntVectorProperty>
       <StringVectorProperty name="Assembly"
                             command="SetAssemblyName"
                             number_of_elements="1"
@@ -298,7 +725,7 @@
       </StringVectorProperty>
       <StringVectorProperty name="Selectors"
                             command="AddSelector"
-                            clean_command="ClearSelectors"
+                            clean_command="RemoveAllSelectors"
                             repeat_command="1"
                             number_of_elements_per_command="1">
         <Documentation>
@@ -310,72 +737,130 @@
                          default_values="0"
                          name="InsideOut"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When this property is false the selection describes
-        everything that should be extracted. When this is true the selection
-        describes everything that should NOT be extracted.</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When this property is false the selection describes everything that should be extracted.
+          When this is true the selection describes everything that should NOT be extracted.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetContainingCells"
+                         default_values="0"
+                         name="ContainingCells"
+                         number_of_elements="1">
+        <Documentation>
+          When field type is POINT, this controls whether single vertex cells will be produced
+          for each selected point, or whether the cells that contain each selected point will be produced.
+          When field type is CELL this has no effect.
+        </Documentation>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfLayers"
                          default_values="0"
                          name="NumberOfLayers"
                          number_of_elements="1">
-        <Documentation>Specify the number of layers of connected elements
-          to include in the selection.</Documentation>
-        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify the number of layers of connected elements to include in the selection.
+        </Documentation>
+        <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
-      <!-- end of SelectionQuerySource -->
+      <IntVectorProperty command="SetRemoveSeed"
+                         default_values="0"
+                         name="RemoveSeed"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if the initial seed selection is remove or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveIntermediateLayers"
+                         default_values="0"
+                         name="RemoveIntermediateLayers"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if intermediate layers are removes or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <!-- End of SelectionQuerySource -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <Proxy name="SelectionSourceBase">
-      <Documentation>Internal proxy used to define the common API for Selection
-      Source proxies. Do not use.</Documentation>
+      <Documentation>
+        Internal proxy used to define the common API for Selection Source proxies. Do not use.
+      </Documentation>
       <IntVectorProperty command="SetFieldType"
                          default_values="0"
                          name="FieldType"
                          number_of_elements="1">
-        <Documentation>The location of the array the selection came from (ex,
-        point, cell).</Documentation>
+        <Documentation>
+          The location of the array the selection came from (e.g. point, cell).
+        </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="CELL"
-                 value="0" />
+                 value="0"/>
           <Entry text="POINT"
-                 value="1" />
+                 value="1"/>
           <Entry text="FIELD"
-                 value="2" />
+                 value="2"/>
           <Entry text="VERTEX"
-                 value="3" />
+                 value="3"/>
           <Entry text="EDGE"
-                 value="4" />
+                 value="4"/>
           <Entry text="ROW"
-                 value="5" />
+                 value="5"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetContainingCells"
                          default_values="0"
                          name="ContainingCells"
                          number_of_elements="1">
-        <Documentation>When field type is POINT, this controls whether single
-        vertex cells will be produced for each selected point, or whether the
-        cells that contain each selected point will be produced. When field
-        type is CELL this has no effect.</Documentation>
-        <BooleanDomain name="bool" />
+        <Documentation>
+          When field type is POINT, this controls whether single vertex cells will be produced
+          for each selected point, or whether the cells that contain each selected point will be produced.
+          When field type is CELL this has no effect.
+        </Documentation>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty command="SetInverse"
                          default_values="0"
                          name="InsideOut"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When this property is false the selection describes
-        everything that should be extracted. When this is true the selection
-        describes everything that should NOT be extracted.</Documentation>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When this property is false the selection describes everything that should be extracted.
+          When this is true the selection describes everything that should NOT be extracted.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfLayers"
                          default_values="0"
                          name="NumberOfLayers"
                          number_of_elements="1">
-        <Documentation>Specify the number of layers of connected elements
-          to include in the selection.</Documentation>
-        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify the number of layers of connected elements to include in the selection.
+        </Documentation>
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveSeed"
+                         default_values="0"
+                         name="RemoveSeed"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if the initial seed selection is remove or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveIntermediateLayers"
+                         default_values="0"
+                         name="RemoveIntermediateLayers"
+                         number_of_elements="1">
+        <Documentation>
+          When using NumberOfLayers, this controls if intermediate layers are removes or not.
+          Default is false.
+        </Documentation>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </Proxy>
     <!-- ==================================================================== -->
@@ -384,8 +869,10 @@
                  class="vtkPVSelectionSource"
                  name="BlockSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>BlockSelectionSource is a source producing a block-based
-      selection used to select blocks from a composite dataset.</Documentation>
+      <Documentation>
+        BlockSelectionSource is a source producing a block-based selection used to select blocks
+        from a composite dataset.
+      </Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllBlocks"
                             command="AddBlock"
                             label="Blocks"
@@ -393,9 +880,10 @@
                             number_of_elements="0"
                             number_of_elements_per_command="1"
                             repeat_command="1">
-        <Documentation>The list of blocks that will be added to the selection
-        produced by the selection source. The blocks are identified using their
-        composite index (flat index).</Documentation>
+        <Documentation>
+          The list of blocks that will be added to the selection produced by the selection source.
+          The blocks are identified using their composite index (flat index).
+        </Documentation>
       </IdTypeVectorProperty>
       <!-- End of BlockSelectionSource -->
     </SourceProxy>
@@ -405,8 +893,10 @@
                  class="vtkPVSelectionSource"
                  name="BlockSelectorsSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>BlockSelectorsSelectionSource is a source producing a block-based
-      selection used to select blocks from a composite dataset using selectors.</Documentation>
+      <Documentation>
+        BlockSelectorsSelectionSource is a source producing a block-based selection used to select blocks
+        from a composite dataset using selectors.
+      </Documentation>
       <StringVectorProperty clean_command="RemoveAllBlockSelectors"
                             command="AddBlockSelector"
                             label="Block Selectors"
@@ -414,15 +904,15 @@
                             number_of_elements="0"
                             number_of_elements_per_command="1"
                             repeat_command="1">
-        <Documentation>The list of blocks selectors that will be added to the selection
-          produced by the selection source.
+        <Documentation>
+          The list of blocks selectors that will be added to the selection produced by the selection source.
         </Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty command="SetArrayName"
                             name="BlockSelectorsAssemblyName"
                             number_of_elements="1"
-                            default_values="Hierarchy" />
+                            default_values="Hierarchy"/>
       <!-- End of BlockSelectionSource -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -431,8 +921,9 @@
                  class="vtkPVSelectionSource"
                  name="FrustumSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>FrustumSelectionSource is a source producing a frustum
-      selection.</Documentation>
+      <Documentation>
+        FrustumSelectionSource is a source producing a frustum selection.
+      </Documentation>
       <DoubleVectorProperty argument_is_array="1"
                             command="AddFrustum"
                             default_values="0.0 0.0 1.0 0.0
@@ -446,8 +937,9 @@
                             label="Frustum"
                             name="Frustum"
                             number_of_elements="32">
-        <Documentation>Vertices that define a frustum for the selection
-        source.</Documentation>
+        <Documentation>
+          Vertices that define a frustum for the selection source.
+        </Documentation>
       </DoubleVectorProperty>
       <!-- End of FrustumSelectionSource -->
     </SourceProxy>
@@ -457,8 +949,9 @@
                  class="vtkPVSelectionSource"
                  name="GlobalIDSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>GlobalIDSelectionSource is a source producing a global ID
-      based selection.</Documentation>
+      <Documentation>
+        GlobalIDSelectionSource is a source producing a global ID based selection.
+      </Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllGlobalIDs"
                             command="AddGlobalID"
                             label="Global IDs"
@@ -466,8 +959,9 @@
                             number_of_elements="0"
                             number_of_elements_per_command="1"
                             repeat_command="1">
-        <Documentation>The list of IDs that will be added to the selection
-        produced by the selection source.</Documentation>
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+        </Documentation>
       </IdTypeVectorProperty>
       <!-- End of GlobalIDSelectionSource -->
     </SourceProxy>
@@ -477,8 +971,9 @@
                  class="vtkPVSelectionSource"
                  name="PedigreeIDSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>PedigreeIDSelectionSource is a source producing a pedigree
-      ID based selection.</Documentation>
+      <Documentation>
+        PedigreeIDSelectionSource is a source producing a pedigree ID based selection.
+      </Documentation>
       <StringVectorProperty clean_command="RemoveAllPedigreeIDs"
                             command="AddPedigreeID"
                             default_values="id 0"
@@ -488,9 +983,10 @@
                             number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <Documentation>The list of integer IDs that will be added to the
-        selection produced by the selection source, specified by the pair
-        (domain, id).</Documentation>
+        <Documentation>
+          The list of integer IDs that will be added to the selection produced by the selection source,
+          specified by the pair (domain, id).
+        </Documentation>
       </StringVectorProperty>
       <StringVectorProperty clean_command="RemoveAllPedigreeStringIDs"
                             command="AddPedigreeStringID"
@@ -501,9 +997,10 @@
                             number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <Documentation>The list of string IDs that will be added to the
-        selection produced by the selection source, specified by the pair
-        (domain, id).</Documentation>
+        <Documentation>
+          The list of string IDs that will be added to the selection produced by the selection source,
+          specified by the pair (domain, id).
+        </Documentation>
       </StringVectorProperty>
       <!-- End of PedigreeIDSelectionSource -->
     </SourceProxy>
@@ -513,18 +1010,20 @@
                  class="vtkPVSelectionSource"
                  name="IDSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>IDSelectionSource is a source producing a ID based
-      selection. This cannot be used for selecting composite
-      datasets.</Documentation>
+      <Documentation>
+        IDSelectionSource is a source producing a ID based selection.
+        This cannot be used for selecting composite datasets.
+      </Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllIDs"
                             command="AddID"
                             name="IDs"
                             number_of_elements="0"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <Documentation>The list of IDs that will be added to the selection
-        produced by the selection source. This takes pairs of values as
-        (process number, id).</Documentation>
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+          This takes pairs of values as (process number, id).
+        </Documentation>
       </IdTypeVectorProperty>
       <!-- End of IDSelectionSource -->
     </SourceProxy>
@@ -534,18 +1033,20 @@
                  class="vtkPVSelectionSource"
                  name="ValueSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>ValueSelectionSource is a source producing a value based
-      selection. This cannot be used for selecting composite
-      datasets.</Documentation>
+      <Documentation>
+        ValueSelectionSource is a source producing a value based selection.
+        This cannot be used for selecting composite datasets.
+      </Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllValues"
                             command="AddValue"
                             name="Values"
                             number_of_elements="0"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <Documentation>The list of Values that will be added to the selection
-        produced by the selection source. This takes pairs of values as
-        (process number, value).</Documentation>
+        <Documentation>
+          The list of Values that will be added to the selection produced by the selection source.
+          This takes pairs of values as (process number, value).
+        </Documentation>
       </IdTypeVectorProperty>
       <StringVectorProperty command="SetArrayName"
                             name="ArrayName"
@@ -560,18 +1061,20 @@
                  class="vtkPVSelectionSource"
                  name="CompositeDataIDSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>CompositeDataIDSelectionSource used to create an ID based
-      selection for composite datasets (Multiblock or HierarchicalBox
-      dataset).</Documentation>
+      <Documentation>
+        CompositeDataIDSelectionSource used to create an ID based selection for composite datasets
+        (Multiblock or HierarchicalBox dataset).
+      </Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllCompositeIDs"
                             command="AddCompositeID"
                             name="IDs"
                             number_of_elements="0"
                             number_of_elements_per_command="3"
                             repeat_command="1">
-        <Documentation>The list of IDs that will be added to the selection
-        produced by the selection source. This takes 3-tuple of values as
-        (flat-index, process number, id).</Documentation>
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+          This takes 3-tuple of values as (flat-index, process number, id).
+        </Documentation>
       </IdTypeVectorProperty>
       <!-- End of CompositeDataIDSelectionSource -->
     </SourceProxy>
@@ -581,17 +1084,19 @@
                  class="vtkPVSelectionSource"
                  name="HierarchicalDataIDSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>HierarchicalDataIDSelectionSource used to create an ID
-      based selection for HierarchicalBox datasets.</Documentation>
+      <Documentation>
+        HierarchicalDataIDSelectionSource used to create an ID based selection for HierarchicalBox datasets.
+      </Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllHierarchicalIDs"
                             command="AddHierarhicalID"
                             name="IDs"
                             number_of_elements="0"
                             number_of_elements_per_command="3"
                             repeat_command="1">
-        <Documentation>The list of IDs that will be added to the selection
-        produced by the selection source. This takes 3-tuple of values as
-        (level, index, id).</Documentation>
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the selection source.
+          This takes 3-tuple of values as (level, index, id).
+        </Documentation>
       </IdTypeVectorProperty>
       <!-- End of HierarchicalDataIDSelectionSource -->
     </SourceProxy>
@@ -601,24 +1106,26 @@
                  class="vtkPVSelectionSource"
                  name="ThresholdSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>ThresholdSelectionSource is used to create a threshold
-      based selection.</Documentation>
+      <Documentation>
+        ThresholdSelectionSource is used to create a threshold based selection.
+      </Documentation>
       <DoubleVectorProperty clean_command="RemoveAllThresholds"
                             command="AddThreshold"
                             name="Thresholds"
                             number_of_elements="0"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <Documentation>The list of thresholds that will be added to the
-        selection produced by the selection source.</Documentation>
+        <Documentation>
+          The list of thresholds that will be added to the selection produced by the selection source.
+        </Documentation>
       </DoubleVectorProperty>
       <StringVectorProperty command="SetArrayName"
                             default_values="none"
                             name="ArrayName"
                             number_of_elements="1">
-        <Documentation>For threshold and value selection, this controls the
-        name of the scalar array that will be thresholded
-        within.</Documentation>
+        <Documentation>
+          For threshold and value selection, this controls the name of the scalar array that will be thresholded within.
+        </Documentation>
       </StringVectorProperty>
       <!-- End of ThresholdSelectionSource -->
     </SourceProxy>
@@ -628,18 +1135,21 @@
                  class="vtkPVSelectionSource"
                  name="LocationSelectionSource"
                  processes="client|renderserver|dataserver">
-      <Documentation>LocationSelectionSource is used to create a location based
-      selection.</Documentation>
+      <Documentation>
+        LocationSelectionSource is used to create a location based selection.
+      </Documentation>
       <DoubleVectorProperty clean_command="RemoveAllLocations"
                             command="AddLocation"
                             name="Locations"
                             number_of_elements="0"
                             number_of_elements_per_command="3"
                             repeat_command="1">
-        <Documentation>The list of locations that will be added to the
-        selection produced by the selection source.</Documentation>
+        <Documentation>
+          The list of locations that will be added to the selection produced by the selection source.
+        </Documentation>
       </DoubleVectorProperty>
       <!-- End of LocationSelectionSource -->
     </SourceProxy>
+    <!-- End of sources -->
   </ProxyGroup>
 </ServerManagerConfiguration>

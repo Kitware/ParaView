@@ -12,11 +12,75 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
+#define vtkSMExtractTriggerProxy_ENABLE_PYTHON 1
+#else
+#define vtkSMExtractTriggerProxy_ENABLE_PYTHON 0
+#endif
+
+#if vtkSMExtractTriggerProxy_ENABLE_PYTHON
+#include "vtkPython.h" // must be first include
+
+#include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
+#endif
+
 #include "vtkSMExtractTriggerProxy.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkSMExtractsController.h"
 #include "vtkSMPropertyHelper.h"
+
+#if vtkSMExtractTriggerProxy_ENABLE_PYTHON
+namespace
+{
+
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
+  {
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
+  }
+  return false;
+}
+
+bool IsActivatedPython(const std::string& script, vtkSMExtractsController* controller)
+{
+  // Initialize Python is not already initialized.
+  vtkPythonInterpreter::Initialize();
+
+  vtkPythonScopeGilEnsurer gilEnsurer;
+
+  vtkSmartPyObject mdlParaView(PyImport_ImportModule("paraview.detail"));
+  if (CheckAndFlushPythonErrors() || !mdlParaView)
+  {
+    return false;
+  }
+
+  vtkSmartPyObject load_method(PyString_FromString("module_from_string"));
+  vtkSmartPyObject module(PyObject_CallMethodObjArgs(
+    mdlParaView, load_method, PyString_FromString(script.c_str()), nullptr));
+  if (CheckAndFlushPythonErrors() || !module)
+  {
+    return false;
+  }
+
+  vtkSmartPyObject function(PyString_FromString("is_activated"));
+  vtkSmartPyObject self = vtkPythonUtil::GetObjectFromPointer(controller);
+  vtkSmartPyObject result(PyObject_CallMethodObjArgs(module, function, self.GetPointer(), nullptr));
+  if (CheckAndFlushPythonErrors() || !result)
+  {
+    return false;
+  }
+
+  return PyBool_Check(result) && result.GetPointer() == Py_True;
+}
+
+}
+#endif
 
 vtkStandardNewMacro(vtkSMExtractTriggerProxy);
 //----------------------------------------------------------------------------
@@ -126,6 +190,15 @@ bool vtkSMExtractTriggerProxy::IsActivated(vtkSMExtractsController* controller)
     }
     this->LastTimeValue = timevalue;
     return doIt;
+  }
+  else if (triggerName == "Python")
+  {
+#if vtkSMExtractTriggerProxy_ENABLE_PYTHON
+    return ::IsActivatedPython(vtkSMPropertyHelper(this, "Script").GetAsString(), controller);
+#else
+    vtkErrorMacro("Python support not enabled. Python trigger will be ignored!");
+    return false;
+#endif
   }
   else
   {

@@ -38,7 +38,7 @@ public:
 
 protected:
   vtkSMMultiplexerInputDomain();
-  ~vtkSMMultiplexerInputDomain();
+  ~vtkSMMultiplexerInputDomain() override;
 
 private:
   vtkSMMultiplexerInputDomain(const vtkSMMultiplexerInputDomain&) = delete;

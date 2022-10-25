@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <QWidget>
 #include <QtDebug>
@@ -91,10 +92,24 @@ pqArrayListDomain::~pqArrayListDomain()
 void pqArrayListDomain::domainChanged()
 {
   // reset the widget's value using the domain.
-  QList<QList<QVariant>> newVal =
-    pqSMAdaptor::getSelectionProperty(this->Internals->SMProperty, pqSMAdaptor::UNCHECKED);
   QVariant variantVal;
-  variantVal.setValue(newVal);
+  vtkSMStringVectorProperty* prop =
+    vtkSMStringVectorProperty::SafeDownCast(this->Internals->SMProperty);
+
+  unsigned int nbPerCommand = prop->GetNumberOfElementsPerCommand();
+
+  // if property has multiple string elements
+  if (prop && nbPerCommand > 1 && prop->GetElementType(1) == vtkSMStringVectorProperty::STRING)
+  {
+    QList<QVariant> newPropList = pqSMAdaptor::getStringListProperty(this->Internals->SMProperty);
+    variantVal.setValue(newPropList);
+  }
+  else
+  {
+    QList<QList<QVariant>> newPropList =
+      pqSMAdaptor::getSelectionProperty(this->Internals->SMProperty, pqSMAdaptor::UNCHECKED);
+    variantVal.setValue(newPropList);
+  }
 
   this->parent()->setProperty(this->Internals->QProperty.toUtf8().data(), variantVal);
 }

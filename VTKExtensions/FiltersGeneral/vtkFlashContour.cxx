@@ -800,13 +800,13 @@ void vtkFlashContour::ProcessBlock(vtkImageData* image)
 void vtkFlashContour::ProcessNeighborhoodSharedRegion(
   int neighborhood[3][3][3], int r[3], vtkMultiBlockDataSet* input)
 {
-  int regionDims[3];   // dual cell dimensions of region
-  double* ptrs[8];     // Pointer to corner scalars
-  double* aptrs[8];    // Pointer to attribute to pass
-  double corners[32];  // world location of corners
-  double spacings[32]; // spacing for each corner block.
-  int levelDiff[8];    // level of corner relative to center block
-  int incs[3];         // all blocks have the same increments
+  int regionDims[3];       // dual cell dimensions of region
+  double* ptrs[8];         // Pointer to corner scalars
+  double* aptrs[8];        // Pointer to attribute to pass
+  double cornerPoints[32]; // world location of corners
+  double spacings[32];     // spacing for each corner block.
+  int levelDiff[8];        // level of corner relative to center block
+  int incs[3];             // all blocks have the same increments
 
   // Assumptions that all blocks have the same increments is only
   // to minimize the arguments to the ProcessSharedRegion method.
@@ -917,7 +917,7 @@ void vtkFlashContour::ProcessNeighborhoodSharedRegion(
     ;
     image2->GetSpacing(spacing2);
     // Find world location for dual point / corner.
-    double* cornerPoint = corners + (cornerId << 2);
+    double* cornerPoint = cornerPoints + (cornerId << 2);
     // Find index of cell in block for corner.
     int dualPoint2Index[3];
     if (levelDiff[cornerId] == 0)
@@ -980,7 +980,7 @@ void vtkFlashContour::ProcessNeighborhoodSharedRegion(
   }
   // Now that we have all of the information for the starting cell corners
   // Contour the region.
-  this->ProcessSharedRegion(regionDims, ptrs, incs, corners, spacings, levelDiff, aptrs);
+  this->ProcessSharedRegion(regionDims, ptrs, incs, cornerPoints, spacings, levelDiff, aptrs);
 }
 
 //----------------------------------------------------------------------------
@@ -1226,7 +1226,7 @@ void vtkFlashContour::ProcessCellFinal(const double cornerPoints[32], const doub
 {
   vtkIdType pointIds[6];
   vtkMarchingCubesTriangleCases *triCase, *triCases;
-  EDGE_LIST* edge;
+  int* edge;
   double k, v0, v1;
   triCases = vtkMarchingCubesTriangleCases::GetCases();
 

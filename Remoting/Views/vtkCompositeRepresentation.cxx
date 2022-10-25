@@ -264,12 +264,12 @@ void vtkCompositeRepresentation::SetSelectionConnection(vtkAlgorithmOutput* inpu
   }
 
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  int nbPiece = controller->GetNumberOfProcesses();
-  int pieceNum = controller->GetLocalProcessId();
-  input->GetProducer()->UpdatePiece(pieceNum, nbPiece, 0);
+  int numPiece = controller->GetNumberOfProcesses();
+  int piece = controller->GetLocalProcessId();
+  input->GetProducer()->UpdatePiece(piece, numPiece, 0);
 
   vtkSmartPointer<vtkSelection> sel;
-  int actualNbPieces = nbPiece;
+  int actualNbPieces = numPiece;
 
   vtkSMSession* session =
     vtkSMSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetSession());
@@ -280,7 +280,7 @@ void vtkCompositeRepresentation::SetSelectionConnection(vtkAlgorithmOutput* inpu
 
   // in order to handle the case where we are connected to a parallel server using
   // local rendering, we have to compare the number of processes here
-  if (nbPiece < actualNbPieces && pieceNum == 0)
+  if (numPiece < actualNbPieces && piece == 0)
   {
     vtkSelection* localSel =
       vtkSelection::SafeDownCast(input->GetProducer()->GetOutputDataObject(0));
@@ -307,7 +307,7 @@ void vtkCompositeRepresentation::SetSelectionConnection(vtkAlgorithmOutput* inpu
     {
       vtkWarningMacro("Only the first node of a selection will be considered.");
     }
-    sel->GetNode(0)->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), pieceNum);
+    sel->GetNode(0)->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), piece);
   }
 
   vtkInternals::RepresentationMap::iterator iter;

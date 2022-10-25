@@ -36,11 +36,7 @@ public:
   {
   public:
     ConfigInfo()
-      : OSDescriptor("")
-      , CPUDescriptor("")
-      , MemDescriptor("")
-      , HostName("")
-      , ProcessType(-1)
+      : ProcessType(-1)
       , SystemType(-1)
       , Rank(-1)
       , Pid(0)
@@ -54,7 +50,6 @@ public:
 
     bool operator<(const ConfigInfo& other) const { return this->Rank < other.Rank; }
 
-  public:
     string OSDescriptor;
     string CPUDescriptor;
     string MemDescriptor;
@@ -68,7 +63,6 @@ public:
     long long ProcMemoryAvailable;
   };
 
-public:
   static vtkPVSystemConfigInformation* New();
   vtkTypeMacro(vtkPVSystemConfigInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
@@ -120,7 +114,6 @@ protected:
 private:
   vector<ConfigInfo> Configs;
 
-private:
   vtkPVSystemConfigInformation(const vtkPVSystemConfigInformation&) = delete;
   void operator=(const vtkPVSystemConfigInformation&) = delete;
 };

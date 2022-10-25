@@ -7,7 +7,7 @@
         GIT_CLONE_PATH: "$CI_BUILDS_DIR/paraview-ci-ext/$CI_CONCURRENT_ID"
         # TODO: Factor this out so that each job selects the Xcode version to
         # use so that different versions can be tested in a single pipeline.
-        DEVELOPER_DIR: "/Applications/Xcode-12.4.app/Contents/Developer"
+        DEVELOPER_DIR: "/Applications/Xcode-13.1.app/Contents/Developer"
 
 ### Build and test
 
@@ -27,14 +27,12 @@
 
     variables:
         CMAKE_CONFIGURATION: macos_arm64_python_qt
-        CTEST_NO_WARNINGS_ALLOWED: 1
 
 .macos_x86_64_python_qt:
     extends: .macos_build
 
     variables:
         CMAKE_CONFIGURATION: macos_x86_64_python_qt
-        CTEST_NO_WARNINGS_ALLOWED: 1
 
 ## Tags
 
@@ -43,7 +41,7 @@
         - paraview
         - macos
         - shell
-        - xcode-12.4
+        - xcode-13.1
         - nonconcurrent
 
 .macos_arm64_builder_tags:
@@ -51,7 +49,7 @@
         - paraview
         - macos-arm64
         - shell
-        - xcode-12.4
+        - xcode-13.1
         - nonconcurrent
 
 ## macOS-specific scripts
@@ -71,6 +69,7 @@
 
 .cmake_build_macos:
     stage: build
+    extends: .warning_policy
 
     script:
         - *before_script_macos
@@ -86,6 +85,7 @@
         - ctest -VV -S .gitlab/ci/ctest_configure.cmake
         - ctest -VV -S .gitlab/ci/ctest_build.cmake
         - sccache --show-stats
+        - exec .gitlab/ci/check_warnings.sh .
 
     interruptible: true
     timeout: 2 hours

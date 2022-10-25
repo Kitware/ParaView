@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqMaterialEditor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -92,6 +92,7 @@ protected Q_SLOTS:
   void addMaterial();
   void removeMaterial();
   void attachMaterial();
+  void saveMaterials();
 
   void addProperty();
   void removeProperty();

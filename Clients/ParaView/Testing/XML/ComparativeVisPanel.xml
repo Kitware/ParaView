@@ -10,7 +10,7 @@
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Comparative View Inspector" />
   <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/addParameter" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/layoutY" command="spin" arguments="up" />
-  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="displ" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="DISPL" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />

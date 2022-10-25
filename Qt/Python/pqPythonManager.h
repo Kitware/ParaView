@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonModule.h" // for exports
 
 #include <QObject>
+#include <QVector>
 
 class QWidget;
 class QToolBar;
@@ -92,7 +93,18 @@ public:
    */
   void updateMacroList();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+
+  /**
+   * @brief Executes the given code.  If the python interpreter hasn't been initialized
+   * yet it will be initialized.
+   * @param code: lines of code to execute
+   * @param pre_push: instructions to execute before the code execution
+   * @param post_push: instructions to execute after the code execution
+   */
+  void executeCode(const QByteArray& code, const QVector<QByteArray>& pre_push = {},
+    const QVector<QByteArray>& post_push = {});
+
   /**
    * Executes the given script.  If the python interpreter hasn't been initialized
    * yet it will be initialized.

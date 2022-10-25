@@ -24,20 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "vtkPVVersion.h"
-#if PARAVIEW_VERSION_MAJOR == 5 && PARAVIEW_VERSION_MINOR >= 6
-#define USE_VTK_OGL_STATE
-#endif
 
-#include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_opengl_canvas.h"
+#include "vtknvindex_forwarding_logger.h"
 
 #include "vtkOpenGLError.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLRenderer.h"
-#ifdef USE_VTK_OGL_STATE
 #include "vtkOpenGLState.h"
-#endif
 #include "vtkRenderWindow.h"
 
 #if defined(__APPLE__)
@@ -77,7 +71,6 @@ std::string vtknvindex_opengl_canvas::get_class_name() const
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_opengl_canvas::initialize_gl()
 {
-#ifdef USE_VTK_OGL_STATE
   vtkOpenGLState* ostate = m_vtk_ogl_render_window->GetState();
 
   if (ostate)
@@ -85,10 +78,6 @@ void vtknvindex_opengl_canvas::initialize_gl()
     ostate->vtkglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ostate->vtkglDisable(GL_LIGHTING);
   }
-#else
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_LIGHTING);
-#endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -103,7 +92,6 @@ void vtknvindex_opengl_canvas::prepare()
   glDepthMask(GL_FALSE);
   glDisable(GL_DEPTH_TEST);
 
-#ifdef USE_VTK_OGL_STATE
   vtkOpenGLState* ostate = m_vtk_ogl_render_window->GetState();
 
   if (ostate)
@@ -112,7 +100,6 @@ void vtknvindex_opengl_canvas::prepare()
     ostate->ResetGLDepthMaskState();
     ostate->ResetEnumState(GL_DEPTH_TEST);
   }
-#endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -186,8 +173,7 @@ void vtknvindex_opengl_canvas::receive_tile_blend(
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_opengl_canvas::finish()
 {
-// Restore default settings.
-#ifdef USE_VTK_OGL_STATE
+  // Restore default settings.
   vtkOpenGLState* ostate = m_vtk_ogl_render_window->GetState();
 
   if (ostate)
@@ -196,11 +182,6 @@ void vtknvindex_opengl_canvas::finish()
     ostate->vtkglEnable(GL_DEPTH_TEST);
     ostate->vtkglDepthMask(GL_TRUE);
   }
-#else
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_DEPTH_TEST);
-  glDepthMask(GL_TRUE);
-#endif
 }
 
 //-------------------------------------------------------------------------------------------------

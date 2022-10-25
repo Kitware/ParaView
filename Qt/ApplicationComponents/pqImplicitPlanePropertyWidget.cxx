@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlanePropertyWidget.h"
 #include "ui_pqImplicitPlanePropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqPointPickingHelper.h"
 #include "pqRenderView.h"
+
 #include "vtkCamera.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -143,18 +145,17 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
 
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
 
   pqPointPickingHelper* pickHelper2 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
   pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper2, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
 
-  this->placeWidget();
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::dataUpdated, this,
+    &pqImplicitPlanePropertyWidget::placeWidget);
 }
 
 //-----------------------------------------------------------------------------

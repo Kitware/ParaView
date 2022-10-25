@@ -61,7 +61,7 @@ public:
   /**
    * Remove the edge from the scene it has been added to.
    */
-  virtual ~pqNodeEditorEdge();
+  ~pqNodeEditorEdge() override;
 
   //@{
   /*
@@ -92,7 +92,7 @@ public:
    */
   std::string toString();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Recompute the points where the edge should pass by.
    * Should be called whenever one of the port the edge is attached to move.

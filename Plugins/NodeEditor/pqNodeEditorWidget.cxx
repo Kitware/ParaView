@@ -91,22 +91,21 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
 
   // create node editor scene and view
   this->scene = new pqNodeEditorScene(this);
-  this->scene->setObjectName("sceneNE");
   this->view = new pqNodeEditorView(this->scene, this);
-  this->view->setObjectName("viewNE");
-  this->view->setDragMode(QGraphicsView::ScrollHandDrag);
-  constexpr QRectF MAX_SCENE_SIZE{ -1e4, -1e4, 3e4, 3e4 };
-  this->view->setSceneRect(MAX_SCENE_SIZE);
 
   // toolbar
   this->initializeActions();
   this->createToolbar(layout);
 
+  // add view to layout
   layout->addWidget(this->view);
 
   this->attachServerManagerListeners();
   this->initializeSignals();
   this->setWidget(widget);
+
+  // initialize view extent
+  this->view->fitInView(-2, -10, 20, 20, Qt::KeepAspectRatio);
 }
 
 // ----------------------------------------------------------------------------
@@ -578,13 +577,13 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
         [this, proxyAsFilter, idx](QGraphicsSceneMouseEvent* event) {
           if (event->button() == Qt::MouseButton::MiddleButton)
           {
-            this->setInput(proxyAsFilter, idx, true);
+            this->setInput(proxyAsFilter, static_cast<int>(idx), true);
             pqApplicationCore::instance()->render();
           }
           else if (event->button() == Qt::MouseButton::LeftButton &&
             (event->modifiers() & Qt::ControlModifier))
           {
-            this->setInput(proxyAsFilter, idx, false);
+            this->setInput(proxyAsFilter, static_cast<int>(idx), false);
           }
         });
     }

@@ -97,14 +97,12 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
 
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(pickHelper, SIGNAL(pick(double, double, double)),
     SLOT(setWorldPosition(double, double, double)));
 
   pqPointPickingHelper* pickHelper2 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
   pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(pickHelper2, SIGNAL(pick(double, double, double)),
     SLOT(setWorldPosition(double, double, double)));
 }

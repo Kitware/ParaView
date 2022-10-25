@@ -90,18 +90,15 @@ public:
   void SetMergePoints(bool status);
 
   /**
-   * Method used for vtkHyperTreeGridPlaneCutter
+   * Method used for vtkHyperTreeGrid
    */
   void SetDual(bool dual);
 
-  virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkPVMetaSliceDataSet();
   ~vtkPVMetaSliceDataSet() override;
-
-  bool AxisCut;
 
   vtkImplicitFunction* ImplicitFunctions[2];
 

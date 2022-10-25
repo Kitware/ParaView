@@ -145,7 +145,7 @@ protected Q_SLOTS:
    */
   void inputChanged(vtkObject*, unsigned long, void* client_data);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Use this method to initialize the pqObject state using the underlying
    * vtkSMProxy. This needs to be done only once, after the object has been

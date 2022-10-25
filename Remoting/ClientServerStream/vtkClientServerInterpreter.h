@@ -67,6 +67,9 @@ public:
   vtkTypeMacro(vtkClientServerInterpreter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  vtkClientServerInterpreter(const vtkClientServerInterpreter&) = delete;
+  vtkClientServerInterpreter& operator=(const vtkClientServerInterpreter&) = delete;
+
   //@{
   /**
    * Process all messages in a given vtkClientServerStream.  Return 1
@@ -219,9 +222,6 @@ private:
   // Internal implementation details.
   vtkClientServerInterpreterInternals* Internal;
 
-private:
-  vtkClientServerInterpreter(const vtkClientServerInterpreter&) = delete;
-  void operator=(const vtkClientServerInterpreter&) = delete;
   int NextAvailableId;
 };
 

@@ -86,27 +86,22 @@ if (TARGET ParaView::RemotingLive)
       LiveOnly.py)
 endif()
 
-if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
-  # no need to add these non-MPI tests if serial tests are going to use MPI
-  # anyways. The have another `paraview_add_test_mpi` invocation right after this
-  # to handle it.
-  paraview_add_test(
-    PREFIX "Catalyst::WaveletMiniApp"
-    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
-    TEST_SCRIPTS ${simple_scripts})
+paraview_add_test(
+  PREFIX "Catalyst::WaveletMiniApp"
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
+  TEST_SCRIPTS ${simple_scripts})
 
-  # Add test to test for adding the same pipeline script twice.
-  paraview_add_test(
-    PREFIX "Catalyst::WaveletMiniApp"
-    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 2 --size 21
+# Add test to test for adding the same pipeline script twice.
+paraview_add_test(
+  PREFIX "Catalyst::WaveletMiniApp"
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 2 --size 21
             --script-version 2
             -s "${CMAKE_CURRENT_SOURCE_DIR}/repeated_pipeline.py"
             -s
-    TEST_SCRIPTS "repeated_pipeline.py" )
-  set_tests_properties("Catalyst::WaveletMiniApp.repeated_pipeline"
-     PROPERTIES
-        PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
-endif()
+            TEST_SCRIPTS "repeated_pipeline.py" )
+set_tests_properties("Catalyst::WaveletMiniApp.repeated_pipeline"
+  PROPERTIES
+  PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
 
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
@@ -120,17 +115,17 @@ paraview_add_test_mpi(
           --script-version 2
           -s "${CMAKE_CURRENT_SOURCE_DIR}/repeated_pipeline.py"
           -s
-  TEST_SCRIPTS "repeated_pipeline.py" )
-set_tests_properties("Catalyst::WaveletMiniApp.repeated_pipeline"
-   PROPERTIES
-      PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
+          TEST_SCRIPTS "repeated_pipeline.py" )
+if (PARAVIEW_USE_MPI)
+  set_tests_properties("Catalyst::MPI::WaveletMiniApp.repeated_pipeline"
+    PROPERTIES
+    PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
+endif()
 
 foreach (tname IN LISTS scripts)
-  if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
-    set_tests_properties("Catalyst::WaveletMiniApp.${tname}"
-      PROPERTIES
-        PASS_REGULAR_EXPRESSION "All ok")
-  endif()
+  set_tests_properties("Catalyst::WaveletMiniApp.${tname}"
+    PROPERTIES
+    PASS_REGULAR_EXPRESSION "All ok")
   if (PARAVIEW_USE_MPI)
     set_tests_properties("Catalyst::MPI::WaveletMiniApp.${tname}"
       PROPERTIES
@@ -298,7 +293,7 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
       WaveletPhiThetaExtractsWithCinema.xml,CINEMA
       WaveletVolumeRenderWithCinema.xml,CINEMA)
   else ()
-    message(AUTHOR_WARNING
+    message(STATUS
       "'pandas' is missing. Skipping Cinema tests")
   endif()
 

@@ -138,6 +138,14 @@ public:
   vtkGetMacro(SkipRenderingComponents, bool);
   //@}
 
+  //@{
+  /**
+   * The trace will include camera interaction. (default false)
+   */
+  vtkSetMacro(FullyTraceCameraAdjustments, bool);
+  vtkGetMacro(FullyTraceCameraAdjustments, bool);
+  //@}
+
   enum
   {
     RECORD_ALL_PROPERTIES = 0,
@@ -191,6 +199,7 @@ public:
     TraceItemArgs& arg(int val);
     TraceItemArgs& arg(double val);
     TraceItemArgs& arg(bool val);
+    TraceItemArgs& arg(const std::vector<std::string>& val);
 
   private:
     TraceItemArgs(const TraceItemArgs&);
@@ -231,6 +240,7 @@ protected:
   int PropertiesToTraceOnCreate;
   bool FullyTraceSupplementalProxies;
   bool SkipRenderingComponents;
+  bool FullyTraceCameraAdjustments;
 
 private:
   vtkSMTrace(const vtkSMTrace&) = delete;

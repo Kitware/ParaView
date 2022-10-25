@@ -322,7 +322,6 @@ protected:
    */
   void SetExecutablePath(const std::string& path);
 
-protected:
   vtkProcessModuleInternals* Internals;
 
   // vtkSessionIterator needs access to vtkInternals to be able to iterate over

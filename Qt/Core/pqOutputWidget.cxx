@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 
 #include <QClipboard>
+#include <QDockWidget>
 #include <QMutexLocker>
 #include <QPointer>
 #include <QScopedValueRollback>
@@ -189,6 +190,7 @@ class pqOutputWidget::pqInternals
   }
 
 public:
+  bool FirstShowFinished = false;
   Ui::OutputWidget Ui;
   QPointer<QStandardItemModel> Model;
   vtkNew<OutputWidgetInternals::OutputWindow> VTKOutputWindow;
@@ -355,16 +357,17 @@ public:
       pqSettings* settings = pqApplicationCore::instance()->settings();
       this->Parent->showFullMessages(
         settings->value(QString("%1.ShowFullMessages").arg(key), false).toBool());
+      this->Parent->alwaysOpenForNewMessages(
+        settings->value(QString("%1.AlwaysOpenForNewMessages").arg(key), true).toBool());
     }
   }
 
-  void saveSettings()
+  void saveSetting(const QString& settingName, const QVariant& value)
   {
-    if (!this->SettingsKey.isEmpty())
+    if (!this->SettingsKey.isEmpty() && !settingName.isEmpty())
     {
       pqSettings* settings = pqApplicationCore::instance()->settings();
-      settings->setValue(QString("%1.ShowFullMessages").arg(this->SettingsKey),
-        this->Ui.showFullMessagesCheckBox->isChecked());
+      settings->setValue(QString("%1.%2").arg(this->SettingsKey).arg(settingName), value);
     }
   }
 
@@ -418,6 +421,8 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
 
   this->connect(
     internals.Ui.showFullMessagesCheckBox, SIGNAL(toggled(bool)), SLOT(showFullMessages(bool)));
+  this->connect(internals.Ui.alwaysOpenForNewMessagesCheckBox, SIGNAL(toggled(bool)),
+    SLOT(alwaysOpenForNewMessages(bool)));
   this->connect(internals.Ui.saveButton, SIGNAL(clicked()), SLOT(saveToFile()));
   this->connect(internals.Ui.copyButton, SIGNAL(clicked()), SLOT(copyToClipboard()));
 
@@ -426,8 +431,6 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
 
   // Install the message handler
   MessageHandler::install(this);
-
-  this->setSettingsKey("pqOutputWidget");
 }
 
 //-----------------------------------------------------------------------------
@@ -529,12 +532,47 @@ QString pqOutputWidget::extractSummary(const QString& message, QtMsgType)
 }
 
 //-----------------------------------------------------------------------------
+void pqOutputWidget::alwaysOpenForNewMessages(bool val)
+{
+  pqInternals& internals = (*this->Internals);
+  internals.Ui.alwaysOpenForNewMessagesCheckBox->setChecked(val);
+  internals.saveSetting("AlwaysOpenForNewMessages", val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqOutputWidget::shouldOpenForNewMessages()
+{
+  pqInternals& internals = (*this->Internals);
+  return internals.FirstShowFinished ? internals.Ui.alwaysOpenForNewMessagesCheckBox->isChecked()
+                                     : true;
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputWidget::showEvent(QShowEvent* event)
+{
+  this->Superclass::showEvent(event);
+  pqInternals& internals = (*this->Internals);
+  internals.FirstShowFinished = true;
+
+  // if we're docked, then disable 'Always open for new messages' checkbox
+  QDockWidget* dock = qobject_cast<QDockWidget*>(this->parentWidget());
+  if (dock != nullptr && !dock->isFloating())
+  {
+    internals.Ui.alwaysOpenForNewMessagesCheckBox->setEnabled(false);
+  }
+  else
+  {
+    internals.Ui.alwaysOpenForNewMessagesCheckBox->setEnabled(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqOutputWidget::showFullMessages(bool val)
 {
   pqInternals& internals = (*this->Internals);
   internals.Ui.showFullMessagesCheckBox->setChecked(val);
   internals.Ui.stackedWidget->setCurrentIndex(val ? 1 : 0);
-  internals.saveSettings();
+  internals.saveSetting("ShowFullMessages", val);
 }
 
 //-----------------------------------------------------------------------------

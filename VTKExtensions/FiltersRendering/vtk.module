@@ -11,12 +11,14 @@ CONDITION
 KIT
   ParaView::CoreKit
 DEPENDS
+  # public due to deprecation header; was private before
+  # PARAVIEW_DEPRECATED_IN_5_11_0
+  ParaView::RemotingCore
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
 PRIVATE_DEPENDS
-  ParaView::RemotingCore
   ParaView::VTKExtensionsMisc
   VTK::CommonSystem
   VTK::FiltersGeneric

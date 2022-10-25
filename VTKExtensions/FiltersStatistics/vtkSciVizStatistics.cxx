@@ -14,15 +14,21 @@
 #include "vtkInformationVector.h"
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkVariantArray.h"
 
 #include <set>
 #include <sstream>
+
+vtkCxxSetObjectMacro(vtkSciVizStatistics, Controller, vtkMultiProcessController);
 
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
@@ -34,10 +40,13 @@ vtkSciVizStatistics::vtkSciVizStatistics()
   this->Task = MODEL_AND_ASSESS;
   this->SetNumberOfInputPorts(2);  // data + optional model
   this->SetNumberOfOutputPorts(2); // model + assessed input
+  this->Controller = nullptr;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 vtkSciVizStatistics::~vtkSciVizStatistics()
 {
+  this->SetController(nullptr);
   delete this->P;
 }
 
@@ -262,6 +271,30 @@ int vtkSciVizStatistics::RequestData(
     modelObjOu->GetInformation()->Remove(MULTIPLE_MODELS());
   }
 
+  // FIXME Temporary workaround.
+  // Currently the stats filters output a vtkMultiBlockDataSet on the model output port.
+  // If we copy the structure of an input vtkPartitionedDataSetCollection, it currently translates
+  // into a multiblock of partitioned data sets. Since later on, we compute the stats for each leaf,
+  // a multiblock (the output model) is injected in this partitioned data set, which is not allowed.
+  // You CANNOT have a partitioned data sets of multiblocks.
+  // To avoid this problem, we're converting partitioned data sets back to multi blocks when this
+  // happens.
+  //
+  // Ideally, we should make the statistic filters correctly handle partitioned data set inputs,
+  // and not output a multiblock.
+  if (auto ouModel = vtkMultiBlockDataSet::SafeDownCast(modelObjOu))
+  {
+    for (unsigned int blockId = 0; blockId < ouModel->GetNumberOfBlocks(); ++blockId)
+    {
+      if (auto pds = vtkPartitionedDataSet::SafeDownCast(ouModel->GetBlock(blockId)))
+      {
+        vtkNew<vtkMultiBlockDataSet> mbds;
+        mbds->SetNumberOfBlocks(pds->GetNumberOfPartitions());
+        ouModel->SetBlock(blockId, mbds);
+      }
+    }
+  }
+
   // II. Create/update the output sci-viz data
   this->ShallowCopy(dataObjOu, dataObjIn);
 
@@ -287,6 +320,11 @@ int vtkSciVizStatistics::RequestData(
   else
   {
     stat = this->RequestData(dataObjOu, modelObjOu, dataObjIn, modelObjIn);
+  }
+
+  if (this->Controller->GetLocalProcessId() != 0)
+  {
+    modelObjOu->Initialize();
   }
 
   return stat;
@@ -429,7 +467,20 @@ int vtkSciVizStatistics::RequestData(
     // Create a table to hold the input data (unless the TrainingFraction is exactly 1.0)
     vtkSmartPointer<vtkTable> train = nullptr;
     vtkIdType N = inTable->GetNumberOfRows();
-    vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining(inTable);
+
+    vtkUnsignedCharArray* ghosts = inTable->GetRowData()->GetGhostArray();
+    if (ghosts)
+    {
+      for (vtkIdType id = 0; id < ghosts->GetNumberOfValues(); ++id)
+      {
+        if (ghosts->GetValue(id))
+        {
+          --N;
+        }
+      }
+    }
+
+    vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining(N);
     if (M == N)
     {
       train = inTable;
@@ -482,27 +533,28 @@ int vtkSciVizStatistics::RequestData(
   {
     outData->ShallowCopy(inData);
   }
+  vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast(outModel);
+  if (!outModelDS)
+  {
+    vtkErrorMacro("No model output dataset or incorrect type");
+    return 0;
+  }
   if (this->Task != CREATE_MODEL && this->Task != MODEL_INPUT)
   {
     // Assess the data using the input or the just-created model
-    vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast(outModel);
-    if (!outModelDS)
-    {
-      vtkErrorMacro("No model output dataset or incorrect type");
-      stat = 0;
-    }
-    else
-    {
-      stat = this->AssessData(inTable, outData, outModelDS);
-    }
+    stat = this->AssessData(inTable, outData, outModelDS);
+  }
+  // We remove the output model in ranks other than the root
+  if (this->Controller && this->Controller->GetLocalProcessId() != 0)
+  {
+    vtkMultiBlockDataSet::SafeDownCast(outModelDS)->Initialize();
   }
   return stat ? 1 : 0;
 }
 
 int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* dataAttrIn)
 {
-  std::set<vtkStdString>::iterator colIt;
-  for (colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++colIt)
+  for (auto colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++colIt)
   {
     vtkAbstractArray* arr = dataAttrIn->GetAbstractArray(colIt->c_str());
     if (arr)
@@ -589,6 +641,12 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
     }
   }
 
+  // If there's a ghost array in the input, we want it in the table.
+  if (vtkUnsignedCharArray* ghosts = dataAttrIn->GetGhostArray())
+  {
+    inTable->AddColumn(ghosts);
+  }
+
   vtkIdType ncols = inTable->GetNumberOfColumns();
   if (ncols < 1)
   {
@@ -604,12 +662,19 @@ int vtkSciVizStatistics::PrepareTrainingTable(
 {
   // FIXME: this should eventually eliminate duplicate points as well as subsample...
   //        but will require the original ugrid/polydata/graph.
+
+  vtkUnsignedCharArray* ghosts = fullDataTable->GetRowData()->GetGhostArray();
+
   std::set<vtkIdType> trainRows;
   vtkIdType N = fullDataTable->GetNumberOfRows();
   double frac = static_cast<double>(M) / static_cast<double>(N);
   vtkNew<vtkMinimalStandardRandomSequence> rand;
   for (vtkIdType i = 0; i < N; ++i)
   {
+    if (ghosts && ghosts->GetValue(i))
+    {
+      continue;
+    }
     rand->Next();
     if (rand->GetValue() < frac)
     {
@@ -628,7 +693,10 @@ int vtkSciVizStatistics::PrepareTrainingTable(
   {
     rand->Next();
     vtkIdType rec = static_cast<vtkIdType>(rand->GetRangeValue(0, N));
-    trainRows.insert(rec);
+    if (!ghosts || !ghosts->GetValue(rec))
+    {
+      trainRows.insert(rec);
+    }
   }
   // Finally, copy the subset into the training table
   trainingTable->Initialize();
@@ -651,9 +719,8 @@ int vtkSciVizStatistics::PrepareTrainingTable(
   return 1;
 }
 
-vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkTable* observations)
+vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkIdType N)
 {
-  vtkIdType N = observations->GetNumberOfRows();
   vtkIdType M = static_cast<vtkIdType>(N * this->TrainingFraction);
   return M < 100 ? (N < 100 ? N : 100) : M;
 }

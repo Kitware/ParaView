@@ -146,9 +146,18 @@ public:
 
   //@{
   /**
+   * Get/Set which process to limit the selection to. `-1` is treated as
+   * all processes.
+   */
+  vtkSetClampMacro(ProcessID, int, -1, VTK_INT_MAX);
+  vtkGetMacro(ProcessID, int);
+  //@}
+
+  //@{
+  /**
    * Set the field type for the generated selection.
    * Possible values are as defined by
-   * vtkSelection::SelectionField.
+   * vtkSelectionNode::SelectionField.
    */
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
@@ -183,6 +192,26 @@ public:
   vtkSetClampMacro(NumberOfLayers, int, 0, VTK_INT_MAX);
   vtkGetMacro(NumberOfLayers, int);
   //@}
+
+  //@{
+  /**
+   * Set/Get the flag the control if, when using the number of layers to extract connected elements,
+   * the initial selection seed should be removed.
+   * Default is falsse
+   */
+  vtkSetMacro(RemoveSeed, bool);
+  vtkGetMacro(RemoveSeed, bool);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the flag the control if, when using the number of layers to extract connected elements,
+   * the intermediate layers should be removed.
+   * Default is falsse
+   */
+  vtkSetMacro(RemoveIntermediateLayers, bool);
+  vtkGetMacro(RemoveIntermediateLayers, bool);
+  //@}
 protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource() override;
@@ -209,6 +238,7 @@ protected:
   };
 
   Modes Mode;
+  int ProcessID;
   int FieldType;
   int ContainingCells;
   int Inverse;
@@ -216,6 +246,8 @@ protected:
   char* ArrayName;
   char* QueryString;
   int NumberOfLayers;
+  bool RemoveSeed = false;
+  bool RemoveIntermediateLayers = false;
 
 private:
   vtkPVSelectionSource(const vtkPVSelectionSource&) = delete;

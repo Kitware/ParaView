@@ -42,7 +42,7 @@ class pqSLACManager : public QObject
 public:
   static pqSLACManager* instance();
 
-  ~pqSLACManager();
+  ~pqSLACManager() override;
 
   /// Get the action for the respective operation.
   QAction* actionDataLoadManager();
@@ -60,9 +60,6 @@ public:
 
   /// Convenience function for getting the current server.
   pqServer* getActiveServer();
-
-  /// Convenience function for getting the main window.
-  QWidget* getMainWindow();
 
   /// Get the window used for viewing the mesh.
   pqView* getMeshView();
@@ -90,7 +87,7 @@ public:
   /// consumers.
   static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void showDataLoadManager();
   void checkActionEnabled();
   void onSourceCreated(pqPipelineSource* source);

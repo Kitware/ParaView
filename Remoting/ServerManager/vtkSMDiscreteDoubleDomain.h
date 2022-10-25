@@ -67,7 +67,7 @@ public:
 
 protected:
   vtkSMDiscreteDoubleDomain();
-  ~vtkSMDiscreteDoubleDomain();
+  ~vtkSMDiscreteDoubleDomain() override;
 
   /**
    * Reads the "values" property, with a maximum of 256 values.

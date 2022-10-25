@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Multi-block Inspector</string>
+   <string>MultiBlock Inspector</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
    <property name="spacing">
     <number>2</number>
    </property>
@@ -33,6 +33,13 @@
        <number>0</number>
       </property>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="extractBlocks">
+     <property name="text">
+      <string>Extract Blocks</string>
+     </property>
     </widget>
    </item>
    <item>

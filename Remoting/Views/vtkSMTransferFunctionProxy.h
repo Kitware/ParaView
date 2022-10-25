@@ -31,7 +31,9 @@
 
 #include <vtk_jsoncpp_fwd.h> // for forward declarations
 
+// Forward declarations
 class vtkPVArrayInformation;
+
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy
 {
 public:
@@ -327,12 +329,6 @@ public:
   }
   using Superclass::ResetPropertiesToXMLDefaults;
   //@}
-
-  /**
-   * Reset the transfer function's AutomaticRescaleResetMode to the global
-   * TransferFunctionRresetMode setting.
-   */
-  void ResetRescaleModeToGlobalSetting();
 
   //@{
   /**

@@ -613,6 +613,8 @@ public:
    */
   const char* GetLogNameOrDefault();
 
+  bool GetPropertiesModified() { return this->PropertiesModified; }
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy() override;
@@ -1008,7 +1010,6 @@ protected:
 
   vtkWeakPointer<vtkSMProxy> ParentProxy;
 
-protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
   vtkSMProxy(const vtkSMProxy&) = delete;

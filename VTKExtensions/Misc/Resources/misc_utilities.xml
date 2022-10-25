@@ -518,6 +518,93 @@
         </ProxyList>
       </Hints>
     </Proxy>
+    <!-- ================================================================== -->
+    <Proxy
+      class="vtkCoordinateFrame" name="CoordinateFrame"
+      processes="dataserver|renderserver|client">
+      <InputProperty is_internal="1"
+                     name="Input"></InputProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the origin of the coordinate frame.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetXAxis"
+                            default_values="1.0 0.0 0.0"
+                            name="XAxis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set one axis of the coordinate frame. The axis vectors must
+          all be of unit length, be perpendicular to one another, and
+          form a right-handed coordinate system.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetYAxis"
+                            default_values="0.0 1.0 0.0"
+                            name="YAxis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set one axis of the coordinate frame. The axis vectors must
+          all be of unit length, be perpendicular to one another, and
+          form a right-handed coordinate system.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetZAxis"
+                            default_values="0.0 0.0 1.0"
+                            name="ZAxis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set one axis of the coordinate frame. The axis vectors must
+          all be of unit length, be perpendicular to one another, and
+          form a right-handed coordinate system.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Frame Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Origin" />
+        <Property function="XAxis" name="XAxis" />
+        <Property function="YAxis" name="YAxis" />
+        <Property function="ZAxis" name="ZAxis" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+
+      <Hints>
+        <!-- Hints are metadata associated with the proxy.
+             As far as the ServerManager is concerned, Hints have no
+             significance. GUI is free to interpret the hints as
+             it chooses. Hints provide a mechanism to add some GUI
+             pertinant information to the server manager XML.
+        -->
+
+        <ProxyList>
+          <!--
+            ProxyList hints are used when this proxy
+            is made a part of a proxy list domain.
+            It provides a mechanism to link certain
+            properties from this proxy with properties
+            from the proxy which has the property
+            with the proxy list domain.
+          -->
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+
   </ProxyGroup>
   <!-- ================================================================== -->
   <ProxyGroup name="slice_implicit_functions">
@@ -530,7 +617,7 @@
     <Proxy group="implicit_functions"
            name="Cylinder" />
   </ProxyGroup>
-  <ProxyGroup name="slice_htg_implicit_functions">
+  <ProxyGroup name="slice_htg_amr_implicit_functions">
     <Proxy group="implicit_functions"
            name="Plane" />
     <Proxy group="implicit_functions"

@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystExportReaction : public pqReactio
 
 public:
   pqCatalystExportReaction(QAction* parent);
-  ~pqCatalystExportReaction();
+  ~pqCatalystExportReaction() override;
 
   /**
    * Export a Catalyst script. Returns true on success.

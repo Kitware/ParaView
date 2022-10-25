@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqFindDataCurrentSelectionFrame.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -89,7 +89,7 @@ private Q_SLOTS:
    */
   void updateSpreadSheet();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame)
 
   class pqInternals;

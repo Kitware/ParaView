@@ -1443,6 +1443,7 @@ void vtkAMRDualClip::ShareLevelMask(vtkAMRDualGridHelperBlock* block)
             if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1] != 0)
             {
               neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+              // NOLINTNEXTLINE(readability-suspicious-call-argument)
               neighborLocator->CopyNeighborLevelMask(neighbor, block);
             }
           }

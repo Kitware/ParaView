@@ -1,5 +1,5 @@
 set(python_files
-  paraview/__init__.py
+  paraview/__init__.py.in
   paraview/_backwardscompatibilityhelper.py
   paraview/_colorMaps.py
   paraview/algorithms/__init__.py
@@ -12,6 +12,7 @@ set(python_files
   paraview/apps/flow.py
   paraview/apps/glance.py
   paraview/apps/lite.py
+  paraview/apps/trame.py
   paraview/apps/visualizer.py
   paraview/benchmark/__init__.py
   paraview/benchmark/basic.py
@@ -47,7 +48,7 @@ set(python_files
   paraview/detail/catalyst_export.py
   paraview/live.py
   paraview/lookuptable.py
-  paraview/modules/__init__.py
+  paraview/modules/__init__.py.in
   paraview/numeric.py
   paraview/numpy_support.py
   paraview/pv-vtk-all.py
@@ -72,21 +73,39 @@ set(python_files
   paraview/vtkConstants.py
   paraview/vtk.py)
 
+# build the "__all__ = [...]" list for paraview/modules/__init__.py
+set(_paraview_python_modules_all)
+foreach (_paraview_python_module IN LISTS paraview_python_wrapped_modules)
+  get_property(_paraview_python_library_name
+    TARGET    "${_paraview_python_module}"
+    PROPERTY  "INTERFACE_vtk_module_library_name")
+  string(APPEND _paraview_python_modules_all
+    "    \'${_paraview_python_library_name}\',\n")
+endforeach ()
+
 set(python_copied_modules)
 foreach (python_file IN LISTS python_files)
   set(output_python_file
     "${CMAKE_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file}")
-  add_custom_command(
-    OUTPUT  "${output_python_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
-            "${output_python_file}"
-    COMMENT "Copying ${python_file} to the binary directory")
+  if (python_file MATCHES "\\.in$")
+    string(REPLACE ".in" "" output_python_file "${output_python_file}")
+    configure_file(
+      "${python_file}"
+      "${output_python_file}"
+      @ONLY)
+  else ()
+    add_custom_command(
+      OUTPUT  "${output_python_file}"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
+      COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+              "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
+              "${output_python_file}"
+      COMMENT "Copying ${python_file} to the binary directory")
+  endif ()
   if (BUILD_SHARED_LIBS)
     get_filename_component(python_file_directory "${python_file}" DIRECTORY)
     install(
-      FILES       "${python_file}"
+      FILES       "${output_python_file}"
       DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file_directory}"
       COMPONENT   "python")
   endif ()

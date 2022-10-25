@@ -54,7 +54,7 @@ class PQWIDGETS_EXPORT pqHierarchicalGridWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqHierarchicalGridWidget(QWidget* parent = 0);
+  pqHierarchicalGridWidget(QWidget* parent = nullptr);
   ~pqHierarchicalGridWidget() override;
 
   //@{

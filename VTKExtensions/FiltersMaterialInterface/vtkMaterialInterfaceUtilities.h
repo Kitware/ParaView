@@ -61,7 +61,7 @@ void ClearVectorOfVtkPointers(vector<T*>& V)
   size_t n = V.size();
   for (size_t i = 0; i < n; ++i)
   {
-    if (V[i] != 0)
+    if (V[i] != nullptr)
     {
       V[i]->Delete();
     }
@@ -138,7 +138,7 @@ void ResizeVectorOfVtkArrayPointers(vector<T*>& V, int nComps, int nTups, int nv
 template <class T>
 inline void ReNewVtkPointer(T*& pv)
 {
-  if (pv != 0)
+  if (pv != nullptr)
   {
     pv->Delete();
   }
@@ -157,7 +157,7 @@ inline void NewVtkArrayPointer(T*& pv, int nComps, vtkIdType nTups, std::string 
 template <class T>
 inline void ReNewVtkArrayPointer(T*& pv, int nComps, vtkIdType nTups, std::string name)
 {
-  if (pv != 0)
+  if (pv != nullptr)
   {
     pv->Delete();
   }
@@ -175,29 +175,29 @@ inline void ReleaseVtkPointer(T*& pv)
 {
   assert("Attempted to release a 0 pointer." && pv != 0);
   pv->Delete();
-  pv = 0;
+  pv = nullptr;
 }
 // vtk object memory management helper
 template <class T>
 inline void CheckAndReleaseVtkPointer(T*& pv)
 {
-  if (pv == 0)
+  if (pv == nullptr)
   {
     return;
   }
   pv->Delete();
-  pv = 0;
+  pv = nullptr;
 }
 // memory management helper
 template <class T>
 inline void CheckAndReleaseArrayPointer(T*& pv)
 {
-  if (pv == 0)
+  if (pv == nullptr)
   {
     return;
   }
   delete[] pv;
-  pv = 0;
+  pv = nullptr;
 }
 // memory management helper
 template <class T>
@@ -544,7 +544,6 @@ void PrintHistogram(vector<TCnt>& bins, vector<TLabel>& binIds)
     }
     cerr << "(" << bins[i] << ")" << endl;
   }
-  return;
 }
 //
 template <typename TCnt>
@@ -559,7 +558,6 @@ void PrintHistogram(vector<TCnt>& bins)
   }
   //
   PrintHistogram(bins, binIds);
-  return;
 }
 };
 #endif

@@ -49,12 +49,12 @@ class pqIntegrationModelSurfaceHelperWidget : public pqIntegrationModelHelperWid
 
 public:
   pqIntegrationModelSurfaceHelperWidget(
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = nullptr);
   ~pqIntegrationModelSurfaceHelperWidget() override = default;
 
   QList<QVariant> arrayToGenerate() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setArrayToGenerate(const QList<QVariant>&);
 
 Q_SIGNALS:
@@ -64,7 +64,7 @@ protected Q_SLOTS:
   /// Create/Reset the widget
   void resetWidget() override;
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /// Recursive method to fill leaf names from a potentially composite data information
   /// to a flat string array
   static vtkStringArray* fillLeafNames(

@@ -25,13 +25,15 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
+#include "vtkParaViewDeprecation.h"                   // for PARAVIEW_DEPRECATED_IN_5_11_0
+
 class vtkCallbackCommand;
 class vtkDataSet;
-class vtkDataSetSurfaceFilter;
 class vtkExplicitStructuredGrid;
 class vtkFeatureEdges;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
+class vtkGeometryFilter;
 class vtkHyperTreeGrid;
 class vtkImageData;
 class vtkUniformGrid;
@@ -94,16 +96,34 @@ public:
    * triangle strips.  This should render faster and use less memory, but no
    * cell data is copied.  By default, UseStrips is Off.
    */
-  void SetUseStrips(int);
-  vtkGetMacro(UseStrips, int);
-  vtkBooleanMacro(UseStrips, int);
-  //@}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  void SetUseStrips(int) {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual int GetUseStrips() VTK_FUTURE_CONST { return false; }
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void UseStripsOn() {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void UseStripsOff() {}
 
   // Description:
   // Makes set use strips call modified after it changes the setting.
-  void SetForceUseStrips(int);
-  vtkGetMacro(ForceUseStrips, int);
-  vtkBooleanMacro(ForceUseStrips, int);
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  void SetForceUseStrips(int) {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual int GetForceUseStrips() VTK_FUTURE_CONST { return false; }
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void ForceUseStripsOn() {}
+  PARAVIEW_DEPRECATED_IN_5_11_0(
+    "Removed; the backing implementation has done nothing since VTK 9.1.0")
+  virtual void ForceUseStripsOff() {}
+  //@}
 
   //@{
   /**
@@ -123,7 +143,7 @@ public:
    * This option has no effect when using OpenGL2 rendering backend. OpenGL2
    * rendering always triangulates polygonal meshes.
    */
-  virtual void SetTriangulate(int val);
+  vtkSetMacro(Triangulate, int);
   vtkGetMacro(Triangulate, int);
   vtkBooleanMacro(Triangulate, int);
   //@}
@@ -282,19 +302,16 @@ protected:
 
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
 
-  void ChangeUseStripsInternal(int val, int force);
-
   int OutlineFlag;
   int UseOutline;
   int BlockColorsDistinctValues;
-  int UseStrips;
   int GenerateCellNormals;
   int Triangulate;
   int NonlinearSubdivisionLevel;
 
   vtkMultiProcessController* Controller;
   vtkOutlineSource* OutlineSource;
-  vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
+  vtkGeometryFilter* GeometryFilter;
   vtkGenericGeometryFilter* GenericGeometryFilter;
   vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
   vtkPVRecoverGeometryWireframe* RecoverWireframeFilter;
@@ -319,15 +336,9 @@ protected:
    */
   int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  // Convenience method to purge ghost cells.
-  void RemoveGhostCells(vtkPolyData*);
-
   bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;
-  int ForceUseStrips;
-  vtkTimeStamp StripSettingMTime;
-  int StripModFirstPass;
   bool HideInternalAMRFaces;
   bool UseNonOverlappingAMRMetaDataForOutlines;
   bool GenerateFeatureEdges;

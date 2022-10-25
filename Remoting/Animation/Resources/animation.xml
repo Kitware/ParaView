@@ -249,6 +249,8 @@
       </IntVectorProperty>
       <Property command="Play"
                 name="Play" />
+      <Property command="Reverse"
+                name="Reverse" />
       <Property command="Stop"
                 name="Stop" />
       <Property command="GoToNext"
@@ -630,6 +632,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="FrameStride"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          The stride which is used to extract the next frame.
+          E.g. 1, 2, 3, would have frame stride = 1, while 1, 3, 5 would have frame stride = 2.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="FrameWindow"
         number_of_elements="2"
         default_values="none"
@@ -674,6 +687,7 @@
 
       <PropertyGroup label="Animation Options">
         <Property name="FrameRate" />
+        <Property name="FrameStride" />
         <Property name="FrameWindow" />
       </PropertyGroup>
 
@@ -703,9 +717,50 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <Hints>
-        <UseDocumentationForLabels />
-      </Hints>
+
+      <ProxyProperty name="AnimationScene" panel_visibility="never"/>
+
+      <IntVectorProperty name="FrameRate"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          Frame rate in frames-per-second (FPS).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FrameStride"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          The stride which is used to extract the next frame.
+          E.g. 1, 2, 3, would have frame stride = 1, while 1, 3, 5 would have frame stride = 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FrameWindow"
+                         number_of_elements="2"
+                         default_values="none"
+                         panel_visibility="advanced">
+        <AnimationFrameWindowDomain name="range" default_mode="min,max">
+          <RequiredProperties>
+            <Property name="AnimationScene" function="AnimationScene"/>
+            <Property name="FrameRate" function="FrameRate"/>
+          </RequiredProperties>
+        </AnimationFrameWindowDomain>
+        <Documentation>
+          Specify a window to save only a part of the animation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Animation Options">
+        <Property name="FrameRate"/>
+        <Property name="FrameStride"/>
+        <Property name="FrameWindow"/>
+      </PropertyGroup>
     </SaveAnimationExtractsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

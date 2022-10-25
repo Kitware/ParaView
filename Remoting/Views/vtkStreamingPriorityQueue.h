@@ -36,8 +36,8 @@
 namespace
 {
 // this code is stolen from vtkFrustumCoverageCuller.
-double vtkComputeScreenCoverage(const double planes[24], const double bounds[6], double& distance,
-  double& centeredness, double& itemCoverage)
+inline double vtkComputeScreenCoverage(const double planes[24], const double bounds[6],
+  double& distance, double& centeredness, double& itemCoverage)
 {
   distance = 0.0;
   centeredness = 0.0;

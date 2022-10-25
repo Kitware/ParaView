@@ -32,20 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MultiServerClientMainWindow.h"
 #include "ui_MultiServerClientMainWindow.h"
 
-#include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
-#include "pqParaViewBehaviors.h"
-#include "pqParaViewMenuBuilders.h"
-#include "pqPipelineBrowserWidget.h"
-#include "pqServer.h"
-#include "pqServerConfiguration.h"
-#include "pqServerConnectReaction.h"
-#include "pqServerManagerModel.h"
-
-#include "vtkProcessModule.h"
-#include "vtkSMSession.h"
-#include "vtkSession.h"
+#include <pqActiveObjects.h>
+#include <pqApplicationCore.h>
+#include <pqObjectBuilder.h>
+#include <pqParaViewBehaviors.h>
+#include <pqParaViewMenuBuilders.h>
+#include <pqPipelineBrowserWidget.h>
+#include <pqServer.h>
+#include <pqServerConfiguration.h>
+#include <pqServerConnectReaction.h>
+#include <pqServerManagerModel.h>
+#include <vtkProcessModule.h>
+#include <vtkSMSession.h>
+#include <vtkSession.h>
 
 #include <QComboBox>
 

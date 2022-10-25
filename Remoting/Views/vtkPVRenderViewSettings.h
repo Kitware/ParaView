@@ -70,6 +70,15 @@ public:
   vtkGetMacro(OutlineThreshold, vtkIdType);
   //@}
 
+  //@{
+  /**
+   * When rendering a volume, this option simulates light coming from both its direction
+   * and its opposite for all lights in the scene. It is enabled by default.
+   */
+  vtkSetMacro(TwoSidedLighting, bool);
+  vtkGetMacro(TwoSidedLighting, bool);
+  //@}
+
   enum
   {
     AUTOMATIC = 0,
@@ -113,6 +122,24 @@ public:
   vtkGetMacro(EnableFastPreselection, bool);
   //@}
 
+  //@{
+  /**
+   * When enabled and growing selection, remove the initial selection seed.
+   * Default is false.
+   */
+  vtkSetMacro(GrowSelectionRemoveSeed, bool);
+  vtkGetMacro(GrowSelectionRemoveSeed, bool);
+  //@}
+
+  //@{
+  /**
+   * When enabled and growing selection, remove the intermediate layers.
+   * Default is false.
+   */
+  vtkSetMacro(GrowSelectionRemoveIntermediateLayers, bool);
+  vtkGetMacro(GrowSelectionRemoveIntermediateLayers, bool);
+  //@}
+
   ///@{
   /**
    * Used by vtkPVRenderView and other views to determine background color.
@@ -130,9 +157,12 @@ protected:
 
   int DefaultInteractionMode;
   vtkIdType OutlineThreshold;
+  bool TwoSidedLighting = true;
   int PointPickingRadius;
   bool DisableIceT;
   bool EnableFastPreselection;
+  bool GrowSelectionRemoveSeed = false;
+  bool GrowSelectionRemoveIntermediateLayers = false;
 
   double BackgroundColor[3];
   double Background2Color[3];

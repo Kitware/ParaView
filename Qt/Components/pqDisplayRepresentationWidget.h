@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDataRepresentation;
 class vtkSMProxy;
+class vtkSMViewProxy;
 
 /**
  * A widget for representation type for a vtkSMRepresentationProxy. It works
@@ -53,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqDisplayRepresentationWidget(QWidget* parent = 0);
+  pqDisplayRepresentationWidget(QWidget* parent = nullptr);
   ~pqDisplayRepresentationWidget() override;
 
   /**
@@ -61,7 +62,12 @@ public:
    */
   QString representationText() const;
 
-public Q_SLOTS:
+  /**
+   * Returns the view proxy corresponding to the set representation, if any.
+   */
+  vtkSMViewProxy* viewProxy() const;
+
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * set the representation proxy or pqDataRepresentation instance.
    */
@@ -91,6 +97,8 @@ private:
   pqInternals* Internal;
 
   class PropertyLinksConnection;
+
+  pqDataRepresentation* Representation = nullptr;
 };
 
 /**
@@ -101,7 +109,7 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPrope
   Q_OBJECT
 
 public:
-  pqDisplayRepresentationPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
+  pqDisplayRepresentationPropertyWidget(vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqDisplayRepresentationPropertyWidget() override;
 
 private:

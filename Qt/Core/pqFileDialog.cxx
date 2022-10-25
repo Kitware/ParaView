@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPoint>
 #include <QScopedValueRollback>
+#include <QShortcut>
 #include <QtDebug>
 
 #include <QKeyEvent>
@@ -133,6 +134,7 @@ public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
   pqFileDialogRecentDirsModel* const RecentModel;
+  QSortFilterProxyModel* proxyFavoriteModel;
   pqFileDialogFilter FileFilter;
   QStringList FileNames; // list of file names in the FileName ui text edit
   QCompleter* Completer;
@@ -141,6 +143,7 @@ public:
   QList<QStringList> SelectedFiles;
   int SelectedFilterIndex;
   QStringList Filters;
+  bool GroupPaths;
   bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
   QString FileNamesSeperator;
@@ -155,11 +158,12 @@ public:
   pqImplementation(pqFileDialog* p, pqServer* server)
     : QObject(p)
     , Model(new pqFileDialogModel(server, nullptr))
-    , FavoriteModel(new pqFileDialogFavoriteModel(server, nullptr))
+    , FavoriteModel(new pqFileDialogFavoriteModel(Model, server, nullptr))
     , RecentModel(new pqFileDialogRecentDirsModel(Model, server, nullptr))
     , FileFilter(this->Model)
     , Completer(new QCompleter(&this->FileFilter, nullptr))
     , Mode(ExistingFile)
+    , GroupPaths(true)
     , SuppressOverwriteWarning(false)
     , ShowMultipleFileHelp(false)
     , FileNamesSeperator(";")
@@ -186,10 +190,10 @@ public:
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(anEvent);
         if (keyEvent->key() == Qt::Key_Backspace || keyEvent->key() == Qt::Key_Delete)
         {
-          this->Ui.FileName->setFocus(Qt::OtherFocusReason);
+          this->Ui.EntityName->setFocus(Qt::OtherFocusReason);
           // send out a backspace event to the file name now
           QKeyEvent replicateDelete(keyEvent->type(), keyEvent->key(), keyEvent->modifiers());
-          QApplication::sendEvent(this->Ui.FileName, &replicateDelete);
+          QApplication::sendEvent(this->Ui.EntityName, &replicateDelete);
           return true;
         }
       }
@@ -217,9 +221,11 @@ public:
     return this->Model->getCurrentPath();
   }
 
+  void setGroupPaths(bool group) { this->GroupPaths = group; }
+
   void setCurrentPath(const QString& p)
   {
-    this->Model->setCurrentPath(p);
+    this->Model->setCurrentPath(p, this->GroupPaths);
     pqServer* s = this->Model->server();
     if (s)
     {
@@ -283,7 +289,7 @@ QString pqFileDialog::pqImplementation::LocalFilePath;
 // pqFileDialog
 
 pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
-  const QString& startDirectory, const QString& nameFilter)
+  const QString& startDirectory, const QString& nameFilter, bool groupFiles)
   : Superclass(p)
   , Implementation(new pqImplementation(this, server))
 {
@@ -302,7 +308,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.Files->installEventFilter(this->Implementation);
 
   // install the autocompleter
-  impl.Ui.FileName->setCompleter(impl.Completer);
+  impl.Ui.EntityName->setCompleter(impl.Completer);
 
   // this is the Navigate button, which is only shown when needed
   impl.Ui.Navigate->hide();
@@ -345,17 +351,24 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
 
+  auto shortcutDel = new QShortcut(QKeySequence::Delete, this);
+  QObject::connect(shortcutDel, &QShortcut::activated, this,
+    &pqFileDialog::onRemoveSelectedDirectoriesFromFavorites);
+
   impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
   QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
     SLOT(onAddCurrentDirectoryToFavorites()));
-  impl.Ui.RemoveCurrentDirectoryFromFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqMinus.svg"));
-  QObject::connect(impl.Ui.RemoveCurrentDirectoryFromFavorites, SIGNAL(clicked()), this,
-    SLOT(onRemoveCurrentDirectoryFromFavorites()));
   impl.Ui.ResetFavortiesToSystemDefault->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
     SLOT(onResetFavoritesToSystemDefault()));
 
-  impl.Ui.Favorites->setModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel = new QSortFilterProxyModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+  impl.proxyFavoriteModel->setSourceModel(impl.FavoriteModel);
+
+  impl.Ui.Favorites->setModel(impl.proxyFavoriteModel);
+  impl.Ui.Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
   impl.Ui.Recent->setModel(impl.RecentModel);
 
   this->setFileMode(ExistingFile);
@@ -369,11 +382,14 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QObject::connect(
     impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
 
-  QObject::connect(impl.Ui.FileType, SIGNAL(currentIndexChanged(const QString&)), this,
+  QObject::connect(impl.Ui.EntityType, SIGNAL(currentIndexChanged(const QString&)), this,
     SLOT(onFilterChange(const QString&)));
 
   QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedFavorite(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.favoritesSearchBar, &QLineEdit::textChanged, this,
+    &pqFileDialog::FilterDirectoryFromFavorites);
 
   QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedRecent(const QModelIndex&)));
@@ -394,7 +410,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QObject::connect(impl.Ui.Files, SIGNAL(doubleClicked(const QModelIndex&)), this,
     SLOT(onDoubleClickFile(const QModelIndex&)));
 
-  QObject::connect(impl.Ui.FileName, SIGNAL(textChanged(const QString&)), this,
+  QObject::connect(impl.Ui.EntityName, SIGNAL(textChanged(const QString&)), this,
     SLOT(onTextEdited(const QString&)));
 
   impl.Completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -402,15 +418,15 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QStringList filterList = MakeFilterList(nameFilter);
   if (filterList.empty())
   {
-    impl.Ui.FileType->addItem("All Files (*)");
+    impl.Ui.EntityType->addItem("All Files (*)");
     impl.Filters << "All Files (*)";
   }
   else
   {
-    impl.Ui.FileType->addItems(filterList);
+    impl.Ui.EntityType->addItems(filterList);
     impl.Filters = filterList;
   }
-  this->onFilterChange(impl.Ui.FileType->currentText());
+  this->onFilterChange(impl.Ui.EntityType->currentText());
 
   QString startPath = startDirectory;
   if (startPath.isEmpty())
@@ -418,6 +434,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     startPath = impl.getStartPath();
   }
   impl.addHistory(startPath);
+  impl.setGroupPaths(groupFiles);
   impl.setCurrentPath(startPath);
 
   impl.Ui.Files->resizeColumnToContents(0);
@@ -468,8 +485,8 @@ void pqFileDialog::onCreateNewFolder()
   //    actually creating a new directory but this way I could reuse code.
   QString dirName = QString("New Folder");
   int i = 0;
-  QString fullDir;
-  while (impl.Model->dirExists(dirName, fullDir))
+  QString fullpath;
+  while (impl.Model->dirExists(dirName, fullpath))
   {
     dirName = QString("New Folder%1").arg(i++);
   }
@@ -505,7 +522,7 @@ void pqFileDialog::onCreateNewFolder()
   impl.Ui.Files->selectionModel()->select(
     idx, QItemSelectionModel::Select | QItemSelectionModel::Current);
   impl.Ui.Files->edit(idx);
-  impl.Ui.FileName->clear();
+  impl.Ui.EntityName->clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -513,7 +530,7 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
 {
   auto& impl = *this->Implementation;
 
-  QMenu menu;
+  QMenu menu(this); // Make sure to set the parent to `this` to solve #20981
   menu.setObjectName("FileDialogContextMenu");
 
   QModelIndex proxyItemIndex = this->Implementation->Ui.Files->indexAt(menuPos).siblingAtColumn(0);
@@ -572,16 +589,13 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
   // Delete directory action
   if (isCurrentIndexADirectory)
   {
-    QString const fullPath =
-      this->Implementation->Model->data(sourceItemIndex, Qt::UserRole).toString();
-    QDir dir(fullPath);
-    if (dir.isEmpty())
+    QString temp;
+    QString dir = impl.Model->data(sourceItemIndex, Qt::UserRole).toString();
+    if (this->Implementation->Model->dirIsEmpty(dir, temp))
     {
       auto deleteDirectoryAction = new QAction("Delete empty directory", this);
-      QObject::connect(deleteDirectoryAction, &QAction::triggered, [=]() {
-        this->Implementation->Model->rmdir(
-          this->Implementation->Model->data(sourceItemIndex, Qt::DisplayRole).toString());
-      });
+      QObject::connect(deleteDirectoryAction, &QAction::triggered,
+        [=]() { this->Implementation->Model->rmdir(dir); });
       menu.addAction(deleteDirectoryAction);
     }
   }
@@ -610,6 +624,12 @@ void pqFileDialog::RemoveDirectoryFromFavorites(QString const& directory)
 }
 
 //-----------------------------------------------------------------------------
+void pqFileDialog::FilterDirectoryFromFavorites(const QString& filter)
+{
+  this->Implementation->proxyFavoriteModel->setFilterRegExp(filter);
+}
+
+//-----------------------------------------------------------------------------
 void pqFileDialog::onAddCurrentDirectoryToFavorites()
 {
   QString const currentPath = this->Implementation->Model->getCurrentPath();
@@ -617,10 +637,20 @@ void pqFileDialog::onAddCurrentDirectoryToFavorites()
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onRemoveCurrentDirectoryFromFavorites()
+void pqFileDialog::onRemoveSelectedDirectoriesFromFavorites()
 {
-  QString const currentPath = this->Implementation->Model->getCurrentPath();
-  this->RemoveDirectoryFromFavorites(currentPath);
+  QStringList selectedDirs;
+  for (const QModelIndex& index :
+    this->Implementation->Ui.Favorites->selectionModel()->selectedIndexes())
+  {
+    QString dirPath = this->Implementation->FavoriteModel->filePath(index);
+    selectedDirs.push_back(dirPath);
+  }
+
+  for (const QString& dir : selectedDirs)
+  {
+    this->Implementation->FavoriteModel->removeFromFavorites(dir);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -650,7 +680,7 @@ void pqFileDialog::onFavoritesContextMenuRequested(const QPoint& menuPos)
     {
       auto removeFromFavorites = new QAction("Remove from favorites", this);
       QObject::connect(removeFromFavorites, &QAction::triggered,
-        [=] { this->Implementation->FavoriteModel->removeFromFavorites(dirPath); });
+        [=] { this->onRemoveSelectedDirectoriesFromFavorites(); });
       menu.addAction(removeFromFavorites);
 
       auto renameLabel = new QAction("Rename label", this);
@@ -687,6 +717,32 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       selectionMode = QAbstractItemView::ExtendedSelection;
       break;
   }
+
+  impl.Model->setDirectoryItemFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  impl.Model->setFileItemFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  switch (mode)
+  {
+    case Directory:
+      // final selectable entities will be limited to directories.
+      impl.Ui.EntityNameLabel->setText("Directory name:");
+      impl.Ui.EntityTypeLabel->setVisible(false);
+      impl.Ui.EntityType->setVisible(false);
+      impl.Model->setFileItemFlags(Qt::NoItemFlags);
+      break;
+    case ExistingFilesAndDirectories:
+      // final selectable entities can be files or directories.
+      impl.Ui.EntityNameLabel->setText("Name:");
+      impl.Ui.EntityTypeLabel->setVisible(true);
+      impl.Ui.EntityType->setVisible(true);
+      break;
+    default:
+      // final selectable entities will be limited to files.
+      impl.Ui.EntityNameLabel->setText("File name:");
+      impl.Ui.EntityTypeLabel->setVisible(true);
+      impl.Ui.EntityType->setVisible(true);
+      break;
+  }
+
   if (setupMultipleFileHelp)
   {
     // only set the tooltip and window title the first time through
@@ -698,7 +754,8 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 
   impl.Ui.Navigate->show();
   impl.Ui.Navigate->setEnabled(false);
-  impl.Ui.CreateFolder->setEnabled(impl.Mode == pqFileDialog::AnyFile);
+  impl.Ui.CreateFolder->setVisible(
+    impl.Mode == pqFileDialog::AnyFile || impl.Mode == pqFileDialog::Directory);
   this->updateButtonStates();
 }
 
@@ -712,14 +769,14 @@ void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension)
     // upon the initial use of any kind (e.g., data or screenshot) of dialog
     // 'fileExtension' is equal /set to an empty string.
     // In this case, no any user preferences are considered
-    impl.Ui.FileType->setCurrentIndex(0);
+    impl.Ui.EntityType->setCurrentIndex(0);
   }
   else
   {
-    int index = impl.Ui.FileType->findText(fileExtension, Qt::MatchContains);
+    int index = impl.Ui.EntityType->findText(fileExtension, Qt::MatchContains);
     // just in case the provided extension is not in the combobox list
     index = (index == -1) ? 0 : index;
-    impl.Ui.FileType->setCurrentIndex(index);
+    impl.Ui.EntityType->setCurrentIndex(index);
   }
 }
 
@@ -823,7 +880,7 @@ bool pqFileDialog::acceptDefault(const bool& checkForGrouping)
 {
   auto& impl = *this->Implementation;
 
-  QString filename = impl.Ui.FileName->text();
+  QString filename = impl.Ui.EntityName->text();
   filename = filename.trimmed();
 
   QString fullFilePath = impl.Model->absoluteFilePath(filename);
@@ -961,8 +1018,8 @@ void pqFileDialog::onNavigate(const QString& newpath)
   impl.addHistory(impl.Model->getCurrentPath());
   impl.setCurrentPath(path_to_navigate);
   this->updateButtonStates();
-  impl.Ui.FileName->clear();
-  impl.Ui.FileName->setFocus(Qt::OtherFocusReason);
+  impl.Ui.EntityName->clear();
+  impl.Ui.EntityName->setFocus(Qt::OtherFocusReason);
 }
 
 //-----------------------------------------------------------------------------
@@ -1018,9 +1075,9 @@ void pqFileDialog::onFilterChange(const QString& filter)
 
   // update view
   impl.FileFilter.invalidate();
-  impl.Ui.FileType->setToolTip(impl.Ui.FileType->currentText());
+  impl.Ui.EntityType->setToolTip(impl.Ui.EntityType->currentText());
 
-  impl.SelectedFilterIndex = impl.Ui.FileType->currentIndex();
+  impl.SelectedFilterIndex = impl.Ui.EntityType->currentIndex();
 
   this->updateButtonStates();
 }
@@ -1054,7 +1111,7 @@ void pqFileDialog::onActivateFavorite(const QModelIndex& index)
   {
     QString file = impl.FavoriteModel->filePath(index);
     this->onNavigate(file);
-    impl.Ui.FileName->selectAll();
+    impl.Ui.EntityName->selectAll();
   }
 }
 
@@ -1064,7 +1121,7 @@ void pqFileDialog::onActivateRecent(const QModelIndex& index)
   auto& impl = *this->Implementation;
   QString file = impl.RecentModel->filePath(index);
   this->onNavigate(file);
-  impl.Ui.FileName->selectAll();
+  impl.Ui.EntityName->selectAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -1228,7 +1285,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
       case ExistingFiles:
       case AnyFile:
         this->onNavigate(file);
-        impl.Ui.FileName->clear();
+        impl.Ui.EntityName->clear();
         break;
     }
     return false;
@@ -1238,7 +1295,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
   if (impl.Mode == pqFileDialog::AnyFile)
   {
     // If mode is a "save" dialog, we fix the extension first.
-    file = this->fixFileExtension(file, impl.Ui.FileType->currentText());
+    file = this->fixFileExtension(file, impl.Ui.EntityType->currentText());
 
     // It is very possible that after fixing the extension,
     // the new filename is an already present directory,
@@ -1246,7 +1303,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
     if (impl.Model->dirExists(file, file))
     {
       this->onNavigate(file);
-      impl.Ui.FileName->clear();
+      impl.Ui.EntityName->clear();
       return false;
     }
   }
@@ -1258,7 +1315,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
     {
       case Directory:
         // User chose a file in directory mode, do nothing
-        impl.Ui.FileName->clear();
+        impl.Ui.EntityName->clear();
         break;
       case ExistingFile:
       case ExistingFiles:
@@ -1290,15 +1347,10 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
       case ExistingFile:
       case ExistingFiles:
       case ExistingFilesAndDirectories:
-        impl.Ui.FileName->selectAll();
+        impl.Ui.EntityName->selectAll();
         return false;
 
       case AnyFile:
-        QDir dir = QFileInfo(file).absoluteDir();
-        if (!dir.exists())
-        {
-          qWarning() << "'" << dir.absolutePath() << "' does not exist";
-        }
         this->addToFilesSelected(QStringList(file));
         return true;
     }
@@ -1310,7 +1362,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
 void pqFileDialog::fileSelectionChanged()
 {
   auto& impl = *this->Implementation;
-  // Selection changed, update the FileName entry box
+  // Selection changed, update the EntityName entry box
   // to reflect the current selection.
   QString fileString;
   const QModelIndexList indices = impl.Ui.Files->selectionModel()->selectedIndexes();
@@ -1318,7 +1370,7 @@ void pqFileDialog::fileSelectionChanged()
 
   if (indices.isEmpty())
   {
-    // do not change the FileName text if no selections
+    // do not change the EntityName text if no selections
     return;
   }
   QStringList fileNames;
@@ -1344,9 +1396,9 @@ void pqFileDialog::fileSelectionChanged()
   }
 
   // user is currently editing a name, don't change the text
-  impl.Ui.FileName->blockSignals(true);
-  impl.Ui.FileName->setText(fileString);
-  impl.Ui.FileName->blockSignals(false);
+  impl.Ui.EntityName->blockSignals(true);
+  impl.Ui.EntityName->setText(fileString);
+  impl.Ui.EntityName->blockSignals(false);
 
   impl.FileNames = fileNames;
   this->updateButtonStates();
@@ -1376,7 +1428,7 @@ bool pqFileDialog::selectFile(const QString& f)
 
   QPointer<QDialog> diag = this;
   impl.Model->setCurrentPath(dirname.c_str());
-  impl.Ui.FileName->setText(filename.c_str());
+  impl.Ui.EntityName->setText(filename.c_str());
   impl.SuppressOverwriteWarning = true;
   this->accept();
   if (diag && diag->result() != QDialog::Accepted)
@@ -1395,7 +1447,7 @@ void pqFileDialog::showEvent(QShowEvent* _showEvent)
   // which is determined by the creation order. This means that we have
   // to explicitly state that the line edit has the focus on showing no
   // matter the tab order
-  impl.Ui.FileName->setFocus(Qt::OtherFocusReason);
+  impl.Ui.EntityName->setFocus(Qt::OtherFocusReason);
 }
 
 //-----------------------------------------------------------------------------

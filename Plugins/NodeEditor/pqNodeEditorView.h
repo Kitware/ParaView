@@ -35,8 +35,6 @@ class QAction;
 class pqNodeEditorView : public QGraphicsView
 {
 public:
-  pqNodeEditorView(QWidget* parent = nullptr);
-
   /**
    * Create a view for the specified scene. Also construct a new pqDeleteReaction
    * for whenever a user tries to delete a node using the `Del` key on the keyboard.
@@ -45,11 +43,11 @@ public:
 
   void triggerDeleteAction() const;
 
-  virtual ~pqNodeEditorView() = default;
+  ~pqNodeEditorView() override = default;
 
 protected:
-  void wheelEvent(QWheelEvent* event);
-  void keyReleaseEvent(QKeyEvent* event);
+  void wheelEvent(QWheelEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
 
 private:
   QAction* deleteAction;

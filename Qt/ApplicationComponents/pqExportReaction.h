@@ -59,7 +59,7 @@ public:
    */
   QString exportActiveView();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
@@ -72,11 +72,6 @@ protected:
   void onTriggered() override { this->exportActiveView(); }
 
 private:
-  /**
-   * Creates a dialog widget containing the predefined proxyWidget.
-   */
-  QDialog* createConfigurationDialog(pqProxyWidget* proxyWidget);
-
   pqView* ConnectedView;
 
   Q_DISABLE_COPY(pqExportReaction)

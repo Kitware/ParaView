@@ -82,7 +82,7 @@ class PQCOMPONENTS_EXPORT pqCompositePropertyWidgetDecorator : public pqProperty
 
 public:
   pqCompositePropertyWidgetDecorator(vtkPVXMLElement* xml, pqPropertyWidget* parent);
-  virtual ~pqCompositePropertyWidgetDecorator();
+  ~pqCompositePropertyWidgetDecorator() override;
 
   bool canShowWidget(bool show_advanced) const override;
   bool enableWidget() const override;

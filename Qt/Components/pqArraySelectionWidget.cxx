@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqHeaderView.h"
 #include "pqSMAdaptor.h"
+#include "pqTimer.h"
 
 #include <QEvent>
 #include <QHeaderView>
@@ -102,11 +103,15 @@ class pqArraySelectionWidget::Model : public QStandardItemModel
   PixmapMap Pixmaps;
 
   QMap<QString, QString> IconTypeMap;
+  QVector<QMap<QString, QMap<QString, QString>>> Columns;
+  QVector<QMap<int, QVariant>> ColumnItemData;
 
 public:
   Model(int rs, int cs, pqArraySelectionWidget* parentObject)
     : Superclass(rs, cs, parentObject)
     , Widget(parentObject)
+    , Columns(cs)
+    , ColumnItemData(cs)
   {
   }
 
@@ -115,6 +120,23 @@ public:
   void addPixmap(const QString& key, QIcon&& pixmap)
   {
     this->Pixmaps.insert(key, std::move(pixmap));
+  }
+
+  void setColumnData(int column, const QString& key, QMap<QString, QString>&& mapping)
+  {
+    auto& current = this->Columns[column][key];
+    if (current == mapping)
+    {
+      return;
+    }
+
+    current = std::move(mapping);
+    this->updateColumnData(column, key);
+  }
+
+  void setColumnItemData(int column, int role, const QVariant& data)
+  {
+    this->ColumnItemData[column][role] = data;
   }
 
   // Here, `key` is the dynamic property name,
@@ -132,40 +154,40 @@ public:
   void setStatus(const QString& key, const std::map<QString, bool>& value_map)
   {
     auto& items_map = this->GroupedItemsMap[key];
-    // any items not in value_map should be removed.
-    for (auto iter = items_map.begin(); iter != items_map.end();)
+    // We want to keep arrays order from "value_map", not previous order.
+    // Easiest way is to clear all and recreate rows.
+    if (!items_map.empty())
     {
-      if (value_map.find(iter->first) == value_map.end())
+      int row = std::numeric_limits<int>::max();
+      for (const auto& pair : items_map)
       {
-        this->removeRow(iter->second);
-        iter = items_map.erase(iter);
+        row = std::min(this->indexFromItem(pair.second).row(), row);
       }
-      else
-      {
-        ++iter;
-      }
+      this->removeRows(row, static_cast<int>(items_map.size()));
+      items_map.clear();
     }
 
     const QVariant pixmap = this->Pixmaps.contains(key) ? QVariant(this->Pixmaps[key]) : QVariant();
-
     for (const auto& pair : value_map)
     {
-      auto iter = items_map.find(pair.first);
-      if (iter == items_map.end())
-      {
-        auto item = new QStandardItem(pair.first);
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
-          Qt::ItemNeverHasChildren);
-        item->setData(pixmap, Qt::DecorationRole);
-        this->appendRow(item);
+      auto item = new QStandardItem(pair.first);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
+        Qt::ItemNeverHasChildren);
+      item->setData(pixmap, Qt::DecorationRole);
+      item->setCheckState(pair.second ? Qt::Checked : Qt::Unchecked);
+      this->updateItemData(0, item);
+      this->appendRow(item);
 
-        // add to map.
-        iter = items_map.insert(std::pair<QString, QStandardItem*>(pair.first, item)).first;
-      }
-      assert(iter != items_map.end());
-      assert(iter->second != nullptr);
-      iter->second->setCheckState(pair.second ? Qt::Checked : Qt::Unchecked);
+      // add to map.
+      items_map.emplace(pair.first, item);
     }
+
+    // update other columns
+    for (int cc = 1; cc < this->columnCount(); ++cc)
+    {
+      this->updateColumnData(cc, key);
+    }
+
     // potentially changed, so just indicate that.
     this->emitHeaderDataChanged();
   }
@@ -352,10 +374,35 @@ private:
     return this->HeaderCheckState;
   }
 
+  void updateColumnData(int column, const QString& key)
+  {
+    const auto& itemsMap = this->GroupedItemsMap[key];
+    auto& current = this->Columns[column][key];
+    for (const auto& pair : itemsMap)
+    {
+      const int row = this->indexFromItem(pair.second).row();
+
+      auto iter = current.find(pair.first);
+      auto* item = new QStandardItem(iter != current.end() ? iter.value() : QString());
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemNeverHasChildren);
+      this->updateItemData(column, item);
+      this->setItem(row, column, item);
+    }
+  }
+
   void emitHeaderDataChanged()
   {
     this->HeaderCheckState.clear();
     Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, 0);
+  }
+
+  void updateItemData(int column, QStandardItem* item)
+  {
+    const auto& qmap = this->ColumnItemData[column];
+    for (auto iter = qmap.begin(); iter != qmap.end(); ++iter)
+    {
+      item->setData(iter.value(), /*role=*/iter.key());
+    }
   }
 
   std::map<QString, std::map<QString, QStandardItem*>> GroupedItemsMap;
@@ -363,22 +410,47 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parentObject)
+pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parent)
+  : pqArraySelectionWidget(1, parent)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqArraySelectionWidget::pqArraySelectionWidget(int numColumns, QWidget* parentObject)
   : Superclass(parentObject, /*use_pqHeaderView=*/true)
   , UpdatingProperty(false)
+  , Timer(new pqTimer())
 {
   this->setObjectName("ArraySelectionWidget");
   this->setRootIsDecorated(false);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  // allow the QTreeView and QSortFilterProxyModel to handle sorting.
+  this->setSortingEnabled(true);
 
   // name it changed just to avoid having to change a whole lot of tests.
   this->header()->setObjectName("1QHeaderView0");
+  if (auto headerView = qobject_cast<pqHeaderView*>(this->header()))
+  {
+    headerView->setToggleCheckStateOnSectionClick(false);
+  }
 
-  auto mymodel = new pqArraySelectionWidget::Model(0, 1, this);
+  auto mymodel = new pqArraySelectionWidget::Model(0, numColumns, this);
   auto sortmodel = new QSortFilterProxyModel(this);
   sortmodel->setSourceModel(mymodel);
   this->setModel(sortmodel);
+  // use underlying structure by default - no alphabetic sort until header clicked.
+  this->header()->setSortIndicator(-1, Qt::AscendingOrder);
+
+  this->Timer->setInterval(10);
+  this->Timer->setSingleShot(true);
+  QObject::connect(this->Timer, &QTimer::timeout,
+    [this]() { this->header()->resizeSections(QHeaderView::ResizeToContents); });
+
+  if (numColumns > 1)
+  {
+    this->header()->moveSection(0, numColumns - 1);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -496,14 +568,17 @@ void pqArraySelectionWidget::propertyChanged(const QString& pname)
   if (pname == "GenerateObjectIdCellArray")
   {
     amodel->setStatus(pname, "Object Ids", value.toBool());
+    this->resizeSectionsEventually();
   }
   else if (pname == "GenerateGlobalElementIdArray")
   {
     amodel->setStatus(pname, "Global Element Ids", value.toBool());
+    this->resizeSectionsEventually();
   }
   else if (pname == "GenerateGlobalNodeIdArray")
   {
     amodel->setStatus(pname, "Global Node Ids", value.toBool());
+    this->resizeSectionsEventually();
   }
   else
   {
@@ -517,6 +592,7 @@ void pqArraySelectionWidget::propertyChanged(const QString& pname)
       }
     }
     amodel->setStatus(pname, statuses);
+    this->resizeSectionsEventually();
   }
 }
 
@@ -532,17 +608,66 @@ void pqArraySelectionWidget::updateProperty(const QString& pname, const QVariant
 }
 
 //-----------------------------------------------------------------------------
-void pqArraySelectionWidget::setHeaderLabel(const QString& label)
+void pqArraySelectionWidget::setHeaderLabel(int column, const QString& label)
 {
   auto amodel = this->realModel();
   assert(amodel);
-  amodel->setHeaderData(0, Qt::Horizontal, label, Qt::DisplayRole);
+  amodel->setHeaderData(column, Qt::Horizontal, label, Qt::DisplayRole);
 }
 
 //-----------------------------------------------------------------------------
-QString pqArraySelectionWidget::headerLabel() const
+QString pqArraySelectionWidget::headerLabel(int column) const
 {
   auto amodel = this->realModel();
   assert(amodel);
-  return amodel->headerData(0, Qt::Horizontal, Qt::DisplayRole).toString();
+  if (column <= 0 || column >= amodel->columnCount())
+  {
+    qCritical() << "Incorrect column (" << column << ") specified!";
+    return {};
+  }
+
+  return amodel->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+}
+
+//-----------------------------------------------------------------------------
+void pqArraySelectionWidget::setColumnData(
+  int column, const QString& pname, QMap<QString, QString>&& mapping)
+{
+  auto* amodel = this->realModel();
+  if (column < 0 || column >= amodel->columnCount())
+  {
+    qCritical() << "Incorrect column (" << column << ") specified!";
+    return;
+  }
+
+  if (column == 0)
+  {
+    qCritical() << "setColumnData(0,...) is not supported!";
+    return;
+  }
+
+  amodel->setColumnData(column, pname, std::move(mapping));
+  this->resizeSectionsEventually();
+}
+
+//-----------------------------------------------------------------------------
+void pqArraySelectionWidget::setColumnItemData(int column, int role, const QVariant& value)
+{
+  auto* amodel = this->realModel();
+  if (column < 0 || column >= amodel->columnCount())
+  {
+    qCritical() << "Incorrect column (" << column << ") specified!";
+    return;
+  }
+  amodel->setColumnItemData(column, role, value);
+}
+
+//-----------------------------------------------------------------------------
+void pqArraySelectionWidget::resizeSectionsEventually()
+{
+  auto* amodel = this->realModel();
+  if (amodel && amodel->columnCount() > 1)
+  {
+    this->Timer->start(10);
+  }
 }

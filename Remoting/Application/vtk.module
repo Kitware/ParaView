@@ -19,6 +19,7 @@ OPTIONAL_DEPENDS
   # features
   ParaView::VTKExtensionsExtraction
   ParaView::VTKExtensionsFiltersGeneral
+  ParaView::VTKExtensionsIOCGNSWriter
   VTK::CommonComputationalGeometry
   VTK::DomainsChemistry
   VTK::FiltersAMR
@@ -46,10 +47,12 @@ OPTIONAL_DEPENDS
   VTK::ImagingGeneral
   VTK::ImagingHybrid
   VTK::ImagingSources
+  VTK::ImagingStatistics
   VTK::InteractionWidgets
   VTK::IOADIOS2
   VTK::IOCGNSReader
   VTK::IOFides
+  VTK::IOCatalystConduit
   VTK::IOChemistry
   VTK::IOCityGML
   VTK::IOGDAL
@@ -85,6 +88,8 @@ OPTIONAL_DEPENDS
   VTK::ParallelMomentInvariants
   VTK::PythonInterpreter
   VTK::RenderingFreeType
+TEST_DEPENDS
+  VTK::TestingCore
 TEST_OPTIONAL_DEPENDS
   ParaView::RemotingMisc
 TEST_LABELS

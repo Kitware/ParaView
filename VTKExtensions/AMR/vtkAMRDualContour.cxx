@@ -1160,7 +1160,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
   int nx, ny, nz; // Neighbor index [3][3][3];
   vtkIdType pointIds[6];
   vtkMarchingCubesTriangleCases *triCase, *triCases;
-  EDGE_LIST* edge;
+  int* edge;
   double k, v0, v1;
   triCases = vtkMarchingCubesTriangleCases::GetCases();
 

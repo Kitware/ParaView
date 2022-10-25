@@ -110,11 +110,18 @@ public:
 
   void loadStateFromPythonFile(const QString& filename, pqServer* server);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * A useful slot to trigger an apply on the pipeline.
+   * This is just emitting a signal usually caught by a pqApplyBehavior.
+   */
+  void applyPipeline();
+
   /**
    * Pops-up the quick launch dialog.
    */
   void quickLaunch();
+
   /**
    * Pops-up the search dialog if the focused widget is
    * QAsbstractItemView type.
@@ -128,6 +135,8 @@ Q_SIGNALS:
    * dialog.
    */
   void aboutToShowQuickLaunch();
+
+  void triggerApply();
 
 protected:
   /**

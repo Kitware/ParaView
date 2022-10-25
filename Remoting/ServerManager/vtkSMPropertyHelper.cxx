@@ -415,6 +415,30 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const T* values, unsigned int 
 
 //----------------------------------------------------------------------------
 template <>
+// Note: const T* == T const* i.e, immutable T and mutable pointer
+// const char* const* -> read whole thing as T const*, where T = const char*
+inline void vtkSMPropertyHelper::SetPropertyArray(const char* const* values, unsigned int count)
+{
+  if (this->Type == STRING)
+  {
+    std::vector<std::string> std_values(values, values + count);
+    if (this->UseUnchecked)
+    {
+      this->StringVectorProperty->SetUncheckedElements(std_values);
+    }
+    else
+    {
+      this->StringVectorProperty->SetElements(std_values);
+    }
+  }
+  else
+  {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+  }
+}
+
+//----------------------------------------------------------------------------
+template <>
 inline void vtkSMPropertyHelper::SetPropertyArray(const int* values, unsigned int count)
 {
   if (this->Type == INT)
@@ -1633,9 +1657,11 @@ bool vtkSMPropertyHelper::Copy(const vtkSMPropertyHelper& source)
       return this->CopyInternal<double>(source);
     case IDTYPE:
       return this->CopyInternal<vtkIdType>(source);
+    case STRING:
+      return this->CopyInternal<const char*>(source);
     default:
       vtkSMPropertyHelperWarningMacro(
-        "Copy currently only supported for int/double/idtype properties.");
+        "Copy currently only supported for int/double/idtype/string properties.");
       return false;
   }
 }

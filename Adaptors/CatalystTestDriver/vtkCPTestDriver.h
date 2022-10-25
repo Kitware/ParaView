@@ -76,7 +76,7 @@ public:
 
 protected:
   vtkCPTestDriver();
-  ~vtkCPTestDriver();
+  ~vtkCPTestDriver() override;
 
 private:
   vtkCPTestDriver(const vtkCPTestDriver&) = delete;

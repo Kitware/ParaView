@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqComparativeCueWidget : public QTableWidget
   typedef QTableWidget Superclass;
 
 public:
-  pqComparativeCueWidget(QWidget* parent = 0);
+  pqComparativeCueWidget(QWidget* parent = nullptr);
   ~pqComparativeCueWidget() override;
 
   /**
@@ -66,7 +66,7 @@ public:
   // Returns if this cue can accept more than 1 value as a parameter value.
   bool acceptsMultipleValues() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the comparative grid size.
    */
@@ -92,7 +92,7 @@ protected Q_SLOTS:
 
   void onCellChanged(int x, int y);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called when mouse is released. We use this to popup the range editing
    * dialog if the selection changed.

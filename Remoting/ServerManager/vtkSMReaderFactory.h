@@ -48,10 +48,10 @@ class vtkSMSession;
 
 struct FileTypeDetailed
 {
-  std::string Description = "";
+  std::string Description;
   std::vector<std::string> FilenamePatterns = {};
-  std::string Group = "";
-  std::string Name = "";
+  std::string Group;
+  std::string Name;
 };
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMReaderFactory : public vtkSMObject
@@ -192,6 +192,16 @@ public:
    * created.
    */
   static void AddReaderToWhitelist(const char* readerxmlgroup, const char* readerxmlname);
+
+  /**
+   * Description of the file type used for all supported types
+   */
+  static const std::string SUPPORTED_TYPES_DESCRIPTION;
+
+  /**
+   * Description of the file type used for all files
+   */
+  static const std::string ALL_FILES_DESCRIPTION;
 
 protected:
   vtkSMReaderFactory();

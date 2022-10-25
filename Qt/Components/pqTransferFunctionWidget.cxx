@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAxis.h"
 #include "vtkBoundingBox.h"
 #include "vtkChartXY.h"
-#include "vtkColorTransferControlPointsItem.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkColorTransferFunctionItem.h"
 #include "vtkCompositeControlPointsItem.h"
@@ -50,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVColorTransferControlPointsItem.h"
 #include "vtkPiecewiseControlPointsItem.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPiecewiseFunctionItem.h"
@@ -336,7 +336,7 @@ void pqTransferFunctionWidget::initialize(
 
     if (stc_editable)
     {
-      vtkNew<vtkColorTransferControlPointsItem> cpItem;
+      vtkNew<vtkPVColorTransferControlPointsItem> cpItem;
       cpItem->SetColorTransferFunction(ctf);
       cpItem->SetColorFill(true);
       cpItem->SetEndPointsXMovable(false);
@@ -475,8 +475,8 @@ void pqTransferFunctionWidget::initialize(
     this->Internals->ChartXY->SetTFRange(vtkVector2d(ctf->GetRange()));
   }
 
-  pqCoreUtilities::connect(
-    this->Internals->ChartXY, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
+  pqCoreUtilities::connect(this->Internals->Widget->interactor(), vtkCommand::MouseMoveEvent, this,
+    SLOT(showUsageStatus()));
 }
 
 //-----------------------------------------------------------------------------
@@ -506,6 +506,11 @@ void pqTransferFunctionWidget::editColorAtCurrentControlPoint()
   vtkColorTransferFunction* ctf = cpitem->GetColorTransferFunction();
   assert(ctf != nullptr);
 
+  // Disable the interactor to ignore any events that may be issues
+  // from the operating system after the dialog is shown and closed.
+  // Fixes #20758.
+  this->Internals->Widget->interactor()->Disable();
+
   double xrgbms[6];
   ctf->GetNodeValue(currentIdx, xrgbms);
   QColor color = QColorDialog::getColor(QColor::fromRgbF(xrgbms[1], xrgbms[2], xrgbms[3]), this,
@@ -517,14 +522,18 @@ void pqTransferFunctionWidget::editColorAtCurrentControlPoint()
     xrgbms[3] = color.blueF();
     ctf->SetNodeValue(currentIdx, xrgbms);
 
-    // Simulate a MouseButtonReleaseEvent that can get lost when the color
-    // selector is closed. Fixes #20758.
-    vtkContextMouseEvent mouseEvent;
-    mouseEvent.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
-    cpitem->MouseButtonReleaseEvent(mouseEvent);
-
     Q_EMIT this->controlPointsModified();
   }
+
+  // Simulate a MouseButtonReleaseEvent that can get lost when the color
+  // selector is closed. Fixes #20758.
+  vtkContextMouseEvent mouseEvent;
+  mouseEvent.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
+  cpitem->MouseButtonReleaseEvent(mouseEvent);
+
+  // Re-enable the widget interactor a short time after the dialog closes.
+  // Fixes #20758.
+  QTimer::singleShot(100, [=]() { this->Internals->Widget->interactor()->Enable(); });
 }
 
 //-----------------------------------------------------------------------------
@@ -656,8 +665,9 @@ void pqTransferFunctionWidget::showUsageStatus()
   QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
   if (mainWindow)
   {
-    mainWindow->statusBar()->showMessage(tr("Grab and move a handle to interactively change the "
-                                            "range. Double click on it to set custom range."),
+    mainWindow->statusBar()->showMessage(
+      tr("Drag a handle to change the range. "
+         "Double click it to set custom range. Return/Enter to edit color."),
       2000);
   }
 }

@@ -241,7 +241,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Multi-block Inspector</string>
+    <string>MultiBlock Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -271,6 +271,18 @@
     <number>2</number>
    </attribute>
    <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
+  </widget>
+  <widget class="QDockWidget" name="selectionEditorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Selection Editor</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqSelectionEditor" name="selectionEditorPanel"/>
   </widget>
   <widget class="QDockWidget" name="materialEditorDock">
    <property name="allowedAreas">
@@ -346,15 +358,15 @@
   </widget>
   <widget class="QDockWidget" name="timeInspectorDock">
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Time Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>8</number>
    </attribute>
-   <widget class="pqTimeInspectorWidget" name="timeInspectorPanel"/>
+  <widget class="pqTimeInspectorWidget" name="timeInspectorPanel"/>
   </widget>
   <widget class="QDockWidget" name="outputWidgetDock">
    <property name="floating">
@@ -542,6 +554,12 @@
    <class>pqLightsInspector</class>
    <extends>QWidget</extends>
    <header>pqLightsInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSelectionEditor</class>
+   <extends>QWidget</extends>
+   <header>pqSelectionEditor.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

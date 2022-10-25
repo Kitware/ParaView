@@ -192,7 +192,6 @@ Q_SIGNALS:
 private:
   void fireDataChanged(const QModelIndex& root, const QVector<int>& roles);
 
-private:
   Q_DISABLE_COPY(pqDataAssemblyTreeModel);
 
   class pqInternals;

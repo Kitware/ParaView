@@ -89,7 +89,7 @@ Q_SIGNALS:
 private:
   static MessageHandler* instance();
 
-private Q_SLOTS:
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void displayMessage(QtMsgType type, const QString& msg);
 };
 
@@ -134,7 +134,12 @@ public:
   void setFontSize(int fontSize);
   //@}
 
-public Q_SLOTS:
+  /**
+   * Get the state of the 'Always open for new messages' checkbox.
+   */
+  bool shouldOpenForNewMessages();
+
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Display a message in the widget. There's generally no need to use this
    * since one can have the same effect by triggering the message through Qt or
@@ -143,6 +148,11 @@ public Q_SLOTS:
    * @returns true if the message was displayed, otherwise false.
    */
   bool displayMessage(const QString& message, QtMsgType type = QtInfoMsg);
+
+  /**
+   * Always open the messages window for every new message unless it is docked.
+   */
+  void alwaysOpenForNewMessages(bool val);
 
   /**
    * Show full messages instead of grouped messages.
@@ -163,6 +173,11 @@ public Q_SLOTS:
    * Clears the console.
    */
   void clear();
+
+  /**
+   * Record the first ever show event.
+   */
+  void showEvent(QShowEvent* event) override;
 
 Q_SIGNALS:
   /**

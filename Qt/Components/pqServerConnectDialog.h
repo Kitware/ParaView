@@ -152,9 +152,10 @@ protected Q_SLOTS:
   void onNameChanged();
 
   /**
-   * called to delete a server.
+   * called to delete one or all servers.
    */
   void deleteServer();
+  void deleteAllServers();
 
   /**
    * called to load/save servers.
@@ -211,8 +212,9 @@ protected Q_SLOTS:
   void saveSourcesList();
   void cancelEditSources();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void editConfiguration(const pqServerConfiguration&);
+  bool serverNameExists(const QString& name);
 
 private:
   Q_DISABLE_COPY(pqServerConnectDialog)

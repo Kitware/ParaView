@@ -31,6 +31,7 @@
 #include "vtkPolyData.h"
 #include "vtkPolyhedron.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
@@ -242,6 +243,8 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
   size_t numNodesSoFar = 0;
   unsigned int blockNo;
   vtkCellArray* polygonCells;
+  vtkSmartPointer<vtkCellArray> lineCells;
+  vtkSmartPointer<vtkCellArray> vertexCells;
   vtkCellArray* tracerCells;
   vtkFloatArray* coords;
   vtkIdType list[27];
@@ -1376,6 +1379,8 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
 
             polygonPoints = vtkPoints::New();
             polygonCells = vtkCellArray::New();
+            lineCells = vtkSmartPointer<vtkCellArray>::New();
+            vertexCells = vtkSmartPointer<vtkCellArray>::New();
 
             // Find out whether material property has been selected for reading.
             // Done once before reading the first polygon and re-used for
@@ -1403,6 +1408,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
             firstPolygonParsed = true;
           }
 
+          vtkCellArray* currentCells = nullptr;
           switch (GMVRead::gmv_data.datatype)
           {
             unsigned int npts;
@@ -1412,8 +1418,18 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
               vtkDebugMacro(
                 "GMVReader::RequestData: Found " << npts << " points for polygon definition ");
 
+              currentCells = polygonCells;
+              if (npts == 2)
+              {
+                currentCells = lineCells;
+              }
+              else if (npts == 1)
+              {
+                currentCells = vertexCells;
+              }
+
               // Number of points polygon cell consists of
-              polygonCells->InsertNextCell(npts);
+              currentCells->InsertNextCell(npts);
 
               for (unsigned int i = 0; i < npts; i++)
               {
@@ -1421,17 +1437,19 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                 vtkIdType id = polygonPoints->InsertNextPoint(GMVRead::gmv_data.doubledata1[i],
                   GMVRead::gmv_data.doubledata2[i], GMVRead::gmv_data.doubledata3[i]);
                 // Add point to cell definition
-                polygonCells->InsertCellPoint(id);
+                currentCells->InsertCellPoint(id);
               }
 
               if (polygonMaterialPosInDataArray >= 0 &&
                 this->CellDataArraySelection->GetArraySetting(polygonMaterialPosInDataArray))
               {
+                vtkIdType numberOfCells = polygonCells->GetNumberOfCells() +
+                  lineCells->GetNumberOfCells() + vertexCells->GetNumberOfCells();
                 vtkDebugMacro("GMVReader::RequestData: Polygon #"
-                  << polygonCells->GetNumberOfCells() << "  material #" << GMVRead::gmv_data.num
-                  << "  total polygon #" << this->NumberOfPolygons);
+                  << numberOfCells << "  material #" << GMVRead::gmv_data.num << "  total polygon #"
+                  << this->NumberOfPolygons);
                 polygonMaterials->SetComponent(
-                  polygonCells->GetNumberOfCells() - 1, 0, vtkTypeInt64(GMVRead::gmv_data.num));
+                  numberOfCells - 1, 0, vtkTypeInt64(GMVRead::gmv_data.num));
               }
 
               break;
@@ -1439,6 +1457,8 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
               // Set polygon points and cells
               this->Polygons->SetPoints(polygonPoints);
               this->Polygons->SetPolys(polygonCells); // essential for calling BuildCells()
+              this->Polygons->SetLines(lineCells);
+              this->Polygons->SetVerts(vertexCells);
               this->Polygons
                 ->BuildCells(); // mandatory to be able to call vtkPolyData::GetCellPoints,
                                 // e.g. when using CleantoGrid filter.

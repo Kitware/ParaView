@@ -220,7 +220,7 @@ protected Q_SLOTS:
   void resizeEvent(QResizeEvent* evt) override;
   //@}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called whenever a new frame needs to be created for a view. Note that view
    * may be null, in which case a place-holder frame is expected. The caller
@@ -238,7 +238,6 @@ protected:
 private:
   void layoutPropertyModified(vtkObject*, unsigned long, void*);
 
-private:
   Q_DISABLE_COPY(pqMultiViewWidget)
 
   class pqInternals;

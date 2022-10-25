@@ -26,6 +26,7 @@ list(APPEND sources
   ${toolbar_sources})
 
 paraview_add_plugin(GUIMyToolBar
+  REQUIRED_ON_CLIENT
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})

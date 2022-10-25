@@ -131,7 +131,7 @@ public:
   QList<QVariant> suppressedTimeSources() const;
   void setSuppressedTimeSources(const QList<QVariant>& proxies);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * set the active server.
    */

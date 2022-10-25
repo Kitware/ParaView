@@ -139,7 +139,7 @@ public:
    */
   int activeLayoutLocation() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the active view. Changing the active view may lead to change in
    * active representation as well.
@@ -192,6 +192,20 @@ Q_SIGNALS:
    * the active source's pipeline updates.
    */
   void dataUpdated();
+
+  /**
+   * this signal is fired when the active representation fires the updated()
+   * signal. This is used by components in the GUI that need to be updated when
+   * the active representation updates.
+   */
+  void representationUpdated();
+
+  /**
+   * this signal is fired when the active view fires the dataUpdated()
+   * signal. This is used by components in the GUI that need to be updated when
+   * the active view updates.
+   */
+  void viewUpdated();
 
 private Q_SLOTS:
   /**

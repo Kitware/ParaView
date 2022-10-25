@@ -1,32 +1,29 @@
 set(classes
   vtkCDIReader)
 
-set(sources
-  ThirdParty/cdilib.c)
+set (sources
+    cdi_tools.cxx
+    projections.cxx
+    )
+set (private_headers
+    cdi_tools.h
+    projections.h)
 
-set(private_headers
-  ThirdParty/cdi.h)
-
-set(CMAKE_C_STANDARD 99)
 vtk_module_add_module(CDIReader::vtkCDIReader
   CLASSES ${classes}
   SOURCES ${sources}
-  PRIVATE_HEADERS ${private_headers})
+  PRIVATE_HEADERS ${private_headers}
+)
 
-if (TARGET VTK::ParallelMPI)
-  # FIXME: The API should not depend on this.
-  vtk_module_definitions(CDIReader::vtkCDIReader
-    PUBLIC
-      PARAVIEW_USE_MPI)
-endif ()
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/../cmake")
+vtk_module_find_package(
+  PACKAGE CDI
+  VERSION 2.0.3
+  )
 
-vtk_module_definitions(CDIReader::vtkCDIReader
+vtk_module_link(CDIReader::vtkCDIReader
   PRIVATE
-    # Please leave these definitions in here and do not change them. We use the
-    # cdi library to read both, netCDF2 and netCDF4 data.
-    HAVE_LIBNETCDF
-    HAVE_NETCDF2
-    HAVE_NETCDF4)
+  CDI::CDI)
 
 paraview_add_server_manager_xmls(
   XMLS  CDIReader.xml)

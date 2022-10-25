@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
-#include "pqQtConfig.h"             // for PARAVIEW_USE_QTHELP
 #include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkSmartPointer.h"        // for vtkSmartPointer
 #include <QObject>
@@ -58,9 +57,7 @@ class pqSettings;
 class pqTestUtility;
 class pqUndoStack;
 class QApplication;
-#ifdef PARAVIEW_USE_QTHELP
 class QHelpEngine;
-#endif
 class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
@@ -164,13 +161,11 @@ public:
    */
   void unRegisterManager(const QString& function);
 
-#ifdef PARAVIEW_USE_QTHELP
   /**
    * provides access to the help engine. The engine is created the first time
    * this method is called.
    */
   QHelpEngine* helpEngine();
-#endif
 
   /**
    * QHelpEngine doesn't like filenames in resource space. This method creates
@@ -328,7 +323,7 @@ public:
    */
   void _paraview_client_environment_complete();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * Applications calls this to ensure that any cleanup is performed correctly.
@@ -340,13 +335,21 @@ public Q_SLOTS:
    */
   void quit();
 
+  ///@{
   /**
    * Load configuration xml. This results in firing of the loadXML() signal
    * which different components that support configuration catch and process to
    * update their behavior.
+   * This also update available readers and writers.
    */
   void loadConfiguration(const QString& filename);
   void loadConfigurationXML(const char* xmldata);
+  ///@}
+
+  /**
+   * Update the available readers and writers using the factories
+   */
+  void updateAvailableReadersAndWriters();
 
   /**
    * Renders all windows
@@ -435,9 +438,7 @@ protected:
   pqRecentlyUsedResourcesList* RecentlyUsedResourcesList;
   pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
-#ifdef PARAVIEW_USE_QTHELP
   QHelpEngine* HelpEngine;
-#endif
   QPointer<pqTestUtility> TestUtility;
 
 private:

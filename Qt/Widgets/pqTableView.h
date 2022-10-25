@@ -79,7 +79,7 @@ class PQWIDGETS_EXPORT pqTableView : public QTableView
   Q_PROPERTY(int padding READ padding WRITE setPadding);
 
 public:
-  pqTableView(QWidget* parent = 0);
+  pqTableView(QWidget* parent = nullptr);
   ~pqTableView() override;
 
   /**
@@ -133,7 +133,7 @@ public:
 private Q_SLOTS:
   void invalidateLayout();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqTableView)
 
   int MaximumRowCountBeforeScrolling;

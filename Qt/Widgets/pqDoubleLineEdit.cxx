@@ -89,12 +89,16 @@ void unregister_dle_instance(pqDoubleLineEdit* dle)
 class pqDoubleLineEdit::pqInternals
 {
 public:
+  bool AlwaysUseFullPrecision = false;
   int Precision = 2;
   pqDoubleLineEdit::RealNumberNotation Notation = pqDoubleLineEdit::FixedNotation;
   bool UseGlobalPrecisionAndNotation = true;
   QPointer<QLineEdit> InactiveLineEdit = nullptr;
 
-  bool useFullPrecision(const pqDoubleLineEdit* self) const { return self->hasFocus(); }
+  bool useFullPrecision(const pqDoubleLineEdit* self) const
+  {
+    return this->AlwaysUseFullPrecision || self->hasFocus();
+  }
 
   void sync(pqDoubleLineEdit* self)
   {
@@ -310,4 +314,10 @@ QString pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(double val
 {
   return pqDoubleLineEdit::formatDouble(
     value, pqDoubleLineEdit::globalNotation(), pqDoubleLineEdit::globalPrecision());
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleLineEdit::setAlwaysUseFullPrecision(bool value)
+{
+  this->Internals->AlwaysUseFullPrecision = value;
 }

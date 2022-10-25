@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqOMETransferFunctionsPropertyWidget : publ
 
 public:
   pqOMETransferFunctionsPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqOMETransferFunctionsPropertyWidget() override;
 
   bool event(QEvent* evt) override;
@@ -59,7 +59,7 @@ private Q_SLOTS:
   void stcChanged(pqTransferFunctionWidget* src = nullptr);
   void pwfChanged(pqTransferFunctionWidget* src = nullptr);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqOMETransferFunctionsPropertyWidget);
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

@@ -174,6 +174,7 @@ private:
 pqFileDialogModelIconProvider::pqFileDialogModelIconProvider()
 {
   QStyle* style = QApplication::style();
+  this->InvalidIcon = style->standardIcon(QStyle::SP_MessageBoxWarning);
   this->FolderLinkIcon = style->standardIcon(QStyle::SP_DirLinkIcon);
   this->FileLinkIcon = style->standardIcon(QStyle::SP_FileLinkIcon);
   this->DomainIcon.addPixmap(QPixmap(":/pqCore/Icons/pqDomain16.png"));
@@ -184,6 +185,8 @@ QIcon pqFileDialogModelIconProvider::icon(IconType t) const
 {
   switch (t)
   {
+    case Invalid:
+      return this->InvalidIcon;
     case Computer:
       return QFileIconProvider::icon(QFileIconProvider::Computer);
     case Drive:
@@ -208,6 +211,10 @@ QIcon pqFileDialogModelIconProvider::icon(IconType t) const
 
 QIcon pqFileDialogModelIconProvider::icon(vtkPVFileInformation::FileTypes f) const
 {
+  if (f == vtkPVFileInformation::INVALID)
+  {
+    return icon(pqFileDialogModelIconProvider::Invalid);
+  }
   if (f == vtkPVFileInformation::DIRECTORY_LINK)
   {
     return icon(pqFileDialogModelIconProvider::FolderLink);
@@ -247,6 +254,7 @@ QIcon pqFileDialogModelIconProvider::icon(QFileIconProvider::IconType ico) const
   return QFileIconProvider::icon(ico);
 }
 
+// NOLINTNEXTLINE(readability-redundant-member-init)
 Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
 namespace
@@ -260,24 +268,6 @@ bool CaseInsensitiveSort(const pqFileDialogModelFileInfo& A, const pqFileDialogM
   // Sort alphabetically (but case-insensitively)
   return A.label().toLower() < B.label().toLower();
 }
-
-class CaseInsensitiveSortGroup
-  : public std::binary_function<pqFileDialogModelFileInfo, pqFileDialogModelFileInfo, bool>
-{
-public:
-  CaseInsensitiveSortGroup(const QString& groupName) { this->numPrefix = groupName.length(); }
-  bool operator()(const pqFileDialogModelFileInfo& A, const pqFileDialogModelFileInfo& B) const
-  {
-    QString aLabel = A.label();
-    QString bLabel = B.label();
-    aLabel = aLabel.right(aLabel.length() - numPrefix);
-    bLabel = bLabel.right(bLabel.length() - numPrefix);
-    return aLabel < bLabel;
-  }
-
-private:
-  int numPrefix;
-};
 
 bool getShowDetailedInformationSetting()
 {
@@ -314,6 +304,9 @@ void setShowDetailedInformationSetting(pqServer* server, bool show)
 class pqFileDialogModel::pqImplementation
 {
 public:
+  Qt::ItemFlags FileItemFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  Qt::ItemFlags DirItemFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+
   pqImplementation(pqServer* server)
     : Separator(0)
     , Server(server)
@@ -348,7 +341,7 @@ public:
     this->FileInformation.TakeReference(vtkPVFileInformation::New());
 
     // current path
-    vtkPVFileInformation* info = this->GetData(false, "", ".", false);
+    vtkPVFileInformation* info = this->GetData(false, "", ".", false, true);
     this->CurrentPath = info->GetFullPath();
   }
 
@@ -363,14 +356,15 @@ public:
   }
 
   /// query the file system for information
-  vtkPVFileInformation* GetData(bool dirListing, const QString& path, bool specialDirs)
+  vtkPVFileInformation* GetData(
+    bool dirListing, const QString& path, bool specialDirs, bool groupFiles)
   {
-    return this->GetData(dirListing, this->CurrentPath, path, specialDirs);
+    return this->GetData(dirListing, this->CurrentPath, path, specialDirs, groupFiles);
   }
 
   /// query the file system for information
-  vtkPVFileInformation* GetData(
-    bool dirListing, const QString& workingDir, const QString& path, bool specialDirs)
+  vtkPVFileInformation* GetData(bool dirListing, const QString& workingDir, const QString& path,
+    bool specialDirs, bool groupFiles)
   {
     if (this->FileInformationHelperProxy)
     {
@@ -380,6 +374,7 @@ public:
       pqSMAdaptor::setElementProperty(helper->GetProperty("DirectoryListing"), dirListing);
       pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), path.toUtf8());
       pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"), specialDirs);
+      pqSMAdaptor::setElementProperty(helper->GetProperty("GroupFileSequences"), groupFiles);
       helper->UpdateVTKObjects();
 
       // get data from server
@@ -393,6 +388,7 @@ public:
       helper->SetPath(path.toUtf8().data());
       helper->SetSpecialDirectories(specialDirs);
       helper->SetWorkingDirectory(workingDir.toUtf8().data());
+      helper->SetGroupFileSequences(groupFiles);
       this->FileInformation->CopyFromObject(helper);
     }
     return this->FileInformation;
@@ -604,6 +600,16 @@ pqFileDialogModel::~pqFileDialogModel()
   delete this->Implementation;
 }
 
+void pqFileDialogModel::setFileItemFlags(const Qt::ItemFlags& flags)
+{
+  this->Implementation->FileItemFlags = flags;
+}
+
+void pqFileDialogModel::setDirectoryItemFlags(const Qt::ItemFlags& flags)
+{
+  this->Implementation->DirItemFlags = flags;
+}
+
 bool pqFileDialogModel::isShowingDetailedInfo()
 {
   return this->Implementation->isShowingDetailedInformation();
@@ -620,12 +626,12 @@ pqServer* pqFileDialogModel::server() const
   return this->Implementation->getServer();
 }
 
-void pqFileDialogModel::setCurrentPath(const QString& path)
+void pqFileDialogModel::setCurrentPath(const QString& path, bool groupFiles)
 {
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(path);
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, groupFiles);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 }
@@ -643,7 +649,7 @@ QString pqFileDialogModel::absoluteFilePath(const QString& path)
   }
 
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, path, false);
+  info = this->Implementation->GetData(false, path, false, true);
   return this->Implementation->cleanPath(QString::fromUtf8(info->GetFullPath()));
 }
 
@@ -665,7 +671,7 @@ bool pqFileDialogModel::isHidden(const QModelIndex& localIndex)
   return false;
 }
 
-bool pqFileDialogModel::isDir(const QModelIndex& localIndex)
+bool pqFileDialogModel::isDir(const QModelIndex& localIndex) const
 {
   if (localIndex.model() == this)
   {
@@ -679,12 +685,12 @@ bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
 {
   QString filePath = this->Implementation->cleanPath(file);
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, filePath, false);
+  info = this->Implementation->GetData(false, filePath, false, true);
 
   // try again for shortcut
   if (info->GetType() != vtkPVFileInformation::SINGLE_FILE)
   {
-    info = this->Implementation->GetData(false, filePath + ".lnk", false);
+    info = this->Implementation->GetData(false, filePath + ".lnk", false, true);
   }
 
   if (info->GetType() == vtkPVFileInformation::SINGLE_FILE)
@@ -693,6 +699,14 @@ bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
     return true;
   }
   return false;
+}
+
+int pqFileDialogModel::fileType(const QString& file)
+{
+  QString filePath = this->Implementation->cleanPath(file);
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, filePath, false, true);
+  return info->GetType();
 }
 
 bool pqFileDialogModel::mkdir(const QString& dirName)
@@ -723,7 +737,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, true);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
@@ -758,7 +772,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, true);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
@@ -776,7 +790,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   }
 
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, oldPath, false);
+  info = this->Implementation->GetData(false, oldPath, false, true);
 
   int oldType = info->GetType();
 
@@ -786,7 +800,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   }
 
   // don't replace file/dir
-  info = this->Implementation->GetData(false, newPath, false);
+  info = this->Implementation->GetData(false, newPath, false, true);
   if (info->GetType() == oldType)
   {
     QString message("Cannot rename to %1, which already exists");
@@ -812,7 +826,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, true);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
@@ -823,17 +837,34 @@ bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
 {
   QString dir = this->Implementation->cleanPath(path);
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, dir, false);
+  info = this->Implementation->GetData(false, dir, false, true);
 
   // try again for shortcuts
   if (!vtkPVFileInformation::IsDirectory(info->GetType()))
   {
-    info = this->Implementation->GetData(false, dir + ".lnk", false);
+    info = this->Implementation->GetData(false, dir + ".lnk", false, true);
   }
 
   if (vtkPVFileInformation::IsDirectory(info->GetType()))
   {
     fullpath = info->GetFullPath();
+    return true;
+  }
+  return false;
+}
+
+bool pqFileDialogModel::dirIsEmpty(const QString& path, QString& fullpath)
+{
+  if (!this->dirExists(path, fullpath))
+  {
+    return false;
+  }
+
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, fullpath, false, true);
+  info->FetchDirectoryListing();
+  if (info->GetContents()->GetNumberOfItems() == 0)
+  {
     return true;
   }
   return false;
@@ -1078,7 +1109,8 @@ bool pqFileDialogModel::setData(const QModelIndex& idx, const QVariant& value, i
 
 Qt::ItemFlags pqFileDialogModel::flags(const QModelIndex& idx) const
 {
-  Qt::ItemFlags ret = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  Qt::ItemFlags ret =
+    this->isDir(idx) ? this->Implementation->DirItemFlags : this->Implementation->FileItemFlags;
   const pqFileDialogModelFileInfo* file = this->Implementation->infoForIndex(idx);
   if (file && !file->isGroup())
   {

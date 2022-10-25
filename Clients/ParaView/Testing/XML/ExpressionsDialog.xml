@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageExpressions" />
+
+  <!-- add entry "Python" "" "expression A" -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="expression A" />
+
+  <!-- add entry "Python" "to-remove" "expression B" -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <!-- new expression should appear top, due to sort policy -->
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="0.2," />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="expression B" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,expression B" />
+  <!-- should have been sorted under previous expression -->
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="1.2,expression B" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="1.1" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="1.1" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="to-remove" />
+
+  <!-- add entry "Expression" "" "expression C" -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Expression" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="expression C" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,expression C" />
+
+  <!-- add entry "Python" "" "expression B" -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/groupChooser" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="expression to remove" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,expression to remove" />
+  <!-- group name should default to current combobox value -->
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="2.0,Python" />
+
+  <!-- test group filtering -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/groupChooser" command="activated" arguments="Python" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="3" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/groupChooser" command="activated" arguments="Expression" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="1" />
+
+  <!-- test text filtering: should match Name and Expression columns -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/groupChooser" command="activated" arguments="All" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/searchBox/SearchLineEdit" command="set_string" arguments="remove" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="2" />
+
+  <!-- remove selection -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setSelection" arguments="0.0,1.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/remove" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="0" />
+
+  <!-- clear filter -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/searchBox/SearchLineEdit" command="set_string" arguments="" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="2" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/groupChooser" command="activated" arguments="Python" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="1" />
+
+  <!-- remove all -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/removeAll" command="activate" arguments="" />
+  <pqevent object="1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/widget/groupChooser" command="activated" arguments="All" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="0" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/close" command="activate" arguments="" />
+</pqevents>

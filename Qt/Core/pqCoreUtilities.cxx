@@ -391,3 +391,32 @@ void pqCoreUtilities::setPaletteHighlightToCritical(QPalette& palette)
   palette.setColor(QPalette::Highlight, criticalRed);
   palette.setColor(QPalette::HighlightedText, Qt::white);
 }
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilities::removeRecursively(QDir dir)
+{
+  const bool success = dir.removeRecursively();
+  if (!success)
+  {
+    QMessageBox(QMessageBox::Warning, QObject::tr("File IO Warning"),
+      QObject::tr("Unable to delete some files in %1").arg(dir.absolutePath()),
+      QMessageBox::StandardButton::Ok, pqCoreUtilities::mainWidget())
+      .exec();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilities::remove(const QString& filePath)
+{
+  const auto finfo = QFileInfo(filePath);
+  QDir dir = finfo.dir();
+  const auto fileName = finfo.fileName();
+  const bool success = dir.remove(fileName);
+  if (!success)
+  {
+    QMessageBox(QMessageBox::Warning, QObject::tr("File IO Warning"),
+      QObject::tr("Unable to delete %1").arg(finfo.absoluteFilePath()),
+      QMessageBox::StandardButton::Ok, pqCoreUtilities::mainWidget())
+      .exec();
+  }
+}

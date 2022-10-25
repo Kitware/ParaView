@@ -1,11 +1,13 @@
 # Building ParaView
 
 This page describes how to build and install ParaView. It covers building for
-development, on both Unix-type systems (Linux, HP-UX, Solaris, macOS), and
-Windows. Note that Unix-like environments such as Cygwin and MinGW are not
-officially supported. However, patches to fix problems with these platforms
-will be considered for inclusion. ParaView builds on x86_64, PowerPC, and ARM
-architectures.
+development, on both Linux and Windows. Please Note that Linux (x86_64), Windows (x86_64)
+and macOS (x86_64 and arm64) version are built and tested by our continuous
+integration system and are considered supported environments.
+
+Any other environnements and architecture (including Cygwin, MingGW, PowerPC) are considered
+non-officially supported, however, patches to fix problems with these platforms will
+be considered for inclusion.
 
 ParaView depends on several open source tools and libraries such as Python, Qt,
 CGNS, HDF5, etc. Some of these are included in the ParaView source itself
@@ -67,7 +69,7 @@ cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENT
 ninja
 ```
 
-To build a specific ParaView version, eg: v5.6.0 , please run the following commands in a terminal while replacing "tag" by the version you want to build
+To build a specific ParaView version, eg: v5.9.1, please run the following commands in a terminal while replacing "tag" by the version you want to build
 ```sh
 git clone https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build
@@ -88,17 +90,19 @@ Double click on the paraview executable in the `/bin` directory or run in the pr
 
 ### Windows
 
-Note: the following steps concerning Visual Studio 2015 can also be applied to Visual Studio 2017 and 2019.
-If so, be sure to use the msvc2017_64/msvc2019_64 Qt Version and the Developer Command Prompt for VS 2017/2019.
+Note: The following steps concerning Visual Studio 2019 can also be applied to newer versions.
+If so, be sure to use the respective Qt Version (e.g. for VS 2022, use msvc2022_64) and the Native Tools Command Prompt.
 
 #### Dependencies
  * Download and install [git bash for windows][gitforwindows]
  * Download and install [cmake][cmake-download]
- * Download and install [Visual Studio 2015 Community Edition][visual-studio]
+ * Download and install [Visual Studio 2019 Community Edition][visual-studio]
  * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
  * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
- * Download and install [Python for windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
- * Download and install [Qt 5.12.3][qt-download-5.12.3] for Windows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environment variable.
+ * Download and install [Python for Windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
+ * Download and install [Qt 5.15.3][qt-download-5.15.3] for Windows, make sure to check the MSVC 2019 64-bit component during installation.
+    * Make sure to add `C:\Qt\Qt5.15.3\5.15.3\msvc2019_64\bin` to your `PATH` environment variable.
+    * You may also need to add an environment variable `QT_QPA_PLATFORM_PLUGIN_PATH`: `C:\Qt\Qt5.15.3\5.15.3\msvc2019_64\plugins\platforms`.
 
 #### Recover the source
  * Open git bash
@@ -113,7 +117,7 @@ mv paraview pv
 mkdir pvb
 ```
 
- * Or, to build a specific ParaView version, eg: v5.6.0 , please run the following commands while replacing "tag" by the version you want to build
+ * Or, to build a specific ParaView version, eg: v5.9.1, please run the following commands while replacing "tag" by the version you want to build
 
 ```sh
 cd C:
@@ -129,16 +133,18 @@ git submodule update --init --recursive
 
 #### Build
 
- * Open VS2015 x64 Native Tools Command Prompt and run the following commands
+ * Open VS2019 x64 Native Tools Command Prompt and run the following commands
 ```sh
 cd C:\pv\pvb
-cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP -DCMAKE_BUILD_TYPE=Release ..\pv
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread -DCMAKE_BUILD_TYPE=Release ..\pv
 ninja
 ```
 
+Note: If you want to build ParaView with `CMAKE_BUILD_TYPE=Debug` you also need to add the option `-DPARAVIEW_WINDOWS_PYTHON_DEBUGGABLE=ON`.
+
 #### Run
 
- * Double click on the `C:\pv\pvb\bin\paraview` executable
+ * Double click on the `C:\pv\pvb\bin\paraview.exe` executable
 
 ## Complete Compilation Guide
 
@@ -172,14 +178,14 @@ Required:
     - IBM XL 16.1 or newer
     - Clang 4 or newer
     - Xcode 9 or newer
-    - Visual Studio 2015 or newer
+    - Visual Studio 2019 or newer
 
 Optional dependencies:
 
   * [Python][python]
     - At least 3.3 is required
   * [Qt5][qt]
-    - Version 5.12 or newer
+    - Version 5.12 or newer. Qt6 is not supported.
 
 ##### Installing CMake
 
@@ -253,7 +259,7 @@ please file a new [issue][paraview-issues].
 
 #### Windows
 
-  * [Visual Studio 2015 Community Edition][visual-studio]
+  * [Visual Studio 2019 Community Edition][visual-studio]
   * Use "x64 Native Tools Command Prompt" for the installed Visual Studio
     version to configure with CMake and to build with ninja.
   * Get [ninja][ninja]. Unzip the binary and put it in `PATH`.
@@ -287,7 +293,6 @@ Command Prompt" available with Visual Studio in the start menu.
 ParaView has a number of settings available for its build. These are categorized
 as build options, capability options, feature options and miscellaneous options.
 
-
 #### Build Options
 
 Options that impact the build begin with the prefix `PARAVIEW_BUILD_`.
@@ -301,10 +306,13 @@ Less common, but variables which may be of interest to some:
   * `PARAVIEW_BUILD_EDITION` (default `CANONICAL`): Choose which features to
     enable in this build. This is useful to generate ParaView builds with
     limited features. More on this later.
-  * `PARAVIEW_BUILD_EXAMPLES` (default `OFF`): If set, ParaView's example code
-    will be added as tests to the ParaView test suite.
+  * `PARAVIEW_ENABLE_EXAMPLES` (default `OFF`): If set, ParaView's example code
+    will be added as tests to the ParaView test suite. These tests may be built
+    and run using the `paraview-examples` target.
   * `PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION` (default `OFF`): If set, the HTML
     documentation for ParaView's C++, Python, and proxies will be generated.
+  * `PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION` (default `OFF`): Whether
+    plugin XML documentation is forcefully disabled.
   * `PARAVIEW_BUILD_TESTING` (default `OFF`): Whether to build tests or not.
     Valid values are `OFF` (no testing), `WANT` (enable tests as possible), and
     `ON` (enable all tests; may error out if features otherwise disabled are
@@ -312,6 +320,8 @@ Less common, but variables which may be of interest to some:
   * `PARAVIEW_BUILD_VTK_TESTING` (default `OFF`): Whether to build tests for the
     VTK codebase built by ParaView. Valid values are same as
     `PARAVIEW_BUILD_TESTING`.
+  * `PARAVIEW_ENABLE_CATALYST` (default `OFF`): Whether to build the ParaView
+    implementation of Catalyst.
 
 More advanced build options are:
 
@@ -348,6 +358,9 @@ Less common, but potentially useful variables are:
   * `PARAVIEW_USE_VTKM` (default `ON`): Whether VTK-m based filters are enabled.
   * `PARAVIEW_USE_FORTRAN` (default `ON` if Fortran compiler found): Enable
      Fortran support for Catalyst libraries.
+  * `PARAVIEW_USE_CUDA` (default `OFF`): Enable CUDA support in ParaView.
+  * `PARAVIEW_USE_HIP` (default `OFF`, requires CMake >= 3.21 and NOT
+    `PARAVIEW_USE_CUDA`): Enable HIP support in ParaView.
 
 #### Feature settings
 
@@ -387,7 +400,15 @@ More advanced / less common options include:
   * `PARAVIEW_ENABLE_COSMOTOOLS` (default `OFF`; requires `PARAVIEW_USE_MPI`
     and not available on Windows): Enable support for CosmoTools which includes
     GenericIO readers and writers as well as some point cloud algorithms.
-
+  * `PARAVIEW_ENABLE_CGNS_READER` (default `ON` for CANONICAL builds, `OFF` for
+    non-CANONICAL builds): Enable support for reading CGNS files. When building
+    ParaView for e.g. CATALYST, this option allows building support for reading
+    CGNS files. It will also build CGNSReader dependencies: HDF5 and CGNS.
+  * `PARAVIEW_ENABLE_CGNS_WRITER` (default `ON` for CANONICAL builds, `OFF` for
+    non-CANONICAL builds): Enable support for writing CGNS files. When building
+    ParaView for e.g. CATALYST, this option allows building support for writing
+    CGNS files. It will also build CGNSReader dependencies: HDF5 and CGNS. If
+    `PARAVIEW_ENABLE_MPI` is `ON`, the parallel CGNS writer will also be built.
 
 #### Plugin settings
 
@@ -453,10 +474,18 @@ More advanced options:
     build-machine-specific paths in the install tree.
   * `PARAVIEW_SERIAL_TESTS_USE_MPIEXEC` (default `OFF`): Used on HPC to run
     serial tests on compute nodes. If set, it prefixes serial tests with
-    "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "1" ${MPIEXEC_PREFLAGS}
+    "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "1" ${MPI_PREFLAGS}
+  * `PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK` (defaults `ON`; requires
+    `CMAKE_<LANG>_CLANG_TIDY`): If set, any `clang-tidy` settings will be
+    cleared for the internal VTK build.
+  * `PARAVIEW_TEST_DIR`: Used on HPC to set the test directory (default is
+    "${CMAKE_BINARY_DIR}/Testing/Temporary") to a location that is writable from
+    the compute nodes. Typically the user home directory is not.
 
 <!--
-These variables should be documented once they're effective again.
+These variables should be documented once they're effective again. Note that
+various settings have a dependency on this that is not mentioned since the
+option doesn't "exist" yet.
 
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
@@ -595,7 +624,7 @@ steps:
 [pythonwindows]: https://www.python.org/downloads/windows/
 [qt-download]: https://download.qt.io/official_releases/qt
 [qt]: https://qt.io
-[qt-download-5.12.3]: https://download.qt.io/archive/qt/5.12/5.12.3/
+[qt-download-5.15.3]: https://download.qt.io/archive/qt/5.15/5.15.3/
 [tbb]: https://github.com/intel/tbb/releases
 [visual-studio]: https://visualstudio.microsoft.com/vs/older-downloads
 [spack]: https://spack.io/

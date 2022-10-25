@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidgetEventTranslator : public pqWidgetEve
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqPluginTreeWidgetEventTranslator(QObject* parentObject = 0);
+  pqPluginTreeWidgetEventTranslator(QObject* parentObject = nullptr);
   ~pqPluginTreeWidgetEventTranslator() override;
 
   using Superclass::translateEvent;
@@ -58,10 +58,9 @@ private Q_SLOTS:
   void onCollapsed(const QModelIndex&);
   void onCurrentChanged(const QModelIndex&);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   QString getIndexAsString(const QModelIndex&);
 
-private:
   pqPluginTreeWidgetEventTranslator(const pqPluginTreeWidgetEventTranslator&);
   pqPluginTreeWidgetEventTranslator& operator=(const pqPluginTreeWidgetEventTranslator&);
 

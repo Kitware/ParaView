@@ -42,6 +42,7 @@ class pqDataRepresentation;
 class pqScalarsToColors;
 class QComboBox;
 class vtkEventQtSlotConnect;
+class vtkSMProxy;
 class vtkSMViewProxy;
 
 /**
@@ -60,8 +61,7 @@ class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 public:
   typedef QPair<int, QString> ValueType;
 
-public:
-  pqDisplayColorWidget(QWidget* parent = 0);
+  pqDisplayColorWidget(QWidget* parent = nullptr);
   ~pqDisplayColorWidget() override;
 
   /**
@@ -79,6 +79,12 @@ public:
    * Returns the view proxy corresponding to the set representation, if any.
    */
   vtkSMViewProxy* viewProxy() const;
+
+  /**
+   * Updates the scalar bar visibility of the representation `reprProxy` in `view`.
+   * The behavior of the scalar bar visibility is dependent of the general settings.
+   */
+  static void updateScalarBarVisibility(vtkSMViewProxy* view, vtkSMProxy* reprProxy);
 
 Q_SIGNALS:
   /**
@@ -153,7 +159,6 @@ private:
    */
   int addOutOfDomainEntry(int association, const QString& arrayName);
 
-private:
   QIcon* CellDataIcon;
   QIcon* PointDataIcon;
   QIcon* FieldDataIcon;

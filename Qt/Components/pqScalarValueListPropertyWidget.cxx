@@ -495,17 +495,22 @@ void pqScalarValueListPropertyWidget::addRange()
 {
   if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
   {
-    double range_min, range_max;
-    if (!this->getRange(range_min, range_max))
+    double rangeMin, rangeMax;
+    if (!this->getRange(rangeMin, rangeMax))
     {
-      range_min = 0.0;
-      range_max = 10.0;
+      rangeMin = 0.0;
+      rangeMax = 10.0;
     }
 
     if (!this->Internals->GeneratorDialog)
     {
-      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(range_min, range_max, this);
+      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(rangeMin, rangeMax, this);
     }
+    else
+    {
+      this->Internals->GeneratorDialog->setDataRange(rangeMin, rangeMax);
+    }
+
     if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
     {
       return;
@@ -521,17 +526,22 @@ void pqScalarValueListPropertyWidget::addRange()
   }
   else if (this->Internals->Mode == pqInternals::MODE_INT)
   {
-    int range_min, range_max;
-    if (!this->getRange(range_min, range_max))
+    int rangeMin, rangeMax;
+    if (!this->getRange(rangeMin, rangeMax))
     {
-      range_min = 0;
-      range_max = 10;
+      rangeMin = 0;
+      rangeMax = 10;
     }
 
     if (!this->Internals->GeneratorDialog)
     {
-      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(range_min, range_max, this);
+      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(rangeMin, rangeMax, this);
     }
+    else
+    {
+      this->Internals->GeneratorDialog->setDataRange(rangeMin, rangeMax);
+    }
+
     if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
     {
       return;
@@ -602,10 +612,10 @@ void pqScalarValueListPropertyWidget::smRangeModified()
 {
   if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
   {
-    double range_min, range_max;
-    if (this->getRange(range_min, range_max))
+    double rangeMin, rangeMax;
+    if (this->getRange(rangeMin, rangeMax))
     {
-      this->Internals->setScalarRangeLabel(range_min, range_max);
+      this->Internals->setScalarRangeLabel(rangeMin, rangeMax);
     }
     else
     {
@@ -614,10 +624,10 @@ void pqScalarValueListPropertyWidget::smRangeModified()
   }
   else if (this->Internals->Mode == pqInternals::MODE_INT)
   {
-    int range_min, range_max;
-    if (this->getRange(range_min, range_max))
+    int rangeMin, rangeMax;
+    if (this->getRange(rangeMin, rangeMax))
     {
-      this->Internals->setScalarRangeLabel(range_min, range_max);
+      this->Internals->setScalarRangeLabel(rangeMin, rangeMax);
     }
     else
     {
@@ -627,7 +637,7 @@ void pqScalarValueListPropertyWidget::smRangeModified()
 }
 
 //-----------------------------------------------------------------------------
-bool pqScalarValueListPropertyWidget::getRange(double& range_min, double& range_max)
+bool pqScalarValueListPropertyWidget::getRange(double& rangeMin, double& rangeMax)
 {
   assert(this->Internals->Mode == pqInternals::MODE_DOUBLE);
   // Return the range of values in the input (if available)
@@ -637,15 +647,15 @@ bool pqScalarValueListPropertyWidget::getRange(double& range_min, double& range_
     vtkSMDoubleRangeDomain* doubleRange =
       vtkSMDoubleRangeDomain::SafeDownCast(this->Internals->RangeDomain);
     assert(doubleRange != nullptr);
-    range_min = doubleRange->GetMinimum(0, min_exists);
-    range_max = doubleRange->GetMaximum(0, max_exists);
+    rangeMin = doubleRange->GetMinimum(0, min_exists);
+    rangeMax = doubleRange->GetMaximum(0, max_exists);
     return (min_exists && max_exists);
   }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqScalarValueListPropertyWidget::getRange(int& range_min, int& range_max)
+bool pqScalarValueListPropertyWidget::getRange(int& rangeMin, int& rangeMax)
 {
   assert(this->Internals->Mode == pqInternals::MODE_INT);
   // Return the range of values in the input (if available)
@@ -655,8 +665,8 @@ bool pqScalarValueListPropertyWidget::getRange(int& range_min, int& range_max)
     vtkSMIntRangeDomain* doubleRange =
       vtkSMIntRangeDomain::SafeDownCast(this->Internals->RangeDomain);
     assert(doubleRange != nullptr);
-    range_min = doubleRange->GetMinimum(0, min_exists);
-    range_max = doubleRange->GetMaximum(0, max_exists);
+    rangeMin = doubleRange->GetMinimum(0, min_exists);
+    rangeMax = doubleRange->GetMaximum(0, max_exists);
     return (min_exists && max_exists);
   }
   return false;

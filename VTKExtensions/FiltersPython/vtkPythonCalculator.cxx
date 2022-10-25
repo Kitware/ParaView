@@ -16,24 +16,16 @@
 
 #include "vtkPythonCalculator.h"
 
-#include "vtkDataArray.h"
 #include "vtkDataObject.h"
-#include "vtkDataSet.h"
-#include "vtkGraph.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMolecule.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVStringFormatter.h"
-#include "vtkPointData.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonUtil.h"
 #include "vtkSmartPyObject.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkTable.h"
 
-#include <algorithm>
-#include <map>
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
@@ -246,6 +238,7 @@ int vtkPythonCalculator::FillInputPortInformation(int port, vtkInformation* info
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);

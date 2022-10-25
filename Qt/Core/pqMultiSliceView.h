@@ -140,7 +140,7 @@ protected:
   double NormalValuesHolder[9];
   double OriginValuesHolder[9];
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   // Internal slot that will emit sliceClicked()
   void onSliceClicked(int button, int modifier, double value);
 

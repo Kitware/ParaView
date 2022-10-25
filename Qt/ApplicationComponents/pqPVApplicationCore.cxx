@@ -63,7 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QFileOpenEvent>
 #include <QList>
-#include <QShortcut>
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
@@ -77,9 +76,10 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* 
   bool addStandardArgs /*=true*/, QObject* parentObject /*=nullptr*/)
   : Superclass(argc, argv, options, addStandardArgs, parentObject)
 {
-  // Initialize pqComponents resources.
+  // Initialize pqComponents resources, only for static builds.
+#if !BUILD_SHARED_LIBS
   pqApplicationComponentsInit();
-
+#endif
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
 
@@ -164,14 +164,18 @@ void pqPVApplicationCore::quickLaunch()
         }
       }
     }
-    // If shift modifier is pressed, let's force the auto apply
-    bool forceAutoApply = QApplication::keyboardModifiers() & Qt::ShiftModifier;
-    bool autoApplyState = pqPropertiesPanel::autoApply();
-    pqPropertiesPanel::setAutoApply(autoApplyState || forceAutoApply);
     dialog.exec();
-    // Restore the auto apply state
-    pqPropertiesPanel::setAutoApply(autoApplyState);
+    if (dialog.quickApply())
+    {
+      this->applyPipeline();
+    }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::applyPipeline()
+{
+  Q_EMIT this->triggerApply();
 }
 
 //-----------------------------------------------------------------------------

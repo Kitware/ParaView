@@ -36,14 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
 #include "pqDoubleRangeDialog.h"
+#include "pqHeaderView.h"
 #include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
-#include "pqPropertyLinks.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
+
+#include "vtkPVGeneralSettings.h"
+
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -58,8 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
+#include "vtkSelectionSource.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 
@@ -658,26 +660,26 @@ void selectBlocks(vtkSMOutputPort* producerPort, const std::set<std::string>& se
 {
   auto producer = producerPort->GetSourceProxy();
 
-  vtkNew<vtkSelection> selection;
-  vtkNew<vtkSelectionNode> node;
-  node->SetContentType(vtkSelectionNode::BLOCK_SELECTORS);
-  node->SetFieldType(vtkSelectionNode::CELL);
-  vtkNew<vtkStringArray> array;
-  array->SetName("Hierarchy");
-  array->Allocate(static_cast<vtkIdType>(selectors.size()));
-  for (const auto& item : selectors)
+  vtkNew<vtkSelectionSource> selectionSource;
+  selectionSource->SetFieldType(vtkSelectionNode::CELL);
+  selectionSource->SetContentType(vtkSelectionNode::BLOCK_SELECTORS);
+  selectionSource->SetArrayName("Hierarchy");
+  for (const auto& selector : selectors)
   {
-    array->InsertNextValue(item);
+    selectionSource->AddBlockSelector(selector.c_str());
   }
-  node->SetSelectionList(array);
-  selection->AddNode(node);
+  selectionSource->Update();
 
-  auto source = vtk::TakeSmartPointer(
-    vtkSMSelectionHelper::NewSelectionSourceFromSelection(producer->GetSession(), selection));
-  if (source)
+  // create selection proxy
+  auto selectionSourceProxy = vtk::TakeSmartPointer(
+    vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+      producer->GetSession(), selectionSource->GetOutput())));
+  // create append selection proxy from selection source proxy
+  auto appendSelections = vtk::TakeSmartPointer(vtkSMSourceProxy::SafeDownCast(
+    vtkSMSelectionHelper::NewAppendSelectionsFromSelectionSource(selectionSourceProxy)));
+  if (appendSelections)
   {
-    producer->SetSelectionInput(
-      producerPort->GetPortIndex(), vtkSMSourceProxy::SafeDownCast(source), 0);
+    producer->SetSelectionInput(producerPort->GetPortIndex(), appendSelections, 0);
 
     auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
     auto selManager = pqPVApplicationCore::instance()->selectionManager();
@@ -765,31 +767,40 @@ void hookupActiveSelection(
       }
       else
       {
-        // update selection.
-        auto selectors = getSelectors(port->getSelectionInput(), assembly);
-        const auto nodes = assembly->SelectNodes(selectors);
-        QList<int> iListNodes;
-        std::copy(nodes.begin(), nodes.end(), std::back_inserter(iListNodes));
-        auto indexes = model->index(iListNodes);
-        QItemSelection selection;
-        for (const auto& idx : indexes)
+        auto appendSelections = port->getSelectionInput();
+        unsigned int numInputs = appendSelections
+          ? vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements()
+          : 0;
+        for (unsigned int i = 0; i < numInputs; ++i)
         {
-          selection.select(idx, idx);
-        }
+          // update selection.
+          auto selectionSource = vtkSMSourceProxy::SafeDownCast(
+            vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i));
+          auto selectors = getSelectors(selectionSource, assembly);
+          const auto nodes = assembly->SelectNodes(selectors);
+          QList<int> iListNodes;
+          std::copy(nodes.begin(), nodes.end(), std::back_inserter(iListNodes));
+          auto indexes = model->index(iListNodes);
+          QItemSelection selection;
+          for (const auto& idx : indexes)
+          {
+            selection.select(idx, idx);
+          }
 
-        std::vector<QAbstractProxyModel*> proxyModels;
-        auto currentModel = selectionModel->model();
-        while (auto proxyModel = qobject_cast<QAbstractProxyModel*>(currentModel))
-        {
-          proxyModels.push_back(proxyModel);
-          currentModel = proxyModel->sourceModel();
+          std::vector<QAbstractProxyModel*> proxyModels;
+          auto currentModel = selectionModel->model();
+          while (auto proxyModel = qobject_cast<QAbstractProxyModel*>(currentModel))
+          {
+            proxyModels.push_back(proxyModel);
+            currentModel = proxyModel->sourceModel();
+          }
+          std::reverse(proxyModels.begin(), proxyModels.end());
+          for (auto& proxyModel : proxyModels)
+          {
+            selection = proxyModel->mapSelectionFromSource(selection);
+          }
+          selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
         }
-        std::reverse(proxyModels.begin(), proxyModels.end());
-        for (auto& proxyModel : proxyModels)
-        {
-          selection = proxyModel->mapSelectionFromSource(selection);
-        }
-        selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
       }
       selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
     });
@@ -924,6 +935,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   internals.Ui.setupUi(this);
   internals.Ui.hierarchy->header()->setDefaultSectionSize(iconSize + 4);
   internals.Ui.hierarchy->header()->setMinimumSectionSize(iconSize + 4);
+  internals.Ui.hierarchy->setSortingEnabled(true);
 
   internals.AssemblyTreeModel = new pqDataAssemblyTreeModel(this);
 
@@ -963,6 +975,12 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   // change pqTreeView header.
   internals.Ui.hierarchy->setupCustomHeader(/*use_pqHeaderView=*/true);
   new pqTreeViewSelectionHelper(internals.Ui.hierarchy);
+  if (auto headerView = qobject_cast<pqHeaderView*>(internals.Ui.hierarchy->header()))
+  {
+    headerView->setToggleCheckStateOnSectionClick(false);
+    // use underlying structure by default - no alphabetic sort until header clicked.
+    headerView->setSortIndicator(-1, Qt::AscendingOrder);
+  }
 
   hookupTableView(internals.Ui.table, internals.SelectorsTableModel, internals.Ui.add,
     internals.Ui.remove, internals.Ui.removeAll);
@@ -972,8 +990,10 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.Ui.removeOpacities, internals.Ui.removeAllOpacities);
 
   int linkActiveSelection = 0;
+  bool enableActiveSelectionProperty =
+    vtkPVGeneralSettings::GetInstance()->GetSelectOnClickMultiBlockInspector();
   if (groupHints && groupHints->GetScalarAttribute("link_active_selection", &linkActiveSelection) &&
-    linkActiveSelection == 1)
+    linkActiveSelection == 1 && enableActiveSelectionProperty)
   {
     hookupActiveSelection(
       smproxy, internals.Ui.hierarchy->selectionModel(), internals.AssemblyTreeModel);

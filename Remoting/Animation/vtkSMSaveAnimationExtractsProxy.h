@@ -48,7 +48,7 @@ public:
 
 protected:
   vtkSMSaveAnimationExtractsProxy();
-  ~vtkSMSaveAnimationExtractsProxy();
+  ~vtkSMSaveAnimationExtractsProxy() override;
 
 private:
   vtkSMSaveAnimationExtractsProxy(const vtkSMSaveAnimationExtractsProxy&) = delete;

@@ -20,10 +20,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  explicit pqWelcomeDialog(QWidget* parent = 0);
+  explicit pqWelcomeDialog(QWidget* parent = nullptr);
   ~pqWelcomeDialog() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void onGettingStartedGuideClicked();
 
   virtual void onExampleVisualizationsClicked();

@@ -124,7 +124,8 @@ pqServerConfigurationCollection::pqServerConfigurationCollection(QObject* parent
 pqServerConfigurationCollection::~pqServerConfigurationCollection()
 {
   auto config = vtkRemotingCoreConfiguration::GetInstance();
-  if (!config->GetDisableRegistry())
+  // save to servers.pvsc only if --dr/--disable-registry flag is absent and configurations exist
+  if (!config->GetDisableRegistry() && !this->configurations().empty())
   {
     this->save(userServers(), true);
   }
@@ -313,4 +314,13 @@ const pqServerConfiguration* pqServerConfigurationCollection::configuration(
   }
 
   return nullptr;
+}
+
+void pqServerConfigurationCollection::removeUserConfigurations()
+{
+  Q_FOREACH (pqServerConfiguration config, this->configurations())
+  {
+    this->removeConfiguration(config.name());
+  }
+  pqCoreUtilities::remove(::userServers());
 }

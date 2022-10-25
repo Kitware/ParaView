@@ -21,6 +21,7 @@
         <file>Icons/pqBottomLeftCorner32.png</file>
         <file>Icons/pqBottomRightCorner32.png</file>
         <file>Icons/pqBoxChart16.png</file>
+        <file>Icons/pqBoxColorAlpha.svg</file>
         <file>Icons/pqBundle16.png</file>
         <file>Icons/pqBundle32.png</file>
         <file>Icons/pqCalculator.svg</file>
@@ -85,8 +86,11 @@
         <file>Icons/pqInteractionMode2D.svg</file>
         <file>Icons/pqInteractionMode3D.svg</file>
         <file>Icons/pqInvert.svg</file>
+        <file>Icons/pqIsometricView.svg</file>
         <file>Icons/pqIsosurface.svg</file>
         <file>Icons/pqItalics24.png</file>
+        <file>Icons/pqLightOn.svg</file>
+        <file>Icons/pqLightOff.svg</file>
         <file>Icons/pqLineChart16.png</file>
         <file>Icons/pqLinkBack16.png</file>
         <file>Icons/pqLinkIn16.png</file>
@@ -211,6 +215,7 @@
         <file>Icons/pqVcrLoop.svg</file>
         <file>Icons/pqVcrPause.svg</file>
         <file>Icons/pqVcrPlay.svg</file>
+        <file>Icons/pqVcrReverse.svg</file>
         <file>Icons/pqWarp.svg</file>
         <file>Icons/pqWindow16.png</file>
         <file>Icons/pqWindow16@2x.png</file>

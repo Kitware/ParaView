@@ -120,9 +120,12 @@ public:
    * if the server is nullptr, files are browsed locally
    * the title, and start directory may be specified
    * the filter is a string of semi-colon separated filters
+   * if groupFiles is true, then file sequences are grouped into a file name where the sequence
+   * numbers are replaced by `..`
    */
   pqFileDialog(pqServer* server, QWidget* parent, const QString& title = QString(),
-    const QString& directory = QString(), const QString& filter = QString());
+    const QString& directory = QString(), const QString& filter = QString(),
+    bool groupFiles = true);
   ~pqFileDialog() override;
 
   /**
@@ -241,9 +244,10 @@ private Q_SLOTS:
 
   void AddDirectoryToFavorites(QString const&);
   void RemoveDirectoryFromFavorites(QString const&);
+  void FilterDirectoryFromFavorites(const QString& filter);
 
   void onAddCurrentDirectoryToFavorites();
-  void onRemoveCurrentDirectoryFromFavorites();
+  void onRemoveSelectedDirectoriesFromFavorites();
   void onResetFavoritesToSystemDefault();
 
   // Called when the user requests to create a new directory in the cwd
@@ -266,7 +270,7 @@ private Q_SLOTS:
    */
   void updateButtonStates();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
 

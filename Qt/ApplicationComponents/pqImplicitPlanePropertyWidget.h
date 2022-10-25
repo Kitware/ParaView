@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * pqImplicitPlanePropertyWidget is a custom property widget that uses
  * "ImplicitPlaneWidgetRepresentation" to help users interactively set the origin
  * and normal for a plane. To use this widget for a property group
- * (vtkSMPropertyGroup), use "InteractivePlane" as the "panel_widget" in the
+ * (vtkSMPropertyGroup), use "InteractivePlane2" as the "panel_widget" in the
  * XML configuration for the proxy. The property group should have properties for
  * following functions:
  * \li \c Origin: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
@@ -56,7 +56,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqImplicitPlanePropertyWidget
 
 public:
   pqImplicitPlanePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqImplicitPlanePropertyWidget() override;
 
   /**
@@ -65,7 +65,7 @@ public:
   void apply() override;
   void reset() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Slots used to toggle the visibility of the translucent plane.
    */
@@ -112,7 +112,7 @@ protected Q_SLOTS:
 private Q_SLOTS:
   void setOrigin(double x, double y, double z);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqImplicitPlanePropertyWidget)
 
   void setNormal(double x, double y, double z);

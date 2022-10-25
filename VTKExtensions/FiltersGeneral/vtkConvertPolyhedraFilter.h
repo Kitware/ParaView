@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkConvertPolyhedraFilter() = default;
-  ~vtkConvertPolyhedraFilter() = default;
+  ~vtkConvertPolyhedraFilter() override = default;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 

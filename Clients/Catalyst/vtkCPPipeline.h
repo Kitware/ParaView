@@ -50,7 +50,7 @@ public:
 
 protected:
   vtkCPPipeline();
-  virtual ~vtkCPPipeline();
+  ~vtkCPPipeline() override;
 
 private:
   vtkCPPipeline(const vtkCPPipeline&) = delete;

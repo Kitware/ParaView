@@ -146,7 +146,6 @@ private:
   /// is made only for indexes that are shared between 2 or 3 faces.
   void MinFaceIndex(int side, int index[3]) const;
 
-private:
   int MpiRank;          /// MPI rank
   int ChunkCapacity;    /// maximum number of (vertical) columns in a chunk
   int NCells2d;         /// total number of 2D cells on a MPI processor

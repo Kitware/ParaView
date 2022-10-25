@@ -109,7 +109,7 @@ private Q_SLOTS:
    */
   void domainChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSignalAdaptorSelectionTreeWidget)
 
   class pqInternal;

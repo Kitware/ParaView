@@ -52,7 +52,7 @@ class PQPYTHON_EXPORT pqPythonDebugLeaksView : public vtkQtDebugLeaksView
   Q_OBJECT
 
 public:
-  pqPythonDebugLeaksView(QWidget* p = 0);
+  pqPythonDebugLeaksView(QWidget* p = nullptr);
   ~pqPythonDebugLeaksView() override;
 
   void setShell(pqPythonShell*);

@@ -61,7 +61,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0">
      <item>
       <widget class="QCheckBox" name="showFullMessagesCheckBox">
        <property name="toolTip">
@@ -69,6 +69,19 @@
        </property>
        <property name="text">
         <string>Show full messages</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="alwaysOpenForNewMessagesCheckBox">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If unchecked and the window is closed, the window will remain closed when new messages are available.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Always open for new messages</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

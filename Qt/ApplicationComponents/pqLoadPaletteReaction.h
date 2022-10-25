@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadPaletteReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqLoadPaletteReaction(QAction* parent = 0);
+  pqLoadPaletteReaction(QAction* parent = nullptr);
   ~pqLoadPaletteReaction() override;
 
 protected:
@@ -59,7 +59,7 @@ private Q_SLOTS:
   void populateMenu();
   void actionTriggered(QAction* actn);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqLoadPaletteReaction)
   QPointer<QMenu> Menu;
 };

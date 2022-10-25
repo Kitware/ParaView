@@ -116,7 +116,6 @@ private:
   vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter&) = delete;
   void operator=(const vtkSMProxyConfigurationWriter&) = delete;
 
-private:
   char* FileName;
   //-------------------
   vtkSMProxy* Proxy;

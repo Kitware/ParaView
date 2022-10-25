@@ -8,13 +8,12 @@ readonly name="cinemasci"
 readonly ownership="Cinemasci Python Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/cinemasci/paraview/tpl"
 readonly repo="https://github.com/cinemascience/cinemasci.git"
-readonly tag="377d04985005a9a52b18dc54cee9279e28e97946"
+readonly tag="e7666713075c42f41bef9fc1fa9d19a76163de93" # 2.7.1
 
 readonly paths="
 .gitignore
 license.md
 cinemasci/__init__.py
-cinemasci/version.py
 cinemasci/cdb/
 cinemasci/cis/
 cinemasci/pynb/
@@ -32,7 +31,8 @@ extract_source () {
 
     echo "* -whitespace" > "$extractdir/$name-reduced/.gitattributes"
     echo >> "$extractdir/$name-reduced/cinemasci/viewers/cinema/lib/d3.v4.min.js"
-    echo >> "$extractdir/$name-reduced/cinemasci/viewers/cinema/view/2.0/css/range-css.css"
+    echo >> "$extractdir/$name-reduced/cinemasci/viewers/cinema/lib/CinemaComponents.v2.7.1.min.css"
+    echo >> "$extractdir/$name-reduced/cinemasci/viewers/cinema/view/2.2/css/range-css.css"
     echo >> "$extractdir/$name-reduced/cinemasci/viewers/.gitignore"
 
     rm -rfv "$extractdir/$name-reduced/cinemasci/viewers/cinema/testImages"

@@ -78,7 +78,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCheckableProperty : public pqPropertyWidg
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqCheckableProperty(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqCheckableProperty(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqCheckableProperty() override;
 
   void apply() override;
@@ -92,7 +92,7 @@ public:
 
   bool enableCheckbox() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setEnableCheckbox(bool enableCheckbox);
 
 private:

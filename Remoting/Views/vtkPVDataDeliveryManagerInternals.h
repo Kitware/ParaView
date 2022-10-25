@@ -86,7 +86,7 @@ public:
     vtkMTimeType TimeStamp{ 0 };
 
   public:
-    vtkItem() {}
+    vtkItem() = default;
 
     void ClearCache() { this->Data.clear(); }
 

@@ -45,6 +45,7 @@ class vtkDataObjectToTable;
 class vtkFieldData;
 class vtkInformationIntegerKey;
 class vtkMultiBlockDataSet;
+class vtkMultiProcessController;
 class vtkSciVizStatisticsP;
 class vtkStatisticsAlgorithm;
 
@@ -103,6 +104,14 @@ public:
   vtkSetClampMacro(TrainingFraction, double, 0.0, 1.0);
   vtkGetMacro(TrainingFraction, double);
   //@}
+
+  ///@{
+  /**
+   * Get/Set the multiprocess controller. If no controller is set, single process is assumed.
+   */
+  virtual void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  ///@}
 
   /**\brief Possible tasks the filter can perform.
    *
@@ -193,11 +202,9 @@ protected:
    * observations->GetNumberOfRows() * this->TrainingFraction and
    * min( observations->GetNumberOfRows(), 100 ).
    * Thus, it will require the entire set of observations unless there are more than 100.
-
-   * @param[in] observations - a table containing the full number of available observations (in
-   this process).
+   * Parameter N is the number of non-ghost observations.
    */
-  virtual vtkIdType GetNumberOfObservationsForTraining(vtkTable* observations);
+  virtual vtkIdType GetNumberOfObservationsForTraining(vtkIdType N);
 
   /**
    * A variant of shallow copy that calls vtkDataObject::ShallowCopy() and then
@@ -210,6 +217,7 @@ protected:
   int Task;
   double TrainingFraction;
   vtkSciVizStatisticsP* P;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkSciVizStatistics(const vtkSciVizStatistics&) = delete;

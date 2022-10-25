@@ -339,14 +339,17 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     rangeMin = std::min(rangeMin, preNormalizationRange[0]);
     rangeMax = std::max(rangeMax, preNormalizationRange[1]);
   }
+
+  // Setting the "LastRange" here because, it should match the current range of the control points.
+  // Aside from that, it will also be used for computing the 1D and 2D histograms.
+  this->LastRange[0] = rangeMin;
+  this->LastRange[1] = rangeMax;
   if (preNormalizationRange[0] == rangeMin && preNormalizationRange[1] == rangeMax)
   {
     // current range is same as the new range. Nothing to do here.
     return true;
   }
 
-  this->LastRange[0] = rangeMin;
-  this->LastRange[1] = rangeMax;
   vtkRescaleNormalizedControlPoints(points, rangeMin, rangeMax, log_space);
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
@@ -1161,20 +1164,6 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
 
   // Ensure the lookup table is rebuilt.
   this->UpdateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMTransferFunctionProxy::ResetRescaleModeToGlobalSetting()
-{
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
-  // Guard against the settings proxies not being available.
-  if (settingsProxy)
-  {
-    int globalResetMode =
-      vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
-    vtkSMPropertyHelper(this, "AutomaticRescaleRangeMode").Set(globalResetMode);
-  }
 }
 
 //----------------------------------------------------------------------------

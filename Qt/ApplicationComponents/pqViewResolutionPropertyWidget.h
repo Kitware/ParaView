@@ -58,7 +58,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewResolutionPropertyWidget : public pqP
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqViewResolutionPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqViewResolutionPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqViewResolutionPropertyWidget() override;
 
   //@{
@@ -83,11 +84,13 @@ Q_SIGNALS:
 private Q_SLOTS:
   void resetButtonClicked();
   void scale(double factor);
+  void applyPreset();
+  void applyRecent();
   void widthTextEdited(const QString&);
   void heightTextEdited(const QString&);
   void lockAspectRatioToggled(bool);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqViewResolutionPropertyWidget);
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

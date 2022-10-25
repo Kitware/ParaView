@@ -43,11 +43,15 @@
 #include "vtkIOSSReader.h"
 #endif
 
+#if VTK_MODULE_ENABLE_VTK_IOFides
+#include "vtkFidesReader.h"
+#endif
+
 #include "catalyst_impl_paraview.h"
 
 static bool update_producer_mesh_blueprint(const std::string& channel_name,
   const conduit_node* node, const conduit_node* global_fields, bool multimesh,
-  const conduit_node* assemblyNode)
+  const conduit_node* assemblyNode, bool multiblock)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
@@ -67,6 +71,7 @@ static bool update_producer_mesh_blueprint(const std::string& channel_name,
   algo->SetNode(node);
   algo->SetGlobalFieldsNode(global_fields);
   algo->SetUseMultiMeshProtocol(multimesh);
+  algo->SetOutputMultiBlock(multiblock);
   algo->SetAssemblyNode(assemblyNode);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
@@ -119,6 +124,63 @@ static bool update_producer_ioss(const std::string& channel_name, const conduit_
 #else
   (void)channel_name;
   (void)node;
+  return false;
+#endif
+}
+
+#if VTK_MODULE_ENABLE_VTK_IOFides
+static bool create_producer_fides(const std::string& channel_name, const conduit_cpp::Node& node)
+{
+  // For the ADIOS Inline engine, the reader proxy must be created before simulation
+  // steps can start
+  auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
+  if (producer == nullptr)
+  {
+    auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    producer = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "FidesJSONReader"));
+    if (!producer)
+    {
+      vtkLogF(ERROR, "Failed to create 'Fides' proxy!");
+      return false;
+    }
+
+    vtkSMPropertyHelper(producer, "FileName").Set(node["json_file"].as_string().c_str());
+    vtkSMPropertyHelper(producer, "DataSourceIO")
+      .Set(0, node["data_source_io/source"].as_string().c_str());
+    vtkSMPropertyHelper(producer, "DataSourceIO")
+      .Set(1, node["data_source_io/address"].as_string().c_str());
+    vtkSMPropertyHelper(producer, "DataSourcePath")
+      .Set(0, node["data_source_path/source"].as_string().c_str());
+    vtkSMPropertyHelper(producer, "DataSourcePath")
+      .Set(1, node["data_source_path/path"].as_string().c_str());
+    vtkInSituInitializationHelper::SetProducer(channel_name, producer);
+    producer->UpdateVTKObjects();
+    // Required so that vtkFidesReader will setup the inline reader
+    producer->UpdatePipelineInformation();
+    producer->Delete();
+  }
+
+  return true;
+}
+#endif
+
+static bool update_producer_fides(const std::string& channel_name, double& time)
+{
+#if VTK_MODULE_ENABLE_VTK_IOFides
+  auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
+  if (producer == nullptr)
+  {
+    vtkLogF(ERROR, "Fides producer doesn't exist!");
+    return false;
+  }
+  auto algo = vtkFidesReader::SafeDownCast(producer->GetClientSideObject());
+  algo->PrepareNextStep();
+  time = algo->GetTimeOfCurrentStep();
+  vtkInSituInitializationHelper::MarkProducerModified(channel_name);
+  return true;
+#else
+  (void)channel_name;
+  (void)time;
   return false;
 #endif
 }
@@ -189,10 +251,15 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
   static_assert(sizeof(MPI_Fint) <= sizeof(vtkTypeUInt64),
     "MPI_Fint size is greater than 64bit! That is not supported.");
-  vtkTypeUInt64 comm = static_cast<vtkTypeUInt64>(MPI_Comm_c2f(MPI_COMM_WORLD));
-  if (cpp_params.has_path("catalyst/mpi_comm"))
+  vtkTypeUInt64 comm = 0;
+  int isMPIInitialized = 0;
+  if (MPI_Initialized(&isMPIInitialized) == MPI_SUCCESS && isMPIInitialized)
   {
-    comm = cpp_params["catalyst/mpi_comm"].to_int64();
+    comm = static_cast<vtkTypeUInt64>(MPI_Comm_c2f(MPI_COMM_WORLD));
+    if (cpp_params.has_path("catalyst/mpi_comm"))
+    {
+      comm = cpp_params["catalyst/mpi_comm"].to_int64();
+    }
   }
 #else
   const vtkTypeUInt64 comm = 0;
@@ -272,6 +339,16 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
       "analysis pipelines will be executed.");
   }
 
+#if VTK_MODULE_ENABLE_VTK_IOFides
+  // For the ADIOS Inline engine, the reader proxy must be created before simulation
+  // steps can start
+  if (cpp_params.has_path("catalyst/fides"))
+  {
+    auto& fidesParams = cpp_params["catalyst/fides"];
+    create_producer_fides("fides", fidesParams);
+  }
+#endif
+
   return catalyst_status_ok;
 }
 
@@ -299,7 +376,10 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
   const int timestep = root.has_path("state/timestep")
     ? root["state/timestep"].to_int64()
     : (root.has_path("state/cycle") ? root["state/cycle"].to_int64() : 0);
-  const double time = root.has_path("state/time") ? root["state/time"].to_float64() : 0;
+  double time = root.has_path("state/time") ? root["state/time"].to_float64() : 0;
+
+  const int output_multiblock =
+    root.has_path("state/multiblock") ? root["state/multiblock"].to_int() : 0;
 
   vtkVLogScopeF(
     PARAVIEW_LOG_CATALYST_VERBOSITY(), "co-processing for timestep=%d, time=%f", timestep, time);
@@ -328,6 +408,10 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
 
       const double channel_time =
         channel_node.has_path("state/time") ? channel_node["state/time"].to_float64() : time;
+
+      const int channel_output_multiblock = channel_node.has_path("state/multiblock")
+        ? channel_node["state/multiblock"].to_int()
+        : output_multiblock;
 
       if (type == "mesh")
       {
@@ -375,6 +459,17 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
         vtkLogF(ERROR, "IOSS mesh is not supported by this build. Rebuild with IOSS enabled.");
 #endif
       }
+      else if (type == "fides")
+      {
+#if VTK_MODULE_ENABLE_VTK_IOFides
+        is_valid = true;
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+          "Fides mesh detected for channel (%s); validation will be skipped for now",
+          channel_name.c_str());
+#else
+        vtkLogF(ERROR, "Fides mesh is not supported by this build. Rebuild with Fides enabled.");
+#endif
+      }
       else
       {
         is_valid = false;
@@ -402,11 +497,16 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
           assembly = conduit_cpp::c_node(&anode);
         }
         update_producer_mesh_blueprint(channel_name, conduit_cpp::c_node(&data_node),
-          conduit_cpp::c_node(&fields), type == "multimesh", assembly);
+          conduit_cpp::c_node(&fields), type == "multimesh", assembly,
+          channel_output_multiblock != 0);
       }
       else if (type == "ioss")
       {
         update_producer_ioss(channel_name, &data_node, &fields);
+      }
+      else if (type == "fides")
+      {
+        update_producer_fides(channel_name, time);
       }
     }
   }

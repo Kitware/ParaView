@@ -18,6 +18,7 @@
 
 #include "vtkPVGeneralSettings.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -36,6 +37,10 @@
 #include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTransferFunctionManager.h"
+#endif
+
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+#include "vtkmFilterOverrides.h"
 #endif
 
 #include <cassert>
@@ -57,11 +62,6 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , AutoApply(false)
   , AutoApplyActiveOnly(false)
   , DefaultViewType(nullptr)
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  , TransferFunctionResetMode(vtkSMTransferFunctionManager::GROW_ON_APPLY)
-#else
-  , TransferFunctionResetMode(0)
-#endif
   , ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
   , AnimationGeometryCacheLimit(0)
   , AnimationTimePrecision(6)
@@ -76,6 +76,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , ColorByBlockColorsOnApply(true)
   , AnimationTimeNotation(vtkPVGeneralSettings::MIXED)
   , EnableStreaming(false)
+  , SelectOnClickMultiBlockInspector(true)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -288,14 +289,38 @@ void vtkPVGeneralSettings::SetEnableStreaming(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetUseAcceleratedFilters(bool val)
+{
+  static_cast<void>(val);
+
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+  if (this->GetUseAcceleratedFilters() != val)
+  {
+    vtkmFilterOverrides::SetEnabled(val);
+    this->Modified();
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeneralSettings::GetUseAcceleratedFilters()
+{
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+  return vtkmFilterOverrides::GetEnabled();
+#else
+  return false;
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "AutoApply: " << this->AutoApply << "\n";
+  os << indent << "AutoApplyDelay: " << this->AutoApplyDelay << "\n";
   os << indent << "AutoApplyActiveOnly: " << this->AutoApplyActiveOnly << "\n";
   os << indent << "DefaultViewType: " << this->DefaultViewType << "\n";
-  os << indent << "TransferFunctionResetMode: " << this->TransferFunctionResetMode << "\n";
   os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
   os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
   os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";

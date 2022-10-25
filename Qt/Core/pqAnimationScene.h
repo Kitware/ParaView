@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqAnimationScene_h
 
 #include "pqProxy.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
 #include <QPair>
 #include <QSet>
 
@@ -150,14 +151,30 @@ Q_SIGNALS:
   void clockTimeRangesChanged();
 
   /**
-   * Emitted when animation starts playing.
+   * @deprecated in ParaView 5.11.0
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
   void beginPlay();
 
   /**
-   * Emitted when animation ends playing.
+   * @deprecated in ParaView 5.11.0
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
   void endPlay();
+
+  /**
+   * Emitted when animation starts playing.
+   * `reversed` is a pointer to boolean that
+   * indicates if the playback direction is backward
+   */
+  void beginPlay(vtkObject* caller, unsigned long, void*, void* reversed);
+
+  /**
+   * Emitted when animation ends playing.
+   * `reversed` is a pointer to boolean that
+   * indicates if the playback direction is backward
+   */
+  void endPlay(vtkObject* caller, unsigned long, void*, void* reversed);
 
   /**
    * Emitted when playing animation.

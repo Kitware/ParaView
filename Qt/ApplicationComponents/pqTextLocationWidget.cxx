@@ -137,8 +137,11 @@ QString pqTextLocationWidget::windowLocation() const
 void pqTextLocationWidget::radioButtonLocationClicked()
 {
   auto button = this->Internals->Ui.buttonGroupLocation->checkedButton();
-  QString locationStr(button->property("location").toString());
-  this->setWindowLocation(locationStr);
+  if (button)
+  {
+    QString locationStr(button->property("location").toString());
+    this->setWindowLocation(locationStr);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -163,9 +166,21 @@ void pqTextLocationWidget::updateUI()
   ui.radioButtonLocation->setChecked(!anyLocation);
   ui.radioButtonLocation->blockSignals(false);
 
-  // Check the selected location button if location is anything other than "AnyLocation"
-  if (!anyLocation)
+  if (anyLocation)
   {
+    // If we have a PositionInfo property, update the property information so that we can
+    // set the Position property values read from the current PositionInfo values.
+    if (this->proxy()->GetProperty("PositionInfo") != nullptr)
+    {
+      this->proxy()->UpdatePropertyInformation();
+      auto position = vtkSMPropertyHelper(this->proxy(), "PositionInfo").GetDoubleArray();
+      vtkSMPropertyHelper(this->proxy(), "Position").Set(position.data(), 2);
+      this->proxy()->UpdateVTKObjects();
+    }
+  }
+  else
+  {
+    // Check the selected location button if location is anything other than "AnyLocation"
     QList<QAbstractButton*> toolButtons = this->Internals->Ui.buttonGroupLocation->buttons();
     for (QAbstractButton* toolButton : toolButtons)
     {

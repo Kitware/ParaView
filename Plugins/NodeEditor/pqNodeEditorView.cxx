@@ -20,6 +20,7 @@
 -------------------------------------------------------------------------*/
 
 #include "pqNodeEditorView.h"
+#include "pqNodeEditorUtils.h"
 
 #include <pqDeleteReaction.h>
 
@@ -29,12 +30,6 @@
 #include <QWheelEvent>
 
 // ----------------------------------------------------------------------------
-pqNodeEditorView::pqNodeEditorView(QWidget* parent)
-  : QGraphicsView(parent)
-{
-}
-
-// ----------------------------------------------------------------------------
 pqNodeEditorView::pqNodeEditorView(QGraphicsScene* scene, QWidget* parent)
   : QGraphicsView(scene, parent)
   , deleteAction(new QAction(this))
@@ -42,8 +37,12 @@ pqNodeEditorView::pqNodeEditorView(QGraphicsScene* scene, QWidget* parent)
   // create delete reaction
   new pqDeleteReaction(this->deleteAction);
 
-  this->setRenderHint(QPainter::Antialiasing);
+  this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
   this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+  this->setDragMode(QGraphicsView::ScrollHandDrag);
+  constexpr QRectF MAX_SCENE_SIZE{ -1e4, -1e4, 3e4, 3e4 };
+  this->setSceneRect(MAX_SCENE_SIZE);
 }
 
 // ----------------------------------------------------------------------------

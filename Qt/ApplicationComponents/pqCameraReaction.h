@@ -54,6 +54,7 @@ public:
     RESET_NEGATIVE_X,
     RESET_NEGATIVE_Y,
     RESET_NEGATIVE_Z,
+    APPLY_ISOMETRIC_VIEW,
     ZOOM_TO_DATA,
     ROTATE_CAMERA_CW,
     ROTATE_CAMERA_CCW,
@@ -74,8 +75,9 @@ public:
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
   static void zoomToData(bool closest = false);
   static void rotateCamera(double angle);
+  static void applyIsometricView();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call
    * this.

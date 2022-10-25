@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create cone -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ConeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- open animation view -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
+
+  <!-- add "Follow path" Camera Cue -->
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/ProxyCombo" command="activated" arguments="Camera" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo" property="currentText" arguments="Follow Path" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,2" />
+
+  <!-- check default initial camera position -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionAdjustCamera" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position0" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position1" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position2" property="text" arguments="2.5" />
+
+  <!-- edit track -->
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mousePress" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseDblClick" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqcheck object="1QDialog0/pqKeyFrameEditor/tableView" property="modelRowCount" arguments="2" />
+
+  <!-- check keyframe. position spline has 10 control points -->
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_4/leftPane" command="setCurrent" arguments="0.0" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_4/leftPane" command="setCheckState" arguments="0.0,0" />
+  <pqcheck object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_4/stackedWidget/page/positionContainer/1pqProxyWidget0/InteractiveSpline/PointsTable" property="modelRowCount" arguments="10" />
+
+  <!-- add new key frame, with orbit. Position spline has 7 control points -->
+  <pqevent object="1QDialog0/pqKeyFrameEditor/pbNew" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="0.1,Path ..." />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/pbCreateOrbit" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/OrbitCreatorDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_4/leftPane" command="setCurrent" arguments="0.0" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_4/leftPane" command="setCheckState" arguments="0.0,0" />
+  <pqcheck object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_4/stackedWidget/page/positionContainer/1pqProxyWidget0/InteractiveSpline/PointsTable" property="modelRowCount" arguments="7" />
+
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+
+  <!-- check last frame camera -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <!-- do not check x and z position due to rounding problem -->
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position1" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/viewUp0" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/viewUp1" property="text" arguments="1" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/viewUp2" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/focalPoint0" property="text" arguments="1" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/focalPoint1" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/focalPoint2" property="text" arguments="0" />
+
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+</pqevents>

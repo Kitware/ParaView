@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqUndoStack.h"
+#include "vtkFileSequenceParser.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 #include <QInputDialog>
+#include <QMap>
 
 #include <cassert>
 
@@ -78,27 +80,70 @@ void pqLoadDataReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
+  ReaderSet readerSet;
+  return pqLoadDataReaction::loadData(readerSet);
+}
+
+//-----------------------------------------------------------------------------
+QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet)
+{
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+
   std::vector<FileTypeDetailed> filtersDetailed =
     readerFactory->GetSupportedFileTypesDetailed(server->session());
-
   QString filtersString;
+
+  // When using a readerSet, rewrite the Supported Types extensions to only list wanted
+  // supported files
+  if (!readerSet.isEmpty())
+  {
+    FileTypeDetailed* supportedTypesDetailed = nullptr;
+    std::vector<std::string> supportedTypesPattern;
+    for (auto& filterDetailed : filtersDetailed)
+    {
+      ReaderPair readerPair(
+        QString::fromStdString(filterDetailed.Group), QString::fromStdString(filterDetailed.Name));
+      if (filterDetailed.Description == vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION)
+      {
+        supportedTypesDetailed = &filterDetailed;
+      }
+      else if (readerSet.contains(readerPair))
+      {
+        supportedTypesPattern.insert(supportedTypesPattern.end(),
+          filterDetailed.FilenamePatterns.begin(), filterDetailed.FilenamePatterns.end());
+      }
+    }
+    supportedTypesDetailed->FilenamePatterns = supportedTypesPattern;
+  }
+
   bool first = true;
+  std::vector<ReaderPair> readerPairVector;
   // Generates the filter string used by the fileDialog
   // For example, this could be "Supported Files (*.jpg *.jpeg *.png);;All Files (*);;JPEG Image
   // Files(*.jpg *.jpeg);;PNG Image Files (*.png)"
   for (auto const& filterDetailed : filtersDetailed)
   {
-    if (!first)
+    // Check if reader pair is part of provided reader pair list
+    // only if list is not empty and not a standard description
+    ReaderPair readerPair(
+      QString::fromStdString(filterDetailed.Group), QString::fromStdString(filterDetailed.Name));
+    if (readerSet.isEmpty() ||
+      filterDetailed.Description == vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION ||
+      filterDetailed.Description == vtkSMReaderFactory::ALL_FILES_DESCRIPTION ||
+      readerSet.contains(readerPair))
     {
-      filtersString += ";;";
+      if (!first)
+      {
+        filtersString += ";;";
+      }
+
+      filtersString += QString::fromStdString(filterDetailed.Description) + " (" +
+        QString::fromStdString(vtksys::SystemTools::Join(filterDetailed.FilenamePatterns, " ")) +
+        ")";
+      readerPairVector.push_back(readerPair);
+      first = false;
     }
-
-    filtersString += QString::fromStdString(filterDetailed.Description) + " (" +
-      QString::fromStdString(vtksys::SystemTools::Join(filterDetailed.FilenamePatterns, " ")) + ")";
-
-    first = false;
   }
 
   int constexpr SupportedFilesFilterIndex = 0;
@@ -135,9 +180,8 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
       break;
       default:
         // Specific reader
-        pqPipelineSource* source = pqLoadDataReaction::loadData(files,
-          QString::fromStdString(filtersDetailed[filterIndex].Group),
-          QString::fromStdString(filtersDetailed[filterIndex].Name));
+        pqPipelineSource* source = pqLoadDataReaction::loadData(
+          files, readerPairVector[filterIndex].first, readerPairVector[filterIndex].second);
         if (source)
         {
           sources << source;
@@ -288,7 +332,21 @@ pqPipelineSource* pqLoadDataReaction::loadData(
   const QStringList& files, const QString& smgroup, const QString& smname, pqServer* server)
 {
   QList<QStringList> f;
-  f.append(files);
+  QMap<std::string, QStringList> fileGroups;
+  vtkNew<vtkFileSequenceParser> sequenceParser;
+  // --- detect file series
+  for (const auto& _file : files)
+  {
+    if (sequenceParser->ParseFileSequence(_file.toUtf8()))
+    {
+      fileGroups[sequenceParser->GetSequenceName()].append(_file);
+    }
+    else
+    {
+      f.append(QStringList(_file));
+    }
+  }
+  f << fileGroups.values();
   return pqLoadDataReaction::loadData(f, smgroup, smname, server);
 }
 

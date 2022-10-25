@@ -108,7 +108,7 @@ public:
    */
   QString getViewType() const { return this->ViewType; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Request a StillRender on idle. Multiple calls are collapsed into one.
    */
@@ -143,7 +143,7 @@ public Q_SLOTS:
    */
   virtual void resetDisplay(bool closest = false) { (void)closest; }
 
-public:
+public: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Returns true if undo can be done.
    */
@@ -192,12 +192,6 @@ public:
    * vtkSMViewProxy::CanDisplayData().
    */
   bool canDisplay(pqOutputPort* opPort) const;
-
-  /**
-   * Called when a selection is made, passing in the mode as the sole
-   * argument.
-   */
-  virtual void emitSelectionSignals(bool frustum);
 
 Q_SIGNALS:
   /**
@@ -253,12 +247,6 @@ Q_SIGNALS:
    *    have been initialized to a selection source.
    */
   void selected(pqOutputPort* opport);
-
-  /**
-   * Fired when the selection changes.
-   * \c frustum is a boolean indicating whether the selection is frustum-based.
-   */
-  void selectionModeChanged(bool frustum);
 
   /**
    * Fired when a port is picked.

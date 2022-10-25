@@ -106,6 +106,17 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
 }
 
 //-----------------------------------------------------------------------------
+void pqPythonScriptEditor::runCurrentTab()
+{
+  if (!this->TabWidget->getCurrentTextArea()->isEmpty())
+  {
+    const QString& code{ this->TabWidget->getCurrentTextArea()->getTextEdit()->toPlainText() };
+    this->PythonManager->executeCode(code.toUtf8());
+    pqApplicationCore::instance()->render();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqPythonScriptEditor::closeEvent(QCloseEvent* e)
 {
   if (this->TabWidget->saveOnClose())
@@ -161,6 +172,7 @@ void pqPythonScriptEditor::createMenus()
   this->fileMenu->addAction(&this->Actions[Action::SaveFileAs]);
   this->fileMenu->addAction(&this->Actions[Action::SaveFileAsMacro]);
   this->fileMenu->addAction(&this->Actions[Action::SaveFileAsScript]);
+  this->fileMenu->addAction(&this->Actions[Action::Run]);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(&this->Actions[Action::CloseCurrentTab]);
   this->fileMenu->addAction(&this->Actions[Action::Exit]);
@@ -175,7 +187,7 @@ void pqPythonScriptEditor::createMenus()
   this->editMenu->addAction(&this->Actions[Action::Undo]);
   this->editMenu->addAction(&this->Actions[Action::Redo]);
 
-  this->Actions.updateScriptsList();
+  this->Actions.updateScriptsList(this->PythonManager);
   auto menu = menuBar()->addMenu(this->tr("&Scripts"));
   menu->setToolTipsVisible(true);
   menu->addAction(&this->Actions[Action::SaveFileAsScript]);
@@ -186,7 +198,8 @@ void pqPythonScriptEditor::createMenus()
     this->tr("Open a python script in a new tab"));
   this->scriptMenus[ScriptActionType::Open]->setToolTipsVisible(true);
 
-  this->scriptMenus[ScriptActionType::Load] = menu->addMenu(this->tr("Use as current script..."));
+  this->scriptMenus[ScriptActionType::Load] =
+    menu->addMenu(this->tr("Load script into current editor tab..."));
   this->scriptMenus[ScriptActionType::Load]->setStatusTip(
     this->tr("Load a python script in the current opened tab and override its content"));
   this->scriptMenus[ScriptActionType::Load]->setToolTipsVisible(true);
@@ -194,6 +207,14 @@ void pqPythonScriptEditor::createMenus()
   this->scriptMenus[ScriptActionType::Delete] = menu->addMenu(this->tr("Delete..."));
   this->scriptMenus[ScriptActionType::Delete]->setStatusTip(this->tr("Delete the script"));
   this->scriptMenus[ScriptActionType::Delete]->setToolTipsVisible(true);
+
+  this->scriptMenus[ScriptActionType::Run] = menu->addMenu(this->tr("Run..."));
+  this->scriptMenus[ScriptActionType::Run]->setStatusTip(
+    this->tr("Load a python script in a new tab and run it"));
+  this->scriptMenus[ScriptActionType::Run]->setToolTipsVisible(true);
+
+  menu->addSeparator();
+  menu->addAction(&this->Actions[Action::DeleteAll]);
 
   this->Actions.FillQMenu(this->scriptMenus);
 }
@@ -225,7 +246,7 @@ void pqPythonScriptEditor::updateMacroList()
 void pqPythonScriptEditor::updateScriptList()
 {
   auto editor = pqPythonScriptEditor::getUniqueInstance();
-  editor->Actions.updateScriptsList();
+  editor->Actions.updateScriptsList(editor->PythonManager);
   editor->Actions.FillQMenu(editor->scriptMenus);
 }
 

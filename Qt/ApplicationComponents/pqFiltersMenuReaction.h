@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFiltersMenuReaction : public QObject
 public:
   pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager, bool hideDisabledActions = false);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state.  The actions in toolbars will
    * be updated automatically.  The containing widget of other actions

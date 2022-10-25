@@ -46,7 +46,7 @@ public:
   pqFileDialogFilter(pqFileDialogModel* sourceModel, QObject* Parent = nullptr);
   ~pqFileDialogFilter() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setFilter(const QString& filter);
   void setShowHidden(const bool& hidden);
   bool getShowHidden() { return showHidden; };

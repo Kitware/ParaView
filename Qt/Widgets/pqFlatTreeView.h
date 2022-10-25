@@ -64,9 +64,9 @@ class QRect;
  *
  * The tree view is flattened by taking long indented chains of
  * single items and lining them up vertically. If an item is the
- * only descendent of its parent item, it is drawn directly below
+ * only descendant of its parent item, it is drawn directly below
  * its parent. A vertical branch is drawn between the items to
- * indicate relationship. If an item has more than one descendent,
+ * indicate relationship. If an item has more than one descendant,
  * those items are indented from the parent. Normal tree view
  * branches are drawn between the parent and child items to show
  * the relationship.
@@ -90,13 +90,12 @@ public:
     ExtendedSelection
   };
 
-public:
   /**
    * \brief
    *   Creates a flat tree view.
    * \param parent The parent widget for this instance.
    */
-  pqFlatTreeView(QWidget* parent = 0);
+  pqFlatTreeView(QWidget* parent = nullptr);
   ~pqFlatTreeView() override;
 
   /**
@@ -233,7 +232,7 @@ protected Q_SLOTS:
   void updateData(const QModelIndex& topLeft, const QModelIndex& bottomRight);
   //@}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * \name Keyboard Event Handlers
    */
@@ -286,7 +285,7 @@ private Q_SLOTS:
   void changeSelection(const QItemSelection& selected, const QItemSelection& deselected);
   //@}
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   void resetRoot();
   void resetPreferredSizes();
 
@@ -333,7 +332,6 @@ private:
   void drawFocus(
     QPainter& painter, const QRect& cell, const QStyleOptionViewItem& options, bool selected);
 
-private:
   QAbstractItemModel* Model;
   QItemSelectionModel* Selection;
   SelectionBehavior Behavior;

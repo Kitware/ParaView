@@ -1,38 +1,38 @@
-// -*- c++ -*-
 /*=========================================================================
- *
- *  Program:   Visualization Toolkit
- *  Module:    vtkCDIReader.cxx
- *
- *  Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
- *  All rights reserved.
- *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
- *
- *     This software is distributed WITHOUT ANY WARRANTY; without even
- *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE.  See the above copyright notice for more information.
- *
- *  =========================================================================*/
-// .NAME vtkCDIReader - reads ICON/CDI netCDF data sets
-// .SECTION Description
-// vtkCDIReader is based on the vtk MPAS netCDF reader developed by
-// Christine Ahrens (cahrens@lanl.gov). The plugin reads all ICON/CDI
-// netCDF data sets with Point and cell variables, both 2D and 3D. It allows
-// spherical (standard), as well as equidistant cylindrical and Cassini projection.
-// 3D data can be visualized using slices, as well as 3D unstructured mesh. If
-// bathymetry information (wet_c) is present in the data, this can be used for
-// masking out continents. For more information, also check out our ParaView tutorial:
-// https://www.dkrz.de/Nutzerportal-en/doku/vis/sw/paraview
-//
-// .SECTION Caveats
-// The integrated visualization of performance data is not yet fully developed
-// and documented. If interested in using it, see the following presentation
-// https://www.dkrz.de/about/media/galerie/Vis/performance/perf-vis
-// and/or contact Niklas Roeber at roeber@dkrz.de
-//
-// .SECTION Thanks
-// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
-// Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
+
+   Program: ParaView
+   Module:  vtkCDIReader.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+
+/*-------------------------------------------------------------------------
+   Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
+  -------------------------------------------------------------------------*/
 
 #include "vtkCDIReader.h"
 
@@ -40,16 +40,14 @@
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
-#include "vtkDataArraySelection.h"
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
+#include "vtkDummyController.h"
 #include "vtkFieldData.h"
 #include "vtkFileSeriesReader.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
-#include "vtkInformationIntegerKey.h"
-#include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -57,42 +55,25 @@
 #include "vtkUnstructuredGrid.h"
 
 #include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
 
-#include "ThirdParty/cdi.h"
-#include "vtk_netcdf.h"
+#include "cdi_tools.h"
 
-#include <cmath>
+#include <set>
 #include <sstream>
 
-using namespace std;
-
-#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
-struct CDIVar
-{
-  int StreamID;
-  int VarID;
-  int GridID;
-  int ZAxisID;
-  int GridSize;
-  int NLevel;
-  int Type;
-  int ConstTime;
-  int Timestep;
-  int LevelID;
-  char Name[CDI_MAX_NAME];
-};
+constexpr static int MAX_VARS = 100;
 
 struct Point
 {
-  double lon;
-  double lat;
+  double Lon;
+  double Lat;
 };
 
 struct PointWithIndex
 {
-  Point p;
-  int i;
+  Point Pt;
+  int Idx;
 };
 
 //----------------------------------------------------------------------------
@@ -112,9 +93,9 @@ public:
   ~Internal() = default;
 
   int CellVarIDs[MAX_VARS];
-  CDIVar CellVars[MAX_VARS];
-  CDIVar PointVars[MAX_VARS];
-  string DomainVars[MAX_VARS];
+  cdi_tools::CDIVar CellVars[MAX_VARS];
+  cdi_tools::CDIVar PointVars[MAX_VARS];
+  std::string DomainVars[MAX_VARS];
 
   // The Point data we expect to receive from each process.
   vtkSmartPointer<vtkIdTypeArray> PointsExpectedFromProcessesLengths;
@@ -129,56 +110,12 @@ public:
 namespace
 {
 //----------------------------------------------------------------------------
-//  CDI helper functions
-//----------------------------------------------------------------------------
-void cdi_set_cur(CDIVar* cdiVar, int Timestep, int level)
-{
-  cdiVar->Timestep = Timestep;
-  cdiVar->LevelID = level;
-}
-
-template <class T>
-void cdi_get_part(CDIVar* cdiVar, int start, size_t size, T* buffer, int nlevels)
-{
-  size_t nmiss;
-  int memtype = 0;
-  int nrecs = streamInqTimestep(cdiVar->StreamID, cdiVar->Timestep);
-  if (nrecs > 0)
-  {
-    if (std::is_same<T, double>::value)
-      memtype = 1; // this is CDI memtype double
-    else if (std::is_same<T, float>::value)
-      memtype = 2; // this is CDI memtype float
-  }
-
-  if (nlevels == 1)
-    streamReadVarSlicePart(cdiVar->StreamID, cdiVar->VarID, cdiVar->LevelID, cdiVar->Type, start,
-      size, buffer, &nmiss, memtype);
-  else
-    streamReadVarPart(
-      cdiVar->StreamID, cdiVar->VarID, cdiVar->Type, start, size, buffer, &nmiss, memtype);
-}
-
-//----------------------------------------------------------------------------
-// Open netCDF files
-//----------------------------------------------------------------------------
-#define CALL_NETCDF(call)                                                                          \
-  {                                                                                                \
-    int errorcode = call;                                                                          \
-    if (errorcode != NC_NOERR)                                                                     \
-    {                                                                                              \
-      vtkErrorMacro("netCDF Error: " << nc_strerror(errorcode));                                   \
-      return 0;                                                                                    \
-    }                                                                                              \
-  }
-
-//----------------------------------------------------------------------------
 // Macro to check new didn't return an error
 //----------------------------------------------------------------------------
 #define CHECK_NEW(ptr)                                                                             \
   if ((ptr) == nullptr)                                                                            \
   {                                                                                                \
-    vtkErrorMacro("new failed!" << endl);                                                          \
+    vtkErrorMacro("new failed!");                                                                  \
     return 0;                                                                                      \
   }
 
@@ -198,141 +135,6 @@ void cdi_get_part(CDIVar* cdiVar, int start, size_t size, T* buffer, int nlevels
       abort();                                                                                     \
   }
 
-//-----------------------------------------------------------------------------
-//  Function to convert cartesian coordinates to spherical, for use in
-//  computing points in different layers of multilayer spherical view
-//----------------------------------------------------------------------------
-int CartesianToSpherical(double x, double y, double z, double* rho, double* phi, double* theta)
-{
-  double trho = sqrt((x * x) + (y * y) + (z * z));
-  double ttheta = atan2(y, x);
-  double tphi = acos(z / (trho));
-  if (vtkMath::IsNan(trho) || vtkMath::IsNan(ttheta) || vtkMath::IsNan(tphi))
-  {
-    return -1;
-  }
-
-  *rho = trho;
-  *theta = ttheta;
-  *phi = tphi;
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-//  Function to convert spherical coordinates to cartesian, for use in
-//  computing points in different layers of multilayer spherical view
-//----------------------------------------------------------------------------
-int SphericalToCartesian(double rho, double phi, double theta, double* x, double* y, double* z)
-{
-  double tx = rho * sin(phi) * cos(theta);
-  double ty = rho * sin(phi) * sin(theta);
-  double tz = rho * cos(phi);
-  if (vtkMath::IsNan(tx) || vtkMath::IsNan(ty) || vtkMath::IsNan(tz))
-  {
-    return -1;
-  }
-
-  *x = tx;
-  *y = ty;
-  *z = tz;
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-//  Function to convert lon/lat coordinates to cartesian
-//----------------------------------------------------------------------------
-int LLtoXYZ(double lon, double lat, double* x, double* y, double* z, int projectionMode)
-{
-  double tx = 0.0;
-  double ty = 0.0;
-  double tz = 0.0;
-
-  if (projectionMode == 0) // Project Spherical
-  {
-    lat += vtkMath::Pi() * 0.5;
-    tx = sin(lat) * cos(lon);
-    ty = sin(lat) * sin(lon);
-    tz = cos(lat);
-  }
-  else if (projectionMode == 1) // Lat/Lon
-  {
-    tx = lon;
-    ty = lat;
-    tz = 0.0;
-  }
-  else if (projectionMode == 2) // Cassini
-  {
-    tx = 50 * asin(cos(lat) * sin(lon));
-    ty = 50 * atan2(sin(lat), (cos(lat) * cos(lon)));
-    tz = 0.0;
-  }
-  else if (projectionMode == 3) // Mollweide
-  {
-    tx = (2 * sqrt(2) / vtkMath::Pi()) * lon *
-      cos((lat) - ((2 * lat + sin(2 * lat) - vtkMath::Pi() * sin(lat)) / (2 + 2 * cos(lat))));
-    ty = sqrt(2) *
-      sin((lat) - ((2 * lat + sin(2 * lat) - vtkMath::Pi() * sin(lat)) / (2 + 2 * cos(lat))));
-    tz = 0.0;
-  }
-  else if (projectionMode == 4) // Catalyst (lat/lon)
-  {
-    tx = lon;
-    ty = lat;
-    tz = 0.0;
-  }
-
-  if (vtkMath::IsNan(tx) || vtkMath::IsNan(ty) || vtkMath::IsNan(tz))
-  {
-    return -1;
-  }
-
-  *x = tx;
-  *y = ty;
-  *z = tz;
-
-  return 1;
-}
-
-// Strip leading and trailing punctuation
-// http://answers.yahoo.com/question/index?qid=20081226034047AAzf8lj
-void Strip(string& s)
-{
-  string::iterator i = s.begin();
-  while (ispunct(*i))
-    s.erase(i);
-  string::reverse_iterator j = s.rbegin();
-  while (ispunct(*j))
-  {
-    s.resize(s.length() - 1);
-    j = s.rbegin();
-  }
-}
-
-string ConvertInt(int number)
-{
-  stringstream ss;
-  ss << number;
-  return ss.str();
-}
-
-string GetPathName(const string& s)
-{
-  char sep = '/';
-#ifdef _WIN32
-  sep = '\\';
-#endif
-
-  size_t i = s.rfind(sep, s.length());
-  if (i != string::npos)
-  {
-    return (s.substr(0, i));
-  }
-
-  return ("");
-}
-
 //----------------------------------------------------------------------------
 // Routines for sorting and efficient removal of duplicates
 // (c) and thanks to Moritz Hanke (DKRZ)
@@ -343,81 +145,65 @@ int ComparePointWithIndex(const void* a, const void* b)
   const struct PointWithIndex* b_ = (struct PointWithIndex*)b;
   double threshold = 1e-22;
 
-  int lon_diff = fabs(a_->p.lon - b_->p.lon) > threshold;
+  int lon_diff = fabs(a_->Pt.Lon - b_->Pt.Lon) > threshold;
   if (lon_diff)
   {
-    return (a_->p.lon > b_->p.lon) ? -1 : 1;
+    return (a_->Pt.Lon > b_->Pt.Lon) ? -1 : 1;
   }
 
-  int lat_diff = fabs(a_->p.lat - b_->p.lat) > threshold;
+  int lat_diff = fabs(a_->Pt.Lat - b_->Pt.Lat) > threshold;
   if (lat_diff)
   {
-    return (a_->p.lat > b_->p.lat) ? -1 : 1;
+    return (a_->Pt.Lat > b_->Pt.Lat) ? -1 : 1;
   }
   return 0;
 }
-}
+} // end of anonymous namepace
 
 vtkStandardNewMacro(vtkCDIReader);
-#if VTK_MODULE_ENABLE_VTK_ParallelMPI
-#include "vtkDummyController.h"
-#include "vtkMultiProcessController.h"
+
 vtkCxxSetObjectMacro(vtkCDIReader, Controller, vtkMultiProcessController);
-#endif
 
 //----------------------------------------------------------------------------
 // Constructor for vtkCDIReader
 //----------------------------------------------------------------------------
 vtkCDIReader::vtkCDIReader()
+  : Internals(new Internal())
 {
-  // Debugging
-  if (DEBUG)
-  {
-    this->DebugOn();
-  }
-  vtkDebugMacro("Starting to create vtkCDIReader..." << endl);
+  vtkDebugMacro("Starting to create vtkCDIReader...");
+  this->Initialized = false;
 
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 
-  this->Internals = new vtkCDIReader::Internal;
   this->StreamID = -1;
   this->VListID = -1;
-  this->CellMask = nullptr;
-  this->LoadingDimensions = vtkSmartPointer<vtkIntArray>::New();
-  this->VariableDimensions = vtkStringArray::New();
-  this->AllDimensions = vtkStringArray::New();
+  this->VariableDimensions = vtkSmartPointer<vtkStringArray>::New();
+  this->AllDimensions = vtkSmartPointer<vtkStringArray>::New();
   this->AllVariableArrayNames = vtkSmartPointer<vtkStringArray>::New();
   this->InfoRequested = false;
   this->DataRequested = false;
   this->HaveDomainData = false;
 
   // Setup selection callback to modify this object when array selection changes
-  this->PointDataArraySelection = vtkDataArraySelection::New();
-  this->CellDataArraySelection = vtkDataArraySelection::New();
-  this->DomainDataArraySelection = vtkDataArraySelection::New();
-  this->SelectionObserver = vtkCallbackCommand::New();
   this->SelectionObserver->SetCallback(&vtkCDIReader::SelectionCallback);
   this->SelectionObserver->SetClientData(this);
   this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
   this->PointDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
   this->DomainDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
 
-#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
   if (!this->Controller)
   {
-    this->SetController(vtkDummyController::New());
+    vtkNew<vtkDummyController> dummyController;
+    this->SetController(dummyController);
   }
-#endif
-
-  this->Output = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
   this->SetDefaults();
 
-  vtkDebugMacro("MAX_VARS:" << MAX_VARS << endl);
-  vtkDebugMacro("Created vtkCDIReader" << endl);
+  vtkDebugMacro("MAX_VARS:" << MAX_VARS);
+  vtkDebugMacro("Created vtkCDIReader");
 }
 
 //----------------------------------------------------------------------------
@@ -426,53 +212,17 @@ vtkCDIReader::vtkCDIReader()
 //----------------------------------------------------------------------------
 void vtkCDIReader::DestroyData()
 {
-  vtkDebugMacro("DestroyData..." << endl);
-  vtkDebugMacro("Destructing double cell var data..." << endl);
+  vtkDebugMacro("DestroyData...");
+  vtkDebugMacro("Destructing double cell var data...");
 
-  if (this->CellVarDataArray)
-  {
-    for (int i = 0; i < this->NumberOfCellVars; i++)
-    {
-      if (this->CellVarDataArray[i] != nullptr)
-      {
-        this->CellVarDataArray[i]->Delete();
-        this->CellVarDataArray[i] = nullptr;
-      }
-    }
-  }
+  this->CellVarDataArray->Initialize();
 
-  vtkDebugMacro("Destructing double Point var array..." << endl);
-  if (this->PointVarDataArray)
-  {
-    for (int i = 0; i < this->NumberOfPointVars; i++)
-    {
-      if (this->PointVarDataArray[i] != nullptr)
-      {
-        this->PointVarDataArray[i]->Delete();
-        this->PointVarDataArray[i] = nullptr;
-      }
-    }
-  }
+  vtkDebugMacro("Destructing double Point var array...");
+  this->PointVarDataArray->Initialize();
 
-  if (this->DomainVarDataArray)
-  {
-    for (int i = 0; i < this->NumberOfDomainVars; i++)
-    {
-      if (this->DomainVarDataArray[i] != nullptr)
-      {
-        this->DomainVarDataArray[i]->Delete();
-        this->DomainVarDataArray[i] = nullptr;
-      }
-    }
-  }
+  this->DomainVarDataArray->Initialize();
 
-  if (this->ReconstructNew)
-  {
-    delete[] this->PointVarData;
-    this->PointVarData = nullptr;
-  }
-
-  vtkDebugMacro("Out DestroyData..." << endl);
+  vtkDebugMacro("Out DestroyData...");
 }
 
 //----------------------------------------------------------------------------
@@ -480,7 +230,7 @@ void vtkCDIReader::DestroyData()
 //----------------------------------------------------------------------------
 vtkCDIReader::~vtkCDIReader()
 {
-  vtkDebugMacro("Destructing vtkCDIReader..." << endl);
+  vtkDebugMacro("Destructing vtkCDIReader...");
   this->SetFileName(nullptr);
 
   if (this->StreamID >= 0)
@@ -491,124 +241,20 @@ vtkCDIReader::~vtkCDIReader()
 
   this->DestroyData();
 
-  delete[] this->CellVarDataArray;
-  this->CellVarDataArray = nullptr;
+  vtkDebugMacro("Destructing other stuff...");
+  this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->DomainDataArraySelection->RemoveObserver(this->SelectionObserver);
 
-  delete[] this->PointVarDataArray;
-  this->PointVarDataArray = nullptr;
-
-  delete[] this->DomainVarDataArray;
-  this->DomainVarDataArray = nullptr;
-
-  delete[] this->DomainMask;
-  this->DomainMask = nullptr;
-
-  vtkDebugMacro("Destructing other stuff..." << endl);
-  if (this->PointDataArraySelection)
-  {
-    this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
-    this->PointDataArraySelection->Delete();
-    this->PointDataArraySelection = nullptr;
-  }
-  if (this->CellDataArraySelection)
-  {
-    this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
-    this->CellDataArraySelection->Delete();
-    this->CellDataArraySelection = nullptr;
-  }
-  if (this->DomainDataArraySelection)
-  {
-    this->DomainDataArraySelection->RemoveObserver(this->SelectionObserver);
-    this->DomainDataArraySelection->Delete();
-    this->DomainDataArraySelection = nullptr;
-  }
-  if (this->SelectionObserver)
-  {
-    this->SelectionObserver->Delete();
-    this->SelectionObserver = nullptr;
-  }
-
-  delete this->Internals;
-
-#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   this->SetController(nullptr);
-#endif
 
-  this->VariableDimensions->Delete();
-  this->AllDimensions->Delete();
-
-  vtkDebugMacro("Destructed vtkCDIReader" << endl);
+  vtkDebugMacro("Destructed vtkCDIReader");
 }
 
+// Grab info from outInfo object (method extracted from RequestInformation)
 //----------------------------------------------------------------------------
-// Verify that the file exists, get dimension sizes and variables
-//----------------------------------------------------------------------------
-int vtkCDIReader::RequestInformation(
-  vtkInformation* reqInfo, vtkInformationVector** inVector, vtkInformationVector* outVector)
+void vtkCDIReader::GetFileSeriesInformation(vtkInformation* outInfo)
 {
-  vtkDebugMacro("In vtkCDIReader::RequestInformation" << endl);
-  if (!this->Superclass::RequestInformation(reqInfo, inVector, outVector))
-  {
-    return 0;
-  }
-
-  if (this->FileName.empty())
-  {
-    vtkErrorMacro("No filename specified");
-    return 0;
-  }
-
-#if VTK_MODULE_ENABLE_VTK_ParallelMPI
-  if (this->Controller->GetNumberOfProcesses() > 1)
-  {
-    this->Decomposition = true;
-    this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
-  }
-#endif
-
-  vtkDebugMacro(
-    "In vtkCDIReader::RequestInformation read filename ok: " << this->FileName.c_str() << endl);
-  vtkInformation* outInfo = outVector->GetInformationObject(0);
-
-  vtkDebugMacro("FileName: " << this->FileName.c_str() << endl);
-
-  if (!this->GetDims())
-  {
-    return 0;
-  }
-
-  this->InfoRequested = true;
-
-  vtkDebugMacro("In vtkCDIReader::RequestInformation setting VerticalLevelRange" << endl);
-  this->VerticalLevelRange[0] = 0;
-  this->VerticalLevelRange[1] = this->MaximumNVertLevels - 1;
-
-  if (!this->BuildVarArrays())
-  {
-    return 0;
-  }
-
-  delete[] this->PointVarDataArray;
-  this->PointVarDataArray = new vtkDataArray*[this->NumberOfPointVars];
-  for (int i = 0; i < this->NumberOfPointVars; i++)
-  {
-    this->PointVarDataArray[i] = nullptr;
-  }
-
-  delete[] this->CellVarDataArray;
-  this->CellVarDataArray = new vtkDataArray*[this->NumberOfCellVars];
-  for (int i = 0; i < this->NumberOfCellVars; i++)
-  {
-    this->CellVarDataArray[i] = nullptr;
-  }
-
-  delete[] this->DomainVarDataArray;
-  this->DomainVarDataArray = new vtkDoubleArray*[this->NumberOfDomainVars];
-  for (int i = 0; i < this->NumberOfDomainVars; i++)
-  {
-    this->DomainVarDataArray[i] = nullptr;
-  }
-
   if (outInfo->Has(vtkFileSeriesReader::FILE_SERIES_NUMBER_OF_FILES()))
   {
     this->NumberOfFiles = outInfo->Get(vtkFileSeriesReader::FILE_SERIES_NUMBER_OF_FILES());
@@ -621,17 +267,160 @@ int vtkCDIReader::RequestInformation(
   {
     this->FileSeriesFirstName = outInfo->Get(vtkFileSeriesReader::FILE_SERIES_FIRST_FILENAME());
   }
+}
 
-  VTK_CREATE(vtkDoubleArray, timeValues);
-  timeValues->Allocate(this->NumberOfTimeSteps);
-  timeValues->SetNumberOfComponents(1);
-  int time_start = this->FileSeriesNumber * this->NumberOfTimeSteps;
-  int time_end = (this->FileSeriesNumber + 1) * this->NumberOfTimeSteps;
-  for (int step = time_start; step < time_end; step++)
+//----------------------------------------------------------------------------
+// Verify that the file exists, get dimension sizes and variables
+//----------------------------------------------------------------------------
+int vtkCDIReader::RequestInformation(
+  vtkInformation* reqInfo, vtkInformationVector** inVector, vtkInformationVector* outVector)
+{
+  vtkDebugMacro("In vtkCDIReader::RequestInformation");
+  if (!this->Superclass::RequestInformation(reqInfo, inVector, outVector))
   {
-    timeValues->InsertNextTuple1(step * this->TStepDistance);
+    return 0;
   }
 
+  if (this->FileName.empty())
+  {
+    vtkErrorMacro("No filename specified");
+    return 0;
+  }
+
+  if (this->Controller->GetNumberOfProcesses() > 1)
+  {
+    this->Decomposition = true;
+    this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
+  }
+
+  vtkDebugMacro("In vtkCDIReader::RequestInformation read filename ok: " << this->FileName.c_str());
+  vtkInformation* outInfo = outVector->GetInformationObject(0);
+
+  vtkDebugMacro("FileName: " << this->FileName.c_str());
+
+  if (!this->GetDims())
+  {
+    return 0;
+  }
+
+  this->InfoRequested = true;
+
+  vtkDebugMacro("In vtkCDIReader::RequestInformation setting VerticalLevelRange");
+  this->VerticalLevelRange[0] = 0;
+  this->VerticalLevelRange[1] = this->MaximumNVertLevels - 1;
+
+  if (!this->BuildVarArrays())
+  {
+    return 0;
+  }
+
+  this->ResetVarDataArrays();
+
+  this->GetFileSeriesInformation(outInfo);
+
+  vtkSmartPointer<vtkDoubleArray> timeValues = this->ReadTimeAxis();
+
+  this->OutputTimeAxis(outInfo, timeValues);
+
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
+  vtkDebugMacro("Out vtkCDIReader::RequestInformation");
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkDoubleArray> vtkCDIReader::ReadTimeAxis()
+{
+  if ((this->FileSeriesNumber == 0) && (!this->TimeSet))
+  {
+
+    int taxisID = vlistInqTaxis(this->VListID);
+    int calendar = taxisInqCalendar(taxisID);
+    streamInqTimestep(this->StreamID, 0);
+    int vdate = taxisInqVdate(taxisID);
+    int vtime = taxisInqVtime(taxisID);
+
+    this->FirstDay = date_to_julday(calendar, vdate);
+    this->TimeUnits = cdi_tools::ParseTimeUnits(vdate, vtime);
+    this->Calendar = cdi_tools::ParseCalendar(calendar);
+    this->TimeSet = true;
+  }
+
+  if (!this->TimeSeriesTimeStepsAllSet)
+  {
+    if (this->TimeSeriesTimeSteps.size() < this->FileSeriesNumber + 1)
+      this->TimeSeriesTimeSteps.resize(this->FileSeriesNumber + 1);
+    this->TimeSeriesTimeSteps[this->FileSeriesNumber] = this->NumberOfTimeSteps;
+  }
+
+  this->NumberOfAllTimeSteps = 0;
+  for (int step = 0; step < this->NumberOfFiles; step++)
+  {
+    this->NumberOfAllTimeSteps += this->TimeSeriesTimeSteps[step];
+  }
+
+  auto timeValues = vtkSmartPointer<vtkDoubleArray>::New();
+  timeValues->Allocate(this->NumberOfTimeSteps);
+  timeValues->SetNumberOfComponents(1);
+  int start = 0;
+  int counter = 0;
+  for (int step = 0; step < this->FileSeriesNumber; step++)
+  {
+    start += this->TimeSeriesTimeSteps[step];
+  }
+  int end = start + this->NumberOfTimeSteps;
+  for (int step = start; step < end; step++)
+  {
+    int taxisID = vlistInqTaxis(this->VListID);
+    int calendar = taxisInqCalendar(taxisID);
+    streamInqTimestep(this->StreamID, counter);
+    int vdate = taxisInqVdate(taxisID);
+    int vtime = taxisInqVtime(taxisID);
+    double timevalue = date_to_julday(calendar, vdate);
+    if (vtime > 0)
+    {
+      timevalue += (double)((time_to_sec(vtime)) / 86400.0);
+    }
+    timevalue -= this->FirstDay;
+    if (timevalue >= 0.0)
+    {
+      timeValues->InsertNextTuple1(timevalue);
+      if (!this->TimeSeriesTimeStepsAllSet)
+      {
+        if (TimeSteps.size() < step + 1)
+          TimeSteps.resize(step + 1);
+        this->TimeSteps[step] = timevalue;
+      }
+    }
+    else
+    {
+      this->NumberOfTimeSteps -= 1;
+    }
+    counter++;
+  }
+
+  if (this->FileSeriesNumber == (this->NumberOfFiles - 1))
+  {
+    this->TimeSeriesTimeStepsAllSet = true;
+  }
+
+  return timeValues;
+}
+
+// Call DestroyData() before calling this!
+//----------------------------------------------------------------------------
+void vtkCDIReader::ResetVarDataArrays()
+{
+  this->PointVarDataArray->AllocateArrays(this->NumberOfPointVars);
+  this->CellVarDataArray->AllocateArrays(this->NumberOfCellVars);
+  this->DomainVarDataArray->AllocateArrays(this->NumberOfDomainVars);
+}
+
+// Add the time axis to the out info
+//----------------------------------------------------------------------------
+void vtkCDIReader::OutputTimeAxis(
+  vtkInformation* outInfo, const vtkSmartPointer<vtkDoubleArray>& timeValues)
+{
   if (this->NumberOfTimeSteps > 0)
   {
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeValues->GetPointer(0),
@@ -641,82 +430,21 @@ int vtkCDIReader::RequestInformation(
     timeRange[1] = timeValues->GetValue(timeValues->GetNumberOfTuples() - 1);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }
-
-  if (this->NumberOfFiles > 1)
-  {
-    this->ReadTimeUnits(this->FileSeriesFirstName.c_str());
-  }
-  else
-  {
-    this->ReadTimeUnits(this->FileName.c_str());
-  }
-  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
-  vtkDebugMacro("Out vtkCDIReader::RequestInformation" << endl);
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkCDIReader::ReadTimeUnits(const char* Name)
+int vtkCDIReader::GetTimeIndex(double dataTimeStep)
 {
-  // Code from vtkNetCDFReader to read in time and calendar data for annotation
-  // For now we use the netCDF reader directly, as there is yet no CDI call for this
-  delete[] this->TimeUnits;
-  this->TimeUnits = nullptr;
-  delete[] this->Calendar;
-  this->Calendar = nullptr;
-
-  if (this->NumberOfTimeSteps > 0)
+  int start = 0;
+  for (int step = 0; step < this->FileSeriesNumber; step++)
+    start += this->TimeSeriesTimeSteps[step];
+  int end = start + this->TimeSeriesTimeSteps[this->FileSeriesNumber];
+  for (int step = start; step < end; step++)
   {
-    int ncFD;
-    CALL_NETCDF(nc_open(Name, NC_NOWRITE, &ncFD));
-
-    int status, varId;
-    size_t len = 0;
-    char* buffer = nullptr;
-    status = nc_inq_varid(ncFD, "time", &varId);
-    if (status == NC_NOERR)
-    {
-      status = nc_inq_attlen(ncFD, varId, "units", &len);
-    }
-
-    if (status == NC_NOERR)
-    {
-      buffer = new char[len + 1];
-      status = nc_get_att_text(ncFD, varId, "units", buffer);
-      buffer[len] = '\0';
-      if (status == NC_NOERR)
-      {
-        this->TimeUnits = buffer;
-      }
-      else
-      {
-        delete[] buffer;
-      }
-    }
-
-    if (status == NC_NOERR)
-    {
-      status = nc_inq_attlen(ncFD, varId, "calendar", &len);
-    }
-
-    if (status == NC_NOERR)
-    {
-      buffer = new char[len + 1];
-      status = nc_get_att_text(ncFD, varId, "calendar", buffer);
-      buffer[len] = '\0';
-      if (status == NC_NOERR)
-      {
-        this->Calendar = buffer;
-      }
-      else
-      {
-        delete[] buffer;
-      }
-    }
-    CALL_NETCDF(nc_close(ncFD));
+    if (this->TimeSteps[step] == dataTimeStep)
+      return (step - start);
   }
-  return 1;
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -746,7 +474,7 @@ long vtkCDIReader::GetPartitioning(int piece, int numPieces, int numCellsPerLeve
   else
   {
     long localCells = 0;
-    int cells_per_piece = floor(numCellsPerLevel / numPieces);
+    int cells_per_piece = numCellsPerLevel / numPieces;
     if (piece == 0)
     {
       beginCell = 0;
@@ -781,10 +509,7 @@ long vtkCDIReader::GetPartitioning(int piece, int numPieces, int numCellsPerLeve
 int vtkCDIReader::RequestData(vtkInformation* vtkNotUsed(reqInfo),
   vtkInformationVector** vtkNotUsed(inVector), vtkInformationVector* outVector)
 {
-  vtkDebugMacro("In vtkCDIReader::RequestData" << endl);
-  vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outVector);
-  this->Output = output;
-
+  vtkDebugMacro("In vtkCDIReader::RequestData");
   vtkInformation* outInfo = outVector->GetInformationObject(0);
 
   if (outInfo->Has(vtkFileSeriesReader::FILE_SERIES_CURRENT_FILE_NUMBER()))
@@ -801,11 +526,14 @@ int vtkCDIReader::RequestData(vtkInformation* vtkNotUsed(reqInfo),
   {
     this->DestroyData();
   }
-
-  if (!this->ReadAndOutputGrid(true))
+  if ((!this->Initialized) || (!this->SkipGrid))
   {
-    return 0;
+    if (!this->ReadAndOutputGrid(true))
+    {
+      return 0;
+    }
   }
+  this->Initialized = true;
 
   double requestedTimeStep = 0.;
 #ifndef NDEBUG
@@ -822,57 +550,60 @@ int vtkCDIReader::RequestData(vtkInformation* vtkNotUsed(reqInfo),
     requestedTimeStep = outInfo->Get(timeKey);
   }
 
-  vtkDebugMacro("Num Time steps requested: " << numRequestedTimeSteps << endl);
+  vtkDebugMacro("Num Time steps requested: " << numRequestedTimeSteps);
   this->DTime = requestedTimeStep;
-  vtkDebugMacro("this->DTime: " << this->DTime << endl);
+  vtkDebugMacro("this->DTime: " << this->DTime);
   double dTimeTemp = this->DTime;
-  output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), dTimeTemp);
-  vtkDebugMacro("dTimeTemp: " << dTimeTemp << endl);
+  this->Output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), dTimeTemp);
+  vtkDebugMacro("dTimeTemp: " << dTimeTemp);
   this->DTime = dTimeTemp;
 
   for (int var = 0; var < this->NumberOfCellVars; var++)
   {
     if (this->GetCellArrayStatus(this->Internals->CellVars[var].Name))
     {
-      vtkDebugMacro("Loading Cell Variable: " << this->Internals->CellVars[var].Name << endl);
+      vtkDebugMacro("Loading Cell Variable: " << this->Internals->CellVars[var].Name);
       this->LoadCellVarData(var, this->DTime);
-      output->GetCellData()->AddArray(this->CellVarDataArray[var]);
     }
+    else
+      vtkDebugMacro(
+        "Ignoring Cell Variable: " << this->Internals->CellVars[var].Name << " as requested ");
   }
+  this->Output->GetCellData()->ShallowCopy(this->CellVarDataArray);
+
   for (int var = 0; var < this->NumberOfPointVars; var++)
   {
     if (this->GetPointArrayStatus(this->Internals->PointVars[var].Name))
     {
-      vtkDebugMacro("Loading Point Variable: " << var << endl);
+      vtkDebugMacro("Loading Point Variable: " << var);
       this->LoadPointVarData(var, this->DTime);
-      output->GetPointData()->AddArray(this->PointVarDataArray[var]);
     }
   }
+  this->Output->GetPointData()->ShallowCopy(this->PointVarDataArray);
 
   for (int var = 0; var < this->NumberOfDomainVars; var++)
   {
     if (this->GetDomainArrayStatus(this->Internals->DomainVars[var].c_str()))
     {
-      vtkDebugMacro(
-        "Loading Domain Variable: " << this->Internals->DomainVars[var].c_str() << endl);
+      vtkDebugMacro("Loading Domain Variable: " << this->Internals->DomainVars[var].c_str());
       this->LoadDomainVarData(var);
-      output->GetFieldData()->AddArray(this->DomainVarDataArray[var]);
     }
   }
+  this->Output->GetFieldData()->ShallowCopy(this->DomainVarDataArray);
 
-  if (this->TimeUnits)
+  if (!this->TimeUnits.empty())
   {
     vtkNew<vtkStringArray> arr;
     arr->SetName("time_units");
     arr->InsertNextValue(this->TimeUnits);
-    output->GetFieldData()->AddArray(arr);
+    this->Output->GetFieldData()->AddArray(arr);
   }
-  if (this->Calendar)
+  if (!this->Calendar.empty())
   {
     vtkNew<vtkStringArray> arr;
     arr->SetName("time_calendar");
     arr->InsertNextValue(this->Calendar);
-    output->GetFieldData()->AddArray(arr);
+    this->Output->GetFieldData()->AddArray(arr);
   }
 
   if (this->BuildDomainArrays)
@@ -881,7 +612,9 @@ int vtkCDIReader::RequestData(vtkInformation* vtkNotUsed(reqInfo),
   }
 
   this->DataRequested = true;
-  vtkDebugMacro("Returning from RequestData" << endl);
+  vtkDebugMacro("Returning from RequestData");
+
+  vtkUnstructuredGrid::GetData(outVector)->ShallowCopy(this->Output);
 
   return 1;
 }
@@ -891,7 +624,7 @@ int vtkCDIReader::RequestData(vtkInformation* vtkNotUsed(reqInfo),
 //----------------------------------------------------------------------------
 int vtkCDIReader::RegenerateVariables()
 {
-  vtkDebugMacro("In RegenerateVariables" << endl);
+  vtkDebugMacro("In RegenerateVariables");
   this->NumberOfPointVars = 0;
   this->NumberOfCellVars = 0;
   this->NumberOfDomainVars = 0;
@@ -910,31 +643,9 @@ int vtkCDIReader::RegenerateVariables()
   }
 
   // Allocate the ParaView data arrays which will hold the variables
-  delete[] this->PointVarDataArray;
+  this->ResetVarDataArrays();
 
-  this->PointVarDataArray = new vtkDataArray*[this->NumberOfPointVars];
-  for (int i = 0; i < this->NumberOfPointVars; i++)
-  {
-    this->PointVarDataArray[i] = nullptr;
-  }
-
-  delete[] this->CellVarDataArray;
-
-  this->CellVarDataArray = new vtkDataArray*[this->NumberOfCellVars];
-  for (int i = 0; i < this->NumberOfCellVars; i++)
-  {
-    this->CellVarDataArray[i] = nullptr;
-  }
-
-  delete[] this->DomainVarDataArray;
-
-  this->DomainVarDataArray = new vtkDoubleArray*[this->NumberOfDomainVars];
-  for (int i = 0; i < this->NumberOfDomainVars; i++)
-  {
-    this->DomainVarDataArray[i] = nullptr;
-  }
-
-  vtkDebugMacro("Returning from RegenerateVariables" << endl);
+  vtkDebugMacro("Returning from RegenerateVariables");
   return 1;
 }
 
@@ -944,50 +655,53 @@ int vtkCDIReader::RegenerateVariables()
 //----------------------------------------------------------------------------
 int vtkCDIReader::RegenerateGeometry()
 {
-  vtkUnstructuredGrid* output = this->Output;
-  vtkDebugMacro("RegenerateGeometry ..." << endl);
+  vtkDebugMacro("RegenerateGeometry ...");
 
   if (this->GridReconstructed)
   {
+    vtkDebugMacro("GridReconstructed!");
     if (!this->ReadAndOutputGrid(true))
     {
       return 0;
     }
   }
+  else
+  {
+    vtkDebugMacro("GridReconstructed=false");
+  }
 
   double dTimeTemp = this->DTime;
-  output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), dTimeTemp);
+  this->Output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), dTimeTemp);
   this->DTime = dTimeTemp;
 
   for (int var = 0; var < this->NumberOfCellVars; var++)
   {
     if (this->GetCellArrayStatus(this->Internals->CellVars[var].Name))
     {
-      vtkDebugMacro("Loading Cell Variable: " << this->Internals->CellVars[var].Name << endl);
+      vtkDebugMacro("Loading Cell Variable: " << this->Internals->CellVars[var].Name);
       this->LoadCellVarData(var, this->DTime);
-      output->GetCellData()->AddArray(this->CellVarDataArray[var]);
     }
   }
+  this->Output->GetCellData()->ShallowCopy(this->CellVarDataArray);
   for (int var = 0; var < this->NumberOfPointVars; var++)
   {
     if (this->GetPointArrayStatus(this->Internals->PointVars[var].Name))
     {
-      vtkDebugMacro("Loading Point Variable: " << var << endl);
+      vtkDebugMacro("Loading Point Variable: " << var);
       this->LoadPointVarData(var, this->DTime);
-      output->GetPointData()->AddArray(this->PointVarDataArray[var]);
     }
   }
+  this->Output->GetPointData()->ShallowCopy(this->PointVarDataArray);
 
   for (int var = 0; var < this->NumberOfDomainVars; var++)
   {
     if (this->GetDomainArrayStatus(this->Internals->DomainVars[var].c_str()))
     {
-      vtkDebugMacro(
-        "Loading Domain Variable: " << this->Internals->DomainVars[var].c_str() << endl);
+      vtkDebugMacro("Loading Domain Variable: " << this->Internals->DomainVars[var].c_str());
       this->LoadDomainVarData(var);
-      output->GetFieldData()->AddArray(this->DomainVarDataArray[var]);
     }
   }
+  this->Output->GetFieldData()->ShallowCopy(this->DomainVarDataArray);
 
   this->PointDataArraySelection->Modified();
   this->CellDataArraySelection->Modified();
@@ -1009,6 +723,11 @@ void vtkCDIReader::SetDefaults()
   this->LayerThicknessRange[0] = 0;
   this->LayerThicknessRange[1] = 100;
   this->LayerThickness = 50;
+  this->Bloat = 2.0;
+
+  this->Layer0OffsetRange[0] = -50;
+  this->Layer0OffsetRange[1] = 51;
+  this->Layer0Offset = 1e-30;
 
   // this is hard coded for now but will change when data generation gets more mature
   this->PerformanceDataFile = "timer.atmo.";
@@ -1020,53 +739,48 @@ void vtkCDIReader::SetDefaults()
   this->DimensionSelection = 0;
   this->InvertZAxis = false;
   this->DoublePrecision = false;
-  this->ProjectionMode = 0;
+  this->ShowClonClat = false;
+  this->ProjectionMode = projection::SPHERICAL;
   this->ShowMultilayerView = false;
   this->ReconstructNew = false;
   this->CellDataSelected = 0;
   this->PointDataSelected = 0;
+  this->MaskingVarname = "";
   this->GotMask = false;
   this->AddCoordinateVars = false;
-  this->FilenameSet = false;
-
+  this->NumberOfTimeSteps = 0;
+  this->NumberOfAllTimeSteps = 0;
+  this->TimeSeriesTimeSteps.reserve(5);
+  this->TimeSteps.reserve(100 * 250 + 25);
+  this->TimeSeriesTimeStepsAllSet = false;
   this->GridReconstructed = false;
-  this->MaskingValue = 0.0;
-  this->InvertedTopography = false;
-  this->IncludeTopography = false;
+  this->CustomMaskValue = 0.0;
+  this->InvertMask = false;
+  this->UseMask = false;
+  this->UseCustomMaskValue = false;
   this->Decomposition = false;
 
-  this->PointX = nullptr;
-  this->PointY = nullptr;
-  this->PointZ = nullptr;
-  this->OrigConnections = nullptr;
-  this->ModConnections = nullptr;
-  this->ModConnections_size = 0;
-  this->CLon = nullptr;
-  this->CLat = nullptr;
+  this->SkipGrid = false;
+
   this->BeginCell = 0;
+  this->FirstDay = -1;
+  this->TimeSet = false;
 
   this->DTime = 0;
-  this->CellVarDataArray = nullptr;
-  this->PointVarDataArray = nullptr;
-  this->DomainVarDataArray = nullptr;
-  this->PointVarData = nullptr;
   this->FileSeriesNumber = 0;
   this->NumberOfFiles = 1;
   this->NeedHorizontalGridFile = false;
   this->NeedVerticalGridFile = false;
 
-  this->TimeUnits = nullptr;
-  this->Calendar = nullptr;
-  this->TStepDistance = 1.0;
   this->NumberOfProcesses = 1;
 
   this->BuildDomainArrays = false;
+  this->MaximumNVertLevels = 0;
+  this->MaximumPoints = 0;
+  this->MaximumCells = 0;
+  this->DepthVar = nullptr;
 
-  this->DomainMask = new int[MAX_VARS];
-  for (int i = 0; i < MAX_VARS; i++)
-  {
-    this->DomainMask[i] = 0;
-  }
+  this->NumberOfPoints = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1074,18 +788,12 @@ void vtkCDIReader::SetDefaults()
 //----------------------------------------------------------------------------
 int vtkCDIReader::OpenFile()
 {
-  // With this version, no grib support is available.
   // check if we got either *.Grib or *.nc data
-  string file = this->FileName;
-  string check = file.substr((file.size() - 4), file.size());
+  std::string file = this->FileName;
+  std::string check = file.substr((file.size() - 4), file.size());
   if (check == "grib" || check == ".grb")
   {
     this->Grib = true;
-    if (this->Decomposition)
-    {
-      vtkErrorMacro("Parallel reading of Grib data not supported!");
-      return 0;
-    }
   }
   else
   {
@@ -1102,21 +810,44 @@ int vtkCDIReader::OpenFile()
   this->StreamID = streamOpenRead(this->FileNameGrid.c_str());
   if (this->StreamID < 0)
   {
-    vtkErrorMacro("Couldn't open file: " << cdiStringError(this->StreamID) << endl);
     return 0;
   }
 
-  vtkDebugMacro("In vtkCDIReader::RequestInformation read file okay" << endl);
+  vtkDebugMacro("In vtkCDIReader::RequestInformation read file okay");
   this->VListID = streamInqVlist(this->StreamID);
 
   int nvars = vlistNvars(this->VListID);
   char varname[CDI_MAX_NAME];
-  for (int VarID = 0; VarID < nvars; ++VarID)
+  for (int varID = 0; varID < nvars; ++varID)
   {
-    vlistInqVarName(this->VListID, VarID, varname);
+    vlistInqVarName(this->VListID, varID, varname);
   }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkCDIReader::GuessGridFile()
+{
+  std::string fallback = vtksys::SystemTools::GetParentDirectory(this->FileName) + "/grid.nc";
+
+  std::string guess;
+  if (!this->Grib)
+    guess = cdi_tools::GuessGridFileFromUri(this->FileName);
+
+  if (!guess.empty())
+  {
+    if (vtksys::SystemTools::TestFileAccess(guess, vtksys::TEST_FILE_READ))
+    {
+      this->FileNameGrid = guess;
+      return;
+    }
+    else
+      vtkWarningMacro("Could not find grid file "
+        << guess << " indicated by grid_file_uri attribute in " << this->FileName
+        << " Trying fallback guess " << fallback);
+  }
+  this->FileNameGrid = fallback;
 }
 
 //----------------------------------------------------------------------------
@@ -1136,7 +867,7 @@ int vtkCDIReader::GetDims()
     }
 
     this->ReadHorizontalGridData();
-    if (this->NeedHorizontalGridFile && !this->Grib)
+    if (this->NeedHorizontalGridFile)
     {
       // if there is no grid information in the data file, try opening
       // an additional grid file named grid.nc in the same directory to
@@ -1150,15 +881,15 @@ int vtkCDIReader::GetDims()
 
       char* directory = new char[strlen(this->FileName.c_str()) + 1];
       strcpy(directory, this->FileName.c_str());
-      this->FileNameGrid = ::GetPathName(directory) + "/grid.nc";
+
+      this->GuessGridFile();
       if (!this->OpenFile())
       {
         return 0;
       }
-
       if (!this->ReadHorizontalGridData())
       {
-        vtkErrorMacro("Couldn't open grid information in data nor in the grid file." << endl);
+        vtkErrorMacro("Couldn't open grid information in data nor in the grid file.");
         return 0;
       }
 
@@ -1170,7 +901,7 @@ int vtkCDIReader::GetDims()
     }
 
     this->ReadVerticalGridData();
-    if (this->NeedVerticalGridFile && !this->Grib)
+    if (this->NeedVerticalGridFile)
     {
       // if there is no grid information in the data file, try opening
       // an additional grid file named grid.nc in the same directory to
@@ -1184,7 +915,6 @@ int vtkCDIReader::GetDims()
 
       char* directory = new char[strlen(this->FileName.c_str()) + 1];
       strcpy(directory, this->FileName.c_str());
-      this->FileNameGrid = ::GetPathName(directory) + "/grid.nc";
       if (!this->OpenFile())
       {
         return 0;
@@ -1193,11 +923,9 @@ int vtkCDIReader::GetDims()
       if (!this->ReadVerticalGridData())
       {
         vtkDebugMacro("Couldn't neither open grid information within the data netCDF file, nor "
-                      "in the grid.nc file."
-          << endl);
+                      "in the grid.nc file.");
         vtkErrorMacro("Couldn't neither open grid information within the data netCDF file, nor "
-                      "in the grid.nc file."
-          << endl);
+                      "in the grid.nc file.");
         return 0;
       }
 
@@ -1210,59 +938,49 @@ int vtkCDIReader::GetDims()
 
     if (this->DimensionSelection > 0)
     {
-      this->ZAxisID = vlistZaxis(this->VListID, this->DimensionSelection);
+      vlistNgrids(this->VListID);
+      int nzaxis = vlistNzaxis(this->VListID);
+
+      this->GridID = vlistGrid(this->VListID, this->DimensionSelection / nzaxis);
+      this->ZAxisID = vlistZaxis(
+        this->VListID, this->DimensionSelection - (nzaxis * this->DimensionSelection / nzaxis));
     }
 
     if (this->GridID != -1)
     {
       this->NumberOfCells = static_cast<int>(gridInqSize(this->GridID));
-    }
 
-    if (this->GridID != -1)
-    {
+      if (this->NumberOfPoints and
+        this->NumberOfPoints != static_cast<int>(gridInqSize(this->GridID)))
+        vtkDebugMacro("GetDims: Changing number of points from  "
+          << this->NumberOfPoints << " to " << static_cast<int>(gridInqSize(this->GridID)));
       this->NumberOfPoints = static_cast<int>(gridInqSize(this->GridID));
-    }
-
-    if (this->GridID != -1)
-    {
       this->PointsPerCell = gridInqNvertex(this->GridID);
     }
 
-    int ntsteps = vlistNtsteps(this->VListID);
-    if (ntsteps > 1)
+    int ntsteps = 0;
+    if (this->Grib)
     {
-      this->NumberOfTimeSteps = ntsteps;
-      int status, varId, ncFD;
-      CALL_NETCDF(nc_open(this->FileNameGrid.c_str(), NC_NOWRITE, &ncFD));
-      static size_t start[] = { 0 };
-      static size_t count[] = { 2 };
-      double data[2];
-      if ((status = nc_inq_varid(ncFD, "time", &varId)))
-      {
-        vtkDebugMacro("No Time Variable in data file: " << status << endl);
-      }
-      if ((status = nc_get_vara_double(ncFD, varId, start, count, data)))
-      {
-        vtkDebugMacro("No Time Variable in data file: " << status << endl);
-      }
-      CALL_NETCDF(nc_close(ncFD));
-      this->TStepDistance = data[1] - data[0];
+      while (streamInqTimestep(this->StreamID, ntsteps))
+        ntsteps++;
     }
     else
     {
-      this->NumberOfTimeSteps = 1;
+      ntsteps = vlistNtsteps(this->VListID);
     }
+    this->NumberOfTimeSteps = ntsteps;
+
     this->MaximumNVertLevels = 1;
     if (this->ZAxisID != -1)
     {
       this->MaximumNVertLevels = zaxisInqSize(this->ZAxisID);
     }
 
-    this->FillVariableDimensions();
+    this->FillGridDimensions();
   }
   else
   {
-    vtkDebugMacro("No Filename yet set!" << endl);
+    vtkDebugMacro("No Filename yet set!");
   }
 
   return 1;
@@ -1284,7 +1002,7 @@ int vtkCDIReader::ReadHorizontalGridData()
     int gridID_l = vlistGrid(vlistID_l, i);
     int nv = gridInqNvertex(gridID_l);
 
-    if ((nv == 3 || nv == 4) && gridInqType(gridID_l) == GRID_UNSTRUCTURED)
+    if (nv >= 3) //  ((nv == 3 || nv == 4)) // && gridInqType(gridID_l) == GRID_UNSTRUCTURED)
     {
       this->GridID = gridID_l;
       break;
@@ -1301,7 +1019,7 @@ int vtkCDIReader::ReadHorizontalGridData()
 }
 
 //----------------------------------------------------------------------------
-// Read Horizontal Grid Data
+// Read Vertical Grid Data
 //----------------------------------------------------------------------------
 int vtkCDIReader::ReadVerticalGridData()
 {
@@ -1351,19 +1069,24 @@ int vtkCDIReader::GetVars()
   int numVars = vlistNvars(this->VListID);
   for (int i = 0; i < numVars; i++)
   {
-    int VarID = i;
-    CDIVar aVar;
+    int varID = i;
+    cdi_tools::CDIVar aVar;
 
-    aVar.StreamID = StreamID;
-    aVar.VarID = VarID;
-    aVar.GridID = vlistInqVarGrid(this->VListID, VarID);
-    aVar.ZAxisID = vlistInqVarZaxis(this->VListID, VarID);
+    aVar.StreamID = this->StreamID;
+    aVar.VarID = varID;
+    aVar.GridID = vlistInqVarGrid(this->VListID, varID);
+    aVar.ZAxisID = vlistInqVarZaxis(this->VListID, varID);
     aVar.GridSize = static_cast<int>(gridInqSize(aVar.GridID));
     aVar.NLevel = zaxisInqSize(aVar.ZAxisID);
     aVar.Type = 0;
     aVar.ConstTime = 0;
 
-    if (vlistInqVarTsteptype(this->VListID, VarID) == TIME_CONSTANT)
+    // to do multiple grids:
+    // - Check how many grids are available
+    // - Check if all grids can be reconstructed, or if bnds are all zero
+    // - Reform gui to load either Cell, Point or Edge data
+
+    if (vlistInqVarTsteptype(this->VListID, varID) == TIME_CONSTANT)
     {
       aVar.ConstTime = 1;
     }
@@ -1371,12 +1094,8 @@ int vtkCDIReader::GetVars()
     {
       continue;
     }
-    if (gridInqType(aVar.GridID) != GRID_UNSTRUCTURED)
-    {
-      continue;
-    }
 
-    vlistInqVarName(this->VListID, VarID, aVar.Name);
+    vlistInqVarName(this->VListID, varID, aVar.Name);
     aVar.Type = 2;
     if (aVar.NLevel > 1)
     {
@@ -1391,8 +1110,16 @@ int vtkCDIReader::GetVars()
     {
       isCellData = true;
     }
-    else if (aVar.GridSize < this->NumberOfCells)
+    else if ((aVar.GridSize < this->NumberOfCells) && (this->PointsPerCell == 3))
     {
+      if (this->NumberOfPoints and this->NumberOfPoints != aVar.GridSize)
+      {
+        vtkWarningMacro("Not adding "
+          << aVar.Name << " as point var, as it's size " << aVar.GridSize
+          << " does not correspond to our understanding of the correct size for 'the' point grid: "
+          << this->NumberOfPoints);
+        break;
+      }
       isPointData = true;
       this->NumberOfPoints = aVar.GridSize;
     }
@@ -1409,49 +1136,49 @@ int vtkCDIReader::GetVars()
         cellVarIndex++;
         if (cellVarIndex > MAX_VARS - 1)
         {
-          vtkErrorMacro("Exceeded number of cell vars." << endl);
+          vtkErrorMacro("Exceeded number of cell vars.");
           return 0;
         }
         this->Internals->CellVars[cellVarIndex] = aVar;
-        vtkDebugMacro("Adding var " << aVar.Name << " to CellVars" << endl);
+        vtkDebugMacro("Adding var " << aVar.Name << " to CellVars");
       }
       else if (isPointData)
       {
         pointVarIndex++;
         if (pointVarIndex > MAX_VARS - 1)
         {
-          vtkErrorMacro("Exceeded number of Point vars." << endl);
+          vtkErrorMacro("Exceeded number of Point vars.");
           return 0;
         }
         this->Internals->PointVars[pointVarIndex] = aVar;
-        vtkDebugMacro("Adding var " << aVar.Name << " to PointVars" << endl);
+        vtkDebugMacro("Adding var " << aVar.Name << " to PointVars");
       }
     }
     // 2D variables
     else if (varType == 2)
     {
-      vtkDebugMacro("check for " << aVar.Name << "." << endl);
+      vtkDebugMacro("check for " << aVar.Name << ".");
       if (isCellData)
       {
         cellVarIndex++;
         if (cellVarIndex > MAX_VARS - 1)
         {
-          vtkDebugMacro("Exceeded number of cell vars." << endl);
+          vtkDebugMacro("Exceeded number of cell vars.");
           return 0;
         }
         this->Internals->CellVars[cellVarIndex] = aVar;
-        vtkDebugMacro("Adding var " << aVar.Name << " to CellVars" << endl);
+        vtkDebugMacro("Adding var " << aVar.Name << " to CellVars");
       }
       else if (isPointData)
       {
         pointVarIndex++;
         if (pointVarIndex > MAX_VARS - 1)
         {
-          vtkErrorMacro("Exceeded number of Point vars." << endl);
+          vtkErrorMacro("Exceeded number of Point vars.");
           return 0;
         }
         this->Internals->PointVars[pointVarIndex] = aVar;
-        vtkDebugMacro("Adding var " << aVar.Name << " to PointVars" << endl);
+        vtkDebugMacro("Adding var " << aVar.Name << " to PointVars");
       }
     }
   }
@@ -1473,7 +1200,7 @@ int vtkCDIReader::GetVars()
   }
 
   // prepare data structure and read in names
-  string filename = PerformanceDataFile + "0000";
+  std::string filename = this->PerformanceDataFile + "0000";
   vtksys::ifstream file(filename.c_str());
   if (file.good())
   {
@@ -1482,7 +1209,7 @@ int vtkCDIReader::GetVars()
 
   if (this->SupportDomainData())
   {
-    vtkDebugMacro("Found Domain Data and loading it." << endl);
+    vtkDebugMacro("Found Domain Data and loading it.");
     this->BuildDomainArrays = true;
   }
 
@@ -1500,7 +1227,7 @@ int vtkCDIReader::GetVars()
 //----------------------------------------------------------------------------
 int vtkCDIReader::BuildVarArrays()
 {
-  vtkDebugMacro("In vtkCDIReader::BuildVarArrays" << endl);
+  vtkDebugMacro("In vtkCDIReader::BuildVarArrays");
 
   if (!this->FileName.empty())
   {
@@ -1509,37 +1236,37 @@ int vtkCDIReader::BuildVarArrays()
       return 0;
     }
 
-    vtkDebugMacro("NumberOfCellVars: " << this->NumberOfCellVars << " NumberOfPointVars: "
-                                       << this->NumberOfPointVars << endl);
+    vtkDebugMacro("NumberOfCellVars: " << this->NumberOfCellVars
+                                       << " NumberOfPointVars: " << this->NumberOfPointVars);
     if (this->NumberOfCellVars == 0)
     {
-      vtkErrorMacro("No cell variables found!" << endl);
+      vtkErrorMacro("No cell variables found!");
     }
 
     for (int var = 0; var < this->NumberOfPointVars; var++)
     {
       this->PointDataArraySelection->EnableArray(this->Internals->PointVars[var].Name);
-      vtkDebugMacro("Adding Point var: " << this->Internals->PointVars[var].Name << endl);
+      vtkDebugMacro("Adding Point var: " << this->Internals->PointVars[var].Name);
     }
 
     for (int var = 0; var < this->NumberOfCellVars; var++)
     {
-      vtkDebugMacro("Adding cell var: " << this->Internals->CellVars[var].Name << endl);
+      vtkDebugMacro("Adding cell var: " << this->Internals->CellVars[var].Name);
       this->CellDataArraySelection->EnableArray(this->Internals->CellVars[var].Name);
     }
 
     for (int var = 0; var < this->NumberOfDomainVars; var++)
     {
-      vtkDebugMacro("Adding domain var: " << this->Internals->DomainVars[var].c_str() << endl);
+      vtkDebugMacro("Adding domain var: " << this->Internals->DomainVars[var].c_str());
       this->DomainDataArraySelection->EnableArray(this->Internals->DomainVars[var].c_str());
     }
   }
   else
   {
-    vtkDebugMacro("No Filename yet set." << endl);
+    vtkDebugMacro("No Filename yet set.");
   }
 
-  vtkDebugMacro("Leaving vtkCDIReader::BuildVarArrays" << endl);
+  vtkDebugMacro("Leaving vtkCDIReader::BuildVarArrays");
   return 1;
 }
 
@@ -1549,9 +1276,9 @@ int vtkCDIReader::BuildVarArrays()
 //----------------------------------------------------------------------------
 int vtkCDIReader::ReadAndOutputGrid(bool init)
 {
-  vtkDebugMacro("In vtkCDIReader::ReadAndOutputGrid" << endl);
+  vtkDebugMacro("In vtkCDIReader::ReadAndOutputGrid");
 
-  if (this->ProjectionMode == 0)
+  if (this->ProjectionMode == projection::SPHERICAL)
   {
     if (!this->AllocSphereGeometry())
     {
@@ -1565,30 +1292,32 @@ int vtkCDIReader::ReadAndOutputGrid(bool init)
       return 0;
     }
 
-    if (this->ProjectionMode == 2)
+    if (this->ProjectionMode == projection::CASSINI)
     {
-      if (!this->EliminateYWrap())
+      if (!this->Wrap(2))
       {
         return 0;
       }
     }
     else
     {
-      if (!this->EliminateXWrap())
+      if (!this->Wrap(1))
       {
         return 0;
       }
     }
   }
 
+  if ((this->ProjectionMode == projection::CYLINDRICAL_EQUIDISTANT) ||
+    (this->ProjectionMode == projection::CASSINI))
+  {
+    this->AddMaskHalo();
+    this->AddClonClatHalo();
+  }
   this->OutputPoints(init);
   this->OutputCells(init);
 
-  // Allocate the data arrays which will hold the NetCDF var data
-  vtkDebugMacro("pointVarData: Alloc " << this->MaximumPoints << " doubles" << endl);
-  delete[] this->PointVarData;
-  this->PointVarData = new double[this->MaximumPoints];
-  vtkDebugMacro("Leaving vtkCDIReader::ReadAndOutputGrid" << endl);
+  vtkDebugMacro("Leaving vtkCDIReader::ReadAndOutputGrid");
 
   return 1;
 }
@@ -1608,7 +1337,7 @@ int vtkCDIReader::MirrorMesh()
 
 //----------------------------------------------------------------------------
 void vtkCDIReader::RemoveDuplicates(
-  double* PointLon, double* PointLat, int temp_nbr_vertices, int* triangle_list, int* nbr_cells)
+  double* pointLon, double* pointLat, int temp_nbr_vertices, int* triangle_list, int* nbr_cells)
 {
   struct PointWithIndex* sort_array = new PointWithIndex[temp_nbr_vertices];
 
@@ -1616,8 +1345,8 @@ void vtkCDIReader::RemoveDuplicates(
   {
     double curr_lon, curr_lat;
     double threshold = (vtkMath::Pi() / 2.0) - 1e-4;
-    curr_lon = ((double*)PointLon)[i];
-    curr_lat = ((double*)PointLat)[i];
+    curr_lon = ((double*)pointLon)[i];
+    curr_lat = ((double*)pointLat)[i];
 
     while (curr_lon < 0.0)
     {
@@ -1637,25 +1366,25 @@ void vtkCDIReader::RemoveDuplicates(
       curr_lon = 0.0;
     }
 
-    sort_array[i].p.lon = curr_lon;
-    sort_array[i].p.lat = curr_lat;
-    sort_array[i].i = i;
+    sort_array[i].Pt.Lon = curr_lon;
+    sort_array[i].Pt.Lat = curr_lat;
+    sort_array[i].Idx = i;
   }
 
   qsort(sort_array, temp_nbr_vertices, sizeof(*sort_array), ::ComparePointWithIndex);
-  triangle_list[sort_array[0].i] = 1;
+  triangle_list[sort_array[0].Idx] = 1;
 
-  int last_unique_idx = sort_array[0].i;
+  int last_unique_idx = sort_array[0].Idx;
   for (int i = 1; i < temp_nbr_vertices; ++i)
   {
     if (::ComparePointWithIndex(sort_array + i - 1, sort_array + i))
     {
-      triangle_list[sort_array[i].i] = 1;
-      last_unique_idx = sort_array[i].i;
+      triangle_list[sort_array[i].Idx] = 1;
+      last_unique_idx = sort_array[i].Idx;
     }
     else
     {
-      triangle_list[sort_array[i].i] = -last_unique_idx;
+      triangle_list[sort_array[i].Idx] = -last_unique_idx;
     }
   }
 
@@ -1664,8 +1393,8 @@ void vtkCDIReader::RemoveDuplicates(
   {
     if (triangle_list[i] == 1)
     {
-      PointLon[new_nbr_vertices] = PointLon[i];
-      PointLat[new_nbr_vertices] = PointLat[i];
+      pointLon[new_nbr_vertices] = pointLon[i];
+      pointLat[new_nbr_vertices] = pointLat[i];
       triangle_list[i] = new_nbr_vertices;
       new_nbr_vertices++;
     }
@@ -1689,34 +1418,49 @@ void vtkCDIReader::RemoveDuplicates(
 //----------------------------------------------------------------------------
 int vtkCDIReader::ConstructGridGeometry()
 {
-  vtkDebugMacro("Starting grid reconstruction ..." << endl);
+  vtkDebugMacro("Starting grid reconstruction ...");
+  if (this->NumberOfCellVars == 0 && this->NumberOfPointVars == 0)
+  {
+    vtkErrorMacro("No cell variables - can't construct grid");
+    return 0;
+  }
+
+  this->NumberLocalCells = this->GetPartitioning(this->Piece, this->NumPieces, this->NumberOfCells,
+    this->PointsPerCell, this->BeginPoint, this->EndPoint, this->BeginCell, this->EndCell);
+
   int size = this->NumberLocalCells * this->PointsPerCell;
   int size2 = this->NumberAllCells * this->PointsPerCell;
-  this->CLonVertices = new double[size];
-  this->CLatVertices = new double[size];
+  std::vector<double> cLonVertices;
+  std::vector<double> cLatVertices;
+  if (size > cLonVertices.max_size())
+  {
+    vtkErrorMacro("Too many points to construct geometry.");
+    return 0;
+  }
+  cLonVertices.resize(size);
+  cLatVertices.resize(size);
   this->DepthVar = new double[this->MaximumNVertLevels];
-  CHECK_NEW(this->CLonVertices);
-  CHECK_NEW(this->CLatVertices);
   CHECK_NEW(this->DepthVar);
 
+  vtkDebugMacro("Start reading Vertices");
   gridInqXboundsPart(
-    this->GridID, (this->BeginCell * this->PointsPerCell), size, this->CLonVertices);
+    this->GridID, (this->BeginCell * this->PointsPerCell), size, cLonVertices.data());
   gridInqYboundsPart(
-    this->GridID, (this->BeginCell * this->PointsPerCell), size, this->CLatVertices);
+    this->GridID, (this->BeginCell * this->PointsPerCell), size, cLatVertices.data());
+  vtkDebugMacro("Done reading Vertices");
   zaxisInqLevels(this->ZAxisID, this->DepthVar);
   char units[CDI_MAX_NAME];
-  this->OrigConnections = new int[size];
-  CHECK_NEW(this->OrigConnections);
-  int* new_cells = new int[2];
+  this->OrigConnections.resize(size);
+  int new_cells[2];
 
-  if (this->ProjectionMode != 4)
+  if (this->ProjectionMode != projection::CATALYST)
   {
     gridInqXunits(this->GridID, units);
     if (strncmp(units, "degree", 6) == 0)
     {
       for (int i = 0; i < size; i++)
       {
-        this->CLonVertices[i] = vtkMath::RadiansFromDegrees(this->CLonVertices[i]);
+        cLonVertices[i] = vtkMath::RadiansFromDegrees(cLonVertices[i]);
       }
     }
     gridInqYunits(this->GridID, units);
@@ -1724,33 +1468,41 @@ int vtkCDIReader::ConstructGridGeometry()
     {
       for (int i = 0; i < size; i++)
       {
-        this->CLatVertices[i] = vtkMath::RadiansFromDegrees(this->CLatVertices[i]);
+        cLatVertices[i] = vtkMath::RadiansFromDegrees(cLatVertices[i]);
       }
     }
   }
 
   // check for duplicates in the Point list and update the triangle list
   this->RemoveDuplicates(
-    this->CLonVertices, this->CLatVertices, size, this->OrigConnections, new_cells);
-  this->NumberLocalCells = floor(new_cells[0] / 3.0);
+    cLonVertices.data(), cLatVertices.data(), size, &this->OrigConnections[0], new_cells);
+  this->NumberLocalCells = new_cells[0] / this->PointsPerCell;
   this->NumberLocalPoints = new_cells[1];
+  if (this->NumberOfPoints and this->NumberOfPoints != new_cells[1])
+    vtkDebugMacro("ConstructGridGeometry: Changing number of points from  "
+      << this->NumberOfPoints << " to " << new_cells[1]);
 
-  this->PointX = new double[this->NumberLocalPoints];
-  this->PointY = new double[this->NumberLocalPoints];
-  this->PointZ = new double[this->NumberLocalPoints];
-  CHECK_NEW(this->PointX);
-  CHECK_NEW(this->PointY);
-  CHECK_NEW(this->PointZ);
+  this->NumberOfPoints = new_cells[1];
+
+  this->ModNumPoints = (int)floor(this->NumberLocalPoints * (this->Bloat * this->Bloat));
+  this->ModNumCells = (int)floor(this->NumberLocalCells * (this->Bloat));
+
+  this->PointMap.resize((size_t)floor(this->NumberOfPoints * (this->Bloat * this->Bloat)));
+  this->CellMap.resize((size_t)floor(this->NumberOfCells * this->Bloat));
+
+  this->PointX.resize(this->ModNumPoints);
+  this->PointY.resize(this->ModNumPoints);
+  this->PointZ.resize(this->ModNumPoints);
 
   // now get the individual coordinates out of the clon/clat vertices
   for (int i = 0; i < this->NumberLocalPoints; i++)
   {
-    ::LLtoXYZ(this->CLonVertices[i], this->CLatVertices[i], &PointX[i], &PointY[i], &PointZ[i],
-      this->ProjectionMode);
+    projection::longLatToCartesian(
+      cLonVertices[i], cLatVertices[i], &PointX[i], &PointY[i], &PointZ[i], this->ProjectionMode);
   }
 
   // mirror the mesh if needed
-  if (ProjectionMode == 0)
+  if (this->ProjectionMode == projection::SPHERICAL)
   {
     this->MirrorMesh();
   }
@@ -1758,20 +1510,22 @@ int vtkCDIReader::ConstructGridGeometry()
   this->ReconstructNew = false;
 
   // if we run with data decomposition, we need to know the mapping of points
-  this->VertexIds = new int[size];
-  int* vertex_ids2 = new int[size2];
-  CHECK_NEW(this->VertexIds);
-  CHECK_NEW(vertex_ids2);
+  this->VertexIds.resize(size);
+  std::vector<int> vertex_ids2;
+  if (size2 > vertex_ids2.max_size())
+  {
+    vtkErrorMacro("Too many points to construct geometry.");
+    return 0;
+  }
+  vertex_ids2.resize(size2);
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
   if (this->Decomposition)
   {
     if (this->Piece == 0)
     {
-      int* new_cells2 = new int[2];
-      double* clon_vert2 = new double[size2];
-      double* clat_vert2 = new double[size2];
-      CHECK_NEW(clon_vert2);
-      CHECK_NEW(clat_vert2);
+      int new_cells2[2];
+      double clon_vert2[size2];
+      double clat_vert2[size2];
 
       gridInqXboundsPart(this->GridID, 0, size2, clon_vert2);
       gridInqYboundsPart(this->GridID, 0, size2, clat_vert2);
@@ -1794,18 +1548,15 @@ int vtkCDIReader::ConstructGridGeometry()
         }
       }
 
-      this->RemoveDuplicates(clon_vert2, clat_vert2, size2, vertex_ids2, new_cells2);
+      this->RemoveDuplicates(clon_vert2, clat_vert2, size2, vertex_ids2.data(), new_cells2);
       for (int i = 1; i < this->NumPieces; i++)
       {
-        this->Controller->Send(vertex_ids2, size2, i, 101);
+        this->Controller->Send(vertex_ids2.data(), size2, i, 101);
       }
-
-      delete[] clon_vert2;
-      delete[] clat_vert2;
     }
     else
     {
-      this->Controller->Receive(vertex_ids2, size2, 0, 101);
+      this->Controller->Receive(vertex_ids2.data(), size2, 0, 101);
 
       for (int i = this->BeginPoint; i < (this->EndPoint + 1); i++)
       {
@@ -1817,12 +1568,12 @@ int vtkCDIReader::ConstructGridGeometry()
   }
 #endif
 
-  delete[] this->CLonVertices;
-  delete[] this->CLatVertices;
-  this->CLonVertices = nullptr;
-  this->CLatVertices = nullptr;
-  delete[] vertex_ids2;
-  vtkDebugMacro("Grid Reconstruction complete..." << endl);
+  this->CurrentExtraPoint = this->NumberLocalPoints;
+  this->CurrentExtraCell = this->NumberLocalCells;
+
+  cLonVertices.clear();
+  cLatVertices.clear();
+  vtkDebugMacro("Grid Reconstruction complete...");
   return 1;
 }
 
@@ -1849,7 +1600,7 @@ void vtkCDIReader::SetupPointConnectivity()
 //----------------------------------------------------------------------------
 int vtkCDIReader::AllocSphereGeometry()
 {
-  vtkDebugMacro("In AllocSphereGeometry..." << endl);
+  vtkDebugMacro("In AllocSphereGeometry...");
 
   if (!GridReconstructed || this->ReconstructNew)
   {
@@ -1867,7 +1618,10 @@ int vtkCDIReader::AllocSphereGeometry()
     this->MaximumPoints = this->NumberLocalPoints;
   }
 
-  this->LoadClonClatVars();
+  if (this->ShowClonClat)
+  {
+    this->LoadClonClatVars();
+  }
   this->CheckForMaskData();
   vtkDebugMacro("Leaving AllocSphereGeometry...");
   return 1;
@@ -1878,36 +1632,37 @@ int vtkCDIReader::AllocSphereGeometry()
 //----------------------------------------------------------------------------
 int vtkCDIReader::AllocLatLonGeometry()
 {
-  vtkDebugMacro("In AllocLatLonGeometry..." << endl);
+  vtkDebugMacro("In AllocLatLonGeometry...");
+  if (this->NumberOfCellVars == 0 && this->NumberOfPointVars == 0)
+  {
+    vtkErrorMacro("No cell or point variables - can't construct grid");
+    return 0;
+  }
 
   if (!GridReconstructed || this->ReconstructNew)
   {
     this->ConstructGridGeometry();
   }
 
-  const size_t newsize = this->NumberLocalCells * this->PointsPerCell;
-  if (this->ModConnections_size != newsize)
-  {
-    delete[] this->ModConnections;
-    this->ModConnections = new int[newsize];
-    CHECK_NEW(this->ModConnections);
-    this->ModConnections_size = newsize;
-  }
+  this->ModConnections.resize(this->ModNumCells * this->PointsPerCell);
 
   if (this->ShowMultilayerView)
   {
-    this->MaximumCells = this->NumberLocalCells * this->MaximumNVertLevels;
-    this->MaximumPoints = this->NumberLocalPoints * (this->MaximumNVertLevels + 1);
+    this->MaximumCells = this->CurrentExtraCell * this->MaximumNVertLevels;
+    this->MaximumPoints = this->CurrentExtraPoint * (this->MaximumNVertLevels + 1);
   }
   else
   {
-    this->MaximumCells = this->NumberLocalCells;
-    this->MaximumPoints = this->NumberLocalPoints;
+    this->MaximumPoints = this->CurrentExtraPoint;
+    this->MaximumCells = this->CurrentExtraCell;
   }
 
-  this->LoadClonClatVars();
+  if (this->ShowClonClat)
+  {
+    this->LoadClonClatVars();
+  }
   this->CheckForMaskData();
-  vtkDebugMacro("Leaving AllocLatLonGeometry..." << endl);
+  vtkDebugMacro("Leaving AllocLatLonGeometry...");
   return 1;
 }
 
@@ -1916,15 +1671,13 @@ int vtkCDIReader::AllocLatLonGeometry()
 //----------------------------------------------------------------------------
 int vtkCDIReader::LoadClonClatVars()
 {
-  vtkDebugMacro("In LoadClonClatVars..." << endl);
+  vtkDebugMacro("In LoadClonClatVars...");
 
-  double* CLon_l = new double[this->NumberLocalCells];
-  double* CLat_l = new double[this->NumberLocalCells];
-  CHECK_NEW(CLon_l);
-  CHECK_NEW(CLat_l);
+  std::vector<double> cLon_l(this->NumberLocalCells);
+  std::vector<double> cLat_l(this->NumberLocalCells);
 
-  gridInqXvalsPart(this->GridID, this->BeginCell, this->NumberLocalCells, CLon_l);
-  gridInqYvalsPart(this->GridID, this->BeginCell, this->NumberLocalCells, CLat_l);
+  gridInqXvalsPart(this->GridID, this->BeginCell, this->NumberLocalCells, cLon_l.data());
+  gridInqYvalsPart(this->GridID, this->BeginCell, this->NumberLocalCells, cLat_l.data());
 
   char units[CDI_MAX_NAME];
   gridInqXunits(this->GridID, units);
@@ -1932,7 +1685,7 @@ int vtkCDIReader::LoadClonClatVars()
   {
     for (int i = 0; i < this->NumberLocalCells; i++)
     {
-      CLon_l[i] = vtkMath::RadiansFromDegrees(CLon_l[i]);
+      cLon_l[i] = vtkMath::RadiansFromDegrees(cLon_l[i]);
     }
   }
   gridInqYunits(this->GridID, units);
@@ -1940,81 +1693,149 @@ int vtkCDIReader::LoadClonClatVars()
   {
     for (int i = 0; i < this->NumberLocalCells; i++)
     {
-      CLat_l[i] = vtkMath::RadiansFromDegrees(CLat_l[i]);
+      cLat_l[i] = vtkMath::RadiansFromDegrees(cLat_l[i]);
     }
   }
 
   if (this->ShowMultilayerView)
   {
-    this->CLon = new double[this->MaximumCells];
-    this->CLat = new double[this->MaximumCells];
-    CHECK_NEW(this->CLon);
-    CHECK_NEW(this->CLat);
+    int tmp = this->MaximumCells * this->Bloat;
+    this->CLon.resize(tmp);
+    this->CLat.resize(tmp);
 
     for (int j = 0; j < this->NumberLocalCells; j++)
     {
       for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
       {
         int i = j * this->MaximumNVertLevels;
-        this->CLon[i + levelNum] = static_cast<double>(CLon_l[j]);
-        this->CLat[i + levelNum] = static_cast<double>(CLat_l[j]);
+        this->CLon[i + levelNum] = static_cast<double>(cLon_l[j]);
+        this->CLat[i + levelNum] = static_cast<double>(cLat_l[j]);
       }
     }
   }
   else
   {
-    this->CLon = new double[this->NumberLocalCells];
-    this->CLat = new double[this->NumberLocalCells];
-    CHECK_NEW(this->CLon);
-    CHECK_NEW(this->CLat);
+    int tmp = this->NumberLocalCells * this->Bloat;
+    this->CLon.resize(tmp);
+    this->CLat.resize(tmp);
 
     for (int j = 0; j < this->NumberLocalCells; j++)
     {
-      this->CLon[j] = static_cast<double>(CLon_l[j]);
-      this->CLat[j] = static_cast<double>(CLat_l[j]);
+      this->CLon[j] = static_cast<double>(cLon_l[j]);
+      this->CLat[j] = static_cast<double>(cLat_l[j]);
     }
   }
 
-  delete[] CLon_l;
-  delete[] CLat_l;
-
   this->AddCoordinateVars = true;
-  vtkDebugMacro("Out LoadClonClatVars..." << endl);
+  vtkDebugMacro("Out LoadClonClatVars...");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-//  Read in Land/Sea Mask wet_c to mask out the land surface in ocean
-//  simulations.
+int vtkCDIReader::AddClonClatHalo()
+{
+  if ((this->AddCoordinateVars) && (this->NumberLocalCells < this->CurrentExtraCell))
+  {
+    if (this->ShowMultilayerView)
+    {
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
+        {
+          int l = j * this->MaximumNVertLevels;
+          int k = this->MaximumNVertLevels * this->CellMap[j - this->NumberLocalCells];
+          this->CLon[l + levelNum] = static_cast<int>(CLon[k + levelNum]);
+          this->CLat[l + levelNum] = static_cast<int>(CLat[k + levelNum]);
+        }
+      }
+    }
+    else
+    {
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        int k = this->CellMap[j - this->NumberLocalCells];
+        this->CLon[j] = static_cast<int>(CLon[k]);
+        this->CLat[j] = static_cast<int>(CLat[k]);
+      }
+    }
+
+    return 1;
+  }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+//  Read in Missing value mask. We probably should not read this, but just fetch it, but hell,
+//  whatever.
 //----------------------------------------------------------------------------
 int vtkCDIReader::CheckForMaskData()
 {
-  int numVars = vlistNvars(this->VListID);
+  int numVars = this->NumberOfCellVars;
   this->GotMask = false;
   int mask_pos = 0;
 
+  std::string mask_name;
+  if (this->PointsPerCell == 3)
+    mask_name = "wet_c";
+  if (this->PointsPerCell == 4)
+    mask_name = "wet_e";
+  if (this->PointsPerCell == 6)
+    mask_name = "wet_v";
+
   for (int i = 0; i < numVars; i++)
   {
-    if (!strcmp(this->Internals->CellVars[i].Name, "wet_c"))
+    if (!strcmp(this->Internals->CellVars[i].Name, this->MaskingVarname.c_str()))
     {
+      if (this->MaskingVarname.empty())
+      {
+        vtkWarningMacro(<< "Found empty var at position " << i << " of Internals->CellVars ");
+        break;
+      }
+
       this->GotMask = true;
       mask_pos = i;
+      break;
+    }
+  }
+  if (this->GotMask == false)
+  {
+    this->MaskingVarname = mask_name;
+    for (int i = 0; i < numVars; i++)
+    {
+      if (!strcmp(this->Internals->CellVars[i].Name, this->MaskingVarname.c_str()))
+      {
+        if (this->MaskingVarname.empty())
+        {
+          vtkWarningMacro(<< "Found empty var at position " << i << " of Internals->CellVars ");
+          break;
+        }
+        this->GotMask = true;
+        mask_pos = i;
+        break;
+      }
     }
   }
 
   if (this->GotMask)
   {
-    CDIVar* cdiVar = &(this->Internals->CellVars[mask_pos]);
+    const double maskVal = this->UseCustomMaskValue
+      ? this->CustomMaskValue
+      : vlistInqVarMissval(this->VListID, this->Internals->CellVars[mask_pos].VarID);
+
+    cdi_tools::CDIVar* cdiVar = &(this->Internals->CellVars[mask_pos]);
     if (this->ShowMultilayerView)
     {
-      this->CellMask = new int[this->MaximumCells];
+      this->CellMask.resize(this->MaximumCells * this->Bloat);
       float* dataTmpMask = new float[this->MaximumCells * sizeof(float)];
-      CHECK_NEW(this->CellMask);
       CHECK_NEW(dataTmpMask);
 
       cdi_set_cur(cdiVar, 0, 0);
-      cdi_get_part<float>(
-        cdiVar, this->BeginCell, this->NumberLocalCells, dataTmpMask, this->MaximumNVertLevels);
+      cdi_tools::cdi_get_part<float>(cdiVar, this->BeginCell, this->NumberLocalCells, dataTmpMask,
+        this->MaximumNVertLevels, this->Grib);
+      vtkDebugMacro("Done with read of 3d Mask data");
 
       // readjust the data
       for (int j = 0; j < this->NumberLocalCells; j++)
@@ -2023,35 +1844,71 @@ int vtkCDIReader::CheckForMaskData()
         {
           int i = j * this->MaximumNVertLevels;
           this->CellMask[i + levelNum] =
-            static_cast<int>(dataTmpMask[j + (levelNum * this->NumberLocalCells)]);
+            (dataTmpMask[j + (levelNum * this->NumberLocalCells)] == maskVal);
         }
       }
 
       delete[] dataTmpMask;
-      vtkDebugMacro("Got data for land/sea mask (3D)" << endl);
+      vtkDebugMacro("Got data for missing value mask (3D)");
     }
     else
     {
-      this->CellMask = new int[this->NumberLocalCells];
-      CHECK_NEW(this->CellMask);
+      this->CellMask.resize(this->NumberLocalCells * this->Bloat);
       float* dataTmpMask = new float[this->NumberLocalCells];
 
       cdi_set_cur(cdiVar, 0, this->VerticalLevelSelected);
-      cdi_get_part<float>(cdiVar, this->BeginCell, this->NumberLocalCells, dataTmpMask, 1);
+      cdi_tools::cdi_get_part<float>(
+        cdiVar, this->BeginCell, this->NumberLocalCells, dataTmpMask, 1, this->Grib);
 
       // readjust the data
       for (int j = 0; j < this->NumberLocalCells; j++)
       {
-        this->CellMask[j] = static_cast<int>(dataTmpMask[j]);
+        this->CellMask[j] = (dataTmpMask[j] == maskVal);
       }
 
       delete[] dataTmpMask;
-      vtkDebugMacro("Got data for land/sea mask (2D)" << endl);
+      vtkDebugMacro("Got data for missing value mask (2D)");
     }
     this->GotMask = true;
   }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+//  Add halo to the land sea mask (for points on 180 deg line / ... )
+//----------------------------------------------------------------------------
+int vtkCDIReader::AddMaskHalo()
+{
+  if ((this->GotMask) && (this->NumberLocalCells < this->CurrentExtraCell))
+  {
+    if (this->ShowMultilayerView)
+    {
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
+        {
+          int l = j * this->MaximumNVertLevels;
+          int k = this->MaximumNVertLevels * this->CellMap[j - this->NumberLocalCells];
+          this->CellMask[l + levelNum] = (CellMask[k + levelNum]);
+        }
+      }
+    }
+    else
+    {
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        int k = this->CellMap[j - this->NumberLocalCells];
+        this->CellMask[j] = this->CellMask[k];
+      }
+    }
+
+    return 1;
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2061,11 +1918,9 @@ int vtkCDIReader::CheckForMaskData()
 //----------------------------------------------------------------------------
 bool vtkCDIReader::BuildDomainCellVars()
 {
-  vtkUnstructuredGrid* output = this->Output;
   this->DomainCellVar = new double[this->NumberOfCells * this->NumberOfDomainVars];
-  double* domainTMP = new double[this->NumberOfCells];
+  std::vector<double> domainTMP(this->NumberOfCells);
   CHECK_NEW(this->DomainCellVar);
-  CHECK_NEW(domainTMP);
   double val = 0;
   int mask_pos = 0;
   int numVars = vlistNvars(this->VListID);
@@ -2078,107 +1933,291 @@ bool vtkCDIReader::BuildDomainCellVars()
     }
   }
 
-  CDIVar* cdiVar = &(this->Internals->CellVars[mask_pos]);
+  cdi_tools::CDIVar* cdiVar = &(this->Internals->CellVars[mask_pos]);
   cdi_set_cur(cdiVar, 0, 0);
-  cdi_get_part<double>(cdiVar, this->BeginCell, this->NumberLocalCells, domainTMP, 1);
+  cdi_tools::cdi_get_part<double>(
+    cdiVar, this->BeginCell, this->NumberLocalCells, domainTMP.data(), 1, this->Grib);
 
   for (int j = 0; j < this->NumberOfDomainVars; j++)
   {
-    vtkDoubleArray* domainVar = vtkDoubleArray::New();
+    vtkNew<vtkDoubleArray> domainVar;
     for (int k = 0; k < this->NumberOfCells; k++)
     {
-      val = this->DomainVarDataArray[j]->GetComponent(domainTMP[k], 0l);
+      val = this->DomainVarDataArray->GetArray(j)->GetComponent(domainTMP[k], 0l);
       this->DomainCellVar[k + (j * this->NumberOfCells)] = val;
     }
     domainVar->SetArray(this->DomainCellVar + (j * this->NumberOfCells), this->NumberLocalCells, 0,
       vtkDoubleArray::VTK_DATA_ARRAY_FREE);
     domainVar->SetName(this->Internals->DomainVars[j].c_str());
-    output->GetCellData()->AddArray(domainVar);
+    this->Output->GetCellData()->AddArray(domainVar);
   }
 
-  delete[] domainTMP;
-  vtkDebugMacro("Built cell vars from domain data" << endl);
+  vtkDebugMacro("Built cell vars from domain data");
   return 1;
 }
 
-//----------------------------------------------------------------------------
-// Elimate YWrap for Cassini Projection
-//----------------------------------------------------------------------------
-int vtkCDIReader::EliminateYWrap()
+//------------------------------------------------------------------------------
+//  Add a "mirror point" X -- a point on the opposite side of the lat/lon projection.
+//------------------------------------------------------------------------------
+int vtkCDIReader::AddMirrorPointX(int index, double dividerX, double offset)
 {
-  for (int j = 0; j < this->NumberLocalCells; j++)
+  vtkDebugMacro("In AddMirrorPoint X...");
+  double x = this->PointX[index];
+  double y = this->PointY[index];
+
+  // add on east
+  if (x < dividerX)
   {
-    int* conns = this->OrigConnections + (j * this->PointsPerCell);
-    int* modConns = this->ModConnections + (j * this->PointsPerCell);
-    int lastk = this->PointsPerCell - 1;
-    bool yWrap = false;
-
-    for (int k = 0; k < this->PointsPerCell; k++)
-    {
-      if (abs(this->PointY[conns[k]] - this->PointY[conns[lastk]]) > 149.5)
-      {
-        yWrap = true;
-      }
-
-      lastk = k;
-    }
-
-    if (yWrap)
-    {
-      for (int k = 0; k < this->PointsPerCell; k++)
-      {
-        modConns[k] = 0;
-      }
-    }
-    else
-    {
-      for (int k = 0; k < this->PointsPerCell; k++)
-      {
-        modConns[k] = conns[k];
-      }
-    }
+    x += offset;
   }
-  return 1;
+  else
+  {
+    // add on west
+    x -= offset;
+  }
+
+  this->PointX[this->CurrentExtraPoint] = x;
+  this->PointY[this->CurrentExtraPoint] = y;
+
+  size_t mirrorPoint = this->CurrentExtraPoint;
+
+  // record mapping
+  this->PointMap[this->CurrentExtraPoint - this->NumberLocalPoints] = index;
+  this->CurrentExtraPoint++;
+
+  vtkDebugMacro("Out AddMirrorPoint X...");
+  return static_cast<int>(mirrorPoint);
+}
+
+//------------------------------------------------------------------------------
+//  Add a "mirror point" Y -- a point on the opposite side of the Cassini projection.
+//------------------------------------------------------------------------------
+int vtkCDIReader::AddMirrorPointY(int index, double dividerY, double offset)
+{
+  vtkDebugMacro("In AddMirrorPoint Y...");
+  double x = this->PointX[index];
+  double y = this->PointY[index];
+
+  // add on south
+  if (y < dividerY)
+  {
+    y += offset;
+  }
+  else
+  {
+    // add on north
+    y -= offset;
+  }
+
+  this->PointX[this->CurrentExtraPoint] = x;
+  this->PointY[this->CurrentExtraPoint] = y;
+
+  size_t mirrorPoint = this->CurrentExtraPoint;
+
+  // record mapping
+  this->PointMap[this->CurrentExtraPoint - this->NumberLocalPoints] = index;
+  this->CurrentExtraPoint++;
+
+  vtkDebugMacro("Out AddMirrorPoint Y...");
+  return static_cast<int>(mirrorPoint);
 }
 
 //----------------------------------------------------------------------------
-// Elimate XWrap for lon/lat Projection
+// Elimate Wrap for lon/lat Projection   1 = x-Axis, 2 = Y-Axis
 //----------------------------------------------------------------------------
-int vtkCDIReader::EliminateXWrap()
+int vtkCDIReader::Wrap(int axis)
 {
-  for (int j = 0; j < this->NumberLocalCells; j++)
-  {
-    int* conns = this->OrigConnections + (j * this->PointsPerCell);
-    int* modConns = this->ModConnections + (j * this->PointsPerCell);
-    int lastk = this->PointsPerCell - 1;
-    bool xWrap = false;
+  vtkDebugMacro("In Wrapping...");
 
-    for (int k = 0; k < this->PointsPerCell; k++)
+  if ((this->WrapOn) &&
+    ((this->ProjectionMode == projection::CYLINDRICAL_EQUIDISTANT) ||
+      (this->ProjectionMode == projection::CASSINI)))
+  {
+    double xyLength = 2 * vtkMath::Pi();
+    double xyCenter = 0.0;
+    const double toleranceXY = 1.0;
+
+    // For each cell, examine vertices
+    // Add new points and cells where needed to account for wraparound.
+    for (size_t j = 0; j < this->NumberLocalCells; j++)
     {
-      if (abs(this->PointX[conns[k]] - this->PointX[conns[lastk]]) > 1.0)
+      int* conns = &this->OrigConnections[j * this->PointsPerCell];
+      int* modConns = &this->ModConnections[j * this->PointsPerCell];
+
+      // Determine if we are wrapping in X direction
+      size_t lastk = this->PointsPerCell - 1;
+      bool xyWrap = false;
+      for (size_t k = 0; k < this->PointsPerCell; k++)
       {
-        xWrap = true;
+        if ((std::abs(this->PointX[conns[k]] - this->PointX[conns[lastk]]) > toleranceXY) &&
+          (axis == 1))
+        {
+          xyWrap = true;
+        }
+        if ((std::abs(this->PointY[conns[k]] - this->PointY[conns[lastk]]) > toleranceXY) &&
+          (axis == 2))
+        {
+          xyWrap = true;
+        }
+        lastk = k;
       }
 
-      lastk = k;
+      // If we wrapped in X direction, modify cell and add mirror cell
+      if (xyWrap)
+      {
+        // first point is anchor it doesn't move
+        double anchorX = this->PointX[conns[0]];
+        double anchorY = this->PointY[conns[0]];
+
+        modConns[0] = conns[0];
+        int numExtraPoints = 0;
+
+        // modify existing cell, so it doesn't wrap
+        // move points to one side
+        for (size_t k = 1; k < this->PointsPerCell; k++)
+        {
+          int neigh = conns[k];
+
+          // add a new point, figure out east or west
+          if ((axis == 1) && (std::abs(this->PointX[neigh] - anchorX) > toleranceXY))
+          {
+            modConns[k] = this->AddMirrorPointX(neigh, anchorX, xyLength);
+            numExtraPoints++;
+          }
+          else if ((axis == 2) && (std::abs(this->PointY[neigh] - anchorY) > toleranceXY))
+          {
+            modConns[k] = this->AddMirrorPointY(neigh, anchorY, xyLength);
+            numExtraPoints++;
+          }
+          else
+          {
+            // use existing kth point
+            modConns[k] = neigh;
+          }
+        }
+
+        // move addedConns to this->ModConnections extra cells area
+        int* addedConns = &this->ModConnections[this->CurrentExtraCell * this->PointsPerCell];
+
+        // add a mirroring cell to other side
+        // add mirrored anchor first
+        if (axis == 1)
+        {
+          addedConns[0] = this->AddMirrorPointX(conns[0], xyCenter, xyLength);
+          anchorX = this->PointX[addedConns[0]];
+        }
+        else if (axis == 2)
+        {
+          addedConns[0] = this->AddMirrorPointY(conns[0], xyCenter, xyLength);
+          anchorY = this->PointY[addedConns[0]];
+        }
+        numExtraPoints++;
+
+        // add mirror cell points if needed
+        for (size_t k = 1; k < this->PointsPerCell; k++)
+        {
+          int neigh = conns[k];
+
+          // add a new point for neighbor, figure out east or west
+          if ((axis == 1) && (std::abs(this->PointX[neigh] - anchorX) > toleranceXY))
+          {
+            addedConns[k] = this->AddMirrorPointX(neigh, anchorX, xyLength);
+            numExtraPoints++;
+          }
+          else if ((axis == 2) && (std::abs(this->PointY[neigh] - anchorY) > toleranceXY))
+          {
+            addedConns[k] = this->AddMirrorPointY(neigh, anchorY, xyLength);
+            numExtraPoints++;
+          }
+          else
+          {
+            // use existing kth point
+            addedConns[k] = neigh;
+          }
+        }
+        this->CellMap[this->CurrentExtraCell - this->NumberLocalCells] = j;
+        this->CurrentExtraCell++;
+      }
+      else
+      {
+        // just add cell "as is" to this->ModConnections
+        for (size_t k = 0; k < this->PointsPerCell; k++)
+        {
+          modConns[k] = conns[k];
+        }
+      }
+      if (this->CurrentExtraCell > this->ModNumCells)
+      {
+        vtkErrorMacro(<< "Exceeded storage for extra cells!");
+        return (0);
+      }
+      if (this->CurrentExtraPoint > this->ModNumPoints)
+      {
+        vtkErrorMacro(<< "Exceeded storage for extra points!");
+        return (0);
+      }
     }
 
-    if (xWrap)
+    if (!ShowMultilayerView)
     {
-      for (int k = 0; k < this->PointsPerCell; k++)
-      {
-        modConns[k] = 0;
-      }
+      this->MaximumCells = static_cast<int>(this->CurrentExtraCell);
+      this->MaximumPoints = static_cast<int>(this->CurrentExtraPoint);
+      vtkDebugMacro(<< "elim xwrap: singlelayer: setting this->MaximumPoints to "
+                    << this->MaximumPoints);
     }
     else
     {
+      this->MaximumCells = static_cast<int>(this->CurrentExtraCell * this->MaximumNVertLevels);
+      this->MaximumPoints =
+        static_cast<int>(this->CurrentExtraPoint * (this->MaximumNVertLevels + 1));
+      vtkDebugMacro(<< "elim xwrap: multilayer: setting this->MaximumPoints to "
+                    << this->MaximumPoints);
+    }
+
+    vtkDebugMacro("Out Wrapping...");
+    return 1;
+  }
+  else
+  {
+    for (int j = 0; j < this->NumberLocalCells; j++)
+    {
+      int* conns = &this->OrigConnections[j * this->PointsPerCell];
+      int* modConns = &this->ModConnections[j * this->PointsPerCell];
+      int lastk = this->PointsPerCell - 1;
+      bool xyWrap = false;
+
       for (int k = 0; k < this->PointsPerCell; k++)
       {
-        modConns[k] = conns[k];
+        if ((abs(this->PointX[conns[k]] - this->PointX[conns[lastk]]) > 1.0) && (axis == 1))
+        {
+          xyWrap = true;
+        }
+        if ((abs(this->PointY[conns[k]] - this->PointY[conns[lastk]]) > 1.0) && (axis == 2))
+        {
+          xyWrap = true;
+        }
+
+        lastk = k;
+      }
+
+      if (xyWrap)
+      {
+        for (int k = 0; k < this->PointsPerCell; k++)
+        {
+          modConns[k] = 0;
+        }
+      }
+      else
+      {
+        for (int k = 0; k < this->PointsPerCell; k++)
+        {
+          modConns[k] = conns[k];
+        }
       }
     }
+    vtkDebugMacro("Out Wrapping...");
+    return 1;
   }
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -2186,9 +2225,8 @@ int vtkCDIReader::EliminateXWrap()
 //----------------------------------------------------------------------------
 void vtkCDIReader::OutputPoints(bool init)
 {
-  vtkDebugMacro("In OutputPoints..." << endl);
+  vtkDebugMacro("In OutputPoints...");
   float layerThicknessScaleFactor = 5000.0;
-  vtkUnstructuredGrid* output = this->Output;
   vtkSmartPointer<vtkPoints> points;
   float adjustedLayerThickness = (this->LayerThickness / layerThicknessScaleFactor);
 
@@ -2200,66 +2238,38 @@ void vtkCDIReader::OutputPoints(bool init)
   vtkDebugMacro("OutputPoints: this->MaximumPoints: "
     << this->MaximumPoints << " this->MaximumNVertLevels: " << this->MaximumNVertLevels
     << " LayerThickness: " << this->LayerThickness
-    << " ShowMultilayerView: " << this->ShowMultilayerView << endl);
+    << " ShowMultilayerView: " << this->ShowMultilayerView);
   if (init)
   {
     points = vtkSmartPointer<vtkPoints>::New();
     points->Allocate(this->MaximumPoints, this->MaximumPoints);
-    output->SetPoints(points);
+    this->Output->SetPoints(points);
   }
   else
   {
-    points = output->GetPoints();
+    points = this->Output->GetPoints();
     points->Initialize();
     points->Allocate(this->MaximumPoints, this->MaximumPoints);
   }
 
-  for (int j = 0; j < this->NumberLocalPoints; j++)
+  if (this->DepthVar == nullptr)
   {
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
+    vtkDebugMacro("OutputPoints: this->MaximumPoints: "
+      << this->MaximumPoints << " this->MaximumNVertLevels: " << this->MaximumNVertLevels
+      << " LayerThickness: " << this->LayerThickness
+      << " ShowMultilayerView: " << this->ShowMultilayerView);
+    return; // We don't have any data anyways.
+  }
 
-    if (this->ProjectionMode == 0)
-    {
-      if (this->ShowMultilayerView)
-      {
-        x = this->PointX[j] * 200;
-        y = this->PointY[j] * 200;
-        z = this->PointZ[j] * 200;
-      }
-      else
-      {
-        float scale = adjustedLayerThickness * this->DepthVar[this->VerticalLevelSelected];
-        x = this->PointX[j] * (200 - scale);
-        y = this->PointY[j] * (200 - scale);
-        z = this->PointZ[j] * (200 - scale);
-      }
-    }
-    else if (this->ProjectionMode == 1)
-    {
-      x = this->PointX[j] * 300 / vtkMath::Pi();
-      y = this->PointY[j] * 300 / vtkMath::Pi();
-      z = 0.0;
-    }
-    else if (this->ProjectionMode == 2)
-    {
-      x = this->PointX[j] * 2;
-      y = this->PointY[j] * 2;
-      z = 0.0;
-    }
-    else if (this->ProjectionMode == 3)
-    {
-      x = this->PointX[j] * 120;
-      y = this->PointY[j] * 120;
-      z = 0.0;
-    }
-    else if (this->ProjectionMode == 4)
-    {
-      x = this->PointX[j];
-      y = this->PointY[j];
-      z = 0.0;
-    }
+  double sx, sy, sz;
+  get_scaling(this->ProjectionMode, this->ShowMultilayerView,
+    this->DepthVar[this->VerticalLevelSelected], adjustedLayerThickness, sx, sy, sz);
+
+  for (int j = 0; j < this->CurrentExtraPoint; j++)
+  {
+    double x = this->PointX[j] * sx;
+    double y = this->PointY[j] * sy;
+    double z = this->PointZ[j] * sz;
 
     if (!this->ShowMultilayerView)
     {
@@ -2270,41 +2280,40 @@ void vtkCDIReader::OutputPoints(bool init)
       double rho = 0.0, rholevel = 0.0, theta = 0.0, phi = 0.0;
       int retval = -1;
 
-      if (this->ProjectionMode == 0)
+      if (this->ProjectionMode == projection::SPHERICAL)
       {
         if ((x != 0.0) || (y != 0.0) || (z != 0.0))
         {
-          retval = ::CartesianToSpherical(x, y, z, &rho, &phi, &theta);
+          retval = projection::cartesianToSpherical(x, y, z, &rho, &phi, &theta);
+          if (!retval)
+            retval = projection::sphericalToCartesian(
+              rho + this->Layer0Offset * adjustedLayerThickness, phi, theta, &x, &y, &z);
         }
       }
 
-      if (this->ProjectionMode > 0)
+      if (this->ProjectionMode != projection::SPHERICAL)
       {
-        z = 0.0;
+        z = this->Layer0Offset * adjustedLayerThickness; // to avoid 0 layer thickness / ...
       }
-      else
-      {
-        if (!retval && ((x != 0.0) || (y != 0.0) || (z != 0.0)))
-        {
-          retval = ::SphericalToCartesian(rho, phi, theta, &x, &y, &z);
-        }
-      }
+
       points->InsertNextPoint(x, y, z);
+
       for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
       {
-        if ((this->ProjectionMode != 0) && (this->ProjectionMode != 4))
+        if ((this->ProjectionMode != projection::SPHERICAL) &&
+          (this->ProjectionMode != projection::CATALYST))
         {
           z = -(this->DepthVar[levelNum] * adjustedLayerThickness);
         }
-        else if (this->ProjectionMode == 0)
+        else if (this->ProjectionMode == projection::SPHERICAL)
         {
           if (!retval && ((x != 0.0) || (y != 0.0) || (z != 0.0)))
           {
             rholevel = rho - (adjustedLayerThickness * this->DepthVar[levelNum]);
-            retval = ::SphericalToCartesian(rholevel, phi, theta, &x, &y, &z);
+            retval = projection::sphericalToCartesian(rholevel, phi, theta, &x, &y, &z);
           }
         }
-        else if (this->ProjectionMode == 4)
+        else if (this->ProjectionMode == projection::CATALYST)
         {
           z = -(this->DepthVar[levelNum] * (adjustedLayerThickness * 0.04));
         }
@@ -2312,17 +2321,15 @@ void vtkCDIReader::OutputPoints(bool init)
       }
     }
   }
-
-  if (this->ReconstructNew)
+  if (abs(this->DepthVar[0] - this->Layer0Offset) < 1 && this->ShowMultilayerView)
   {
-    delete[] this->PointX;
-    this->PointX = nullptr;
-    delete[] this->PointY;
-    this->PointY = nullptr;
-    delete[] this->PointZ;
-    this->PointZ = nullptr;
+    vtkWarningMacro(<< this->FileName << ": First vertical level thickness is close to 0 ("
+                    << abs(this->DepthVar[0] - this->Layer0Offset)
+                    << " to be precise). It will be rendered as basically flat. Use \"3D Surface Z "
+                       "offset for first Layer\" to adjust. Current value is "
+                    << this->Layer0Offset << ".");
   }
-  vtkDebugMacro("Leaving OutputPoints..." << endl);
+  vtkDebugMacro("Leaving OutputPoints...");
 }
 
 //----------------------------------------------------------------------------
@@ -2338,8 +2345,12 @@ unsigned char vtkCDIReader::GetCellType()
       return (!this->ShowMultilayerView) ? VTK_TRIANGLE : VTK_WEDGE;
     case 4:
       return (!this->ShowMultilayerView) ? VTK_QUAD : VTK_HEXAHEDRON;
+    case 5:
+      return (!this->ShowMultilayerView) ? VTK_POLYGON : VTK_PENTAGONAL_PRISM;
+    case 6:
+      return (!this->ShowMultilayerView) ? VTK_POLYGON : VTK_HEXAGONAL_PRISM;
     default:
-      break;
+      return (!this->ShowMultilayerView) ? VTK_POLYGON : VTK_POLYHEDRON;
   }
   return VTK_TRIANGLE;
 }
@@ -2349,45 +2360,93 @@ unsigned char vtkCDIReader::GetCellType()
 //----------------------------------------------------------------------------
 void vtkCDIReader::OutputCells(bool init)
 {
-  vtkDebugMacro("In OutputCells..." << endl);
+  vtkDebugMacro("In OutputCells...");
   vtkUnstructuredGrid* output = this->Output;
+
+  output->GetCellData()->Initialize();
+  output->GetCellData()->SetNumberOfTuples(this->MaximumCells);
+  output->Allocate(this->MaximumCells, this->MaximumCells);
+
+  vtkSmartPointer<vtkCellArray> cells;
+  int pointsPerPolygon = this->PointsPerCell * (this->ShowMultilayerView ? 2 : 1);
+  int cellType = this->GetCellType();
 
   if (init)
   {
-    output->Allocate(this->MaximumCells, this->MaximumCells);
+    cells = vtkSmartPointer<vtkCellArray>::New();
+    cells->Allocate(this->MaximumCells, this->MaximumCells);
+    output->SetCells(cellType, cells);
+    cells->SetNumberOfCells(this->MaximumCells);
   }
   else
   {
-    vtkCellArray* cells = output->GetCells();
+    cells = output->GetCells();
     cells->Initialize();
-    output->Allocate(this->MaximumCells, this->MaximumCells);
+    cells->Allocate(this->MaximumCells, this->MaximumCells);
+    cells->SetNumberOfCells(this->MaximumCells);
   }
-
-  int cellType = this->GetCellType();
-  int pointsPerPolygon = this->PointsPerCell * (this->ShowMultilayerView ? 2 : 1);
 
   vtkDebugMacro("OutputCells: init: " << init << " this->MaximumCells: " << this->MaximumCells
                                       << " cellType: " << cellType
                                       << " this->MaximumNVertLevels: " << this->MaximumNVertLevels
-                                      << " LayerThickness: " << LayerThickness
-                                      << " ShowMultilayerView: " << this->ShowMultilayerView);
+                                      << " LayerThickness: " << this->LayerThickness
+                                      << " ShowMultilayerView: " << this->ShowMultilayerView
+                                      << " CurrentExtraCell: " << this->CurrentExtraCell);
+
+  if (this->DepthVar == nullptr)
+  {
+    vtkErrorMacro(
+      "File " << this->FileName << " OutputCells: this->MaximumCells: " << this->MaximumCells
+              << " this->MaximumNVertLevels: " << this->MaximumNVertLevels << " LayerThickness: "
+              << this->LayerThickness << " ShowMultilayerView: " << this->ShowMultilayerView);
+    return; // We don't have any data anyways.
+  }
 
   std::vector<vtkIdType> polygon(pointsPerPolygon);
-  for (int j = 0; j < this->NumberLocalCells; j++)
+  for (int j = 0; j < this->CurrentExtraCell; j++)
   {
     int* conns;
-    if (this->ProjectionMode > 0)
+    if (this->ProjectionMode != projection::SPHERICAL)
     {
-      conns = this->ModConnections + (j * this->PointsPerCell);
+      conns = &this->ModConnections[j * this->PointsPerCell];
     }
     else
     {
-      conns = this->OrigConnections + (j * this->PointsPerCell);
+      conns = &this->OrigConnections[j * this->PointsPerCell];
+    }
+
+    // check for outer boundary cell
+    bool boundary = false;
+    if (this->ProjectionMode == projection::CYLINDRICAL_EQUIDISTANT ||
+      this->ProjectionMode == projection::CASSINI)
+    {
+
+      double borderX, borderY;
+      if (this->ProjectionMode == projection::CYLINDRICAL_EQUIDISTANT)
+      {
+        borderX = vtkMath::Pi() + 0.5;
+        borderY = (vtkMath::Pi() / 2.0) + 0.5;
+      }
+      else
+      {
+        borderX = (vtkMath::Pi() / 2.0) + 0.5;
+        borderY = vtkMath::Pi() + 0.5;
+      }
+      for (size_t k = 0; k < this->PointsPerCell; k++)
+      {
+        double x = this->PointX[conns[k]];
+        double y = this->PointY[conns[k]];
+        if (((x > borderX) || (x < (0.0 - borderX)) || (y > borderY) || (y < (0.0 - borderY))))
+        {
+          boundary = true;
+        }
+      }
     }
 
     if (!this->ShowMultilayerView)
     { // singlelayer
-      if ((this->GotMask) && (this->IncludeTopography) && (this->CellMask[j] == this->MaskingValue))
+      if (((this->GotMask) && (this->UseMask) && (this->CellMask[j] ^ this->InvertMask)) ||
+        boundary)
       {
         output->InsertNextCell(VTK_EMPTY_CELL, 0, polygon.data());
       }
@@ -2406,8 +2465,7 @@ void vtkCDIReader::OutputCells(bool init)
       for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
       {
         int i = j * this->MaximumNVertLevels;
-        if ((this->GotMask) && (this->IncludeTopography) &&
-          (this->CellMask[i + levelNum] == this->MaskingValue))
+        if (((this->GotMask) && (this->UseMask) && (this->CellMask[i + levelNum])) || boundary)
         {
           output->InsertNextCell(VTK_EMPTY_CELL, 0, polygon.data());
         }
@@ -2423,76 +2481,120 @@ void vtkCDIReader::OutputCells(bool init)
             int val = (conns[k] * (this->MaximumNVertLevels + 1)) + levelNum + 1;
             polygon[k + this->PointsPerCell] = val;
           }
-          output->InsertNextCell(cellType, pointsPerPolygon, polygon.data());
+          if (cellType == VTK_POLYHEDRON)
+            this->InsertPolyhedron(polygon);
+          else
+            output->InsertNextCell(cellType, pointsPerPolygon, polygon.data());
         }
       }
     }
   }
 
-  if (this->AddCoordinateVars)
+  if (this->AddCoordinateVars && this->ShowClonClat)
   {
-    vtkNew<vtkDoubleArray> clon, clat;
+    this->ClonArray = vtkSmartPointer<vtkDoubleArray>::New();
+    this->ClonArray->SetName("Center Longitude (CLON)");
+    this->ClonArray->SetNumberOfTuples(this->NumberLocalCells * this->MaximumNVertLevels);
+    this->ClatArray = vtkSmartPointer<vtkDoubleArray>::New();
+    this->ClatArray->SetName("Center Latitude (CLAT)");
+    this->ClatArray->SetNumberOfTuples(this->NumberLocalCells * this->MaximumNVertLevels);
     if (this->ShowMultilayerView)
     {
-      clon->SetArray(this->CLon, this->NumberLocalCells * this->MaximumNVertLevels, 0,
-        vtkIntArray::VTK_DATA_ARRAY_FREE);
-      clat->SetArray(this->CLat, this->NumberLocalCells * this->MaximumNVertLevels, 0,
-        vtkIntArray::VTK_DATA_ARRAY_FREE);
+      this->ClonArray->SetArray(
+        &this->CLon[0], this->CurrentExtraCell * this->MaximumNVertLevels, 1);
+      this->ClatArray->SetArray(
+        &this->CLat[0], this->CurrentExtraCell * this->MaximumNVertLevels, 1);
     }
     else
     {
-      clon->SetArray(this->CLon, this->NumberLocalCells, 0, vtkIntArray::VTK_DATA_ARRAY_FREE);
-      clat->SetArray(this->CLat, this->NumberLocalCells, 0, vtkIntArray::VTK_DATA_ARRAY_FREE);
+      this->ClonArray->SetArray(&this->CLon[0], this->CurrentExtraCell,
+        1); // 1 at the end = No freeing these. They are our vectors.
+      this->ClatArray->SetArray(&this->CLat[0], this->CurrentExtraCell,
+        1); // 1 at the end = No freeing these. They are our vectors.
     }
-    clon->SetName("Center Longitude (CLON)");
-    clat->SetName("Center Latitude (CLAT)");
-    output->GetCellData()->AddArray(clon);
-    output->GetCellData()->AddArray(clat);
+    output->GetCellData()->AddArray(this->ClonArray);
+    output->GetCellData()->AddArray(this->ClatArray);
   }
 
-  if (this->GotMask)
-  {
-    vtkNew<vtkIntArray> mask;
-    mask->SetArray(this->CellMask, this->NumberLocalCells, 0, vtkIntArray::VTK_DATA_ARRAY_FREE);
-    mask->SetName("Land/Sea Mask (wet_c)");
-    output->GetCellData()->AddArray(mask);
-  }
-
-  if (this->ReconstructNew)
-  {
-    delete[] this->ModConnections;
-    this->ModConnections = nullptr;
-    this->ModConnections_size = 0;
-
-    delete[] this->OrigConnections;
-    this->OrigConnections = nullptr;
-  }
-
-  vtkDebugMacro("Leaving OutputCells..." << endl);
+  vtkDebugMacro("Leaving OutputCells...");
 }
+
+//------------------------------------------------------------------------------
+void vtkCDIReader::InsertPolyhedron(std::vector<vtkIdType> polygon)
+{
+
+  std::vector<vtkIdType>::iterator it;
+  it = std::unique(polygon.begin(), polygon.end());
+  polygon.resize(std::distance(polygon.begin(), it));
+  const int pointsPerPolygon = polygon.size();
+
+  const int pointsPerCell = pointsPerPolygon / 2;
+  const int numFaces = pointsPerCell + 2;
+  std::vector<vtkIdType> facestream(7 * pointsPerCell + 2);
+  // number of points of the face, then the points of the face
+  // 1 + pointsPerCell values for lid / bottom
+  // 1 + 4 values for each of the pointsPerCell side faces
+  // bottom
+  size_t next = 0;
+  facestream[next++] = pointsPerCell;
+  for (int k = 0; k < pointsPerCell; k++)
+  {
+    facestream[next++] = polygon[pointsPerCell - 1 - k];
+  }
+  // lid
+  facestream[next++] = pointsPerCell;
+  for (int k = pointsPerCell; k < pointsPerCell * 2; k++)
+  {
+    facestream[next++] = polygon[k];
+  }
+  for (int k = 0; k < pointsPerCell - 1; k++)
+  {
+    facestream[next++] = 4;
+    facestream[next++] = polygon[k];
+    facestream[next++] = polygon[k + 1];
+    facestream[next++] = polygon[k + 1 + pointsPerCell];
+    facestream[next++] = polygon[k + pointsPerCell];
+  }
+  facestream[next++] = 4;
+  facestream[next++] = polygon[pointsPerCell - 1];
+  facestream[next++] = polygon[0];
+  facestream[next++] = polygon[pointsPerCell];
+  facestream[next++] = polygon[pointsPerCell * 2 - 1];
+  this->Output->InsertNextCell(
+    VTK_POLYHEDRON, pointsPerPolygon, polygon.data(), numFaces, facestream.data());
+};
 
 //----------------------------------------------------------------------------
 //  Load the data for a Point variable specified.
 //----------------------------------------------------------------------------
 int vtkCDIReader::LoadPointVarData(int variableIndex, double dTimeStep)
 {
+  if (!(this->PointsPerCell == 3))
+    return 0;
+
   this->PointDataSelected = variableIndex;
 
-  vtkDataArray* dataArray = this->PointVarDataArray[variableIndex];
+  vtkSmartPointer<vtkDataArray> dataArray =
+    this->PointVarDataArray->GetArray(this->Internals->PointVars[variableIndex].Name);
 
   // Allocate data array for this variable
   if (dataArray == nullptr)
   {
-    dataArray = this->DoublePrecision ? static_cast<vtkDataArray*>(vtkDoubleArray::New())
-                                      : static_cast<vtkDataArray*>(vtkFloatArray::New());
+    if (this->DoublePrecision)
+    {
+      dataArray = vtkSmartPointer<vtkDoubleArray>::New();
+    }
+    else
+    {
+      dataArray = vtkSmartPointer<vtkFloatArray>::New();
+    }
 
-    vtkDebugMacro(
-      "Allocated Point var index: " << this->Internals->PointVars[variableIndex].Name << endl);
+    vtkDebugMacro("Allocated Point var index: " << this->Internals->PointVars[variableIndex].Name);
     dataArray->SetName(this->Internals->PointVars[variableIndex].Name);
     dataArray->SetNumberOfTuples(this->MaximumPoints);
     dataArray->SetNumberOfComponents(1);
 
-    this->PointVarDataArray[variableIndex] = dataArray;
+    this->PointVarDataArray->AddArray(dataArray);
   }
 
   int success = false;
@@ -2519,20 +2621,26 @@ int vtkCDIReader::LoadCellVarData(int variableIndex, double dTimeStep)
 {
   this->CellDataSelected = variableIndex;
 
-  vtkDataArray* dataArray = this->CellVarDataArray[variableIndex];
+  vtkSmartPointer<vtkDataArray> dataArray =
+    this->CellVarDataArray->GetArray(this->Internals->CellVars[variableIndex].Name);
   // Allocate data array for this variable
   if (dataArray == nullptr)
   {
-    dataArray = this->DoublePrecision ? static_cast<vtkDataArray*>(vtkDoubleArray::New())
-                                      : static_cast<vtkDataArray*>(vtkFloatArray::New());
+    if (this->DoublePrecision)
+    {
+      dataArray = vtkSmartPointer<vtkDoubleArray>::New();
+    }
+    else
+    {
+      dataArray = vtkSmartPointer<vtkFloatArray>::New();
+    }
 
-    vtkDebugMacro(
-      "Allocated cell var index: " << this->Internals->CellVars[variableIndex].Name << endl);
+    vtkDebugMacro("Allocated cell var index: " << this->Internals->CellVars[variableIndex].Name);
     dataArray->SetName(this->Internals->CellVars[variableIndex].Name);
     dataArray->SetNumberOfTuples(this->MaximumCells);
     dataArray->SetNumberOfComponents(1);
 
-    this->CellVarDataArray[variableIndex] = dataArray;
+    this->CellVarDataArray->AddArray(dataArray);
   }
 
   int success = false;
@@ -2559,30 +2667,36 @@ template <typename ValueType>
 int vtkCDIReader::LoadCellVarDataTemplate(
   int variableIndex, double dTimeStep, vtkDataArray* dataArray)
 {
-  vtkDebugMacro("In vtkCDIReader::LoadCellVarData" << endl);
+  vtkDebugMacro("In vtkCDIReader::LoadCellVarData");
   ValueType* dataBlock = static_cast<ValueType*>(dataArray->GetVoidPointer(0));
-  CDIVar* cdiVar = &(this->Internals->CellVars[variableIndex]);
+  cdi_tools::CDIVar* cdiVar = &(this->Internals->CellVars[variableIndex]);
   int varType = cdiVar->Type;
 
-  int global_timestep = dTimeStep / this->TStepDistance;
-  int local_timestep = global_timestep - (this->NumberOfTimeSteps * this->FileSeriesNumber);
-  int Timestep = min(local_timestep, this->NumberOfTimeSteps - 1);
-  vtkDebugMacro("Time: " << Timestep << endl);
-  vtkDebugMacro("Dimensions: " << varType << endl);
+  int timestep = this->GetTimeIndex(dTimeStep);
+  vtkDebugMacro("Time: " << timestep);
+  vtkDebugMacro("Dimensions: " << varType);
 
   if (varType == 3) // 3D arrays
   {
     if (!this->ShowMultilayerView)
     {
-      cdi_set_cur(cdiVar, Timestep, this->VerticalLevelSelected);
-      cdi_get_part<ValueType>(cdiVar, this->BeginCell, this->NumberLocalCells, dataBlock, 1);
+      cdi_set_cur(cdiVar, timestep, this->VerticalLevelSelected);
+      cdi_tools::cdi_get_part<ValueType>(
+        cdiVar, this->BeginCell, this->NumberLocalCells, dataBlock, 1, this->Grib);
+
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        int k = this->CellMap[j - this->NumberLocalCells];
+        dataBlock[j] = dataBlock[k];
+      }
     }
     else
     {
       ValueType* dataTmp = new ValueType[this->MaximumCells];
-      cdi_set_cur(cdiVar, Timestep, 0);
-      cdi_get_part<ValueType>(
-        cdiVar, this->BeginCell, this->NumberLocalCells, dataTmp, this->MaximumNVertLevels);
+      cdi_set_cur(cdiVar, timestep, 0);
+      cdi_tools::cdi_get_part<ValueType>(cdiVar, this->BeginCell, this->NumberLocalCells, dataTmp,
+        this->MaximumNVertLevels, this->Grib);
 
       // readjust the data
       for (int j = 0; j < this->NumberLocalCells; j++)
@@ -2594,23 +2708,42 @@ int vtkCDIReader::LoadCellVarDataTemplate(
         }
       }
 
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
+        {
+          int l = j * this->MaximumNVertLevels;
+          int k = this->CellMap[j - this->NumberLocalCells];
+          dataBlock[l + levelNum] = dataTmp[k + (levelNum * this->NumberLocalCells)];
+        }
+      }
+
       delete[] dataTmp;
     }
-    vtkDebugMacro(
-      "Got data for cell var: " << this->Internals->CellVars[variableIndex].Name << endl);
+    vtkDebugMacro("Got data for cell var: " << this->Internals->CellVars[variableIndex].Name);
   }
   else // 2D arrays
   {
     if (!this->ShowMultilayerView)
     {
-      cdi_set_cur(cdiVar, Timestep, 0);
-      cdi_get_part<ValueType>(cdiVar, this->BeginCell, this->NumberLocalCells, dataBlock, 1);
+      cdi_set_cur(cdiVar, timestep, 0);
+      cdi_tools::cdi_get_part<ValueType>(
+        cdiVar, this->BeginCell, this->NumberLocalCells, dataBlock, 1, this->Grib);
+
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        int k = this->CellMap[j - this->NumberLocalCells];
+        dataBlock[j] = dataBlock[k];
+      }
     }
     else
     {
       ValueType* dataTmp = new ValueType[this->NumberLocalCells];
-      cdi_set_cur(cdiVar, Timestep, 0);
-      cdi_get_part<ValueType>(cdiVar, this->BeginCell, this->NumberLocalCells, dataTmp, 1);
+      cdi_set_cur(cdiVar, timestep, 0);
+      cdi_tools::cdi_get_part<ValueType>(
+        cdiVar, this->BeginCell, this->NumberLocalCells, dataTmp, 1, this->Grib);
 
       for (int j = 0; j < +this->NumberLocalCells; j++)
       {
@@ -2621,14 +2754,54 @@ int vtkCDIReader::LoadCellVarDataTemplate(
         }
       }
 
+      // put out data for extra cells
+      for (int j = this->NumberLocalCells; j < this->CurrentExtraCell; j++)
+      {
+        for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
+        {
+          int l = j * this->MaximumNVertLevels;
+          int k = this->CellMap[j - this->NumberLocalCells];
+          dataBlock[l + levelNum] = dataTmp[k];
+        }
+      }
+
       delete[] dataTmp;
     }
 
-    vtkDebugMacro(
-      "Got data for cell var: " << this->Internals->CellVars[variableIndex].Name << endl);
+    vtkDebugMacro("Got data for cell var: " << this->Internals->CellVars[variableIndex].Name);
   }
-  vtkDebugMacro(
-    "Stored data for cell var: " << this->Internals->CellVars[variableIndex].Name << endl);
+
+  vtkDebugMacro("Stored data for cell var: " << this->Internals->CellVars[variableIndex].Name);
+
+  this->ReplaceFillWithNan(cdiVar->VarID, dataArray);
+  return 1;
+}
+
+//------------------------------------------------------------------------------
+int vtkCDIReader::ReplaceFillWithNan(const int varID, vtkDataArray* dataArray)
+{
+  double miss = vlistInqVarMissval(this->VListID, varID);
+
+  // NaN only available with float and double.
+  if (dataArray->GetDataType() == VTK_FLOAT)
+  {
+
+    float fillValue = miss;
+    std::replace(reinterpret_cast<float*>(dataArray->GetVoidPointer(0)),
+      reinterpret_cast<float*>(dataArray->GetVoidPointer(dataArray->GetNumberOfTuples())),
+      fillValue, static_cast<float>(vtkMath::Nan()));
+  }
+  else if (dataArray->GetDataType() == VTK_DOUBLE)
+  {
+    double fillValue = miss;
+    std::replace(reinterpret_cast<double*>(dataArray->GetVoidPointer(0)),
+      reinterpret_cast<double*>(dataArray->GetVoidPointer(dataArray->GetNumberOfTuples())),
+      fillValue, vtkMath::Nan());
+  }
+  else
+  {
+    vtkWarningMacro(<< "No NaN available for data of type " << dataArray->GetDataType());
+  }
 
   return 1;
 }
@@ -2640,11 +2813,11 @@ template <typename ValueType>
 int vtkCDIReader::LoadPointVarDataTemplate(
   int variableIndex, double dTimeStep, vtkDataArray* dataArray)
 {
-  vtkDebugMacro("In vtkICONReader::LoadPointVarData" << endl);
-  CDIVar* cdiVar = &this->Internals->PointVars[variableIndex];
+  vtkDebugMacro("In vtkICONReader::LoadPointVarData");
+  cdi_tools::CDIVar* cdiVar = &this->Internals->PointVars[variableIndex];
   int varType = cdiVar->Type;
 
-  vtkDebugMacro("getting pointer in vtkICONReader::LoadPointVarData" << endl);
+  vtkDebugMacro("getting pointer in vtkICONReader::LoadPointVarData");
   ValueType* dataBlock = static_cast<ValueType*>(dataArray->GetVoidPointer(0));
   ValueType* dataTmp;
   if (this->ShowMultilayerView)
@@ -2656,30 +2829,47 @@ int vtkCDIReader::LoadPointVarDataTemplate(
     dataTmp = new ValueType[this->NumberLocalPoints];
   }
 
-  int global_timestep = dTimeStep / this->TStepDistance;
-  int local_timestep = global_timestep - (this->NumberOfTimeSteps * this->FileSeriesNumber);
-  int Timestep = min(local_timestep, this->NumberOfTimeSteps - 1);
-  vtkDebugMacro("Time: " << Timestep << endl);
-  vtkDebugMacro("dTimeStep requested: " << dTimeStep << endl);
+  int timestep = this->GetTimeIndex(dTimeStep);
+  vtkDebugMacro("Time: " << timestep);
+  vtkDebugMacro("dTimeStep requested: " << dTimeStep);
 
   if (this->Piece < 1)
   {
     // 3D arrays ...
-    vtkDebugMacro("Dimensions: " << varType << endl);
+    vtkDebugMacro("Dimensions: " << varType);
     if (varType == 3)
     {
       if (!this->ShowMultilayerView)
       {
-        cdi_set_cur(cdiVar, Timestep, this->VerticalLevelSelected);
-        cdi_get_part<ValueType>(cdiVar, this->BeginPoint, this->NumberLocalPoints, dataBlock, 1);
+        cdi_set_cur(cdiVar, timestep, this->VerticalLevelSelected);
+        cdi_tools::cdi_get_part<ValueType>(
+          cdiVar, this->BeginPoint, this->NumberLocalPoints, dataBlock, 1, this->Grib);
         dataBlock[0] = dataBlock[1];
+
+        // put out data for extra points
+        for (int j = this->NumberLocalPoints; j < this->CurrentExtraPoint; j++)
+        {
+          int k = this->PointMap[j - this->NumberLocalPoints];
+          dataBlock[j] = dataBlock[k];
+        }
       }
       else
       {
-        cdi_set_cur(cdiVar, Timestep, 0);
-        cdi_get_part<ValueType>(
-          cdiVar, this->BeginPoint, this->NumberLocalPoints, dataTmp, this->MaximumNVertLevels);
+        cdi_set_cur(cdiVar, timestep, 0);
+        cdi_tools::cdi_get_part<ValueType>(cdiVar, this->BeginPoint, this->NumberLocalPoints,
+          dataTmp, this->MaximumNVertLevels, this->Grib);
         dataTmp[0] = dataTmp[1];
+
+        // put out data for extra points
+        for (int j = this->NumberLocalPoints; j < this->CurrentExtraPoint; j++)
+        {
+          for (int levelNum = 0; levelNum < this->MaximumNVertLevels; levelNum++)
+          {
+            int l = j * this->MaximumNVertLevels;
+            int k = this->PointMap[j - this->NumberLocalPoints];
+            dataBlock[l + levelNum] = dataTmp[k + (levelNum * this->NumberLocalPoints)];
+          }
+        }
       }
     }
     // 2D arrays ...
@@ -2687,18 +2877,20 @@ int vtkCDIReader::LoadPointVarDataTemplate(
     {
       if (!this->ShowMultilayerView)
       {
-        cdi_set_cur(cdiVar, Timestep, 0);
-        cdi_get_part<ValueType>(cdiVar, this->BeginPoint, this->NumberLocalPoints, dataBlock, 1);
+        cdi_set_cur(cdiVar, timestep, 0);
+        cdi_tools::cdi_get_part<ValueType>(
+          cdiVar, this->BeginPoint, this->NumberLocalPoints, dataBlock, 1, this->Grib);
         dataBlock[0] = dataBlock[1];
       }
       else
       {
-        cdi_set_cur(cdiVar, Timestep, 0);
-        cdi_get_part<ValueType>(cdiVar, this->BeginPoint, this->NumberLocalPoints, dataTmp, 1);
+        cdi_set_cur(cdiVar, timestep, 0);
+        cdi_tools::cdi_get_part<ValueType>(
+          cdiVar, this->BeginPoint, this->NumberLocalPoints, dataTmp, 1, this->Grib);
         dataTmp[0] = dataTmp[1];
       }
     }
-    vtkDebugMacro("got Point data in vtkICONReader::LoadPointVarDataSP" << endl);
+    vtkDebugMacro("got Point data in vtkICONReader::LoadPointVarDataSP");
 
     if (this->ShowMultilayerView)
     {
@@ -2711,7 +2903,7 @@ int vtkCDIReader::LoadPointVarDataTemplate(
       // write highest level dummy Point (duplicate of last level)
       dataBlock[this->MaximumNVertLevels] =
         dataTmp[this->MaximumNVertLevels + this->MaximumNVertLevels - 1];
-      vtkDebugMacro("Wrote dummy vtkICONReader::LoadPointVarDataSP" << endl);
+      vtkDebugMacro("Wrote dummy vtkICONReader::LoadPointVarDataSP");
 
       // readjust the data
       for (int j = 0; j < this->NumberLocalPoints; j++)
@@ -2735,13 +2927,13 @@ int vtkCDIReader::LoadPointVarDataTemplate(
     ValueType* dataTmp2 = new ValueType[length];
 
     // 3D arrays ...
-    vtkDebugMacro("Dimensions: " << varType << endl);
+    vtkDebugMacro("Dimensions: " << varType);
     if (varType == 3)
     {
       if (!this->ShowMultilayerView)
       {
-        cdi_set_cur(cdiVar, Timestep, this->VerticalLevelSelected);
-        cdi_get_part<ValueType>(cdiVar, start, length, dataTmp2, 1);
+        cdi_set_cur(cdiVar, timestep, this->VerticalLevelSelected);
+        cdi_tools::cdi_get_part<ValueType>(cdiVar, start, length, dataTmp2, 1, this->Grib);
         dataTmp2[0] = dataTmp2[1];
 
         // readjust the data
@@ -2762,8 +2954,9 @@ int vtkCDIReader::LoadPointVarDataTemplate(
       }
       else
       {
-        cdi_set_cur(cdiVar, Timestep, 0);
-        cdi_get_part<ValueType>(cdiVar, start, length, dataTmp, this->MaximumNVertLevels);
+        cdi_set_cur(cdiVar, timestep, 0);
+        cdi_tools::cdi_get_part<ValueType>(
+          cdiVar, start, length, dataTmp, this->MaximumNVertLevels, this->Grib);
         dataTmp[0] = dataTmp[1];
       }
     }
@@ -2772,8 +2965,8 @@ int vtkCDIReader::LoadPointVarDataTemplate(
     {
       if (!this->ShowMultilayerView)
       {
-        cdi_set_cur(cdiVar, Timestep, 0);
-        cdi_get_part<ValueType>(cdiVar, start, length, dataTmp2, 1);
+        cdi_set_cur(cdiVar, timestep, 0);
+        cdi_tools::cdi_get_part<ValueType>(cdiVar, start, length, dataTmp2, 1, this->Grib);
         dataTmp2[0] = dataTmp2[1];
 
         // readjust the data
@@ -2794,17 +2987,17 @@ int vtkCDIReader::LoadPointVarDataTemplate(
       }
       else
       {
-        cdi_set_cur(cdiVar, Timestep, 0);
-        cdi_get_part<ValueType>(cdiVar, start, length, dataTmp, 1);
+        cdi_set_cur(cdiVar, timestep, 0);
+        cdi_tools::cdi_get_part<ValueType>(cdiVar, start, length, dataTmp, 1, this->Grib);
         dataTmp[0] = dataTmp[1];
       }
     }
     delete[] dataTmp2;
-    vtkDebugMacro("got Point data in vtkICONReader::LoadPointVarDataSP" << endl);
+    vtkDebugMacro("got Point data in vtkICONReader::LoadPointVarDataSP");
   }
 
   vtkDebugMacro("this->NumberOfPoints: " << this->NumberOfPoints << " this->NumberLocalPoints: "
-                                         << this->NumberLocalPoints << endl);
+                                         << this->NumberLocalPoints);
   delete[] dataTmp;
 
   return 1;
@@ -2817,58 +3010,59 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
 {
   // This is not very well implemented, also due to the organization of
   // the data available. Needs to be improved together with the modellers.
-  vtkDebugMacro("In vtkCDIReader::LoadDomainVarData" << endl);
-  string variable = this->Internals->DomainVars[variableIndex];
+  vtkDebugMacro("In vtkCDIReader::LoadDomainVarData");
+  std::string variable = this->Internals->DomainVars[variableIndex];
   this->DomainDataSelected = variableIndex;
 
   // Allocate data array for this variable
-  if (this->DomainVarDataArray[variableIndex] == nullptr)
+  if (!this->DomainVarDataArray->HasArray(variable.c_str()))
   {
-    this->DomainVarDataArray[variableIndex] = vtkDoubleArray::New();
-    vtkDebugMacro("Allocated domain var index: " << variable.c_str() << endl);
-    this->DomainVarDataArray[variableIndex]->SetName(variable.c_str());
-    this->DomainVarDataArray[variableIndex]->SetNumberOfTuples(this->NumberOfDomains);
+    vtkNew<vtkDoubleArray> dataArray;
+    vtkDebugMacro("Allocated domain var index: " << variable.c_str());
+    dataArray->SetName(variable.c_str());
+    dataArray->SetNumberOfTuples(this->NumberOfDomains);
     // 6 components
-    this->DomainVarDataArray[variableIndex]->SetNumberOfComponents(1);
+    dataArray->SetNumberOfComponents(1);
+    this->DomainVarDataArray->AddArray(dataArray);
   }
 
   for (int i = 0; i < this->NumberOfDomains; i++)
   {
-    string filename;
+    std::string filename;
     if (i < 10)
     {
-      filename = this->PerformanceDataFile + "000" + ::ConvertInt(i);
+      filename = this->PerformanceDataFile + "000" + std::to_string(i);
     }
     else if (i < 100)
     {
-      filename = this->PerformanceDataFile + "00" + ::ConvertInt(i);
+      filename = this->PerformanceDataFile + "00" + std::to_string(i);
     }
     else if (i < 1000)
     {
-      filename = this->PerformanceDataFile + "0" + ::ConvertInt(i);
+      filename = this->PerformanceDataFile + "0" + std::to_string(i);
     }
     else
     {
-      filename = this->PerformanceDataFile + ::ConvertInt(i);
+      filename = this->PerformanceDataFile + std::to_string(i);
     }
 
-    vector<string> wordVec;
-    vector<string>::iterator k;
+    std::vector<std::string> wordVec;
     vtksys::ifstream file(filename.c_str());
-    string str, word;
+    std::string str, word;
     double temp[1];
 
-    for (int j = 0; j < DomainMask[variableIndex]; j++)
-    {
-      getline(file, str);
-    }
-
     getline(file, str);
-    stringstream ss(str);
+    std::stringstream ss(str);
     while (ss.good())
     {
       ss >> word;
-      ::Strip(word);
+
+      word.erase(word.begin(),
+        std::find_if(word.begin(), word.end(), [](int c) { return !std::ispunct(c); }));
+      word.erase(
+        std::find_if(word.rbegin(), word.rend(), [](int c) { return !std::ispunct(c); }).base(),
+        word.end());
+
       wordVec.push_back(word);
     }
     //  0    1      	2     		3      	4       	5      	6 7		  8
@@ -2887,43 +3081,66 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
     }
 
     // for now, we just use t_average
-    this->DomainVarDataArray[variableIndex]->InsertTuple(i, temp);
+    this->DomainVarDataArray->GetArray(variableIndex)->InsertTuple(i, temp);
   }
 
-  vtkDebugMacro("Out vtkCDIReader::LoadDomainVarData" << endl);
+  vtkDebugMacro("Out vtkCDIReader::LoadDomainVarData");
   return 1;
 }
 
 //----------------------------------------------------------------------------
 //  Specify the netCDF dimension names
 //-----------------------------------------------------------------------------
-int vtkCDIReader::FillVariableDimensions()
+int vtkCDIReader::FillGridDimensions()
 {
-  int nzaxis = vlistNzaxis(VListID);
+  int ngrids = vlistNgrids(this->VListID);
+  int nzaxis = vlistNzaxis(this->VListID);
+  int nvars = vlistNvars(this->VListID);
   this->AllDimensions->SetNumberOfValues(0);
-  this->VariableDimensions->SetNumberOfValues(nzaxis);
+  this->VariableDimensions->SetNumberOfValues(ngrids * nzaxis);
   char nameGridX[CDI_MAX_NAME];
   char nameGridY[CDI_MAX_NAME];
   char nameLev[CDI_MAX_NAME];
 
-  for (int i = 0; i < nzaxis; ++i)
-  {
-    string dimEncoding("(");
-    int gridID_l = vlistGrid(VListID, 0);
-    gridInqXname(gridID_l, nameGridX);
-    gridInqYname(gridID_l, nameGridY);
-    dimEncoding += nameGridX;
-    dimEncoding += ", ";
-    dimEncoding += nameGridY;
-    dimEncoding += ", ";
-    int zaxisID_l = vlistZaxis(VListID, i);
-    zaxisInqName(zaxisID_l, nameLev);
-    dimEncoding += nameLev;
-    dimEncoding += ")";
+  std::set<std::string> hits;
 
-    this->AllDimensions->InsertNextValue(dimEncoding);
-    this->VariableDimensions->SetValue(i, dimEncoding.c_str());
+  for (int k = 0; k < nvars; k++)
+  {
+    int i = vlistInqVarGrid(this->VListID, k);
+    int j = vlistInqVarZaxis(this->VListID, k);
+    hits.insert(std::to_string(i) + "x" + std::to_string(j));
+    // IDs are not 0 to n-1 but can be 30-ish for a file with 3 grids.
+    // they map to the gridID_l and zaxisID_l values below.
+    // Thus we need to a map to catch rather unpredictable values.
   }
+
+  for (int i = 0; i < ngrids; ++i)
+  {
+    for (int j = 0; j < nzaxis; ++j)
+    {
+      std::string dimEncoding("(");
+      int gridID_l = vlistGrid(this->VListID, i);
+      gridInqXname(gridID_l, nameGridX);
+      gridInqYname(gridID_l, nameGridY);
+      dimEncoding += nameGridX;
+      dimEncoding += ", ";
+      dimEncoding += nameGridY;
+      dimEncoding += ", ";
+      int zaxisID_l = vlistZaxis(this->VListID, j);
+      zaxisInqName(zaxisID_l, nameLev);
+      dimEncoding += nameLev;
+      dimEncoding += ")";
+
+      if (hits.count(std::to_string(gridID_l) + "x" + std::to_string(zaxisID_l)) == 0)
+      {
+        continue; // skip empty grid combinations
+      }
+
+      this->AllDimensions->InsertNextValue(dimEncoding);
+      this->VariableDimensions->SetValue(i * nzaxis + j, dimEncoding.c_str());
+    }
+  }
+
   return 1;
 }
 
@@ -2940,21 +3157,22 @@ void vtkCDIReader::SetDimensions(const char* dimensions)
     }
   }
 
-  if (this->PointDataArraySelection)
-  {
-    this->PointDataArraySelection->RemoveAllArrays();
-  }
-  if (this->CellDataArraySelection)
-  {
-    this->CellDataArraySelection->RemoveAllArrays();
-  }
+  this->PointDataArraySelection->RemoveAllArrays();
+  this->CellDataArraySelection->RemoveAllArrays();
+  this->PointDataArraySelection->Modified();
+  this->CellDataArraySelection->Modified();
+
   if (this->DomainDataArraySelection)
   {
     this->DomainDataArraySelection->RemoveAllArrays();
+    this->DomainDataArraySelection->Modified();
   }
 
+  this->ReconstructNew = true;
   this->DestroyData();
   this->RegenerateVariables();
+  if (this->GridReconstructed)
+    this->RegenerateGeometry();
 }
 
 //----------------------------------------------------------------------------
@@ -3018,6 +3236,65 @@ void vtkCDIReader::SetDomainArrayStatus(const char* name, int status)
 }
 
 //----------------------------------------------------------------------------
+// Set status of named domain variable selection.
+//----------------------------------------------------------------------------
+void vtkCDIReader::SetMaskingVariable(const char* name)
+{
+  vtkDebugMacro("Setting MaskingVariable to " << name);
+
+  this->MaskingVarname = name;
+
+  this->Modified();
+
+  if (!this->InfoRequested || !this->DataRequested)
+  {
+    return;
+  }
+  this->DestroyData();
+  this->RegenerateGeometry();
+}
+
+//----------------------------------------------------------------------------
+// Toggle the Use of the custom mask value.
+//----------------------------------------------------------------------------
+void vtkCDIReader::SetUseCustomMaskValue(bool val)
+{
+  if (val == this->UseCustomMaskValue)
+    return;
+
+  this->UseCustomMaskValue = val;
+
+  this->Modified();
+
+  if (!this->InfoRequested || !this->DataRequested || !this->UseCustomMaskValue)
+  {
+    return;
+  }
+  this->DestroyData();
+  this->RegenerateGeometry();
+}
+
+//----------------------------------------------------------------------------
+// Set custom mask value.
+//----------------------------------------------------------------------------
+void vtkCDIReader::SetCustomMaskValue(double val)
+{
+  if (val == this->CustomMaskValue)
+    return;
+
+  this->CustomMaskValue = val;
+
+  this->Modified();
+
+  if (!this->InfoRequested || !this->DataRequested || !this->UseCustomMaskValue)
+  {
+    return;
+  }
+  this->DestroyData();
+  this->RegenerateGeometry();
+}
+
+//----------------------------------------------------------------------------
 // Get name of indexed Point variable
 //----------------------------------------------------------------------------
 const char* vtkCDIReader::GetPointArrayName(int index)
@@ -3060,7 +3337,7 @@ void vtkCDIReader::SetFileName(const char* val)
       return;
     }
     this->FileName = val;
-    vtkDebugMacro("SetFileName to " << this->FileName << endl);
+    vtkDebugMacro("SetFileName to " << this->FileName);
 
     this->DestroyData();
     this->RegenerateVariables();
@@ -3074,6 +3351,13 @@ void vtkCDIReader::SetVerticalLevel(int level)
 {
   if (this->VerticalLevelSelected != level)
   {
+    if (level < 0 || level > this->MaximumNVertLevels - 1)
+    {
+      vtkErrorMacro("Requested inexistent vertical level: "
+        << level << ".\nThe level must be the in range [ 0 ; " << this->MaximumNVertLevels - 1
+        << " ].");
+      return;
+    }
     this->VerticalLevelSelected = level;
     this->Modified();
     vtkDebugMacro("Set VerticalLevelSelected to: " << level);
@@ -3089,7 +3373,7 @@ void vtkCDIReader::SetVerticalLevel(int level)
   {
     if (this->PointDataArraySelection->GetArraySetting(var))
     {
-      vtkDebugMacro("Loading Point Variable: " << this->Internals->PointVars[var].Name << endl);
+      vtkDebugMacro("Loading Point Variable: " << this->Internals->PointVars[var].Name);
       this->LoadPointVarData(var, this->DTime);
     }
   }
@@ -3098,7 +3382,7 @@ void vtkCDIReader::SetVerticalLevel(int level)
   {
     if (this->CellDataArraySelection->GetArraySetting(var))
     {
-      vtkDebugMacro("Loading Cell Variable: " << this->Internals->CellVars[var].Name << endl);
+      vtkDebugMacro("Loading Cell Variable: " << this->Internals->CellVars[var].Name);
       this->LoadCellVarData(var, this->DTime);
     }
   }
@@ -3116,7 +3400,30 @@ void vtkCDIReader::SetLayerThickness(int val)
   {
     this->LayerThickness = val;
     this->Modified();
-    vtkDebugMacro("SetLayerThickness: LayerThickness set to " << this->LayerThickness << endl);
+    vtkDebugMacro("SetLayerThickness: LayerThickness set to " << this->LayerThickness);
+
+    if (this->ShowMultilayerView)
+    {
+      if (!this->InfoRequested || !this->DataRequested)
+      {
+        return;
+      }
+      this->DestroyData();
+      this->RegenerateGeometry();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+//  Set layer 0 offset for multilayer view.
+//----------------------------------------------------------------------------
+void vtkCDIReader::SetLayer0Offset(double val)
+{
+  if (this->Layer0Offset != val)
+  {
+    this->Layer0Offset = val;
+    this->Modified();
+    vtkDebugMacro("SetLayer0Offset: Layer0Offset set to " << this->Layer0Offset);
 
     if (this->ShowMultilayerView)
     {
@@ -3137,9 +3444,15 @@ void vtkCDIReader::SetProjection(int val)
 {
   if (this->ProjectionMode != val)
   {
-    this->ProjectionMode = val;
+    if (!projection::isproj(val))
+    {
+      vtkErrorMacro(
+        "SetProjection: Can't set ProjectionMode to '" << val << "'. Not a valid projection.");
+      return;
+    }
+    this->ProjectionMode = projection::Projection(val);
     this->Modified();
-    vtkDebugMacro("SetProjection: ProjectionMode to " << this->ProjectionMode << endl);
+    vtkDebugMacro("SetProjection: ProjectionMode to " << this->ProjectionMode);
     this->ReconstructNew = true;
 
     if (!this->InfoRequested || !this->DataRequested)
@@ -3161,7 +3474,29 @@ void vtkCDIReader::SetDoublePrecision(bool val)
   {
     this->DoublePrecision = val;
     this->Modified();
-    vtkDebugMacro("DoublePrecision to " << this->DoublePrecision << endl);
+    vtkDebugMacro("DoublePrecision to " << this->DoublePrecision);
+    this->ReconstructNew = true;
+
+    if (!this->InfoRequested || !this->DataRequested)
+    {
+      return;
+    }
+
+    this->DestroyData();
+    this->RegenerateGeometry();
+  }
+}
+
+//----------------------------------------------------------------------------
+// Set wrapping.
+//----------------------------------------------------------------------------
+void vtkCDIReader::SetWrapping(bool val)
+{
+  if (this->WrapOn != val)
+  {
+    this->WrapOn = val;
+    this->Modified();
+    vtkDebugMacro("Wrapping set to " << this->WrapOn);
     this->ReconstructNew = true;
 
     if (!this->InfoRequested || !this->DataRequested)
@@ -3183,7 +3518,7 @@ void vtkCDIReader::SetInvertZAxis(bool val)
   {
     this->InvertZAxis = val;
     this->Modified();
-    vtkDebugMacro("InvertZAxis to " << this->InvertZAxis << endl);
+    vtkDebugMacro("InvertZAxis to " << this->InvertZAxis);
 
     if (!this->InfoRequested || !this->DataRequested)
     {
@@ -3198,13 +3533,34 @@ void vtkCDIReader::SetInvertZAxis(bool val)
 //----------------------------------------------------------------------------
 // Set visualization with topography/bathymetrie.
 //----------------------------------------------------------------------------
-void vtkCDIReader::SetTopography(bool val)
+void vtkCDIReader::SetUseMask(bool val)
 {
-  if (this->IncludeTopography != val)
+  if (this->UseMask != val)
   {
-    this->IncludeTopography = val;
+    this->UseMask = val;
     this->Modified();
-    vtkDebugMacro("SetTopography to " << this->IncludeTopography << endl);
+    vtkDebugMacro("Set UseMask to " << this->UseMask);
+
+    if (!this->InfoRequested || !this->DataRequested)
+    {
+      return;
+    }
+
+    this->DestroyData();
+    this->RegenerateGeometry();
+  }
+}
+
+//----------------------------------------------------------------------------
+// Add Clon and Clat to output
+//----------------------------------------------------------------------------
+void vtkCDIReader::SetShowClonClat(bool val)
+{
+  if (this->ShowClonClat != val)
+  {
+    this->ShowClonClat = val;
+    this->Modified();
+    vtkDebugMacro("Set ShowClonClat to " << this->ShowClonClat);
 
     if (!this->InfoRequested || !this->DataRequested)
     {
@@ -3219,19 +3575,16 @@ void vtkCDIReader::SetTopography(bool val)
 //----------------------------------------------------------------------------
 // Set visualization with inverted topography/bathymetrie.
 //----------------------------------------------------------------------------
-void vtkCDIReader::InvertTopography(bool val)
+void vtkCDIReader::SetInvertMask(bool val)
 {
-  if (val)
+  if (val == this->InvertMask)
   {
-    this->MaskingValue = 1.0;
+    return;
   }
-  else
-  {
-    this->MaskingValue = 0.0;
-  }
+  this->InvertMask = val;
   this->Modified();
 
-  vtkDebugMacro("InvertTopography to " << this->MaskingValue << endl);
+  vtkDebugMacro("Set InvertMask to " << this->InvertMask);
 
   if (!this->InfoRequested || !this->DataRequested)
   {
@@ -3240,6 +3593,12 @@ void vtkCDIReader::InvertTopography(bool val)
 
   this->DestroyData();
   this->RegenerateGeometry();
+}
+
+//------------------------------------------------------------------------------
+void vtkCDIReader::SetSkipGrid(bool val)
+{
+  this->SkipGrid = val;
 }
 
 //----------------------------------------------------------------------------
@@ -3251,7 +3610,7 @@ void vtkCDIReader::SetShowMultilayerView(bool val)
   {
     this->ShowMultilayerView = val;
     this->Modified();
-    vtkDebugMacro("ShowMultilayerView to " << this->ShowMultilayerView << endl);
+    vtkDebugMacro("ShowMultilayerView to " << this->ShowMultilayerView);
 
     if (!this->InfoRequested || !this->DataRequested)
     {
@@ -3271,22 +3630,46 @@ void vtkCDIReader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: " << (this->FileName.c_str() ? this->FileName.c_str() : "nullptr")
      << "\n";
-  os << indent << "VariableDimensions: " << this->VariableDimensions << endl;
-  os << indent << "AllDimensions: " << this->AllDimensions << endl;
-  os << indent << "this->NumberOfPointVars: " << this->NumberOfPointVars << "\n";
-  os << indent << "this->NumberOfCellVars: " << this->NumberOfCellVars << "\n";
-  os << indent << "this->NumberOfDomainVars: " << this->NumberOfDomainVars << "\n";
-  os << indent << "this->MaximumPoints: " << this->MaximumPoints << "\n";
-  os << indent << "this->MaximumCells: " << this->MaximumCells << "\n";
+  os << indent << "VariableDimensions: ";
+  if (this->VariableDimensions)
+  {
+    this->VariableDimensions->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "(nullptr)"
+       << "\n";
+  }
+  os << indent << "AllDimensions: ";
+  if (this->AllDimensions)
+  {
+    this->AllDimensions->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "(nullptr)"
+       << "\n";
+  }
+  os << indent << "NumberOfPointVars: " << this->NumberOfPointVars << "\n";
+  os << indent << "NumberOfCellVars: " << this->NumberOfCellVars << "\n";
+  os << indent << "NumberOfDomainVars: " << this->NumberOfDomainVars << "\n";
+  os << indent << "MaximumPoints: " << this->MaximumPoints << "\n";
+  os << indent << "MaximumCells: " << this->MaximumCells << "\n";
   os << indent << "Projection: " << this->ProjectionMode << endl;
   os << indent << "DoublePrecision: " << (this->DoublePrecision ? "ON" : "OFF") << endl;
+  os << indent << "Wrapping: " << (this->WrapOn ? "ON" : "OFF") << endl;
+  os << indent << "ShowClonClat: " << (this->ShowClonClat ? "ON" : "OFF") << endl;
   os << indent << "ShowMultilayerView: " << (this->ShowMultilayerView ? "ON" : "OFF") << endl;
   os << indent << "InvertZ: " << (this->InvertZAxis ? "ON" : "OFF") << endl;
-  os << indent << "UseTopography: " << (this->IncludeTopography ? "ON" : "OFF") << endl;
-  os << indent << "SetInvertTopography: " << (this->InvertedTopography ? "ON" : "OFF") << endl;
+  os << indent << "UseMask: " << (this->UseMask ? "ON" : "OFF") << endl;
+  os << indent << "CustomMaskValue: " << this->CustomMaskValue << endl;
+  os << indent << "SkipGrid: " << (this->SkipGrid ? "ON" : "OFF") << endl;
+  os << indent << "InvertMask: " << (this->InvertMask ? "ON" : "OFF") << endl;
   os << indent << "VerticalLevel: " << this->VerticalLevelSelected << "\n";
   os << indent << "VerticalLevelRange: " << this->VerticalLevelRange[0] << ","
      << this->VerticalLevelRange[1] << endl;
   os << indent << "LayerThicknessRange: " << this->LayerThicknessRange[0] << ","
      << this->LayerThicknessRange[1] << endl;
+  os << indent << "Layer0OffsetRange: " << this->Layer0OffsetRange[0] << ","
+     << this->Layer0OffsetRange[1] << endl;
 }

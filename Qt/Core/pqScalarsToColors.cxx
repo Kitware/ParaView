@@ -112,13 +112,6 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
     {
       pqSMAdaptor::setElementProperty(prop, vtkSMTransferFunctionManager::NEVER);
     }
-    else
-    {
-      // Reset the AutomaticRescaleRangeMode to the current global setting.
-      vtkSMTransferFunctionProxy* tfProxy =
-        vtkSMTransferFunctionProxy::SafeDownCast(this->getProxy());
-      tfProxy->ResetRescaleModeToGlobalSetting();
-    }
   }
   this->getProxy()->UpdateVTKObjects();
 }

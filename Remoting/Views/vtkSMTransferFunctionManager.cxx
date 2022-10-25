@@ -96,10 +96,6 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
 
-  // Set the range reset mode based on the global setting
-  vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-  tfProxy->ResetRescaleModeToGlobalSetting();
-
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
   // Load array-specific preset, if specified.
@@ -127,6 +123,15 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
     {
       sof->UpdateVTKObjects();
       vtkSMPropertyHelper(proxy, "ScalarOpacityFunction").Set(sof);
+    }
+  }
+  if (proxy->GetProperty("TransferFunction2D"))
+  {
+    vtkSMProxy* tf2d = this->GetTransferFunction2D(arrayName, pxm);
+    if (tf2d)
+    {
+      tf2d->UpdateVTKObjects();
+      vtkSMPropertyHelper(proxy, "TransferFunction2D").Set(tf2d);
     }
   }
   controller->PostInitializeProxy(proxy);
@@ -167,6 +172,58 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
   std::ostringstream proxyName;
   proxyName << arrayName << ".PiecewiseFunction";
   controller->RegisterOpacityTransferFunction(proxy, proxyName.str().c_str());
+  proxy->FastDelete();
+  proxy->UpdateVTKObjects();
+  return proxy;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
+  const char* arrayName, vtkSMSessionProxyManager* pxm)
+{
+  return this->GetTransferFunction2D(arrayName, nullptr, pxm);
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
+  const char* arrayName, const char* array2Name, vtkSMSessionProxyManager* pxm)
+{
+  // ok to have the array2Name be empty (used when the gradient of the array is used as array2)
+  assert(arrayName != nullptr && pxm != nullptr);
+
+  // sanitize the arrayName. This is necessary since sometimes array names have
+  // characters that can mess up regular expressions.
+  std::string sanitizedArrayName = vtkSMCoreUtilities::SanitizeName(arrayName);
+  arrayName = sanitizedArrayName.c_str();
+  std::string sanitizedArray2Name = vtkSMCoreUtilities::SanitizeName(array2Name);
+  array2Name = sanitizedArray2Name.c_str();
+  std::ostringstream coupledArrayName;
+  coupledArrayName << arrayName;
+  if (array2Name && array2Name[0] != '\0')
+  {
+    coupledArrayName << "_" << array2Name;
+  }
+  vtkSMProxy* proxy = FindProxy("transfer_2d_functions", coupledArrayName.str().c_str(), pxm);
+  if (proxy)
+  {
+    return proxy;
+  }
+
+  // Create a new one.
+  proxy = pxm->NewProxy("transfer_2d_functions", "TransferFunction2D");
+  if (!proxy)
+  {
+    vtkErrorMacro("Failed to create 2D TransferFunction proxy");
+    return nullptr;
+  }
+
+  proxy->SetLogName((std::string("tf2d-for-") + coupledArrayName.str()).c_str());
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  controller->PreInitializeProxy(proxy);
+  controller->PostInitializeProxy(proxy);
+
+  coupledArrayName << ".TransferFunction2D";
+  controller->RegisterTransferFunction2D(proxy, coupledArrayName.str().c_str());
   proxy->FastDelete();
   proxy->UpdateVTKObjects();
   return proxy;

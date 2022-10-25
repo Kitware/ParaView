@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DisplaySizedImplicitPlanePropertyWidget</class>
+ <widget class="QWidget" name="DisplaySizedImplicitPlanePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>611</width>
+    <height>395</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Show the interactive plane in the 3D render view.</string>
+     </property>
+     <property name="text">
+      <string>Show Plane</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="showOutlineAndIntersectionEdges">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Show the outline of the data the intersection edges of the plane with the outline.</string>
+     </property>
+     <property name="text">
+      <string>Show Outline and Intersection Edges</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelNormal">
+       <property name="text">
+        <string>Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqDoubleLineEdit" name="normalX"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelOrigin">
+       <property name="text">
+        <string>Origin</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqDoubleLineEdit" name="normalZ"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqDoubleLineEdit" name="originZ"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="pqDoubleLineEdit" name="originY"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqDoubleLineEdit" name="normalY"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqDoubleLineEdit" name="originX"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="pickLabel">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Note: Use 'P' to pick 'Origin' on mesh or 'Ctrl+P' to snap to the closest mesh point. Also, use 'N' to pick &quot;Normal&quot; on mesh or 'Ctrl+N' to snap to the closest mesh point normal, if it's available.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="useCameraNormal">
+       <property name="toolTip">
+        <string>Set the normal to the camera's view direction.</string>
+       </property>
+       <property name="text">
+        <string>Camera Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="useXNormal">
+       <property name="toolTip">
+        <string>Set the normal to the x-axis.</string>
+       </property>
+       <property name="text">
+        <string>&amp;X Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="useZNormal">
+       <property name="toolTip">
+        <string>Set the normal to the z-axis.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Z Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="useYNormal">
+       <property name="toolTip">
+        <string>Set the normal to the y-axis.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Y Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="2">
+      <widget class="QPushButton" name="resetToDataBounds">
+       <property name="toolTip">
+        <string>Reset the plane based on the data bounds.</string>
+       </property>
+       <property name="text">
+        <string>Reset to Data Bounds</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QPushButton" name="resetCameraToNormal">
+       <property name="toolTip">
+        <string>Reset the camera to look along the normal.</string>
+       </property>
+       <property name="text">
+        <string>Reset Camera to Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="QPushButton" name="resetRadiusSize">
+       <property name="toolTip">
+        <string>Reset the radius size of the disk plane to its default value.</string>
+       </property>
+       <property name="text">
+        <string>Reset Radius Size</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>originX</tabstop>
+  <tabstop>originY</tabstop>
+  <tabstop>originZ</tabstop>
+  <tabstop>normalX</tabstop>
+  <tabstop>normalY</tabstop>
+  <tabstop>normalZ</tabstop>
+  <tabstop>useXNormal</tabstop>
+  <tabstop>useYNormal</tabstop>
+  <tabstop>useZNormal</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

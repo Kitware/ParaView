@@ -93,7 +93,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionsImplementation
   Q_INTERFACES(pqViewFrameActionsInterface);
 
 public:
-  pqStandardViewFrameActionsImplementation(QObject* parent = 0);
+  pqStandardViewFrameActionsImplementation(QObject* parent = nullptr);
   ~pqStandardViewFrameActionsImplementation() override;
 
   /**
@@ -142,7 +142,7 @@ protected Q_SLOTS:
    */
   void captureViewTriggered();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called to setup empty frame.
    */
@@ -188,7 +188,7 @@ protected:
   {
     QString Label;
     QString Name;
-    ViewType() {}
+    ViewType() = default;
     ViewType(const QString& label, const QString& name)
       : Label(label)
       , Name(name)

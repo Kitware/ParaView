@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqFindDataCurrentSelectionFrame.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,16 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFindDataCurrentSelectionFrame.h"
 #include "ui_pqFindDataCurrentSelectionFrame.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPropertiesPanel.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
+#include "pqSpreadSheetColumnsVisibility.h"
+#include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqTimer.h"
+#include "pqUndoStack.h"
+
 #include "vtkDataObject.h"
-#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMFieldDataDomain.h"
@@ -49,14 +53,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
+#include "vtkView.h"
 
+#include <QCheckBox>
+#include <QDebug>
+#include <QMenu>
 #include <QPointer>
-#include <QSignalBlocker>
+#include <QWidget>
 
 #include <cassert>
+#include <memory>
 
 namespace
 {
@@ -134,6 +144,7 @@ class pqFindDataCurrentSelectionFrame::pqInternals
 public:
   Ui::FindDataCurrentSelectionFrame Ui;
   QPointer<pqSelectionManager> SelectionManager;
+  QMenu ColumnToggleMenu;
 
   pqInternals(pqFindDataCurrentSelectionFrame* self)
   {
@@ -161,6 +172,10 @@ public:
   }
 
   ~pqInternals() { this->deleteSpreadSheet(); }
+
+  vtkSmartPointer<vtkSMViewProxy> GetViewProxy() const { return ViewProxy; }
+
+  QPointer<pqSpreadSheetViewModel> GetModel() const { return Model; }
 
   //---------------------------------------------------------------------------
   // setup the proxies needed for the spreadsheet view.
@@ -240,9 +255,11 @@ public:
       vtkSMPropertyHelper(this->RepresentationProxy, "Input")
         .Set(port->getSource()->getProxy(), port->getPortNumber());
 
-      vtkSMSourceProxy* selectionSource = port->getSelectionInput();
-      if (new_selection && selectionSource)
+      vtkSMSourceProxy* appendSelections = port->getSelectionInput();
+      if (new_selection && appendSelections)
       {
+        // Checking only one of the inputs of the appendSelections is sufficient
+        vtkSMProxy* selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(0);
         // if the selection is a new one, we try to show the element type more
         // appropriate based on the type of selection itself, i.e. if points are
         // being selected, show points. If cells are being selected show cells.
@@ -266,7 +283,7 @@ public:
         {
           const QSignalBlocker blocker(this->Ui.showTypeComboBox);
           this->Ui.showTypeComboBox->setCurrentIndex(index);
-          this->Ui.showTypeComboBox->setEnabled(true);
+          // this->Ui.showTypeComboBox->setEnabled(true);
         }
         else
         {
@@ -276,7 +293,7 @@ public:
       this->updateFieldType();
 
       bool checked =
-        selectionSource && (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
+        appendSelections && (vtkSMPropertyHelper(appendSelections, "InsideOut").GetAsInt() != 0);
       prev = this->Ui.invertSelectionCheckBox->blockSignals(true);
       this->Ui.invertSelectionCheckBox->setChecked(checked);
       this->Ui.invertSelectionCheckBox->blockSignals(prev);
@@ -327,6 +344,12 @@ pqFindDataCurrentSelectionFrame::pqFindDataCurrentSelectionFrame(
   : Superclass(parentObject, wflags)
   , Internals(new pqInternals(this))
 {
+  auto& internals = *this->Internals;
+  internals.Ui.ToggleColumnVisibility->setMenu(&internals.ColumnToggleMenu);
+  QObject::connect(&internals.ColumnToggleMenu, &QMenu::aboutToShow, [&internals]() {
+    pqSpreadSheetColumnsVisibility::populateMenu(
+      internals.GetViewProxy(), internals.GetModel(), &internals.ColumnToggleMenu);
+  });
 }
 
 //-----------------------------------------------------------------------------

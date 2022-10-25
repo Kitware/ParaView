@@ -35,7 +35,8 @@ project(ParaView)
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
   message(FATAL_ERROR
     "ParaView requires an out-of-source build. Please create a separate "
-    "binary directory and run CMake there.")
+    "binary directory and run CMake command there giving "
+    "in parameter the ParaView source directory.")
 endif ()
 
 #------------------------------------------------------------------------------
@@ -102,6 +103,27 @@ include(CMakeDependentOption)
 include(ParaViewOptions)
 include(ParaViewMigrations)
 
+# Some flags are really bad for caching. Replace them with better variants.
+if (paraview_replace_uncacheable_flags)
+  get_property(is_multiconfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if (is_multiconfig)
+    string(TOUPPER "${CMAKE_CONFIGURATION_TYPES}" build_types)
+  else ()
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" build_types)
+  endif ()
+  foreach (lang IN ITEMS C CXX Fortran)
+    foreach (prefix IN ITEMS - /)
+      foreach (flag IN ITEMS Zi ZI)
+        string(REPLACE "${prefix}${flag}" "-Z7" "CMAKE_${lang}_FLAGS" "${CMAKE_${lang}_FLAGS}")
+
+        foreach (build_type IN LISTS build_types)
+          string(REPLACE "${prefix}${flag}" "-Z7" "CMAKE_${lang}_FLAGS_${build_type}" "${CMAKE_${lang}_FLAGS_${build_type}}")
+        endforeach ()
+      endforeach ()
+    endforeach ()
+  endforeach ()
+endif ()
+
 #------------------------------------------------------------------------------
 # Choose static or shared libraries.
 set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
@@ -158,11 +180,19 @@ if (NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif ()
 
+cmake_dependent_option(PARAVIEW_USE_HIP "Support HIP backend accelerator" OFF
+  "CMAKE_VERSION VERSION_GREATER_EQUAL 3.21 AND NOT PARAVIEW_USE_CUDA" OFF)
+mark_as_advanced(PARAVIEW_USE_HIP)
+
+# The following `enable_language` needs to be a top level flag as
+# enable_language needs to be called from CMake entry point for variables to
+# have the correct scope.
 if(PARAVIEW_USE_CUDA)
-  # This needs to be a top level flag as enable_language needs
-  # to be called from CMake entry point for variables to have
-  # the correct scope.
   enable_language(CUDA)
+endif()
+
+if(PARAVIEW_USE_HIP)
+  enable_language(HIP)
 endif()
 
 set(BUILD_TESTING OFF)
@@ -229,6 +259,13 @@ else ()
       "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
   determine_version("${CMAKE_CURRENT_SOURCE_DIR}/VTK" "${GIT_EXECUTABLE}" "VTK")
 
+  # When building from a source tarball, the VTK_VERSION_FULL is empty at this point.
+  # Check for that condition here and set a value for VTK_VERSION_FULL.
+  if (NOT VTK_VERSION_FULL)
+    set(VTK_VERSION_FULL "${VTK_VERSION}")
+  endif()
+  message(STATUS "VTK version: ${VTK_VERSION_FULL}")
+
   if (PARAVIEW_USE_PYTHON)
     include(vtkModuleWrapPython)
   endif ()
@@ -251,7 +288,6 @@ set(paraview_default_plugins
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
   BagPlotViewsAndFilters
-  CDIReader
   Datamine
   DigitalRockPhysics
   EULATestPlugin
@@ -264,10 +300,10 @@ set(paraview_default_plugins
   GMVReader
   HyperTreeGridADR
   LagrangianParticleTracker
+  LANLX3DReader
   LegacyExodusReader
   Moments
   MooseXfemClip
-  NetCDFTimeAnnotationPlugin
   NodeEditor
   NonOrthogonalSource
   PacMan
@@ -441,6 +477,8 @@ else ()
 
   # Forward CUDA option to VTK
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
+  # Forward HIP option to VTK
+  set(VTK_USE_HIP "${PARAVIEW_USE_HIP}")
   # Forward Memkind option to VTK.
   set(VTK_USE_MEMKIND "${PARAVIEW_USE_MEMKIND}")
   # Forward OpenVDB option to VTK.
@@ -508,6 +546,12 @@ else ()
       "${vtk_required_modules};${vtk_unrecognized_modules}.")
   endif ()
 
+  # Handle the requirement of `sqlitebin` for `proj`.
+  set(vtk_sqlite_build_binary 0)
+  if ("VTK::libproj" IN_LIST vtk_modules)
+    set(vtk_sqlite_build_binary 1)
+  endif ()
+
   if (PARAVIEW_USE_PYTHON)
     find_package("Python3" 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
@@ -520,6 +564,7 @@ else ()
 
   set(VTK_BUILD_QT_DESIGNER_PLUGIN OFF)
   set(VTK_INSTALL_PYTHON_EXES OFF)
+  set(VTK_QT_VERSION 5)
 
   cmake_dependent_option(VTK_NO_PYTHON_THREADS "Disable Python Threads support" ON
     "PARAVIEW_USE_PYTHON" OFF)
@@ -535,6 +580,15 @@ else ()
     "WIN32;PARAVIEW_USE_PYTHON" OFF)
   mark_as_advanced(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE)
   set(VTK_WINDOWS_PYTHON_DEBUGGABLE ${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE})
+
+  cmake_dependent_option(PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK "Skip `clang-tidy` rules for VTK source" ON
+    "CMAKE_C_CLANG_TIDY OR CMAKE_CXX_CLANG_TIDY" OFF)
+  if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
+    set(CMAKE_C_CLANG_TIDY_save "${CMAKE_C_CLANG_TIDY}")
+    set(CMAKE_CXX_CLANG_TIDY_save "${CMAKE_CXX_CLANG_TIDY}")
+    set(CMAKE_C_CLANG_TIDY "")
+    set(CMAKE_CXX_CLANG_TIDY "")
+  endif ()
 
   vtk_module_build(
     MODULES             ${vtk_modules}
@@ -554,7 +608,13 @@ else ()
     USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
     ENABLE_WRAPPING     ON
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
-    TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing")
+    TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing"
+    TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
+
+  if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
+    set(CMAKE_C_CLANG_TIDY "${CMAKE_C_CLANG_TIDY_save}")
+    set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY_save}")
+  endif ()
 
   install(
     FILES       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Copyright.txt"
@@ -598,37 +658,8 @@ vtk_module_build(
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
-  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
-
-# Catalyst sanity check. See `ThirdParty/catalyst/CMakeLists.txt` for details.
-if (TARGET ParaView::vtkcatalyst)
-  get_property(catalyst_dir_primary GLOBAL PROPERTY paraview_catalyst_dir_primary)
-  set(catalyst_using_modules)
-  foreach (catalyst_using_module IN LISTS catalyst_using_modules)
-    get_property(catalyst_dir_module GLOBAL PROPERTY "paraview_catalyst_dir_${catalyst_using_module}")
-    if (NOT catalyst_using_module)
-      continue ()
-    endif ()
-
-    if (NOT catalyst_dir_primary)
-      message(FATAL_ERROR
-        "ParaView's `catalyst` module is using its internal catalyst but the "
-        "`${catalyst_using_module}` is using a copy from "
-        "`${catalyst_dir_module}`. Due to the way `libcatalyst` works, all "
-        "modules which use it must agree on a single installation of it. "
-        "Either ParaView must use an external catalyst (using "
-        "`VTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst`) or external packages "
-        "must be configured without `libcatalyst` support.")
-    elseif (NOT catalyst_dir_primary STREQUAL catalyst_dir_module)
-      message(FATAL_ERROR
-        "ParaView's `catalyst` module is using an external catalyst from "
-        "`${catalyst_dir_primary}` but the `${catalyst_using_module}` found "
-        "its copy at `${catalyst_dir_module}`. Due to the way `libcatalyst` "
-        "works, all modules which use it must agree on a single installation "
-        "of it.")
-    endif ()
-  endforeach ()
-endif ()
+  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
 
 vtk_module_build(
   MODULES             ${paraview_client_modules}
@@ -647,7 +678,29 @@ vtk_module_build(
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
-  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
+  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
+
+# Catalyst sanity check. Ensure every module is using the same Catalyst dependency.
+if (PARAVIEW_ENABLE_CATALYST)
+  get_property(catalyst_dir_primary GLOBAL PROPERTY vtk_catalyst_dir_primary)
+  set(catalyst_using_modules ClientsInSitu)
+  foreach (catalyst_using_module IN LISTS catalyst_using_modules)
+    get_property(catalyst_dir_module GLOBAL PROPERTY "vtk_catalyst_dir_${catalyst_using_module}")
+    if (NOT catalyst_using_module)
+      continue ()
+    endif ()
+
+    if (NOT catalyst_dir_primary STREQUAL catalyst_dir_module)
+      message(FATAL_ERROR
+        "ParaView's `catalyst` module is using an external catalyst from "
+        "`${catalyst_dir_primary}` but the `${catalyst_using_module}` found "
+        "its copy at `${catalyst_dir_module}`. Due to the way `libcatalyst` "
+        "works, all modules which use it must agree on a single installation "
+        "of it.")
+    endif ()
+  endforeach ()
+endif ()
 
 include(vtkModuleJson)
 vtk_module_json(
@@ -689,7 +742,8 @@ paraview_plugin_build(
   TARGET_COMPONENT  "development"
   PLUGINS_COMPONENT "plugins"
   PLUGINS ${paraview_plugins}
-  AUTOLOAD ${autoload_plugins})
+  AUTOLOAD ${autoload_plugins}
+  DISABLE_XML_DOCUMENTATION "${PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION}")
 
 set(CMAKE_INSTALL_RPATH
   "${_paraview_CMAKE_INSTALL_RPATH_save}")
@@ -722,6 +776,7 @@ if (PARAVIEW_USE_PYTHON)
       CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
       LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
       USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
+      HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/vtkpythonmodules"
       WRAPPED_MODULES vtk_python_wrapped_modules
       TARGET          VTK::vtkpythonmodules)
 
@@ -760,6 +815,7 @@ if (PARAVIEW_USE_PYTHON)
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
     LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
+    HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/pvpythonmodules"
     WRAPPED_MODULES paraview_python_wrapped_modules
     TARGET          ParaView::pvpythonmodules
     DEPENDS         VTK::vtkpythonmodules)
@@ -891,6 +947,6 @@ install(
   COMPONENT   "license")
 
 #-----------------------------------------------------------------------------
-if (PARAVIEW_BUILD_EXAMPLES)
+if (PARAVIEW_ENABLE_EXAMPLES)
   add_subdirectory(Examples)
 endif ()

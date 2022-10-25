@@ -61,7 +61,7 @@ class PQCOMPONENTS_EXPORT pqInputSelectorWidget : public pqPropertyWidget
   Q_PROPERTY(pqSMProxy selectedInput READ selectedInput WRITE setSelectedInput)
 
 public:
-  pqInputSelectorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqInputSelectorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqInputSelectorWidget() override;
 
   /**
@@ -70,7 +70,7 @@ public:
    */
   pqSMProxy selectedInput() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setSelectedInput(pqSMProxy);
 
 Q_SIGNALS:
@@ -79,7 +79,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void updateComboBox();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqInputSelectorWidget);
   QComboBox* ComboBox;
   vtkWeakPointer<vtkSMProxy> ChosenPort;

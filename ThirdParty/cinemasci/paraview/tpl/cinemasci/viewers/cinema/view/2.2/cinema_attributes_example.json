@@ -1,0 +1,7 @@
+{
+    "note"      : [
+        "assetname allows you to set the column used as the default",
+        "asset name, instead of the FILE column, which is the Cinema default"
+    ],
+    "assetname" : "FILE_other"
+}

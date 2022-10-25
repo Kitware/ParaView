@@ -149,7 +149,6 @@ private:
   static EULAConfirmationCallback EULAConfirmationCallbackPtr;
   friend class vtkPVPluginLoader;
 
-private:
   vtkPVPlugin(const vtkPVPlugin&) = delete;
   void operator=(const vtkPVPlugin&) = delete;
 };

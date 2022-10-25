@@ -193,7 +193,6 @@ class pqProxyWidgetItem : public QObject
   pqProxyWidgetItem(QObject* parentObj)
     : Superclass(parentObj)
     , Group(false)
-    , GroupTag()
     , Advanced(false)
     , InformationOnly(false)
   {
@@ -444,7 +443,7 @@ public:
       }
       else
       {
-        glayout->addWidget(this->LabelWidget, row, 0, Qt::AlignTop | Qt::AlignLeft);
+        glayout->addWidget(this->LabelWidget, row, 0, Qt::AlignVCenter | Qt::AlignLeft);
         glayout->addWidget(this->PropertyWidget, row, 1);
       }
     }
@@ -1168,7 +1167,6 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     {
       // Create decorators, if any.
       ::add_decorators(pwidget, smgroup->GetHints());
-
       if (smgroup->GetXMLLabel())
       {
         // see #18498
@@ -1311,6 +1309,22 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
     this->setUpdatesEnabled(prevUE);
   }
   return (prevItem != nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::showLinkedInteractiveWidget(int portIndex, bool show)
+{
+  for (const pqProxyWidgetItem* item : this->Internals->Items)
+  {
+    if (show)
+    {
+      item->propertyWidget()->selectPort(portIndex);
+    }
+    else
+    {
+      item->propertyWidget()->deselect();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

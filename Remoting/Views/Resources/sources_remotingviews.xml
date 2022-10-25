@@ -15,6 +15,7 @@
         <OutputPort index="0"
                     name="Output-0"
                     type="logo" />
+        <Plotable />
       </Hints>
       <!-- End of LogoSource -->
     </SourceProxy>

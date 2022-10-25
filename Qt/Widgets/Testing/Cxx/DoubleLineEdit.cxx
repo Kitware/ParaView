@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <pqDoubleLineEdit.h>
 
+// NOLINTNEXTLINE(performance-no-int-to-ptr)
 Q_DECLARE_METATYPE(pqDoubleLineEdit::RealNumberNotation);
 void DoubleLineEditTester::basic()
 {

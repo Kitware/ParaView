@@ -13,9 +13,6 @@
 
 =========================================================================*/
 
-// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (SetUseStrips).
-#define VTK_DEPRECATION_LEVEL 0
-
 #include "vtkPVGeometryFilter.h"
 
 #include "vtkAMRInformation.h"
@@ -25,13 +22,11 @@
 #include "vtkCellArray.h"
 #include "vtkCellArrayIterator.h"
 #include "vtkCellData.h"
-#include "vtkCellIterator.h"
 #include "vtkCellTypes.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTreeIterator.h"
-#include "vtkDataSetSurfaceFilter.h"
 #include "vtkExplicitStructuredGrid.h"
 #include "vtkExplicitStructuredGridSurfaceFilter.h"
 #include "vtkFeatureEdges.h"
@@ -40,8 +35,6 @@
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 #include "vtkGeometryFilter.h"
-#include "vtkHierarchicalBoxDataIterator.h"
-#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
@@ -55,6 +48,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPartitionedDataSetCollection.h"
@@ -63,25 +57,19 @@
 #include "vtkPolygon.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
-#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
 #include "vtkTriangleFilter.h"
 #include "vtkUniformGrid.h"
-#include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridGeometryFilter.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -109,8 +97,8 @@ class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Op
 {
 public:
   // Subclasses must overload this method, which performs the actual
-  // operations.  The methods should first do a reintepret cast of the arrays
-  // to the type suggestsed by \c datatype (which will be one of the VTK type
+  // operations.  The methods should first do a reinterpret_cast of the arrays
+  // to the type suggested by \c datatype (which will be one of the VTK type
   // identifiers like VTK_INT, etc.).  Both arrays are considered top be
   // length entries.  The method should perform the operation A*B (where * is
   // a placeholder for whatever operation is actually performed) and store the
@@ -162,7 +150,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UseOutline = 1;
   this->GenerateFeatureEdges = false;
   this->BlockColorsDistinctValues = 7;
-  this->UseStrips = 0;
   // generating cell normals by default really slows down paraview
   // it is especially noticeable with the OpenGL2 backend.  Leaving
   // it on for the old backend as some tests rely on the cell normals
@@ -171,17 +158,17 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
-  this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
+  this->GeometryFilter = vtkGeometryFilter::New();
   // we're prepping geometry for rendering
   // fast mode is adequate.
-  this->DataSetSurfaceFilter->SetFastMode(true);
+  this->GeometryFilter->SetFastMode(true);
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
   this->FeatureEdgesFilter = vtkFeatureEdges::New();
 
   // Setup a callback for the internal readers to report progress.
-  this->DataSetSurfaceFilter->AddObserver(
+  this->GeometryFilter->AddObserver(
     vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
   this->GenericGeometryFilter->AddObserver(
     vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
@@ -198,8 +185,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
 
   this->PassThroughCellIds = 1;
   this->PassThroughPointIds = 1;
-  this->ForceUseStrips = 0;
-  this->StripModFirstPass = 1;
 
   this->HideInternalAMRFaces = true;
   this->UseNonOverlappingAMRMetaDataForOutlines = true;
@@ -210,10 +195,10 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
 {
   // Be careful how you delete these so that you don't foul up the garbage
   // collector.
-  if (this->DataSetSurfaceFilter)
+  if (this->GeometryFilter)
   {
-    vtkDataSetSurfaceFilter* tmp = this->DataSetSurfaceFilter;
-    this->DataSetSurfaceFilter = nullptr;
+    vtkGeometryFilter* tmp = this->GeometryFilter;
+    this->GeometryFilter = nullptr;
     tmp->Delete();
   }
   if (this->GenericGeometryFilter)
@@ -240,16 +225,6 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
   }
   this->OutlineSource->Delete();
   this->SetController(nullptr);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::SetTriangulate(int val)
-{
-  if (this->Triangulate != val)
-  {
-    this->Triangulate = val;
-    this->Modified();
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -305,7 +280,7 @@ vtkExecutive* vtkPVGeometryFilter::CreateDefaultExecutive()
 void vtkPVGeometryFilter::HandleGeometryFilterProgress(vtkObject* caller, unsigned long, void*)
 {
   vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(caller);
-  // This limits progress for only the DataSetSurfaceFilter.
+  // This limits progress for only the GeometryFilter.
   if (algorithm)
   {
     double progress = algorithm->GetProgress();
@@ -353,29 +328,6 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 int vtkPVGeometryFilter::RequestUpdateExtent(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  /*
-  vtkUnstructuredGrid* ug_input =
-    vtkUnstructuredGrid::GetData(inputVector[0], 0);
-  vtkCompositeDataSet* cd_input =
-    vtkCompositeDataSet::GetData(inputVector[0], 0);
-  if (ug_input || cd_input)
-    {
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    int numPieces, ghostLevels;
-    numPieces =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-    ghostLevels =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
-    if (numPieces > 1)
-      {
-      ++ghostLevels;
-      }
-    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-      ghostLevels);
-    }
-
-  */
   return this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
 }
 
@@ -482,8 +434,7 @@ void vtkPVGeometryFilter::ExecuteAMRBlock(
   {
     int extent[6];
     input->GetExtent(extent);
-    this->DataSetSurfaceFilter->UniformGridExecute(
-      input, output, input->GetExtent(), extent, const_cast<bool*>(extractface));
+    this->GeometryFilter->StructuredExecute(input, output, extent, const_cast<bool*>(extractface));
   }
   this->OutlineFlag = 0;
 }
@@ -495,59 +446,43 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
   // Copy field data from the input block to the output block
   output->GetFieldData()->PassData(input->GetFieldData());
 
-  if (input->IsA("vtkImageData"))
+  if (auto imageData = vtkImageData::SafeDownCast(input))
   {
-    this->ImageDataExecute(
-      static_cast<vtkImageData*>(input), output, doCommunicate, updatePiece, wholeExtent);
-    return;
+    this->ImageDataExecute(imageData, output, doCommunicate, updatePiece, wholeExtent);
   }
-
-  if (input->IsA("vtkStructuredGrid"))
+  else if (auto structuredGrid = vtkStructuredGrid::SafeDownCast(input))
   {
-    this->StructuredGridExecute(static_cast<vtkStructuredGrid*>(input), output, updatePiece,
-      updateNumPieces, updateGhosts, wholeExtent);
-    return;
+    this->StructuredGridExecute(
+      structuredGrid, output, updatePiece, updateNumPieces, updateGhosts, wholeExtent);
   }
-
-  if (input->IsA("vtkRectilinearGrid"))
+  else if (auto rectilinearGrid = vtkRectilinearGrid::SafeDownCast(input))
   {
-    this->RectilinearGridExecute(static_cast<vtkRectilinearGrid*>(input), output, updatePiece,
-      updateNumPieces, updateGhosts, wholeExtent);
-    return;
+    this->RectilinearGridExecute(
+      rectilinearGrid, output, updatePiece, updateNumPieces, updateGhosts, wholeExtent);
   }
-
-  if (input->IsA("vtkUnstructuredGridBase"))
+  else if (auto unstructuredGridBase = vtkUnstructuredGridBase::SafeDownCast(input))
   {
-    this->UnstructuredGridExecute(
-      static_cast<vtkUnstructuredGridBase*>(input), output, doCommunicate);
-    return;
+    this->UnstructuredGridExecute(unstructuredGridBase, output, doCommunicate);
   }
-
-  if (input->IsA("vtkPolyData"))
+  else if (auto polyData = vtkPolyData::SafeDownCast(input))
   {
-    this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
-    return;
+    this->PolyDataExecute(polyData, output, doCommunicate);
   }
-  if (input->IsA("vtkHyperTreeGrid"))
+  else if (auto hyperTreeGrid = vtkHyperTreeGrid::SafeDownCast(input))
   {
-    this->HyperTreeGridExecute(static_cast<vtkHyperTreeGrid*>(input), output, doCommunicate);
-    return;
+    this->HyperTreeGridExecute(hyperTreeGrid, output, doCommunicate);
   }
-  if (input->IsA("vtkExplicitStructuredGrid"))
+  else if (auto explicitStructuredGrid = vtkExplicitStructuredGrid::SafeDownCast(input))
   {
-    this->ExplicitStructuredGridExecute(
-      static_cast<vtkExplicitStructuredGrid*>(input), output, doCommunicate, wholeExtent);
-    return;
+    this->ExplicitStructuredGridExecute(explicitStructuredGrid, output, doCommunicate, wholeExtent);
   }
-  if (input->IsA("vtkDataSet"))
+  else if (auto dataset = vtkDataSet::SafeDownCast(input))
   {
-    this->DataSetExecute(static_cast<vtkDataSet*>(input), output, doCommunicate);
-    return;
+    this->DataSetExecute(dataset, output, doCommunicate);
   }
-  if (input->IsA("vtkGenericDataSet"))
+  else if (auto genericDataSet = vtkGenericDataSet::SafeDownCast(input))
   {
-    this->GenericDataSetExecute(static_cast<vtkGenericDataSet*>(input), output, doCommunicate);
-    return;
+    this->GenericDataSetExecute(genericDataSet, output, doCommunicate);
   }
 }
 
@@ -555,6 +490,7 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
 int vtkPVGeometryFilter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   if (vtkCompositeDataSet::SafeDownCast(input))
   {
@@ -602,7 +538,7 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
     output->ShallowCopy(this->FeatureEdgesFilter->GetOutput());
   }
   this->ExecuteCellNormals(output, doCommunicate);
-  this->RemoveGhostCells(output);
+  output->RemoveGhostCells();
   if (this->GenerateProcessIds && output)
   {
     // add process ids array.
@@ -673,11 +609,17 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
     return nullptr;
   }
 
-  vtkPolyData* output = vtkPolyData::New();
-  vtkAppendPolyData* appender = vtkAppendPolyData::New();
-  appender->ExecuteAppend(output, &inputs[0], static_cast<int>(inputs.size()));
-  appender->Delete();
+  // Save field data attached to pieces as we want to preserve it (the vtkAppendPolydata filter
+  // removes it). The field data is expected to be the same for all pieces of the multipiece so we
+  // take it from the first one. See paraview/paraview#20748
+  vtkFieldData* fd = inputs[0]->GetFieldData();
+
+  vtkNew<vtkPolyData> output;
+  vtkNew<vtkAppendPolyData> appender;
+  appender->ExecuteAppend(output, inputs.data(), static_cast<int>(inputs.size()));
   inputs.clear();
+
+  output->SetFieldData(fd);
 
   std::vector<int> points_offsets, verts_offsets, lines_offsets, polys_offsets, strips_offsets;
   polys_offsets.resize(num_pieces);
@@ -705,19 +647,18 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
   }
 
   mp->SetPartition(0, output);
-  output->FastDelete();
 
   vtkInformation* metadata = mp->GetMetaData(static_cast<unsigned int>(0));
   metadata->Set(
-    vtkPVGeometryFilter::POINT_OFFSETS(), &points_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::POINT_OFFSETS(), points_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::VERTS_OFFSETS(), &verts_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::VERTS_OFFSETS(), verts_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::LINES_OFFSETS(), &lines_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::LINES_OFFSETS(), lines_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::POLYS_OFFSETS(), &polys_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::POLYS_OFFSETS(), polys_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::STRIPS_OFFSETS(), &strips_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::STRIPS_OFFSETS(), strips_offsets.data(), static_cast<int>(num_pieces));
   return output;
 }
 };
@@ -725,52 +666,47 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
-  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> cindex;
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(pd->GetNumberOfCells());
   cindex->FillTypedComponent(0, index);
   cindex->SetName("vtkCompositeIndex");
   pd->GetCellData()->AddArray(cindex);
-  cindex->FastDelete();
 
-  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> pindex;
   pindex->SetNumberOfComponents(1);
   pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
   pindex->FillTypedComponent(0, index);
   pindex->SetName("vtkCompositeIndex");
   pd->GetPointData()->AddArray(pindex);
-  pindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddBlockColors(vtkDataObject* pd, unsigned int index)
 {
-  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> cindex;
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(1);
   cindex->SetValue(0, index % this->BlockColorsDistinctValues);
   cindex->SetName("vtkBlockColors");
   pd->GetFieldData()->AddArray(cindex);
-  cindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddHierarchicalIndex(
   vtkPolyData* pd, unsigned int level, unsigned int index)
 {
-  vtkUnsignedIntArray* dslevel = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> dslevel;
   dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
   dslevel->FillTypedComponent(0, level);
   dslevel->SetName("vtkAMRLevel");
   pd->GetCellData()->AddArray(dslevel);
-  dslevel->FastDelete();
 
-  vtkUnsignedIntArray* dsindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> dsindex;
   dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
   dsindex->FillTypedComponent(0, index);
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
-  dsindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
@@ -781,14 +717,14 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   // STEP 0: Acquire input & output object
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
-  if (output == nullptr)
+  if (!output)
   {
     vtkErrorMacro("Output AMR multi-block dataset is NULL");
     return 0;
   }
 
   vtkUniformGridAMR* amr = vtkUniformGridAMR::GetData(inputVector[0], 0);
-  if (amr == nullptr)
+  if (!amr)
   {
     vtkErrorMacro("Input AMR dataset is NULL");
     return 0;
@@ -983,22 +919,16 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
       continue;
     }
 
-    vtkPolyData* tmpOut = vtkPolyData::New();
+    vtkNew<vtkPolyData> tmpOut;
     this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
     this->CleanupOutputData(tmpOut, 0);
     // skip empty nodes.
     if (tmpOut->GetNumberOfPoints() > 0)
     {
       output->SetDataSet(inIter, tmpOut);
-      tmpOut->FastDelete();
 
       const unsigned int current_flat_index = inIter->GetCurrentFlatIndex();
       this->AddCompositeIndex(tmpOut, current_flat_index);
-    }
-    else
-    {
-      tmpOut->Delete();
-      tmpOut = nullptr;
     }
 
     numInputs++;
@@ -1042,8 +972,8 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
       counts.push_back(multipiece->GetNumberOfPartitions());
     }
     std::vector<unsigned int> gcounts(counts.size());
-    this->Controller->AllReduce(
-      &counts[0], &gcounts[0], static_cast<vtkIdType>(counts.size()), vtkCommunicator::MAX_OP);
+    this->Controller->AllReduce(counts.data(), gcounts.data(),
+      static_cast<vtkIdType>(counts.size()), vtkCommunicator::MAX_OP);
     for (size_t cc = 0; cc < gcounts.size(); ++cc)
     {
       pieces_to_merge[cc]->SetNumberOfPartitions(gcounts[cc]);
@@ -1079,8 +1009,8 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     {
       std::vector<unsigned char> reduced_non_null_leaves;
       reduced_non_null_leaves.resize(reduced_size, 0);
-      this->Controller->AllReduce(
-        &non_null_leaves[0], &reduced_non_null_leaves[0], reduced_size, vtkCommunicator::MAX_OP);
+      this->Controller->AllReduce(non_null_leaves.data(), reduced_non_null_leaves.data(),
+        reduced_size, vtkCommunicator::MAX_OP);
 
       outIter->SkipEmptyNodesOff();
       outIter->VisitOnlyLeavesOn();
@@ -1091,10 +1021,9 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
           index < static_cast<unsigned int>(reduced_non_null_leaves.size()) &&
           reduced_non_null_leaves[index] != 0)
         {
-          vtkPolyData* trivalInput = vtkPolyData::New();
+          vtkNew<vtkPolyData> trivalInput;
           this->AddCompositeIndex(trivalInput, index);
           output->SetDataSet(outIter, trivalInput);
-          trivalInput->FastDelete();
         }
       }
     }
@@ -1190,7 +1119,7 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
   }
 
   double polyNorm[3];
-  vtkFloatArray* cellNormals = vtkFloatArray::New();
+  vtkNew<vtkFloatArray> cellNormals;
   cellNormals->SetName("cellNormals");
   cellNormals->SetNumberOfComponents(3);
   cellNormals->Allocate(3 * output->GetNumberOfCells());
@@ -1219,8 +1148,6 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
 
   output->GetCellData()->AddArray(cellNormals);
   output->GetCellData()->SetActiveNormals(cellNormals->GetName());
-  cellNormals->Delete();
-  cellNormals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -1349,8 +1276,8 @@ void vtkPVGeometryFilter::ImageDataExecute(
   {
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->StructuredExecute(
-        input, output, input->GetExtent(), const_cast<int*>(ext));
+      this->GeometryFilter->StructuredExecute(
+        input, output, const_cast<int*>(ext), nullptr, nullptr);
     }
     this->OutlineFlag = 0;
     return;
@@ -1374,20 +1301,18 @@ void vtkPVGeometryFilter::ImageDataExecute(
     bounds[4] = spacing[2] * ((float)ext[4]) + origin[2];
     bounds[5] = spacing[2] * ((float)ext[5]) + origin[2];
 
-    vtkOutlineSource* outline = vtkOutlineSource::New();
+    vtkNew<vtkOutlineSource> outline;
     outline->SetBounds(bounds);
     outline->Update();
 
     output->SetPoints(outline->GetOutput()->GetPoints());
     output->SetLines(outline->GetOutput()->GetLines());
     output->SetPolys(outline->GetOutput()->GetPolys());
-    outline->Delete();
   }
   else
   {
-    vtkPoints* pts = vtkPoints::New();
+    vtkNew<vtkPoints> pts;
     output->SetPoints(pts);
-    pts->Delete();
   }
 }
 
@@ -1402,7 +1327,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input, vtkPol
   {
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(), wholeExtent);
+      this->GeometryFilter->StructuredExecute(input, output, wholeExtent, nullptr, nullptr);
     }
     this->OutlineFlag = 0;
     return;
@@ -1429,8 +1354,8 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input, vtkP
   {
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->StructuredExecute(
-        input, output, input->GetExtent(), const_cast<int*>(wholeExtent));
+      this->GeometryFilter->StructuredExecute(
+        input, output, const_cast<int*>(wholeExtent), nullptr, nullptr);
     }
     this->OutlineFlag = 0;
     return;
@@ -1461,22 +1386,20 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
     {
       // Check to see if the data actually has nonlinear cells.  Handling
       // nonlinear cells adds unnecessary work if we only have linear cells.
-      vtkSmartPointer<vtkCellIterator> cellIter =
-        vtkSmartPointer<vtkCellIterator>::Take(input->NewCellIterator());
-      for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
+      if (input->GetNumberOfCells() > 0)
       {
-        if (!vtkCellTypes::IsLinear(cellIter->GetCellType()))
+        auto helper = vtkGeometryFilterHelper::CharacterizeUnstructuredGrid(input);
+        if (!helper->IsLinear)
         {
           handleSubdivision = true;
-          break;
         }
+        delete helper;
       }
     }
 
     vtkSmartPointer<vtkIdTypeArray> facePtIds2OriginalPtIds;
 
-    vtkSmartPointer<vtkUnstructuredGridBase> inputClone =
-      vtkSmartPointer<vtkUnstructuredGridBase>::Take(input->NewInstance());
+    auto inputClone = vtkSmartPointer<vtkUnstructuredGridBase>::Take(input->NewInstance());
     inputClone->ShallowCopy(input);
     input = inputClone;
 
@@ -1485,8 +1408,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // Use the vtkUnstructuredGridGeometryFilter to extract 2D surface cells
       // from the geometry.  This is important to extract an appropriate
       // wireframe in vtkPVRecoverGeometryWireframe.  Also, at the time of this
-      // writing vtkDataSetSurfaceFilter only properly subdivides 2D cells past
-      // level 1.
+      // writing vtkGeometryFilter only properly subdivides 2D cells past level 1.
       this->UnstructuredGridGeometryFilter->SetInputData(input);
 
       // Let the vtkUnstructuredGridGeometryFilter record from which point and
@@ -1495,8 +1417,8 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->UnstructuredGridGeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
       // Turn off ghost cell clipping. This ensures that ghost cells are retained
-      // and handed to the DataSetSurfaceFilter to ensure only valid faces are
-      // generated. If this weren't here, then the DataSetSurfaceFilter would
+      // and handed to the GeometryFilter to ensure only valid faces are
+      // generated. If this weren't here, then the GeometryFilter would
       // generate boundary faces between normal cells and where the ghost cells
       // used to be, which is not correct.
       this->UnstructuredGridGeometryFilter->DuplicateGhostCellClippingOff();
@@ -1523,23 +1445,23 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // recognize.  Note that because the data set comes from
       // UnstructuredGridGeometryFilter, the ids will represent the faces rather
       // than the original cells, which is important.
-      this->DataSetSurfaceFilter->PassThroughCellIdsOn();
-      this->DataSetSurfaceFilter->SetOriginalCellIdsName(
+      this->GeometryFilter->PassThroughCellIdsOn();
+      this->GeometryFilter->SetOriginalCellIdsName(
         vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
 
       if (this->PassThroughPointIds)
       {
-        // vtkDataSetSurfaceFilter is going to strip the vtkOriginalPointIds
+        // vtkGeometryFilter is going to strip the vtkOriginalPointIds
         // created by the vtkPVUnstructuredGridGeometryFilter because it
-        // cannot interpolate the ids.  Make the vtkDataSetSurfaceFilter make
+        // cannot interpolate the ids.  Make the vtkGeometryFilter make
         // its own original ids array.  We will resolve them later.
-        this->DataSetSurfaceFilter->PassThroughPointIdsOn();
+        this->GeometryFilter->PassThroughPointIdsOn();
       }
     }
 
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
+      this->GeometryFilter->UnstructuredGridExecute(input, output);
     }
 
     if (this->Triangulate && (output->GetNumberOfPolys() > 0))
@@ -1554,10 +1476,10 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
     if (handleSubdivision)
     {
-      // Restore state of DataSetSurfaceFilter.
-      this->DataSetSurfaceFilter->SetPassThroughCellIds(this->PassThroughCellIds);
-      this->DataSetSurfaceFilter->SetOriginalCellIdsName(nullptr);
-      this->DataSetSurfaceFilter->SetPassThroughPointIds(this->PassThroughPointIds);
+      // Restore state of GeometryFilter.
+      this->GeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+      this->GeometryFilter->SetOriginalCellIdsName(nullptr);
+      this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
       // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
       // that will cause the wireframe to be rendered correctly.
@@ -1619,85 +1541,64 @@ void vtkPVGeometryFilter::PolyDataExecute(
   if (!this->UseOutline)
   {
     this->OutlineFlag = 0;
-    if (this->UseStrips)
+    output->ShallowCopy(input);
+    if (this->PassThroughCellIds)
     {
-      vtkPolyData* inCopy = vtkPolyData::New();
-      vtkStripper* stripper = vtkStripper::New();
-      stripper->SetPassThroughCellIds(this->PassThroughCellIds);
-      // stripper->SetPassThroughPointIds(this->PassThroughPointIds);
-      inCopy->ShallowCopy(input);
-      inCopy->RemoveGhostCells();
-      stripper->SetInputData(inCopy);
-      stripper->Update();
-      output->CopyStructure(stripper->GetOutput());
-      output->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
-      output->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
-      inCopy->Delete();
-      stripper->Delete();
-    }
-    else
-    {
-      output->ShallowCopy(input);
-      if (this->PassThroughCellIds)
-      {
-        vtkNew<vtkIdTypeArray> originalCellIds;
-        originalCellIds->SetName("vtkOriginalCellIds");
-        originalCellIds->SetNumberOfComponents(1);
-        vtkNew<vtkIdTypeArray> originalFaceIds;
-        originalFaceIds->SetName(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
-        originalFaceIds->SetNumberOfComponents(1);
-        vtkCellData* outputCD = output->GetCellData();
-        outputCD->AddArray(originalCellIds.Get());
-        if (this->Triangulate)
-        {
-          outputCD->AddArray(originalFaceIds.Get());
-        }
-        vtkIdType numTup = output->GetNumberOfCells();
-        originalCellIds->SetNumberOfValues(numTup);
-        originalFaceIds->SetNumberOfValues(numTup);
-        for (vtkIdType cId = 0; cId < numTup; cId++)
-        {
-          originalCellIds->SetValue(cId, cId);
-          originalFaceIds->SetValue(cId, cId);
-        }
-      }
-      if (this->PassThroughPointIds)
-      {
-        vtkNew<vtkIdTypeArray> originalPointIds;
-        originalPointIds->SetName("vtkOriginalPointIds");
-        originalPointIds->SetNumberOfComponents(1);
-        vtkPointData* outputPD = output->GetPointData();
-        outputPD->AddArray(originalPointIds.Get());
-        vtkIdType numTup = output->GetNumberOfPoints();
-        originalPointIds->SetNumberOfValues(numTup);
-        for (vtkIdType pId = 0; pId < numTup; pId++)
-        {
-          originalPointIds->SetValue(pId, pId);
-        }
-      }
-
-      output->RemoveGhostCells();
-
+      vtkNew<vtkIdTypeArray> originalCellIds;
+      originalCellIds->SetName("vtkOriginalCellIds");
+      originalCellIds->SetNumberOfComponents(1);
+      vtkNew<vtkIdTypeArray> originalFaceIds;
+      originalFaceIds->SetName(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+      originalFaceIds->SetNumberOfComponents(1);
+      vtkCellData* outputCD = output->GetCellData();
+      outputCD->AddArray(originalCellIds.Get());
       if (this->Triangulate)
       {
-        // Triangulate the polygonal mesh.
-        vtkNew<vtkTriangleFilter> triangleFilter;
-        triangleFilter->SetInputData(output);
-        triangleFilter->Update();
-
-        // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
-        // that will cause the wireframe to be rendered correctly.
-        this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
-        // TODO: Make the consecutive internal filter execution have monotonically
-        // increasing progress rather than restarting for every internal filter.
-        this->RecoverWireframeFilter->Update();
-        this->RecoverWireframeFilter->SetInputData(nullptr);
-
-        // Get what should be the final output.
-        output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
-
-        output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+        outputCD->AddArray(originalFaceIds.Get());
       }
+      vtkIdType numTup = output->GetNumberOfCells();
+      originalCellIds->SetNumberOfValues(numTup);
+      originalFaceIds->SetNumberOfValues(numTup);
+      for (vtkIdType cId = 0; cId < numTup; cId++)
+      {
+        originalCellIds->SetValue(cId, cId);
+        originalFaceIds->SetValue(cId, cId);
+      }
+    }
+    if (this->PassThroughPointIds)
+    {
+      vtkNew<vtkIdTypeArray> originalPointIds;
+      originalPointIds->SetName("vtkOriginalPointIds");
+      originalPointIds->SetNumberOfComponents(1);
+      vtkPointData* outputPD = output->GetPointData();
+      outputPD->AddArray(originalPointIds.Get());
+      vtkIdType numTup = output->GetNumberOfPoints();
+      originalPointIds->SetNumberOfValues(numTup);
+      for (vtkIdType pId = 0; pId < numTup; pId++)
+      {
+        originalPointIds->SetValue(pId, pId);
+      }
+    }
+
+    if (this->Triangulate)
+    {
+      // Triangulate the polygonal mesh.
+      vtkNew<vtkTriangleFilter> triangleFilter;
+      triangleFilter->SetInputData(output);
+      triangleFilter->Update();
+
+      // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
+      // that will cause the wireframe to be rendered correctly.
+      this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
+      // TODO: Make the consecutive internal filter execution have monotonically
+      // increasing progress rather than restarting for every internal filter.
+      this->RecoverWireframeFilter->Update();
+      this->RecoverWireframeFilter->SetInputData(nullptr);
+
+      // Get what should be the final output.
+      output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
+
+      output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
     }
     return;
   }
@@ -1714,23 +1615,19 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
   {
     this->OutlineFlag = 0;
 
-    vtkHyperTreeGridGeometry* internalFilter = vtkHyperTreeGridGeometry::New();
-    // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-    // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-    vtkHyperTreeGrid* htgCopy = vtkHyperTreeGrid::New();
+    vtkNew<vtkHyperTreeGridGeometry> internalFilter;
+    vtkNew<vtkHyperTreeGrid> htgCopy;
     htgCopy->ShallowCopy(input);
     internalFilter->SetInputData(htgCopy);
     internalFilter->Update();
     output->ShallowCopy(internalFilter->GetOutput());
-    htgCopy->Delete();
-    internalFilter->Delete();
     return;
   }
 
   this->OutlineFlag = 1;
   double bds[6];
   int procid = 0;
-  if (!doCommunicate && input->GetNumberOfVertices() == 0)
+  if (!doCommunicate && input->GetNumberOfCells() == 0)
   {
     return;
   }
@@ -1817,7 +1714,7 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port, vtkInformation* info
 void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
-  vtkGarbageCollectorReport(collector, this->DataSetSurfaceFilter, "DataSetSurfaceFilter");
+  vtkGarbageCollectorReport(collector, this->GeometryFilter, "GeometryFilter");
   vtkGarbageCollectorReport(collector, this->GenericGeometryFilter, "GenericGeometryFilter");
   vtkGarbageCollectorReport(
     collector, this->UnstructuredGridGeometryFilter, "UnstructuredGridGeometryFilter");
@@ -1829,32 +1726,29 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  if (this->OutlineFlag)
-  {
-    os << indent << "OutlineFlag: On\n";
-  }
-  else
-  {
-    os << indent << "OutlineFlag: Off\n";
-  }
-
+  os << indent << "OutlineFlag: " << (this->OutlineFlag ? "on" : "off") << endl;
   os << indent << "UseOutline: " << (this->UseOutline ? "on" : "off") << endl;
-  os << indent << "UseStrips: " << (this->UseStrips ? "on" : "off") << endl;
+  os << indent << "GenerateFeatureEdges: " << (this->GenerateFeatureEdges ? "on" : "off") << endl;
+  os << indent << "BlockColorsDistinctValues: " << this->BlockColorsDistinctValues << endl;
   os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals ? "on" : "off") << endl;
+  os << indent << "Triangulate: " << (this->Triangulate ? "on" : "off") << endl;
   os << indent << "NonlinearSubdivisionLevel: " << this->NonlinearSubdivisionLevel << endl;
   os << indent << "Controller: " << this->Controller << endl;
-
-  os << indent << "PassThroughCellIds: " << (this->PassThroughCellIds ? "On\n" : "Off\n");
-  os << indent << "PassThroughPointIds: " << (this->PassThroughPointIds ? "On\n" : "Off\n");
+  os << indent << "PassThroughCellIds: " << (this->PassThroughCellIds ? "on" : "off") << endl;
+  os << indent << "PassThroughPointIds: " << (this->PassThroughPointIds ? "on" : "off") << endl;
+  os << indent << "GenerateProcessIds: " << (this->GenerateProcessIds ? "on" : "off") << endl;
+  os << indent << "HideInternalAMRFaces: " << (this->HideInternalAMRFaces ? "on" : "off") << endl;
+  os << indent << "UseNonOverlappingAMRMetaDataForOutlines: "
+     << (this->UseNonOverlappingAMRMetaDataForOutlines ? "on" : "off") << endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
 {
   this->PassThroughCellIds = newvalue;
-  if (this->DataSetSurfaceFilter)
+  if (this->GeometryFilter)
   {
-    this->DataSetSurfaceFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+    this->GeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
   }
   if (this->GenericGeometryFilter)
   {
@@ -1866,63 +1760,9 @@ void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
 void vtkPVGeometryFilter::SetPassThroughPointIds(int newvalue)
 {
   this->PassThroughPointIds = newvalue;
-  if (this->DataSetSurfaceFilter)
+  if (this->GeometryFilter)
   {
-    this->DataSetSurfaceFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-  }
-  /*
-  if (this->GenericGeometryFilter)
-    {
-    this->GenericGeometryFilter->SetPassThroughPointIds(
-      this->PassThroughPointIds);
-    }
-  */
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::SetForceUseStrips(int newvalue)
-{
-  this->ForceUseStrips = newvalue;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::SetUseStrips(int newvalue)
-{
-  if (this->UseStrips != newvalue)
-  {
-    this->UseStrips = newvalue;
-    if (this->DataSetSurfaceFilter)
-    {
-      this->DataSetSurfaceFilter->SetUseStrips(this->UseStrips);
-    }
-    // this little bit of nastiness is here for surface selection
-    // surf selection has to have strips off
-    // but we don't want to reexecute this filter unless we really really have
-    // to, so this checks:
-    // if we have been asked to change the setting for selection AND
-    // if something other than the strip setting has been changed
-    int OnlyStripsChanged = 1;
-    if ((this->GetInput() && this->GetInput()->GetMTime() > this->StripSettingMTime) ||
-      this->MTime > this->StripSettingMTime || this->StripModFirstPass)
-    {
-      OnlyStripsChanged = 0;
-    }
-    if (this->ForceUseStrips && !OnlyStripsChanged)
-    {
-      this->Modified();
-      this->StripModFirstPass = 0;
-    }
-    this->StripSettingMTime.Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::RemoveGhostCells(vtkPolyData* output)
-{
-  vtkDataArray* ghost = output->GetCellData()->GetArray(vtkDataSetAttributes::GhostArrayName());
-  if (ghost)
-  {
-    output->RemoveGhostCells();
+    this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
   }
 }
 
@@ -1933,9 +1773,9 @@ void vtkPVGeometryFilter::SetNonlinearSubdivisionLevel(int newvalue)
   {
     this->NonlinearSubdivisionLevel = newvalue;
 
-    if (this->DataSetSurfaceFilter)
+    if (this->GeometryFilter)
     {
-      this->DataSetSurfaceFilter->SetNonlinearSubdivisionLevel(this->NonlinearSubdivisionLevel);
+      this->GeometryFilter->SetNonlinearSubdivisionLevel(this->NonlinearSubdivisionLevel);
     }
 
     this->Modified();

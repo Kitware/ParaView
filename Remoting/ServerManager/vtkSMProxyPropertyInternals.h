@@ -56,7 +56,6 @@ private:
 
   std::map<void*, unsigned long> ObserverIds;
 
-private:
   void UpdateProducerConsumerLinks()
   {
     if (this->Self == nullptr || this->Self->GetParent() == nullptr ||
@@ -188,7 +187,7 @@ public:
   //------------------------------------------------------------------------------------
   bool Clear()
   {
-    if (this->Proxies.size() > 0)
+    if (!this->Proxies.empty())
     {
       this->Proxies.clear();
       this->Ports.clear();
@@ -199,7 +198,7 @@ public:
   //------------------------------------------------------------------------------------
   bool ClearUnchecked()
   {
-    if (this->UncheckedProxies.size() > 0)
+    if (!this->UncheckedProxies.empty())
     {
       this->UncheckedProxies.clear();
       this->UncheckedPorts.clear();
@@ -314,7 +313,7 @@ public:
   //------------------------------------------------------------------------------------
   vtkSMProxy* GetUnchecked(unsigned int index) const
   {
-    if (this->UncheckedProxies.size() > 0)
+    if (!this->UncheckedProxies.empty())
     {
       return (index < static_cast<unsigned int>(this->UncheckedProxies.size())
           ? this->UncheckedProxies[index].GetPointer()
@@ -329,7 +328,7 @@ public:
   }
   unsigned int GetUncheckedPort(unsigned int index) const
   {
-    if (this->UncheckedPorts.size() > 0)
+    if (!this->UncheckedPorts.empty())
     {
       return (index < static_cast<unsigned int>(this->UncheckedPorts.size())
           ? this->UncheckedPorts[index]

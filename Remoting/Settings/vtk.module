@@ -15,5 +15,6 @@ PRIVATE_DEPENDS
 OPTIONAL_DEPENDS
   ParaView::RemotingAnimation
   ParaView::RemotingViews
+  VTK::AcceleratorsVTKmFilters
 TEST_LABELS
   ParaView

@@ -47,15 +47,23 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
+  enum DeleteModes
+  {
+    SELECTED,
+    ALL,
+    TREE
+  };
   /**
    * if delete_all is false, then only selected items will be deleted if
    * possible.
    */
-  pqDeleteReaction(QAction* parent, bool delete_all = false);
+  pqDeleteReaction(QAction* parent, DeleteModes mode = SELECTED);
 
   static void deleteAll();
   static void deleteSelected();
   static bool canDeleteSelected();
+  static void deleteTree();
+  static bool canDeleteTree();
 
   /**
    * Deletes all sources in the set, if possible.
@@ -67,7 +75,7 @@ public:
    */
   static void deleteSources(const QSet<pqProxy*>& sources);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
@@ -86,7 +94,7 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqDeleteReaction)
-  bool DeleteAll;
+  DeleteModes DeleteMode;
 
   /**
    * Method called just before deleting a source.

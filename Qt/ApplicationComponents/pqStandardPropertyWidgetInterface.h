@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface
   Q_OBJECT
   Q_INTERFACES(pqPropertyWidgetInterface)
 public:
-  pqStandardPropertyWidgetInterface(QObject* p = 0);
+  pqStandardPropertyWidgetInterface(QObject* p = nullptr);
   ~pqStandardPropertyWidgetInterface() override;
 
   /**
@@ -95,7 +95,8 @@ public:
    * \li \c ColorOpacityEditor : pqColorOpacityEditorWidget
    * \li \c FontEditor : pqFontPropertyWidget
    * \li \c SeriesEditor : pqSeriesEditorPropertyWidget
-   * \li \c InteractivePlane : pqImplicitPlanePropertyWidget
+   * \li \c InteractivePlane : pqDisplaySizedImplicitPlanePropertyWidget
+   * \li \c InteractivePlane2 : pqImplicitPlanePropertyWidget
    * \li \c InteractiveBox: pqBoxPropertyWidget
    * \li \c InteractiveHandle: pqHandlePropertyWidget
    * \li \c InteractiveLine: pqLinePropertyWidget
@@ -108,6 +109,8 @@ public:
    * \li \c PropertyCollection : pqPropertyCollectionWidget
    * \li \c DataAssemblyEditor: pqDataAssemblyPropertyWidget
    * \li \c CheckableProperty : pqCheckableProperty
+   * \li \c EqualizerPropertyWidget : pqEqualizerPropertyWidget
+   * \li \c MetaDataPropertyWidget : pqMetaDataPropertyWidget
    */
   pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget) override;

@@ -110,7 +110,6 @@ private:
   vtkZlibCompressorImageConditioner* Conditioner; // manages color space reduction and strip alpha
   int CompressionLevel;                           // zlib compression level
 
-private:
   vtkZlibImageCompressor(const vtkZlibImageCompressor&) = delete;
   void operator=(const vtkZlibImageCompressor&) = delete;
 };

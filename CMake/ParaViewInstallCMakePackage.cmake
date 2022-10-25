@@ -16,6 +16,8 @@ if (TARGET ParaView::catalyst-paraview)
     PROPERTY paraview_catalyst_directory)
 endif ()
 
+string(REPLACE "ParaView::" "" _paraview_all_components "${paraview_modules};${paraview_client_modules}")
+
 configure_file(
   "${paraview_cmake_dir}/paraview-config.cmake.in"
   "${paraview_cmake_build_dir}/paraview-config.cmake"
@@ -82,6 +84,12 @@ set(paraview_cmake_module_files
 
   # Client Server
   vtkModuleWrapClientServer.cmake)
+
+# From the `GmshIO` plugin.
+if (TARGET GmshIO::vtkGmshIO)
+  list(APPEND paraview_cmake_module_files
+    FindGmsh.cmake)
+endif ()
 
 set(paraview_cmake_files_to_install)
 foreach (paraview_cmake_module_file IN LISTS paraview_cmake_module_files)

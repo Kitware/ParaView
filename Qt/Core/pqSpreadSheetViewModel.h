@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSpreadSheetViewModel_h
 
 #include "pqCoreModule.h"
-#include "vtkType.h" // needed for vtkIdType.
+#include "vtkTuple.h" // needed for vtkTuple.
+#include "vtkType.h"  // needed for vtkIdType.
 #include <QAbstractTableModel>
 #include <QPair>
 #include <QSet>
@@ -62,29 +63,8 @@ public:
   pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent = nullptr);
   ~pqSpreadSheetViewModel() override;
 
-  class vtkIndex
+  class vtkIndex : public vtkTuple<vtkIdType, 3>
   {
-  public:
-    vtkIdType Tuple[3];
-    vtkIndex()
-    {
-      this->Tuple[0] = 0;
-      this->Tuple[1] = 0;
-      this->Tuple[2] = 0;
-    }
-
-    vtkIndex(vtkIdType a, vtkIdType b, vtkIdType c)
-    {
-      this->Tuple[0] = a;
-      this->Tuple[1] = b;
-      this->Tuple[2] = c;
-    }
-
-    bool operator==(const vtkIndex& other) const
-    {
-      return (this->Tuple[0] == other.Tuple[0] && this->Tuple[1] == other.Tuple[1] &&
-        this->Tuple[2] == other.Tuple[2]);
-    }
   };
 
   /**
@@ -182,7 +162,7 @@ public:
    */
   QString GetRowsAsString() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * resets the model.
    */

@@ -3,8 +3,8 @@
     <Proxy name="CDIReader"
            class="vtkCDIReader"
            label="CDIReader">
-      <Documentation long_help="Reads CDI/ICON netCDF data."
-                     short_help="Reads CDI/ICON netCDF data.">
+      <Documentation long_help="Reads CDI netCDF/GRIB (ICON) data."
+                     short_help="Reads CDI netCDF/GRIB (ICON) data.">
       </Documentation>
 
       <StringVectorProperty name="FileName"
@@ -14,7 +14,7 @@
                             panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
-          This property specifies the netCDF file name for the CDI/ICON reader.
+          This property specifies the netCDF/GRIB file name for the CDI reader.
         </Documentation>
       </StringVectorProperty>
 
@@ -70,7 +70,7 @@
           </RequiredProperties>
         </ArraySelectionDomain>
         <Documentation>
-          This list shows the available ICON point variables.
+          This list shows the available point variables.
         </Documentation>
       </StringVectorProperty>
 
@@ -92,9 +92,11 @@
           </RequiredProperties>
         </ArraySelectionDomain>
         <Documentation>
-          This list shows the available ICON cell variables.
+          This list shows the available cell variables.
         </Documentation>
       </StringVectorProperty>
+
+
 
       <StringVectorProperty name="DomainArrayInfo"
                             information_only="1" >
@@ -118,6 +120,17 @@
         </Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty name="Show3DSurface"
+                         label="Show 3D Surface (or chose the level in the field below)"
+                         command="SetShowMultilayerView"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Switch on for 3D rendering of the data. 2D arrays show the same data on all levels.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="SetProjection"
                          label="Set Projection: "
                          command="SetProjection"
@@ -129,31 +142,10 @@
           <Entry value="2" text="Cassini Projection"/>
           <Entry value="3" text="Mollweide Projection"/>
           <Entry value="4" text="Catalyst (no scaling)"/>
+          <Entry value="5" text="Spilhouse Projection"/>
         </EnumerationDomain>
         <Documentation>
           Select one out of four different projections for the data. The default is lon/lat projection.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="UseTopography"
-                         label="Use Topography (wet_c)"
-                         command="SetTopography"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Switch on to remove land structure contained in the variable "wet_c".
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="SetInvertTopography"
-                         label="Use Land/Sea for Masking (Off = Sea; On = Land)"
-                         command="InvertTopography"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Switch to either remove land or sea structure contained within the variable "wet_c".
         </Documentation>
       </IntVectorProperty>
 
@@ -168,16 +160,79 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Show3DSurface"
-                         label="Show 3D Surface"
-                         command="SetShowMultilayerView"
+      <StringVectorProperty name="MaskingVarInfo"
+                            information_only="1" >
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+      <StringVectorProperty name="MaskingValueVar"
+			    label="Variable to use for masking miss vals"
+                            command="SetMaskingVariable"
+                            number_of_elements="1">
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+            <Property name="MaskingVarInfo" function="ArraySelection"/>
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>
+	  The variable to be used for determining the missing values for masking.
+	  You can also just turn NaNs to transparent, but that can look weird b/c walls are missing.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseMask"
+                         label="Use Missing value mask"
+                         command="SetUseMask"
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
-          Switch on for 3D rendering of the data. 2D arrays show the same data on all levels.
+          Switch on to remove land structure contained in the variable "wet_c".
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty name="InvertMask"
+                         label="Invert the missing value mask"
+                         command="SetInvertMask"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+	  Invert the missing value mask.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SkipGrid"
+                         label="Skip the grid"
+                         command="SetSkipGrid"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+	  Skip the grid (b/c it's known already).
+        </Documentation>
+      </IntVectorProperty>
+
+
+      <IntVectorProperty name="UseCustomMaskValue"
+                         label="Use a custom mask value"
+                         command="SetUseCustomMaskValue"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+	  Use a custom value for masking.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CustomMaskValue"
+                         label="Custom Value for masking"
+                         command="SetCustomMaskValue"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+	  Choose the Value to use for masking instead of missval/_FillValue.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="Read/OutputDoublePrecision"
                          label="Read/Output Double Precision"
@@ -187,6 +242,28 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Switch between single and double precision output.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="WrapAround"
+                         label="Wrap Cells in X/Y"
+                         command="SetWrapping"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Switch between no wrapping, and wrapping in either X or Y direction.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LoadClonAndClat"
+                         label="Load Clon/Clat Coordinates"
+                         command="SetShowClonClat"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Switch to load and show clon/clat coordinates.
         </Documentation>
       </IntVectorProperty>
 
@@ -211,8 +288,35 @@
         </Documentation>
         <Hints>
           <Visibility replace_input="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Show3DSurface"
+            value="1" />
         </Hints>
       </IntVectorProperty>
+
+      <DoubleVectorProperty name="Layer0OffsetRangeInfo"
+                         command="GetLayer0OffsetRange"
+                         information_only="1">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Layer0Offset"
+                         label="3D Surface z offset for first layer"
+                         command="SetLayer0Offset"
+                         number_of_elements="1"
+                         default_values="1e-30">
+        <DoubleRangeDomain name="Layer0OffsetRange" min="-50" max="50" />
+        <Documentation>
+	  We don't know where to start the vertical colums (we don't have bounds). So we need one additional value. This will affect the thickness of the first layer in 3D.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Show3DSurface"
+            value="1" />
+        </Hints>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="VerticalLevelRangeInfo"
                          command="GetVerticalLevelRange"
@@ -229,6 +333,12 @@
             <Property name="VerticalLevelRangeInfo" function="Range"/>
           </RequiredProperties>
         </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Show3DSurface"
+            value="0" />
+        </Hints>
         <Documentation>
           Adjust the vertical level that is displayed. This is only available for 3D data sets.
         </Documentation>
@@ -249,8 +359,8 @@
                  label="CDIReader"
                  name="CDISeriesReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads ICON netCDF data."
-                     short_help="Read ICON netCDF data."></Documentation>
+      <Documentation long_help="Reads irregular netCDF data (eg. ICON)."
+                     short_help="Read irregular netCDF data."></Documentation>
 
       <SubProxy>
         <Proxy name="Reader"
@@ -258,6 +368,7 @@
                proxyname="CDIReader" />
         <ExposedProperties>
           <Property name="DimensionInfo" />
+          <PropertyGroup label="Variables">
           <Property name="Dimensions" />
           <Property name="VariableDimensionInfo" />
           <Property name="VariableArrayInfo" />
@@ -267,16 +378,32 @@
           <Property name="CellArrayStatus" />
           <Property name="DomainArrayInfo" />
           <Property name="DomainArrayStatus" />
+          <Property name="LoadClonAndClat" />
+	  </PropertyGroup>
+          <PropertyGroup label="Projection">
           <Property name="SetProjection" />
-          <Property name="UseTopography" />
-          <Property name="SetInvertTopography" />
+          <Property name="WrapAround" />
           <Property name="InvertZ" />
           <Property name="Show3DSurface" />
-          <Property name="Read/OutputDoublePrecision" />
-          <Property name="LayerThicknessRangeInfo" />
-          <Property name="LayerThickness" />
           <Property name="VerticalLevelRangeInfo" />
           <Property name="VerticalLevel" />
+          <Property name="LayerThicknessRangeInfo" />
+          <Property name="LayerThickness" />
+          <Property name="Layer0OffsetRangeInfo" />
+          <Property name="Layer0Offset" />
+	  </PropertyGroup>
+          <PropertyGroup label="Masking / Missing Values">
+          <Property name="MaskingValueVar" />
+          <Property name="UseMask" />
+          <Property name="InvertMask" />
+          <Property name="SkipGrid" />
+          <Property name="UseCustomMaskValue" />
+          <Property name="CustomMaskValue" />
+	  </PropertyGroup>
+          <PropertyGroup label="Misc">
+          <Property name="Read/OutputDoublePrecision" />
+          </PropertyGroup>
+
         </ExposedProperties>
       </SubProxy>
 
@@ -310,8 +437,8 @@
       </DoubleVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="nc"
-                       file_description="ICON/CDI netCDF files" />
+        <ReaderFactory extensions="nc grb grib"
+                       file_description="CDI netCDF/GRIB (ICON) files" />
       </Hints>
 
     </SourceProxy>

@@ -21,15 +21,16 @@
 #ifndef vtkXYChartRepresentationInternals_h
 #define vtkXYChartRepresentationInternals_h
 
-#include "vtkCSVExporter.h"       // for vtkCSVExporter
-#include "vtkChartXY.h"           // for vtkChartXY
-#include "vtkDataArray.h"         // for vtkDataArray
-#include "vtkPen.h"               // for vtkPen enums
-#include "vtkPlotBar.h"           // for vtkPlotBar
-#include "vtkPlotFunctionalBag.h" // for vtkPlotFunctionalBag
-#include "vtkPlotPoints.h"        // for vtkPlotPoints
-#include "vtkSmartPointer.h"      // for vtkSmartPointer
-#include "vtkTable.h"             // for vtkTable
+#include "vtkCSVExporter.h"           // for vtkCSVExporter
+#include "vtkChartXY.h"               // for vtkChartXY
+#include "vtkDataArray.h"             // for vtkDataArray
+#include "vtkPen.h"                   // for vtkPen enums
+#include "vtkPlotBar.h"               // for vtkPlotBar
+#include "vtkPlotFunctionalBag.h"     // for vtkPlotFunctionalBag
+#include "vtkPlotPoints.h"            // for vtkPlotPoints
+#include "vtkSmartPointer.h"          // for vtkSmartPointer
+#include "vtkTable.h"                 // for vtkTable
+#include "vtkXYChartRepresentation.h" // for vtkXYChartRepresentation
 
 #include <map>    // for std::map
 #include <string> // for std::string
@@ -207,6 +208,7 @@ public:
   std::map<std::string, int> LineThicknesses;
   std::map<std::string, int> LineStyles;
   std::map<std::string, vtkColor3d> Colors;
+  std::map<std::string, double> Opacities;
   std::map<std::string, int> AxisCorners;
   std::map<std::string, int> MarkerStyles;
   std::map<std::string, double> MarkerSizes;
@@ -225,7 +227,7 @@ public:
   {
   }
 
-  virtual ~vtkInternals() {}
+  virtual ~vtkInternals() = default;
 
   //---------------------------------------------------------------------------
   /**
@@ -352,7 +354,7 @@ public:
   virtual void UpdatePlotProperties(vtkXYChartRepresentation* self)
   {
     vtkChartXY* chartXY = self->GetChart();
-    vtkPlot* lastFunctionalBagPlot = 0;
+    vtkPlot* lastFunctionalBagPlot = nullptr;
     for (PlotsMap::iterator iter1 = this->SeriesPlots.begin(); iter1 != this->SeriesPlots.end();
          ++iter1)
     {
@@ -456,7 +458,9 @@ protected:
 
     vtkColor3d color = this->GetSeriesParameter(
       self, tableName, columnName, role, this->Colors, vtkColor3d(0, 0, 0));
-    plot->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+    double opacity =
+      this->GetSeriesParameter(self, tableName, columnName, role, this->Opacities, 1.0);
+    plot->SetColorF(color.GetRed(), color.GetGreen(), color.GetBlue(), opacity);
     plot->GetSelectionPen()->SetColorF(self->SelectionColor);
 
     plot->SetWidth(

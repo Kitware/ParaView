@@ -21,10 +21,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="pqLineEdit" name="Function">
-     <property name="resetCursorPositionOnEditingFinished" stdset="0">
-      <bool>false</bool>
-     </property>
+    <widget class="pqExpressionsWidget" name="Function">
     </widget>
    </item>
    <item>
@@ -566,9 +563,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <class>pqExpressionsWidget</class>
+   <extends>QWidget</extends>
+   <header>pqExpressionsWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

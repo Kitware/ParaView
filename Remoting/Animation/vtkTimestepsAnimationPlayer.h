@@ -88,6 +88,11 @@ protected:
    */
   double GetNextTime(double currentime) override;
 
+  /**
+   * Return the previous time given the current time.
+   */
+  double GetPreviousTime(double currenttime) override;
+
   double GoToNext(double, double, double currenttime) override
   {
     return this->GetNextTimeStep(currenttime);

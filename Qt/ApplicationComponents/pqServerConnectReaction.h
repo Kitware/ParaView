@@ -91,7 +91,7 @@ private Q_SLOTS:
    */
   void updateEnableState() override;
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqServerConnectReaction)
 };
 

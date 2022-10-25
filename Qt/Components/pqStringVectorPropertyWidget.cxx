@@ -48,12 +48,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
+#include "pqArrayListWidget.h"
 #include "pqArraySelectionWidget.h"
 #include "pqArraySelectorPropertyWidget.h"
 #include "pqComboBoxDomain.h"
+#include "pqCoreUtilities.h"
 #include "pqDialog.h"
+#include "pqExpandableTableView.h"
+#include "pqExpressionChooserButton.h"
+#include "pqExpressionsDialog.h"
+#include "pqExpressionsManager.h"
+#include "pqExpressionsWidget.h"
 #include "pqFileChooserWidget.h"
 #include "pqLineEdit.h"
+#include "pqOneLinerTextEdit.h"
 #include "pqPopOutWidget.h"
 #include "pqQtDeprecated.h"
 #include "pqSMAdaptor.h"
@@ -97,6 +105,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkPVXMLElement* hints = svp->GetHints();
 
   bool multiline_text = false;
+  bool wrap_text = false;
   bool python = false;
   bool showLabel = false;
   QString placeholderText;
@@ -107,6 +116,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
     {
       multiline_text = true;
+    }
+    else if (widgetHint && widgetHint->GetAttribute("type") &&
+      strcmp(widgetHint->GetAttribute("type"), "one_liner_wrapped") == 0)
+    {
+      wrap_text = true;
     }
     if (widgetHint && widgetHint->GetAttribute("syntax") &&
       strcmp(widgetHint->GetAttribute("syntax"), "python") == 0)
@@ -198,39 +212,62 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   {
     assert(smProperty->GetRepeatable());
 
-    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArraySelectionWidget`.");
+    int type = svp->GetElementType(1);
+    int nbElements = svp->GetNumberOfElementsPerCommand();
+    const char* property_name = smProxy->GetPropertyName(smProperty);
+    QWidget* listWidget = nullptr;
+    if (type == vtkSMStringVectorProperty::STRING && nbElements == 2)
+    {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArrayListWidget`.");
 
-    // repeatable array list domains get a the pqArraySelectionWidget
-    // that lists each array name with a check box
-    auto selectorWidget = new pqArraySelectionWidget(this);
-    selectorWidget->setObjectName("ArraySelectionWidget");
-    selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-    selectorWidget->setMaximumRowCountBeforeScrolling(
-      pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
+      auto arrayListWidget = new pqArrayListWidget(this);
+      arrayListWidget->setObjectName("ArrayListWidget");
+      arrayListWidget->setHeaderLabel(property_name);
+      arrayListWidget->setMaximumRowCountBeforeScrolling(
+        pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
-    // add context menu and custom indicator for sorting and filtering.
-    new pqTreeViewSelectionHelper(selectorWidget);
+      if (auto aswHints = hints ? hints->FindNestedElementByName("ArraySelectionWidget") : nullptr)
+      {
+        arrayListWidget->setIconType(aswHints->GetAttribute("icon_type"));
+      }
+
+      listWidget = arrayListWidget;
+    }
+    else
+    {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArraySelectionWidget`.");
+
+      auto selectorWidget = new pqArraySelectionWidget(this);
+      selectorWidget->setObjectName("ArraySelectionWidget");
+      selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+      selectorWidget->setMaximumRowCountBeforeScrolling(
+        pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
+
+      // add context menu and custom indicator for sorting and filtering.
+      new pqTreeViewSelectionHelper(selectorWidget);
+      // pass icon hints, if provided.
+      if (auto aswhints = hints ? hints->FindNestedElementByName("ArraySelectionWidget") : nullptr)
+      {
+        selectorWidget->setIconType(property_name, aswhints->GetAttribute("icon_type"));
+      }
+
+      listWidget = selectorWidget;
+    }
 
     // hide widget label
     this->setShowLabel(showLabel);
 
-    vbox->addWidget(selectorWidget);
+    vbox->addWidget(listWidget);
 
-    // unlike vtkSMArraySelectionDomain which is doesn't tend to change based
+    // unlike vtkSMArraySelectionDomain which doesn't tend to change based
     // on values of other properties, typically, vtkSMArrayListDomain changes
     // on other property values e.g. when one switches from point-data to
     // cell-data, the available arrays change. Hence we "reset" the widget
     // every time the domain changes.
     new pqArrayListDomain(
-      selectorWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
+      listWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
 
-    const char* property_name = smProxy->GetPropertyName(smProperty);
-    // pass icon hints, if provided.
-    if (auto aswhints = hints ? hints->FindNestedElementByName("ArraySelectionWidget") : nullptr)
-    {
-      selectorWidget->setIconType(property_name, aswhints->GetAttribute("icon_type"));
-    }
-    this->addPropertyLink(selectorWidget, property_name, SIGNAL(widgetModified()), smProperty);
+    this->addPropertyLink(listWidget, property_name, SIGNAL(widgetModified()), smProperty);
     this->setChangeAvailableAsChangeFinished(true);
   }
   else if (arraySelectionDomain)
@@ -365,21 +402,44 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
     else
     {
-      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqLineEdit`.");
       // add a single line edit.
-      QLineEdit* lineEdit = new pqLineEdit(this);
-      lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
-      this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(const QString&)), smProperty);
-      this->connect(
-        lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
-      this->setChangeAvailableAsChangeFinished(false);
-
-      if (!placeholderText.isEmpty())
+      if (wrap_text)
       {
-        lineEdit->setPlaceholderText(placeholderText);
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqOneLinerTextEdit`.");
+
+        QString group = python ? pqExpressionsManager::PYTHON_EXPRESSION_GROUP()
+                               : pqExpressionsManager::EXPRESSION_GROUP();
+        auto expressionsWidget = new pqExpressionsWidget(this, group);
+        expressionsWidget->setObjectName("ExpressionWidget");
+        vbox->addWidget(expressionsWidget);
+
+        pqOneLinerTextEdit* lineEdit = expressionsWidget->lineEdit();
+        if (!placeholderText.isEmpty())
+        {
+          lineEdit->setPlaceholderText(placeholderText);
+        }
+
+        this->addPropertyLink(lineEdit, "plainText", SIGNAL(textChanged()), smProperty);
+        this->connect(
+          lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+      }
+      else
+      {
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqLineEdit`.");
+        pqLineEdit* lineEdit = new pqLineEdit(this);
+        if (!placeholderText.isEmpty())
+        {
+          lineEdit->setPlaceholderText(placeholderText);
+        }
+
+        this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(const QString&)), smProperty);
+        lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
+        vbox->addWidget(lineEdit);
+        this->connect(
+          lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
       }
 
-      vbox->addWidget(lineEdit);
+      this->setChangeAvailableAsChangeFinished(false);
     }
   }
   this->setLayout(vbox);

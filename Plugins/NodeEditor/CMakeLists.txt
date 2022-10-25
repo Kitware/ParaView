@@ -34,6 +34,7 @@ list(APPEND sources
   ${dock_sources})
 
 paraview_add_plugin(NodeEditor
+  REQUIRED_ON_CLIENT
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})

@@ -70,6 +70,7 @@ set(classes
   pqProgressWidget
   pqQuickLaunchDialog
   pqScaleByButton
+  pqScaledSpinBox
   pqSectionVisibilityContextMenu
   pqSeriesGeneratorDialog
   pqSetData
@@ -88,7 +89,8 @@ set(classes
   pqTreeWidgetItemObject
   pqTreeWidgetSelectionHelper
   pqVectorWidget
-  pqWaitCursor)
+  pqWaitCursor
+  pqWidgetsInit)
 
 set(headers)
 

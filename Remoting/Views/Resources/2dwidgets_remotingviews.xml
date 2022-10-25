@@ -1,0 +1,52 @@
+<ServerManagerConfiguration>
+  <!-- We put all 2D widget definitions in this file -->
+  <ProxyGroup name="representations">
+    <!-- ================================================================== -->
+    <New2DWidgetRepresentationProxy class="vtk2DWidgetRepresentation"
+                                  name="EqualizerWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                        default_values="0"
+                        name="Enabled"
+                        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="ContextItem"
+              proxygroup="2d_widget_representations"
+              proxyname="EqualizerContextItem"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="EqualizerPoints" />
+        </ExposedProperties>
+      </SubProxy>
+
+    </New2DWidgetRepresentationProxy>
+    <!-- End of EqualizerWidgetRepresentation -->
+  </ProxyGroup>
+
+  <ProxyGroup name="2d_widget_representations">
+    <!-- ================================================================== -->
+      <ContextItemWidgetProxy class="vtkEqualizerContextItem"
+            name="EqualizerContextItem">
+        <IntVectorProperty animateable="1"
+                          command="SetVisible"
+                          default_values="1"
+                          name="Visibility"
+                          number_of_elements="1">
+          <BooleanDomain name="bool" />
+        </IntVectorProperty>
+        <StringVectorProperty animateable="1"
+                              command="SetPoints"
+                              label="Equalizer Points"
+                              name="EqualizerPoints"
+                              number_of_elements="1"
+                              element_types="2"
+                              panel_visibility="never">
+          <Documentation>This property defines the interactive points of the equalizer.</Documentation>
+        </StringVectorProperty>
+      </ContextItemWidgetProxy>
+    <!-- End of EqualizerContextItem -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

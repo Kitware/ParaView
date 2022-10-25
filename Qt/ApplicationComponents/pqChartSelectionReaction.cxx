@@ -81,7 +81,7 @@ inline void setChartParameters(pqContextView* view, int selectionType, bool upda
   }
 
   if (update_modifier &&
-    (selectionModifier < vtkContextScene::SELECTION_NONE ||
+    (selectionModifier < vtkContextScene::SELECTION_DEFAULT ||
       selectionModifier > vtkContextScene::SELECTION_TOGGLE))
   {
     qWarning() << "Invalid selection modifier  " << selectionModifier
@@ -153,9 +153,6 @@ int pqChartSelectionReaction::getSelectionModifier()
   int selectionModifier = this->Superclass::getSelectionModifier();
   switch (selectionModifier)
   {
-    case (pqView::PV_SELECTION_DEFAULT):
-      return vtkContextScene::SELECTION_DEFAULT;
-      break;
     case (pqView::PV_SELECTION_ADDITION):
       return vtkContextScene::SELECTION_ADDITION;
       break;
@@ -165,8 +162,9 @@ int pqChartSelectionReaction::getSelectionModifier()
     case (pqView::PV_SELECTION_TOGGLE):
       return vtkContextScene::SELECTION_TOGGLE;
       break;
+    case (pqView::PV_SELECTION_DEFAULT):
     default:
-      return vtkContextScene::SELECTION_NONE;
+      return vtkContextScene::SELECTION_DEFAULT;
       break;
   }
 }

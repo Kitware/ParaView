@@ -395,10 +395,10 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     else if (strcmp(proxyElement->GetName(), "Group") == 0)
     {
       // Recover group name
-      const char* name = proxyElement->GetAttribute("name");
+      const char* groupName = proxyElement->GetAttribute("name");
       const char* defaultProxyName = proxyElement->GetAttributeOrEmpty("default");
 
-      if (name)
+      if (groupName)
       {
         // Browse group and recover each proxy type
         vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
@@ -412,11 +412,11 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
         else
         {
           unsigned int index = 0;
-          vtkPVProxyDefinitionIterator* iter = pxdm->NewSingleGroupIterator(name);
+          vtkPVProxyDefinitionIterator* iter = pxdm->NewSingleGroupIterator(groupName);
           for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
           {
             const char* proxyName = iter->GetProxyName();
-            this->AddProxy(name, proxyName);
+            this->AddProxy(groupName, proxyName);
             if (defaultProxyName && (strcmp(proxyName, defaultProxyName) == 0))
             {
               this->SetDefaultIndex(index);

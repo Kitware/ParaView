@@ -1,6 +1,3 @@
-// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (vtkUnicodeString).
-#define VTK_DEPRECATION_LEVEL 0
-
 #include "vtkBoundingRectContextDevice2D.h"
 
 #include "vtkAbstractContextItem.h"
@@ -10,7 +7,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 #include "vtkStdString.h"
-#include "vtkUnicodeString.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkBoundingRectContextDevice2D);
@@ -88,12 +84,6 @@ void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkStdString
 
   this->AddPoint(point[0] + bounds[0], point[1] + bounds[1]);
   this->AddPoint(point[0] + bounds[0] + bounds[2], point[1] + bounds[1] + bounds[3]);
-}
-
-//-----------------------------------------------------------------------------
-void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkUnicodeString& string)
-{
-  return this->DrawString(point, string.utf8_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -404,16 +394,6 @@ void vtkBoundingRectContextDevice2D::DrawEllipticArc(
 //-----------------------------------------------------------------------------
 void vtkBoundingRectContextDevice2D::ComputeStringBounds(
   const vtkStdString& string, float bounds[4])
-{
-  if (this->DelegateDevice)
-  {
-    this->DelegateDevice->ComputeStringBounds(string, bounds);
-  }
-}
-
-//-----------------------------------------------------------------------------
-void vtkBoundingRectContextDevice2D::ComputeStringBounds(
-  const vtkUnicodeString& string, float bounds[4])
 {
   if (this->DelegateDevice)
   {

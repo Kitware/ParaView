@@ -225,6 +225,10 @@
                      the specified plane. The Slice filter takes any type of
                      dataset as input. The output of this filter is polygonal
                      data.</Documentation>
+      <Deprecated deprecated_in="5.11" to_remove_in="5.13">
+        This filter is deprecated and will be removed in a future
+        release. Please use the Slice filter instead.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -1096,108 +1100,6 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPlaneCutter"
-                 name="SliceWithPlane"
-                 label="Slice With Plane">
-      <Documentation long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces. This filter is faster than the standard Slice filter."
-                     short_help="Slice datasets with a plane.">This filter
-                     extracts the portion of the input dataset that lies along
-                     the specified plane. The Slice filter takes any type of
-                     dataset as input. The output of this filter is a multiblock of multipiece
-                     polygonal data. This is a multithreaded implementation.
-                     </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-          <DataType value="vtkCompositeDataSet" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input of the slice
-        filter.</Documentation>
-      </InputProperty>
-      <ProxyProperty command="SetPlane"
-                     name="Plane">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-        </ProxyListDomain>
-        <Documentation>This property sets the parameters of the plane
-        function.</Documentation>
-      </ProxyProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetBuildTree"
-                         default_values="1"
-                         name="BuildTree"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-        If enabled and input is not an Image Data, Sphere Tree will be computed, for a faster slice computation.
-       </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetBuildHierarchy"
-                         default_values="1"
-                         name="BuildHierarchy"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-        If enabled and input is not an Image Data, Tree hierarchy will be computed, for a faster slice computation.
-       </Documentation>
-       <Hints>
-         <PropertyWidgetDecorator type="ShowWidgetDecorator">
-           <Property name="BuildTree" function="boolean" />
-         </PropertyWidgetDecorator>
-       </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetComputeNormals"
-                         default_values="0"
-                         name="ComputeNormals"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-        If enabled, compute the normal on each cell. Since all output cells are coplanar,
-        the normal generated is simply the normal of the plane used to slice with.
-        By default computing of normals is disabled.
-       </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetInterpolateAttributes"
-                         default_values="1"
-                         name="InterpolateAttributes"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-        If enabled, interpolate attribute data. By default this is
-        enabled. Point data is always interpolated. Cell data is transferred
-        unless input is an image data.
-       </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetGeneratePolygons"
-                         default_values="1"
-                         name="GeneratePolygons"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-        If enabled and input is a Structured Grid or a Rectilinear Grid,
-        output slice will consist of polygons instead of only triangles.
-       </Documentation>
-      </IntVectorProperty>
-
-      <!-- End SliceWithPlane -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPointDataToCellData"
                  label="Point Data to Cell Data"
                  name="PointDataToCellData">
@@ -1475,6 +1377,7 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the dataset from which to obtain
         probe values. The data attributes come from this dataset.</Documentation>
@@ -1597,6 +1500,18 @@ found and the point will be rejected.</Documentation>
         cells containing such points, are marked as blank.
         </Documentation>
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetSnapToCellWithClosestPoint"
+                         default_values="0"
+                         name="SnapToCellWithClosestPoint"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+          Set whether to snap to the cell with the closest point, if no cell has been found while
+          FindCell is executed. Note: This is useful only when the source is a vtkPointSet.
+        </Documentation>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <!-- cell locator begin -->
       <ProxyProperty command="SetCellLocatorPrototype"
@@ -2231,5 +2146,139 @@ found and the point will be rejected.</Documentation>
       </InputProperty>
     </SourceProxy>
 
+    <SourceProxy class="vtkArrayRename" label="RenameArrays" name="RenameArrays">
+      <Documentation long_help="Rename Data Arrays"
+        short_help="Rename Data Arrays">
+    This forwards the data to the output and allow to modify array names in place.</Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <InputArrayDomain name="field_arrays" attribute_type="field" optional="1" />
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
+        <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+      </InputProperty>
+      <StringVectorProperty name="PointArrayNames"
+                            label="Point Arrays"
+                            command="SetPointArrayName"
+                            clean_command="ClearPointMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="point_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input point array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayNames"
+                            label="Cell Arrays"
+                            command="SetCellArrayName"
+                            clean_command="ClearCellMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="cell_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input cell array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FieldArrayNames"
+                            label="Field Arrays"
+                            command="SetFieldArrayName"
+                            clean_command="ClearFieldMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="field_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input field array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="field"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VertexArrayNames"
+                            label="Vertex Arrays"
+                            command="SetVertexArrayName"
+                            clean_command="ClearVertexMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="vertex_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input vertex array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="vertex"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeArrayNames"
+                            label="Edge Arrays"
+                            command="SetEdgeArrayName"
+                            clean_command="ClearEdgeMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="edge_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input edge array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="RowArrayNames"
+                            label="Row Arrays"
+                            command="SetRowArrayName"
+                            clean_command="ClearRowMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="row_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input row array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="row"/>
+        </Hints>
+      </StringVectorProperty>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

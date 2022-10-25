@@ -56,7 +56,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget : public pqPropertyGro
   typedef pqPropertyGroupWidget Superclass;
 
 public:
-  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqFontPropertyWidget() override;
 
   QString HorizontalJustification() const;
@@ -73,7 +73,7 @@ protected:
   void UpdateToolButtonIcon(QString& str, QToolButton* justification);
   QActionGroup* CreateFontActionGroup(QToolButton* justification);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void changeHorizontalJustificationIcon(QAction*);
   void changeVerticalJustificationIcon(QAction*);
   void onFontFamilyChanged();

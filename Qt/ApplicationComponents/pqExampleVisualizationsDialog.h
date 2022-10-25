@@ -22,7 +22,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialog : public QDia
   typedef QDialog Superclass;
 
 public:
-  explicit pqExampleVisualizationsDialog(QWidget* parent = 0);
+  explicit pqExampleVisualizationsDialog(QWidget* parent = nullptr);
   ~pqExampleVisualizationsDialog() override;
 
 protected Q_SLOTS:

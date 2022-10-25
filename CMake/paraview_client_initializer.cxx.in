@@ -170,6 +170,9 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   {
     this->PVApp->loadConfiguration(QString(":/@_paraview_client_NAME@/Configuration/") + file);
   }
+#else
+  // NO XMLS provided, Reader and Writers still needs to be updated
+  this->PVApp->updateAvailableReadersAndWriters();
 #endif
 
 #if _paraview_client_TITLE

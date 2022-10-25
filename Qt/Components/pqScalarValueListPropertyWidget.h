@@ -52,7 +52,8 @@ class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWid
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqScalarValueListPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqScalarValueListPropertyWidget(
+    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqScalarValueListPropertyWidget() override;
 
   void setScalars(const QVariantList& scalars);
@@ -82,7 +83,7 @@ private Q_SLOTS:
   void removeAll();
   void editPastLastRow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
 
   bool getRange(double& range_min, double& range_max);

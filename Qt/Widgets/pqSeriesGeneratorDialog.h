@@ -60,6 +60,20 @@ public:
    */
   QVector<double> series() const;
 
+  /**
+   * Set the dataMin and dataMax on the dialog
+   * They will be used only if reset is true
+   * or if resetRangeToDataRange is called.
+   */
+  void setDataRange(double dataMin, double dataMax, bool reset = false);
+
+public Q_SLOTS:
+
+  /**
+   * Reset the range to the data range
+   */
+  void resetRangeToDataRange();
+
 private:
   Q_DISABLE_COPY(pqSeriesGeneratorDialog);
 

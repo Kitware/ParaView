@@ -50,8 +50,11 @@ constexpr int NODE_HEADLINE_MIN_HEIGHT = 1.5 * NODE_LABEL_HEIGHT;
 constexpr int EDGE_WIDTH = 4;
 constexpr int EDGE_OUTLINE = 1;
 
+constexpr qreal GRID_SIZE = 25;
+
 // UI colors
 const QColor COLOR_BASE = QApplication::palette().window().color();
+const QColor COLOR_GRID = QApplication::palette().mid().color();
 const QColor COLOR_HIGHLIGHT = QApplication::palette().highlight().color();
 const QColor COLOR_BASE_DEEP = COLOR_BASE.lighter(COLOR_BASE.lightness() * 0.7 + 10);
 const QColor COLOR_CONSTRAST = QColor::fromHslF(
@@ -86,13 +89,13 @@ public:
     , functor(fn)
   {
   }
-  ~Interceptor() = default;
+  ~Interceptor() override = default;
 
 protected:
   /**
    * Filters events if this object has been installed as an event filter for the watched object.
    */
-  bool eventFilter(QObject* object, QEvent* event) { return this->functor(object, event); }
+  bool eventFilter(QObject* object, QEvent* event) override { return this->functor(object, event); }
 
   F functor;
 };

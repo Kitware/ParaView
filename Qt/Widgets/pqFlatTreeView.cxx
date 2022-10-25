@@ -44,9 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemEditorFactory>
 #include <QLineEdit>
 #include <QList>
-#include <QPaintEvent>
 #include <QPainter>
-#include <QPersistentModelIndex>
 #include <QPoint>
 #include <QRect>
 #include <QScrollBar>

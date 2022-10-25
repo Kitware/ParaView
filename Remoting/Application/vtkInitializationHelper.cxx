@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 // Windows-only helper functionality:
 #ifdef _WIN32
+#include <conio.h> // for getch()
 #include <windows.h>
 #endif
 
@@ -179,6 +180,17 @@ bool vtkInitializationHelper::Initialize(vtkStringList* slist, int type)
 bool vtkInitializationHelper::Initialize(
   int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
 {
+  if (!vtkInitializationHelper::InitializeOptions(argc, argv, type, options, addStandardArgs))
+  {
+    return false;
+  }
+  return vtkInitializationHelper::InitializeMiscellaneous(type);
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeOptions(
+  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
+{
   if (vtkProcessModule::GetProcessModule())
   {
     vtkLogF(ERROR, "Process already initialize! `Initialize` should only be called once.");
@@ -229,7 +241,23 @@ bool vtkInitializationHelper::Initialize(
     {
       std::ostringstream str;
       str << options->GetHelp() << endl;
+
+#ifndef _WIN32
       vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
+#else
+      // Pop up a console and reopen stdin, stderr, stdout to it to display help
+      AllocConsole();
+      FILE* fDummy;
+      freopen_s(&fDummy, "CONIN$", "r", stdin);
+      freopen_s(&fDummy, "CONOUT$", "w", stderr);
+      freopen_s(&fDummy, "CONOUT$", "w", stdout);
+
+      std::cout << str.str() << std::endl;
+
+      // Need user input to close the console, otherwise it will close immediately
+      std::cout << "Press any key to exit" << std::endl;
+      getch();
+#endif
     }
     vtkProcessModule::Finalize();
     vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
@@ -258,7 +286,13 @@ bool vtkInitializationHelper::Initialize(
     vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
     return false;
   }
+  return true;
+}
 
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeMiscellaneous(int type)
+{
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
   // this has to happen after process module is initialized and options have
   // been set.
   paraview_initialize();

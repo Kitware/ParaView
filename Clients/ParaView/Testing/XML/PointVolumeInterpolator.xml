@@ -10,4 +10,5 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Point Interpolation" command="activate" arguments="PointVolumeInterpolator" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Volume" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 </pqevents>

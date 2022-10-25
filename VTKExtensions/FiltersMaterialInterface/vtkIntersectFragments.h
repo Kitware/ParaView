@@ -94,7 +94,7 @@ protected:
   //
   void ComputeGeometricAttributes();
   // Send my geometric attribuites to a single process.
-  int SendGeometricAttributes(const int recipientProcId);
+  int SendGeometricAttributes(int recipientProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<std::vector<vtkDoubleArray*>>& centers, std::vector<std::vector<int*>>& ids);
@@ -108,9 +108,9 @@ protected:
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes(std::vector<std::vector<int>>& unique);
   // Gather geometric attributes on a single process.
-  int GatherGeometricAttributes(const int recipientProcId);
+  int GatherGeometricAttributes(int recipientProcId);
   // Copy attributes from input to output
-  int CopyAttributesToStatsOutput(const int controllingProcId);
+  int CopyAttributesToStatsOutput(int controllingProcId);
   //
   int CleanUpAfterRequest();
 

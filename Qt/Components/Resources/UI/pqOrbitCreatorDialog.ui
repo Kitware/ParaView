@@ -87,9 +87,9 @@
    <item>
     <layout class="QHBoxLayout">
      <item>
-      <widget class="QPushButton" name="resetBounds">
+      <widget class="QPushButton" name="resetCenter">
        <property name="text">
-        <string>Reset Bounds</string>
+        <string>Reset Center</string>
        </property>
       </widget>
      </item>

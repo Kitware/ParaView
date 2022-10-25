@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCalculatorWidget.h"
 #include "ui_pqCalculatorWidget.h"
 
+#include "pqCoreUtilities.h"
+#include "pqExpressionsDialog.h"
+#include "pqExpressionsManager.h"
+#include "pqOneLinerTextEdit.h"
 #include "pqOutputPort.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -75,10 +79,6 @@ pqCalculatorWidget::pqCalculatorWidget(
   this->Internals->Vectors->setMenu(this->Internals->VectorsMenu);
   this->Internals->Scalars->setMenu(this->Internals->ScalarsMenu);
 
-  // clicking on any button or any part of the panel where another button
-  // doesn't take focus will cause the line edit to have focus
-  this->setFocusProxy(this->Internals->Function);
-
   // before the menus are popped up, fill them up with the list of available
   // arrays.
   QObject::connect(
@@ -114,15 +114,21 @@ pqCalculatorWidget::pqCalculatorWidget(
     this->Internals->dot, &QToolButton::pressed, this, [=]() { this->buttonPressed("dot"); });
 
   //--------------------------------------------------------------------------
+  static const QString expressionGroup = pqExpressionsManager::EXPRESSION_GROUP();
+  this->Internals->Function->setupButtons(expressionGroup);
 
   this->addPropertyLink(
-    this->Internals->Function, "text", SIGNAL(textChanged(const QString&)), smproperty);
+    this->Internals->Function->lineEdit(), "plainText", SIGNAL(textChanged()), smproperty);
 
   // now when editing is finished, we will fire the changeFinished() signal.
-  this->connect(this->Internals->Function, SIGNAL(textChangedAndEditingFinished()), this,
-    SIGNAL(changeFinished()));
+  this->connect(this->Internals->Function->lineEdit(), SIGNAL(textChangedAndEditingFinished()),
+    this, SIGNAL(changeFinished()));
 
   this->updateButtons();
+
+  // clicking on any button or any part of the panel where another button
+  // doesn't take focus will cause the line edit to have focus
+  this->setFocusProxy(this->Internals->Function->lineEdit());
 }
 
 //-----------------------------------------------------------------------------
@@ -137,14 +143,14 @@ void pqCalculatorWidget::variableChosen(QAction* menuAction)
 {
   if (menuAction)
   {
-    this->Internals->Function->insert(menuAction->text());
+    this->Internals->Function->lineEdit()->insertPlainText(menuAction->text());
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqCalculatorWidget::buttonPressed(const QString& buttonText)
 {
-  this->Internals->Function->insert(buttonText);
+  this->Internals->Function->lineEdit()->insertPlainText(buttonText);
 }
 
 //-----------------------------------------------------------------------------

@@ -21,7 +21,7 @@ public:
 
 protected:
   vtkDataMinePointReader();
-  ~vtkDataMinePointReader();
+  ~vtkDataMinePointReader() override;
 
   void Read(vtkPoints* points, vtkCellArray* cells) override;
   // submethods depending on file type

@@ -219,27 +219,34 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* in
   vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
   vtkImageData* idInput = vtkImageData::SafeDownCast(input);
   vtkStructuredGrid* sgInput = vtkStructuredGrid::SafeDownCast(input);
-  const int* dimensions = nullptr;
+  int dimensions[3] = { -1 };
   if (rgInput)
   {
-    dimensions = rgInput->GetDimensions();
+    rgInput->GetDimensions(dimensions);
   }
   else if (idInput)
   {
-    dimensions = idInput->GetDimensions();
+    idInput->GetDimensions(dimensions);
   }
   else if (sgInput)
   {
-    dimensions = sgInput->GetDimensions();
+    sgInput->GetDimensions(dimensions);
+  }
+  bool dimSuccess = !((dimensions[0] < 0) || (dimensions[1] < 0) || (dimensions[2] < 0));
+
+  int* pDimensions = nullptr;
+  if (dimSuccess)
+  {
+    pDimensions = dimensions;
   }
 
   int cellDims[3];
-  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS && dimensions)
+  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS && dimSuccess)
   {
     cellDims[0] = std::max(1, (dimensions[0] - 1));
     cellDims[1] = std::max(1, (dimensions[1] - 1));
     cellDims[2] = std::max(1, (dimensions[2] - 1));
-    dimensions = cellDims;
+    pDimensions = cellDims;
   }
 
   if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS && psInput &&
@@ -248,7 +255,7 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* in
     output->GetRowData()->AddArray(psInput->GetPoints()->GetData());
   }
 
-  if (dimensions)
+  if (pDimensions)
   {
     // I cannot decide if this should be put in the vtkInformation associated
     // with the vtkTable or in FieldData. I'd rather the former but not sure
@@ -257,7 +264,7 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* in
     dArray->SetName("STRUCTURED_DIMENSIONS");
     dArray->SetNumberOfComponents(3);
     dArray->SetNumberOfTuples(1);
-    dArray->SetTypedTuple(0, dimensions);
+    dArray->SetTypedTuple(0, pDimensions);
     output->GetFieldData()->AddArray(dArray);
     dArray->Delete();
   }

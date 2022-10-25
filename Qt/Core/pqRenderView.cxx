@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderView.cxx
+   Module:  pqRenderView.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkCollection.h"
-#include "vtkEventQtSlotConnect.h"
 #include "vtkIntArray.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
@@ -53,18 +52,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkStructuredData.h"
 
 // Qt includes.
 #include <QEvent>
-#include <QFileInfo>
 #include <QGridLayout>
 #include <QList>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPointer>
-#include <QSet>
 #include <QtDebug>
 
 // ParaView includes.
@@ -531,20 +527,117 @@ void pqRenderView::fakeInteraction(bool start)
 void pqRenderView::resetViewDirection(
   double look_x, double look_y, double look_z, double up_x, double up_y, double up_z)
 {
-  vtkSMProxy* proxy = this->getProxy();
-  double pos[3] = { 0, 0, 0 };
-  double focal_point[3] = { look_x, look_y, look_z };
-  double view_up[3] = { up_x, up_y, up_z };
-  vtkSMPropertyHelper(proxy, "CameraPosition").Set(pos, 3);
-  vtkSMPropertyHelper(proxy, "CameraFocalPoint").Set(focal_point, 3);
-  vtkSMPropertyHelper(proxy, "CameraViewUp").Set(view_up, 3);
-  proxy->UpdateVTKObjects();
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToDirection(look_x, look_y, look_z, up_x, up_y, up_z);
   this->resetCamera();
   this->render();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectOnSurface(int rect[4], int selectionModifier, const char* array)
+void pqRenderView::adjustView(const int& adjustType, const double& angle)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustActiveCamera(adjustType, angle);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustAzimuth(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustAzimuth(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustElevation(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustElevation(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustRoll(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustRoll(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustZoom(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustZoom(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::applyIsometricView()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ApplyIsometricView();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToPositiveX()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToPositiveX();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToNegativeX()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToNegativeX();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToPositiveY()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToPositiveY();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToNegativeY()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToNegativeY();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToPositiveZ()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToPositiveZ();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToNegativeZ()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToNegativeZ();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectCellsOnSurface(int rect[4], int selectionModifier, const char* array)
 {
   QList<pqOutputPort*> opPorts;
   this->selectOnSurfaceInternal(rect, opPorts, false, selectionModifier, false, array);
@@ -554,8 +647,7 @@ void pqRenderView::selectOnSurface(int rect[4], int selectionModifier, const cha
 //-----------------------------------------------------------------------------
 void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts, int selectionModifier)
 {
-  // Fire selection event to let the world know that this view selected
-  // something.
+  // Fire selection event to let the world know that this view selected something.
   if (opPorts.count() > 0)
   {
     Q_EMIT this->selected(opPorts.value(0));
@@ -627,56 +719,60 @@ void pqRenderView::collectSelectionPorts(vtkCollection* selectedRepresentations,
 
   for (int i = 0; i < selectedRepresentations->GetNumberOfItems(); i++)
   {
-    vtkSMRepresentationProxy* repr =
+    vtkSMRepresentationProxy* selectedDataRepr =
       vtkSMRepresentationProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(i));
     vtkSmartPointer<vtkSMSourceProxy> selectionSource =
       vtkSMSourceProxy::SafeDownCast(selectionSources->GetItemAsObject(i));
 
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-    pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
-    if (!repr)
+    pqDataRepresentation* pqDataRepr = smmodel->findItem<pqDataRepresentation*>(selectedDataRepr);
+    if (!selectedDataRepr)
     {
       // No data display was selected (or none that is registered).
       continue;
     }
-    pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-    vtkSMSourceProxy* selectedSource =
+    pqOutputPort* opPort = pqDataRepr->getOutputPortFromInput();
+    vtkSMSourceProxy* prevAppendSelections = opPort->getSelectionInput();
+    vtkSMSourceProxy* selectedDataSource =
       vtkSMSourceProxy::SafeDownCast(opPort->getSource()->getProxy());
     if (select_blocks)
     {
       // convert the index based selection to BLOCKS or BLOCK_SELECTORS.
       // Eventually, we want all datasets to simply create `BLOCK_SELECTORS`,
       // however I am worried this will impact custom applications. So we only
-      // do this for ParitionedDataSetCollection for now.
+      // do this for vtkPartitionedDataSetCollection for now.
       auto dinfo = opPort->getDataInformation();
       const int targetContentType = dinfo->DataSetTypeIsA(VTK_PARTITIONED_DATA_SET_COLLECTION)
         ? vtkSelectionNode::BLOCK_SELECTORS
         : vtkSelectionNode::BLOCKS;
-      vtkSMSourceProxy* newSelSource =
-        vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertSelection(
-          targetContentType, selectionSource, selectedSource, opPort->getPortNumber()));
-      selectionSource.TakeReference(newSelSource);
+      selectionSource.TakeReference(
+        vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertSelectionSource(
+          targetContentType, selectionSource, selectedDataSource, opPort->getPortNumber())));
     }
+
+    // create an append-selections proxy with the selection source as the only input
+    vtkSmartPointer<vtkSMSourceProxy> newAppendSelections;
+    newAppendSelections.TakeReference(vtkSMSourceProxy::SafeDownCast(
+      vtkSMSelectionHelper::NewAppendSelectionsFromSelectionSource(selectionSource)));
 
     switch (selectionModifier)
     {
-      case (pqView::PV_SELECTION_ADDITION):
-        vtkSMSelectionHelper::MergeSelection(
-          selectionSource, opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
+      case pqView::PV_SELECTION_ADDITION:
+        vtkSMSelectionHelper::AddSelection(prevAppendSelections, newAppendSelections);
         break;
-      case (pqView::PV_SELECTION_SUBTRACTION):
-        vtkSMSelectionHelper::SubtractSelection(
-          selectionSource, opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
+      case pqView::PV_SELECTION_SUBTRACTION:
+        vtkSMSelectionHelper::SubtractSelection(prevAppendSelections, newAppendSelections);
         break;
-      case (pqView::PV_SELECTION_TOGGLE):
-        vtkSMSelectionHelper::ToggleSelection(
-          selectionSource, opPort->getSelectionInput(), selectedSource, opPort->getPortNumber());
+      case pqView::PV_SELECTION_TOGGLE:
+        vtkSMSelectionHelper::ToggleSelection(prevAppendSelections, newAppendSelections);
         break;
+      case pqView::PV_SELECTION_DEFAULT:
       default:
+        vtkSMSelectionHelper::IgnoreSelection(prevAppendSelections, newAppendSelections);
         break;
     }
 
-    opPort->setSelectionInput(selectionSource, 0);
+    opPort->setSelectionInput(newAppendSelections, 0);
     output_ports.append(opPort);
   }
 }
@@ -692,11 +788,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
   // Local variables for tracing
   std::string modifier = GetSelectionModifierAsString(selectionModifier);
 
-  std::vector<int> rectVector(4);
-  for (size_t i = 0; i < 4; ++i)
-  {
-    rectVector[i] = rect[i];
-  }
+  std::vector<int> rectVector(rect, rect + 4);
 
   vtkNew<vtkCollection> selectedRepresentations;
   vtkNew<vtkCollection> selectionSources;
@@ -728,7 +820,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
         .arg("SelectSurfaceBlocks")
         .arg("Rectangle", rectVector)
         .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
-        .arg("comment", "create a frustum selection of cells");
+        .arg("comment", "create a block selection");
     }
     else
     {
@@ -750,8 +842,7 @@ void pqRenderView::selectPointsOnSurface(int rect[4], int selectionModifier, con
 {
   QList<pqOutputPort*> output_ports;
   this->selectOnSurfaceInternal(rect, output_ports, true, selectionModifier, false, array);
-  // Fire selection event to let the world know that this view selected
-  // something.
+  // Fire selection event to let the world know that this view selected something.
   this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
@@ -760,8 +851,7 @@ void pqRenderView::selectPolygonPoints(vtkIntArray* polygon, int selectionModifi
 {
   QList<pqOutputPort*> output_ports;
   this->selectPolygonInternal(polygon, output_ports, true, selectionModifier, false);
-  // Fire selection event to let the world know that this view selected
-  // something.
+  // Fire selection event to let the world know that this view selected something.
   this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
@@ -770,8 +860,7 @@ void pqRenderView::selectPolygonCells(vtkIntArray* polygon, int selectionModifie
 {
   QList<pqOutputPort*> output_ports;
   this->selectPolygonInternal(polygon, output_ports, false, selectionModifier, false);
-  // Fire selection event to let the world know that this view selected
-  // something.
+  // Fire selection event to let the world know that this view selected something.
   this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
@@ -780,8 +869,8 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
   bool select_points, int selectionModifier, bool select_blocks)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
-  vtkSmartPointer<vtkCollection> selectedRepresentations = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> selectionSources = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
 
   // Local variables for tracing
   std::string modifier = GetSelectionModifierAsString(selectionModifier);
@@ -829,12 +918,13 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectFrustum(int rect[4])
+void pqRenderView::selectFrustumCells(int rect[4], int selectionModifier)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
+  std::string modifier = GetSelectionModifierAsString(selectionModifier);
 
-  vtkSmartPointer<vtkCollection> selectedRepresentations = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> selectionSources = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
   QList<pqOutputPort*> output_ports;
 
   BEGIN_UNDO_EXCLUDE();
@@ -842,7 +932,7 @@ void pqRenderView::selectFrustum(int rect[4])
         rect, selectedRepresentations, selectionSources, this->UseMultipleRepresentationSelection))
   {
     END_UNDO_EXCLUDE();
-    this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
+    this->emitSelectionSignal(output_ports, selectionModifier);
     return;
   }
 
@@ -855,25 +945,26 @@ void pqRenderView::selectFrustum(int rect[4])
   SM_SCOPED_TRACE(CallFunction)
     .arg("SelectCellsThrough")
     .arg("Rectangle", rectVector)
+    .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
     .arg("comment", "create a frustum selection of cells");
 
   END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(
-    selectedRepresentations, selectionSources, output_ports, pqView::PV_SELECTION_DEFAULT, false);
+    selectedRepresentations, selectionSources, output_ports, selectionModifier, false);
 
-  // Fire selection event to let the world know that this view selected
-  // something.
-  this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
+  // Fire selection event to let the world know that this view selected something.
+  this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectFrustumPoints(int rect[4])
+void pqRenderView::selectFrustumPoints(int rect[4], int selectionModifier)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
+  std::string modifier = GetSelectionModifierAsString(selectionModifier);
 
-  vtkSmartPointer<vtkCollection> selectedRepresentations = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> selectionSources = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
   QList<pqOutputPort*> output_ports;
 
   BEGIN_UNDO_EXCLUDE();
@@ -881,29 +972,25 @@ void pqRenderView::selectFrustumPoints(int rect[4])
         rect, selectedRepresentations, selectionSources, this->UseMultipleRepresentationSelection))
   {
     END_UNDO_EXCLUDE();
-    this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
+    this->emitSelectionSignal(output_ports, selectionModifier);
     return;
   }
 
-  std::vector<int> rectVector(4);
-  for (size_t i = 0; i < 4; ++i)
-  {
-    rectVector[i] = rect[i];
-  }
+  std::vector<int> rectVector(rect, rect + 4);
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("SelectPointsThrough")
     .arg("Rectangle", rectVector)
+    .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
     .arg("comment", "create a frustum selection of points");
 
   END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(
-    selectedRepresentations, selectionSources, output_ports, pqView::PV_SELECTION_DEFAULT, false);
+    selectedRepresentations, selectionSources, output_ports, selectionModifier, false);
 
-  // Fire selection event to let the world know that this view selected
-  // something.
-  this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
+  // Fire selection event to let the world know that this view selected something.
+  this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
@@ -911,6 +998,7 @@ void pqRenderView::selectBlock(int rectangle[4], int selectionModifier)
 {
   bool block = this->blockSignals(true);
   QList<pqOutputPort*> opPorts;
+  // block selection will create a cell based selection always
   this->selectOnSurfaceInternal(rectangle, opPorts, false, selectionModifier, true);
 
   this->blockSignals(block);

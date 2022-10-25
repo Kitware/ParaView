@@ -165,6 +165,9 @@ set(headers
   google/protobuf/wire_format_lite.h
   google/protobuf/wrappers.pb.h
 
+  google/protobuf/port_def.inc
+  google/protobuf/port_undef.inc
+
   google/protobuf/any.proto
   google/protobuf/api.proto
   google/protobuf/descriptor.proto

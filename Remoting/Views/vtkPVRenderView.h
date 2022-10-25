@@ -30,6 +30,7 @@
 #include "vtkBoundingBox.h" // needed for iVar
 #include "vtkNew.h"         // needed for iVar
 #include "vtkPVView.h"
+#include "vtkParaViewDeprecation.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for iVar
 #include "vtkWeakPointer.h"         // needed for iVar
@@ -719,6 +720,8 @@ public:
   virtual void SetCamera2DManipulators(const int manipulators[9]);
   virtual void SetCamera3DManipulators(const int manipulators[9]);
   void SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9]);
+  virtual void SetReverseMouseWheelZoomDirection(bool reverse);
+  virtual void SetMouseWheelZoomsToCursor(bool value);
   virtual void SetCamera2DMouseWheelMotionFactor(double factor);
   virtual void SetCamera3DMouseWheelMotionFactor(double factor);
 
@@ -945,9 +948,12 @@ public:
   /**
    * Set the path tracers volume anisotropy
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use vtkVolumeProperty::SetScatteringAnisotropy instead")
   void SetVolumeAnisotropy(double);
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use vtkVolumeProperty::GetScatteringAnisotropy instead")
   double GetVolumeAnisotropy();
   //@}
+
   //@{
   /**
    * Set the number of primary rays that OSPRay shoots per pixel.
@@ -1196,6 +1202,8 @@ protected:
   // 2D and 3D interactor style
   vtkPVInteractorStyle* TwoDInteractorStyle;
   vtkPVInteractorStyle* ThreeDInteractorStyle;
+
+  bool ReverseMouseWheelZoomDirection = false;
 
   // Active interactor style either [TwoDInteractorStyle, ThreeDInteractorStyle]
   vtkPVInteractorStyle* InteractorStyle;

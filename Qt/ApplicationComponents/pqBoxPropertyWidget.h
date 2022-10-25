@@ -75,7 +75,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractiveP
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqBoxPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0,
+  pqBoxPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr,
     bool hideReferenceBounds = false);
   ~pqBoxPropertyWidget() override;
 
@@ -89,6 +89,8 @@ private:
   Q_DISABLE_COPY(pqBoxPropertyWidget)
   pqPropertyLinks WidgetLinks;
   bool BoxIsRelativeToInput;
+
+  QMetaObject::Connection PlaceWidgetConnection;
 };
 
 #endif

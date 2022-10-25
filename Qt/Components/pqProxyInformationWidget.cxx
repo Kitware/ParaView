@@ -485,16 +485,6 @@ public:
   // populate arrays info
   void setDataArrays(vtkPVDataInformation* dinfo)
   {
-    if (dinfo && dinfo->GetHasTime())
-    {
-      this->Ui.labelDataArrays->setText(
-        QString("Data Arrays (time: %1)").arg(formatTime(dinfo->GetTime())));
-    }
-    else
-    {
-      this->Ui.labelDataArrays->setText("Data Arrays");
-    }
-
     this->ArraysModel.setDataInformation(dinfo);
     this->Ui.dataArraysTable->header()->resizeSections(QHeaderView::ResizeToContents);
     this->Ui.dataArraysTable->updateGeometry();
@@ -617,6 +607,23 @@ public:
       ui.extents->setText("(n/a)\n(n/a)\n(n/a)");
       ui.labelExtents->setVisible(false);
       ui.extents->setVisible(false);
+    }
+
+    ui.labelTimeSteps->setVisible(dinfo && dinfo->GetHasTime());
+    ui.timeSteps->setVisible(dinfo && dinfo->GetHasTime());
+    if (dinfo && dinfo->GetHasTime())
+    {
+      ui.timeSteps->setText(l.toString(dinfo->GetNumberOfTimeSteps()));
+    }
+
+    ui.labelCurrentTime->setVisible(dinfo && dinfo->GetHasTime());
+    ui.currentTime->setVisible(dinfo && dinfo->GetHasTime());
+    if (dinfo && dinfo->GetHasTime())
+    {
+      ui.currentTime->setText(QString("%1 (range: [%2, %3])")
+                                .arg(formatTime(dinfo->GetTime()))
+                                .arg(dinfo->GetTimeRange()[0])
+                                .arg(dinfo->GetTimeRange()[1]));
     }
   }
 };

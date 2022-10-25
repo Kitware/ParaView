@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPauseLiveSourcePropertyWidget : public pq
 
 public:
   pqPauseLiveSourcePropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqPauseLiveSourcePropertyWidget() override;
 
 private:

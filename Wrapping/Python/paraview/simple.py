@@ -565,8 +565,11 @@ def SaveExtracts(**kwargs):
 
     scene.UpdateAnimationUsingDataTimeSteps()
 
-    pxm = servermanager.ProxyManager()
-    proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
+    controller = servermanager.ParaViewPipelineController()
+    proxy = servermanager.misc.SaveAnimationExtracts()
+    controller.PreInitializeProxy(proxy)
+    proxy.AnimationScene = scene
+    controller.PostInitializeProxy(proxy)
     SetProperties(proxy, **kwargs)
     return proxy.SaveExtracts()
 
@@ -1233,6 +1236,12 @@ def ExtendFileSeries(proxy=None):
     return helper.ExtendFileSeries(proxy.SMProxy)
 
 # -----------------------------------------------------------------------------
+def ReplaceReaderFileName(readerProxy, files, propName):
+    """Replaces the readerProxy by a new one given a list of files. PropName
+    should be "FileNames" or "FileName" depending on the property name in the reader."""
+    servermanager.vtkSMCoreUtilities.ReplaceReaderFileName(readerProxy.SMProxy, files, propName)
+
+# -----------------------------------------------------------------------------
 def ImportCinema(filename, view=None):
     """::deprecated:: 5.9
 
@@ -1851,6 +1860,27 @@ def GetOpacityTransferFunction(arrayname, representation=None, separate=False, *
     SetProperties(otf, **params)
     return otf
 
+def GetTransferFunction2D(arrayname, array2name=None, representation=None, separate=False,
+        **params):
+    """Get the 2D transfer function used to map either two data arrays or a data array against its
+    gradient to color and opacity. Representation is used to modify the array name when using a
+    separate color transfer function. separate can be used to recover the separate transfer function
+    even if it is not used by the representation. This may create a new 2D transfer function if none
+    exists, or return an existing one"""
+    array2name = "" if array2name is None else ("_%s" % array2name)
+    if representation:
+      if separate or representation.UseSeparateColorMap:
+        arrayname = ("%s%s_%s%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(),
+            arrayname, array2name))
+    if not servermanager.ActiveConnection:
+        raise RuntimeError ("Missing active session")
+    session = servermanager.ActiveConnection.Session
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    tf2d = servermanager._getPyProxy(\
+            tfmgr.GetTransferFunction2D(arrayname, session.GetSessionProxyManager()))
+    SetProperties(tf2d, **params)
+    return tf2d
+
 # -----------------------------------------------------------------------------
 def ImportPresets(filename):
     """Import presets from a file. The file can be in the legacy color map xml
@@ -1972,14 +2002,18 @@ def CreateScalarBar(**params):
     It is possible to pass the lookup table (and other properties) as arguments
     to this method::
 
-        lt = MakeBlueToRedLt(3.5, 7.5)
+        lt = MakeBlueToRedLT(3.5, 7.5)
         bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
         GetRenderView().Representations.append(bar)
 
     By default the returned widget is selectable and resizable.
+    ::deprecated:: 5.10
+    Use :func:`GetScalarBar` instead.
     """
+    import warnings
+    warnings.warn("`CreateScalarBar` is deprecated in ParaView 5.10. Use `GetScalarBar` instead",
+        DeprecationWarning)
     sb = servermanager.rendering.ScalarBarWidgetRepresentation()
-    servermanager.Register(sb)
     sb.Selectable = 1
     sb.Resizable = 1
     sb.Enabled = 1
@@ -2095,8 +2129,8 @@ def AnimateReader(reader=None, view=None):
 
 # -----------------------------------------------------------------------------
 
-def _GetRepresentationAnimationHelper(sourceproxy):
-    """Internal method that returns the representation animation helper for a
+def GetRepresentationAnimationHelper(sourceproxy):
+    """Method that returns the representation animation helper for a
        source proxy. It creates a new one if none exists."""
     # ascertain that proxy is a source proxy
     if not sourceproxy in GetSources().values():
@@ -2144,8 +2178,8 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     # To handle the case where the property is actually a "display" property, in
     # which case we are actually animating the "RepresentationAnimationHelper"
     # associated with the source.
-    if propertyname in ["Visibility", "Opacity"]:
-        proxy = _GetRepresentationAnimationHelper(proxy)
+    if propertyname in ["Visibility", "Opacity"] and proxy.GetXMLName() != "RepresentationAnimationHelper":
+        proxy = GetRepresentationAnimationHelper(proxy)
     if not proxy or not proxy.GetProperty(propertyname):
         raise AttributeError ("Failed to locate property %s" % propertyname)
 
@@ -2466,34 +2500,60 @@ def CreateTexture(filename=None):
 #==============================================================================
 # Miscellaneous functions.
 #==============================================================================
-def Show3DWidgets(proxy=None):
+def ShowInteractiveWidgets(proxy=None):
     """If possible in the current environment, this method will
-    request the application to show the 3D widget(s) for proxy"""
+    request the application to show the interactive widget(s) for proxy"""
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
         raise ValueError ("No 'proxy' was provided and no active source was found.")
-    _Invoke3DWidgetUserEvent(proxy, "ShowWidget")
+    _InvokeWidgetUserEvent(proxy, "ShowWidget")
+
+def HideInteractiveWidgets(proxy=None):
+    """If possible in the current environment, this method will
+    request the application to hide the interactive widget(s) for proxy"""
+    proxy = proxy if proxy else GetActiveSource()
+    if not proxy:
+        raise ValueError ("No 'proxy' was provided and no active source was found.")
+    _InvokeWidgetUserEvent(proxy, "HideWidget")
+
+def Show3DWidgets(proxy=None):
+    """
+    If possible in the current environment, this method will
+    request the application to show the 3D widget(s) for proxy
+
+    ::deprecated:: 5.11
+    Use :func:`ShowInteractiveWidgets` instead.
+    """
+    import warnings
+    warnings.warn("`Show3DWidgets` is deprecated in ParaView 5.11. Use `ShowInteractiveWidgets` instead",
+        DeprecationWarning)
+    ShowInteractiveWidgets(proxy)
 
 def Hide3DWidgets(proxy=None):
-    """If possible in the current environment, this method will
-    request the application to hide the 3D widget(s) for proxy"""
-    proxy = proxy if proxy else GetActiveSource()
-    if not proxy:
-        raise ValueError ("No 'proxy' was provided and no active source was found.")
-    _Invoke3DWidgetUserEvent(proxy, "HideWidget")
+    """
+    If possible in the current environment, this method will
+    request the application to show the 3D widget(s) for proxy
 
-def _Invoke3DWidgetUserEvent(proxy, event):
-    """Internal method used by Show3DWidgets/Hide3DWidgets"""
+    ::deprecated:: 5.11
+    Use :func:`HideInteractiveWidgets` instead.
+    """
+    import warnings
+    warnings.warn("`Hide3DWidgets` is deprecated in ParaView 5.11. Use `HideInteractiveWidgets` instead",
+        DeprecationWarning)
+    HideInteractiveWidgets(proxy)
+
+def _InvokeWidgetUserEvent(proxy, event):
+    """Internal method used by ShowInteractiveWidgets/HideInteractiveWidgets"""
     if proxy:
         proxy.InvokeEvent('UserEvent', event)
-        # Since in 5.0 and earlier, Show3DWidgets/Hide3DWidgets was called with the
-        # proxy being the filter proxy (eg. Clip) and not the proxy that has the
-        # widget i.e. (Clip.ClipType), we explicitly handle it by iterating of
-        # proxy list properties and then invoking the event on their value proxies
-        # too.
+        # Since in 5.0 and earlier, ShowInteractiveWidgets/HideInteractiveWidgets
+        # was called with the proxy being the filter proxy (eg. Clip) and not the
+        # proxy that has the widget i.e. (Clip.ClipType), we explicitly handle it
+        # by iterating of proxy list properties and then invoking the event on
+        # their value proxies too.
         for smproperty in proxy:
             if smproperty.FindDomain("vtkSMProxyListDomain"):
-                _Invoke3DWidgetUserEvent(smproperty.GetData(), event)
+                _InvokeWidgetUserEvent(smproperty.GetData(), event)
 
 def ExportView(filename, view=None, **params):
     """Export a view to the specified output file."""

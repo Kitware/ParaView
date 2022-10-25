@@ -59,7 +59,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTooltipSelectionPipeline.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QSet>
+#include <QShortcut>
 #include <QToolTip>
 
 #include <cassert>
@@ -80,6 +83,7 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   , ZoomCursor(QCursor(QPixmap((const char**)zoom_xpm)))
   , MouseMovingTimer(this)
   , MouseMoving(false)
+  , CopyToolTipShortcut(new QShortcut(pqCoreUtilities::mainWidget()))
 {
   this->MousePosition[0] = 0;
   this->MousePosition[1] = 0;
@@ -109,15 +113,6 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
     }
   }
 
-  if (this->Mode == SELECT_FRUSTUM_CELLS || this->Mode == SELECT_FRUSTUM_POINTS)
-  {
-    this->DisableSelectionModifiers = true;
-  }
-  else
-  {
-    this->DisableSelectionModifiers = false;
-  }
-
   this->setRepresentation(nullptr);
   if (this->Mode == SELECT_SURFACE_POINTDATA_INTERACTIVELY ||
     this->Mode == SELECT_SURFACE_CELLDATA_INTERACTIVELY)
@@ -131,6 +126,10 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
 
   this->MouseMovingTimer.setSingleShot(true);
   this->connect(&this->MouseMovingTimer, SIGNAL(timeout()), this, SLOT(onMouseStop()));
+
+  // Copy tooltip
+  QObject::connect(this->CopyToolTipShortcut, &QShortcut::activated,
+    [this]() { QApplication::clipboard()->setText(this->PlainTooltipText); });
 }
 
 //-----------------------------------------------------------------------------
@@ -197,16 +196,26 @@ void pqRenderViewSelectionReaction::updateEnableState()
     case SHRINK_SELECTION:
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
-        bool can_shrink = false;
+        bool canShrink = false;
         for (auto port : core->selectionManager()->getSelectedPorts())
         {
-          if (auto selsource = port->getSelectionInput())
+          if (auto appendSelections = port->getSelectionInput())
           {
-            vtkSMPropertyHelper helper(selsource, "NumberOfLayers");
-            can_shrink |= (helper.GetAsInt() >= 1);
+            bool canShrinkAppendSelections = true;
+            unsigned int numInputs =
+              vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements();
+            // for all the selections of this port
+            for (unsigned int i = 0; i < numInputs; ++i)
+            {
+              auto selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i);
+              // check if the number of layers is at least 1
+              canShrinkAppendSelections &=
+                (vtkSMPropertyHelper(selectionSource, "NumberOfLayers").GetAsInt() >= 1);
+            }
+            canShrink |= canShrinkAppendSelections;
           }
         }
-        paction->setEnabled(can_shrink);
+        paction->setEnabled(canShrink);
       }
       else
       {
@@ -325,9 +334,6 @@ void pqRenderViewSelectionReaction::beginSelection()
     pqRenderViewSelectionReaction::ActiveReaction->endSelection();
   }
 
-  // Enable/Disable selection if supported
-  this->disableSelectionModifiers(this->DisableSelectionModifiers);
-
   pqRenderViewSelectionReaction::ActiveReaction = this;
 
   vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
@@ -420,7 +426,10 @@ void pqRenderViewSelectionReaction::beginSelection()
     case SHRINK_SELECTION:
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
-        core->selectionManager()->expandSelection(this->Mode == GROW_SELECTION ? 1 : -1);
+        auto settings = vtkPVRenderViewSettings::GetInstance();
+        core->selectionManager()->expandSelection(this->Mode == GROW_SELECTION ? 1 : -1,
+          settings->GetGrowSelectionRemoveSeed(),
+          settings->GetGrowSelectionRemoveIntermediateLayers());
       }
       break;
 
@@ -459,6 +468,11 @@ void pqRenderViewSelectionReaction::beginSelection()
         vtkCommand::MouseWheelForwardEvent, this, &pqRenderViewSelectionReaction::onWheelRotate);
       this->ObserverIds[3] = this->ObservedObject->AddObserver(
         vtkCommand::MouseWheelBackwardEvent, this, &pqRenderViewSelectionReaction::onWheelRotate);
+
+      this->ObserverIds[4] = this->ObservedObject->AddObserver(vtkCommand::RightButtonPressEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonPressed);
+      this->ObserverIds[5] = this->ObservedObject->AddObserver(vtkCommand::RightButtonReleaseEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonRelease);
       break;
 
     case SELECT_SURFACE_POINTS_TOOLTIP:
@@ -466,6 +480,10 @@ void pqRenderViewSelectionReaction::beginSelection()
       this->ObservedObject = rmp->GetInteractor();
       this->ObserverIds[0] = this->ObservedObject->AddObserver(
         vtkCommand::MouseMoveEvent, this, &pqRenderViewSelectionReaction::onMouseMove);
+      this->ObserverIds[1] = this->ObservedObject->AddObserver(vtkCommand::RightButtonPressEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonPressed);
+      this->ObserverIds[2] = this->ObservedObject->AddObserver(vtkCommand::RightButtonReleaseEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonRelease);
       break;
 
     default:
@@ -474,6 +492,7 @@ void pqRenderViewSelectionReaction::beginSelection()
         vtkCommand::SelectionChangedEvent, this, &pqRenderViewSelectionReaction::selectionChanged);
       break;
   }
+
   this->parentAction()->setChecked(true);
 }
 
@@ -534,7 +553,7 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
   switch (this->Mode)
   {
     case SELECT_SURFACE_CELLS:
-      this->View->selectOnSurface(region, selectionModifier);
+      this->View->selectCellsOnSurface(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_POINTS:
@@ -542,11 +561,11 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
       break;
 
     case SELECT_FRUSTUM_CELLS:
-      this->View->selectFrustum(region);
+      this->View->selectFrustumCells(region, selectionModifier);
       break;
 
     case SELECT_FRUSTUM_POINTS:
-      this->View->selectFrustumPoints(region);
+      this->View->selectFrustumPoints(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_CELLS_POLYGON:
@@ -580,18 +599,17 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
   END_UNDO_EXCLUDE();
 
   this->endSelection();
-
-  if (this->View)
-  {
-    bool frustumSelection = this->Mode == pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS ||
-      this->Mode == pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS;
-    this->View->emitSelectionSignals(frustumSelection);
-  }
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::onMouseMove()
 {
+  // Preselection can sometimes be disabled when a rotation is performed
+  if (this->DisablePreSelection)
+  {
+    return;
+  }
+
   switch (this->Mode)
   {
     case SELECT_SURFACE_POINTS_TOOLTIP:
@@ -869,8 +887,9 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
   bool showTooltip;
   if (pipeline->CanDisplayTooltip(showTooltip))
   {
-    std::string tooltipText;
-    if (showTooltip && !this->MouseMoving && pipeline->GetTooltipInfo(association, tooltipText))
+    std::string tooltipText, plainTooltipText;
+    if (showTooltip && !this->MouseMoving &&
+      pipeline->GetTooltipInfo(association, tooltipText, plainTooltipText))
     {
       QWidget* widget = this->View->widget();
 
@@ -882,9 +901,16 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
         this->MousePosition[0] / dpr, widget->size().height() - (this->MousePosition[1] / dpr)));
 
       QToolTip::showText(pos, tooltipText.c_str());
+
+      // Copy to clipboard mechanism
+      this->PlainTooltipText = QString::fromStdString(plainTooltipText);
+      this->CopyToolTipShortcut->setEnabled(true);
+      this->CopyToolTipShortcut->setKey(QKeySequence::Copy);
     }
     else
     {
+      this->CopyToolTipShortcut->setKey(0);
+      this->CopyToolTipShortcut->setEnabled(false);
       QToolTip::hideText();
     }
   }
@@ -936,7 +962,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
 
           if (association == vtkDataObject::CELL)
           {
-            this->View->selectOnSurface(region, selectionModifier, arrayName);
+            this->View->selectCellsOnSurface(region, selectionModifier, arrayName);
           }
           else
           {
@@ -948,7 +974,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     break;
 
     case SELECT_SURFACE_CELLS_INTERACTIVELY:
-      this->View->selectOnSurface(region, selectionModifier);
+      this->View->selectCellsOnSurface(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_POINTS_INTERACTIVELY:
@@ -993,16 +1019,18 @@ bool pqRenderViewSelectionReaction::isCompatible(SelectionMode mode)
     return true;
   }
   else if ((this->Mode == SELECT_SURFACE_CELLS || this->Mode == SELECT_SURFACE_CELLS_POLYGON ||
-             this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY) &&
+             this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY ||
+             this->Mode == SELECT_FRUSTUM_CELLS) &&
     (mode == SELECT_SURFACE_CELLS || mode == SELECT_SURFACE_CELLS_POLYGON ||
-      mode == SELECT_SURFACE_CELLS_INTERACTIVELY))
+      mode == SELECT_SURFACE_CELLS_INTERACTIVELY || mode == SELECT_FRUSTUM_CELLS))
   {
     return true;
   }
   else if ((this->Mode == SELECT_SURFACE_POINTS || this->Mode == SELECT_SURFACE_POINTS_POLYGON ||
-             this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY) &&
+             this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY ||
+             this->Mode == SELECT_FRUSTUM_POINTS) &&
     (mode == SELECT_SURFACE_POINTS || mode == SELECT_SURFACE_POINTS_POLYGON ||
-      mode == SELECT_SURFACE_POINTS_INTERACTIVELY))
+      mode == SELECT_SURFACE_POINTS_INTERACTIVELY || mode == SELECT_FRUSTUM_POINTS))
   {
     return true;
   }
@@ -1016,4 +1044,15 @@ void pqRenderViewSelectionReaction::onWheelRotate()
   {
     this->onMouseMove();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onRightButtonPressed()
+{
+  this->DisablePreSelection = true;
+}
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onRightButtonRelease()
+{
+  this->DisablePreSelection = false;
 }

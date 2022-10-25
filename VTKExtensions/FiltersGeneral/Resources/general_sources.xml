@@ -173,9 +173,11 @@
                  label="Text"
                  name="TextSource">
       <Documentation long_help="The Text source generates a table containing text."
-                     short_help="Display text">The Text source is used to
-                     generate a 1x1 vtkTable with a single text
-                     string.</Documentation>
+                     short_help="Display text">
+                     The Text source is used to generate a vtkTable with a single text string.
+                     To create a table with several columns, use the '|' (pipe) character.
+                     To create several rows, simply add newlines.
+      </Documentation>
       <StringVectorProperty command="SetText"
                             default_values="Text"
                             name="Text"
@@ -184,8 +186,10 @@
         <Hints>
           <Widget type="multi_line" />
         </Hints>
-        <Documentation>This property specifies the text to
-        display.</Documentation>
+        <Documentation>
+          This property specifies the text to display. To display text separated into cells,
+          use newlines to separate text into rows and the '|' (pipe) character to create columns.
+        </Documentation>
       </StringVectorProperty>
       <Hints>
         <OutputPort index="0"

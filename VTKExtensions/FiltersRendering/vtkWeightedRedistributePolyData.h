@@ -48,7 +48,7 @@ public:
 
 protected:
   vtkWeightedRedistributePolyData();
-  ~vtkWeightedRedistributePolyData();
+  ~vtkWeightedRedistributePolyData() override;
 
   enum
   {
@@ -60,7 +60,7 @@ protected:
     SCHED_2_TAG = 311
   };
 
-  virtual void MakeSchedule(vtkPolyData* input, vtkCommSched*) override;
+  void MakeSchedule(vtkPolyData* input, vtkCommSched*) override;
   float* Weights;
 
 private:

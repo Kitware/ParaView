@@ -123,7 +123,7 @@ public:
 
 protected:
   vtkPVWebApplication();
-  ~vtkPVWebApplication();
+  ~vtkPVWebApplication() override;
 
   int ImageEncoding;
   int ImageCompression;

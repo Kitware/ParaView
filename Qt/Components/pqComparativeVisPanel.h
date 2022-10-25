@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqComparativeVisPanel(QWidget* parent = 0);
+  pqComparativeVisPanel(QWidget* parent = nullptr);
   ~pqComparativeVisPanel() override;
 
   /**
@@ -59,7 +59,7 @@ public:
    */
   pqView* view() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the view to shown in this panel. If the view is not a comparative view
    * then the panel will be disabled, otherwise, it shows the properties of the
@@ -96,7 +96,7 @@ protected Q_SLOTS:
    */
   void removeParameter(int index);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   // void activateCue(vtkSMProperty* cuesProperty,
   // vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 

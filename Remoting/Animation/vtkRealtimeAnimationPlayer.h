@@ -46,8 +46,8 @@ public:
    *
    * Stride is not relevant for realtime animation so let it be always 1.
    */
-  void SetStride(int) override final{};
-  int GetStride() override final { return 1; }
+  void SetStride(int) final {}
+  int GetStride() final { return 1; }
   //@}
 
 protected:
@@ -61,6 +61,11 @@ protected:
    * Return the next time given the current time.
    */
   double GetNextTime(double currentime) override;
+
+  /**
+   * Return the previous time given the current time.
+   */
+  double GetPreviousTime(double currenttime) override;
 
   double GoToNext(double start, double end, double currenttime) override;
   double GoToPrevious(double start, double end, double currenttime) override;

@@ -55,7 +55,7 @@ class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
   typedef pqTestUtility Superclass;
 
 public:
-  pqCoreTestUtility(QObject* parent = 0);
+  pqCoreTestUtility(QObject* parent = nullptr);
   ~pqCoreTestUtility() override;
 
   /**
@@ -64,7 +64,6 @@ public:
    */
   static QString fixPath(const QString& path);
 
-public:
   /**
    * Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
    * (slashes forward), or empty string

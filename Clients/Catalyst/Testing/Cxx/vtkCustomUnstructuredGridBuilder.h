@@ -44,7 +44,7 @@ public:
    * that were returned were already built before.
    * vtkCustomUnstructuredGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
+  vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   /**
    * Customized function to build UnstructuredGrid.
@@ -53,7 +53,7 @@ public:
 
 protected:
   vtkCustomUnstructuredGridBuilder();
-  ~vtkCustomUnstructuredGridBuilder();
+  ~vtkCustomUnstructuredGridBuilder() override;
 
   /**
    * Method to compute the centroid of Cell and return the values in xyz.

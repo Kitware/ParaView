@@ -64,7 +64,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultContextMenu
   using Superclass = pqContextMenuInterface;
 
 public:
-  pqDefaultContextMenu(QObject* parent = 0);
+  pqDefaultContextMenu(QObject* parent = nullptr);
   ~pqDefaultContextMenu() override;
 
   //@{
@@ -101,7 +101,12 @@ protected Q_SLOTS:
    */
   void colorMenuTriggered(QAction* action);
 
-protected:
+  /**
+   * called to show all blocks.
+   */
+  void showAllBlocks() const;
+
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called to build the color arrays submenu.
    */

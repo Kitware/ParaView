@@ -66,7 +66,7 @@ public:
 
 protected:
   vtkRedistributePolyData();
-  ~vtkRedistributePolyData();
+  ~vtkRedistributePolyData() override;
 
   enum
   {

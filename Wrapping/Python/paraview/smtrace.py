@@ -247,6 +247,10 @@ class Trace(object):
             pname = cls.get_registered_name(obj, "piecewise_functions")
             if cls._create_accessor_for_tf(obj, pname):
                 return True
+        if not skip_rendering and cls.get_registered_name(obj, "transfer_2d_functions"):
+            pname = cls.get_registered_name(obj, "transfer_2d_functions")
+            if cls._create_accessor_for_tf(obj, pname):
+                return True
         if not skip_rendering and cls.get_registered_name(obj, "scalar_bars"):
             # trace scalar bar.
             lutAccessor = cls.get_accessor(obj.LookupTable)
@@ -265,6 +269,14 @@ class Trace(object):
             return True
         if cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
+        if obj.SMProxy.GetXMLName() == "RepresentationAnimationHelper":
+            sourceAccessor = cls.get_accessor(obj.Source)
+            varname = cls.get_varname("%sRepresentationAnimationHelper" % (sourceAccessor))
+            accessor = ProxyAccessor(varname, obj)
+            cls.Output.append_separated([\
+                " # get animation representation helper for '%s'" % (sourceAccessor),
+                "%s = GetRepresentationAnimationHelper(%s)" % (accessor, sourceAccessor)])
+            return True
         if not skip_rendering and cls.get_registered_name(obj, "layouts"):
             view = simple.GetActiveView()
             if view and obj.GetViewLocation(view.SMProxy) != -1:
@@ -367,7 +379,7 @@ class Trace(object):
                 comment = "color transfer function/color map"
               method = "GetColorTransferFunction"
               varsuffix = "LUT"
-            else:
+            elif proxy.GetXMLGroup() == "piecewise_functions":
               arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
               if rep:
                 repAccessor = Trace.get_accessor(rep)
@@ -378,6 +390,18 @@ class Trace(object):
                 comment = "opacity transfer function/opacity map"
               method = "GetOpacityTransferFunction"
               varsuffix = "PWF"
+            else:
+              arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
+              if rep:
+                repAccessor = Trace.get_accessor(rep)
+                args = ("'%s', %s, separate=True" % (arrayName, repAccessor))
+                comment = "separate 2D transfer function"
+              else :
+                args = ("'%s'" % arrayName)
+                comment = "2D transfer function"
+              method = "GetTransferFunction2D"
+              varsuffix = "TF2D"
+
             varname = cls.get_varname("%s%s" % (varname, varsuffix))
             accessor = ProxyAccessor(varname, proxy)
             #cls.Output.append_separated([\
@@ -428,6 +452,12 @@ class Trace(object):
             return True
         if obj.GetXMLName() == "PythonAnimationCue":
             raise Untraceable("PythonAnimationCue's are currently not supported in trace")
+        if obj.GetXMLGroup() == "animation_keyframes":
+            accessor = ProxyAccessor(cls.get_varname(pname), obj)
+            ctor = sm._make_name_valid(obj.GetXMLLabel())
+            cls.Output.append_separated("# create a new key frame")
+            cls.Output.append(accessor.trace_ctor(ctor, ProxyFilter()))
+            return True
         return False
 
 class Untraceable(Exception):
@@ -654,6 +684,7 @@ class PropertyTraceHelper(object):
         will either be a string used to refer to another proxy or a string used
         to refer to the proxy in a proxy list domain."""
         myobject = self.get_object()
+        fileListDomain = myobject.SMProperty.FindDomain("vtkSMFileListDomain")
         if isinstance(myobject, sm.ProxyProperty):
             data = myobject[:]
             if self.has_proxy_list_domain():
@@ -675,8 +706,9 @@ class PropertyTraceHelper(object):
                   return data[0]
             except IndexError:
                 return "None"
-        elif myobject.SMProperty.IsA("vtkSMStringVectorProperty"):
+        elif myobject.SMProperty.IsA("vtkSMStringVectorProperty") and not (fileListDomain and fileListDomain.GetIsOptional() == 0):
             # handle multiline properties (see #18480)
+            # but, not if the property is a list of files (see #21100)
             return self.create_multiline_string(repr(myobject))
         else:
             return repr(myobject)
@@ -1462,20 +1494,10 @@ class CreateAnimationTrack(TraceItem):
 
         # We let Trace create an accessor for the cue. We will then simply log the
         # default property values.
-        accessor = Trace.get_accessor(self.Cue)
-
-        trace = TraceOutput()
-        trace.append("# create keyframes for this animation track")
-
-        # Create accessors for each of the animation key frames.
-        for keyframeProxy in self.Cue.KeyFrames:
-            pname = Trace.get_registered_name(keyframeProxy, "animation")
-            kfaccessor = ProxyAccessor(Trace.get_varname(pname), keyframeProxy)
-            ctor = sm._make_name_valid(keyframeProxy.GetXMLLabel())
-            trace.append_separated("# create a key frame")
-            trace.append(kfaccessor.trace_ctor(ctor, AnimationProxyFilter()))
+        accessor = Trace.get_accessor(self.Cue) # type: RealProxyAccessor
 
         # Now trace properties on the cue.
+        trace = TraceOutput()
         trace.append_separated("# initialize the animation track")
         trace.append(accessor.trace_ctor(None, AnimationProxyFilter()))
         Trace.Output.append_separated(trace.raw_data())
@@ -1595,6 +1617,19 @@ class CallFunction(TraceItem):
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
+class TraceText(TraceItem):
+    """Add text directly to the trace. For paraview client applications to use with non-proxy objects."""
+    def __init__(self, text, *args, **kwargs):
+        TraceItem.__init__(self)
+        to_trace = []
+        try:
+            to_trace.append("# " + kwargs["comment"])
+            del kwargs["comment"]
+        except KeyError:
+            pass
+        to_trace.append(text)
+        Trace.Output.append_separated(to_trace)
+
 class ChooseTexture(RenderingMixin, TraceItem):
     """Traces changes of texture object selection. For example renderview background."""
     def __init__(self, owner, texture, prop):
@@ -1612,8 +1647,13 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
     """This is used to request recording of cameras in trace"""
     # This is a little hackish at this point. We'll figure something cleaner out
     # in time.
-    def __init__(self, proxy=None):
+    def __init__(self, proxy=None, **kwargs):
         trace = self.get_trace(proxy)
+        try:
+            Trace.Output.append(["# " + kwargs["comment"]])
+            del kwargs["comment"]
+        except KeyError:
+            pass
         if trace:
             Trace.Output.append_separated(trace)
 

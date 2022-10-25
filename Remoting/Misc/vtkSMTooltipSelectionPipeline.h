@@ -60,11 +60,15 @@ public:
    */
   bool CanDisplayTooltip(bool& showTooltip);
 
+  //@{
   /**
-   * Get information about the tooltip to be displayed.
-   * Return false if the method failed computing information.
+   * Get information about the tooltip to be displayed in a HTML formated string.
+   * tooltipText received a HTML formatted string, while plainTooltipText receive a plain text
+   * version. Return false if the method failed computing information.
    */
   bool GetTooltipInfo(int association, std::string& tooltipText);
+  bool GetTooltipInfo(int association, std::string& tooltipText, std::string& plainTooltipText);
+  //@}
 
 protected:
   vtkSMTooltipSelectionPipeline();

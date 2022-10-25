@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoxPropertyWidget.h"
 #include "ui_pqBoxPropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqUndoStack.h"
+
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMUncheckedPropertyHelper.h"
@@ -231,7 +233,12 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     }
     wdgProxy->UpdateVTKObjects();
     Q_EMIT this->changeAvailable();
-    this->placeWidget();
+    if (this->PlaceWidgetConnection)
+    {
+      QObject::disconnect(this->PlaceWidgetConnection);
+    }
+    this->PlaceWidgetConnection = QObject::connect(&pqActiveObjects::instance(),
+      &pqActiveObjects::dataUpdated, this, &pqBoxPropertyWidget::placeWidget);
     this->render();
   });
 }

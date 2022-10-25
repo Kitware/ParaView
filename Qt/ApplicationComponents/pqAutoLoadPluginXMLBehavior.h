@@ -57,7 +57,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAutoLoadPluginXMLBehavior : public QObjec
   typedef QObject Superclass;
 
 public:
-  pqAutoLoadPluginXMLBehavior(QObject* parent = 0);
+  pqAutoLoadPluginXMLBehavior(QObject* parent = nullptr);
 
 protected Q_SLOTS:
   void updateResources();

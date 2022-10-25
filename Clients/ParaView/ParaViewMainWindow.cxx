@@ -47,9 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqTimer.h"
 #include "pqWelcomeDialog.h"
+
 #include "vtkCommand.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
@@ -60,7 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <QDragEnterEvent>
-#include <QDropEvent>
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QtDebug>
@@ -153,7 +152,6 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->memoryInspectorDock);
-  this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->timeInspectorDock);
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock, this->Internals->comparativePanelDock);
   this->tabifyDockWidget(
@@ -173,10 +171,12 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->colorMapEditorDock->hide();
   this->Internals->timeInspectorDock->hide();
   this->Internals->lightInspectorDock->hide();
+  this->Internals->selectionEditorDock->hide();
 
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->pythonShellDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->timeInspectorDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
@@ -400,6 +400,11 @@ void ParaViewMainWindow::updateFontSize()
 void ParaViewMainWindow::handleMessage(const QString&, int type)
 {
   QDockWidget* dock = this->Internals->outputWidgetDock;
+  pqOutputWidget* outputWidget = qobject_cast<pqOutputWidget*>(dock->widget());
+  if (dock->isFloating() && !outputWidget->shouldOpenForNewMessages())
+  {
+    return;
+  }
   if (!dock->isVisible() && (type == QtCriticalMsg || type == QtFatalMsg || type == QtWarningMsg))
   {
     // if dock is not visible, we always pop it up as a floating dialog. This

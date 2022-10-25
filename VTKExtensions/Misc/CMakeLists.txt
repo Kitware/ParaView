@@ -35,10 +35,10 @@ set(classes
   vtkCleanArrays
   vtkCompleteArrays
   vtkEnvironmentAnnotationFilter
-  vtkExtractHistogram
   vtkMergeBlocks
   vtkMinMax
   vtkPExtractHistogram
+  vtkPVExtractHistogram2D
   vtkPVBox
   vtkPVChangeOfBasisHelper
   vtkPVCylinder

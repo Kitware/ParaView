@@ -2,6 +2,7 @@ include:
     # Metadata shared my many jobs
     - local: .gitlab/rules.yml
     - local: .gitlab/artifacts.yml
+    - local: .gitlab/warning-policy.yml
 
     # OS builds.
     - local: .gitlab/os-linux.yml
@@ -33,7 +34,7 @@ stages:
 
 ## Spack
 
-build:spack-centos7:
+spack-centos7:build:
     extends:
         - .centos7
         - .spack_build_linux
@@ -42,114 +43,135 @@ build:spack-centos7:
 
 ## Linux
 
-build:fedora33-static-mpi-offscreen-osmesa-python:
+fedora35-static-mpi-offscreen-osmesa-python:build:
     extends:
-        - .fedora33_static_mpi_offscreen_osmesa_python
+        - .fedora35_static_mpi_offscreen_osmesa_python
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:fedora33-static-mpi-offscreen-osmesa-python:
+fedora35-static-mpi-offscreen-osmesa-python:test:
     extends:
-        - .fedora33_static_mpi_offscreen_osmesa_python
+        - .fedora35_static_mpi_offscreen_osmesa_python
         - .cmake_test_linux
         - .linux_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:fedora33-static-mpi-offscreen-osmesa-python
+        - fedora35-static-mpi-offscreen-osmesa-python:build
     needs:
-        - build:fedora33-static-mpi-offscreen-osmesa-python
+        - fedora35-static-mpi-offscreen-osmesa-python:build
 
-build:fedora31-shared-icc-mpi-python:
+el8-shared-icc-mpi-python:build:
     extends:
-        - .fedora31_shared_icc_mpi_python
+        - .el8_shared_icc_mpi_python
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:fedora31-shared-icc-mpi-python:
+el8-shared-icc-mpi-python:test:
     extends:
-        - .fedora31_shared_icc_mpi_python
+        - .el8_shared_icc_mpi_python
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:fedora31-shared-icc-mpi-python
+        - el8-shared-icc-mpi-python:build
     needs:
-        - build:fedora31-shared-icc-mpi-python
+        - el8-shared-icc-mpi-python:build
 
-build:fedora33-shared-debug-mpi-python-qt:
+fedora35-shared-debug-mpi-python-qt:build:
     extends:
-        - .fedora33_shared_debug_mpi_python_qt
+        - .fedora35_shared_debug_mpi_python_qt
         - .cmake_build_linux
         - .linux_qt_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:fedora33-shared-debug-mpi-python-qt:
+fedora35-shared-debug-mpi-python-qt:test:
     extends:
-        - .fedora33_shared_debug_mpi_python_qt
+        - .fedora35_shared_debug_mpi_python_qt
         - .cmake_test_linux
         - .linux_qt_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:fedora33-shared-debug-mpi-python-qt
+        - fedora35-shared-debug-mpi-python-qt:build
     needs:
-        - build:fedora33-shared-debug-mpi-python-qt
+        - fedora35-shared-debug-mpi-python-qt:build
     timeout: 120 minutes
+
+fedora35-shared-mpi-python-qt-vtkmoverride:build:
+    extends:
+        - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .cmake_build_linux
+        - .linux_qt_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+fedora35-shared-mpi-python-qt-vtkmoverride:test:
+    extends:
+        - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .cmake_test_linux
+        - .linux_qt_tester_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+    needs:
+        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+    timeout: 90 minutes
 
 ## Catalyst editions
 
-build:fedora33-shared-mpi-core:
+fedora35-shared-mpi-core:build:
     extends:
-        - .fedora33_shared_mpi_core
+        - .fedora35_shared_mpi_core
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:fedora33-shared-mpi-core:
+fedora35-shared-mpi-core:test:
     extends:
-        - .fedora33_shared_mpi_core
+        - .fedora35_shared_mpi_core
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:fedora33-shared-mpi-core
+        - fedora35-shared-mpi-core:build
     needs:
-        - build:fedora33-shared-mpi-core
+        - fedora35-shared-mpi-core:build
 
-build:fedora33-shared-mpi-python-core:
+fedora35-shared-mpi-python-core:build:
     extends:
-        - .fedora33_shared_mpi_python_core
+        - .fedora35_shared_mpi_python_core
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:fedora33-shared-mpi-python-core:
+fedora35-shared-mpi-python-core:test:
     extends:
-        - .fedora33_shared_mpi_python_core
+        - .fedora35_shared_mpi_python_core
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:fedora33-shared-mpi-python-core
+        - fedora35-shared-mpi-python-core:build
     needs:
-        - build:fedora33-shared-mpi-python-core
+        - fedora35-shared-mpi-python-core:build
 
 ## Static analysis
 
-build:fedora33-tidy:
+fedora35-tidy:build:
     extends:
-        - .fedora33_tidy
+        - .fedora35_tidy
         - .cmake_build_linux
         - .linux_qt_builder_tags
         - .cmake_tidy_artifacts
@@ -159,7 +181,7 @@ build:fedora33-tidy:
 
 # macOS
 
-build:macos-arm64-python-qt:
+macos-arm64-python-qt:build:
     extends:
         - .macos_arm64_python_qt
         - .cmake_build_macos
@@ -167,7 +189,7 @@ build:macos-arm64-python-qt:
         - .cmake_build_artifacts
         - .run_manually
 
-test:macos-arm64-python-qt:
+macos-arm64-python-qt:test:
     extends:
         - .macos_arm64_python_qt
         - .cmake_test_macos
@@ -175,11 +197,11 @@ test:macos-arm64-python-qt:
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:macos-arm64-python-qt
+        - macos-arm64-python-qt:build
     needs:
-        - build:macos-arm64-python-qt
+        - macos-arm64-python-qt:build
 
-build:macos-x86_64-python-qt:
+macos-x86_64-python-qt:build:
     extends:
         - .macos_x86_64_python_qt
         - .cmake_build_macos
@@ -187,7 +209,7 @@ build:macos-x86_64-python-qt:
         - .cmake_build_artifacts
         - .run_manually
 
-test:macos-x86_64-python-qt:
+macos-x86_64-python-qt:test:
     extends:
         - .macos_x86_64_python_qt
         - .cmake_test_macos
@@ -195,34 +217,35 @@ test:macos-x86_64-python-qt:
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:macos-x86_64-python-qt
+        - macos-x86_64-python-qt:build
     needs:
-        - build:macos-x86_64-python-qt
+        - macos-x86_64-python-qt:build
 
 # Windows
 
-build:windows-vs2019-kits-mpi-python-qt:
+windows-vs2019-kits-mpi-python-qt:build:
     extends:
         - .windows_vs2019_kits_mpi_python_qt
         - .cmake_build_windows
         - .windows_builder_tags
         - .cmake_build_artifacts
         - .run_manually
-
-test:windows-vs2019-kits-mpi-python-qt:
-    extends:
-        - .windows_vs2019_kits_mpi_python_qt
-        - .cmake_test_windows
-        - .windows_test_tags
-        - .cmake_build_artifacts
-        - .run_automatically
-    dependencies:
-        - build:windows-vs2019-kits-mpi-python-qt
-    needs:
-        - build:windows-vs2019-kits-mpi-python-qt
     timeout: 90 minutes
 
-build:windows-vs2019-qt:
+windows-vs2019-kits-mpi-python-qt:test:
+    extends:
+        - .windows_vs2019_kits_mpi_python_qt
+        - .cmake_test_windows
+        - .windows_test_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - windows-vs2019-kits-mpi-python-qt:build
+    needs:
+        - windows-vs2019-kits-mpi-python-qt:build
+    timeout: 90 minutes
+
+windows-vs2019-qt:build:
     extends:
         - .windows_vs2019_qt
         - .cmake_build_windows
@@ -230,7 +253,7 @@ build:windows-vs2019-qt:
         - .cmake_build_artifacts
         - .run_manually
 
-test:windows-vs2019-qt:
+windows-vs2019-qt:test:
     extends:
         - .windows_vs2019_qt
         - .cmake_test_windows
@@ -238,17 +261,17 @@ test:windows-vs2019-qt:
         - .cmake_build_artifacts
         - .run_automatically
     dependencies:
-        - build:windows-vs2019-qt
+        - windows-vs2019-qt:build
     needs:
-        - build:windows-vs2019-qt
+        - windows-vs2019-qt:build
 
 # Deployment
 
 ## Documentation
 
-build:documentation:
+documentation:build:
     extends:
-        - .fedora33
+        - .fedora35
         - .doxygen_build_linux
         - .linux_qt_builder_tags
         - .doxygen_log_artifacts
@@ -258,7 +281,7 @@ build:documentation:
 
 ## Superbuild
 
-build:superbuild:
+superbuild:build:
     extends:
         - .run_superbuild_trigger
     stage: build

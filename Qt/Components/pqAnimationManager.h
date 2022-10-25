@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-#include "pqComponentsModule.h" // for exports
+#include "pqComponentsModule.h"     // for exports
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
 
 class QSize;
 
@@ -44,6 +45,7 @@ class pqProxy;
 class pqServer;
 class pqView;
 class vtkSMProxy;
+class vtkObject;
 
 /**
  * pqAnimationManager manages the Animation sub-system.
@@ -55,7 +57,7 @@ class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
 public:
-  pqAnimationManager(QObject* parent = 0);
+  pqAnimationManager(QObject* parent = nullptr);
   ~pqAnimationManager() override;
 
   /**
@@ -121,14 +123,26 @@ Q_SIGNALS:
   void writeAnimation(const QString& filename, int magnification, double frameRate);
 
   /**
+   * @deprecated in ParaView 5.11.0
+   */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
+  void beginPlay();
+
+  /**
+   * @deprecated in ParaView 5.11.0
+   */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
+  void endPlay();
+
+  /**
    * Emitted when the active animation scene begins playing.
    */
-  void beginPlay();
+  void beginPlay(vtkObject* caller, unsigned long, void*, void* reversed);
 
   /**
    * Emitted when the active animation scene finishes playing.
    */
-  void endPlay();
+  void endPlay(vtkObject* caller, unsigned long, void*, void* reversed);
 
 public Q_SLOTS:
   // Called when the active server changes.
@@ -144,10 +158,22 @@ protected Q_SLOTS:
   void onTick(int);
 
   /**
+   * @deprecated in ParaView 5.11.0
+   */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
+  void onBeginPlay();
+
+  /**
+   * @deprecated in ParaView 5.11.0
+   */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
+  void onEndPlay();
+
+  /**
    * Called to demarcate the start and end of an animation
    */
-  void onBeginPlay();
-  void onEndPlay();
+  void onBeginPlay(vtkObject* caller, unsigned long, void*, void* reversed);
+  void onEndPlay(vtkObject* caller, unsigned long, void*, void* reversed);
 
 private:
   Q_DISABLE_COPY(pqAnimationManager)

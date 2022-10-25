@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpreadSheetViewSelectionModel.h
+   Module:  pqSpreadSheetViewSelectionModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -59,10 +59,10 @@ class PQCORE_EXPORT pqSpreadSheetViewSelectionModel : public QItemSelectionModel
   typedef QItemSelectionModel Superclass;
 
 public:
-  pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = 0);
+  pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = nullptr);
   ~pqSpreadSheetViewSelectionModel() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void select(const QModelIndex& index, QItemSelectionModel::SelectionFlags command) override
   {
     this->Superclass::select(index, command);
@@ -77,7 +77,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
   void serverSelectionChanged(const QItemSelection&);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Locate the selection source currently set on the representation being shown.
    * If no selection exists, or selection present is not "updatable" by this
@@ -90,8 +90,7 @@ protected:
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewSelectionModel)
 
-  class pqInternal;
-  pqInternal* Internal;
+  pqSpreadSheetViewModel* Model;
 };
 
 #endif

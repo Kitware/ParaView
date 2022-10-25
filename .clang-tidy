@@ -4,6 +4,8 @@ boost-*,\
 bugprone-*,\
 -bugprone-argument-comment,\
 -bugprone-branch-clone,\
+-bugprone-easily-swappable-parameters,\
+-bugprone-implicit-widening-of-multiplication-result,\
 -bugprone-incorrect-roundings,\
 -bugprone-macro-parentheses,\
 -bugprone-misplaced-widening-cast,\
@@ -62,6 +64,7 @@ modernize-*,\
 -modernize-use-equals-delete,\
 -modernize-use-trailing-return-type,\
 -modernize-use-using,\
+-modernize-use-transparent-functors,\
 mpi-*,\
 openmp-*,\
 performance-*,\
@@ -79,6 +82,7 @@ readability-*,\
 -readability-braces-around-statements,\
 -readability-convert-member-functions-to-static,\
 -readability-else-after-return,\
+-readability-function-cognitive-complexity,\
 -readability-function-size,\
 -readability-implicit-bool-conversion,\
 -readability-inconsistent-declaration-parameter-name,\

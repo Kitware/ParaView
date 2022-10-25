@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDataRepresentation;
 class pqDisplayColorWidget;
-class vtkSMProxy;
 
 /**
  * @ingroup Reactions
@@ -57,14 +56,14 @@ public:
    */
   pqUseSeparateColorMapReaction(
     QAction* parent, pqDisplayColorWidget* colorWidget, bool track_active_objects = true);
-  virtual ~pqUseSeparateColorMapReaction();
+  ~pqUseSeparateColorMapReaction() override;
 
   /**
    * Returns the representation currently being used by the reaction.
    */
   pqDataRepresentation* representation() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the active representation.
    */
@@ -74,12 +73,12 @@ protected Q_SLOTS:
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
   /**
    * Called when the action is triggered.
    */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqUseSeparateColorMapReaction)

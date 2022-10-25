@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandLineOptionsBehavior : public QObje
   typedef QObject Superclass;
 
 public:
-  pqCommandLineOptionsBehavior(QObject* parent = 0);
+  pqCommandLineOptionsBehavior(QObject* parent = nullptr);
 
   /**
    * Used during testing to "initialize" application state as much as possible.

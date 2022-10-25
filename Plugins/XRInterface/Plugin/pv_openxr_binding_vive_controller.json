@@ -1,0 +1,104 @@
+{
+  "interaction_profile": "/interaction_profiles/htc/vive_controller",
+
+  "bindings": {
+    "vtk-actions": {
+      "sources": [
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/left/input/aim"
+        },
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/right/input/aim"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "startmovement"
+            },
+            "position": {
+              "output": "movement"
+            }
+          },
+          "mode:": "trackpad",
+          "path": "/user/hand/right/input/trackpad"
+        },
+        {
+          "inputs": {},
+          "mode": "button",
+          "path": "/user/hand/left/input/menu"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "thickcropstart"
+            },
+            "position": {
+              "output": "thickcropdirection"
+            }
+          },
+          "mode:": "trackpad",
+          "path": "/user/hand/left/input/trackpad"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "showmenu"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/menu"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "nextcamerapose"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "triggeraction"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "leftgripaction"
+            },
+            "pose": {
+              "output": "handposehandgrip"
+            }
+          },
+          "path": "/user/hand/left/input/squeeze"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "rightgripaction"
+            },
+            "pose": {
+              "output": "handposehandgrip"
+            }
+          },
+          "path": "/user/hand/right/input/squeeze"
+        }
+      ]
+    }
+  }
+}

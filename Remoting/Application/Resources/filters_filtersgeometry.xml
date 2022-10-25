@@ -105,15 +105,15 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkDataSetSurfaceFilter"
+    <SourceProxy class="vtkGeometryFilter"
                  label="Extract Surface"
                  name="DataSetSurfaceFilter">
       <Documentation long_help="Extract a 2D boundary surface using neighbor relations to eliminate internal faces."
-                     short_help="Extract 2D boundary surface.">The Extract
-                     Surface filter extracts the polygons forming the outer
-                     surface of the input dataset. This filter operates on any
-                     type of data and produces polygonal data as
-                     output.</Documentation>
+                     short_help="Extract 2D boundary surface.">
+        The Extract Surface filter extracts the polygons forming the outer
+        surface of the input dataset. This filter operates on any type of data
+        and produces polygonal data as output.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -123,18 +123,20 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input to the Extract Surface
-        filter.</Documentation>
+        <Documentation>
+          This property specifies the input to the Extract Surface filter.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty command="SetPieceInvariant"
                          default_values="1"
                          name="PieceInvariant"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>If the value of this property is set to 1, internal
-        surfaces along process boundaries will be removed. NOTE: Enabling this
-        option might cause multiple executions of the data source because more
-        information is needed to remove internal surfaces.</Documentation>
+        <Documentation>
+          If the value of this property is set to 1, internal surfaces along process
+          boundaries will be removed. NOTE: Enabling this option might cause multiple
+          executions of the data source because more information is needed to remove internal surfaces.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNonlinearSubdivisionLevel"
                          default_values="1"
@@ -143,16 +145,18 @@
         <IntRangeDomain max="4"
                         min="0"
                         name="range" />
-        <Documentation>If the input is an unstructured grid with nonlinear
-        faces, this parameter determines how many times the face is subdivided
-        into linear faces. If 0, the output is the equivalent of its linear
-        counterpart (and the midpoints determining the nonlinear interpolation
-        are discarded). If 1, the nonlinear face is triangulated based on the
-        midpoints. If greater than 1, the triangulated pieces are recursively
-        subdivided to reach the desired subdivision. Setting the value to
-        greater than 1 may cause some point data to not be passed even if no
-        quadratic faces exist. This option has no effect if the input is not an
-        unstructured grid.</Documentation>
+        <Documentation>
+          If the input is an unstructured grid with nonlinear
+          faces, this parameter determines how many times the face is subdivided
+          into linear faces. If 0, the output is the equivalent of its linear
+          counterpart (and the midpoints determining the nonlinear interpolation
+          are discarded). If 1, the nonlinear face is triangulated based on the
+          midpoints. If greater than 1, the triangulated pieces are recursively
+          subdivided to reach the desired subdivision. Setting the value to
+          greater than 1 may cause some point data to not be passed even if no
+          quadratic faces exist. This option has no effect if the input is not an
+          unstructured grid.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetFastMode"
@@ -168,18 +172,17 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty command="SetDelegation"
-                         default_values="0"
-                         name="UseGeometryFilter"
+      <IntVectorProperty command="SetRemoveGhostInterfaces"
+                         default_values="1"
+                         name="RemoveGhostInterfaces"
                          number_of_elements="1"
-                         panel_visibility="advanced" >
-        <BooleanDomain name="bool" />
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
         <Documentation>
-          When enabled, the filter may use `vtkGeometryFilter` internally to generate
-          the surface.
+          Set whether Ghost interfaces will be removed. When you are rendering you want to remove ghost interfaces.
+          There are certain algorithms though that need the ghost interfaces.
         </Documentation>
       </IntVectorProperty>
-
       <!-- End DataSetSurfaceFilter -->
     </SourceProxy>
 

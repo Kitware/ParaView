@@ -35,17 +35,17 @@ public:
    * Get the NumberOfComponents.  This is abstract to make sure
    * that the value for the NumberOfComponents cannot be changed.
    */
-  virtual unsigned int GetNumberOfComponents() override { return 1; };
+  unsigned int GetNumberOfComponents() override { return 1; };
 
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(
+  double ComputeComponenentAtPoint(
     unsigned int component, double point[3], unsigned long timeStep, double time) override = 0;
 
 protected:
   vtkCPScalarFieldFunction();
-  ~vtkCPScalarFieldFunction();
+  ~vtkCPScalarFieldFunction() override;
 
 private:
   vtkCPScalarFieldFunction(const vtkCPScalarFieldFunction&) = delete;

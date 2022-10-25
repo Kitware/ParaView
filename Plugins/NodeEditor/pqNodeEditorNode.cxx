@@ -49,6 +49,12 @@
 #include <QStyleOptionGraphicsItem>
 #include <QVBoxLayout>
 
+// The pqDoubleLineEdit.h file is only included to handle the issue that the
+// simplified notation rendering of pqDoubleLineEdit widgets is currently not
+// working correctly in QT Graphics View Framework and therefore needs to be
+// explicitly disabled.
+#include <pqDoubleLineEdit.h>
+
 pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
   pqNodeEditorNode::Verbosity::NORMAL
 };
@@ -90,16 +96,28 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphi
     font.setPointSize(pqNodeEditorUtils::CONSTS::NODE_FONT_SIZE);
     this->label->setFont(font);
 
-    // Get the name from the linked proxy and place it in the middle of the GUI
-    // Function is connected to be called each time the proxy get renamed.
-    auto nameChangeFunc = [this]() {
+    // This function retrieves the name of the linked proxy and places it in the
+    // middle of the node. If necessary the label is scaled to fit inside the
+    // node. The function is connected to the nameChanged event.
+    auto updateNodeLabel = [this]() {
       this->label->setPlainText(this->proxy->getSMName());
-      auto br = this->label->boundingRect();
-      this->label->setPos(0.5 * (pqNodeEditorUtils::CONSTS::NODE_WIDTH - br.width()), 3);
-    };
-    QObject::connect(this->proxy, &pqPipelineSource::nameChanged, this->label, nameChangeFunc);
+      this->label->setScale(1.0);
 
-    nameChangeFunc();
+      const auto br = this->label->boundingRect();
+      const auto nodeWidthToLabelWidthRatio = pqNodeEditorUtils::CONSTS::NODE_WIDTH / br.width();
+
+      // if label width larger than node width resize label
+      if (nodeWidthToLabelWidthRatio < 1.0)
+      {
+        this->label->setScale(nodeWidthToLabelWidthRatio);
+      }
+
+      this->label->setPos(
+        0.5 * (pqNodeEditorUtils::CONSTS::NODE_WIDTH - br.width() * this->label->scale()), 1);
+    };
+    QObject::connect(this->proxy, &pqPipelineSource::nameChanged, this->label, updateNodeLabel);
+
+    updateNodeLabel();
     this->labelHeight = this->label->boundingRect().height();
     this->headlineHeight += labelHeight + 3;
   }
@@ -132,6 +150,13 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphi
 
     this->proxyProperties->setObjectName("proxyPropertiesWidget");
     this->proxyProperties->updatePanel();
+
+    // Disable the simplified notation rendering for pqDoubleLineEdit widgets.
+    for (auto element : this->proxyProperties->findChildren<pqDoubleLineEdit*>())
+    {
+      element->setAlwaysUseFullPrecision(true);
+    }
+
     containerLayout->addWidget(this->proxyProperties);
   }
 
@@ -311,8 +336,6 @@ QRectF pqNodeEditorNode::boundingRect() const
 // ----------------------------------------------------------------------------
 void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  const auto& palette = QApplication::palette();
-
   QPainterPath path;
   // Make sure the whole node is redrawn to avoid artefacts
   constexpr double borderOffset = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;

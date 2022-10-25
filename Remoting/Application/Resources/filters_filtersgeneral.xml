@@ -535,10 +535,39 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkFiniteElementFieldDistributor"
+                 label="Finite Element Field Distributor"
+                 name="FiniteElementFieldDistributor">
+      <Documentation long_help="The Finite Element Field Distributor filter (or the FEFD filter in short)
+                                can now visualize Discontinuous Galerkin (DG) finite element fields of type H(Grad), H(Curl), and H(Div)
+                                Note that all cells must be of the same type and the field data must
+                                contain a vtkStringArray describing the DG fields, basis types, and
+                                reference cells."
+                     short_help="Distribute finite element fields.">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Finite Element
+          Field Distributor filter. The input dataset must have an Information Records
+          string array in the field data.
+        </Documentation>
+      </InputProperty>
+      <!-- End FiniteElementFieldDistributor -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkGradientFilter"
                  label="Gradient Of Unstructured DataSet"
                  name="UnstructuredGradientLegacy">
-      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
         This filter has been replaced by 'Gradient'.
         Please consider using that instead.
       </Deprecated>
@@ -826,7 +855,7 @@
       <Hints>
         <Visibility replace_input="1" />
       </Hints>
-      <!-- End GroupDataSets -->
+      <!-- End GroupTimeSteps -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -1762,7 +1791,7 @@
       <IntVectorProperty command="SetBackwardTime"
                      panel_visibility="advanced"
                      default_values="0"
-                     name="Backward Time"
+                     name="BackwardTime"
                      number_of_elements="1">
           <BooleanDomain name="bool" />
           <Documentation>Compute particle path lines when time goes backward.
@@ -1935,7 +1964,6 @@
         whether to merge coincident vertices.</Documentation>
       </IntVectorProperty>
       <Property command="ResetFieldCriteria"
-                immediate_update="1"
                 name="ResetFieldCriteria"></Property>
       <!-- End TessellatorFilter -->
     </SourceProxy>

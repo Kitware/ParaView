@@ -339,6 +339,47 @@
       <!-- End TemporalSnapToTimeStep -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenerateTimeSteps"
+                 name="GenerateTimeSteps"
+                 label="Generate Time Steps">
+      <Documentation short_help="Generate time steps on any input data.">
+        This filter generate timesteps on any input, it completely ignores input time steps if any.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty animateable="1"
+                         command="AddTimeStepValue"
+                         clean_command="ClearTimeStepValues"
+                         label="Time Step Values"
+                         name="TimeStepValuesToGenerate"
+                         number_of_elements="0"
+                         number_of_elements_per_command="1"
+                         repeat_command="1">
+        <!-- Using a range domain will add the "Generate Values" button to the widget -->
+        <DoubleRangeDomain name="range" min="0" max="9"/>
+        <Documentation>
+          This property specifies the timestep values to generate.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+
+      <!-- End GenerateTimeSteps -->
+    </SourceProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="sources">

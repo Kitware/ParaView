@@ -59,7 +59,7 @@ private Q_SLOTS:
   void showHeaderContextMenu(const QPoint&);
   void showBodyContextMenu(const QPoint&);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqDataInformationModel* Model;
   QTableView* View;
 };

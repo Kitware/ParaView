@@ -1,0 +1,91 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkOpenVDBReader"
+                 label="OpenVDB Reader"
+                 name="OpenVDBReader">
+      <Documentation>
+        Reader used for OpenVDB files. An OpenVDB file is a collection of grids. There are two types of
+        grids: image volumes, and point clouds. The reader returns a vtkPartitionedDataSetCollection
+        with one leaf per grid. An image volume will give a vtkImageData block, and
+        a point cloud will give a vtkPolyData block filled with vertices. Since (most of the time) blocks
+        are related and represent the same data this readers expose options to merge all image volume
+        (respectively point clouds) into a single vtkImageData (respectively vtkPolyData) with one data
+        attribute per grid (cf `MergeImageVolumes` and `MergePointSets`).
+      </Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the OpenVDB Reader.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty information_only="1"
+                            name="GridArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="GridsSelection" />
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetGridsSelectionArrayStatus"
+                            element_types="2 0"
+                            information_property="GridArrayInfo"
+                            label="Grid Arrays"
+                            name="GridArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="GridArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which grid arrays to read.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="GetFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="DownsamplingFactor"
+                            command="SetDownsamplingFactor"
+                            default_values="1.0"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0" min="0.05" name="range" />
+        <Documentation>
+          This parameter controls the sampling rate of the image volume. A value of 1 will lead to a volume with
+          the same resolution as the read one. A value of 0.5 will downsample the file by half along each axis.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetMergeImageVolumes"
+                         default_values="0"
+                         name="MergeImageVolumes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the different requested image grids will be merged into a single ImageData.
+          When disabled, the different requested image grids will be stored into individual blocks.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetMergePointSets"
+                         default_values="0"
+                         name="MergePointSets"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the different requested point clouds will be merged into a single PolyData.
+          When disabled, the different requested point clouds will be stored into individual blocks.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="vdb" file_description="OpenVDB files" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

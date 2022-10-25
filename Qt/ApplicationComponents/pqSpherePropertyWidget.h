@@ -53,10 +53,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpherePropertyWidget : public pqInteracti
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqSpherePropertyWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Center the widget on the data bounds.
    */
@@ -71,7 +71,7 @@ protected Q_SLOTS:
 private Q_SLOTS:
   void setCenter(double x, double y, double z);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSpherePropertyWidget)
 };
 

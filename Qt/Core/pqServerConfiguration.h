@@ -49,8 +49,20 @@ class vtkIndent;
 class PQCORE_EXPORT pqServerConfiguration
 {
 public:
+  /**
+   * Create an empty server configuration with the default name.
+   */
   pqServerConfiguration();
+
+  /**
+   * Default destructor
+   */
   ~pqServerConfiguration();
+
+  /**
+   * Create an empty server configuration with a provided name.
+   */
+  pqServerConfiguration(const QString& name);
 
   /**
    * Create a server configuration with the provided xml.
@@ -78,6 +90,11 @@ public:
   bool isNameDefault() const;
 
   /**
+   * Returns the default name of a server configuration.
+   */
+  static QString defaultName();
+
+  /**
    * Get/Set the resource that describes the server scheme, hostname(s) and port(s).
    */
   pqServerResource resource() const;
@@ -91,21 +108,21 @@ public:
    * which can be different than the server where the pvserver is running.
    * eg. it will give you localhost:8080, instead of serverip:serverport when using port forwarding.
    * Using this method is needed only when using low level tcp api.
-   * ressource() method should be used in any other cases.
+   * resource() method should be used in any other cases.
    */
-  pqServerResource actualResource() const;
+  pqServerResource actualResource();
 
   /**
-   * get the resource URI
+   * get the resource URI, does not contain the server name
    */
   QString URI() const;
 
   /**
    * Get/Set the timeout in seconds that will be used when connecting
    * 0 means no retry and -1 means infinite retries.
-   * If not set in the XML, default is 60.
+   * If not set in the XML, the defaultTimeout is retuned.
    */
-  int connectionTimeout() const;
+  int connectionTimeout(int defaultTimeout = 60) const;
   void setConnectionTimeout(int connectionTimeout);
 
   /**
@@ -189,7 +206,7 @@ public:
   /**
    * Get the port forwarding local port.
    * Initialized by the server xml if port forwarding is used.
-   * Equal to the ressource port if port forwarding is not used.
+   * Equal to the resource port if port forwarding is not used.
    */
   QString portForwardingLocalPort() const;
 
@@ -204,11 +221,12 @@ protected:
   static QString lookForCommand(QString command);
 
 private:
+  void constructor(const QString& name);
   void constructor(vtkPVXMLElement*);
-  bool Mutable;
+  bool Mutable = true;
   vtkSmartPointer<vtkPVXMLElement> XML;
-  bool PortForwarding;
-  bool SSHCommand;
+  bool PortForwarding = false;
+  bool SSHCommand = false;
   QString PortForwardingLocalPort;
   QString ActualURI;
 };

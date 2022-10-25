@@ -118,6 +118,10 @@ void pqCameraReaction::onTriggered()
       this->resetNegativeZ();
       break;
 
+    case APPLY_ISOMETRIC_VIEW:
+      this->applyIsometricView();
+      break;
+
     case ZOOM_TO_DATA:
       this->zoomToData();
       break;
@@ -164,37 +168,61 @@ void pqCameraReaction::resetDirection(
 //-----------------------------------------------------------------------------
 void pqCameraReaction::resetPositiveX()
 {
-  pqCameraReaction::resetDirection(1, 0, 0, 0, 0, 1);
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (ren)
+  {
+    ren->resetViewDirectionToPositiveX();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraReaction::resetNegativeX()
 {
-  pqCameraReaction::resetDirection(-1, 0, 0, 0, 0, 1);
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (ren)
+  {
+    ren->resetViewDirectionToNegativeX();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraReaction::resetPositiveY()
 {
-  pqCameraReaction::resetDirection(0, 1, 0, 0, 0, 1);
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (ren)
+  {
+    ren->resetViewDirectionToPositiveY();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraReaction::resetNegativeY()
 {
-  pqCameraReaction::resetDirection(0, -1, 0, 0, 0, 1);
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (ren)
+  {
+    ren->resetViewDirectionToNegativeY();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraReaction::resetPositiveZ()
 {
-  pqCameraReaction::resetDirection(0, 0, 1, 0, 1, 0);
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (ren)
+  {
+    ren->resetViewDirectionToPositiveZ();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraReaction::resetNegativeZ()
 {
-  pqCameraReaction::resetDirection(0, 0, -1, 0, 1, 0);
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (ren)
+  {
+    ren->resetViewDirectionToNegativeZ();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +246,16 @@ void pqCameraReaction::rotateCamera(double angle)
 
   if (renModule)
   {
-    renModule->getRenderViewProxy()->GetActiveCamera()->Roll(angle);
-    renModule->render();
+    renModule->adjustRoll(angle);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraReaction::applyIsometricView()
+{
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (renModule)
+  {
+    renModule->applyIsometricView();
   }
 }

@@ -77,7 +77,7 @@ public:
    */
   pqPreviewMenuManager(const QStringList& defaultItems, QMenu* parent);
 
-  virtual ~pqPreviewMenuManager();
+  ~pqPreviewMenuManager() override;
 
   /**
    * Provides access to the parent menu.
@@ -106,14 +106,13 @@ private Q_SLOTS:
    */
   void aboutToShow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   void updateCustomActions();
   QAction* findAction(int dx, int dy);
   bool prependCustomResolution(int dx, int dy, const QString& label);
   QPointer<QAction> FirstCustomAction;
   pqTimer Timer;
 
-private:
   Q_DISABLE_COPY(pqPreviewMenuManager);
   void init(const QStringList& defaultItems, QMenu* parentMenu);
 };

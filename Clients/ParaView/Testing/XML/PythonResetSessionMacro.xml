@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!--Create a new macro from a script that calls `ResetSession`-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroCreate" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/Udirectory/resetSession.py" />
+  <!--Run the macro-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="resetSession" />
+  <!--Delete the macro-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros/menuMacroDelete" command="activate" arguments="resetSession" />
+</pqevents>

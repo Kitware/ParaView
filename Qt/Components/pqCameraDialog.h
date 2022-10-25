@@ -38,6 +38,7 @@ class pqCameraDialogInternal;
 class pqView;
 class pqSettings;
 class vtkSMRenderViewProxy;
+class QDoubleSpinBox;
 
 class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog
 {
@@ -83,7 +84,7 @@ public:
    */
   static QStringList CustomViewpointConfigurations();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setRenderModule(pqView*);
 
 private Q_SLOTS:
@@ -110,9 +111,13 @@ private Q_SLOTS:
   void resetViewDirection(
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
 
-  void applyCameraRoll();
-  void applyCameraElevation();
-  void applyCameraAzimuth();
+  void applyIsometricView();
+  void applyCameraRollPlus();
+  void applyCameraRollMinus();
+  void applyCameraElevationPlus();
+  void applyCameraElevationMinus();
+  void applyCameraAzimuthPlus();
+  void applyCameraAzimuthMinus();
   void applyCameraZoomIn();
   void applyCameraZoomOut();
 
@@ -127,15 +132,6 @@ protected:
 
 private:
   pqCameraDialogInternal* Internal;
-
-  enum CameraAdjustmentType
-  {
-    Roll = 0,
-    Elevation,
-    Azimuth,
-    Zoom
-  };
-  void adjustCamera(CameraAdjustmentType enType, double value);
 };
 
 #endif

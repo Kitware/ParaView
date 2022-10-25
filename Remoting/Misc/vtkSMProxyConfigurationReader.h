@@ -132,7 +132,6 @@ private:
   char* FileDescription;
   char* FileExtension;
 
-private:
   vtkSMProxyConfigurationReader(const vtkSMProxyConfigurationReader&) = delete;
   void operator=(const vtkSMProxyConfigurationReader&) = delete;
 };

@@ -132,14 +132,11 @@ def setattr(proxy, pname, value):
 
     if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
         if paraview.compatibility.GetVersion() <= 5.4:
+            from paraview.modules.vtkRemotingViews import vtkSMTransferFunctionManager
             if value:
-                from paraview.modules.vtkRemotingViews import vtkSMTransferFunctionManager
                 proxy.GetProperty("AutomaticRescaleRangeMode").SetData(vtkSMTransferFunctionManager.NEVER)
             else:
-                pxm = proxy.SMProxy.GetSessionProxyManager()
-                settingsProxy = pxm.GetProxy("settings", "GeneralSettings")
-                mode = settingsProxy.GetProperty("TransferFunctionResetMode").GetElement(0)
-                proxy.GetProperty("AutomaticRescaleRangeMode").SetData(mode)
+                proxy.GetProperty("AutomaticRescaleRangeMode").SetData(vtkSMTransferFunctionManager.GROW_ON_APPLY)
 
             raise Continue()
         else:
@@ -398,8 +395,17 @@ def setattr(proxy, pname, value):
                     "removed in ParaView 5.10. Please set the lower and upper "
                     "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
                     "properties, then set the 'ThresholdMethod' property to "
-                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
-                    "lower and upper thresholds.")
+                    "'Between' to threshold between the lower and upper thresholds.")
+
+    # In 5.11, we changed the ParticleTracer/ParticlePath/StreakLine's the StaticMesh
+    # property to be called MeshOverTime since more capabilities were added.
+    if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
+        if paraview.compatibility.GetVersion() <= 5.10:
+            proxy.GetProperty("MeshOverTime").SetData(value)
+            raise Continue()
+        else:
+            raise NotSupportedException("'StaticMesh' is obsolete.  Use 'MeshOverTime' property of " +
+                                        proxy.SMProxy.GetXMLName() + " filter instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -816,8 +822,42 @@ def getattr(proxy, pname):
                     "removed in ParaView 5.10. Please set the lower and upper "
                     "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
                     "properties, then set the 'ThresholdMethod' property to "
-                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
-                    "lower and upper thresholds.")
+                    "'Between' to threshold between the lower and upper thresholds.")
+
+    if pname == "ThresholdBetween" and proxy.SMProxy.GetXMLName() == "VTKmThreshold":
+        # The Threshold filter now offers additional thresholding methods
+        # besides ThresholdBetween. The lower and upper threshold values
+        # are also set separately.
+        if paraview.compatibility.GetVersion() <= 5.10:
+            return [proxy.GetProperty("LowerThreshold").GetData(),
+                    proxy.GetProperty("UpperThreshold").GetData()]
+        else:
+            raise NotSupportedException("The 'ThresholdRange' property has been "
+                    "removed in ParaView 5.11. Please set the lower and upper "
+                    "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
+                    "properties, then set the 'ThresholdMethod' property to "
+                    "'Between' to threshold between the lower and upper thresholds.")
+
+    if pname == "CutoffArray" and proxy.SMProxy.GetXMLName() != "SPHDataSetInterpolator":
+        raise NotSupportedException("The 'CutoffArray' property has been removed in ParaView 5.11."
+                    "If you are wishing to use this property, please use 'SPHDataSetInterpolator' "
+                    "instead. The 'CutoffArray' needs to be provided by the data set source.")
+
+    if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
+        if paraview.compatibility.GetVersion() <= 5.10:
+            return proxy.GetProperty("MeshOverTime").GetData()
+        else:
+            raise NotSupportedException(
+                "The " + proxy.SMProxy.GetXMLName() + ".StaticMesh property has been changed in ParaView 5.11. " \
+                "Please set the MeshOverTime property instead.")
+
+    if proxy.SMProxy.GetXMLName() == "DataSetSurfaceFilter":
+        if pname == "UseGeometryFilter":
+            if paraview.compatibility.GetVersion() <= 5.10:
+                return 1
+            else:
+                raise NotSupportedException(
+                    "Since ParaView 5.11, 'UseGeometryFilter' has been removed. ")
 
     raise Continue()
 
@@ -826,14 +866,6 @@ def getattr(proxy, pname):
 # label and not its name.
 def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
-    if version < 5.2:
-        if key == "ResampleWithDataset":
-            return builtins.getattr(module, "LegacyResampleWithDataset")(**kwargs)
-    if version < 5.3:
-        if key == "PLYReader":
-            # note the case. The old reader didn't support `FileNames` property,
-            # only `FileName`.
-            return builtins.getattr(module, "plyreader")(**kwargs)
     if version < 5.5:
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
@@ -841,13 +873,6 @@ def GetProxy(module, key, **kwargs):
             clip = builtins.getattr(module, key)(**kwargs)
             clip.Invert = 0
             return clip
-    if version < 5.6:
-        if key == "Glyph":
-            # In PV 5.6, we replaced the Glyph filter with a new implementation that has a
-            # different set of properties. The previous implementation was renamed to
-            # GlyphLegacy.
-            glyph = builtins.getattr(module, "GlyphLegacy")(**kwargs)
-            return glyph
     if version < 5.7:
         if key == "ExodusRestartReader" or key == "ExodusIIReader":
             # in 5.7, we changed the names for blocks, this preserves old
@@ -877,6 +902,13 @@ def GetProxy(module, key, **kwargs):
             # into a unique 'Gradient" filter.
             gradient = builtins.getattr(module, "GradientLegacy")(**kwargs)
             return gradient
+    if version <= 5.10:
+        if key in ["ParticleTracer, ParticlePath, StreakLine"]:
+            # in 5.11, we changed the StaticMesh flag of ParticleTracer, ParticlePath and StreakLine
+            # This restores the previous StaticMesh.
+            particleTracerBase = builtins.getattr(module, key)(**kwargs)
+            particleTracerBase.MeshOverTime = 0
+            return particleTracerBase
 
     return builtins.getattr(module, key)(**kwargs)
 

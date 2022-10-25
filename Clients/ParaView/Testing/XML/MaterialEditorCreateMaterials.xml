@@ -63,7 +63,6 @@
   <!-- manually added -->
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0" command="activated" arguments="Load ..." />
   <!-- end manually added -->
-  <!-- <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ParaView_Mark.png" /> -->
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ParaView_Mark.png" />
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0" command="activated" arguments="ParaView_Mark" />
   <!-- select an other property just to update the modified property -->

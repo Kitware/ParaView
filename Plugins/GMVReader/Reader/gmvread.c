@@ -1378,7 +1378,7 @@ int checkfromfile()
       gmv_data.datatype = FROMFILE;
       i = (int)strlen(charptr);
       gmv_data.nchardata1 = i;
-      gmv_data.chardata1 = (char *)malloc(i*sizeof(char));
+      gmv_data.chardata1 = (char *)malloc((i+1)*sizeof(char));
       /*  No need for strncpy here because charptr is by design not too long.  */
       strcpy(gmv_data.chardata1,charptr);
       return 0;
@@ -3685,14 +3685,13 @@ void readunits(FILE* gmvin, int ftype)
       strncpy(gmv_data.chardata1, unittype, GMV_MIN(strlen(unittype), 20-1));
       *(gmv_data.chardata1 + GMV_MIN(strlen(unittype), 20-1)) = (char)0;
       gmv_data.nchardata2 = 1;
-      gmv_data.chardata2 = (char *)malloc(20*sizeof(char));
+      gmv_data.chardata2 = (char *)calloc(strlen(unitname), sizeof(char));
       if (gmv_data.chardata2 == NULL)
         {
          gmvrdmemerr();
          return;
         }
-      strncpy(gmv_data.chardata2, unitname, GMV_MIN(strlen(unitname), 20-1));
-      *(gmv_data.chardata2 + GMV_MIN(strlen(unitname), 20-1)) = (char)0;
+      strcpy(gmv_data.chardata2, unitname);
       return;
      }
 
@@ -3744,10 +3743,10 @@ void readunits(FILE* gmvin, int ftype)
             ioerrtst(gmvin);
             *(unitname+16) = (char) 0;
            }
+
          strncpy(&fldstr[i*MAXCUSTOMNAMELENGTH], fldname, GMV_MIN(strlen(fldname), MAXCUSTOMNAMELENGTH-1));
          fldstr[i*MAXCUSTOMNAMELENGTH + GMV_MIN(strlen(fldname), MAXCUSTOMNAMELENGTH-1)] = '\0';
-         strncpy(&unitstr[i*MAXCUSTOMNAMELENGTH], unitname, GMV_MIN(strlen(unitname), MAXCUSTOMNAMELENGTH-1));
-         unitstr[i*MAXCUSTOMNAMELENGTH + GMV_MIN(strlen(unitname), MAXCUSTOMNAMELENGTH-1)] = '\0';
+         strcpy(&unitstr[i*MAXCUSTOMNAMELENGTH], unitname);
         }
 
       if (strncmp(unittype,"nodes",5) == 0)
@@ -7216,7 +7215,7 @@ void gmvrayread_data()
 void readrays(FILE* gmvrayin, int ftype)
 {
   int i, j=0, k, iswap=0, jswap=0, iray, npts=0, nvarin;
-  int lrays, lrayvars;
+  int64_t lrays, lrayvars;
   int *rayids;
   double *x, *y, *z, *field, *tmpdouble;
   float *tmpfloat = NULL; /* TODO: check fix for uninitialized pointer */
@@ -7227,7 +7226,11 @@ void readrays(FILE* gmvrayin, int ftype)
 
    if (ftype == ASCII)
      {
-      int res = fscanf(gmvrayin,"%d %d",&lrays,&lrayvars); (void) res;
+#ifdef _WIN32
+      int res = fscanf(gmvrayin,"%I64d %I64d",&lrays,&lrayvars); (void) res;
+#else
+      int res = fscanf(gmvrayin,"%" PRIu64 "d %" PRIu64 "d",&lrays,&lrayvars); (void) res;
+#endif
       if (ioerrtst2(gmvrayin)) return;
      }
    else
@@ -7267,7 +7270,11 @@ void readrays(FILE* gmvrayin, int ftype)
      }
 
    if (printon)
-      printf("Reading %d rays.\n",lrays);
+#ifdef _WIN32
+      printf("Reading %I64d rays.\n",lrays);
+#else
+      printf("Reading %" PRIu64 "d rays.\n",lrays);
+#endif
 
    /*  Allocate and read variable 8 or 32 char. names and types.  */
    varnames = (char *)malloc(lrayvars*MAXCUSTOMNAMELENGTH*sizeof(char));
@@ -7484,8 +7491,13 @@ void readrayids(FILE* gmvrayin, int ftype)
   /*                                              */
   /*  Read and set alternate node numbers (ids).  */
   /*                                              */
+
+  // XXX numrays seems to never have been set before, assuming is has
+  // the same value as numnodes 
+  numrays = numnodes;
+
   int i, *lrayids = NULL;
-  long *tmpids;
+  int64_t *tmpids;
 
    /*  Allocate ray ids.  */
    FREE(gmvray_data.rayids);
@@ -7501,7 +7513,7 @@ void readrayids(FILE* gmvrayin, int ftype)
      {
       if (ftype == IEEEI8R4 || ftype == IEEEI8R8)
         {
-         tmpids=(long *)malloc(numrays*sizeof(long));
+         tmpids=(int64_t *)malloc(numrays*sizeof(int64_t));
          if (tmpids == NULL)
            {
             gmvrayrdmemerr();

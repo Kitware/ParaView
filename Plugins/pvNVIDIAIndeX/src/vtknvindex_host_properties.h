@@ -67,6 +67,9 @@ public:
     // matches data_bbox.
     const mi::Uint8* data_buffer;
 
+    // True when data_buffer is defined and points to local memory (not shared memory).
+    bool data_buffer_is_local;
+
     // Data buffer of just the neighbor border data, if fetched from a remote node. Its size matches
     // border_bbox.
     std::unique_ptr<mi::Uint8[]> border_data_buffer;
@@ -79,7 +82,7 @@ public:
 
     // Write the border data to the destination buffer
     void copy(mi::Uint8* dst_buffer, const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global,
-      mi::Size voxel_fmt_size) const;
+      mi::Size voxel_fmt_size, const std::string& source_scalar_type) const;
 
     // Data is available either completely in local or shared memory, or as fetched border data.
     bool is_data_available() const;

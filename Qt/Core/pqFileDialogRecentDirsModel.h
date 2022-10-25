@@ -85,7 +85,7 @@ public:
    */
   QVariant headerData(int section, Qt::Orientation, int role) const override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setChosenFiles(const QList<QStringList>& files);
 
 protected:

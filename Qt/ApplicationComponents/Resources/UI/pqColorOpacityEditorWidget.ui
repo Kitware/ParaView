@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
+    <width>410</width>
     <height>774</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>80</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -30,7 +36,7 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -66,6 +72,26 @@
            <width>16777215</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Select control point and press "Enter" or "Return" to change colors</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="pqTransferFunction2DWidget" name="Transfer2DEditor" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">gridline-color: rgb(46, 95, 255);
+background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
          </property>
         </widget>
        </item>
@@ -188,6 +214,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="ChooseBoxColor">
+         <property name="toolTip">
+          <string>Choose box color and alpha</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../Components/Resources/pqComponents.qrc">
+           <normaloff>:/pqWidgets/Icons/pqBoxColorAlpha.svg</normaloff>:/pqWidgets/Icons/pqBoxColorAlpha.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="pqHighlightableToolButton" name="ComputeDataHistogram">
          <property name="toolTip">
           <string>Compute data histogram</string>
@@ -195,13 +235,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqHistogramReload24.png</normaloff>
-          </iconset>
+           <normaloff>:/pqWidgets/Icons/pqHistogramReload24.png</normaloff>:/pqWidgets/Icons/pqHistogramReload24.png</iconset>
          </property>
         </widget>
        </item>
@@ -243,6 +279,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Set the data value for the selected control point</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -250,7 +289,7 @@
    <item>
     <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be "drawn" instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be &quot;drawn&quot; instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
@@ -281,6 +320,13 @@
      </property>
      <property name="text">
       <string>Use Log Scale When Mapping Data To Opacity</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="Use2DTransferFunction">
+     <property name="text">
+      <string>Edit 2D Transfer Function</string>
      </property>
     </widget>
    </item>
@@ -346,11 +392,11 @@
        <property name="text">
         <string>&lt;html&gt;&lt;b&gt;Data Histogram&lt;/b&gt;&lt;/html&gt;</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
        <property name="wordWrap">
         <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeft</set>
        </property>
       </widget>
      </item>
@@ -400,10 +446,10 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimum">
+       <property name="minimum" stdset="0">
         <number>1</number>
        </property>
-       <property name="maximum">
+       <property name="maximum" stdset="0">
         <number>256</number>
        </property>
       </widget>
@@ -439,26 +485,15 @@
    <extends>QToolButton</extends>
    <header>pqHighlightableToolButton.h</header>
   </customwidget>
+  <customwidget>
+   <class>pqTransferFunction2DWidget</class>
+   <extends>QWidget</extends>
+   <header>pqTransferFunction2DWidget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>EnableOpacityMapping</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>UseLogScaleOpacity</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>166</x>
-     <y>279</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>166</x>
-     <y>305</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

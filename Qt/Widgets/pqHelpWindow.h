@@ -54,7 +54,7 @@ public:
     QHelpEngine* engine, QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqHelpWindow() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Requests showing of a particular page. The url must begin with "qthelp:"
    * scheme when referring to pages from the help files.
@@ -77,7 +77,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
   void search();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QHelpEngine* HelpEngine;
 
 private:

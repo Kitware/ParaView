@@ -4,6 +4,7 @@
 # cells and describes flows in the direction of the cell.
 
 paraview_add_plugin(Moments
+  REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   VERSION "0.0"
   MODULES Moments::MomentFilters

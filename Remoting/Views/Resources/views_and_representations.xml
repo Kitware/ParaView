@@ -928,6 +928,18 @@
         <!-- <Property name="BottomAxisLabelShadow" function="Shadow" /> -->
       </PropertyGroup>
       <!-- end bottom axis -->
+      <ProxyProperty command="AddRepresentation"
+                     is_internal="1"
+                     name="HiddenRepresentations"
+                     remove_command="RemoveRepresentation"
+                     repeatable="1">
+        <Documentation>
+          This property is meant for adding/removing
+          representation secretly. e.g. 2D widgets etc. This property is not
+          saved in states nor it recorded by undo-redo.
+        </Documentation>
+      </ProxyProperty>
+
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
@@ -2009,6 +2021,38 @@
         </Hints>
         <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReverseMouseWheelZoomDirection"
+                         command="SetReverseMouseWheelZoomDirection"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Reverse Mouse Wheel Zoom Direction"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="ReverseMouseWheelZoomDirection"/>
+        </Hints>
+        <Documentation>
+          This option changes the direction of the mouse wheel for zooming in and out.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="MouseWheelZoomsToCursor"
+                         command="SetMouseWheelZoomsToCursor"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Mouse Wheel Zooms To Cursor"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="MouseWheelZoomsToCursor"/>
+        </Hints>
+        <Documentation>
+          Zooms the renderer's camera to the projected point under the cursor position.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseLightKit"
                          default_values="1"
                          name="UseLight"
@@ -2905,29 +2949,12 @@
       </IntVectorProperty>
       <DoubleVectorProperty
           name="VolumeAnisotropy"
-          command="SetVolumeAnisotropy"
           default_values="0.0"
+          panel_visibility="never"
           animateable="0"
           number_of_elements="1">
-        <DoubleRangeDomain
-            min="-1.0"
-            max="1.0"
-            name="range"/>
-        <Documentation>Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableOSPRay"
-                                       values="1" />
-              <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                 <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
-              </PropertyWidgetDecorator>
-            </Expression>
-	  </PropertyWidgetDecorator>
-        </Hints>
+        <Documentation>DEPRECATED_IN_5.11 (Use SetAnisotropy of vtkImageVolumeRepresentation instead):
+          Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty
           name="Denoise"
@@ -3258,7 +3285,6 @@
         <Property name="RouletteDepth"/>
         <Property name="MaxFrames"/>
         <Property name="Denoise"/>
-        <Property name="VolumeAnisotropy"/>
         <Property name="LightScale"/>
         <Property name="OSPRayTemporalCacheSize"/>
         <Property name="BackgroundNorth"/>
@@ -3497,6 +3523,13 @@
                          panel_visibility="advanced">
         <IntRangeDomain min="0" name="range" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetPadding"
+                         default_values="0.05"
+                         name="Padding"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+      <DoubleRangeDomain min="0.0" max="0.25" name="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetNumberOfAnimationFrames"
                          default_values="25"
                          name="NumberOfAnimationFrames"
@@ -3515,6 +3548,7 @@
       <PropertyGroup label="Spacing (Gutter)">
         <Property name="GutterX"/>
         <Property name="GutterY"/>
+        <Property name="Padding"/>
       </PropertyGroup>
 
       <DoubleVectorProperty command="SetScatterPlotSelectedRowColumnColor"
@@ -4224,47 +4258,12 @@
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="points"/>
             <Hints>
-              <!--Hide for volume and slice representation-->
-              <PropertyWidgetDecorator type="CompositeDecorator">
-                <Expression type="or">
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Surface" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Surface With Edges" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Outline" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Points" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Wireframe" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="3D Glyphs" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Point Gaussian" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Feature Edges" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Stream Lines" />
-                </Expression>
-              </PropertyWidgetDecorator>
+              <!--Hide for volume representation-->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume"
+                                       inverse="1" />
             </Hints>
           </PropertyGroup>
 
@@ -4319,32 +4318,13 @@
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
             <Property name="FlipTextures" panel_visibility="advanced"/>
-            <!--Hide for volumes and non surface representations-->
             <Hints>
-              <PropertyWidgetDecorator type="CompositeDecorator">
-                <Expression type="or">
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Surface" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Surface With Edges" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="3D Glyphs" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                          mode="visibility"
-                                          property="RenderLinesAsTubes"
-                                          value="1" />
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                          mode="visibility"
-                                          property="RenderPointsAsSpheres"
-                                          value="1" />
-                </Expression>
-              </PropertyWidgetDecorator>
+              <!--Hide for volume representation-->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume"
+                                       inverse="1" />
             </Hints>
           </PropertyGroup>
 
@@ -4633,14 +4613,13 @@
                         name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkGenericDataSet" />
-          <DataType value="vtkHyperTreeGrid" />
 
           <!-- for MB, we want to match if any of the leaf nodes is of the following type -->
           <DataType value="vtkDataObjectTree" child_match="any">
             <DataType value="vtkDataSet" />
             <DataType value="vtkGenericDataSet" />
-            <DataType value="vtkHyperTreeGrid" />
           </DataType>
+
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"
@@ -4652,19 +4631,8 @@
       </InputProperty>
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
-    <!-- ================================================================== -->
-    <PVRepresentationProxy base_proxygroup="representations"
-                           base_proxyname="UnstructuredGridRepresentation"
-                           class="vtkPVCompositeRepresentation"
-                           name="UnstructuredGridBaseRepresentation"
-                           processes="client|renderserver|dataserver">
-      <Deprecated deprecated_in="5.4" to_remove_in="5.5">
-          This is no longer needed. Simply use UniformGridVolumeRepresentation.
-      </Deprecated>
-    </PVRepresentationProxy>
 
     <!-- ================================================================== -->
-
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -4804,6 +4772,8 @@
       </Hints>
       <!-- End of StructuredGridRepresentation -->
     </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -4844,11 +4814,20 @@
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
             <Property name="ScalarOpacityFunction" />
+            <Property name="TransferFunction2D" />
             <Property name="UseSeparateOpacityArray"
                       panel_visibility="advanced" />
             <Property name="OpacityArrayName"
                       panel_visibility="advanced" />
             <Property name="OpacityComponent"
+                      panel_visibility="advanced" />
+            <Property name="UseTransfer2D"
+                      panel_visibility="advanced" />
+            <Property name="UseGradientForTransfer2D"
+                      panel_visibility="advanced" />
+            <Property name="ColorArray2Name"
+                      panel_visibility="advanced" />
+            <Property name="ColorArray2Component"
                       panel_visibility="advanced" />
             <Property name="VolumeRenderingMode"
                       panel_visibility="advanced"
@@ -4856,6 +4835,14 @@
             <Property name="Shade"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
+            <Property name="GlobalIlluminationReach"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="VolumetricScatteringBlending"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="VolumeAnisotropy"
+                      panel_visibility="advanced"/>
             <Property name="InterpolationType"
                       panel_visibility="never" />
             <Property name="BlendMode" />
@@ -4942,6 +4929,7 @@
       </Hints>
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
+
     <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
@@ -5016,6 +5004,239 @@
 
       <!-- End of AMRRepresentation -->
     </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy class="vtkPVCompositeRepresentation"
+                           name="HyperTreeGridRepresentation"
+                           base_proxygroup="internal_representations"
+                           base_proxyname="PVRepresentationBase"
+                           processes="client|renderserver|dataserver">
+      <Documentation>Representation to show Hyper Tree Grids in the render view
+      based on the Composite Representation.</Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+          <DataType value="vtkDataObjectTree" child_match="all">
+            <DataType value="vtkHyperTreeGrid" />
+          </DataType>
+        </DataTypeDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+
+    </PVRepresentationProxy>
+
+    <PVRepresentationProxy class="vtkHyperTreeGridRepresentation"
+                           name="FastHyperTreeGridRepresentation"
+                           processes="client|renderserver|dataserver"
+                           si_class="vtkSIProxy">
+      <Documentation>Dedicated representation to show 2D Hyper Tree Grid.
+        Use an adaptive decimation mechanism for improved performances.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1">
+        </InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetAdaptiveDecimation"
+                         default_values="1"
+                         name="AdaptiveDecimation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable the use of the Adaptive decimation to only map the part
+          of the HTG inside the camera frustum. Only support 2D HTG with
+          parallel prokjection.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="HTG Surface" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="HTG Surface With Edges" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="HTG Wireframe" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetRepresentation"
+                         default_values="1"
+                         name="Representation"
+                         panel_widget="display_representation_selector"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Wireframe"
+                 value="1" />
+          <Entry text="Surface"
+                 value="2" />
+          <Entry text="Surface With Edges"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+
+      <!-- Coloring -->
+
+      <IntVectorProperty command="SetMapScalars"
+                         default_values="1"
+                         name="MapScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to True, LookupTable will always be
+        used for scalar mapping. Otherwise, when up to 4 component
+        scalars are present, the components are clamped to a valid
+        color interval (0-255 for an integral type and 0.0-1.0 for a
+        floating point type) and then directly used as
+        color.</Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable" >
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty default_values="0"
+                         name="UseSeparateColorMap"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>By default, ParaView shares a single color map among all datasets colored
+        by arrays that have the same name. When this option is enabled, the active dataset will
+        be assigned a separate color map not shared by other datasets.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDiffuseColor"
+                            default_values="1.0 1.0 1.0"
+                            name="DiffuseColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
+        </Hints>
+        <Documentation>
+          The solid color of the model.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- Edges parameters -->
+
+      <DoubleVectorProperty command="SetEdgeColor"
+                            default_values="0 0 0.5"
+                            name="EdgeColor"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <Documentation>Set the edge color. This color is used to draw the edge
+        for the hyper tree grid data when EdgeVisibility is on.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Representation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- Position -->
+
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            label="Translation"
+                            name="Position"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <!-- UI -->
+
+    </PVRepresentationProxy>
+
+    <Extension name="HyperTreeGridRepresentation">
+      <Documentation>
+        Extends standard HTG Representation by adding
+        Fast2DHyperTreeGridRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="FastHyperTreeGridRepresentation"
+        text="HTG Surface" subtype="Surface"/>
+      <RepresentationType subproxy="FastHyperTreeGridRepresentation"
+        text="HTG Surface With Edges" subtype="Surface With Edges"/>
+      <RepresentationType subproxy="FastHyperTreeGridRepresentation"
+        text="HTG Wireframe" subtype="Wireframe"/>
+
+      <SubProxy>
+        <Proxy name="FastHyperTreeGridRepresentation"
+               proxygroup="representations"
+               proxyname="FastHyperTreeGridRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup panel_visibility="default"
+                         label="HTG Rendering" >
+            <Property name="AdaptiveDecimation" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
 
     <!-- ================================================================== -->
     <RepresentationProxy class="vtkStructuredGridVolumeRepresentation"
@@ -5095,6 +5316,87 @@
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUseTransfer2D"
+                         default_values="0"
+                         name="UseTransfer2D"
+                         label="Use 2D Transfer Function"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, a 2D transfer function will be used for volume rendering instead
+          of two 1D piecewise functions.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseGradientForTransfer2D"
+                         default_values="1"
+                         name="UseGradientForTransfer2D"
+                         label="Use Gradient as Y-Axis Array"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the gradient of the input scalar array will be used for the Y
+          axis of the 2D transfer function.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty name="ColorArray2Name"
+                            command="SelectColorArray2"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="2D Transfer Function Y-Axis Array"
+                            panel_visibility="advanced">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_point_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Set the second array to color with. This would be used when a 2D transfer function is
+          enabled and if the use_gradient property is set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean" />
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForTransfer2D" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SelectColorArray2Component"
+                         default_values="0"
+                         name="ColorArray2Component"
+                         label="2D Transfer Function Y-Axis Array Component"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="0">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="ColorArray2Name" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          This property indicates the component of the array to be used for Y-axis of the volume 2D
+          transfer function.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean" />
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForTransfer2D" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseSeparateOpacityArray"
                          default_values="0"
                          name="UseSeparateOpacityArray"
@@ -5105,6 +5407,11 @@
           If this property is on, the Opacity Array will be used to determine the
           point gaussian sprites.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <StringVectorProperty name="OpacityArrayName"
                             command="SelectOpacityArray"
@@ -5124,6 +5431,9 @@
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="UseSeparateOpacityArray" function="boolean" />
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean_invert" />
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
@@ -5146,6 +5456,9 @@
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="UseSeparateOpacityArray" function="boolean" />
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean_invert" />
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
@@ -5240,6 +5553,62 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable shading.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetGlobalIlluminationReach"
+            default_values="0.0"
+            name="GlobalIlluminationReach"
+            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+          min="0.0"
+          name="range" />
+        <Documentation>
+          This parameter acts as a balance between localness and globalness of shadows.
+          A higher value results in more accurate, but also slower renders.
+          A slower value results in faster renders, but only produces ambiant occlusion.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                      mode="visibility"
+                      property="Shade"
+                      value="1"
+                      inverse="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetVolumetricScatteringBlending"
+            default_values="0.0"
+            name="VolumetricScatteringBlending"
+            number_of_elements="1">
+        <DoubleRangeDomain max="2.0"
+          min="0.0"
+          name="range" />
+        <Documentation>
+          This parameter controls the blending between surfacic approximation
+          and volumetric multi-scattering.
+          A value of 0.0 means that no scattered rays will be cast, no volumetric shadows.
+          A value of 1.0 means that the shader will smartly blend between the two models.
+          A value of 2.0 means that the shader only uses the volumetric scattering model.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                      mode="visibility"
+                      property="Shade"
+                      value="1"
+                      inverse="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAnisotropy"
+            default_values="0.0"
+            name="VolumeAnisotropy"
+            number_of_elements="1"
+            panel_visibility="advanced">
+        <DoubleRangeDomain max="1.0"
+          min="-1.0"
+          name="range" />
+        <Documentation>
+          Set the volume's anisotropy, according to the Henyey-Greenstein model.
+          Describes whether the model is rather backwards-scattering (-1.0) or forwards-scattering (1.0).
+          An isotropic volume has a null anisotropy.
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetMapScalars"
                          default_values="1"
                          name="MapScalars"
@@ -5266,6 +5635,12 @@
                      name="ScalarOpacityFunction">
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetTransferFunction2D"
+                     name="TransferFunction2D" >
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_2d_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
       <IntVectorProperty command="SetRequestedRenderMode"
@@ -5393,6 +5768,839 @@
 
       <!-- end of UniformGridVolumeRepresentation -->
     </RepresentationProxy>
+
+    <!--======================================================================-->
+    <RepresentationProxy name="SurfaceLICRepresentation"
+      class="vtkSurfaceLICRepresentation"
+      processes="client|dataserver|renderserver"
+      base_proxygroup="representations"
+      base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        Representation proxy for Surface LIC.
+      </Documentation>
+
+      <StringVectorProperty name="SelectInputVectors"
+        command="SelectInputVectors"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Vectors">
+        <ArrayListDomain name="array_list" attribute_type="Vectors"
+          input_domain_name="input_array_point_3">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the input vector array to process.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!--
+      Integrator controls
+      -->
+      <IntVectorProperty name="NumberOfSteps"
+        command="SetNumberOfSteps"
+        number_of_elements="1"
+        default_values="40">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="StepSize"
+        command="SetStepSize"
+        number_of_elements="1"
+        default_values="0.25">
+        <DoubleRangeDomain name="range" min="0.0"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NormalizeVectors"
+        command="SetNormalizeVectors"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnhancedLIC"
+        command="SetEnhancedLIC"
+        label="Enhanced/2-Pass Image LIC"
+        number_of_elements="1"
+        default_values="1"
+        >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!--
+      Coloring controls
+      -->
+      <IntVectorProperty name="ColorMode"
+        command="SetColorMode"
+        number_of_elements="1"
+        default_values="0"
+        >
+        <EnumerationDomain name="enum">
+          <Entry text="Blend"    value="0" />
+          <Entry text="Multiply" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="MapModeBias"
+        command="SetMapModeBias"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="-0.25" max="0.25" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LICIntensity"
+        label="LIC Intensity"
+        command="SetLICIntensity"
+        number_of_elements="1"
+        default_values="0.8"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="EnhanceContrast"
+        command="SetEnhanceContrast"
+        number_of_elements="1"
+        default_values="0"
+        >
+        <EnumerationDomain name="enum">
+          <Entry text="Off"           value="0" />
+          <Entry text="LIC Only"      value="1" />
+          <Entry text="LIC and Color" value="4" />
+          <Entry text="Color Only"    value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="LowLICContrastEnhancementFactor"
+        command="SetLowLICContrastEnhancementFactor"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="0.5" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="HighLICContrastEnhancementFactor"
+        command="SetHighLICContrastEnhancementFactor"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="0.5" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LowColorContrastEnhancementFactor"
+        command="SetLowColorContrastEnhancementFactor"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="0.5" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="HighColorContrastEnhancementFactor"
+        command="SetHighColorContrastEnhancementFactor"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="0.5" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="AntiAlias"
+        command="SetAntiAlias"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced"
+        >
+        <IntRangeDomain name="range" min="0" max="5" />
+      </IntVectorProperty>
+
+      <!--
+      Fragment masking Control
+      -->
+      <IntVectorProperty name="MaskOnSurface"
+        command="SetMaskOnSurface"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced"
+        >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="MaskThreshold"
+        command="SetMaskThreshold"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="MaskColor"
+        command="SetMaskColor"
+        number_of_elements="3"
+        default_values="0.5 0.5 0.5"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="MaskIntensity"
+        command="SetMaskIntensity"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+      </DoubleVectorProperty>
+
+      <!--
+      Noise Texture Generator Controls
+      -->
+      <IntVectorProperty name="GenerateNoiseTexture"
+        command="SetGenerateNoiseTexture"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced"
+        >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NoiseType"
+        command="SetNoiseType"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced"
+        >
+        <EnumerationDomain name="enum">
+          <Entry text="uniform"  value="0" />
+          <Entry text="Gaussian" value="1" />
+          <Entry text="Perlin"   value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NoiseTextureSize"
+        command="SetNoiseTextureSize"
+        number_of_elements="1"
+        default_values="128"
+        panel_visibility="advanced"
+        >
+        <IntRangeDomain name="range" min="2" max="4096" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NoiseGrainSize"
+        command="SetNoiseGrainSize"
+        number_of_elements="1"
+        default_values="2"
+        panel_visibility="advanced"
+        >
+        <IntRangeDomain name="range" min="1" max="4096" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="MinNoiseValue"
+        command="SetMinNoiseValue"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="MaxNoiseValue"
+        command="SetMaxNoiseValue"
+        number_of_elements="1"
+        default_values="0.8"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NumberOfNoiseLevels"
+        command="SetNumberOfNoiseLevels"
+        number_of_elements="1"
+        default_values="1024"
+        panel_visibility="advanced"
+        >
+        <IntRangeDomain name="range" min="1" max="1024" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ImpulseNoiseProbability"
+        label="Impulse Probability"
+        command="SetImpulseNoiseProbability"
+        number_of_elements="1"
+        default_values="1.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ImpulseNoiseBackgroundValue"
+        label="Impulse BackgroundValue"
+        command="SetImpulseNoiseBackgroundValue"
+        number_of_elements="1"
+        default_values="0.0"
+        panel_visibility="advanced"
+        >
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NoiseGeneratorSeed"
+        label="RNG Seed"
+        command="SetNoiseGeneratorSeed"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced"
+        >
+        <IntRangeDomain name="range" min="1" max="1073741823" />
+      </IntVectorProperty>
+
+      <!--
+      Parallel performance
+      -->
+      <IntVectorProperty name="CompositeStrategy"
+        command="SetCompositeStrategy"
+        number_of_elements="1"
+        default_values="3"
+        panel_visibility="advanced"
+        >
+        <EnumerationDomain name="enum">
+          <Entry text="INPLACE"          value="0" />
+          <Entry text="INPLACE DISJOINT" value="1" />
+          <Entry text="BALANCED"         value="2" />
+          <Entry text="AUTO"             value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <!--
+      Interactive performance.
+      -->
+      <IntVectorProperty name="UseLICForLOD"
+        label="Use LIC for LOD"
+        command="SetUseLICForLOD"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced"
+        >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!--
+      for benchmarking
+      setting the file name will trigger the write.
+      -->
+      <StringVectorProperty name="WriteLog"
+        command="WriteTimerLog"
+        number_of_elements="1"
+        label="Log File"
+        panel_visibility="advanced">
+        <Documentation>
+         when compiled for benchmarking
+         setting the file name will trigger
+         a write of the parallel timer log
+        </Documentation>
+      </StringVectorProperty>
+      <!-- end of SurfaceLICRepresentation -->
+    </RepresentationProxy>
+
+    <!--======================================================================-->
+    <Extension name="GeometryRepresentation">
+      <RepresentationType subproxy="SurfaceLICRepresentation"
+        subtype="Surface" text="Surface LIC" />
+
+      <SubProxy>
+        <Proxy name="SurfaceLICRepresentation"
+          proxygroup="representations" proxyname="SurfaceLICRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+        <!--<PropertyGroup label="Surface LIC Parameters">-->
+         <!-- Integrator -->
+         <PropertyGroup label="SurfaceLIC: Integrator">
+           <Property name="SelectInputVectors"/>
+           <Property name="NumberOfSteps"/>
+           <Property name="StepSize" />
+           <Property name="NormalizeVectors" />
+           <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Rendering controls -->
+         <PropertyGroup label="SurfaceLIC: Rendering">
+           <Property name="ColorMode" />
+           <Property name="LICIntensity" />
+           <Property name="MapModeBias" />
+
+           <Property name="EnhanceContrast" />
+           <Property name="LowLICContrastEnhancementFactor" />
+           <Property name="HighLICContrastEnhancementFactor" />
+           <Property name="LowColorContrastEnhancementFactor" />
+           <Property name="HighColorContrastEnhancementFactor" />
+
+           <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Fragment Masking -->
+         <PropertyGroup label="SurfaceLIC: Fragment masking">
+           <Property name="MaskOnSurface" />
+           <Property name="MaskThreshold" />
+           <Property name="MaskIntensity" />
+           <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Noise texture controls -->
+         <PropertyGroup label="SurfaceLIC: Noise texture generator">
+           <Property name="GenerateNoiseTexture" />
+           <Property name="NoiseType" />
+           <Property name="NoiseTextureSize" />
+           <Property name="NoiseGrainSize" />
+           <Property name="MinNoiseValue" />
+           <Property name="MaxNoiseValue" />
+           <Property name="NumberOfNoiseLevels" />
+           <Property name="ImpulseNoiseProbability" />
+           <Property name="ImpulseNoiseBackgroundValue" />
+           <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Parallel  controls -->
+         <PropertyGroup label="SurfaceLIC: Parallelization">
+           <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Interactivity controls -->
+         <PropertyGroup label="SurfaceLIC: Interactivity">
+           <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- benchmarking -->
+         <PropertyGroup label="SurfaceLIC: Benchmark">
+           <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+        <!-- </PropertyGroup> -->
+        </ExposedProperties>
+
+      </SubProxy>
+    </Extension>
+
+    <!--======================================================================-->
+    <Extension name="UnstructuredGridRepresentation">
+      <RepresentationType subproxy="SurfaceLICRepresentation"
+        subtype="Surface" text="Surface LIC" />
+
+      <SubProxy>
+        <Proxy name="SurfaceLICRepresentation"
+          proxygroup="representations" proxyname="SurfaceLICRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+        <!--<PropertyGroup label="Surface LIC Parameters">-->
+         <!-- Integrator -->
+         <PropertyGroup label="SurfaceLIC: Integrator">
+           <Property name="SelectInputVectors"/>
+           <Property name="NumberOfSteps"/>
+           <Property name="StepSize" />
+           <Property name="NormalizeVectors" />
+           <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Rendering controls -->
+         <PropertyGroup label="SurfaceLIC: Rendering">
+           <Property name="ColorMode" />
+           <Property name="LICIntensity" />
+           <Property name="MapModeBias" />
+
+           <Property name="EnhanceContrast" />
+           <Property name="LowLICContrastEnhancementFactor" />
+           <Property name="HighLICContrastEnhancementFactor" />
+           <Property name="LowColorContrastEnhancementFactor" />
+           <Property name="HighColorContrastEnhancementFactor" />
+
+           <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Fragment Masking -->
+         <PropertyGroup label="SurfaceLIC: Fragment masking">
+           <Property name="MaskOnSurface" />
+           <Property name="MaskThreshold" />
+           <Property name="MaskIntensity" />
+           <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Noise texture controls -->
+         <PropertyGroup label="SurfaceLIC: Noise texture generator">
+           <Property name="GenerateNoiseTexture" />
+           <Property name="NoiseType" />
+           <Property name="NoiseTextureSize" />
+           <Property name="NoiseGrainSize" />
+           <Property name="MinNoiseValue" />
+           <Property name="MaxNoiseValue" />
+           <Property name="NumberOfNoiseLevels" />
+           <Property name="ImpulseNoiseProbability" />
+           <Property name="ImpulseNoiseBackgroundValue" />
+           <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Parallel  controls -->
+         <PropertyGroup label="SurfaceLIC: Parallelization">
+           <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Interactivity controls -->
+         <PropertyGroup label="SurfaceLIC: Interactivity">
+           <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- benchmarking -->
+         <PropertyGroup label="SurfaceLIC: Benchmark">
+           <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+        <!-- </PropertyGroup> -->
+        </ExposedProperties>
+
+      </SubProxy>
+    </Extension>
+
+    <!--======================================================================-->
+    <Extension name="UniformGridRepresentation">
+      <RepresentationType subproxy="SurfaceLICRepresentation"
+        subtype="Surface" text="Surface LIC" />
+      <SubProxy>
+        <Proxy name="SurfaceLICRepresentation"
+          proxygroup="representations" proxyname="SurfaceLICRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+        <!--<PropertyGroup label="Surface LIC Parameters">-->
+         <!-- Integrator -->
+         <PropertyGroup label="SurfaceLIC: Integrator">
+           <Property name="SelectInputVectors"/>
+           <Property name="NumberOfSteps"/>
+           <Property name="StepSize" />
+           <Property name="NormalizeVectors" />
+           <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Rendering controls -->
+         <PropertyGroup label="SurfaceLIC: Rendering">
+           <Property name="ColorMode" />
+           <Property name="LICIntensity" />
+           <Property name="MapModeBias" />
+
+           <Property name="EnhanceContrast" />
+           <Property name="LowLICContrastEnhancementFactor" />
+           <Property name="HighLICContrastEnhancementFactor" />
+           <Property name="LowColorContrastEnhancementFactor" />
+           <Property name="HighColorContrastEnhancementFactor" />
+
+           <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Fragment Masking -->
+         <PropertyGroup label="SurfaceLIC: Fragment masking">
+           <Property name="MaskOnSurface" />
+           <Property name="MaskThreshold" />
+           <Property name="MaskIntensity" />
+           <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Noise texture controls -->
+         <PropertyGroup label="SurfaceLIC: Noise texture generator">
+           <Property name="GenerateNoiseTexture" />
+           <Property name="NoiseType" />
+           <Property name="NoiseTextureSize" />
+           <Property name="NoiseGrainSize" />
+           <Property name="MinNoiseValue" />
+           <Property name="MaxNoiseValue" />
+           <Property name="NumberOfNoiseLevels" />
+           <Property name="ImpulseNoiseProbability" />
+           <Property name="ImpulseNoiseBackgroundValue" />
+           <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Parallel  controls -->
+         <PropertyGroup label="SurfaceLIC: Parallelization">
+           <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Interactivity controls -->
+         <PropertyGroup label="SurfaceLIC: Interactivity">
+           <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- benchmarking -->
+         <PropertyGroup label="SurfaceLIC: Benchmark">
+           <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+        <!-- </PropertyGroup> -->
+        </ExposedProperties>
+
+      </SubProxy>
+    </Extension>
+
+    <!--======================================================================-->
+    <Extension name="StructuredGridRepresentation">
+      <RepresentationType subproxy="SurfaceLICRepresentation"
+        subtype="Surface" text="Surface LIC" />
+      <SubProxy>
+        <Proxy name="SurfaceLICRepresentation"
+          proxygroup="representations" proxyname="SurfaceLICRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+        <!--<PropertyGroup label="Surface LIC Parameters">-->
+         <!-- Integrator -->
+         <PropertyGroup label="SurfaceLIC: Integrator">
+           <Property name="SelectInputVectors"/>
+           <Property name="NumberOfSteps"/>
+           <Property name="StepSize" />
+           <Property name="NormalizeVectors" />
+           <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Rendering controls -->
+         <PropertyGroup label="SurfaceLIC: Rendering">
+           <Property name="ColorMode" />
+           <Property name="LICIntensity" />
+           <Property name="MapModeBias" />
+
+           <Property name="EnhanceContrast" />
+           <Property name="LowLICContrastEnhancementFactor" />
+           <Property name="HighLICContrastEnhancementFactor" />
+           <Property name="LowColorContrastEnhancementFactor" />
+           <Property name="HighColorContrastEnhancementFactor" />
+
+           <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Fragment Masking -->
+         <PropertyGroup label="SurfaceLIC: Fragment masking">
+           <Property name="MaskOnSurface" />
+           <Property name="MaskThreshold" />
+           <Property name="MaskIntensity" />
+           <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Noise texture controls -->
+         <PropertyGroup label="SurfaceLIC: Noise texture generator">
+           <Property name="GenerateNoiseTexture" />
+           <Property name="NoiseType" />
+           <Property name="NoiseTextureSize" />
+           <Property name="NoiseGrainSize" />
+           <Property name="MinNoiseValue" />
+           <Property name="MaxNoiseValue" />
+           <Property name="NumberOfNoiseLevels" />
+           <Property name="ImpulseNoiseProbability" />
+           <Property name="ImpulseNoiseBackgroundValue" />
+           <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Parallel  controls -->
+         <PropertyGroup label="SurfaceLIC: Parallelization">
+           <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- Interactivity controls -->
+         <PropertyGroup label="SurfaceLIC: Interactivity">
+           <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+
+         <!-- benchmarking -->
+         <PropertyGroup label="SurfaceLIC: Benchmark">
+           <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
+         </PropertyGroup>
+        <!-- </PropertyGroup> -->
+        </ExposedProperties>
+
+      </SubProxy>
+    </Extension>
+
+
 
     <!-- ================================================================== -->
     <RepresentationProxy class="vtkOutlineRepresentation"
@@ -6345,7 +7553,6 @@
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
-          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="any"
                           name="input_array_any" />
@@ -7741,6 +8948,42 @@
              the text right now -->
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetLabelLocation"
+                         default_values="4"
+                         name="LabelLocation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Any Location" value="0" />
+          <Entry text="Lower Left Corner" value="1" />
+          <Entry text="Lower Right Corner" value="2" />
+          <Entry text="Lower Center" value="3" />
+          <Entry text="Upper Left Corner" value="4" />
+          <Entry text="Upper Right Corner" value="5" />
+          <Entry text="Upper Center" value="6" />
+        </EnumerationDomain>
+        <Documentation>
+          Placement of the text inside of the window.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetPosition"
+                            name="Position"
+                            default_values="0.05 0.05"
+                            number_of_elements="2"
+                            information_property="PositionInfo">
+        <DoubleRangeDomain min="0 0"
+                           max="1 1"
+                           name="range" />
+        <Documentation>
+          Normalized position of the bottom left corner of the text box in pixels.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">
+        <Property name="LabelLocation" function="WindowLocation" />
+        <Property name="Position" />
+      </PropertyGroup>
+
       <SubProxy command="SetTextProperty">
         <Proxy name="Prop2DProperty" proxygroup="properties" proxyname="ChartTextProperty" />
         <ExposedProperties>
@@ -7756,17 +8999,71 @@
             <Property name="Justification" function="Justification"/>
             <Property name="VerticalJustification" default_values="1" />
           </PropertyGroup>
+
+          <PropertyGroup label="Multi Cell Properties">
+            <Property name="LineSpacing" panel_visibility="advanced" />
+            <Property name="CellOffset" panel_visibility="advanced" />
+            <Property name="InteriorLinesWidth" panel_visibility="advanced" />
+            <Property name="InteriorLinesColor" panel_visibility="advanced" />
+            <Property name="InteriorLinesVisibility" panel_visibility="advanced" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 
-      <IntVectorProperty command="SetLabelLocation"
-                         default_values="4"
-                         name="LabelLocation"
+    </ChartRepresentationProxy>
+
+<!-- =================================================================== -->
+    <ChartRepresentationProxy class="vtkChartLogoRepresentation"
+                              name="ChartLogoRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation to show logo in Chart views</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetLogoLocation"
+                         default_values="5"
+                         name="LogoLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <!-- for now, we skip interactive placement functionality
           <Entry text="Any Location" value="0" />
-          -->
           <Entry text="Lower Left Corner" value="1" />
           <Entry text="Lower Right Corner" value="2" />
           <Entry text="Lower Center" value="3" />
@@ -7774,11 +9071,29 @@
           <Entry text="Upper Right Corner" value="5" />
           <Entry text="Upper Center" value="6" />
         </EnumerationDomain>
-        <Documentation>Specify placement of the scalar bar actor.</Documentation>
+        <Documentation>Specify placement of the logo actor.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            name="Position"
+                            default_values="0.05 0.05"
+                            number_of_elements="2"
+                            information_property="PositionInfo">
+        <DoubleRangeDomain min="0 0"
+            max="1 1"
+            name="range" />
+        <Documentation>
+        Normalized position of the bottom left corner of the text box in pixels.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
-      <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">
-        <Property name="LabelLocation" function="WindowLocation" />
+      <PropertyGroup label="Logo Position" panel_widget="TextLocationEditor">
+        <Property name="LogoLocation" function="WindowLocation" />
+        <Property name="Position"/>
       </PropertyGroup>
 
     </ChartRepresentationProxy>
@@ -7951,6 +9266,24 @@
         <ChartSeriesSelectionDomain name="array_list"
                                     hide_partial_arrays="0"
                                     default_mode="color">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetOpacity"
+                            clean_command="ClearOpacities"
+                            element_types="2 1"
+                            name="SeriesOpacity"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series line/bar opacity.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="value"
+                                    default_value="1.0">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
@@ -8901,6 +10234,8 @@
                   function="SeriesVisibility" />
         <Property name="SeriesColor"
                   function="SeriesColor" />
+        <Property name="SeriesOpacity"
+                  function="SeriesOpacity" />
         <Property name="SeriesLineThickness"
                   function="SeriesLineThickness" />
         <Property name="SeriesLineStyle"
@@ -9006,6 +10341,8 @@
                   function="SeriesVisibility" />
         <Property name="SeriesColor"
                   function="SeriesColor" />
+        <Property name="SeriesOpacity"
+                  function="SeriesOpacity" />
         <Property name="SeriesLineThickness"
                   function="SeriesLineThickness" />
         <Property name="SeriesLineStyle"
@@ -9086,6 +10423,15 @@
           Set whether to render the line for the maximum value, if available.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="ShowSum"
+                         command="SetSumVisibility"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the line for the sum, if available.
+        </Documentation>
+      </IntVectorProperty>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
@@ -9103,6 +10449,8 @@
                   function="SeriesVisibility" />
         <Property name="SeriesColor"
                   function="SeriesColor" />
+        <Property name="SeriesOpacity"
+                  function="SeriesOpacity" />
         <Property name="SeriesLabel"
                   function="SeriesLabel" />
         <Property name="SeriesPlotCorner"
@@ -9358,6 +10706,14 @@
               </PropertyWidgetDecorator>
             </Hints>
 
+          </PropertyGroup>
+
+          <PropertyGroup label="Multi Cell Properties">
+            <Property name="LineSpacing" panel_visibility="advanced" />
+            <Property name="CellOffset" panel_visibility="advanced" />
+            <Property name="InteriorLinesWidth" panel_visibility="advanced" />
+            <Property name="InteriorLinesColor" panel_visibility="advanced" />
+            <Property name="InteriorLinesVisibility" panel_visibility="advanced" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -9679,15 +11035,19 @@
                            min="0"
                            name="range" />
       </DoubleVectorProperty>
-      <SubProxy command="SetLogoWidgetRepresentation">
+
+       <SubProxy command="SetLogoWidgetRepresentation">
         <Proxy name="LogoWidgetRepresentation"
                proxygroup="representations"
                proxyname="LogoWidgetRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Position" />
-          <Property name="Position2" panel_visibility="never"/>
-          <Property name="PositionInfo" />
-          <Property name="Position2Info" />
+          <PropertyGroup name="LogoPosition" label="Logo Position" panel_widget="TextLocationEditor">
+            <Property name="WindowLocation" />
+            <Property name="Position" />
+            <Property name="Position2" panel_visibility="never"/>
+            <Property name="PositionInfo" />
+            <Property name="Position2Info" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of LogoSourceRepresentation -->
@@ -11737,7 +13097,7 @@
       <!-- end of AMRVolumeRepresentation -->
     </RepresentationProxy>
 
-    <!-- ================================================================== -->
+  <!-- ================================================================== -->
     <RepresentationProxy class="vtkGeometryRepresentation"
                          name="SurfaceRepresentationBase"
                          processes="client|renderserver|dataserver">

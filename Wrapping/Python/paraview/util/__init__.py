@@ -42,3 +42,45 @@ def ReplaceDollarVariablesWithEnvironment(text):
             return os.environ[m.group(1)]
         raise KeyError("'%s' is not defined in the process environment" % m.group(1))
     return re.sub(r, repl, text)
+
+def Glob(path, rootDir = None):
+    """Given a path, this function performs globbing on the file names inside the input
+    directory. rootDir is an optional parameter that can set a relative root directory from which
+    path is defined. This function returns the list of files matching the globbing pattern (the
+    wildcard * is an example of pattern that can be used) of the
+    input path. Note that for this function to work, the globbing pattern needs to only belong to
+    the file name at the end of path.
+    fnmatch package is used as the backend for processing the input pattern.
+    """
+    import paraview
+    import paraview.simple
+    import paraview.servermanager as sm
+    import fnmatch
+    import os.path
+
+    head_tail = os.path.split(path)
+    dirPath = head_tail[0]
+    fileName = head_tail[1]
+
+    fileInfoHelperProxy = sm.ProxyManager().NewProxy("misc", "FileInformationHelper")
+    fileInfoHelperProxy.GetProperty("DirectoryListing").SetElement(0, True)
+    fileInfoHelperProxy.GetProperty("Path").SetElement(0, dirPath)
+    fileInfoHelperProxy.GetProperty("GroupFileSequences").SetElement(0, False)
+    if rootDir != None:
+        fileInfoHelperProxy.GetProperty("WorkingDirectory").SetElement(0, rootDir)
+    fileInfoHelperProxy.UpdateVTKObjects()
+
+    localFileInfo = sm.vtkPVFileInformation()
+    fileInfoHelperProxy.GatherInformation(localFileInfo)
+    numFiles = localFileInfo.GetContents().GetNumberOfItems()
+
+    foundFiles = []
+
+    for i in range(numFiles):
+        name = localFileInfo.GetContents().GetItemAsObject(i).GetName()
+        if fnmatch.fnmatch(name, fileName):
+            foundFiles.append(dirPath + '/' + name)
+
+    foundFiles.sort()
+
+    return foundFiles

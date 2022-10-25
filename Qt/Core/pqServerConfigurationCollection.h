@@ -63,7 +63,7 @@ class PQCORE_EXPORT pqServerConfigurationCollection : public QObject
   typedef QObject Superclass;
 
 public:
-  pqServerConfigurationCollection(QObject* parent = 0);
+  pqServerConfigurationCollection(QObject* parent = nullptr);
   ~pqServerConfigurationCollection() override;
 
   /**
@@ -113,6 +113,12 @@ public:
    * found.
    */
   const pqServerConfiguration* configuration(const char* configuration_name) const;
+
+public Q_SLOTS:
+  /**
+   * Remove all user configurations. This deletes the user servers.pvsc file.
+   */
+  void removeUserConfigurations();
 
 Q_SIGNALS:
   /**

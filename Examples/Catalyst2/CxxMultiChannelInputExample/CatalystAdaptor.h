@@ -106,6 +106,7 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   // make the particles' time update every other step of the mesh's
   channel_particles["state/cycle"].set(cycle - (cycle % 2));
   channel_particles["state/time"].set(time - (cycle % 2) * 0.1);
+  channel_particles["state/multiblock"].set(1);
 
   // Since this example is using Conduit Mesh Blueprint to define the mesh,
   // we set the channel_particles's type to "mesh".

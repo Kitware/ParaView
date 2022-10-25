@@ -133,6 +133,7 @@ class vtkTickOnGenericCue
   double CurrentTime;
   double DeltaTime;
   double ClockTime;
+  vtkAnimationCue::PlayDirection Direction;
 
 protected:
   virtual bool IsAcceptable(vtkAnimationCue* cue) const
@@ -145,13 +146,14 @@ protected:
   }
 
 public:
-  vtkTickOnGenericCue(
-    double starttime, double endtime, double currenttime, double deltatime, double clocktime)
+  vtkTickOnGenericCue(double starttime, double endtime, double currenttime, double deltatime,
+    double clocktime, vtkAnimationCue::PlayDirection direction)
     : StartTime(starttime)
     , EndTime(endtime)
     , CurrentTime(currenttime)
     , DeltaTime(deltatime)
     , ClockTime(clocktime)
+    , Direction(direction)
   {
   }
   virtual ~vtkTickOnGenericCue() = default;
@@ -162,6 +164,8 @@ public:
       return;
     }
 
+    const auto& dir = cue->GetDirection();
+    cue->SetDirection(this->Direction);
     switch (cue->GetTimeMode())
     {
       case vtkAnimationCue::TIMEMODE_RELATIVE:
@@ -174,6 +178,7 @@ public:
       default:
         vtkGenericWarningMacro("Invalid cue time mode");
     }
+    cue->SetDirection(dir);
   }
 };
 
@@ -189,8 +194,8 @@ protected:
 
 public:
   vtkTickOnCameraCue(double starttime, double endtime, double currenttime, double deltatime,
-    double clocktime, vtkSMProxy* timeKeeper)
-    : vtkTickOnGenericCue(starttime, endtime, currenttime, deltatime, clocktime)
+    double clocktime, vtkAnimationCue::PlayDirection direction, vtkSMProxy* timeKeeper)
+    : vtkTickOnGenericCue(starttime, endtime, currenttime, deltatime, clocktime, direction)
     , TimeKeeper(timeKeeper)
   {
   }
@@ -224,9 +229,9 @@ protected:
   }
 
 public:
-  vtkTickOnPythonCue(
-    double starttime, double endtime, double currenttime, double deltatime, double clocktime)
-    : vtkTickOnGenericCue(starttime, endtime, currenttime, deltatime, clocktime)
+  vtkTickOnPythonCue(double starttime, double endtime, double currenttime, double deltatime,
+    double clocktime, vtkAnimationCue::PlayDirection direction)
+    : vtkTickOnGenericCue(starttime, endtime, currenttime, deltatime, clocktime, direction)
   {
   }
 };
@@ -484,16 +489,18 @@ void vtkSMAnimationScene::TickInternal(double currenttime, double deltatime, dou
   // RenderAllViews()
 
   std::for_each(cues.begin(), cues.end(),
-    vtkTickOnGenericCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime));
+    vtkTickOnGenericCue(
+      this->StartTime, this->EndTime, currenttime, deltatime, clocktime, this->Direction));
 
   std::for_each(cues.begin(), cues.end(),
-    vtkTickOnPythonCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime));
+    vtkTickOnPythonCue(
+      this->StartTime, this->EndTime, currenttime, deltatime, clocktime, this->Direction));
 
   this->Internals->UpdateAllViews();
 
   std::for_each(cues.begin(), cues.end(),
-    vtkTickOnCameraCue(
-      this->StartTime, this->EndTime, currenttime, deltatime, clocktime, this->TimeKeeper));
+    vtkTickOnCameraCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime,
+      this->Direction, this->TimeKeeper));
 
   this->Superclass::TickInternal(currenttime, deltatime, clocktime);
 
@@ -533,6 +540,15 @@ void vtkSMAnimationScene::Play()
 {
   this->AnimationPlayer->Play();
 }
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::Reverse()
+{
+  this->SetDirection(vtkAnimationCue::PlayDirection::BACKWARD);
+  this->AnimationPlayer->Play(static_cast<int>(vtkAnimationCue::PlayDirection::BACKWARD));
+  this->SetDirection(vtkAnimationCue::PlayDirection::FORWARD);
+}
+
 //----------------------------------------------------------------------------
 void vtkSMAnimationScene::Stop()
 {

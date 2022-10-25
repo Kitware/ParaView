@@ -76,7 +76,7 @@ public:
 
 protected:
   vtkDisplayConfiguration();
-  ~vtkDisplayConfiguration();
+  ~vtkDisplayConfiguration() override;
 
 private:
   vtkDisplayConfiguration(const vtkDisplayConfiguration&) = delete;

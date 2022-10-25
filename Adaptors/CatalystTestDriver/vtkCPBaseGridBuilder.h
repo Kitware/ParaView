@@ -43,7 +43,7 @@ public:
 
 protected:
   vtkCPBaseGridBuilder();
-  ~vtkCPBaseGridBuilder();
+  ~vtkCPBaseGridBuilder() override;
 
 private:
   vtkCPBaseGridBuilder(const vtkCPBaseGridBuilder&) = delete;

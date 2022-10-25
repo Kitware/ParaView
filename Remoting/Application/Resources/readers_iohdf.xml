@@ -91,6 +91,17 @@
         <Documentation>Select the field arrays to read.</Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty command="SetMaximumLevelsToReadByDefaultForAMR"
+                         name="MaximumLevelsToReadByDefaultForAMR"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          The number of levels that the reader can read when the data type
+          is AMR. Set this to 0 to imply no limit. Default is 0.
+        </Documentation>
+      </IntVectorProperty>
 
       <!-- End HDFReaderCore -->
     </Proxy>
@@ -123,6 +134,7 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="MaximumLevelsToReadByDefaultForAMR" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"

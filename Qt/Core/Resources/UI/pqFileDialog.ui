@@ -120,8 +120,14 @@
       </property>
       <widget class="QWidget" name="favoritesLayoutWidget">
        <layout class="QVBoxLayout" name="favoritesVerticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="favoritesHorizontalLayout">
+          <property name="spacing">
+           <number>5</number>
+          </property>
           <item>
            <widget class="QLabel" name="favoritesLabel">
             <property name="text">
@@ -150,26 +156,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="RemoveCurrentDirectoryFromFavorites">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>Remove current directory from favorites</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="list-remove">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="ResetFavortiesToSystemDefault">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -190,6 +176,46 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>6</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="favoritesSearchBar">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>18</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Filter favorites panel</string>
+          </property>
+          <property name="placeholderText">
+           <string>Filter favorites</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QListView" name="Favorites">
@@ -283,17 +309,17 @@
           <number>6</number>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="EntityNameLabel">
            <property name="text">
             <string>File name:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="FileName"/>
+          <widget class="QLineEdit" name="EntityName"/>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="EntityTypeLabel">
            <property name="text">
             <string>Files of type:</string>
            </property>
@@ -327,7 +353,7 @@
           </widget>
          </item>
          <item row="1" column="1" colspan="2">
-          <widget class="pqFileComboBox" name="FileType">
+          <widget class="pqFileComboBox" name="EntityType">
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
            </property>
@@ -349,8 +375,8 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>FileName</tabstop>
-  <tabstop>FileType</tabstop>
+  <tabstop>EntityName</tabstop>
+  <tabstop>EntityType</tabstop>
   <tabstop>OK</tabstop>
   <tabstop>Cancel</tabstop>
   <tabstop>Parents</tabstop>

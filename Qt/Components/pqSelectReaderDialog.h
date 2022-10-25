@@ -52,9 +52,9 @@ public:
    * constructor
    */
   pqSelectReaderDialog(
-    const QString& file, pqServer* s, vtkSMReaderFactory* factory, QWidget* p = 0);
+    const QString& file, pqServer* s, vtkSMReaderFactory* factory, QWidget* p = nullptr);
 
-  pqSelectReaderDialog(const QString& file, pqServer* s, vtkStringList* list, QWidget* p = 0);
+  pqSelectReaderDialog(const QString& file, pqServer* s, vtkStringList* list, QWidget* p = nullptr);
   /**
    * destructor
    */

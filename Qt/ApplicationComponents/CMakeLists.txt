@@ -35,7 +35,6 @@ set(classes
   pqAnimationShortcutDecorator
   pqAnimationShortcutWidget
   pqAnimationTimeToolbar
-  pqAnnotationsModel
   pqApplicationComponentsInit
   pqApplicationSettingsReaction
   pqApplyBehavior
@@ -59,6 +58,7 @@ set(classes
   pqCatalystRemoveBreakpointReaction
   pqCatalystSetBreakpointReaction
   pqCategoryToolbarsBehavior
+  pqChangeFileNameReaction
   pqChangePipelineInputReaction
   pqChartSelectionReaction
   pqChooseColorPresetReaction
@@ -81,6 +81,7 @@ set(classes
   pqCustomizeShortcutsReaction
   pqCustomizeShortcutsDialog
   pqCheckableProperty
+  pqCoordinateFramePropertyWidget
   pqCustomViewpointsToolbar
   pqCylinderPropertyWidget
   pqDataAssemblyPropertyWidget
@@ -91,11 +92,13 @@ set(classes
   pqDefaultViewBehavior
   pqDeleteReaction
   pqDesktopServicesReaction
+  pqDisplaySizedImplicitPlanePropertyWidget
   pqDoubleRangeSliderPropertyWidget
   pqEditCameraReaction
   pqEditColorMapReaction
   pqEditScalarBarReaction
   pqEnableWidgetDecorator
+  pqEqualizerPropertyWidget
   pqExampleVisualizationsDialog
   pqExampleVisualizationsDialogReaction
   pqExportReaction
@@ -112,8 +115,11 @@ set(classes
   pqImageCompressorWidget
   pqImplicitPlanePropertyWidget
   pqInputDataTypeDecorator
+  pqInteractiveProperty2DWidget
   pqInteractivePropertyWidget
+  pqInteractivePropertyWidgetAbstract
   pqLightPropertyWidget
+  pqLightToolbar
   pqLinePropertyWidget
   pqLinkSelectionReaction
   pqListPropertyWidget
@@ -129,6 +135,7 @@ set(classes
   pqMainControlsToolbar
   pqMainWindowEventBehavior
   pqManageCustomFiltersReaction
+  pqManageExpressionsReaction
   pqManageFavoritesReaction
   pqManageLinksReaction
   pqManagePluginsReaction
@@ -157,6 +164,7 @@ set(classes
   pqPropertyCollectionWidget
   pqProxyGroupMenuManager
   pqReaction
+  pqMetaDataPropertyWidget
   pqReloadFilesReaction
   pqRenameProxyReaction
   pqRenderViewSelectionReaction
@@ -172,6 +180,7 @@ set(classes
   pqSaveStateReaction
   pqScalarBarVisibilityReaction
   pqSearchItemReaction
+  pqSelectionEditor
   pqSelectionQueryPropertyWidget
   pqSelectionReaction
   pqSeriesEditorPropertyWidget
@@ -258,6 +267,7 @@ set(ui_files
   Resources/UI/pqImageCompressorWidget.ui
   Resources/UI/pqImplicitPlanePropertyWidget.ui
   Resources/UI/pqLightPropertyWidget.ui
+  Resources/UI/pqLightToolbar.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqMoleculePropertyWidget.ui
@@ -266,6 +276,7 @@ set(ui_files
   Resources/UI/pqPropertyCollectionWidget.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
+  Resources/UI/pqSelectionEditor.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqSpherePropertyWidget.ui
   Resources/UI/pqSplinePropertyWidget.ui

@@ -52,7 +52,7 @@ class PQCORE_EXPORT pqScalarBarRepresentation : public pqRepresentation
 
 public:
   pqScalarBarRepresentation(const QString& group, const QString& name, vtkSMProxy* scalarbar,
-    pqServer* server, QObject* parent = 0);
+    pqServer* server, QObject* parent = nullptr);
   ~pqScalarBarRepresentation() override;
 
 protected Q_SLOTS:

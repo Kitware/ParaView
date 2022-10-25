@@ -14,11 +14,14 @@ DEPENDS
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::CommonMath
+  VTK::FiltersStatistics
 PRIVATE_DEPENDS
   ParaView::RemotingClientServerStream
   ParaView::RemotingCore
   ParaView::VTKExtensionsCore
   VTK::FiltersCore # needed for append
+  VTK::FiltersGeneral
+  VTK::FiltersImaging
   VTK::IOLegacy
   VTK::ParallelCore
   VTK::vtksys

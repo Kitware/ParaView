@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtk2DWidgetRepresentation
   vtk3DWidgetRepresentation
   vtkAMROutlineRepresentation
   vtkAMRStreamingPriorityQueue
@@ -38,6 +39,7 @@ set(classes
   vtkChartRepresentation
   vtkChartSelectionRepresentation
   vtkChartTextRepresentation
+  vtkChartLogoRepresentation
   vtkChartWarning
   vtkCompositeRepresentation
   vtkContext2DScalarBarActor
@@ -51,6 +53,7 @@ set(classes
   vtkGridAxes3DActor
   vtkGridAxesHelper
   vtkGridAxesPlane2DActor
+  vtkHyperTreeGridRepresentation
   vtkImageSliceRepresentation
   vtkImageVolumeRepresentation
   vtkLogoSourceRepresentation
@@ -58,9 +61,6 @@ set(classes
   vtkMultiSliceContextItem
   vtkOrderedCompositingHelper
   vtkOutlineRepresentation
-  vtkPointGaussianRepresentation
-  vtkPolarAxesRepresentation
-  vtkProgressBarSourceRepresentation
   vtkPVAxesActor
   vtkPVAxesWidget
   vtkPVBoxChartRepresentation
@@ -79,6 +79,7 @@ set(classes
   vtkPVDataRepresentationPipeline
   vtkPVDefaultPass
   vtkPVDiscretizableColorTransferFunction
+  vtkPVDisplaySizedImplicitPlaneRepresentation
   vtkPVEncodeSelectionForServer
   vtkPVFrustumActor
   vtkPVGridAxes3DActor
@@ -89,10 +90,10 @@ set(classes
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
   vtkPVInteractiveViewLinkRepresentation
-  vtkPVLastSelectionInformation
-  vtkPVLight
   vtkPVLODActor
   vtkPVLODVolume
+  vtkPVLastSelectionInformation
+  vtkPVLight
   vtkPVLogoSource
   vtkPVMaterialLibrary
   vtkPVMultiSliceView
@@ -105,11 +106,11 @@ set(classes
   vtkPVProcessWindow
   vtkPVProminentValuesInformation
   vtkPVRayCastPickingHelper
-  vtkPVRenderingCapabilitiesInformation
   vtkPVRenderView
   vtkPVRenderViewDataDeliveryManager
   vtkPVRenderViewSettings
   vtkPVRenderViewWithEDL
+  vtkPVRenderingCapabilitiesInformation
   vtkPVRepresentedArrayListSettings
   vtkPVRepresentedDataInformation
   vtkPVScalarBarActor
@@ -117,11 +118,15 @@ set(classes
   vtkPVSelectionInformation
   vtkPVStreamingPiecesInformation
   vtkPVSynchronizedRenderer
+  vtkPVTransferFunction2D
+  vtkPVTransferFunction2DBox
   vtkPVView
   vtkPVXYChartView
+  vtkPointGaussianRepresentation
+  vtkPolarAxesRepresentation
+  vtkProgressBarSourceRepresentation
   vtkQuartileChartRepresentation
   vtkRulerSourceRepresentation
-  vtkSelectionRepresentation
   vtkSIImageTextureProxy
   vtkSIPVRepresentationProxy
   vtkSIUnstructuredGridVolumeRepresentationProxy
@@ -137,23 +142,27 @@ set(classes
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
+  vtkSMContextItemWidgetProxy
   vtkSMDataDeliveryManagerProxy
+  vtkSMDisplaySizedImplicitPlaneRepresentationProxy
   vtkSMImageExtractWriterProxy
   vtkSMImplicitPlaneRepresentationProxy
   vtkSMLightProxy
   vtkSMMaterialDomain
   vtkSMMaterialLibraryProxy
   vtkSMMultiSliceViewProxy
+  vtkSMNew2DWidgetRepresentationProxy
   vtkSMNewWidgetRepresentationProxy
+  vtkSMNewWidgetRepresentationProxyAbstract
   vtkSMOrthographicSliceViewProxy
-  vtkSMParaViewPipelineControllerWithRendering
-  vtkSMPlotMatrixViewProxy
   vtkSMPVMoleculeRepresentationProxy
   vtkSMPVRepresentationProxy
+  vtkSMParaViewPipelineControllerWithRendering
+  vtkSMPlotMatrixViewProxy
   vtkSMRangedTransferFunctionDomain
   vtkSMRecolorableImageExtractWriterProxy
-  vtkSMRendererDomain
   vtkSMRenderViewProxy
+  vtkSMRendererDomain
   vtkSMRepresentationProxy
   vtkSMRepresentationTypeDomain
   vtkSMRepresentedArrayListDomain
@@ -164,6 +173,7 @@ set(classes
   vtkSMSpreadSheetRepresentationProxy
   vtkSMSpreadSheetViewProxy
   vtkSMTextWidgetRepresentationProxy
+  vtkSMTransferFunction2DProxy
   vtkSMTransferFunctionManager
   vtkSMTransferFunctionPresets
   vtkSMTransferFunctionProxy
@@ -174,12 +184,16 @@ set(classes
   vtkSMViewResolutionDomain
   vtkSMWidgetRepresentationProxy
   vtkSMXYChartRepresentationInitializationHelper
+  vtkSelectionRepresentation
   vtkSpreadSheetRepresentation
   vtkSpreadSheetView
   vtkStructuredGridVolumeRepresentation
+  vtkSurfaceLICRepresentation
   vtkTextSourceRepresentation
   vtkThreeSliceFilter
   vtkTilesHelper
+  vtkTransferFunctionBoxItem
+  vtkTransferFunctionChartHistogram2D
   vtkUnstructuredGridVolumeRepresentation
   vtkViewLayout
   vtkVolumeRepresentation
@@ -242,7 +256,8 @@ vtk_module_add_module(ParaView::RemotingViews
   PRIVATE_HEADERS ${vtk_object_factory_header} ${private_headers})
 
 paraview_add_server_manager_xmls(
-  XMLS Resources/3dwidgets_remotingviews.xml
+  XMLS Resources/2dwidgets_remotingviews.xml
+       Resources/3dwidgets_remotingviews.xml
        Resources/extractors_remotingviews.xml
        Resources/rendering.xml
        Resources/sources_remotingviews.xml

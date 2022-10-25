@@ -45,7 +45,7 @@ class PQWIDGETS_EXPORT pqColorDialogEventPlayer : public pqWidgetEventPlayer
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqColorDialogEventPlayer(QObject* parent = 0);
+  pqColorDialogEventPlayer(QObject* parent = nullptr);
   ~pqColorDialogEventPlayer() override;
 
   using Superclass::playEvent;

@@ -52,9 +52,9 @@ class pqNodeEditorWidget : public QDockWidget
 public:
   pqNodeEditorWidget(QWidget* parent = nullptr);
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
-  virtual ~pqNodeEditorWidget() = default;
+  ~pqNodeEditorWidget() override = default;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Update ParaView pipeline and views
    */

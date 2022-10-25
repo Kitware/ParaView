@@ -75,7 +75,7 @@ public:
 
 protected:
   vtkInSituPipelinePython();
-  ~vtkInSituPipelinePython();
+  ~vtkInSituPipelinePython() override;
 
 private:
   vtkInSituPipelinePython(const vtkInSituPipelinePython&) = delete;

@@ -23,29 +23,28 @@
 #include "pqView.h"
 
 #include "QVTKOpenGLWindow.h"
+#include <QComboBox>
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QOpenGLContext>
-#include <QOpenGLExtraFunctions>
+#include <QSignalBlocker>
 
-#include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkLookingGlassInterface.h"
 #include "vtkOpenGLFramebufferObject.h"
-#include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLState.h"
 #include "vtkPVRenderView.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkTextureObject.h"
 
+#include <array>
 #include <cmath>
 
 namespace
@@ -96,12 +95,27 @@ public:
   int InteractiveRender = 0;
 };
 
+class vtkFocalDistanceObserver : public vtkCommand
+{
+public:
+  static vtkFocalDistanceObserver* New() { return new vtkFocalDistanceObserver; }
+
+  void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(event),
+    void* vtkNotUsed(callData)) override
+  {
+    panel->resetFocalDistanceSliderRange();
+  }
+
+  pqLookingGlassDockPanel* panel = nullptr;
+};
+
 } // end anonymous namespace
 
 class pqLookingGlassDockPanel::pqInternal
 {
 public:
   Ui::pqLookingGlassDockPanel Ui;
+  std::array<double, 2> FocalDistanceSliderRange;
 };
 
 void pqLookingGlassDockPanel::constructor()
@@ -125,13 +139,30 @@ void pqLookingGlassDockPanel::constructor()
     ui.PullFocalPlaneForwardButton, SIGNAL(clicked(bool)), SLOT(pullFocalPlaneForward()));
   this->connect(ui.SaveQuilt, SIGNAL(clicked(bool)), SLOT(saveQuilt()));
   this->connect(ui.RecordQuilt, SIGNAL(clicked(bool)), SLOT(onRecordQuiltClicked()));
+  this->connect(ui.FocalDistance, SIGNAL(valueEdited(double)), SLOT(onFocalDistanceEdited(double)));
 
   this->connect(activeObjects, SIGNAL(serverChanged(pqServer*)), SLOT(reset()));
 
   // Disable button if active view is not compatible with LG
   this->connect(activeObjects, SIGNAL(viewChanged(pqView*)), SLOT(activeViewChanged(pqView*)));
 
-  this->updateSaveRecordVisibility();
+  this->updateEnableStates();
+
+  // Populate target device dropdown
+  auto devices = vtkLookingGlassInterface::GetDevices();
+  for (auto device : devices)
+  {
+    ui.TargetDeviceComboBox->addItem(
+      QString::fromStdString(device.second), QString::fromStdString(device.first));
+  }
+  ui.TargetDeviceComboBox->setCurrentIndex(-1);
+
+  this->connect(ui.TargetDeviceComboBox,
+    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+    &pqLookingGlassDockPanel::onTargetDeviceChanged);
+
+  ui.FocalDistance->setResolution(100);
+  resetFocalDistanceSliderRange();
 }
 
 pqLookingGlassDockPanel::~pqLookingGlassDockPanel()
@@ -193,6 +224,14 @@ void pqLookingGlassDockPanel::setView(pqView* view)
     this->View->getProxy()->RemoveObserver(this->ViewRenderObserver);
     this->ViewRenderObserver->Delete();
     this->ViewRenderObserver = nullptr;
+    this->View->getProxy()
+      ->GetProperty("CameraFocalPoint")
+      ->RemoveObserver(this->FocalDistanceObserver);
+    this->View->getProxy()
+      ->GetProperty("CameraPosition")
+      ->RemoveObserver(this->FocalDistanceObserver);
+    this->FocalDistanceObserver->Delete();
+    this->FocalDistanceObserver = nullptr;
   }
 
   this->View = renderView;
@@ -203,13 +242,27 @@ void pqLookingGlassDockPanel::setView(pqView* view)
     this->ViewRenderObserver = vtkViewRenderObserver::New();
     this->View->getProxy()->AddObserver(vtkCommand::StartEvent, this->ViewRenderObserver);
 
+    auto* focalDistanceObserver = vtkFocalDistanceObserver::New();
+    focalDistanceObserver->panel = this;
+    this->FocalDistanceObserver = focalDistanceObserver;
+
+    // When a property is modified that may result in the focal distance
+    // changing, reset the focal distance slider.
+    this->View->getProxy()
+      ->GetProperty("CameraFocalPoint")
+      ->AddObserver(vtkCommand::ModifiedEvent, this->FocalDistanceObserver);
+    this->View->getProxy()
+      ->GetProperty("CameraPosition")
+      ->AddObserver(vtkCommand::ModifiedEvent, this->FocalDistanceObserver);
+
     auto settings = this->getSettingsForView(this->View);
     settings->UpdateVTKObjects();
 
     proxyWidget = new pqProxyWidget(settings, this);
     proxyWidget->setApplyChangesImmediately(true);
     QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(this->widget()->layout());
-    layout->insertWidget(4, proxyWidget);
+    layout->insertWidget(2, proxyWidget);
+
     QObject::connect(proxyWidget, SIGNAL(changeFinished()), this->View, SLOT(tryRender()));
   }
 }
@@ -247,7 +300,13 @@ void pqLookingGlassDockPanel::onRender()
   if (!this->DisplayWindow)
   {
     this->Interface = vtkLookingGlassInterface::New();
+    this->Interface->SetDeviceType(
+      this->Internal->Ui.TargetDeviceComboBox->currentData().toString().toStdString());
     this->Interface->Initialize();
+
+    // Update the combo box to default to the attached device
+    auto deviceType = this->Interface->GetDeviceType();
+    this->setAttachedDevice(deviceType);
 
     srcWin->MakeCurrent();
 
@@ -288,52 +347,18 @@ void pqLookingGlassDockPanel::onRender()
     this->EndObserver = endObserver;
     this->DisplayWindow->AddObserver(vtkCommand::RenderEvent, this->EndObserver);
 
-    this->updateSaveRecordVisibility();
-
-    // Update the GUI with the interface values
-    auto& ui = this->Internal->Ui;
-    ui.QuiltExportMagnification->setValue(this->Interface->GetQuiltExportMagnification());
+    this->updateEnableStates();
   }
-
-  vtkCollectionSimpleIterator rsit;
-
-  // loop over the tiles, render,and blit
-  vtkOpenGLFramebufferObject* renderFramebuffer;
-  vtkOpenGLFramebufferObject* quiltFramebuffer;
-  this->Interface->GetFramebuffers(srcWin, renderFramebuffer, quiltFramebuffer);
-  auto ostate = srcWin->GetState();
-  ostate->PushFramebufferBindings();
-  renderFramebuffer->Bind(GL_READ_FRAMEBUFFER);
-
-  // default to our standard alpha blend eqn, some vtk classes rely on this
-  // and do not set it themselves
-  ostate->vtkglEnable(GL_BLEND);
-  ostate->vtkglBlendFuncSeparate(
-    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
   int renderSize[2];
   this->Interface->GetRenderSize(renderSize);
 
-  int tcount = this->Interface->GetNumberOfTiles();
-
-  // save the original camera settings
-  vtkRenderer* aren;
-  std::vector<vtkCamera*> Cameras;
-  auto* renderers = srcWin->GetRenderers();
-  for (renderers->InitTraversal(rsit); (aren = renderers->GetNextRenderer(rsit));)
-  {
-    auto oldCam = aren->GetActiveCamera();
-    oldCam->SetLeftEye(1);
-    oldCam->Register(this->DisplayWindow);
-    Cameras.push_back(oldCam);
-    vtkNew<vtkCamera> newCam;
-    aren->SetActiveCamera(newCam);
-  }
-
   std::vector<double> clippingLimits =
     vtkSMPropertyHelper(settings, "ClippingLimits").GetArray<double>();
-  double nearClippingLimit = clippingLimits[0];
-  double farClippingLimit = clippingLimits[1];
+
+  this->Interface->SetUseClippingLimits(true);
+  this->Interface->SetNearClippingLimit(clippingLimits[0]);
+  this->Interface->SetFarClippingLimit(clippingLimits[1]);
 
   // save the current size and temporarily set the new size to the render
   // framebuffer size
@@ -344,79 +369,11 @@ void pqLookingGlassDockPanel::onRender()
   srcWin->UseOffScreenBuffersOn();
   srcWin->SetSize(renderSize[0], renderSize[1]);
 
-  // loop over all the tiles and render then and blit them to the quilt
-  for (int tile = 0; tile < tcount; ++tile)
-  {
-    renderFramebuffer->Bind(GL_DRAW_FRAMEBUFFER);
-    ostate->vtkglViewport(0, 0, renderSize[0], renderSize[1]);
-    ostate->vtkglScissor(0, 0, renderSize[0], renderSize[1]);
-
-    {
-      int count = 0;
-      for (renderers->InitTraversal(rsit); (aren = renderers->GetNextRenderer(rsit)); ++count)
-      {
-        // adjust camera
-        auto cam = aren->GetActiveCamera();
-        cam->DeepCopy(Cameras[count]);
-        this->Interface->AdjustCamera(cam, tile);
-
-        // limit the clipping range to limit parallex
-        double* cRange = cam->GetClippingRange();
-        double cameraDistance = cam->GetDistance();
-
-        double newRange[2];
-        newRange[0] = cRange[0];
-        newRange[1] = cRange[1];
-        if (cRange[0] < cameraDistance * nearClippingLimit)
-        {
-          newRange[0] = cameraDistance * nearClippingLimit;
-        }
-        if (cRange[1] > cameraDistance * farClippingLimit)
-        {
-          newRange[1] = cameraDistance * farClippingLimit;
-        }
-        cam->SetClippingRange(newRange);
-      }
-      renderers->Render();
-    }
-
-    quiltFramebuffer->Bind(GL_DRAW_FRAMEBUFFER);
-
-    int destPos[2];
-    this->Interface->GetTilePosition(tile, destPos);
-
-    // blit to quilt
-    ostate->vtkglViewport(destPos[0], destPos[1], renderSize[0], renderSize[1]);
-    ostate->vtkglScissor(destPos[0], destPos[1], renderSize[0], renderSize[1]);
-
-    QOpenGLExtraFunctions* f = ctx->extraFunctions();
-    if (!f)
-    {
-      qCritical("required glBlitFramebuffer call not available");
-      break;
-    }
-    f->glBlitFramebuffer(0, 0, renderSize[0], renderSize[1], destPos[0], destPos[1],
-      destPos[0] + renderSize[0], destPos[1] + renderSize[1], GL_COLOR_BUFFER_BIT, GL_LINEAR);
-  }
-
-  if (this->IsRecording)
-  {
-    this->Interface->WriteQuiltMovieFrame();
-  }
+  this->Interface->RenderQuilt(srcWin);
 
   // restore the original size
   srcWin->SetSize(origSize[0], origSize[1]);
   srcWin->UseOffScreenBuffersOff();
-
-  ostate->PopFramebufferBindings();
-
-  // restore the original camera settings
-  int count = 0;
-  for (renderers->InitTraversal(rsit); (aren = renderers->GetNextRenderer(rsit)); ++count)
-  {
-    aren->SetActiveCamera(Cameras[count]);
-    Cameras[count]->Delete();
-  }
 
   // finally render. The callback will actually do the fullscreen quad
   // in the middle of this call
@@ -469,6 +426,7 @@ void pqLookingGlassDockPanel::resetToCenterOfRotation()
   position.Set(0, pos[0] - fp[0] + cor[0]);
   position.Set(1, pos[1] - fp[1] + cor[1]);
   position.Set(2, pos[2] - fp[2] + cor[2]);
+
   this->View->getProxy()->UpdateVTKObjects();
   this->View->render();
 }
@@ -480,6 +438,9 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
     return;
   }
 
+  double directionOfProjection[3];
+  double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
   auto viewProxy = this->View->getProxy();
 
   // limit the clipping range to limit parallex
@@ -487,16 +448,6 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
 
   std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPointInfo").GetDoubleArray();
   std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPositionInfo").GetDoubleArray();
-
-  double dx = fp[0] - pos[0];
-  double dy = fp[1] - pos[1];
-  double dz = fp[2] - pos[2];
-  double distance = sqrt(dx * dx + dy * dy + dz * dz);
-
-  double directionOfProjection[3];
-  directionOfProjection[0] = dx / distance;
-  directionOfProjection[1] = dy / distance;
-  directionOfProjection[2] = dz / distance;
 
   double focalPlaneMovementFactor =
     vtkSMPropertyHelper(settings, "FocalPlaneMovementFactor").GetAsDouble();
@@ -524,6 +475,9 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
     return;
   }
 
+  double directionOfProjection[3];
+  double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
   auto viewProxy = this->View->getProxy();
 
   // limit the clipping range to limit parallex
@@ -531,16 +485,6 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
 
   std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPointInfo").GetDoubleArray();
   std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPositionInfo").GetDoubleArray();
-
-  double dx = fp[0] - pos[0];
-  double dy = fp[1] - pos[1];
-  double dz = fp[2] - pos[2];
-  double distance = sqrt(dx * dx + dy * dy + dz * dz);
-
-  double directionOfProjection[3];
-  directionOfProjection[0] = dx / distance;
-  directionOfProjection[1] = dy / distance;
-  directionOfProjection[2] = dz / distance;
 
   double focalPlaneMovementFactor =
     vtkSMPropertyHelper(settings, "FocalPlaneMovementFactor").GetAsDouble();
@@ -561,15 +505,20 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
   this->View->render();
 }
 
-void pqLookingGlassDockPanel::updateSaveRecordVisibility()
+void pqLookingGlassDockPanel::updateEnableStates()
 {
   bool visible = this->Interface && this->DisplayWindow;
 
   auto& ui = this->Internal->Ui;
-  ui.SaveQuilt->setVisible(visible);
-  ui.RecordQuilt->setVisible(visible);
-  ui.QuiltExportMagnificationLabel->setVisible(visible);
-  ui.QuiltExportMagnification->setVisible(visible);
+  ui.SaveQuilt->setEnabled(visible);
+  ui.RecordQuilt->setEnabled(visible);
+  ui.ResetToCenterOfRotationButton->setEnabled(visible);
+  ui.PushFocalPlaneBackButton->setEnabled(visible);
+  ui.PullFocalPlaneForwardButton->setEnabled(visible);
+  ui.TargetDeviceComboBox->setEnabled(visible);
+  ui.TargetDeviceLabel->setEnabled(visible);
+  ui.FocalDistanceLabel->setEnabled(visible);
+  ui.FocalDistance->setEnabled(visible);
 }
 
 QString pqLookingGlassDockPanel::getQuiltFileSuffix()
@@ -620,10 +569,7 @@ void pqLookingGlassDockPanel::saveQuilt()
   }
 
   // Update the interface with the GUI values
-  auto& ui = this->Internal->Ui;
-  this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
-
-  this->Interface->SaveQuilt(this->DisplayWindow, filepath.toUtf8().data());
+  this->Interface->SaveQuilt(filepath.toUtf8().data());
 
   auto text = QString("Saved to \"%1\"").arg(filepath);
   QMessageBox::information(this, "Quilt Saved", filepath);
@@ -651,6 +597,121 @@ void pqLookingGlassDockPanel::onRecordQuiltClicked()
   else
   {
     ui.RecordQuilt->setText("Record Quilt");
+  }
+}
+
+double pqLookingGlassDockPanel::computeFocalDistanceAndDirection(double directionOfProjection[3])
+{
+  if (!this->View)
+  {
+    return -1;
+  }
+
+  auto viewProxy = this->View->getProxy();
+  std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPoint").GetDoubleArray();
+  std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPosition").GetDoubleArray();
+
+  double dx = fp[0] - pos[0];
+  double dy = fp[1] - pos[1];
+  double dz = fp[2] - pos[2];
+  double distance = sqrt(dx * dx + dy * dy + dz * dz);
+
+  directionOfProjection[0] = dx / distance;
+  directionOfProjection[1] = dy / distance;
+  directionOfProjection[2] = dz / distance;
+
+  return distance;
+}
+
+void pqLookingGlassDockPanel::onFocalDistanceEdited(double distance)
+{
+  if (!this->View)
+  {
+    return;
+  }
+
+  auto viewProxy = this->View->getProxy();
+
+  std::vector<double> fp = vtkSMPropertyHelper(viewProxy, "CameraFocalPointInfo").GetDoubleArray();
+  std::vector<double> pos = vtkSMPropertyHelper(viewProxy, "CameraPositionInfo").GetDoubleArray();
+
+  double directionOfProjection[3];
+  double oldDistance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
+  fp[0] = pos[0] + directionOfProjection[0] * distance;
+  fp[1] = pos[1] + directionOfProjection[1] * distance;
+  fp[2] = pos[2] + directionOfProjection[2] * distance;
+  vtkSMPropertyHelper(viewProxy, "CameraFocalPoint").Set(&fp[0], 3);
+
+  viewProxy->UpdateVTKObjects();
+  this->View->render();
+}
+
+void pqLookingGlassDockPanel::resetFocalDistanceSliderRange()
+{
+  if (!this->View)
+  {
+    return;
+  }
+
+  auto& ui = this->Internal->Ui;
+  if (this->sender() == ui.FocalDistance)
+  {
+    // If this was caused by the focal distance slider being edited, ignore it
+    return;
+  }
+
+  double directionOfProjection[3];
+  double distance = this->computeFocalDistanceAndDirection(directionOfProjection);
+
+  // The slider will move 1/4 backward/forward
+  this->Internal->FocalDistanceSliderRange[0] = distance * 3 / 4;
+  this->Internal->FocalDistanceSliderRange[1] = distance * 5 / 4;
+
+  QSignalBlocker blocked(ui.FocalDistance);
+
+  ui.FocalDistance->setMinimum(this->Internal->FocalDistanceSliderRange[0]);
+  ui.FocalDistance->setMaximum(this->Internal->FocalDistanceSliderRange[1]);
+  ui.FocalDistance->setValue(distance);
+}
+
+void pqLookingGlassDockPanel::onTargetDeviceChanged(int index)
+{
+  // Check if we are currently rendering to a device
+  if (this->Interface != nullptr)
+  {
+    // Reset
+    this->reset();
+
+    // Restart
+    onRenderOnLookingGlassClicked();
+  }
+}
+
+void pqLookingGlassDockPanel::setAttachedDevice(const std::string& deviceType)
+{
+  auto& ui = this->Internal->Ui;
+
+  // Only set if the user hasn't made a selection
+  if (!ui.TargetDeviceComboBox->currentData().isValid())
+  {
+
+    // Set the selection in the combo box
+    if (!deviceType.empty())
+    {
+      auto index = ui.TargetDeviceComboBox->findData(QString::fromStdString(deviceType));
+      if (index < 0)
+      {
+        qWarning() << "Unrecognized device type:" << QString::fromStdString(deviceType);
+      }
+      else
+      {
+        // Block the signal so we don't trigger currentIndexChanged
+        ui.TargetDeviceComboBox->blockSignals(true);
+        ui.TargetDeviceComboBox->setCurrentIndex(index);
+        ui.TargetDeviceComboBox->blockSignals(false);
+      }
+    }
   }
 }
 
@@ -698,14 +759,12 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
       return;
     }
   }
-
   // Update the interface with the GUI values
   auto& ui = this->Internal->Ui;
-  this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
-  ui.QuiltExportMagnificationLabel->setEnabled(false);
-  ui.QuiltExportMagnification->setEnabled(false);
+  ui.TargetDeviceLabel->setEnabled(false);
+  ui.TargetDeviceComboBox->setEnabled(false);
 
-  this->Interface->StartRecordingQuilt(this->DisplayWindow, filepath.toUtf8().data());
+  this->Interface->StartRecordingQuilt(filepath.toUtf8().data());
   this->IsRecording = true;
   this->MovieFilepath = filepath;
 
@@ -721,8 +780,8 @@ void pqLookingGlassDockPanel::stopRecordingQuilt()
   }
 
   auto& ui = this->Internal->Ui;
-  ui.QuiltExportMagnificationLabel->setEnabled(true);
-  ui.QuiltExportMagnification->setEnabled(true);
+  ui.TargetDeviceLabel->setEnabled(true);
+  ui.TargetDeviceComboBox->setEnabled(true);
 
   this->Interface->StopRecordingQuilt();
   this->IsRecording = false;

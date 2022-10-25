@@ -48,42 +48,42 @@ class PQWIDGETS_EXPORT pqTreeWidgetItem : public QTreeWidgetItem
 public:
   pqTreeWidgetItem(int atype = UserType)
     : Superclass(atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(const QStringList& strings, int atype = UserType)
     : Superclass(strings, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(QTreeWidget* aparent, int atype = UserType)
     : Superclass(aparent, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(QTreeWidget* aparent, const QStringList& strings, int atype = UserType)
     : Superclass(aparent, strings, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(QTreeWidget* aparent, QTreeWidgetItem* preceding, int atype = UserType)
     : Superclass(aparent, preceding, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(QTreeWidgetItem* aparent, int atype = UserType)
     : Superclass(aparent, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(QTreeWidgetItem* aparent, const QStringList& strings, int atype = UserType)
     : Superclass(aparent, strings, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
   pqTreeWidgetItem(QTreeWidgetItem* aparent, QTreeWidgetItem* preceding, int atype = UserType)
     : Superclass(aparent, preceding, atype)
-    , CallbackHandler(0)
+    , CallbackHandler(nullptr)
   {
   }
 
@@ -92,11 +92,10 @@ public:
    */
   void setData(int column, int role, const QVariant& v) override;
 
-public:
   class pqCallbackHandler
   {
   public:
-    virtual ~pqCallbackHandler(){};
+    virtual ~pqCallbackHandler() = default;
 
     /**
      * Called to indicate that the data is about to be changed.

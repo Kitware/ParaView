@@ -79,7 +79,7 @@ protected:
    * Default constructors and destructors
    */
   vtkAbstractAccumulator();
-  virtual ~vtkAbstractAccumulator() override = default;
+  ~vtkAbstractAccumulator() override = default;
   //@}
 
   /**

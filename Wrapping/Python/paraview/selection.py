@@ -27,7 +27,7 @@ A simple example::
   Show(es)
 
 """
-#==============================================================================
+# ==============================================================================
 #
 #  Program:   ParaView
 #  Module:    selection.py
@@ -40,7 +40,7 @@ A simple example::
 #     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #     PURPOSE.  See the above copyright notice for more information.
 #
-#==============================================================================
+# ==============================================================================
 
 from __future__ import absolute_import, division, print_function
 
@@ -48,13 +48,14 @@ import paraview
 from paraview import servermanager as sm
 import paraview.simple
 
-import sys
 
 class SelectionProxy(sm.Proxy):
     """ Special proxy wrapper type for Selections.
     """
+
     def __init__(self, **args):
         super(SelectionProxy, self).__init__(**args)
+
 
 def _createSelection(proxyname, **args):
     """ Utility function to create a selection source. Basically a factory function
@@ -73,6 +74,7 @@ def _createSelection(proxyname, **args):
         s.SetPropertyWithName(name, value)
 
     return s
+
 
 def _collectSelectionPorts(selectedReps, selectionSources, SelectBlocks=False, Modifier=None):
     """ Utility to collect all the selection output ports from a list of selected representations
@@ -106,44 +108,49 @@ def _collectSelectionPorts(selectedReps, selectionSources, SelectBlocks=False, M
 
         # Get the output port from the representation input
         inputProperty = repr.GetProperty("Input")
-        selectedSource = inputProperty.GetProxy(0)
+        selectedDataSource = inputProperty.GetProxy(0)
         portNumber = inputProperty.GetOutputPortForConnection(0)
 
-        outputPort = selectedSource.GetOutputPort(portNumber)
+        outputPort = selectedDataSource.GetOutputPort(portNumber)
 
-        # Get the output port's proxy. That is the selected source.
-        outputProxy = outputPort.GetSourceProxy()
+        prevAppendSelections = selectedDataSource.GetSelectionInput(portNumber)
 
         # Convert block selection from index-based selection
         from paraview.modules.vtkRemotingViews import vtkSMSelectionHelper
         import paraview.vtk as vtk
         if SelectBlocks:
-            selectionSource = vtkSMSelectionHelper.ConvertSelection(
-                vtk.vtkSelectionNode.BLOCKS, selectionSource, selectedSource, portNumber)
+            dinfo = selectedDataSource.GetDataInformation()
+            targetContentType = vtk.vtkSelectionNode.BLOCK_SELECTORS if dinfo.DataSetTypeIsA(
+                "vtkPartitionedDataSetCollection") else vtk.vtkSelectionNode.BLOCKS
+            selectionSource = vtkSMSelectionHelper.ConvertSelectionSource(targetContentType, selectionSource,
+                                                                          selectedDataSource, portNumber)
+
+        # create an append-selections proxy with the selection source as the only input
+        newAppendSelections = vtkSMSelectionHelper.NewAppendSelectionsFromSelectionSource(selectionSource)
 
         # Handle selection modifier
         if Modifier == 'ADD':
-            vtkSMSelectionHelper.MergeSelection(selectionSource, selectedSource.GetSelectionInput(portNumber),
-              selectedSource, outputPort.GetPortIndex())
+            vtkSMSelectionHelper.AddSelection(prevAppendSelections, newAppendSelections)
         elif Modifier == 'SUBTRACT':
-            vtkSMSelectionHelper.SubtractSelection(selectionSource, selectedSource.GetSelectionInput(portNumber),
-              selectedSource, outputPort.GetPortIndex())
+            vtkSMSelectionHelper.SubtractSelection(prevAppendSelections, newAppendSelections)
         elif Modifier == 'TOGGLE':
-            vtkSMSelectionHelper.ToggleSelection(selectionSource, selectedSource.GetSelectionInput(portNumber),
-              selectedSource, outputPort.GetPortIndex())
+            vtkSMSelectionHelper.ToggleSelection(prevAppendSelections, newAppendSelections)
+        else:
+            vtkSMSelectionHelper.IgnoreSelection(prevAppendSelections, newAppendSelections)
 
-        # Set the selection input on the selected port of the selected source proxy
-        selectedSource.SetSelectionInput(portNumber, selectionSource, outputPort.GetPortIndex())
+        selectedDataSource.SetSelectionInput(portNumber, newAppendSelections, outputPort.GetPortIndex())
 
         if SelectBlocks:
             # A new selection proxy was allocated when converting to a block
-            # selection, so we need to delete unregsiter it for garbage collection
+            # selection, so we need to delete unregister it for garbage collection
             selectionSource.UnRegister(None)
+        newAppendSelections.UnRegister(None)
 
         # Add output port to list of ports and return it
         outputPorts.append(outputPort)
 
     return outputPorts
+
 
 def _surfaceSelectionHelper(rectOrPolygon, view, type, Modifier=None):
     """ Selects mesh elements on a surface
@@ -197,6 +204,7 @@ def _surfaceSelectionHelper(rectOrPolygon, view, type, Modifier=None):
 
     paraview.simple.Render(view)
 
+
 def SelectSurfacePoints(Rectangle=[], Polygon=[], View=None, Modifier=None):
     """Select visible points within a rectangular or polygon region.
 
@@ -224,6 +232,7 @@ def SelectSurfacePoints(Rectangle=[], Polygon=[], View=None, Modifier=None):
 
     return None
 
+
 def SelectSurfaceCells(Rectangle=[], Polygon=[], View=None, Modifier=None):
     """Select visible cells within a rectangular or polygon region.
 
@@ -249,6 +258,7 @@ def SelectSurfaceCells(Rectangle=[], Polygon=[], View=None, Modifier=None):
     else:
         raise RuntimeError("")
 
+
 def SelectSurfaceBlocks(Rectangle=[], View=None, Modifier=None):
     """Select visible blocks within a rectangular region.
 
@@ -272,7 +282,8 @@ def SelectSurfaceBlocks(Rectangle=[], View=None, Modifier=None):
 
     return _surfaceSelectionHelper(Rectangle, View, 'BLOCK', Modifier)
 
-def SelectPointsThrough(Rectangle=[], View=None):
+
+def SelectPointsThrough(Rectangle=[], View=None, Modifier=None):
     """Select all points within a rectangular region regardless of their visibility.
 
     - Rectangle - list containing bottom left (x1, y1) and top right (x2, y2) corner of a
@@ -282,9 +293,10 @@ def SelectPointsThrough(Rectangle=[], View=None):
     if not View:
         View = paraview.simple.GetActiveView()
 
-    return _surfaceSelectionHelper(Rectangle, View, 'FRUSTUM_POINTS', None)
+    return _surfaceSelectionHelper(Rectangle, View, 'FRUSTUM_POINTS', Modifier)
 
-def SelectCellsThrough(Rectangle=[], View=None):
+
+def SelectCellsThrough(Rectangle=[], View=None, Modifier=None):
     """Select all cells within a rectangular region regardless of their visibility.
 
     - Rectangle - list containing bottom left (x1, y1) and top right (x2, y2) corner of a
@@ -294,7 +306,8 @@ def SelectCellsThrough(Rectangle=[], View=None):
     if not View:
         View = paraview.simple.GetActiveView()
 
-    return _surfaceSelectionHelper(Rectangle, View, 'FRUSTUM_CELLS', None)
+    return _surfaceSelectionHelper(Rectangle, View, 'FRUSTUM_CELLS', Modifier)
+
 
 def _selectIDsHelper(proxyname, IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
     """Selects IDs of a given field type.
@@ -328,6 +341,7 @@ def _selectIDsHelper(proxyname, IDs=[], FieldType='POINT', ContainingCells=False
 
     paraview.simple.RenderAllViews()
 
+
 def SelectGlobalIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
     """Select attributes by global IDs.
 
@@ -340,6 +354,7 @@ def SelectGlobalIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=Non
         should modify the existing selection.
     """
     _selectIDsHelper('GlobalIDSelectionSource', **locals())
+
 
 def SelectPedigreeIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
     """Select attributes by Pedigree IDs.
@@ -354,6 +369,7 @@ def SelectPedigreeIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=N
         should modify the existing selection.
     """
     _selectIDsHelper('PedigreeIDSelectionSource', **locals())
+
 
 def SelectIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
     """Select attributes by attribute IDs.
@@ -370,6 +386,7 @@ def SelectIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Mod
     """
     _selectIDsHelper('IDSelectionSource', **locals())
 
+
 def SelectCompositeDataIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
     """Select attributes by composite attribute IDs.
 
@@ -383,6 +400,7 @@ def SelectCompositeDataIDs(IDs=[], FieldType='POINT', ContainingCells=False, Sou
         should modify the existing selection.
     """
     selectIDsHelper('CompositeDataIDSelectionSource', **locals())
+
 
 def SelectHierarchicalDataIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
     """Select attributes by hierarchical data IDs.
@@ -398,7 +416,8 @@ def SelectHierarchicalDataIDs(IDs=[], FieldType='POINT', ContainingCells=False, 
     """
     _selectIDsHelper('HierarchicalDataIDSelectionSource', **locals())
 
-def SelectThresholds(Thresholds=[], ArrayName='', FieldType='POINT', Source=None):
+
+def SelectThresholds(Thresholds=[], ArrayName='', FieldType='POINT', Source=None, Modifier=None):
     """Select attributes in a source by thresholding on values in an associated array.
 
     - Thresholds - list of lower and upper threshold bounds. Attributes with associated
@@ -410,12 +429,24 @@ def SelectThresholds(Thresholds=[], ArrayName='', FieldType='POINT', Source=None
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    selection = _createSelection('ThresholdSelectionSource', Thresholds=Thresholds, ArrayName=ArrayName, FieldType=FieldType)
+    repr = paraview.simple.GetRepresentation(Source)
+
+    import paraview.vtk as vtk
+    reprCollection = vtk.vtkCollection()
+    reprCollection.AddItem(repr.SMProxy)
+
+    selection = _createSelection('ThresholdSelectionSource', Thresholds=Thresholds, ArrayName=ArrayName,
+                                 FieldType=FieldType)
     if selection:
-        Source.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
+        selectionCollection = vtk.vtkCollection()
+        selectionCollection.AddItem(selection.SMProxy)
+
+        _collectSelectionPorts(reprCollection, selectionCollection, Modifier=Modifier)
+
     Source.UpdateVTKObjects()
 
-def SelectLocation(Locations=[], Source=None):
+
+def SelectLocation(Locations=[], Source=None, Modifier=None):
     """Select points by location.
 
     - Locations - list of x, y, z points to select.
@@ -424,10 +455,21 @@ def SelectLocation(Locations=[], Source=None):
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
+    repr = paraview.simple.GetRepresentation(Source)
+
+    import paraview.vtk as vtk
+    reprCollection = vtk.vtkCollection()
+    reprCollection.AddItem(repr.SMProxy)
+
     selection = _createSelection('LocationSelectionSource', Locations=Locations, FieldType='POINT')
     if selection:
-        Source.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
+        selectionCollection = vtk.vtkCollection()
+        selectionCollection.AddItem(selection.SMProxy)
+
+        _collectSelectionPorts(reprCollection, selectionCollection, Modifier=Modifier)
+
     Source.UpdateVTKObjects()
+
 
 def QuerySelect(QueryString='', FieldType='POINT', Source=None, InsideOut=False):
     """Selection by query expression.
@@ -440,19 +482,30 @@ def QuerySelect(QueryString='', FieldType='POINT', Source=None, InsideOut=False)
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
+    repr = paraview.simple.GetRepresentation(Source)
+
+    import paraview.vtk as vtk
+    reprCollection = vtk.vtkCollection()
+    reprCollection.AddItem(repr.SMProxy)
+
     # convert FieldType to ElementType. Eventually, all public API should change
     # to accepting ElementType but we'll do that after all selection sources use
     # ElementType consistently.
-    from paraview.vtk import vtkSelectionNode
-    ftype = vtkSelectionNode.GetFieldTypeFromString(FieldType)
-    if ftype == vtkSelectionNode.NUM_FIELD_TYPES:
+    ftype = vtk.vtkSelectionNode.GetFieldTypeFromString(FieldType)
+    if ftype == vtk.vtkSelectionNode.NUM_FIELD_TYPES:
         raise ValueError("Invalid FieldType '%s'" % FieldType)
-    ElementType = vtkSelectionNode.ConvertSelectionFieldToAttributeType(ftype)
+    ElementType = vtk.vtkSelectionNode.ConvertSelectionFieldToAttributeType(ftype)
+
     selection = _createSelection('SelectionQuerySource', ElementType=ElementType,
-            QueryString=QueryString, InsideOut=InsideOut)
+                                 QueryString=QueryString, InsideOut=InsideOut)
     if selection:
-        Source.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
+        selectionCollection = vtk.vtkCollection()
+        selectionCollection.AddItem(selection.SMProxy)
+
+        _collectSelectionPorts(reprCollection, selectionCollection)
+
     Source.UpdateVTKObjects()
+
 
 def ClearSelection(Source=None):
     """ Clears the selection on the source passed in to the source parameter

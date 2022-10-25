@@ -53,6 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtksys/SystemTools.hxx"
@@ -155,6 +157,11 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
 
     menu->addSeparator();
   }
+  else
+  {
+    QAction* showAllBlocksAction = menu->addAction("Show All Blocks");
+    this->connect(showAllBlocksAction, SIGNAL(triggered()), this, SLOT(showAllBlocks()));
+  }
 
   // Even when nothing was picked, show the "link camera" and
   // possibly the frame decoration menu items.
@@ -207,6 +214,42 @@ void pqDefaultContextMenu::buildColorFieldsMenu(
 
     QVariant data = convert(QPair<int, QString>(association, name));
     menu->addAction(icon, name)->setData(data);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqDefaultContextMenu::showAllBlocks() const
+{
+  QList<pqRepresentation*> representations =
+    pqActiveObjects::instance().activeView()->getRepresentations();
+  for (pqRepresentation* repr : representations)
+  {
+    if (!repr)
+    {
+      continue;
+    }
+    if (repr->isVisible())
+    {
+      vtkSMProxy* proxy = repr->getProxy();
+      if (!proxy)
+      {
+        continue;
+      }
+      vtkSMProperty* property = proxy->GetProperty("BlockSelectors");
+
+      auto smProperty = vtkSMStringVectorProperty::SafeDownCast(property);
+      if (!smProperty)
+      {
+        continue;
+      }
+
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
+      BEGIN_UNDO_SET("Show All Blocks");
+      smProperty->SetElements(std::vector<std::string>({ "/" }));
+      proxy->UpdateVTKObjects();
+      END_UNDO_SET();
+      repr->renderViewEventually();
+    }
   }
 }
 
@@ -267,6 +310,7 @@ void pqDefaultContextMenu::reprTypeChanged(QAction* action)
   pqDataRepresentation* repr = this->PickedRepresentation;
   if (repr)
   {
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", repr->getProxy());
     BEGIN_UNDO_SET("Representation Type Changed");
     pqSMAdaptor::setEnumerationProperty(
       repr->getProxy()->GetProperty("Representation"), action->text());
@@ -282,6 +326,7 @@ void pqDefaultContextMenu::hide()
   pqDataRepresentation* repr = this->PickedRepresentation;
   if (repr)
   {
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", repr->getProxy());
     BEGIN_UNDO_SET("Visibility Changed");
     repr->setVisible(false);
     repr->renderViewEventually();

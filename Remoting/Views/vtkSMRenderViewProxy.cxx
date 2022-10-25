@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSMRenderViewProxy.cxx
 
   Copyright (c) Kitware, Inc.
   Copyright (c) 2017, NVIDIA CORPORATION.
@@ -19,7 +19,6 @@
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkDataArray.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkExtractSelectedFrustum.h"
 #include "vtkFloatArray.h"
@@ -34,13 +33,12 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVEncodeSelectionForServer.h"
-#include "vtkPVLastSelectionInformation.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -48,14 +46,12 @@
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
@@ -65,10 +61,56 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
-#include "vtkWeakPointer.h"
 
 #include <cassert>
-#include <map>
+#include <cmath>
+
+namespace
+{
+// magic number used as elevation to achieve an isometric view direction.
+const double isometric_elev = vtkMath::DegreesFromRadians(std::asin(std::tan(vtkMath::Pi() / 6.0)));
+
+void RotateElevation(vtkCamera* camera, double angle)
+{
+  vtkNew<vtkTransform> transform;
+
+  double scale = vtkMath::Norm(camera->GetPosition());
+  if (scale <= 0.0)
+  {
+    scale = vtkMath::Norm(camera->GetFocalPoint());
+    if (scale <= 0.0)
+    {
+      scale = 1.0;
+    }
+  }
+  double* temp = camera->GetFocalPoint();
+  camera->SetFocalPoint(temp[0] / scale, temp[1] / scale, temp[2] / scale);
+  temp = camera->GetPosition();
+  camera->SetPosition(temp[0] / scale, temp[1] / scale, temp[2] / scale);
+
+  double v2[3];
+  // translate to center
+  // we rotate around 0,0,0 rather than the center of rotation
+  transform->Identity();
+
+  // elevation
+  camera->OrthogonalizeViewUp();
+  double* viewUp = camera->GetViewUp();
+  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
+  transform->RotateWXYZ(-angle, v2[0], v2[1], v2[2]);
+
+  // translate back
+  // we are already at 0,0,0
+  camera->ApplyTransform(transform.GetPointer());
+  camera->OrthogonalizeViewUp();
+
+  // For rescale back.
+  temp = camera->GetFocalPoint();
+  camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
+  temp = camera->GetPosition();
+  camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
+}
+}
 
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
@@ -251,6 +293,12 @@ void vtkSMRenderViewProxy::PostRender(bool interactive)
   cameraProxy->UpdatePropertyInformation();
   this->SynchronizeCameraProperties();
   this->Superclass::PostRender(interactive);
+  vtkSMTrace* tracer = nullptr;
+  if (!interactive && (tracer = vtkSMTrace::GetActiveTracer()) &&
+    tracer->GetFullyTraceCameraAdjustments())
+  {
+    SM_SCOPED_TRACE(SaveCameras).arg("proxy", this).arg("comment", "Adjust camera");
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -292,6 +340,162 @@ vtkCamera* vtkSMRenderViewProxy::GetActiveCamera()
   this->CreateVTKObjects();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
   return rv ? rv->GetActiveCamera() : nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustActiveCamera(const int& adjustType, const double& angle)
+{
+  if (adjustType >= 0 && adjustType < 4)
+  {
+    this->AdjustActiveCamera(
+      static_cast<vtkSMRenderViewProxy::CameraAdjustmentType>(adjustType), angle);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustActiveCamera(
+  const CameraAdjustmentType& adjustType, const double& angle)
+{
+  switch (adjustType)
+  {
+    case CameraAdjustmentType::Azimuth:
+      this->AdjustAzimuth(angle);
+      break;
+    case CameraAdjustmentType::Roll:
+      this->AdjustRoll(angle);
+      break;
+    case CameraAdjustmentType::Elevation:
+      this->AdjustElevation(angle);
+      break;
+    case CameraAdjustmentType::Zoom:
+      this->AdjustZoom(angle);
+      break;
+    default:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustAzimuth(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustAzimuth").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  camera->Azimuth(value);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustElevation(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustElevation").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  // camera->Elevation(angle); // sometimes, this can cause an invalid view-up vector
+  RotateElevation(camera, value);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustRoll(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustRoll").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  camera->Roll(value);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustZoom(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustZoom").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  if (camera->GetParallelProjection())
+  {
+    camera->SetParallelScale(camera->GetParallelScale() / value);
+  }
+  else
+  {
+    camera->Dolly(value);
+  }
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ApplyIsometricView()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ApplyIsometricView");
+  vtkCamera* cam = this->GetActiveCamera();
+  // Ref: Fig 2.4 - Brian Griffith: "Engineering Drawing for Manufacture", DOI
+  // https://doi.org/10.1016/B978-185718033-6/50016-1
+  this->ResetActiveCameraToDirection(0, 0, -1, 0, 1, 0);
+  cam->Azimuth(45.);
+  RotateElevation(cam, isometric_elev);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToDirection(const double& look_x, const double& look_y,
+  const double& look_z, const double& up_x, const double& up_y, const double& up_z)
+{
+  if (vtkCamera* cam = this->GetActiveCamera())
+  {
+    cam->SetPosition(0, 0, 0);
+    cam->SetFocalPoint(look_x, look_y, look_z);
+    cam->SetViewUp(up_x, up_y, up_z);
+    this->SynchronizeCameraProperties();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToPositiveX()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToPositiveX");
+  this->ResetActiveCameraToDirection(1, 0, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToNegativeX()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToNegativeX");
+  this->ResetActiveCameraToDirection(-1, 0, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToPositiveY()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToPositiveY");
+  this->ResetActiveCameraToDirection(0, 1, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToNegativeY()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToNegativeY");
+  this->ResetActiveCameraToDirection(0, -1, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToPositiveZ()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToPositiveZ");
+  this->ResetActiveCameraToDirection(0, 0, 1, 0, 1, 0);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToNegativeZ()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToNegativeZ");
+  this->ResetActiveCameraToDirection(0, 0, -1, 0, 1, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -461,13 +665,13 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
   }
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
   const char* representationsToTry[] = { "UnstructuredGridRepresentation",
-    "StructuredGridRepresentation", "AMRRepresentation", "UniformGridRepresentation",
-    "PVMoleculeRepresentation", "GeometryRepresentation", nullptr };
+    "StructuredGridRepresentation", "HyperTreeGridRepresentation", "AMRRepresentation",
+    "UniformGridRepresentation", "PVMoleculeRepresentation", "GeometryRepresentation", nullptr };
   for (int cc = 0; representationsToTry[cc] != nullptr; ++cc)
   {
-    vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", representationsToTry[cc]);
-    if (prototype)
+    if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", representationsToTry[cc]))
     {
       vtkSMProperty* inputProp = prototype->GetProperty("Input");
       vtkSMUncheckedPropertyHelper helper(inputProp);
@@ -481,12 +685,17 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
     }
   }
 
-  // check if the data type is a vtkTable with a single row and column with
-  // a vtkStringArray named "Text". If it is, we render this in a render view
-  // with the value shown in the view.
-  if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
   {
-    if (vtkPVDataInformation* dataInformation = port->GetDataInformation())
+    vtkPVDataInformation* dataInformation = nullptr;
+    if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
+    {
+      dataInformation = port->GetDataInformation();
+    }
+
+    // check if the data type is a vtkTable with a single row and column with
+    // a vtkStringArray named "Text". If it is, we render this in a render view
+    // with the value shown in the view.
+    if (dataInformation)
     {
       if (dataInformation->GetDataSetType() == VTK_TABLE)
       {
@@ -501,6 +710,21 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       }
     }
   }
+
+  // Default to "GeometryRepresentation" for composite datasets where we
+  // might not yet know the dataset type of the children at the time the
+  // representation is created.
+  if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
+  {
+    if (vtkPVDataInformation* dataInformation = port->GetDataInformation())
+    {
+      if (dataInformation->IsCompositeDataSet())
+      {
+        return "GeometryRepresentation";
+      }
+    }
+  }
+
   return nullptr;
 }
 
@@ -528,7 +752,10 @@ void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest)
     result.GetArgument(0, 0, bounds, 6);
   }
 
-  this->ResetCamera(bounds, closest);
+  if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
+  {
+    this->ResetCamera(bounds, closest);
+  }
   this->GetSession()->CleanupPendingProgress();
 }
 
@@ -613,7 +840,12 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     const bool isSelectionRepresentation =
       strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
       strcmp(modifiedProxy->GetXMLName(), "SelectionRepresentation") == 0;
-    forceClearCache = !(isPVExtractSelectionFilter || isSelectionRepresentation);
+
+    const bool isFastPreSelection = strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
+      vtkPVRenderViewSettings::GetInstance()->GetEnableFastPreselection();
+
+    forceClearCache =
+      !(isPVExtractSelectionFilter || isSelectionRepresentation || isFastPreSelection);
   }
 
   const bool cacheCleared = this->ClearSelectionCache(forceClearCache);
@@ -659,8 +891,8 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
   rank = 0;
 
   vtkSMRepresentationProxy* repr = nullptr;
-  vtkSmartPointer<vtkCollection> reprs = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> sources = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> reprs;
+  vtkNew<vtkCollection> sources;
   int region[4] = { x, y, x, y };
   if (this->SelectSurfaceCells(region, reprs, sources, false))
   {
@@ -680,10 +912,11 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
   auto input = vtkSMPropertyHelper(repr, "Input", /*quiet*/ true).GetAsOutputPort();
   auto info = input ? input->GetDataInformation() : nullptr;
 
-  // get selection in order to determine which block of the data set
-  // set was selected (if it is a composite data set)
+  // get selection in order to determine which block of the dataset
+  // was selected (if it is a composite data set)
   if (info && info->IsCompositeDataSet())
   {
+    // selection Source is NOT an appendSelections filter, so we can continue as usual
     auto selectionSource = vtkSMProxy::SafeDownCast(sources->GetItemAsObject(0));
 
     // since SelectSurfaceCells can ever only return a
@@ -724,8 +957,8 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
-  const int display_position[2], double world_position[3], bool snapOnMeshPoint)
+bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(const int display_position[2],
+  double world_position[3], double world_normal[3], bool snapOnMeshPoint)
 {
   int region[4] = { display_position[0], display_position[1], display_position[0],
     display_position[1] };
@@ -789,7 +1022,27 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     pickingHelper->UpdateProperty("Update", 1);
     vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
     vtkSMPropertyHelper(pickingHelper, "Intersection").Get(world_position, 3);
+    vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").UpdateValueFromServer();
+    vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").Get(world_normal, 3);
     pickingHelper->Delete();
+
+    static constexpr double PI_2 = vtkMath::Pi() / 2.0f;
+    // Note: Fix normal direction in case the orientation of the picked cell is wrong.
+    // When you cast a ray to a 3d object from a specific view angle (camera normal), the angle
+    // between the camera normal and the normal of the cell surface that the ray intersected,
+    // can have an angle up to pi / 2. This is true because you can't see surface objects
+    // with a greater angle than pi / 2, therefore, you can't pick them. In case an angle greater
+    // than pi / 2 is computed, it must be a result of a wrong orientation of the picked cell.
+    // To solve this issue, we reverse the picked normal.
+    double cameraNormal[3];
+    this->GetRenderer()->GetActiveCamera()->GetViewPlaneNormal(cameraNormal);
+    if (vtkMath::AngleBetweenVectors(world_normal, cameraNormal) > PI_2)
+    {
+      world_normal[0] *= -1;
+      world_normal[1] *= -1;
+      world_normal[2] *= -1;
+    }
+    return true;
   }
   else
   {
@@ -797,14 +1050,14 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     if (!this->IsSelectionAvailable())
     {
       vtkWarningMacro("Snapping to the surface is not available therefore "
-                      "the camera focal point will be used to determine "
+                      "the camera focal point and normal will be used to determine "
                       "the depth of the picking.");
     }
-
     // Use camera focal point to get some Zbuffer
     double cameraFP[4];
     vtkRenderer* renderer = this->GetRenderer();
     vtkCamera* camera = renderer->GetActiveCamera();
+    camera->GetViewPlaneNormal(world_normal);
     camera->GetFocalPoint(cameraFP);
     cameraFP[3] = 1.0;
     renderer->SetWorldPoint(cameraFP);
@@ -820,9 +1073,8 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     {
       world_position[i] = world[i] / world[3];
     }
+    return false;
   }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1061,7 +1313,7 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
   selectionSource->UpdateVTKObjects();
 
   // 2) Figure out which representation is "selected".
-  vtkExtractSelectedFrustum* extractor = vtkExtractSelectedFrustum::New();
+  vtkNew<vtkExtractSelectedFrustum> extractor;
   extractor->CreateFrustum(frustum);
 
   // Now we just use the first selected representation,
@@ -1101,7 +1353,6 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
     }
   }
 
-  extractor->Delete();
   selectionSource->Delete();
   return true;
 }

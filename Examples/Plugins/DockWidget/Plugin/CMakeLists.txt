@@ -21,6 +21,7 @@ list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS
   "${CMAKE_CURRENT_SOURCE_DIR}/UIs")
 
 paraview_add_plugin(ExampleDockPanel
+  REQUIRED_ON_CLIENT
   VERSION "1.0"
   UI_FILES UIs/ExampleDockPanel.ui
   UI_INTERFACES ${interfaces}

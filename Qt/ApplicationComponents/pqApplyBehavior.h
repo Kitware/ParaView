@@ -49,9 +49,13 @@ class pqView;
  * ParaView application, it gets its own behavior so applications can customize
  * it, if needed.
  *
- * For pqApplyBehavior to work, one needs to manually register
- * pqPropertiesPanel instance(s). pqParaViewBehaviors does that automatically
+ * pqApplyBehavior can work with or without registered pqPropertiesPanel.
+ * One could still manually register any pqPropertiesPanel instance(s).
+ * pqParaViewBehaviors does that automatically
  * for pqPropertiesPanel instances available during the startup.
+ *
+ * This behavior is also responsible for managing the AutoApply mechanism
+ * with is controllable using vtkPVGeneralSettings
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
 {
@@ -59,21 +63,29 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqApplyBehavior(QObject* parent = 0);
+  pqApplyBehavior(QObject* parent = nullptr);
   ~pqApplyBehavior() override;
 
+  //@{
   /**
    * Register/unregister pqPropertiesPanel instances to monitor.
    */
   void registerPanel(pqPropertiesPanel* panel);
   void unregisterPanel(pqPropertiesPanel* panel);
+  //@}
+
+Q_SIGNALS:
+  void triggerApply();
+
 protected Q_SLOTS:
-  virtual void applied(pqPropertiesPanel*, pqProxy*);
-  virtual void applied(pqPropertiesPanel*);
+  virtual void applied(pqPropertiesPanel* panel, pqProxy* proxy);
+  virtual void applied(pqPropertiesPanel* panel = nullptr);
 
 private Q_SLOTS:
   void onApplied(pqProxy*);
   void onApplied();
+  void onModified();
+  void onResetDone();
 
 protected:
   virtual void showData(pqPipelineSource* source, pqView* view);

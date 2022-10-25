@@ -419,7 +419,7 @@ struct vtkSMSessionProxyManagerInternals
           found = true;
           it2->second.erase(it3);
         }
-        if (it2->second.size() == 0)
+        if (it2->second.empty())
         {
           it->second.erase(it2);
         }

@@ -132,6 +132,10 @@ void vtkSIWriterProxy::AddInput(int input_port, vtkAlgorithmOutput* connection, 
   {
     pipeline.push_back(vtkAlgorithm::SafeDownCast(passArrays->GetVTKObject()));
   }
+  else if (auto selectExtract = this->GetSubSIProxy("SelectArraysExtractBlocks"))
+  {
+    pipeline.push_back(vtkAlgorithm::SafeDownCast(selectExtract->GetVTKObject()));
+  }
   if (auto completeArrays = this->GetSubSIProxy("CompleteArrays"))
   {
     pipeline.push_back(vtkAlgorithm::SafeDownCast(completeArrays->GetVTKObject()));
@@ -160,6 +164,10 @@ void vtkSIWriterProxy::CleanInputs(const char* method)
   if (auto passArrays = this->GetSubSIProxy("PassArrays"))
   {
     pipeline.push_back(vtkAlgorithm::SafeDownCast(passArrays->GetVTKObject()));
+  }
+  else if (auto selectExtract = this->GetSubSIProxy("SelectArraysExtractBlocks"))
+  {
+    pipeline.push_back(vtkAlgorithm::SafeDownCast(selectExtract->GetVTKObject()));
   }
   if (auto completeArrays = this->GetSubSIProxy("CompleteArrays"))
   {

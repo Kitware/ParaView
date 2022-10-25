@@ -99,8 +99,8 @@ public:
   static void FillImage(vtkImageData* image, const int extent[6], const unsigned char rgb[3]);
 
 protected:
-  vtkSMUtilities() {}
-  ~vtkSMUtilities() override {}
+  vtkSMUtilities() = default;
+  ~vtkSMUtilities() override = default;
 
 private:
   vtkSMUtilities(const vtkSMUtilities&) = delete;

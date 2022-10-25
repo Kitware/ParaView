@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqOrbitCreatorDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqOrbitCreatorDialog(QWidget* parent = 0);
+  pqOrbitCreatorDialog(QWidget* parent = nullptr);
   ~pqOrbitCreatorDialog() override;
 
   /**
@@ -67,7 +67,7 @@ public:
   void setOrigin(double xyz[3]);
 
 protected Q_SLOTS:
-  void resetBounds();
+  void resetCenter();
 
 private:
   Q_DISABLE_COPY(pqOrbitCreatorDialog)

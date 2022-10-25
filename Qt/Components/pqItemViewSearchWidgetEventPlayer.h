@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqItemViewSearchWidgetEventPlayer : public pqWidgetEve
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqItemViewSearchWidgetEventPlayer(QObject* parent = 0);
+  pqItemViewSearchWidgetEventPlayer(QObject* parent = nullptr);
   ~pqItemViewSearchWidgetEventPlayer() override;
 
   using Superclass::playEvent;

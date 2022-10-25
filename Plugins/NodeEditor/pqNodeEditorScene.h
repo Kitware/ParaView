@@ -43,7 +43,7 @@ class pqNodeEditorScene : public QGraphicsScene
 
 public:
   pqNodeEditorScene(QObject* parent = nullptr);
-  virtual ~pqNodeEditorScene() = default;
+  ~pqNodeEditorScene() override = default;
 
 Q_SIGNALS:
   /**
@@ -65,7 +65,13 @@ public Q_SLOTS:
 
 protected:
   /**
-   *  Draws a grid background.
+   * Snaps the given x and y coordinate to the next available top left gird point.
+   * Optionally the grid can be scaled with the resolution parameter.
+   */
+  static QPointF snapToGrid(const qreal& x, const qreal& y, const qreal& resolution = 1.0);
+
+  /**
+   * Draws a grid background.
    */
   void drawBackground(QPainter* painter, const QRectF& rect) override;
 };

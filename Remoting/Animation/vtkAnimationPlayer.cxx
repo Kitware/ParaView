@@ -51,8 +51,9 @@ vtkSMAnimationScene* vtkAnimationPlayer::GetAnimationScene()
 }
 
 //----------------------------------------------------------------------------
-void vtkAnimationPlayer::Play()
+void vtkAnimationPlayer::Play(const int dir /*=1*/)
 {
+  bool reverse = (dir == static_cast<int>(vtkAnimationCue::PlayDirection::BACKWARD));
   if (!this->AnimationScene)
   {
     vtkErrorMacro("No animation scene to play.");
@@ -61,11 +62,14 @@ void vtkAnimationPlayer::Play()
 
   if (this->InPlay)
   {
-    vtkErrorMacro("Cannot play while playing.");
+    const char* currentDir = reverse ? "backwards" : "forwards";
+    vtkErrorMacro("Cannot play " << currentDir << " during an active playback.");
     return;
   }
 
-  this->InvokeEvent(vtkCommand::StartEvent);
+  // tell animation components that playback started in a certain play direction.
+  // typical observers would want to update their button icon and tool tip texts.
+  this->InvokeEvent(vtkCommand::StartEvent, &reverse);
 
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
@@ -83,27 +87,41 @@ void vtkAnimationPlayer::Play()
   }
 
   // clamp current time to range
-  this->CurrentTime =
-    (this->CurrentTime < starttime || this->CurrentTime >= endtime) ? starttime : this->CurrentTime;
+  const double& srcTime = reverse ? endtime : starttime;
+  const bool needClamp = reverse ? (this->CurrentTime <= starttime || this->CurrentTime > endtime)
+                                 : (this->CurrentTime < starttime || this->CurrentTime >= endtime);
+  this->CurrentTime = needClamp ? srcTime : this->CurrentTime;
 
+  // prepare to start animation.
+  const double windowLength = playbackWindow[1] - playbackWindow[0];
   this->InPlay = true;
   this->StopPlay = false;
+
+  auto withinTimeRange = [&]() -> bool { // returns true if animation can continue, false otherwise
+    return reverse ? this->CurrentTime >= playbackWindow[0]
+                   : this->CurrentTime <= playbackWindow[1];
+  };
+  auto getElapsedPercent = [&]() -> double { // return percent of animation completed.
+    return 100. *
+      (reverse ? playbackWindow[1] - this->CurrentTime : this->CurrentTime - playbackWindow[0]) /
+      windowLength;
+  };
 
   do
   {
     this->StartLoop(starttime, endtime, this->CurrentTime, playbackWindow);
     this->AnimationScene->Initialize();
     double deltatime = 0.0;
-    while (!this->StopPlay && this->CurrentTime <= playbackWindow[1])
+    while (!this->StopPlay && withinTimeRange())
     {
       this->AnimationScene->Tick(this->CurrentTime, deltatime, this->CurrentTime);
-      double progress =
-        (this->CurrentTime - playbackWindow[0]) / (playbackWindow[1] - playbackWindow[0]);
+      double progress = getElapsedPercent() / 100.;
       this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
 
-      double nexttime = this->GetNextTime(this->CurrentTime);
-      deltatime = nexttime - this->CurrentTime;
-      this->CurrentTime = nexttime;
+      double t =
+        reverse ? this->GetPreviousTime(this->CurrentTime) : this->GetNextTime(this->CurrentTime);
+      deltatime = t - this->CurrentTime;
+      this->CurrentTime = t;
     }
 
     // Finalize will get called when Tick() is called with time>=endtime on the
@@ -112,7 +130,7 @@ void vtkAnimationPlayer::Play()
     // TODO: not sure what's the right thing here.
     // this->AnimationScene->Finalize();
 
-    this->CurrentTime = starttime;
+    this->CurrentTime = reverse ? endtime : starttime;
     this->EndLoop();
     // loop when this->Loop is true.
   } while (this->Loop && !this->StopPlay);
@@ -120,7 +138,9 @@ void vtkAnimationPlayer::Play()
   this->InPlay = false;
   this->StopPlay = false;
 
-  this->InvokeEvent(vtkCommand::EndEvent);
+  // tell animation components that playback ended in a certain play direction.
+  // typical observers would want to update their button icon and tool tip texts.
+  this->InvokeEvent(vtkCommand::EndEvent, &reverse);
 }
 
 //----------------------------------------------------------------------------

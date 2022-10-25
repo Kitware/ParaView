@@ -385,6 +385,7 @@ being of a vtkDoubleArray.</Documentation>
           <DataType value="vtkDataSet" />
           <DataType value="vtkGraph"/>
           <DataType value="vtkTable"/>
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" optional="1"/>
         <Documentation>This property specifies the input dataset (vtkDataSet, vtkTable or vtkGraph) to the
@@ -409,6 +410,9 @@ being of a vtkDoubleArray.</Documentation>
                          name="CoordinateResults"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AttributeType" value="0" inverse="0" />
+        </Hints>
         <Documentation>The value of this property determines whether the
         results of this computation should be used as point coordinates or as a
         new array.</Documentation>
@@ -649,12 +653,17 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkNonOverlappingAMR" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="1"
                           data_type="vtkDataSet" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_amr"
+                          number_of_components="1"
+                          data_type="vtkNonOverlappingAMR" />
         <InputArrayDomain attribute_type="cell"
                           name="input_array_htg"
                           number_of_components="1"
@@ -1304,292 +1313,6 @@ Every Nth Point.
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVGlyphFilterLegacy"
-                 name="GlyphLegacy">
-      <Deprecated deprecated_in="5.6" to_remove_in="5.7">
-        It has been replaced by 'GlyphWithCustomSource'. Please consider using that instead.
-      </Deprecated>
-      <Documentation long_help="This filter produces a glyph at each point of in input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
-                     short_help="Generate a glyph at each point of the input data set.">
-The Glyph filter generates a glyph (i.e., an arrow, cone, cube,
-cylinder, line, sphere, or 2D glyph) at each point in the input
-dataset. The glyphs can be oriented and scaled by the input
-point-centered scalars and vectors. The Glyph filter operates on any
-type of data set. Its output is polygonal
-
-To use this filter, you first select the arrays to use for as the
-**Scalars** and **Vectors**, if any.  To orient the glyphs using the
-selected **Vectors**, use **Orient** property.  To scale the glyphs using
-the selected **Scalars** or **Vectors**, use the **Scale Mode** property.
-
-The **Glyph Mode** property controls which points in the input dataset
-are selected for glyphing (since in most cases, glyphing all points in
-the input dataset can be both performance impeding as well as visually
-cluttered.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <InputArrayDomain name="input_array1"
-                          number_of_components="1"
-                          optional="1" />
-        <InputArrayDomain name="input_array2"
-                          number_of_components="3"
-                          optional="1" />
-        <Documentation>
-This property specifies the input to the Glyph filter.  This is the
-dataset from which the points are selected to be glyphed.
-        </Documentation>
-      </InputProperty>
-      <InputProperty command="SetSourceConnection"
-                     label="Glyph Type"
-                     name="Source">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="glyph_sources" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
-        </DataTypeDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="sources" name="ArrowSource" />
-          <Proxy group="sources" name="ConeSource" />
-          <Proxy group="sources" name="CubeSource" />
-          <Proxy group="sources" name="CylinderSource" />
-          <Proxy group="sources" name="LineSource" />
-          <Proxy group="sources" name="SphereSource" />
-          <Proxy group="sources" name="GlyphSource2D" />
-        </ProxyListDomain>
-        <Hints>
-          <ProxyPropertyWidget selected_proxy_panel_visibility="advanced" />
-          <!-- show the selected proxy's panel, only in advanced mode. -->
-        </Hints>
-        <Documentation>This property determines which type of glyph will be
-        placed at the points in the input dataset.</Documentation>
-      </InputProperty>
-      <StringVectorProperty command="SetInputArrayToProcess"
-                            default_values="0"
-                            element_types="0 0 0 0 2"
-                            name="Scalars"
-                            number_of_elements="5">
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array1"
-                         name="array_list"
-                         none_string="None">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-Select the input array to be treated as the active **Scalars**.  You
-can scale the glyphs using the selected scalars by setting the **Scale
-Mode** property to **scalar**.
-        </Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetInputArrayToProcess"
-                            default_values="1"
-                            element_types="0 0 0 0 2"
-                            name="Vectors"
-                            number_of_elements="5">
-        <!-- default value=1 so normals go to the right place -->
-        <ArrayListDomain attribute_type="Vectors"
-                         input_domain_name="input_array2"
-                         name="array_list"
-                         none_string="None">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-Select the input array to be treated as the active **Vectors**.  You can
-scale the glyphs using the selected vectors by setting the **Scale
-Mode** property to **vector** or **vector_components**. You can orient the
-glyphs using the selected vectors by checking the **Orient** property.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetOrient"
-                         default_values="1"
-                         name="Orient"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-If this property is set to 1, the glyphs will be oriented based on the
-vectors selected using the **Vectors** property.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetScaleMode"
-                         default_values="3"
-                         name="ScaleMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="scalar"
-                 value="0" />
-          <Entry text="vector"
-                 value="1" />
-          <Entry text="vector_components"
-                 value="2" />
-          <Entry text="off"
-                 value="3" />
-        </EnumerationDomain>
-        <Documentation>
-Select how to scale the glyphs. Set to **off** to disable scaling
-entirely. Set to **scalar** to scale the glyphs using the array selected
-using the **Scalars** property. Set to **vector** to scale the glyphs
-using the magnitude of the array selected using the **Vectors**
-property.  Set to **vector_components** to scale using the **Vectors**,
-scaling each component individually.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetScaleFactor"
-                            default_values="1.0"
-                            name="ScaleFactor"
-                            number_of_elements="1"
-                            panel_widget="glyph_scale_factor">
-        <BoundsDomain mode="scaled_extent" name="bounds" scale_factor="0.1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </BoundsDomain>
-        <ArrayRangeDomain name="scalar_range">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="ArraySelection" name="Scalars" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <ArrayRangeDomain name="vector_range">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="ArraySelection" name="Vectors" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Documentation>Specify the constant multiplier to use to scale the glyphs.
-        </Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetGlyphMode"
-                         default_values="2"
-                         name="GlyphMode"
-                         number_of_elements="1"
-                         panel_visibility="default">
-        <EnumerationDomain name="enum">
-          <Entry text="All Points" value="0"/>
-          <Entry text="Every Nth Point" value="1"/>
-          <Entry text="Uniform Spatial Distribution" value="2"/>
-        </EnumerationDomain>
-        <Documentation>
-          This property indicates the mode that will be used to generate
-          glyphs from the dataset.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMaximumNumberOfSamplePoints"
-                        number_of_elements="1"
-                        default_values="5000"
-                        name="MaximumNumberOfSamplePoints">
-        <IntRangeDomain min="1" name="range" />
-        <Documentation>
-This property specifies the maximum number of sample points to use
-when sampling the space when Uniform Spatial Distribution is used.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="2" />
-          <!-- show this widget when GlyphMode==2 -->
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetSeed"
-                        number_of_elements="1"
-                        default_values="10339"
-                        name="Seed">
-        <IntRangeDomain min="1" name="range"/>
-        <Documentation>
-This property specifies the seed that will be used for generating a
-uniform distribution of glyph points when a Uniform Spatial
-Distribution is used.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="2" />
-          <!-- show this widget when GlyphMode==2 -->
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetStride"
-                         number_of_elements="1"
-                         default_values="1"
-                         name="Stride">
-        <IntRangeDomain min="1" name="range"/>
-        <Documentation>
-This property specifies the stride that will be used when glyphing by
-Every Nth Point.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="1" />
-          <!-- show this widget when GlyphMode==1 -->
-        </Hints>
-     </IntVectorProperty>
-
-     <ProxyProperty command="SetSourceTransform"
-                     name="GlyphTransform"
-                     panel_visibility="advanced">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="Transform2" />
-        </ProxyListDomain>
-        <Documentation>
-The values in this property allow you to specify the transform
-(translation, rotation, and scaling) to apply to the glyph
-source.</Documentation>
-      </ProxyProperty>
-
-      <PropertyGroup label="Glyph Source">
-        <Property name="Source" />
-      </PropertyGroup>
-      <PropertyGroup label="Active Attributes">
-        <Property name="Scalars" />
-        <Property name="Vectors" />
-      </PropertyGroup>
-      <PropertyGroup label="Glyph Transform">
-        <Property name="GlyphTransform" />
-      </PropertyGroup>
-      <PropertyGroup label="Orientation">
-        <Property name="Orient" />
-      </PropertyGroup>
-      <PropertyGroup label="Scaling">
-        <Property name="ScaleMode"/>
-        <Property name="ScaleFactor"/>
-      </PropertyGroup>
-      <PropertyGroup label="Masking">
-        <Property name="GlyphMode" />
-        <Property name="MaximumNumberOfSamplePoints" />
-        <Property name="Seed" />
-        <Property name="Stride" />
-      </PropertyGroup>
-
-      <Hints>
-        <!-- Visibility Element can be used to suggest the GUI about
-          visibility of this filter (or its input) on creation.
-          replace_input="0" implies that the input visibility is not
-            changed on creation of this filter (defaults to "1")
-       -->
-        <Visibility replace_input="0" />
-      </Hints>
-      <!-- End Glyph -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVGlyphFilter"
                  name="GlyphWithCustomSource"
                  label="Glyph With Custom Source">
@@ -1878,259 +1601,6 @@ Every Nth Point.
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVGlyphFilterLegacy"
-                 label="Glyph With Custom Source Legacy"
-                 name="GlyphWithCustomSourceLegacy">
-      <Documentation long_help="This filter generates a glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
-                     short_help="Generate a glyph symbol at each point of the input data set.">
-      The Glyph filter generates a glyph at each point in the input dataset.
-      The glyphs can be oriented and scaled by the input point-centered scalars
-      and vectors. The Glyph filter operates on any type of data set. Its
-      output is polygonal. This filter is available on the
-      Toolbar.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <InputArrayDomain attribute_type="point"
-                          name="input_array1"
-                          number_of_components="1"
-                          optional="1" />
-        <InputArrayDomain attribute_type="point"
-                          name="input_array2"
-                          number_of_components="3"
-                          optional="1" />
-        <Documentation>This property specifies the input to the Glyph filter.
-        This is the dataset from which the points are selected to be glyphed.
-        </Documentation>
-      </InputProperty>
-      <InputProperty command="SetSourceConnection"
-                     label="Glyph Type"
-                     name="Source">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="glyph_sources" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
-        </DataTypeDomain>
-        <Documentation>This property determines which type of glyph will be
-        placed at the points in the input dataset.</Documentation>
-      </InputProperty>
-      <StringVectorProperty command="SetInputArrayToProcess"
-                            element_types="0 0 0 0 2"
-                            name="Scalars"
-                            number_of_elements="5">
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array1"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>Select the input array to be treated as the active "Scalars".
-          You can scale the glyphs using the selected scalars by setting the
-          "Scale Mode" property to "scalar"
-        </Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetInputArrayToProcess"
-                            default_values="1"
-                            element_types="0 0 0 0 2"
-                            name="Vectors"
-                            number_of_elements="5">
-        <!-- default value=1 so normals go to the right place -->
-        <ArrayListDomain attribute_type="Vectors"
-                         input_domain_name="input_array2"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>Select the input array to be treated as the active "Vectors".
-          You can scale the glyphs using the selected vectors by setting the "Scale Mode"
-          property to "vector" or "vector_components". You can orient the glyphs using the
-          selected vectors by checking the "Orient" property.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetOrient"
-                         default_values="1"
-                         name="Orient"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If this property is set to 1, the glyphs will be
-          oriented based on the vectors selected using the "Vectors" property.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetScaleMode"
-                         default_values="3"
-                         name="ScaleMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="scalar"
-                 value="0" />
-          <Entry text="vector"
-                 value="1" />
-          <Entry text="vector_components"
-                 value="2" />
-          <Entry text="off"
-                 value="3" />
-        </EnumerationDomain>
-        <Documentation>Select how to scale the glyphs. Set to "off" to disable
-          scaling entirely. Set to "scalar" to scale the glyphs using the
-          array selected using the "Scalars" property. Set to "vector" to scale the
-          glyphs using the magnitude of the array selected using the "Vectors" property.
-          Set to "vector_components" to scale using the "Vectors", scaling each component
-          individually.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetScaleFactor"
-                            default_values="1.0"
-                            name="ScaleFactor"
-                            number_of_elements="1"
-                            panel_widget="glyph_scale_factor">
-        <BoundsDomain mode="scaled_extent" name="bounds" scale_factor="0.1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </BoundsDomain>
-        <ArrayRangeDomain name="scalar_range">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="ArraySelection" name="Scalars" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <ArrayRangeDomain name="vector_range">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="ArraySelection" name="Vectors" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Documentation>Specify the constant multiplier to use to scale the glyphs.
-        </Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetGlyphMode"
-                         default_values="2"
-                         name="GlyphMode"
-                         number_of_elements="1"
-                         panel_visibility="default">
-        <EnumerationDomain name="enum">
-          <Entry text="All Points" value="0"/>
-          <Entry text="Every Nth Point" value="1"/>
-          <Entry text="Uniform Spatial Distribution" value="2"/>
-        </EnumerationDomain>
-        <Documentation>
-          This property indicates the mode that will be used to generate
-          glyphs from the dataset.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMaximumNumberOfSamplePoints"
-                        number_of_elements="1"
-                        default_values="5000"
-                        name="MaximumNumberOfSamplePoints">
-        <IntRangeDomain min="1" name="range" />
-        <Documentation>
-          This property specifies the maximum number of sample points to use
-          when sampling the space when Uniform Spatial Distribution is used.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="2" />
-          <!-- show this widget when GlyphMode==2 -->
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetSeed"
-                        number_of_elements="1"
-                        default_values="10339"
-                        name="Seed">
-        <IntRangeDomain min="1" name="range"/>
-        <Documentation>
-          This property specifies the seed that will be used for generating
-          a uniform distribution of glyph points when a Uniform Spatial
-          Distribution is used.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="2" />
-          <!-- show this widget when GlyphMode==2 -->
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetStride"
-                         number_of_elements="1"
-                         default_values="1"
-                         name="Stride">
-        <IntRangeDomain min="1" name="range"/>
-        <Documentation>
-          This property specifies the stride that will be used when glyphing
-          by Every Nth Point.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="1" />
-          <!-- show this widget when GlyphMode==1 -->
-        </Hints>
-     </IntVectorProperty>
-
-     <ProxyProperty command="SetSourceTransform"
-                     name="GlyphTransform"
-                     panel_visibility="advanced">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="Transform2" />
-        </ProxyListDomain>
-        <Documentation>The values in this property allow you to specify the
-        transform (translation, rotation, and scaling) to apply to the glyph
-        source.</Documentation>
-      </ProxyProperty>
-
-      <PropertyGroup label="Glyph Source">
-        <Property name="Source" />
-      </PropertyGroup>
-      <PropertyGroup label="Active Attributes">
-        <Property name="Scalars" />
-        <Property name="Vectors" />
-      </PropertyGroup>
-      <PropertyGroup label="Glyph Transform">
-        <Property name="GlyphTransform" />
-      </PropertyGroup>
-      <PropertyGroup label="Orientation">
-        <Property name="Orient" />
-      </PropertyGroup>
-      <PropertyGroup label="Scaling">
-        <Property name="ScaleMode"/>
-        <Property name="ScaleFactor"/>
-      </PropertyGroup>
-      <PropertyGroup label="Masking">
-        <Property name="GlyphMode" />
-        <Property name="MaximumNumberOfSamplePoints" />
-        <Property name="Seed" />
-        <Property name="Stride" />
-      </PropertyGroup>
-
-      <Hints>
-        <!-- Visibility Element can be used to suggest the GUI about
-          visibility of this filter (or its input) on creation.
-          replace_input="0" implies that the input visibility is not
-            changed on creation of this filter (defaults to "1")
-       -->
-        <Visibility replace_input="0" />
-      </Hints>
-      <!-- End GlyphWithCustomSource -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVGradientFilter"
                  label="Gradient"
                  name="Gradient">
@@ -2157,6 +1627,7 @@ Every Nth Point.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array" />
         <Documentation>
@@ -2235,15 +1706,23 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2281,15 +1760,23 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2309,6 +1796,13 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
             <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
                                        name="vtkImageData"
@@ -2318,6 +1812,7 @@ Every Nth Point.
                                        property="BoundaryMethod"
                                        value="1"
                                        mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2332,15 +1827,23 @@ Every Nth Point.
                             panel_visibility="advanced">
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2356,15 +1859,23 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2379,15 +1890,23 @@ Every Nth Point.
                             panel_visibility="advanced">
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2404,15 +1923,23 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2427,15 +1954,23 @@ Every Nth Point.
                             panel_visibility="advanced">
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2458,15 +1993,23 @@ Every Nth Point.
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2492,15 +2035,23 @@ Every Nth Point.
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
+            <Expression type="and">
+
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkImageData"
-                                       exclude="1"
-                                       mode="enabled_state" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       property="BoundaryMethod"
-                                       value="1"
-                                       mode="enabled_state" />
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+
+              <Expression type="or">
+                <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkImageData"
+                                         exclude="1"
+                                         mode="enabled_state" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         property="BoundaryMethod"
+                                         value="1"
+                                         mode="enabled_state" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2903,7 +2454,7 @@ Every Nth Point.
                                    mode="visibility"/>
         </Hints>
         <ProxyListDomain name="proxy_list">
-          <Group name="slice_htg_implicit_functions" default="Plane"/>
+          <Group name="slice_htg_amr_implicit_functions" default="Plane"/>
         </ProxyListDomain>
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
@@ -3017,7 +2568,9 @@ Every Nth Point.
         <Documentation>The values in this property specify a list of current
         offset values. This can be used to create multiple slices with
         different centers. Each entry represents a new slice with its center
-        shifted by the offset value.</Documentation>
+        shifted by the offset value. The 'Values Range' information is the
+        range based on the global bounding box, not necessarily on the current
+        slice geometry configuration.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="PreserveInputCells" function="boolean_invert" />
@@ -3205,6 +2758,224 @@ Every Nth Point.
         <Visibility replace_input="2" />
       </Hints>
       <!-- End Threshold -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVPlaneCutter"
+                 name="SliceWithPlane"
+                 label="Slice With Plane">
+      <Documentation
+              long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces. This filter is faster than the standard Slice filter."
+              short_help="Slice datasets with a plane.">
+        This filter extracts the portion of the input dataset that lies along
+        the specified plane. The Slice filter takes any type of
+        dataset as input. This is a multithreaded implementation.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the slice filter.
+        </Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetPlane"
+                     label="Plane Type"
+                     name="Plane">
+        <ProxyListDomain name="proxy_list">
+          <Group name="slice_htg_amr_implicit_functions" default="Plane"/>
+        </ProxyListDomain>
+        <Documentation>
+          This property sets the parameters of the plane function.
+        </Documentation>
+      </ProxyProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildTree"
+                         default_values="1"
+                         name="BuildTree"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled and input is not an Image Data, Sphere Tree will be computed, for a faster slice computation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildHierarchy"
+                         default_values="1"
+                         name="BuildHierarchy"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If enabled and input is not an Image Data, Tree hierarchy will be computed, for a faster slice computation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                       exclude="1"
+                                       mode="visibility"/>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="BuildTree" function="boolean"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComputeNormals"
+                         default_values="0"
+                         name="ComputeNormals"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled, compute the normal on each cell. Since all output cells are coplanar,
+          the normal generated is simply the normal of the plane used to slice with.
+          By default, computing of normals is disabled.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetInterpolateAttributes"
+                         default_values="1"
+                         name="InterpolateAttributes"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled, interpolate attribute data. By default this is
+          enabled. Point data is always interpolated. Cell data is transferred
+          unless input is an image data.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetGeneratePolygons"
+                         default_values="1"
+                         name="GeneratePolygons"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled and input is a vtkImageData, vtkStructuredGrid or vtkRectilinearGrid,
+          output slice will consist of polygons instead of only triangles.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMergePoints"
+                         default_values="0"
+                         name="MergePoints"
+                         label="Merge duplicated points in the slice"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This parameter controls whether to merge duplicated points in the slice.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDual"
+                         default_values="0"
+                         label="Use Dual"
+                         name="SetDual"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       mode="visibility"
+                                       name="vtkHyperTreeGrid"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Plane"
+                                       value="Plane"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If checked, uses the dual of the hyper tree grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetLevelOfResolution"
+                         default_values="0"
+                         name="Level"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility"
+                                   name="vtkOverlappingAMR"/>
+        </Hints>
+        <AMRLevelsDomain default_mode="max"
+                         name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </AMRLevelsDomain>
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseNativeCutter"
+                         default_values="0"
+                         name="UseNativeCutter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       mode="visibility"
+                                       name="vtkOverlappingAMR"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Plane"
+                                       value="Plane"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          This property specifies whether the ParaView's generic
+          dataset cutter is used instead of the specialized AMR cutter.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End SliceWithPlane -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -4131,5 +3902,116 @@ Every Nth Point.
      </StringVectorProperty>
      <!-- End ComputeConnectedSurfaceProperties -->
    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkEqualizerFilter"
+                 name="EqualizerFilter"
+                 label="Equalizer Filter">
+      <Documentation long_help="Filter for signal modification.">
+        The Equalizer Filter implements an algorithm that selectively corrects
+        the signal amplitude depending on the frequency characteristics.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+    <IntVectorProperty command="SetSamplingFrequency"
+                       default_values="1000"
+                       name="SamplingFrequency"
+                       label="Sampling Frequency, Hz"
+                       number_of_elements="1">
+      <Documentation>
+        Set sampling frequency of signal.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty name="Array"
+                          command="SetArray"
+                          number_of_elements="1"
+                          animateable="0">
+          <ArrayListDomain
+            name="array_list" attribute_type="Scalars"
+            input_domain_name="inputs_array">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+        <Documentation>
+          Specify the name of a scalar array which will be used to FFT.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllColumns" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+    </StringVectorProperty>
+
+    <IntVectorProperty command="SetAllColumns"
+                       default_values="0"
+                       name="AllColumns"
+                       number_of_elements="1">
+      <BooleanDomain name="bool" />
+        <Documentation>Use for all columns of table.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty animateable="1"
+                       command="SetSpectrumGain"
+                       default_values="0"
+                       name="SpectrumGain"
+                       label="Spectrum Gain, dB"
+                       number_of_elements="1">
+      <IntRangeDomain max="50"
+                      min="-50"
+                      name="range" />
+      <Documentation>
+        Specify a gain coefficient (in dB) to apply to the spectrum of the input signal.
+        Used only for convenient viewing.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty animateable="1"
+                          command="SetPoints"
+                          label="Equalizer Points"
+                          name="EqualizerPoints"
+                          number_of_elements="1" >
+      <Documentation>This property defines the interactive points of the equalizer.</Documentation>
+    </StringVectorProperty>
+
+    <PropertyGroup name="Equalizer Filtering Points" panel_widget="EqualizerPropertyWidget">
+      <Property name="EqualizerPoints" />
+      <Property name="SamplingFrequency" />
+      <Hints>
+        <WidgetVisibilityLink port="2" />
+      </Hints>
+    </PropertyGroup>
+
+    <OutputPort index="0" name="Spectrum" />
+    <OutputPort index="1" name="Result" />
+    <OutputPort index="2" name="Normalized Spectrum" />
+
+    <Hints>
+      <PipelineIcon port="0" name="XYChartView" />
+      <View port="0" type="None" />
+
+      <PipelineIcon port="1" name="XYChartView" />
+      <View port="1" type="None" />
+
+      <PipelineIcon port="2" name="XYChartView" />
+      <View port="2" type="XYChartView" />
+
+      <RepresentationType view="XYChartView" type="XYChartRepresentation" />
+    </Hints>
+
+    </SourceProxy>
+    <!-- End vtkEqualizerFilter -->
   </ProxyGroup>
 </ServerManagerConfiguration>

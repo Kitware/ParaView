@@ -104,6 +104,33 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <PropertyGroup label="Data Selection">
+            <Property name="ChooseArraysToWrite" />
+          </PropertyGroup>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
       <Hints>
         <Property name="Input"
                   show="0" />

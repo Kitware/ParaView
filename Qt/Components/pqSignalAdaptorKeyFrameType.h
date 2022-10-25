@@ -78,7 +78,7 @@ private Q_SLOTS:
    */
   void onTypeChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSignalAdaptorKeyFrameType)
 
   class pqInternals;

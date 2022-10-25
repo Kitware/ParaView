@@ -1,16 +1,18 @@
 paraview_add_plugin(ComplexModuleArchitecture
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   SERVER_MANAGER_XML filters.xml
   MODULES
     ComplexPluginArchitecture::Shared
-    ComplexModuleArchitecture::Core 
+    ComplexModuleArchitecture::Core
     ComplexModuleArchitecture::Filters
-  MODULE_FILES 
+  MODULE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/../Core/vtk.module"
     "${CMAKE_CURRENT_SOURCE_DIR}/../Filters/vtk.module")
 
-target_link_libraries(ComplexModuleArchitecture 
-        PRIVATE 
-          ComplexPluginArchitecture::Shared 
-          ComplexModuleArchitecture::Core 
-          ComplexModuleArchitecture::Filters)
+target_link_libraries(ComplexModuleArchitecture
+  PRIVATE
+    ComplexPluginArchitecture::Shared
+    ComplexModuleArchitecture::Core
+    ComplexModuleArchitecture::Filters)
