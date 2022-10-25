@@ -425,7 +425,7 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the data histogram will be automatically recomputed when needed instead of needing to click on the compute data histogram button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>Automatically recompute data histogram</string>
+      <string>Automatically Recompute Data Histogram</string>
      </property>
     </widget>
    </item>
