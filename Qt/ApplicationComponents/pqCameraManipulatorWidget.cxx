@@ -144,7 +144,8 @@ pqCameraManipulatorWidget::pqCameraManipulatorWidget(
   {
     for (unsigned int kk = 0, max = domain->GetNumberOfEntries(); kk < max; kk++)
     {
-      boxes[cc]->addItem(domain->GetEntryText(kk), QVariant(domain->GetEntryValue(kk)));
+      boxes[cc]->addItem(QCoreApplication::translate("ServerManagerXML", domain->GetEntryText(kk)),
+        QVariant(domain->GetEntryValue(kk)));
     }
     this->connect(boxes[cc], SIGNAL(currentIndexChanged(int)), SIGNAL(manipulatorTypesChanged()));
   }

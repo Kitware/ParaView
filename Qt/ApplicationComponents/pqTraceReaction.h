@@ -49,8 +49,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTraceReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqTraceReaction(QAction* parent, const char* start_trace_label = "Start Trace",
-    const char* stop_trace_label = "Stop Trace");
+  pqTraceReaction(QAction* parent, QString start_trace_label = "Start Trace",
+    QString stop_trace_label = "Stop Trace");
   ~pqTraceReaction() override;
 
   /**

@@ -390,7 +390,8 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   menu.addSeparator(); // --------------------------------------------------
   new pqTraceReaction(menu.addAction(QCoreApplication::translate("pqToolsMenu", "Start Trace"))
       << pqSetName("actionToolsStartStopTrace"),
-    "Start Trace", "Stop Trace");
+    QCoreApplication::translate("pqToolsMenu", "Start Trace"),
+    QCoreApplication::translate("pqToolsMenu", "Stop Trace"));
   menu.addSeparator();
   new pqPythonScriptEditorReaction(
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Python Script Editor"))

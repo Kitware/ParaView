@@ -783,7 +783,8 @@ QString pqProxyWidget::documentationText(vtkSMProperty* smProperty, Documentatio
   }
   else
   {
-    return pqProxy::rstToHtml(xmlDocumentation).c_str();
+    return QCoreApplication::translate(
+      "ServerManagerXML", pqProxy::rstToHtml(xmlDocumentation).c_str());
   }
 }
 
@@ -794,7 +795,7 @@ QString pqProxyWidget::documentationText(vtkSMProxy* smProxy, DocumentationType 
     smProxy ? vtkGetDocumentation(smProxy->GetDocumentation(), dtype) : nullptr;
   return (!xmlDocumentation || xmlDocumentation[0] == 0)
     ? QString()
-    : pqProxy::rstToHtml(xmlDocumentation).c_str();
+    : QCoreApplication::translate("ServerManagerXML", pqProxy::rstToHtml(xmlDocumentation).c_str());
 }
 
 //-----------------------------------------------------------------------------

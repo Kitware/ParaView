@@ -141,7 +141,9 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
   {
     for (int cc = 0, max = enumDomain->GetNumberOfEntries(); cc < max; ++cc)
     {
-      internal.Attribute->addItem(enumDomain->GetEntryText(cc), enumDomain->GetEntryValue(cc));
+      internal.Attribute->addItem(
+        QCoreApplication::translate("ServerManagerXML", enumDomain->GetEntryText(cc)),
+        enumDomain->GetEntryValue(cc));
     }
   }
 

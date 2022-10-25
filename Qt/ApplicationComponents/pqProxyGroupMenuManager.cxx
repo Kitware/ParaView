@@ -274,8 +274,9 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
         continue;
       }
       QString categoryName = curElem->GetAttribute("name");
-      QString categoryLabel =
-        curElem->GetAttribute("menu_label") ? curElem->GetAttribute("menu_label") : categoryName;
+      QString categoryLabel = curElem->GetAttribute("menu_label")
+        ? QCoreApplication::translate("ServerManagerXML", curElem->GetAttribute("menu_label"))
+        : categoryName;
       int preserve_order = 0;
       curElem->GetScalarAttribute("preserve_order", &preserve_order);
       int show_in_toolbar = 0;

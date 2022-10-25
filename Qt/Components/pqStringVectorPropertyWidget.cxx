@@ -390,7 +390,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     for (unsigned int i = 0; i < enumerationDomain->GetNumberOfEntries(); i++)
     {
-      comboBox->addItem(enumerationDomain->GetEntryText(i));
+      comboBox->addItem(
+        QCoreApplication::translate("ServerManagerXML", enumerationDomain->GetEntryText(i)));
     }
 
     vbox->addWidget(comboBox);

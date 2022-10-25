@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QCoreApplication>
 #include <QMenu>
 
 //-----------------------------------------------------------------------------
@@ -139,7 +140,8 @@ void pqExtractorsMenuReaction::updateEnableState(bool)
     {
       actn->setEnabled(true);
       actn->setVisible(true);
-      actn->setStatusTip(prototype->GetDocumentation()->GetShortHelp());
+      actn->setStatusTip(QCoreApplication::translate(
+        "ServerManagerXML", prototype->GetDocumentation()->GetShortHelp()));
     }
     else // Either we do not have an input or the input domain
     {

@@ -78,10 +78,10 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   custom.setContents(pqActiveObjects::instance().selection());
   if (!custom.hasChildren(QModelIndex()))
   {
-    QMessageBox::warning(mainWin, "Create Custom Filter Error",
-      "The selected objects cannot be used to make a custom filter.\n"
-      "To create a new custom filter, select the sources and "
-      "filters you want.\nThen, launch the creation wizard.",
+    QMessageBox::warning(mainWin, tr("Create Custom Filter Error"),
+      tr("The selected objects cannot be used to make a custom filter.\n"
+         "To create a new custom filter, select the sources and "
+         "filters you want.\nThen, launch the creation wizard."),
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     return;
   }

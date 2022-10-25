@@ -97,7 +97,8 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
   auto enumDomain = prop->FindDomain<vtkSMEnumerationDomain>();
   for (unsigned int i = 0; i < enumDomain->GetNumberOfEntries(); i++)
   {
-    ui.atomicRadiusType->addItem(enumDomain->GetEntryText(i));
+    ui.atomicRadiusType->addItem(
+      QCoreApplication::translate("ServerManagerXML", enumDomain->GetEntryText(i)));
   }
   this->addPropertyLink(ui.atomicRadiusType, "AtomicRadiusType");
   QObject::connect(ui.atomicRadiusType, &QComboBox::currentTextChanged, this,
@@ -278,7 +279,7 @@ void pqMoleculePropertyWidget::setDocumentationAsTooltip(vtkSMProperty* prop, QW
 
   if (doc != nullptr && widget != nullptr && doc->GetDescription())
   {
-    widget->setToolTip(doc->GetDescription());
+    widget->setToolTip(QCoreApplication::translate("ServerManagerXML", doc->GetDescription()));
   }
 }
 

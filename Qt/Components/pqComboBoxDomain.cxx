@@ -230,8 +230,8 @@ void pqComboBoxDomain::internalDomainChanged()
           (vtkSMFieldDataDomain::SafeDownCast(this->Internal->Domain) != nullptr);
         for (unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
         {
-          texts.append(ed->GetEntryText(i));
-          data.append(ed->GetEntryText(i));
+          texts.append(QCoreApplication::translate("ServerManagerXML", ed->GetEntryText(i)));
+          data.append(QCoreApplication::translate("ServerManagerXML", ed->GetEntryText(i)));
           if (const char* info = ed->GetInfoText(i))
           {
             infos.append(info);

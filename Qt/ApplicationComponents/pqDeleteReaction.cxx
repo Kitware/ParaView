@@ -452,7 +452,7 @@ void pqDeleteReaction::onTriggered()
   if (this->DeleteMode == ALL)
   {
     if (pqCoreUtilities::promptUser("pqDeleteReaction::onTriggered", QMessageBox::Question,
-          "Delete All?",
+          tr("Delete All?"),
           tr("The current visualization will be reset\n"
              "and the state will be discarded.\n\n"
              "Are you sure you want to continue?"),

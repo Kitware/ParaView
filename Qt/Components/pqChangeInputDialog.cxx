@@ -161,7 +161,9 @@ void pqChangeInputDialog::buildPortWidgets()
     rb->setText(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));
     if (smproperty->GetDocumentation())
     {
-      rb->setToolTip(QString(smproperty->GetDocumentation()->GetDescription()).trimmed());
+      rb->setToolTip(QCoreApplication::translate(
+        "ServerManagerXML", smproperty->GetDocumentation()->GetDescription())
+                       .trimmed());
     }
     vbox->addWidget(rb);
 
