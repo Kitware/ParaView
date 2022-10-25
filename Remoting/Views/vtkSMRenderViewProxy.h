@@ -249,6 +249,12 @@ public:
   {
   }
 
+  /**
+   * Compute the bounds of the visible data on the given representation.
+   * Delegated to the server side (vtkPVRenderView).
+   */
+  void ComputeVisibleBounds(vtkSMProxy* representation, double* bounds);
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;

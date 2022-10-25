@@ -869,6 +869,7 @@ endif()
 
 SET(TESTS_WITH_BASELINES
   BDFReader.xml
+  BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
   CleanToGridRemovePoints.xml
   DataAxesGrid.xml
@@ -1684,7 +1685,8 @@ set(BlockOpacities_DISABLE_CRS TRUE)
 set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
 set(CombineFrustumSelections_DISABLE_CRS TRUE) # yes, this test does a selection
 
-# ZoomToData is not working as well in crs
+# BoxWidgetVisibleBlock and ZoomToData are not working as well in crs
+set(BoxWidgetVisibleBlock_DISABLE_CRS TRUE)
 set(ZoomToData_DISABLE_CRS TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
