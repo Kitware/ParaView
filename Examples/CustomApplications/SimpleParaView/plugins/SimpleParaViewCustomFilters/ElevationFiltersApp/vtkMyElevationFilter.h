@@ -25,9 +25,9 @@
 
 #include <vtkElevationFilter.h>
 
-#include "ElevationFiltersModule.h" // for export macro
+#include "ElevationFiltersAppModule.h" // for export macro
 
-class ELEVATIONFILTERS_EXPORT vtkMyElevationFilter : public vtkElevationFilter
+class ELEVATIONFILTERSAPP_EXPORT vtkMyElevationFilter : public vtkElevationFilter
 {
 public:
   static vtkMyElevationFilter* New();
