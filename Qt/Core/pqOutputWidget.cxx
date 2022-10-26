@@ -275,13 +275,13 @@ public:
       }
     }
 
-    QStandardItem* summaryItem = new QStandardItem(tr(summary));
+    QStandardItem* summaryItem = new QStandardItem(summary);
     summaryItem->setFlags(summaryItem->flags() ^ Qt::ItemIsEditable);
     summaryItem->setForeground(this->foregroundColor(type));
     summaryItem->setIcon(this->icon(type));
     summaryItem->setData(QVariant(Qt::AlignLeft | Qt::AlignTop), Qt::TextAlignmentRole);
 
-    QStandardItem* messageItem = new QStandardItem(tr(message));
+    QStandardItem* messageItem = new QStandardItem(message);
     messageItem->setFlags(messageItem->flags() ^ Qt::ItemIsEditable);
     messageItem->setForeground(this->foregroundColor(type));
     messageItem->setData(QVariant(Qt::AlignLeft | Qt::AlignTop), Qt::TextAlignmentRole);
@@ -402,10 +402,6 @@ public:
   }
 
 private:
-  QString tr(const QString& sourceText) const
-  {
-    return QCoreApplication::translate("pqOutputWidget", sourceText.toUtf8().data());
-  }
   QString SettingsKey;
   QMutex SuppressionMutex;
 };
@@ -416,7 +412,7 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   , Internals(new pqOutputWidget::pqInternals(this))
 {
   // Setup Qt message pattern
-  qSetMessagePattern(tr("%{type}: In %{file}, line %{line}\n%{type}: %{message}"));
+  qSetMessagePattern("%{type}: In %{file}, line %{line}\n%{type}: %{message}");
 
   pqInternals& internals = (*this->Internals);
 
