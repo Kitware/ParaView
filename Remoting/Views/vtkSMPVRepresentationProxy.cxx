@@ -492,7 +492,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
   vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction");
   vtkSMProperty* useTransfer2DProperty = this->GetProperty("UseTransfer2D");
   vtkSMProperty* transfer2DProperty = this->GetProperty("TransferFunction2D");
-  if ((!lutProperty && !sofProperty) || (!useTransfer2DProperty && !transfer2DProperty))
+  if ((!lutProperty && !sofProperty) && (!useTransfer2DProperty && !transfer2DProperty))
   {
     // No LookupTable and ScalarOpacityFunction found.
     // No UseTransfer2D and TransferFunction2D found.
