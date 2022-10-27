@@ -22,6 +22,8 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
  * @brief Writes CGNS files
  *
  * This writer writes (composite) datasets that may consist of
+ *   - vtkImageData
+ *   - vtkRectilinearGrid
  *   - vtkStructuredGrid
  *   - vtkUnstructuredGrid
  *   - vtkPolydata
