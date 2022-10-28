@@ -1,0 +1,197 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkPrismSESAMEReader"
+           name="SESAMEReaderCore">
+      <Documentation long_help="Reads ASCII SESAME files."
+                     short_help="Reads SESAME files.">
+        The SESAME reader reads ASCII. The expected file extension is .asc
+        The output of this reader is a vtkPolyData dataset.
+      </Documentation>
+      <OutputPort index="0"
+                  name="SESAME Surface"/>
+      <OutputPort index="1"
+                  name="SESAME Curves"/>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the SESAME reader.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="SurfaceTableIds"
+                         command="GetSurfaceTableIds"
+                         information_only="1">
+        <IntArrayInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTableId"
+                         default_values="-1"
+                         name="TableId"
+                         label="Surface Table Id"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <RequiredProperties>
+            <Property name="SurfaceTableIds" function="Enumeration"/>
+          </RequiredProperties>
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies the table id which describes the surface.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetFlatArraysOfTables"
+                            information_only="1"
+                            name="FlatArraysOfTables">
+        <StringArrayHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetXArrayName"
+                            name="XArray"
+                            number_of_elements="1">
+        <PrismTableArraysDomain name="prism_array_list" default_array_id="0">
+          <RequiredProperties>
+            <Property function="FlatArraysOfTables" name="FlatArraysOfTables"/>
+            <Property function="TableId" name="TableId"/>
+          </RequiredProperties>
+        </PrismTableArraysDomain>
+        <Documentation>
+          This property specifies the array name to use for the x-axis.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYArrayName"
+                            name="YArray"
+                            number_of_elements="1">
+        <PrismTableArraysDomain name="prism_array_list" default_array_id="1">
+          <RequiredProperties>
+            <Property function="FlatArraysOfTables" name="FlatArraysOfTables"/>
+            <Property function="TableId" name="TableId"/>
+          </RequiredProperties>
+        </PrismTableArraysDomain>
+        <Documentation>
+          This property specifies the array name to use for the y-axis.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetZArrayName"
+                            name="ZArray"
+                            number_of_elements="1">
+        <PrismTableArraysDomain name="prism_array_list" default_array_id="2">
+          <RequiredProperties>
+            <Property function="FlatArraysOfTables" name="FlatArraysOfTables"/>
+            <Property function="TableId" name="TableId"/>
+          </RequiredProperties>
+        </PrismTableArraysDomain>
+        <Documentation>
+          This property specifies the array name to use for the z-axis.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetCurvesAvailable"
+                         information_only="1"
+                         name="CurvesAvailable">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty name="ReadCurves"
+                         command="SetReadCurves"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property specifies whether to read curves or not.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="CurvesAvailable" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="VariableConversionValues"
+                            command="SetVariableConversionValue"
+                            set_number_command="SetNumberOfVariableConversionValues"
+                            number_of_elements="0"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            use_index="1">
+        <Documentation>
+          This property specifies the variable conversion values.
+        </Documentation>
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPrismSESAMEFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Prism: SESAME Reader"
+                 name="SESAMEReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads ASCII SESAME files."
+                     short_help="Reads SESAME files.">The SESAME reader reads ASCII.
+        The expected file extension is .asc. The output of this reader is a
+        vtkStructuredGrid dataset.
+      </Documentation>
+      <OutputPort index="0"
+                  name="SESAME Surface"/>
+      <OutputPort index="1"
+                  name="SESAME Curves"/>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="SESAMEReaderCore"/>
+        <ExposedProperties>
+          <Property name="TableId"/>
+          <PropertyGroup label="Axis Information">
+            <Property name="XArray"/>
+            <Property name="YArray"/>
+            <Property name="ZArray"/>
+          </PropertyGroup>
+          <PropertyGroup label="Curves">
+            <Property name="CurvesAvailable"/>
+            <Property name="ReadCurves"/>
+          </PropertyGroup>
+          <PropertyGroup label="Conversions" panel_widget="SESAMEConversions">
+            <Property function="VariableConversionValues" name="VariableConversionValues"/>
+            <Property function="FlatArraysOfTables" name="FlatArraysOfTables"/>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader. If more than one file
+          is specified, the reader will switch to file series mode in which
+          it will pretend that it can support time and provide one file per time step.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <PipelineIcon port="0" name="GEOMETRY"/>
+        <View port="0" type="PrismView"/>
+
+        <PipelineIcon port="1" name="GEOMETRY"/>
+        <View port="1" type="None"/>
+
+        <ReaderFactory extensions="asc sesame ses" file_description="SESAME File Reader (Plugin)"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

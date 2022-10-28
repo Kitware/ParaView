@@ -1,0 +1,13 @@
+NAME
+  Prism::vtkPrismViews
+LIBRARY_NAME
+  vtkPrismViews
+DEPENDS
+  ParaView::RemotingViews
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::RemotingCore
+  Prism::vtkPrismFilters
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersExtraction

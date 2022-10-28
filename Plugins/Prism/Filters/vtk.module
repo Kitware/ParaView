@@ -1,0 +1,11 @@
+NAME
+  Prism::vtkPrismFilters
+LIBRARY_NAME
+  vtkPrismFilters
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::fmt

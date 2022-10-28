@@ -317,6 +317,22 @@ int vtkGridAxes2DActor::GetPrecision(int axis)
 }
 
 //----------------------------------------------------------------------------
+void vtkGridAxes2DActor::SetTickLabelFunction(int axis, std::function<double(double)> func)
+{
+  if (axis >= 0 && axis < 3)
+  {
+    this->TickLabelFunction[axis] = func;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+std::function<double(double)> vtkGridAxes2DActor::GetTickLabelFunction(int axis)
+{
+  return (axis >= 0 && axis < 3) ? this->TickLabelFunction[axis] : nullptr;
+}
+
+//----------------------------------------------------------------------------
 void vtkGridAxes2DActor::SetProperty(vtkProperty* property)
 {
   this->PlaneActor->SetProperty(property);
@@ -641,6 +657,7 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport* viewport)
   for (int index = 0; index < 4; index++)
   {
     int axis = index % 2;
+    int activeAxis = activeAxes[axis];
     vtkStringArray* labels = activeAxisHelpers[axis]->GetTickLabels();
     vtkDoubleArray* tickPositions = activeAxisHelpers[axis]->GetTickPositions();
     vtkIdType numTicks = labelVisibilties[index] ? tickPositions->GetNumberOfTuples() : 0;
@@ -666,7 +683,15 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport* viewport)
       vtkVector3d tickWC = this->Helper->TransformPoint(tickPosition);
 
       labelActor->SetPosition(tickWC.GetData());
-      labelActor->SetInput(labels->GetValue(cc).c_str());
+      if (!labels->GetValue(cc).empty() && this->TickLabelFunction[activeAxis] != nullptr)
+      {
+        const double tickValue = this->TickLabelFunction[activeAxis](tickPositions->GetValue(cc));
+        labelActor->SetInput(activeAxisHelpers[axis]->GenerateSimpleLabel(tickValue).c_str());
+      }
+      else
+      {
+        labelActor->SetInput(labels->GetValue(cc).c_str());
+      }
       labelActor->GetTextProperty()->SetJustification(this->Labels->Justifications[index].GetX());
       labelActor->GetTextProperty()->SetVerticalJustification(
         this->Labels->Justifications[index].GetY());

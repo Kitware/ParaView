@@ -689,6 +689,7 @@ protected:
   friend class vtkSMMultiServerSourceProxy;
   friend class vtkSMNamedPropertyIterator;
   friend class vtkSMOrderedPropertyIterator;
+  friend class vtkSMPreselectionPipeline;
   friend class vtkSMProperty;
   friend class vtkSMPropertyIterator;
   friend class vtkSMProxyObserver;

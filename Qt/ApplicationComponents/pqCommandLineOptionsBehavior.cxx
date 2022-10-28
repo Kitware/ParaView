@@ -295,10 +295,9 @@ void pqCommandLineOptionsBehavior::processPlugins()
     auto xml =
       QString("<Plugins><Plugin name=\"%1\" auto_load=\"1\"/></Plugins>").arg(plugin.c_str());
 
-    // Load the plugin into the plugin manager. Local and remote
-    // loading is done here.
-    pluginManager->LoadPluginConfigurationXMLFromString(qPrintable(xml), activeSession, true);
+    // Load the plugin into the plugin manager. Local and remote loading is done here.
     pluginManager->LoadPluginConfigurationXMLFromString(qPrintable(xml), activeSession, false);
+    pluginManager->LoadPluginConfigurationXMLFromString(qPrintable(xml), activeSession, true);
   }
 }
 

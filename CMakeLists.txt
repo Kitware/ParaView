@@ -311,6 +311,7 @@ set(paraview_default_plugins
   PanoramicProjectionView
   ParametricSurfaces
   # ParFlow - Because of dependency to nlohmann_json
+  Prism
   SaveStateAndScreenshot
   SLACTools
   StreamLinesRepresentation

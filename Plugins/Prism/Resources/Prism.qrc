@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/Prism">
+    <file>SESAMEConversions.xml</file>
+  </qresource>
+</RCC>

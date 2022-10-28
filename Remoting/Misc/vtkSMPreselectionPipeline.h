@@ -50,7 +50,12 @@ public:
    */
   virtual vtkSMProxy* GetSelectionRepresentation() const;
   virtual vtkSMProxy* GetOrCreateSelectionRepresentation();
-  virtual vtkSMProxy* CreateSelectionRepresentation(vtkSMSourceProxy* extract);
+  virtual vtkSMProxy* CreateSelectionRepresentation(
+    vtkSMSourceProxy* extract, vtkSMRenderViewProxy* view);
+  virtual vtkSMProxy* CreateSelectionRepresentation(vtkSMSourceProxy* extract)
+  {
+    return this->CreateSelectionRepresentation(extract, nullptr);
+  }
   ///@}
 
   /**
