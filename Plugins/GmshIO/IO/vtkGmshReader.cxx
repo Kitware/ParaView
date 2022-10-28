@@ -557,6 +557,15 @@ void vtkGmshReader::FillGrid(vtkUnstructuredGrid* grid, int groupIdx, double tim
   {
     grid->GetCellData()->AddArray(group.EntityIds);
   }
+  if (this->CreateGmshPhysicalIDArray)
+  {
+    vtkNew<vtkIntArray> physicalTags;
+    physicalTags->SetName("gmshPhysicalID");
+    physicalTags->SetNumberOfComponents(1);
+    physicalTags->SetNumberOfTuples(nbCells);
+    physicalTags->Fill(group.Tag);
+    grid->GetCellData()->AddArray(physicalTags);
+  }
 
   for (const DataArray& data : group.Data)
   {
