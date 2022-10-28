@@ -17,6 +17,8 @@ if (TARGET VTK::IOCGNSReader)
     TestMultiBlockDataSet.cxx,NO_VALID,NO_DATA
     TestMappedUnstructuredGrid.cxx,NO_VALID,NO_DATA
     TestTimeWriting.cxx,NO_VALID,NO_DATA
+    TestRectilinearGrid.cxx,NO_VALID,NO_DATA
+    TestImageData.cxx,NO_VALID,NO_DATA
   )
   vtk_test_cxx_executable(vtkPVVTKExtensionsIOCGNSWriterCxxTests tests)
 endif()

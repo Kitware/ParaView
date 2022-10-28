@@ -8,11 +8,15 @@ class vtkUnstructuredGrid;
 class vtkStructuredGrid;
 class vtkPolyData;
 class vtkMultiBlockDataSet;
+class vtkImageData;
+class vtkRectilinearGrid;
 
 void Create(vtkUnstructuredGrid*, vtkIdType);
 void Create(vtkStructuredGrid*, vtkIdType, vtkIdType, vtkIdType);
 void Create(vtkPolyData*);
 void CreatePolyhedral(vtkUnstructuredGrid*);
+void Create(vtkImageData*, vtkIdType, vtkIdType, vtkIdType);
+void Create(vtkRectilinearGrid*, vtkIdType, vtkIdType, vtkIdType);
 
 int PolydataTest(vtkMultiBlockDataSet*, unsigned int, unsigned int, const char*);
 int UnstructuredGridTest(vtkMultiBlockDataSet*, unsigned int, unsigned int, int, const char*);

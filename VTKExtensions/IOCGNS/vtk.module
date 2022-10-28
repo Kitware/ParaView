@@ -13,12 +13,14 @@ PRIVATE_DEPENDS
   VTK::cgns
   VTK::CommonCore
   VTK::CommonDataModel
+  VTK::FiltersGeneral
   VTK::CommonExecutionModel
   VTK::FiltersCore
 TEST_DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::TestingCore
+  VTK::FiltersGeneral
   VTK::TestingDataModel
   ParaView::VTKExtensionsCore
 TEST_OPTIONAL_DEPENDS
