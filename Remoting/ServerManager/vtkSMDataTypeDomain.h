@@ -85,6 +85,12 @@ public:
    */
   std::string GetDomainDescription() const;
 
+  /**
+   * Parse XML attributes and store in the appropriate ivars
+   * Used by ReadXMLAttributes but can be used independently.
+   */
+  int ParseXMLAttributes(vtkPVXMLElement* element);
+
 protected:
   vtkSMDataTypeDomain();
   ~vtkSMDataTypeDomain() override;
