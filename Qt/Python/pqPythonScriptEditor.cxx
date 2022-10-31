@@ -178,7 +178,7 @@ void pqPythonScriptEditor::createMenus()
   this->fileMenu->addAction(&this->Actions[Action::Exit]);
 
   this->editMenu = menuBar()->addMenu(tr("&Edit"));
-  this->editMenu->setObjectName(tr("Edit"));
+  this->editMenu->setObjectName("Edit");
   this->editMenu->setToolTipsVisible(true);
   this->editMenu->addAction(&this->Actions[Action::Cut]);
   this->editMenu->addAction(&this->Actions[Action::Copy]);
