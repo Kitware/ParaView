@@ -38,10 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVMemoryUseInformation.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVSystemConfigInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMDataTypeDomain.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
 #include <QCoreApplication>
@@ -100,16 +105,106 @@ bool pqSourcesMenuReaction::warnOnCreate(
         ? prototype->GetHints()->FindNestedElementByName("WarnOnCreate")
         : nullptr)
     {
-      const char* title = hints->GetAttributeOrDefault("title", qPrintable(tr("Are you sure?")));
-      QString txt = hints->GetCharacterData();
-      if (txt.isEmpty())
+      bool shouldWarn = true;
+
+      // Recover active output port data type and check against the provided dataset type names
+      pqOutputPort* port = pqActiveObjects::instance().activePort();
+      if (port)
       {
-        txt = tr("Creating '%1'. Do you want to continue?")
-                .arg(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()));
+        // Look for a DataTypeDomain condition on the warn
+        vtkPVXMLElement* dataTypeDomain = hints->FindNestedElementByName("DataTypeDomain");
+        if (dataTypeDomain)
+        {
+          vtkNew<vtkSMDataTypeDomain> smDomain;
+          smDomain->ParseXMLAttributes(dataTypeDomain);
+          if (!smDomain->IsInDomain(port->getSourceProxy(), port->getPortNumber()))
+          {
+            shouldWarn = false;
+          }
+        }
+
+        // Recover memory usage condition
+        vtkPVXMLElement* memoryUsage = hints->FindNestedElementByName("MemoryUsage");
+        if (shouldWarn && memoryUsage)
+        {
+          // Recover memory information
+          vtkNew<vtkPVMemoryUseInformation> infos;
+          vtkNew<vtkPVSystemConfigInformation> serverInfos;
+
+          auto session = server->session();
+          session->GatherInformation(vtkPVSession::SERVERS, infos, 0);
+          session->GatherInformation(vtkPVSession::SERVERS, serverInfos, 0);
+
+          long long worstRemainingMemory = std::numeric_limits<long long>::infinity();
+          for (size_t rank = 0; rank < infos->GetSize(); ++rank)
+          {
+            long long hostMemoryUse = infos->GetHostMemoryUse(rank);
+            long long hostMemoryAvailable = serverInfos->GetHostMemoryAvailable(rank);
+            if (hostMemoryAvailable <= 0)
+            {
+              continue;
+            }
+            long long remainingMemory = hostMemoryAvailable - hostMemoryUse;
+            if (remainingMemory < worstRemainingMemory)
+            {
+              worstRemainingMemory = remainingMemory;
+            }
+          }
+
+          // Compare with the input size
+          vtkTypeInt64 inputSize = port->getDataInformation()->GetMemorySize();
+          double relative = std::stod(memoryUsage->GetAttributeOrDefault("relative", "1"));
+          if (inputSize * relative < worstRemainingMemory)
+          {
+            shouldWarn = false;
+          }
+        }
       }
-      return pqCoreUtilities::promptUser(QString("WarnOnCreate/%1/%2").arg(xmlgroup).arg(xmlname),
-        QMessageBox::Information, QString::fromStdString(pqProxy::rstToHtml(title)),
-        pqProxy::rstToHtml(txt), QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+
+      if (shouldWarn)
+      {
+        // Recover Text and Title
+        QString title;
+        QString text;
+
+        // PARAVIEW_DEPRECATED_IN_5_12_0
+#if !defined(VTK_LEGACY_REMOVE)
+        title = hints->GetAttributeOrEmpty("title");
+        text = hints->GetCharacterData();
+#if !defined(VTK_LEGACY_SILENT)
+        if (!title.isEmpty())
+        {
+          qWarning("WarnOnCreate title property has been deprecated in ParaView 5.12, "
+                   "add a Text element with a title property instead");
+        }
+        if (!text.trimmed().isEmpty())
+        {
+          qWarning("WarnOnCreate character data has been deprecated in ParaView 5.12, "
+                   "add a Text element with character data instead.");
+        }
+#endif
+#endif
+        vtkPVXMLElement* textElement = hints->FindNestedElementByName("Text");
+        if (textElement)
+        {
+          title = textElement->GetAttributeOrEmpty("title");
+          text = textElement->GetCharacterData();
+        }
+
+        if (title.isEmpty())
+        {
+          title = tr("Are you sure?");
+        }
+        if (text.isEmpty())
+        {
+          text = tr("Creating '%1'. Do you want to continue?")
+                   .arg(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()));
+        }
+
+        return pqCoreUtilities::promptUser(QString("WarnOnCreate/%1/%2").arg(xmlgroup).arg(xmlname),
+          QMessageBox::Information, pqProxy::rstToHtml(title), pqProxy::rstToHtml(text),
+          QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+      }
     }
   }
   return true;

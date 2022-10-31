@@ -870,6 +870,20 @@ found and the point will be rejected.</Documentation>
         <Property function="Point2WorldPosition" name="HighPoint" />
         <Property function="Input" name="Input" />
       </PropertyGroup>
+      <Hints>
+        <WarnOnCreate>
+          <DataTypeDomain composite_data_supported="1"
+                          name="input_type">
+            <DataType value="vtkPointSet" />
+          </DataTypeDomain>
+          <MemoryUsage relative="0.01" />
+          <Text title="Potentially slow operation">
+            **Temporal Statistics** filter needs to process all timesteps
+            available in your dataset and can potentially take a long time to complete.
+            Do you want to continue?
+          </Text>
+        </WarnOnCreate>
+      </Hints>
 
       <!-- End ElevationFilter -->
     </SourceProxy>
