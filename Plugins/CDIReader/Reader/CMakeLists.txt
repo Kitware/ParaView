@@ -4,7 +4,6 @@ set(classes
 set (sources
     cdi_tools.cxx
     projections.cxx
-    DataSource.cxx
     )
 set (private_headers
     cdi_tools.h
