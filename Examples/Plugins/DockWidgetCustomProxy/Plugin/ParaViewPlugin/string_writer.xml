@@ -1,0 +1,37 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="custom_proxy">
+   <Proxy name="MyStringWriter" class="vtkMyStringWriter">
+      <Documentation>A custom proxy to write a text to a file.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <FileListDomain name="files" />
+        <Hints>
+          <AcceptAnyFile/>
+        </Hints>
+        <Documentation>This property specifies the file name to write to.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetText"
+                            default_values="Text"
+                            name="Text"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>
+          This property specifies the text to write.
+        </Documentation>
+      </StringVectorProperty>
+      <Property command="Write"
+                label="Write"
+                name="Write"
+                panel_widget="command_button"
+                panel_visibility="default">
+        <Documentation>Press this to write text to file</Documentation>
+      </Property>
+   </Proxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

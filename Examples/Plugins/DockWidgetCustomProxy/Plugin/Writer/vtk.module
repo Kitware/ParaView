@@ -1,0 +1,4 @@
+NAME
+  DockWidgetCustomProxy::Writer
+DEPENDS
+  VTK::FiltersCore
