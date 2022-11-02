@@ -55,9 +55,8 @@ The DataTypeDomain syntax is the same as the one for the DataTypeDomain with Inp
             <DataType value="vtkImageData" />
           </DataTypeDomain>
           <MemoryUsage relative="10" />
-          <Text title="Potentially slow operations">
-            **Temporal Statistics** filter needs to process all timesteps
-            available in your dataset and can potentially take a long time to complete.
+          <Text title="Potentially running out of memory">
+            This filter may not have enough memory to process
             Do you want to continue?
           </Text>
         </WarnOnCreate>
