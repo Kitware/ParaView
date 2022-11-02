@@ -27,7 +27,6 @@ paraview_add_plugin(DockWidgetCustomProxy
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
 
-
 target_link_libraries(DockWidgetCustomProxy
   PRIVATE
     DockWidgetCustomProxy::Writer
