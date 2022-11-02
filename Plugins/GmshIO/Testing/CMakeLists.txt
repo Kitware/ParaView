@@ -13,6 +13,7 @@ if (BUILD_SHARED_LIBS)
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/GmshIOTestD.png}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/GmshIOTestE.png}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/GmshIOTestF.png}"
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/GmshIOTestG.png}"
   )
 
   paraview_add_client_tests(

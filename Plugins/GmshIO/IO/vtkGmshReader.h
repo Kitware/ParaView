@@ -87,6 +87,15 @@ public:
 
   ///@{
   /**
+   * Specify if we create a cell data array containing the physical tag number of the group.
+   * Default is false.
+   */
+  vtkSetMacro(CreateGmshPhysicalIDArray, bool);
+  vtkGetMacro(CreateGmshPhysicalIDArray, bool);
+  ///@}
+
+  ///@{
+  /**
    * If true physical groups will be grouped by dimensions with a vtkMultiBlockDataSet
    * for each dimension. Else every physical group will be directly under the root node.
    * Default is true.
@@ -122,6 +131,7 @@ private:
   bool CreateGmshNodeIDArray = false;
   bool CreateGmshEntityIDArray = false;
   bool CreateGmshDimensionArray = false;
+  bool CreateGmshPhysicalIDArray = false;
   bool GroupByDimension = true;
   GmshReaderInternal* Internal = nullptr;
 

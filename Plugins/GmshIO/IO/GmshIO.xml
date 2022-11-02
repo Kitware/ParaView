@@ -69,6 +69,18 @@
       </IntVectorProperty>
 
       <IntVectorProperty
+        name="CreateGmshPhysicalIDArray"
+        command="SetCreateGmshPhysicalIDArray"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we create a cell data array containing physical group tags.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
         name="GroupByDimension"
         command="SetGroupByDimension"
         number_of_elements="1"
