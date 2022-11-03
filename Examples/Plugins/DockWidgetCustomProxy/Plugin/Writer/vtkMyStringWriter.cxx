@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkMyStringWriter);
 //----------------------------------------------------------------------------
 bool vtkMyStringWriter::Write()
 {
-  vtksys::ofstream* fptr = new vtksys::ofstream(this->FileName, ios::out);
+  vtksys::ofstream* fptr = new vtksys::ofstream(this->FileName.c_str(), ios::out);
 
   if (fptr->fail())
   {

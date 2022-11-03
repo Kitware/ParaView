@@ -2,3 +2,4 @@ NAME
   DockWidgetCustomProxy::Writer
 DEPENDS
   VTK::FiltersCore
+  VTK::vtksys
