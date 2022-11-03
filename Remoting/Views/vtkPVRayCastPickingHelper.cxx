@@ -184,9 +184,16 @@ int vtkPVRayCastPickingHelper::ComputeSurfaceNormal(
           }
         }
       }
-      // calculate the normal of the 2D face
-      vtkPolygon::ComputeNormal(
-        cell->GetFace(closestIntersectedFaceId)->Points, this->IntersectionNormal);
+      if (closestIntersectedFaceId != -1)
+      {
+        // calculate the normal of the 2D face
+        vtkPolygon::ComputeNormal(
+          cell->GetFace(closestIntersectedFaceId)->Points, this->IntersectionNormal);
+      }
+      else
+      {
+        return 0;
+      }
     }
     else if (cell->GetCellDimension() == 2)
     {
