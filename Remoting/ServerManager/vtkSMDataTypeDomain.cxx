@@ -209,6 +209,12 @@ int vtkSMDataTypeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
 {
   this->Superclass::ReadXMLAttributes(prop, element);
 
+  return this->ParseXMLAttributes(element);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDataTypeDomain::ParseXMLAttributes(vtkPVXMLElement* element)
+{
   int compositeDataSupported;
   if (element->GetScalarAttribute("composite_data_supported", &compositeDataSupported))
   {
