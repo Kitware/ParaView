@@ -31,6 +31,7 @@ struct GmshWriterInternal;
 class vtkUnstructuredGrid;
 class vtkDataSetAttributes;
 
+VTK_ABI_NAMESPACE_BEGIN
 class VTKGMSHIO_EXPORT vtkGmshWriter : public vtkWriter
 {
 public:
@@ -70,6 +71,22 @@ public:
   vtkUnstructuredGrid* GetInput(int port);
   ///@}
 
+  ///@{
+  /**
+   * Get/Set the name of the elementary entity ID cell field if there is one
+   */
+  vtkGetStringMacro(ElementaryEntityIDFieldName);
+  vtkSetStringMacro(ElementaryEntityIDFieldName);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the name of the physical group ID cell field if there is one
+   */
+  vtkGetStringMacro(PhysicalGroupIDFieldName);
+  vtkSetStringMacro(PhysicalGroupIDFieldName);
+  ///@}
+
 protected:
   vtkGmshWriter();
   ~vtkGmshWriter() override;
@@ -85,7 +102,12 @@ protected:
   bool WriteAllTimeSteps = false;
   bool WriteGmshSpecificArray = false;
 
+  char* ElementaryEntityIDFieldName = nullptr;
+  char* PhysicalGroupIDFieldName = nullptr;
+
 private:
+  void SetUpEntities();
+  bool SetUpPhysicalGroups();
   void LoadNodes();
   void LoadCells();
   void InitViews();
@@ -98,5 +120,6 @@ private:
   vtkGmshWriter(const vtkGmshWriter&) = delete;
   void operator=(const vtkGmshWriter&) = delete;
 };
+VTK_ABI_NAMESPACE_END
 
 #endif // vtkGmshWriter_h
