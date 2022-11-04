@@ -188,9 +188,11 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   // vtkTimerLog::MarkStartEvent("StillRenderToString");
   // vtkTimerLog::MarkStartEvent("CaptureWindow");
 
+  vtkSmartPointer<vtkImageData> image;
+
   // TODO: We should add logic to check if a new rendering needs to be done and
   // then alone do a new rendering otherwise use the cached image.
-  vtkImageData* image = view->CaptureWindow(1);
+  image.TakeReference(view->CaptureWindow(1));
   image->GetDimensions(this->LastStillRenderImageSize);
   // vtkTimerLog::MarkEndEvent("CaptureWindow");
 
