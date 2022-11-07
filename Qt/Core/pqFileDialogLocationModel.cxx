@@ -39,12 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
 #include <vtkCollectionIterator.h>
+#include <vtkPVEnvironmentInformation.h>
+#include <vtkPVEnvironmentInformationHelper.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
 #include <vtkProcessModule.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMSessionProxyManager.h>
+#include <vtkSMSettings.h>
+#include <vtkSMSettingsProxy.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringList.h>
@@ -191,6 +195,12 @@ void pqFileDialogLocationModel::resetToDefault()
 void pqFileDialogLocationModel::LoadSpecialsFromSystem()
 {
   vtkNew<vtkPVFileInformation> information;
+  vtkNew<vtkPVEnvironmentInformation> envInfo;
+  auto* settings = vtkSMSettings::GetInstance();
+  // this setting is a list of labels and env-var pairs, the env-vars should store directory paths
+  char const* settingName = ".settings.RepresentedArrayListSettings.LocationEnvironmentVariables";
+  unsigned int const numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 2;
+  std::vector<std::pair<QString, QString>> envVarList;
 
   if (this->Server)
   {
@@ -203,6 +213,21 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
       pqFileDialogLocationModel::AddExamplesInLocations);
     helper->UpdateVTKObjects();
     helper->GatherInformation(information);
+
+    helper.TakeReference(pxm->NewProxy("misc", "EnvironmentInformationHelper"));
+    for (unsigned int ii = 0; ii < numberOfEntries; ++ii)
+    {
+      auto const label = settings->GetSettingAsString(settingName, ii * 2, "");
+      auto const var = settings->GetSettingAsString(settingName, ii * 2 + 1, "");
+      pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"), var.c_str());
+      helper->UpdateVTKObjects();
+      helper->GatherInformation(envInfo);
+      // only add a Location entry if the env-var has a non-empty value.
+      if (envInfo->GetVariable() && !std::string(envInfo->GetVariable()).empty())
+      {
+        envVarList.push_back({ label.c_str(), envInfo->GetVariable() });
+      }
+    }
   }
   else
   {
@@ -210,6 +235,19 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
     helper->SetSpecialDirectories(1);
     helper->SetExamplesInSpecialDirectories(pqFileDialogLocationModel::AddExamplesInLocations);
     information->CopyFromObject(helper);
+
+    vtkNew<vtkPVEnvironmentInformationHelper> envHelper;
+    for (unsigned int ii = 0; ii < numberOfEntries; ++ii)
+    {
+      auto const label = settings->GetSettingAsString(settingName, ii * 2, "");
+      auto const var = settings->GetSettingAsString(settingName, ii * 2 + 1, "");
+      envHelper->SetVariable(var.c_str());
+      envInfo->CopyFromObject(envHelper);
+      if (envInfo->GetVariable() && !std::string(envInfo->GetVariable()).empty())
+      {
+        envVarList.push_back({ label.c_str(), envInfo->GetVariable() });
+      }
+    }
   }
 
   this->LocationList.clear();
@@ -224,5 +262,14 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
     }
     this->LocationList.push_back(pqFileDialogLocationModelFileInfo{
       cur_info->GetName(), QDir::cleanPath(cur_info->GetFullPath()), cur_info->GetType() });
+  }
+  // add directories from env-vars at the end
+  for (auto& it : envVarList)
+  {
+    QString label = it.first;
+    QString path = it.second;
+    int type = this->FileDialogModel->fileType(path);
+
+    this->LocationList.push_back(pqFileDialogLocationModelFileInfo{ label, path, type });
   }
 }
