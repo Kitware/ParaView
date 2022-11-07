@@ -27,7 +27,7 @@ vtkMyPNGReader::~vtkMyPNGReader() = default;
 //----------------------------------------------------------------------------
 const char* vtkMyPNGReader::GetRegistrationName()
 {
-  return "MyCustomName";
+  return "ReaderDefinedName";
 }
 
 //----------------------------------------------------------------------------
