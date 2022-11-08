@@ -815,6 +815,8 @@ a `SetFileName` function property. You are free to have other properties as
 well, as with a standard (non-reader) filter. Also, the `Hints` section is needed
 in order to associate the file extension with the reader on the client. The
 `ReaderFactory` hint is what the client uses to identify readers from sources.
+Optionally, you can provide an information property `RegistrationName` to specify the reader
+pipeline name to use.
 
 ```xml
 <ServerManagerConfiguration>
@@ -834,6 +836,20 @@ in order to associate the file extension with the reader on the client. The
           This property specifies the file name for the PNG reader.
         </Documentation>
       </StringVectorProperty>
+
+     <StringVectorProperty
+        name="RegistrationName"
+        number_of_elements="1"
+        default_values="MyCustomName"
+        command="GetRegistrationName"
+        panel_visibility="never"
+        information_only="1">
+        <Documentation>
+          This property specify the pipeline name for the reader, using the return value of `command`.
+          If `command` attributes is not specified, it uses `default_values`.
+        </Documentation>
+     </StringVectorProperty>
+
       <Hints>
         <ReaderFactory extensions="png"
                        file_description="PNG File Format" />

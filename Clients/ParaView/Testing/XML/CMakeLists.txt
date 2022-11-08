@@ -58,6 +58,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/PLOAD_C_xMax.bdf}"
   "DATA{${paraview_test_data_directory_input}/Data/PNGReadersPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/PropertyLink.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/ReaderNamePlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/RectGrid2.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/RodPlate/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/SLAC/pic-example/,REGEX:.*}"
@@ -117,6 +118,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletGradientLegacy.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/img1.png}"
+  "DATA{${paraview_test_data_directory_input}/Data/img1.mypng}"
   "DATA{${paraview_test_data_directory_input}/Data/img2.png}"
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/linesPolydata.vtk}"
@@ -727,6 +729,7 @@ SET (TESTS_WITHOUT_BASELINES
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
   ReadIOHDFAMRMaxLevels.xml
+  ReaderRegistrationName.xml
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml
