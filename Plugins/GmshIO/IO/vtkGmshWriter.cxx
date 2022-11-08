@@ -228,7 +228,7 @@ bool CheckIntegralDataArray(vtkDataArray* dArr)
 
 vtkDataArray* GetIntegralArray(vtkUnstructuredGrid* input, char* name)
 {
-  if (name)
+  if (name && std::string(name) != "None")
   {
     vtkDataArray* entityIDs = input->GetCellData()->GetArray(name);
     if (!entityIDs)

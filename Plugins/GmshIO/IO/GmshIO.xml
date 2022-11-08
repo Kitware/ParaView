@@ -125,7 +125,57 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_entity"
+          number_of_components="1"
+          optional="1"/>
+        <Documentation>This property specifies the elementary entity input to the writer.</Documentation>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_physical"
+          number_of_components="1"
+          optional="1"/>
+        <Documentation>This property specifies the physical group input to the writer.</Documentation>
       </InputProperty>
+
+      <StringVectorProperty command="SetElementaryEntityIDFieldName"
+                            element_types="2"
+                            label="EntityArray"
+                            name="SelectEntityArray"
+                            number_of_elements="1"
+                            optional="1"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Scalars"
+          input_domain_name="input_array_entity"
+          none_string="None"
+          name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the scalar array to use to determine
+          the elementary entities of the array (entity tag at each cell).</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetPhysicalGroupIDFieldName"
+                            element_types="2"
+                            label="PhysicalGroupArray"
+                            name="SelectPhysicalGroupArray"
+                            number_of_elements="1"
+                            optional="1"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Scalars"
+          input_domain_name="input_array_physical"
+          none_string="None"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the scalar array to use to determine
+          the physical groups of the array (group tag at each cell).</Documentation>
+      </StringVectorProperty>
 
       <IntVectorProperty
         name="WriteGmshSpecificArray"
@@ -188,6 +238,8 @@
         <ExposedProperties>
           <Property name="WriteGmshSpecificArray" />
           <Property name="WriteAllTimeSteps"/>
+          <Property name="SelectEntityArray" />
+          <Property name="SelectPhysicalGroupArray"/>
         </ExposedProperties>
       </SubProxy>
 
