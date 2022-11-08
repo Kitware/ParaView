@@ -20,6 +20,15 @@
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty
+            name="StreamSteps"
+            command="SetStreamSteps"
+            label="StreamSteps"
+            number_of_elements="1"
+            default_values="0"
+            panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
             name="ConvertToVTK"
             command="SetConvertToVTK"
             label="Convert To VTK"
@@ -127,6 +136,15 @@
             number_of_elements="1"
             default_values="1"
             panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+            name="StreamSteps"
+            command="SetStreamSteps"
+            label="StreamSteps"
+            number_of_elements="1"
+            default_values="0"
+            panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <StringVectorProperty
