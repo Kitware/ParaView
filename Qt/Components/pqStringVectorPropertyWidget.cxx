@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStringVectorPropertyWidget.h"
 
+#include "vtkCollection.h"
 #include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
@@ -109,6 +110,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   bool wrap_text = false;
   bool python = false;
   bool showLabel = false;
+  vtkPVXMLElement* showLabels = nullptr;
   QString placeholderText;
   if (hints)
   {
@@ -134,6 +136,37 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       placeholderText = placeholderText.trimmed();
     }
     showLabel = (hints->FindNestedElementByName("ShowLabel") != nullptr);
+    showLabels = hints->FindNestedElementByName("ShowComponentLabels");
+  }
+
+  int elementCount = svp->GetNumberOfElements();
+
+  std::vector<const char*> componentLabels(elementCount);
+  if (showLabels)
+  {
+    vtkNew<vtkCollection> elements;
+    showLabels->GetElementsByName("ComponentLabel", elements.GetPointer());
+    int nbCompLabels = elements->GetNumberOfItems();
+    if (elementCount == 0)
+    {
+      elementCount = nbCompLabels;
+      componentLabels.resize(nbCompLabels);
+    }
+    for (int i = 0; i < nbCompLabels; ++i)
+    {
+      vtkPVXMLElement* labelElement = vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
+      if (labelElement)
+      {
+        int component;
+        if (labelElement->GetScalarAttribute("component", &component))
+        {
+          if (component < elementCount)
+          {
+            componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
+          }
+        }
+      }
+    }
   }
 
   // find the domain(s)
@@ -405,6 +438,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
         new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
       widget->setObjectName("ScalarValueList");
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+      widget->setShowLabels(showLabels);
+      if (showLabels)
+      {
+        widget->setLabels(componentLabels);
+      }
       this->setChangeAvailableAsChangeFinished(true);
       vbox->addWidget(widget);
       this->setShowLabel(showLabel);

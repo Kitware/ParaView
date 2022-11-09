@@ -26,11 +26,12 @@ In that case, use this property hint as follows.
 
 ComponentLabels
 -----------------
-Show vector component labels for double vector properties.
+Show vector component labels for double or string vector properties.
 
 A multi-component double vector property may represent several different types
 of coordinates.  It may be useful to provide labels for each component's input
-to designate which type of vector is being represented.
+to designate which type of vector is being represented. Labels may also be
+provided for multi-component string vector properties.
 
     <DoubleVectorProperty ...>
       ...

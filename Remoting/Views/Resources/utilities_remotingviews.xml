@@ -935,6 +935,11 @@
         </Documentation>
         <Hints>
           <ShowLabel />
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="File pattern"/>
+            <ComponentLabel component="1" label="Description"/>
+            <ComponentLabel component="2" label="Filter"/>
+          </ShowComponentLabels>
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty command="SetExcludedNameFilter"
@@ -961,6 +966,22 @@
         </Documentation>
         <Hints>
           <ShowLabel />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="LocationEnvironmentVariables"
+                            label="File dialog 'Location' variables"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>
+          List of labels and environment variables to add to the 'Location' list in the File dialog.
+          The value of the environment variable is looked up on the connected server and treated as a directory path.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Label"/>
+            <ComponentLabel component="1" label="Environment variable"/>
+          </ShowComponentLabels>
         </Hints>
       </StringVectorProperty>
 
