@@ -17,6 +17,7 @@
 #include "gmshCommon.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkArrayDispatch.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
 #include "vtkCellTypes.h"
@@ -45,11 +46,6 @@
 #include <unordered_map>
 #include <vector>
 
-namespace
-{
-using InverseMap = std::map<std::pair<std::size_t, std::size_t>, std::vector<int>>;
-}
-
 //-----------------------------------------------------------------------------
 struct GmshWriterInternal
 {
@@ -73,8 +69,9 @@ struct GmshWriterInternal
 
   vtkSmartPointer<vtkDataArray> EntityIDs = nullptr;
 
-  ::InverseMap InverseEntityMapping;
-  std::map<int, std::map<vtkIdType, std::size_t>> VtkGmshNodeMap;
+  using InverseMap = std::map<std::pair<std::size_t, std::size_t>, std::vector<int>>;
+  InverseMap InverseEntityMapping;
+  std::unordered_map<int, std::unordered_map<vtkIdType, std::size_t>> VtkGmshNodeMap;
 };
 
 const std::unordered_map<unsigned char, GmshPrimitive> GmshWriterInternal::TRANSLATE_CELLS_TYPE = {
@@ -141,7 +138,7 @@ void FillCells(const int entityTag, GmshWriterInternal* internal,
   vtkIdType& cellCounterId)
 {
 
-  for (unsigned char currentType = 0; currentType < GmshWriterInternal::MAX_TAG; ++currentType)
+  for (unsigned char currentType = 1; currentType < GmshWriterInternal::MAX_TAG; ++currentType)
   {
     std::vector<std::size_t>& indexes = idxPerType[currentType];
     if (indexes.empty())
@@ -207,6 +204,14 @@ void FillCells(const int entityTag, GmshWriterInternal* internal,
   }
 }
 
+struct IntegralChecker
+{
+  template <template <typename> class ArrayT, typename VType>
+  void operator()(ArrayT<VType>*)
+  {
+  }
+};
+
 bool CheckIntegralDataArray(vtkDataArray* dArr)
 {
   if (!dArr)
@@ -214,16 +219,9 @@ bool CheckIntegralDataArray(vtkDataArray* dArr)
     return false;
   }
 
-  // could benefit from being more comprehensive for integral types
-  if (vtkArrayDownCast<vtkIntArray>(dArr) || vtkArrayDownCast<vtkUnsignedIntArray>(dArr) ||
-    vtkArrayDownCast<vtkCharArray>(dArr) || vtkArrayDownCast<vtkIdTypeArray>(dArr) ||
-    vtkArrayDownCast<vtkUnsignedCharArray>(dArr) || vtkArrayDownCast<vtkShortArray>(dArr) ||
-    vtkArrayDownCast<vtkUnsignedShortArray>(dArr) || vtkArrayDownCast<vtkLongArray>(dArr) ||
-    vtkArrayDownCast<vtkUnsignedLongArray>(dArr))
-  {
-    return true;
-  }
-  return false;
+  using IntegralTL = vtkArrayDispatch::Integrals;
+  using Dispatcher = vtkArrayDispatch::DispatchByValueType<IntegralTL>;
+  return Dispatcher::Execute(dArr, IntegralChecker());
 }
 
 vtkDataArray* GetIntegralArray(vtkUnstructuredGrid* input, char* name)
@@ -246,7 +244,8 @@ vtkDataArray* GetIntegralArray(vtkUnstructuredGrid* input, char* name)
   return nullptr;
 }
 
-void AddInverseMapping(vtkUnstructuredGrid* input, vtkDataArray* mapping, ::InverseMap& invMap)
+void AddInverseMapping(
+  vtkUnstructuredGrid* input, vtkDataArray* mapping, GmshWriterInternal::InverseMap& invMap)
 {
   vtkUnsignedCharArray* cellTypes = input->GetCellTypesArray();
   auto cTypeRange = vtk::DataArrayValueRange<1>(cellTypes);
@@ -336,7 +335,7 @@ bool vtkGmshWriter::SetUpPhysicalGroups()
   if (physIDs)
   {
     // generate physical groups
-    ::InverseMap invPhysical;
+    GmshWriterInternal::InverseMap invPhysical;
     ::AddInverseMapping(this->Internal->Input, physIDs, invPhysical);
     for (auto pair : invPhysical)
     {
@@ -397,7 +396,8 @@ void vtkGmshWriter::LoadNodes()
     std::iota(gmshTags.begin(), gmshTags.end(), runningNodeTag);
     runningNodeTag += vtkTags.size();
 
-    this->Internal->VtkGmshNodeMap[pair.first.second] = std::map<vtkIdType, std::size_t>();
+    this->Internal->VtkGmshNodeMap[pair.first.second] =
+      std::unordered_map<vtkIdType, std::size_t>();
     auto vtkIt = vtkTags.begin();
     auto gmshIt = gmshTags.begin();
     for (; vtkIt != vtkTags.end(); ++vtkIt, ++gmshIt)
@@ -455,7 +455,7 @@ void vtkGmshWriter::LoadNodeData()
   // Generate Gmsh tags
   std::size_t totNodeTags = 0;
   std::for_each(this->Internal->VtkGmshNodeMap.begin(), this->Internal->VtkGmshNodeMap.end(),
-    [&totNodeTags](std::pair<std::size_t, std::map<vtkIdType, std::size_t>> p) {
+    [&totNodeTags](std::pair<std::size_t, std::unordered_map<vtkIdType, std::size_t>> p) {
       totNodeTags += p.second.size();
     });
   std::vector<std::size_t> tags(totNodeTags);

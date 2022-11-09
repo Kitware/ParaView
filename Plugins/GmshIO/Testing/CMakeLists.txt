@@ -1,5 +1,6 @@
 set(module_tests
-  GmshIOTest.xml)
+  GmshIOTest.xml
+  TestGmshWriterEntities.xml)
 
 if (BUILD_SHARED_LIBS)
   set(_paraview_add_tests_default_test_data_target ParaViewData)
