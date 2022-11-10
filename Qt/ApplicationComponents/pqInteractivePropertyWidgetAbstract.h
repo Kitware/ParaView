@@ -105,8 +105,10 @@ public:
   /**
    * Returns bounds from the dataSource, if possible. May return invalid bounds
    * when no dataSource exists of hasn't been updated to produce valid data.
+   * If the input source is a vtkMultiBlockDataSet and "visibleOnly" is set to "true",
+   * this function returns the bounds of the visible blocks only.
    */
-  vtkBoundingBox dataBounds() const;
+  vtkBoundingBox dataBounds(bool visibleOnly = false) const;
 
   /**
    * Returns the vtkSMPropertyGroup pass to the constructor.

@@ -31,8 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqInteractivePropertyWidgetAbstract.h"
 
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqView.h"
 #include "vtkCommand.h"
@@ -43,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
@@ -231,21 +236,42 @@ vtkSMProxy* pqInteractivePropertyWidgetAbstract::dataSource() const
 }
 
 //-----------------------------------------------------------------------------
-vtkBoundingBox pqInteractivePropertyWidgetAbstract::dataBounds() const
+vtkBoundingBox pqInteractivePropertyWidgetAbstract::dataBounds(bool visibleOnly) const
 {
+  vtkBoundingBox bbox;
+
   if (vtkSMSourceProxy* dsrc = vtkSMSourceProxy::SafeDownCast(this->dataSource()))
   {
-    // FIXME: we need to get the output port number correctly. For now, just use
-    // 0.
-    vtkPVDataInformation* dataInfo = dsrc->GetDataInformation(0);
-    vtkBoundingBox bbox(dataInfo->GetBounds());
-    return bbox;
+    if (visibleOnly) // Compute the bounds of the visible blocks only
+    {
+      // Get the representation of the input source
+      if (pqRenderView* view =
+            qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView()))
+      {
+        vtkSMRenderViewProxy* viewProxy = view->getRenderViewProxy();
+        // FIXME: we need to get the output port number correctly. For now, just use 0.
+        vtkSMRepresentationProxy* representationProxy = viewProxy->FindRepresentation(dsrc, 0);
+
+        // If found, compute visible bounds from the representation.
+        // If not, return the default bounding box.
+        if (representationProxy)
+        {
+          double bounds[6] = { 0.0 };
+          viewProxy->ComputeVisibleBounds(representationProxy, bounds);
+          bbox.SetBounds(bounds);
+          return bbox;
+        }
+      }
+    }
+    else // Compute the bounds from the source (data)
+    {
+      // FIXME: we need to get the output port number correctly. For now, just use 0.
+      vtkPVDataInformation* dataInfo = dsrc->GetDataInformation(0);
+      bbox.SetBounds(dataInfo->GetBounds());
+      return bbox;
+    }
   }
-  else
-  {
-    vtkBoundingBox bbox;
-    return bbox;
-  }
+  return bbox;
 }
 
 //-----------------------------------------------------------------------------

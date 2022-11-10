@@ -731,6 +731,17 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest)
 {
+  double bounds[6] = { 0.0 };
+  this->ComputeVisibleBounds(representation, bounds);
+  if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
+  {
+    this->ResetCamera(bounds, closest);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ComputeVisibleBounds(vtkSMProxy* representation, double* bounds)
+{
   vtkSMPropertyHelper helper(representation, "Input");
   vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy());
   if (!input)
@@ -740,22 +751,18 @@ void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest)
 
   // Send client server stream to the vtkPVRenderView to reduce visible bounds
   this->GetSession()->PrepareProgress();
+
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ComputeVisibleBounds"
          << VTKOBJECT(representation) << vtkClientServerStream::End;
   this->ExecuteStream(stream);
   vtkClientServerStream result = this->GetLastResult();
 
-  double bounds[6];
   if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
   {
     result.GetArgument(0, 0, bounds, 6);
   }
 
-  if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
-  {
-    this->ResetCamera(bounds, closest);
-  }
   this->GetSession()->CleanupPendingProgress();
 }
 

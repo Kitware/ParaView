@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqBoxPropertyWidget_h
 
 #include "pqInteractivePropertyWidget.h"
+#include <QPointer> // For QScopedPointer
 
 /**
  * @class pqBoxPropertyWidget
@@ -69,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Note while all of the above are optional, it really doesn't make much sense
  * to use this widget if any of them are not specified.
  */
+
 class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT
@@ -87,6 +89,8 @@ protected Q_SLOTS:
 
 private:
   Q_DISABLE_COPY(pqBoxPropertyWidget)
+  class pqUi;
+  QScopedPointer<pqUi> Ui;
   pqPropertyLinks WidgetLinks;
   bool BoxIsRelativeToInput;
 
