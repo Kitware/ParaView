@@ -17,18 +17,26 @@
 #include "gmshCommon.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkArrayDispatch.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
+#include "vtkCellTypes.h"
+#include "vtkCharArray.h"
 #include "vtkDataArray.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLongArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkShortArray.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkType.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkUnsignedShortArray.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "gmsh.h"
@@ -58,6 +66,12 @@ struct GmshWriterInternal
 
   static const std::unordered_map<unsigned char, GmshPrimitive> TRANSLATE_CELLS_TYPE;
   static constexpr unsigned char MAX_TAG = 15u;
+
+  vtkSmartPointer<vtkDataArray> EntityIDs = nullptr;
+
+  using InverseMap = std::map<std::pair<std::size_t, std::size_t>, std::vector<int>>;
+  InverseMap InverseEntityMapping;
+  std::unordered_map<int, std::unordered_map<vtkIdType, std::size_t>> VtkGmshNodeMap;
 };
 
 const std::unordered_map<unsigned char, GmshPrimitive> GmshWriterInternal::TRANSLATE_CELLS_TYPE = {
@@ -119,13 +133,10 @@ void AddTriangulatedCell(std::vector<std::size_t>& nodeTags,
 }
 
 // Add every supported VTK cells in the gmsh model by type.
-void FillCells(const int modelTag, GmshWriterInternal* internal,
-  std::vector<std::size_t> idxPerType[], vtkUnstructuredGrid* input, vtkDataArray* offsets,
-  vtkDataArray* connectivity)
+void FillCells(const int entityTag, GmshWriterInternal* internal,
+  std::vector<std::size_t> idxPerType[], vtkDataArray* offsets, vtkDataArray* connectivity,
+  vtkIdType& cellCounterId)
 {
-  vtkIdType cellCounterId = 1;
-  internal->CellDataIndex.clear();
-  internal->CellDataIndex.reserve(input->GetNumberOfCells());
 
   for (unsigned char currentType = 1; currentType < GmshWriterInternal::MAX_TAG; ++currentType)
   {
@@ -153,7 +164,7 @@ void FillCells(const int modelTag, GmshWriterInternal* internal,
       long offsetEnd = static_cast<long>(*offsets->GetTuple(vtkIdx + 1));
       for (unsigned int j = offsetBegin; j < offsetEnd; ++j)
       {
-        gmshNodeTags.push_back(static_cast<long>(*connectivity->GetTuple(j)) + 1u);
+        gmshNodeTags.emplace_back(internal->VtkGmshNodeMap[entityTag][*connectivity->GetTuple(j)]);
       }
 
       // Ordering if needed
@@ -189,11 +200,74 @@ void FillCells(const int modelTag, GmshWriterInternal* internal,
         gmshNodeTags, gmshIds, idxPerType[VTK_POLYGON], internal, cellCounterId, 3);
     }
 
-    gmsh::model::mesh::addElementsByType(modelTag, gmshType, gmshIds, gmshNodeTags);
+    gmsh::model::mesh::addElementsByType(entityTag, gmshType, gmshIds, gmshNodeTags);
+  }
+}
+
+struct IntegralChecker
+{
+  template <template <typename> class ArrayT, typename VType>
+  void operator()(ArrayT<VType>*)
+  {
+  }
+};
+
+bool CheckIntegralDataArray(vtkDataArray* dArr)
+{
+  if (!dArr)
+  {
+    return false;
+  }
+
+  using IntegralTL = vtkArrayDispatch::Integrals;
+  using Dispatcher = vtkArrayDispatch::DispatchByValueType<IntegralTL>;
+  return Dispatcher::Execute(dArr, IntegralChecker());
+}
+
+vtkDataArray* GetIntegralArray(vtkUnstructuredGrid* input, char* name)
+{
+  if (name && std::string(name) != "None")
+  {
+    vtkDataArray* entityIDs = input->GetCellData()->GetArray(name);
+    if (!entityIDs)
+    {
+      vtkWarningWithObjectMacro(nullptr, "Could not find " << name << " in data set");
+      return nullptr;
+    }
+    if (!::CheckIntegralDataArray(entityIDs))
+    {
+      vtkWarningWithObjectMacro(nullptr, "Array " << name << " is not of integral type");
+      return nullptr;
+    }
+    return entityIDs;
+  }
+  return nullptr;
+}
+
+void AddInverseMapping(
+  vtkUnstructuredGrid* input, vtkDataArray* mapping, GmshWriterInternal::InverseMap& invMap)
+{
+  vtkUnsignedCharArray* cellTypes = input->GetCellTypesArray();
+  auto cTypeRange = vtk::DataArrayValueRange<1>(cellTypes);
+  auto mappingRange = vtk::DataArrayValueRange<1>(mapping);
+  auto cTypeIt = cTypeRange.begin();
+  auto mapIt = mappingRange.begin();
+  for (vtkIdType iCell = 0; iCell < input->GetNumberOfCells(); ++iCell)
+  {
+    std::pair<std::size_t, std::size_t> dimEnt = { vtkCellTypes::GetDimension(*cTypeIt), *mapIt };
+    mapIt++, cTypeIt++;
+    auto it = invMap.find(dimEnt);
+    if (it == invMap.end())
+    {
+      invMap.emplace(dimEnt, std::vector<int>({ static_cast<int>(iCell) }));
+      continue;
+    }
+    it->second.emplace_back(iCell);
   }
 }
 }
 
+VTK_ABI_NAMESPACE_BEGIN
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkGmshWriter);
 
@@ -212,30 +286,127 @@ vtkGmshWriter::~vtkGmshWriter()
 }
 
 //-----------------------------------------------------------------------------
-void vtkGmshWriter::LoadNodes()
+void vtkGmshWriter::SetUpEntities()
 {
-  vtkUnstructuredGrid* input = this->Internal->Input;
 
-  vtkDataArray* points = input->GetPoints()->GetData();
-
-  const vtkIdType numTuples = points->GetNumberOfTuples();
-  const vtkIdType numCompnt = points->GetNumberOfComponents();
-  std::vector<double> inlineCoords(numTuples * numCompnt);
-  // Store point coordinates in a structure Gmsh can understand
-  for (vtkIdType i = 0, counter = 0; i < numTuples; ++i)
+  vtkSmartPointer<vtkDataArray> entityIDs =
+    ::GetIntegralArray(this->Internal->Input, this->ElementaryEntityIDFieldName);
+  if (!entityIDs)
   {
-    for (vtkIdType j = 0; j < numCompnt; ++j)
+    if (vtkDataArray* physIDs =
+          ::GetIntegralArray(this->Internal->Input, this->PhysicalGroupIDFieldName))
     {
-      inlineCoords[counter] = *(points->GetTuple(i) + j);
-      ++counter;
+      entityIDs = physIDs;
+    }
+    else
+    {
+      // create entityIDs
+      entityIDs = vtkSmartPointer<vtkIntArray>::New();
+      entityIDs->SetName("gmshEntityId");
+      entityIDs->SetNumberOfComponents(1);
+      entityIDs->SetNumberOfTuples(this->Internal->Input->GetNumberOfCells());
+      vtkUnsignedCharArray* cellType = this->Internal->Input->GetCellTypesArray();
+      for (vtkIdType iCell = 0; iCell < this->Internal->Input->GetNumberOfCells(); ++iCell)
+      {
+        entityIDs->SetComponent(
+          iCell, 0, vtkCellTypes::GetDimension(cellType->GetValue(iCell)) + 1);
+      }
     }
   }
 
-  std::vector<std::size_t> gmshTags(numTuples);
-  std::iota(gmshTags.begin(), gmshTags.end(), 1u);
+  this->Internal->EntityIDs = entityIDs;
 
-  gmsh::model::mesh::addNodes(
-    this->Internal->Dimension, this->Internal->ModelTag, gmshTags, inlineCoords);
+  ::AddInverseMapping(this->Internal->Input, entityIDs, this->Internal->InverseEntityMapping);
+  for (auto pair : this->Internal->InverseEntityMapping)
+  {
+    gmsh::model::addDiscreteEntity(pair.first.first, pair.first.second);
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkGmshWriter::SetUpPhysicalGroups()
+{
+  if (!this->Internal->EntityIDs)
+  {
+    vtkErrorMacro("Cannot setup physical groups before setting up entities");
+    return false;
+  }
+  vtkDataArray* physIDs = ::GetIntegralArray(this->Internal->Input, this->PhysicalGroupIDFieldName);
+  if (physIDs)
+  {
+    // generate physical groups
+    GmshWriterInternal::InverseMap invPhysical;
+    ::AddInverseMapping(this->Internal->Input, physIDs, invPhysical);
+    for (auto pair : invPhysical)
+    {
+      std::transform(pair.second.begin(), pair.second.end(), pair.second.begin(),
+        [&](int val) { return static_cast<int>(this->Internal->EntityIDs->GetComponent(val, 0)); });
+      std::set<int> uniques(pair.second.begin(), pair.second.end());
+      pair.second.assign(uniques.begin(), uniques.end());
+      gmsh::model::addPhysicalGroup(pair.first.first, pair.second, pair.first.second);
+    }
+  }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkGmshWriter::LoadNodes()
+{
+  this->Internal->VtkGmshNodeMap.clear();
+  vtkUnstructuredGrid* input = this->Internal->Input;
+
+  vtkDataArray* offsets = input->GetCells()->GetOffsetsArray();
+  vtkDataArray* connectivity = input->GetCells()->GetConnectivityArray();
+  vtkDataArray* points = input->GetPoints()->GetData();
+
+  std::size_t runningNodeTag = 1u;
+  for (auto pair : this->Internal->InverseEntityMapping)
+  {
+
+    std::vector<vtkIdType> vtkTags;
+    for (vtkIdType iCell : pair.second)
+    {
+      int offsetBegin = offsets->GetComponent(iCell, 0);
+      int offsetEnd = offsets->GetComponent(iCell + 1, 0);
+      int cellSize = offsetEnd - offsetBegin;
+      vtkTags.resize(vtkTags.size() + cellSize);
+      for (vtkIdType iP = offsetBegin; iP < offsetEnd; iP++)
+      {
+        vtkTags.emplace_back(connectivity->GetComponent(iP, 0));
+      }
+    }
+
+    {
+      std::set<vtkIdType> uniques(vtkTags.begin(), vtkTags.end());
+      vtkTags.assign(uniques.begin(), uniques.end());
+    }
+
+    int counter = 0;
+    std::vector<double> inlineCoords(vtkTags.size() * 3, 0.0);
+    for (vtkIdType globPIndex : vtkTags)
+    {
+      for (vtkIdType j = 0; j < 3; ++j)
+      {
+        inlineCoords[counter] = *(points->GetTuple(globPIndex) + j);
+        counter++;
+      }
+    }
+
+    std::vector<std::size_t> gmshTags(vtkTags.size());
+    std::iota(gmshTags.begin(), gmshTags.end(), runningNodeTag);
+    runningNodeTag += vtkTags.size();
+
+    this->Internal->VtkGmshNodeMap[pair.first.second] =
+      std::unordered_map<vtkIdType, std::size_t>();
+    auto vtkIt = vtkTags.begin();
+    auto gmshIt = gmshTags.begin();
+    for (; vtkIt != vtkTags.end(); ++vtkIt, ++gmshIt)
+    {
+      this->Internal->VtkGmshNodeMap[pair.first.second][*vtkIt] = *gmshIt;
+    }
+
+    gmsh::model::mesh::addNodes(pair.first.first, pair.first.second, gmshTags, inlineCoords);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -246,21 +417,28 @@ void vtkGmshWriter::LoadCells()
   // Build list of gmsh indexes per type
   vtkCellArray* cells = input->GetCells();
   vtkUnsignedCharArray* cellType = input->GetCellTypesArray();
-  std::vector<std::size_t> indexesPerTypes[GmshWriterInternal::MAX_TAG];
+  vtkIdType cellCounterId = 1;
 
-  for (vtkIdType i = 0; i < cells->GetNumberOfCells(); ++i)
+  this->Internal->CellDataIndex.clear();
+  this->Internal->CellDataIndex.reserve(input->GetNumberOfCells());
+
+  for (auto pair : this->Internal->InverseEntityMapping)
   {
-    const unsigned char vtkCellType = cellType->GetValue(i);
-    if (!GmshWriterInternal::TRANSLATE_CELLS_TYPE.count(vtkCellType))
+    std::vector<std::size_t> indexesPerTypes[GmshWriterInternal::MAX_TAG];
+    for (int iCell : pair.second)
     {
-      continue;
+      const unsigned char vtkCellType = cellType->GetValue(iCell);
+      if (!GmshWriterInternal::TRANSLATE_CELLS_TYPE.count(vtkCellType))
+      {
+        continue;
+      }
+      indexesPerTypes[vtkCellType].push_back(static_cast<std::size_t>(iCell + 1));
     }
-    indexesPerTypes[vtkCellType].push_back(i + 1);
-  }
 
-  // Add these cells to gmsh::model
-  ::FillCells(this->Internal->ModelTag, this->Internal, indexesPerTypes, input,
-    cells->GetOffsetsArray(), cells->GetConnectivityArray());
+    // Add these cells to gmsh::model
+    ::FillCells(pair.first.second, this->Internal, indexesPerTypes, cells->GetOffsetsArray(),
+      cells->GetConnectivityArray(), cellCounterId);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -274,10 +452,13 @@ void vtkGmshWriter::LoadNodeData()
     return;
   }
 
-  const vtkIdType numTuples =
-    pointData->GetAbstractArray(pointData->GetArrayName(0))->GetNumberOfTuples();
   // Generate Gmsh tags
-  std::vector<std::size_t> tags(numTuples);
+  std::size_t totNodeTags = 0;
+  std::for_each(this->Internal->VtkGmshNodeMap.begin(), this->Internal->VtkGmshNodeMap.end(),
+    [&totNodeTags](std::pair<std::size_t, std::unordered_map<vtkIdType, std::size_t>> p) {
+      totNodeTags += p.second.size();
+    });
+  std::vector<std::size_t> tags(totNodeTags);
   std::iota(tags.begin(), tags.end(), 1);
 
   for (int arrayId = 0; arrayId < numVtkArrays; ++arrayId)
@@ -289,15 +470,16 @@ void vtkGmshWriter::LoadNodeData()
     const int numComponents = vtkArray->GetNumberOfComponents();
 
     // Store it in a structure Gmsh can understand
-    std::vector<double> gmshData(numTuples * numComponents);
-    gmshData.resize(numTuples * numComponents);
-    vtkIdType counter = 0;
-    for (vtkIdType i = 0; i < numTuples; ++i)
+    std::vector<double> gmshData(totNodeTags * numComponents, 0.0);
+    for (auto ent : this->Internal->VtkGmshNodeMap)
     {
-      for (int j = 0; j < numComponents; ++j)
+      for (auto nodeTags : ent.second)
       {
-        gmshData[counter] = *(vtkArray->GetTuple(i) + j);
-        ++counter;
+        for (int j = 0; j < numComponents; ++j)
+        {
+          gmshData[(nodeTags.second - 1) * numComponents + j] =
+            *(vtkArray->GetTuple(nodeTags.first) + j);
+        }
       }
     }
 
@@ -473,10 +655,12 @@ int vtkGmshWriter::RequestData(
     gmsh::option::setNumber("General.Verbosity", 1);
     gmsh::option::setNumber("PostProcessing.SaveMesh", 0);
     gmsh::model::add(this->Internal->ModelName.c_str());
-    gmsh::model::addDiscreteEntity(0);
-    gmsh::model::addDiscreteEntity(1);
-    gmsh::model::addDiscreteEntity(2);
-    gmsh::model::addDiscreteEntity(3);
+    this->SetUpEntities();
+    if (!this->SetUpPhysicalGroups())
+    {
+      return 0;
+    }
+
     this->Internal->Dimension = 3;
     // Get tag of the current model
     {
@@ -553,3 +737,4 @@ void vtkGmshWriter::PrintSelf(std::ostream& os, vtkIndent indent)
      << ", WriteAllTimeSteps: " << this->WriteAllTimeSteps << indent
      << ", WriteGmshSpecificArray: " << this->WriteGmshSpecificArray << std::endl;
 }
+VTK_ABI_NAMESPACE_END

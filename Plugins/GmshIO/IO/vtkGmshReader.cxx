@@ -143,6 +143,7 @@ void GetElements(gmsh::vectorpair& elemTypes, Array2D<std::size_t>& elemTags,
 }
 }
 
+VTK_ABI_NAMESPACE_BEGIN
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkGmshReader);
 
@@ -722,3 +723,4 @@ void vtkGmshReader::PrintSelf(std::ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Filename:" << this->FileName << std::endl;
 }
+VTK_ABI_NAMESPACE_END
