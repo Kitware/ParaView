@@ -28,6 +28,17 @@
             panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <StringVectorProperty
+            name="DataSourceEngine"
+            animateable="0"
+            command="SetDataSourceEngine"
+            label="DataSourceEngines"
+            repeat_command="1"
+            element_types="2 2"
+            number_of_elements="2"
+            number_of_elements_per_command="2"
+            panel_visibility="advanced">
+      </StringVectorProperty>
       <IntVectorProperty
             name="ConvertToVTK"
             command="SetConvertToVTK"
@@ -128,6 +139,17 @@
             number_of_elements="2"
             number_of_elements_per_command="2"
             panel_visibility="default">
+      </StringVectorProperty>
+      <StringVectorProperty
+            name="DataSourceEngine"
+            animateable="0"
+            command="SetDataSourceEngine"
+            label="DataSourceEngines"
+            repeat_command="1"
+            element_types="2 2"
+            number_of_elements="2"
+            number_of_elements_per_command="2"
+            panel_visibility="advanced">
       </StringVectorProperty>
       <IntVectorProperty
             name="ConvertToVTK"
