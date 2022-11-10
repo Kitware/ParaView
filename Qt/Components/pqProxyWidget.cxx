@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqShortcutDecorator.h"
 #include "pqStringVectorPropertyWidget.h"
 #include "pqTimer.h"
 #include "vtkCollection.h"
@@ -544,6 +545,7 @@ bool skip_group(
 } // end of namespace {}
 
 //-----------------------------------------------------------------------------------
+// static
 QWidget* pqProxyWidget::newGroupLabelWidget(
   const QString& labelText, QWidget* parent, const QList<QWidget*>& buttons)
 {
@@ -1318,13 +1320,28 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::showLinkedInteractiveWidget(int portIndex, bool show)
+void pqProxyWidget::showLinkedInteractiveWidget(int portIndex, bool show, bool changeFocus)
 {
+  bool done = false;
   for (const pqProxyWidgetItem* item : this->Internals->Items)
   {
     if (show)
     {
       item->propertyWidget()->selectPort(portIndex);
+      // make sure the first widget shown has active keyboard shortcuts.
+      if (!done)
+      {
+        for (pqPropertyWidgetDecorator* decorator : item->propertyWidget()->decorators())
+        {
+          auto* shortcutDecorator = qobject_cast<pqShortcutDecorator*>(decorator);
+          if (shortcutDecorator)
+          {
+            shortcutDecorator->setEnabled(true, changeFocus);
+            done = true;
+            break;
+          }
+        }
+      }
     }
     else
     {

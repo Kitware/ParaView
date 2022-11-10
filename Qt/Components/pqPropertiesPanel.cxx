@@ -487,6 +487,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
     source = nullptr;
   }
 
+  bool created = false;
   if (this->Internals->Source != source)
   {
     // Panel has changed.
@@ -500,6 +501,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
     if (source && !this->Internals->SourceWidgets.contains(source))
     {
       // create the panel for the source.
+      created = true;
       pqProxyWidgets* widgets = new pqProxyWidgets(source, this);
       this->Internals->SourceWidgets[source] = widgets;
 
@@ -528,7 +530,8 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
     // update interactive widgets specifically
     if (this->Internals->SourcePort >= 0)
     {
-      sourceWidgets->Panel->showLinkedInteractiveWidget(this->Internals->SourcePort, true);
+      // change the focus for newly created pqProxyWidgets
+      sourceWidgets->Panel->showLinkedInteractiveWidget(this->Internals->SourcePort, true, created);
     }
 
     Q_EMIT this->modified();

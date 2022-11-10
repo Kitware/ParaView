@@ -192,7 +192,7 @@ public Q_SLOTS:
    * Show any interactive widget linked to a specific output port
    * this proxyWdiget has. See XML hint \verbatim<WidgetVisibilityLink port="X" />\endverbatim.
    */
-  void showLinkedInteractiveWidget(int portIndex, bool show);
+  void showLinkedInteractiveWidget(int portIndex, bool show, bool changeFocus);
 
   /**
    * Accepts the property widget changes changes.
