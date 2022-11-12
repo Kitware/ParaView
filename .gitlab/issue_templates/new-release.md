@@ -115,7 +115,8 @@ git submodule update --recursive --init
 
   - Integrate changes.
     - Update versions
-      - [ ] Guide selections in `versions.cmake`
+      - [ ] Guide selections in `versions.cmake` and ensure that the paraview
+            http URL source is the _DEFAULT_ source.
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
       - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
       - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
@@ -131,6 +132,10 @@ git submodule update --recursive --init
       - Create a commit which will be tagged:
         - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
       - [ ] Created tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
+<!-- if not RC and patch == 0 -->
+      - [ ] Create a commit that changes the paraview _DEFAULT_ source to the git
+            url source in the `versions.cmake` file.
+<!-- endif -->
       - Force `@VERSION@@RC@` in CMakeLists.txt
         - [ ] Append to the top of CMakeLists.txt (After project...) The following
             ```
@@ -139,7 +144,11 @@ git submodule update --recursive --init
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
          - [ ] Create fixup commit `git commit -a --fixup=@`
+<!-- if not RC and patch == 0 -->
+  - Create a merge request targeting `master`
+<!-- else -->
   - Create a merge request targeting `release`
+<!-- endif -->
     - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
           (ask @ben.boeckel if you do not have one)
     - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
@@ -149,6 +158,10 @@ git submodule update --recursive --init
       - Pull the script for each release; it may have been updated since it
         was last used
       - `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
+<!-- if not RC and patch == 0-->
+      - Make sure that the backporting directive in the merge-request
+        description skips the last commit such as: `Backport: release:HEAD~`
+<!-- endif -->
   - [ ] Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
