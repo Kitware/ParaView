@@ -16,11 +16,9 @@
 #include "vtkPVContourFilter.h"
 
 #include "vtkAMRDualContour.h"
-#include "vtkAppendPolyData.h"
 #include "vtkArrayDispatch.h"
 #include "vtkAssume.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkContour3DLinearGrid.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayAccessor.h"
 #include "vtkDataObject.h"
@@ -179,34 +177,6 @@ int vtkPVContourFilter::RequestData(
   {
     vtkLog(INFO, "Contour array is null.");
     return 1;
-  }
-
-  // See if we can delegate to the faster vtkContour3DLinearGrid for this dataset and settings
-  // Note: vtkContour3DLinearGrid does not support the ComputeScalars option.
-  bool useLinear3DContour = this->ComputeScalars == 0 &&
-    vtkContour3DLinearGrid::CanFullyProcessDataObject(inDataObj, array->GetName());
-
-  if (useLinear3DContour)
-  {
-    vtkNew<vtkContour3DLinearGrid> linear3DContour;
-    linear3DContour->SetNumberOfContours(this->GetNumberOfContours());
-    for (int i = 0; i < this->GetNumberOfContours(); ++i)
-    {
-      linear3DContour->SetValue(i, this->GetValue(i));
-    }
-    linear3DContour->SetMergePoints(this->GetLocator() != nullptr);
-    linear3DContour->SetInterpolateAttributes(true);
-    linear3DContour->SetComputeNormals(this->GetComputeNormals());
-    linear3DContour->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
-    linear3DContour->SetUseScalarTree(this->GetUseScalarTree());
-    linear3DContour->SetScalarTree(this->GetScalarTree());
-    linear3DContour->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
-    vtkNew<vtkEventForwarderCommand> progressForwarder;
-    progressForwarder->SetTarget(this);
-    linear3DContour->AddObserver(vtkCommand::ProgressEvent, progressForwarder);
-    auto retval = linear3DContour->ProcessRequest(request, inputVector, outputVector);
-
-    return retval;
   }
 
   return this->ContourUsingSuperclass(request, inputVector, outputVector);
