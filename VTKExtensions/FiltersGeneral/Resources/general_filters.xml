@@ -688,17 +688,12 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
-          <DataType value="vtkNonOverlappingAMR" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="1"
                           data_type="vtkDataSet" />
-        <InputArrayDomain attribute_type="cell"
-                          name="input_array_amr"
-                          number_of_components="1"
-                          data_type="vtkNonOverlappingAMR" />
         <InputArrayDomain attribute_type="cell"
                           name="input_array_htg"
                           number_of_components="1"
