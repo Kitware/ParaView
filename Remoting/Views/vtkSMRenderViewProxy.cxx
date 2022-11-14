@@ -985,8 +985,8 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(const int display_posi
 
   if (representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
   {
-    vtkSMPVRepresentationProxy* rep =
-      vtkSMPVRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
+    vtkSMRepresentationProxy* rep =
+      vtkSMRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
     vtkSMProxy* input = vtkSMPropertyHelper(rep, "Input").GetAsProxy(0);
     vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
 
