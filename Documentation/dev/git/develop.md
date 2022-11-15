@@ -384,10 +384,10 @@ manual trigger to run:
   Note that, as detailed below, a full CI run is necessary before the request
   can be merged.
 
-* When working simultaneously on ParaView and a submodule, eg, VTK, it may be useful
+* When working simultaneously on ParaView and a submodule, e.g., VTK, it may be useful
   to run the CI before merging changes in the submodule in question. This is perfectly
   supported, just push your change on your remote for the submodule and update the submodule
-  manually in a fixup commit, then run the CI. Make sure to remove this commit before the merge
+  manually in a temporary commit, then run the CI. Make sure to remove this commit before the merge
   and use `git bump` when performing the actual submodule update.
 
 * [ParaView GitLab Project Developers][] may trigger CI on a merge request by
