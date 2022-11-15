@@ -17,7 +17,7 @@
       "type": "pose"
     },
     {
-      "name": "handposehandgrip",
+      "name": "handposegrip",
       "type": "pose"
     },
     {
@@ -107,7 +107,7 @@
       "elevation": "Elevation",
       "forwardthickcrop": "Move Thick Crop Forward",
       "handpose": "Hand Pose",
-      "handposehandgrip": "Hand Pose Hand Grip",
+      "handposegrip": "Hand Pose Grip",
       "haptic": "Haptic Vibration",
       "leftgripaction": "Left Grip Action",
       "movement": "Trackpad Movement",
