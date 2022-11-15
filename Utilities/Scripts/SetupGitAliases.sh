@@ -23,4 +23,7 @@ git config alias.gerrit-push '!sh -c "echo '"${gerrit_disabled}"'"' &&
 git config alias.gitlab-push '!bash Utilities/GitSetup/git-gitlab-push' &&
 git config alias.gitlab-sync '!bash Utilities/GitSetup/git-gitlab-sync' &&
 
+# Alias to bump a submodule
+git config alias.bump '!bash Utilities/GitSetup/git-bump' &&
+
 true
