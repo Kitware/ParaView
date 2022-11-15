@@ -53,10 +53,6 @@
       "type": "boolean"
     },
     {
-      "name": "squeezeforce",
-      "type": "float"
-    },
-    {
       "name": "startelevation",
       "type": "boolean"
     },
@@ -116,7 +112,6 @@
       "rightgripaction": "Right Grip Action",
       "showmenu": "Show Menu",
       "shownavigationpanel": "Show Navigation Panel",
-      "squeezeforce": "Squeeze Force",
       "startelevation": "Start Elevation",
       "startmovement": "Start Movement",
       "thickcropdirection": "Thick Crop Direction",
