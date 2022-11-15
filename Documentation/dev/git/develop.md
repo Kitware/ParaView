@@ -134,6 +134,21 @@ cases, being your topic name with the issue number.
     bug is described in the bug tracker, the commit message must
     contain a reference to the bug number.
 
+4. Update a submodule if needed
+
+    If you need to update a submodule (eg: VTK) in order to access a specific bugfix or features, first make sure
+    that the needed developements have been merged into the main branch of the submodule. You can then use the command:
+
+        $ git bump my-submodule my-hash-or-branch
+
+    `my-submodule` being the submodule folder (eg: VTK), `my-hash-or-branch` being either a hash or a branch provided
+    by any of your remote or your local repository, typically, `origin/master`.
+
+    This will add a new commit which update the submodule and prefill the commit message with information about
+    the different commits in the submodule. Make sure to still add some information about the reason for the bump.
+
+    Please note you can run CI on a submodule commit in another remote, see [Continuous Integration] for more info.
+
 4. Add some tests
 
     * Start `paraview.exe -dr` to ignore prefs (disable registry)
@@ -368,6 +383,12 @@ manual trigger to run:
   early build/test failures before a full CI run that would tie up useful resources.
   Note that, as detailed below, a full CI run is necessary before the request
   can be merged.
+
+* When working simultaneously on ParaView and a submodule, eg, VTK, it may be useful
+  to run the CI before merging changes in the submodule in question. This is perfectly
+  supported, just push your change on your remote for the submodule and update the submodule
+  manually in a fixup commit, then run the CI. Make sure to remove this commit before the merge
+  and use `git bump` when performing the actual submodule update.
 
 * [ParaView GitLab Project Developers][] may trigger CI on a merge request by
   adding a comment with a command among the [comment trailing
