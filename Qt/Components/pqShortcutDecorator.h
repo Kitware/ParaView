@@ -61,6 +61,22 @@ public:
 
   bool isEnabled() const;
 
+public Q_SLOTS:
+  /**
+   * Called to force all shortcuts for the attached property widget to enable/disable.
+   *
+   * This is tied internally to pqPropertyWidget::widgetVisibilityUpdated, which passes
+   * a boolean state so that shortcuts are disabled when the widget is not visible and
+   * the widget grabs shortcuts when it becomes visible.
+   *
+   * If \a refocusWhenEnabling is true, and if an enabled shortcut has a context
+   * widget, the keyboard focus will shift to that widget (so that users can
+   * immediately use it). This parameter is false by default and should only be
+   * enabled when direct user interaction with the decorated frame is what causes
+   * the call to setEnabled().
+   */
+  virtual void setEnabled(bool enable, bool refocusWhenEnabling = false);
+
 protected Q_SLOTS:
   /**
    * Called when any shortcut is enabled (and will enable them all and mark the widget).
@@ -77,20 +93,6 @@ protected Q_SLOTS:
    * are also deactivated so the state is consistent.
    */
   virtual void onShortcutDisabled();
-  /**
-   * Called to force all shortcuts for the attached property widget to enable/disable.
-   *
-   * This is tied internally to pqPropertyWidget::widgetVisibilityUpdated, which passes
-   * a boolean state so that shortcuts are disabled when the widget is not visible and
-   * the widget grabs shortcuts when it becomes visible.
-   *
-   * If \a refocusWhenEnabling is true, and if an enabled shortcut has a context
-   * widget, the keyboard focus will shift to that widget (so that users can
-   * immediately use it). This parameter is false by default and should only be
-   * enabled when direct user interaction with the decorated frame is what causes
-   * the call to setEnabled().
-   */
-  virtual void setEnabled(bool enable, bool refocusWhenEnabling = false);
 
 protected:
   /**

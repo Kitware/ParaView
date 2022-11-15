@@ -17,7 +17,7 @@ became visible.
 Going forward, the focus is only diverted to the context widget
 when you explicitly click on a property-widget's frame (i.e.,
 you are using the mouse not the keyboard and interacting with
-the property widget, not some other widget). This does mean
-that unless you click on the mouse to activate keyboard shortcuts
-for a property widget, you must click on the context widget
-for the shortcuts to be accepted.
+the property widget, not some other widget). When a pipeline
+object is shown in the Properties panel, keyboard shortcuts
+are activated for the first item that has them. Otherwise, you
+must click on the context widget for the shortcuts to be accepted.
