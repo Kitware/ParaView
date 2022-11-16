@@ -1,0 +1,6 @@
+NAME
+  DockWidgetCustomProxy
+DESCRIPTION
+  An example plugin that shows a dock widget that can write a text to a file using a custom proxy
+REQUIRES_MODULES
+  ParaView::pqComponents
