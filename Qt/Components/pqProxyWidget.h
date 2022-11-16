@@ -40,6 +40,7 @@ class pqPropertyWidget;
 class pqView;
 class vtkSMProperty;
 class vtkSMProxy;
+class QPoint;
 
 /**
  * pqProxyWidget represents a panel for a vtkSMProxy. pqProxyWidget creates
@@ -159,6 +160,8 @@ public:
   const QSet<QString>& defaultVisibilityLabels() const { return this->DefaultVisibilityLabels; }
   const QSet<QString>& advancedVisibilityLabels() const { return this->AdvancedVisibilityLabels; }
   ///@}
+
+  void showContextMenu(const QPoint& pt, pqPropertyWidget* propWidget);
 
 Q_SIGNALS:
   /**
