@@ -79,6 +79,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # Random segfault that would require deep investigation
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21484
     "\\.ColorOpacityTableEditing$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21656
+    "^pv\\.ShaderReplacements$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21657
+    "^pv\\.StreamLinesRepresentationColor$"
     )
 endif ()
 
