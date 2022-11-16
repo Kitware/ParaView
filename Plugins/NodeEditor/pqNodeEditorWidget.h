@@ -38,7 +38,9 @@ class pqPipelineFilter;
 class pqPipelineSource;
 class pqOutputPort;
 class pqView;
+
 class QAction;
+class QCheckBox;
 class QLayout;
 
 /**
@@ -52,7 +54,7 @@ class pqNodeEditorWidget : public QDockWidget
 public:
   pqNodeEditorWidget(QWidget* parent = nullptr);
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
-  ~pqNodeEditorWidget() override = default;
+  ~pqNodeEditorWidget() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -70,21 +72,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   int zoom();
 
-  ///@{
-  /**
-   * Create/Remove the node corresponding to the given proxy
-   */
-  int createNodeForSource(pqPipelineSource* proxy);
-  int createNodeForView(pqView* proxy);
-  int removeNode(pqProxy* proxy);
-  ///@}
-
-  /**
-   * Given a consumer, set its input port @c idx to be connected with the
-   * currently selected output ports.
-   */
-  int setInput(pqPipelineSource* consumer, int idx, bool clear);
-
   /**
    * Update style for the view nodes.
    */
@@ -96,24 +83,9 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   int updateActiveSourcesAndPorts();
 
   /**
-   * Given a proxy, remove every edges connected to its input ports. Only affects the UI.
-   */
-  int removeIncomingEdges(pqProxy* proxy);
-
-  /**
-   * Rebuild every input edge of a given source proxy.
-   */
-  int updatePipelineEdges(pqPipelineFilter* consumer);
-
-  /**
    * Sets the style of ports.
    */
   int updatePortStyles();
-
-  /**
-   * Rebuild every input edges of a given view proxy.
-   */
-  int updateVisibilityEdges(pqView* proxy);
 
   /**
    * Toggle the visibility of the given output port int the active view.
@@ -130,6 +102,46 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   int cycleNodeVerbosity();
 
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  ///@{
+  /**
+   * Create/Remove the node corresponding to the given proxy
+   */
+  int createNodeForSource(pqPipelineSource* proxy);
+  int createNodeForView(pqView* proxy);
+  int removeNode(pqProxy* proxy);
+  ///@}
+
+  /**
+   * Given a consumer, set its input port @c idx to be connected with the
+   * currently selected output ports.
+   */
+  int setInput(pqPipelineSource* consumer, int idx, bool clear);
+
+  /**
+   * Given a proxy, remove every edges connected to its input ports. Only affects the UI.
+   */
+  int removeIncomingEdges(pqProxy* proxy);
+
+  /**
+   * Rebuild every input edges of a given view proxy.
+   */
+  int updateVisibilityEdges(pqView* proxy);
+
+  /**
+   * Rebuild every input edge of a given source proxy.
+   */
+  int updatePipelineEdges(pqPipelineFilter* consumer);
+
+  ///@{
+  /**
+   * Import/Export layout from/as a Qt settings file. This is called whenver a state file is
+   * loaded/saved. Use this->processedStateFile to determine where to save the layout.
+   */
+  void exportLayout();
+  void importLayout();
+  ///@}
+
 protected:
   void initializeNode(pqNodeEditorNode* node, vtkIdType id);
 
@@ -138,9 +150,18 @@ protected:
   int createToolbar(QLayout* layout);
   int attachServerManagerListeners();
 
+  // Construct the absolute path to the layout file using this->processedStateFile
+  // Returns an empty string if processedStateFile is empty.
+  // This function assume processedStateFile is a valid path (even though the actual file may not
+  // exist)
+  QString constructLayoutFilename() const;
+
 private:
   pqNodeEditorScene* scene;
   pqNodeEditorView* view;
+
+  // set using signals when state files are loaded / saved
+  QString processedStateFile;
 
   bool autoUpdateLayout{ true };
   bool showViewNodes{ true };
@@ -152,6 +173,8 @@ private:
   QAction* actionCycleNodeVerbosity;
   QAction* actionToggleViewNodeVisibility;
   pqNodeEditorApplyBehavior* applyBehavior;
+
+  QCheckBox* autoLayoutCheckbox;
 
   /**
    *  The node registry stores a node for each source/filter/view proxy
