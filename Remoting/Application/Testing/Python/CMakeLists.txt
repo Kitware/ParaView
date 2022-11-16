@@ -65,7 +65,7 @@ set(PY_TESTS
 include(FindPythonModules)
 find_python_module(numpy numpy_found)
 if (numpy_found)
-  list(APPEND PY_TESTS PythonSelection.py)
+  list(APPEND PY_TESTS PythonSelection.py PythonSMTraceTest3.py)
 endif ()
 
 if (PARAVIEW_PLUGIN_ENABLE_SurfaceLIC AND PARAVIEW_PLUGIN_ENABLE_Moments)
