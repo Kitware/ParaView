@@ -12,6 +12,7 @@ readonly tag="setup"
 readonly shortlog=false
 readonly paths="
   .gitattributes
+  git-bump
   git-gitlab-push
   git-gitlab-sync
   LICENSE

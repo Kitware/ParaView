@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+#=============================================================================
+# Copyright 2022 Kitware, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#=============================================================================
+
+# This command allows to create a commit that bumps a submodule while creating
+# a nice commit message template. It will list all topics merged between the
+# current HEAD and the target commit, as well as constructing the URLs to the
+# merge requests.
+#
+# Usage: git bump <submodule-name> <target-commit>"
+#
+# <target-commit> can be any target compatible with the command `git checkout`.
+# <submodule-name> must be a valid submodule name (case sensitive), but doesn't
+# have to be the full path to the module.
+#
+# DISCLAIMER: it was designed ONLY for projects relying on Kitware-Robots for
+# the merging process. It relies on specific formatting of commit's titles
+# and bodys in order to extract the relevant commits and related informations
+# (such as the list of commits and their MR URLs).
+#
+# This command can be used from anywhere in the project tree, even from
+# submodules. It will try to checkout the given submodule to the target commit
+# and commit these changes in the current branch of the parent git project.
+# You will be able to edit the commit message as usual. Note that saving an
+# empty message will abort the bump and reset the submodule to its previous
+# state.
+
+set -e
+
+submodule=$1
+target_commit=$2
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: git bump <submodule-name> <target-commit>"
+  exit 1
+fi
+
+# go to root path
+root_path=$(git rev-parse --show-superproject-working-tree)
+if [[ -z "$root_path" ]]; then
+  root_path=$(git rev-parse --show-toplevel)
+fi
+cd "$root_path"
+
+# Find informations about the submodule
+config=$(git config --local --get-regexp submodule\..*"$submodule".*\.url)
+n_match=$(echo  "$config" | wc -l)
+if [[ $n_match != "1" ]]; then
+  echo "Submodule name ambiguous, aborting"
+  exit 1
+fi
+submodule_path=$(echo "$config" | sed -e '/submodule\.\(.*\)\.url.*/!d;s//\1/')
+url=$(echo "$config" | sed -e '/submodule\..*\.url \(.*\)\.git/!d;s//\1/')
+
+if [[ -z "$config" ]] || [[ -z "$submodule_path" ]] || [[ -z "$url" ]]; then
+  echo "Submodule not found"
+  echo "Usage: git bump <submodule-name> <target-commit>"
+  exit 1
+fi
+
+# allow error for grep
+set +e
+if git status | grep -qE "modified:\s+$submodule_path"; then
+  echo "Submodule is not in a clean state, please make sure it is in a clean state before using the command"
+  exit 1
+fi
+set -e
+
+# construct resulting log
+# basic format
+result=$(git -C "$submodule_path" log --first-parent --grep="Merge topic '.*'$" --format=format:"* %an: %s%n%b" HEAD.."$target_commit")
+
+# sed operations in order :
+# - beautify topic names
+# - remove useless keyword
+# - remove useless informations
+# - remove empty line
+# - beautify lines not starting with '*'
+result=$(echo "$result" | sed -e '
+  /^\*/ s/[-_]/ /g
+  s/Merge topic //g
+  /^[a-zA-Z]\+-by:/d
+  /^$/d
+  /^\* /!s/^/  * /
+  ')
+
+# XXX: if at some point we want to remove mentions of intermediate commits
+# if [[ "$short_option" == "--short" ]]; then
+#   result=$(echo "$result" | sed -e '/^  \* Merge\-request/!s/^  \*.*//') # remove all commit details
+#   result=$(echo "$result" | sed -e '/^$/d') # remove empty lines
+# fi
+
+# add urls to the merge request number
+url_escaped=$(echo "$url" | sed -e 's/[\/\-\_\.\:]/\\&/g')
+check_gitlab=$(echo "$url" | grep 'gitlab')
+if [[ -n "$check_gitlab" ]]; then
+  result=$(echo "$result" | sed -e "s/Merge\-request\: \!\([0-9]\+\)/Merge\-request\: $url_escaped\/merge\_requests\/\1/g")
+else
+  result=$(echo "$result" | sed -e "s/Merge\-request\: \!\([0-9]\+\)/Merge\-request\: $url_escaped\/pull\/\1/g")
+fi
+
+# construct resulting commit message
+template=$(cat <<EOF
+$submodule: <SHORT REASON FOR THIS BUMP>
+
+# <LONG REASON FOR THIS BUMP>
+
+$result
+EOF
+)
+
+# Save template in file
+tmp_file=$(mktemp "$root_path"/.git/bump.XXXXXX || exit 1)
+trap 'rm -f -- "$tmp_file"' EXIT
+echo "$template" > "$tmp_file"
+
+# try committing
+git -C "$submodule_path" fetch --all
+git -C "$submodule_path" checkout "$target_commit"
+git -C "$submodule_path" submodule update --recursive
+git add "$submodule_path"
+# restore state if commit failed
+set +e
+if ! git commit -eF "$tmp_file"; then
+ git restore --staged "$submodule_path"
+ git submodule update --recursive -- "$submodule_path"
+fi
