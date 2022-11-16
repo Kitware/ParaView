@@ -96,8 +96,6 @@ protected Q_SLOTS:
   void saveMaterials();
 
   void addProperty();
-  void removeProperty();
-  void removeAllProperties();
 
   void propertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 

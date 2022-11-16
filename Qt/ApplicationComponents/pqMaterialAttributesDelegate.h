@@ -72,6 +72,17 @@ public:
   void setModelData(
     QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
 
+protected:
+  /**
+   * Generate a custom dialog with appropriate widget from the QVariantList.
+   */
+  QWidget* createPropertiesEditor(QVariantList list, QWidget* parent) const;
+
+  /**
+   * From the properties editor, create a QVariantList containing each value from widgets.
+   */
+  QVariantList getPropertiesFromEditor(QWidget* editor) const;
+
 private:
   Q_DISABLE_COPY(pqMaterialAttributesDelegate)
 };
