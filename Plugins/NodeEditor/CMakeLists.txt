@@ -39,17 +39,19 @@ paraview_add_plugin(NodeEditor
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
 
-find_package(Graphviz QUIET)
-if (Graphviz_FOUND)
+option(NodeEditor_ENABLE_AUTOLAYOUT "Enable auto layout for the node editor. Needs Graphviz." OFF)
+mark_as_advanced(NodeEditor_ENABLE_AUTOLAYOUT)
+if(NodeEditor_ENABLE_AUTOLAYOUT)
+  find_package(Graphviz REQUIRED)
   target_link_libraries(NodeEditor
     PRIVATE
       Graphviz::cgraph
       Graphviz::gvc)
-endif ()
+endif()
 
 set_property(SOURCE pqNodeEditorScene.cxx APPEND
   PROPERTY
-    COMPILE_DEFINITIONS "NodeEditor_ENABLE_GRAPHVIZ=$<BOOL:${Graphviz_FOUND}>")
+    COMPILE_DEFINITIONS "NodeEditor_ENABLE_GRAPHVIZ=$<BOOL:${NodeEditor_ENABLE_AUTOLAYOUT}>")
 target_link_libraries(NodeEditor
   PRIVATE
     ParaView::RemotingViews
