@@ -83,7 +83,7 @@ Please remove this comment.
           extraction heuristics fail).
     - [ ] Get positive review
     - [ ] `Do: merge`
-    - [ ] Create tag: `git tag -a -m '@VERSION@@RC@' @VERSION@@RC@ commit-that-updated-version.txt`
+    - [ ] Create tag: `git tag -a -m '@VERSION@@RC@' v@VERSION@@RC@ commit-that-updated-version.txt`
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
   - Upload tarballs to `paraview.org`
@@ -131,7 +131,7 @@ git submodule update --recursive --init
               groups (if `@BASEBRANCH@` is `master`)
       - Create a commit which will be tagged:
         - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
-      - [ ] Created tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
+      - [ ] Create tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
 <!-- if not RC and patch == 0 -->
       - [ ] Create a commit that changes the paraview _DEFAULT_ source to the git
             url source in the `versions.cmake` file.
