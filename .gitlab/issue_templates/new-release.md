@@ -139,7 +139,7 @@ git submodule update --recursive --init
             set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
-      - [ ] Create fixup commit `git commit -a --fixup=@`. This will prevent merging of the temporary code above; it will be removed in a future step.
+      - [ ] Create fixup commit with the above changes `git commit -a --fixup=@`. The fixup commit will prevent merging of the temporary code above; it will be removed in a future step.
       - [ ] Create a merge request targeting `release`
     - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
           (ask @ben.boeckel if you do not have one)
@@ -151,7 +151,7 @@ git submodule update --recursive --init
         was last used
       - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
       - [ ] Make sure that the backporting directive in the merge-request
-        description skips the last commit such as: `Backport: release:HEAD~`
+        description skips the last commit such as: `Backport: master:HEAD~`
   - [ ] Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
