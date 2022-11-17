@@ -218,7 +218,7 @@ Binary checklist
 # Upload binaries
 
   - [ ] Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`)
-  - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website
+  - [ ] Ask @jonthan.volks (Kitware comm team) to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website
 
 ```
 buildListing.sh
@@ -265,8 +265,6 @@ If making a non-RC release:
 /cc @ben.boeckel
 
 /cc @cory.quammen
-
-/cc @utkarsh.ayachit
 
 /cc @charles.gueunet
 
