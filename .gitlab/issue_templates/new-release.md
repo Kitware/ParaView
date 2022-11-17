@@ -17,9 +17,6 @@ Please remove this comment.
 # Preparatory steps
 
   - Update ParaView guides
-    - User manual
-      - [ ] Rename to ParaViewTutorial-@VERSION@.pdf
-      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
     - Catalyst Guide
       - [ ] Rename to ParaViewCatalystGuide-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
@@ -262,7 +259,6 @@ If making a non-RC release:
 If making a non-RC release:
 
   - [ ] Request update of version number in "Download Latest Release" text on www.paraview.org
-  - [ ] Request update of link to ParaView Guide PDF at https://www.paraview.org/paraview-guide/
   - [ ] Move unclosed issues to next release milestone in GitLab
 -->
 
