@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNMReader.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVRenderView.h"
-#include "vtkProcessModule.h"
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
@@ -494,7 +493,7 @@ public Q_SLOTS:
 };
 
 //-----------------------------------------------------------------------------
-pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* dockWidget)
+pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* vtkNotUsed(dockWidget))
   : Superclass(parentObject)
   , Internals(new pqMaterialEditor::pqInternals(this))
 {

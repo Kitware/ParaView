@@ -8,6 +8,7 @@ GROUPS
   Rendering
 DEPENDS
   VTK::CommonCore
+  VTK::CommonColor
 PRIVATE_DEPENDS
   VTK::FiltersSources
   VTK::IOImage

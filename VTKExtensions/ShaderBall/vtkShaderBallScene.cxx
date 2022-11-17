@@ -136,8 +136,11 @@ vtkShaderBallScene::vtkShaderBallScene()
 {
   this->Renderer->SetRenderWindow(this->Window);
 
+  vtkNew<vtkNamedColors> color;
+
   vtkSmartPointer<vtkOSPRayPass> ospp = vtkSmartPointer<vtkOSPRayPass>::New();
   this->Renderer->SetPass(ospp);
+  this->Renderer->SetBackground(color->GetColor3d("light_grey").GetData());
 
   vtkOSPRayRendererNode::SetSamplesPerPixel(2, this->Renderer);
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this->Renderer);
