@@ -23,8 +23,8 @@ Please remove this comment.
     - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-    - macOS sigining machine
-      - [ ] if the machine is offline, request to be switched on.
+    - macOS signing machine
+      - [ ] Check that the macOS signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
@@ -200,9 +200,9 @@ Show(Text(Text="$A^2$"))
   - Examples load and match thumbnails in dialog
   - Python. Open the Python shell and run
   - Plugins are present and load properly
-  - OSPRay raycasting and pathtracing runs
-  - OptiX pathtracing runs
-  - IndeX runs
+  - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
+  - OptiX pathtracing runs (not macOS)
+  - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representaiton to NVIDIA IndeX)
 
 Binary checklist
   - [ ] macOS arm64
