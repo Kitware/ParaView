@@ -830,6 +830,33 @@ points in the input. Defaults to ***Single***.
         Warning: Many filters do not properly handle non-triangular polygons.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFastMode"
+                         default_values="0"
+                         name="FastMode"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkImageData"
+                                       mode="visibility"/>
+
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="GenerateTriangles"
+                                       value="1"
+                                       mode="enabled_state"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This parameter controls whether to use Fast Mode or not.
+          Fast Mode is only applicable to vtkImageData input and when GenerateTriangles is on.
+          Fast Mode is much faster but it may produce degenerate triangles.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Isosurfaces"
