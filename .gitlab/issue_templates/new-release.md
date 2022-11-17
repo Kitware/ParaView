@@ -69,10 +69,10 @@ Please remove this comment.
             `Developer` privileges (so it can open MRs)
       - [ ] Use [the `release-mr`][release-mr] script to open the create the
             Merge Request (see script for usage)
-        - Pull the script for each release; it may have been updated since it
+        - [ ] Pull the script for each release; it may have been updated since it
           was last used
-        - `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
-        - The script outputs the information it will be using to create the
+        - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
+        - [ ] The script outputs the information it will be using to create the
           merge request. Please verify that it is all correct before creating
           the merge request. See usage at the top of the script to provide
           information that is either missing or incorrect (e.g., if its data
@@ -139,31 +139,25 @@ git submodule update --recursive --init
             set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
-         - [ ] Create fixup commit `git commit -a --fixup=@`
-<!-- if not RC and patch == 0 -->
-  - Create a merge request targeting `master`
-<!-- else -->
-  - Create a merge request targeting `release`
-<!-- endif -->
+      - [ ] Create fixup commit `git commit -a --fixup=@`. This will prevent merging of the temporary code above; it will be removed in a future step.
+      - [ ] Create a merge request targeting `release`
     - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
           (ask @ben.boeckel if you do not have one)
     - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
           `Developer` privileges (so it can open MRs)
     - [ ] Use [the `release-mr`][release-mr] script to open the create the
           Merge Request (see script for usage)
-      - Pull the script for each release; it may have been updated since it
+      - [ ] Pull the script for each release; it may have been updated since it
         was last used
-      - `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
-<!-- if not RC and patch == 0-->
-      - Make sure that the backporting directive in the merge-request
+      - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
+      - [ ] Make sure that the backporting directive in the merge-request
         description skips the last commit such as: `Backport: release:HEAD~`
-<!-- endif -->
   - [ ] Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
           build products. They will be deleted within 24 hours.
-  - [ ] Get positive review
   - [ ] Remove fixup commit: `git reset --hard @^`
+  - [ ] Get positive review
   - [ ] Force push `git push -f gitlab`
   - [ ] `Do: merge`
   - Software process updates (these can all be done independently)
@@ -217,7 +211,7 @@ Binary checklist
 # Upload binaries
 
   - [ ] Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`)
-  - [ ] Ask @jonthan.volks (Kitware comm team) to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website
+  - [ ] Ask @jonthan.volks (Kitware comm team) to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website from within the directory corresponding to www.paraview.org/files/
 
 ```
 buildListing.sh
@@ -257,8 +251,8 @@ If making a non-RC release:
 <!--
 If making a non-RC release:
 
-  - [ ] Request update of version number in "Download Latest Release" text on www.paraview.org
-  - [ ] Move unclosed issues to next release milestone in GitLab
+  - [ ] Request from comm@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
+  - [ ] Move unclosed issues in GitLab to the next release milestone in GitLab
 -->
 
 /cc @ben.boeckel
