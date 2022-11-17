@@ -46,7 +46,6 @@ Please remove this comment.
     - Make a commit for each of these `release`-only changes on a single topic
       (suggested branch name: `update-to-v@VERSION@`):
       - Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
-        - [ ] If `PATCH` is greater than 0, add items to the end of this file.
       - [ ] Update `version.txt` and tag the commit (tag this commit below)
         ```
         git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
