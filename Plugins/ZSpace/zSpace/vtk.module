@@ -4,11 +4,12 @@ LIBRARY_NAME
   vtkZSpaceView
 DEPENDS
   ParaView::RemotingViews
+  ParaView::RemotingMisc
+  ParaView::VTKExtensionsInteractionStyle
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
-  ParaView::VTKExtensionsInteractionStyle
-  ParaView::RemotingMisc
+  VTK::RenderingZSpace
 PRIVATE_DEPENDS
   ParaView::RemotingCore
   VTK::RenderingOpenGL2

@@ -97,16 +97,5 @@ if (zSpaceCompat_FOUND)
     add_library(zSpaceImpl MODULE IMPORTED)
     set_target_properties(zSpaceImpl PROPERTIES
       IMPORTED_LOCATION "${zSpace_LIBRARY}")
-
-    # Copy the .dll file to the build location
-    add_custom_target(zSpaceCopy
-      COMMAND 
-        ${CMAKE_COMMAND} -E copy
-        "${zSpace_LIBRARY}"
-        "${CMAKE_BINARY_DIR}/bin/")
-
-    # In order to launch the command
-    add_dependencies(zSpaceHeaders
-      zSpaceCopy)
   endif ()
 endif ()
