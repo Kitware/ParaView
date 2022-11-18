@@ -1182,6 +1182,13 @@ protected:
    */
   void ConfigureTexture(vtkTexture* texture);
 
+  /**
+   * Set the 3D renderer to use within the render view.
+   * This function modifies the input renderer in order
+   * to be usable by the render view.
+   */
+  virtual void SetupAndSetRenderer(vtkRenderer* ren);
+
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;
