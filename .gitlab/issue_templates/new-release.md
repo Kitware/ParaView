@@ -9,7 +9,7 @@ following strings with the associated values:
   - `@PATCH@` - replace with patch version number
   - `@BASEBRANCH@`: The branch to create the release on (for `x.y.0-RC1`,
     `master`, otherwise `release`)
-  - `@BRANCHPOINT@`: The commit where the release should be started
+  - `@BRANCHPOINT@`: The ParaView commit where the release should be started
 
 Please remove this comment.
 -->
@@ -107,7 +107,7 @@ git checkout @BASEBRANCH@
 git merge --ff-only origin/@BASEBRANCH@
 git submodule update --recursive --init
 ```
-  - [ ] Create new branch `git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@`
+  - [ ] Create new branch `git checkout -b update-to-v@VERSION@@RC@ @BASEBRANCH@`
 
   - Integrate changes.
     - Update versions
