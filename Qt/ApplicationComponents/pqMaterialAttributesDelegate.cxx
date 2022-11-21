@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QVector2D>
 #include <QVector3D>
+#include <QVector4D>
 
 //-----------------------------------------------------------------------------
 pqMaterialAttributesDelegate::pqMaterialAttributesDelegate(QObject* parent)
@@ -250,6 +251,14 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
           new pqVectorWidgetImpl<QVector3D, 3>(variant.value<QVector3D>(), parent);
         return widget;
       }
+      case vtkOSPRayMaterialLibrary::ParameterType::VEC4:
+      {
+        pqVectorWidgetImpl<QVector4D, 4>* widget =
+          new pqVectorWidgetImpl<QVector4D, 4>(variant.value<QVector4D>(), parent);
+        return widget;
+      }
+      case vtkOSPRayMaterialLibrary::ParameterType::FLOAT_DATA:
+        return nullptr;
       case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
       {
         auto editor = new QPushButton(parent);

@@ -135,7 +135,8 @@ ParaViewMainWindow::ParaViewMainWindow()
 #endif
 
 #if PARAVIEW_USE_MATERIALEDITOR
-  pqMaterialEditor* materialEditor = new pqMaterialEditor(this);
+  pqMaterialEditor* materialEditor =
+    new pqMaterialEditor(this, this->Internals->materialEditorDock);
   materialEditor->setObjectName("materialEditorPanel");
   this->Internals->materialEditorDock->setWidget(materialEditor);
 #endif

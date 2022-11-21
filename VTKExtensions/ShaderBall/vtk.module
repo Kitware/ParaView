@@ -1,0 +1,18 @@
+NAME
+  ParaView::VTKExtensionsShaderBall
+LIBRARY_NAME
+  vtkExtensionsShaderBall
+KIT
+  ParaView::CoreKit
+GROUPS
+  Rendering
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonColor
+PRIVATE_DEPENDS
+  VTK::FiltersSources
+  VTK::IOImage
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingRayTracing
+  VTK::IOXML

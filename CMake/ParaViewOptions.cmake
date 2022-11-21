@@ -365,6 +365,11 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY
+  MODULES   ParaView::VTKExtensionsShaderBall
+  EXCLUSIVE)
+
+paraview_require_module(
   CONDITION PARAVIEW_ENABLE_NVPIPE
   MODULES   ParaView::nvpipe
   EXCLUSIVE)
