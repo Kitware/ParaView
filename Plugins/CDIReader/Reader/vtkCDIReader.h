@@ -326,7 +326,7 @@ protected:
   double Layer0Offset;
   double Layer0OffsetRange[2];
 
-  int DimensionSelection;
+  std::string DimensionSelection;
   bool InvertZAxis;
   bool AddCoordinateVars;
   projection::Projection ProjectionMode;

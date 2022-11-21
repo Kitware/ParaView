@@ -193,7 +193,7 @@ public:
   vtkSmartPointer<vtkIdTypeArray> PointsToSendToProcessesLengths;
   vtkSmartPointer<vtkIdTypeArray> PointsToSendToProcessesOffsets;
 
-  std::vector<Dimset> DimensionSets;
+  std::map<std::string, Dimset> DimensionSets;
   std::vector<Grid> Grids;
   CDIObject DataFile, GridFile, VGridFile;
 };
@@ -828,7 +828,7 @@ void vtkCDIReader::SetDefaults()
   this->HaveDomainVariable = false;
   this->HaveDomainData = false;
 
-  this->DimensionSelection = 0;
+  this->DimensionSelection = "";
   this->InvertZAxis = false;
   this->DoublePrecision = false;
   this->ShowClonClat = false;
@@ -977,36 +977,20 @@ int vtkCDIReader::GetDims()
 
   this->FillGridDimensions();
 
-  try
+  if (this->DimensionSelection.empty())
   {
-    if (this->DimensionSelection >= 0)
+    // select first by default
+    this->DimensionSelection = this->Internals->DimensionSets.begin()->first;
+  }
+  for (int i = 0; i < this->Internals->Grids.size(); i++)
+    if (this->Internals->DimensionSets.at(this->DimensionSelection).GridSize ==
+      this->Internals->Grids.at(i).Size)
     {
-      if (this->DimensionSelection >= this->Internals->DimensionSets.size())
-      {
-        vtkErrorMacro("Trying to select inexistent dimensionset "
-          << this->DimensionSelection << " " << this->Internals->DimensionSets.size()
-          << " are available.");
-        return 0;
-      }
-      for (int i = 0; i < this->Internals->Grids.size(); i++)
-        if (this->Internals->DimensionSets.at(this->DimensionSelection).GridSize ==
-          this->Internals->Grids.at(i).Size)
-        {
-          this->Internals->DimensionSets.at(this->DimensionSelection).GridID =
-            this->Internals->Grids.at(i).GridID;
-          this->GridID = i;
-        }
-      this->ZAxisID = this->Internals->DimensionSets.at(this->DimensionSelection).ZAxisID;
-      vtkDebugMacro(
-        "NEW ZAxisID" << this->ZAxisID << " from "
-                      << this->Internals->DimensionSets.at(this->DimensionSelection).ZAxisID);
+      this->Internals->DimensionSets.at(this->DimensionSelection).GridID =
+        this->Internals->Grids.at(i).GridID;
+      this->GridID = i;
     }
-  }
-  catch (const std::out_of_range& oor)
-  {
-    vtkErrorMacro("Out of Range error in GetDims trying to set Grid and ZAxisID: " << oor.what());
-    return 0;
-  }
+  this->ZAxisID = this->Internals->DimensionSets.at(this->DimensionSelection).ZAxisID;
 
   try
   {
@@ -3229,7 +3213,7 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
 //-----------------------------------------------------------------------------
 int vtkCDIReader::FillGridDimensions()
 {
-  this->Internals->DimensionSets.resize(0);
+  this->Internals->DimensionSets.clear();
 
   int ngrids = vlistNgrids(this->Internals->DataFile.getVListID());
   int nzaxis = vlistNzaxis(this->Internals->DataFile.getVListID());
@@ -3284,16 +3268,19 @@ int vtkCDIReader::FillGridDimensions()
         .GridSize = static_cast<size_t>(gridInqSize(gridID_l)),
         .NLevel = zaxisInqSize(zaxisID_l),
         .label = dimEncoding };
-      this->Internals->DimensionSets.push_back(ds);
+      this->Internals->DimensionSets[dimEncoding] = ds;
       counter++;
     }
   }
   this->AllDimensions->SetNumberOfValues(0);
   this->VariableDimensions->SetNumberOfValues(counter);
-  for (int i = 0; i < counter; i++)
+
+  int i = 0;
+  for (const auto& label_diset_tuple : this->Internals->DimensionSets)
   {
-    this->AllDimensions->InsertNextValue(this->Internals->DimensionSets[i].label);
-    this->VariableDimensions->SetValue(i, this->Internals->DimensionSets[i].label.c_str());
+    this->AllDimensions->InsertNextValue(label_diset_tuple.first);
+    this->VariableDimensions->SetValue(i, label_diset_tuple.first.c_str());
+    ++i;
   }
 
   return 1;
@@ -3305,13 +3292,7 @@ int vtkCDIReader::FillGridDimensions()
 void vtkCDIReader::SetDimensions(const char* dimensions)
 {
   vtkDebugMacro("In SetDimensions");
-  for (vtkIdType i = 0; i < this->VariableDimensions->GetNumberOfValues(); i++)
-  {
-    if (this->VariableDimensions->GetValue(i) == dimensions)
-    {
-      this->DimensionSelection = i;
-    }
-  }
+  this->DimensionSelection = dimensions;
 
   this->PointDataArraySelection->RemoveAllArrays();
   this->CellDataArraySelection->RemoveAllArrays();
