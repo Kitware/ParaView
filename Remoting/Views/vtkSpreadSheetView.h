@@ -102,6 +102,23 @@ public:
 
   ///@{
   /**
+   * Specify sorting method that we want to use, when it's enabled, columns will be sorted
+   * internally by a given array, this array will be cached in `OrderedColumnList`.
+   *
+   * Default of `OrderedColumnList` will be the list of each visible columns visible in the current
+   * SpreadSheetView.
+   *
+   * Default is false.
+   */
+  void OrderColumnsByList(bool enable);
+  void InitializeOrderedColumnList();
+  std::vector<std::string> GetOrderedColumnList();
+  void SetOrderedColumnList(std::vector<std::string> list);
+  void ClearOrderedColumnList();
+  ///@}
+
+  ///@{
+  /**
    * This API enables the users to hide columns that should be shown.
    * Columns can be hidden using their names or labels.
    */

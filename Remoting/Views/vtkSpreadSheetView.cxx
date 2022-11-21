@@ -55,42 +55,6 @@
 
 namespace
 {
-bool OrderByNames(vtkAbstractArray* a1, vtkAbstractArray* a2)
-{
-  const char* order[] = { "vtkBlockNameIndices", "vtkOriginalProcessIds", "vtkCompositeIndexArray",
-    "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds", "vtkOriginalRowIds",
-    "Structured Coordinates", nullptr };
-  std::string a1Name = a1->GetName() ? a1->GetName() : "";
-  std::string a2Name = a2->GetName() ? a2->GetName() : "";
-  int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
-  for (int cc = 0; order[cc] != nullptr; cc++)
-  {
-    if (a1Index == VTK_INT_MAX && a1Name == order[cc])
-    {
-      a1Index = cc;
-    }
-    if (a2Index == VTK_INT_MAX && a2Name == order[cc])
-    {
-      a2Index = cc;
-    }
-  }
-  if (a1Index < a2Index)
-  {
-    return true;
-  }
-  if (a2Index < a1Index)
-  {
-    return false;
-  }
-  // we can reach here only when both array names are not in the "priority"
-  // set or they are the same (which does happen, see BUG #9808).
-  assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
-
-  std::transform(a1Name.begin(), a1Name.end(), a1Name.begin(), ::tolower);
-  std::transform(a2Name.begin(), a2Name.end(), a2Name.begin(), ::tolower);
-  return (a1Name < a2Name);
-}
-
 vtkSmartPointer<vtkAbstractArray> MapBlockNames(vtkAbstractArray* aa_ids, vtkStringArray* names)
 {
   const auto ids = vtkIdTypeArray::SafeDownCast(aa_ids);
@@ -395,6 +359,49 @@ public:
     return nullptr;
   }
 
+  bool OrderByNames(vtkAbstractArray* a1, vtkAbstractArray* a2)
+  {
+    std::vector<std::string> order = { "vtkBlockNameIndices", "vtkOriginalProcessIds",
+      "vtkCompositeIndexArray", "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds",
+      "vtkOriginalRowIds", "Structured Coordinates" };
+
+    if (this->OrderColumnsByList && !this->OrderedColumnList.empty())
+    {
+      order.insert(order.end(), this->OrderedColumnList.begin(), this->OrderedColumnList.end());
+    }
+
+    std::string a1Name = a1->GetName() ? a1->GetName() : "";
+    std::string a2Name = a2->GetName() ? a2->GetName() : "";
+    int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
+    for (int i = 0; i < order.size(); i++)
+    {
+      if (a1Index == VTK_INT_MAX && a1Name == order[i])
+      {
+        a1Index = i;
+      }
+      if (a2Index == VTK_INT_MAX && a2Name == order[i])
+      {
+        a2Index = i;
+      }
+    }
+    if (a1Index < a2Index)
+    {
+      return true;
+    }
+    if (a2Index < a1Index)
+    {
+      return false;
+    }
+
+    // we can reach here only when both array names are not in the "priority"
+    // set or they are the same (which does happen, see BUG #9808).
+    assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
+
+    std::transform(a1Name.begin(), a1Name.end(), a1Name.begin(), ::tolower);
+    std::transform(a2Name.begin(), a2Name.end(), a2Name.begin(), ::tolower);
+    return (a1Name < a2Name);
+  }
+
   vtkTable* AddToCache(vtkIdType blockId, vtkTable* data, vtkIdType max)
   {
     CacheType::iterator iter = this->CachedBlocks.find(blockId);
@@ -439,7 +446,8 @@ public:
       }
     }
     // if block-names are present in field-data, create an array
-    std::sort(arrays.begin(), arrays.end(), OrderByNames);
+    std::sort(arrays.begin(), arrays.end(),
+      [this](vtkAbstractArray* a1, vtkAbstractArray* a2) { return this->OrderByNames(a1, a2); });
     for (const auto& column : arrays)
     {
       clone->AddColumn(column);
@@ -485,6 +493,9 @@ public:
 
   std::set<std::string> HiddenColumnsByName;
   std::set<std::string> HiddenColumnsByLabel;
+
+  std::vector<std::string> OrderedColumnList;
+  bool OrderColumnsByList = false;
 };
 
 namespace
@@ -711,6 +722,58 @@ bool vtkSpreadSheetView::IsColumnInternal(const char* columnName)
       (std::strstr(columnName, "__vtkValidMask__") == columnName)
     ? true
     : false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetView::OrderColumnsByList(bool val)
+{
+  // Avoid unecessary called to ClearCache()
+  if (this->Internals->OrderColumnsByList == val)
+  {
+    return;
+  }
+
+  this->Internals->OrderColumnsByList = val;
+  this->ClearCache();
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetView::InitializeOrderedColumnList()
+{
+  // We only want visible column
+  const char* unwantedColumnNames[2] = { "__vtkValidMask__", "vtkOriginalIndices" };
+
+  for (vtkIdType index = 0; index < this->GetNumberOfColumns(); index++)
+  {
+    std::string colName = this->GetColumnName(index);
+    if (colName.find(unwantedColumnNames[0]) == std::string::npos &&
+      colName.find(unwantedColumnNames[1]) == std::string::npos)
+    {
+      this->Internals->OrderedColumnList.push_back(colName);
+    }
+  }
+
+  std::sort(this->Internals->OrderedColumnList.begin(), this->Internals->OrderedColumnList.end());
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkSpreadSheetView::GetOrderedColumnList()
+{
+  return this->Internals->OrderedColumnList;
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetView::SetOrderedColumnList(std::vector<std::string> list)
+{
+  this->Internals->OrderedColumnList = list;
+  this->ClearCache();
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetView::ClearOrderedColumnList()
+{
+  this->Internals->OrderedColumnList.clear();
+  this->ClearCache();
 }
 
 //----------------------------------------------------------------------------
