@@ -76,6 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHideEvent>
 #include <QLabel>
+#include <QMenu>
 #include <QPointer>
 #include <QShowEvent>
 #include <QVBoxLayout>
@@ -215,16 +216,43 @@ public:
   }
 
   static pqProxyWidgetItem* newItem(
-    pqPropertyWidget* widget, const QString& label, QObject* parentObj)
+    pqPropertyWidget* widget, const QString& label, pqProxyWidget* parentObj)
   {
     pqProxyWidgetItem* item = new pqProxyWidgetItem(parentObj);
     item->PropertyWidget = widget;
     if (!label.isEmpty() && widget->showLabel())
     {
       QLabel* labelWdg = new QLabel(QString("<p>%1</p>").arg(label), widget->parentWidget());
+      labelWdg->setObjectName(QString("%1Label").arg(widget->objectName()));
       labelWdg->setWordWrap(true);
       labelWdg->setAlignment(Qt::AlignLeft | Qt::AlignTop);
       item->LabelWidget = labelWdg;
+      // context menu for manipulating defaults.
+      labelWdg->setContextMenuPolicy(Qt::CustomContextMenu);
+      QPointer<QLabel> labelWdgPtr(labelWdg);
+      QPointer<pqPropertyWidget> widgetPtr(widget);
+      QObject::connect(labelWdg, &QLabel::customContextMenuRequested, parentObj,
+        [labelWdgPtr, widgetPtr, parentObj](const QPoint& pt) {
+          if (!labelWdgPtr || !widgetPtr)
+          {
+            return;
+          }
+          parentObj->showContextMenu(labelWdgPtr->mapToGlobal(pt), widgetPtr);
+        });
+    }
+    else
+    {
+      // context menu for manipulating defaults.
+      widget->setContextMenuPolicy(Qt::CustomContextMenu);
+      QPointer<pqPropertyWidget> widgetPtr(widget);
+      QObject::connect(widget, &QLabel::customContextMenuRequested, parentObj,
+        [widgetPtr, parentObj](const QPoint& pt) {
+          if (!widgetPtr)
+          {
+            return;
+          }
+          parentObj->showContextMenu(widgetPtr->mapToGlobal(pt), widgetPtr);
+        });
     }
     return item;
   }
@@ -233,7 +261,7 @@ public:
   /// an item for a group where there's a single widget for all the properties
   /// in that group.
   static pqProxyWidgetItem* newGroupItem(
-    pqPropertyWidget* widget, const QString& label, bool showSeparators, QObject* parentObj)
+    pqPropertyWidget* widget, const QString& label, bool showSeparators, pqProxyWidget* parentObj)
   {
     if (widget->isSingleRowItem())
     {
@@ -255,7 +283,8 @@ public:
   /// Creates a new item for a property group with several widgets (for
   /// individual properties in the group).
   static pqProxyWidgetItem* newMultiItemGroupItem(const QString& group_label,
-    pqPropertyWidget* widget, const QString& widget_label, bool showSeparators, QObject* parentObj)
+    pqPropertyWidget* widget, const QString& widget_label, bool showSeparators,
+    pqProxyWidget* parentObj)
   {
     pqProxyWidgetItem* item = newItem(widget, widget_label, parentObj);
     item->Group = true;
@@ -540,6 +569,14 @@ bool skip_group(
   vtkSMPropertyGroup* smgroup, const QStringList& chosenProperties, const pqProxyWidget* self)
 {
   return skip(smgroup->GetXMLLabel(), smgroup->GetPanelVisibility(), chosenProperties, {}, self);
+}
+
+// return true if this property widget can save default values to settings,
+// and have its default value restored.
+bool canSaveDefault(vtkSMProperty* smproperty)
+{
+  return (vtkSMVectorProperty::SafeDownCast(smproperty) && !smproperty->GetNoCustomDefault() &&
+    !smproperty->GetInformationOnly());
 }
 
 } // end of namespace {}
@@ -1416,12 +1453,69 @@ void pqProxyWidget::saveAsDefaults()
   {
     propertyIt = vtkSMNamedPropertyIterator::New();
     propertyIt->SetPropertyNames(this->Internals->Properties);
+    propertyIt->SetProxy(this->Internals->Proxy);
   }
   settings->SetProxySettings(this->Internals->Proxy, propertyIt);
   if (propertyIt)
   {
     propertyIt->Delete();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::showContextMenu(const QPoint& pt, pqPropertyWidget* propWidget)
+{
+  if (!canSaveDefault(propWidget->property()))
+  {
+    return;
+  }
+  QMenu menu(this);
+  menu.setObjectName("PropertyContextMenu");
+  // if a prop has a dynamic domain, can't save default, but can reset to app default.
+  if (!propWidget->property()->HasDomainsWithRequiredProperties())
+  {
+    auto* useDefault = menu.addAction(tr("Use as Default"), propWidget, [this, propWidget]() {
+      // get the property name
+      std::string name = this->Internals->Proxy->GetPropertyName(propWidget->property());
+      // tell settings to save a single property by name
+      std::vector<std::string> names{ name };
+      vtkNew<vtkSMNamedPropertyIterator> propertyIt;
+      propertyIt->SetProxy(this->Internals->Proxy);
+      propertyIt->SetPropertyNames(names);
+      vtkSMSettings* settings = vtkSMSettings::GetInstance();
+      settings->SetProxySettings(this->Internals->Proxy, propertyIt);
+    });
+    useDefault->setObjectName("UseDefault");
+  }
+  auto* resetToDefault =
+    menu.addAction(tr("Reset to Application Default"), propWidget, [this, propWidget]() {
+      bool anyReset = false;
+      // mirror pqProxyWidget::restoreDefaults() for a single property
+      vtkSMProperty* smproperty = propWidget->property();
+      vtkSMSettings* settings = vtkSMSettings::GetInstance();
+      if (!smproperty->IsValueDefault())
+      {
+        anyReset = true;
+      }
+      smproperty->ResetToDefault();
+
+      // Restore to site setting if there is one. If there isn't, this does
+      // not change the property setting. NOTE: user settings have priority
+      // of VTK_DOUBLE_MAX, so we set the site settings priority to a
+      // number just below VTK_DOUBLE_MAX.
+      settings->GetPropertySetting(smproperty, nextafter(VTK_DOUBLE_MAX, 0));
+      // The code above bypasses the changeAvailable() and
+      // changeFinished() signal from the pqProxyWidget, so we check here
+      // whether we should act as if changes are available only if any of
+      // the properties have been reset.
+      if (anyReset)
+      {
+        Q_EMIT this->changeAvailable();
+        Q_EMIT this->changeFinished();
+      }
+    });
+  resetToDefault->setObjectName("ResetToDefault");
+  menu.exec(pt);
 }
 
 //-----------------------------------------------------------------------------
