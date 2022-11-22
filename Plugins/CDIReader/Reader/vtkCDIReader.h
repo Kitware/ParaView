@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGridAlgorithm.h"
 
 #include "vtkDataArraySelection.h" // for ivars
-#include "vtkSmartPointer.h"       // for ivars
-#include "vtkStringArray.h"        // for ivars
+#include "vtkDoubleArray.h"
+#include "vtkSmartPointer.h" // for ivars
+#include "vtkStringArray.h"  // for ivars
 
 #include "projections.h" // for projection enum
 
@@ -94,11 +95,11 @@ public:
   vtkGetMacro(NumberOfCellVars, int);
   vtkGetMacro(NumberOfPointVars, int);
 
-  vtkSmartPointer<vtkStringArray> VariableDimensions;
-  vtkSmartPointer<vtkStringArray> AllDimensions;
+  vtkNew<vtkStringArray> VariableDimensions;
+  vtkNew<vtkStringArray> AllDimensions;
   void SetDimensions(const char* dimensions);
   vtkStringArray* GetAllVariableArrayNames();
-  vtkSmartPointer<vtkStringArray> AllVariableArrayNames;
+  vtkNew<vtkStringArray> AllVariableArrayNames;
   vtkGetObjectMacro(AllDimensions, vtkStringArray);
   vtkGetObjectMacro(VariableDimensions, vtkStringArray);
 
@@ -200,7 +201,6 @@ protected:
 
   int OpenFile();
   void DestroyData();
-  void SetDefaults();
   int CheckForMaskData();
   int AddMaskHalo();
   int GetVars();
@@ -259,54 +259,52 @@ protected:
   int AddMirrorPointX(int index, double dividerX, double offset);
   int AddMirrorPointY(int index, double dividerY, double offset);
 
-  vtkMultiProcessController* Controller;
+  vtkMultiProcessController* Controller = nullptr;
 
-  bool Initialized;
+  bool Initialized = false;
 
-  int NumberOfProcesses;
-  double CustomMaskValue;
-  int BeginPoint, EndPoint, BeginCell, EndCell;
-  int Piece, NumPieces;
-  int NumberLocalCells;
-  int NumberAllCells;
-  int NumberLocalPoints;
-  int NumberAllPoints;
-  bool Decomposition;
-  long FirstDay;
-  int ModNumPoints;
-  int ModNumCells;
-  unsigned int CurrentExtraPoint;     // current extra point
-  unsigned int CurrentExtraCell;      // current extra cell
+  int NumberOfProcesses = 1;
+  double CustomMaskValue = 0.0;
+  int BeginPoint = 0, EndPoint = 0, BeginCell = 0, EndCell = 0;
+  int Piece = 0, NumPieces = 0;
+  int NumberLocalCells = 0;
+  int NumberAllCells = 0;
+  int NumberLocalPoints = 0;
+  int NumberAllPoints = 0;
+  bool Decomposition = false;
+  long FirstDay = -1;
+  int ModNumPoints = 0;
+  int ModNumCells = 0;
+  unsigned int CurrentExtraPoint = 0; // current extra point
+  unsigned int CurrentExtraCell = 0;  // current extra cell
   std::vector<unsigned int> CellMap;  // maps from added cell to original cell #
   std::vector<unsigned int> PointMap; // maps from added point to original point #
 
-  std::string FileName;
-  std::string FileNameGrid;
-  std::string FileNameGridSelect;
-  std::string FileSeriesFirstName;
-  std::string MaskingVarname;
-  int NumberOfTimeSteps;
-  int NumberOfAllTimeSteps;
+  std::string FileName = "";
+  std::string FileSeriesFirstName = "";
+  std::string MaskingVarname = "";
+  int NumberOfTimeSteps = 0;
+  int NumberOfAllTimeSteps = 0;
   std::vector<int> TimeSeriesTimeSteps;
-  bool TimeSeriesTimeStepsAllSet;
-  bool TimeSet;
-  double DTime;
+  bool TimeSeriesTimeStepsAllSet = false;
+  bool TimeSet = false;
+  double DTime = 0;
   std::vector<double> TimeSteps;
-  int FileSeriesNumber;
-  int NumberOfFiles;
-  double Bloat;
+  int FileSeriesNumber = 0;
+  int NumberOfFiles = 1;
+  double Bloat = 2.0;
 
-  bool UseMask;
-  bool InvertMask;
-  bool GotMask;
-  bool UseCustomMaskValue;
+  bool UseMask = false;
+  bool InvertMask = false;
+  bool GotMask = false;
+  bool UseCustomMaskValue = false;
 
-  bool SkipGrid;
+  bool SkipGrid = false;
 
   vtkNew<vtkCallbackCommand> SelectionObserver;
-  bool InfoRequested;
-  bool DataRequested;
-  bool Grib;
+  bool InfoRequested = false;
+  bool DataRequested = false;
+  bool Grib = false;
 
   vtkNew<vtkDataArraySelection> CellDataArraySelection;
   vtkNew<vtkDataArraySelection> PointDataArraySelection;
@@ -316,69 +314,66 @@ protected:
   vtkNew<vtkFieldData> PointVarDataArray;
   vtkNew<vtkFieldData> DomainVarDataArray;
 
-  int VerticalLevelSelected;
-  int VerticalLevelRange[2];
-  int CellDataSelected;
-  int PointDataSelected;
-  int DomainDataSelected;
-  int LayerThickness;
-  int LayerThicknessRange[2];
-  double Layer0Offset;
-  double Layer0OffsetRange[2];
+  int VerticalLevelSelected = 0;
+  int VerticalLevelRange[2] = { 0, 1 };
+  int CellDataSelected = 0;
+  int PointDataSelected = 0;
+  int LayerThickness = 50;
+  int LayerThicknessRange[2] = { 0, 100 };
+  double Layer0Offset = 1e-30;
+  double Layer0OffsetRange[2] = { -50, 51 };
 
-  std::string DimensionSelection;
-  bool InvertZAxis;
-  bool AddCoordinateVars;
-  projection::Projection ProjectionMode;
-  bool DoublePrecision;
-  bool ShowClonClat;
-  bool ShowMultilayerView;
-  bool HaveDomainData;
-  bool HaveDomainVariable;
-  bool BuildDomainArrays;
-  std::string DomainVarName;
-  std::string DomainDimension;
-  std::string PerformanceDataFile;
+  std::string DimensionSelection = "";
+  bool InvertZAxis = false;
+  bool AddCoordinateVars = false;
+  projection::Projection ProjectionMode = projection::SPHERICAL;
+  bool DoublePrecision = false;
+  bool ShowClonClat = false;
+  bool ShowMultilayerView = false;
+  bool HaveDomainData = false;
+  bool HaveDomainVariable = false;
+  bool BuildDomainArrays = false;
 
-  int MaximumNVertLevels;
-  int NumberOfCells;
-  int NumberOfVertices;
-  int NumberOfPoints;
-  int NumberOfTriangles;
-  int NumberOfDomains;
-  int PointsPerCell;
-  bool ReconstructNew;
-  bool NeedHorizontalGridFile;
-  bool NeedVerticalGridFile;
-  bool WrapOn;
+  // this is hard coded for now but will change when data generation gets more mature
+  std::string DomainVarName = "cell_owner";
+  std::string DomainDimension = "domains";
+  std::string PerformanceDataFile = "timer.atmo.";
+
+  int MaximumNVertLevels = 0;
+  int NumberOfCells = 0;
+  int NumberOfPoints = 0;
+  int NumberOfDomains = 0;
+  int PointsPerCell = 0;
+  bool ReconstructNew = false;
+  bool WrapOn = false;
 
   std::vector<double> CLon;
   std::vector<double> CLat;
-  double* DepthVar;
+  std::vector<double> DepthVar;
   std::vector<double> PointX;
   std::vector<double> PointY;
   std::vector<double> PointZ;
   std::vector<int> OrigConnections;
   std::vector<int> ModConnections;
   std::vector<bool> CellMask;
-  double* DomainCellVar;
-  int MaximumCells;
-  int MaximumPoints;
+  std::vector<double> DomainCellVar;
+  int MaximumCells = 0;
+  int MaximumPoints = 0;
   std::vector<int> VertexIds;
 
-  int NumberOfCellVars;
-  int NumberOfPointVars;
-  int NumberOfDomainVars;
-  bool GridReconstructed;
+  int NumberOfCellVars = 0;
+  int NumberOfPointVars = 0;
+  int NumberOfDomainVars = 0;
+  bool GridReconstructed = false;
 
-  int GridID;
-  int ZAxisID;
+  int GridID = -1;
+  int ZAxisID = -1;
   std::unordered_set<int> SurfIDs;
 
-  std::string TimeUnits;
-  std::string Calendar;
-  vtkSmartPointer<vtkDoubleArray> ClonArray;
-  vtkSmartPointer<vtkDoubleArray> ClatArray;
+  std::string TimeUnits = "";
+  std::string Calendar = "";
+  vtkNew<vtkDoubleArray> ClonArray;
+  vtkNew<vtkDoubleArray> ClatArray;
   vtkNew<vtkUnstructuredGrid> Output;
 
 private:

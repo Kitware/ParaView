@@ -10,11 +10,13 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/fesom.nc}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDISimpleRead.png,:}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDIUseMask.png,:}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDIDimensionsTest.png,:}"
 )
 
 set (xml_tests
   CDISimpleRead.xml
   CDIUseMask.xml
+  CDIDimensionsTest.xml
   )
 
 paraview_add_client_tests(

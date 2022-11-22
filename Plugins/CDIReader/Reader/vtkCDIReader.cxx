@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCellData.h"
 #include "vtkCellType.h"
 #include "vtkDataObject.h"
-#include "vtkDoubleArray.h"
 #include "vtkDummyController.h"
 #include "vtkFieldData.h"
 #include "vtkFileSeriesReader.h"
@@ -262,17 +261,9 @@ vtkCDIReader::vtkCDIReader()
   : Internals(new Internal())
 {
   vtkDebugMacro("Starting to create vtkCDIReader...");
-  this->Initialized = false;
 
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-
-  this->VariableDimensions = vtkSmartPointer<vtkStringArray>::New();
-  this->AllDimensions = vtkSmartPointer<vtkStringArray>::New();
-  this->AllVariableArrayNames = vtkSmartPointer<vtkStringArray>::New();
-  this->InfoRequested = false;
-  this->DataRequested = false;
-  this->HaveDomainData = false;
 
   // Setup selection callback to modify this object when array selection changes
   this->SelectionObserver->SetCallback(&vtkCDIReader::SelectionCallback);
@@ -281,15 +272,12 @@ vtkCDIReader::vtkCDIReader()
   this->PointDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
   this->DomainDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
 
-  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
   if (!this->Controller)
   {
     vtkNew<vtkDummyController> dummyController;
     this->SetController(dummyController);
   }
-
-  this->SetDefaults();
 
   vtkDebugMacro("MAX_VARS:" << MAX_VARS);
   vtkDebugMacro("Created vtkCDIReader");
@@ -803,78 +791,6 @@ int vtkCDIReader::RegenerateGeometry()
 }
 
 //----------------------------------------------------------------------------
-// Set defaults for various parameters and initialize some variables
-//----------------------------------------------------------------------------
-void vtkCDIReader::SetDefaults()
-{
-  this->Grib = false;
-
-  this->VerticalLevelRange[0] = 0;
-  this->VerticalLevelRange[1] = 1;
-  this->VerticalLevelSelected = 0;
-  this->LayerThicknessRange[0] = 0;
-  this->LayerThicknessRange[1] = 100;
-  this->LayerThickness = 50;
-  this->Bloat = 2.0;
-
-  this->Layer0OffsetRange[0] = -50;
-  this->Layer0OffsetRange[1] = 51;
-  this->Layer0Offset = 1e-30;
-
-  // this is hard coded for now but will change when data generation gets more mature
-  this->PerformanceDataFile = "timer.atmo.";
-  this->DomainVarName = "cell_owner";
-  this->DomainDimension = "domains";
-  this->HaveDomainVariable = false;
-  this->HaveDomainData = false;
-
-  this->DimensionSelection = "";
-  this->InvertZAxis = false;
-  this->DoublePrecision = false;
-  this->ShowClonClat = false;
-  this->ProjectionMode = projection::SPHERICAL;
-  this->ShowMultilayerView = false;
-  this->ReconstructNew = false;
-  this->CellDataSelected = 0;
-  this->PointDataSelected = 0;
-  this->MaskingVarname = "";
-  this->GotMask = false;
-  this->AddCoordinateVars = false;
-  this->NumberOfTimeSteps = 0;
-  this->NumberOfAllTimeSteps = 0;
-  this->TimeSeriesTimeSteps.reserve(5);
-  this->TimeSteps.reserve(100 * 250 + 25);
-  this->TimeSeriesTimeStepsAllSet = false;
-  this->GridReconstructed = false;
-  this->CustomMaskValue = 0.0;
-  this->InvertMask = false;
-  this->UseMask = false;
-  this->UseCustomMaskValue = false;
-  this->Decomposition = false;
-
-  this->SkipGrid = false;
-
-  this->BeginCell = 0;
-  this->FirstDay = -1;
-  this->TimeSet = false;
-
-  this->DTime = 0;
-  this->FileSeriesNumber = 0;
-  this->NumberOfFiles = 1;
-  this->NeedVerticalGridFile = false;
-  this->GridID = -1;
-  this->NumberOfProcesses = 1;
-
-  this->BuildDomainArrays = false;
-  this->MaximumNVertLevels = 0;
-  this->MaximumPoints = 0;
-  this->MaximumCells = 0;
-  this->DepthVar = nullptr;
-
-  this->NumberOfPoints = 0;
-}
-
-//----------------------------------------------------------------------------
 // Get dimensions of key NetCDF variables
 //----------------------------------------------------------------------------
 
@@ -983,6 +899,7 @@ int vtkCDIReader::GetDims()
     this->DimensionSelection = this->Internals->DimensionSets.begin()->first;
   }
   for (int i = 0; i < this->Internals->Grids.size(); i++)
+  {
     if (this->Internals->DimensionSets.at(this->DimensionSelection).GridSize ==
       this->Internals->Grids.at(i).Size)
     {
@@ -990,6 +907,7 @@ int vtkCDIReader::GetDims()
         this->Internals->Grids.at(i).GridID;
       this->GridID = i;
     }
+  }
   this->ZAxisID = this->Internals->DimensionSets.at(this->DimensionSelection).ZAxisID;
 
   try
@@ -1047,16 +965,16 @@ int vtkCDIReader::GetDims()
 int vtkCDIReader::ReadHorizontalGridData()
 {
   this->Internals->Grids.resize(0);
-  int vlistID_l = this->Internals->GridFile.getVListID();
-  if (vlistID_l == CDI_UNDEFID)
+  int vListID = this->Internals->GridFile.getVListID();
+  if (vListID == CDI_UNDEFID)
   {
     vtkErrorMacro("No VList found in Grid file.");
     return 0;
   }
-  int ngrids = vlistNgrids(vlistID_l);
+  int ngrids = vlistNgrids(vListID);
   for (int i = 0; i < ngrids; ++i)
   {
-    int gridID_l = vlistGrid(vlistID_l, i);
+    int gridID_l = vlistGrid(vListID, i);
     int nv = gridInqNvertex(gridID_l);
 
     if (nv >= 3) //  ((nv == 3 || nv == 4)) // && gridInqType(gridID_l) == GRID_UNSTRUCTURED)
@@ -1499,8 +1417,7 @@ int vtkCDIReader::ConstructGridGeometry()
   }
   cLonVertices.resize(size);
   cLatVertices.resize(size);
-  this->DepthVar = new double[this->MaximumNVertLevels];
-  CHECK_NEW(this->DepthVar);
+  this->DepthVar.resize(this->MaximumNVertLevels);
 
   vtkDebugMacro("Start reading Vertices");
   try
@@ -1519,7 +1436,7 @@ int vtkCDIReader::ConstructGridGeometry()
   vtkDebugMacro("Done reading Vertices");
   vtkDebugMacro("Getting vertical axis" << this->ZAxisID << " expecting up to "
                                         << this->MaximumNVertLevels << " levels.");
-  zaxisInqLevels(this->ZAxisID, this->DepthVar);
+  zaxisInqLevels(this->ZAxisID, this->DepthVar.data());
   vtkDebugMacro("Got vertical axis" << this->ZAxisID);
   char units[CDI_MAX_NAME];
   this->OrigConnections.resize(size);
@@ -2030,9 +1947,8 @@ int vtkCDIReader::AddMaskHalo()
 //----------------------------------------------------------------------------
 bool vtkCDIReader::BuildDomainCellVars()
 {
-  this->DomainCellVar = new double[this->NumberOfCells * this->NumberOfDomainVars];
+  this->DomainCellVar.resize(this->NumberOfCells * this->NumberOfDomainVars);
   std::vector<double> domainTMP(this->NumberOfCells);
-  CHECK_NEW(this->DomainCellVar);
   double val = 0;
   int mask_pos = 0;
   int numVars = vlistNvars(this->Internals->DataFile.getVListID());
@@ -2058,7 +1974,7 @@ bool vtkCDIReader::BuildDomainCellVars()
       val = this->DomainVarDataArray->GetArray(j)->GetComponent(domainTMP[k], 0l);
       this->DomainCellVar[k + (j * this->NumberOfCells)] = val;
     }
-    domainVar->SetArray(this->DomainCellVar + (j * this->NumberOfCells), this->NumberLocalCells, 0,
+    domainVar->SetArray(&(this->DomainCellVar[j * this->NumberOfCells]), this->NumberLocalCells, 0,
       vtkDoubleArray::VTK_DATA_ARRAY_FREE);
     domainVar->SetName(this->Internals->DomainVars[j].c_str());
     this->Output->GetCellData()->AddArray(domainVar);
@@ -2364,7 +2280,7 @@ void vtkCDIReader::OutputPoints(bool init)
     points->Allocate(this->MaximumPoints, this->MaximumPoints);
   }
 
-  if (this->DepthVar == nullptr)
+  if (this->DepthVar.empty())
   {
     vtkDebugMacro("OutputPoints: this->MaximumPoints: "
       << this->MaximumPoints << " this->MaximumNVertLevels: " << this->MaximumNVertLevels
@@ -2507,7 +2423,7 @@ void vtkCDIReader::OutputCells(bool init)
                                       << " ShowMultilayerView: " << this->ShowMultilayerView
                                       << " CurrentExtraCell: " << this->CurrentExtraCell);
 
-  if (this->DepthVar == nullptr)
+  if (this->DepthVar.empty())
   {
     vtkErrorMacro(
       "File " << this->FileName << " OutputCells: this->MaximumCells: " << this->MaximumCells
@@ -2610,10 +2526,8 @@ void vtkCDIReader::OutputCells(bool init)
 
   if (this->AddCoordinateVars && this->ShowClonClat)
   {
-    this->ClonArray = vtkSmartPointer<vtkDoubleArray>::New();
     this->ClonArray->SetName("Center Longitude (CLON)");
     this->ClonArray->SetNumberOfTuples(this->NumberLocalCells * this->MaximumNVertLevels);
-    this->ClatArray = vtkSmartPointer<vtkDoubleArray>::New();
     this->ClatArray->SetName("Center Latitude (CLAT)");
     this->ClatArray->SetNumberOfTuples(this->NumberLocalCells * this->MaximumNVertLevels);
     if (this->ShowMultilayerView)
@@ -3132,7 +3046,6 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
   // the data available. Needs to be improved together with the modellers.
   vtkDebugMacro("In vtkCDIReader::LoadDomainVarData");
   std::string variable = this->Internals->DomainVars[variableIndex];
-  this->DomainDataSelected = variableIndex;
 
   // Allocate data array for this variable
   if (!this->DomainVarDataArray->HasArray(variable.c_str()))
@@ -3272,13 +3185,13 @@ int vtkCDIReader::FillGridDimensions()
       counter++;
     }
   }
-  this->AllDimensions->SetNumberOfValues(0);
+  this->AllDimensions->SetNumberOfValues(counter);
   this->VariableDimensions->SetNumberOfValues(counter);
 
   int i = 0;
   for (const auto& label_diset_tuple : this->Internals->DimensionSets)
   {
-    this->AllDimensions->InsertNextValue(label_diset_tuple.first);
+    this->AllDimensions->SetValue(i, label_diset_tuple.first);
     this->VariableDimensions->SetValue(i, label_diset_tuple.first.c_str());
     ++i;
   }
