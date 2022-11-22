@@ -1216,7 +1216,11 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
         {
           case detail::ColorRole:
           {
-            QColor color = model->data(idx, detail::ColorRole).value<QColor>();
+            QColor color(255, 255, 255);
+            if (model->data(idx, detail::ColorRole).canConvert<QColor>())
+            {
+              color = model->data(idx, detail::ColorRole).value<QColor>();
+            }
             color = QColorDialog::getColor(
               color, this, "Select Color", QColorDialog::DontUseNativeDialog);
             if (color.isValid())
@@ -1228,7 +1232,12 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
 
           case detail::OpacityRole:
           {
-            double opacity = model->data(idx, detail::OpacityRole).toDouble();
+            // provide non-zero default when data is unset.
+            double opacity = 1.0;
+            if (model->data(idx, detail::OpacityRole).canConvert<double>())
+            {
+              opacity = model->data(idx, detail::OpacityRole).toDouble();
+            }
             pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
             dialog.setObjectName("OpacityDialog");
             dialog.setWindowTitle("Select Opacity");
