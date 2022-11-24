@@ -114,7 +114,7 @@ bool pqSaveDataReaction::saveActiveData()
   }
 
   pqFileDialog fileDialog(
-    server, pqCoreUtilities::mainWidget(), tr("Save File:"), QString(), filters);
+    server, pqCoreUtilities::mainWidget(), tr("Save File:"), QString(), filters, false);
   fileDialog.setRecentlyUsedExtension(
     pqSaveDataReaction::defaultExtension(port->getDataInformation()));
   fileDialog.setObjectName("FileSaveDialog");

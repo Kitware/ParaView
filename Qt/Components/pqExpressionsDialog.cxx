@@ -482,7 +482,7 @@ void pqExpressionsManagerDialog::onClose()
 void pqExpressionsManagerDialog::exportToFile()
 {
   pqFileDialog dialog(nullptr, this, tr("Export Expressions(s)"), QString(),
-    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"));
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false);
   dialog.setObjectName("ExportExpressions");
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -523,7 +523,7 @@ void pqExpressionsManagerDialog::exportToFile()
 bool pqExpressionsManagerDialog::importFromFile()
 {
   pqFileDialog dialog(nullptr, this, tr("Import Expressions(s)"), QString(),
-    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"));
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false);
   dialog.setObjectName("ImportExpressions");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())

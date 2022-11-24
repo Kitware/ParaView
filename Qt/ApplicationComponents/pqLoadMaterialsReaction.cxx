@@ -60,7 +60,8 @@ bool pqLoadMaterialsReaction::loadMaterials()
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Load Materials:"), QString(),
     tr("OSPRay Material Files") + QString(" (*.json);;") + tr("Wavefront Material Files") +
-      QString(" (*.mtl)"));
+      QString(" (*.mtl)"),
+    false);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFiles);
   if (fileDialog.exec() == QDialog::Accepted)

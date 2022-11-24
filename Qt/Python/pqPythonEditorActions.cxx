@@ -380,7 +380,8 @@ void pqPythonEditorActions::connect<pqPythonTabWidget>(
   QObject::connect(&actions[Action::OpenFile], &QAction::triggered, [tWidget]() {
     pqFileDialog dialog(nullptr, pqPythonScriptEditor::getUniqueInstance(),
       QCoreApplication::translate("pqPythonEditorActions", "Open File"), QString(),
-      QCoreApplication::translate("pqPythonEditorActions", "Python Files") + QString(" (*.py);;"));
+      QCoreApplication::translate("pqPythonEditorActions", "Python Files") + QString(" (*.py);;"),
+      false);
     dialog.setObjectName("FileOpenDialog");
     if (QFileDialog::Accepted == dialog.exec())
     {

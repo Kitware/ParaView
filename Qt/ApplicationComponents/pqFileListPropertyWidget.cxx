@@ -73,7 +73,7 @@ public:
 
     pqFileDialog dialog(server, self,
       tr("Select %1").arg(QCoreApplication::translate("ServerManagerXML", property->GetXMLLabel())),
-      QString(), filter);
+      QString(), filter, false);
     if (directoryMode)
     {
       dialog.setFileMode(pqFileDialog::Directory);

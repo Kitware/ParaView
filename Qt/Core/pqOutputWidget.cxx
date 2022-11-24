@@ -450,7 +450,7 @@ void pqOutputWidget::saveToFile()
 {
   QString text = this->Internals->Ui.consoleWidget->text();
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save output"), QString(),
-    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)");
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)", false);
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {

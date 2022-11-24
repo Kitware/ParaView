@@ -850,7 +850,7 @@ void pqCameraDialog::saveCameraConfiguration()
     QString("%1 (*%2);;").arg(writer->GetFileDescription()).arg(writer->GetFileExtension()) +
     tr("All Files") + " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, tr("Save Camera Configuration"), "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Save Camera Configuration"), "", filters, false);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -877,7 +877,7 @@ void pqCameraDialog::loadCameraConfiguration()
     QString("%1 (*%2);;").arg(reader->GetFileDescription()).arg(reader->GetFileExtension()) +
     tr("All Files") + " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, tr("Load Camera Configuration"), "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Load Camera Configuration"), "", filters, false);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)

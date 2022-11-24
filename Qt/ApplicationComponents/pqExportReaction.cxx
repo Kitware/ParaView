@@ -133,7 +133,7 @@ QString pqExportReaction::exportActiveView()
   }
 
   pqFileDialog file_dialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Export View:"), QString(), filters);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Export View:"), QString(), filters, false);
   file_dialog.setObjectName("FileExportDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   if (file_dialog.exec() == QDialog::Accepted && !file_dialog.getSelectedFiles().empty())

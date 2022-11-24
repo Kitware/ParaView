@@ -70,7 +70,7 @@ pqCatalystExportReaction::~pqCatalystExportReaction() = default;
 QString pqCatalystExportReaction::exportScript()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Catalyst State:"),
-    QString(), tr("Python file") + QString(" (*.py);;") + tr("All files") + QString(" (*)"));
+    QString(), tr("Python file") + QString(" (*.py);;") + tr("All files") + QString(" (*)"), false);
   fileDialog.setObjectName("SaveCatalystStateFileDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (!fileDialog.exec())

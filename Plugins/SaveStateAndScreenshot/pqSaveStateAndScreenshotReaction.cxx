@@ -167,8 +167,8 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   // Configure directory and name
   QString fileExt =
     QString("%1 (*.pvsm);;%2 (*)").arg(tr("ParaView state file")).arg(tr("All files"));
-  pqFileDialog fileDialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"), QString(), fileExt);
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"),
+    QString(), fileExt, false);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);

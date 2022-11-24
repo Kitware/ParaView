@@ -319,7 +319,8 @@ void pqCustomViewpointButtonDialog::importConfigurations()
     QString("%1 (*%2);;").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension) +
     tr("All Files") + " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, tr("Load Custom Viewpoints Configuration"), "", filters);
+  pqFileDialog dialog(
+    nullptr, this, tr("Load Custom Viewpoints Configuration"), "", filters, false);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -434,7 +435,8 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
     QString("%1 (*%2);;").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension) + "All Files" +
     " (*.*)";
 
-  pqFileDialog dialog(nullptr, this, tr("Save Custom Viewpoints Configuration"), "", filters);
+  pqFileDialog dialog(
+    nullptr, this, tr("Save Custom Viewpoints Configuration"), "", filters, false);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)

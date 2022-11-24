@@ -72,7 +72,7 @@ void PVBlotPluginActions::startPVBlot()
     "All Files (*)";
 
   pqFileDialog* fdialog =
-    new pqFileDialog(server, this->mainWindow(), "Open Blot File", QString(), filter);
+    new pqFileDialog(server, this->mainWindow(), "Open Blot File", QString(), filter, false);
   fdialog->setAttribute(Qt::WA_DeleteOnClose);
   fdialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fdialog, SIGNAL(filesSelected(const QStringList&)), this,

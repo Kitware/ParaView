@@ -183,7 +183,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
   int constexpr AllFilesFilterIndex = 1;
 
   pqFileDialog fileDialog(
-    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filtersString);
+    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filtersString, true);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFilesAndDirectories);
   QList<pqPipelineSource*> sources;

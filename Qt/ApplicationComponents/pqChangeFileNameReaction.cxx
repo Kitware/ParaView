@@ -120,7 +120,7 @@ void pqChangeFileNameReaction::changeFileName()
   qExtensions += QString(")");
 
   pqFileDialog fileDialog(
-    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), qExtensions);
+    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), qExtensions, false);
 
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);

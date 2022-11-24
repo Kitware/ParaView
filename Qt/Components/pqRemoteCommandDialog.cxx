@@ -537,7 +537,7 @@ string pqRemoteCommandDialog::LocateFile()
 {
   QString filters = tr("All Files") + QString(" (*)");
 
-  pqFileDialog dialog(nullptr, this, tr("Find file"), "", filters);
+  pqFileDialog dialog(nullptr, this, tr("Find file"), "", filters, false);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)

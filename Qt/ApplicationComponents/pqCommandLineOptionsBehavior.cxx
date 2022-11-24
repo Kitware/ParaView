@@ -199,7 +199,7 @@ void pqCommandLineOptionsBehavior::processData()
     // makes it possible to select a file group.
     // This also resolve relative path into a canonical one.
     pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
-      tr("Internal Open File"), QString(), QString());
+      tr("Internal Open File"), QString(), QString(), false);
     dialog.setFileMode(pqFileDialog::ExistingFiles);
 
     if (!dialog.selectFile(path))
