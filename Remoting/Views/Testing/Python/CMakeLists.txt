@@ -29,6 +29,7 @@ set(PY_TESTS
   LockScalarRangeBackwardsCompatibility.py,NO_VALID
   SpreadSheetViewBlockNames.py,NO_VALID
   SpreadSheetViewPartialArrays.py,NO_VALID
+  SpreadSheetViewSortByList.py,NO_VALID
   TransferFunctionPresets.py,NO_VALID
   TestSurfaceLIC.py,NO_VALID
   RenderViewOSPRayParameters.py,NO_VALID
