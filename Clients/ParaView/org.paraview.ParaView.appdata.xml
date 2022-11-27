@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014-2018 Kitware, Inc. -->
 <component type="desktop-application">
- <id>org.paraview.paraview</id>
+ <id>org.paraview.ParaView</id>
  <metadata_license>CC-BY-4.0</metadata_license>
  <project_license>BSD-3-Clause</project_license>
  <name>ParaView</name>
@@ -20,6 +20,9 @@
    datasets of exascale size as well as on laptops for smaller data.
   </p>
  </description>
+ <categories>
+  <category>Science</category>
+ </categories>
  <screenshots>
   <screenshot type="default">
    <caption>This visualization was a finalist in the SC21 Visualization Showcase. Credits: Francesca Samel et al. at Los Alamos National Lab.</caption>
