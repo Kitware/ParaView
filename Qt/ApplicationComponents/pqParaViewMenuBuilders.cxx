@@ -728,18 +728,18 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   // ParaView Release Notes
   versionString.replace('.', '-');
   new pqDesktopServicesReaction(
-    QUrl("https://blog.kitware.com/paraview-" + versionString + "-release-notes/"),
+    QUrl("https://www.kitware.com/paraview-" + versionString + "-release-notes/"),
     (menu.addAction("Release Notes") << pqSetName("actionReleaseNotes")));
 
   // -----------------
   menu.addSeparator();
 
   // Professional Support
-  new pqDesktopServicesReaction(QUrl("http://www.kitware.com/products/paraviewpro.html"),
+  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/custom-support/"),
     (menu.addAction("Professional Support") << pqSetName("actionProfessionalSupport")));
 
   // Professional Training
-  new pqDesktopServicesReaction(QUrl("http://www.kitware.com/products/protraining.php"),
+  new pqDesktopServicesReaction(QUrl("https://www.kitware.com/support/#training"),
     (menu.addAction("Professional Training") << pqSetName("actionTraining")));
 
   // Online Tutorials
@@ -747,7 +747,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction("Online Tutorials") << pqSetName("actionTutorials")));
 
   // Online Blogs
-  new pqDesktopServicesReaction(QUrl("https://blog.kitware.com/tag/ParaView/"),
+  new pqDesktopServicesReaction(QUrl("https://www.kitware.com/tag/ParaView/"),
     (menu.addAction("Online Blogs") << pqSetName("actionBlogs")));
 
 #if !defined(__APPLE__)
