@@ -1,0 +1,200 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkOCCTReader"
+           name="OCCTReaderBase">
+      <Documentation long_help="Reads OCCT files."
+                     short_help="Reads OCCT files.">
+        Reader for open cascade files step, iges.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The file name for the OCCT reader.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty name="LinearDeflection"
+                            command="SetLinearDeflection"
+                            number_of_elements="1"
+                            default_values="0.1">
+        <Documentation>
+          Limits the distance between a curve and the resulting tesselation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="AngularDeflection"
+                            command="SetAngularDeflection"
+                            number_of_elements="1"
+                            default_values="0.5">
+        <Documentation>
+          Limits the angle between two subsequent segments.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="RelativeDeflection"
+                         command="SetRelativeDeflection"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Determines if the deflection values are relative to object size.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ReadWire"
+                         command="SetReadWire"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Determines if 1D cells will be read. If enabled, surface boundaries are read.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+
+    <!-- ==================================================================== -->
+    <Proxy base_proxygroup="internal_sources"
+           base_proxyname="OCCTReaderBase"
+           class="vtkOCCTReader"
+           name="STEPReaderCore">
+      <Documentation long_help="Reads STEP files."
+                     short_help="Reads STEP files.">
+        Reader for STEP files.
+      </Documentation>
+      <IntVectorProperty name="FileFormat"
+                         command="SetFileFormat"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+    </Proxy>
+    <!-- ==================================================================== -->
+    <Proxy base_proxygroup="internal_sources"
+           base_proxyname="OCCTReaderBase"
+           class="vtkOCCTReader"
+           name="IGESReaderCore">
+      <Documentation long_help="Reads IGES files."
+                     short_help="Reads IGES files.">
+        Reader for IGES files.
+      </Documentation>
+      <IntVectorProperty name="FileFormat"
+                         command="SetFileFormat"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="STEP Reader"
+                 name="STEPReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads STEP files."
+                     short_help="Reads STEP files.">
+        The STEP reader reads .step, .stp file extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="STEPReaderCore"/>
+        <ExposedProperties>
+          <Property name="LinearDeflection"/>
+          <Property name="AngularDeflection"/>
+          <Property name="RelativeDeflection"/>
+          <Property name="ReadWire"/>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader. If more than one file
+          is specified, the reader will switch to file series mode in which
+          it will pretend that it can support time and provide one file per time step.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="step stp" file_description="STEP File Reader"/>
+      </Hints>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="IGES Reader"
+                 name="IGESReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads IGES files."
+                     short_help="Reads IGES files.">
+        The IGES reader reads .iges file extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="IGESReaderCore"/>
+        <ExposedProperties>
+          <Property name="LinearDeflection"/>
+          <Property name="AngularDeflection"/>
+          <Property name="RelativeDeflection"/>
+          <Property name="ReadWire"/>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader. If more than one file
+          is specified, the reader will switch to file series mode in which
+          it will pretend that it can support time and provide one file per time step.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="iges" file_description="IGES File Reader"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

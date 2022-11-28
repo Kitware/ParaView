@@ -409,6 +409,8 @@ More advanced / less common options include:
     ParaView for e.g. CATALYST, this option allows building support for writing
     CGNS files. It will also build CGNSReader dependencies: HDF5 and CGNS. If
     `PARAVIEW_ENABLE_MPI` is `ON`, the parallel CGNS writer will also be built.
+  * `PARAVIEW_ENABLE_OCCT` (default `OFF`): Enable support for reading OpenCascade
+     file formats such as STEP and IGES.
 
 #### Plugin settings
 
