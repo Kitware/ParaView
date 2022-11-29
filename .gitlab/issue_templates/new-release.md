@@ -150,8 +150,10 @@ git submodule update --recursive --init
       - [ ] Pull the script for each release; it may have been updated since it
         was last used
       - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
+<!-- if not RC and patch == 0-->
       - [ ] Make sure that the backporting directive in the merge-request
         description skips the last commit such as: `Backport: master:HEAD~`
+<!-- endif -->
   - [ ] Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
