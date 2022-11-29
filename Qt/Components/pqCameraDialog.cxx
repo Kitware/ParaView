@@ -698,7 +698,7 @@ bool pqCameraDialog::addCurrentViewpointToCustomViewpoints(vtkSMRenderViewProxy*
   settings->endGroup();
   settings->beginGroup("ToolTips");
   settings->setValue(
-    QString::number(configs.size()), QString("Current Viewpoint %1").arg(configs.size() + 1));
+    QString::number(configs.size()), tr("Current Viewpoint %1").arg(configs.size() + 1));
   settings->endGroup();
   settings->endGroup();
   settings->alertSettingsModified();

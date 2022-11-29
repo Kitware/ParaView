@@ -87,6 +87,7 @@ include(ParaViewTesting)
 include(ParaViewClient)
 include(ParaViewPlugin)
 include(ParaViewPluginDebugging)
+include(ParaViewTranslations)
 include(vtkModuleWrapClientServer)
 include(CTest)
 set_property(CACHE BUILD_TESTING
@@ -489,6 +490,13 @@ else ()
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)
 
+  # Create a translation source file generation target and create the
+  # option-specified source files directory if not already created
+  if (PARAVIEW_BUILD_TRANSLATIONS)
+    file(MAKE_DIRECTORY "${PARAVIEW_TRANSLATIONS_DIRECTORY}")
+    add_custom_target(localization ALL)
+  endif()
+
   # ParaView assumes these are created. These should probably be moved to
   # distinct modules for easier handling however.
   set(VTK_USE_VIDEO_FOR_WINDOWS ON)
@@ -757,12 +765,24 @@ vtk_module_wrap_client_server(
   TARGET    paraview_client_server
   INSTALL_EXPORT ParaView)
 
+set(_paraview_server_manager_process_args)
+if (PARAVIEW_BUILD_TRANSLATIONS)
+  list(APPEND _paraview_server_manager_process_args
+    TRANSLATIONS_DIRECTORY "${PARAVIEW_TRANSLATIONS_DIRECTORY}"
+    TRANSLATIONS_TARGET "ServerManager-XMLs.ts")
+endif ()
+
 paraview_server_manager_process(
   MODULES   ${paraview_modules}
             ${vtk_modules}
   TARGET    paraview_server_manager
   XML_FILES paraview_server_manager_files
-  INSTALL_EXPORT ParaView)
+  INSTALL_EXPORT ParaView
+  ${_paraview_server_manager_process_args})
+
+if (PARAVIEW_BUILD_TRANSLATIONS)
+  add_dependencies(localization "ServerManager-XMLs.ts")
+endif()
 
 if (PARAVIEW_USE_PYTHON)
   if (PARAVIEW_USE_EXTERNAL_VTK)

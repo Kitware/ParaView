@@ -925,6 +925,9 @@ paraview_add_plugin(<name>
   [DOCUMENTATION_DEPENDENCIES <target>...]
 
   [FORCE_STATIC <ON|OFF>])
+
+  [TRANSLATIONS_DIRECTORY <directory>]
+  [TRANSLATIONS_TARGET    <target>]
 ```
 
   * `REQUIRED_ON_SERVER`: The plugin is required to be loaded on the server for
@@ -971,6 +974,10 @@ paraview_add_plugin(<name>
   * `EXPORT`: (Deprecated) Use `paraview_plugin_build(INSTALL_EXPORT)` instead.
   * `FORCE_STATIC`: (Defaults to `OFF`) If set, the plugin will be built
     statically so that it can be embedded into an application.
+  * `TRANSLATIONS_DIRECTORY`: (Defaults to `${CMAKE_CURRENT_BINARY_DIR}/Translations`)
+    The path of the directory where translation source files are stored.
+  * `TRANSLATION_TARGET` : The name of the target on which to add the ts file as
+    dependency.
 #]==]
 function (paraview_add_plugin name)
   if (NOT name STREQUAL _paraview_build_plugin)
@@ -981,7 +988,7 @@ function (paraview_add_plugin name)
 
   cmake_parse_arguments(_paraview_add_plugin
     "REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT"
-    "VERSION;EULA;EXPORT;MODULE_INSTALL_EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC;DOCUMENTATION_TOC"
+    "VERSION;EULA;EXPORT;MODULE_INSTALL_EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC;DOCUMENTATION_TOC;TRANSLATIONS_DIRECTORY;TRANSLATIONS_TARGET"
     "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES;MODULE_FILES;MODULE_ARGS;DOCUMENTATION_ADD_PATTERNS;DOCUMENTATION_DEPENDENCIES;INITIALIZERS;EXTRA_INCLUDES"
     ${ARGN})
 
@@ -1169,11 +1176,25 @@ function (paraview_add_plugin name)
       MODULES ${_paraview_add_plugin_MODULES}
       TARGET  "${_paraview_build_plugin}_client_server"
       ${_paraview_add_plugin_install_export_args})
+
+    if (NOT DEFINED _paraview_add_plugin_TRANSLATIONS_DIRECTORY)
+      set(_paraview_add_plugin_TRANSLATIONS_DIRECTORY
+        "${CMAKE_CURRENT_BINARY_DIR}/Translations")
+    endif ()
+    set(_paraview_add_plugin_translation_args)
+    if (_paraview_add_plugin_TRANSLATIONS_DIRECTORY AND _paraview_add_plugin_TRANSLATIONS_TARGET)
+      list(APPEND _paraview_add_plugin_translation_args
+        TRANSLATIONS_DIRECTORY "${_paraview_add_plugin_TRANSLATIONS_DIRECTORY}")
+      list(APPEND _paraview_add_plugin_translation_args
+        TRANSLATIONS_TARGET "${_paraview_add_plugin_TRANSLATIONS_TARGET}")
+    endif ()
+
     paraview_server_manager_process(
       MODULES   ${_paraview_add_plugin_MODULES}
       TARGET    "${_paraview_build_plugin}_server_manager_modules"
       ${_paraview_add_plugin_install_export_args}
-      XML_FILES _paraview_add_plugin_module_xmls)
+      XML_FILES _paraview_add_plugin_module_xmls
+      ${_paraview_add_plugin_translation_args})
 
     list(APPEND _paraview_add_plugin_required_libraries
       "${_paraview_build_plugin}_client_server"
