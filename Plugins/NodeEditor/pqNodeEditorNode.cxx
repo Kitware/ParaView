@@ -57,48 +57,7 @@
 // explicitly disabled.
 #include <pqDoubleLineEdit.h>
 
-namespace details
-{
-/**
- * Simple implementation of something like `std::optional`
- * XXX(c++17): remove this in favor of std::optional
- */
-template <typename T>
-struct Optional
-{
-  Optional()
-    : Value{}
-    , Valid{ false }
-  {
-  }
-  Optional(T arg)
-    : Value{ arg }
-    , Valid{ true }
-  {
-  }
-
-  operator bool() const { return Valid; }
-
-  const T Value;
-  const bool Valid;
-};
-
-template <typename T>
-Optional<T> safeGetValue(const QSettings& settings, const QString& key)
-{
-  if (settings.contains(key))
-  {
-    QVariant value = settings.value(key);
-    if (value.isValid() && value.canConvert<T>())
-    {
-      return Optional<T>{ value.value<T>() };
-    }
-  }
-
-  return Optional<T>();
-}
-};
-
+// ----------------------------------------------------------------------------
 pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
   pqNodeEditorNode::Verbosity::NORMAL
 };
@@ -423,15 +382,15 @@ void pqNodeEditorNode::importLayout(const QSettings& settings)
 {
   const QString nodeName = this->getNodeKey();
 
-  if (auto verbos = details::safeGetValue<int>(settings, nodeName + ".verbosity"))
+  if (auto verbos = pqNodeEditorUtils::safeGetValue<int>(settings, nodeName + ".verbosity"))
   {
     this->setVerbosity(static_cast<Verbosity>(verbos.Value));
   }
-  if (auto transfo = details::safeGetValue<QTransform>(settings, nodeName + ".transform"))
+  if (auto transfo = pqNodeEditorUtils::safeGetValue<QTransform>(settings, nodeName + ".transform"))
   {
     this->setTransform(transfo.Value);
   }
-  if (auto pos = details::safeGetValue<QPointF>(settings, nodeName + ".pos"))
+  if (auto pos = pqNodeEditorUtils::safeGetValue<QPointF>(settings, nodeName + ".pos"))
   {
     this->setPos(pos.Value);
   }

@@ -67,6 +67,18 @@ void pqNodeEditorView::keyReleaseEvent(QKeyEvent* event)
     this->deleteAction->trigger();
   }
 
+  if (event->key() == Qt::Key_N)
+  {
+    if (event->modifiers() == Qt::ControlModifier)
+    {
+      Q_EMIT this->annotate(true);
+    }
+    else if (event->modifiers() == Qt::NoModifier)
+    {
+      Q_EMIT this->annotate(false);
+    }
+  }
+
   return QWidget::keyReleaseEvent(event);
 }
 

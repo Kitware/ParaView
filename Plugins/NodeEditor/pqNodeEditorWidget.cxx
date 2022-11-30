@@ -21,6 +21,7 @@
 
 #include "pqNodeEditorWidget.h"
 
+#include "pqNodeEditorAnnotationItem.h"
 #include "pqNodeEditorEdge.h"
 #include "pqNodeEditorLabel.h"
 #include "pqNodeEditorNode.h"
@@ -66,8 +67,6 @@
 #include <QSettings>
 #include <QSpacerItem>
 #include <QVBoxLayout>
-
-#include <iostream>
 
 // ----------------------------------------------------------------------------
 class pqNodeEditorApplyBehavior : public pqApplyBehavior
@@ -249,6 +248,9 @@ int pqNodeEditorWidget::initializeSignals()
       }
     });
 
+  QObject::connect(
+    this->view, &pqNodeEditorView::annotate, this, &pqNodeEditorWidget::annotateNodes);
+
   return 1;
 }
 
@@ -352,6 +354,15 @@ int pqNodeEditorWidget::attachServerManagerListeners()
 
   QObject::connect(appCore, &pqApplicationCore::stateSaved, this,
     [this](vtkPVXMLElement* /*root*/) { this->exportLayout(); });
+
+  // Remove annotations when reset / connecting to a server
+  QObject::connect(smm, &pqServerManagerModel::serverAdded, [this](pqServer*) {
+    for (auto* annot : this->annotationRegistry)
+    {
+      this->scene->removeItem(annot);
+    }
+    this->annotationRegistry.clear();
+  });
 
   // source/filter creation
   QObject::connect(
@@ -1040,6 +1051,12 @@ void pqNodeEditorWidget::importLayout()
     {
       node.second->importLayout(settings);
     }
+    auto annotations = pqNodeEditorAnnotationItem::importAll(settings);
+    for (auto* annot : annotations)
+    {
+      this->scene->addItem(annot);
+      this->annotationRegistry.push_back(annot);
+    }
 
     this->actionZoom->trigger();
   }
@@ -1064,7 +1081,7 @@ void pqNodeEditorWidget::exportLayout()
   QSettings settings(filename, QSettings::Format::NativeFormat);
   if (!settings.isWritable())
   {
-    qWarning("NodeEditor: coudln't create a writable settings file, aborting");
+    qWarning("NodeEditor: couldn't create a writable settings file, aborting");
     return;
   }
 
@@ -1072,6 +1089,47 @@ void pqNodeEditorWidget::exportLayout()
   for (auto node : this->nodeRegistry)
   {
     node.second->exportLayout(settings);
+  }
+  pqNodeEditorAnnotationItem::exportAll(settings, this->annotationRegistry);
+}
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorWidget::annotateNodes(bool del)
+{
+  if (del)
+  {
+    auto& registry = this->annotationRegistry;
+    registry.erase(std::remove_if(registry.begin(), registry.end(),
+                     [this](pqNodeEditorAnnotationItem* annot) {
+                       const bool selected = annot->isSelected();
+                       if (selected)
+                       {
+                         this->scene->removeItem(annot);
+                       }
+                       return selected;
+                     }),
+      registry.end());
+  }
+  else
+  {
+    QRectF bbox;
+    for (const auto& nodeR : this->nodeRegistry)
+    {
+      auto* node = nodeR.second;
+      if (node->getOutlineStyle() == pqNodeEditorNode::OutlineStyle::SELECTED_FILTER)
+      {
+        bbox = bbox.united(node->boundingRect().translated(node->pos()));
+      }
+    }
+
+    if (bbox.isValid())
+    {
+      constexpr float MARGIN = 30.f;
+      bbox.adjust(-MARGIN, -MARGIN, MARGIN, MARGIN);
+      auto* annot = new pqNodeEditorAnnotationItem(bbox);
+      this->scene->addItem(annot);
+      this->annotationRegistry.push_back(annot);
+    }
   }
 }
 

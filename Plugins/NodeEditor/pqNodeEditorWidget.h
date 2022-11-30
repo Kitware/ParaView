@@ -28,6 +28,7 @@
 
 #include <unordered_map>
 
+class pqNodeEditorAnnotationItem;
 class pqNodeEditorApplyBehavior;
 class pqNodeEditorEdge;
 class pqNodeEditorNode;
@@ -142,6 +143,15 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void importLayout();
   ///@}
 
+  /**
+   * Handle creation and delection of annotation items. Called when the view catch the
+   * related user input.
+   *
+   * @param del if true then will delete all selected annotation items. Id false
+   * it will create a new annotation item that will contain currently selected pipeline items.
+   */
+  void annotateNodes(bool del);
+
 protected:
   void initializeNode(pqNodeEditorNode* node, vtkIdType id);
 
@@ -187,6 +197,8 @@ private:
    *  The key is the global identifier of the node proxy.
    */
   std::unordered_map<vtkIdType, std::vector<pqNodeEditorEdge*>> edgeRegistry;
+
+  std::vector<pqNodeEditorAnnotationItem*> annotationRegistry;
 };
 
 #endif // pqNodeEditorWidget_h
