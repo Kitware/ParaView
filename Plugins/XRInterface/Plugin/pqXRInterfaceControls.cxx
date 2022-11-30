@@ -64,6 +64,9 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   QObject::connect(this->Internals->exitButton, &QPushButton::clicked,
     std::bind(&vtkPVXRInterfaceHelper::Quit, this->Helper));
 
+  QObject::connect(this->Internals->resetCameraButton, &QPushButton::clicked, this,
+    &pqXRInterfaceControls::resetCamera);
+
   QObject::connect(this->Internals->resetPositionsButton, &QPushButton::clicked, this,
     &pqXRInterfaceControls::resetPositions);
 
@@ -183,6 +186,12 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
 pqXRInterfaceControls::~pqXRInterfaceControls()
 {
   delete this->Internals;
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::resetCamera()
+{
+  this->Helper->ResetCamera();
 }
 
 //------------------------------------------------------------------------------

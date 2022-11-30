@@ -83,6 +83,7 @@ protected:
   bool NoForward;
 
 protected Q_SLOTS:
+  void resetCamera();
   void resetPositions();
   void assignFieldValue();
 
