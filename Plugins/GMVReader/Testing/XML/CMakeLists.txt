@@ -28,7 +28,7 @@ if (TEST "pv.GMVReaderInvalidFiles${suffix}")
 endif ()
 
 # Increase timeout for BasicRead as the data can take some time to read
-if (TEST "pvcs.GMVReaderBasicRead${suffix}")
+if (TEST "pv.GMVReaderBasicRead${suffix}")
   set_property(TEST "pv.GMVReaderBasicRead${suffix}"
     PROPERTY TIMEOUT 300)
 endif ()
