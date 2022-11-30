@@ -194,7 +194,7 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       filters += ";;PPM image (*.ppm)";
       filters += ";;JPG image (*.jpg)";
       pqFileDialog file_dialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Screenshot:"),
-        baselineDir.path(), filters);
+        baselineDir.path(), filters, false);
       file_dialog.setObjectName("FileSaveScreenshotDialog");
       file_dialog.setFileMode(pqFileDialog::AnyFile);
 

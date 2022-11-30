@@ -186,7 +186,7 @@ void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
   }
   stream << "All files (*)";
 
-  pqFileDialog fd(remote ? server : nullptr, this, "Load Plugin", QString(), filterString);
+  pqFileDialog fd(remote ? server : nullptr, this, "Load Plugin", QString(), filterString, false);
   if (fd.exec() == QDialog::Accepted)
   {
     QString plugin = fd.getSelectedFiles()[0];

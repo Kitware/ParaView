@@ -342,7 +342,7 @@ QString pqAboutDialog::formatToText()
 void pqAboutDialog::saveToFile()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save to File"), QString(),
-    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)");
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)", false);
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {

@@ -289,7 +289,7 @@ void pqTimerLogDisplay::save()
   filters += ";;All files (*)";
 
   pqFileDialog* const fileDialog =
-    new pqFileDialog(nullptr, this, tr("Save Timer Log"), QString(), filters);
+    new pqFileDialog(nullptr, this, tr("Save Timer Log"), QString(), filters, false);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("TimerLogSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);

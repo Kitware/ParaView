@@ -1480,7 +1480,7 @@ void pqFileDialog::showEvent(QShowEvent* _showEvent)
 QString pqFileDialog::getSaveFileName(pqServer* server, QWidget* parentWdg, const QString& title,
   const QString& directory, const QString& filter)
 {
-  pqFileDialog fileDialog(server, parentWdg, title, directory, filter);
+  pqFileDialog fileDialog(server, parentWdg, title, directory, filter, false);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)

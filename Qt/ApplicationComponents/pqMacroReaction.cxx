@@ -58,7 +58,7 @@ void pqMacroReaction::createMacro()
 
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(),
     tr("Open Python File to create a Macro:"), QString(),
-    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"));
+    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"), false);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)

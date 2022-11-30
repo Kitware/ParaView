@@ -183,7 +183,7 @@ void pqFileChooserWidget::chooseFile()
     }
   }
 
-  pqFileDialog dialog(this->Server, this, title, QString(), filters);
+  pqFileDialog dialog(this->Server, this, title, QString(), filters, false);
 
   if (this->UseDirectoryMode)
   {

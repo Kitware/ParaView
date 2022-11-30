@@ -886,7 +886,8 @@ void pqPresetDialog::importPresets()
     tr("Supported Presets/Color Map Files") + QString(" (*.json *.xml *.ct);;") +
       tr("ParaView Color/Opacity Presets") + QString(" (*.json);;") + tr("Legacy Color Maps") +
       QString(" (*.xml);;") + tr("VisIt Color Table") + QString(" (*.ct);;") + tr("All Files") +
-      QString(" (*)"));
+      QString(" (*)"),
+    false);
   dialog.setObjectName("ImportPresets");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted && !dialog.getSelectedFiles().empty())
@@ -922,7 +923,8 @@ void pqPresetDialog::exportPresets()
 {
   pqFileDialog dialog(nullptr, this, tr("Export Preset(s)"), QString(),
     tr("ParaView Color/Opacity Presets") + QString(" (*.json);;") + tr("All Files") +
-      QString(" (*)"));
+      QString(" (*)"),
+    false);
   dialog.setObjectName("ExportPresets");
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())

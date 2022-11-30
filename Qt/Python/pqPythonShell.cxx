@@ -455,7 +455,7 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
 void pqPythonShell::runScript()
 {
   pqFileDialog dialog(nullptr, this, tr("Run Script"), QString(),
-    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"));
+    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"), false);
   dialog.setObjectName("PythonShellRunScriptDialog");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted)

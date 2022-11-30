@@ -164,7 +164,7 @@ void pqEqualizerPropertyWidget::placeWidget()
 void pqEqualizerPropertyWidget::saveEqualizer()
 {
   pqFileDialog dialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Save Equalizer:"), QString(), "CSV (*.csv)");
+    nullptr, pqCoreUtilities::mainWidget(), tr("Save Equalizer:"), QString(), "CSV (*.csv)", false);
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (QFileDialog::Accepted == dialog.exec())
   {
@@ -189,7 +189,7 @@ void pqEqualizerPropertyWidget::saveEqualizer()
 void pqEqualizerPropertyWidget::loadEqualizer()
 {
   pqFileDialog dialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Load Equalizer:"), QString(), "CSV (*.csv)");
+    nullptr, pqCoreUtilities::mainWidget(), tr("Load Equalizer:"), QString(), "CSV (*.csv)", false);
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (QFileDialog::Accepted == dialog.exec())
   {

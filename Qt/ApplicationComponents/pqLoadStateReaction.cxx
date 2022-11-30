@@ -150,7 +150,7 @@ void pqLoadStateReaction::loadState()
 #endif
       ");;" +
       tr("All files") + " (*)",
-    false /* groupFiles */);
+    false);
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)

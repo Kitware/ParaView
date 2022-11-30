@@ -83,7 +83,7 @@ bool pqSaveStateReaction::saveState()
     tr("ParaView state file") + QString(" (*.pvsm);;") + tr("All Files") + QString(" (*)");
 #endif
   pqFileDialog fileDialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt, false);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);

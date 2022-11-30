@@ -184,7 +184,7 @@ void pqFileDialogTestWidget::openFileDialog()
   }
 
   pqFileDialog diag(
-    server, this, this->FileMode->currentText(), testDirName, this->FileFilter->text());
+    server, this, this->FileMode->currentText(), testDirName, this->FileFilter->text(), false);
   QVariant mode = this->FileMode->itemData(this->FileMode->currentIndex());
   diag.setFileMode(static_cast<pqFileDialog::FileMode>(mode.toInt()));
   QObject::connect(&diag, SIGNAL(filesSelected(const QList<QStringList>&)), this,

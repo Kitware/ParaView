@@ -83,7 +83,7 @@ void pqSaveAnimationGeometryReaction::saveAnimationGeometry()
 
   QString filters = "ParaView Data files (*.pvd);;All files (*)";
   pqFileDialog fileDialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
-    tr("Save Animation Geometry"), QString(), filters);
+    tr("Save Animation Geometry"), QString(), filters, false);
   fileDialog.setObjectName("FileSaveAnimationDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)

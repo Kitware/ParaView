@@ -776,7 +776,7 @@ void pqSESAMEConversionsPanelWidget::onConversionFileChanged()
   QString filters = tr("Conversion files (*.xml)");
   // Note: As of now files are only loaded from the client and not the server
   pqFileDialog fileDialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Conversions File"), QString(), filters);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Conversions File"), QString(), filters, false);
   fileDialog.setObjectName("OpenConversionFileDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
