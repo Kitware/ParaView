@@ -14,8 +14,8 @@ if (BUILD_SHARED_LIBS)
     LoadConversions.xml
     SandiaLoadSESAME.xml
     SESAMEContouring.xml
-    SimulationData1.xml
-    SimulationData2.xml
+    SimulationData.xml
+    SimulationDataMulti.xml
     SimulationDataSelections.xml
     ViewAspectRatio.xml
     ViewLogScaling.xml
