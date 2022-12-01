@@ -2242,6 +2242,21 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::ResetCamera()
+{
+  if (!this->Renderer)
+  {
+    return;
+  }
+
+  // Close menu
+  this->ToggleShowControls();
+
+  this->Renderer->ResetCamera();
+  this->Renderer->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::ResetPositions()
 {
   if (!this->Renderer)

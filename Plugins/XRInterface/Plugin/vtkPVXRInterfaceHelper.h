@@ -113,6 +113,11 @@ public:
   // if in VR close out the event loop
   void Quit();
 
+  /**
+   * Reset camera with the center of the dataset bounding box as focal point.
+   */
+  void ResetCamera();
+
   // reset all prop positions
   void ResetPositions();
 

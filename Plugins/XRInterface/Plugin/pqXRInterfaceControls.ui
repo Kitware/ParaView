@@ -153,6 +153,12 @@
       </item>
       <item>
        <widget class="QComboBox" name="movementStyle">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
         <item>
          <property name="text">
           <string>Flying</string>
@@ -163,6 +169,19 @@
           <string>Grounded</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="resetCameraButton">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Reset camera</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -183,7 +202,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>40</height>
+          <height>30</height>
          </size>
         </property>
         <property name="text">
@@ -196,7 +215,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>40</height>
+          <height>30</height>
          </size>
         </property>
         <property name="styleSheet">
