@@ -31,6 +31,7 @@
 set(classes
   vtk2DWidgetRepresentation
   vtk3DWidgetRepresentation
+  vtkProtractorRepresentation
   vtkAMROutlineRepresentation
   vtkAMRStreamingPriorityQueue
   vtkAMRStreamingVolumeRepresentation

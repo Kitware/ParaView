@@ -874,6 +874,7 @@ if(NOT APPLE)
 endif()
 
 SET(TESTS_WITH_BASELINES
+  Protractor.xml
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml

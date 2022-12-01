@@ -43,6 +43,7 @@
     show_in_toolbar="1">
     <Proxy group="sources" name="Axes" omit_from_toolbar="1" />
     <Proxy group="sources" name="Ruler" />
+    <Proxy group="sources" name="Protractor" />
   </Category>
 
   <!-- This section list all sources that can be available in ParaView and their icons -->
@@ -73,6 +74,7 @@
   <Proxy group="sources" name="RTAnalyticSource" />
   <Proxy group="sources" name="RandomHyperTreeGridSource" />
   <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler.svg"/>
+  <Proxy group="sources" name="Protractor" icon=":/pqWidgets/Icons/pqProtractor.svg"/>
   <Proxy group="sources" name="SphereSource" />
   <Proxy group="sources" name="SplineSource" />
   <Proxy group="sources" name="SuperquadricSource" />

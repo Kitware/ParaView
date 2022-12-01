@@ -10987,6 +10987,116 @@
       <!-- End of RulerSourceRepresentation -->
     </RepresentationProxy>
     <!-- =================================================================== -->
+    <RepresentationProxy class="vtkProtractorRepresentation"
+                         name="ProtractorRepresentation"
+                         processes="client|dataserver|renderserver"
+                         si_class="vtkSIProxy">
+      <Documentation>
+        Representation proxy used to show an angle.
+        The angle is defined by 3 points and the representation shows 2 lines
+        as well as the angle value formed by these 2 lines as a label.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetLineColor"
+                            default_values="0 1 0"
+                            name="LineColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Set the color of the ruler.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLineThickness"
+                            default_values="1"
+                            name="LineThickness"
+                            number_of_elements="1" >
+        <DoubleRangeDomain max="10" min="1" name="range" />
+        <Documentation>Set the thickness of all lines.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetArrowStyle"
+                         default_values="0"
+                         name="ArrowStyle"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>Set the style of the tip of each axes.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Filled" value="0" />
+          <Entry text="Empty" value="1" />
+          <Entry text="Hollow" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="TextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Font Properties" panel_widget="FontEditor">
+            <Property name="Color" function="Color"/>
+            <Property name="Opacity" function="Opacity"/>
+            <Property name="FontFamily" function="Family"/>
+            <Property name="FontFile" function="File"/>
+            <Property name="Bold" function="Bold"/>
+            <Property name="Italic" function="Italics" />
+            <Property name="Shadow" function="Shadow"/>
+            <Property name="Justification" function="Justification" default_values="1"/>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <DoubleVectorProperty command="SetLabelFactorSize"
+                            default_values="1"
+                            name="LabelFactorSize"
+                            number_of_elements="1" >
+        <DoubleRangeDomain max="2" min="0.1" name="range" />
+        <Documentation>Set a size factor for the label, applied to the computed optimal size.</Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty command="SetLabelFormat"
+                            default_values="%6.3g"
+                            name="LabelFormat"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          This should be a printf-style format string. You can do things
+          like limit the number of significant digits, add prefixes/suffixes,
+          basically anything that printf can do. An empty string or a string
+          without the % symbol results in no label.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty command="SetAngleScale"
+                            default_values="1"
+                            name="AngleScale"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Set the scale factor from degrees. The label will be defined in terms of the scaled space. For
+          example, to use radians in the label set the scale factor to pi/180.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End of ProtractorRepresentation -->
+    </RepresentationProxy>
+    <!-- =================================================================== -->
     <RepresentationProxy class="vtkProgressBarSourceRepresentation"
                          name="ProgressBarSourceRepresentation"
                          processes="client|dataserver|renderserver"

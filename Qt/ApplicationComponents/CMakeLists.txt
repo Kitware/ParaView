@@ -32,6 +32,7 @@ set(classes
   pqAboutDialogReaction
   pqAddToFavoritesReaction
   pqAlwaysConnectedBehavior
+  pqAnglePropertyWidget
   pqAnimationShortcutDecorator
   pqAnimationShortcutWidget
   pqAnimationTimeToolbar

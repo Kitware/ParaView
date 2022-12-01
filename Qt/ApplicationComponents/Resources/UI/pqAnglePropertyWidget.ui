@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AnglePropertyWidget</class>
+ <widget class="QWidget" name="AnglePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>379</width>
+    <height>189</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item row="1" column="0" colspan="4">
+    <widget class="QLabel" name="labelAngle">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Angle: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;na&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Widget</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelPoint1">
+     <property name="text">
+      <string>Point 1</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqDoubleLineEdit" name="point1X"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqDoubleLineEdit" name="point1Y"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="pqDoubleLineEdit" name="point1Z"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelCenter">
+     <property name="text">
+      <string>Center</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="pqDoubleLineEdit" name="centerX"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="pqDoubleLineEdit" name="centerY"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="pqDoubleLineEdit" name="centerZ"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labelPoint2">
+     <property name="text">
+      <string>Point 2</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="pqDoubleLineEdit" name="point2X"/>
+   </item>
+   <item row="5" column="2">
+    <widget class="pqDoubleLineEdit" name="point2Y"/>
+   </item>
+   <item row="5" column="3">
+    <widget class="pqDoubleLineEdit" name="point2Z"/>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <widget class="QLabel" name="pickLabel">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Note: Use '1'/'C'/'2' to place P1/Center/P2 on a mesh respectively. Combine with 'Ctrl' to snap to the closest mesh point.
+Use 'X'/'Y'/'Z' to constrain the movement to the X / Y / Z axis respectively.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+
+ <resources/>
+ <connections/>
+</ui>

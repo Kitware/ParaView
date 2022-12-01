@@ -836,6 +836,34 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyLineSource"
+                 name="Protractor">
+                 <Documentation long_help="This is a poly-line source that can be used to measure an angle between 3 points"
+                 short_help="Create a protractor">The protractor can be used to
+                 interactively (using a 3D widget) or manually (using the
+                 entries on the user interface) specify 3 points and then
+                 determine the angle between these three. To place
+                 points on the surface of any dataset, one can use the 'p'
+                 key shortcut.</Documentation>
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+      </DoubleVectorProperty>
+      <PropertyGroup label="Angle Parameters" panel_widget="InteractiveAngle">
+        <Property function="HandlePositions" name="Points" />
+      </PropertyGroup>
+
+      <Hints>
+        <Representation view="RenderView" type="ProtractorRepresentation" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkOutlineSource"
                  label="Outline Source"
                  name="OutlineSource">
