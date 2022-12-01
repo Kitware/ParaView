@@ -150,8 +150,7 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
 
   vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
   vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
-  vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pxm->NewProxy("misc", "SaveScreenshot"));
+  auto proxy = vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("misc", "SaveScreenshot"));
   vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(proxy);
   if (!shProxy)
   {
@@ -220,7 +219,9 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)
   {
-    shProxy->WriteImage(filename.toUtf8().data());
+    const bool embedParaViewState =
+      vtkSMPropertyHelper(shProxy, "EmbedParaViewState").GetAsInt() == 1;
+    shProxy->WriteImage(filename.toUtf8().data(), vtkPVSession::CLIENT, embedParaViewState);
   }
 
   if (layout)

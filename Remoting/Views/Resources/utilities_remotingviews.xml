@@ -3191,18 +3191,23 @@
         </Hints>
       </ProxyProperty>
 
-      <!-- FIXME:: deprecated
-      <IntVectorProperty name="ImageQuality"
-        number_of_elements="1"
-        default_values="100"
-        panel_visibility="advanced">
-        <IntRangeDomain name="range" min="0" max="100" />
+      <IntVectorProperty name="EmbedParaViewState"
+                         label="Embed ParaView State"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
-          Specify output image quality (or compression), if applicable.
-          **0** - low quality, **100** - high quality.
+          Set whether to embed the ParaView state in the image as metadata.
+          This option is only available for PNG.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Format"
+                                   value="PNG">
+           </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
-      -->
 
       <PropertyGroup label="Size and Scaling">
         <Property name="SaveAllViews" />
@@ -3223,6 +3228,10 @@
 
       <PropertyGroup label="Image Options">
         <Property name="Format" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Metadata">
+        <Property name="EmbedParaViewState" />
       </PropertyGroup>
     </SaveScreenshotProxy>
 
