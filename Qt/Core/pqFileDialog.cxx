@@ -669,7 +669,7 @@ void pqFileDialog::onResetFavoritesToSystemDefault()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onFavoritesContextMenuRequested(const QPoint& menuPos)
 {
-  QMenu menu;
+  QMenu menu(this); // Make sure to set the parent to `this` to solve #21680
   menu.setObjectName("FileDialogFavoritesContextMenu");
 
   QModelIndex index = this->Implementation->Ui.Favorites->indexAt(menuPos);
