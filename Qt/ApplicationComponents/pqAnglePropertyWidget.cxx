@@ -53,7 +53,7 @@ struct pqAnglePropertyWidget::pqInternals
 {
   Ui::AnglePropertyWidget Ui;
   pqPropertyLinks InternalLinks;
-  std::array<double, 9> InlinedCoordinates{ 1, 0, 0, 0, 0, 0, 0, 1, 0 };
+  std::array<double, 9> InlinedCoordinates{ { 1, 0, 0, 0, 0, 0, 0, 1, 0 } };
 };
 
 //-----------------------------------------------------------------------------
