@@ -152,7 +152,7 @@ int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLE
 const char** vtkSMChartSeriesListDomain::GetKnownSeriesNames()
 {
   static const char* strings_to_check[] = { "bin_extents", "Time", "time", "arc_length", "XArray",
-    "x_array", nullptr };
+    "x_array", "Frequency", nullptr };
   return strings_to_check;
 }
 //----------------------------------------------------------------------------
