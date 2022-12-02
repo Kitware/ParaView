@@ -22,6 +22,7 @@ Page | Description
 [ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
 [Anatomy of Catalyst Python Module (Version 2.0)](@ref CatalystPythonScriptsV2) | Understanding Catalyst Python modules.
 [String Formatting Arguments](@ref StringFormattingArguments) | String formatting arguments that are used for formatting formattable strings.
+[Localization Howto](@ref LocalizationHowto) | Description of the translation workflow and how comply to it.
 
 
 ParaView Catalyst
