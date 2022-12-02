@@ -189,7 +189,7 @@ int vtkDataTabulator::RequestData(
     iter->Delete();
 
     auto output = this->Transform(xInput);
-    outputPD->ShallowCopy(output);
+    outputPD->CompositeShallowCopy(vtkPartitionedDataSet::SafeDownCast(output));
   }
   else
   {

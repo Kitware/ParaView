@@ -96,11 +96,12 @@ int vtkSelectArraysExtractBlocks::RequestData(vtkInformation* vtkNotUsed(request
   {
     pipeline.front()->SetInputDataObject(input);
     pipeline.back()->Update();
-    output->ShallowCopy(pipeline.back()->GetOutputDataObject(0));
+    output->CompositeShallowCopy(
+      vtkCompositeDataSet::SafeDownCast(pipeline.back()->GetOutputDataObject(0)));
   }
   else
   {
-    output->ShallowCopy(input);
+    output->CompositeShallowCopy(input);
   }
 
   return 1;

@@ -147,7 +147,8 @@ int vtkPVPlaneCutter::RequestData(
       this->AMRPlaneCutter->SetUseNativeCutter(this->GetUseNativeCutter());
       this->AMRPlaneCutter->SetInputData(inOverlappingAMR);
       this->AMRPlaneCutter->Update();
-      vtkMultiBlockDataSet::SafeDownCast(output)->ShallowCopy(this->AMRPlaneCutter->GetOutput());
+      vtkMultiBlockDataSet::SafeDownCast(output)->CompositeShallowCopy(
+        this->AMRPlaneCutter->GetOutput());
       return 1;
     }
   }

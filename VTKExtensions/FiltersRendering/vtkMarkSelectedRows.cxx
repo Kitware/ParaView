@@ -115,7 +115,7 @@ int vtkMarkSelectedRows::RequestData(
     extractedInput->GetNumberOfElements(vtkDataObject::ROW) == 0)
   {
     // the extracted input doesn't exist, no need to mark anything selected.
-    output->ShallowCopy(input);
+    output->CompositeShallowCopy(input);
     return 1;
   }
 

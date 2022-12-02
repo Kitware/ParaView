@@ -138,7 +138,9 @@ int vtkPVContourFilter::RequestData(
         vtkSmartPointer<vtkMultiBlockDataSet> out(vtkSmartPointer<vtkMultiBlockDataSet>::New());
         amrDC->SetIsoValue(this->GetValue(i));
         amrDC->Update();
-        out->ShallowCopy(amrDC->GetOutput(0));
+        // amrDC output is generate from an empty multiblock dataset on each execution
+        // so CompositeShallowCopy is safe here
+        out->CompositeShallowCopy(amrDC->GetOutput(0));
         vtkMultiBlockDataSet::SafeDownCast(outDataObj)->SetBlock(i, out);
       }
       return 1;
