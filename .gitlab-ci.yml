@@ -102,7 +102,7 @@ fedora35-shared-debug-mpi-python-qt:test:
         - fedora35-shared-debug-mpi-python-qt:build
     needs:
         - fedora35-shared-debug-mpi-python-qt:build
-    timeout: 120 minutes
+    timeout: 180 minutes
 
 fedora35-shared-mpi-python-qt-vtkmoverride:build:
     extends:
