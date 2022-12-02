@@ -93,7 +93,7 @@ public:
 
   pqInternals()
   {
-    this->Timer.setInterval(DEFAULT_INTERVAL);
+    this->Timer.setInterval(std::numeric_limits<int>::max());
     this->Timer.setSingleShot(true);
   }
 
