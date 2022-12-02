@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014-2018 Kitware, Inc. -->
 <component type="desktop-application">
- <id>org.paraview.paraview</id>
+ <id>org.paraview.ParaView</id>
  <metadata_license>CC-BY-4.0</metadata_license>
- <project_license>BSD</project_license>
+ <project_license>BSD-3-Clause</project_license>
  <name>ParaView</name>
  <summary>Data analysis and visualization</summary>
  <description>
@@ -25,24 +25,28 @@
  </categories>
  <screenshots>
   <screenshot type="default">
-   <caption>Using ParaView to compare simulated and analytical results (Image courtesy of Sandia National Labs)</caption>
-   <image width="902" height="677">http://www.paraview.org/wp-content/uploads/2014/04/full_AlegraVV.png</image>
+   <caption>This visualization was a finalist in the SC21 Visualization Showcase. Credits: Francesca Samel et al. at Los Alamos National Lab.</caption>
+   <image width="1117" height="826">https://www.paraview.org/wp-content/uploads/2022/10/energy-exascale-earth-system-model-global-climate-model-data.jpg</image>
   </screenshot>
   <screenshot>
-   <caption>Global Seismic Wave Propagation Simulation (Contributors from ICES, The University of Texas at Austin: Carsten Burstedde, Omar Ghattas, James R. Martin, Georg Stadler, Lucas C. Wilcox Visualization at the Texas Advanced Computing Center, the University of Texas at Austin by Greg Abram)</caption>
-   <image width="812" height="468">http://www.paraview.org/wp-content/uploads/2014/04/seismic.jpg</image>
+   <caption>Emergence of skin micro-wrinkles. Courtesy of Georges Limbert, University of Southampton, UK and University of Cape Town, South Africa.</caption>
+   <image width="1920" height="1420">https://www.paraview.org/wp-content/uploads/2022/10/Soft-Matter-cover-ARTWORK.jpg</image>
   </screenshot>
   <screenshot>
-   <caption>Polar Vortex Breakdown Simulation (Image courtesy of Sandia National Labs)</caption>
-   <image width="940" height="661">http://www.paraview.org/wp-content/uploads/2014/04/full_PolarVortexBreakdown.png</image>
+   <caption>ParaView was used in Russell Taylor’s Comp 715: Visualization in the Sciences class at the University of North Carolina at Chapel Hill. Author: Jared Vicory et al.</caption>
+   <image width="1049" height="776">https://www.paraview.org/wp-content/uploads/2022/10/full_harmonic_tremor.jpg</image>
   </screenshot>
   <screenshot>
-   <caption>Hydrodynamic simulations of quark-gluon plasma (Russell Taylor's Comp 715: Visualization in the Sciences class at the University of North Carolina at Chapel Hill. Author: Joo Hwi Lee and Zhigang (Alfred) Zhong Copyright: Data courtesy of Steffen Bass and Hannah Peterson, Duke Physics)</caption>
-   <image width="875" height="700">http://www.paraview.org/wp-content/uploads/2014/04/full_hydrodynamic_simulation.png</image>
+   <caption>Temporal plane jet DNS simulation</caption>
+   <image width="1024" height="728">https://www.paraview.org/wp-content/uploads/2022/11/full_temporal_plane_jet_DNS_simulation.png.jpg</image>
+  </screenshot>
+  <screenshot>
+   <caption>Visualization of MIT General Circulation Model data showing surface temperature, VHEr and bathymetry</caption>
+   <image width="1593" height="1178">https://www.paraview.org/wp-content/uploads/2022/10/MITgcm.jpg</image>
   </screenshot>
   <screenshot>
    <caption>Cross Wind Fire Simulation (Image courtesy of Sandia National Labs)</caption>
-   <image width="902" height="609">http://www.paraview.org/wp-content/uploads/2014/04/0_full_Fire.png</image>
+   <image width="1540" height="1139">https://www.paraview.org/wp-content/uploads/2022/10/0_full_Fire.jpg</image>
   </screenshot>
  </screenshots>
  <launchable type="desktop-id">org.paraview.ParaView.desktop</launchable>
