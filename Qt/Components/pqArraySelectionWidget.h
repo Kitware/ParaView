@@ -153,6 +153,9 @@ private:
   friend class Model;
 
   Model* realModel() const;
+
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  void resizeSectionsToContents();
 };
 
 #endif
