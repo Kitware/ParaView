@@ -444,6 +444,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OMFReader.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OpacityWidgetRange.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ParallelCoordinatesView.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ParallelCoordinatesView_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice.png}"
@@ -1630,6 +1631,7 @@ set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
 set(SelectionBlocks_DISABLE_CRS TRUE)
+set(SelectionEditor_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
