@@ -5,27 +5,14 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ProgrammableSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OutputDataSetType/ComboBox" command="activated" arguments="vtkTable" />
   <!-- Create a table. Script is :
-obj = self.GetTableOutput()
-time = vtk.vtkDoubleArray()
-time.SetName("Time")
-data = vtk.vtkDoubleArray()
-data.SetName("Data")
-obj.AddColumn(time)
-obj.AddColumn(data)
-gc = vtk.vtkMultiProcessController.GetGlobalController()
-if gc.GetLocalProcessId() == 0:
-    time.InsertNextValue(0.0)
-    time.InsertNextValue(0.2)
-    time.InsertNextValue(0.4)
-    time.InsertNextValue(0.6)
-    data.InsertNextValue(1.0)
-    data.InsertNextValue(1.0)
-    data.InsertNextValue(1.0)
-    data.InsertNextValue(1.0)
+time = numpy.linspace(0, 1, 10000, endpoint=False)
+signal = numpy.sin(2 * numpy.pi * 1000 * time)
+output.RowData.append(time, "Time")
+output.RowData.append(signal, "Signal")
   -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script"
            command="set_string"
-           arguments="obj = self.GetTableOutput()&#xA;time = vtk.vtkDoubleArray()&#xA;time.SetName(&quot;Time&quot;)&#xA;data = vtk.vtkDoubleArray()&#xA;data.SetName(&quot;Data&quot;)&#xA;obj.AddColumn(time)&#xA;obj.AddColumn(data)&#xA;gc = vtk.vtkMultiProcessController.GetGlobalController()&#xA;if gc.GetLocalProcessId() == 0:&#xA;  time.InsertNextValue(0.0)&#xA;  time.InsertNextValue(0.2)&#xA;  time.InsertNextValue(0.4)&#xA;  time.InsertNextValue(0.6)&#xA;  data.InsertNextValue(1.0)&#xA;  data.InsertNextValue(1.0)&#xA;  data.InsertNextValue(1.0)&#xA;  data.InsertNextValue(1.0)"/>
+           arguments="time = numpy.linspace(0, 1, 10000, endpoint=False)&#xA;signal = numpy.sin(2 * numpy.pi * 1000 * time)&#xA;output.RowData.append(time, &quot;Time&quot;)&#xA;output.RowData.append(signal, &quot;Signal&quot;)"/>
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/Close" command="activate" arguments="" />
 
@@ -36,7 +23,7 @@ if gc.GetLocalProcessId() == 0:
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TableFFT1.png" width="400" height="400" />
 
   <!-- Check optimize for real input otion -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OptimizeForRealInput/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OneSidedSpectrum/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TableFFT2.png" width="400" height="400" />
 </pqevents>
