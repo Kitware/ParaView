@@ -1,0 +1,17 @@
+<VTKFile type="PUnstructuredGrid" version="1.0" byte_order="LittleEndian" header_type="UInt64">
+  <PUnstructuredGrid GhostLevel="1">
+    <PPointData>
+      <PDataArray type="Float64" Name="IntegrationTime"/>
+      <PDataArray type="Float64" Name="ParticleDensity"/>
+      <PDataArray type="Float64" Name="ParticleDiameter"/>
+      <PDataArray type="Float64" Name="ParticleInitialVelocity" NumberOfComponents="3"/>
+      <PDataArray type="Float64" Name="ParticleVelocity" NumberOfComponents="3"/>
+      <PDataArray type="Int64" Name="vtkOriginalPointIds"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float32" Name="Points" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="distriSeeds_0.vtu"/>
+    <Piece Source="distriSeeds_1.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
