@@ -1242,16 +1242,6 @@ def ReplaceReaderFileName(readerProxy, files, propName):
     servermanager.vtkSMCoreUtilities.ReplaceReaderFileName(readerProxy.SMProxy, files, propName)
 
 # -----------------------------------------------------------------------------
-def ImportCinema(filename, view=None):
-    """::deprecated:: 5.9
-
-    Cinema import capabilities are no longer supported in this version.
-    """
-    import warnings
-    warnings.warn("'ImportCinema' is no longer supported", DeprecationWarning)
-    return False
-
-# -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):
     """Creates a writer that can write the data produced by the source proxy in
        the given file format (identified by the extension). If no source is
