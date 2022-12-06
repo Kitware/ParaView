@@ -1632,65 +1632,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     SetProperties(options, **params)
     return options.WriteAnimation(filename)
 
-def WriteAnimation(filename, **params):
-    """
-    ::deprecated:: 5.3
-    Use :func:`SaveAnimation` instead.
-
-    This function can still be used to save an animation, but using
-    :func: `SaveAnimation` is strongly recommended as it provides more
-    flexibility.
-
-    The following parameters are currently supported.
-
-    **Parameters**
-
-        filename (str)
-          Name of the output file.
-
-    **Keyword Parameters (optional)**
-
-        Magnification (int):
-          Magnification factor for the saved animation.
-
-        Quality (int)
-          int in range [0,2].
-
-        FrameRate (int)
-          Frame rate.
-
-    The following parameters are no longer supported and are ignored:
-    Subsampling, BackgroundColor, FrameRate, StartFileCount, PlaybackTimeWindow
-    """
-    newparams = {}
-
-    # this method simply tries to provide legacy behavior.
-    scene = GetAnimationScene()
-    newparams["scene"] = scene
-
-    # previously, scene saved all views and only worked well if there was 1
-    # layout, so do that.
-    layout = GetLayout()
-    newparams["viewOrLayout"] = layout
-
-    if "Magnification" in params:
-        magnification = params["Magnification"]
-        exts = [0] * 4
-        layout.GetLayoutExtent(exts)
-        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
-        imageResolution = (size[0]*magnification, size[1]*magnification)
-        newparams["ImageResolution"] = imageResolution
-
-    if "Quality" in params:
-        # convert quality (0=worst, 2=best) to imageQuality (0 = worst, 100 = best)
-        quality = int(params["Quality"])
-        imageQuality = int(100 * quality/2.0)
-        newparams["ImageQuality"] = imageQuality
-
-    if "FrameRate" in params:
-        newparams["FrameRate"] = int(params["FrameRate"])
-    return SaveAnimation(filename, **newparams)
-
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
     The animation geometry is written out as a PVD file. If no view is
