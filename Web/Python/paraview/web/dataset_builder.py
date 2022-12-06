@@ -133,7 +133,7 @@ class ImageDataSetBuilder(DataSetBuilder):
     def writeImages(self):
         for cam in self.camera:
             update_camera(self.view, cam)
-            simple.WriteImage(self.dataHandler.getDataAbsoluteFilePath("image"))
+            simple.SaveScreenshot(self.dataHandler.getDataAbsoluteFilePath("image"))
 
 
 # -----------------------------------------------------------------------------

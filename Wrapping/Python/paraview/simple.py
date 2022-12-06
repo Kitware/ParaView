@@ -1290,24 +1290,6 @@ def SaveData(filename, proxy=None, **extraArgs):
     del writer
 
 # -----------------------------------------------------------------------------
-
-def WriteImage(filename, view=None, **params):
-    """::deprecated:: 4.2
-    Use :func:`SaveScreenshot` instead.
-    """
-    if not view:
-        view = active_objects.view
-    writer = None
-    if 'Writer' in params:
-        writer = params['Writer']
-    mag = 1
-    if 'Magnification' in params:
-        mag = int(params['Magnification'])
-    if not writer:
-        writer = _find_writer(filename)
-    view.WriteImage(filename, writer, mag)
-
-# -----------------------------------------------------------------------------
 def _SaveScreenshotLegacy(filename,
     view=None, layout=None, magnification=None, quality=None, **params):
     if view is not None and layout is not None:

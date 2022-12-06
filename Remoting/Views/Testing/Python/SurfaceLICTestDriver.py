@@ -46,7 +46,7 @@ if ok:
     SetActiveView(view)
     Render()
     imageFile = os.path.splitext(os.path.basename(smtesting.StateXMLFileName))[0]
-    WriteImage('%s/../../%s.png'%(smtesting.TempDir, imageFile))
+    SaveScreenshot('%s/../../%s.png'%(smtesting.TempDir, imageFile))
 
   if not smtesting.DoRegressionTesting(view.SMProxy):
     raise smtesting.TestError('Test failed.')

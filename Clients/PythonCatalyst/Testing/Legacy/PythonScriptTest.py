@@ -41,7 +41,7 @@ def DoCoProcessing(datadescription):
   DataRepresentation2.EdgeColor = [0.0, 0.0, 0.50000762951094835]
 
   fname = 'CPGrid' + str(timestep) + '.png'
-  WriteImage(fname)
+  SaveScreenshot(fname)
 
   DataRepresentation2 = Show(trivialproducer)
   DataRepresentation2.LookupTable = MakeBlueToRedLT(2702, 3202)
@@ -55,7 +55,7 @@ def DoCoProcessing(datadescription):
   RenderView1.CameraParallelScale = 13.743685418725535
 
   fname = 'CPPressure' + str(timestep) + '.png'
-  WriteImage(fname)
+  SaveScreenshot(fname)
 
 
 def RequestDataDescription(datadescription):

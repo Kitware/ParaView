@@ -45,7 +45,7 @@ def DoCoProcessing(datadescription):
         for view in range(len(renderviews)):
             fname = imagefilename.replace("%v", str(view))
             fname = fname.replace("%t", str(timestep))
-            WriteImage(fname, renderviews[view])
+            SaveScreenshot(fname, renderviews[view])
 
     # explicitly delete the proxies -- we do it this way to avoid problems with prototypes
     tobedeleted = GetProxiesToDelete()
