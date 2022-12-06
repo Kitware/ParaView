@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function
 from functools import wraps
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
-from inspect import getargspec
+from inspect import signature
 
 import sys
 
@@ -135,7 +135,7 @@ class smproperty(object):
         attrs = smproperty._update_property_defaults(func, attrs)
 
         if attrs.get("number_of_elements", None) is None:
-            attrs["number_of_elements"] = len(getargspec(func).args) - 1
+            attrs["number_of_elements"] = len(signature(func).parameters) - 1
 
         if attrs.get("default_values", None) is None:
             attrs["default_values"] = "None"
@@ -147,7 +147,7 @@ class smproperty(object):
         # if not set.
         if attrs.get("repeat_command", None) is not None and \
                 attrs.get("number_of_elements_per_command", None) is None:
-                    attrs["number_of_elements_per_command"] = len(getargspec(func).args) - 1
+                    attrs["number_of_elements_per_command"] = len(signature(func).parameters) - 1
         return attrs
 
     @staticmethod
