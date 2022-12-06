@@ -30,7 +30,7 @@ assert ((compatibility.GetVersion() >= (4,10)) == False), "version comparison fa
 
 
 compatibility.major = 4
-compatibility.major = 11
+compatibility.minor = 11
 assert ((compatibility.GetVersion() < 4.1) == False), "version comparison failed"
 assert ((compatibility.GetVersion() <= 4.1) == False), "version comparison failed"
 assert ((compatibility.GetVersion() > 4.1) == True), "version comparison failed"
