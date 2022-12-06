@@ -1995,34 +1995,6 @@ def LoadLookupTable(fileName):
 
 # -----------------------------------------------------------------------------
 
-def CreateScalarBar(**params):
-    """Create and return a scalar bar widget.  The returned widget may
-    be added to a render view by appending it to the view's representations
-    The widget must have a valid lookup table before it is added to a view.
-    It is possible to pass the lookup table (and other properties) as arguments
-    to this method::
-
-        lt = MakeBlueToRedLT(3.5, 7.5)
-        bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
-        GetRenderView().Representations.append(bar)
-
-    By default the returned widget is selectable and resizable.
-    ::deprecated:: 5.10
-    Use :func:`GetScalarBar` instead.
-    """
-    import warnings
-    warnings.warn("`CreateScalarBar` is deprecated in ParaView 5.10. Use `GetScalarBar` instead",
-        DeprecationWarning)
-    sb = servermanager.rendering.ScalarBarWidgetRepresentation()
-    sb.Selectable = 1
-    sb.Resizable = 1
-    sb.Enabled = 1
-    sb.Title = "Scalars"
-    SetProperties(sb, **params)
-    return sb
-
-# -----------------------------------------------------------------------------
-
 # TODO: Change this to take the array name and number of components. Register
 # the lt under the name ncomp.array_name
 def MakeBlueToRedLT(min, max):
