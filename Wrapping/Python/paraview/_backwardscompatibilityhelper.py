@@ -400,7 +400,7 @@ def setattr(proxy, pname, value):
     # In 5.11, we changed the ParticleTracer/ParticlePath/StreakLine's the StaticMesh
     # property to be called MeshOverTime since more capabilities were added.
     if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
-        if paraview.compatibility.GetVersion() <= 5.10:
+        if paraview.compatibility.GetVersion() <= (5, 10):
             proxy.GetProperty("MeshOverTime").SetData(value)
             raise Continue()
         else:
@@ -828,7 +828,7 @@ def getattr(proxy, pname):
         # The Threshold filter now offers additional thresholding methods
         # besides ThresholdBetween. The lower and upper threshold values
         # are also set separately.
-        if paraview.compatibility.GetVersion() <= 5.10:
+        if paraview.compatibility.GetVersion() <= (5, 10):
             return [proxy.GetProperty("LowerThreshold").GetData(),
                     proxy.GetProperty("UpperThreshold").GetData()]
         else:
@@ -844,7 +844,7 @@ def getattr(proxy, pname):
                     "instead. The 'CutoffArray' needs to be provided by the data set source.")
 
     if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
-        if paraview.compatibility.GetVersion() <= 5.10:
+        if paraview.compatibility.GetVersion() <= (5, 10):
             return proxy.GetProperty("MeshOverTime").GetData()
         else:
             raise NotSupportedException(
@@ -853,7 +853,7 @@ def getattr(proxy, pname):
 
     if proxy.SMProxy.GetXMLName() == "DataSetSurfaceFilter":
         if pname == "UseGeometryFilter":
-            if paraview.compatibility.GetVersion() <= 5.10:
+            if paraview.compatibility.GetVersion() <= (5, 10):
                 return 1
             else:
                 raise NotSupportedException(
@@ -902,7 +902,7 @@ def GetProxy(module, key, **kwargs):
             # into a unique 'Gradient" filter.
             gradient = builtins.getattr(module, "GradientLegacy")(**kwargs)
             return gradient
-    if version <= 5.10:
+    if version <= (5, 10):
         if key in ["ParticleTracer, ParticlePath, StreakLine"]:
             # in 5.11, we changed the StaticMesh flag of ParticleTracer, ParticlePath and StreakLine
             # This restores the previous StaticMesh.
