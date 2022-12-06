@@ -4,15 +4,15 @@ import paraview
 # This test tests backwards compatibility for ColorArrayName and ColorAttributeType
 # properties.
 
-assert (paraview.compatibility.GetVersion().GetVersion() == None),\
+assert (bool(paraview.compatibility.GetVersion()) == False),\
     "ParaView modules should never force backwards compatibility to any version"
-assert ((paraview.compatibility.GetVersion() < 4.1) == False),\
+assert ((paraview.compatibility.GetVersion() < (4, 1)) == False),\
     "less-than test should always fail when version is not specified."
-assert ((paraview.compatibility.GetVersion() <= 4.1) == False),\
+assert ((paraview.compatibility.GetVersion() <= (4, 1)) == False),\
     "less-equal test should always fail when version is not specified."
-assert ((paraview.compatibility.GetVersion() > 4.1) == True),\
+assert ((paraview.compatibility.GetVersion() > (4, 1)) == True),\
     "greater-than test should always pass when version is not specified."
-assert ((paraview.compatibility.GetVersion() >= 4.1) == True),\
+assert ((paraview.compatibility.GetVersion() >= (4, 1)) == True),\
     "greater-equal test should always pass when version is not specified."
 
 Sphere()
@@ -39,10 +39,10 @@ else:
 # Now switch backwards compatibility to 4.1
 paraview.compatibility.major = 4
 paraview.compatibility.minor = 1
-assert ((paraview.compatibility.GetVersion() < 4.1) == False), "version comparison failed"
-assert ((paraview.compatibility.GetVersion() <= 4.1) == True), "version comparison failed"
-assert ((paraview.compatibility.GetVersion() > 4.1) == False), "version comparison failed"
-assert ((paraview.compatibility.GetVersion() >= 4.1) == True), "version comparison failed"
+assert ((paraview.compatibility.GetVersion() < (4, 1)) == False), "version comparison failed"
+assert ((paraview.compatibility.GetVersion() <= (4, 1)) == True), "version comparison failed"
+assert ((paraview.compatibility.GetVersion() > (4, 1)) == False), "version comparison failed"
+assert ((paraview.compatibility.GetVersion() >= (4, 1)) == True), "version comparison failed"
 
 a = r.ColorAttributeType
 assert (type(a) == str), "'ColorAttributeType' must return a string"

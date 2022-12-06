@@ -169,12 +169,12 @@ def CreateView(view_xml_name, detachedFromLayout=None, **params):
     controller.PostInitializeProxy(view)
     controller.RegisterViewProxy(view, registrationName)
 
-    if paraview.compatibility.GetVersion() <= 5.6:
+    if paraview.compatibility.GetVersion() <= (5, 6):
         # older versions automatically assigned view to a
         # layout.
         controller.AssignViewToLayout(view)
 
-    if paraview.compatibility.GetVersion() <= 5.9:
+    if paraview.compatibility.GetVersion() <= (5, 9):
         if hasattr(view, "UseColorPaletteForBackground"):
             view.UseColorPaletteForBackground = 0
 

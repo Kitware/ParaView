@@ -90,7 +90,7 @@ def _wrap_property(proxy, smproperty):
     appropriate python object.
     """
     property = None
-    if paraview.compatibility.GetVersion() >= 3.5 and \
+    if paraview.compatibility.GetVersion() >= (3, 5) and \
       smproperty.IsA("vtkSMStringVectorProperty"):
         arraySelectionDomain = smproperty.FindDomain("vtkSMArraySelectionDomain")
         chartSeriesSelectionDomain = smproperty.FindDomain("vtkSMChartSeriesSelectionDomain")
@@ -358,7 +358,7 @@ class Proxy(object):
         """Returns a scalar for properties with 1 elements, the property
         itself for vectors."""
         p = self.GetProperty(name)
-        if isinstance(p, VectorProperty) and paraview.compatibility.GetVersion() <= 4.1 and name == "ColorArrayName":
+        if isinstance(p, VectorProperty) and paraview.compatibility.GetVersion() <= (4, 1) and name == "ColorArrayName":
             # Return ColorArrayName as just the array name for backwards compatibility.
             return p[1]
         if isinstance(p, EnumerationProperty) or \
@@ -608,7 +608,7 @@ class ExodusIIReaderProxy(SourceProxy):
     """Special class to define convenience functions for array
     selection."""
 
-    if paraview.compatibility.GetVersion() >= 3.5:
+    if paraview.compatibility.GetVersion() >= (3, 5):
         def FileNameChanged(self):
             "Called when the filename changes. Selects all variables."
             SourceProxy.FileNameChanged(self)
@@ -1579,7 +1579,7 @@ class ArrayInformation(object):
     def __neq__(self, other):
         return not self.__eq__(other)
 
-    if paraview.compatibility.GetVersion() <= 3.4:
+    if paraview.compatibility.GetVersion() <= (3, 4):
        def Range(self, component=0):
            return self.GetRange(component)
 
@@ -2599,7 +2599,7 @@ def _createGetProperty(pName):
     """Internal method to create a GetXXX() method where XXX == pName."""
     propName = pName
     def getProperty(self):
-        if paraview.compatibility.GetVersion() >= 3.5:
+        if paraview.compatibility.GetVersion() >= (3, 5):
             return self.GetPropertyValue(propName)
         else:
             return self.GetProperty(propName)
@@ -2670,7 +2670,7 @@ class ProxyNamespace:
         assert xml or smproxy or proxyname
         if proxyname:
             name = proxyname
-        elif paraview.compatibility.GetVersion() >= 3.5:
+        elif paraview.compatibility.GetVersion() >= (3, 5):
             if xml:
                 name = xml.GetAttributeOrDefault("label", xml.GetAttribute("name"))
             elif smproxy:
@@ -2832,12 +2832,12 @@ def _createClassProperties(proto, excludeset=frozenset()):
     # Add all properties as python properties.
     for prop in iter:
         propName = iter.GetKey()
-        if paraview.compatibility.GetVersion() >= 3.5:
+        if paraview.compatibility.GetVersion() >= (3, 5):
             if (prop.GetInformationOnly() and propName != "TimestepValues" \
               and prop.GetPanelVisibility() == "never") or prop.GetIsInternal():
                 continue
         names = [propName]
-        if paraview.compatibility.GetVersion() >= 3.5:
+        if paraview.compatibility.GetVersion() >= (3, 5):
             names = [iter.PropertyLabel]
 
         propDoc = None
@@ -2863,7 +2863,7 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
        paraview.print_error("Error while loading %s %s"%(groupName, proxyName))
        return None
     pname = proxyName
-    if paraview.compatibility.GetVersion() >= 3.5 and proto.GetXMLLabel():
+    if paraview.compatibility.GetVersion() >= (3, 5) and proto.GetXMLLabel():
         pname = proto.GetXMLLabel()
     pname = _make_name_valid(pname)
     if not pname:
@@ -2949,7 +2949,7 @@ def demo1():
     view)"""
     if not ActiveConnection:
         Connect()
-    if paraview.compatibility.GetVersion() <= 3.4:
+    if paraview.compatibility.GetVersion() <= (3, 4):
         ss = sources.SphereSource(Radius=2, ThetaResolution=32)
         shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
         cs = sources.ConeSource()
@@ -2979,7 +2979,7 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     # Create the exodus reader and specify a file name
     reader = sources.ExodusIIReader(FileName=fname)
     # Get the list of point arrays.
-    if paraview.compatibility.GetVersion() <= 3.4:
+    if paraview.compatibility.GetVersion() <= (3, 4):
         arraySelection = reader.PointResultArrayStatus
     else:
         arraySelection = reader.PointVariables
@@ -3016,7 +3016,7 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
         numComps = ai.GetNumberOfComponents()
         print ("Number of components:", numComps)
         for j in range(numComps):
-            if paraview.compatibility.GetVersion() <= 3.4:
+            if paraview.compatibility.GetVersion() <= (3, 4):
                 print ("Range:", ai.Range(j))
             else:
                 print ("Range:", ai.GetRange(j))
@@ -3049,7 +3049,7 @@ def demo3():
     if not ActiveConnection:
         Connect()
     # Create a synthetic data source
-    if paraview.compatibility.GetVersion() <= 3.4:
+    if paraview.compatibility.GetVersion() <= (3, 4):
         source = sources.RTAnalyticSource()
     else:
         source = sources.Wavelet()
@@ -3083,7 +3083,7 @@ def demo3():
     rv.StillRender()
 
     # Now, let's probe the data
-    if paraview.compatibility.GetVersion() <= 3.4:
+    if paraview.compatibility.GetVersion() <= (3, 4):
         probe = filters.Probe(Input=source)
         # with a line
         line = sources.LineSource(Resolution=60)
@@ -3133,7 +3133,7 @@ def demo5():
     """ Simple sphere animation"""
     if not ActiveConnection:
         Connect()
-    if paraview.compatibility.GetVersion() <= 3.4:
+    if paraview.compatibility.GetVersion() <= (3, 4):
         sphere = sources.SphereSource()
     else:
         sphere = sources.Sphere()
