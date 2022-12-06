@@ -63,6 +63,21 @@ vtk_module_find_package(
 source_group("Resources" FILES
   ${ui_files})
 
+set(translatable_files)
+if (PARAVIEW_BUILD_TRANSLATIONS)
+  list(APPEND translatable_files ${ui_files})
+  foreach(el IN LISTS classes)
+    list(APPEND translatable_files "${el}.cxx")
+    list(APPEND translatable_files "${el}.h")
+  endforeach()
+
+    paraview_create_translation(
+      TARGET "Python.ts"
+      FILES ${translatable_files}
+      OUTPUT_TS "${PARAVIEW_TRANSLATIONS_DIRECTORY}/Qt_Python.ts")
+  add_dependencies(localization "Python.ts")
+  endif ()
+
 vtk_module_add_module(ParaView::pqPython
   CLASSES ${classes}
   SOURCES ${ui_files}

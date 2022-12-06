@@ -228,6 +228,12 @@ option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 
 option(PARAVIEW_ENABLE_OCCT "Enable OCCT Support." OFF)
 
+option(PARAVIEW_BUILD_TRANSLATIONS "Generate translation files" OFF)
+if (PARAVIEW_BUILD_TRANSLATIONS)
+  set(PARAVIEW_TRANSLATIONS_DIRECTORY "${CMAKE_BINARY_DIR}/Translation" CACHE STRING
+    "The directory containing translation files")
+endif()
+
 # If building on Unix with MPI enabled, we will present another option to
 # enable building of CosmoTools VTK extensions. This option is by default
 # OFF and set to OFF if ParaView is not built with MPI.

@@ -59,6 +59,13 @@ if (default_style)
     DEFAULT_STYLE "${default_style}")
 endif ()
 
+set(_paraview_client_add_translation_args)
+if (PARAVIEW_BUILD_TRANSLATIONS)
+  list(APPEND _paraview_client_add_translation_args
+    TRANSLATIONS_DIRECTORY "${PARAVIEW_TRANSLATIONS_DIRECTORY}"
+    TRANSLATION_TARGET "ParaViewClient.ts"
+    TRANSLATE_XML "ON")
+endif ()
 paraview_client_add(
   NAME              paraview
   NAMESPACE         "ParaView"
@@ -74,7 +81,12 @@ paraview_client_add(
   APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.ico"
   SOURCES           ${sources}
   PLUGINS_TARGETS   ParaView::paraview_plugins
-  APPLICATION_XMLS  ${xmls})
+  APPLICATION_XMLS  ${xmls}
+  ${_paraview_client_add_translation_args})
+
+if (PARAVIEW_BUILD_TRANSLATIONS AND TARGET "localization")
+  add_dependencies(localization "ParaViewClient.ts")
+endif()
 
 find_package(Qt5 REQUIRED QUIET COMPONENTS Widgets)
 

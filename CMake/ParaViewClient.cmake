@@ -37,7 +37,11 @@ paraview_client_add(
   [FORCE_UNIX_LAYOUT    <ON|OFF>]
   [BUNDLE_DESTINATION   <directory>]
   [RUNTIME_DESTINATION  <directory>]
-  [LIBRARY_DESTINATION  <directory>])
+  [LIBRARY_DESTINATION  <directory>]
+
+  [TRANSLATE_XML           <ON|OFF>]
+  [TRANSLATIONS_DIRECTORY  <directory>]
+  [TRANSLATION_TARGET      <target>])
 ```
 
   * `NAME`: (Required) The name of the application. This is used as the target
@@ -78,11 +82,17 @@ paraview_client_add(
   * `LIBRARY_DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where
     libraries are placed. Sets up `RPATH` on ELF platforms (e.g., Linux and the
     BSD family).
+  * `TRANSLATE_XML`: (Defaults to `OFF`) Produce a translations source file
+    from APPLICATION_XMLS files.
+  * `TRANSLATIONS_DIRECTORY`: (Defaults to `${CMAKE_CURRENT_BINARY_DIR}/Translations`)
+    The path of the directory where translation source files are stored.
+  * `TRANSLATION_TARGET` : The name of the target on which to add the ts file as
+    dependency.
 #]==]
 function (paraview_client_add)
   cmake_parse_arguments(_paraview_client
     ""
-    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
+    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT;TRANSLATION_TARGET;TRANSLATE_XML;TRANSLATIONS_DIRECTORY"
     "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILES;QCH_FILE;PLUGINS_TARGETS"
     ${ARGN})
 
@@ -358,6 +368,43 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       FILES
         ${_paraview_client_resource_files})
   endif ()
+
+  ## Translation Management
+  if (NOT DEFINED _paraview_client_TRANSLATIONS_DIRECTORY)
+    set(_paraview_client_TRANSLATIONS_DIRECTORY
+      "${CMAKE_CURRENT_BINARY_DIR}/Translations")
+  endif ()
+  if (NOT DEFINED _paraview_client_TRANSLATE_XML)
+    set(_paraview_client_TRANSLATE_XML "OFF")
+  endif ()
+  if (_paraview_client_TRANSLATE_XML)
+    if (NOT DEFINED _paraview_client_TRANSLATION_TARGET)
+      message(FATAL_ERROR "The `TRANSLATION_TARGET` argument is required.")
+    endif ()
+  endif ()
+  if (DEFINED _paraview_client_TRANSLATION_TARGET)
+    find_package(Qt5 QUIET COMPONENTS LinguistTools REQUIRED)
+    if (_paraview_client_TRANSLATE_XML)
+      set(xml_header "${CMAKE_CURRENT_BINARY_DIR}/translationSources${_paraview_client_NAME}ClientXMLs.h")
+      paraview_generate_translation_header(
+        TARGET      "${_paraview_client_TRANSLATION_TARGET}Header"
+        INPUT_FILES ${_paraview_client_APPLICATION_XMLS}
+        RESULT_FILE "${xml_header}")
+      paraview_create_translation(
+        TARGET "${_paraview_client_TRANSLATION_TARGET}XMLs"
+        FILES "${xml_header}"
+        OUTPUT_TS "${_paraview_client_TRANSLATIONS_DIRECTORY}/Clients_${_paraview_client_APPLICATION_NAME}-XMLs.ts")
+      add_dependencies("${_paraview_client_TRANSLATION_TARGET}XMLs" "${_paraview_client_TRANSLATION_TARGET}Header")
+    endif ()
+    paraview_create_translation(
+      TARGET "${_paraview_client_TRANSLATION_TARGET}"
+      FILES ${_paraview_client_SOURCES}
+      OUTPUT_TS "${_paraview_client_TRANSLATIONS_DIRECTORY}/Clients_${_paraview_client_APPLICATION_NAME}.ts")
+    if (_paraview_client_TRANSLATE_XML)
+      add_dependencies("${_paraview_client_TRANSLATION_TARGET}" "${_paraview_client_TRANSLATION_TARGET}XMLs")
+    endif()
+  endif ()
+
   add_executable("${_paraview_client_NAME}" ${_paraview_client_executable_flags}
     ${_paraview_client_SOURCES}
     ${_paraview_client_resource_files}

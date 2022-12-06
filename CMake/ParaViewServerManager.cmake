@@ -66,7 +66,9 @@ paraview_server_manager_process(
   TARGET <target>
   [INSTALL_EXPORT <export>]
   [FILES <file>...]
-  [XML_FILES  <variable>])
+  [XML_FILES  <variable>]
+  [TRANSLATIONS_DIRECTORY <directory>]
+  [TRANSLATIONS_TARGET <target>])
 ```
 
 The `MODULES` argument contains the modules to include in the server manager
@@ -84,7 +86,7 @@ export set.
 function (paraview_server_manager_process)
   cmake_parse_arguments(_paraview_sm_process
     ""
-    "TARGET;XML_FILES;INSTALL_EXPORT"
+    "TARGET;XML_FILES;INSTALL_EXPORT;TRANSLATIONS_DIRECTORY;TRANSLATIONS_TARGET"
     "MODULES;FILES"
     ${ARGN})
 
@@ -199,6 +201,25 @@ function (paraview_server_manager_process)
     set("${_paraview_sm_process_XML_FILES}"
       "${_paraview_sm_process_files}"
       PARENT_SCOPE)
+  endif ()
+
+  if (NOT DEFINED _paraview_sm_process_TRANSLATIONS_DIRECTORY)
+    set(_paraview_sm_process_TRANSLATIONS_DIRECTORY
+      "${CMAKE_CURRENT_BINARY_DIR}/Translations")
+  endif ()
+  get_property(_header_name TARGET "${_paraview_sm_process_TARGET}" PROPERTY "NAME")
+  if (DEFINED _paraview_sm_process_TRANSLATIONS_TARGET)
+    set(xml_header "${CMAKE_CURRENT_BINARY_DIR}/translationSources${_header_name}.h")
+    paraview_generate_translation_header(
+      TARGET      "${_paraview_sm_process_TRANSLATIONS_TARGET}Header"
+      INPUT_FILES ${_paraview_sm_process_files}
+      RESULT_FILE "${xml_header}")
+    paraview_create_translation(
+      TARGET              "${_paraview_sm_process_TRANSLATIONS_TARGET}"
+      FILES               "${xml_header}"
+      OUTPUT_TS "${_paraview_sm_process_TRANSLATIONS_DIRECTORY}/${_paraview_sm_process_TRANSLATIONS_TARGET}")
+    add_dependencies("${_paraview_sm_process_TRANSLATIONS_TARGET}"
+      "${_paraview_sm_process_TRANSLATIONS_TARGET}Header")
   endif ()
 endfunction ()
 
