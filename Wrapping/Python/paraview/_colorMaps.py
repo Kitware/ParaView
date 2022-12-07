@@ -1,7 +1,10 @@
 r"""
+PARAVIEW_DEPRECATED_IN_5_12_0
+
 This is a deprecated module and should not be used anymore.
 These are legacy colormap XMLs kept around till `paraview.lookuptable` module is deprecated
-and removed."""
+and removed.
+"""
 
 __colorMapsXML = """
 <ColorMaps>
@@ -2945,7 +2948,13 @@ __colorMapsXML = """
 </ColorMaps>
 """
 def getColorMaps():
-    """Returns the vtkPVXMLElement instance for the default (legacy) color maps"""
+    """
+    PARAVIEW_DEPRECATED_IN_5_12_0
+    Returns the vtkPVXMLElement instance for the default (legacy) color maps
+    """
+    import warnings
+    warnings.warn("'getColorMaps' is deprecated.", DeprecationWarning)
+
     global __colorMapsXML
     from paraview.modules.vtkPVCore import vtkPVXMLParser
     parser = vtkPVXMLParser()

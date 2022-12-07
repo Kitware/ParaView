@@ -1840,7 +1840,10 @@ def GetLookupTableForArray(arrayname, num_components, **params):
     """Used to get an existing lookuptable for a array or to create one if none
     exists. Keyword arguments can be passed in to initialize the LUT if a new
     one is created.
-    *** DEPRECATED ***: Use GetColorTransferFunction instead"""
+    PARAVIEW_DEPRECATED_IN_5_12_0: Use GetColorTransferFunction instead"""
+    import warnings
+    warnings.warn("'GetLookupTableForArray' is deprecated, use GetColorTransferFunction instead", DeprecationWarning)
+
     return GetColorTransferFunction(arrayname, **params)
 
 # -----------------------------------------------------------------------------
@@ -2406,7 +2409,7 @@ def Show3DWidgets(proxy=None):
     If possible in the current environment, this method will
     request the application to show the 3D widget(s) for proxy
 
-    ::deprecated:: 5.11
+    PARAVIEW_DEPRECATED_IN_5_11_0
     Use :func:`ShowInteractiveWidgets` instead.
     """
     import warnings
@@ -2419,7 +2422,7 @@ def Hide3DWidgets(proxy=None):
     If possible in the current environment, this method will
     request the application to show the 3D widget(s) for proxy
 
-    ::deprecated:: 5.11
+    PARAVIEW_DEPRECATED_IN_5_11_0
     Use :func:`HideInteractiveWidgets` instead.
     """
     import warnings

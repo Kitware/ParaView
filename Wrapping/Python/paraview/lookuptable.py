@@ -2,7 +2,7 @@ r"""Utility module for easy manipultions of lookup tables.
 This module is intended for use with by simple.py.
 
 
-DEPRECATED: will be removed in future releases of ParaView.
+PARAVIEW_DEPRECATED_IN_5_12_0: will be removed in future releases of ParaView.
 """
 #==============================================================================
 #
@@ -146,6 +146,9 @@ class vtkPVLUTReader:
   """
 
   def __init__(self,ns=None):
+    import warnings
+    warnings.warn("'vtkPVLUTReader' is deprecated.", DeprecationWarning)
+
     self.LUTS={}
     self.DefaultLUT=None
     self.Globals=ns
