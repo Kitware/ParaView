@@ -40,17 +40,15 @@ animationScene1.UpdateAnimationUsingDataTimeSteps()
 canex2Display = Show(reader, renderView1)
 
 # Save animation images
-SaveAnimation(tempdir + "/SaveAnimation.png", ImageResolution=[600, 600], ImageQuality=40)
+SaveAnimation(tempdir + "/SaveAnimation.png", ImageResolution=[600, 600])
 
 # Lets save stereo animation images (two eyes at the same time)
 SaveAnimation(tempdir + "/SaveAnimationStereo.png",
-        ImageResolution=[600, 600], ImageQuality=40,
-        StereoMode="Both Eyes")
+        ImageResolution=[600, 600], StereoMode="Both Eyes")
 
 # Lets save stere video
 SaveAnimation(tempdir + "/SaveAnimationStereo.ogv",
-        ImageResolution=[600, 600], ImageQuality=40,
-        StereoMode="Both Eyes")
+        ImageResolution=[600, 600], StereoMode="Both Eyes")
 
 pm = servermanager.vtkProcessModule.GetProcessModule()
 if pm.GetPartitionId() == 0:

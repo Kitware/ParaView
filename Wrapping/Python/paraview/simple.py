@@ -1288,9 +1288,9 @@ def _SaveScreenshotLegacy(filename,
     except TypeError:
         magnification = 1
     try:
-        quality = int(quality)
+        quality = max(0, min(100, int(quality)))
     except TypeError:
-        quality = -1
+        quality = 100
 
     # convert magnification to image resolution.
     if viewOrLayout.IsA("vtkSMViewProxy"):
@@ -1303,13 +1303,20 @@ def _SaveScreenshotLegacy(filename,
 
     imageResolution = (size[0]*magnification, size[1]*magnification)
 
-    # convert quality to ImageQuality
-    imageQuality = quality
-
-    # now, call the new API
-    return SaveScreenshot(filename, viewOrLayout,
+    import os.path
+    _, extension = os.path.splitext(filename)
+    if (extension == '.jpg'):
+        return SaveScreenshot(filename, viewOrLayout,
             ImageResolution=imageResolution,
-            ImageQuality=imageQuality)
+            Quality=quality)
+    elif (extension == '.png'):
+        compression = int(((quality * 0.01) - 1.0) * -9.0)
+        return SaveScreenshot(filename, viewOrLayout,
+            ImageResolution=imageResolution,
+            CompressionLevel=compression)
+    else:
+        return SaveScreenshot(filename, viewOrLayout,
+            ImageResolution=imageResolution)
 
 def SaveScreenshot(filename, viewOrLayout=None, **params):
     """Save screenshot for a view or layout (collection of views) to an image.
@@ -1399,11 +1406,6 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
 
         quality (int)
           Output image quality, a number in the range [0, 100].
-
-        ImageQuality (int)
-            For ParaView 5.4, the following parameters were available, however
-            it is ignored starting with ParaView 5.5. Instead, it is recommended
-            to use format-specific quality parameters based on the file format being used.
     """
     # Let's handle backwards compatibility.
     # Previous API for this method took the following arguments:
@@ -1453,11 +1455,6 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
         if prop in params:
             formatProxy.SetPropertyWithName(prop, params[prop])
             del params[prop]
-
-    if "ImageQuality" in params:
-        import warnings
-        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
-        del params["ImageQuality"]
 
     SetProperties(options, **params)
     return options.WriteImage(filename)
@@ -1541,11 +1538,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         DisconnectAndSave (int):
           This mode is no longer supported as of ParaView 5.5, and will be
           ignored.
-
-        ImageQuality (int)
-            For ParaView 5.4, the following parameters were available, however
-            it is ignored starting with ParaView 5.5. Instead, it is recommended
-            to use format-specific quality parameters based on the file format being used.
     """
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
@@ -1589,11 +1581,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
             if formatProxy.GetProperty(prop).GetPanelVisibility() != "never":
                 formatProxy.SetPropertyWithName(prop, params[prop])
                 del params[prop]
-
-    if "ImageQuality" in params:
-        import warnings
-        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
-        del params["ImageQuality"]
 
     SetProperties(options, **params)
     return options.WriteAnimation(filename)
