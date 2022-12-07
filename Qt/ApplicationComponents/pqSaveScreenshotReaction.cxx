@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqImageUtil.h"
 #include "pqProxyWidgetDialog.h"
-#include "pqServer.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqUndoStack.h"
@@ -82,7 +81,7 @@ pqSaveScreenshotReaction::pqSaveScreenshotReaction(QAction* parentObject, bool c
 void pqSaveScreenshotReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool is_enabled = (activeObjects->activeView() && activeObjects->activeServer());
+  const bool is_enabled = (activeObjects->activeView() && activeObjects->activeServer());
   this->parentAction()->setEnabled(is_enabled);
 }
 
@@ -122,7 +121,7 @@ QString pqSaveScreenshotReaction::promptFileName(
   }
 
   QString file = file_dialog.getSelectedFiles()[0];
-  QFileInfo fileInfo(file);
+  const QFileInfo fileInfo(file);
   settings->setValue(skey, fileInfo.suffix().prepend("*."));
   return file;
 }
@@ -144,15 +143,14 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   {
     // Get pixel size (not scaled pixel size) for the view.
     // fixes #20225
-    vtkSMPropertyHelper helper(viewProxy, "ViewSize");
+    const vtkSMPropertyHelper helper(viewProxy, "ViewSize");
     const QSize pixelSize(helper.GetAsInt(0), helper.GetAsInt(1));
     return pqSaveScreenshotReaction::copyScreenshotToClipboard(pixelSize, false);
   }
 
   vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
   vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
-  vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pxm->NewProxy("misc", "SaveScreenshot"));
+  auto proxy = vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("misc", "SaveScreenshot"));
   vtkSMSaveScreenshotProxy* shProxy = vtkSMSaveScreenshotProxy::SafeDownCast(proxy);
   if (!shProxy)
   {
@@ -160,8 +158,8 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
     return false;
   }
 
-  // Get the filename first, this will determine some of the options shown.
-  QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png");
+  // Get the filename first, this will determine some options shown.
+  const QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png");
   if (filename.isEmpty())
   {
     return false;
@@ -170,7 +168,7 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   bool restorePreviewMode = false;
 
   // Cache the separator width and color
-  int width = vtkSMPropertyHelper(shProxy, "SeparatorWidth").GetAsInt();
+  const int width = vtkSMPropertyHelper(shProxy, "SeparatorWidth").GetAsInt();
   double color[3];
   vtkSMPropertyHelper(shProxy, "SeparatorColor").Get(color, 3);
   // Link the vtkSMViewLayoutProxy to vtkSMSaveScreenshotProxy to update
@@ -221,7 +219,9 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)
   {
-    shProxy->WriteImage(filename.toUtf8().data());
+    const bool embedParaViewState =
+      vtkSMPropertyHelper(shProxy, "EmbedParaViewState").GetAsInt() == 1;
+    shProxy->WriteImage(filename.toUtf8().data(), vtkPVSession::CLIENT, embedParaViewState);
   }
 
   if (layout)
@@ -274,7 +274,7 @@ vtkSmartPointer<vtkImageData> pqSaveScreenshotReaction::takeScreenshot(
 bool pqSaveScreenshotReaction::saveScreenshot(
   const QString& filename, const QSize& size, int quality, bool all_views)
 {
-  vtkSmartPointer<vtkImageData> image = takeScreenshot(size, all_views);
+  const vtkSmartPointer<vtkImageData> image = takeScreenshot(size, all_views);
   if (!image)
   {
     return false;
@@ -285,7 +285,7 @@ bool pqSaveScreenshotReaction::saveScreenshot(
 //-----------------------------------------------------------------------------
 bool pqSaveScreenshotReaction::copyScreenshotToClipboard(const QSize& size, bool all_views)
 {
-  vtkSmartPointer<vtkImageData> image = takeScreenshot(size, all_views);
+  const vtkSmartPointer<vtkImageData> image = takeScreenshot(size, all_views);
   if (!image)
   {
     return false;

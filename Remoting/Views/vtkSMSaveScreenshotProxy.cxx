@@ -502,13 +502,8 @@ vtkSMSaveScreenshotProxy::~vtkSMSaveScreenshotProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname)
-{
-  return this->WriteImage(fname, vtkPVSession::CLIENT);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 location)
+bool vtkSMSaveScreenshotProxy::WriteImage(
+  const char* fname, vtkTypeUInt32 location, bool embedStateAsMetadata)
 {
   if (fname == nullptr)
   {
@@ -611,6 +606,18 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
 
   vtkTimerLog::MarkStartEvent("Write image to disk");
   auto remoteWriterAlgorithm = vtkAlgorithm::SafeDownCast(remoteWriter->GetClientSideObject());
+
+  // save paraview state as metadata
+  const bool embedState = embedStateAsMetadata && strcmp(format->GetXMLName(), "PNG") == 0;
+  if (embedState)
+  {
+    std::ostringstream stream;
+    auto stateXMLRoot = vtkSmartPointer<vtkPVXMLElement>::Take(pxm->SaveXMLState());
+    stateXMLRoot->PrintXML(stream, vtkIndent());
+    vtkSMPropertyHelper metadata(format, "MetaData");
+    metadata.Set(0, "ParaViewState");
+    metadata.Set(1, stream.str().c_str());
+  }
 
   // write right-eye image first.
   if (image_pair.second)

@@ -30,6 +30,7 @@
 #ifndef vtkSMSaveScreenshotProxy_h
 #define vtkSMSaveScreenshotProxy_h
 
+#include "vtkPVSession.h"           // needed for vtkPVSession::ServerFlags
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
@@ -47,20 +48,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Capture image. The properties for this proxy provide all the necessary
-   * information to capture the image.
+   * Capture image. You can specify the location at which to write the image. Currently supported
+   * values are vtkPVSession::CLIENT, vtkPVSession::DATA_SERVER or vtkPVSession::DATA_SERVER_ROOT.
+   * Selecting vtkPVSession::DATA_SERVER is same as vtkPVSession::DATA_SERVER_ROOT since the images
+   * are only written on root node. You can also specify if the state should be embedded as
+   * metadata.
+   *
+   * Note: embedding state as metadata is supported only for PNG files.
    */
-  bool WriteImage(const char* filename);
-
-  /**
-   * This is same as `WriteImage(const char*)` except that one can specify the
-   * location at which to write the image. Currently supported values are
-   * vtkPVSession::CLIENT, vtkPVSession::DATA_SERVER or vtkPVSession::DATA_SERVER_ROOT.
-   * Selecting vtkPVSession::DATA_SERVER is same as
-   * vtkPVSession::DATA_SERVER_ROOT since the images are only written on root
-   * node.
-   */
-  bool WriteImage(const char* filename, vtkTypeUInt32 location);
+  bool WriteImage(const char* filename, vtkTypeUInt32 location = vtkPVSession::CLIENT,
+    bool embedStateAsMetadata = false);
 
   /**
    * Capture the rendered image but doesn't save it out to any file.

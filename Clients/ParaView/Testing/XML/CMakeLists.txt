@@ -890,6 +890,7 @@ SET(TESTS_WITH_BASELINES
   PickCenter.xml
   ResampleToLine.xml
   ReverseSense.xml
+  SaveScreenShotAndEmbedState.xml
   SelectionByArray.xml
   SeriesPreset.xml
   SeriesPresetRegexp.xml
