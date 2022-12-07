@@ -42,8 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTabbedMultiViewWidget.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+
 #include "vtkImageData.h"
 #include "vtkNew.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -181,6 +183,7 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
     colorLink->AddLinkedProperty(shProxy, "SeparatorColor", vtkSMLink::INPUT);
     colorLink->AddLinkedProperty(layout, "SeparatorColor", vtkSMLink::OUTPUT);
   }
+  auto stateXMLRoot = vtkSmartPointer<vtkPVXMLElement>::Take(pxm->SaveXMLState());
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(shProxy);
@@ -221,7 +224,11 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   {
     const bool embedParaViewState =
       vtkSMPropertyHelper(shProxy, "EmbedParaViewState").GetAsInt() == 1;
-    shProxy->WriteImage(filename.toUtf8().data(), vtkPVSession::CLIENT, embedParaViewState);
+    if (embedParaViewState)
+    {
+      Q_EMIT pqApplicationCore::instance()->aboutToWriteState(filename);
+    }
+    shProxy->WriteImage(filename.toUtf8().data(), vtkPVSession::CLIENT, stateXMLRoot);
   }
 
   if (layout)
