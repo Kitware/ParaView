@@ -14,6 +14,7 @@ DEPENDS
   VTK::jsoncpp
 PRIVATE_DEPENDS
   VTK::CommonSystem
+  VTK::IOImage
   VTK::vtksys
   VTK::pugixml
   VTK::cli11

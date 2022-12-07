@@ -82,7 +82,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
     return;
   }
 
-  if (filename.endsWith(".pvsm"))
+  if (filename.endsWith(".pvsm") || filename.endsWith(".png"))
   {
     vtkSMSessionProxyManager* pxm = server->proxyManager();
     vtkSmartPointer<vtkSMProxy> aproxy;
@@ -145,6 +145,7 @@ void pqLoadStateReaction::loadState()
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
     tr("ParaView state file") +
       " (*.pvsm"
+      " *.png"
 #if VTK_MODULE_ENABLE_ParaView_pqPython
       " *.py"
 #endif
