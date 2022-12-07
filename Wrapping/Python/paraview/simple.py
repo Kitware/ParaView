@@ -1532,12 +1532,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         UseSubsampling:
           When set to 1 (or True), the video will be encoded using 4:2:0
           subsampling for the color channels.
-
-    **Obsolete Parameters**
-
-        DisconnectAndSave (int):
-          This mode is no longer supported as of ParaView 5.5, and will be
-          ignored.
     """
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
@@ -1548,11 +1542,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     scene = scene if scene else GetAnimationScene()
     if not scene:
         raise RuntimeError("Missing animation scene.")
-
-    if "DisconnectAndSave" in params:
-        import warnings
-        warnings.warn("'DisconnectAndSave' is deprecated and will be ignored.", DeprecationWarning)
-        del params["DisconnectAndSave"]
 
     controller = servermanager.ParaViewPipelineController()
     options = servermanager.misc.SaveAnimation()
