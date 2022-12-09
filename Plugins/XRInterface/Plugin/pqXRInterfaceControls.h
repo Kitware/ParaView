@@ -23,12 +23,15 @@
 #ifndef pqXRInterfaceControls_h
 #define pqXRInterfaceControls_h
 
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+
+#include <QStringList>
 #include <QWidget>
 
 class pqPipelineSource;
-class pqView;
-class vtkPVXRInterfaceHelper;
 class pqVCRController;
+class vtkPVXRInterfaceHelper;
+
 class pqXRInterfaceControls : public QWidget
 {
   Q_OBJECT
@@ -44,11 +47,19 @@ public:
 
   pqPipelineSource* GetSelectedPipelineSource();
 
-  // set the right trigger menu to the passed value
-  // used when the helper programmatically adjusts
-  // the mode
+  /**
+   * Set the value of the Right Trigger combobox.
+   */
   void SetRightTriggerMode(std::string const& text);
 
+  /**
+   * Set the value of the Movement Style combobox.
+   */
+  void SetMovementStyle(std::string const& text);
+
+  /**
+   * Set the available camera pose indices of the Load Camera Pose combobox.
+   */
   void SetAvailablePositions(std::vector<int> const& slots);
 
   /**
@@ -76,11 +87,34 @@ public:
    */
   void SetCurrentViewUp(std::string dir);
 
-  void SetFieldValues(std::string vals);
+  /**
+   * Set the available values of the Field Value combobox.
+   */
+  void SetFieldValues(const QStringList& values);
+
+  /**
+   * Set check state of the Show Floor checkbox.
+   */
+  void SetShowFloor(bool checked);
+
+  /**
+   * Set check state of the Interactive Ray checkbox.
+   */
+  void SetInteractiveRay(bool checked);
+
+  /**
+   * Set check state of the Navigation Panel checkbox.
+   */
+  void SetNavigationPanel(bool checked);
+
+  /**
+   * Set check state of the Snap Crop Planes checkbox.
+   */
+  void SetSnapCropPlanes(bool checked);
 
 protected:
-  vtkPVXRInterfaceHelper* Helper;
-  bool NoForward;
+  vtkSmartPointer<vtkPVXRInterfaceHelper> Helper;
+  bool NoForward = false;
 
 protected Q_SLOTS:
   void resetPositions();

@@ -2110,9 +2110,19 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     // Set initial values
     this->SetRightTriggerMode("Pick");
     this->XRInterfaceControls->SetRightTriggerMode("Pick");
+    this->XRInterfaceControls->SetMovementStyle("Flying");
     this->XRInterfaceControls->SetCurrentScaleFactor(1);
     this->XRInterfaceControls->SetCurrentMotionFactor(1);
     this->XRInterfaceControls->SetCurrentSavedPosition(-1);
+    this->XRInterfaceControls->SetCurrentPosition(-1);
+    this->XRInterfaceControls->SetShowFloor(true);
+    this->XRInterfaceControls->SetInteractiveRay(false);
+    this->XRInterfaceControls->SetNavigationPanel(false);
+    this->XRInterfaceControls->SetSnapCropPlanes(false);
+
+    // Ensure that the floor actor is displayed in case the checkbox
+    // "Show Floor" stays checked between sessions
+    ren->SetShowFloor(true);
 
     // Retrieve initial View Up direction
     double* viewUpDir = renWin->GetPhysicalViewUp();
