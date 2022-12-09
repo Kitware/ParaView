@@ -11024,7 +11024,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetLineThickness"
-                            default_values="1"
+                            default_values="2"
                             name="LineThickness"
                             number_of_elements="1" >
         <DoubleRangeDomain max="10" min="1" name="range" />
