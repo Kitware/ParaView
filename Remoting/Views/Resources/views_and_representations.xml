@@ -11050,6 +11050,7 @@
                proxyname="TextProperty"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="Font Properties" panel_widget="FontEditor">
+            <Property name="FontSize" function="Size" />
             <Property name="Color" function="Color"/>
             <Property name="Opacity" function="Opacity"/>
             <Property name="FontFamily" function="Family"/>
@@ -11061,14 +11062,6 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
-
-      <DoubleVectorProperty command="SetLabelFactorSize"
-                            default_values="1"
-                            name="LabelFactorSize"
-                            number_of_elements="1" >
-        <DoubleRangeDomain max="2" min="0.1" name="range" />
-        <Documentation>Set a size factor for the label, applied to the computed optimal size.</Documentation>
-      </DoubleVectorProperty>
 
       <StringVectorProperty command="SetLabelFormat"
                             default_values="%6.3g"

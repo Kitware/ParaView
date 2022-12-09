@@ -48,6 +48,7 @@ vtkProtractorRepresentation::vtkProtractorRepresentation()
   this->AngleRepresentation->SetDragable(false);
   this->AngleRepresentation->InstantiateHandleRepresentation();
   this->AngleRepresentation->ArcVisibilityOn();
+  this->AngleRepresentation->GetArc()->UseFontSizeFromPropertyOn();
 }
 
 //----------------------------------------------------------------------------
