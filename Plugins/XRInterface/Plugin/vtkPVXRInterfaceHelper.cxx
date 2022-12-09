@@ -110,40 +110,8 @@ vtkStandardNewMacro(vtkPVXRInterfaceHelper);
 //----------------------------------------------------------------------------
 vtkPVXRInterfaceHelper::vtkPVXRInterfaceHelper()
 {
-  this->View = nullptr;
-  this->Renderer = nullptr;
-  this->RenderWindow = nullptr;
-  this->Interactor = nullptr;
-  this->XRInterfacePolyfill = nullptr;
-
-  this->AddedProps = vtkPropCollection::New();
-
-  this->BaseStationVisibility = false;
-  this->MultiSample = false;
-
-  this->NeedStillRender = false;
-  this->LoadLocationValue = -1;
-
-  this->CollaborationClient = vtkPVXRInterfaceCollaborationClient::New();
   this->CollaborationClient->SetHelper(this);
-
-  this->QWidgetWidget = nullptr;
-
-  this->XRInterfacePolyfill = vtkXRInterfacePolyfill::New();
-
-  this->ObserverWidget = nullptr;
-
   this->Widgets->SetHelper(this);
-}
-
-//----------------------------------------------------------------------------
-vtkPVXRInterfaceHelper::~vtkPVXRInterfaceHelper()
-{
-  this->XRInterfacePolyfill->Delete();
-  this->AddedProps->Delete();
-
-  this->CollaborationClient->Delete();
-  this->CollaborationClient = nullptr;
 }
 
 //==========================================================
