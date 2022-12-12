@@ -58,7 +58,7 @@ def WriteImages(currentTimeStep, currentTime, views):
         filename = view.tpFileName.replace("%t", str(currentTimeStep))
         view.ViewTime = currentTime
         cinemaLines.append(str(currentTime) + "," + view.GetXMLName()+"_"+str(cnt) + "," + filename + "\n")
-        pvsimple.WriteImage(filename, view, Magnification=view.tpMagnification)
+        pvsimple.SaveScreenshot(filename, view, magnification=view.tpMagnification)
         cnt = cnt + 1
     return cinemaLines
 

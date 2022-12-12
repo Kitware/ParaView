@@ -139,16 +139,10 @@ def SetActiveConnection(connection=None, ns=None):
 #==============================================================================
 # Views and Layout methods
 #==============================================================================
-def CreateView(view_xml_name, detachedFromLayout=None, **params):
+def CreateView(view_xml_name, **params):
     """Creates and returns the specified proxy view based on its name/label.
     Also set params keywords arguments as view properties.
-
-    `detachedFromLayout` has been deprecated in ParaView 5.7 as it is no longer
-    needed. All views are created detached by default.
     """
-    if detachedFromLayout is not None:
-        warnings.warn("`detachedFromLayout` is deprecated in ParaView 5.7", DeprecationWarning)
-
     view = servermanager._create_view(view_xml_name)
     if not view:
         raise RuntimeError ("Failed to create requested view", view_xml_name)
@@ -169,12 +163,12 @@ def CreateView(view_xml_name, detachedFromLayout=None, **params):
     controller.PostInitializeProxy(view)
     controller.RegisterViewProxy(view, registrationName)
 
-    if paraview.compatibility.GetVersion() <= 5.6:
+    if paraview.compatibility.GetVersion() <= (5, 6):
         # older versions automatically assigned view to a
         # layout.
         controller.AssignViewToLayout(view)
 
-    if paraview.compatibility.GetVersion() <= 5.9:
+    if paraview.compatibility.GetVersion() <= (5, 9):
         if hasattr(view, "UseColorPaletteForBackground"):
             view.UseColorPaletteForBackground = 0
 
@@ -191,67 +185,67 @@ def CreateView(view_xml_name, detachedFromLayout=None, **params):
 
 # -----------------------------------------------------------------------------
 
-def CreateRenderView(detachedFromLayout=False, **params):
+def CreateRenderView(**params):
     """Create standard 3D render view.
     See CreateView for arguments documentation"""
-    return CreateView("RenderView", detachedFromLayout, **params)
+    return CreateView("RenderView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateXYPlotView(detachedFromLayout=False, **params):
+def CreateXYPlotView(**params):
     """Create XY plot Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("XYChartView", detachedFromLayout, **params)
+    return CreateView("XYChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateXYPointPlotView(detachedFromLayout=False, **params):
+def CreateXYPointPlotView(**params):
     """Create XY plot point Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("XYPointChartView", detachedFromLayout, **params)
+    return CreateView("XYPointChartView", **params)
 
 # -----------------------------------------------------------------------------
 
 
-def CreateBarChartView(detachedFromLayout=False, **params):
+def CreateBarChartView(**params):
     """Create Bar Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("XYBarChartView", detachedFromLayout, **params)
+    return CreateView("XYBarChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeRenderView(detachedFromLayout=False, **params):
+def CreateComparativeRenderView(**params):
     """Create Comparative view.
     See CreateView for arguments documentation"""
-    return CreateView("ComparativeRenderView", detachedFromLayout, **params)
+    return CreateView("ComparativeRenderView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeXYPlotView(detachedFromLayout=False, **params):
+def CreateComparativeXYPlotView(**params):
     """Create comparative XY plot Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("ComparativeXYPlotView", detachedFromLayout, **params)
+    return CreateView("ComparativeXYPlotView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeBarChartView(detachedFromLayout=False, **params):
+def CreateComparativeBarChartView(**params):
     """Create comparative Bar Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("ComparativeBarChartView", detachedFromLayout, **params)
+    return CreateView("ComparativeBarChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateParallelCoordinatesChartView(detachedFromLayout=False, **params):
+def CreateParallelCoordinatesChartView(**params):
     """Create Parallele coordinate Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("ParallelCoordinatesChartView", detachedFromLayout, **params)
+    return CreateView("ParallelCoordinatesChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def Create2DRenderView(detachedFromLayout=False, **params):
+def Create2DRenderView(**params):
     """Create the standard 3D render view with the 2D interaction mode turned ON.
     See CreateView for arguments documentation"""
-    return CreateView("2DRenderView", detachedFromLayout, **params)
+    return CreateView("2DRenderView", **params)
 
 # -----------------------------------------------------------------------------
 
@@ -1242,16 +1236,6 @@ def ReplaceReaderFileName(readerProxy, files, propName):
     servermanager.vtkSMCoreUtilities.ReplaceReaderFileName(readerProxy.SMProxy, files, propName)
 
 # -----------------------------------------------------------------------------
-def ImportCinema(filename, view=None):
-    """::deprecated:: 5.9
-
-    Cinema import capabilities are no longer supported in this version.
-    """
-    import warnings
-    warnings.warn("'ImportCinema' is no longer supported", DeprecationWarning)
-    return False
-
-# -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):
     """Creates a writer that can write the data produced by the source proxy in
        the given file format (identified by the extension). If no source is
@@ -1290,24 +1274,6 @@ def SaveData(filename, proxy=None, **extraArgs):
     del writer
 
 # -----------------------------------------------------------------------------
-
-def WriteImage(filename, view=None, **params):
-    """::deprecated:: 4.2
-    Use :func:`SaveScreenshot` instead.
-    """
-    if not view:
-        view = active_objects.view
-    writer = None
-    if 'Writer' in params:
-        writer = params['Writer']
-    mag = 1
-    if 'Magnification' in params:
-        mag = int(params['Magnification'])
-    if not writer:
-        writer = _find_writer(filename)
-    view.WriteImage(filename, writer, mag)
-
-# -----------------------------------------------------------------------------
 def _SaveScreenshotLegacy(filename,
     view=None, layout=None, magnification=None, quality=None, **params):
     if view is not None and layout is not None:
@@ -1322,9 +1288,9 @@ def _SaveScreenshotLegacy(filename,
     except TypeError:
         magnification = 1
     try:
-        quality = int(quality)
+        quality = max(0, min(100, int(quality)))
     except TypeError:
-        quality = -1
+        quality = 100
 
     # convert magnification to image resolution.
     if viewOrLayout.IsA("vtkSMViewProxy"):
@@ -1337,13 +1303,20 @@ def _SaveScreenshotLegacy(filename,
 
     imageResolution = (size[0]*magnification, size[1]*magnification)
 
-    # convert quality to ImageQuality
-    imageQuality = quality
-
-    # now, call the new API
-    return SaveScreenshot(filename, viewOrLayout,
+    import os.path
+    _, extension = os.path.splitext(filename)
+    if (extension == '.jpg'):
+        return SaveScreenshot(filename, viewOrLayout,
             ImageResolution=imageResolution,
-            ImageQuality=imageQuality)
+            Quality=quality)
+    elif (extension == '.png'):
+        compression = int(((quality * 0.01) - 1.0) * -9.0)
+        return SaveScreenshot(filename, viewOrLayout,
+            ImageResolution=imageResolution,
+            CompressionLevel=compression)
+    else:
+        return SaveScreenshot(filename, viewOrLayout,
+            ImageResolution=imageResolution)
 
 def SaveScreenshot(filename, viewOrLayout=None, **params):
     """Save screenshot for a view or layout (collection of views) to an image.
@@ -1433,11 +1406,6 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
 
         quality (int)
           Output image quality, a number in the range [0, 100].
-
-        ImageQuality (int)
-            For ParaView 5.4, the following parameters were available, however
-            it is ignored starting with ParaView 5.5. Instead, it is recommended
-            to use format-specific quality parameters based on the file format being used.
     """
     # Let's handle backwards compatibility.
     # Previous API for this method took the following arguments:
@@ -1487,11 +1455,6 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
         if prop in params:
             formatProxy.SetPropertyWithName(prop, params[prop])
             del params[prop]
-
-    if "ImageQuality" in params:
-        import warnings
-        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
-        del params["ImageQuality"]
 
     SetProperties(options, **params)
     return options.WriteImage(filename)
@@ -1569,17 +1532,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         UseSubsampling:
           When set to 1 (or True), the video will be encoded using 4:2:0
           subsampling for the color channels.
-
-    **Obsolete Parameters**
-
-        DisconnectAndSave (int):
-          This mode is no longer supported as of ParaView 5.5, and will be
-          ignored.
-
-        ImageQuality (int)
-            For ParaView 5.4, the following parameters were available, however
-            it is ignored starting with ParaView 5.5. Instead, it is recommended
-            to use format-specific quality parameters based on the file format being used.
     """
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
@@ -1590,11 +1542,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     scene = scene if scene else GetAnimationScene()
     if not scene:
         raise RuntimeError("Missing animation scene.")
-
-    if "DisconnectAndSave" in params:
-        import warnings
-        warnings.warn("'DisconnectAndSave' is deprecated and will be ignored.", DeprecationWarning)
-        del params["DisconnectAndSave"]
 
     controller = servermanager.ParaViewPipelineController()
     options = servermanager.misc.SaveAnimation()
@@ -1624,72 +1571,8 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
                 formatProxy.SetPropertyWithName(prop, params[prop])
                 del params[prop]
 
-    if "ImageQuality" in params:
-        import warnings
-        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
-        del params["ImageQuality"]
-
     SetProperties(options, **params)
     return options.WriteAnimation(filename)
-
-def WriteAnimation(filename, **params):
-    """
-    ::deprecated:: 5.3
-    Use :func:`SaveAnimation` instead.
-
-    This function can still be used to save an animation, but using
-    :func: `SaveAnimation` is strongly recommended as it provides more
-    flexibility.
-
-    The following parameters are currently supported.
-
-    **Parameters**
-
-        filename (str)
-          Name of the output file.
-
-    **Keyword Parameters (optional)**
-
-        Magnification (int):
-          Magnification factor for the saved animation.
-
-        Quality (int)
-          int in range [0,2].
-
-        FrameRate (int)
-          Frame rate.
-
-    The following parameters are no longer supported and are ignored:
-    Subsampling, BackgroundColor, FrameRate, StartFileCount, PlaybackTimeWindow
-    """
-    newparams = {}
-
-    # this method simply tries to provide legacy behavior.
-    scene = GetAnimationScene()
-    newparams["scene"] = scene
-
-    # previously, scene saved all views and only worked well if there was 1
-    # layout, so do that.
-    layout = GetLayout()
-    newparams["viewOrLayout"] = layout
-
-    if "Magnification" in params:
-        magnification = params["Magnification"]
-        exts = [0] * 4
-        layout.GetLayoutExtent(exts)
-        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
-        imageResolution = (size[0]*magnification, size[1]*magnification)
-        newparams["ImageResolution"] = imageResolution
-
-    if "Quality" in params:
-        # convert quality (0=worst, 2=best) to imageQuality (0 = worst, 100 = best)
-        quality = int(params["Quality"])
-        imageQuality = int(100 * quality/2.0)
-        newparams["ImageQuality"] = imageQuality
-
-    if "FrameRate" in params:
-        newparams["FrameRate"] = int(params["FrameRate"])
-    return SaveAnimation(filename, **newparams)
 
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
@@ -1927,7 +1810,10 @@ def GetLookupTableForArray(arrayname, num_components, **params):
     """Used to get an existing lookuptable for a array or to create one if none
     exists. Keyword arguments can be passed in to initialize the LUT if a new
     one is created.
-    *** DEPRECATED ***: Use GetColorTransferFunction instead"""
+    PARAVIEW_DEPRECATED_IN_5_12_0: Use GetColorTransferFunction instead"""
+    import warnings
+    warnings.warn("'GetLookupTableForArray' is deprecated, use GetColorTransferFunction instead", DeprecationWarning)
+
     return GetColorTransferFunction(arrayname, **params)
 
 # -----------------------------------------------------------------------------
@@ -1992,34 +1878,6 @@ def LoadLookupTable(fileName):
     """
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return presets.ImportPresets(fileName)
-
-# -----------------------------------------------------------------------------
-
-def CreateScalarBar(**params):
-    """Create and return a scalar bar widget.  The returned widget may
-    be added to a render view by appending it to the view's representations
-    The widget must have a valid lookup table before it is added to a view.
-    It is possible to pass the lookup table (and other properties) as arguments
-    to this method::
-
-        lt = MakeBlueToRedLT(3.5, 7.5)
-        bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
-        GetRenderView().Representations.append(bar)
-
-    By default the returned widget is selectable and resizable.
-    ::deprecated:: 5.10
-    Use :func:`GetScalarBar` instead.
-    """
-    import warnings
-    warnings.warn("`CreateScalarBar` is deprecated in ParaView 5.10. Use `GetScalarBar` instead",
-        DeprecationWarning)
-    sb = servermanager.rendering.ScalarBarWidgetRepresentation()
-    sb.Selectable = 1
-    sb.Resizable = 1
-    sb.Enabled = 1
-    sb.Title = "Scalars"
-    SetProperties(sb, **params)
-    return sb
 
 # -----------------------------------------------------------------------------
 
@@ -2521,7 +2379,7 @@ def Show3DWidgets(proxy=None):
     If possible in the current environment, this method will
     request the application to show the 3D widget(s) for proxy
 
-    ::deprecated:: 5.11
+    PARAVIEW_DEPRECATED_IN_5_11_0
     Use :func:`ShowInteractiveWidgets` instead.
     """
     import warnings
@@ -2534,7 +2392,7 @@ def Hide3DWidgets(proxy=None):
     If possible in the current environment, this method will
     request the application to show the 3D widget(s) for proxy
 
-    ::deprecated:: 5.11
+    PARAVIEW_DEPRECATED_IN_5_11_0
     Use :func:`HideInteractiveWidgets` instead.
     """
     import warnings

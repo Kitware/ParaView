@@ -47,7 +47,7 @@ class TPlot(object):
 
     def __del__(self):
         self.reset()
-        
+
 
     def reset(self):
         self._curves = []
@@ -182,8 +182,8 @@ class TPlot(object):
             curves_to_plot = self._curves
         elif curve_index < len(self._curves):
             curves_to_plot = [self._curves[curve_index]]
-        else: return          
-        
+        else: return
+
         view = self.view
         view.Representations = []
 
@@ -330,9 +330,9 @@ class Curve(object):
         else:
             return "%s %s %s" % (self.var.decorated_name,
                                  self.var.type_name,
-                                 self.id)  
+                                 self.id)
 
-   
+
 
 def _get_field_type_for_variable(var):
     if var.type == NODE_VARIABLE: return "POINT"

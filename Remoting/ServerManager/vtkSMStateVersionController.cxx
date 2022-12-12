@@ -61,13 +61,6 @@ public:
   vtkTypeUInt32 GetNextUniqueId() { return (++this->LastUniqueId); }
 };
 
-string toString(int i)
-{
-  ostringstream ostr;
-  ostr << i;
-  return ostr.str();
-}
-
 class vtkSMVersion
 {
 public:

@@ -30,15 +30,16 @@ testing2.AddArgument("-V")
 testing2.AddArgument(baseline2)
 
 v2 = CreateXYPlotView()
+
 for i in [0, 1, 2]:
     Render(v1)
     filename = "%s/view1_%d.png" % (smtesting.TempDir, i)
-    WriteImage(filename, v1)
+    SaveScreenshot(filename, v1, ImageResolution=(400, 400))
     if testing1.RegressionTest(filename, smtesting.Threshold) != testing1.PASSED:
         raise RuntimeError("Failed image comparison for view 1 on run #%d"%i)
 
     Render(v2)
     filename = "%s/view2_%d.png" % (smtesting.TempDir, i)
-    WriteImage(filename, v2)
+    SaveScreenshot(filename, v2, ImageResolution=(400, 400))
     if testing2.RegressionTest(filename, smtesting.Threshold) != testing2.PASSED:
         raise RuntimeError("Failed image comparison for view 2 on run #%d"%i)

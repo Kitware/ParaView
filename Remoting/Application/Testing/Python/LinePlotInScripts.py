@@ -25,5 +25,5 @@ Render()
 
 for i in xrange(5):
     w.Maximum = 2**i
-    WriteImage(smtesting.TempDir + "/LinePlotInScripts_%d.png" % i, Magnification=2)
+    SaveScreenshot(smtesting.TempDir + "/LinePlotInScripts_%d.png" % i, magnification=2)
 print("Done")

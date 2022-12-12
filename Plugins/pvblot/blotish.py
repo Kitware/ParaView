@@ -173,7 +173,7 @@ class _State(object):
                 self._block_id_variable = "Part Index"
                 self._block_id_field = "POINT_DATA"
                 self._block_id_offset = 0
-                
+
             else:
                 self._reader = paraview.simple.ExodusIIReader(FileName=self.filename)
                 self._reader.add_attribute("DatabaseType", EXODUS)
@@ -289,7 +289,7 @@ class _State(object):
         import paraview.vtk
         # Find a good range for the data.
         range = self.currentVariableInfo.GetRange(self.currentVariableComponent)
-        
+
         if self.currentVariableComponent == -1:
             lt.VectorMode = "Magnitude"
         else:
@@ -802,7 +802,7 @@ def _tplot_plot(io_helper=None):
 
         if state.diskwrite:
             fname = state.get_next_screenshot_filename("tplot_overlay")
-            paraview.simple.WriteImage(fname, state.tplot.view)
+            paraview.simple.SaveScreenshot(fname, state.tplot.view)
 
         return
 
@@ -813,7 +813,7 @@ def _tplot_plot(io_helper=None):
 
         if state.diskwrite:
             fname = state.get_next_screenshot_filename("tplot_curve%02d"%i)
-            paraview.simple.WriteImage(fname, state.tplot.view)
+            paraview.simple.SaveScreenshot(fname, state.tplot.view)
 
         if interactive and i < nCurves-1:
             yield "Enter 'Q' to quit, '' to continue. "
@@ -824,7 +824,7 @@ def _tplot_plot(io_helper=None):
 
 def _tplot_reset():
     state.tplot.reset()
-    
+
 def _detour_reset():
     wireframe()
 
@@ -921,7 +921,7 @@ def alltimes():
 
 def show(name=""):
     """Show the given parameter name"""
-    
+
     name = name.lower()
     if name in ["tmin", "tmax", "nintv", "zintv", "times", "steps"]:
         sel = state.time_selection
@@ -947,7 +947,7 @@ def _detour_plot(io_helper=None):
         paraview.simple.Render(view)
 
         if state.diskwrite:
-            paraview.simple.WriteImage(state.get_next_screenshot_filename("detour"), view)
+            paraview.simple.SaveScreenshot(state.get_next_screenshot_filename("detour"), view)
 
         if interactive and stepIdx != nSteps-1:
             yield ("Time %f: Enter 'C' to complete, 'Q' to quit, '' to continue. " % t)
@@ -958,7 +958,7 @@ def _detour_plot(io_helper=None):
                 interactive = False
 
 def autoplot(flag):
-    """    
+    """
     Turn autoplot on or off.  The flag should be 0 (off) or 1 (on).  When
     autoplot is on, then a command that changes the state of the plot
     automatically renders the last time step with the new features.
@@ -1099,5 +1099,3 @@ def _maybe_convert(token, number_class):
     try: num = number_list_parser.convert_to_number_class(token, number_class)
     except number_list_parser.Error, err: raise BlotishError(err)
     return num
-
-

@@ -90,41 +90,21 @@ class _version(object):
     def __bool__(self):
         return bool(self.__version)
 
-    def GetVersion(self):
-        """::deprecated:: 5.10
-
-        Return version as a float. Will return None is no version is
-        specified.
-
-        This method is deprecated in 5.10. It's return value is not appropriate
-        for version number comparisons and hence should no longer be used.
-        """
-        if self:
-            version = float(self.minor)
-            while version >= 1.0:
-                version = version / 10.0
-            version += float(self.major)
-            return version
-        return None
-
     def _convert(self, value):
         # convert value to _version
         if type(value) == type(self):
             return value
         elif type(value) == tuple or type(value) == list:
             if len(value) == 0:
-                value = _version(None, None)
+                return _version(None, None)
             elif len(value) == 1:
-                value = _version(value[0], 0)
+                return _version(value[0], 0)
             elif len(value) >= 2:
-                value = _version(value[0], value[1])
+                return _version(value[0], value[1])
         elif type(value) == int:
-            value = _version(value, 0)
-        elif type(value) == float:
-            major = int(value)
-            minor = int(10 * value) - (10 * major)
-            value = _version(major, minor)
-        return value
+            return _version(value, 0)
+        else:
+            raise TypeError("unsupport type %s", type(value))
 
     def __lt__(self, other):
         """This will always return False if compatibility is not being forced
@@ -132,12 +112,7 @@ class _version(object):
         if not self:
             return False
 
-        # convert other to _version, if possible
-        other = self._convert(other)
-        if type(other) == type(self):
-            return self.__version < other.__version
-        else:
-            raise TypeError("unsupport type %s", type(other))
+        return self.__version < self._convert(other).__version
 
     def __le__(self, other):
         """This will always return False if compatibility is not forced to a
@@ -145,12 +120,7 @@ class _version(object):
         if not self:
             return False
 
-        # convert other to _version, if possible
-        other = self._convert(other)
-        if type(other) == type(self):
-            return self.__version <= other.__version
-        else:
-            raise TypeError("unsupport type %s", type(other))
+        return self.__version <= self._convert(other).__version
 
     def __eq__(self, other):
         raise RuntimeError("Equal operation not supported.")
@@ -164,26 +134,15 @@ class _version(object):
         if not self:
             return True
 
-        # convert other to _version, if possible
-        other = self._convert(other)
-        if type(other) == type(self):
-            return self.__version > other.__version
-        else:
-            raise TypeError("unsupport type %s", type(other))
+        return self.__version > self._convert(other).__version
 
     def __ge__(self, other):
         """This will always return True if compatibility is not being forced to
         a particular version"""
-        myversion = self.GetVersion()
-        if not myversion:
+        if not self:
             return True
 
-        # convert other to _version, if possible
-        other = self._convert(other)
-        if type(other) == type(self):
-            return self.__version >= other.__version
-        else:
-            raise TypeError("unsupport type %s", type(other))
+        return self.__version >= self._convert(other).__version
 
     def __repr__(self):
         return str(self.__version)

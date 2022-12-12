@@ -80,7 +80,7 @@ def setattr(proxy, pname, value):
     version = paraview.compatibility.GetVersion()
 
     if pname == "ColorAttributeType" and proxy.SMProxy.GetProperty("ColorArrayName"):
-        if paraview.compatibility.GetVersion() <= 4.1:
+        if paraview.compatibility.GetVersion() <= (4, 1):
             # set ColorAttributeType on ColorArrayName property instead.
             caProp = proxy.GetProperty("ColorArrayName")
             proxy.GetProperty("ColorArrayName").SetData((value, caProp[1]))
@@ -92,7 +92,7 @@ def setattr(proxy, pname, value):
                     "instead. Refer to ParaView Python API changes documentation online.")
 
     if pname == "AspectRatio" and proxy.SMProxy.GetProperty("ScalarBarThickness"):
-        if paraview.compatibility.GetVersion() <= 5.3:
+        if paraview.compatibility.GetVersion() <= (5, 3):
             # We can't do this perfectly, so we set the ScalarBarThickness
             # property instead. Assume a reasonable modern screen size of
             # 1280x1024 with a Render view size of 1000x600. Even if we had
@@ -115,7 +115,7 @@ def setattr(proxy, pname, value):
                 "'ScalarBarThickness' property to set the width instead.")
 
     if pname == "Position2" and proxy.SMProxy.GetProperty("ScalarBarLength"):
-        if paraview.compatibility.GetVersion() <= 5.3:
+        if paraview.compatibility.GetVersion() <= (5, 3):
             # The scalar bar length corresponds to Position2[0] when the
             # orientation is horizontal and Position2[1] when the orientation
             # is vertical.
@@ -131,7 +131,7 @@ def setattr(proxy, pname, value):
                 "'ScalarBarLength' property to set the length instead.")
 
     if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if paraview.compatibility.GetVersion() <= (5, 4):
             from paraview.modules.vtkRemotingViews import vtkSMTransferFunctionManager
             if value:
                 proxy.GetProperty("AutomaticRescaleRangeMode").SetData(vtkSMTransferFunctionManager.NEVER)
@@ -148,7 +148,7 @@ def setattr(proxy, pname, value):
     # data it operates on.  This change changed the method and property name from AttributeMode to
     # AttributeType
     if pname == "AttributeMode" and proxy.SMProxy.GetXMLName() == "Calculator":
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if paraview.compatibility.GetVersion() <= (5, 4):
             # The Attribute type uses enumeration values from vtkDataObject::AttributeTypes
             # rather than custom constants for the calculator.  For the values supported by
             # ParaView before this change, the conversion works out to subtracting 1 if value
@@ -164,13 +164,13 @@ def setattr(proxy, pname, value):
                 "'AttributeMode' is obsolete.  Use 'AttributeType' property of Calculator filter instead.")
 
     if pname == "UseOffscreenRenderingForScreenshots" and proxy.SMProxy.IsA("vtkSMViewProxy"):
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if paraview.compatibility.GetVersion() <= (5, 4):
             raise Continue()
         else:
             raise NotSupportedException(\
                     "'UseOffscreenRenderingForScreenshots' is obsolete. Simply remove it from your script.")
     if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if paraview.compatibility.GetVersion() <= (5, 4):
             raise Continue()
         else:
             raise NotSupportedException(\
@@ -180,7 +180,7 @@ def setattr(proxy, pname, value):
         # in 5.5, CGNS reader had some changes. "BaseStatus", "FamilyStatus",
         # "LoadBndPatch", and "LoadMesh" properties were removed.
         if pname in ["LoadBndPatch", "LoadMesh", "BaseStatus", "FamilyStatus"]:
-            if paraview.compatibility.GetVersion() <= 5.4:
+            if paraview.compatibility.GetVersion() <= (5, 4):
                 paraview.print_warning(\
                   "'%s' is no longer supported and will have no effect. "\
                   "Please use `Blocks` property to specify blocks to load." % pname)
@@ -190,7 +190,7 @@ def setattr(proxy, pname, value):
                         "property to select blocks using SIL instead." % pname)
 
     if pname == "DataBoundsInflateFactor" and proxy.SMProxy.GetProperty("DataBoundsScaleFactor"):
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if paraview.compatibility.GetVersion() <= (5, 4):
             # In 5.5, The axes grid data bounds inflate factor have been
             # translated by 1 to become the scale factor.
             proxy.GetProperty("DataBoundsScaleFactor").SetData(value + 1)
@@ -203,7 +203,7 @@ def setattr(proxy, pname, value):
     if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "AnnotateAttributeData":
         # in 5.5, Annotate Attribute Data changed how it sets the array to annotate
         if pname == "ArrayAssociation":
-            if paraview.compatibility.GetVersion() <= 5.4:
+            if paraview.compatibility.GetVersion() <= (5, 4):
                 paraview.print_warning(\
                 "'ArrayAssociation' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
 
@@ -223,7 +223,7 @@ def setattr(proxy, pname, value):
                 raise NotSupportedException(\
                     "'ArrayAssociation' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
         elif pname == "ArrayName":
-            if paraview.compatibility.GetVersion() <= 5.4:
+            if paraview.compatibility.GetVersion() <= (5, 4):
                 paraview.print_warning(\
                 "'ArrayName' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
 
@@ -237,7 +237,7 @@ def setattr(proxy, pname, value):
     # In 5.5, we changed the Clip to be inverted from what it was before and changed the InsideOut
     # property to be called Invert to be clearer.
     if pname == "InsideOut" and proxy.SMProxy.GetXMLName() == "Clip":
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if paraview.compatibility.GetVersion() <= (5, 4):
             proxy.GetProperty("Invert").SetData(1-value)
             raise Continue()
         else:
@@ -248,7 +248,7 @@ def setattr(proxy, pname, value):
     # the "FieldAssociation" and "GenerateCellConnectivity" properties. They are
     # now moved to the view.
     if pname in ["FieldAssociation", "GenerateCellConnectivity"] and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() <= 5.5:
+        if paraview.compatibility.GetVersion() <= (5, 5):
             raise Continue()
         else:
             raise NotSupportedException(
@@ -257,7 +257,7 @@ def setattr(proxy, pname, value):
     # In 5.7, we changed to the names of the input proxies in ResampleWithDataset to clarify what
     # each source does.
     if pname == "Input" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             proxy.GetProperty("SourceDataArrays").SetData(value)
             raise Continue()
         else:
@@ -266,7 +266,7 @@ def setattr(proxy, pname, value):
                 'Please set the SourceDataArrays property instead.')
 
     if pname == "Source" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             proxy.GetProperty("DestinationMesh").SetData(value)
             raise Continue()
         else:
@@ -277,7 +277,7 @@ def setattr(proxy, pname, value):
     # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
     # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
     if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             proxy.GetProperty("PointIdsArrayName").SetData(value)
             proxy.GetProperty("CellIdsArrayName").SetData(value)
             raise Continue()
@@ -288,7 +288,7 @@ def setattr(proxy, pname, value):
 
     # In 5.7, we renamed the 3D View's ray tracing interface from OSPRay to RayTracing
     if pname == "EnableOSPRay" and proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             return proxy.GetProperty("EnableRayTracing").SetData(value)
         else:
             raise NotSupportedException(
@@ -297,7 +297,7 @@ def setattr(proxy, pname, value):
         newvalue = "OSPRay raycaster"
         if value == "pathtracer":
             newvalue = "OSPRay pathtracer"
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             return proxy.GetProperty("BackEnd").SetData(newvalue)
         else:
             raise NotSupportedException(
@@ -305,32 +305,32 @@ def setattr(proxy, pname, value):
                 'the settings `scivis` and `pathtracer` have been renamed to `OSPRay scivis` '\
                 'and `OSPRay pathtracer` respectively.')
     if pname == "OSPRayTemporalCacheSize" and proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             return proxy.GetProperty("TemporalCacheSize").SetData(value)
         else:
             raise NotSupportedException(
                 'The `OSPRayTemporalCacheSize` control has been renamed in ParaView 5.7 to `TemporalCacheSize`.')
     if pname == "OSPRayUseScaleArray" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             return proxy.GetProperty("UseScaleArray").SetData(value)
         else:
             raise NotSupportedException(
                 'The `OSPRayUseScaleArray` control has been renamed in ParaView 5.7 to `UseScaleArray`.')
     if pname == "OSPRayScaleFunction" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             return proxy.GetProperty("ScaleFunction").SetData(value)
         else:
             raise NotSupportedException(
                 'The `OSPRayScaleFunction` control has been renamed in ParaView 5.7 to `ScaleFunction`.')
     if pname == "OSPRayMaterial" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if paraview.compatibility.GetVersion() < (5, 7):
             return proxy.GetProperty("Material").SetData(value)
         else:
             raise NotSupportedException(
                 'The `OSPRayMaterial` control has been renamed in ParaView 5.7 to `Material`.')
 
     if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if paraview.compatibility.GetVersion() <= (5, 9):
             selectors = ["//*[@cid='%s']" % cid for cid in value]
             return proxy.GetProperty("BlockVisibilities").SetData(selectors)
         else:
@@ -340,7 +340,7 @@ def setattr(proxy, pname, value):
 
 
     if pname == "BlockIndices" and proxy.SMProxy.GetXMLName() == "ExtractBlock":
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if paraview.compatibility.GetVersion() <= (5, 9):
             selectors = ["//*[@cid='%s']" % cid for cid in value]
             return proxy.GetProperty("Selectors").SetData(selectors)
         else:
@@ -349,7 +349,7 @@ def setattr(proxy, pname, value):
                 "supports 'Selectors' to select blocks.")
 
     if pname in ["MaintainStructure", "PruneOutput"] and proxy.SMProxy.GetXMLName() == "ExtractBlock":
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if paraview.compatibility.GetVersion() <= (5, 9):
             return
         else:
             raise NotSupportedException(
@@ -359,7 +359,7 @@ def setattr(proxy, pname, value):
     if pname in ["UseGradientBackground", "UseTexturedBackground",
             "UseSkyboxBackground"] and proxy.SMProxy.GetXMLGroup() == "views" \
                     and proxy.SMProxy.GetProperty("BackgroundColorMode"):
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if paraview.compatibility.GetVersion() <= (5, 9):
             mode = proxy.GetProperty("BackgroundColorMode").GetData()
             if pname == "UseGradientBackground":
                 if value == 1 and mode != "Gradient":
@@ -385,7 +385,7 @@ def setattr(proxy, pname, value):
         # From ParaView 5.10, the Threshold filter now offers additional
         # thresholding methods besides ThresholdBetween. The lower and upper
         # threshold values are also set separately.
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if paraview.compatibility.GetVersion() <= (5, 9):
             proxy.GetProperty("ThresholdMethod").SetData(0)
             proxy.GetProperty("LowerThreshold").SetData(value[0])
             proxy.GetProperty("UpperThreshold").SetData(value[1])
@@ -400,7 +400,7 @@ def setattr(proxy, pname, value):
     # In 5.11, we changed the ParticleTracer/ParticlePath/StreakLine's the StaticMesh
     # property to be called MeshOverTime since more capabilities were added.
     if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
-        if paraview.compatibility.GetVersion() <= 5.10:
+        if paraview.compatibility.GetVersion() <= (5, 10):
             proxy.GetProperty("MeshOverTime").SetData(value)
             raise Continue()
         else:
@@ -416,7 +416,7 @@ def setattr(proxy, pname, value):
 def setattr_fix_value(proxy, pname, value, setter_func):
     if pname == "ShaderPreset" and proxy.SMProxy.GetXMLName().endswith("Representation"):
         if value == "Gaussian Blur (Default)":
-            if paraview.compatibility.GetVersion() <= 5.5:
+            if paraview.compatibility.GetVersion() <= (5, 5):
                 paraview.print_warning(\
                     "The 'Gaussian Blur (Default)' option has been renamed to 'Gaussian Blur'.  Please use that instead.")
                 setter_func(proxy, "Gaussian Blur")
@@ -426,7 +426,7 @@ def setattr_fix_value(proxy, pname, value, setter_func):
                     " Use 'Gaussian Blur' instead.")
 
     if pname == "FieldAssociation" and proxy.SMProxy.GetXMLName() in ["DataSetCSVWriter", "CSVWriter"]:
-        if paraview.compatibility.GetVersion() < 5.8:
+        if paraview.compatibility.GetVersion() < (5, 8):
             if value == "Points":
                 value = "Point Data"
             elif value == "Cells":
@@ -448,7 +448,7 @@ def setattr_fix_value(proxy, pname, value, setter_func):
             if value == seed_sources_from[i]:
                 domain_proxy = domain.FindProxy("extended_sources", seed_sources_proxyname[i])
                 if domain_proxy:
-                    if paraview.compatibility.GetVersion() < 5.9:
+                    if paraview.compatibility.GetVersion() < (5, 9):
                         value = seed_sources_to[i]
                         setter_func(proxy, value)
                         raise Continue()
@@ -463,7 +463,7 @@ def setattr_fix_value(proxy, pname, value, setter_func):
                                'UpperLeftCorner': 'Upper Left Corner', 'UpperRightCorner': 'Upper Right Corner',
                                'UpperCenter': 'Upper Center'}
         new_value = window_location_map[value]
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if paraview.compatibility.GetVersion() <= (5, 9):
             setter_func(proxy, new_value)
             raise Continue()
         else:
@@ -493,7 +493,7 @@ def getattr(proxy, pname):
     # In 4.2, we removed ColorAttributeType property. One is expected to use
     # ColorArrayName to specify the attribute type as well.
     if pname == "ColorAttributeType" and proxy.SMProxy.GetProperty("ColorArrayName"):
-        if version <= 4.1:
+        if version <= (4, 1):
             if proxy.GetProperty("ColorArrayName")[0] == "CELLS":
                 return "CELL_DATA"
             else:
@@ -507,7 +507,7 @@ def getattr(proxy, pname):
     # since we added support to render view to automatically reset clipping
     # range for each render.
     if pname == "CameraClippingRange" and not proxy.SMProxy.GetProperty("CameraClippingRange"):
-        if version <= 5.0:
+        if version <= (5, 0):
             return [0.0, 0.0, 0.0]
         else:
             raise NotSupportedException(
@@ -517,7 +517,7 @@ def getattr(proxy, pname):
     # In 5.1, we remove support for Cube Axes and related properties.
     global _ACubeAxesHelper
     if proxy.SMProxy.IsA("vtkSMPVRepresentationProxy") and hasattr(_ACubeAxesHelper, pname):
-        if version <= 5.0:
+        if version <= (5, 0):
             return builtins.getattr(_ACubeAxesHelper, pname)
         else:
             raise NotSupportedException(
@@ -527,7 +527,7 @@ def getattr(proxy, pname):
     # In 5.4, we removed the AspectRatio property and replaced it with the
     # ScalarBarThickness property.
     if pname == "AspectRatio" and proxy.SMProxy.GetProperty("ScalarBarThickness"):
-        if version <= 5.3:
+        if version <= (5, 3):
             return 20.0
         else:
             raise NotSupportedException(
@@ -538,7 +538,7 @@ def getattr(proxy, pname):
     # In 5.4, we removed the Position2 property and replaced it with the
     # ScalarBarLength property.
     if pname == "Position2" and proxy.SMProxy.GetProperty("ScalarBarLength"):
-        if version <= 5.3:
+        if version <= (5, 3):
             if proxy.GetProperty("Orientation").GetData() == "Horizontal":
                 return [0.05, proxy.GetProperty("ScalarBarLength").GetData()]
             else:
@@ -551,7 +551,7 @@ def getattr(proxy, pname):
     # In 5.5, we removed the PVLookupTable.LockScalarRange boolean property and
     # replaced it with the enumeration AutomaticRescaleRangeMode.
     if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
-        if version <= 5.4:
+        if version <= (5, 4):
             from paraview.modules.vtkRemotingViews import vtkSMTransferFunctionManager
             if proxy.GetProperty("AutomaticRescaleRangeMode").GetData() == "Never":
                 return 1
@@ -566,7 +566,7 @@ def getattr(proxy, pname):
     # data it operates on.  This change changed the method and property name from AttributeMode to
     # AttributeType
     if pname == "AttributeMode" and proxy.SMProxy.GetName() == "Calculator":
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if version <= (5, 4):
             # The Attribute type uses enumeration values from vtkDataObject::AttributeTypes
             # rather than custom constants for the calculator.  For the values supported by
             # ParaView before this change, the conversion works out to adding 1 if it is an
@@ -583,14 +583,14 @@ def getattr(proxy, pname):
                     'constants are needed for the two properties.')
 
     if pname == "UseOffscreenRenderingForScreenshots" and proxy.SMProxy.IsA("vtkSMViewProxy"):
-        if version <= 5.4:
+        if version <= (5, 4):
             return 0
         else:
             raise NotSupportedException('`UseOffscreenRenderingForScreenshots` '\
                     'is no longer supported. Please remove it.')
 
     if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
-        if version <= 5.4:
+        if version <= (5, 4):
             return 0
         else:
             raise NotSupportedException(\
@@ -598,7 +598,7 @@ def getattr(proxy, pname):
 
     if proxy.SMProxy.GetXMLName() == "CGNSSeriesReader" and\
             pname in ["LoadBndPatch", "LoadMesh", "BaseStatus", "FamilyStatus"]:
-        if version < 5.5:
+        if version < (5, 5):
             if pname in ["LoadMesh", "LoadBndPatch"]:
                 return 0
             else:
@@ -613,7 +613,7 @@ def getattr(proxy, pname):
     # In 5.5, we removed the DataBoundsInflateFactor property and replaced it with the
     # DataBoundsScaleFactor property.
     if pname == "DataBoundsInflateFactor" and proxy.SMProxy.GetProperty("DataBoundsScaleFactor"):
-        if version <= 5.4:
+        if version <= (5, 4):
             inflateValue = proxy.GetProperty("DataBoundsScaleFactor").GetData() - 1
             if inflateValue >= 0:
                 return inflateValue
@@ -627,7 +627,7 @@ def getattr(proxy, pname):
     if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "AnnotateAttributeData":
         # in 5.5, Annotate Attribute Data changed how it sets the array to annotate
         if pname == "ArrayAssociation":
-            if paraview.compatibility.GetVersion() <= 5.4:
+            if version <= (5, 4):
                 paraview.print_warning(\
                 "'ArrayAssociation' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
 
@@ -644,7 +644,7 @@ def getattr(proxy, pname):
                 raise NotSupportedException(\
                     "'ArrayAssociation' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
         elif pname == "ArrayName":
-            if paraview.compatibility.GetVersion() <= 5.4:
+            if version <= (5, 4):
                 paraview.print_warning(\
                 "'ArrayName' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
                 return proxy.GetProperty("SelectInputArray")[1]
@@ -655,7 +655,7 @@ def getattr(proxy, pname):
     # In 5.5, we changed the Clip to be inverted from what it was before and changed the InsideOut
     # property to be called Invert to be clearer.
     if pname == "InsideOut" and proxy.SMProxy.GetXMLName() == "Clip":
-        if paraview.compatibility.GetVersion() <= 5.4:
+        if version <= (5, 4):
             return proxy.GetProperty("Invert").GetData()
         else:
             raise NotSupportedException(
@@ -666,7 +666,7 @@ def getattr(proxy, pname):
     # the "FieldAssociation" and "GenerateCellConnectivity" properties. They are
     # now moved to the view.
     if pname in ["FieldAssociation", "GenerateCellConnectivity"] and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() <= 5.5:
+        if version <= (5, 5):
             return 0
         else:
             raise NotSupportedException(
@@ -675,7 +675,7 @@ def getattr(proxy, pname):
     # In 5.7, we changed to the names of the input proxies in ResampleWithDataset to clarify what
     # each source does.
     if pname == "Input" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("SourceDataArrays")
         else:
             raise NotSupportedException(
@@ -683,7 +683,7 @@ def getattr(proxy, pname):
                 'Please access the SourceDataArrays property instead.')
 
     if pname == "Source" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("DestinationMesh")
         else:
             raise NotSupportedException(
@@ -693,7 +693,7 @@ def getattr(proxy, pname):
     # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
     # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
     if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("PointIdsArrayName")
         else:
             raise NotSupportedException(
@@ -702,13 +702,13 @@ def getattr(proxy, pname):
 
     # In 5.7, we renamed the 3D View's ray tracing interface from OSPRay to RayTracing
     if pname == "EnableOSPRay" and proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("EnableRayTracing")
         else:
             raise NotSupportedException(
                 'The `EnableOSPRay` control has been renamed in ParaView 5.7 to `EnableRayTracing`.')
     if pname == "OSPRayRenderer" and proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("BackEnd")
         else:
             raise NotSupportedException(
@@ -716,25 +716,25 @@ def getattr(proxy, pname):
                 'the settings `scivis` and `pathtracer` have been renamed to `OSPRay scivis` '\
                 'and `OSPRay pathtracer` respectively.')
     if pname == "OSPRayTemporalCacheSize" and proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("TemporalCacheSize")
         else:
             raise NotSupportedException(
                 'The `OSPRayTemporalCacheSize` control has been renamed in ParaView 5.7 to `TemporalCacheSize`.')
     if pname == "OSPRayUseScaleArray" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("UseScaleArray")
         else:
             raise NotSupportedException(
                 'The `OSPRayUseScaleArray` control has been renamed in ParaView 5.7 to `UseScaleArray`.')
     if pname == "OSPRayScaleFunction" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("ScaleFunction")
         else:
             raise NotSupportedException(
                 'The `OSPRayScaleFunction` control has been renamed in ParaView 5.7 to `ScaleFunction`.')
     if pname == "OSPRayMaterial" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("Material")
         else:
             raise NotSupportedException(
@@ -743,7 +743,7 @@ def getattr(proxy, pname):
     #  In 5.7, the `Box` implicit function's Scale property was renamed to
     #  Length.
     if pname == "Scale" and proxy.SMProxy.GetXMLName() == "Box":
-        if paraview.compatibility.GetVersion() < 5.7:
+        if version < (5, 7):
             return proxy.GetProperty("Length")
         else:
             raise NotSupportedException(
@@ -751,7 +751,7 @@ def getattr(proxy, pname):
 
     # In 5.9, CGNSSeriesReader no longer supports the "Blocks" property.
     if pname == "Blocks" and proxy.SMProxy.GetXMLName() == "CGNSSeriesReader":
-        if paraview.compatibility.GetVersion() < 5.9:
+        if version < (5, 9):
             return []
         else:
             raise NotSupportedException(
@@ -763,7 +763,7 @@ def getattr(proxy, pname):
     # 5.10 onwards SpreadSheetRepresentation cannot provide a value for
     # CompositeDataSetIndex
     if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if version <= (5, 9):
             return []
         else:
             raise NotSupportedException(
@@ -773,21 +773,21 @@ def getattr(proxy, pname):
 
     if proxy.SMProxy.GetXMLName() == "ExtractBlock":
         if pname == "BlockIndices":
-            if paraview.compatibility.GetVersion() <= 5.9:
+            if version <= (5, 9):
                 return []
             else:
                 raise NotSupportedException(
                         "Since ParaView 5.10, 'BlockIndices' on 'ExtractBlock' "
                         "has been replaced by 'Selectors'.")
         elif pname == "PruneOutput":
-            if paraview.compatibility.GetVersion() <= 5.9:
+            if version <= (5, 9):
                 return 1
             else:
                 raise NotSupportedException(
                         "Since ParaView 5.10, 'PruneOutput' on 'ExtractBlock' "
                         "is no longer supported. Simply remove it.")
         elif pname == "MaintainStructure":
-            if paraview.compatibility.GetVersion() <= 5.9:
+            if version <= (5, 9):
                 return 1
             else:
                 raise NotSupportedException(
@@ -797,7 +797,7 @@ def getattr(proxy, pname):
     if pname in ["UseGradientBackground", "UseTexturedBackground",
             "UseSkyboxBackground"] and proxy.SMProxy.GetXMLGroup() == "views" \
                     and proxy.SMProxy.GetProperty("BackgroundColorMode"):
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if version <= (5, 9):
             mode = proxy.GetProperty("BackgroundColorMode").GetData()
             if pname == "UseGradientBackground":
                 return 1 if mode == "Gradient" else 0
@@ -814,7 +814,7 @@ def getattr(proxy, pname):
         # The Threshold filter now offers additional thresholding methods
         # besides ThresholdBetween. The lower and upper threshold values
         # are also set separately.
-        if paraview.compatibility.GetVersion() <= 5.9:
+        if version <= (5, 9):
             return [proxy.GetProperty("LowerThreshold").GetData(),
                     proxy.GetProperty("UpperThreshold").GetData()]
         else:
@@ -828,7 +828,7 @@ def getattr(proxy, pname):
         # The Threshold filter now offers additional thresholding methods
         # besides ThresholdBetween. The lower and upper threshold values
         # are also set separately.
-        if paraview.compatibility.GetVersion() <= 5.10:
+        if version <= (5, 10):
             return [proxy.GetProperty("LowerThreshold").GetData(),
                     proxy.GetProperty("UpperThreshold").GetData()]
         else:
@@ -844,7 +844,7 @@ def getattr(proxy, pname):
                     "instead. The 'CutoffArray' needs to be provided by the data set source.")
 
     if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
-        if paraview.compatibility.GetVersion() <= 5.10:
+        if version <= (5, 10):
             return proxy.GetProperty("MeshOverTime").GetData()
         else:
             raise NotSupportedException(
@@ -853,7 +853,7 @@ def getattr(proxy, pname):
 
     if proxy.SMProxy.GetXMLName() == "DataSetSurfaceFilter":
         if pname == "UseGeometryFilter":
-            if paraview.compatibility.GetVersion() <= 5.10:
+            if version <= (5, 10):
                 return 1
             else:
                 raise NotSupportedException(
@@ -866,21 +866,21 @@ def getattr(proxy, pname):
 # label and not its name.
 def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
-    if version < 5.5:
+    if version < (5, 5):
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
             # also InsideOut was changed to Invert in 5.5
             clip = builtins.getattr(module, key)(**kwargs)
             clip.Invert = 0
             return clip
-    if version < 5.7:
+    if version < (5, 7):
         if key == "ExodusRestartReader" or key == "ExodusIIReader":
             # in 5.7, we changed the names for blocks, this preserves old
             # behavior
             reader = builtins.getattr(module, key)(**kwargs)
             reader.UseLegacyBlockNamesWithElementTypes = 1
             return reader
-    if version <= 5.9:
+    if version <= (5, 9):
         if key == "PlotOverLine":
             ## in 5.10, we changed the backend of Plot Over Line
             ## This restores the previous backend.
@@ -902,7 +902,7 @@ def GetProxy(module, key, **kwargs):
             # into a unique 'Gradient" filter.
             gradient = builtins.getattr(module, "GradientLegacy")(**kwargs)
             return gradient
-    if version <= 5.10:
+    if version <= (5, 10):
         if key in ["ParticleTracer, ParticlePath, StreakLine"]:
             # in 5.11, we changed the StaticMesh flag of ParticleTracer, ParticlePath and StreakLine
             # This restores the previous StaticMesh.
@@ -919,7 +919,7 @@ def lookupTableUpdate(lutName):
     # For backwards compatibility
     reverseLut = False
     version = paraview.compatibility.GetVersion()
-    if (version <= 5.8):
+    if (version <= (5, 8)):
         # In 5.9, some redundant color maps were removed and some had name changes.
         # Replace these with a color map that remains. Also handle some color map
         # name changes.
