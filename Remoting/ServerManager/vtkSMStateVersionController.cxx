@@ -1449,6 +1449,39 @@ struct Process_5_10_to_5_11
   }
 };
 
+struct Process_5_11_to_5_12
+{
+  bool operator()(xml_document& document) { return ConvertTableFFT(document); }
+
+  static bool ConvertTableFFT(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='TableFFT']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+
+      if (auto averageNode = node.find_child_by_attribute("name", "AverageFft"))
+      {
+        averageNode.attribute("name").set_value("UseWelchMethod");
+      }
+
+      if (auto optimizeNode = node.find_child_by_attribute("name", "OptimizeForRealInput"))
+      {
+        optimizeNode.attribute("name").set_value("OneSidedSpectrum");
+      }
+
+      if (auto nblockNode = node.find_child_by_attribute("name", "NumberOfBlock"))
+      {
+        node.remove_child(nblockNode);
+      }
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -1561,6 +1594,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_10_to_5_11 converter;
     status = converter(document);
     version = vtkSMVersion(5, 11, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 12, 0)))
+  {
+    Process_5_11_to_5_12 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 12, 0);
   }
 
   if (status)
