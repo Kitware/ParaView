@@ -48,6 +48,8 @@ vtkProtractorRepresentation::vtkProtractorRepresentation()
   this->AngleRepresentation->SetDragable(false);
   this->AngleRepresentation->InstantiateHandleRepresentation();
   this->AngleRepresentation->ArcVisibilityOn();
+  this->AngleRepresentation->GetArc()->UseFontSizeFromPropertyOn();
+  this->AngleRepresentation->GetArc()->AutoLabelOff();
 }
 
 //----------------------------------------------------------------------------
@@ -98,6 +100,7 @@ bool vtkProtractorRepresentation::RemoveFromView(vtkView* view)
 void vtkProtractorRepresentation::SetTextProperty(vtkTextProperty* prop)
 {
   vtkMTimeType previousMTime = this->AngleRepresentation->GetMTime();
+  prop->SetVerticalJustificationToCentered();
   this->AngleRepresentation->GetArc()->SetLabelTextProperty(prop);
   if (this->AngleRepresentation->GetArc()->GetMTime() != previousMTime)
   {
