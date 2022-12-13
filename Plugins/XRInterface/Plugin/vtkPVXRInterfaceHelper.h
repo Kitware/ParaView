@@ -39,8 +39,7 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include "vtkVRCamera.h"          // for visibility of inner "Pose" class
-#include "vtkVRInteractorStyle.h" // for visibility of enum "MovementStyle"
+#include "vtkVRCamera.h" // for visibility of inner "Pose" class
 
 #include <array>  // for method sig
 #include <map>    // for ivar
@@ -85,6 +84,18 @@ public:
   static vtkPVXRInterfaceHelper* New();
   vtkTypeMacro(vtkPVXRInterfaceHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  /**
+   * Actions produced when pushing the right controller trigger.
+   */
+  enum RightTriggerAction
+  {
+    ADD_POINT_TO_SOURCE = 0,
+    GRAB,
+    PICK,
+    INTERACTIVE_CROP,
+    PROBE
+  };
 
   /**
    * Create an XR View (e.g. displayed in an HMD) with the actors
@@ -251,12 +262,12 @@ public:
   /**
    * Set the right trigger action.
    */
-  void SetRightTriggerMode(std::string const& mode);
+  void SetRightTriggerMode(int index);
 
   /**
    * Set the movement style of the interactor style.
    */
-  void SetMovementStyle(vtkVRInteractorStyle::MovementStyle style);
+  void SetMovementStyle(int index);
 
   /**
    * Set the physical up direction of the render window.
@@ -401,7 +412,7 @@ protected:
   bool Done = true;
   bool UseOpenXR = false;
 
-  std::string RightTriggerMode = "Pick";
+  RightTriggerAction RightTriggerMode = vtkPVXRInterfaceHelper::PICK;
 
   // To simulate dpad with a trackpad on OpenXR we need to
   // store the last position

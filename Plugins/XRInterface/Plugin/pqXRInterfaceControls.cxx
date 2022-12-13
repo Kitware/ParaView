@@ -81,28 +81,13 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   QObject::connect(this->Internals->interactiveRay, &QCheckBox::stateChanged,
     [&](int state) { this->Helper->SetHoverPick(state == Qt::Checked); });
 
-  QObject::connect(
-    this->Internals->rightTrigger, &QComboBox::currentTextChanged, [&](QString const& text) {
-      std::string mode = text.toUtf8().toStdString();
-      this->Helper->SetRightTriggerMode(mode);
-    });
+  QObject::connect(this->Internals->rightTrigger,
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [&](int index) { this->Helper->SetRightTriggerMode(index); });
 
-  QObject::connect(
-    this->Internals->movementStyle, &QComboBox::currentTextChanged, [&](QString const& text) {
-      std::string style = text.toUtf8().toStdString();
-      if (style == "Flying")
-      {
-        this->Helper->SetMovementStyle(vtkVRInteractorStyle::FLY_STYLE);
-      }
-      else if (style == "Grounded")
-      {
-        this->Helper->SetMovementStyle(vtkVRInteractorStyle::GROUNDED_STYLE);
-      }
-      else
-      {
-        qWarning("Unrecognised movement style.");
-      }
-    });
+  QObject::connect(this->Internals->movementStyle,
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [&](int index) { this->Helper->SetMovementStyle(index); });
 
   QObject::connect(this->Internals->fieldValueButton, &QPushButton::clicked, this,
     &pqXRInterfaceControls::assignFieldValue);
@@ -201,15 +186,15 @@ void pqXRInterfaceControls::assignFieldValue()
 }
 
 //------------------------------------------------------------------------------
-void pqXRInterfaceControls::SetRightTriggerMode(std::string const& text)
+void pqXRInterfaceControls::SetRightTriggerMode(vtkPVXRInterfaceHelper::RightTriggerAction action)
 {
-  this->Internals->rightTrigger->setCurrentText(text.c_str());
+  this->Internals->rightTrigger->setCurrentIndex(static_cast<int>(action));
 }
 
 //------------------------------------------------------------------------------
-void pqXRInterfaceControls::SetMovementStyle(std::string const& text)
+void pqXRInterfaceControls::SetMovementStyle(vtkVRInteractorStyle::MovementStyle style)
 {
-  this->Internals->movementStyle->setCurrentText(text.c_str());
+  this->Internals->movementStyle->setCurrentIndex(static_cast<int>(style));
 }
 
 //------------------------------------------------------------------------------

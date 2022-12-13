@@ -23,14 +23,15 @@
 #ifndef pqXRInterfaceControls_h
 #define pqXRInterfaceControls_h
 
-#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkPVXRInterfaceHelper.h" // for enum
+#include "vtkSmartPointer.h"        // for vtkSmartPointer
+#include "vtkVRInteractorStyle.h"   // for enum
 
 #include <QStringList>
 #include <QWidget>
 
 class pqPipelineSource;
 class pqVCRController;
-class vtkPVXRInterfaceHelper;
 
 class pqXRInterfaceControls : public QWidget
 {
@@ -50,12 +51,12 @@ public:
   /**
    * Set the value of the Right Trigger combobox.
    */
-  void SetRightTriggerMode(std::string const& text);
+  void SetRightTriggerMode(vtkPVXRInterfaceHelper::RightTriggerAction action);
 
   /**
    * Set the value of the Movement Style combobox.
    */
-  void SetMovementStyle(std::string const& text);
+  void SetMovementStyle(vtkVRInteractorStyle::MovementStyle style);
 
   /**
    * Set the available camera pose indices of the Load Camera Pose combobox.
