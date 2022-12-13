@@ -32,20 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMainWindowEventBehavior.h"
 
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainWindowEventManager.h"
 #include "pqSaveStateReaction.h"
 #include "pqSettings.h"
-#include "pqTimer.h"
-#include "pqWelcomeDialog.h"
 
-#include <QCloseEvent>
-#include <QDragEnterEvent>
+#include "vtkSMLoadStateOptionsProxy.h"
+
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QMimeData>
-#include <QShowEvent>
 #include <QString>
 #include <QUrl>
 
@@ -118,7 +116,21 @@ void pqMainWindowEventBehavior::onDrop(QDropEvent* event)
       }
       else
       {
-        files.append(url.toLocalFile());
+        std::string contents;
+        const bool statePresentInPNF = path.endsWith(".png", Qt::CaseInsensitive) &&
+          vtkSMLoadStateOptionsProxy::PNGHasStateFile(path.toStdString().c_str(), contents);
+        if (statePresentInPNF &&
+          QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Read PNG or state file?"),
+            tr("This PNG file has a ParaView state file embedded.\n"
+               "Do you want to open this file as a state file?"),
+            QMessageBox::No | QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+        {
+          pqLoadStateReaction::loadState(path);
+        }
+        else
+        {
+          files.append(url.toLocalFile());
+        }
       }
     }
   }

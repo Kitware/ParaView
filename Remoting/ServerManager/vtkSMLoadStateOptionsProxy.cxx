@@ -18,6 +18,7 @@
 #include "vtkFileSequenceParser.h"
 #include "vtkLogger.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGReader.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
@@ -470,17 +471,54 @@ void ReplaceEnvironmentVariables(std::string& contents)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMLoadStateOptionsProxy::PNGHasStateFile(const char* statefilename, std::string& contents)
+{
+  vtkNew<vtkPNGReader> reader;
+  if (!reader->CanReadFile(statefilename))
+  {
+    vtkErrorWithObjectMacro(nullptr, "Failed to open state file '" << statefilename << "'.");
+    return false;
+  }
+  reader->SetFileName(statefilename);
+  reader->Update();
+  auto pngTextChunks = reader->GetNumberOfTextChunks();
+  bool stateFound = false;
+  for (int i = 0; i < pngTextChunks; ++i)
+  {
+    if (strcmp(reader->GetTextKey(i), "ParaViewState") == 0)
+    {
+      contents = reader->GetTextValue(i);
+      stateFound = true;
+      break;
+    }
+  }
+  return stateFound;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 {
   this->SetStateFileName(statefilename);
-  std::ifstream xmlfile(statefilename);
-  if (!xmlfile.is_open())
+  std::string contents;
+  const auto fileNameExt = vtksys::SystemTools::GetFilenameLastExtension(statefilename);
+  if (fileNameExt == ".png")
   {
-    vtkErrorMacro("Failed to open state file '" << statefilename << "'.");
-    return false;
+    if (!vtkSMLoadStateOptionsProxy::PNGHasStateFile(statefilename, contents))
+    {
+      vtkErrorMacro("Failed to find state in png file '" << statefilename << "'.");
+      return false;
+    }
   }
-
-  auto contents = ::GetContents(xmlfile);
+  else
+  {
+    std::ifstream xmlfile(statefilename);
+    if (!xmlfile.is_open())
+    {
+      vtkErrorMacro("Failed to open state file '" << statefilename << "'.");
+      return false;
+    }
+    contents = ::GetContents(xmlfile);
+  }
   ::ReplaceEnvironmentVariables(contents);
 
   auto& internals = (*this->Internals);
