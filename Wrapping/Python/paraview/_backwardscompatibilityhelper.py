@@ -407,6 +407,27 @@ def setattr(proxy, pname, value):
             raise NotSupportedException("'StaticMesh' is obsolete.  Use 'MeshOverTime' property of " +
                                         proxy.SMProxy.GetXMLName() + " filter instead.")
 
+    # 5.11 -> 5.12 breaking changes on "TableFFT" properties
+    # Renamed AverageFFTperblock into UseWelchMethod
+    # Renamed OptimizeForRealInput into OneSidedSpectrum
+    # Removed NumberOfBlock
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "TableFFT":
+        isOldVersion = paraview.compatibility.GetVersion() < (5, 12)
+        if pname == "AverageFFTperblock":
+            if isOldVersion:
+                proxy.GetProperty("UseWelchMethod").SetData(value)
+                raise Continue()
+            else:
+                raise NotSupportedException("'AverageFFTperblock' is obsolete.  Use 'UseWelchMethod' property instead.")
+        elif pname == "OptimizeForRealInput":
+            if isOldVersion:
+                proxy.GetProperty("OneSidedSpectrum").SetData(value)
+                raise Continue()
+            else:
+                raise NotSupportedException("'OptimizeForRealInput' is obsolete.  Use 'OneSidedSpectrum' property instead.")
+        elif pname == "NumberOfBlock" and not isOldVersion:
+            raise NotSupportedException("'NumberOfBlock' is obsolete.  See 'BlockOverlap' property instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -858,6 +879,25 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException(
                     "Since ParaView 5.11, 'UseGeometryFilter' has been removed. ")
+
+    # 5.11 -> 5.12 breaking changes on "TableFFT" properties
+    # Renamed AverageFFTperblock into UseWelchMethod
+    # Renamed OptimizeForRealInput into OneSidedSpectrum
+    # Removed NumberOfBlock
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "TableFFT":
+        isOldVersion = paraview.compatibility.GetVersion() < (5, 12)
+        if pname == "AverageFFTperblock":
+            if isOldVersion:
+                return proxy.GetProperty("UseWelchMethod").GetData()
+            else:
+                raise NotSupportedException("'AverageFft' is obsolete.  Use 'UseWelchMethod' property instead.")
+        elif pname == "OptimizeForRealInput":
+            if isOldVersion:
+                return proxy.GetProperty("OneSidedSpectrum").GetData()
+            else:
+                raise NotSupportedException("'OptimizeForRealInput' is obsolete.  Use 'OneSidedSpectrum' property instead.")
+        elif pname == "NumberOfBlock" and not isOldVersion:
+            raise NotSupportedException("'NumberOfBlock' is obsolete.  See 'BlockOverlap' property instead.")
 
     raise Continue()
 

@@ -1469,7 +1469,6 @@ if(PARAVIEW_USE_PYTHON)
     SelectionLinkScripting.xml
     SelectPointsTrace.xml
     SplitViewTrace.xml
-    TestTableFFT.xml
     TraceMultiViews.xml
   )
   set(SelectCellsTrace_DISABLE_CRS TRUE)
@@ -1525,7 +1524,9 @@ if(PARAVIEW_USE_PYTHON)
 
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FindDataTrace.xml
-      FindDataQueries.xml)
+      FindDataQueries.xml
+      TestTableFFT.xml # needs programmable filter + numpy
+      )
 
     # PythonAlgorithm plugin tests.
     configure_file(

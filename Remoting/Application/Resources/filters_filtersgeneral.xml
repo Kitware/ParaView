@@ -2647,8 +2647,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty name="DefaultSampleRate"
+                            command="SetDefaultSampleRate"
+                            number_of_elements="1"
+                            default_values="10000">
+        <DoubleRangeDomain name="range" min="10" max="100000" />
+        <Documentation>
+          If the "Time" column is not found then this value will be used as the sample rate of the input.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="WindowingFunction"
                          command="SetWindowingFunction"
+                         panel_visibility="advanced"
                          number_of_elements="1"
                          default_values="4">
         <EnumerationDomain name="enum">
@@ -2660,14 +2671,13 @@
         </EnumerationDomain>
         <Documentation>
           Specify the windowing function to apply on the input. This allows to better process
-          data that is not periodic. When NumberOfBlocks > 1, the windowing function is applied
-          to each block.
+          data that is not periodic. When Welch method is used, the window is applied to each frame.
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="OptimizeForRealInput"
-                         command="SetOptimizeForRealInput"
-                         panel_visibility="advanced"
+      <IntVectorProperty name="OneSidedSpectrum"
+                         command="SetReturnOnesided"
+                         panel_visibility="default"
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain name="bool" />
@@ -2684,40 +2694,28 @@
                          default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
-          Specify if the output should be normalized.
+          Specify if the output should be normalized. Only used if UseWelchMethod is false.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AverageFft"
+                                   value="0" />
+        </Hints>
       </IntVectorProperty>
 
-      <IntVectorProperty name="AverageFft"
+      <IntVectorProperty name="UseWelchMethod"
                          command="SetAverageFft"
-                         label="Average FFT per block"
                          panel_visibility="advanced"
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
-          Specify if the input should be split in multiple blocks to compute
-          an average fft across all blocks.
+          Specify if filter should use the Welch / periodogram method. If true the
+          input will be split in multiple segment to compute an average fft across
+          all segments / blocks. This can be faster for input with lots of samples
+          and also remove some noise.
         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="NumberOfBlock"
-                         command="SetNumberOfBlock"
-                         panel_visibility="advanced"
-                         number_of_elements="1"
-                         default_values="2">
-        <Documentation>
-          Specify the number of blocks to use when computing the average fft over
-          the whole input sample array. If NumberOfBlock == 1, no average is done
-          and we only compute the fft on the first BlockSize samples of the input data.
-        </Documentation>
-
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="AverageFft"
-                                   value="1" />
-        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="BlockSize"
@@ -2726,17 +2724,62 @@
                          number_of_elements="1"
                          default_values="1024">
         <Documentation>
-          Specify the number of samples to use for each block. This should be a power of 2.
-          If not, the closest power of two will be used anyway.
+          Specify the number of samples to use for each block / segment in the Welch method.
+          This should be a power of 2 in order to achieve better performance.
         </Documentation>
+      </IntVectorProperty>
 
+      <IntVectorProperty name="BlockOverlap"
+                         command="SetBlockOverlap"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="-1">
+        <Documentation>
+          Specify the number of samples which will overlap between each block / segment.
+          If value is not in a valid range (ie inferior to 0 or superior to BlockSize) then the
+          value BlockSize / 2 will be used. Only used if UseWelchMethod is true.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScalingMethod"
+                         command="SetScalingMethod"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Density"/>
+          <Entry value="1" text="Spectrum"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set what scaling should be used when applying the Welch method.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Detrend"
+                         command="SetDetrend"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Remove trend on each segment before applying the FFT. This is a constant
+          detrend where the mean of the signal is substracted to the signal.
+          Only used if UseWelchMethod is true.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Welch Method Parameters" panel_visibility="advanced" >
+        <Property name="BlockSize" />
+        <Property name="BlockOverlap" />
+        <Property name="ScalingMethod" />
+        <Property name="Detrend" />
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="AverageFft"
+                                   property="UseWelchMethod"
                                    value="1" />
         </Hints>
-      </IntVectorProperty>
+      </PropertyGroup>
 
       <Hints>
         <PipelineIcon name="XYChartView" />
