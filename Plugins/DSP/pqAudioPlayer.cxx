@@ -354,19 +354,25 @@ bool pqAudioPlayer::pqInternals::fetchAndPrepareData()
   audioFormat.setSampleType(sampleType);
 
   // Look for a device that supports the format
-  bool found = false;
-  QAudioDeviceInfo foundDeviceInfo;
-  const auto deviceInfos = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
-  for (const QAudioDeviceInfo& deviceInfo : deviceInfos)
+  QAudioDeviceInfo foundDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
+  if (!foundDeviceInfo.isFormatSupported(audioFormat))
   {
-    if (deviceInfo.isFormatSupported(audioFormat))
+    const auto deviceInfos = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
+    for (const QAudioDeviceInfo& deviceInfo : deviceInfos)
     {
-      foundDeviceInfo = deviceInfo;
-      found = true;
-      break;
+      if (!deviceInfo.isNull() && deviceInfo != foundDeviceInfo &&
+        deviceInfo.isFormatSupported(audioFormat))
+      {
+        qInfo() << "Switched audio device from default '" << foundDeviceInfo.deviceName()
+                << "' to '" << deviceInfo.deviceName() << "'";
+        foundDeviceInfo = deviceInfo;
+        break;
+      }
     }
   }
-  if (!found)
+
+  // If we still couldn't find a device that supports the output format then abort
+  if (!foundDeviceInfo.isFormatSupported(audioFormat))
   {
     qWarning() << "This audio format not supported by any of your audio devices "
                   "(sample rate = "
@@ -536,6 +542,12 @@ void pqAudioPlayer::constructor()
   this->Internals->enablePlayerPanel(false);
   this->Internals->swapToPlayButton();
   this->Internals->StopButton->setEnabled(false);
+
+  // Make sure it is working properly when launching the plugin after we created a source
+  if (auto* source = pqActiveObjects::instance().activeSource())
+  {
+    this->onActiveSourceChanged(source);
+  }
 }
 
 //-----------------------------------------------------------------------------
