@@ -72,6 +72,17 @@ is interpreted as a different audio signal and can be selected in the widget. Ea
 a sample. The sample rate is selected manually in the widget. The default value can be
 automatically configured by adding a field data array in the vtkTable named "sample_rate".
 
+## Example
+
+Here's an example of a pipeline that uses all of the filters exposed by this plugin, presented using
+the node editor :
+
+![DSP Pipeline Example](Documentation/example_pipeline.png "DSP Pipeline example")
+
+And a part of the resulting output :
+
+![DSP Pipeline Results](Documentation/pipeline_results.png "DSP Pipeline results")
+
 ## Acknowledgement
 
 This work is funded by the CALM-AA European project (cofunded by the European fund for
