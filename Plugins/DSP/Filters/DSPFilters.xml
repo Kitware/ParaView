@@ -1,0 +1,635 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkMeanPowerSpectralDensity"
+                label="Mean Power Spectral Density"
+                name="MeanPowerSpectralDensity">
+      <Documentation short_help="Compute mean power spectral density (PSD).">
+        This filter computes the mean power spectral density (PSD) of temporal signals.
+        The input should be a multiblock dataset of vtkTables where each block
+        represents a point. Each row of the tables corresponds to a timestep.
+      </Documentation>
+
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+      </InputProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFFTArrayName"
+                            name="FFTArrayName"
+                            label="FFT Column"
+                            number_of_elements="1">
+        <ArrayListDomain attribute_type="Scalars"
+                          name="array_list"
+                          none_string="None"
+                          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Name of the FFT array from which to compute the mean PSD.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFrequencyArrayName"
+                            name="FrequencyArrayName"
+                            label="Frequency Column"
+                            number_of_elements="1">
+        <ArrayListDomain attribute_type="Scalars"
+                          name="array_list"
+                          none_string="None"
+                          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Name of the frequency array to copy.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <View type="XYChartView" />
+      </Hints>
+
+    </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkMergeReduceTableBlocks"
+                 label="Merge Reduce Table Blocks"
+                 name="MergeReduceTableBlocks">
+      <Documentation short_help="Reduce a multiblock of tables with operations such as mean or sum.">
+        This filter performs reduction operations such as the mean or the sum over columns
+        across all blocks of a multiblock of vtkTables.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays"
+                          attribute_type="row"
+                          optional="1" />
+        <Documentation>
+          This property specifies the input of the filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="GetColumnToReduceSelection"
+                            name="ColumnArraysToReduce"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the row data arrays to reduce.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="GetColumnToCopySelection"
+                            name="ColumnArraysToCopy"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the row data arrays to copy from input to output.
+            Arrays are copied from the first block.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="GetOperationSelection"
+                            name="OperationSelectionInfo"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty command="GetOperationSelection"
+                            name="OperationTypes"
+                            information_property="OperationSelectionInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="OperationSelectionInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Select the operations to apply for reduction.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkSoundQuantitiesCalculator"
+                 label="Sound Quantities Calculator"
+                 name="SoundQuantitiesCalculator">
+      <Documentation short_help="Compute intensity from sound pressure level.">
+        Compute the pressure RMS value (Pa and dB) as well as the acoustic power from a sound pressure (Pa) array.
+        Could be improved by adding more conversions.
+
+        This filter has 2 inputs:
+        - port 0 is the input geometry for cell connectivity.
+        - port 1 is a multi-block dataset representing the data through time. Block flat index
+          corresponds to the index of the point in the input mesh. This kind of dataset
+          can be obtained e.g. by first applying the filter Plot Data Over Time with the
+          option "Only Report Selection Statistics" turned off.
+
+        The output is the input geometry with the computed sound quantities attached to
+        it i.e. the mean pressure, the RMS pressure and the acoustic power.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input" >
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <InputProperty command="SetSourceConnection"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+        <Documentation>
+          Multiblock dataset containing the temporal data. Each block corresponds to one point.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetPressureArrayName"
+                            name="PressureArrayName"
+                            label="Pressure Column"
+                            number_of_elements="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list"
+                         none_string="None"
+                         input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Specify the input array containing the pressure level (in Pa).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="MediumDensity"
+                            label="Medium Density (kg/m3)"
+                            command="SetMediumDensity"
+                            number_of_elements="1"
+                            animateable="1"
+                            default_values="1.2">
+         <Documentation>
+           Density of the medium the sound is traveling through.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="MediumSoundVelocity"
+                            label="Sound Velocity (m/s)"
+                            command="SetMediumSoundVelocity"
+                            number_of_elements="1"
+                            animateable="1"
+                            default_values="340">
+         <Documentation>
+           Velocity of the sound in the medium it is traveling through.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty  name="ComputeMeanPressure"
+                          label="Compute Mean Pressure (Pa)"
+                          command="SetComputeMeanPressure"
+                          number_of_elements="1"
+                          animateable="1"
+                          default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If enabled, compute the mean pressure through time over the surface.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ComputeRMSPressure"
+                          label="Compute RMS Pressure (Pa + dB)"
+                          command="SetComputeRMSPressure"
+                          number_of_elements="1"
+                          animateable="1"
+                          default_values="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator  type="GenericDecorator"
+                                    mode="visibility"
+                                    property="ComputeMeanPressure"
+                                    value="1" />
+        </Hints>
+        <Documentation>
+           If enabled, compute the root mean squared pressure value through time over the surface.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ComputePower"
+                          label="Compute Acoustic Power (dB)"
+                          command="SetComputePower"
+                          number_of_elements="1"
+                          animateable="1"
+                          default_values="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator  type="GenericDecorator"
+                                    mode="visibility"
+                                    property="ComputeRMSPressure"
+                                    value="1" />
+          <PropertyWidgetDecorator  type="GenericDecorator"
+                                    mode="visibility"
+                                    property="ComputeMeanPressure"
+                                    value="1" />
+        </Hints>
+        <Documentation>
+          If enabled, compute the sound power over time and over the whole surface.
+          This is a single value that will be stored in the field data.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkSpectrogramFilter"
+                 label="Spectrogram"
+                 name="Spectrogram">
+      <Documentation long_help="Compute spectrogram from given vtkTable temporal data."
+                     short_help="Compute spectrogram.">
+        This filter computes the spectrogram of the input vtkTable column.
+        The output is a vtkImageData where the X and Y axes correspond to time and
+        frequency, respectively.
+        The spectrogram is computed by applying a FFT on temporal windows each containing
+        a subset of the input samples. The window size and type can be controlled with the
+        time resolution and window type properties, respectively.
+      </Documentation>
+
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array"
+                          number_of_components="1" >
+        </InputArrayDomain>
+      </InputProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputScalars"
+                            label="Column"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Name of the column array from which to compute a spectrogram.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetWindowType"
+                         name="WindowType"
+                         label="Window Type"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Hanning" value="0" />
+          <Entry text="Bartlett" value="1" />
+          <Entry text="Sine" value="2" />
+          <Entry text="Blackman" value="3" />
+          <Entry text="Rectangular" value="4" />
+        </EnumerationDomain>
+        <Documentation>
+          Type of windowing function.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetTimeResolution"
+                         name="TimeResolution"
+                         label="Time Resolution"
+                         number_of_elements="1"
+                         default_values="100">
+        <IntRangeDomain name="range" min="3" max="1000"/>
+        <Documentation>
+          Number of samples per temporal window.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetOverlapPercentage"
+                         name="OverlapPercentage"
+                         label="Overlap Percentage"
+                         number_of_elements="1"
+                         default_values="50"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+            Percentage of samples overlap between consecutive windows.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetDefaultSampleRate"
+                            name="DefaultSampleRate"
+                            label="Default Sampling Rate"
+                            number_of_elements="1"
+                            default_values="10000">
+        <DoubleRangeDomain name="range" min="0" max="48000" />
+        <Documentation>
+            Sampling rate of the signal in Hz. Only used if no column called
+            "Time" (case insensitive) is available in the input.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkProjectSpectrumMagnitude"
+                 name="ProjectSpectrumMagnitude"
+                 label="Project Spectrum Magnitude">
+      <Documentation short_help="Project spectrum magnitude on mesh.">
+        This filter computes the magnitudes of complex data values from a multi block
+        of tables (input) and places them on the points of a given mesh (source) for
+        a specified frequency range.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     label="Table Data" >
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays1"
+                          attribute_type="row"
+                          number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain name="row_arrays"
+                          attribute_type="row"
+                          optional="1" />
+        <Documentation>
+          Multiblock dataset containing the temporal data. Each block corresponds to one point.
+        </Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSourceConnection"
+                     name="Source"
+                     label="Destination Mesh">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Mesh on which to display point values.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="GetColumnSelection"
+                            name="ColumnSelection"
+                            label="Columns To Project"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the column data arrays to project on the mesh.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="FrequencyArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list"
+                         input_domain_name="row_arrays1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Name of the frequency array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty command="SetLowerFrequency"
+                            name="LowerFrequency"
+                            default_values="0"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="min">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="FrequencyArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          Lower bound of the frequency range.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetUpperFrequency"
+                            name="UpperFrequency"
+                            default_values="0"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="max">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="FrequencyArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          Upper bound of the frequency range.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkBandFiltering"
+                 label="Band filtering"
+                 name="BandFiltering">
+      <Documentation short_help="Compute amplitude per band of a table.">
+        This filter computes the magnitudes of complex data values from a multi block
+        of tables (input) per frequency band. The user can specify their band manually. Bands
+        are created using either temporal informations or the frequency related ones.
+        By default it processes temporal signals but deactivating the "Apply FFT" option
+        allows to process directly the result of a given FFT.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array"/>
+      </InputProperty>
+
+      <IntVectorProperty command="SetBandFilteringMode"
+                         default_values="0"
+                         name="BandFilteringMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Octave" value="0" />
+          <Entry text="Third-octave" value="1" />
+          <Entry text="Custom" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify if the filter should use octave, third or custom octave band.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetOctaveSubdivision"
+                         default_values="1"
+                         name="OctaveSubdivision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="1" max="9" resolution="2"/>
+        <Hints>
+          <PropertyWidgetDecorator  type="GenericDecorator"
+                                    mode="visibility"
+                                    property="BandFilteringMode"
+                                    value="2" />
+        </Hints>
+        <Documentation>
+          Set the number of octave subdivision when
+          BandFilteringMode is "Custom" . Only odd numbers are valid.
+          When using even numbers, the number just below will be used.
+          1 is equivalent to using the "Octave" mode, and 3 the "Third-octave"
+          mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetDefaultSamplingRate"
+                         default_values="10000"
+                         name="DefaultSamplingRate"
+                         panel_visibility="advanced"
+                         number_of_elements="1" >
+        <Documentation>
+          Specify the frequency sample rate in Hz.
+          If ApplyFFT is true: this will be used if the filter cannot find a time column
+          If ApplyFFT is false: this will be used if the filter cannot find a frequency column.
+        </Documentation>
+      </DoubleVectorProperty>
+
+       <IntVectorProperty command="SetApplyFFT"
+                         default_values="1"
+                         name="ApplyFFT"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+       <IntVectorProperty command="SetWindowType"
+                         name="WindowType"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Hanning" value="0" />
+          <Entry text="Bartlett" value="1" />
+          <Entry text="Sine" value="2" />
+          <Entry text="Blackman" value="3" />
+          <Entry text="Rectangular" value="4" />
+        </EnumerationDomain>
+        <Documentation>
+          Type of windowing function when applying the fft when the input is temporal.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator  type="GenericDecorator"
+                                    mode="visibility"
+                                    property="ApplyFFT"
+                                    value="1" />
+        </Hints>
+        <Documentation>
+          Used only when ApplyFFT is true, meaning that input is temporal.
+          Set the windowing function to use before applying the FFT.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+  </ProxyGroup>
+
+  <ParaViewFilters>
+    <Category name="Digital Signal Processing" menu_label="DSP" show_in_toolbar="0">
+      <Proxy group="filters" name="SoundQuantitiesCalculator" />
+      <Proxy group="filters" name="MeanPowerSpectralDensity" />
+      <Proxy group="filters" name="MergeReduceTableBlocks" />
+      <Proxy group="filters" name="Spectrogram" />
+      <Proxy group="filters" name="ProjectSpectrumMagnitude" />
+      <Proxy group="filters" name="TableFFT" />
+      <Proxy group="filters" name="EqualizerFilter"/>
+      <Proxy group="filters" name="BandFiltering"/>
+    </Category>
+  </ParaViewFilters>
+</ServerManagerConfiguration>

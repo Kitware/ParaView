@@ -1,0 +1,12 @@
+NAME
+  DigitalSignalProcessing::DSPFiltersPlugin
+LIBRARY_NAME
+  vtkDSPFiltersPlugin
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersGeneral
+PRIVATE_DEPENDS
+  VTK::FiltersCore
+  VTK::FiltersExtraction

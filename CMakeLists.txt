@@ -292,6 +292,7 @@ set(paraview_default_plugins
   CFSReader
   Datamine
   DigitalRockPhysics
+  DigitalSignalProcessing
   EULATestPlugin
   EmbossingRepresentations
   EyeDomeLighting
