@@ -39,8 +39,7 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include "vtkVRCamera.h"          // for visibility of inner "Pose" class
-#include "vtkVRInteractorStyle.h" // for visibility of enum "MovementStyle"
+#include "vtkVRCamera.h" // for visibility of inner "Pose" class
 
 #include <array>  // for method sig
 #include <map>    // for ivar
@@ -48,8 +47,6 @@
 
 class pqXRInterfaceControls;
 class QVTKOpenGLWindow;
-class vtkCallbackCommand;
-class vtkEventData;
 class vtkOpenGLCamera;
 class vtkOpenGLRenderer;
 class vtkOpenGLRenderWindow;
@@ -62,7 +59,6 @@ class vtkPVRenderView;
 class vtkPVXMLElement;
 class vtkQWidgetWidget;
 class vtkVRRenderWindow;
-class vtkVRRenderer;
 class vtkRenderWindowInteractor;
 class vtkSMProxy;
 class vtkSMProxyLocator;
@@ -90,8 +86,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Re-initializes the priority queue using the amr structure given to the most
-   * recent call to Initialize().
+   * Actions produced when pushing the right controller trigger.
+   */
+  enum RightTriggerAction
+  {
+    ADD_POINT_TO_SOURCE = 0,
+    GRAB,
+    PICK,
+    INTERACTIVE_CROP,
+    PROBE
+  };
+
+  /**
+   * Create an XR View (e.g. displayed in an HMD) with the actors
+   * present in the current Render View.
    */
   virtual void SendToXR(vtkSMViewProxy* view);
 
@@ -107,54 +115,57 @@ public:
    */
   void ShowXRView();
 
-  // called when a view is removed from PV
+  /**
+   * Called when a view is removed.
+   */
   void ViewRemoved(vtkSMViewProxy* view);
 
-  // if in VR close out the event loop
+  /**
+   * Stop the event loop.
+   */
   void Quit();
 
-  // reset all prop positions
+  /**
+   * Reset camera with the center of the dataset bounding box as focal point.
+   */
+  void ResetCamera();
+
+  /**
+   * Reset all prop positions.
+   */
   void ResetPositions();
 
-  // if running update the props to the current props
-  // on the View
+  /**
+   * If running, update the props to the current props in the view.
+   */
   void UpdateProps();
 
-  // use multisampling
-  vtkSetMacro(MultiSample, bool);
-  vtkGetMacro(MultiSample, bool);
-
-  // Use OpenXR backend instead of OpenVR
-  void SetUseOpenXR(bool useOpenXr);
-  vtkGetMacro(UseOpenXR, bool);
-
-  // hide base stations
-  virtual void SetBaseStationVisibility(bool);
-  vtkGetMacro(BaseStationVisibility, bool);
-
-  // set the initial thickness in world coordinates for
-  // thick crop planes. 0 indicates automatic
-  // setting. It defaults to 0
-  void SetDefaultCropThickness(double);
-  double GetDefaultCropThickness();
-
-  // Save/Load the state for VR
-  void LoadState(vtkPVXMLElement*, vtkSMProxyLocator*);
+  /**
+   * Save VR state.
+   */
   void SaveState(vtkPVXMLElement*);
 
-  // export the data for each saved location
-  // as a skybox
+  /**
+   * Load VR state.
+   */
+  void LoadState(vtkPVXMLElement*, vtkSMProxyLocator*);
+
+  /**
+   * Export the data for each saved location as a skybox.
+   */
   void ExportLocationsAsSkyboxes(vtkSMViewProxy* view);
 
-  // export the data for each saved location
-  // in a form mineview can load. Bacially
-  // as imple XML format with the surface geometry
-  // stored as vtp files.
+  /**
+   * Export saved locations as .vtp files in a folder called pv-view.
+   * This option is meant to be used for Mineview.
+   */
   void ExportLocationsAsView(vtkSMViewProxy* view);
 
-  // support for collaboration. The collaboration client
-  // will always be set even when collaboration is not
-  // enabled.
+  ///@{
+  /**
+   * Support for collaboration. The collaboration client
+   * will always be set even when collaboration is not enabled.
+   */
   vtkPVXRInterfaceCollaborationClient* GetCollaborationClient()
   {
     return this->CollaborationClient;
@@ -162,15 +173,22 @@ public:
   bool CollaborationConnect();
   bool CollaborationDisconnect();
   void GoToSavedLocation(int, double*, double*);
+  ///@}
 
-  // bring other collaborators to you
+  ///@{
+  /**
+   * Bring other collaborators to the user.
+   */
   void ComeToMe();
   void collabGoToPose(vtkVRCamera::Pose* pose, double* collabTrans, double* collabDir);
+  ///@}
 
-  // are we currently in VR
+  /**
+   * Return true if XR is currently running.
+   */
   bool InVR() { return this->Interactor != nullptr; }
 
-  //@{
+  ///@{
   /**
    * Add/remove crop planes and thick crops
    */
@@ -182,139 +200,229 @@ public:
   void collabUpdateThickCrop(int count, double* matrix);
   void SetCropSnapping(int val);
   void RemoveAllCropPlanesAndThickCrops();
-  //@}
+  ///@}
 
-  // show the billboard with the provided text
+  ///@{
+  /**
+   * Show/hide a billboard with the provided text.
+   */
   void ShowBillboard(std::string const& text, bool updatePosition, std::string const& tfile);
   void HideBillboard();
+  ///@}
 
-  // add a point to the currently selected source in PV
-  // if it accepts points
+  ///@{
+  /**
+   * Add a point to the currently selected source if it accepts points.
+   */
   void AddPointToSource(double const* pnt);
   void collabAddPointToSource(std::string const& name, double const* pnt);
+  ///@}
 
-  //@{
-  // set/show the pqOpenVRControls GUI elements
+  ///@{
+  /**
+   * Set/show the pqOpenVRControls GUI elements.
+   */
   void SetXRInterfaceControls(pqXRInterfaceControls* val) { this->XRInterfaceControls = val; }
   void ToggleShowControls();
-  //@}
+  ///@}
 
-  // additional widgets in VR
-  void SetDrawControls(bool);
-  void SetShowNavigationPanel(bool);
+  /**
+   * Add measuring widget to the view.
+   */
   void TakeMeasurement();
+
+  /**
+   * Remove measuring widget from the view.
+   */
   void RemoveMeasurement();
 
-  // set what the right trigger will do when pressed
-  void SetRightTriggerMode(std::string const& mode);
+  ///@{
+  /**
+   * Save/load a camera position.
+   */
+  void SaveCameraPose(int loc);
+  void LoadCameraPose(int loc);
+  ///@}
+
+  /**
+   * Load a saved location with the given index.
+   */
+  void LoadLocationState(int slot);
+
+  /**
+   * Set whether to display the XR menu.
+   */
+  void SetDrawControls(bool);
+
+  /**
+   * Set whether to display the navigation panel.
+   */
+  void SetShowNavigationPanel(bool);
+
+  /**
+   * Set the right trigger action.
+   */
+  void SetRightTriggerMode(int index);
 
   /**
    * Set the movement style of the interactor style.
    */
-  void SetMovementStyle(vtkVRInteractorStyle::MovementStyle style);
-
-  vtkGetObjectMacro(Renderer, vtkOpenGLRenderer);
+  void SetMovementStyle(int index);
 
   /**
    * Set the physical up direction of the render window.
    */
   void SetViewUp(const std::string& axis);
 
-  void SaveCameraPose(int loc);
-  void LoadCameraPose(int loc);
+  /**
+   * Set the scale factor determining the speed of scaling.
+   */
   void SetScaleFactor(float val);
+
+  /**
+   * Set the motion factor determining the speed of joystick-based movement.
+   */
   void SetMotionFactor(float val);
 
+  /**
+   * Indicates if picking should be updated every frame. If so, the interaction
+   * picker will try to pick a prop and rays will be updated accordingly.
+   */
   void SetHoverPick(bool);
 
-  // allow the user to edit a scalar field
-  // in VR
-  void SetEditableField(std::string);
-  std::string GetEditableField();
-
+  /**
+   * Set custom value chosen in the XR menu on the selected cell and given array.
+   */
   void SetEditableFieldValue(std::string name);
 
-  void LoadLocationState(int slot);
+  ///@{
+  /**
+   * Set/get whether multisampled framebuffers are used.
+   * Default is false.
+   */
+  vtkSetMacro(MultiSample, bool);
+  vtkGetMacro(MultiSample, bool);
+  ///@}
 
+  ///@{
+  /**
+   * Set/get whether to use the OpenXR backend instead of OpenVR.
+   * Default is false.
+   */
+  void SetUseOpenXR(bool useOpenXr);
+  vtkGetMacro(UseOpenXR, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/get whether to display base stations in the XR View.
+   * Default is false.
+   */
+  virtual void SetBaseStationVisibility(bool);
+  vtkGetMacro(BaseStationVisibility, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/get the initial thickness for thick crop planes in world coordinates.
+   * Default is 0 for automatic setting.
+   */
+  void SetDefaultCropThickness(double);
+  double GetDefaultCropThickness();
+  ///@}
+
+  ///@{
+  /**
+   * Set/get name of the array to edit.
+   */
+  void SetEditableField(std::string name);
+  std::string GetEditableField();
+  ///@}
+
+  ///@{
+  /**
+   * Set/get whether a high resolution render is needed.
+   */
+  vtkSetMacro(NeedStillRender, bool);
+  vtkGetMacro(NeedStillRender, bool);
+  ///@}
+
+  /**
+   * Get the renderer.
+   */
+  vtkGetObjectMacro(Renderer, vtkOpenGLRenderer);
+
+  /**
+   * Get the added props.
+   */
   vtkGetObjectMacro(AddedProps, vtkPropCollection);
 
+  /**
+   * Get the view.
+   */
   vtkGetObjectMacro(SMView, vtkSMViewProxy);
 
-  vtkSetMacro(NeedStillRender, bool);
-
-  // forward to widgets helper
+  /**
+   * Get the widgets.
+   */
   vtkGetObjectMacro(Widgets, vtkPVXRInterfaceWidgets);
 
-  // get polyfill
+  /**
+   * Get the polyfill.
+   */
   vtkGetObjectMacro(XRInterfacePolyfill, vtkXRInterfacePolyfill);
 
 protected:
   vtkPVXRInterfaceHelper();
-  ~vtkPVXRInterfaceHelper();
-
-  vtkPVXRInterfaceCollaborationClient* CollaborationClient;
-
-  vtkQWidgetWidget* QWidgetWidget;
-  pqXRInterfaceControls* XRInterfaceControls;
-
-  // state settings that the helper loads
-  bool MultiSample;
-  bool BaseStationVisibility;
-
-  std::string RightTriggerMode;
+  virtual ~vtkPVXRInterfaceHelper() = default;
 
   void ApplyState();
   void RecordState();
-
-  std::string FieldValues;
-
   bool InteractorEventCallback(vtkObject* object, unsigned long event, void* calldata);
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
-
   void HandleDeleteEvent(vtkObject* caller);
   void UpdateBillboard(bool updatePosition);
-
-  vtkPVRenderView* View;
-  vtkSMViewProxy* SMView;
-  vtkOpenGLRenderer* Renderer;
-  vtkOpenGLRenderWindow* RenderWindow;
-  vtkRenderWindowInteractor* Interactor;
-  vtkPropCollection* AddedProps;
-  vtkTimeStamp PropUpdateTime;
-
-  vtkXRInterfacePolyfill* XRInterfacePolyfill;
-
-  bool NeedStillRender;
-
-  // quit the event loop
-  bool Done;
-
-  bool UseOpenXR = false;
-
-  std::map<int, vtkVRCamera::Pose> SavedCameraPoses;
-  int LastCameraPoseIndex = 0;
-
   void SaveLocationState(int slot);
-
   void SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot);
   void LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot);
   void LoadNextCameraPose();
-
-  std::map<int, vtkPVXRInterfaceHelperLocation> Locations;
-  int LoadLocationValue;
-
   void DoOneEvent();
-
-  QVTKOpenGLWindow* ObserverWidget = nullptr;
-  vtkNew<vtkOpenGLCamera> ObserverCamera;
   void RenderXRView();
 
+  vtkNew<vtkOpenGLCamera> ObserverCamera;
+  vtkNew<vtkPropCollection> AddedProps;
+  vtkNew<vtkPVXRInterfaceCollaborationClient> CollaborationClient;
   vtkNew<vtkPVXRInterfaceExporter> Exporter;
   vtkNew<vtkPVXRInterfaceWidgets> Widgets;
+  vtkNew<vtkXRInterfacePolyfill> XRInterfacePolyfill;
+
+  pqXRInterfaceControls* XRInterfaceControls = nullptr;
+  QVTKOpenGLWindow* ObserverWidget = nullptr;
+  vtkQWidgetWidget* QWidgetWidget = nullptr;
+  vtkPVRenderView* View = nullptr;
+  vtkSMViewProxy* SMView = nullptr;
+  vtkOpenGLRenderer* Renderer = nullptr;
+  vtkOpenGLRenderWindow* RenderWindow = nullptr;
+  vtkRenderWindowInteractor* Interactor = nullptr;
+  vtkTimeStamp PropUpdateTime;
+
+  bool MultiSample = false;
+  bool BaseStationVisibility = false;
+  bool NeedStillRender = false;
+  bool Done = true;
+  bool UseOpenXR = false;
+
+  RightTriggerAction RightTriggerMode = vtkPVXRInterfaceHelper::PICK;
 
   // To simulate dpad with a trackpad on OpenXR we need to
   // store the last position
   double LeftTrackPadPosition[2];
+
+  std::map<int, vtkVRCamera::Pose> SavedCameraPoses;
+  int LastCameraPoseIndex = 0;
+
+  std::map<int, vtkPVXRInterfaceHelperLocation> Locations;
+  int LoadLocationValue = -1;
 
 private:
   vtkPVXRInterfaceHelper(const vtkPVXRInterfaceHelper&) = delete;

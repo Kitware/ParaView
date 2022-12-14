@@ -50,16 +50,12 @@ class pqXRInterfaceControls::pqInternals : public Ui::pqXRInterfaceControls
 void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
 {
   this->Helper = val;
-  this->NoForward = false;
 
   this->setWindowTitle("pqXRInterfaceControls");
   this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-  // this->setTitleBarWidget(new QWidget());
   QWidget* t_widget = new QWidget(this);
   this->Internals = new pqInternals();
   this->Internals->setupUi(t_widget);
-  // this->setWidget(t_widget);
-  // this->hide();
 
   QObject::connect(this->Internals->exitButton, &QPushButton::clicked,
     std::bind(&vtkPVXRInterfaceHelper::Quit, this->Helper));
@@ -82,28 +78,13 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   QObject::connect(this->Internals->interactiveRay, &QCheckBox::stateChanged,
     [&](int state) { this->Helper->SetHoverPick(state == Qt::Checked); });
 
-  QObject::connect(
-    this->Internals->rightTrigger, &QComboBox::currentTextChanged, [&](QString const& text) {
-      std::string mode = text.toUtf8().toStdString();
-      this->Helper->SetRightTriggerMode(mode);
-    });
+  QObject::connect(this->Internals->rightTrigger,
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [&](int index) { this->Helper->SetRightTriggerMode(index); });
 
-  QObject::connect(
-    this->Internals->movementStyle, &QComboBox::currentTextChanged, [&](QString const& text) {
-      std::string style = text.toUtf8().toStdString();
-      if (style == "Flying")
-      {
-        this->Helper->SetMovementStyle(vtkVRInteractorStyle::FLY_STYLE);
-      }
-      else if (style == "Grounded")
-      {
-        this->Helper->SetMovementStyle(vtkVRInteractorStyle::GROUNDED_STYLE);
-      }
-      else
-      {
-        qWarning("Unrecognised movement style.");
-      }
-    });
+  QObject::connect(this->Internals->movementStyle,
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [&](int index) { this->Helper->SetMovementStyle(index); });
 
   QObject::connect(this->Internals->fieldValueButton, &QPushButton::clicked, this,
     &pqXRInterfaceControls::assignFieldValue);
@@ -172,11 +153,6 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
         this->Helper->SaveCameraPose(std::stoi(text.toUtf8().toStdString()));
       }
     });
-
-  // Populate sources menu.
-  // QMenu *menu = new QMenu();
-  // pqParaViewMenuBuilders::buildSourcesMenu(*menu, nullptr);
-  // this->Internals->addSource->setMenu(menu);
 }
 
 //------------------------------------------------------------------------------
@@ -201,9 +177,15 @@ void pqXRInterfaceControls::assignFieldValue()
 }
 
 //------------------------------------------------------------------------------
-void pqXRInterfaceControls::SetRightTriggerMode(std::string const& text)
+void pqXRInterfaceControls::SetRightTriggerMode(vtkPVXRInterfaceHelper::RightTriggerAction action)
 {
-  this->Internals->rightTrigger->setCurrentText(text.c_str());
+  this->Internals->rightTrigger->setCurrentIndex(static_cast<int>(action));
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetMovementStyle(vtkVRInteractorStyle::MovementStyle style)
+{
+  this->Internals->movementStyle->setCurrentIndex(static_cast<int>(style));
 }
 
 //------------------------------------------------------------------------------
@@ -241,21 +223,10 @@ std::string trim(std::string const& str)
 }
 
 //------------------------------------------------------------------------------
-void pqXRInterfaceControls::SetFieldValues(std::string vals)
+void pqXRInterfaceControls::SetFieldValues(const QStringList& values)
 {
   this->Internals->fieldValueCombo->clear();
-  QStringList list;
-
-  std::istringstream iss(vals);
-
-  std::string token;
-  while (std::getline(iss, token, ','))
-  {
-    token = trim(token);
-    list << QString(token.c_str());
-  }
-
-  this->Internals->fieldValueCombo->addItems(list);
+  this->Internals->fieldValueCombo->addItems(values);
 }
 
 //------------------------------------------------------------------------------
@@ -316,4 +287,28 @@ void pqXRInterfaceControls::SetCurrentViewUp(std::string dir)
 {
   auto idx = this->Internals->viewUpCombo->findText(QString::fromStdString(dir));
   this->Internals->viewUpCombo->setCurrentIndex(idx);
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetInteractiveRay(bool val)
+{
+  this->Internals->interactiveRay->setCheckState(val ? Qt::Checked : Qt::Unchecked);
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetNavigationPanel(bool val)
+{
+  this->Internals->navigationPanel->setCheckState(val ? Qt::Checked : Qt::Unchecked);
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetSnapCropPlanes(bool checked)
+{
+  this->Internals->cropSnapping->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetShowFloor(bool checked)
+{
+  this->Internals->showFloorCheckbox->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
 }

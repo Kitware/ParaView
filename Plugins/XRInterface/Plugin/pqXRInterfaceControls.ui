@@ -75,7 +75,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>360</height>
+          <height>250</height>
          </size>
         </property>
         <property name="contextMenuPolicy">
@@ -179,6 +179,19 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="showFloorCheckbox">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Show Floor</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="interactiveRay">
         <property name="minimumSize">
          <size>
@@ -199,17 +212,8 @@
           <height>40</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
         <property name="text">
          <string>Navigation Panel</string>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -572,27 +576,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
              <string>+Z</string>
             </property>
            </item>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="showFloorCheckbox">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Show Floor</string>
-           </property>
           </widget>
          </item>
         </layout>
