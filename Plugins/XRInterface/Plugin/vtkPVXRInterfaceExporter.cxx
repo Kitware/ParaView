@@ -42,15 +42,73 @@
 #include "vtkXMLUtilities.h"
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
-#include <QCoreApplication>
 
 #if PARAVIEW_ENABLE_FFMPEG
 #include "vtkFFMPEGVideoSource.h"
 #include "vtkOpenGLMovieSphere.h"
 #endif
 
+#include <QCoreApplication>
+
 vtkStandardNewMacro(vtkPVXRInterfaceExporter);
 
+namespace
+{
+vtkPolyData* findPolyData(vtkDataObject* input)
+{
+  // do we have polydata?
+  vtkPolyData* pd = vtkPolyData::SafeDownCast(input);
+  if (pd)
+  {
+    return pd;
+  }
+  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(input);
+  if (cd)
+  {
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(cd->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      pd = vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());
+      if (pd)
+      {
+        return pd;
+      }
+    }
+  }
+  return nullptr;
+}
+}
+
+namespace
+{
+template <typename T>
+void setVectorAttribute(vtkXMLDataElement* el, const char* name, int count, T* data)
+{
+  std::ostringstream o;
+  vtkNumberToString convert;
+  for (int i = 0; i < count; ++i)
+  {
+    if (i)
+    {
+      o << " ";
+    }
+    o << convert(data[i]);
+  }
+  el->SetAttribute(name, o.str().c_str());
+}
+
+void writeTextureReference(vtkXMLDataElement* adatael, vtkTexture* texture, const char* tname,
+  std::map<vtkTexture*, size_t>& textures)
+{
+  if (texture)
+  {
+    adatael->SetIntAttribute(tname, static_cast<int>(textures[texture]));
+  }
+}
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVXRInterfaceExporter::ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper* helper,
   vtkSMViewProxy* smview, std::map<int, vtkPVXRInterfaceHelperLocation>& locations,
   vtkRenderer* ren)
@@ -113,9 +171,6 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper*
     helper->LoadLocationState(loci.first);
 
     auto& camPose = *loc.Pose;
-
-    //    QCoreApplication::processEvents();
-    //  this->SMView->StillRender();
 
     renWin->Render();
 
@@ -206,62 +261,7 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper*
           "\"metadata\": {\"backgroundColor\": \"rgb(0, 0, 0)\"} }";
 }
 
-namespace
-{
-vtkPolyData* findPolyData(vtkDataObject* input)
-{
-  // do we have polydata?
-  vtkPolyData* pd = vtkPolyData::SafeDownCast(input);
-  if (pd)
-  {
-    return pd;
-  }
-  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(input);
-  if (cd)
-  {
-    vtkSmartPointer<vtkCompositeDataIterator> iter;
-    iter.TakeReference(cd->NewIterator());
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      pd = vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());
-      if (pd)
-      {
-        return pd;
-      }
-    }
-  }
-  return nullptr;
-}
-}
-
-namespace
-{
-template <typename T>
-void setVectorAttribute(vtkXMLDataElement* el, const char* name, int count, T* data)
-{
-  std::ostringstream o;
-  vtkNumberToString convert;
-  for (int i = 0; i < count; ++i)
-  {
-    if (i)
-    {
-      o << " ";
-    }
-    o << convert(data[i]);
-  }
-  el->SetAttribute(name, o.str().c_str());
-}
-
-void writeTextureReference(vtkXMLDataElement* adatael, vtkTexture* texture, const char* tname,
-  std::map<vtkTexture*, size_t>& textures)
-{
-  if (texture)
-  {
-    adatael->SetIntAttribute(tname, static_cast<int>(textures[texture]));
-  }
-}
-}
-
+//-----------------------------------------------------------------------------
 void vtkPVXRInterfaceExporter::ExportLocationsAsView(vtkPVXRInterfaceHelper* helper,
   vtkSMViewProxy* smview, std::map<int, vtkPVXRInterfaceHelperLocation>& locations)
 {
@@ -300,7 +300,7 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsView(vtkPVXRInterfaceHelper* hel
 
   vtkNew<vtkXMLDataElement> posesel;
   posesel->SetName("CameraPoses");
-  int count = 0;
+  size_t count = 0;
   for (auto& loci : locations)
   {
     auto& loc = loci.second;
@@ -607,7 +607,7 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsView(vtkPVXRInterfaceHelper* hel
   topel2->AddNestedElement(fsel);
 
   // write out photospheres
-  std::map<int, std::string> defaultSkyboxes;
+  std::map<size_t, std::string> defaultSkyboxes;
   vtkNew<vtkXMLDataElement> psel;
   psel->SetName("PhotoSpheres");
   count = 0;

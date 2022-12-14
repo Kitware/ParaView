@@ -32,7 +32,6 @@
 #include "vtkJPEGReader.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
-#include "vtkOpenVRInteractorStyle.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
@@ -56,12 +55,14 @@
 #include "vtkTexture.h"
 #include "vtkTransform.h"
 #include "vtkVRFollower.h"
+#include "vtkVRInteractorStyle.h"
 #include "vtkVRPanelRepresentation.h"
 #include "vtkVRPanelWidget.h"
 #include "vtkVRRenderWindow.h"
 #include "vtkVectorOperators.h"
 #include "vtkView.h"
 #include "vtkVolume.h"
+
 #include <algorithm>
 #include <cctype>
 #include <regex>
@@ -75,8 +76,9 @@
 
 vtkStandardNewMacro(vtkPVXRInterfaceWidgets);
 
+//----------------------------------------------------------------------------
 #if XRINTERFACE_HAS_IMAGO_SUPPORT
-#include "vtkPVImagoLoader.cxx"
+#include "vtkPVImagoLoader.inl"
 #else
 class vtkImagoLoader
 {
@@ -99,15 +101,59 @@ public:
 #endif
 
 //----------------------------------------------------------------------------
-vtkPVXRInterfaceWidgets::vtkPVXRInterfaceWidgets()
+namespace
 {
-  this->NavRepresentation->GetTextActor()->GetTextProperty()->SetFontFamilyToCourier();
-  this->NavRepresentation->GetTextActor()->GetTextProperty()->SetFrame(0);
-  this->NavRepresentation->SetCoordinateSystemToLeftController();
+vtkPVDataRepresentation* FindRepresentation(vtkProp* prop, vtkView* view)
+{
+  int nr = view->GetNumberOfRepresentations();
 
-  this->DistanceWidget = vtkDistanceWidget::New();
+  for (int i = 0; i < nr; ++i)
+  {
+    vtkGeometryRepresentation* gr =
+      vtkGeometryRepresentation::SafeDownCast(view->GetRepresentation(i));
+    if (gr && gr->GetActor() == prop)
+    {
+      return gr;
+    }
+  }
+  return nullptr;
+}
+}
+
+//----------------------------------------------------------------------------
+struct vtkPVXRInterfaceWidgets::vtkInternals
+{
+  vtkNew<vtkVRPanelWidget> NavWidget;
+  vtkNew<vtkVRPanelRepresentation> NavRepresentation;
+  vtkNew<vtkDistanceWidget> DistanceWidget;
+
+  vtkNew<vtkTextActor3D> TextActor3D;
+  vtkNew<vtkPlaneSource> ImagePlane;
+  vtkNew<vtkActor> ImageActor;
+
+  vtkPVDataRepresentation* LastPickedRepresentation = nullptr;
+  vtkProp* LastPickedProp = nullptr;
+  vtkPVDataRepresentation* PreviousPickedRepresentation = nullptr;
+  std::vector<vtkIdType> SelectedCells;
+
+  vtkDataSet* LastPickedDataSet = nullptr;
+  vtkIdType LastPickedCellId = -1;
+  vtkDataSet* PreviousPickedDataSet = nullptr;
+  vtkIdType PreviousPickedCellId = -1;
+  std::unique_ptr<vtkImagoLoader> ImagoLoader;
+  std::map<vtkSMProxy*, vtkAbstractWidget*> WidgetsFromParaView;
+};
+
+//----------------------------------------------------------------------------
+vtkPVXRInterfaceWidgets::vtkPVXRInterfaceWidgets()
+  : Internals(new vtkPVXRInterfaceWidgets::vtkInternals())
+{
+  this->Internals->NavRepresentation->GetTextActor()->GetTextProperty()->SetFontFamilyToCourier();
+  this->Internals->NavRepresentation->GetTextActor()->GetTextProperty()->SetFrame(0);
+  this->Internals->NavRepresentation->SetCoordinateSystemToLeftController();
+
   vtkNew<vtkDistanceRepresentation3D> drep;
-  this->DistanceWidget->SetRepresentation(drep.Get());
+  this->Internals->DistanceWidget->SetRepresentation(drep.Get());
   vtkNew<vtkVRFollower> fol;
   drep->SetLabelActor(fol.Get());
   vtkNew<vtkPointHandleRepresentation3D> hr;
@@ -116,84 +162,83 @@ vtkPVXRInterfaceWidgets::vtkPVXRInterfaceWidgets()
 
   drep->SetLabelFormat("Dist: %g\ndeltaX: %g\ndeltaY: %g\ndeltaZ: %g");
 
-  this->DefaultCropThickness = 0;
-  this->CropSnapping = false;
-
   vtkNew<vtkPolyDataMapper> mapper;
-  mapper->SetInputConnection(this->ImagePlane->GetOutputPort());
-  this->ImageActor->GetProperty()->SetAmbient(1.0);
-  this->ImageActor->GetProperty()->SetDiffuse(0.0);
-  this->ImageActor->SetMapper(mapper);
-  // setup an observer to check if the texture is loaded yet
-  this->WaitingForImage = false;
-
-  this->LastPickedDataSet = nullptr;
-  this->LastPickedRepresentation = nullptr;
-  this->PreviousPickedDataSet = nullptr;
-  this->PreviousPickedRepresentation = nullptr;
-
-#if XRINTERFACE_HAS_IMAGO_SUPPORT
-  this->ImagoLoader = new vtkImagoLoader();
-#endif
+  mapper->SetInputConnection(this->Internals->ImagePlane->GetOutputPort());
+  this->Internals->ImageActor->GetProperty()->SetAmbient(1.0);
+  this->Internals->ImageActor->GetProperty()->SetDiffuse(0.0);
+  this->Internals->ImageActor->SetMapper(mapper);
 }
 
-vtkPVXRInterfaceWidgets::~vtkPVXRInterfaceWidgets()
-{
-#if XRINTERFACE_HAS_IMAGO_SUPPORT
-  delete this->ImagoLoader;
-#endif
-  this->DistanceWidget->Delete();
-}
+//----------------------------------------------------------------------------
+vtkPVXRInterfaceWidgets::~vtkPVXRInterfaceWidgets() = default;
 
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::LoginToImago(std::string const& uid, std::string const& pw)
 {
-  return this->ImagoLoader->Login(uid, pw);
+  return this->Internals->ImagoLoader->Login(uid, pw);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetImagoWorkspace(std::string val)
 {
-  this->ImagoLoader->SetWorkspace(val);
+  this->Internals->ImagoLoader->SetWorkspace(val);
 }
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetImagoDataset(std::string val)
 {
-  this->ImagoLoader->SetDataset(val);
+  this->Internals->ImagoLoader->SetDataset(val);
 }
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetImagoImageryType(std::string val)
 {
-  this->ImagoLoader->SetImageryType(val);
+  this->Internals->ImagoLoader->SetImageryType(val);
 }
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetImagoImageType(std::string val)
 {
-  this->ImagoLoader->SetImageType(val);
+  this->Internals->ImagoLoader->SetImageType(val);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::GetImagoWorkspaces(std::vector<std::string>& vals)
 {
-  this->ImagoLoader->GetWorkspaces(vals);
-}
-void vtkPVXRInterfaceWidgets::GetImagoDatasets(std::vector<std::string>& vals)
-{
-  this->ImagoLoader->GetDatasets(vals);
-}
-void vtkPVXRInterfaceWidgets::GetImagoImageryTypes(std::vector<std::string>& vals)
-{
-  this->ImagoLoader->GetImageryTypes(vals);
-}
-void vtkPVXRInterfaceWidgets::GetImagoImageTypes(std::vector<std::string>& vals)
-{
-  this->ImagoLoader->GetImageTypes(vals);
+  this->Internals->ImagoLoader->GetWorkspaces(vals);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVXRInterfaceWidgets::GetImagoDatasets(std::vector<std::string>& vals)
+{
+  this->Internals->ImagoLoader->GetDatasets(vals);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXRInterfaceWidgets::GetImagoImageryTypes(std::vector<std::string>& vals)
+{
+  this->Internals->ImagoLoader->GetImageryTypes(vals);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXRInterfaceWidgets::GetImagoImageTypes(std::vector<std::string>& vals)
+{
+  this->Internals->ImagoLoader->GetImageTypes(vals);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetLastEventData(vtkEventData* edd)
 {
   this->LastEventData = edd;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetHelper(vtkPVXRInterfaceHelper* val)
 {
   this->Helper = val;
 }
 
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::EventCallback(vtkObject* caller, unsigned long eventID, void*)
 {
   // handle different events
@@ -235,11 +280,13 @@ bool vtkPVXRInterfaceWidgets::EventCallback(vtkObject* caller, unsigned long eve
   return false;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::ReleaseGraphicsResources()
 {
-  this->DistanceWidget->SetInteractor(nullptr);
+  this->Internals->DistanceWidget->SetInteractor(nullptr);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetShowNavigationPanel(bool val, vtkOpenGLRenderWindow* renderWindow)
 {
   // ignored for simulated VR
@@ -249,37 +296,39 @@ void vtkPVXRInterfaceWidgets::SetShowNavigationPanel(bool val, vtkOpenGLRenderWi
     return;
   }
 
-  if ((this->NavWidget->GetEnabled() != 0) == val)
+  if ((this->Internals->NavWidget->GetEnabled() != 0) == val)
   {
     return;
   }
 
-  if (this->NavWidget->GetEnabled())
+  if (this->Internals->NavWidget->GetEnabled())
   {
-    this->NavWidget->SetEnabled(0);
+    this->Internals->NavWidget->SetEnabled(0);
   }
   else
   {
     // add an observer on the left controller to update the bearing and position
-    this->NavWidget->SetInteractor(renderWindow->GetInteractor());
-    this->NavWidget->SetRepresentation(this->NavRepresentation.Get());
-    this->NavRepresentation->SetText("\n Position not updated yet \n");
+    this->Internals->NavWidget->SetInteractor(renderWindow->GetInteractor());
+    this->Internals->NavWidget->SetRepresentation(this->Internals->NavRepresentation.Get());
+    this->Internals->NavRepresentation->SetText("\n Position not updated yet \n");
     double scale = vr_rw->GetPhysicalScale();
 
     double bnds[6] = { -0.3, 0.3, 0.01, 0.01, -0.01, -0.01 };
     double normal[3] = { 0, 2, 1 };
     double vup[3] = { 0, 1, -2 };
-    this->NavRepresentation->PlaceWidgetExtended(bnds, normal, vup, scale);
+    this->Internals->NavRepresentation->PlaceWidgetExtended(bnds, normal, vup, scale);
 
-    this->NavWidget->SetEnabled(1);
+    this->Internals->NavWidget->SetEnabled(1);
   }
 }
 
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::GetNavigationPanelVisibility()
 {
-  return this->NavWidget->GetEnabled();
+  return this->Internals->NavWidget->GetEnabled();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::UpdateNavigationText(
   vtkEventDataDevice3D* edd, vtkOpenGLRenderWindow* renderWindow)
 {
@@ -335,23 +384,26 @@ void vtkPVXRInterfaceWidgets::UpdateNavigationText(
   {
     toString << " Bearing: undefined \n";
   }
-  this->NavRepresentation->SetText(toString.str().c_str());
+  this->Internals->NavRepresentation->SetText(toString.str().c_str());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::TakeMeasurement(vtkOpenGLRenderWindow* renWin)
 {
-  this->DistanceWidget->SetInteractor(renWin->GetInteractor());
-  this->DistanceWidget->SetWidgetStateToStart();
-  this->DistanceWidget->SetEnabled(0);
-  this->DistanceWidget->SetEnabled(1);
+  this->Internals->DistanceWidget->SetInteractor(renWin->GetInteractor());
+  this->Internals->DistanceWidget->SetWidgetStateToStart();
+  this->Internals->DistanceWidget->SetEnabled(0);
+  this->Internals->DistanceWidget->SetEnabled(1);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::RemoveMeasurement()
 {
-  this->DistanceWidget->SetWidgetStateToStart();
-  this->DistanceWidget->SetEnabled(0);
+  this->Internals->DistanceWidget->SetWidgetStateToStart();
+  this->Internals->DistanceWidget->SetEnabled(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::AddACropPlane(double* origin, double* normal)
 {
   size_t i = this->CropPlanes.size();
@@ -359,6 +411,7 @@ void vtkPVXRInterfaceWidgets::AddACropPlane(double* origin, double* normal)
   this->Helper->GetCollaborationClient()->UpdateCropPlane(i, this->CropPlanes[i]);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal)
 {
   vtkNew<vtkImplicitPlaneRepresentation> rep;
@@ -444,6 +497,7 @@ void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::collabRemoveAllCropPlanes()
 {
   for (vtkImplicitPlaneWidget2* iter : this->CropPlanes)
@@ -451,7 +505,7 @@ void vtkPVXRInterfaceWidgets::collabRemoveAllCropPlanes()
     iter->SetEnabled(0);
 
     vtkImplicitPlaneRepresentation* rep =
-      static_cast<vtkImplicitPlaneRepresentation*>(iter->GetRepresentation());
+      vtkImplicitPlaneRepresentation::SafeDownCast(iter->GetRepresentation());
 
     vtkCollectionSimpleIterator pit;
     vtkProp* prop;
@@ -491,13 +545,14 @@ void vtkPVXRInterfaceWidgets::collabRemoveAllCropPlanes()
   this->CropPlanes.clear();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::collabRemoveAllThickCrops()
 {
   for (vtkBoxWidget2* iter : this->ThickCrops)
   {
     iter->SetEnabled(0);
 
-    vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
+    vtkBoxRepresentation* rep = vtkBoxRepresentation::SafeDownCast(iter->GetRepresentation());
 
     vtkCollectionSimpleIterator pit;
     vtkProp* prop;
@@ -539,6 +594,7 @@ void vtkPVXRInterfaceWidgets::collabRemoveAllThickCrops()
   this->ThickCrops.clear();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::AddAThickCrop(vtkTransform* intrans)
 {
   size_t i = this->ThickCrops.size();
@@ -546,6 +602,7 @@ void vtkPVXRInterfaceWidgets::AddAThickCrop(vtkTransform* intrans)
   this->Helper->GetCollaborationClient()->UpdateThickCrop(i, this->ThickCrops[i]);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::collabAddAThickCrop(vtkTransform* intrans)
 {
   vtkNew<vtkBoxRepresentation> rep;
@@ -623,9 +680,10 @@ void vtkPVXRInterfaceWidgets::collabAddAThickCrop(vtkTransform* intrans)
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::collabUpdateCropPlane(int index, double* origin, double* normal)
 {
-  if (index >= this->CropPlanes.size())
+  if (static_cast<size_t>(index) >= this->CropPlanes.size())
   {
     this->collabAddACropPlane(origin, normal);
     return;
@@ -637,7 +695,7 @@ void vtkPVXRInterfaceWidgets::collabUpdateCropPlane(int index, double* origin, d
     if (count == index)
     {
       vtkImplicitPlaneRepresentation* rep =
-        static_cast<vtkImplicitPlaneRepresentation*>(widget->GetRepresentation());
+        vtkImplicitPlaneRepresentation::SafeDownCast(widget->GetRepresentation());
       rep->SetNormal(normal);
       rep->SetOrigin(origin);
       return;
@@ -646,9 +704,10 @@ void vtkPVXRInterfaceWidgets::collabUpdateCropPlane(int index, double* origin, d
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::collabUpdateThickCrop(int index, double* matrix)
 {
-  if (index >= this->ThickCrops.size())
+  if (static_cast<size_t>(index) >= this->ThickCrops.size())
   {
     vtkNew<vtkTransform> t;
     t->SetMatrix(matrix);
@@ -661,7 +720,7 @@ void vtkPVXRInterfaceWidgets::collabUpdateThickCrop(int index, double* matrix)
   {
     if (count == index)
     {
-      vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(widget->GetRepresentation());
+      vtkBoxRepresentation* rep = vtkBoxRepresentation::SafeDownCast(widget->GetRepresentation());
       vtkNew<vtkTransform> t;
       t->SetMatrix(matrix);
       rep->SetTransform(t);
@@ -671,23 +730,25 @@ void vtkPVXRInterfaceWidgets::collabUpdateThickCrop(int index, double* matrix)
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetCropSnapping(int val)
 {
   this->CropSnapping = val;
 
   for (vtkBoxWidget2* iter : this->ThickCrops)
   {
-    vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
+    vtkBoxRepresentation* rep = vtkBoxRepresentation::SafeDownCast(iter->GetRepresentation());
     rep->SetSnapToAxes(this->CropSnapping);
   }
   for (vtkImplicitPlaneWidget2* iter : this->CropPlanes)
   {
     vtkImplicitPlaneRepresentation* rep =
-      static_cast<vtkImplicitPlaneRepresentation*>(iter->GetRepresentation());
+      vtkImplicitPlaneRepresentation::SafeDownCast(iter->GetRepresentation());
     rep->SetSnapToAxes(this->CropSnapping);
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SaveLocationState(vtkPVXRInterfaceHelperLocation& sd)
 {
   sd.NavigationPanelVisibility = this->GetNavigationPanelVisibility();
@@ -697,7 +758,7 @@ void vtkPVXRInterfaceWidgets::SaveLocationState(vtkPVXRInterfaceHelperLocation& 
     for (vtkImplicitPlaneWidget2* iter : this->CropPlanes)
     {
       vtkImplicitPlaneRepresentation* rep =
-        static_cast<vtkImplicitPlaneRepresentation*>(iter->GetRepresentation());
+        vtkImplicitPlaneRepresentation::SafeDownCast(iter->GetRepresentation());
       std::pair<std::array<double, 3>, std::array<double, 3>> data;
       rep->GetOrigin(data.first.data());
       rep->GetNormal(data.second.data());
@@ -709,7 +770,7 @@ void vtkPVXRInterfaceWidgets::SaveLocationState(vtkPVXRInterfaceHelperLocation& 
     sd.ThickCropStates.clear();
     for (vtkBoxWidget2* iter : this->ThickCrops)
     {
-      vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
+      vtkBoxRepresentation* rep = vtkBoxRepresentation::SafeDownCast(iter->GetRepresentation());
       vtkNew<vtkTransform> t;
       rep->GetTransform(t);
       std::array<double, 16> tdata;
@@ -719,12 +780,13 @@ void vtkPVXRInterfaceWidgets::SaveLocationState(vtkPVXRInterfaceHelperLocation& 
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::MoveThickCrops(bool forward)
 {
-  for (auto i = 0; i < this->ThickCrops.size(); ++i)
+  for (size_t i = 0; i < this->ThickCrops.size(); ++i)
   {
     vtkBoxRepresentation* rep =
-      static_cast<vtkBoxRepresentation*>(this->ThickCrops[i]->GetRepresentation());
+      vtkBoxRepresentation::SafeDownCast(this->ThickCrops[i]->GetRepresentation());
     if (forward)
     {
       rep->StepForward();
@@ -737,6 +799,7 @@ void vtkPVXRInterfaceWidgets::MoveThickCrops(bool forward)
   }
 }
 
+//----------------------------------------------------------------------------
 // used for async texture loading
 void vtkPVXRInterfaceWidgets::UpdateTexture()
 {
@@ -758,14 +821,15 @@ void vtkPVXRInterfaceWidgets::UpdateTexture()
       int* dims = id->GetDimensions();
       double xsize = sqrt(2.0 * dims[0] / dims[1]);
       double ysize = 2.0 / xsize;
-      this->ImagePlane->SetOrigin(-xsize * 0.5, -ysize * 0.5, 0.0);
-      this->ImagePlane->SetPoint1(xsize * 0.5, -ysize * 0.5, 0.0);
-      this->ImagePlane->SetPoint2(-xsize * 0.5, ysize * 0.5, 0.0);
-      this->ImageActor->SetTexture(texture);
+      this->Internals->ImagePlane->SetOrigin(-xsize * 0.5, -ysize * 0.5, 0.0);
+      this->Internals->ImagePlane->SetPoint1(xsize * 0.5, -ysize * 0.5, 0.0);
+      this->Internals->ImagePlane->SetPoint2(-xsize * 0.5, ysize * 0.5, 0.0);
+      this->Internals->ImageActor->SetTexture(texture);
     }
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::ShowBillboard(
   const std::string& text, bool updatePosition, std::string const& textureFile)
 {
@@ -827,46 +891,46 @@ void vtkPVXRInterfaceWidgets::ShowBillboard(
     }
     rot->Transpose();
     vtkTransform::GetOrientation(orient, rot);
-    this->TextActor3D->SetOrientation(orient);
-    this->TextActor3D->RotateY(-60.0);
-    this->TextActor3D->RotateX(-10.0);
+    this->Internals->TextActor3D->SetOrientation(orient);
+    this->Internals->TextActor3D->RotateY(-60.0);
+    this->Internals->TextActor3D->RotateX(-10.0);
 
     double bbPos[3] = { 0.7, 0.9, -0.4 };
     ren->GetActiveCamera()->GetPosition(tpos);
     tpos[0] += (bbPos[0] * scale * dop[0] + bbPos[1] * scale * vr[0] + bbPos[2] * scale * vup[0]);
     tpos[1] += (bbPos[0] * scale * dop[1] + bbPos[1] * scale * vr[1] + bbPos[2] * scale * vup[1]);
     tpos[2] += (bbPos[0] * scale * dop[2] + bbPos[1] * scale * vr[2] + bbPos[2] * scale * vup[2]);
-    this->TextActor3D->SetPosition(tpos);
+    this->Internals->TextActor3D->SetPosition(tpos);
     // scale should cover 10% of FOV
     double fov = ren->GetActiveCamera()->GetViewAngle();
     double tsize = 0.1 * 2.0 * atan(fov * 0.5); // 10% of fov
     tsize /= 200.0;                             // about 200 pixel texture map
     tsize *= scale;
-    this->TextActor3D->SetScale(tsize, tsize, tsize);
+    this->Internals->TextActor3D->SetScale(tsize, tsize, tsize);
 
     double iaPos[3] = { 1.0, 0.0, -0.3 };
     ren->GetActiveCamera()->GetPosition(tpos);
     tpos[0] += (iaPos[0] * scale * dop[0] + iaPos[1] * scale * vr[0] + iaPos[2] * scale * vup[0]);
     tpos[1] += (iaPos[0] * scale * dop[1] + iaPos[1] * scale * vr[1] + iaPos[2] * scale * vup[1]);
     tpos[2] += (iaPos[0] * scale * dop[2] + iaPos[1] * scale * vr[2] + iaPos[2] * scale * vup[2]);
-    this->ImageActor->SetOrientation(orient);
-    this->ImageActor->RotateX(-10.0);
-    this->ImageActor->SetPosition(tpos);
-    this->ImageActor->SetScale(scale, scale, scale);
+    this->Internals->ImageActor->SetOrientation(orient);
+    this->Internals->ImageActor->RotateX(-10.0);
+    this->Internals->ImageActor->SetPosition(tpos);
+    this->Internals->ImageActor->SetScale(scale, scale, scale);
   }
 
-  this->TextActor3D->SetInput(text.c_str());
-  ren->AddActor(this->TextActor3D);
+  this->Internals->TextActor3D->SetInput(text.c_str());
+  ren->AddActor(this->Internals->TextActor3D);
 
-  this->TextActor3D->ForceOpaqueOn();
-  vtkTextProperty* prop = this->TextActor3D->GetTextProperty();
+  this->Internals->TextActor3D->ForceOpaqueOn();
+  vtkTextProperty* prop = this->Internals->TextActor3D->GetTextProperty();
   prop->SetFrame(1);
   prop->SetFrameColor(1.0, 1.0, 1.0);
   prop->SetBackgroundOpacity(1.0);
   prop->SetBackgroundColor(0.0, 0.0, 0.0);
   prop->SetFontSize(14);
 
-  if (textureFile.size())
+  if (!textureFile.empty())
   {
     // is it a file reference?
     if (!strncmp(textureFile.c_str(), "file://", 7))
@@ -895,13 +959,13 @@ void vtkPVXRInterfaceWidgets::ShowBillboard(
         int* dims = texture->GetInput()->GetDimensions();
         double xsize = sqrt(2.0 * dims[0] / dims[1]);
         double ysize = 2.0 / xsize;
-        this->ImagePlane->SetOrigin(-xsize * 0.5, -ysize * 0.5, 0.0);
-        this->ImagePlane->SetPoint1(xsize * 0.5, -ysize * 0.5, 0.0);
-        this->ImagePlane->SetPoint2(-xsize * 0.5, ysize * 0.5, 0.0);
+        this->Internals->ImagePlane->SetOrigin(-xsize * 0.5, -ysize * 0.5, 0.0);
+        this->Internals->ImagePlane->SetPoint1(xsize * 0.5, -ysize * 0.5, 0.0);
+        this->Internals->ImagePlane->SetPoint2(-xsize * 0.5, ysize * 0.5, 0.0);
 
-        this->ImageActor->SetTexture(texture);
+        this->Internals->ImageActor->SetTexture(texture);
 
-        ren->AddActor(this->ImageActor);
+        ren->AddActor(this->Internals->ImageActor);
       }
     }
 
@@ -911,36 +975,38 @@ void vtkPVXRInterfaceWidgets::ShowBillboard(
       bool success = false;
       if (!strncmp(textureFile.c_str(), "http", 4))
       {
-        success = this->ImagoLoader->GetHttpImage(textureFile, this->ImageFuture);
+        success = this->Internals->ImagoLoader->GetHttpImage(textureFile, this->ImageFuture);
       }
       if (!strncmp(textureFile.c_str(), "holeid:", 7))
       {
-        success = this->ImagoLoader->GetImage(textureFile, this->ImageFuture);
+        success = this->Internals->ImagoLoader->GetImage(textureFile, this->ImageFuture);
       }
 
       if (success)
       {
-        this->ImageActor->SetTexture(nullptr);
-        this->ImagePlane->SetOrigin(-0.2, -0.002, 0.0);
-        this->ImagePlane->SetPoint1(0.2, -0.002, 0.0);
-        this->ImagePlane->SetPoint2(-0.2, 0.002, 0.0);
+        this->Internals->ImageActor->SetTexture(nullptr);
+        this->Internals->ImagePlane->SetOrigin(-0.2, -0.002, 0.0);
+        this->Internals->ImagePlane->SetPoint1(0.2, -0.002, 0.0);
+        this->Internals->ImagePlane->SetPoint2(-0.2, 0.002, 0.0);
         this->WaitingForImage = true;
         this->RenderObserver =
           ren->AddObserver(vtkCommand::StartEvent, this, &vtkPVXRInterfaceWidgets::UpdateTexture);
 
-        ren->AddActor(this->ImageActor);
+        ren->AddActor(this->Internals->ImageActor);
       }
     }
 #endif
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::HideBillboard()
 {
-  this->Helper->GetRenderer()->RemoveActor(this->TextActor3D);
-  this->Helper->GetRenderer()->RemoveActor(this->ImageActor);
+  this->Helper->GetRenderer()->RemoveActor(this->Internals->TextActor3D);
+  this->Helper->GetRenderer()->RemoveActor(this->Internals->ImageActor);
 }
 
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::HasCellImage(vtkStringArray* sa, vtkIdType currCell)
 {
   std::string svalue = sa->GetValue(currCell);
@@ -955,6 +1021,7 @@ bool vtkPVXRInterfaceWidgets::HasCellImage(vtkStringArray* sa, vtkIdType currCel
   return false;
 }
 
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::FindCellImage(
   vtkDataSetAttributes* celld, vtkIdType currCell, std::string& image)
 {
@@ -1002,7 +1069,7 @@ bool vtkPVXRInterfaceWidgets::FindCellImage(
     }
   }
 
-  if (!image.size())
+  if (image.empty())
   {
     return false;
   }
@@ -1032,15 +1099,16 @@ bool vtkPVXRInterfaceWidgets::FindCellImage(
   return false;
 }
 
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceWidgets::IsCellImageDifferent(
   std::string const& oldimg, std::string const& newimg)
 {
   // if one is empty when the other is not return quickly
-  if (oldimg.size() == 0 && newimg.size() != 0)
+  if (oldimg.empty() && !newimg.empty())
   {
     return true;
   }
-  if (newimg.size() == 0 && oldimg.size() != 0)
+  if (newimg.empty() && !oldimg.empty())
   {
     return true;
   }
@@ -1060,7 +1128,7 @@ bool vtkPVXRInterfaceWidgets::IsCellImageDifferent(
 
 // deal with http and holeid: style values
 #if XRINTERFACE_HAS_IMAGO_SUPPORT
-  return this->ImagoLoader->IsCellImageDifferent(oldimg, newimg);
+  return this->Internals->ImagoLoader->IsCellImageDifferent(oldimg, newimg);
 #else
   return oldimg != newimg;
 #endif
@@ -1072,8 +1140,8 @@ void vtkPVXRInterfaceWidgets::MoveToNextImage()
   vtkEventDataDevice3D* edd = this->LastEventData->GetAsEventDataDevice3D();
   if (!edd)
   {
-    this->PreviousPickedRepresentation = nullptr;
-    this->PreviousPickedDataSet = nullptr;
+    this->Internals->PreviousPickedRepresentation = nullptr;
+    this->Internals->PreviousPickedDataSet = nullptr;
     return;
   }
 
@@ -1083,7 +1151,7 @@ void vtkPVXRInterfaceWidgets::MoveToNextImage()
   edd->GetWorldDirection(rdir.GetData());
 
   vtkNew<vtkMatrix4x4> mat4;
-  this->ImageActor->GetMatrix(mat4);
+  this->Internals->ImageActor->GetMatrix(mat4);
 
   // compute plane basis
   double originWC[4];
@@ -1091,11 +1159,11 @@ void vtkPVXRInterfaceWidgets::MoveToNextImage()
   double point2WC[4];
   double tmp[4];
   tmp[3] = 1.0;
-  this->ImagePlane->GetOrigin(tmp);
+  this->Internals->ImagePlane->GetOrigin(tmp);
   mat4->MultiplyPoint(tmp, originWC);
-  this->ImagePlane->GetPoint1(tmp);
+  this->Internals->ImagePlane->GetPoint1(tmp);
   mat4->MultiplyPoint(tmp, point1WC);
-  this->ImagePlane->GetPoint2(tmp);
+  this->Internals->ImagePlane->GetPoint2(tmp);
   mat4->MultiplyPoint(tmp, point2WC);
 
   // now we have the points all in WC create a coord system
@@ -1126,7 +1194,7 @@ void vtkPVXRInterfaceWidgets::MoveToNextImage()
 
   // now move up or down the list of cells to the next different image
   // this only works for polylines, find the line with the cell, then navigate up or down
-  vtkPolyData* pd = vtkPolyData::SafeDownCast(this->LastPickedDataSet);
+  vtkPolyData* pd = vtkPolyData::SafeDownCast(this->Internals->LastPickedDataSet);
   if (!pd)
   {
     return;
@@ -1134,7 +1202,7 @@ void vtkPVXRInterfaceWidgets::MoveToNextImage()
 
   std::string lastImage;
   vtkDataSetAttributes* celld = pd->GetCellData();
-  vtkIdType cid = this->LastPickedCellId;
+  vtkIdType cid = this->Internals->LastPickedCellId;
 
   vtkIdType numCells = pd->GetNumberOfCells();
   vtkIdType currCell = cid;
@@ -1159,18 +1227,19 @@ void vtkPVXRInterfaceWidgets::MoveToNextImage()
     return;
   }
 
-  this->LastPickedCellId = currCell;
+  this->Internals->LastPickedCellId = currCell;
   this->UpdateBillboard(false);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::MoveToNextCell()
 {
   // find the intersection with the image actor
   vtkEventDataDevice3D* edd = this->LastEventData->GetAsEventDataDevice3D();
   if (!edd)
   {
-    this->PreviousPickedRepresentation = nullptr;
-    this->PreviousPickedDataSet = nullptr;
+    this->Internals->PreviousPickedRepresentation = nullptr;
+    this->Internals->PreviousPickedDataSet = nullptr;
     return;
   }
 
@@ -1180,7 +1249,7 @@ void vtkPVXRInterfaceWidgets::MoveToNextCell()
   edd->GetWorldDirection(rdir.GetData());
 
   vtkNew<vtkMatrix4x4> mat4;
-  this->TextActor3D->GetMatrix(mat4);
+  this->Internals->TextActor3D->GetMatrix(mat4);
 
   // compute plane basis
   double origin[4]{ 0.0, 0.0, 0.0, 1.0 };
@@ -1218,13 +1287,13 @@ void vtkPVXRInterfaceWidgets::MoveToNextCell()
 
   // now move up or down the list of cells to the next different image
   // this only works for polylines, find the line with the cell, then navigate up or down
-  vtkPolyData* pd = vtkPolyData::SafeDownCast(this->LastPickedDataSet);
+  vtkPolyData* pd = vtkPolyData::SafeDownCast(this->Internals->LastPickedDataSet);
   if (!pd)
   {
     return;
   }
 
-  vtkIdType cid = this->LastPickedCellId;
+  vtkIdType cid = this->Internals->LastPickedCellId;
   vtkIdType numCells = pd->GetNumberOfCells();
   vtkIdType currCell = cid;
 
@@ -1235,15 +1304,16 @@ void vtkPVXRInterfaceWidgets::MoveToNextCell()
     return;
   }
 
-  this->LastPickedCellId = currCell + step;
+  this->Internals->LastPickedCellId = currCell + step;
   this->UpdateBillboard(false);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
 {
-  vtkCellData* celld = this->LastPickedDataSet->GetCellData();
-  vtkIdType aid = this->LastPickedCellId;
-  vtkCell* cell = this->LastPickedDataSet->GetCell(aid);
+  vtkCellData* celld = this->Internals->LastPickedDataSet->GetCellData();
+  vtkIdType aid = this->Internals->LastPickedCellId;
+  vtkCell* cell = this->Internals->LastPickedDataSet->GetCell(aid);
 
   // update the billboard with information about this data
   std::ostringstream toString;
@@ -1251,7 +1321,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   cell->GetBounds(p1);
   double pos[3] = { 0.5 * (p1[1] + p1[0]), 0.5 * (p1[3] + p1[2]), 0.5 * (p1[5] + p1[4]) };
   toString << "\n Cell Center (DC): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
-  vtkMatrix4x4* pmat = this->LastPickedProp->GetMatrix();
+  vtkMatrix4x4* pmat = this->Internals->LastPickedProp->GetMatrix();
   double wpos[4];
   wpos[0] = pos[0];
   wpos[1] = pos[1];
@@ -1299,20 +1369,20 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   vtkDataArray* validArray1 = celld->GetArray("vtkCompositingValid");
   vtkDataArray* validArray2 = celld->GetArray("vtkConversionValid");
   if (holeid && fromArray && toArray && validArray1 && validArray2 &&
-    this->PreviousPickedRepresentation == this->LastPickedRepresentation &&
-    this->PreviousPickedDataSet == this->LastPickedDataSet)
+    this->Internals->PreviousPickedRepresentation == this->Internals->LastPickedRepresentation &&
+    this->Internals->PreviousPickedDataSet == this->Internals->LastPickedDataSet)
   {
     // ok same dataset, lets see if we have composite results
     vtkVariant hid1 = holeid->GetVariantValue(aid);
-    vtkVariant hid2 = holeid->GetVariantValue(this->PreviousPickedCellId);
+    vtkVariant hid2 = holeid->GetVariantValue(this->Internals->PreviousPickedCellId);
     if (hid1 == hid2)
     {
       toString << "\n Composite results:\n";
       double totDist = 0;
       double fromEnd = fromArray->GetTuple1(aid);
       double toEnd = toArray->GetTuple1(aid);
-      double fromEnd2 = fromArray->GetTuple1(this->PreviousPickedCellId);
-      double toEnd2 = toArray->GetTuple1(this->PreviousPickedCellId);
+      double fromEnd2 = fromArray->GetTuple1(this->Internals->PreviousPickedCellId);
+      double toEnd2 = toArray->GetTuple1(this->Internals->PreviousPickedCellId);
       if (fromEnd2 < fromEnd)
       {
         fromEnd = fromEnd2;
@@ -1351,7 +1421,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
             {
               if (!insertedCells)
               {
-                this->SelectedCells.push_back(cidx);
+                this->Internals->SelectedCells.push_back(cidx);
               }
               if (valid1 != 0 && valid2 != 0)
               {
@@ -1388,26 +1458,27 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   this->Helper->GetCollaborationClient()->ShowBillboard(cvals);
   this->ShowBillboard(toString.str(), updatePosition, textureFile);
   auto style = renWin->GetInteractor()
-    ? vtkOpenVRInteractorStyle::SafeDownCast(renWin->GetInteractor()->GetInteractorStyle())
+    ? vtkVRInteractorStyle::SafeDownCast(renWin->GetInteractor()->GetInteractorStyle())
     : nullptr;
   if (style)
   {
-    style->ShowPickCell(cell, vtkProp3D::SafeDownCast(this->LastPickedProp));
+    style->ShowPickCell(cell, vtkProp3D::SafeDownCast(this->Internals->LastPickedProp));
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
 {
   this->Helper->GetEditableField();
 
-  if (!this->LastPickedDataSet || !this->LastPickedDataSet->GetCellData())
+  if (!this->Internals->LastPickedDataSet || !this->Internals->LastPickedDataSet->GetCellData())
   {
     vtkErrorMacro("no last picked dataset to edit or no cell data on last picked dataset.");
     return;
   }
 
-  vtkAbstractArray* array =
-    this->LastPickedDataSet->GetCellData()->GetAbstractArray(this->EditableField.c_str());
+  vtkAbstractArray* array = this->Internals->LastPickedDataSet->GetCellData()->GetAbstractArray(
+    this->EditableField.c_str());
 
   if (!array)
   {
@@ -1415,7 +1486,8 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
     return;
   }
 
-  if (this->LastPickedCellId < 0 || this->LastPickedCellId >= array->GetNumberOfTuples())
+  if (this->Internals->LastPickedCellId < 0 ||
+    this->Internals->LastPickedCellId >= array->GetNumberOfTuples())
   {
     vtkErrorMacro("last picked cell id is outside the number of cellls in the edit field.");
     return;
@@ -1424,7 +1496,7 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
   vtkStringArray* sarray = vtkStringArray::SafeDownCast(array);
   if (sarray)
   {
-    for (vtkIdType cidx : this->SelectedCells)
+    for (vtkIdType cidx : this->Internals->SelectedCells)
     {
       sarray->SetValue(cidx, value);
     }
@@ -1439,7 +1511,7 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
       d1 = strtod(value.c_str(), &pEnd);
       if (pEnd == value.c_str() + value.size())
       {
-        for (vtkIdType cidx : this->SelectedCells)
+        for (vtkIdType cidx : this->Internals->SelectedCells)
         {
           darray->SetTuple1(cidx, d1);
         }
@@ -1453,8 +1525,8 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
   }
 
   array->Modified();
-  this->LastPickedDataSet->Modified();
-  this->LastPickedRepresentation->Modified();
+  this->Internals->LastPickedDataSet->Modified();
+  this->Internals->LastPickedRepresentation->Modified();
 
   // find the matching repr
   vtkSMPropertyHelper helper(this->Helper->GetSMView(), "Representations");
@@ -1466,7 +1538,8 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
     if (repr2)
     {
       if (vtkPVDataRepresentation::SafeDownCast(repr2->GetClientSideObject())
-            ->GetRenderedDataObject(0) == this->LastPickedRepresentation->GetRenderedDataObject(0))
+            ->GetRenderedDataObject(0) ==
+        this->Internals->LastPickedRepresentation->GetRenderedDataObject(0))
       {
         vtkSMPropertyHelper helper2(repr2, "Input");
         vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(helper2.GetAsProxy());
@@ -1483,28 +1556,10 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
   }
 }
 
-namespace
-{
-vtkPVDataRepresentation* FindRepresentation(vtkProp* prop, vtkView* view)
-{
-  int nr = view->GetNumberOfRepresentations();
-
-  for (int i = 0; i < nr; ++i)
-  {
-    vtkGeometryRepresentation* gr =
-      vtkGeometryRepresentation::SafeDownCast(view->GetRepresentation(i));
-    if (gr && gr->GetActor() == prop)
-    {
-      return gr;
-    }
-  }
-  return nullptr;
-}
-}
-
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::HandlePickEvent(vtkObject*, void* calldata)
 {
-  this->SelectedCells.clear();
+  this->Internals->SelectedCells.clear();
   this->HideBillboard();
   this->Helper->GetCollaborationClient()->HideBillboard();
 
@@ -1512,8 +1567,8 @@ void vtkPVXRInterfaceWidgets::HandlePickEvent(vtkObject*, void* calldata)
 
   if (!sel || sel->GetNumberOfNodes() == 0)
   {
-    this->PreviousPickedRepresentation = nullptr;
-    this->PreviousPickedDataSet = nullptr;
+    this->Internals->PreviousPickedRepresentation = nullptr;
+    this->Internals->PreviousPickedDataSet = nullptr;
     return;
   }
 
@@ -1522,13 +1577,13 @@ void vtkPVXRInterfaceWidgets::HandlePickEvent(vtkObject*, void* calldata)
   vtkProp3D* prop = vtkProp3D::SafeDownCast(node->GetProperties()->Get(vtkSelectionNode::PROP()));
 
   // if the selection is the image actor?
-  if (prop == this->ImageActor)
+  if (prop == this->Internals->ImageActor)
   {
     this->MoveToNextImage();
     return;
   }
 
-  if (prop == this->TextActor3D)
+  if (prop == this->Internals->TextActor3D)
   {
     this->MoveToNextCell();
     return;
@@ -1540,14 +1595,9 @@ void vtkPVXRInterfaceWidgets::HandlePickEvent(vtkObject*, void* calldata)
   {
     return;
   }
-  this->PreviousPickedRepresentation = this->LastPickedRepresentation;
-  this->LastPickedRepresentation = repr;
+  this->Internals->PreviousPickedRepresentation = this->Internals->LastPickedRepresentation;
+  this->Internals->LastPickedRepresentation = repr;
 
-  // next two lines are debugging code to mark what actor was picked
-  // by changing its color. Useful to track down picking errors.
-  // double *color = static_cast<vtkActor*>(prop)->GetProperty()->GetColor();
-  // static_cast<vtkActor*>(prop)->GetProperty()->SetColor(color[0] > 0.0 ?
-  // 0.0 : 1.0, 0.5, 0.5);
   vtkDataObject* dobj = repr->GetInput();
   node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
 
@@ -1582,32 +1632,35 @@ void vtkPVXRInterfaceWidgets::HandlePickEvent(vtkObject*, void* calldata)
 
   // get the picked cell
   vtkIdTypeArray* ids = vtkArrayDownCast<vtkIdTypeArray>(node->GetSelectionList());
-  if (ids == 0)
+  if (ids == nullptr)
   {
     return;
   }
   vtkIdType aid = ids->GetComponent(0, 0);
 
-  this->PreviousPickedDataSet = this->LastPickedDataSet;
-  this->LastPickedDataSet = ds;
-  this->PreviousPickedCellId = this->LastPickedCellId;
-  this->LastPickedCellId = aid;
-  this->SelectedCells.push_back(aid);
-  this->LastPickedProp = prop;
+  this->Internals->PreviousPickedDataSet = this->Internals->LastPickedDataSet;
+  this->Internals->LastPickedDataSet = ds;
+  this->Internals->PreviousPickedCellId = this->Internals->LastPickedCellId;
+  this->Internals->LastPickedCellId = aid;
+  this->Internals->SelectedCells.push_back(aid);
+  this->Internals->LastPickedProp = prop;
   this->UpdateBillboard(true);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::Quit()
 {
   // remove any widgets that are no longer in ParaView
-  for (auto it = this->WidgetsFromParaView.begin(); it != this->WidgetsFromParaView.end();)
+  for (auto it = this->Internals->WidgetsFromParaView.begin();
+       it != this->Internals->WidgetsFromParaView.end();)
   {
     it->second->SetEnabled(0);
     it->second->Delete();
-    it = this->WidgetsFromParaView.erase(it);
+    it = this->Internals->WidgetsFromParaView.erase(it);
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
 {
   // do a mark approach to find any widgets that have been removed
@@ -1646,8 +1699,8 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
     found.insert(repr);
 
     // if we already know about this widgetRep then continue
-    auto idx = this->WidgetsFromParaView.find(repr);
-    if (idx != this->WidgetsFromParaView.end())
+    auto idx = this->Internals->WidgetsFromParaView.find(repr);
+    if (idx != this->Internals->WidgetsFromParaView.end())
     {
       continue;
     }
@@ -1686,7 +1739,7 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
     ps->SetRepresentation(rep.Get());
     ps->SetInteractor(renWin->GetInteractor());
     ps->SetEnabled(1);
-    this->WidgetsFromParaView[repr] = ps;
+    this->Internals->WidgetsFromParaView[repr] = ps;
   }
 
 #if PARAVIEW_USE_QTWEBENGINE
@@ -1724,8 +1777,8 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
     found.insert(repr);
 
     // if we already know about this widgetRep then continue
-    auto idx = this->WidgetsFromParaView.find(repr);
-    if (idx != this->WidgetsFromParaView.end())
+    auto idx = this->Internals->WidgetsFromParaView.find(repr);
+    if (idx != this->Internals->WidgetsFromParaView.end())
     {
       continue;
     }
@@ -1738,19 +1791,20 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
     ps->Register(this);
     ps->SetInteractor(renWin->GetInteractor());
     ps->SetEnabled(1);
-    this->WidgetsFromParaView[repr] = ps;
+    this->Internals->WidgetsFromParaView[repr] = ps;
   }
 #endif
 
   // remove any widgets that are no longer in ParaView
   // and update origin and normal between any that are still there
-  for (auto it = this->WidgetsFromParaView.begin(); it != this->WidgetsFromParaView.end();)
+  for (auto it = this->Internals->WidgetsFromParaView.begin();
+       it != this->Internals->WidgetsFromParaView.end();)
   {
     if (found.find(it->first) == found.end())
     {
       it->second->SetEnabled(0);
       it->second->Delete();
-      it = this->WidgetsFromParaView.erase(it);
+      it = this->Internals->WidgetsFromParaView.erase(it);
     }
     else
     {
@@ -1769,13 +1823,6 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
             pvRep->SetOrigin(origin);
             pvRep->SetNormal(normal);
             widgetRep->GetWidget()->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
-            // set the properties on the Rep
-            // vtkSMPropertyHelper rephelper(it->first, "Origin");
-            // rephelper.SetNumberOfElements(3);
-            // rephelper.Set(origin, 3);
-            // vtkSMPropertyHelper rephelper2(it->first, "Normal");
-            // rephelper2.SetNumberOfElements(3);
-            // rephelper2.Set(normal, 3);
           }
           else
           {

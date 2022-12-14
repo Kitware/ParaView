@@ -61,7 +61,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayoutXRBackend">
         <item>
-         <widget class="QLabel" name="sendToXRLabel">
+         <widget class="QLabel" name="backendLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>

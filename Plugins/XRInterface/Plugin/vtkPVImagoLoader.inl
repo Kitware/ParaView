@@ -239,8 +239,10 @@ Json::Value getJSON(std::vector<char> const& result)
 }
 }
 
+//-----------------------------------------------------------------------------
 vtkImagoLoader::vtkImagoLoader() = default;
 
+//-----------------------------------------------------------------------------
 vtkImagoLoader::~vtkImagoLoader()
 {
   if (this->Connection)
@@ -255,6 +257,7 @@ vtkImagoLoader::~vtkImagoLoader()
   }
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::Connect()
 {
   if (!this->Session)
@@ -281,6 +284,7 @@ bool vtkImagoLoader::Connect()
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void vtkImagoLoader::GetWorkspaces(std::vector<std::string>& vals)
 {
   vals.clear();
@@ -299,6 +303,7 @@ void vtkImagoLoader::GetWorkspaces(std::vector<std::string>& vals)
   }
 }
 
+//-----------------------------------------------------------------------------
 void vtkImagoLoader::GetDatasets(std::vector<std::string>& vals)
 {
   vals.clear();
@@ -325,6 +330,7 @@ void vtkImagoLoader::GetDatasets(std::vector<std::string>& vals)
   }
 }
 
+//-----------------------------------------------------------------------------
 void vtkImagoLoader::GetImageryTypes(std::vector<std::string>& vals)
 {
   vals.clear();
@@ -359,6 +365,7 @@ void vtkImagoLoader::GetImageryTypes(std::vector<std::string>& vals)
   }
 }
 
+//-----------------------------------------------------------------------------
 void vtkImagoLoader::GetImageTypes(std::vector<std::string>& vals)
 {
   vals.clear();
@@ -397,6 +404,7 @@ void vtkImagoLoader::GetImageTypes(std::vector<std::string>& vals)
   }
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::IsCellImageDifferent(std::string const& /*oldimg*/, std::string const& newimg)
 {
   std::smatch sm;
@@ -491,6 +499,7 @@ bool vtkImagoLoader::AcquireToken()
   return true;
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::GetContext()
 {
   // return if we already loaded it
@@ -523,6 +532,7 @@ bool vtkImagoLoader::GetContext()
   return true;
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::GetImage(std::string const& fname, std::future<vtkImageData*>& future)
 {
   std::smatch sm;
@@ -552,6 +562,7 @@ bool vtkImagoLoader::GetImage(std::string const& fname, std::future<vtkImageData
     this->ImageType != "Any" ? this->ImageType : "", args["dp"], future);
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::GetHttpImage(std::string const& fname, std::future<vtkImageData*>& future)
 {
   std::smatch sm;
@@ -581,6 +592,7 @@ bool vtkImagoLoader::GetHttpImage(std::string const& fname, std::future<vtkImage
     args["ds"], args["im"], args["dp"], future);
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::GetCollection(
   std::string const& collection, std::string const& datasetID, Json::Value& resultJSON)
 {
@@ -631,6 +643,7 @@ bool vtkImagoLoader::GetCollection(
   return true;
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::GetImagery(
   std::string const& collectionID, std::string const& imageryTypeID, Json::Value& resultJSON)
 {
@@ -688,6 +701,7 @@ bool vtkImagoLoader::GetImagery(
   return true;
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::ImageryHasDepth(Json::Value imageryJSON, double targetDepth)
 {
   // find the image we want based on the depth
@@ -709,6 +723,7 @@ bool vtkImagoLoader::ImageryHasDepth(Json::Value imageryJSON, double targetDepth
   return false;
 }
 
+//-----------------------------------------------------------------------------
 bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& dataset,
   std::string const& collection, std::string const& imageryType, std::string const& imageType,
   std::string const& depth, std::future<vtkImageData*>& future)

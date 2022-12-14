@@ -2,20 +2,35 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets Network)
 
 set(required_modules "")
 set(openxr_support FALSE)
+set(openvr_support FALSE)
 
-if (TARGET VTK::RenderingOpenXR)
-  list(APPEND required_modules
-    VTK::RenderingOpenXR
-  )
-  find_package(OpenXR REQUIRED)
-  set(openxr_support TRUE)
-endif()
+option(PARAVIEW_XRInterface_OpenXR_Support "Turn on support for OpenXR in XRInterface plugin" OFF)
+if (PARAVIEW_XRInterface_OpenXR_Support)
+  if (TARGET VTK::RenderingOpenXR)
+    list(APPEND required_modules
+      VTK::RenderingOpenXR
+    )
+    set(openxr_support TRUE)
+  else ()
+    message(FATAL_ERROR "PARAVIEW_XRInterface_OpenXR_Support is ON but VTK::RenderingOpenXR is not, please enable VTK::RenderingOpenXR for OpenXR support")
+  endif ()
+endif ()
 
-if (TARGET VTK::RenderingOpenVR)
-  list(APPEND required_modules
-    VTK::RenderingOpenVR
-  )
-endif()
+option(PARAVIEW_XRInterface_OpenVR_Support "Turn on support for OpenVR in XRInterface plugin" ON)
+if (PARAVIEW_XRInterface_OpenVR_Support)
+  if (TARGET VTK::RenderingOpenVR)
+    list(APPEND required_modules
+      VTK::RenderingOpenVR
+    )
+    set(openvr_support TRUE)
+  else ()
+    message(FATAL_ERROR "PARAVIEW_XRInterface_OpenVR_Support is ON but VTK::RenderingOpenVR is not, please enable VTK::RenderingOpenVR for OpenVR support")
+  endif ()
+endif ()
+
+if (NOT (PARAVIEW_XRInterface_OpenXR_Support OR PARAVIEW_XRInterface_OpenVR_Support))
+  message(STATUS "XRInterface plugin is enabled but neither OpenVR or OpenXR support are enabled, the plugin may not be usable")
+endif ()
 
 set(interfaces)
 set(sources
@@ -91,7 +106,14 @@ set_property(
   pqXRInterfaceDockPanel.cxx
   vtkPVXRInterfaceHelper.cxx
   APPEND PROPERTY
-    COMPILE_DEFINITIONS "PARAVIEW_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>")
+    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>")
+
+set_property(
+  SOURCE
+  pqXRInterfaceDockPanel.cxx
+  vtkPVXRInterfaceHelper.cxx
+  APPEND PROPERTY
+    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENVR_SUPPORT=$<BOOL:${openvr_support}>")
 
 if (openxr_support)
   list(APPEND xr_input_files
@@ -162,3 +184,7 @@ set_property(SOURCE vtkPVXRInterfaceExporter.cxx APPEND PROPERTY
 
 set_property(SOURCE vtkPVXRInterfaceWidgets.cxx APPEND PROPERTY
   COMPILE_DEFINITIONS "PARAVIEW_USE_QTWEBENGINE=$<BOOL:${PARAVIEW_USE_QTWEBENGINE}>")
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

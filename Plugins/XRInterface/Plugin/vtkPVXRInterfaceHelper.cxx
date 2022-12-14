@@ -13,10 +13,14 @@
 =========================================================================*/
 #include "vtkPVXRInterfaceHelper.h"
 
+#if XRINTERFACE_HAS_OPENVR_SUPPORT
 // must be before others due to glew include
 #include "vtkOpenVRRenderWindow.h"
+#include "vtkOpenVRRenderWindowInteractor.h"
+#include "vtkOpenVRRenderer.h"
+#endif
 
-#if PARAVIEW_HAS_OPENXR_SUPPORT
+#if XRINTERFACE_HAS_OPENXR_SUPPORT
 #include "vtkOpenXRRenderWindow.h"
 #include "vtkOpenXRRenderWindowInteractor.h"
 #include "vtkOpenXRRenderer.h"
@@ -47,8 +51,6 @@
 #include "vtkOpenGLQuadHelper.h"
 #include "vtkOpenGLShaderCache.h"
 #include "vtkOpenGLState.h"
-#include "vtkOpenVRRenderWindowInteractor.h"
-#include "vtkOpenVRRenderer.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXRInterfaceCollaborationClient.h"
@@ -104,15 +106,40 @@ vtkPVXRInterfaceHelperLocation::~vtkPVXRInterfaceHelperLocation()
   delete this->Pose;
 }
 
+struct vtkPVXRInterfaceHelper::vtkInternals
+{
+  vtkNew<vtkQWidgetWidget> QWidgetWidget;
+  vtkPVRenderView* View = nullptr;
+  vtkSmartPointer<vtkOpenGLRenderWindow> RenderWindow;
+  vtkSmartPointer<vtkRenderWindowInteractor> Interactor;
+  vtkTimeStamp PropUpdateTime;
+  bool Done = false;
+  std::map<int, vtkVRCamera::Pose> SavedCameraPoses;
+  int LastCameraPoseIndex = 0;
+  std::map<int, vtkPVXRInterfaceHelperLocation> Locations;
+  int LoadLocationValue = -1;
+  QVTKOpenGLWindow* ObserverWidget = nullptr;
+  vtkNew<vtkOpenGLCamera> ObserverCamera;
+  vtkNew<vtkPVXRInterfaceExporter> Exporter;
+
+  // To simulate dpad with a trackpad on OpenXR we need to
+  // store the last position
+  double LeftTrackPadPosition[2] = { 0., 0. };
+};
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXRInterfaceHelper);
 
 //----------------------------------------------------------------------------
 vtkPVXRInterfaceHelper::vtkPVXRInterfaceHelper()
+  : Internals(new vtkPVXRInterfaceHelper::vtkInternals())
 {
   this->CollaborationClient->SetHelper(this);
   this->Widgets->SetHelper(this);
 }
+
+//----------------------------------------------------------------------------
+vtkPVXRInterfaceHelper::~vtkPVXRInterfaceHelper() = default;
 
 //==========================================================
 // these methods mostly just forward to helper classes
@@ -121,75 +148,60 @@ vtkPVXRInterfaceHelper::vtkPVXRInterfaceHelper()
 void vtkPVXRInterfaceHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* view)
 {
   this->SMView = view;
-  this->View = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
-
-  // record the state if we are currently in vr
-  if (this->Interactor)
-  {
-    this->RecordState();
-  }
+  this->Internals->View = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
 
   // save the old values and create temp values to use
-  vtkSmartPointer<vtkOpenGLRenderWindow> oldrw = this->RenderWindow;
+  vtkSmartPointer<vtkOpenGLRenderWindow> oldrw = this->Internals->RenderWindow;
   vtkSmartPointer<vtkOpenGLRenderer> oldr = this->Renderer;
-  vtkSmartPointer<vtkRenderWindowInteractor> oldi = this->Interactor;
-  this->RenderWindow = vtkOpenGLRenderWindow::SafeDownCast(vtkRenderWindow::New());
-  this->Renderer = vtkOpenGLRenderer::SafeDownCast(vtkRenderer::New());
-  this->RenderWindow->AddRenderer(this->Renderer);
-  this->Interactor = vtkRenderWindowInteractor::New();
-  this->RenderWindow->SetInteractor(this->Interactor);
+  vtkSmartPointer<vtkRenderWindowInteractor> oldi = this->Internals->Interactor;
+  this->Internals->RenderWindow =
+    vtkOpenGLRenderWindow::SafeDownCast(vtkSmartPointer<vtkRenderWindow>::New());
+  this->Renderer = vtkOpenGLRenderer::SafeDownCast(vtkSmartPointer<vtkRenderer>::New());
+  this->Internals->RenderWindow->AddRenderer(this->Renderer);
+  this->Internals->Interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  this->Internals->RenderWindow->SetInteractor(this->Internals->Interactor);
 
-  this->Exporter->ExportLocationsAsSkyboxes(this, view, this->Locations, this->Renderer);
+  this->Internals->Exporter->ExportLocationsAsSkyboxes(
+    this, view, this->Internals->Locations, this->Renderer);
 
   // restore previous values
   this->Widgets->ReleaseGraphicsResources(); // must delete before the interactor
-  this->Renderer->Delete();
   this->Renderer = oldr;
-  this->Interactor->Delete();
-  this->Interactor = oldi;
-  this->RenderWindow->Delete();
-  this->RenderWindow = oldrw;
+  this->Internals->Interactor = oldi;
+  this->Internals->RenderWindow = oldrw;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::ExportLocationsAsView(vtkSMViewProxy* view)
 {
   this->SMView = view;
-  this->View = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
-
-  // record the state if we are currently in vr
-  if (this->Interactor)
-  {
-    this->RecordState();
-  }
+  this->Internals->View = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
 
   // save the old values and create temp values to use
-  vtkSmartPointer<vtkOpenGLRenderWindow> oldrw = this->RenderWindow;
+  vtkSmartPointer<vtkOpenGLRenderWindow> oldrw = this->Internals->RenderWindow;
   vtkSmartPointer<vtkOpenGLRenderer> oldr = this->Renderer;
-  vtkSmartPointer<vtkRenderWindowInteractor> oldi = this->Interactor;
-  this->RenderWindow = vtkOpenGLRenderWindow::SafeDownCast(vtkRenderWindow::New());
-  this->Renderer = vtkOpenGLRenderer::SafeDownCast(vtkRenderer::New());
-  this->RenderWindow->AddRenderer(this->Renderer);
-  this->Interactor = vtkRenderWindowInteractor::New();
-  this->RenderWindow->SetInteractor(this->Interactor);
+  vtkSmartPointer<vtkRenderWindowInteractor> oldi = this->Internals->Interactor;
+  this->Internals->RenderWindow =
+    vtkOpenGLRenderWindow::SafeDownCast(vtkSmartPointer<vtkRenderWindow>::New());
+  this->Renderer = vtkOpenGLRenderer::SafeDownCast(vtkSmartPointer<vtkRenderer>::New());
+  this->Internals->RenderWindow->AddRenderer(this->Renderer);
+  this->Internals->Interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  this->Internals->RenderWindow->SetInteractor(this->Internals->Interactor);
 
-  this->Exporter->ExportLocationsAsView(this, view, this->Locations);
+  this->Internals->Exporter->ExportLocationsAsView(this, view, this->Internals->Locations);
 
   // restore previous values
   this->Widgets->ReleaseGraphicsResources(); // must delete before the interactor
-  this->Renderer->Delete();
   this->Renderer = oldr;
-  this->Interactor->Delete();
-  this->Interactor = oldi;
-  this->RenderWindow->Delete();
-  this->RenderWindow = oldrw;
+  this->Internals->Interactor = oldi;
+  this->Internals->RenderWindow = oldrw;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::TakeMeasurement()
 {
   this->ToggleShowControls();
-  this->Widgets->TakeMeasurement(this->RenderWindow);
+  this->Widgets->TakeMeasurement(this->Internals->RenderWindow);
 }
 
 //----------------------------------------------------------------------------
@@ -201,7 +213,7 @@ void vtkPVXRInterfaceHelper::RemoveMeasurement()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetShowNavigationPanel(bool val)
 {
-  this->Widgets->SetShowNavigationPanel(val, this->RenderWindow);
+  this->Widgets->SetShowNavigationPanel(val, this->Internals->RenderWindow);
 }
 
 //----------------------------------------------------------------------------
@@ -285,7 +297,7 @@ void vtkPVXRInterfaceHelper::SetCropSnapping(int val)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetUseOpenXR(bool useOpenXr)
 {
-#if PARAVIEW_HAS_OPENXR_SUPPORT
+#if XRINTERFACE_HAS_OPENXR_SUPPORT
   this->UseOpenXR = useOpenXr;
 #else
   if (useOpenXr)
@@ -304,7 +316,7 @@ bool vtkPVXRInterfaceHelper::CollaborationConnect()
   }
 
   // add observers to vr rays
-  if (auto* ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (auto* ovr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
     vtkVRModel* cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::LeftController);
     if (cmodel)
@@ -326,7 +338,7 @@ bool vtkPVXRInterfaceHelper::CollaborationConnect()
 //----------------------------------------------------------------------------
 bool vtkPVXRInterfaceHelper::CollaborationDisconnect()
 {
-  auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+  auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
   if (ovr_rw)
   {
     vtkVRModel* cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::LeftController);
@@ -346,14 +358,16 @@ bool vtkPVXRInterfaceHelper::CollaborationDisconnect()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::LoadNextCameraPose()
 {
-  if (this->SavedCameraPoses.empty())
+  if (this->Internals->SavedCameraPoses.empty())
   {
     return;
   }
 
-  auto lowerIter = this->SavedCameraPoses.upper_bound(this->LastCameraPoseIndex);
-  int nextValue = lowerIter != this->SavedCameraPoses.end() ? lowerIter->first
-                                                            : this->SavedCameraPoses.begin()->first;
+  auto lowerIter =
+    this->Internals->SavedCameraPoses.upper_bound(this->Internals->LastCameraPoseIndex);
+  int nextValue = lowerIter != this->Internals->SavedCameraPoses.end()
+    ? lowerIter->first
+    : this->Internals->SavedCameraPoses.begin()->first;
 
   this->LoadCameraPose(nextValue);
 }
@@ -361,18 +375,19 @@ void vtkPVXRInterfaceHelper::LoadNextCameraPose()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot)
 {
-  auto p_iter = this->SavedCameraPoses.find(slot);
-  if (p_iter != this->SavedCameraPoses.end())
+  auto p_iter = this->Internals->SavedCameraPoses.find(slot);
+  if (p_iter != this->Internals->SavedCameraPoses.end())
   {
     // If we ever add ability to remove camera poses from the SavedCameraPoses
     // map, be sure to check that LastCameraPoseIndex isn't left holding a key
     // which is no longer valid.
-    this->LastCameraPoseIndex = slot;
+    this->Internals->LastCameraPoseIndex = slot;
     vtkVRCamera::Pose pose = p_iter->second;
-    vtkRenderer* ren = static_cast<vtkRenderer*>(vr_rw->GetRenderers()->GetItemAsObject(0));
+    vtkRenderer* ren = vr_rw->GetRenderers()->GetFirstRenderer();
     vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
     cam->ApplyPoseToCamera(&pose, vr_rw);
     ren->ResetCameraClippingRange();
+    // NOLINTNEXTLINE(performance-no-int-to-ptr)
     this->InvokeEvent(vtkCommand::LoadStateEvent, reinterpret_cast<void*>(slot));
   }
 }
@@ -380,9 +395,9 @@ void vtkPVXRInterfaceHelper::LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::LoadCameraPose(int slot)
 {
-  if (this->RenderWindow)
+  if (this->Internals->RenderWindow)
   {
-    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
     {
       this->LoadPoseInternal(vr_rw, slot);
     }
@@ -392,19 +407,20 @@ void vtkPVXRInterfaceHelper::LoadCameraPose(int slot)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot)
 {
-  vtkVRCamera::Pose& pose = this->SavedCameraPoses[slot];
-  vtkRenderer* ren = static_cast<vtkRenderer*>(vr_rw->GetRenderers()->GetItemAsObject(0));
+  vtkVRCamera::Pose& pose = this->Internals->SavedCameraPoses[slot];
+  vtkRenderer* ren = vr_rw->GetRenderers()->GetFirstRenderer();
   vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
   cam->SetPoseFromCamera(&pose, vr_rw);
+  // NOLINTNEXTLINE(performance-no-int-to-ptr)
   this->InvokeEvent(vtkCommand::SaveStateEvent, reinterpret_cast<void*>(slot));
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SaveCameraPose(int slot)
 {
-  if (this->RenderWindow)
+  if (this->Internals->RenderWindow)
   {
-    auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+    auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
     if (vr_rw)
     {
       this->SavePoseInternal(vr_rw, slot);
@@ -420,9 +436,9 @@ void vtkPVXRInterfaceHelper::SaveCameraPose(int slot)
 void vtkPVXRInterfaceHelper::collabGoToPose(
   vtkVRCamera::Pose* pose, double* collabTrans, double* collabDir)
 {
-  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
-    vtkVRCamera* cam = static_cast<vtkVRCamera*>(this->Renderer->GetActiveCamera());
+    vtkVRCamera* cam = vtkVRCamera::SafeDownCast(this->Renderer->GetActiveCamera());
     cam->ApplyPoseToCamera(pose, vr_rw);
     this->Renderer->ResetCameraClippingRange();
     vr_rw->UpdateHMDMatrixPose();
@@ -432,7 +448,7 @@ void vtkPVXRInterfaceHelper::collabGoToPose(
   }
   else
   {
-    this->XRInterfacePolyfill->ApplyPose(pose, this->Renderer, this->RenderWindow);
+    this->XRInterfacePolyfill->ApplyPose(pose, this->Renderer, this->Internals->RenderWindow);
   }
 }
 
@@ -440,11 +456,11 @@ void vtkPVXRInterfaceHelper::collabGoToPose(
 void vtkPVXRInterfaceHelper::ComeToMe()
 {
   // get the current pose
-  if (this->RenderWindow)
+  if (this->Internals->RenderWindow)
   {
-    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
     {
-      vtkVRCamera* cam = static_cast<vtkVRCamera*>(this->Renderer->GetActiveCamera());
+      vtkVRCamera* cam = vtkVRCamera::SafeDownCast(this->Renderer->GetActiveCamera());
       vtkVRCamera::Pose pose;
       cam->SetPoseFromCamera(&pose, vr_rw);
       double* collabTrans = this->XRInterfacePolyfill->GetPhysicalTranslation();
@@ -457,7 +473,7 @@ void vtkPVXRInterfaceHelper::ComeToMe()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetViewUp(const std::string& axis)
 {
-  if (vtkVRRenderWindow* renWin = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (vtkVRRenderWindow* renWin = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
     if (axis == "+X")
     {
@@ -498,8 +514,8 @@ void vtkPVXRInterfaceHelper::SetViewUp(const std::string& axis)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetScaleFactor(float val)
 {
-  auto style = this->Interactor
-    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+  auto style = this->Internals->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -512,8 +528,8 @@ void vtkPVXRInterfaceHelper::SetScaleFactor(float val)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetMotionFactor(float val)
 {
-  auto style = this->Interactor
-    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+  auto style = this->Internals->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -530,9 +546,9 @@ void vtkPVXRInterfaceHelper::SetBaseStationVisibility(bool v)
   }
 
   this->BaseStationVisibility = v;
-  if (this->RenderWindow)
+  if (this->Internals->RenderWindow)
   {
-    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
     {
       vr_rw->SetBaseStationVisibility(v);
       this->Modified();
@@ -544,20 +560,15 @@ void vtkPVXRInterfaceHelper::SetBaseStationVisibility(bool v)
 void vtkPVXRInterfaceHelper::ToggleShowControls()
 {
   // only show when in VR not simulated
-  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
-    if (!this->QWidgetWidget)
-    {
-      this->QWidgetWidget = vtkQWidgetWidget::New();
-      this->QWidgetWidget->CreateDefaultRepresentation();
-      this->QWidgetWidget->SetWidget(this->XRInterfaceControls);
-      this->XRInterfaceControls->show();
-      // this->OpenVRControls->resize(960, 700);
-      this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
-      this->QWidgetWidget->SetInteractor(this->Interactor);
-    }
+    this->Internals->QWidgetWidget->CreateDefaultRepresentation();
+    this->Internals->QWidgetWidget->SetWidget(this->XRInterfaceControls);
+    this->XRInterfaceControls->show();
+    this->Internals->QWidgetWidget->SetCurrentRenderer(this->Renderer);
+    this->Internals->QWidgetWidget->SetInteractor(this->Internals->Interactor);
 
-    if (!this->QWidgetWidget->GetEnabled())
+    if (!this->Internals->QWidgetWidget->GetEnabled())
     {
       // place widget in front of the viewer, facing them
       double aspect = static_cast<double>(this->XRInterfaceControls->height()) /
@@ -578,7 +589,8 @@ void vtkPVXRInterfaceHelper::ToggleShowControls()
       vRight = camDOP.Cross(physUp);
       vtkVector3d center = camPos + camDOP * scale * 2.7;
 
-      vtkPlaneSource* ps = this->QWidgetWidget->GetQWidgetRepresentation()->GetPlaneSource();
+      vtkPlaneSource* ps =
+        this->Internals->QWidgetWidget->GetQWidgetRepresentation()->GetPlaneSource();
 
       vtkVector3d pos = center - 2.6 * physUp * scale * aspect - 2.0 * vRight * scale;
       ps->SetOrigin(pos.GetData());
@@ -587,16 +599,16 @@ void vtkPVXRInterfaceHelper::ToggleShowControls()
       pos = center + 1.4 * physUp * scale * aspect - 2.0 * vRight * scale;
       ps->SetPoint2(pos.GetData());
 
-      this->QWidgetWidget->SetInteractor(this->Interactor);
-      this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
-      this->QWidgetWidget->SetEnabled(1);
+      this->Internals->QWidgetWidget->SetInteractor(this->Internals->Interactor);
+      this->Internals->QWidgetWidget->SetCurrentRenderer(this->Renderer);
+      this->Internals->QWidgetWidget->SetEnabled(1);
       vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
       vrmodel->SetShowRay(true);
       vrmodel->SetRayLength(this->Renderer->GetActiveCamera()->GetClippingRange()[1]);
     }
     else
     {
-      this->QWidgetWidget->SetEnabled(0);
+      this->Internals->QWidgetWidget->SetEnabled(0);
       this->NeedStillRender = true;
     }
   }
@@ -605,8 +617,8 @@ void vtkPVXRInterfaceHelper::ToggleShowControls()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetDrawControls(bool val)
 {
-  auto style = this->Interactor
-    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+  auto style = this->Internals->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -617,36 +629,8 @@ void vtkPVXRInterfaceHelper::SetDrawControls(bool val)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::collabAddPointToSource(std::string const& name, double const* pnt)
 {
-  vtkSMSourceProxy* source = static_cast<vtkSMSourceProxy*>(
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
     pqActiveObjects::instance().proxyManager()->GetProxy("sources", name.c_str()));
-
-  // pqPipelineSource* psrc =
-  //   pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(source);
-  // psrc->getRepresentations(this->SMView);
-
-  // find the matching repr
-  vtkSMPVRepresentationProxy* repr = nullptr;
-  vtkSMPropertyHelper helper(this->SMView, "Representations");
-  for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
-  {
-    vtkSMPVRepresentationProxy* repr2 =
-      vtkSMPVRepresentationProxy::SafeDownCast(helper.GetAsProxy(i));
-
-    if (!repr2 || !repr2->GetProperty("Input"))
-    {
-      continue;
-    }
-
-    vtkSMPropertyHelper helper2(repr2, "Input");
-    vtkSMSourceProxy* rsource = vtkSMSourceProxy::SafeDownCast(helper2.GetAsProxy());
-    if (!rsource || rsource != source)
-    {
-      continue;
-    }
-
-    repr = repr2;
-    break;
-  }
 
   // first try addPoint
   vtkSMProperty* property = source->GetProperty("Points");
@@ -677,15 +661,7 @@ void vtkPVXRInterfaceHelper::collabAddPointToSource(std::string const& name, dou
     ptshelper.Set(pts.data(), static_cast<unsigned int>(pts.size()));
   }
 
-  source->UpdateVTKObjects(); // maybe?
-  // source->MarkDirty(source);
-  // source->UpdateSelfAndAllInputs();
-  // source->UpdatePipeline();
-  // if (repr)
-  // {
-  //   repr->UpdateSelfAndAllInputs();
-  //   repr->UpdatePipeline();
-  // }
+  source->UpdateVTKObjects();
   this->NeedStillRender = true;
 }
 
@@ -719,8 +695,8 @@ void vtkPVXRInterfaceHelper::SetEditableFieldValue(std::string value)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetHoverPick(bool val)
 {
-  auto style = this->Interactor
-    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+  auto style = this->Internals->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -735,8 +711,8 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
   this->CollaborationClient->HideBillboard();
   this->RightTriggerMode = static_cast<vtkPVXRInterfaceHelper::RightTriggerAction>(index);
 
-  auto style = this->Interactor
-    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+  auto style = this->Internals->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     : nullptr;
   if (!style)
   {
@@ -745,13 +721,13 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
 
   style->HidePickActor();
 
-  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
     vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
 
     if (vrmodel)
     {
-      vrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() ||
+      vrmodel->SetShowRay(this->Internals->QWidgetWidget->GetEnabled() ||
         this->RightTriggerMode == vtkPVXRInterfaceHelper::PICK);
     }
 
@@ -782,8 +758,8 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
 void vtkPVXRInterfaceHelper::SetMovementStyle(int index)
 {
   // Get interactor style
-  auto interactorStyle = this->Interactor
-    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+  auto interactorStyle = this->Internals->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     : nullptr;
 
   if (interactorStyle)
@@ -811,14 +787,14 @@ bool vtkPVXRInterfaceHelper::InteractorEventCallback(
     this->Widgets->GetNavigationPanelVisibility() && eventID == vtkCommand::Move3DEvent /* &&
       cam->GetLeftEye() */)
   {
-    this->Widgets->UpdateNavigationText(edd, this->RenderWindow);
+    this->Widgets->UpdateNavigationText(edd, this->Internals->RenderWindow);
   }
 
   // handle right trigger
   if (edd && eventID == vtkCommand::Select3DEvent)
   {
     // always pass events on to QWidget if enabled
-    if (this->QWidgetWidget && this->QWidgetWidget->GetEnabled())
+    if (this->Internals->QWidgetWidget->GetEnabled())
     {
       return false;
     }
@@ -871,7 +847,7 @@ void vtkPVXRInterfaceHelper::HandleDeleteEvent(vtkObject* caller)
   }
 
   // remove the proxy from all visibility lists
-  for (auto& loci : this->Locations)
+  for (auto& loci : this->Internals->Locations)
   {
     auto& loc = loci.second;
     for (auto it = loc.Visibility.begin(); it != loc.Visibility.end();)
@@ -891,18 +867,12 @@ void vtkPVXRInterfaceHelper::HandleDeleteEvent(vtkObject* caller)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SaveState(vtkPVXMLElement* root)
 {
-  // if we are in VR then RecordState first
-  if (this->Interactor)
-  {
-    this->RecordState();
-  }
-
   root->AddAttribute("PluginVersion", "1.2");
 
   // save the locations
   vtkNew<vtkPVXMLElement> e;
   e->SetName("Locations");
-  for (auto& loci : this->Locations)
+  for (auto& loci : this->Internals->Locations)
   {
     auto& loc = loci.second;
 
@@ -987,15 +957,9 @@ void vtkPVXRInterfaceHelper::SaveState(vtkPVXMLElement* root)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::RecordState()
-{
-  // save the camera poses
-}
-
-//----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator)
 {
-  this->Locations.clear();
+  this->Internals->Locations.clear();
 
   double version = -1.0;
   e->GetScalarAttribute("PluginVersion", &version);
@@ -1023,7 +987,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
       int poseNum = 0;
       locel->GetScalarAttribute("PoseNumber", &poseNum);
 
-      vtkPVXRInterfaceHelperLocation& loc = this->Locations[poseNum];
+      vtkPVXRInterfaceHelperLocation& loc = this->Internals->Locations[poseNum];
 
       vtkPVXMLElement* child = locel->FindNestedElementByName("CameraPose");
       if (child)
@@ -1107,14 +1071,14 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
     }
 
     // if we are in VR then applyState
-    if (this->Interactor)
+    if (this->Internals->Interactor)
     {
       this->ApplyState();
     }
 
     // update the lost of locations in the GUI
     std::vector<int> locs;
-    for (auto& l : this->Locations)
+    for (auto& l : this->Internals->Locations)
     {
       locs.push_back(l.first);
     }
@@ -1136,7 +1100,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
         int poseNum = 0;
         child->GetScalarAttribute("PoseNumber", &poseNum);
 
-        vtkPVXRInterfaceHelperLocation& loc = this->Locations[poseNum];
+        vtkPVXRInterfaceHelperLocation& loc = this->Internals->Locations[poseNum];
         auto& pose = *loc.Pose;
 
         child->GetVectorAttribute("Position", 3, pose.Position);
@@ -1176,14 +1140,14 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
           }
           else
           {
-            this->Locations[slot].Visibility[proxy] = (vis != 0 ? true : false);
+            this->Internals->Locations[slot].Visibility[proxy] = (vis != 0 ? true : false);
           }
         }
       }
     }
   }
 
-  for (auto& loci : this->Locations)
+  for (auto& loci : this->Internals->Locations)
   {
     auto& loc = loci.second;
 
@@ -1215,7 +1179,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
 
     // update the lost of locations in the GUI
     std::vector<int> locs;
-    for (auto& l : this->Locations)
+    for (auto& l : this->Internals->Locations)
     {
       locs.push_back(l.first);
     }
@@ -1250,7 +1214,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
   }
 
   // if we are in VR then applyState
-  if (this->Interactor)
+  if (this->Internals->Interactor)
   {
     this->ApplyState();
   }
@@ -1259,18 +1223,13 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::ApplyState()
 {
-  // apply crop snapping setting first
-  // this->CropMenu->RenameMenuItem(
-  //   "togglesnapping", (this->CropSnapping ? "Turn Snap to Axes Off" : "Turn
-  //   Snap to Axes On"));
-
   // set camera poses
-  for (auto& loci : this->Locations)
+  for (auto& loci : this->Internals->Locations)
   {
     if (loci.second.Pose)
     {
       auto& src = loci.second.Pose;
-      auto& dst = this->SavedCameraPoses[loci.first];
+      auto& dst = this->Internals->SavedCameraPoses[loci.first];
 
       dst.Position[0] = src->Position[0];
       dst.Position[1] = src->Position[1];
@@ -1330,7 +1289,7 @@ bool vtkPVXRInterfaceHelper::EventCallback(vtkObject* caller, unsigned long even
     break;
     case vtkCommand::LoadStateEvent:
     {
-      this->LoadLocationValue = reinterpret_cast<vtkTypeInt64>(calldata);
+      this->Internals->LoadLocationValue = reinterpret_cast<vtkTypeInt64>(calldata);
     }
     break;
     case vtkCommand::EndPickEvent:
@@ -1340,7 +1299,7 @@ bool vtkPVXRInterfaceHelper::EventCallback(vtkObject* caller, unsigned long even
     break;
     case vtkCommand::ModifiedEvent:
     {
-      auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+      auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
       vtkVRRay* ray = vtkVRRay::SafeDownCast(caller);
       if (vr_rw && ray)
       {
@@ -1369,14 +1328,14 @@ void vtkPVXRInterfaceHelper::GoToSavedLocation(int pos, double* collabTrans, dou
 {
   this->CollaborationClient->SetCurrentLocation(pos);
 
-  auto sdi = this->Locations.find(pos);
-  if (sdi == this->Locations.end())
+  auto sdi = this->Internals->Locations.find(pos);
+  if (sdi == this->Internals->Locations.end())
   {
     return;
   }
   auto& loc = sdi->second;
 
-  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
     this->LoadPoseInternal(vr_rw, pos);
     vr_rw->UpdateHMDMatrixPose();
@@ -1386,16 +1345,16 @@ void vtkPVXRInterfaceHelper::GoToSavedLocation(int pos, double* collabTrans, dou
   }
   else
   {
-    this->XRInterfacePolyfill->ApplyPose(loc.Pose, this->Renderer, this->RenderWindow);
-    this->LoadLocationValue = pos;
+    this->XRInterfacePolyfill->ApplyPose(loc.Pose, this->Renderer, this->Internals->RenderWindow);
+    this->Internals->LoadLocationValue = pos;
   }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::LoadLocationState(int slot)
 {
-  auto sdi = this->Locations.find(slot);
-  if (sdi == this->Locations.end())
+  auto sdi = this->Internals->Locations.find(slot);
+  if (sdi == this->Internals->Locations.end())
   {
     return;
   }
@@ -1450,10 +1409,10 @@ void vtkPVXRInterfaceHelper::LoadLocationState(int slot)
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SaveLocationState(int slot)
 {
-  vtkPVXRInterfaceHelperLocation& sd = this->Locations[slot];
+  vtkPVXRInterfaceHelperLocation& sd = this->Internals->Locations[slot];
 
-  auto p_iter = this->SavedCameraPoses.find(slot);
-  if (p_iter == this->SavedCameraPoses.end())
+  auto p_iter = this->Internals->SavedCameraPoses.find(slot);
+  if (p_iter == this->Internals->SavedCameraPoses.end())
   {
     return;
   }
@@ -1476,7 +1435,7 @@ void vtkPVXRInterfaceHelper::SaveLocationState(int slot)
 
   // update the lost of locations in the GUI
   std::vector<int> locs;
-  for (auto& l : this->Locations)
+  for (auto& l : this->Internals->Locations)
   {
     locs.push_back(l.first);
   }
@@ -1493,15 +1452,16 @@ void vtkPVXRInterfaceHelper::ViewRemoved(vtkSMViewProxy* smview)
   }
   this->Quit();
   this->SMView = nullptr;
-  this->View = nullptr;
+  this->Internals->View = nullptr;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::DoOneEvent()
 {
-  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
-    static_cast<vtkVRRenderWindowInteractor*>(this->Interactor)->DoOneEvent(vr_rw, this->Renderer);
+    vtkVRRenderWindowInteractor::SafeDownCast(this->Internals->Interactor)
+      ->DoOneEvent(vr_rw, this->Renderer);
   }
   else
   {
@@ -1603,7 +1563,7 @@ public:
   vtkOpenGLRenderWindow* ObserverWindow = nullptr;
   unsigned int RenderTextureHandle = 0;
   int ResolveSize[2];
-  vtkTextureObject* ObserverTexture = nullptr;
+  vtkSmartPointer<vtkTextureObject> ObserverTexture;
   vtkOpenGLQuadHelper* ObserverDraw = nullptr;
 
   void Initialize(vtkOpenGLRenderWindow* rw, unsigned int handle, int* resolveSize)
@@ -1614,7 +1574,7 @@ public:
     this->ResolveSize[1] = resolveSize[1];
     if (!this->ObserverTexture)
     {
-      this->ObserverTexture = vtkTextureObject::New();
+      this->ObserverTexture = vtkSmartPointer<vtkTextureObject>::New();
       this->ObserverTexture->SetMagnificationFilter(vtkTextureObject::Linear);
       this->ObserverTexture->SetMinificationFilter(vtkTextureObject::Linear);
     }
@@ -1637,7 +1597,6 @@ protected:
     }
     if (this->ObserverTexture != nullptr)
     {
-      this->ObserverTexture->Delete();
       this->ObserverTexture = nullptr;
     }
   }
@@ -1646,17 +1605,16 @@ protected:
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::RenderXRView()
 {
-  if (this->ObserverWidget)
+  if (this->Internals->ObserverWidget)
   {
-    vtkRenderer* ren =
-      static_cast<vtkRenderer*>(this->RenderWindow->GetRenderers()->GetItemAsObject(0));
+    vtkRenderer* ren = this->Internals->RenderWindow->GetRenderers()->GetFirstRenderer();
 
-    vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+    vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
 
     // bind framebuffer with texture
-    this->RenderWindow->GetState()->PushFramebufferBindings();
-    this->RenderWindow->GetRenderFramebuffer()->Bind();
-    this->RenderWindow->GetRenderFramebuffer()->ActivateDrawBuffer(0);
+    this->Internals->RenderWindow->GetState()->PushFramebufferBindings();
+    this->Internals->RenderWindow->GetRenderFramebuffer()->Bind();
+    this->Internals->RenderWindow->GetRenderFramebuffer()->ActivateDrawBuffer(0);
 
     // save old camera
     auto* ocam = ren->GetActiveCamera();
@@ -1673,9 +1631,9 @@ void vtkPVXRInterfaceHelper::RenderXRView()
     ocam->GetViewUp(vup);
     double distance = ocam->GetDistance();
 
-    auto* opos = this->ObserverCamera->GetPosition();
-    auto* odop = this->ObserverCamera->GetDirectionOfProjection();
-    auto* ovup = this->ObserverCamera->GetViewUp();
+    auto* opos = this->Internals->ObserverCamera->GetPosition();
+    auto* odop = this->Internals->ObserverCamera->GetDirectionOfProjection();
+    auto* ovup = this->Internals->ObserverCamera->GetViewUp();
 
     // adjust ratio based on current delta
     double ratio = 0.0;
@@ -1720,12 +1678,12 @@ void vtkPVXRInterfaceHelper::RenderXRView()
       npos[0] + distance * ndop[0], npos[1] + distance * ndop[1], npos[2] + distance * ndop[2]);
 
     // store new values
-    this->ObserverCamera->SetPosition(ocam->GetPosition());
-    this->ObserverCamera->SetFocalPoint(ocam->GetFocalPoint());
-    this->ObserverCamera->SetViewUp(ocam->GetViewUp());
+    this->Internals->ObserverCamera->SetPosition(ocam->GetPosition());
+    this->Internals->ObserverCamera->SetFocalPoint(ocam->GetFocalPoint());
+    this->Internals->ObserverCamera->SetViewUp(ocam->GetViewUp());
 
     // render
-    this->RenderWindow->GetRenderers()->Render();
+    this->Internals->RenderWindow->GetRenderers()->Render();
     vrrw->RenderModels();
 
     // restore
@@ -1734,64 +1692,64 @@ void vtkPVXRInterfaceHelper::RenderXRView()
     ocam->SetViewUp(vup);
 
     // resolve the framebuffer
-    this->RenderWindow->GetDisplayFramebuffer()->Bind(GL_DRAW_FRAMEBUFFER);
+    this->Internals->RenderWindow->GetDisplayFramebuffer()->Bind(GL_DRAW_FRAMEBUFFER);
 
-    int* size = this->RenderWindow->GetDisplayFramebuffer()->GetLastSize();
+    int* size = this->Internals->RenderWindow->GetDisplayFramebuffer()->GetLastSize();
     glBlitFramebuffer(
       0, 0, size[0], size[1], 0, 0, size[0], size[1], GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     // unbind framebuffer
-    this->RenderWindow->GetState()->PopFramebufferBindings();
+    this->Internals->RenderWindow->GetState()->PopFramebufferBindings();
 
     // do a FSQ render
-    this->ObserverWidget->renderWindow()->Render();
-    this->RenderWindow->MakeCurrent();
+    this->Internals->ObserverWidget->renderWindow()->Render();
+    this->Internals->RenderWindow->MakeCurrent();
   }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::ShowXRView()
 {
-  vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+  vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
   if (!vrrw)
   {
     return;
   }
 
-  if (!this->ObserverWidget)
+  if (!this->Internals->ObserverWidget)
   {
     vrrw->MakeCurrent();
     QOpenGLContext* ctx = QOpenGLContext::currentContext();
 
-    this->ObserverWidget = new QVTKOpenGLWindow(ctx);
-    this->ObserverWidget->setFormat(QVTKOpenGLWindow::defaultFormat());
+    this->Internals->ObserverWidget = new QVTKOpenGLWindow(ctx);
+    this->Internals->ObserverWidget->setFormat(QVTKOpenGLWindow::defaultFormat());
 
     // we have to setup a close on main window close otherwise
     // qt will still think there is a toplevel window open and
     // will not close or destroy this view.
     pqMainWindowEventManager* mainWindowEventManager =
       pqApplicationCore::instance()->getMainWindowEventManager();
-    QObject::connect(
-      mainWindowEventManager, SIGNAL(close(QCloseEvent*)), this->ObserverWidget, SLOT(close()));
+    QObject::connect(mainWindowEventManager, SIGNAL(close(QCloseEvent*)),
+      this->Internals->ObserverWidget, SLOT(close()));
 
     vtkNew<vtkGenericOpenGLRenderWindow> observerWindow;
-    observerWindow->GetState()->SetVBOCache(this->RenderWindow->GetVBOCache());
-    this->ObserverWidget->setRenderWindow(observerWindow);
-    this->ObserverWidget->resize(QSize(800, 600));
-    this->ObserverWidget->show();
+    observerWindow->GetState()->SetVBOCache(this->Internals->RenderWindow->GetVBOCache());
+    this->Internals->ObserverWidget->setRenderWindow(observerWindow);
+    this->Internals->ObserverWidget->resize(QSize(800, 600));
+    this->Internals->ObserverWidget->show();
 
     vtkNew<vtkEndRenderObserver> endObserver;
     endObserver->Initialize(observerWindow,
-      this->RenderWindow->GetDisplayFramebuffer()
+      this->Internals->RenderWindow->GetDisplayFramebuffer()
         ->GetColorAttachmentAsTextureObject(0)
         ->GetHandle(),
-      this->RenderWindow->GetSize());
+      this->Internals->RenderWindow->GetSize());
     observerWindow->AddObserver(vtkCommand::RenderEvent, endObserver);
     observerWindow->SetMultiSamples(8);
   }
   else
   {
-    this->ObserverWidget->show();
+    this->Internals->ObserverWidget->show();
   }
 }
 
@@ -1799,50 +1757,47 @@ void vtkPVXRInterfaceHelper::ShowXRView()
 void vtkPVXRInterfaceHelper::AttachToCurrentView(vtkSMViewProxy* smview)
 {
   this->SMView = smview;
-  this->View = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
+  this->Internals->View = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
 
-  if (!this->View)
+  if (!this->Internals->View)
   {
     vtkErrorMacro("Attach without a valid view");
     return;
   }
 
   vtkOpenGLRenderer* pvRenderer =
-    vtkOpenGLRenderer::SafeDownCast(this->View->GetRenderView()->GetRenderer());
+    vtkOpenGLRenderer::SafeDownCast(this->Internals->View->GetRenderView()->GetRenderer());
   vtkOpenGLRenderWindow* pvRenderWindow =
     vtkOpenGLRenderWindow::SafeDownCast(pvRenderer->GetVTKWindow());
 
   // we support desktop and OpenVR
   this->XRInterfacePolyfill->SetRenderWindow(pvRenderWindow);
-  this->RenderWindow = pvRenderWindow;
-  this->RenderWindow->Register(this);
+  this->Internals->RenderWindow = pvRenderWindow;
   this->Renderer = pvRenderer;
-  this->Renderer->Register(this);
-  this->Interactor = this->RenderWindow->GetInteractor();
-  this->Interactor->Register(this);
+  this->Internals->Interactor = this->Internals->RenderWindow->GetInteractor();
 
   // add a pick observer
-  this->Interactor->GetInteractorStyle()->AddObserver(
+  this->Internals->Interactor->GetInteractorStyle()->AddObserver(
     vtkCommand::EndPickEvent, this, &vtkPVXRInterfaceHelper::EventCallback, 1.0);
 
-  auto origLocked = this->View->GetLockBounds();
+  auto origLocked = this->Internals->View->GetLockBounds();
 
   // set locked bounds to prevent PV from setting it's own clipping range
   // which ignores avatars
-  this->View->SetLockBounds(true);
+  this->Internals->View->SetLockBounds(true);
 
   // start the event loop
   this->UpdateProps();
-  this->RenderWindow->Render();
+  this->Internals->RenderWindow->Render();
   this->Renderer->ResetCamera();
   this->Renderer->GetActiveCamera()->SetViewAngle(60);
   this->Renderer->ResetCameraClippingRange();
   this->ApplyState();
-  this->Done = false;
+  this->Internals->Done = false;
   double lastRenderTime = 0;
 
   double minTime = 0.04; // 25 fps
-  while (!this->Done)
+  while (!this->Internals->Done)
   {
     // throttle rendering
     this->DoOneEvent();
@@ -1850,11 +1805,11 @@ void vtkPVXRInterfaceHelper::AttachToCurrentView(vtkSMViewProxy* smview)
 
     QCoreApplication::processEvents();
 
-    if (this->SMView && this->LoadLocationValue >= 0)
+    if (this->SMView && this->Internals->LoadLocationValue >= 0)
     {
       this->SMView->StillRender();
-      this->LoadLocationState(this->LoadLocationValue);
-      this->LoadLocationValue = -1;
+      this->LoadLocationState(this->Internals->LoadLocationValue);
+      this->Internals->LoadLocationValue = -1;
       this->SMView->StillRender();
     }
 
@@ -1871,18 +1826,14 @@ void vtkPVXRInterfaceHelper::AttachToCurrentView(vtkSMViewProxy* smview)
     }
   }
 
-  if (this->View)
+  if (this->Internals->View)
   {
-    this->View->SetLockBounds(origLocked);
+    this->Internals->View->SetLockBounds(origLocked);
   }
 
   // disconnect
   this->CollaborationClient->Disconnect();
 
-  // record the last state upon exiting VR
-  // so that a later SaveState will have our last
-  // recorded data
-  this->RecordState();
   this->collabRemoveAllCropPlanes();
   this->collabRemoveAllThickCrops();
 
@@ -1890,28 +1841,26 @@ void vtkPVXRInterfaceHelper::AttachToCurrentView(vtkSMViewProxy* smview)
 
   this->AddedProps->RemoveAllItems();
   this->Widgets->ReleaseGraphicsResources(); // must delete before the interactor
-  this->Renderer->Delete();
+
   this->Renderer = nullptr;
-  this->Interactor->Delete();
-  this->Interactor = nullptr;
-  this->RenderWindow->Delete();
-  this->RenderWindow = nullptr;
+  this->Internals->Interactor = nullptr;
+  this->Internals->RenderWindow = nullptr;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 {
   this->SMView = smview;
-  this->View = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
+  this->Internals->View = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
 
-  if (!this->View)
+  if (!this->Internals->View)
   {
     vtkErrorMacro("Send to VR without a valid view");
     return;
   }
 
   // are we already in VR ?
-  if (this->Interactor)
+  if (this->Internals->Interactor)
   {
     // just update the actors and return
     this->UpdateProps();
@@ -1919,7 +1868,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   }
 
   vtkOpenGLRenderer* pvRenderer =
-    vtkOpenGLRenderer::SafeDownCast(this->View->GetRenderView()->GetRenderer());
+    vtkOpenGLRenderer::SafeDownCast(this->Internals->View->GetRenderView()->GetRenderer());
   vtkOpenGLRenderWindow* pvRenderWindow =
     vtkOpenGLRenderWindow::SafeDownCast(pvRenderer->GetVTKWindow());
 
@@ -1932,19 +1881,19 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     manifestFile = pluginLocation + "/";
   }
 
-  vtkVRRenderWindow* renWin = nullptr;
-  vtkVRRenderer* ren = nullptr;
-  vtkVRRenderWindowInteractor* vriren = nullptr;
+  vtkSmartPointer<vtkVRRenderWindow> renWin = nullptr;
+  vtkSmartPointer<vtkVRRenderer> ren = nullptr;
+  vtkSmartPointer<vtkVRRenderWindowInteractor> vriren = nullptr;
 
-#if PARAVIEW_HAS_OPENXR_SUPPORT
+#if XRINTERFACE_HAS_OPENXR_SUPPORT
   if (this->UseOpenXR)
   {
-    renWin = static_cast<vtkVRRenderWindow*>(vtkOpenXRRenderWindow::New());
+    renWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
     renWin->MakeCurrent();
     renWin->SetHelperWindow(pvRenderWindow);
-    ren = static_cast<vtkVRRenderer*>(vtkOpenXRRenderer::New());
-    vtkOpenXRRenderWindowInteractor* oxriren = vtkOpenXRRenderWindowInteractor::New();
-    vriren = static_cast<vtkVRRenderWindowInteractor*>(oxriren);
+    ren = vtkSmartPointer<vtkOpenXRRenderer>::New();
+    vtkNew<vtkOpenXRRenderWindowInteractor> oxriren;
+    vriren = oxriren;
     manifestFile += "pv_openxr_actions.json";
     vriren->SetActionManifestFileName(manifestFile.c_str());
 
@@ -1960,7 +1909,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
       vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
       if (edd && edd->GetAction() == vtkEventDataAction::Press)
       {
-        this->Widgets->MoveThickCrops(this->LeftTrackPadPosition[0] > 0.0);
+        this->Widgets->MoveThickCrops(this->Internals->LeftTrackPadPosition[0] > 0.0);
       }
     });
 
@@ -1968,7 +1917,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
       vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
       if (edd)
       {
-        edd->GetTrackPadPosition(this->LeftTrackPadPosition);
+        edd->GetTrackPadPosition(this->Internals->LeftTrackPadPosition);
       }
     });
 
@@ -1999,13 +1948,16 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     });
   }
   else
-  {
+#else
+  (void)pvRenderWindow;
 #endif
-    renWin = static_cast<vtkVRRenderWindow*>(vtkOpenVRRenderWindow::New());
+  {
+#if XRINTERFACE_HAS_OPENVR_SUPPORT
+    renWin = vtkSmartPointer<vtkOpenVRRenderWindow>::New();
     renWin->SetHelperWindow(pvRenderWindow);
-    ren = static_cast<vtkVRRenderer*>(vtkOpenVRRenderer::New());
-    vtkOpenVRRenderWindowInteractor* ovriren = vtkOpenVRRenderWindowInteractor::New();
-    vriren = static_cast<vtkVRRenderWindowInteractor*>(ovriren);
+    ren = vtkSmartPointer<vtkOpenVRRenderer>::New();
+    vtkNew<vtkOpenVRRenderWindowInteractor> ovriren;
+    vriren = ovriren;
     manifestFile += "pv_openvr_actions.json";
     vriren->SetActionManifestFileName(manifestFile);
 
@@ -2032,16 +1984,24 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
         this->Widgets->MoveThickCrops(false);
       }
     });
-#if PARAVIEW_HAS_OPENXR_SUPPORT
-  }
 #endif
+  }
 
-  this->RenderWindow = static_cast<vtkOpenGLRenderWindow*>(renWin);
+  this->Internals->RenderWindow = renWin;
+  this->Renderer = ren;
+  this->Internals->Interactor = vriren;
+
+  if (!this->Internals->Interactor || !this->Internals->RenderWindow || !this->Renderer)
+  {
+    vtkErrorMacro("Attempted to SendToXR without any backend available");
+    this->Internals->RenderWindow = nullptr;
+    this->Internals->Interactor = nullptr;
+    this->Renderer = nullptr;
+    return;
+  }
+
   this->XRInterfacePolyfill->SetRenderWindow(renWin);
-  this->Renderer = static_cast<vtkOpenGLRenderer*>(ren);
-
-  this->Interactor = vriren;
-  static_cast<vtkVRInteractorStyle*>(this->Interactor->GetInteractorStyle())
+  vtkVRInteractorStyle::SafeDownCast(this->Internals->Interactor->GetInteractorStyle())
     ->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
 
   this->AddObserver(vtkCommand::SaveStateEvent, this, &vtkPVXRInterfaceHelper::EventCallback, 1.0);
@@ -2050,9 +2010,9 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   // pvRenderWindow is a vtkGenericOpenglRenderWindow
 
   renWin->SetBaseStationVisibility(this->BaseStationVisibility);
-  this->RenderWindow->SetNumberOfLayers(2);
-  this->RenderWindow->AddRenderer(this->Renderer);
-  this->RenderWindow->SetInteractor(this->Interactor);
+  this->Internals->RenderWindow->SetNumberOfLayers(2);
+  this->Internals->RenderWindow->AddRenderer(this->Renderer);
+  this->Internals->RenderWindow->SetInteractor(this->Internals->Interactor);
 
   // Setup camera
   renWin->InitializeViewFromCamera(pvRenderer->GetActiveCamera());
@@ -2062,14 +2022,14 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 
   this->Renderer->RemoveCuller(this->Renderer->GetCullers()->GetLastItem());
   this->Renderer->SetBackground(pvRenderer->GetBackground());
-  this->RenderWindow->SetMultiSamples(this->MultiSample ? 8 : 0);
+  this->Internals->RenderWindow->SetMultiSamples(this->MultiSample ? 8 : 0);
 
   // we always get first pick on events
-  this->Interactor->AddObserver(
+  this->Internals->Interactor->AddObserver(
     vtkCommand::Select3DEvent, this, &vtkPVXRInterfaceHelper::InteractorEventCallback, 2.0);
-  this->Interactor->AddObserver(
+  this->Internals->Interactor->AddObserver(
     vtkCommand::Move3DEvent, this, &vtkPVXRInterfaceHelper::InteractorEventCallback, 2.0);
-  this->Interactor->AddObserver(
+  this->Internals->Interactor->AddObserver(
     vtkCommand::NextPose3DEvent, this, &vtkPVXRInterfaceHelper::InteractorEventCallback, 3.0);
 
   // create 4 lights for even lighting
@@ -2108,15 +2068,15 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   }
 
   // add a pick observer
-  this->Interactor->GetInteractorStyle()->AddObserver(
+  this->Internals->Interactor->GetInteractorStyle()->AddObserver(
     vtkCommand::EndPickEvent, this, &vtkPVXRInterfaceHelper::EventCallback, 1.0);
 
-  this->RenderWindow->SetDesiredUpdateRate(200.0);
-  this->Interactor->SetDesiredUpdateRate(200.0);
-  this->Interactor->SetStillUpdateRate(200.0);
+  this->Internals->RenderWindow->SetDesiredUpdateRate(200.0);
+  this->Internals->Interactor->SetDesiredUpdateRate(200.0);
+  this->Internals->Interactor->SetStillUpdateRate(200.0);
 
-  this->RenderWindow->Initialize();
-  vtkVRRenderWindow* vrRenWin = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+  this->Internals->RenderWindow->Initialize();
+  vtkVRRenderWindow* vrRenWin = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
 
   if (vrRenWin && vrRenWin->GetInitialized())
   {
@@ -2171,13 +2131,13 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 
     // start the event loop
     this->UpdateProps();
-    this->RenderWindow->Render();
+    this->Internals->RenderWindow->Render();
     this->Renderer->ResetCamera();
     this->Renderer->ResetCameraClippingRange();
     this->ApplyState();
 
-    this->Done = false;
-    while (!this->Done)
+    this->Internals->Done = false;
+    while (!this->Internals->Done)
     {
       this->Widgets->UpdateWidgetsFromParaView();
       this->DoOneEvent(); // calls render()
@@ -2190,11 +2150,11 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
         this->SMView->StillRender();
         this->NeedStillRender = false;
       }
-      if (this->SMView && this->LoadLocationValue >= 0)
+      if (this->SMView && this->Internals->LoadLocationValue >= 0)
       {
         this->SMView->StillRender();
-        this->LoadLocationState(this->LoadLocationValue);
-        this->LoadLocationValue = -1;
+        this->LoadLocationState(this->Internals->LoadLocationValue);
+        this->Internals->LoadLocationValue = -1;
         this->SMView->StillRender();
       }
     }
@@ -2203,33 +2163,26 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   // disconnect
   this->CollaborationClient->Disconnect();
 
-  // record the last state upon exiting VR
-  // so that a later SaveState will have our last
-  // recorded data
-  this->RecordState();
-
   this->collabRemoveAllCropPlanes();
   this->collabRemoveAllThickCrops();
 
-  if (this->ObserverWidget)
+  if (this->Internals->ObserverWidget)
   {
-    this->ObserverWidget->destroy();
-    delete this->ObserverWidget;
-    this->ObserverWidget = nullptr;
+    this->Internals->ObserverWidget->destroy();
+    delete this->Internals->ObserverWidget;
+    this->Internals->ObserverWidget = nullptr;
   }
 
   this->AddedProps->RemoveAllItems();
   this->Widgets->ReleaseGraphicsResources(); // must delete before the interactor
-  this->Renderer->Delete();
-  this->Renderer = nullptr;
-  this->Interactor->Delete();
-  this->Interactor = nullptr;
   if (renWin)
   {
     renWin->SetHelperWindow(nullptr);
   }
-  this->RenderWindow->Delete();
-  this->RenderWindow = nullptr;
+
+  this->Internals->RenderWindow = nullptr;
+  this->Internals->Interactor = nullptr;
+  this->Renderer = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -2255,7 +2208,7 @@ void vtkPVXRInterfaceHelper::ResetPositions()
     return;
   }
 
-  this->RenderWindow->MakeCurrent();
+  this->Internals->RenderWindow->MakeCurrent();
 
   vtkCollectionSimpleIterator pit;
   vtkProp* prop;
@@ -2279,20 +2232,20 @@ void vtkPVXRInterfaceHelper::ResetPositions()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::UpdateProps()
 {
-  if (!this->View)
+  if (!this->Internals->View)
   {
     return;
   }
 
-  vtkRenderer* pvRenderer = this->View->GetRenderView()->GetRenderer();
+  vtkRenderer* pvRenderer = this->Internals->View->GetRenderView()->GetRenderer();
 
   if (!this->Renderer)
   {
     return;
   }
 
-  this->RenderWindow->MakeCurrent();
-  if (pvRenderer->GetViewProps()->GetMTime() > this->PropUpdateTime ||
+  this->Internals->RenderWindow->MakeCurrent();
+  if (pvRenderer->GetViewProps()->GetMTime() > this->Internals->PropUpdateTime ||
     this->AddedProps->GetNumberOfItems() == 0)
   {
     // remove prior props
@@ -2329,15 +2282,7 @@ void vtkPVXRInterfaceHelper::UpdateProps()
         this->Renderer->AddViewProp(prop);
       }
     }
-    // vtkVolumeCollection* avol = pvRenderer->GetVolumes();
-    // vtkVolume* volume;
-    // for (avol->InitTraversal(pit); (volume = avol->GetNextVolume(pit));)
-    // {
-    //   this->AddedProps->AddItem(volume);
-    //   this->Renderer->AddVolume(volume);
-    // }
-
-    this->PropUpdateTime.Modified();
+    this->Internals->PropUpdateTime.Modified();
   }
 
   this->DoOneEvent();
@@ -2346,7 +2291,7 @@ void vtkPVXRInterfaceHelper::UpdateProps()
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::Quit()
 {
-  this->Done = true;
+  this->Internals->Done = true;
   this->Widgets->Quit();
 }
 
@@ -2354,4 +2299,10 @@ void vtkPVXRInterfaceHelper::Quit()
 void vtkPVXRInterfaceHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVXRInterfaceHelper::InVR()
+{
+  return this->Internals->Interactor != nullptr;
 }

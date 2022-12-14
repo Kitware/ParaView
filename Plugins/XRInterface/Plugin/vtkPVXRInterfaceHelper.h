@@ -31,7 +31,6 @@
 // clang-format from "fixing" this for us or compilation will fail.
 // clang-format off
 #include "vtk_glew.h"
-#include "QVTKOpenGLWindow.h"
 #include <qdir.h>
 #include <qurl.h>
 // clang-format on
@@ -39,31 +38,27 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include "vtkVRCamera.h" // for visibility of inner "Pose" class
+#include "vtkVRCamera.h"       // for visibility of enum Pose
+#include "vtkOpenGLRenderer.h" // TODO should not be needed
 
 #include <array>  // for method sig
 #include <map>    // for ivar
+#include <memory> // for unique_ptr
 #include <vector> // for ivar
 
 class pqXRInterfaceControls;
-class QVTKOpenGLWindow;
-class vtkOpenGLCamera;
 class vtkOpenGLRenderer;
-class vtkOpenGLRenderWindow;
-class vtkXRInterfacePolyfill;
-class vtkPropCollection;
-class vtkPVXRInterfaceCollaborationClient;
-class vtkPVXRInterfaceExporter;
-class vtkPVXRInterfaceWidgets;
-class vtkPVRenderView;
 class vtkPVXMLElement;
-class vtkQWidgetWidget;
-class vtkVRRenderWindow;
-class vtkRenderWindowInteractor;
-class vtkSMProxy;
+class vtkPVXRInterfaceCollaborationClient;
+class vtkPVXRInterfaceWidgets;
+class vtkPropCollection;
 class vtkSMProxyLocator;
+class vtkSMProxy;
 class vtkSMViewProxy;
 class vtkTransform;
+class vtkVRRenderWindow;
+class vtkVRRenderer;
+class vtkXRInterfacePolyfill;
 
 // helper class to store information per location
 class vtkPVXRInterfaceHelperLocation
@@ -186,7 +181,7 @@ public:
   /**
    * Return true if XR is currently running.
    */
-  bool InVR() { return this->Interactor != nullptr; }
+  bool InVR();
 
   ///@{
   /**
@@ -374,45 +369,23 @@ public:
 
 protected:
   vtkPVXRInterfaceHelper();
-  virtual ~vtkPVXRInterfaceHelper() = default;
+  ~vtkPVXRInterfaceHelper();
 
   void ApplyState();
-  void RecordState();
   bool InteractorEventCallback(vtkObject* object, unsigned long event, void* calldata);
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
+
   void HandleDeleteEvent(vtkObject* caller);
   void UpdateBillboard(bool updatePosition);
+
   void SaveLocationState(int slot);
+
   void SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot);
   void LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot);
   void LoadNextCameraPose();
+
   void DoOneEvent();
   void RenderXRView();
-
-  vtkNew<vtkOpenGLCamera> ObserverCamera;
-  vtkNew<vtkPropCollection> AddedProps;
-  vtkNew<vtkPVXRInterfaceCollaborationClient> CollaborationClient;
-  vtkNew<vtkPVXRInterfaceExporter> Exporter;
-  vtkNew<vtkPVXRInterfaceWidgets> Widgets;
-  vtkNew<vtkXRInterfacePolyfill> XRInterfacePolyfill;
-
-  pqXRInterfaceControls* XRInterfaceControls = nullptr;
-  QVTKOpenGLWindow* ObserverWidget = nullptr;
-  vtkQWidgetWidget* QWidgetWidget = nullptr;
-  vtkPVRenderView* View = nullptr;
-  vtkSMViewProxy* SMView = nullptr;
-  vtkOpenGLRenderer* Renderer = nullptr;
-  vtkOpenGLRenderWindow* RenderWindow = nullptr;
-  vtkRenderWindowInteractor* Interactor = nullptr;
-  vtkTimeStamp PropUpdateTime;
-
-  bool MultiSample = false;
-  bool BaseStationVisibility = false;
-  bool NeedStillRender = false;
-  bool Done = true;
-  bool UseOpenXR = false;
-
-  RightTriggerAction RightTriggerMode = vtkPVXRInterfaceHelper::PICK;
 
   // To simulate dpad with a trackpad on OpenXR we need to
   // store the last position
@@ -427,6 +400,24 @@ protected:
 private:
   vtkPVXRInterfaceHelper(const vtkPVXRInterfaceHelper&) = delete;
   void operator=(const vtkPVXRInterfaceHelper&) = delete;
+
+  // state settings that the helper loads
+  bool MultiSample = false;
+  bool BaseStationVisibility = false;
+  bool NeedStillRender = false;
+  bool UseOpenXR = false;
+  RightTriggerAction RightTriggerMode = vtkPVXRInterfaceHelper::PICK;
+
+  vtkSMViewProxy* SMView = nullptr;
+  pqXRInterfaceControls* XRInterfaceControls = nullptr;
+  vtkSmartPointer<vtkOpenGLRenderer> Renderer;
+  vtkNew<vtkPVXRInterfaceCollaborationClient> CollaborationClient;
+  vtkNew<vtkPropCollection> AddedProps;
+  vtkNew<vtkXRInterfacePolyfill> XRInterfacePolyfill;
+  vtkNew<vtkPVXRInterfaceWidgets> Widgets;
+
+  struct vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif

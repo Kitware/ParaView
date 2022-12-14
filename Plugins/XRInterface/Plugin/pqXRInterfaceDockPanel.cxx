@@ -21,9 +21,6 @@
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqXRInterfaceControls.h"
-
-#include "vtkSMRenderViewProxy.h"
-
 #include "vtkNew.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVXMLElement.h"
@@ -31,54 +28,76 @@
 #include "vtkPVXRInterfaceHelper.h"
 #include "vtkPVXRInterfaceWidgets.h"
 #include "vtkRenderViewBase.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include <sstream>
 
-class pqXRInterfaceDockPanel::pqInternals : public Ui::pqXRInterfaceDockPanel
+//-----------------------------------------------------------------------------
+struct pqXRInterfaceDockPanel::pqInternals
 {
+  Ui::pqXRInterfaceDockPanel Ui;
+  vtkNew<vtkPVXRInterfaceHelper> Helper;
+  pqXRInterfaceControls* XRInterfaceControls = nullptr;
+  bool XREnabled = false;
+  bool Attached = false;
 };
 
+//-----------------------------------------------------------------------------
+pqXRInterfaceDockPanel::pqXRInterfaceDockPanel(
+  const QString& title, QWidget* parent, Qt::WindowFlags flag)
+  : Superclass(title, parent, flag)
+  , Internals(new pqXRInterfaceDockPanel::pqInternals())
+{
+  this->constructor();
+}
+
+//-----------------------------------------------------------------------------
+pqXRInterfaceDockPanel::pqXRInterfaceDockPanel(QWidget* parent, Qt::WindowFlags flags)
+  : Superclass(parent, flags)
+  , Internals(new pqXRInterfaceDockPanel::pqInternals())
+{
+  this->constructor();
+}
+
+//-----------------------------------------------------------------------------
+pqXRInterfaceDockPanel::~pqXRInterfaceDockPanel() = default;
+
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::constructor()
 {
-  this->Helper = vtkPVXRInterfaceHelper::New();
-  this->XRInterfaceControls = new pqXRInterfaceControls(this->Helper);
-  this->Helper->SetXRInterfaceControls(this->XRInterfaceControls);
+  this->Internals->XRInterfaceControls = new pqXRInterfaceControls(this->Internals->Helper, this);
+  this->Internals->Helper->SetXRInterfaceControls(this->Internals->XRInterfaceControls);
 
   this->setWindowTitle("XRInterface");
   QWidget* t_widget = new QWidget(this);
-  this->Internals = new pqInternals();
-  this->Internals->setupUi(t_widget);
+  this->Internals->Ui.setupUi(t_widget);
   this->setWidget(t_widget);
 
-  this->Internals->showXRViewButton->setEnabled(false);
+  this->Internals->Ui.showXRViewButton->setEnabled(false);
 
-  QObject::connect(this->Internals->sendToXRButton, &QPushButton::clicked,
+  QObject::connect(this->Internals->Ui.sendToXRButton, &QPushButton::clicked,
     std::bind(&pqXRInterfaceDockPanel::sendToXRInterface, this));
-  QObject::connect(this->Internals->attachToCurrentViewButton, &QPushButton::clicked,
+  QObject::connect(this->Internals->Ui.attachToCurrentViewButton, &QPushButton::clicked,
     std::bind(&pqXRInterfaceDockPanel::attachToCurrentView, this));
-  QObject::connect(this->Internals->showXRViewButton, &QPushButton::clicked,
+  QObject::connect(this->Internals->Ui.showXRViewButton, &QPushButton::clicked,
     std::bind(&pqXRInterfaceDockPanel::showXRView, this));
-  connect(this->Internals->exportLocationsAsSkyboxesButton, SIGNAL(clicked()), this,
+  connect(this->Internals->Ui.exportLocationsAsSkyboxesButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsSkyboxes()));
-  connect(this->Internals->exportLocationsAsViewButton, SIGNAL(clicked()), this,
+  connect(this->Internals->Ui.exportLocationsAsViewButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsView()));
 
-  connect(this->Internals->editableField, SIGNAL(textChanged(const QString&)), this,
+  connect(this->Internals->Ui.editableField, SIGNAL(textChanged(const QString&)), this,
     SLOT(editableFieldChanged(const QString&)));
-  connect(this->Internals->fieldValues, SIGNAL(textChanged(const QString&)), this,
+  connect(this->Internals->Ui.fieldValues, SIGNAL(textChanged(const QString&)), this,
     SLOT(fieldValuesChanged(const QString&)));
 
-  QObject::connect(this->Internals->multisamples, &QCheckBox::stateChanged,
-    [&](int state) { this->Helper->SetMultiSample(state == Qt::Checked); });
-  QObject::connect(this->Internals->baseStationVisibility, &QCheckBox::stateChanged,
-    [&](int state) { this->Helper->SetBaseStationVisibility(state == Qt::Checked); });
+  QObject::connect(this->Internals->Ui.multisamples, &QCheckBox::stateChanged,
+    [&](int state) { this->Internals->Helper->SetMultiSample(state == Qt::Checked); });
+  QObject::connect(this->Internals->Ui.baseStationVisibility, &QCheckBox::stateChanged,
+    [&](int state) { this->Internals->Helper->SetBaseStationVisibility(state == Qt::Checked); });
 
-  connect(this->Internals->cropThickness, SIGNAL(textChanged(const QString&)), this,
+  connect(this->Internals->Ui.cropThickness, SIGNAL(textChanged(const QString&)), this,
     SLOT(defaultCropThicknessChanged(const QString&)));
-
-  // connect(
-  //   &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
-  //   SLOT(setActiveView(pqView*)));
 
   connect(pqApplicationCore::instance(), SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
     this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
@@ -87,7 +106,6 @@ void pqXRInterfaceDockPanel::constructor()
     SLOT(saveState(vtkPVXMLElement*)));
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smmodel, SIGNAL(preViewAdded(pqView*)), this, SLOT(onViewAdded(pqView*)));
   QObject::connect(smmodel, SIGNAL(preViewRemoved(pqView*)), this, SLOT(onViewRemoved(pqView*)));
 
   QObject::connect(
@@ -100,178 +118,183 @@ void pqXRInterfaceDockPanel::constructor()
     QOverload<vtkObject*, unsigned long, void*, void*>::of(&pqAnimationManager::endPlay), this,
     &pqXRInterfaceDockPanel::endPlay);
 
-  if (this->Helper->GetCollaborationClient()->SupportsCollaboration())
+  if (this->Internals->Helper->GetCollaborationClient()->SupportsCollaboration())
   {
-    this->Internals->cConnectButton->setEnabled(false);
-    connect(this->Internals->cConnectButton, SIGNAL(clicked()), this, SLOT(collaborationConnect()));
+    this->Internals->Ui.cConnectButton->setEnabled(false);
+    connect(
+      this->Internals->Ui.cConnectButton, SIGNAL(clicked()), this, SLOT(collaborationConnect()));
   }
   else
   {
     // hide widgets
-    this->Internals->cConnectButton->hide();
-    this->Internals->cSessionLabel->hide();
-    this->Internals->cSessionValue->hide();
-    this->Internals->cNameLabel->hide();
-    this->Internals->cNameValue->hide();
-    this->Internals->cPortLabel->hide();
-    this->Internals->cPortValue->hide();
-    this->Internals->cServerLabel->hide();
-    this->Internals->cServerValue->hide();
-    this->Internals->cHeader->hide();
-    this->Internals->outputWindow->hide();
+    this->Internals->Ui.cConnectButton->hide();
+    this->Internals->Ui.cSessionLabel->hide();
+    this->Internals->Ui.cSessionValue->hide();
+    this->Internals->Ui.cNameLabel->hide();
+    this->Internals->Ui.cNameValue->hide();
+    this->Internals->Ui.cPortLabel->hide();
+    this->Internals->Ui.cPortValue->hide();
+    this->Internals->Ui.cServerLabel->hide();
+    this->Internals->Ui.cServerValue->hide();
+    this->Internals->Ui.cHeader->hide();
+    this->Internals->Ui.outputWindow->hide();
   }
 
-#if PARAVIEW_HAS_OPENXR_SUPPORT
-  static const std::string OPENVR_LABEL = "OpenVR";
-  static const std::string OPENXR_LABEL = "OpenXR";
+  QObject::connect(this->Internals->Ui.chooseBackendCombo,
+    QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqXRInterfaceDockPanel::xrBackendChanged);
 
-  this->Internals->chooseBackendCombo->clear();
-  this->Internals->chooseBackendCombo->addItem(OPENVR_LABEL.c_str());
-  this->Internals->chooseBackendCombo->addItem(OPENXR_LABEL.c_str());
-
-  QObject::connect(this->Internals->chooseBackendCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
-      if (text.length())
-      {
-        if (text == OPENXR_LABEL.c_str())
-        {
-          this->Helper->SetUseOpenXR(true);
-        }
-        else
-        {
-          this->Helper->SetUseOpenXR(false);
-        }
-      }
-    });
-#else
-  this->Internals->chooseBackendCombo->hide();
-  this->Internals->sendToXRLabel->hide();
+#if XRINTERFACE_HAS_OPENVR_SUPPORT
+  // No need for tr()
+  this->Internals->Ui.chooseBackendCombo->addItem(
+    "OpenVR", QVariant(pqXRInterfaceDockPanel::XR_BACKEND_OPENVR));
 #endif
+
+#if XRINTERFACE_HAS_OPENXR_SUPPORT
+  // No need for tr()
+  this->Internals->Ui.chooseBackendCombo->addItem(
+    "OpenXR", QVariant(pqXRInterfaceDockPanel::XR_BACKEND_OPENXR));
+#endif
+
+  if (this->Internals->Ui.chooseBackendCombo->count() == 0)
+  {
+    this->Internals->Ui.chooseBackendCombo->addItem(
+      tr("None"), QVariant(pqXRInterfaceDockPanel::XR_BACKEND_NONE));
+  }
+  if (this->Internals->Ui.chooseBackendCombo->count() == 1)
+  {
+    this->Internals->Ui.chooseBackendCombo->setEnabled(false);
+  }
+  this->Internals->Ui.chooseBackendCombo->setCurrentIndex(0);
 
 // hide/show widgets based on Imago support
 #if XRINTERFACE_HAS_IMAGO_SUPPORT
-  QObject::connect(this->Internals->imagoLoginButton, &QPushButton::clicked, [&]() {
-    std::string uid = this->Internals->imagoUserValue->text().toUtf8().toStdString();
-    std::string pw = this->Internals->imagoPasswordValue->text().toUtf8().toStdString();
-    if (this->Helper->GetWidgets()->LoginToImago(uid, pw))
+  QObject::connect(this->Internals->Ui.imagoLoginButton, &QPushButton::clicked, [&]() {
+    std::string uid = this->Internals->Ui.imagoUserValue->text().toUtf8().toStdString();
+    std::string pw = this->Internals->Ui.imagoPasswordValue->text().toUtf8().toStdString();
+    if (this->Internals->Helper->GetWidgets()->LoginToImago(uid, pw))
     {
       // set the background of the login button to light green
       // to indicate success
-      this->Internals->imagoLoginButton->setStyleSheet("border:2px solid #44ff44;");
+      this->Internals->Ui.imagoLoginButton->setStyleSheet("border:2px solid #44ff44;");
 
       // set the combo box values to what the context has
       // try to save previous values if we can
       std::vector<std::string> vals;
       {
-        this->Helper->GetWidgets()->GetImagoImageryTypes(vals);
+        this->Internals->Helper->GetWidgets()->GetImagoImageryTypes(vals);
         std::string oldValue =
-          this->Internals->imagoImageryTypeCombo->currentText().toUtf8().data();
-        this->Internals->imagoImageryTypeCombo->clear();
+          this->Internals->Ui.imagoImageryTypeCombo->currentText().toUtf8().data();
+        this->Internals->Ui.imagoImageryTypeCombo->clear();
         QStringList list;
         list << QString("Any");
         for (auto s : vals)
         {
           list << QString(s.c_str());
         }
-        this->Internals->imagoImageryTypeCombo->addItems(list);
-        auto idx = this->Internals->imagoImageryTypeCombo->findText(QString(oldValue.c_str()));
-        this->Internals->imagoImageryTypeCombo->setCurrentIndex(idx);
-        this->Helper->GetWidgets()->SetImagoImageryType(oldValue);
+        this->Internals->Ui.imagoImageryTypeCombo->addItems(list);
+        auto idx = this->Internals->Ui.imagoImageryTypeCombo->findText(QString(oldValue.c_str()));
+        this->Internals->Ui.imagoImageryTypeCombo->setCurrentIndex(idx);
+        this->Internals->Helper->GetWidgets()->SetImagoImageryType(oldValue);
       }
 
       {
-        this->Helper->GetWidgets()->GetImagoImageTypes(vals);
-        std::string oldValue = this->Internals->imagoImageTypeCombo->currentText().toUtf8().data();
-        this->Internals->imagoImageTypeCombo->clear();
+        this->Internals->Helper->GetWidgets()->GetImagoImageTypes(vals);
+        std::string oldValue =
+          this->Internals->Ui.imagoImageTypeCombo->currentText().toUtf8().data();
+        this->Internals->Ui.imagoImageTypeCombo->clear();
         QStringList list;
         list << QString("Any");
         for (auto s : vals)
         {
           list << QString(s.c_str());
         }
-        this->Internals->imagoImageTypeCombo->addItems(list);
-        auto idx = this->Internals->imagoImageTypeCombo->findText(QString(oldValue.c_str()));
-        this->Internals->imagoImageTypeCombo->setCurrentIndex(idx);
-        this->Helper->GetWidgets()->SetImagoImageType(oldValue);
+        this->Internals->Ui.imagoImageTypeCombo->addItems(list);
+        auto idx = this->Internals->Ui.imagoImageTypeCombo->findText(QString(oldValue.c_str()));
+        this->Internals->Ui.imagoImageTypeCombo->setCurrentIndex(idx);
+        this->Internals->Helper->GetWidgets()->SetImagoImageType(oldValue);
       }
 
       {
-        this->Helper->GetWidgets()->GetImagoDatasets(vals);
-        std::string oldValue = this->Internals->imagoDatasetCombo->currentText().toUtf8().data();
-        this->Internals->imagoDatasetCombo->clear();
+        this->Internals->Helper->GetWidgets()->GetImagoDatasets(vals);
+        std::string oldValue = this->Internals->Ui.imagoDatasetCombo->currentText().toUtf8().data();
+        this->Internals->Ui.imagoDatasetCombo->clear();
         QStringList list;
         list << QString("Any");
         for (auto s : vals)
         {
           list << QString(s.c_str());
         }
-        this->Internals->imagoDatasetCombo->addItems(list);
-        auto idx = this->Internals->imagoDatasetCombo->findText(QString(oldValue.c_str()));
-        this->Internals->imagoDatasetCombo->setCurrentIndex(idx);
-        this->Helper->GetWidgets()->SetImagoDataset(oldValue);
+        this->Internals->Ui.imagoDatasetCombo->addItems(list);
+        auto idx = this->Internals->Ui.imagoDatasetCombo->findText(QString(oldValue.c_str()));
+        this->Internals->Ui.imagoDatasetCombo->setCurrentIndex(idx);
+        this->Internals->Helper->GetWidgets()->SetImagoDataset(oldValue);
       }
 
       {
-        this->Helper->GetWidgets()->GetImagoWorkspaces(vals);
-        std::string oldValue = this->Internals->imagoWorkspaceCombo->currentText().toUtf8().data();
-        this->Internals->imagoWorkspaceCombo->clear();
+        this->Internals->Helper->GetWidgets()->GetImagoWorkspaces(vals);
+        std::string oldValue =
+          this->Internals->Ui.imagoWorkspaceCombo->currentText().toUtf8().data();
+        this->Internals->Ui.imagoWorkspaceCombo->clear();
         QStringList list;
         list << QString("Any");
         for (auto s : vals)
         {
           list << QString(s.c_str());
         }
-        this->Internals->imagoWorkspaceCombo->addItems(list);
-        auto idx = this->Internals->imagoWorkspaceCombo->findText(QString(oldValue.c_str()));
-        this->Internals->imagoWorkspaceCombo->setCurrentIndex(idx);
-        this->Helper->GetWidgets()->SetImagoWorkspace(oldValue);
+        this->Internals->Ui.imagoWorkspaceCombo->addItems(list);
+        auto idx = this->Internals->Ui.imagoWorkspaceCombo->findText(QString(oldValue.c_str()));
+        this->Internals->Ui.imagoWorkspaceCombo->setCurrentIndex(idx);
+        this->Internals->Helper->GetWidgets()->SetImagoWorkspace(oldValue);
       }
     }
     else
     {
-      this->Internals->imagoLoginButton->setStyleSheet("border:2px solid #ff4444;");
+      this->Internals->Ui.imagoLoginButton->setStyleSheet("border:2px solid #ff4444;");
     }
   });
 
-  QObject::connect(this->Internals->imagoWorkspaceCombo,
+  QObject::connect(this->Internals->Ui.imagoWorkspaceCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoWorkspace(text.toUtf8().toStdString());
+        this->Internals->Helper->GetWidgets()->SetImagoWorkspace(text.toUtf8().toStdString());
       }
     });
-  QObject::connect(this->Internals->imagoDatasetCombo,
+  QObject::connect(this->Internals->Ui.imagoDatasetCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoDataset(text.toUtf8().toStdString());
+        this->Internals->Helper->GetWidgets()->SetImagoDataset(text.toUtf8().toStdString());
       }
     });
-  QObject::connect(this->Internals->imagoImageryTypeCombo,
+  QObject::connect(this->Internals->Ui.imagoImageryTypeCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoImageryType(text.toUtf8().toStdString());
+        this->Internals->Helper->GetWidgets()->SetImagoImageryType(text.toUtf8().toStdString());
       }
     });
-  QObject::connect(this->Internals->imagoImageTypeCombo,
+  QObject::connect(this->Internals->Ui.imagoImageTypeCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoImageType(text.toUtf8().toStdString());
+        this->Internals->Helper->GetWidgets()->SetImagoImageType(text.toUtf8().toStdString());
       }
     });
 #else
-  this->Internals->imagoLine->hide();
-  this->Internals->imagoGroupBox->hide();
+  this->Internals->Ui.imagoLine->hide();
+  this->Internals->Ui.imagoGroupBox->hide();
 #endif
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::editableFieldChanged(const QString& text)
 {
-  this->Helper->SetEditableField(text.toUtf8().data());
+  this->Internals->Helper->SetEditableField(text.toUtf8().data());
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::fieldValuesChanged(const QString& text)
 {
   // Split string with comma as separator and remove extra whitespaces
@@ -281,97 +304,104 @@ void pqXRInterfaceDockPanel::fieldValuesChanged(const QString& text)
     str = str.trimmed();
   }
 
-  this->XRInterfaceControls->SetFieldValues(list);
+  this->Internals->XRInterfaceControls->SetFieldValues(list);
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::sendToXRInterface()
 {
-  if (!this->XREnabled)
+  if (!this->Internals->XREnabled)
   {
     pqView* view = pqActiveObjects::instance().activeView();
 
     if (view)
     {
+      // XXX setText should be avoid (here and below) with a cleaner
+      // UI design: https://gitlab.kitware.com/vtk/vtk/-/issues/18302
       vtkSMViewProxy* smview = view->getViewProxy();
-      this->Internals->cConnectButton->setText("Connect");
-      this->Internals->attachToCurrentViewButton->setEnabled(false);
-      this->Internals->showXRViewButton->setEnabled(true);
-      this->Internals->sendToXRButton->setText("Quit XR");
-      this->XREnabled = true;
-      this->Internals->cConnectButton->setEnabled(true);
-      this->Helper->SendToXR(smview);
-      this->Internals->cConnectButton->setEnabled(false);
-      this->Internals->cConnectButton->setText("Connect");
-      this->Internals->sendToXRButton->setText("Send to XR");
-      this->XREnabled = false;
-      this->Internals->attachToCurrentViewButton->setEnabled(true);
+      this->Internals->Ui.cConnectButton->setText(tr("Connect"));
+      this->Internals->Ui.attachToCurrentViewButton->setEnabled(false);
+      this->Internals->Ui.showXRViewButton->setEnabled(true);
+      this->Internals->Ui.sendToXRButton->setText(tr("Quit XR"));
+      this->Internals->XREnabled = true;
+      this->Internals->Ui.cConnectButton->setEnabled(true);
+      this->Internals->Helper->SendToXR(smview);
+      this->Internals->Ui.cConnectButton->setEnabled(false);
+      this->Internals->Ui.cConnectButton->setText(tr("Connect"));
+      this->Internals->Ui.sendToXRButton->setText(tr("Send to XR"));
+      this->Internals->XREnabled = false;
+      this->Internals->Ui.attachToCurrentViewButton->setEnabled(true);
     }
   }
   else
   {
-    this->Internals->showXRViewButton->setEnabled(false);
-    this->Internals->cConnectButton->setEnabled(false);
-    this->Helper->Quit();
+    this->Internals->Ui.showXRViewButton->setEnabled(false);
+    this->Internals->Ui.cConnectButton->setEnabled(false);
+    this->Internals->Helper->Quit();
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::showXRView()
 {
-  this->Helper->ShowXRView();
+  this->Internals->Helper->ShowXRView();
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::attachToCurrentView()
 {
-  if (!this->Attached)
+  if (!this->Internals->Attached)
   {
     pqView* view = pqActiveObjects::instance().activeView();
 
     if (view)
     {
       vtkSMViewProxy* smview = view->getViewProxy();
-      this->Internals->cConnectButton->setText("Connect");
-      this->Internals->cConnectButton->setEnabled(true);
-      this->Internals->sendToXRButton->setEnabled(false);
-      this->Internals->attachToCurrentViewButton->setText("Detach from View");
-      this->Attached = true;
-      this->Helper->AttachToCurrentView(smview);
-      this->Internals->cConnectButton->setEnabled(false);
-      this->Internals->cConnectButton->setText("Connect");
-      this->Internals->attachToCurrentViewButton->setText("Attach to Current View");
-      this->Attached = false;
-      this->Internals->sendToXRButton->setEnabled(true);
+      this->Internals->Ui.cConnectButton->setText(tr("Connect"));
+      this->Internals->Ui.cConnectButton->setEnabled(true);
+      this->Internals->Ui.sendToXRButton->setEnabled(false);
+      this->Internals->Ui.attachToCurrentViewButton->setText(tr("Detach from View"));
+      this->Internals->Attached = true;
+      this->Internals->Helper->AttachToCurrentView(smview);
+      this->Internals->Ui.cConnectButton->setEnabled(false);
+      this->Internals->Ui.cConnectButton->setText(tr("Connect"));
+      this->Internals->Ui.attachToCurrentViewButton->setText(tr("Attach to Current View"));
+      this->Internals->Attached = false;
+      this->Internals->Ui.sendToXRButton->setEnabled(true);
     }
   }
   else
   {
-    this->Internals->cConnectButton->setEnabled(false);
-    this->Helper->Quit();
+    this->Internals->Ui.cConnectButton->setEnabled(false);
+    this->Internals->Helper->Quit();
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::collaborationConnect()
 {
-  if (this->Internals->cConnectButton->text() == "Connect")
+  if (this->Internals->Ui.cConnectButton->text() == "Connect")
   {
-    vtkPVXRInterfaceCollaborationClient* cc = this->Helper->GetCollaborationClient();
+    vtkPVXRInterfaceCollaborationClient* cc = this->Internals->Helper->GetCollaborationClient();
     cc->SetLogCallback(std::bind(&pqXRInterfaceDockPanel::collaborationCallback, this,
       std::placeholders::_1, std::placeholders::_2));
-    cc->SetCollabHost(this->Internals->cServerValue->text().toUtf8().data());
-    cc->SetCollabSession(this->Internals->cSessionValue->text().toUtf8().data());
-    cc->SetCollabName(this->Internals->cNameValue->text().toUtf8().data());
-    cc->SetCollabPort(this->Internals->cPortValue->text().toInt());
-    if (this->Helper->CollaborationConnect())
+    cc->SetCollabHost(this->Internals->Ui.cServerValue->text().toUtf8().data());
+    cc->SetCollabSession(this->Internals->Ui.cSessionValue->text().toUtf8().data());
+    cc->SetCollabName(this->Internals->Ui.cNameValue->text().toUtf8().data());
+    cc->SetCollabPort(this->Internals->Ui.cPortValue->text().toInt());
+    if (this->Internals->Helper->CollaborationConnect())
     {
-      this->Internals->cConnectButton->setText("Disconnect");
+      this->Internals->Ui.cConnectButton->setText(tr("Disconnect"));
     }
   }
   else
   {
-    this->Internals->cConnectButton->setText("Connect");
-    this->Helper->CollaborationDisconnect();
+    this->Internals->Ui.cConnectButton->setText(tr("Connect"));
+    this->Internals->Helper->CollaborationDisconnect();
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::collaborationCallback(
   std::string const& msg, vtkLogger::Verbosity /*verbosity*/)
 {
@@ -381,63 +411,47 @@ void pqXRInterfaceDockPanel::collaborationCallback(
     return;
   }
 
-  this->Internals->outputWindow->appendPlainText(msg.c_str());
+  this->Internals->Ui.outputWindow->appendPlainText(msg.c_str());
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::exportLocationsAsSkyboxes()
 {
   pqView* view = pqActiveObjects::instance().activeView();
   vtkSMViewProxy* smview = view->getViewProxy();
 
-  this->Helper->ExportLocationsAsSkyboxes(smview);
+  this->Internals->Helper->ExportLocationsAsSkyboxes(smview);
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::exportLocationsAsView()
 {
   pqView* view = pqActiveObjects::instance().activeView();
   vtkSMViewProxy* smview = view->getViewProxy();
 
-  this->Helper->ExportLocationsAsView(smview);
+  this->Internals->Helper->ExportLocationsAsView(smview);
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::defaultCropThicknessChanged(const QString& text)
 {
   bool ok;
   double d = text.toDouble(&ok);
   if (ok)
   {
-    this->Helper->SetDefaultCropThickness(d);
+    this->Internals->Helper->SetDefaultCropThickness(d);
   }
 }
 
-pqXRInterfaceDockPanel::~pqXRInterfaceDockPanel()
-{
-  delete this->Internals;
-  this->Helper->Delete();
-}
-
 //-----------------------------------------------------------------------------
-void pqXRInterfaceDockPanel::setActiveView(pqView* /*view*/)
-{
-  //  pqRenderView* rview = qobject_cast<pqRenderView*>(view);
-
-  //  vtkSMRenderViewProxy* smview = rview->getRenderViewProxy();
-
-  //  vtkPVRenderView* cview = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
-
-  //  if (cview)
-  //  {
-  // vtkNew<vtkPVOpenVRHelper> helper;
-  // helper->SendToXR(cview, cview->GetRenderView()->GetRenderer());
-  //  }
-}
-
 void pqXRInterfaceDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
 {
   vtkPVXMLElement* e = root->FindNestedElementByName("XRInterface");
   if (!e)
   {
     // For backwards compatibility
+    // XXX should be handled through actual deprecation mechanism
+    // https://gitlab.kitware.com/vtk/vtk/-/issues/18302
     e = root->FindNestedElementByName("OpenVR");
   }
   if (e)
@@ -445,129 +459,134 @@ void pqXRInterfaceDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator*
     int ms = 0;
     if (e->GetScalarAttribute("BaseStationVisibility", &ms))
     {
-      this->Helper->SetBaseStationVisibility(ms);
-      this->Internals->baseStationVisibility->setCheckState(ms ? Qt::Checked : Qt::Unchecked);
+      this->Internals->Helper->SetBaseStationVisibility(ms);
+      this->Internals->Ui.baseStationVisibility->setCheckState(ms ? Qt::Checked : Qt::Unchecked);
     }
     if (e->GetScalarAttribute("MultiSample", &ms))
     {
-      this->Helper->SetMultiSample(ms);
-      this->Internals->multisamples->setCheckState(ms ? Qt::Checked : Qt::Unchecked);
+      this->Internals->Helper->SetMultiSample(ms);
+      this->Internals->Ui.multisamples->setCheckState(ms ? Qt::Checked : Qt::Unchecked);
     }
     double dcropThickness = 0;
     if (e->GetScalarAttribute("DefaultCropThickness", &dcropThickness))
     {
-      this->Internals->cropThickness->setText(QString::number(dcropThickness));
+      this->Internals->Ui.cropThickness->setText(QString::number(dcropThickness));
     }
 
     std::string tmp = e->GetAttributeOrEmpty("EditableField");
-    this->Internals->editableField->setText(QString(tmp.c_str()));
+    this->Internals->Ui.editableField->setText(QString(tmp.c_str()));
     tmp = e->GetAttributeOrEmpty("FieldValues");
-    this->Internals->fieldValues->setText(QString(tmp.c_str()));
+    this->Internals->Ui.fieldValues->setText(QString(tmp.c_str()));
 
     tmp = e->GetAttributeOrEmpty("CollaborationServer");
     if (!tmp.empty())
     {
-      this->Internals->cServerValue->setText(QString(tmp.c_str()));
+      this->Internals->Ui.cServerValue->setText(QString(tmp.c_str()));
     }
     tmp = e->GetAttributeOrEmpty("CollaborationSession");
     if (!tmp.empty())
     {
-      this->Internals->cSessionValue->setText(QString(tmp.c_str()));
+      this->Internals->Ui.cSessionValue->setText(QString(tmp.c_str()));
     }
     tmp = e->GetAttributeOrEmpty("CollaborationPort");
     if (!tmp.empty())
     {
-      this->Internals->cPortValue->setText(QString(tmp.c_str()));
+      this->Internals->Ui.cPortValue->setText(QString(tmp.c_str()));
     }
 
     // imago values
     tmp = e->GetAttributeOrEmpty("ImagoUser");
     if (!tmp.empty())
     {
-      this->Internals->imagoUserValue->setText(QString(tmp.c_str()));
+      this->Internals->Ui.imagoUserValue->setText(QString(tmp.c_str()));
     }
     tmp = e->GetAttributeOrEmpty("ImagoWorkspace");
-    this->Internals->imagoWorkspaceCombo->clear();
+    this->Internals->Ui.imagoWorkspaceCombo->clear();
     if (!tmp.empty())
     {
       QStringList list;
       list << QString(tmp.c_str());
-      this->Internals->imagoWorkspaceCombo->addItems(list);
-      auto idx = this->Internals->imagoWorkspaceCombo->findText(QString(tmp.c_str()));
-      this->Internals->imagoWorkspaceCombo->setCurrentIndex(idx);
+      this->Internals->Ui.imagoWorkspaceCombo->addItems(list);
+      auto idx = this->Internals->Ui.imagoWorkspaceCombo->findText(QString(tmp.c_str()));
+      this->Internals->Ui.imagoWorkspaceCombo->setCurrentIndex(idx);
     }
     tmp = e->GetAttributeOrEmpty("ImagoDataset");
-    this->Internals->imagoDatasetCombo->clear();
+    this->Internals->Ui.imagoDatasetCombo->clear();
     if (!tmp.empty())
     {
       QStringList list;
       list << QString(tmp.c_str());
-      this->Internals->imagoDatasetCombo->addItems(list);
-      auto idx = this->Internals->imagoDatasetCombo->findText(QString(tmp.c_str()));
-      this->Internals->imagoDatasetCombo->setCurrentIndex(idx);
+      this->Internals->Ui.imagoDatasetCombo->addItems(list);
+      auto idx = this->Internals->Ui.imagoDatasetCombo->findText(QString(tmp.c_str()));
+      this->Internals->Ui.imagoDatasetCombo->setCurrentIndex(idx);
     }
     tmp = e->GetAttributeOrEmpty("ImagoImageryType");
-    this->Internals->imagoImageryTypeCombo->clear();
+    this->Internals->Ui.imagoImageryTypeCombo->clear();
     if (!tmp.empty())
     {
       QStringList list;
       list << QString(tmp.c_str());
-      this->Internals->imagoImageryTypeCombo->addItems(list);
-      auto idx = this->Internals->imagoImageryTypeCombo->findText(QString(tmp.c_str()));
-      this->Internals->imagoImageryTypeCombo->setCurrentIndex(idx);
+      this->Internals->Ui.imagoImageryTypeCombo->addItems(list);
+      auto idx = this->Internals->Ui.imagoImageryTypeCombo->findText(QString(tmp.c_str()));
+      this->Internals->Ui.imagoImageryTypeCombo->setCurrentIndex(idx);
     }
     tmp = e->GetAttributeOrEmpty("ImagoImageType");
-    this->Internals->imagoImageTypeCombo->clear();
+    this->Internals->Ui.imagoImageTypeCombo->clear();
     if (!tmp.empty())
     {
       QStringList list;
       list << QString(tmp.c_str());
-      this->Internals->imagoImageTypeCombo->addItems(list);
-      auto idx = this->Internals->imagoImageTypeCombo->findText(QString(tmp.c_str()));
-      this->Internals->imagoImageTypeCombo->setCurrentIndex(idx);
+      this->Internals->Ui.imagoImageTypeCombo->addItems(list);
+      auto idx = this->Internals->Ui.imagoImageTypeCombo->findText(QString(tmp.c_str()));
+      this->Internals->Ui.imagoImageTypeCombo->setCurrentIndex(idx);
     }
 
-    this->Helper->LoadState(e, locator);
+    this->Internals->Helper->LoadState(e, locator);
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::saveState(vtkPVXMLElement* root)
 {
   vtkNew<vtkPVXMLElement> e;
   e->SetName("XRInterface");
 
-  e->AddAttribute("EditableField", this->Internals->editableField->text().toUtf8().data());
-  e->AddAttribute("FieldValues", this->Internals->fieldValues->text().toUtf8().data());
+  e->AddAttribute("EditableField", this->Internals->Ui.editableField->text().toUtf8().data());
+  e->AddAttribute("FieldValues", this->Internals->Ui.fieldValues->text().toUtf8().data());
 
-  e->AddAttribute("BaseStationVisibility", this->Helper->GetBaseStationVisibility() ? 1 : 0);
-  e->AddAttribute("MultiSample", this->Helper->GetMultiSample() ? 1 : 0);
-
-  e->AddAttribute("DefaultCropThickness", this->Helper->GetDefaultCropThickness());
-
-  e->AddAttribute("CollaborationServer", this->Internals->cServerValue->text().toUtf8().data());
-  e->AddAttribute("CollaborationSession", this->Internals->cSessionValue->text().toUtf8().data());
-  e->AddAttribute("CollaborationPort", this->Internals->cPortValue->text().toUtf8().data());
-
-  e->AddAttribute("ImagoUser", this->Internals->imagoUserValue->text().toUtf8().data());
   e->AddAttribute(
-    "ImagoWorkspace", this->Internals->imagoWorkspaceCombo->currentText().toUtf8().data());
-  e->AddAttribute(
-    "ImagoDataset", this->Internals->imagoDatasetCombo->currentText().toUtf8().data());
-  e->AddAttribute(
-    "ImagoImageryType", this->Internals->imagoImageryTypeCombo->currentText().toUtf8().data());
-  e->AddAttribute(
-    "ImagoImageType", this->Internals->imagoImageTypeCombo->currentText().toUtf8().data());
+    "BaseStationVisibility", this->Internals->Helper->GetBaseStationVisibility() ? 1 : 0);
+  e->AddAttribute("MultiSample", this->Internals->Helper->GetMultiSample() ? 1 : 0);
 
-  this->Helper->SaveState(e);
+  e->AddAttribute("DefaultCropThickness", this->Internals->Helper->GetDefaultCropThickness());
+
+  e->AddAttribute("CollaborationServer", this->Internals->Ui.cServerValue->text().toUtf8().data());
+  e->AddAttribute(
+    "CollaborationSession", this->Internals->Ui.cSessionValue->text().toUtf8().data());
+  e->AddAttribute("CollaborationPort", this->Internals->Ui.cPortValue->text().toUtf8().data());
+
+  e->AddAttribute("ImagoUser", this->Internals->Ui.imagoUserValue->text().toUtf8().data());
+  e->AddAttribute(
+    "ImagoWorkspace", this->Internals->Ui.imagoWorkspaceCombo->currentText().toUtf8().data());
+  e->AddAttribute(
+    "ImagoDataset", this->Internals->Ui.imagoDatasetCombo->currentText().toUtf8().data());
+  e->AddAttribute(
+    "ImagoImageryType", this->Internals->Ui.imagoImageryTypeCombo->currentText().toUtf8().data());
+  e->AddAttribute(
+    "ImagoImageType", this->Internals->Ui.imagoImageTypeCombo->currentText().toUtf8().data());
+
+  this->Internals->Helper->SaveState(e);
 
   root->AddNestedElement(e.Get(), 1);
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::prepareForQuit()
 {
-  this->Helper->Quit();
+  this->Internals->Helper->Quit();
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::beginPlay()
 {
   pqAnimationManager* am = pqPVApplicationCore::instance()->animationManager();
@@ -575,6 +594,7 @@ void pqXRInterfaceDockPanel::beginPlay()
   QObject::connect(as, SIGNAL(animationTime(double)), this, SLOT(updateSceneTime()));
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::endPlay()
 {
   pqAnimationManager* am = pqPVApplicationCore::instance()->animationManager();
@@ -582,15 +602,10 @@ void pqXRInterfaceDockPanel::endPlay()
   QObject::disconnect(as, nullptr, this, nullptr);
 }
 
+//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::updateSceneTime()
 {
-  this->Helper->UpdateProps();
-}
-
-//-----------------------------------------------------------------------------
-void pqXRInterfaceDockPanel::onViewAdded(pqView*)
-{
-  // nothing right now
+  this->Internals->Helper->UpdateProps();
 }
 
 //-----------------------------------------------------------------------------
@@ -600,6 +615,23 @@ void pqXRInterfaceDockPanel::onViewRemoved(pqView* view)
   {
     vtkSMViewProxy* smview = view->getViewProxy();
 
-    this->Helper->ViewRemoved(smview);
+    this->Internals->Helper->ViewRemoved(smview);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqXRInterfaceDockPanel::xrBackendChanged(int index)
+{
+  switch (this->Internals->Ui.chooseBackendCombo->itemData(index).toInt())
+  {
+    case pqXRInterfaceDockPanel::XR_BACKEND_OPENVR:
+      this->Internals->Helper->SetUseOpenXR(false);
+      break;
+    case pqXRInterfaceDockPanel::XR_BACKEND_OPENXR:
+      this->Internals->Helper->SetUseOpenXR(true);
+      break;
+    case pqXRInterfaceDockPanel::XR_BACKEND_NONE:
+    default:
+      break;
   }
 }
