@@ -274,7 +274,14 @@ void pqXRInterfaceDockPanel::editableFieldChanged(const QString& text)
 
 void pqXRInterfaceDockPanel::fieldValuesChanged(const QString& text)
 {
-  this->XRInterfaceControls->SetFieldValues(text.toUtf8().data());
+  // Split string with comma as separator and remove extra whitespaces
+  QStringList list = text.split(u',');
+  for (auto& str : list)
+  {
+    str = str.trimmed();
+  }
+
+  this->XRInterfaceControls->SetFieldValues(list);
 }
 
 void pqXRInterfaceDockPanel::sendToXRInterface()

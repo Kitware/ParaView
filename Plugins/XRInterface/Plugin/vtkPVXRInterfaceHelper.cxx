@@ -110,40 +110,8 @@ vtkStandardNewMacro(vtkPVXRInterfaceHelper);
 //----------------------------------------------------------------------------
 vtkPVXRInterfaceHelper::vtkPVXRInterfaceHelper()
 {
-  this->View = nullptr;
-  this->Renderer = nullptr;
-  this->RenderWindow = nullptr;
-  this->Interactor = nullptr;
-  this->XRInterfacePolyfill = nullptr;
-
-  this->AddedProps = vtkPropCollection::New();
-
-  this->BaseStationVisibility = false;
-  this->MultiSample = false;
-
-  this->NeedStillRender = false;
-  this->LoadLocationValue = -1;
-
-  this->CollaborationClient = vtkPVXRInterfaceCollaborationClient::New();
   this->CollaborationClient->SetHelper(this);
-
-  this->QWidgetWidget = nullptr;
-
-  this->XRInterfacePolyfill = vtkXRInterfacePolyfill::New();
-
-  this->ObserverWidget = nullptr;
-
   this->Widgets->SetHelper(this);
-}
-
-//----------------------------------------------------------------------------
-vtkPVXRInterfaceHelper::~vtkPVXRInterfaceHelper()
-{
-  this->XRInterfacePolyfill->Delete();
-  this->AddedProps->Delete();
-
-  this->CollaborationClient->Delete();
-  this->CollaborationClient = nullptr;
 }
 
 //==========================================================
@@ -761,11 +729,11 @@ void vtkPVXRInterfaceHelper::SetHoverPick(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SetRightTriggerMode(std::string const& text)
+void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
 {
   this->HideBillboard();
   this->CollaborationClient->HideBillboard();
-  this->RightTriggerMode = text;
+  this->RightTriggerMode = static_cast<vtkPVXRInterfaceHelper::RightTriggerAction>(index);
 
   auto style = this->Interactor
     ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
@@ -783,41 +751,44 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(std::string const& text)
 
     if (vrmodel)
     {
-      vrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Pick");
+      vrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() ||
+        this->RightTriggerMode == vtkPVXRInterfaceHelper::PICK);
     }
 
     style->GrabWithRayOff();
 
-    if (text == "Grab")
+    switch (this->RightTriggerMode)
     {
-      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
-    }
-    else if (text == "Pick")
-    {
-      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
-      style->GrabWithRayOn();
-    }
-    else if (text == "Interactive Crop")
-    {
-      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_CLIP);
-    }
-    else if (text == "Probe")
-    {
-      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
+      case vtkPVXRInterfaceHelper::GRAB:
+        style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
+        break;
+      case vtkPVXRInterfaceHelper::PICK:
+        style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
+        style->GrabWithRayOn();
+        break;
+      case vtkPVXRInterfaceHelper::INTERACTIVE_CROP:
+        style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_CLIP);
+        break;
+      case vtkPVXRInterfaceHelper::PROBE:
+        style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
+        break;
+      default:
+        break;
     }
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SetMovementStyle(vtkVRInteractorStyle::MovementStyle style)
+void vtkPVXRInterfaceHelper::SetMovementStyle(int index)
 {
   // Get interactor style
   auto interactorStyle = this->Interactor
     ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
     : nullptr;
+
   if (interactorStyle)
   {
-    interactorStyle->SetStyle(style);
+    interactorStyle->SetStyle(static_cast<vtkVRInteractorStyle::MovementStyle>(index));
   }
 }
 
@@ -853,7 +824,7 @@ bool vtkPVXRInterfaceHelper::InteractorEventCallback(
     }
 
     // in add point mode, then do that
-    if (this->RightTriggerMode == "Add Point To Source")
+    if (this->RightTriggerMode == vtkPVXRInterfaceHelper::ADD_POINT_TO_SOURCE)
     {
       if (edd->GetAction() == vtkEventDataAction::Press)
       {
@@ -2140,11 +2111,21 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   if (vrRenWin && vrRenWin->GetInitialized())
   {
     // Set initial values
-    this->SetRightTriggerMode("Pick");
-    this->XRInterfaceControls->SetRightTriggerMode("Pick");
+    this->SetRightTriggerMode(vtkPVXRInterfaceHelper::PICK);
+    this->XRInterfaceControls->SetRightTriggerMode(vtkPVXRInterfaceHelper::PICK);
+    this->XRInterfaceControls->SetMovementStyle(vtkVRInteractorStyle::FLY_STYLE);
     this->XRInterfaceControls->SetCurrentScaleFactor(1);
     this->XRInterfaceControls->SetCurrentMotionFactor(1);
     this->XRInterfaceControls->SetCurrentSavedPosition(-1);
+    this->XRInterfaceControls->SetCurrentPosition(-1);
+    this->XRInterfaceControls->SetShowFloor(true);
+    this->XRInterfaceControls->SetInteractiveRay(false);
+    this->XRInterfaceControls->SetNavigationPanel(false);
+    this->XRInterfaceControls->SetSnapCropPlanes(false);
+
+    // Ensure that the floor actor is displayed in case the checkbox
+    // "Show Floor" stays checked between sessions
+    ren->SetShowFloor(true);
 
     // Retrieve initial View Up direction
     double* viewUpDir = renWin->GetPhysicalViewUp();
