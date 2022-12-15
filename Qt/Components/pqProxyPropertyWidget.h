@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqSelectionInputWidget;
 class pqProxySelectionWidget;
+class vtkSMProxy;
 
 /**
  * This is a widget for a vtkSMProxyProperty. It handles a "SelectionInput"
@@ -70,6 +71,11 @@ public:
    * requested.
    */
   void updateWidget(bool showing_advanced_properties) override;
+
+  /**
+   * If the internal widget is a ProxySelectionWidget, return its chosen proxy. Otherwise null
+   */
+  vtkSMProxy* chosenProxy() const;
 
 private:
   QPointer<pqSelectionInputWidget> SelectionInputWidget;
