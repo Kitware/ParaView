@@ -1,6 +1,0 @@
-NAME
-  PythonOnlyExample
-DESCRIPTION
-  Example python-only plugin.
-REQUIRES_MODULES
-  VTK::CommonCore
