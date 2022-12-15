@@ -1961,9 +1961,9 @@
           Select which properties to save in trace
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="all properties" value="0"/>
-          <Entry text="any *modified* properties" value="1"/>
-          <Entry text="only *user-modified* properites" value="2"/>
+          <Entry text="All Properties" value="0"/>
+          <Entry text="Any *Modified* Properties" value="1"/>
+          <Entry text="Only *User-Modified* Properties" value="2"/>
         </EnumerationDomain>
       </IntVectorProperty>
 
