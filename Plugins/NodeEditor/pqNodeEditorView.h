@@ -56,7 +56,6 @@ Q_SIGNALS:
 
 protected:
   void wheelEvent(QWheelEvent* event) override;
-  void keyReleaseEvent(QKeyEvent* event) override;
 
 private:
   QAction* deleteAction;
