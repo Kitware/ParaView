@@ -721,7 +721,6 @@ SET (TESTS_WITHOUT_BASELINES
   ExpressionsSettings.xml
   ExtractParticlesOverTime.xml
   FavoritesFilters.xml
-  FindWidget.xml
   GradientBackwardsCompatibility.xml
   ImportCustomPresets.xml
   InformationPanel.xml
