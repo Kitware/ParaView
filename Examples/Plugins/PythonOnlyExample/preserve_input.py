@@ -1,6 +1,6 @@
 from paraview.util.vtkAlgorithm import *
 
-@smproxy.filter()
+@smproxy.filter(name="MyPreserveInput")
 @smproperty.input(name="Input")
 @smdomain.datatype(dataTypes=["vtkDataSet"], composite_data_supported=False)
 class PreserveInputTypeFilter(VTKPythonAlgorithmBase):
