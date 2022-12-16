@@ -1987,6 +1987,16 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
         this->Widgets->MoveThickCrops(false);
       }
     });
+
+    oxriren->AddAction("shownavigationpanel", [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        bool visibility = !this->Widgets->GetNavigationPanelVisibility();
+        this->SetShowNavigationPanel(visibility);
+        this->XRInterfaceControls->SetNavigationPanel(visibility);
+      }
+    });
   }
   else
   {
