@@ -115,21 +115,21 @@
     tags:
         - build
         - docker
-        - linux
+        - linux-x86_64
         - paraview
 
 .linux_tester_tags:
     tags:
         - docker
         - paraview
-        - linux
+        - linux-x86_64
         - x11-gnome
 
 .linux_qt_builder_tags:
     tags:
         - build
         - docker
-        - linux
+        - linux-x86_64
         - linux-3.17 # needed to run Qt binaries from Fedora 33
         - paraview
 
@@ -137,7 +137,7 @@
     tags:
         - docker
         - paraview
-        - linux
+        - linux-x86_64
         - linux-3.17
         - x11-gnome
 

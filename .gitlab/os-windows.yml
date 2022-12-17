@@ -52,7 +52,7 @@
         - nonconcurrent
         - shell
         - vs2019
-        - windows
+        - windows-x86_64
 
 .windows_test_tags:
     tags:
@@ -61,7 +61,7 @@
         - nonconcurrent
         - shell
         - vs2019
-        - windows
+        - windows-x86_64
         - test # Some machines have trouble running tests.
 
 ## Windows-specific scripts
