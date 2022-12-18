@@ -87,7 +87,7 @@ fedora35-shared-debug-mpi-python-qt:build:
     extends:
         - .fedora35_shared_debug_mpi_python_qt
         - .cmake_build_linux
-        - .linux_qt_builder_tags
+        - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
@@ -95,7 +95,7 @@ fedora35-shared-debug-mpi-python-qt:test:
     extends:
         - .fedora35_shared_debug_mpi_python_qt
         - .cmake_test_linux
-        - .linux_qt_tester_tags
+        - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
@@ -108,7 +108,7 @@ fedora35-shared-mpi-python-qt-vtkmoverride:build:
     extends:
         - .fedora35_shared_mpi_python_qt_vtkmoverride
         - .cmake_build_linux
-        - .linux_qt_builder_tags
+        - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
@@ -116,7 +116,7 @@ fedora35-shared-mpi-python-qt-vtkmoverride:test:
     extends:
         - .fedora35_shared_mpi_python_qt_vtkmoverride
         - .cmake_test_linux
-        - .linux_qt_tester_tags
+        - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
@@ -173,7 +173,7 @@ fedora35-tidy:build:
     extends:
         - .fedora35_tidy
         - .cmake_build_linux
-        - .linux_qt_builder_tags
+        - .linux_builder_tags
         - .cmake_tidy_artifacts
         - .run_manually
     # clang-tidy is *really* slow because it isn't cached.
@@ -273,7 +273,7 @@ documentation:build:
     extends:
         - .fedora35
         - .doxygen_build_linux
-        - .linux_qt_builder_tags
+        - .linux_builder_tags
         - .doxygen_log_artifacts
         - .doxygen_only
 
