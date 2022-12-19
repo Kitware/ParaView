@@ -222,17 +222,26 @@ int vtkPVAxesActor::RenderOpaqueGeometry(vtkViewport* vp)
   this->YAxisLabel->SetCamera(ren->GetActiveCamera());
   this->ZAxisLabel->SetCamera(ren->GetActiveCamera());
 
-  this->XAxisShaft->RenderOpaqueGeometry(vp);
-  this->YAxisShaft->RenderOpaqueGeometry(vp);
-  this->ZAxisShaft->RenderOpaqueGeometry(vp);
+  if (this->XAxisVisibility)
+  {
+    this->XAxisShaft->RenderOpaqueGeometry(vp);
+    this->XAxisTip->RenderOpaqueGeometry(vp);
+    this->XAxisLabel->RenderOpaqueGeometry(vp);
+  }
 
-  this->XAxisTip->RenderOpaqueGeometry(vp);
-  this->YAxisTip->RenderOpaqueGeometry(vp);
-  this->ZAxisTip->RenderOpaqueGeometry(vp);
+  if (this->YAxisVisibility)
+  {
+    this->YAxisShaft->RenderOpaqueGeometry(vp);
+    this->YAxisTip->RenderOpaqueGeometry(vp);
+    this->YAxisLabel->RenderOpaqueGeometry(vp);
+  }
 
-  this->XAxisLabel->RenderOpaqueGeometry(vp);
-  this->YAxisLabel->RenderOpaqueGeometry(vp);
-  this->ZAxisLabel->RenderOpaqueGeometry(vp);
+  if (this->ZAxisVisibility)
+  {
+    this->ZAxisShaft->RenderOpaqueGeometry(vp);
+    this->ZAxisTip->RenderOpaqueGeometry(vp);
+    this->ZAxisLabel->RenderOpaqueGeometry(vp);
+  }
 
   return renderedSomething;
 }
@@ -244,17 +253,26 @@ int vtkPVAxesActor::RenderTranslucentPolygonalGeometry(vtkViewport* vp)
 
   this->UpdateProps();
 
-  renderedSomething += this->XAxisShaft->RenderTranslucentPolygonalGeometry(vp);
-  renderedSomething += this->YAxisShaft->RenderTranslucentPolygonalGeometry(vp);
-  renderedSomething += this->ZAxisShaft->RenderTranslucentPolygonalGeometry(vp);
+  if (this->XAxisVisibility)
+  {
+    renderedSomething += this->XAxisShaft->RenderTranslucentPolygonalGeometry(vp);
+    renderedSomething += this->XAxisTip->RenderTranslucentPolygonalGeometry(vp);
+    renderedSomething += this->XAxisLabel->RenderTranslucentPolygonalGeometry(vp);
+  }
 
-  renderedSomething += this->XAxisTip->RenderTranslucentPolygonalGeometry(vp);
-  renderedSomething += this->YAxisTip->RenderTranslucentPolygonalGeometry(vp);
-  renderedSomething += this->ZAxisTip->RenderTranslucentPolygonalGeometry(vp);
+  if (this->YAxisVisibility)
+  {
+    renderedSomething += this->YAxisShaft->RenderTranslucentPolygonalGeometry(vp);
+    renderedSomething += this->YAxisTip->RenderTranslucentPolygonalGeometry(vp);
+    renderedSomething += this->YAxisLabel->RenderTranslucentPolygonalGeometry(vp);
+  }
 
-  renderedSomething += this->XAxisLabel->RenderTranslucentPolygonalGeometry(vp);
-  renderedSomething += this->YAxisLabel->RenderTranslucentPolygonalGeometry(vp);
-  renderedSomething += this->ZAxisLabel->RenderTranslucentPolygonalGeometry(vp);
+  if (this->ZAxisVisibility)
+  {
+    renderedSomething += this->ZAxisShaft->RenderTranslucentPolygonalGeometry(vp);
+    renderedSomething += this->ZAxisTip->RenderTranslucentPolygonalGeometry(vp);
+    renderedSomething += this->ZAxisLabel->RenderTranslucentPolygonalGeometry(vp);
+  }
 
   return renderedSomething;
 }
@@ -266,17 +284,26 @@ int vtkPVAxesActor::HasTranslucentPolygonalGeometry()
 
   this->UpdateProps();
 
-  result |= this->XAxisShaft->HasTranslucentPolygonalGeometry();
-  result |= this->YAxisShaft->HasTranslucentPolygonalGeometry();
-  result |= this->ZAxisShaft->HasTranslucentPolygonalGeometry();
+  if (this->XAxisVisibility)
+  {
+    result |= this->XAxisShaft->HasTranslucentPolygonalGeometry();
+    result |= this->XAxisTip->HasTranslucentPolygonalGeometry();
+    result |= this->XAxisLabel->HasTranslucentPolygonalGeometry();
+  }
 
-  result |= this->XAxisTip->HasTranslucentPolygonalGeometry();
-  result |= this->YAxisTip->HasTranslucentPolygonalGeometry();
-  result |= this->ZAxisTip->HasTranslucentPolygonalGeometry();
+  if (this->YAxisVisibility)
+  {
+    result |= this->YAxisShaft->HasTranslucentPolygonalGeometry();
+    result |= this->YAxisTip->HasTranslucentPolygonalGeometry();
+    result |= this->YAxisLabel->HasTranslucentPolygonalGeometry();
+  }
 
-  result |= this->XAxisLabel->HasTranslucentPolygonalGeometry();
-  result |= this->YAxisLabel->HasTranslucentPolygonalGeometry();
-  result |= this->ZAxisLabel->HasTranslucentPolygonalGeometry();
+  if (this->ZAxisVisibility)
+  {
+    result |= this->ZAxisShaft->HasTranslucentPolygonalGeometry();
+    result |= this->ZAxisTip->HasTranslucentPolygonalGeometry();
+    result |= this->ZAxisLabel->HasTranslucentPolygonalGeometry();
+  }
 
   return result;
 }
@@ -313,64 +340,46 @@ void vtkPVAxesActor::GetBounds(double bounds[6])
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
 double* vtkPVAxesActor::GetBounds()
 {
-  double bounds[6];
-  int i;
+  auto updateMaxs = [this](double* bounds) {
+    for (int i = 0; i < 3; i++)
+    {
+      const int idx = 2 * i + 1;
+      this->Bounds[idx] = std::max(bounds[idx], this->Bounds[idx]);
+    }
+  };
 
-  this->XAxisShaft->GetBounds(this->Bounds);
+  double bounds[6]{ 0 };
 
-  this->YAxisShaft->GetBounds(bounds);
-  for (i = 0; i < 3; i++)
+  if (this->XAxisVisibility)
   {
-    this->Bounds[2 * i + 1] = (bounds[2 * i + 1] > this->Bounds[2 * i + 1])
-      ? (bounds[2 * i + 1])
-      : (this->Bounds[2 * i + 1]);
+    this->XAxisShaft->GetBounds(bounds);
+    updateMaxs(bounds);
+    this->XAxisTip->GetBounds(bounds);
+    updateMaxs(bounds);
   }
 
-  this->ZAxisShaft->GetBounds(bounds);
-  for (i = 0; i < 3; i++)
+  if (this->ZAxisVisibility)
   {
-    this->Bounds[2 * i + 1] = (bounds[2 * i + 1] > this->Bounds[2 * i + 1])
-      ? (bounds[2 * i + 1])
-      : (this->Bounds[2 * i + 1]);
+    this->ZAxisShaft->GetBounds(bounds);
+    updateMaxs(bounds);
+    this->ZAxisTip->GetBounds(bounds);
+    updateMaxs(bounds);
   }
 
-  this->XAxisTip->GetBounds(bounds);
-  for (i = 0; i < 3; i++)
+  if (this->YAxisVisibility)
   {
-    this->Bounds[2 * i + 1] = (bounds[2 * i + 1] > this->Bounds[2 * i + 1])
-      ? (bounds[2 * i + 1])
-      : (this->Bounds[2 * i + 1]);
-  }
+    this->YAxisShaft->GetBounds(bounds);
+    updateMaxs(bounds);
+    this->YAxisTip->GetBounds(bounds);
+    updateMaxs(bounds);
 
-  this->YAxisTip->GetBounds(bounds);
-  for (i = 0; i < 3; i++)
-  {
-    this->Bounds[2 * i + 1] = (bounds[2 * i + 1] > this->Bounds[2 * i + 1])
-      ? (bounds[2 * i + 1])
-      : (this->Bounds[2 * i + 1]);
-  }
-
-  this->ZAxisTip->GetBounds(bounds);
-  for (i = 0; i < 3; i++)
-  {
-    this->Bounds[2 * i + 1] = (bounds[2 * i + 1] > this->Bounds[2 * i + 1])
-      ? (bounds[2 * i + 1])
-      : (this->Bounds[2 * i + 1]);
-  }
-
-  double dbounds[6];
-  (vtkPolyDataMapper::SafeDownCast(this->YAxisShaft->GetMapper()))->GetInput()->GetBounds(dbounds);
-
-  for (i = 0; i < 3; i++)
-  {
-    this->Bounds[2 * i + 1] = (dbounds[2 * i + 1] > this->Bounds[2 * i + 1])
-      ? (dbounds[2 * i + 1])
-      : (this->Bounds[2 * i + 1]);
+    (vtkPolyDataMapper::SafeDownCast(this->YAxisShaft->GetMapper()))->GetInput()->GetBounds(bounds);
+    updateMaxs(bounds);
   }
 
   // We want this actor to rotate / re-center about the origin, so give it
   // the bounds it would have if the axes were symmetrical.
-  for (i = 0; i < 3; i++)
+  for (int i = 0; i < 3; i++)
   {
     this->Bounds[2 * i] = -this->Bounds[2 * i + 1];
   }
@@ -660,6 +669,18 @@ void vtkPVAxesActor::UpdateProps()
   this->ZAxisLabel->SetScale(avgScale, avgScale, avgScale);
   this->ZAxisLabel->SetPosition(bounds[0], bounds[2] - (bounds[3] - bounds[2]) * 2.0,
     bounds[4] + this->ZAxisLabelPosition * (bounds[5] - bounds[4]));
+
+  this->XAxisLabel->SetVisibility(this->XAxisVisibility);
+  this->XAxisShaft->SetVisibility(this->XAxisVisibility);
+  this->XAxisTip->SetVisibility(this->XAxisVisibility);
+
+  this->YAxisLabel->SetVisibility(this->YAxisVisibility);
+  this->YAxisShaft->SetVisibility(this->YAxisVisibility);
+  this->YAxisTip->SetVisibility(this->YAxisVisibility);
+
+  this->ZAxisLabel->SetVisibility(this->ZAxisVisibility);
+  this->ZAxisShaft->SetVisibility(this->ZAxisVisibility);
+  this->ZAxisTip->SetVisibility(this->ZAxisVisibility);
 }
 
 //-----------------------------------------------------------------------------

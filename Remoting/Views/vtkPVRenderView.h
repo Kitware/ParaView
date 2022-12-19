@@ -622,6 +622,15 @@ public:
   virtual void SetOrientationAxesVisibility(bool);
   void SetOrientationAxesLabelColor(double r, double g, double b);
   void SetOrientationAxesOutlineColor(double r, double g, double b);
+  void SetOrientationAxesXColor(double r, double g, double b);
+  void SetOrientationAxesYColor(double r, double g, double b);
+  void SetOrientationAxesZColor(double r, double g, double b);
+  void SetOrientationAxesXVisibility(bool vis);
+  void SetOrientationAxesYVisibility(bool vis);
+  void SetOrientationAxesZVisibility(bool vis);
+  void SetOrientationAxesXLabelText(const char* text);
+  void SetOrientationAxesYLabelText(const char* text);
+  void SetOrientationAxesZLabelText(const char* text);
 
   //*****************************************************************
   // Forwarded to camera orientation widget.

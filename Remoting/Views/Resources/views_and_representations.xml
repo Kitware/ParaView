@@ -1925,6 +1925,119 @@
           <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty name="OrientationAxesXVisibility"
+                         number_of_elements="1"
+                         default_values="1"
+                         command="SetOrientationAxesXVisibility"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="OrientationAxesYVisibility"
+                         number_of_elements="1"
+                         default_values="1"
+                         command="SetOrientationAxesYVisibility"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="OrientationAxesZVisibility"
+                         number_of_elements="1"
+                         default_values="1"
+                         command="SetOrientationAxesZVisibility"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="OrientationAxesXColor"
+                            number_of_elements="3"
+                            default_values="1 0 0"
+                            command="SetOrientationAxesXColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesXVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="OrientationAxesYColor"
+                            number_of_elements="3"
+                            default_values="1 1 0"
+                            command="SetOrientationAxesYColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesYVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="OrientationAxesZColor"
+                            number_of_elements="3"
+                            default_values="0 1 0"
+                            command="SetOrientationAxesZColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesZVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty name="OrientationAxesXLabelText"
+                            number_of_elements="1"
+                            default_values="X"
+                            command="SetOrientationAxesXLabelText"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesXVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="OrientationAxesYLabelText"
+                            number_of_elements="1"
+                            default_values="Y"
+                            command="SetOrientationAxesYLabelText"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesYVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="OrientationAxesZLabelText"
+                            number_of_elements="1"
+                            default_values="Z"
+                            command="SetOrientationAxesZLabelText"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OrientationAxesZVisibility" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>        </Hints>
+      </StringVectorProperty>
 
       <DoubleVectorProperty command="SetCenterOfRotation"
                             default_values="0 0 0"
