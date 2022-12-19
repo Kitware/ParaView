@@ -157,9 +157,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Flaky with timeouts paraview/paraview#21591
     "^pvcrs\\.OctreeImageFilters"
-
-    # Fails consistently, needs debugging (paraview/paraview#20742)
-    "^pv\\.PythonAlgorithmPlugin$"
     )
 endif ()
 
