@@ -281,7 +281,7 @@ fedora35-doxygen:build:
     extends:
         - .fedora35
         - .cmake_build_linux
-        - .linux_qt_builder_tags
+        - .linux_builder_tags
         - .cmake_doxygen_artifacts
         - .run_manually
 
