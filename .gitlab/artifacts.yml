@@ -49,6 +49,7 @@
             - build/ExternalData/
             - build/Testing/
             - build/Testing/Temporary/
+            - build/Clients/ParaView/Testing/XML/
 
             # CDash files.
             - build/DartConfiguration.tcl
