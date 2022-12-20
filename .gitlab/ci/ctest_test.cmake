@@ -118,11 +118,6 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
   list(APPEND test_exclusions
-    # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/17433
-    "^pv\\.ServerConnectDialog$"
-    # Supposed to become obsolete eventually. Known to be flaky.
-    "^pv\\.FindWidget$"
-
     # See https://gitlab.kitware.com/paraview/paraview/-/issues/20282
     "\\.ColorByCellDataStringArray$"
     "\\.IndexedLookupInitialization$"
@@ -162,9 +157,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Flaky with timeouts paraview/paraview#21591
     "^pvcrs\\.OctreeImageFilters"
-
-    # Fails consistently, needs debugging (paraview/paraview#20742)
-    "^pv\\.PythonAlgorithmPlugin$"
     )
 endif ()
 
