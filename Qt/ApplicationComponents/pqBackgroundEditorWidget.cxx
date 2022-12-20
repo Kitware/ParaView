@@ -221,7 +221,7 @@ void pqBackgroundEditorWidget::currentIndexChangedBackgroundType(int type)
   const int ROWS = 4;
   const int COLS = 2;
   Ui::BackgroundEditorWidget& ui = *this->Internal;
-  const char* colorButtonName[4] = { "Color", "Color 1", "Color", "Color" };
+  const QString colorButtonName[4] = { tr("Color"), tr("Color 1"), tr("Color"), tr("Color") };
   int currentPage[4] = { 0, 0, 1, 1 };
   bool visibleControls[4][ROWS] = { { true, false, false, false }, { true, true, false, false },
     { false, false, true, false }, { false, false, true, true } };

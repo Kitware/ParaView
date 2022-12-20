@@ -111,8 +111,8 @@ QString pqPropertyWidget::getTooltip(vtkSMProperty* smproperty)
 {
   if (smproperty && smproperty->GetDocumentation())
   {
-    QString doc = QCoreApplication::translate("ServerManagerXML",
-      pqProxy::rstToHtml(smproperty->GetDocumentation()->GetDescription()).c_str());
+    QString doc = pqProxy::rstToHtml(QCoreApplication::translate(
+      "ServerManagerXML", smproperty->GetDocumentation()->GetDescription()));
     doc = doc.trimmed();
     doc = doc.replace(QRegExp("\\s+"), " ");
     return QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc);

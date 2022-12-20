@@ -61,7 +61,6 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
     ? pqActiveObjects::instance().activeServer()->proxyManager()
     : nullptr;
 
-  QMap<QString, QString> valuesMap; // <-- used to sort the entries.
   if (pxm)
   {
     vtkPVProxyDefinitionIterator* iter =
@@ -73,17 +72,13 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
       vtkSMProxy* prototype = pxm->GetPrototypeProxy("views", proxyName);
       if (prototype)
       {
-        valuesMap.insert(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()),
+        this->ComboBox->addItem(
+          QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()),
           iter->GetProxyName());
       }
     }
     iter->Delete();
-
-    for (QMap<QString, QString>::iterator viter = valuesMap.begin(); viter != valuesMap.end();
-         ++viter)
-    {
-      this->ComboBox->addItem(viter.key(), QVariant(viter.value()));
-    }
+    this->ComboBox->model()->sort(0, Qt::AscendingOrder);
 
     this->connect(this->ComboBox, SIGNAL(currentIndexChanged(int)), SIGNAL(valueChanged()));
     this->addPropertyLink(this, "value", SIGNAL(valueChanged()), smproperty);
