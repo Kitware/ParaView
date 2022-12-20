@@ -40,90 +40,81 @@
 
 set -e
 
-submodule=$1
-target_commit=$2
-
-if [[ $# -lt 2 ]]; then
-  echo "Usage: git bump <submodule-name> <target-commit>"
+die () {
+  echo >&2 "$@"
   exit 1
+}
+
+if [[ "$#" -lt 2 ]]; then
+  die "Usage: git bump <submodule-name> <target-commit>"
 fi
+
+readonly submodule="$1"
+shift
+
+readonly target_commit="$1"
+shift
 
 # go to root path
-root_path=$(git rev-parse --show-superproject-working-tree)
+root_path="$( git rev-parse --show-superproject-working-tree )"
 if [[ -z "$root_path" ]]; then
-  root_path=$(git rev-parse --show-toplevel)
+  root_path="$( git rev-parse --show-toplevel )"
 fi
+readonly root_path
 cd "$root_path"
 
 # Find informations about the submodule
-config=$(git config --local --get-regexp submodule\..*"$submodule".*\.url)
-n_match=$(echo  "$config" | wc -l)
-if [[ $n_match != "1" ]]; then
-  echo "Submodule name ambiguous, aborting"
-  exit 1
-fi
-submodule_path=$(echo "$config" | sed -e '/submodule\.\(.*\)\.url.*/!d;s//\1/')
-url=$(echo "$config" | sed -e '/submodule\..*\.url \(.*\)\.git/!d;s//\1/')
-
-if [[ -z "$config" ]] || [[ -z "$submodule_path" ]] || [[ -z "$url" ]]; then
-  echo "Submodule not found"
-  echo "Usage: git bump <submodule-name> <target-commit>"
-  exit 1
+config="$( git config --local --get-regexp "submodule\..*$submodule.*\.url" )"
+readonly config
+n_match="$( echo  "$config" | wc -l )"
+readonly n_match
+if [[ "$n_match" != "1" ]]; then
+  die "Submodule name ambiguous, aborting"
 fi
 
-# allow error for grep
-set +e
-if git status | grep -qE "modified:\s+$submodule_path"; then
-  echo "Submodule is not in a clean state, please make sure it is in a clean state before using the command"
-  exit 1
+# Extract out the submodule name and URL from the configuration line.
+submodule_name="${config//.url */}"
+readonly submodule_name="${submodule_name//submodule./}"
+readonly url="${config//* /}"
+
+if [[ -z "$config" ]] || [[ -z "$submodule_name" ]] || [[ -z "$url" ]]; then
+  die "Submodule not found\nUsage: git bump <submodule-name> <target-commit>"
 fi
-set -e
+
+submodule_path="$( git config -f .gitmodules "submodule.$submodule_name.path" )"
+readonly submodule_path
+if [[ -n "$( git status --short -- "$submodule_path" )" ]]; then
+  die "Submodule is not in a clean state, please make sure it is in a clean state before using the command"
+fi
+
+submodule_xref="$( echo "$url" | sed -e 's,https://[^/]*/\(.*\),\1,;s/\.git$//' )"
+readonly submodule_xref
 
 # construct resulting log
-# basic format
-result=$(git -C "$submodule_path" log --first-parent --grep="Merge topic '.*'$" --format=format:"* %an: %s%n%b" HEAD.."$target_commit")
-
-# sed operations in order :
-# - beautify topic names
-# - remove useless keyword
-# - remove useless informations
-# - remove empty line
-# - beautify lines not starting with '*'
-result=$(echo "$result" | sed -e '
-  /^\*/ s/[-_]/ /g
-  s/Merge topic //g
-  /^[a-zA-Z]\+-by:/d
-  /^$/d
-  /^\* /!s/^/  * /
-  ')
-
-# XXX: if at some point we want to remove mentions of intermediate commits
-# if [[ "$short_option" == "--short" ]]; then
-#   result=$(echo "$result" | sed -e '/^  \* Merge\-request/!s/^  \*.*//') # remove all commit details
-#   result=$(echo "$result" | sed -e '/^$/d') # remove empty lines
-# fi
-
-# add urls to the merge request number
-url_escaped=$(echo "$url" | sed -e 's/[\/\-\_\.\:]/\\&/g')
-check_gitlab=$(echo "$url" | grep 'gitlab')
-if [[ -n "$check_gitlab" ]]; then
-  result=$(echo "$result" | sed -e "s/Merge\-request\: \!\([0-9]\+\)/Merge\-request\: $url_escaped\/merge\_requests\/\1/g")
-else
-  result=$(echo "$result" | sed -e "s/Merge\-request\: \!\([0-9]\+\)/Merge\-request\: $url_escaped\/pull\/\1/g")
-fi
+fphistory="$( git \
+  -C "$submodule_path" \
+  log \
+  --first-parent \
+  --grep="Merge topic" \
+  --format=format:"* %an: %s ($submodule_xref%(trailers:key=Merge-request,separator=,valueonly))" \
+  HEAD.."$target_commit" \
+  | sed -e "/Merge topic/s/Merge topic '\(.*\)'/\1/" )"
+readonly fphistory
 
 # construct resulting commit message
-template=$(cat <<EOF
-$submodule: <SHORT REASON FOR THIS BUMP>
+template="$( cat <<EOF
+$submodule_name: <SHORT REASON FOR THIS BUMP>
 
 # <LONG REASON FOR THIS BUMP>
 
-$result
+$fphistory
 EOF
-)
+)"
+readonly template
 
 # Save template in file
-tmp_file=$(mktemp "$root_path"/.git/bump.XXXXXX || exit 1)
+tmp_file="$( mktemp "$root_path"/.git/bump.XXXXXX )"
+readonly tmp_file
 trap 'rm -f -- "$tmp_file"' EXIT
 echo "$template" > "$tmp_file"
 
@@ -133,8 +124,7 @@ git -C "$submodule_path" checkout "$target_commit"
 git -C "$submodule_path" submodule update --recursive
 git add "$submodule_path"
 # restore state if commit failed
-set +e
 if ! git commit -eF "$tmp_file"; then
- git restore --staged "$submodule_path"
- git submodule update --recursive -- "$submodule_path"
+  git reset "$submodule_path"
+  git submodule update --recursive -- "$submodule_path"
 fi
