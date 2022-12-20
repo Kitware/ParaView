@@ -1,0 +1,3 @@
+# Used by CMake function paraview_create_translation to give Qt lupdate a list of input files.
+SOURCES = @_translations_files_list@
+TRANSLATIONS = @_pv_create_tr_OUTPUT_TS@

@@ -44,6 +44,8 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
   # Xcb error does not seem to cause errors in generated test images
   "qt.qpa.xcb: internal error"
+  # Qt lupdate writes warning on stderr when finding class as template types
+  "Ignoring definition of undeclared qualified class"
 )
 
 # Regular expression for excluding files from coverage testing

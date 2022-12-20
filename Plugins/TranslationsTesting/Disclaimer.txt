@@ -1,0 +1,6 @@
+WARNING
+
+Loading this plugin will automatically compare all UI strings to `_TranslationTesting` and print a warning if not equal.
+It is not meant to be loaded interactively in ParaView and can take long to execute.
+
+Are you sure you want to continue ?

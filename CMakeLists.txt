@@ -321,6 +321,11 @@ set(paraview_default_plugins
   ThickenLayeredCells
   VTKmFilters
   pvblot)
+
+if (PARAVIEW_BUILD_TRANSLATIONS)
+  list(APPEND paraview_default_plugins TranslationsTesting)
+endif()
+
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
   set("_paraview_plugin_default_${paraview_default_plugin}" "${PARAVIEW_PLUGINS_DEFAULT}")
 endforeach ()

@@ -1,0 +1,9 @@
+NAME
+  TranslationsTesting
+DESCRIPTION
+  Finding all UI strings not equal to `_TranslationTesting` in the interface. Only useful for testing purposes.
+CONDITION
+  BUILD_TESTING
+REQUIRES_MODULES
+  ParaView::pqComponents
+  ParaView::qttesting

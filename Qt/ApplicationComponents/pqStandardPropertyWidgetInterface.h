@@ -74,6 +74,7 @@ public:
    * \li \c texture_selector : pqTextureSelectorPropertyWidget
    * \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
    * \li \c viewtype_selector: pqViewTypePropertyWidget
+   * \li \c language_selector: pqLanguageChooserWidget
    * \li \c view_resolution: pqViewResolutionPropertyWidget
    * \li \c pause_livesource: pqPauseLiveSourcePropertyWidget
    * \li \c data_assembly_editor: pqDataAssemblyPropertyWidget

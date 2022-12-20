@@ -184,6 +184,11 @@ public:
    */
   static std::string GetParaViewDocDirectory();
 
+  /**
+   * Return the path of the translations packaged with ParaView.
+   */
+  static std::string GetParaViewTranslationsDirectory();
+
 protected:
   vtkPVFileInformation();
   ~vtkPVFileInformation() override;

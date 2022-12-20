@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QApplication>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
 #include <QMainWindow>
@@ -76,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCLIOptions.h"
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
+#include "vtkPVFileInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
@@ -99,6 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef PARAVIEW_USE_QTHELP
 #include <QHelpEngine>
+#include <QProcessEnvironment>
 #endif
 
 //-----------------------------------------------------------------------------
@@ -757,4 +760,57 @@ void pqApplicationCore::_paraview_client_environment_complete()
   Initialized = true;
   vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "clientEnvironmentDone");
   Q_EMIT this->clientEnvironmentDone();
+}
+
+//-----------------------------------------------------------------------------
+QString pqApplicationCore::getInterfaceLanguage()
+{
+  QProcessEnvironment options = QProcessEnvironment::systemEnvironment();
+  if (options.contains("PV_TRANSLATIONS_LOCALE"))
+  {
+    return options.value("PV_TRANSLATIONS_LOCALE");
+  }
+  else if (this->settings()->contains("GeneralSettings.InterfaceLanguage"))
+  {
+    return this->settings()->value("GeneralSettings.InterfaceLanguage").toString();
+  }
+  return QString("en_US");
+}
+
+//-----------------------------------------------------------------------------
+QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString locale)
+{
+  if (locale.isEmpty())
+  {
+    return QString();
+  }
+  QList<QDir> paths;
+  QProcessEnvironment options = QProcessEnvironment::systemEnvironment();
+  if (options.contains("PV_TRANSLATIONS_DIR"))
+  {
+    for (QString path : options.value("PV_TRANSLATIONS_DIR").split(":"))
+    {
+      paths.append(QDir(path));
+    }
+  }
+  QString translationsPath(vtkPVFileInformation::GetParaViewTranslationsDirectory().c_str());
+  /* PV_TRANSLATIONS_DIR `override` translationsPath's qm files,
+    thus translationsPath has to be added lastly */
+  paths.append(translationsPath);
+  for (QDir directory : paths)
+  {
+    for (QFileInfo fileInfo : directory.entryInfoList(QDir::Files))
+    {
+      if (fileInfo.suffix() == "qm")
+      {
+        QLocale fileLocale(
+          fileInfo.completeBaseName().mid(fileInfo.completeBaseName().indexOf("_") + 1));
+        if (fileLocale == QLocale(locale))
+        {
+          return fileInfo.absoluteFilePath();
+        }
+      }
+    }
+  }
+  return QString();
 }

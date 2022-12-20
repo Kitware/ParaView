@@ -97,9 +97,15 @@ function(paraview_create_translation)
   find_package(Qt5 REQUIRED QUIET COMPONENTS LinguistTools)
   get_filename_component(_pv_create_tr_directory ${_pv_create_tr_OUTPUT_TS} DIRECTORY)
   file(MAKE_DIRECTORY "${_pv_create_tr_directory}")
+  # List of files is stored in a .pro file because the command can reach the Windows limit of character
+  set(_pv_create_tr_pro_file "${CMAKE_CURRENT_BINARY_DIR}/${_pv_create_tr_TARGET}.pro")
+  string(REPLACE ";" " \\\n" _translations_files_list "${_pv_create_tr_files}")
+  configure_file(
+    "${CMAKE_SOURCE_DIR}/CMake/paraview_translation_files_list.pro.in"
+    "${_pv_create_tr_pro_file}")
   add_custom_command(
     OUTPUT  "${_pv_create_tr_OUTPUT_TS}"
-    COMMAND "$<TARGET_FILE:Qt5::lupdate>" ${_pv_create_tr_files} -ts "${_pv_create_tr_OUTPUT_TS}"
+    COMMAND "$<TARGET_FILE:Qt5::lupdate>" ${_pv_create_tr_pro_file}
     DEPENDS ${_pv_create_tr_files})
   add_custom_target("${_pv_create_tr_TARGET}"
     DEPENDS "${_pv_create_tr_OUTPUT_TS}")

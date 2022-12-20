@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInputDataTypeDecorator.h"
 #include "pqInputSelectorWidget.h"
 #include "pqIntMaskPropertyWidget.h"
+#include "pqLanguageChooserWidget.h"
 #include "pqLightPropertyWidget.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
@@ -190,6 +191,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "viewtype_selector")
   {
     return new pqViewTypePropertyWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "language_selector")
+  {
+    return new pqLanguageChooserWidget(smProxy, smProperty, parentWidget);
   }
   else if (name == "glyph_scale_factor")
   {
