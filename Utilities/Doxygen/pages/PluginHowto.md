@@ -1514,6 +1514,13 @@ to the `*.lib` files, including the name of the directory that matches the
 configuration type, which may look something like
 `C:\Users\MyUser\ParaView-v4.2.0-build\lib\Release\vtkPVAnimation-pv4.2.lib`.
 
+### Changing ParaView_DIR after the first configuration do not work as expected
+
+The plugin infrastructure and package finding logic do not support that as
+clearing the cache is not something we can reliably do as a config.cmake file.
+
+Just remove the build directory content and configure from scratch.
+
 [ParaView Guide]: http://www.kitware.com/products/books/paraview.html
 [core readers]: https://gitlab.kitware.com/paraview/paraview/-/blob/87babdbeab6abe20aac6f8b2692788abc6bb20ac/ParaViewCore/ServerManager/SMApplication/Resources/readers.xml#L158-179
 [pqPropertyWidget]: https://kitware.github.io/paraview-docs/nightly/cxx/classpqPropertyWidget.html
