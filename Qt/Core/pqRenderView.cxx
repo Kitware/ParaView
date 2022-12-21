@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkCollection.h"
 #include "vtkIntArray.h"
+#include "vtkLogger.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderViewSettings.h"
@@ -74,6 +75,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+
+#include <algorithm>
 
 namespace
 {
@@ -1040,12 +1043,23 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
   double viewUp[3] = { 0, 0, 0 };
   bool is2DDataSet = false;
 
+  double maxWidth =
+    std::max({ bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4] });
+
+  if (!maxWidth)
+  {
+    maxWidth = 2985;
+    vtkLog(INFO,
+      "Bounds were not set but are needed. "
+        << "Using an arbitrary value for camera position.");
+  }
+
   // Update camera infos
   for (int i = 0; i < 3; i++)
   {
     if (bounds[i * 2 + 1] - bounds[i * 2] == 0 && !is2DDataSet)
     {
-      position[i] = focal[i] + 10000;
+      position[i] = focal[i] + 3.35 * maxWidth;
       viewUp[(i + 2) % 3] = 1;
       is2DDataSet = true;
     }
