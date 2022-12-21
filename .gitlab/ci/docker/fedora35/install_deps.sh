@@ -58,9 +58,10 @@ dnf install -y --setopt=install_weak_deps=False \
     dnf-plugins-core
 
 # Openturns dependencies
-dnf config-manager --add-repo https://download.opensuse.org/repositories/science:/openturns/Fedora_35/science:openturns.repo
-dnf install -y --setopt=install_weak_deps=False \
-    openturns-libs openturns-devel
+# Disabling for now because Fedora 35 is no longer provided by the OpenSuse science team.
+# dnf config-manager --add-repo https://download.opensuse.org/repositories/science:/openturns/Fedora_35/science:openturns.repo
+# dnf install -y --setopt=install_weak_deps=False \
+#     openturns-libs openturns-devel
 
 # RPMFusion
 dnf install -y --setopt=install_weak_deps=False \
