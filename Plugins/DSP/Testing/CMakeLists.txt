@@ -1,5 +1,6 @@
 include(FindPythonModules)
 find_python_module(numpy numpy_found)
+find_python_module(mpi4py mpi4py_found)
 if (NOT PARAVIEW_USE_PYTHON OR NOT numpy_found)
   message(STATUS "Cannot test plugin DigitalSignalProcessing, missing Python + numpy support")
   return()
@@ -27,7 +28,7 @@ paraview_add_client_tests(
 # - MeanPowerSpectralDensity
 
 # add test dependant to Qt
-if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player AND numpy_found)
+if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player AND numpy_found AND mpi4py_found)
   paraview_add_client_tests(
     LOAD_PLUGIN "DigitalSignalProcessing"
     TEST_DATA_TARGET ParaViewData
