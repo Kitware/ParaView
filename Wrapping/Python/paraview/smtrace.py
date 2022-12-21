@@ -710,9 +710,12 @@ class PropertyTraceHelper(object):
                     return "None"
             else:
                 return data[0]
-        elif myobject.SMProperty.IsA("vtkSMStringVectorProperty") and not (fileListDomain and fileListDomain.GetIsOptional() == 0):
+        elif (myobject.SMProperty.IsA("vtkSMStringVectorProperty") and not
+                (fileListDomain and fileListDomain.GetIsOptional() == 0
+                 or myobject.Proxy.GetVTKClassName() == "vtkPythonAnnotationFilter")):
             # handle multiline properties (see #18480)
             # but, not if the property is a list of files (see #21100)
+            # nor if the filter is a PythonAnnotation (see #21654)
             return self.create_multiline_string(repr(myobject))
         else:
             return repr(myobject)
