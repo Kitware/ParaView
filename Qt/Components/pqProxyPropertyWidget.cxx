@@ -147,3 +147,12 @@ void pqProxyPropertyWidget::updateWidget(bool showing_advanced_properties)
     this->ProxySelectionWidget->updateWidget(showing_advanced_properties);
   }
 }
+
+vtkSMProxy* pqProxyPropertyWidget::chosenProxy() const
+{
+  if (this->ProxySelectionWidget)
+  {
+    return this->ProxySelectionWidget->chosenProxy();
+  }
+  return nullptr;
+}

@@ -579,6 +579,50 @@ bool canSaveDefault(vtkSMProperty* smproperty)
     !smproperty->GetInformationOnly());
 }
 
+// ProxyProperties might have a domain that selects another proxy -
+// we want the search tags from that proxy too, for this widget.
+void addProxyTags(QStringList& SearchTags, pqPropertyWidget* pwidget, vtkSMProperty* smproperty)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(smproperty);
+  if (pp)
+  {
+    // find the domain
+    vtkSMDomain* domain = nullptr;
+    vtkSMDomainIterator* domainIter = pp->NewDomainIterator();
+    for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
+    {
+      domain = domainIter->GetDomain();
+    }
+    domainIter->Delete();
+
+    auto* proxyPropWidget = qobject_cast<pqProxyPropertyWidget*>(pwidget);
+    if (proxyPropWidget && vtkSMProxyListDomain::SafeDownCast(domain))
+    {
+      auto* chosenProxy = proxyPropWidget->chosenProxy();
+      if (chosenProxy)
+      {
+        // add the property tags for the chosen proxy
+        vtkSmartPointer<vtkSMPropertyIterator> iter;
+        iter.TakeReference(chosenProxy->NewPropertyIterator());
+        for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+        {
+          vtkSMProperty* chosenProxyProperty = iter->GetProperty();
+          if (chosenProxyProperty->GetXMLLabel())
+          {
+            SearchTags << chosenProxyProperty->GetXMLLabel();
+          }
+
+          const QString xmlDocumentation = pqProxyWidget::documentationText(chosenProxyProperty);
+          if (!xmlDocumentation.isEmpty())
+          {
+            SearchTags << xmlDocumentation;
+          }
+        }
+      }
+    }
+  }
+}
+
 } // end of namespace {}
 
 //-----------------------------------------------------------------------------------
@@ -1143,14 +1187,23 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
               item->SearchTags << QCoreApplication::translate(
                 "ServerManagerXML", smgroup->GetXMLLabel());
             }
-            // FIXME: Maybe SearchTags should have the labels for all the properties
+            // SearchTags should have the labels for all the properties
             // in this group.
+            for (unsigned int i = 0; i < smgroup->GetNumberOfProperties(); ++i)
+            {
+              auto* groupProp = smgroup->GetProperty(i);
+              if (groupProp->GetXMLLabel())
+              {
+                item->SearchTags << QCoreApplication::translate(
+                  "ServerManagerXML", groupProp->GetXMLLabel());
+              }
+            }
 
             this->Internals->appendToItems(item, this);
-            group_widget_status[smgroup] = EnumState::Custom;
+            ref_state = EnumState::Custom;
             break;
           }
-        } // for ()
+        }
 
         if (ref_state == EnumState::Custom)
         {
@@ -1198,6 +1251,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 
     // save record of the property widget and containing widget
     item->SearchTags << xmllabel << xmlDocumentation << smkey.c_str();
+    addProxyTags(item->SearchTags, pwidget, smproperty);
+
     item->InformationOnly = smproperty->GetInformationOnly();
     item->Advanced =
       smproperty->GetPanelVisibility() && strcmp(smproperty->GetPanelVisibility(), "advanced") == 0;
