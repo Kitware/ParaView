@@ -1,8 +1,50 @@
 # XRInterface Plugin
 
-## Building the plugin (and build options)
+This is a ParaView plugin providing support for using XR devices with ParaView.
+It relies on OpenVR or OpenXR and related VTK modules to provide such support.
+For a complete list of features, please take a look at the [doc](https://docs.paraview.org/en/latest/UsersGuide/displayingData.html?highlight=XRInterface#xrinterface-plugin).
 
-If you are on Windows and turn on PARAVIEW_XRInterface_Imago_Support then this
+This plugin is used and tested on Windows only, but may be usable on other OSes.
+It is assured to build on Linux.
+
+## Building the plugin
+
+### Dependencies
+
+Technically, OpenVR and OpenXR are both optional dependencies of this plugin,
+however, without any backend, the plugin does not provide any features, so
+you may want to install one of them.
+
+#### OpenVR
+
+git clone [OpenVR](https://github.com/ValveSoftware/openvr) somewhere.
+Alternatively, compile it yourself, but make sure to turn on `BUILD_SHARED` in the cmake configuration.
+
+#### OpenXR
+
+git clone, configure, build and install [OpenXR](https://github.com/KhronosGroup/OpenXR-SDK) somewhere.
+
+### Building ParaView with the XRInterface plugin
+
+During the ParaView configuration, enable `PARAVIEW_PLUGIN_ENABLE_XRInterface`,
+then enable the wanted backend options, `PARAVIEW_XRInterface_OpenXR_Support` or
+`PARAVIEW_XRInterface_OpenVR_Support` or both.
+
+CMake may then complain about missing VTK modules, you will probably need to set
+`VTK_MODULE_ENABLE_VTK_RenderingOpenVR` and/or `VTK_MODULE_ENABLE_VTK_RenderingOpenXR`
+to `WANT`.
+
+Then make sure to point to the right location for the backends includes and libs:
+ - `OpenVR_INCLUDE_DIR` may point to `path/to/openvr/headers/`
+ - `OpenVR_LIBRARY` may point to `path/to/openvr/bin/${arch}/libopenvr_api.so|lib`
+ - `OpenXR_INCLUDE_DIR` may point to `path/to/openxr_install/include/openxr/`
+ - `OpenXR_LIBRARY` may point to `path/to/openxr_install/lib|bin/openxr_loader.so|lib`
+
+You should then be able to configure and build ParaView with the plugin and start using it in ParaView.
+
+### Other options
+
+If you are on Windows and turn on `PARAVIEW_XRInterface_Imago_Support` then this
 plugin will include settings for loading images from imago.live and
 displaying them in XR. This requires that your data (typically borehole
 plots) have the correct cell data values to link to the online images.
@@ -27,16 +69,18 @@ property. In XR the laser pointers can be used to interact with the web page
 and text can be entered as well from the properties' panel for the
 representation.
 
-## Building the plugin with OpenXR support
+## Testing
 
-To enable support for the OpenXR runtime in the ParaView plugin, first build
-the OpenXR-SDK.  For development and debugging purposes use
-[this](https://github.com/KhronosGroup/OpenXR-SDK-Source) repo, for
-production, use [this](https://github.com/KhronosGroup/OpenXR-SDK) one.
+Automatic tests are lacking for now, with only simple smoke tests that load the plugin
+and check that the buttons are working without actually using VR in any way.
+These tests can be used without any backends.
 
-Then provide the following additional cmake variables when configuring
-paraview:
+For actual manual testing of the features, see [testing](TESTING.md).
 
-`-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR:STRING=WANT`
-`-DOpenXR_INCLUDE_DIR:PATH=<path-to-openxr-install-dir>\include\openxr`
-`-DOpenXR_LIBRARY:FILEPATH=<path-to-openxr-install-dir>\lib\openxr_loader.lib`
+## OpenXR/OpenVR Differences
+
+OpenXR and OpenVR are pretty much at the same level in terms of provided features, there are a few limitations with OpenXR:
+ - Controller model is simple
+ - Grounded movement is not working
+ - Base stations are not visible
+ - Widgets are causing ton of warnings, closing the Output message window is advised
