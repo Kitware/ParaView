@@ -139,7 +139,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Reset camera</string>
+         <string>Reset Camera</string>
         </property>
        </widget>
       </item>
@@ -152,7 +152,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Reset all positions</string>
+         <string>Reset Actors Positions</string>
         </property>
        </widget>
       </item>
