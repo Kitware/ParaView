@@ -231,7 +231,7 @@ QVector<pqPipelineSource*> pqLoadDataReaction::loadFilesForSupportedTypes(QList<
 
     if (!loaded)
     {
-      pqPipelineSource* source = pqLoadDataReaction::loadData({ file });
+      pqPipelineSource* source = pqLoadDataReaction::loadData(QStringList(file));
       if (source)
       {
         newSources << source;
