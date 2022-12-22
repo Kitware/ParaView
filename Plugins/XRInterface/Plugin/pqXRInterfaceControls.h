@@ -23,10 +23,10 @@
 #ifndef pqXRInterfaceControls_h
 #define pqXRInterfaceControls_h
 
-#include "vtkPVXRInterfaceHelper.h" // for enum
-#include "vtkSmartPointer.h"        // for vtkSmartPointer
-#include "vtkVRInteractorStyle.h"   // for enum
+#include "vtkPVXRInterfaceHelper.h"
+#include "vtkVRInteractorStyle.h"
 
+#include <QScopedPointer>
 #include <QStringList>
 #include <QWidget>
 
@@ -39,11 +39,7 @@ class pqXRInterfaceControls : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqXRInterfaceControls(vtkPVXRInterfaceHelper* val, QWidget* p = nullptr)
-    : Superclass(p)
-  {
-    this->constructor(val);
-  }
+  pqXRInterfaceControls(vtkPVXRInterfaceHelper* val, QWidget* p = nullptr);
   ~pqXRInterfaceControls() override;
 
   pqPipelineSource* GetSelectedPipelineSource();
@@ -113,10 +109,6 @@ public:
    */
   void SetSnapCropPlanes(bool checked);
 
-protected:
-  vtkSmartPointer<vtkPVXRInterfaceHelper> Helper;
-  bool NoForward = false;
-
 protected Q_SLOTS:
   void resetCamera();
   void resetPositions();
@@ -125,10 +117,8 @@ protected Q_SLOTS:
 private:
   void constructor(vtkPVXRInterfaceHelper* val);
 
-  class pqInternals;
-  pqInternals* Internals;
-
-  pqVCRController* Controller;
+  struct pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif

@@ -30,27 +30,43 @@ public:
 
   void SetRenderWindow(vtkOpenGLRenderWindow*);
 
-  // get the current physical scale
+  ///@{
+  /**
+   * set/get the current physical scale
+   */
   double GetPhysicalScale();
   void SetPhysicalScale(double val);
+  ///@}
 
-  // get the current physical translation
+  ///@{
+  /**
+   * set/get the current physical translation
+   */
   double* GetPhysicalTranslation();
   void SetPhysicalTranslation(double* val) { this->SetPhysicalTranslation(val[0], val[1], val[2]); }
   void SetPhysicalTranslation(double, double, double);
+  ///@}
 
-  // get the current physical translation
+  ///@{
+  /**
+   * set/get the current physical translation
+   */
   double* GetPhysicalViewDirection();
   void SetPhysicalViewDirection(double* val)
   {
     this->SetPhysicalViewDirection(val[0], val[1], val[2]);
   }
   void SetPhysicalViewDirection(double, double, double);
+  ///@}
 
-  // physical view up
+  ///@{
+  /**
+   * physical view up
+   */
   double* GetPhysicalViewUp();
   void SetPhysicalViewUp(double* val) { this->SetPhysicalViewUp(val[0], val[1], val[2]); }
   void SetPhysicalViewUp(double, double, double);
+  ///@}
 
   vtkVRCamera::Pose* GetPhysicalPose() { return this->PhysicalPose; }
 
@@ -62,9 +78,9 @@ protected:
   vtkXRInterfacePolyfill();
   ~vtkXRInterfacePolyfill() override;
 
-  vtkVRCamera::Pose* PhysicalPose;
-  vtkVRRenderWindow* VRRenderWindow;
-  vtkOpenGLRenderWindow* RenderWindow;
+  vtkVRCamera::Pose* PhysicalPose = nullptr;
+  vtkVRRenderWindow* VRRenderWindow = nullptr;
+  vtkOpenGLRenderWindow* RenderWindow = nullptr;
   double ID;
 
 private:

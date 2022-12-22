@@ -42,7 +42,6 @@
 class vtkBoxWidget2;
 class vtkImplicitPlaneWidget2;
 class vtkOpenGLRenderer;
-class vtkPVOpenVRCollaborationClientInternal;
 class vtkPVXRInterfaceHelper;
 class vtkVRModel;
 
@@ -89,12 +88,14 @@ public:
 protected:
   vtkPVXRInterfaceCollaborationClient();
   ~vtkPVXRInterfaceCollaborationClient();
-  vtkPVOpenVRCollaborationClientInternal* Internal;
-  int CurrentLocation;
 
 private:
   vtkPVXRInterfaceCollaborationClient(const vtkPVXRInterfaceCollaborationClient&) = delete;
   void operator=(const vtkPVXRInterfaceCollaborationClient&) = delete;
+
+  class vtkPVXRCollaborationClientInternal;
+  vtkSmartPointer<vtkPVXRCollaborationClientInternal> Internals;
+  int CurrentLocation = -1;
 };
 
 #endif

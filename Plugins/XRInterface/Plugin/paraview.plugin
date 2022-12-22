@@ -20,5 +20,4 @@ REQUIRES_MODULES
   VTK::RenderingCore
   VTK::RenderingOpenGL2
   VTK::RenderingVR
-  VTK::RenderingOpenVR
   VTK::ViewsCore

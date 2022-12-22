@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/pqXRInterfaceDockPanel/pqXRInterfaceDockPanel/widget/sendToXRButton" command="activate" arguments="" />
+</pqevents>

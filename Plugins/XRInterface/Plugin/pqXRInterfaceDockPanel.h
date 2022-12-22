@@ -20,13 +20,13 @@
  */
 
 #include "vtkLogger.h" // for Verbosity enum
-#include <QDockWidget>
 
-class pqXRInterfaceControls;
+#include <QDockWidget>
+#include <QScopedPointer>
+
 class pqView;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
-class vtkPVXRInterfaceHelper;
 
 class pqXRInterfaceDockPanel : public QDockWidget
 {
@@ -35,25 +35,21 @@ class pqXRInterfaceDockPanel : public QDockWidget
 
 public:
   pqXRInterfaceDockPanel(
-    const QString& t, QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowFlags{})
-    : Superclass(t, p, f)
-  {
-    this->constructor();
-  }
-  pqXRInterfaceDockPanel(QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowFlags{})
-    : Superclass(p, f)
-  {
-    this->constructor();
-  }
-
+    const QString& t, QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  pqXRInterfaceDockPanel(QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqXRInterfaceDockPanel() override;
 
 protected:
-  vtkPVXRInterfaceHelper* Helper;
-  pqXRInterfaceControls* XRInterfaceControls;
   void attachToCurrentView();
   void sendToXRInterface();
   void showXRView();
+
+  enum XRBackend
+  {
+    XR_BACKEND_NONE = -1,
+    XR_BACKEND_OPENVR = 0,
+    XR_BACKEND_OPENXR = 1
+  };
 
 protected Q_SLOTS:
 
@@ -61,8 +57,6 @@ protected Q_SLOTS:
   void exportLocationsAsView();
 
   void defaultCropThicknessChanged(const QString& text);
-
-  void setActiveView(pqView*);
 
   void loadState(vtkPVXMLElement*, vtkSMProxyLocator*);
   void saveState(vtkPVXMLElement*);
@@ -73,7 +67,6 @@ protected Q_SLOTS:
   void endPlay();
   void updateSceneTime();
 
-  void onViewAdded(pqView*);
   void onViewRemoved(pqView*);
 
   void collaborationConnect();
@@ -82,12 +75,11 @@ protected Q_SLOTS:
   void editableFieldChanged(const QString& text);
   void fieldValuesChanged(const QString& text);
 
+  void xrBackendChanged(int index);
+
 private:
   void constructor();
 
-  bool XREnabled = false;
-  bool Attached = false;
-
-  class pqInternals;
-  pqInternals* Internals;
+  struct pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };

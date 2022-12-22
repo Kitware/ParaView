@@ -13,44 +13,33 @@
 =========================================================================*/
 /**
  * @class   vtkPVXRInterfaceWidgets
- * @brief   support for widgets in openvr
+ * @brief   Support for widgets in XR
  *
  */
 
-#ifndef vtkPVOpenVRWidgets_h
-#define vtkPVOpenVRWidgets_h
+#ifndef vtkPVXRInterfaceWidgets_h
+#define vtkPVXRInterfaceWidgets_h
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
 #include "vtkSmartPointer.h" // for ivars
-#include <future>            // for ivar
-#include <map>               // for ivar
-#include <vector>            // for ivar
 
-class vtkAbstractWidget;
-class vtkActor;
+#include <future> // for ivar
+#include <map>    // for ivar
+#include <vector> // for ivar
+
 class vtkBoxWidget2;
-class vtkDataSet;
 class vtkDataSetAttributes;
-class vtkDistanceWidget;
 class vtkEventData;
 class vtkEventDataDevice3D;
 class vtkImageData;
-class vtkImagoLoader;
 class vtkImplicitPlaneWidget2;
 class vtkOpenGLRenderWindow;
-class vtkVRPanelRepresentation;
-class vtkVRPanelWidget;
-class vtkPlaneSource;
-class vtkProp;
-class vtkPVDataRepresentation;
 class vtkPVXRInterfaceHelper;
 class vtkPVXRInterfaceHelperLocation;
 class vtkStringArray;
 class vtkTexture;
 class vtkTransform;
-class vtkTextActor3D;
-class vtkSMProxy;
 
 class vtkPVXRInterfaceWidgets : public vtkObject
 {
@@ -93,16 +82,24 @@ public:
 
   size_t GetNumberOfThickCrops() { return this->ThickCrops.size(); }
 
-  // set the initial thickness in world coordinates for
-  // thick crop planes. 0 indicates automatic
-  // setting. It defaults to 0
+  ///@{
+  /**
+   * set the initial thickness in world coordinates for
+   * thick crop planes. 0 indicates automatic
+   * setting. It defaults to 0
+   */
   vtkSetMacro(DefaultCropThickness, double);
   vtkGetMacro(DefaultCropThickness, double);
+  ///@}
 
-  // allow the user to edit a scalar field
-  // in VR
+  ///@{
+  /**
+   * allow the user to edit a scalar field
+   * in VR
+   */
   vtkSetMacro(EditableField, std::string);
   vtkGetMacro(EditableField, std::string);
+  ///@}
 
   void SetEditableFieldValue(std::string name);
 
@@ -111,7 +108,9 @@ public:
 
   void SetHelper(vtkPVXRInterfaceHelper*);
 
-  // write any widget state that needs to be in the location state
+  /**
+   * write any widget state that needs to be in the location state
+   */
   void SaveLocationState(vtkPVXRInterfaceHelperLocation& sd);
 
   void ReleaseGraphicsResources();
@@ -128,7 +127,9 @@ public:
 
   void UpdateWidgetsFromParaView();
 
-  // perform any cleanup required when quitting VR
+  /**
+   * perform any cleanup required when quitting VR
+   */
   void Quit();
 
 protected:
@@ -138,48 +139,27 @@ protected:
   bool HasCellImage(vtkStringArray* sa, vtkIdType currCell);
   bool FindCellImage(vtkDataSetAttributes* celld, vtkIdType currCell, std::string& image);
   bool IsCellImageDifferent(std::string const& oldimg, std::string const& newimg);
-
-  bool WaitingForImage;
-  void UpdateTexture();
-  std::future<vtkImageData*> ImageFuture;
-  unsigned long RenderObserver;
-
-  vtkNew<vtkVRPanelWidget> NavWidget;
-  vtkNew<vtkVRPanelRepresentation> NavRepresentation;
-  vtkDistanceWidget* DistanceWidget;
-
-  std::vector<vtkImplicitPlaneWidget2*> CropPlanes;
-  std::vector<vtkBoxWidget2*> ThickCrops;
-  bool CropSnapping;
-  double DefaultCropThickness;
-
-  vtkPVXRInterfaceHelper* Helper;
-
-  vtkNew<vtkTextActor3D> TextActor3D;
-  vtkNew<vtkPlaneSource> ImagePlane;
-  vtkNew<vtkActor> ImageActor;
-
-  vtkPVDataRepresentation* LastPickedRepresentation;
-  vtkProp* LastPickedProp;
-  vtkPVDataRepresentation* PreviousPickedRepresentation;
-  std::vector<vtkIdType> SelectedCells;
-
-  vtkDataSet* LastPickedDataSet;
-  vtkIdType LastPickedCellId;
-  vtkDataSet* PreviousPickedDataSet;
-  vtkIdType PreviousPickedCellId;
-  std::string EditableField;
-  vtkSmartPointer<vtkEventData> LastEventData;
-
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
-
-  vtkImagoLoader* ImagoLoader;
-
-  std::map<vtkSMProxy*, vtkAbstractWidget*> WidgetsFromParaView;
+  void UpdateTexture();
 
 private:
   vtkPVXRInterfaceWidgets(const vtkPVXRInterfaceWidgets&) = delete;
   void operator=(const vtkPVXRInterfaceWidgets&) = delete;
+
+  std::vector<vtkImplicitPlaneWidget2*> CropPlanes;
+  std::vector<vtkBoxWidget2*> ThickCrops;
+  bool CropSnapping = false;
+  double DefaultCropThickness = 0;
+  vtkPVXRInterfaceHelper* Helper = nullptr;
+
+  bool WaitingForImage = false;
+  std::future<vtkImageData*> ImageFuture;
+  unsigned long RenderObserver = 0;
+  std::string EditableField;
+  vtkSmartPointer<vtkEventData> LastEventData;
+
+  struct vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif
