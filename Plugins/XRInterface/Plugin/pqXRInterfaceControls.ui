@@ -111,37 +111,6 @@
           <height>40</height>
          </size>
         </property>
-        <property name="currentText">
-         <string>Interactive Crop</string>
-        </property>
-        <property name="currentIndex">
-         <number>3</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>Add Point To Source</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Grab</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Interactive Crop</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Probe</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -159,16 +128,6 @@
           <height>40</height>
          </size>
         </property>
-        <item>
-         <property name="text">
-          <string>Flying</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Grounded</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>

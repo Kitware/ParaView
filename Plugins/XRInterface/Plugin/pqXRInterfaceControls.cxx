@@ -92,13 +92,32 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   QObject::connect(this->Internals->Ui.interactiveRay, &QCheckBox::stateChanged,
     [&](int state) { this->Internals->Helper->SetHoverPick(state == Qt::Checked); });
 
+  // Fill and connect Right Trigger action combo box
+  this->Internals->Ui.rightTrigger->addItem(
+    tr("Add Point to Source"), QVariant(vtkPVXRInterfaceHelper::ADD_POINT_TO_SOURCE));
+  this->Internals->Ui.rightTrigger->addItem(tr("Grab"), QVariant(vtkPVXRInterfaceHelper::GRAB));
+  this->Internals->Ui.rightTrigger->addItem(tr("Pick"), QVariant(vtkPVXRInterfaceHelper::PICK));
+  this->Internals->Ui.rightTrigger->addItem(
+    tr("Interactive Crop"), QVariant(vtkPVXRInterfaceHelper::INTERACTIVE_CROP));
+  this->Internals->Ui.rightTrigger->addItem(tr("Probe"), QVariant(vtkPVXRInterfaceHelper::PROBE));
+
   QObject::connect(this->Internals->Ui.rightTrigger,
-    QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [&](int index) { this->Internals->Helper->SetRightTriggerMode(index); });
+    QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
+      this->Internals->Helper->SetRightTriggerMode(
+        this->Internals->Ui.rightTrigger->itemData(index).toInt());
+    });
+
+  // Fill and connect Movement Style combo box
+  this->Internals->Ui.movementStyle->addItem(
+    tr("Flying"), QVariant(vtkVRInteractorStyle::FLY_STYLE));
+  this->Internals->Ui.movementStyle->addItem(
+    tr("Grounded"), QVariant(vtkVRInteractorStyle::GROUNDED_STYLE));
 
   QObject::connect(this->Internals->Ui.movementStyle,
-    QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [&](int index) { this->Internals->Helper->SetMovementStyle(index); });
+    QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
+      this->Internals->Helper->SetMovementStyle(
+        this->Internals->Ui.movementStyle->itemData(index).toInt());
+    });
 
   QObject::connect(this->Internals->Ui.fieldValueButton, &QPushButton::clicked, this,
     &pqXRInterfaceControls::assignFieldValue);
