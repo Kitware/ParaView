@@ -444,8 +444,8 @@ pqArraySelectionWidget::pqArraySelectionWidget(int numColumns, QWidget* parentOb
 
   this->Timer->setInterval(10);
   this->Timer->setSingleShot(true);
-  QObject::connect(this->Timer, &QTimer::timeout,
-    [this]() { this->header()->resizeSections(QHeaderView::ResizeToContents); });
+  // XXX(gcc-4.8): gcc-4.8 doesn't like the lambda here.
+  QObject::connect(this->Timer, SIGNAL(timeout()), this, SLOT(resizeSectionsToContents()));
 
   if (numColumns > 1)
   {
@@ -670,4 +670,10 @@ void pqArraySelectionWidget::resizeSectionsEventually()
   {
     this->Timer->start(10);
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqArraySelectionWidget::resizeSectionsToContents()
+{
+  this->header()->resizeSections(QHeaderView::ResizeToContents);
 }

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include <QKeySequence>
-#include <QWidget>
+#include <QObject>
 
 class QAction;
 class QShortcut;
