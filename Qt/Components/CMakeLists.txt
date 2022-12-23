@@ -179,6 +179,7 @@ set(classes
   pqViewFrameActionsInterface
   pqViewManager
   pqWidgetRangeDomain
+  pqXYChartViewBoundsPropertyWidget
   vtkPVColorTransferControlPointsItem)
 
 set_property(SOURCE pqComponentsInit.cxx APPEND
