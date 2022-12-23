@@ -997,7 +997,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
           // If no label just make it up
           if (category.Label.isEmpty())
           {
-            category.Label = categoryName;
+            category.Label = QCoreApplication::translate("ServerManagerXML", categoryName);
           }
           int show_in_toolbar = 0;
           if (showInMenu->GetScalarAttribute("show_in_toolbar", &show_in_toolbar))
