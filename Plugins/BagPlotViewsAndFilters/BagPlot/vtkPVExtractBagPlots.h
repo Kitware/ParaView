@@ -113,6 +113,29 @@ public:
   vtkSetClampMacro(NumberOfProjectionAxes, int, 2, 10);
   ///@}
 
+  ///@{
+  /**
+   * Set/get if custom grid bounds should be used
+   * to compute the grid instead of relying on
+   * the PCA array ranges.
+   * Default is false.
+   */
+  vtkGetMacro(UseCustomGridBounds, bool);
+  vtkSetMacro(UseCustomGridBounds, bool);
+  vtkBooleanMacro(UseCustomGridBounds, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the custom grid bounds used to compute the grid
+   * instead of relying on the PCA array ranges.
+   * Default is -1, -1, -1, -1, which is invalid, make sure to set it
+   * when using custom grid bounds.
+   */
+  vtkGetVector4Macro(CustomGridBounds, double);
+  vtkSetVector4Macro(CustomGridBounds, double);
+  ///@}
+
 protected:
   vtkPVExtractBagPlots();
   ~vtkPVExtractBagPlots() override;
@@ -124,6 +147,9 @@ protected:
   void GetEigenvalues(vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvalues);
   void GetEigenvectors(
     vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues);
+
+  bool UseCustomGridBounds = false;
+  double CustomGridBounds[4] = { -1, -1, -1, -1 };
 
   PVExtractBagPlotsInternal* Internal;
 

@@ -23,6 +23,11 @@
 #include <sstream>
 #include <string>
 
+namespace
+{
+constexpr double BORDER_SIZE = 0.15;
+}
+
 //----------------------------------------------------------------------------
 // Internal class that holds selected columns
 class PVExtractBagPlotsInternal
@@ -312,10 +317,6 @@ int vtkPVExtractBagPlots::RequestData(
     }
   }
 
-  double bounds[4] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
-  hdrArrays[0]->GetRange(&bounds[0], 0);
-  hdrArrays[1]->GetRange(&bounds[2], 0);
-
   double sigma = this->KernelWidth;
   if (this->UseSilvermanRule)
   {
@@ -352,12 +353,35 @@ int vtkPVExtractBagPlots::RequestData(
   inObs->CopyComponent(0, hdrArrays[0], 0);
   inObs->CopyComponent(1, hdrArrays[1], 0);
 
-  // Add border to grid
-  const double borderSize = 0.15;
-  bounds[0] -= (bounds[1] - bounds[0]) * borderSize;
-  bounds[1] += (bounds[1] - bounds[0]) * borderSize;
-  bounds[2] -= (bounds[3] - bounds[2]) * borderSize;
-  bounds[3] += (bounds[3] - bounds[2]) * borderSize;
+  // Recover grid bounds
+  double bounds[4] = { -1, -1, -1, -1 };
+  if (this->UseCustomGridBounds)
+  {
+    for (int i = 0; i < 4; i++)
+    {
+      bounds[i] = this->CustomGridBounds[i];
+    }
+  }
+  else
+  {
+    hdrArrays[0]->GetRange(&bounds[0], 0);
+    hdrArrays[1]->GetRange(&bounds[2], 0);
+
+    // Add border to grid
+    double tmp = bounds[0];
+    bounds[0] -= (bounds[1] - tmp) * ::BORDER_SIZE;
+    bounds[1] += (bounds[1] - tmp) * ::BORDER_SIZE;
+    tmp = bounds[2];
+    bounds[2] -= (bounds[3] - tmp) * ::BORDER_SIZE;
+    bounds[3] += (bounds[3] - tmp) * ::BORDER_SIZE;
+  }
+
+  // Check bounds
+  if (bounds[0] >= bounds[1] || bounds[2] >= bounds[3])
+  {
+    vtkErrorMacro("Incorect bounds for grid computation");
+    return 0;
+  }
 
   const int gridWidth = this->GetGridSize();
   const int gridHeight = this->GetGridSize();
