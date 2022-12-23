@@ -111,37 +111,6 @@
           <height>40</height>
          </size>
         </property>
-        <property name="currentText">
-         <string>Interactive Crop</string>
-        </property>
-        <property name="currentIndex">
-         <number>3</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>Add Point To Source</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Grab</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Interactive Crop</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Probe</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -159,16 +128,6 @@
           <height>40</height>
          </size>
         </property>
-        <item>
-         <property name="text">
-          <string>Flying</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Grounded</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -254,14 +213,6 @@
    </item>
    <item>
     <widget class="QTabWidget" name="pqXRInterfaceTabs">
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
      <property name="acceptDrops">
       <bool>true</bool>
      </property>
@@ -331,6 +282,14 @@ font: 75 12pt &quot;Arial&quot;;</string>
       <attribute name="title">
        <string>Widgets</string>
       </attribute>
+      <property name="font">
+        <font>
+          <family>Arial</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+        </font>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
         <number>4</number>
@@ -349,14 +308,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
        </property>
        <item>
         <widget class="QGroupBox" name="groupBoxCrop">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="title">
           <string>Cropping Widgets</string>
          </property>
@@ -368,14 +319,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <width>0</width>
               <height>40</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
             </property>
             <property name="text">
              <string>Add Crop Plane</string>
@@ -390,14 +333,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <height>40</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
             <property name="text">
              <string>Add Thick Crop</string>
             </property>
@@ -410,14 +345,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <width>0</width>
               <height>40</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
             </property>
             <property name="text">
              <string>Remove All Crop Planes</string>
@@ -432,14 +359,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <height>40</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
             <property name="text">
              <string>Snap Crop Planes</string>
             </property>
@@ -450,14 +369,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="title">
           <string>Other Widgets</string>
          </property>
@@ -469,14 +380,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <width>0</width>
               <height>40</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
             </property>
             <property name="text">
              <string>Distance Widget</string>
@@ -490,14 +393,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <width>0</width>
               <height>40</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
             </property>
             <property name="text">
              <string>Remove Distance Widget</string>
@@ -527,16 +422,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
              <height>40</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
            <property name="text">
-            <string>View Up:</string>
+            <string>View Up</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -554,16 +441,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <property name="maximumSize">
             <size>
              <width>70</width>
-             <height>16777215</height>
+             <height>40</height>
             </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
            </property>
            <item>
             <property name="text">
@@ -609,16 +488,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
              <height>40</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
            <property name="text">
-            <string>Scale Factor:</string>
+            <string>Scale Factor</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -636,16 +507,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <property name="maximumSize">
             <size>
              <width>70</width>
-             <height>16777215</height>
+             <height>40</height>
             </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
            </property>
            <property name="currentText">
             <string>0.01</string>
@@ -685,16 +548,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
              <height>40</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
            <property name="text">
-            <string>Motion Factor:</string>
+            <string>Motion Factor</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -712,16 +567,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <property name="maximumSize">
             <size>
              <width>70</width>
-             <height>16777215</height>
+             <height>40</height>
             </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
            </property>
            <property name="currentText">
             <string>0.01</string>
@@ -765,16 +612,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
              <height>40</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
            <property name="text">
-            <string>Load Camera Pose:</string>
+            <string>Load Camera Pose</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -792,16 +631,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <property name="maximumSize">
             <size>
              <width>70</width>
-             <height>16777215</height>
+             <height>40</height>
             </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
            </property>
            <item>
             <property name="text">
@@ -858,16 +689,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
              <height>40</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
            <property name="text">
-            <string>Save Camera Pose:</string>
+            <string>Save Camera Pose</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -885,16 +708,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <property name="maximumSize">
             <size>
              <width>70</width>
-             <height>16777215</height>
+             <height>40</height>
             </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Arial</family>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
            </property>
            <item>
             <property name="text">
@@ -953,14 +768,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <height>40</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="text">
           <string>Bring Collaborators Here</string>
          </property>
@@ -968,28 +775,12 @@ font: 75 12pt &quot;Arial&quot;;</string>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox_2">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="title">
           <string>Adjust Scalar Value</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
            <widget class="QLabel" name="fieldValueLabel">
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
             <property name="text">
              <string>Field Value</string>
             </property>
@@ -1009,14 +800,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <height>40</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
            </widget>
           </item>
           <item>
@@ -1026,14 +809,6 @@ font: 75 12pt &quot;Arial&quot;;</string>
               <width>0</width>
               <height>40</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
             </property>
             <property name="text">
              <string>Assign Value</string>
