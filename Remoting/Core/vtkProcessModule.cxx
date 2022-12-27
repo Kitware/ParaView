@@ -34,6 +34,7 @@
 #include "vtkSessionIterator.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTCPNetworkAccessManager.h"
+#include "vtkThreadedCallbackQueue.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -151,6 +152,7 @@ bool vtkProcessModule::FinalizePython = false;
 
 vtkSmartPointer<vtkProcessModule> vtkProcessModule::Singleton;
 vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
+vtkNew<vtkThreadedCallbackQueue> vtkProcessModule::CallbackQueue;
 
 int vtkProcessModule::DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines = 1;
 int vtkProcessModule::DefaultMinimumGhostLevelsToRequestForStructuredPipelines = 0;
@@ -332,6 +334,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   vtkProcessModule::Singleton = vtkSmartPointer<vtkProcessModule>::New();
   vtkProcessModule::Singleton->DetermineExecutablePath(argc, argv);
   vtkProcessModule::Singleton->InitializePythonEnvironment();
+
   return true;
 }
 
@@ -401,6 +404,12 @@ void vtkProcessModule::UpdateProcessType(ProcessTypes newType, bool dontKnowWhat
 vtkProcessModule* vtkProcessModule::GetProcessModule()
 {
   return vtkProcessModule::Singleton.GetPointer();
+}
+
+//----------------------------------------------------------------------------
+vtkThreadedCallbackQueue* vtkProcessModule::GetCallbackQueue()
+{
+  return vtkProcessModule::CallbackQueue;
 }
 
 //----------------------------------------------------------------------------
