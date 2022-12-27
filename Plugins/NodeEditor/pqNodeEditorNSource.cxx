@@ -29,11 +29,9 @@
 #include <QPen>
 
 // ----------------------------------------------------------------------------
-pqNodeEditorNSource::pqNodeEditorNSource(
-  QGraphicsScene* qscene, pqPipelineSource* source, QGraphicsItem* parent)
-  : pqNodeEditorNode(qscene, (pqProxy*)source, parent)
+pqNodeEditorNSource::pqNodeEditorNSource(pqPipelineSource* source, QGraphicsItem* parent)
+  : pqNodeEditorNode((pqProxy*)source, parent)
 {
-  this->nodeType = NodeType::SOURCE;
   this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
 
   // create ports ...
@@ -169,7 +167,7 @@ pqNodeEditorNSource::pqNodeEditorNSource(
           if (event->modifiers() & Qt::ShiftModifier)
           {
             const bool hideAll = (event->modifiers() & Qt::ControlModifier);
-            Q_EMIT this->showOutputPort(portProxy, hideAll);
+            Q_EMIT this->outputPortClicked(portProxy, hideAll);
           }
           else if (event->modifiers() == Qt::NoModifier)
           {

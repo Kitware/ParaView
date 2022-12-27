@@ -13,30 +13,29 @@
 
 =========================================================================*/
 
-#ifndef pqNodeEditorNSource_h
-#define pqNodeEditorNSource_h
+#ifndef pqNodeEditorNRepresentation_h
+#define pqNodeEditorNRepresentation_h
 
 #include "pqNodeEditorNode.h"
 
-class pqPipelineSource;
-class pqOutputPort;
+class pqRepresentation;
 
-class pqNodeEditorNSource : public pqNodeEditorNode
+class pqNodeEditorNRepresentation : public pqNodeEditorNode
 {
   Q_OBJECT
 
 public:
-  pqNodeEditorNSource(pqPipelineSource* source, QGraphicsItem* parent = nullptr);
-  ~pqNodeEditorNSource() override = default;
+  pqNodeEditorNRepresentation(pqRepresentation* repr, QGraphicsItem* parent = nullptr);
+  ~pqNodeEditorNRepresentation() override = default;
 
-  NodeType getNodeType() const final { return NodeType::SOURCE; }
+  NodeType getNodeType() const final { return NodeType::REPRESENTATION; }
 
-Q_SIGNALS:
-  void inputPortClicked(int port, bool clear);
-  void outputPortClicked(pqOutputPort* port, bool exclusive);
+  void setNodeActive(bool active) override;
+
+  QRectF boundingRect() const override;
 
 protected:
   void setupPaintTools(QPen& pen, QBrush& brush) override;
 };
 
-#endif // pqNodeEditorNSource_h
+#endif // pqNodeEditorNRepresentation_h

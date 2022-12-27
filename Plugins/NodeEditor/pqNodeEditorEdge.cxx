@@ -30,7 +30,6 @@
 #include <vtkSMProxy.h>
 
 #include <QApplication>
-#include <QGraphicsScene>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
@@ -38,11 +37,9 @@
 #include <sstream>
 
 // -----------------------------------------------------------------------------
-pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* qscene, pqNodeEditorNode* producerNode,
-  int outputPortIdx, pqNodeEditorNode* consumerNode, int inputPortIdx, Type edgeType,
-  QGraphicsItem* parent)
+pqNodeEditorEdge::pqNodeEditorEdge(pqNodeEditorNode* producerNode, int outputPortIdx,
+  pqNodeEditorNode* consumerNode, int inputPortIdx, Type edgeType, QGraphicsItem* parent)
   : QGraphicsPathItem(parent)
-  , scene(qscene)
   , type(edgeType)
   , producer(producerNode)
   , producerOutputPortIdx(outputPortIdx)
@@ -63,21 +60,15 @@ pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* qscene, pqNodeEditorNode* pro
                                          : pqNodeEditorUtils::CONSTS::EDGE_LAYER);
 
   this->updatePoints();
-
-  this->scene->addItem(this);
 }
 
 // -----------------------------------------------------------------------------
-pqNodeEditorEdge::~pqNodeEditorEdge()
-{
-  this->scene->removeItem(this);
-}
+pqNodeEditorEdge::~pqNodeEditorEdge() = default;
 
 // -----------------------------------------------------------------------------
 void pqNodeEditorEdge::setType(Type _type)
 {
   this->type = _type;
-  // to update path
   this->updatePoints();
 }
 
@@ -104,25 +95,13 @@ QRectF pqNodeEditorEdge::boundingRect() const
   constexpr qreal BB_MARGIN =
     pqNodeEditorUtils::CONSTS::EDGE_WIDTH + pqNodeEditorUtils::CONSTS::EDGE_OUTLINE;
 
-  if (this->type == Type::VIEW)
-  {
-    qreal x0 = std::min(xo, xi);
-    qreal y0 = std::min(yo, yi - 60);
-    qreal x1 = std::max(xo, std::max(this->cPoint.x(), xi));
-    qreal y1 = std::max(yo, std::max(this->cPoint.y(), yi));
+  const qreal dx = std::abs(xi - xo) * 0.5;
+  const qreal x0 = std::min(xo, xi - dx);
+  const qreal y0 = std::min(yo, yi);
+  const qreal x1 = std::max(xi, xo + dx);
+  const qreal y1 = std::max(yo, yi);
 
-    return QRectF(x0, y0, x1 - x0, y1 - y0).adjusted(-BB_MARGIN, -BB_MARGIN, BB_MARGIN, BB_MARGIN);
-  }
-  else
-  {
-    const auto dx = std::abs(xi - xo) * 0.5;
-    qreal x0 = std::min(xo, xi - dx);
-    qreal y0 = std::min(yo, yi);
-    qreal x1 = std::max(xi, xo + dx);
-    qreal y1 = std::max(yo, yi);
-
-    return QRectF(x0, y0, x1 - x0, y1 - y0).adjusted(-BB_MARGIN, -BB_MARGIN, BB_MARGIN, BB_MARGIN);
-  }
+  return QRectF(x0, y0, x1 - x0, y1 - y0).adjusted(-BB_MARGIN, -BB_MARGIN, BB_MARGIN, BB_MARGIN);
 }
 
 // -----------------------------------------------------------------------------
@@ -135,48 +114,28 @@ int pqNodeEditorEdge::updatePoints()
   this->iPoint =
     this->consumer->getInputPorts()[this->consumerInputPortIdx]->getConnectionPoint(this);
 
-  if (this->type == Type::VIEW)
-  {
-    this->cPoint = this->mapFromItem(this->producer, this->producer->boundingRect().bottomRight());
-    // slighly pad the point so it doesnt get too close of the node
-    this->cPoint += QPointF(10, 0);
-  }
-
   // compute path
-  {
-    const auto xo = this->oPoint.x();
-    const auto yo = this->oPoint.y();
-    const auto xi = this->iPoint.x();
-    const auto yi = this->iPoint.y();
-    const auto xc = this->cPoint.x();
-    const auto yc = this->cPoint.y();
+  const auto xo = this->oPoint.x();
+  const auto yo = this->oPoint.y();
+  const auto xi = this->iPoint.x();
+  const auto yi = this->iPoint.y();
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
-    this->path = QPainterPath();
+  this->path = QPainterPath();
 #else
-    this->path.clear();
+  this->path.clear();
 #endif
-    path.moveTo(this->oPoint);
+  path.moveTo(this->oPoint);
 
-    if (this->type == Type::PIPELINE)
-    {
-      const auto dx = std::abs(xi - xo) * 0.5;
-      path.cubicTo(xo + dx, yo, xi - dx, yi, xi, yi);
-    }
-    else
-    {
-      if (yc < yi)
-      {
-        path.quadTo(xc, yo, xc, yo + xc - xo);
-        path.lineTo(xc, yc);
-        const auto dy = 0.5 * (yi - yc);
-        path.cubicTo(xc, yc + dy, xi, yi - dy, xi, yi);
-      }
-      else
-      {
-        path.cubicTo(xo, yo, xi, yi - 60, xi, yi);
-      }
-    }
+  if (this->type == Type::PIPELINE)
+  {
+    const auto dx = std::abs(xi - xo) * 0.5;
+    path.cubicTo(xo + dx, yo, xi - dx, yi, xi, yi);
+  }
+  else
+  {
+    const auto dy = std::abs(yi - yo) * 0.5;
+    path.cubicTo(xo, yo + dy, xi, yi - dy, xi, yi);
   }
 
   return 1;
@@ -202,8 +161,7 @@ void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
     painter->drawPath(this->path);
     painter->setPen(edgePipelinePen);
   }
-  else if (this->consumer->getNodeType() == pqNodeEditorNode::NodeType::VIEW &&
-    this->consumer->isNodeActive())
+  else if (this->consumer->isNodeActive())
   {
     painter->setPen(activeViewPen);
   }

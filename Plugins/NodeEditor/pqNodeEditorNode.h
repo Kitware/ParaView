@@ -28,7 +28,6 @@ class pqNodeEditorLabel;
 class pqNodeEditorPort;
 class pqProxy;
 class pqProxyWidget;
-class QGraphicsScene;
 class QSettings;
 
 /**
@@ -82,7 +81,7 @@ public:
   {
     SOURCE = 0,
     VIEW,
-    ANNOTATION
+    REPRESENTATION
   };
 
   /**
@@ -106,7 +105,6 @@ public:
   };
 
   /**
-   * Remove the node from the scene it has been added to.
    */
   ~pqNodeEditorNode() override;
 
@@ -153,7 +151,7 @@ public:
   void incrementVerbosity();
 
   /**
-   * Get the type of the node. It can be either SOURCE, VIEW or ANNOTATION.
+   * Get the type of the node. It can be either SOURCE, VIEW or REPRESENTATION.
    */
   virtual NodeType getNodeType() const = 0;
 
@@ -161,7 +159,7 @@ public:
   /**
    * Get/Set wether or not the node is active / selected.
    */
-  void setNodeActive(bool active);
+  virtual void setNodeActive(bool active);
   bool isNodeActive() { return this->nodeActive; };
   ///@}
 
@@ -214,9 +212,8 @@ protected:
    * Internal constructor used by the public ones for initializing the node regardless
    * of what the proxy represents. Initialize things such as the dimensions, the label, etc.
    */
-  pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent = nullptr);
+  pqNodeEditorNode(pqProxy* proxy, QGraphicsItem* parent = nullptr);
 
-  QGraphicsScene* scene;
   pqProxy* proxy;
   pqProxyWidget* proxyProperties;
   QWidget* widgetContainer;
@@ -226,7 +223,6 @@ protected:
   std::vector<pqNodeEditorPort*> oPorts;
 
   bool nodeActive{ false };
-  NodeType nodeType{ NodeType::SOURCE };
   NodeState nodeState{ NodeState::NORMAL };
   Verbosity verbosity{ Verbosity::EMPTY };
 

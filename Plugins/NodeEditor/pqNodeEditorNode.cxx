@@ -55,9 +55,8 @@ pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
 };
 
 // ----------------------------------------------------------------------------
-pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphicsItem* parent)
+pqNodeEditorNode::pqNodeEditorNode(pqProxy* prx, QGraphicsItem* parent)
   : QGraphicsItem(parent)
-  , scene(qscene)
   , proxy(prx)
   , proxyProperties(new pqProxyWidget(prx->getProxy()))
   , widgetContainer(new QWidget)
@@ -142,6 +141,7 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphi
     graphicsProxyWidget->setWidget(this->widgetContainer);
     graphicsProxyWidget->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     graphicsProxyWidget->setPos(QPointF(0, this->headlineHeight));
+    graphicsProxyWidget->setZValue(pqNodeEditorUtils::CONSTS::WIDGET_LAYER);
 
     this->proxyProperties->setObjectName("proxyPropertiesWidget");
     this->proxyProperties->updatePanel();
@@ -157,14 +157,10 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphi
 
   this->setVerbosity(pqNodeEditorNode::DefaultNodeVerbosity);
   this->updateSize();
-  this->scene->addItem(this);
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorNode::~pqNodeEditorNode()
-{
-  this->scene->removeItem(this);
-}
+pqNodeEditorNode::~pqNodeEditorNode() = default;
 
 // ----------------------------------------------------------------------------
 int pqNodeEditorNode::updateSize()
@@ -204,6 +200,7 @@ void pqNodeEditorNode::setVerbosity(Verbosity v)
     case Verbosity::EMPTY:
       this->proxyProperties->filterWidgets(false, "%%%%%%%%%%%%%%");
       this->widgetContainer->hide();
+      this->updateSize();
       break;
     case Verbosity::NORMAL:
       this->proxyProperties->filterWidgets(false);

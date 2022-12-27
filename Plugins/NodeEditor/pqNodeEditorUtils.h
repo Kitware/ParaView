@@ -71,6 +71,7 @@ constexpr int EDGE_LAYER = 20;
 constexpr int PORT_LAYER = 30;
 constexpr int FOREGROUND_LAYER = 40;
 constexpr int VIEW_NODE_LAYER = 50;
+constexpr int WIDGET_LAYER = 60;
 };
 
 // ----------------------------------------------------------------------------

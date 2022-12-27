@@ -25,10 +25,12 @@ class pqNodeEditorNView : public pqNodeEditorNode
   Q_OBJECT
 
 public:
-  pqNodeEditorNView(QGraphicsScene* scene, pqView* source, QGraphicsItem* parent = nullptr);
+  pqNodeEditorNView(pqView* source, QGraphicsItem* parent = nullptr);
   ~pqNodeEditorNView() override = default;
 
   NodeType getNodeType() const final { return NodeType::VIEW; }
+
+  void setNodeActive(bool active) override;
 
 protected:
   void setupPaintTools(QPen& pen, QBrush& brush) override;
