@@ -71,6 +71,17 @@ public:
 
   ///@{
   /**
+   * If set to true, this helper will attempt writing the file in the background in parallel.
+   * As of today, only images can go this path (.jpeg, .png, etc.). Otherwise, writing a file will
+   * happen serially in all circumstances.
+   */
+  vtkSetMacro(TryWritingInBackground, bool);
+  vtkGetMacro(TryWritingInBackground, bool);
+  vtkBooleanMacro(TryWritingInBackground, bool);
+  ///@}
+
+  ///@{
+  /**
    * Set the interpreter to use to call methods on the writer. Initialized to
    * `vtkClientServerInterpreterInitializer::GetGlobalInterpreter()` in the
    * constructor.
@@ -81,6 +92,16 @@ public:
 
   vtkRemoteWriterHelper(const vtkRemoteWriterHelper&) = delete;
   void operator=(const vtkRemoteWriterHelper&) = delete;
+
+  /**
+   * Wait until `fileName` has finished being written. If the file has been written in the
+   * background in parallel, this thread might hang if the file is not finished being written.
+   * Otherwise, there is no waiting.
+   *
+   * @param fileName File name to wait for. It can be provided with its absolute or relative path
+   * regardless.
+   */
+  static void Wait(const std::string& fileName);
 
 protected:
   vtkRemoteWriterHelper();
@@ -98,6 +119,7 @@ protected:
   vtkTypeUInt32 OutputDestination = vtkPVSession::CLIENT;
   vtkAlgorithm* Writer = nullptr;
   vtkClientServerInterpreter* Interpreter = nullptr;
+  bool TryWritingInBackground = false;
 };
 
 #endif /* end of include guard: vtkRemoteWriterHelper_h */

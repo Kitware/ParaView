@@ -334,7 +334,6 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   vtkProcessModule::Singleton = vtkSmartPointer<vtkProcessModule>::New();
   vtkProcessModule::Singleton->DetermineExecutablePath(argc, argv);
   vtkProcessModule::Singleton->InitializePythonEnvironment();
-
   return true;
 }
 

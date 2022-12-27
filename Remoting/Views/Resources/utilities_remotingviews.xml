@@ -3341,6 +3341,17 @@
         </Hints>
       </ProxyProperty>
 
+      <IntVectorProperty name="SaveInBackground"
+                         command="SetSaveInBackground"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If turned ON, screenshots are saved in a pool of threads running in the background
+          instead of running serially.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="EmbedParaViewState"
                          label="Embed ParaView State"
                          number_of_elements="1"

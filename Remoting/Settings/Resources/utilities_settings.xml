@@ -462,7 +462,7 @@
       <IntVectorProperty name="NumberOfCallbackThreads"
         command="SetNumberOfCallbackThreads"
         number_of_elements="1"
-        default_values="8"
+        default_values="1"
         panel_visibility="advanced">
         <Documentation>
           Set the number of threads that are spawned to run certain jobs asynchronously
