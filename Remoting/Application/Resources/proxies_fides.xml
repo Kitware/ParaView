@@ -37,7 +37,7 @@
             command="SetDataSourceIO"
             animateable="0"
             element_types="2 2"
-            number_of_elements="0"
+            number_of_elements="2"
             number_of_elements_per_command="2"
             panel_visibility="never"
             repeat_command="0">
@@ -116,7 +116,7 @@
             command="SetDataSourcePath"
             repeat_command="1"
             element_types="2 2"
-            number_of_elements="0"
+            number_of_elements="2"
             number_of_elements_per_command="2"
             panel_visibility="default">
       </StringVectorProperty>
@@ -134,7 +134,7 @@
             command="SetDataSourceIO"
             animateable="0"
             element_types="2 2"
-            number_of_elements="0"
+            number_of_elements="2"
             number_of_elements_per_command="2"
             panel_visibility="never"
             repeat_command="0">
