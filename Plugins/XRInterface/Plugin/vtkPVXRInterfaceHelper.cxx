@@ -2212,17 +2212,18 @@ void vtkPVXRInterfaceHelper::ResetPositions()
 
   vtkCollectionSimpleIterator pit;
   vtkProp* prop;
+
   for (this->AddedProps->InitTraversal(pit); (prop = this->AddedProps->GetNextProp(pit));)
   {
     vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
+
     if (prop3d)
     {
-      vtkMatrixToLinearTransform* trans =
-        vtkMatrixToLinearTransform::SafeDownCast(prop3d->GetUserTransform());
-      if (trans)
-      {
-        prop3d->GetUserMatrix()->Identity();
-      }
+      // Reset internal transformation
+      prop3d->SetScale(1.0);
+      prop3d->SetOrigin(0.0, 0.0, 0.0);
+      prop3d->SetPosition(0.0, 0.0, 0.0);
+      prop3d->SetOrientation(0.0, 0.0, 0.0);
     }
   }
 

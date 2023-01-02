@@ -72,7 +72,9 @@ See https://gitlab.kitware.com/vtk/vtk/-/issues/18302 for reference.
 ## In the XR menu - Bottom left section:
 
  - Press “Reset Camera” (actors must come back to center of the room)
- - Uncheck “Show Floor”
+ - Outside of the menu, use picking or grabbing to move the wavelet
+ - Press “Reset Actors Position" (actors should come back to their position before picking)
+ - Uncheck “Show Floor” (floor should disappear)
  - Check “Interactive Ray” (ray should change color upon intersecting an actor)
  - Check “Navigation Panel” (should appear above the left controller)
  - Press “Exit XR” button and confirm XR is closed
