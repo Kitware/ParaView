@@ -105,6 +105,28 @@
         determining the final computed variables
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseCustomGridBounds"
+                         default_values="0"
+                         name="UseCustomGridBounds"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if custom grid bounds should be used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomGridBounds"
+                         default_values="-1 -1 -1 -1"
+                         name="CustomGridBounds"
+                         panel_widget="xy_chart_bounds"
+                         number_of_elements="4">
+        <Documentation> Set the bounds of the image data to display in the chart,
+        any negative value means automatic bounds.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomGridBounds" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
 
       <!-- View can be used to specify the preferred view for the proxy -->
       <Hints>

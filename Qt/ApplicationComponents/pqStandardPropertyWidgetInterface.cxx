@@ -92,6 +92,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewResolutionPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
+#include "pqXYChartViewBoundsPropertyWidget.h"
 #include "pqYoungsMaterialPropertyWidget.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMProperty.h"
@@ -235,6 +236,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "reader_selector")
   {
     return new pqReaderSelectionPropertyWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "xy_chart_bounds")
+  {
+    return new pqXYChartViewBoundsPropertyWidget(smProxy, smProperty, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>XYChartViewBoundsPropertyWidget</class>
+ <widget class="QWidget" name="XYChartViewBoundsPropertyWidget">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="BoundsLabel">
+     <property name="text">
+      <string>Bounds</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="pqHighlightableToolButton" name="Reset">
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+     </property>
+     <property name="toolTip">
+      <string>Reset using active chart values</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="XLabel">
+     <property name="text">
+      <string>X</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="pqDoubleLineEdit" name="BottomAxisMin"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="pqDoubleLineEdit" name="BottomAxisMax"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="YLabel">
+     <property name="text">
+      <string>Y</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="pqDoubleLineEdit" name="LeftAxisMin"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="pqDoubleLineEdit" name="LeftAxisMax"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqHighlightableToolButton</class>
+   <extends>QToolButton</extends>
+   <header>pqHighlightableToolButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
