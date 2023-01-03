@@ -9,3 +9,6 @@ take effect.
 Languages are searched from directories specified by the environment variable
 `PV_TRANSLATIONS_DIR` or in the translation's resource directory.
 If a language is not available anymore, its name will be followed by `(?)` in the menu.
+
+Qt-provided translations for its standard widgets are also loaded, either from the
+translations directory of the Qt installation, or from ParaView resource directory.

@@ -101,6 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef PARAVIEW_USE_QTHELP
 #include <QHelpEngine>
+#include <QLibraryInfo>
 #include <QProcessEnvironment>
 #endif
 
@@ -813,4 +814,24 @@ QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString loca
     }
   }
   return QString();
+}
+
+//-----------------------------------------------------------------------------
+QTranslator* pqApplicationCore::getQtTranslations(QString prefix, QString locale)
+{
+  QTranslator* translator = new QTranslator(this);
+  QString qtQmPath(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  bool qtLoaded = translator->load(QLocale(locale), prefix, "_", qtQmPath);
+  if (qtLoaded)
+  {
+    return translator;
+  }
+  qtLoaded = translator->load(this->getTranslationsPathFromInterfaceLanguage(locale), "");
+  if (qtLoaded)
+  {
+    return translator;
+  }
+  qWarning() << QString("Could not load a %1 translation file with associated locale %2")
+                  .arg(prefix, locale);
+  return nullptr;
 }

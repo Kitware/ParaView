@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h" // for vtkSmartPointer
 #include <QObject>
 #include <QPointer>
+#include <QTranslator>
 #include <exception> // for std::exception
 
 class pqInterfaceTracker;
@@ -307,6 +308,15 @@ public:
    * given in the user settings.
    */
   QString getTranslationsPathFromInterfaceLanguage(QString);
+
+  /**
+   * returns a QTranslator with a loaded qm file. The qm file can come either
+   * from the Qt's translation directory or from the ParaView's shared
+   * directory.
+   * @param prefix: The prefix the name should contain.
+   * @param locale: The locale the prefix should contain in its name.
+   */
+  QTranslator* getQtTranslations(QString prefix, QString locale);
 
   /**
    * returns interface language in use in a locale code form.
