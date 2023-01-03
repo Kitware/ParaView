@@ -109,30 +109,13 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   if (locale != "en_US")
   {
     // Load ParaView translations
-    QTranslator* UITranslator = new QTranslator(this->PVApp);
-    bool translationsLoaded = UITranslator->load(this->PVApp->getTranslationsPathFromInterfaceLanguage(locale), "");
-    if (!translationsLoaded)
-    {
-      qWarning() << QString("Could not load `%1.qm` translation file").arg(locale);
-    }
+    QTranslator* UITranslator = this->PVApp->getQtTranslations("paraview", locale);
     QCoreApplication::installTranslator(UITranslator);
     // Load Qt translations
-    QLocale curLocale = QLocale(locale);
-    QTranslator* qtTranslator = new QTranslator(this->PVApp);
-    QString qtQmPath(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    bool qtLoaded = qtTranslator->load(curLocale, "qt", "_", qtQmPath);
-    if (!qtLoaded)
-    {
-      qWarning() << QString("Could not load a qt translation file with associated locale %1").arg(locale);
-    }
+    QTranslator* qtTranslator = this->PVApp->getQtTranslations("qt", locale);
     QCoreApplication::installTranslator(qtTranslator);
-    QTranslator* qtBaseTranslator = new QTranslator(this->PVApp);
-    bool qt_baseLoaded = qtBaseTranslator->load(curLocale, "qtbase", "_", qtQmPath);
-    if (!qt_baseLoaded)
-    {
-      qWarning() << QString("Could not load a qtbase translation file with associated locale %1").arg(locale);
-    }
-    QCoreApplication::installTranslator(qtBaseTranslator);
+    QTranslator* qtbaseTranslator = this->PVApp->getQtTranslations("qtbase", locale);
+    QCoreApplication::installTranslator(qtbaseTranslator);
   }
   // Attach custom event filter
   QApplication::instance()->installEventFilter(this->PVApp);
