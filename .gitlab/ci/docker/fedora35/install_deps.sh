@@ -51,7 +51,7 @@ python3 -m pip install wslink cftime
 
 # Plugin dependencies
 dnf install -y --setopt=install_weak_deps=False \
-    gmsh-devel libcurl-devel
+    gmsh-devel libcurl-devel openxr openxr-devel
 
 # External repository support
 dnf install -y --setopt=install_weak_deps=False \
