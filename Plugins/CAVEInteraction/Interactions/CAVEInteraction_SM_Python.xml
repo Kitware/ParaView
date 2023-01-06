@@ -1,0 +1,25 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="cave_interaction">
+    <VRPythonInteractorStyleProxy name="Python"
+                                  processes="client|renderserver|dataserver">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          File containing python interactor style implementation
+        </Documentation>
+        <Hints>
+          <FileChooser extensions="py"
+            file_description="Python" />
+        </Hints>
+      </StringVectorProperty>
+      <Property animateable="0"
+                name="Refresh"
+                panel_widget="command_button">
+        <Documentation>Reload the python file</Documentation>
+      </Property>
+    </VRPythonInteractorStyleProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

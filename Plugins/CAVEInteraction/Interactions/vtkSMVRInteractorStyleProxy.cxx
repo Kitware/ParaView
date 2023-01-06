@@ -207,10 +207,10 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
   }
 
   // Locate the proxy -- prefer ID lookup.
-  this->ControlledProxy = nullptr;
+  this->SetControlledProxy(nullptr);
   if (hasProxyId)
   {
-    this->ControlledProxy = locator->LocateProxy(id);
+    this->SetControlledProxy(locator->LocateProxy(id));
   }
   else if (hasProxyName)
   {
@@ -219,7 +219,7 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
     pqProxy* proxy = model->findItem<pqProxy*>(child->GetAttribute("proxyName"));
     if (proxy)
     {
-      this->ControlledProxy = proxy->getProxy();
+      this->SetControlledProxy(proxy->getProxy());
     }
   }
 
@@ -243,7 +243,7 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
 
 // ----------------------------------------------------------------------------
 // SaveConfiguration() method -- store into a State file (PVSM file)
-vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration() const
+vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration()
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
@@ -357,6 +357,14 @@ void vtkSMVRInteractorStyleProxy::AddButtonRole(const std::string& role)
 void vtkSMVRInteractorStyleProxy::AddTrackerRole(const std::string& role)
 {
   this->Trackers.insert(StringMap::value_type(role, std::string()));
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::ClearAllRoles()
+{
+  this->Analogs.clear();
+  this->Buttons.clear();
+  this->Trackers.clear();
 }
 
 // ----------------------------------------------------------------------------

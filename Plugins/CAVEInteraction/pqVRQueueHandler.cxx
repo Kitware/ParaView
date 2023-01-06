@@ -248,10 +248,7 @@ void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* 
           {
             this->add(style);
           }
-          else
-          {
-            style->Delete();
-          }
+          style->Delete();
         }
         else
         {

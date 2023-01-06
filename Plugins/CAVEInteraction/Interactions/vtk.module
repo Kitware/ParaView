@@ -11,6 +11,10 @@ DEPENDS
   ParaView::RemotingServerManager
   ParaView::RemotingViews
   ParaView::pqApplicationComponents
+OPTIONAL_DEPENDS
+  VTK::Python
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore
 PRIVATE_DEPENDS
   VTK::CommonTransforms
   VTK::FiltersCore
