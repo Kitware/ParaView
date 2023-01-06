@@ -779,7 +779,7 @@ QString pqApplicationCore::getInterfaceLanguage()
 }
 
 //-----------------------------------------------------------------------------
-QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString locale)
+QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString prefix, QString locale)
 {
   if (locale.isEmpty())
   {
@@ -806,9 +806,9 @@ QString pqApplicationCore::getTranslationsPathFromInterfaceLanguage(QString loca
       {
         QLocale fileLocale(
           fileInfo.completeBaseName().mid(fileInfo.completeBaseName().indexOf("_") + 1));
-        if (fileLocale == QLocale(locale))
+        if (fileInfo.completeBaseName().startsWith(prefix + "_") && fileLocale == QLocale(locale))
         {
-          return fileInfo.absoluteFilePath();
+          return fileInfo.absoluteDir().absolutePath();
         }
       }
     }
@@ -826,7 +826,8 @@ QTranslator* pqApplicationCore::getQtTranslations(QString prefix, QString locale
   {
     return translator;
   }
-  qtLoaded = translator->load(this->getTranslationsPathFromInterfaceLanguage(locale), "");
+  qtQmPath = this->getTranslationsPathFromInterfaceLanguage(prefix, locale);
+  qtLoaded = translator->load(QLocale(locale), prefix, "_", qtQmPath);
   if (qtLoaded)
   {
     return translator;
