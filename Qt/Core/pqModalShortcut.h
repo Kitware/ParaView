@@ -58,7 +58,7 @@ public:
   /// (such as a pqView), use this method to set and update the widget
   /// during the life of the pqModalShortcut.
   void setContextWidget(
-    QWidget* contextWidget, Qt::ShortcutContext contextArea = Qt::WidgetShortcut);
+    QWidget* contextWidget, Qt::ShortcutContext contextArea = Qt::WindowShortcut);
 
   bool isEnabled() const;
   void setEnabled(bool shouldEnable, bool changeFocus = true);
