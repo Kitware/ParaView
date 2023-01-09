@@ -302,19 +302,22 @@ public:
   pqServer* getActiveServer() const;
 
   /**
-   * returns a path to a translation binary file located in a path specified by
-   * the PV_TRANSLATIONS_DIR environment variable or in the resources directory.
+   * returns a path to a directory containing a translation binary file located
+   * in a path specified by the PV_TRANSLATIONS_DIR environment variable or in
+   * the resources directory.
    * The binary file returned is the first one to have a name matching the locale
    * given in the user settings.
+   * @param prefix: The prefix the filename should contain.
+   * @param locale: The locale the filename suffix should contain.
    */
-  QString getTranslationsPathFromInterfaceLanguage(QString);
+  QString getTranslationsPathFromInterfaceLanguage(QString prefix, QString locale);
 
   /**
    * returns a QTranslator with a loaded qm file. The qm file can come either
    * from the Qt's translation directory or from the ParaView's shared
    * directory.
-   * @param prefix: The prefix the name should contain.
-   * @param locale: The locale the prefix should contain in its name.
+   * @param prefix: The prefix the filename should contain.
+   * @param locale: The locale the filename suffix should contain.
    */
   QTranslator* getQtTranslations(QString prefix, QString locale);
 
