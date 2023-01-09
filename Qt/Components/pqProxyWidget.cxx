@@ -623,6 +623,25 @@ void addProxyTags(QStringList& SearchTags, pqPropertyWidget* pwidget, vtkSMPrope
   }
 }
 
+// if this visible propertyWidget has shortcuts or child widget(s) with shortcuts,
+// enable the first, returning true if shortcuts were enabled.
+bool enableShortcutDecorator(pqPropertyWidget* propertyWidget, bool changeFocus)
+{
+  if (propertyWidget->isVisible())
+  {
+    for (pqPropertyWidgetDecorator* decorator : propertyWidget->decorators())
+    {
+      auto* shortcutDecorator = qobject_cast<pqShortcutDecorator*>(decorator);
+      if (shortcutDecorator)
+      {
+        shortcutDecorator->setEnabled(true, changeFocus);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 } // end of namespace {}
 
 //-----------------------------------------------------------------------------------
@@ -956,9 +975,18 @@ void pqProxyWidget::reset() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::setView(pqView* view)
 {
+  bool done = false;
   Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     item->propertyWidget()->setView(view);
+    // make sure the first widget shown has active keyboard shortcuts.
+    if (!done)
+    {
+      if (enableShortcutDecorator(item->propertyWidget(), false))
+      {
+        done = true;
+      }
+    }
   }
 }
 
@@ -1422,15 +1450,9 @@ void pqProxyWidget::showLinkedInteractiveWidget(int portIndex, bool show, bool c
       // make sure the first widget shown has active keyboard shortcuts.
       if (!done)
       {
-        for (pqPropertyWidgetDecorator* decorator : item->propertyWidget()->decorators())
+        if (enableShortcutDecorator(item->propertyWidget(), changeFocus))
         {
-          auto* shortcutDecorator = qobject_cast<pqShortcutDecorator*>(decorator);
-          if (shortcutDecorator)
-          {
-            shortcutDecorator->setEnabled(true, changeFocus);
-            done = true;
-            break;
-          }
+          done = true;
         }
       }
     }
