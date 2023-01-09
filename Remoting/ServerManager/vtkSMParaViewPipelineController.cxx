@@ -630,8 +630,11 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy, const
 
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
-  vtkSMPropertyHelper(timeKeeper, "Views").Add(proxy);
-  timeKeeper->UpdateVTKObjects();
+  if (timeKeeper)
+  {
+    vtkSMPropertyHelper(timeKeeper, "Views").Add(proxy);
+    timeKeeper->UpdateVTKObjects();
+  }
 
   // Register proxy with AnimationScene (optional)
   vtkSMProxy* scene = this->GetAnimationScene(proxy->GetSession());
