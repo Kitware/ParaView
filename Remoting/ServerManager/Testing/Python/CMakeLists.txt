@@ -18,4 +18,5 @@ paraview_add_test_python(
   TestHelperProxySerialization.py
   TestMultiplexerSourceProxy.py
   TestGlobbing.py
+  TestGetRenderViewAfterConnectToCatalyst.py
   )
