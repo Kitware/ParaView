@@ -61,7 +61,7 @@ pqModalShortcut::pqModalShortcut(const QKeySequence& key, QAction* action, QWidg
   // if parent, look for Q_SLOTS to auto-connect
   // if action, connect shortcut.
   // XXX(gcc-4.8): This is a workaround for a bug in gcc-4.8.0.
-  QObject::connect(m_shortcut, SIGNAL(activated()), this, SLOT(activated()));
+  QObject::connect(m_shortcut, SIGNAL(activated()), this, SIGNAL(activated()));
   if (m_action)
   {
     // XXX(gcc-4.8): This is a workaround for a bug in gcc-4.8.0.
@@ -106,7 +106,7 @@ void pqModalShortcut::setContextWidget(QWidget* contextWidget, Qt::ShortcutConte
     m_shortcut->setEnabled(enabled);
     m_shortcut->setContext(contextArea);
     // XXX(gcc-4.8): This is a workaround for a bug in gcc-4.8.0.
-    QObject::connect(m_shortcut, SIGNAL(activated()), this, SLOT(activated()));
+    QObject::connect(m_shortcut, SIGNAL(activated()), this, SIGNAL(activated()));
     if (m_action)
     {
       // XXX(gcc-4.8): This is a workaround for a bug in gcc-4.8.0.
