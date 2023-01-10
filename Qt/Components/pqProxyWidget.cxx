@@ -579,11 +579,11 @@ bool canSaveDefault(vtkSMProperty* smproperty)
     !smproperty->GetInformationOnly());
 }
 
-// ProxyProperties might have a domain that selects another proxy -
-// we want the search tags from that proxy too, for this widget.
-void addProxyTags(QStringList& SearchTags, pqPropertyWidget* pwidget, vtkSMProperty* smproperty)
+// given a propertyWidget, see if it has a vtkSMProxyListDomain, and
+// return the chosen proxy widget if it does.
+pqProxyPropertyWidget* getChosenProxyFromDomain(pqPropertyWidget* propertyWidget)
 {
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(smproperty);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(propertyWidget->property());
   if (pp)
   {
     // find the domain
@@ -595,36 +595,46 @@ void addProxyTags(QStringList& SearchTags, pqPropertyWidget* pwidget, vtkSMPrope
     }
     domainIter->Delete();
 
-    auto* proxyPropWidget = qobject_cast<pqProxyPropertyWidget*>(pwidget);
-    if (proxyPropWidget && vtkSMProxyListDomain::SafeDownCast(domain))
+    auto* proxyPropWidget = qobject_cast<pqProxyPropertyWidget*>(propertyWidget);
+    if (proxyPropWidget && vtkSMProxyListDomain::SafeDownCast(domain) &&
+      proxyPropWidget->chosenProxy())
     {
-      auto* chosenProxy = proxyPropWidget->chosenProxy();
-      if (chosenProxy)
-      {
-        // add the property tags for the chosen proxy
-        vtkSmartPointer<vtkSMPropertyIterator> iter;
-        iter.TakeReference(chosenProxy->NewPropertyIterator());
-        for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-        {
-          vtkSMProperty* chosenProxyProperty = iter->GetProperty();
-          if (chosenProxyProperty->GetXMLLabel())
-          {
-            SearchTags << chosenProxyProperty->GetXMLLabel();
-          }
+      return proxyPropWidget;
+    }
+  }
+  return nullptr;
+}
 
-          const QString xmlDocumentation = pqProxyWidget::documentationText(chosenProxyProperty);
-          if (!xmlDocumentation.isEmpty())
-          {
-            SearchTags << xmlDocumentation;
-          }
-        }
+// ProxyProperties might have a domain that selects another proxy -
+// we want the search tags from that proxy too, for this widget.
+void addProxyTags(QStringList& SearchTags, pqPropertyWidget* propertyWidget)
+{
+  auto* proxyPropWidget = getChosenProxyFromDomain(propertyWidget);
+  if (proxyPropWidget)
+  {
+    auto* chosenProxy = proxyPropWidget->chosenProxy();
+    // add the property tags for the chosen proxy
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(chosenProxy->NewPropertyIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+      vtkSMProperty* chosenProxyProperty = iter->GetProperty();
+      if (chosenProxyProperty->GetXMLLabel())
+      {
+        SearchTags << chosenProxyProperty->GetXMLLabel();
+      }
+
+      const QString xmlDocumentation = pqProxyWidget::documentationText(chosenProxyProperty);
+      if (!xmlDocumentation.isEmpty())
+      {
+        SearchTags << xmlDocumentation;
       }
     }
   }
 }
 
 // if this visible propertyWidget has shortcuts or child widget(s) with shortcuts,
-// enable the first, returning true if shortcuts were enabled.
+// enable the first shortcut decorator found, returning true if shortcuts were enabled.
 bool enableShortcutDecorator(pqPropertyWidget* propertyWidget, bool changeFocus)
 {
   if (propertyWidget->isVisible())
@@ -635,6 +645,28 @@ bool enableShortcutDecorator(pqPropertyWidget* propertyWidget, bool changeFocus)
       if (shortcutDecorator)
       {
         shortcutDecorator->setEnabled(true, changeFocus);
+        return true;
+      }
+    }
+    // Check to see if property has a domain that selects another proxy
+    auto* proxyPropWidget = getChosenProxyFromDomain(propertyWidget);
+    if (proxyPropWidget)
+    {
+      auto* chosenProxy = proxyPropWidget->chosenProxy();
+      // find the widget corresponding to this proxy
+      pqPropertyWidget* chosenProxyWidget = nullptr;
+      QList<pqPropertyWidget*> allPropChildren = proxyPropWidget->findChildren<pqPropertyWidget*>();
+      for (auto* pWidget : allPropChildren)
+      {
+        if (pWidget->proxy() == chosenProxy)
+        {
+          chosenProxyWidget = pWidget;
+          break;
+        }
+      }
+      // recurse, check decorators.
+      if (chosenProxyWidget && enableShortcutDecorator(chosenProxyWidget, changeFocus))
+      {
         return true;
       }
     }
@@ -1278,7 +1310,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 
     // save record of the property widget and containing widget
     item->SearchTags << xmllabel << xmlDocumentation << smkey.c_str();
-    addProxyTags(item->SearchTags, pwidget, smproperty);
+    addProxyTags(item->SearchTags, pwidget);
 
     item->InformationOnly = smproperty->GetInformationOnly();
     item->Advanced =

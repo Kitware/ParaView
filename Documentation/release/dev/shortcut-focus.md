@@ -14,10 +14,11 @@ always switch the focus to a pqModalShortcut's "context widget"
 (generally the active 3-D view) whenever the property widget
 became visible.
 
-Going forward, the focus is only diverted to the context widget
-when you explicitly click on a property-widget's frame (i.e.,
-you are using the mouse not the keyboard and interacting with
-the property widget, not some other widget). When a pipeline
-object is shown in the Properties panel, keyboard shortcuts
-are activated for the first item that has them. Otherwise, you
-must click on the context widget for the shortcuts to be accepted.
+Going forward, the focus is not diverted. Instead shortcuts are active
+for the window, instead of just a widget and its children.
+pqPointPickingHelper is modified to check whether the mouse is inside
+the target view before acting on a shortcut keypress. When a
+pipeline object is shown in the Properties panel, or when switching
+views, keyboard shortcuts are activated for the first item that has
+them. Otherwise, you must click on the context widget for the
+shortcuts to be accepted.
