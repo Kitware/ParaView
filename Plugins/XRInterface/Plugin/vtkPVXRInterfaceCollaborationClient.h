@@ -94,7 +94,7 @@ private:
   void operator=(const vtkPVXRInterfaceCollaborationClient&) = delete;
 
   class vtkPVXRCollaborationClientInternal;
-  vtkSmartPointer<vtkPVXRCollaborationClientInternal> Internals;
+  vtkSmartPointer<vtkPVXRCollaborationClientInternal> Internal;
   int CurrentLocation = -1;
 };
 

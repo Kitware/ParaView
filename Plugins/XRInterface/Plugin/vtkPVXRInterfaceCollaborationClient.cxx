@@ -268,7 +268,7 @@ vtkStandardNewMacro(vtkPVXRInterfaceCollaborationClient);
 
 //----------------------------------------------------------------------------
 vtkPVXRInterfaceCollaborationClient::vtkPVXRInterfaceCollaborationClient()
-  : Internals(vtkSmartPointer<
+  : Internal(vtkSmartPointer<
       vtkPVXRInterfaceCollaborationClient::vtkPVXRCollaborationClientInternal>::New())
 {
 }
