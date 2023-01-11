@@ -1,0 +1,159 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+
+    <RepresentationProxy name="ContourLabelRepresentation"
+      class="vtkContourLabelRepresentation"
+      processes="client|renderserver|dataserver">
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+
+      <!-- Here and below : every "standard" property used when this Proxy is registered as an extension
+      of GeometryRepresentation -->
+      <DoubleVectorProperty command="SetAmbientColor"
+                            default_values="1 1 1"
+                            name="AmbientColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <RepresentedArrayListDomain name="array_list" input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetDiffuseColor"
+                            default_values="1 1 1"
+                            name="DiffuseColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty default_values="0"
+                         name="UseSeparateColorMap"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolateScalarsBeforeMapping"
+                         default_values="1"
+                         name="InterpolateScalarsBeforeMapping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMapScalars"
+                         default_values="1"
+                         name="MapScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1" min="0" name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLineWidth"
+                            default_values="2.0"
+                            name="LineWidth"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRenderLinesAsTubes"
+                         default_values="0"
+                         name="RenderLinesAsTubes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- Property specific to the ContourLabelRepresentation -->
+      <DoubleVectorProperty command="SetSkipDistance" default_values="200" name="SkipDistance" number_of_elements="1">
+        <Documentation>
+          Minimal distance (in pixel) between each label on a line.
+          The higher the less labels will be rendered.
+        </Documentation>
+        <DoubleRangeDomain min="10" max="800" name="range" />
+      </DoubleVectorProperty>
+
+      <SubProxy command="SetLabelTextProperty">
+        <Proxy name="LabelTextProperty" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="LabelColor" name="Color" />
+          <Property exposed_name="LabelOpacity" name="Opacity" />
+          <Property exposed_name="LabelFontFamily" name="FontFamily" />
+          <Property exposed_name="LabelFontFile" name="FontFile" />
+          <Property exposed_name="LabelFontSize" name="FontSize" />
+          <Property exposed_name="LabelBold" name="Bold" />
+          <Property exposed_name="LabelItalic" name="Italic" />
+          <Property exposed_name="LabelShadow" name="Shadow" />
+        </ExposedProperties>
+      </SubProxy>
+
+    </RepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <RepresentationType subproxy="ContourLabelRepresentation"
+                          text="Labeled Contour"/>
+
+      <SubProxy>
+        <Proxy name="ContourLabelRepresentation"
+               proxygroup="representations"
+               proxyname="ContourLabelRepresentation"/>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Labeled Contour" >
+            <Property name="SkipDistance" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Labeled Contour" />
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup label="Contour Label Properties" panel_widget="FontEditor">
+            <Property name="LabelColor" function="Color"/>
+            <Property name="LabelOpacity" function="Opacity"/>
+            <Property name="LabelFontFamily" function="Family"/>
+            <Property name="LabelFontFile" function="File"/>
+            <Property name="LabelFontSize" function="Size"/>
+            <Property name="LabelBold" function="Bold"/>
+            <Property name="LabelItalic" function="Italics"/>
+            <Property name="LabelShadow" function="Shadow"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Labeled Contour" />
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
