@@ -2081,7 +2081,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   this->Internals->RenderWindow->Initialize();
   vtkVRRenderWindow* vrRenWin = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
 
-  if (vrRenWin && vrRenWin->GetInitialized())
+  if (vrRenWin && vrRenWin->GetVRInitialized())
   {
     // Set initial values
     this->SetRightTriggerMode(vtkPVXRInterfaceHelper::PICK);
