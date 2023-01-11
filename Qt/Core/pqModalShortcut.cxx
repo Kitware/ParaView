@@ -134,7 +134,7 @@ void pqModalShortcut::setEnabled(bool enable, bool changeFocus)
     {
       Q_EMIT enabled();
       m_shortcut->setEnabled(true);
-      // Now if we have a context widget, give it focus
+      // Now if we have a context widget with window context, give it focus
       // so that users can immediately use the key.
       auto ctxt = m_shortcut->context();
       if ((ctxt == Qt::WidgetShortcut || ctxt == Qt::WidgetWithChildrenShortcut) && changeFocus)

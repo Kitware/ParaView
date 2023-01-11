@@ -105,6 +105,15 @@ void pqPointPickingHelper::pickPoint()
       return;
     }
 
+    // Only pick if the keypress event actually happened in the window
+    QPointF pos = rview->widget()->mapFromGlobal(QCursor::pos());
+    QSize sz = rview->getSize();
+    bool outside = pos.x() < 0 || pos.x() > sz.width() || pos.y() < 0 || pos.y() > sz.height();
+    if (outside)
+    {
+      return;
+    }
+
     // Get region
     const int* eventpos = rwi->GetEventPosition();
     double position[3], normal[3];
