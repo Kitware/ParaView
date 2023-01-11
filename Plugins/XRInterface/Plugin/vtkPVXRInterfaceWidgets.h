@@ -13,7 +13,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVXRInterfaceWidgets
- * @brief   Support for widgets in XR
+ * @brief   Support for widgets in XR (text billboard, measuring tool, etc.).
  *
  */
 
@@ -25,7 +25,6 @@
 #include "vtkSmartPointer.h" // for ivars
 
 #include <future> // for ivar
-#include <map>    // for ivar
 #include <vector> // for ivar
 
 class vtkBoxWidget2;
@@ -38,7 +37,6 @@ class vtkOpenGLRenderWindow;
 class vtkPVXRInterfaceHelper;
 class vtkPVXRInterfaceHelperLocation;
 class vtkStringArray;
-class vtkTexture;
 class vtkTransform;
 
 class vtkPVXRInterfaceWidgets : public vtkObject
@@ -47,23 +45,60 @@ public:
   static vtkPVXRInterfaceWidgets* New();
   vtkTypeMacro(vtkPVXRInterfaceWidgets, vtkObject);
 
-  void SetShowNavigationPanel(bool val, vtkOpenGLRenderWindow*);
-  bool GetNavigationPanelVisibility();
-  void UpdateNavigationText(vtkEventDataDevice3D* edd, vtkOpenGLRenderWindow*);
+  /**
+   * Set whether to display a navigation panel in the given render window.
+   */
+  void SetShowNavigationPanel(bool val, vtkOpenGLRenderWindow* renderWindow);
 
-  void TakeMeasurement(vtkOpenGLRenderWindow*);
+  /**
+   * Get whether the navigation panel is enabled or not.
+   */
+  bool GetNavigationPanelVisibility();
+
+  /**
+   * Update information in the navigation panel based on the position of the given device.
+   */
+  void UpdateNavigationText(vtkEventDataDevice3D* edd, vtkOpenGLRenderWindow* renderWindow);
+
+  /**
+   * Enable measurement tool in the given render window.
+   */
+  void TakeMeasurement(vtkOpenGLRenderWindow* renWin);
+
+  /**
+   * Disable and remove measurement tool.
+   */
   void RemoveMeasurement();
 
-  // show the billboard with the provided text
+  /**
+   * Show a billboard with the provided text and texture file.
+   * Its position is updated depending on the HMD position if necessary.
+   * Only one billboard can be displayed at a time.
+   */
   void ShowBillboard(std::string const& text, bool updatePosition, std::string const& tfile);
+
+  /**
+   * Hide the billboard.
+   */
   void HideBillboard();
-  void MoveToNextImage();
-  void MoveToNextCell();
+
+  /**
+   * Update the current billboard.
+   * Its position is updated depending on the HMD position if necessary.
+   */
   void UpdateBillboard(bool updatePosition);
 
   ///@{
   /**
-   * Add/remove crop planes and thick crops
+   * Display next image or cell image in billboard. Meant for usage with Imago.
+   */
+  void MoveToNextImage();
+  void MoveToNextCell();
+  ///@}
+
+  ///@{
+  /**
+   * Add/remove crop planes and thick crop planes.
    */
   void AddACropPlane(double* origin, double* normal);
   void collabAddACropPlane(double* origin, double* normal);
@@ -73,20 +108,36 @@ public:
   void collabAddAThickCrop(vtkTransform* t);
   void collabRemoveAllThickCrops();
   void collabUpdateThickCrop(int count, double* matrix);
+  ///@}
+
+  /**
+   * Translate all thick crop planes forward (true) or backward (false).
+   */
   void MoveThickCrops(bool forward);
+
+  ///@{
+  /**
+   * Set/get whether crop planes should snap to the axes.
+   */
   void SetCropSnapping(int val);
   bool GetCropSnapping() { return this->CropSnapping; }
   ///@}
 
+  /**
+   * Get the number of crop planes.
+   */
   size_t GetNumberOfCropPlanes() { return this->CropPlanes.size(); }
 
+  /**
+   * Get the number of thick crop planes.
+   */
   size_t GetNumberOfThickCrops() { return this->ThickCrops.size(); }
 
   ///@{
   /**
-   * set the initial thickness in world coordinates for
-   * thick crop planes. 0 indicates automatic
-   * setting. It defaults to 0
+   * Set/get the initial thickness in world coordinates for
+   * thick crop planes. 0 indicates automatic setting.
+   * Default is 0.
    */
   vtkSetMacro(DefaultCropThickness, double);
   vtkGetMacro(DefaultCropThickness, double);
@@ -94,27 +145,46 @@ public:
 
   ///@{
   /**
-   * allow the user to edit a scalar field
-   * in VR
+   * Set/get the name of the cell data array to edit in XR.
    */
   vtkSetMacro(EditableField, std::string);
   vtkGetMacro(EditableField, std::string);
   ///@}
 
-  void SetEditableFieldValue(std::string name);
-
-  void HandlePickEvent(vtkObject* caller, void* calldata);
-  void SetLastEventData(vtkEventData* edd);
-
-  void SetHelper(vtkPVXRInterfaceHelper*);
+  /**
+   * Set given value on the selected cell for the cell array defined by member EditableField.
+   */
+  void SetEditableFieldValue(std::string value);
 
   /**
-   * write any widget state that needs to be in the location state
+   * Process pick event based on given selection.
+   */
+  void HandlePickEvent(vtkObject* caller, void* calldata);
+
+  /**
+   * Set last event data.
+   */
+  void SetLastEventData(vtkEventData* edd);
+
+  /**
+   * Set helper class.
+   */
+  void SetHelper(vtkPVXRInterfaceHelper* val);
+
+  /**
+   * Write any widget state that needs to be in the location state.
    */
   void SaveLocationState(vtkPVXRInterfaceHelperLocation& sd);
 
+  /**
+   * Release any graphics resources.
+   */
   void ReleaseGraphicsResources();
 
+  ///@{
+  /**
+   * Imago related methods.
+   */
   bool LoginToImago(std::string const& uid, std::string const& pw);
   void SetImagoWorkspace(std::string val);
   void SetImagoDataset(std::string val);
@@ -124,11 +194,15 @@ public:
   void GetImagoDatasets(std::vector<std::string>& vals);
   void GetImagoImageryTypes(std::vector<std::string>& vals);
   void GetImagoImageTypes(std::vector<std::string>& vals);
+  ///@}
 
+  /**
+   * Copy new plane widgets from ParaView into XR so they can be manipulated.
+   */
   void UpdateWidgetsFromParaView();
 
   /**
-   * perform any cleanup required when quitting VR
+   * Perform any cleanup required when quitting XR.
    */
   void Quit();
 
@@ -146,17 +220,17 @@ private:
   vtkPVXRInterfaceWidgets(const vtkPVXRInterfaceWidgets&) = delete;
   void operator=(const vtkPVXRInterfaceWidgets&) = delete;
 
-  std::vector<vtkImplicitPlaneWidget2*> CropPlanes;
-  std::vector<vtkBoxWidget2*> ThickCrops;
   bool CropSnapping = false;
-  double DefaultCropThickness = 0;
-  vtkPVXRInterfaceHelper* Helper = nullptr;
-
   bool WaitingForImage = false;
-  std::future<vtkImageData*> ImageFuture;
+  double DefaultCropThickness = 0;
   unsigned long RenderObserver = 0;
   std::string EditableField;
+
+  std::vector<vtkImplicitPlaneWidget2*> CropPlanes;
+  std::vector<vtkBoxWidget2*> ThickCrops;
+  std::future<vtkImageData*> ImageFuture;
   vtkSmartPointer<vtkEventData> LastEventData;
+  vtkPVXRInterfaceHelper* Helper = nullptr;
 
   struct vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

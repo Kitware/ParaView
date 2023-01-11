@@ -65,6 +65,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <map>
 #include <regex>
 #include <sstream>
 
@@ -422,7 +423,6 @@ void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal
   rep->SetCropPlaneToBoundingBox(false);
   rep->SetSnapToAxes(this->CropSnapping);
 
-  // rep->SetPlaceFactor(1.25);
   auto* ren = this->Helper->GetRenderer();
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow());
 
@@ -1134,6 +1134,7 @@ bool vtkPVXRInterfaceWidgets::IsCellImageDifferent(
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::MoveToNextImage()
 {
   // find the intersection with the image actor
@@ -1320,7 +1321,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   double p1[6];
   cell->GetBounds(p1);
   double pos[3] = { 0.5 * (p1[1] + p1[0]), 0.5 * (p1[3] + p1[2]), 0.5 * (p1[5] + p1[4]) };
-  toString << "\n Cell Center (DC): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
+  toString << "\n Cell Center (Device): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
   vtkMatrix4x4* pmat = this->Internals->LastPickedProp->GetMatrix();
   double wpos[4];
   wpos[0] = pos[0];
@@ -1328,7 +1329,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   wpos[2] = pos[2];
   wpos[3] = 1.0;
   pmat->MultiplyPoint(wpos, wpos);
-  toString << " Cell Center (WC): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
+  toString << " Cell Center (World): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
 
   std::string textureFile;
 
@@ -1733,7 +1734,6 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
     rep->SetNormal(pvrep->GetNormal());
 
     vtkNew<vtkImplicitPlaneWidget2> ps;
-    // this->CropPlanes.push_back(ps.Get());
     ps->Register(this);
 
     ps->SetRepresentation(rep.Get());
