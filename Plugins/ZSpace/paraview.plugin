@@ -5,3 +5,4 @@ DESCRIPTION
 REQUIRES_MODULES
   VTK::CommonCore
   VTK::RenderingCore
+  VTK::RenderingZSpace

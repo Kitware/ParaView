@@ -2768,6 +2768,35 @@ void vtkPVRenderView::ConfigureTexture(vtkTexture* texture)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetupAndSetRenderer(vtkRenderer* ren)
+{
+  // XXX We can consider to redesign the class in the future
+  // to find a cleaner way to change the renderer.
+  // All the following settings corresponds to those made on
+  // the initial renderer in the constructor.
+  ren->GetActiveCamera()->ParallelProjectionOff();
+  ren->SetUseDepthPeeling(1);
+  ren->SetUseDepthPeelingForVolumes(1);
+  ren->SetAutomaticLightCreation(0);
+
+  ren->AddCuller(this->Culler);
+  ren->AddActor(this->CenterAxes);
+  ren->AddActor(this->Skybox);
+
+  vtkMemberFunctionCommand<vtkPVRenderView>* observer =
+    vtkMemberFunctionCommand<vtkPVRenderView>::New();
+  observer->SetCallback(*this, &vtkPVRenderView::ResetCameraClippingRange);
+  ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent, observer);
+  observer->FastDelete();
+
+  this->RenderView->SetRenderer(ren);
+  this->SynchronizedRenderers->SetRenderer(ren);
+  this->CameraOrientationWidget->SetParentRenderer(ren);
+  this->OrientationWidget->SetParentRenderer(ren);
+  this->NonCompositedRenderer->SetActiveCamera(ren->GetActiveCamera());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundMode(int val)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing

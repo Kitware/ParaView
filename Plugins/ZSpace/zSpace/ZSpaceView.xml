@@ -42,7 +42,7 @@
     </IntVectorProperty>
 
     <IntVectorProperty command="SetInteractivePicking"
-                       default_values="1"
+                       default_values="0"
                        name="InteractivePicking"
                        panel_visibility="advanced"
                        number_of_elements="1">
