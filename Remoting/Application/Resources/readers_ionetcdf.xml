@@ -353,6 +353,84 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkNetCDFUGRIDReader"
+           label="NetCDF UGRID reader Core"
+           name="NetCDFUGRIDReaderCore">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetReplaceFillValueWithNan"
+                         default_values="0"
+                         name="ReplaceFillValueWithNan"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, any float or double variable read that has a
+        _FillValue attribute will have that fill value replaced with a
+        not-a-number (NaN) value. The advantage of setting these to NaN values
+        is that, if implemented properly by the system and careful math
+        operations are used, they can implicitly be ignored by calculations
+        like finding the range of the values. That said, this option should be
+        used with caution as VTK does not fully support NaN values and
+        therefore odd calculations may occur.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="nc ncdf"
+                       file_description="NetCDF UGRID file"/>
+      </Hints>
+      <!-- End NetCDFUGRIDReaderCore -->
+    </Proxy>
     <!-- end of "internal_sources" -->
   </ProxyGroup>
 
@@ -560,6 +638,58 @@
                        file_description="netCDF files generic and CF conventions" />
       </Hints>
       <!-- netCDFReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="NetCDF UGRID reader"
+                 name="NetCDFUGRIDReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="NetCDFUGRIDReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+          <Property name="ReplaceFillValueWithNan" />
+        </ExposedProperties>
+      </SubProxy>
+      <Documentation long_help="Reads unstructured grid data from NetCDF files. There are 2 files, a points+fields file which is set as FileName and a cell connectivity file set as ConnectivityFileName."
+                     short_help="Read unstructured grid NetCDF files in UGRID format.">
+      </Documentation>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="nc ncdf"
+                       file_description="UGRID NetCDF (Unstructured)" />
+      </Hints>
+      <!-- End NetCDFUGRIDReader -->
     </SourceProxy>
 
     <!-- ================================================================== -->
