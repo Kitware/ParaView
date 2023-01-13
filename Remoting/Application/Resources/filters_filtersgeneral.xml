@@ -1917,10 +1917,12 @@
         variable over time.</Documentation>
       </IntVectorProperty>
       <Hints>
-        <WarnOnCreate title="Potentially slow operation">
-          **Temporal Statistics** filter needs to process all timesteps
-          available in your dataset and can potentially take a long time to complete.
-          Do you want to continue?
+        <WarnOnCreate>
+          <Text title="Potentially slow operation">
+            **Temporal Statistics** filter needs to process all timesteps
+            available in your dataset and can potentially take a long time to complete.
+            Do you want to continue?
+          </Text>
         </WarnOnCreate>
       </Hints>
       <!-- End TemporalStatistics -->

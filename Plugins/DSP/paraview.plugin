@@ -1,0 +1,11 @@
+NAME
+  DigitalSignalProcessing
+DESCRIPTION
+  Digital Signal Processing Plugin : provides basic signal processing filters as well as an audio player dock.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersGeneral
+  VTK::FiltersCore
+  VTK::FiltersExtraction
