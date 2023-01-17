@@ -426,7 +426,8 @@ void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal
   auto* ren = this->Helper->GetRenderer();
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow());
 
-  double* fp = ren->GetActiveCamera()->GetFocalPoint();
+  vtkCamera* camera = ren->GetActiveCamera();
+  double* fp = camera->GetFocalPoint();
   double scale = 1.0;
 
   auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
@@ -434,24 +435,37 @@ void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal
   {
     scale = vr_rw->GetPhysicalScale();
   }
-  double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
-    fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };
-  rep->PlaceWidget(bnds);
+
   if (origin)
   {
     rep->SetOrigin(origin);
+    double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
+      fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };
+    rep->PlaceWidget(bnds);
   }
   else
   {
-    rep->SetOrigin(fp);
+    // Place widget in front of camera
+    double* camPos = camera->GetPosition();
+    double* camDop = camera->GetDirectionOfProjection();
+    double widgetOrigin[3] = { camPos[0] + scale * camDop[0], camPos[1] + scale * camDop[1],
+      camPos[2] + scale * camDop[2] };
+    rep->SetOrigin(widgetOrigin);
+
+    // Define bounds for widget
+    double bnds[6] = { widgetOrigin[0] - scale * 0.5, widgetOrigin[0] + scale * 0.5,
+      widgetOrigin[1] - scale * 0.5, widgetOrigin[1] + scale * 0.5, widgetOrigin[2] - scale * 0.5,
+      widgetOrigin[2] + scale * 0.5 };
+    rep->PlaceWidget(bnds);
   }
+
   if (normal)
   {
     rep->SetNormal(normal);
   }
   else
   {
-    rep->SetNormal(ren->GetActiveCamera()->GetDirectionOfProjection());
+    rep->SetNormal(camera->GetDirectionOfProjection());
   }
 
   vtkNew<vtkImplicitPlaneWidget2> ps;
@@ -621,14 +635,22 @@ void vtkPVXRInterfaceWidgets::collabAddAThickCrop(vtkTransform* intrans)
   else
   {
     vtkNew<vtkTransform> t;
-    double* fp = ren->GetActiveCamera()->GetFocalPoint();
     double scale = this->DefaultCropThickness;
     auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
+
     if (vr_rw && this->DefaultCropThickness == 0)
     {
       scale = vr_rw->GetPhysicalScale();
     }
-    t->Translate(fp);
+
+    // Place widget in front of camera
+    vtkCamera* camera = ren->GetActiveCamera();
+    double* camPos = camera->GetPosition();
+    double* camDop = camera->GetDirectionOfProjection();
+    double widgetOrigin[3] = { camPos[0] + scale * camDop[0], camPos[1] + scale * camDop[1],
+      camPos[2] + scale * camDop[2] };
+
+    t->Translate(widgetOrigin);
     t->Scale(scale, scale, scale);
     rep->SetTransform(t);
   }
