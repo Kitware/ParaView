@@ -128,7 +128,7 @@ std::string vtkSMTrace::GetState(vtkSMProxy* options)
       throw 1;
     }
 
-    vtkSmartPyObject name(PyString_FromString("get_state"));
+    vtkSmartPyObject name(PyUnicode_FromString("get_state"));
     vtkSmartPyObject pyoptions(vtkPythonUtil::GetObjectFromPointer(options));
     vtkSmartPyObject result(
       PyObject_CallMethodObjArgs(module, name, pyoptions.GetPointer(), nullptr));
@@ -137,7 +137,7 @@ std::string vtkSMTrace::GetState(vtkSMProxy* options)
       vtkGenericWarningMacro("Failed to generate state.");
       throw 1;
     }
-    return std::string(PyString_AsString(result));
+    return std::string(PyUnicode_AsUTF8(result));
   }
   catch (int)
   {
@@ -214,7 +214,7 @@ std::string vtkSMTrace::StopTrace()
     if (Py_None != _stop_trace_internal.GetPointer() &&
       _stop_trace_internal.GetPointer() != nullptr)
     {
-      result = PyString_AsString(_stop_trace_internal);
+      result = PyUnicode_AsUTF8(_stop_trace_internal);
     }
     else
     {
@@ -247,7 +247,7 @@ std::string vtkSMTrace::GetCurrentTrace()
   if (active->CheckForError() == false && get_current_trace_output)
   {
     // no error.
-    return std::string(PyString_AsString(get_current_trace_output));
+    return std::string(PyUnicode_AsUTF8(get_current_trace_output));
   }
 #endif
   return std::string();
@@ -355,7 +355,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, vtkOb
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
     assert(valObj && keyObj);
 
@@ -378,7 +378,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, const
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject valObj;
     if (val == nullptr)
     {
@@ -388,7 +388,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, const
     }
     else
     {
-      valObj.TakeReference(PyString_FromString(val));
+      valObj.TakeReference(PyUnicode_FromString(val));
     }
     assert(keyObj && valObj);
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
@@ -410,7 +410,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, int v
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject valObj(PyInt_FromLong(val));
     assert(keyObj && valObj);
 
@@ -433,7 +433,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, doubl
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject valObj(PyFloat_FromDouble(val));
     assert(keyObj && valObj);
 
@@ -455,7 +455,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, bool 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject valObj(PyBool_FromLong(val ? 1 : 0));
     assert(keyObj && valObj);
 
@@ -478,7 +478,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject listObj(PyList_New(0));
     assert(keyObj && listObj);
 
@@ -509,7 +509,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
     vtkSmartPyObject listObj(PyList_New(0));
     assert(keyObj && listObj);
 
@@ -559,7 +559,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* val)
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject valObj(PyString_FromString(val));
+    vtkSmartPyObject valObj(PyUnicode_FromString(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
@@ -640,7 +640,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const std::vector<std:
 
     for (const std::string& item : val)
     {
-      vtkSmartPyObject valObj(PyString_FromString(item.c_str()));
+      vtkSmartPyObject valObj(PyUnicode_FromString(item.c_str()));
       int ret = PyList_Append(listObj, valObj);
       (void)ret;
       assert(ret == 0);
@@ -713,7 +713,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
     assert(tracer->GetCreateItemFunction());
 
     vtkSmartPyObject args(PyTuple_New(3));
-    PyTuple_SET_ITEM(args.GetPointer(), 0, PyString_FromString(this->Type));
+    PyTuple_SET_ITEM(args.GetPointer(), 0, PyUnicode_FromString(this->Type));
     if (arguments.Internals->PositionalArgs)
     {
       PyTuple_SET_ITEM(

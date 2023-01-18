@@ -60,15 +60,15 @@ bool IsActivatedPython(const std::string& script, vtkSMExtractsController* contr
     return false;
   }
 
-  vtkSmartPyObject load_method(PyString_FromString("module_from_string"));
+  vtkSmartPyObject load_method(PyUnicode_FromString("module_from_string"));
   vtkSmartPyObject module(PyObject_CallMethodObjArgs(
-    mdlParaView, load_method, PyString_FromString(script.c_str()), nullptr));
+    mdlParaView, load_method, PyUnicode_FromString(script.c_str()), nullptr));
   if (CheckAndFlushPythonErrors() || !module)
   {
     return false;
   }
 
-  vtkSmartPyObject function(PyString_FromString("is_activated"));
+  vtkSmartPyObject function(PyUnicode_FromString("is_activated"));
   vtkSmartPyObject self = vtkPythonUtil::GetObjectFromPointer(controller);
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(module, function, self.GetPointer(), nullptr));
   if (CheckAndFlushPythonErrors() || !result)

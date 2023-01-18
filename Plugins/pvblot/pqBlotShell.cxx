@@ -237,7 +237,7 @@ void pqBlotShell::promptForInput()
       if (pvblotinterp)
       {
         PyObject* promptObj = PyObject_GetAttrString(pvblotinterp, const_cast<char*>("prompt"));
-        newPrompt = PyString_AsString(PyObject_Str(promptObj));
+        newPrompt = PyUnicode_AsUTF8(PyObject_Str(promptObj));
       }
     }
   }

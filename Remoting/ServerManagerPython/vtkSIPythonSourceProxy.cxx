@@ -84,9 +84,9 @@ vtkClientServerStream& operator<<(vtkClientServerStream& os, PyObject* obj)
   {
     os << PyFloat_AsDouble(obj);
   }
-  else if (PyString_Check(obj))
+  else if (PyUnicode_Check(obj))
   {
-    os << PyString_AsString(obj);
+    os << PyUnicode_AsUTF8(obj);
   }
   else if (PyVTKObject_Check(obj))
   {
@@ -231,7 +231,7 @@ vtkSmartPyObject ConvertCSArgsToPyTuple(const vtkClientServerStream& msg)
           }
           else
           {
-            obj.TakeReference(PyString_FromStringAndSize(cval.c_str(), cval.size()));
+            obj.TakeReference(PyUnicode_FromStringAndSize(cval.c_str(), cval.size()));
           }
 
           return obj;

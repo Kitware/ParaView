@@ -86,9 +86,9 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
     }
 
     // Setup Module with user given script
-    vtkSmartPyObject load_method(PyString_FromString("module_from_string"));
+    vtkSmartPyObject load_method(PyUnicode_FromString("module_from_string"));
     this->Internals->Module.TakeReference(PyObject_CallMethodObjArgs(
-      importedModule, load_method, PyString_FromString(Script.c_str()), nullptr));
+      importedModule, load_method, PyUnicode_FromString(Script.c_str()), nullptr));
 
     if (!this->Internals->Module || CheckAndFlushPythonErrors())
     {
@@ -99,7 +99,7 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
   }
 
   // call wrapper_start_cue ---------------------------------------------------
-  vtkSmartPyObject start_method(PyString_FromString("start_cue"));
+  vtkSmartPyObject start_method(PyUnicode_FromString("start_cue"));
   vtkSmartPyObject self = vtkPythonUtil::GetObjectFromPointer(this);
   vtkSmartPyObject resultMethod(
     PyObject_CallMethodObjArgs(this->Internals->Module, start_method, self.GetPointer(), nullptr));
@@ -116,7 +116,7 @@ void vtkPythonAnimationCue::HandleTickEvent()
   }
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("tick"));
+  vtkSmartPyObject method(PyUnicode_FromString("tick"));
   vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
   vtkSmartPyObject result(
     PyObject_CallMethodObjArgs(this->Internals->Module, method, self.GetPointer(), nullptr));
@@ -133,7 +133,7 @@ void vtkPythonAnimationCue::HandleEndCueEvent()
   }
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("end_cue"));
+  vtkSmartPyObject method(PyUnicode_FromString("end_cue"));
   vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
   vtkSmartPyObject result(
     PyObject_CallMethodObjArgs(this->Internals->Module, method, self.GetPointer(), nullptr));
