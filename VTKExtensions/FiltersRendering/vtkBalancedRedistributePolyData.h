@@ -42,7 +42,7 @@ public:
 
 protected:
   vtkBalancedRedistributePolyData();
-  ~vtkBalancedRedistributePolyData();
+  ~vtkBalancedRedistributePolyData() override;
   void MakeSchedule(vtkPolyData*, vtkCommSched*) override;
 
 private:
