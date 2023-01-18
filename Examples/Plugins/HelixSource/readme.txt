@@ -1,6 +1,6 @@
 This example contains:
 
-1.  A server manager xml file (helix.xml) which defines a programmable source 
+1.  A server manager xml file (helix.xml) which defines a programmable source
     that creates a helix.  It also contains extra properties for variables in
     the python script.
 
@@ -9,7 +9,7 @@ This example contains:
     add a spacer at the bottom then lay them out in a grid.  The widgets are
     named after their associated server manager property.  For example,
     NumberOfRounds is a string property with 2 values.  The first value is the
-    name of the python variable, and the second is the value of the python 
+    name of the python variable, and the second is the value of the python
     variable.  The widget is named NumberOfRounds_1, where _1 tells the GUI to
     tie the value of the widget with the second value of the server manager
     property.

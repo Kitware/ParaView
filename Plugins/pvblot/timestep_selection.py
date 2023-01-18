@@ -9,7 +9,7 @@ These commands control the time step selection as explained in Section
      * tmax is the maximum selected time,
      * nintv is the number of selected time intervals, and
      * delt is the selected time interval.
-                                            
+
 In the interval-times mode, up to nintv time steps at interval delt between tmin and tmax are
 selected. The mode may have a delta offset or a zero offset. With a delta offset, the first
 selected time is tmin+delt; with a zero offset, it is tmin.
@@ -104,7 +104,7 @@ class TimestepSelection(object):
     parse_steps(string)
 
     """
-  
+
     # mode:
     all_available_times = 1
     interval_times = 2
@@ -154,7 +154,7 @@ class TimestepSelection(object):
         if self.interval_select_mode == self.delt_select:
             if self.offset_mode == self.delt_offset:
                 try: self.nintv = int( (self.tmax - self.tmin) / self.delt )
-                except ZeroDivisionError: self.nintv = int(self.tmax - self.tmin) 
+                except ZeroDivisionError: self.nintv = int(self.tmax - self.tmin)
             elif self.offset_mode == self.zero_offset:
                 try: self.nintv = int( (self.tmax - self.tmin) / self.delt ) + 1
                 except ZeroDivisionError: self.nintv = int(self.tmax - self.tmin) + 1
@@ -173,9 +173,9 @@ class TimestepSelection(object):
             elif self.interval_select_mode == self.delt_select:
                 print " Select whole times %f to %f by %f" %  (self.tmin, self.tmax, self.delt)
         elif self.mode == self.user_selected_times:
-            print " Select specified whole times"   
+            print " Select specified whole times"
         print "    Number of selected times = %d" % len(self.selected_times)
-        print    
+        print
 
 
     def _update_selected_timesteps(self):
@@ -225,7 +225,7 @@ class TimestepSelection(object):
         self.nintv = value
         self._update_delt_and_nintv()
         self._update_selected_timesteps()
-        
+
     def set_nintv(self, value=None):
         self.offset_mode = self.delt_offset
         self._set_nintv_internal(value)

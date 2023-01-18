@@ -21,8 +21,8 @@
 	<g i:extraneous="self">
 		<rect x="0.005" y="0.005" fill="none" stroke="#000000" stroke-width="0.01" width="32" height="32"/>
 		<g>
-			<polyline fill="none" stroke="#488ECC" stroke-linecap="round" stroke-linejoin="round" points="4.913,22.06 6.778,18.142 
-				8.819,21.164 10.86,11.226 12.698,19.136 14.768,16.142 17.519,21.56 22.045,9.226 24.053,15.947 26.629,10.854 27.411,12.817 
+			<polyline fill="none" stroke="#488ECC" stroke-linecap="round" stroke-linejoin="round" points="4.913,22.06 6.778,18.142
+				8.819,21.164 10.86,11.226 12.698,19.136 14.768,16.142 17.519,21.56 22.045,9.226 24.053,15.947 26.629,10.854 27.411,12.817
 							"/>
 			<g id="Axes">
 				<line fill="none" stroke="#000000" x1="4.005" y1="28.505" x2="4.005" y2="3.505"/>

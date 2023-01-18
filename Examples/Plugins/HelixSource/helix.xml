@@ -2,7 +2,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
 
-  <!-- server manager xml for a python script that creates a helix 
+  <!-- server manager xml for a python script that creates a helix
        the auto generated panel for this exposes everything more than we want so
        a custom panel would be good -->
     <SourceProxy name="HelixSource" class="vtkPythonProgrammableFilter"
@@ -14,11 +14,11 @@
       </Documentation>
 
       <!-- data set type -->
-      <IntVectorProperty 
-        name="OutputDataSetType" 
-        command="SetOutputDataSetType" 
+      <IntVectorProperty
+        name="OutputDataSetType"
+        command="SetOutputDataSetType"
         number_of_elements="1"
-        default_values="0"> 
+        default_values="0">
         <!-- value of 0 means vtkPolyData -->
       </IntVectorProperty>
 
@@ -33,7 +33,7 @@
         </Hints>
       </StringVectorProperty>
 
-     <!-- python script references a variable "numPts" 
+     <!-- python script references a variable "numPts"
           we expose this as a property allowing the user to set it -->
      <IntVectorProperty
         name="NumberOfPoints"
@@ -44,7 +44,7 @@
         default_values="80" >
      </IntVectorProperty>
 
-     <!-- python script references a variable "length" 
+     <!-- python script references a variable "length"
           we expose this as a property allowing the user to set it -->
      <DoubleVectorProperty
         name="Length"
@@ -55,7 +55,7 @@
         default_values="2.0" >
      </DoubleVectorProperty>
 
-     <!-- python script references a variable "rounds" 
+     <!-- python script references a variable "rounds"
           we expose this as a property allowing the user to set it -->
      <IntVectorProperty
         name="NumberOfRounds"

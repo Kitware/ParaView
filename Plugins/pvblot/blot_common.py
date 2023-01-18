@@ -84,7 +84,7 @@ def find_variable(source, name):
             for component_index, suffix in zip([0, 1, 2], ["x", "y", "z"]):
                 if name.lower().endswith(suffix):
                     realname = find_insensitive(name[:-1], var_list.Available)
-                    component = component_index  
+                    component = component_index
         if realname:
             if realname not in var_list:
                 var_list.SetData(var_list[:] + [realname])

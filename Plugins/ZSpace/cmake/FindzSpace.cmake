@@ -41,8 +41,8 @@ example : set zSpace_DIR=C:/zSpace/zSpaceSdks/4.0.0.3
 #]=======================================================================]
 
 # Find zSpace headers folder
-find_path(zSpace_INCLUDE_DIR 
-  NAMES 
+find_path(zSpace_INCLUDE_DIR
+  NAMES
     zSpace.h
   HINTS
     ${zSpace_ROOT}
@@ -59,7 +59,7 @@ mark_as_advanced(zSpace_INCLUDE_DIR)
 # Find zSpace library
 find_library(zSpace_LIBRARY
   NAMES
-    zSpaceApi64 
+    zSpaceApi64
     zSpaceApi
   HINTS
     ${zSpace_ROOT}
