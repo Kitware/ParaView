@@ -25,7 +25,6 @@ alphabetically.
 """
 
 import sys
-import math
 import glob
 
 # initialize and read input parameters

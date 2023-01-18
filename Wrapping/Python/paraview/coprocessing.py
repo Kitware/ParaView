@@ -8,8 +8,6 @@ appropriate for co-processing.
 from paraview import simple, servermanager
 from paraview.detail import exportnow
 
-import math
-
 # If the user created a filename in a location that doesn't exist by default we'll
 # make the directory for them. This can be changed though by setting createDirectoriesIfNeeded
 # to False.
