@@ -24,8 +24,6 @@ It attempts to sort the filenames as well, first by name length and second
 alphabetically.
 """
 
-# for Python2 print statmements to output like Python3 print statements
-from __future__ import print_function
 import sys
 import math
 import glob
