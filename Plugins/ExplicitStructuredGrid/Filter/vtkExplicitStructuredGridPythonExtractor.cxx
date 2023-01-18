@@ -245,6 +245,6 @@ bool vtkExplicitStructuredGridPythonExtractor::EvaluatePythonExpression(vtkIdTyp
   PyObject* main_module = PyImport_ImportModule("__main__");
   PyObject* global_dict = PyModule_GetDict(main_module);
   PyObject* iobj = PyDict_GetItemString(global_dict, "ret");
-  ret = PyInt_AsLong(iobj) != 0;
+  ret = PyLong_AsLong(iobj) != 0;
   return ret;
 }

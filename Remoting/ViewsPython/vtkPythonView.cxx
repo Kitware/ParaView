@@ -158,8 +158,8 @@ public:
 
     vtkSmartPyObject methodName(PyUnicode_FromString("call_render"));
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
-    vtkSmartPyObject widthObj(PyInt_FromLong(width));
-    vtkSmartPyObject heightObj(PyInt_FromLong(height));
+    vtkSmartPyObject widthObj(PyLong_FromLong(width));
+    vtkSmartPyObject heightObj(PyLong_FromLong(height));
     vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(this->PythonViewModule,
       methodName.GetPointer(), renderFunction.GetPointer(), view.GetPointer(),
       widthObj.GetPointer(), heightObj.GetPointer(), nullptr));

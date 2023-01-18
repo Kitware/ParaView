@@ -411,7 +411,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, int v
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyUnicode_FromString(key));
-    vtkSmartPyObject valObj(PyInt_FromLong(val));
+    vtkSmartPyObject valObj(PyLong_FromLong(val));
     assert(keyObj && valObj);
 
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
@@ -484,7 +484,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
 
     for (size_t i = 0; i < val.size(); ++i)
     {
-      vtkSmartPyObject valObj(PyInt_FromLong(val[i]));
+      vtkSmartPyObject valObj(PyLong_FromLong(val[i]));
       int ret = PyList_Append(listObj, valObj);
       (void)ret;
       assert(ret == 0);
@@ -578,7 +578,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(int val)
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject valObj(PyInt_FromLong(val));
+    vtkSmartPyObject valObj(PyLong_FromLong(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
