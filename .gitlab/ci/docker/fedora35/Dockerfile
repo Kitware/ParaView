@@ -21,3 +21,6 @@ RUN sh /root/install_cdi.sh
 
 COPY install_catalyst.sh /root/install_catalyst.sh
 RUN sh /root/install_catalyst.sh
+
+COPY install_pythonqt.sh /root/install_pythonqt.sh
+RUN sh /root/install_pythonqt.sh
