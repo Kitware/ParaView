@@ -30,10 +30,6 @@ class VTKHandler(logging.Handler):
                     lvlText = 'WARN: '
                     fullMsg = f"{record.filename}:{record.lineno} {lvlText}{msg}\n"
                     outputWindow.DisplayWarningText(fullMsg)
-                elif lvl == vtkLogger.VERBOSITY_DEBUG:
-                    lvlText = 'DEBUG: '
-                    fullMsg = f"{record.filename}:{record.lineno} {lvlText}{msg}\n"
-                    outputWindow.DisplayDebugText(fullMsg)
                 else:
                     fullMsg = f"{record.filename}:{record.lineno} {msg}\n"
                     outputWindow.DisplayText(fullMsg)
