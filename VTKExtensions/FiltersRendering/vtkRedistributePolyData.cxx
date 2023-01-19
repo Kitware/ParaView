@@ -178,7 +178,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
       this->Controller->Send(input->GetBounds(), 6, id, BOUNDS_TAG);
       }
     }
-  
+
   for (id = 0; id < numProcs; id++)
     {
     if (id != myId)

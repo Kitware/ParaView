@@ -12,7 +12,7 @@ This module defines 3 targets if zSpace has been found:
 ``zSpaceHeaders``
   zSpace header files
 ``zSpaceImpl``
-  zSpace library (dll). 
+  zSpace library (dll).
   We don't use any shared library at compile time.
 ``zSpaceCopy``
   Used to copy the .dll to the appropriate location inside
@@ -49,8 +49,8 @@ example : set zSpace_DIR=C:/zSpace/zSpaceSdks/CoreCompatibility_1.0.0.12
 #]=======================================================================]
 
 # Find zSpace headers folder
-find_path(zSpace_INCLUDE_DIR 
-  NAMES 
+find_path(zSpace_INCLUDE_DIR
+  NAMES
     zSpaceCoreCompatibility.h
   HINTS
     ${zSpace_ROOT}
@@ -90,9 +90,9 @@ if (zSpaceCompat_FOUND)
   if (NOT TARGET zSpaceHeaders)
     # Interface library (headers only)
     add_library(zSpaceHeaders INTERFACE IMPORTED)
-    target_include_directories(zSpaceHeaders 
+    target_include_directories(zSpaceHeaders
       INTERFACE "${zSpace_INCLUDE_DIR}")
-      
+
     # For later purpose (install, etc.)
     add_library(zSpaceImpl MODULE IMPORTED)
     set_target_properties(zSpaceImpl PROPERTIES

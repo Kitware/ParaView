@@ -147,7 +147,7 @@ class _PVBlotInterp(cmd.Cmd):
         # Update the prompt, some commands cause the prompt to change
         self.prompt = blotish._get_prompt()
         return ret
-      
+
     def emptyline(self):
         """If an object is waiting for asynchronous input pass it the empty string"""
         self.handle_async_input("")
@@ -247,7 +247,7 @@ def execute_file(filename):
         if interpreter._error_flag: break
     blotish._set_interactive(True)
     return exit_flag
-        
+
 
 
 def start(data_file, script_file=None):

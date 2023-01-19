@@ -80,7 +80,7 @@ find_package_handle_standard_args(3DxWareSDK
 if (3DxWareSDK_FOUND)
     set(3DxWareSDK_LIBRARIES ${3DxWareSDK_LIBRARY})
     if (APPLE)
-      # CMake should be treating this as a -framework, but we need to 
+      # CMake should be treating this as a -framework, but we need to
       # list the lib explicitly
       set(3DxWareSDK_LIBRARIES ${3DxWareSDK_LIBRARY}/3DconnexionNavlib)
     endif()

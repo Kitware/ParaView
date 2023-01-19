@@ -90,7 +90,7 @@
     <string>Reset center of rotation</string>
    </property>
   </action>
- 
+
   <addaction name="actionShowOrientationAxes" />
   <addaction name="actionShowCenterAxes" />
   <addaction name="actionResetCenter" />
