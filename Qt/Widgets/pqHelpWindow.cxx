@@ -53,6 +53,10 @@ public:
   virtual ~pqBrowser() = default;
   virtual QWidget* widget() const = 0;
   virtual void setUrl(const QUrl& url) = 0;
+  virtual QUrl goBackward() = 0;
+  virtual QUrl goForward() = 0;
+  virtual bool canGoBackward() = 0;
+  virtual bool canGoForward() = 0;
 
 private:
   Q_DISABLE_COPY(pqBrowser)
@@ -71,6 +75,10 @@ public:
   ~pqBrowserTemplate() override { delete this->Widget; }
   QWidget* widget() const override { return this->Widget; }
   void setUrl(const QUrl& url) override { this->Widget->setUrl(url); }
+  QUrl goBackward() override { return this->Widget->goBackward(); }
+  QUrl goForward() override { return this->Widget->goForward(); }
+  bool canGoBackward() override { return this->Widget->canGoBackward(); }
+  bool canGoForward() override { return this->Widget->canGoForward(); }
 };
 
 #if PARAVIEW_USE_QTWEBENGINE
@@ -86,37 +94,59 @@ typedef pqBrowserTemplate<pqTextBrowser> PQBROWSER_TYPE;
 // ****************************************************************************
 
 //-----------------------------------------------------------------------------
+class pqHelpWindow::pqInternals : public Ui::pqHelpWindow
+{
+};
+
+//-----------------------------------------------------------------------------
 pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::WindowFlags parentFlags)
   : Superclass(parentObject, parentFlags)
   , HelpEngine(engine)
   , Browser(new PQBROWSER_TYPE(this->HelpEngine, this))
+  , Internals(new pqInternals())
 {
   assert(engine != nullptr);
 
-  Ui::pqHelpWindow ui;
-  ui.setupUi(this);
+  this->Internals->setupUi(this);
 
   QObject::connect(
     this->HelpEngine, SIGNAL(warning(const QString&)), this, SIGNAL(helpWarnings(const QString&)));
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-  this->tabifyDockWidget(ui.contentsDock, ui.searchDock);
-  ui.contentsDock->setWidget(this->HelpEngine->contentWidget());
-  ui.contentsDock->raise();
+  this->tabifyDockWidget(this->Internals->contentsDock, this->Internals->searchDock);
+  this->Internals->contentsDock->setWidget(this->HelpEngine->contentWidget());
+  this->Internals->contentsDock->raise();
 
   QWidget* searchPane = new QWidget(this);
   QVBoxLayout* vbox = new QVBoxLayout();
   searchPane->setLayout(vbox);
   vbox->addWidget(engine->searchEngine()->queryWidget());
   vbox->addWidget(engine->searchEngine()->resultWidget());
-  ui.searchDock->setWidget(searchPane);
+  this->Internals->searchDock->setWidget(searchPane);
 
   QObject::connect(engine->searchEngine()->queryWidget(), SIGNAL(search()), this, SLOT(search()));
   QObject::connect(engine->searchEngine()->resultWidget(), SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
   this->setCentralWidget(this->Browser->widget());
+
+  QIcon homeIcon = qApp->style()->standardIcon(QStyle::SP_DirHomeIcon);
+  this->Internals->actionHome->setIcon(homeIcon);
+  QObject::connect(
+    this->Internals->actionHome, &QAction::triggered, this, &pqHelpWindow::goToHomePage);
+
+  QIcon backIcon = qApp->style()->standardIcon(QStyle::SP_ArrowLeft);
+  this->Internals->actionBackward->setIcon(backIcon);
+  this->Internals->actionBackward->setEnabled(false);
+  QObject::connect(
+    this->Internals->actionBackward, &QAction::triggered, this, &pqHelpWindow::goBackward);
+
+  QIcon forwardIcon = qApp->style()->standardIcon(QStyle::SP_ArrowRight);
+  this->Internals->actionForward->setIcon(forwardIcon);
+  this->Internals->actionForward->setEnabled(false);
+  QObject::connect(
+    this->Internals->actionForward, &QAction::triggered, this, &pqHelpWindow::goForward);
 
   QObject::connect(this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)), this,
     SLOT(showPage(const QUrl&)));
@@ -161,8 +191,44 @@ void pqHelpWindow::showHomePage(const QString& namespace_name)
     if (url.path().endsWith("index.html"))
     {
       this->showPage(url);
+      this->HomePage = url;
       return;
     }
   }
   qWarning() << "Could not locate index.html";
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::goToHomePage()
+{
+  this->showPage(this->HomePage);
+  this->updateContentWidget(this->HomePage);
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::goBackward()
+{
+  QUrl newUrl = this->Browser->goBackward();
+  this->updateContentWidget(newUrl);
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::goForward()
+{
+  QUrl newUrl = this->Browser->goForward();
+  this->updateContentWidget(newUrl);
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::updateHistoryButtons()
+{
+  this->Internals->actionBackward->setEnabled(this->Browser->canGoBackward());
+  this->Internals->actionForward->setEnabled(this->Browser->canGoForward());
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::updateContentWidget(const QUrl& url)
+{
+  QHelpContentWidget* widget = this->HelpEngine->contentWidget();
+  widget->setCurrentIndex(widget->indexOf(url));
 }

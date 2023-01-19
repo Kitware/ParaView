@@ -728,6 +728,7 @@ SET (TESTS_WITHOUT_BASELINES
   ExtractParticlesOverTime.xml
   FavoritesFilters.xml
   GradientBackwardsCompatibility.xml
+  HelpWindowHistory.xml
   ImportCustomPresets.xml
   InformationPanel.xml
   LogViewer.xml

@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 #include <QMainWindow>
 #include <QScopedPointer>
+#include <QUrl>
 
 class QHelpEngine;
-class QUrl;
 class pqBrowser;
 
 /**
@@ -68,6 +68,20 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   virtual void showHomePage(const QString& namespace_name);
 
+  ///@{
+  /**
+   * Navigate through the history of visited pages.
+   */
+  virtual void goToHomePage();
+  virtual void goBackward();
+  virtual void goForward();
+  ///@}
+
+  /**
+   * Update the state of buttons used to navigate through history.
+   */
+  virtual void updateHistoryButtons();
+
 Q_SIGNALS:
   /**
    * fired to relay warning messages from the help system.
@@ -78,11 +92,21 @@ protected Q_SLOTS:
   void search();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * Convenience method used to update the content widget (displaying all
+   * available pages and the current selection) when navigating through history.
+   */
+  virtual void updateContentWidget(const QUrl& url);
+
   QHelpEngine* HelpEngine;
+  QUrl HomePage;
 
 private:
   Q_DISABLE_COPY(pqHelpWindow)
   const QScopedPointer<pqBrowser> Browser;
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif
