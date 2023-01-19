@@ -12,6 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkFieldData.h"
 #include "vtkFloatArray.h"
 #include "vtkMathUtilities.h"
 #include "vtkNew.h"
@@ -22,6 +23,7 @@ vtkSmartPointer<vtkFloatArray> GetPolyData()
 {
   vtkIdType numPts = 101;
   vtkSmartPointer<vtkFloatArray> array = vtkSmartPointer<vtkFloatArray>::New();
+  array->SetName("array");
 
   array->SetNumberOfTuples(numPts);
   for (vtkIdType cc = 0; cc < numPts; ++cc)
@@ -35,9 +37,11 @@ int TestPVArrayInformation(int, char*[])
 {
 
   vtkSmartPointer<vtkFloatArray> array = GetPolyData();
+  vtkNew<vtkFieldData> fd;
+  fd->AddArray(array);
 
   vtkNew<vtkPVArrayInformation> info;
-  info->CopyFromArray(array.Get());
+  info->CopyFromArray(array.Get(), fd);
 
   // Verify minimum and maximum
   auto range = info->GetComponentRange(0);
@@ -90,7 +94,7 @@ int TestPVArrayInformation(int, char*[])
   // Add infinity and verify minimum and maximum values.
   array->SetComponent(50, 0, vtkMath::Inf());
   array->Modified();
-  info->CopyFromArray(array.Get());
+  info->CopyFromArray(array.Get(), fd);
   range = info->GetComponentRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {

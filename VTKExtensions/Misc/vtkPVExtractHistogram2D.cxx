@@ -11,6 +11,8 @@ Copyright and License information
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkGradientFilter.h"
+#include "vtkGraph.h"
+#include "vtkHyperTreeGrid.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -19,6 +21,8 @@ Copyright and License information
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 
 vtkStandardNewMacro(vtkPVExtractHistogram2D);
 vtkCxxSetObjectMacro(vtkPVExtractHistogram2D, Controller, vtkMultiProcessController);
@@ -160,6 +164,8 @@ void vtkPVExtractHistogram2D::InitializeCache()
   this->ComponentIndexCache[1] = 0;
   this->ComponentArrayCache[0] = nullptr;
   this->ComponentArrayCache[1] = nullptr;
+  this->GhostArray = nullptr;
+  this->GhostsToSkip = 0;
   this->ComponentRangeCache[0][0] = 0.0;
   this->ComponentRangeCache[0][1] = 1.0;
   this->ComponentRangeCache[1][0] = 0.0;
@@ -211,10 +217,14 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
     return;
   }
 
-  // TODO: Handle a composite dataset
-
+  int fieldAssociation;
   vtkDataArray* inputArray0 =
-    vtkDataArray::SafeDownCast(this->GetInputArrayToProcess(0, inputVector));
+    vtkDataArray::SafeDownCast(this->GetInputArrayToProcess(0, inputVector, fieldAssociation));
+
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
+
   if (!inputArray0)
   {
     return;
@@ -228,12 +238,19 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
     this->ComponentArrayCache[0] = inputArray0;
   }
 
+  vtkFieldData* dsa = inputDS
+    ? inputDS->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, inputVector))
+    : nullptr;
+
+  if (dsa)
+  {
+    this->GhostArray = dsa->GetGhostArray();
+    this->GhostsToSkip = dsa->GetGhostsToSkip();
+  }
+
   // Figure out if we are using the gradient magnitude for the Y axis
   if (this->UseGradientForYAxis)
   {
-    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-    vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-    vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
     if (this->ComponentArrayCache[0] != inputArray0)
     {
       // Vector Magnitude
@@ -244,15 +261,13 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
                       "is only supported for vtkDataSet and subclasses.");
         return;
       }
-      inputDS->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, inputVector))
-        ->AddArray(this->ComponentArrayCache[0]);
+      dsa->AddArray(this->ComponentArrayCache[0]);
     }
     this->ComputeGradient(input);
 
     if (this->ComponentArrayCache[0] != inputArray0)
     {
-      inputDS->GetAttributesAsFieldData(this->GetInputArrayAssociation(0, inputVector))
-        ->RemoveArray("Magnitude");
+      dsa->RemoveArray("Magnitude");
     }
   }
   else
@@ -377,7 +392,11 @@ void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
         (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]));
     bin2 = bin2 >= this->NumberOfBins[1] ? this->NumberOfBins[1] - 1 : bin2;
     vtkIdType histIndex = bin2 * this->NumberOfBins[0] + bin1;
-    histRange[histIndex]++;
+
+    if (!this->GhostArray || !(this->GhostArray->GetValue(tupleId) & this->GhostsToSkip))
+    {
+      histRange[histIndex]++;
+    }
   }
 }
 

@@ -167,7 +167,7 @@ void vtkPVDataSetAttributesInformation::CopyFromDataObject(vtkDataObject* dobj)
       if (array && !vtkSkipArray(array->GetName()))
       {
         vtkPVArrayInformation* ainfo = vtkPVArrayInformation::New();
-        ainfo->CopyFromArray(array);
+        ainfo->CopyFromArray(array, fd);
         internals.ArrayInformation[array->GetName()].TakeReference(ainfo);
       }
     }

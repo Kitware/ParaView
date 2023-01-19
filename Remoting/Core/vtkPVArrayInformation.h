@@ -33,6 +33,7 @@
 #include <vector> // for std::vector
 
 class vtkAbstractArray;
+class vtkFieldData;
 class vtkClientServerStream;
 class vtkGenericAttribute;
 
@@ -143,7 +144,7 @@ public:
   const char* GetStringValue(int);
   ///@}
 
-  void CopyFromArray(vtkAbstractArray* array);
+  void CopyFromArray(vtkAbstractArray* array, vtkFieldData* fd = nullptr);
   void CopyFromGenericAttribute(vtkGenericAttribute* array);
   void CopyToStream(vtkClientServerStream*) const;
   bool CopyFromStream(const vtkClientServerStream*);
