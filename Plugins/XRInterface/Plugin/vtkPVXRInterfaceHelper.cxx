@@ -1895,7 +1895,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     vtkNew<vtkOpenXRRenderWindowInteractor> oxriren;
     vriren = oxriren;
     manifestFile += "pv_openxr_actions.json";
-    vriren->SetActionManifestFileName(manifestFile.c_str());
+    vriren->SetActionManifestFileName(manifestFile);
 
     oxriren->AddAction("showmenu", [this](vtkEventData* ed) {
       vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();

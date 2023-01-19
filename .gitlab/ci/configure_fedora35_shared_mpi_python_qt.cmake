@@ -26,5 +26,7 @@ set(PARAVIEW_BUILD_TRANSLATIONS ON CACHE BOOL "")
 
 set(PARAVIEW_XRInterface_OpenVR_Support ON CACHE BOOL "")
 set(VTK_MODULE_ENABLE_VTK_RenderingOpenVR YES CACHE STRING "")
+set(PARAVIEW_XRInterface_OpenXR_Support ON CACHE BOOL "")
+set(VTK_MODULE_ENABLE_VTK_RenderingOpenXR YES CACHE STRING "")
 
 include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora35.cmake")
