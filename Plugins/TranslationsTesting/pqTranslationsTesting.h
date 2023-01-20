@@ -164,6 +164,12 @@ public:
    * Recursively call `printWarningIfUntranslated` on UI-visible properties
    * of then given widget and its children actions.
    */
+  bool isToBeIgnored(QWidget*) const;
+
+  /**
+   * Recursively call `printWarningIfUntranslated` on UI-visible properties
+   * of then given widget and its children actions.
+   */
   void recursiveFindUntranslatedStrings(QWidget*) const;
 
   /**

@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDebug>
 #include <QGuiApplication>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QMenu>
 #include <QRegularExpression>
 #include <QStack>
+#include <QTextEdit>
 #include <QWindow>
 
 //-----------------------------------------------------------------------------
@@ -105,13 +107,22 @@ void pqTranslationsTesting::printWarningIfUntranslated(QObject* object, const ch
 }
 
 //-----------------------------------------------------------------------------
+bool pqTranslationsTesting::isToBeIgnored(QWidget* widget) const
+{
+  return dynamic_cast<QLineEdit*>(widget) || dynamic_cast<QTextEdit*>(widget);
+}
+
+//-----------------------------------------------------------------------------
 void pqTranslationsTesting::recursiveFindUntranslatedStrings(QWidget* widget) const
 {
-  this->printWarningIfUntranslated(widget, "text");
-  this->printWarningIfUntranslated(widget, "toolTip");
-  this->printWarningIfUntranslated(widget, "windowTitle");
-  this->printWarningIfUntranslated(widget, "placeholderText");
-  this->printWarningIfUntranslated(widget, "label");
+  if (!this->isToBeIgnored(widget))
+  {
+    this->printWarningIfUntranslated(widget, "text");
+    this->printWarningIfUntranslated(widget, "toolTip");
+    this->printWarningIfUntranslated(widget, "windowTitle");
+    this->printWarningIfUntranslated(widget, "placeholderText");
+    this->printWarningIfUntranslated(widget, "label");
+  }
 
   for (QAction* action : widget->actions())
   {
