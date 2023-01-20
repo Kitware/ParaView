@@ -65,6 +65,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <map>
 #include <regex>
 #include <sstream>
 
@@ -422,11 +423,11 @@ void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal
   rep->SetCropPlaneToBoundingBox(false);
   rep->SetSnapToAxes(this->CropSnapping);
 
-  // rep->SetPlaceFactor(1.25);
   auto* ren = this->Helper->GetRenderer();
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow());
 
-  double* fp = ren->GetActiveCamera()->GetFocalPoint();
+  vtkCamera* camera = ren->GetActiveCamera();
+  double* fp = camera->GetFocalPoint();
   double scale = 1.0;
 
   auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
@@ -434,24 +435,37 @@ void vtkPVXRInterfaceWidgets::collabAddACropPlane(double* origin, double* normal
   {
     scale = vr_rw->GetPhysicalScale();
   }
-  double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
-    fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };
-  rep->PlaceWidget(bnds);
+
   if (origin)
   {
     rep->SetOrigin(origin);
+    double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
+      fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };
+    rep->PlaceWidget(bnds);
   }
   else
   {
-    rep->SetOrigin(fp);
+    // Place widget in front of camera
+    double* camPos = camera->GetPosition();
+    double* camDop = camera->GetDirectionOfProjection();
+    double widgetOrigin[3] = { camPos[0] + scale * camDop[0], camPos[1] + scale * camDop[1],
+      camPos[2] + scale * camDop[2] };
+    rep->SetOrigin(widgetOrigin);
+
+    // Define bounds for widget
+    double bnds[6] = { widgetOrigin[0] - scale * 0.5, widgetOrigin[0] + scale * 0.5,
+      widgetOrigin[1] - scale * 0.5, widgetOrigin[1] + scale * 0.5, widgetOrigin[2] - scale * 0.5,
+      widgetOrigin[2] + scale * 0.5 };
+    rep->PlaceWidget(bnds);
   }
+
   if (normal)
   {
     rep->SetNormal(normal);
   }
   else
   {
-    rep->SetNormal(ren->GetActiveCamera()->GetDirectionOfProjection());
+    rep->SetNormal(camera->GetDirectionOfProjection());
   }
 
   vtkNew<vtkImplicitPlaneWidget2> ps;
@@ -621,14 +635,22 @@ void vtkPVXRInterfaceWidgets::collabAddAThickCrop(vtkTransform* intrans)
   else
   {
     vtkNew<vtkTransform> t;
-    double* fp = ren->GetActiveCamera()->GetFocalPoint();
     double scale = this->DefaultCropThickness;
     auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
+
     if (vr_rw && this->DefaultCropThickness == 0)
     {
       scale = vr_rw->GetPhysicalScale();
     }
-    t->Translate(fp);
+
+    // Place widget in front of camera
+    vtkCamera* camera = ren->GetActiveCamera();
+    double* camPos = camera->GetPosition();
+    double* camDop = camera->GetDirectionOfProjection();
+    double widgetOrigin[3] = { camPos[0] + scale * camDop[0], camPos[1] + scale * camDop[1],
+      camPos[2] + scale * camDop[2] };
+
+    t->Translate(widgetOrigin);
     t->Scale(scale, scale, scale);
     rep->SetTransform(t);
   }
@@ -1134,6 +1156,7 @@ bool vtkPVXRInterfaceWidgets::IsCellImageDifferent(
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::MoveToNextImage()
 {
   // find the intersection with the image actor
@@ -1320,7 +1343,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   double p1[6];
   cell->GetBounds(p1);
   double pos[3] = { 0.5 * (p1[1] + p1[0]), 0.5 * (p1[3] + p1[2]), 0.5 * (p1[5] + p1[4]) };
-  toString << "\n Cell Center (DC): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
+  toString << "\n Cell Center (Device): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
   vtkMatrix4x4* pmat = this->Internals->LastPickedProp->GetMatrix();
   double wpos[4];
   wpos[0] = pos[0];
@@ -1328,7 +1351,7 @@ void vtkPVXRInterfaceWidgets::UpdateBillboard(bool updatePosition)
   wpos[2] = pos[2];
   wpos[3] = 1.0;
   pmat->MultiplyPoint(wpos, wpos);
-  toString << " Cell Center (WC): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
+  toString << " Cell Center (World): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
 
   std::string textureFile;
 
@@ -1733,7 +1756,6 @@ void vtkPVXRInterfaceWidgets::UpdateWidgetsFromParaView()
     rep->SetNormal(pvrep->GetNormal());
 
     vtkNew<vtkImplicitPlaneWidget2> ps;
-    // this->CropPlanes.push_back(ps.Get());
     ps->Register(this);
 
     ps->SetRepresentation(rep.Get());

@@ -1,7 +1,7 @@
 # Testing Steps for XRInterface Plugin
 
-Created with the Valve Index controller, some adaptations may be needed for other HMD.
-Some features visible in the UI have not been added (eg: Crops) as they are not working properly.
+Created with the Valve Index controller, some adaptations may be needed for other HMDs.
+Some features visible in the UI have not been added (eg: Animation) as they are not working properly.
 See https://gitlab.kitware.com/vtk/vtk/-/issues/18302 for reference.
 
 ## After opening ParaView:
@@ -21,7 +21,7 @@ See https://gitlab.kitware.com/vtk/vtk/-/issues/18302 for reference.
  - Enter values separated by commas, e.g., “1, 2, 3” in “Field Values”
  - Click “Send to XR”
  - Output message may appear, close it.
- - Press “Show XR View” and check VR scene is visible
+ - Press “Show XR View” and check VR scene is visible in a desktop window
 
 ## After entering XR:
 
@@ -44,9 +44,18 @@ See https://gitlab.kitware.com/vtk/vtk/-/issues/18302 for reference.
  - Check “Probe” (pick a cell)
  - Check “Interactive Crop” (keep trigger pressed)
  - Check “Add Point to Source” (will automatically add to the poly line source, make sure it is selected in the pipeline view)
- - Back to  “Pick” action
+ - Back to “Pick” action
 
 ## In the XR menu - Central section:
+
+ - Press "Add Crop Plane" (should place a clip widget in front)
+ - Grab it and check that it moves with the controller
+ - Check "Snap Crop Planes"
+ - Grab the plane and move it slowly in a horizontal position (should snap)
+ - Press "Remove All Crop Planes"
+ - Press "Add Thick Crop" (should place a box widget in front)
+ - Grab it and check that it moves with the controller
+ - Press "Remove All Crop Planes"
 
  - Press “Distance Widget” (ruler)
  - Place two points with right trigger (should place distance info)
