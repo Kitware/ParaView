@@ -117,8 +117,8 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
     }
     return false;
   }
-  vtkSmartPyObject name(PyString_FromString("save_catalyst_state"));
-  vtkSmartPyObject pyfilename(PyString_FromString(filename.toUtf8().data()));
+  vtkSmartPyObject name(PyUnicode_FromString("save_catalyst_state"));
+  vtkSmartPyObject pyfilename(PyUnicode_FromString(filename.toUtf8().data()));
   vtkSmartPyObject pyproxy(vtkPythonUtil::GetObjectFromPointer(proxy));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
     module, name, pyfilename.GetPointer(), pyproxy.GetPointer(), nullptr));

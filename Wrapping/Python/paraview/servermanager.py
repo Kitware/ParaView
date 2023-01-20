@@ -862,7 +862,7 @@ class VectorProperty(Property):
         if not self.GetRepeatable() and len(values) != self.GetNumberOfElements():
             raise RuntimeError("This property requires %d values." % self.GetNumberOfElements())
 
-        # Python3: map returns an iterable, must be converted to list. Safe for python2
+        # map returns an iterable, must be converted to list.
         convertedValues = list(map(self.ConvertValue, values))
         if self.GetRepeatable():
           # Clean up first

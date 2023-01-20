@@ -5,12 +5,8 @@ pipeline. Additionally, this module has several other utility functions that are
 appropriate for co-processing.
 """
 
-# for Python2 print statmements to output like Python3 print statements
-from __future__ import print_function
 from paraview import simple, servermanager
 from paraview.detail import exportnow
-
-import math
 
 # If the user created a filename in a location that doesn't exist by default we'll
 # make the directory for them. This can be changed though by setting createDirectoriesIfNeeded

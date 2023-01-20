@@ -207,8 +207,8 @@ void vtkPythonCalculator::Exec(const char* expression)
   }
 
   vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
-  vtkSmartPyObject fname(PyString_FromString("execute"));
-  vtkSmartPyObject pyexpression(PyString_FromString(orgscript.c_str()));
+  vtkSmartPyObject fname(PyUnicode_FromString("execute"));
+  vtkSmartPyObject pyexpression(PyUnicode_FromString(orgscript.c_str()));
 
   // call `paraview.detail.calculator.execute(self)`
   // calculator.py references ArrayName, ArrayAssociation and ResultArrayType to create the output

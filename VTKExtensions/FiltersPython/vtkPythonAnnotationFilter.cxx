@@ -207,7 +207,7 @@ void vtkPythonAnnotationFilter::EvaluateExpression()
   }
 
   vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
-  vtkSmartPyObject fname(PyString_FromString("execute"));
+  vtkSmartPyObject fname(PyUnicode_FromString("execute"));
 
   // call `paraview.detail.annotation.execute(self)`
   vtkSmartPyObject retVal(

@@ -103,10 +103,10 @@ void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)
     }
   }
 
-  vtkSmartPyObject functionName(PyString_FromString("execute"));
+  vtkSmartPyObject functionName(PyUnicode_FromString("execute"));
   vtkSmartPyObject inputObj(vtkPythonUtil::GetObjectFromPointer(input));
   vtkSmartPyObject nodeObj(vtkPythonUtil::GetObjectFromPointer(this->Node));
-  vtkSmartPyObject arrayNameObj(PyString_FromString(vtkInternals::MASK_ARRAYNAME));
+  vtkSmartPyObject arrayNameObj(PyUnicode_FromString(vtkInternals::MASK_ARRAYNAME));
   vtkSmartPyObject outputObj(vtkPythonUtil::GetObjectFromPointer(output));
   vtkSmartPyObject retVal(
     PyObject_CallMethodObjArgs(psModule, functionName.GetPointer(), inputObj.GetPointer(),

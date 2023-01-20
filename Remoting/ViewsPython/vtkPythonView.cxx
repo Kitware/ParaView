@@ -132,7 +132,7 @@ public:
       return true;
     }
 
-    vtkSmartPyObject methodName(PyString_FromString("setup_data"));
+    vtkSmartPyObject methodName(PyUnicode_FromString("setup_data"));
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
     vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
       this->ScriptModule, methodName.GetPointer(), view.GetPointer(), nullptr));
@@ -156,10 +156,10 @@ public:
     vtkSmartPyObject renderFunction(PyObject_GetAttrString(this->ScriptModule, "render"));
     assert(renderFunction);
 
-    vtkSmartPyObject methodName(PyString_FromString("call_render"));
+    vtkSmartPyObject methodName(PyUnicode_FromString("call_render"));
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
-    vtkSmartPyObject widthObj(PyInt_FromLong(width));
-    vtkSmartPyObject heightObj(PyInt_FromLong(height));
+    vtkSmartPyObject widthObj(PyLong_FromLong(width));
+    vtkSmartPyObject heightObj(PyLong_FromLong(height));
     vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(this->PythonViewModule,
       methodName.GetPointer(), renderFunction.GetPointer(), view.GetPointer(),
       widthObj.GetPointer(), heightObj.GetPointer(), nullptr));

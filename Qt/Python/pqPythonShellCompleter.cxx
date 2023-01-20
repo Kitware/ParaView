@@ -176,7 +176,7 @@ QStringList pqPythonShellCompleter::getPythonAttributes(const QString& pythonObj
         {
           continue;
         }
-        results << PyString_AsString(key);
+        results << PyUnicode_AsUTF8(key);
         Py_DECREF(value);
 
         // Clear out any errors that may have occurred.

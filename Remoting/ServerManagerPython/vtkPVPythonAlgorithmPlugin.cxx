@@ -77,7 +77,7 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
     throw std::runtime_error("Failed to locate `paraview.detail.pythonalgorithm.load_plugin`.");
   }
 
-  vtkSmartPyObject filename(PyString_FromString(modulefile));
+  vtkSmartPyObject filename(PyUnicode_FromString(modulefile));
   vtkSmartPyObject module(
     PyObject_CallFunctionObjArgs(load_plugin, filename.GetPointer(), nullptr));
   if (!module)
@@ -104,9 +104,9 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
     for (decltype(numitems) cc = 0; cc < numitems; ++cc)
     {
       PyObject* borrowed_item = PyList_GET_ITEM(result.GetPointer(), cc);
-      if (PyString_Check(borrowed_item))
+      if (PyUnicode_Check(borrowed_item))
       {
-        internals.XMLs.push_back(PyString_AsString(borrowed_item));
+        internals.XMLs.push_back(PyUnicode_AsUTF8(borrowed_item));
       }
     }
   }
@@ -118,12 +118,12 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
   }
 
   result.TakeReference(PyObject_CallFunctionObjArgs(get_plugin_name, module.GetPointer(), nullptr));
-  if (!result || !PyString_Check(result))
+  if (!result || !PyUnicode_Check(result))
   {
     throw std::runtime_error("Failed to call `paraview.detail.pythonalgorithm.get_plugin_name`.");
   }
 
-  internals.PluginName = PyString_AsString(result);
+  internals.PluginName = PyUnicode_AsUTF8(result);
 
   vtkSmartPyObject get_plugin_version(PyObject_GetAttrString(pvdetail, "get_plugin_version"));
   if (!get_plugin_version)
@@ -134,13 +134,13 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
 
   result.TakeReference(
     PyObject_CallFunctionObjArgs(get_plugin_version, module.GetPointer(), nullptr));
-  if (!result || !PyString_Check(result))
+  if (!result || !PyUnicode_Check(result))
   {
     throw std::runtime_error(
       "Failed to call `paraview.detail.pythonalgorithm.get_plugin_version`.");
   }
 
-  internals.PluginVersion = PyString_AsString(result);
+  internals.PluginVersion = PyUnicode_AsUTF8(result);
 
   this->SetFileName(modulefile);
 }

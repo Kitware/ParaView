@@ -81,7 +81,7 @@ void vtkAnnotateAttributeDataFilter::EvaluateExpression()
   }
 
   vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
-  vtkSmartPyObject fname(PyString_FromString("execute_on_attribute_data"));
+  vtkSmartPyObject fname(PyUnicode_FromString("execute_on_attribute_data"));
 
   // call `paraview.detail.annotation.execute_on_attribute_data(self)`
   vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(modAnnotation, fname.GetPointer(),

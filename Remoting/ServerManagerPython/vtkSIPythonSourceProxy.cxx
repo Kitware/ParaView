@@ -72,10 +72,6 @@ vtkClientServerStream& operator<<(vtkClientServerStream& os, PyObject* obj)
   {
     os << ((obj == Py_True) ? true : false);
   }
-  else if (PyInt_Check(obj))
-  {
-    os << PyInt_AsLong(obj);
-  }
   else if (PyLong_Check(obj))
   {
     os << PyLong_AsLong(obj);
@@ -84,9 +80,9 @@ vtkClientServerStream& operator<<(vtkClientServerStream& os, PyObject* obj)
   {
     os << PyFloat_AsDouble(obj);
   }
-  else if (PyString_Check(obj))
+  else if (PyUnicode_Check(obj))
   {
-    os << PyString_AsString(obj);
+    os << PyUnicode_AsUTF8(obj);
   }
   else if (PyVTKObject_Check(obj))
   {
@@ -187,7 +183,7 @@ vtkSmartPyObject ConvertCSArgsToPyTuple(const vtkClientServerStream& msg)
       case vtkClientServerStream::uint32_array:
       case vtkClientServerStream::uint32_value:
         args.push_back(convert_value_or_array<vtkTypeInt32>(
-          msg, 0, cc, [](const vtkTypeInt32& cval) { return PyInt_FromLong(cval); }));
+          msg, 0, cc, [](const vtkTypeInt32& cval) { return PyLong_FromLong(cval); }));
         break;
 
       case vtkClientServerStream::int64_value:
@@ -231,7 +227,7 @@ vtkSmartPyObject ConvertCSArgsToPyTuple(const vtkClientServerStream& msg)
           }
           else
           {
-            obj.TakeReference(PyString_FromStringAndSize(cval.c_str(), cval.size()));
+            obj.TakeReference(PyUnicode_FromStringAndSize(cval.c_str(), cval.size()));
           }
 
           return obj;

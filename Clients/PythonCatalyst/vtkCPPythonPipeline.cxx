@@ -77,7 +77,7 @@ void CatalystInitializePython()
     PyErr_Clear();
   }
 
-  vtkSmartPyObject method(PyString_FromString("InitializePythonEnvironment"));
+  vtkSmartPyObject method(PyUnicode_FromString("InitializePythonEnvironment"));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(module, method, nullptr));
   if (!result)
   {

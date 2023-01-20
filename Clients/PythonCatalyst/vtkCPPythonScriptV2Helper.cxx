@@ -163,8 +163,8 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Prepare(const std::string& fname)
     return false;
   }
 
-  vtkSmartPyObject method(PyString_FromString("register_module"));
-  vtkSmartPyObject archive(PyString_FromString(fname.c_str()));
+  vtkSmartPyObject method(PyUnicode_FromString("register_module"));
+  vtkSmartPyObject archive(PyUnicode_FromString(fname.c_str()));
   this->PackageName.TakeReference(
     PyObject_CallMethodObjArgs(this->APIModule, method, archive.GetPointer(), nullptr));
   if (!this->PackageName)
@@ -206,7 +206,7 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Import(const std::vector<std::stri
   }
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("import_and_validate"));
+  vtkSmartPyObject method(PyUnicode_FromString("import_and_validate"));
   this->Package.TakeReference(
     PyObject_CallMethodObjArgs(this->APIModule, method, this->PackageName.GetPointer(), nullptr));
   if (!this->Package)
@@ -216,7 +216,7 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Import(const std::vector<std::stri
     return false;
   }
 
-  vtkSmartPyObject method2(PyString_FromString("has_customized_execution"));
+  vtkSmartPyObject method2(PyUnicode_FromString("has_customized_execution"));
   vtkSmartPyObject result(
     PyObject_CallMethodObjArgs(this->APIModule, method2, this->Package.GetPointer(), nullptr));
   if (!result || !PyBool_Check(result))
@@ -319,7 +319,7 @@ bool vtkCPPythonScriptV2Helper::CatalystInitialize()
 
   auto& internals = (*this->Internals);
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("do_catalyst_initialize"));
+  vtkSmartPyObject method(PyUnicode_FromString("do_catalyst_initialize"));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
     internals.APIModule, method, internals.Package.GetPointer(), nullptr));
   if (!result)
@@ -355,7 +355,7 @@ bool vtkCPPythonScriptV2Helper::CatalystFinalize()
   auto& internals = (*this->Internals);
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("do_catalyst_finalize"));
+  vtkSmartPyObject method(PyUnicode_FromString("do_catalyst_finalize"));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
     internals.APIModule, method, internals.Package.GetPointer(), nullptr));
   if (!result)
@@ -410,7 +410,7 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(
   }
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("do_catalyst_execute"));
+  vtkSmartPyObject method(PyUnicode_FromString("do_catalyst_execute"));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
     internals.APIModule, method, internals.Package.GetPointer(), nullptr));
   if (!result)
@@ -485,7 +485,7 @@ bool vtkCPPythonScriptV2Helper::RequestDataDescription(vtkCPDataDescription* dat
   auto& internals = (*this->Internals);
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("do_request_data_description"));
+  vtkSmartPyObject method(PyUnicode_FromString("do_request_data_description"));
   vtkSmartPyObject pyarg(vtkPythonUtil::GetObjectFromPointer(dataDesc));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
     internals.APIModule, method, internals.Package.GetPointer(), pyarg.GetPointer(), nullptr));
