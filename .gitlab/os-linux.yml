@@ -171,6 +171,14 @@
 
     interruptible: true
 
+.cmake_translations_linux:
+    stage: test
+
+    script:
+        - echo "Forwarding translation artifacts"
+
+    interruptible: true
+
 .spack_build_linux:
     stage: build
 
