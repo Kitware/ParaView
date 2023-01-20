@@ -161,10 +161,9 @@ public:
   void printWarningIfUntranslated(QObject*, const char*) const;
 
   /**
-   * Recursively call `printWarningIfUntranslated` on UI-visible properties
-   * of then given widget and its children actions.
+   * Check if a widget should be ignored by the testing.
    */
-  bool isToBeIgnored(QWidget*) const;
+  bool shouldBeIgnored(QWidget*) const;
 
   /**
    * Recursively call `printWarningIfUntranslated` on UI-visible properties

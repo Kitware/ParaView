@@ -107,7 +107,7 @@ void pqTranslationsTesting::printWarningIfUntranslated(QObject* object, const ch
 }
 
 //-----------------------------------------------------------------------------
-bool pqTranslationsTesting::isToBeIgnored(QWidget* widget) const
+bool pqTranslationsTesting::shouldBeIgnored(QWidget* widget) const
 {
   return dynamic_cast<QLineEdit*>(widget) || dynamic_cast<QTextEdit*>(widget);
 }
@@ -115,7 +115,7 @@ bool pqTranslationsTesting::isToBeIgnored(QWidget* widget) const
 //-----------------------------------------------------------------------------
 void pqTranslationsTesting::recursiveFindUntranslatedStrings(QWidget* widget) const
 {
-  if (!this->isToBeIgnored(widget))
+  if (!this->shouldBeIgnored(widget))
   {
     this->printWarningIfUntranslated(widget, "text");
     this->printWarningIfUntranslated(widget, "toolTip");
