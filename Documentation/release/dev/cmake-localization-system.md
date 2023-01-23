@@ -12,3 +12,6 @@ It is controlled by two new CMake options.
 * `PARAVIEW_TRANSLATIONS_DIRECTORY`: Path where
   the translation files will be generated on
   build.
+
+The ParaView CI generates the files with a
+dedicated jobs and keeps them as artifacts.

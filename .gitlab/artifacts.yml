@@ -11,6 +11,14 @@
             - prepare_output.log
             - paraview-docs-doxygen.tgz
 
+.cmake_translations_artifacts:
+    artifacts:
+        expire_in: 1d
+        when: always
+        paths:
+            # Translations source files
+            - translations/*.ts
+
 .cmake_build_artifacts:
     artifacts:
         expire_in: 1d
@@ -59,6 +67,9 @@
 
             # proj.db
             - build/share/vtk-*/proj/proj.db
+
+            # translation source files
+            - translations/*.ts
 
 .cmake_test_artifacts:
     artifacts:
