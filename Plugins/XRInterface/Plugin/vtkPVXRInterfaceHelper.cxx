@@ -1872,13 +1872,16 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   vtkOpenGLRenderWindow* pvRenderWindow =
     vtkOpenGLRenderWindow::SafeDownCast(pvRenderer->GetVTKWindow());
 
-  std::string manifestFile;
+  std::string manifestDir;
   std::string pluginLocation = vtkPVXRInterfacePluginLocation::GetPluginLocation();
   if (!pluginLocation.empty())
   {
     // get the path
-    pluginLocation = vtksys::SystemTools::GetFilenamePath(pluginLocation);
-    manifestFile = pluginLocation + "/";
+    manifestDir = vtksys::SystemTools::GetFilenamePath(pluginLocation) + "/";
+  }
+  else
+  {
+    qWarning("Unable to find action manifest directory from the plugin location");
   }
 
   vtkSmartPointer<vtkVRRenderWindow> renWin = nullptr;
@@ -1894,8 +1897,8 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     ren = vtkSmartPointer<vtkOpenXRRenderer>::New();
     vtkNew<vtkOpenXRRenderWindowInteractor> oxriren;
     vriren = oxriren;
-    manifestFile += "pv_openxr_actions.json";
-    vriren->SetActionManifestFileName(manifestFile);
+    vriren->SetActionManifestDirectory(manifestDir);
+    vriren->SetActionManifestFileName("pv_openxr_actions.json");
 
     oxriren->AddAction("showmenu", [this](vtkEventData* ed) {
       vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
@@ -1958,8 +1961,8 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     ren = vtkSmartPointer<vtkOpenVRRenderer>::New();
     vtkNew<vtkOpenVRRenderWindowInteractor> ovriren;
     vriren = ovriren;
-    manifestFile += "pv_openvr_actions.json";
-    vriren->SetActionManifestFileName(manifestFile);
+    vriren->SetActionManifestDirectory(manifestDir);
+    vriren->SetActionManifestFileName("pv_openvr_actions.json");
 
     ovriren->AddAction("/actions/vtk/in/ShowMenu", false, [this](vtkEventData* ed) {
       vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
@@ -2078,7 +2081,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
   this->Internals->RenderWindow->Initialize();
   vtkVRRenderWindow* vrRenWin = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
 
-  if (vrRenWin && vrRenWin->GetInitialized())
+  if (vrRenWin && vrRenWin->GetVRInitialized())
   {
     // Set initial values
     this->SetRightTriggerMode(vtkPVXRInterfaceHelper::PICK);
