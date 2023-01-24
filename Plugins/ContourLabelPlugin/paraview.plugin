@@ -1,0 +1,15 @@
+NAME
+  ContourLabelPlugin
+DESCRIPTION
+  Provide the 'Labeled Contour' representation for polydata datasets that represent contours.
+CONDITION
+  PARAVIEW_ENABLE_RENDERING
+REQUIRES_MODULES
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsMisc
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::ParallelCore
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2

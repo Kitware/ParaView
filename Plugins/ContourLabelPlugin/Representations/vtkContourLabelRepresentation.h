@@ -1,0 +1,102 @@
+/*=========================================================================
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifndef vtkContourLabelRepresentation_h
+#define vtkContourLabelRepresentation_h
+
+#include "vtkContourLabelPluginModule.h" // export macro
+#include "vtkNew.h"                      // vtkNew
+#include "vtkPVDataRepresentation.h"
+
+class vtkPolyData;
+class vtkLabeledContourMapper;
+class vtkPVLODActor;
+class vtkScalarsToColors;
+class vtkTextProperty;
+
+/**
+ * @class   vtkContourLabelRepresentation
+ * @brief   Provide labelling capabilities for polydata datasets that represent lines.
+ *
+ * This representation expose the 'vtkLabeledContourMapper' in ParaView.
+ * It uses the information contained in the pipeline informations vector in
+ * order to set which array is displayed.
+ *
+ * The input of this representation needs to be a polydata with only lines inside.
+ * An internal stripper filter will take care of cleaning the dataset.
+ */
+class VTKCONTOURLABELPLUGIN_EXPORT vtkContourLabelRepresentation : public vtkPVDataRepresentation
+{
+public:
+  static vtkContourLabelRepresentation* New();
+  vtkTypeMacro(vtkContourLabelRepresentation, vtkPVDataRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  ///@{
+  /**
+   * Provide vtkPVDataRepresentation specific API implementation for this representation.
+   */
+  int ProcessViewRequest(vtkInformationRequestKey*, vtkInformation*, vtkInformation*) override;
+  void SetVisibility(bool value) override;
+  vtkDataObject* GetRenderedDataObject(int port) override;
+  ///@}
+
+  /**
+   * Return the rendered prop that this representation handle.
+   */
+  vtkPVLODActor* GetActor() { return this->Actor; }
+
+  ///@{
+  /**
+   * Forward rendering parameters to the underlying mapper / actor
+   */
+  virtual void SetAmbientColor(double r, double g, double b);
+  virtual void SetDiffuseColor(double r, double g, double b);
+  virtual void SetLookupTable(vtkScalarsToColors* val);
+  virtual void SetInterpolateScalarsBeforeMapping(bool val);
+  virtual void SetMapScalars(int val);
+  virtual void SetOpacity(float val);
+  virtual void SetLineWidth(float val);
+  virtual void SetRenderLinesAsTubes(bool val);
+  virtual void SetLabelTextProperty(vtkTextProperty* val);
+  virtual void SetSkipDistance(float val);
+  ///@}
+
+protected:
+  vtkContourLabelRepresentation();
+  ~vtkContourLabelRepresentation() override = default;
+
+  ///@{
+  /**
+   * Provide vtkPVDataRepresentation specific API implementation for this representation.
+   */
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  bool AddToView(vtkView* view) override;
+  bool RemoveFromView(vtkView* view) override;
+  ///@}
+
+  /**
+   * Handle the selected array and update how scalars should be rendered.
+   */
+  void UpdateColoringParameters();
+
+private:
+  vtkContourLabelRepresentation(const vtkContourLabelRepresentation&) = delete;
+  void operator=(const vtkContourLabelRepresentation&) = delete;
+
+  double VisibleDataBounds[6]{ 0.0 };
+  vtkNew<vtkPolyData> Cache;
+  vtkNew<vtkPVLODActor> Actor;
+  vtkNew<vtkLabeledContourMapper> Mapper;
+};
+
+#endif
