@@ -78,6 +78,16 @@
    <item row="6" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
      <item>
+      <widget class="QComboBox" name="stylesCombo">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the type of interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="pqAnimatableProxyComboBox" name="proxyCombo">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select an object for interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -91,16 +101,6 @@
       <widget class="pqAnimatablePropertiesComboBox" name="propertyCombo">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the object's property for interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="stylesCombo">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the type of interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
@@ -196,11 +196,15 @@
     </widget>
    </item>
    <item row="9" column="0">
-    <widget class="QLabel" name="debugLabel">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="stylePropertiesLayout">
+      <item>
+        <widget class="QLabel" name="stylePropertiesLabel">
+          <property name="text">
+            <string>TextLabel</string>
+          </property>
+        </widget>
+      </item>
+    </layout>
    </item>
    <item row="7" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -234,7 +238,7 @@
      <item>
       <widget class="QPushButton" name="editStyle">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the selected interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Customize role bindings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Edit...</string>

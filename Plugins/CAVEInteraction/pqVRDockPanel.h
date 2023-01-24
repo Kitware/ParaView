@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqView;
 class QListWidgetItem;
+class vtkObject;
 class vtkSMProxy;
 
 class pqVRDockPanel : public QDockWidget
@@ -68,6 +69,7 @@ private Q_SLOTS:
   void initStyles();
   void updateStyles();
   void editStyle(QListWidgetItem* item = nullptr);
+  void configureStyle(vtkObject*, long unsigned int, void*);
   void updateStyleButtons(int row);
 
   void proxyChanged(vtkSMProxy*);
@@ -83,8 +85,6 @@ private Q_SLOTS:
   void updateStartStopButtonStates();
   void start();
   void stop();
-
-  void updateDebugLabel();
 
 private:
   Q_DISABLE_COPY(pqVRDockPanel)

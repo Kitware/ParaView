@@ -16,6 +16,11 @@ set(style_classes
 
 set(sm_xml_files CAVEInteraction_SM.xml)
 
+if (PARAVIEW_USE_PYTHON)
+  list(APPEND style_classes vtkSMVRPythonInteractorStyleProxy)
+  list(APPEND sm_xml_files CAVEInteraction_SM_Python.xml)
+endif ()
+
 vtk_module_add_module(CAVEInteraction::Styles
   CLASSES ${style_classes})
 

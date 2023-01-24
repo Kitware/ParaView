@@ -98,9 +98,7 @@ void pqVRDockPanel::constructor()
   this->Internals->IsRunning = false;
   this->updateStartStopButtonStates();
 
-  QFont font = this->Internals->debugLabel->font();
-  font.setFamily("Courier");
-  this->Internals->debugLabel->setFont(font);
+  this->Internals->stylePropertiesLabel->hide();
 
   this->Internals->propertyCombo->setCollapseVectors(true);
 
@@ -347,6 +345,9 @@ void pqVRDockPanel::addStyle()
   style->SetControlledProxy(proxy);
   style->SetControlledPropertyName(property.data());
 
+  style->AddObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE, this,
+    &pqVRDockPanel::configureStyle);
+
   pqVRAddStyleDialog dialog(this);
   QString name = this->Internals->createName(style);
   dialog.setInteractorStyle(style, name);
@@ -359,6 +360,20 @@ void pqVRDockPanel::addStyle()
 
   // Clean up reference
   style->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::configureStyle(vtkObject* caller, unsigned long, void*)
+{
+  vtkSMVRInteractorStyleProxy* styleProxy = vtkSMVRInteractorStyleProxy::SafeDownCast(caller);
+
+  pqVRAddStyleDialog dialog(this);
+  QString name = this->Internals->createName(styleProxy);
+  dialog.setInteractorStyle(styleProxy, name);
+  if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
+  {
+    dialog.updateInteractorStyle();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -429,19 +444,26 @@ void pqVRDockPanel::updateStyleButtons(int row)
   this->Internals->editStyle->setEnabled(enabled);
   this->Internals->removeStyle->setEnabled(enabled);
 
+  // Remove the existing proxy widget
+  pqProxyWidget* proxyWidget = this->widget()->findChild<pqProxyWidget*>();
+  if (proxyWidget)
+  {
+    proxyWidget->parentWidget()->layout()->removeWidget(proxyWidget);
+    proxyWidget->deleteLater();
+    this->Internals->stylePropertiesLabel->hide();
+  }
+
   if (enabled)
   {
-    // Remove the existing proxy widget
-    pqProxyWidget* proxyWidget = this->widget()->findChild<pqProxyWidget*>();
-    if (proxyWidget)
-    {
-      proxyWidget->parentWidget()->layout()->removeWidget(proxyWidget);
-      proxyWidget->deleteLater();
-    }
-
     QListWidgetItem* item = this->Internals->stylesTable->currentItem();
     QString name = item->text();
     vtkSMVRInteractorStyleProxy* style = this->Internals->StyleNameMap.value(name, nullptr);
+
+    QString propertiesLabelText = "Properties (";
+    propertiesLabelText.append(name);
+    propertiesLabelText.append("):");
+    this->Internals->stylePropertiesLabel->setText(propertiesLabelText);
+    this->Internals->stylePropertiesLabel->show();
 
     if (!style)
     {
@@ -453,7 +475,11 @@ void pqVRDockPanel::updateStyleButtons(int row)
     proxyWidget = new pqProxyWidget(style, this);
     proxyWidget->setApplyChangesImmediately(true);
     QGridLayout* layout = qobject_cast<QGridLayout*>(this->widget()->layout());
-    layout->addWidget(proxyWidget, 9, 0);
+    QVBoxLayout* propertiesLayout = layout->findChild<QVBoxLayout*>("stylePropertiesLayout");
+    if (propertiesLayout)
+    {
+      propertiesLayout->addWidget(proxyWidget, 9, 0);
+    }
   }
 }
 
@@ -496,22 +522,6 @@ void pqVRDockPanel::setActiveView(pqView* view)
   {
     this->Internals->proxyCombo->addProxy(0, rview->getSMName(), rview->getProxy());
   }
-
-  this->Internals->Camera = nullptr;
-  if (rview)
-  {
-    vtkSMRenderViewProxy* renPxy = rview->getRenderViewProxy();
-    if (renPxy)
-    {
-      this->Internals->Camera = renPxy->GetActiveCamera();
-      if (this->Internals->Camera)
-      {
-        pqCoreUtilities::connect(
-          this->Internals->Camera, vtkCommand::ModifiedEvent, this, SLOT(updateDebugLabel()));
-      }
-    }
-  }
-  this->updateDebugLabel();
 }
 
 //-----------------------------------------------------------------------------
@@ -649,39 +659,6 @@ void pqVRDockPanel::stop()
   this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStartStopButtonStates();
   QApplication::restoreOverrideCursor();
-}
-
-//-----------------------------------------------------------------------------
-void pqVRDockPanel::updateDebugLabel()
-{
-  if (this->Internals->Camera)
-  {
-    double* pos = this->Internals->Camera->GetPosition();
-    QString debugString =
-      QString("Camera position: %1 %2 %3\n").arg(pos[0]).arg(pos[1]).arg(pos[2]);
-    vtkMatrix4x4* mv = this->Internals->Camera->GetModelViewTransformMatrix();
-    debugString += "ModelView Matrix:\n";
-    for (int i = 0; i < 4; ++i)
-    {
-      double e0 = mv->GetElement(i, 0);
-      double e1 = mv->GetElement(i, 1);
-      double e2 = mv->GetElement(i, 2);
-      double e3 = mv->GetElement(i, 3);
-      debugString += QString("%1 %2 %3 %4\n")
-                       .arg(fabs(e0) < 1e-5 ? 0.0 : e0, 8, 'g', 3)
-                       .arg(fabs(e1) < 1e-5 ? 0.0 : e1, 8, 'g', 3)
-                       .arg(fabs(e2) < 1e-5 ? 0.0 : e2, 8, 'g', 3)
-                       .arg(fabs(e3) < 1e-5 ? 0.0 : e3, 8, 'g', 3);
-    }
-    // Pop off trailing newline
-    debugString.remove(QRegExp("\n$"));
-    this->Internals->debugLabel->setText(debugString);
-    this->Internals->debugLabel->show();
-  }
-  else
-  {
-    this->Internals->debugLabel->hide();
-  }
 }
 
 //-----------------------------------------------------------------------------

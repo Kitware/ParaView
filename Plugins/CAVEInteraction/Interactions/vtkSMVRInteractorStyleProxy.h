@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkSMVRInteractorStyleProxy_h
 #define vtkSMVRInteractorStyleProxy_h
 
+#include "vtkCommand.h"                 // For UserEvent
 #include "vtkInteractionStylesModule.h" // for export macro
 #include <vtkSMProxy.h>
 
@@ -97,6 +98,14 @@ public:
   std::string GetTrackerRole(const std::string& name);
 
   // Description:
+  // Add a new input role to the interactor style.
+  void AddAnalogRole(const std::string& role);
+  void AddButtonRole(const std::string& role);
+  void AddTrackerRole(const std::string& role);
+
+  void ClearAllRoles();
+
+  // Description:
   // Set/Get the name of the input that fulfills the specified role.
   bool SetAnalogName(const std::string& role, const std::string& name);
   std::string GetAnalogName(const std::string& role);
@@ -109,7 +118,12 @@ public:
   virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
 
   /// Save state to xml.
-  virtual vtkPVXMLElement* SaveConfiguration() const;
+  virtual vtkPVXMLElement* SaveConfiguration();
+
+  enum
+  {
+    INTERACTOR_STYLE_REQUEST_CONFIGURE = vtkCommand::UserEvent + 7370
+  };
 
 protected:
   vtkSMVRInteractorStyleProxy();
@@ -123,12 +137,6 @@ protected:
 
   vtkSMProxy* ControlledProxy;
   char* ControlledPropertyName;
-
-  // Description:
-  // Add a new input role to the interactor style.
-  void AddAnalogRole(const std::string& role);
-  void AddButtonRole(const std::string& role);
-  void AddTrackerRole(const std::string& role);
 
   typedef std::map<std::string, std::string> StringMap;
   StringMap Analogs;
