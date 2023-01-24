@@ -794,6 +794,63 @@ double* vtkPVAxesWidget::GetAxisLabelColor()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetXAxisColor(double r, double g, double b)
+{
+  this->AxesActor->GetXAxisShaftProperty()->SetColor(r, g, b);
+  this->AxesActor->GetXAxisTipProperty()->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetYAxisColor(double r, double g, double b)
+{
+  this->AxesActor->GetYAxisShaftProperty()->SetColor(r, g, b);
+  this->AxesActor->GetYAxisTipProperty()->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetZAxisColor(double r, double g, double b)
+{
+  this->AxesActor->GetZAxisShaftProperty()->SetColor(r, g, b);
+  this->AxesActor->GetZAxisTipProperty()->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetXAxisVisibility(bool vis)
+{
+  this->AxesActor->SetXAxisVisibility(vis);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetYAxisVisibility(bool vis)
+{
+  this->AxesActor->SetYAxisVisibility(vis);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetZAxisVisibility(bool vis)
+{
+  this->AxesActor->SetZAxisVisibility(vis);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetXAxisLabelText(const char* text)
+{
+  this->AxesActor->SetXAxisLabelText(text);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetYAxisLabelText(const char* text)
+{
+  this->AxesActor->SetYAxisLabelText(text);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetZAxisLabelText(const char* text)
+{
+  this->AxesActor->SetZAxisLabelText(text);
+}
+
+//----------------------------------------------------------------------------
 vtkRenderer* vtkPVAxesWidget::GetParentRenderer()
 {
   return this->ParentRenderer;

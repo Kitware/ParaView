@@ -2384,6 +2384,60 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
   this->OrientationWidget->SetOutlineColor(r, g, b);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesXColor(double r, double g, double b)
+{
+  this->OrientationWidget->SetXAxisColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesYColor(double r, double g, double b)
+{
+  this->OrientationWidget->SetYAxisColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesZColor(double r, double g, double b)
+{
+  this->OrientationWidget->SetZAxisColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesXVisibility(bool vis)
+{
+  this->OrientationWidget->SetXAxisVisibility(vis);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesYVisibility(bool vis)
+{
+  this->OrientationWidget->SetYAxisVisibility(vis);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesZVisibility(bool vis)
+{
+  this->OrientationWidget->SetZAxisVisibility(vis);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesXLabelText(const char* text)
+{
+  this->OrientationWidget->SetXAxisLabelText(text);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesYLabelText(const char* text)
+{
+  this->OrientationWidget->SetYAxisLabelText(text);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesZLabelText(const char* text)
+{
+  this->OrientationWidget->SetZAxisLabelText(text);
+}
+
 //*****************************************************************
 // Forwarded to camera orientation widget.
 //----------------------------------------------------------------------------

@@ -116,6 +116,23 @@ public:
   double* GetViewport();
   ///@}
 
+  ///@{
+  /**
+   * Set the color and visibility of each individual axis.
+   */
+  void SetXAxisColor(double r, double g, double b);
+  void SetYAxisColor(double r, double g, double b);
+  void SetZAxisColor(double r, double g, double b);
+
+  void SetXAxisVisibility(bool vis);
+  void SetYAxisVisibility(bool vis);
+  void SetZAxisVisibility(bool vis);
+
+  void SetXAxisLabelText(const char* text);
+  void SetYAxisLabelText(const char* text);
+  void SetZAxisLabelText(const char* text);
+  ///@}
+
 protected:
   vtkPVAxesWidget();
   ~vtkPVAxesWidget() override;

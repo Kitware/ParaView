@@ -604,7 +604,7 @@ public:
   vtkSetMacro(UpdateAnnotation, bool);
   ///@}
 
-  ///@{}
+  ///@{
   /**
    * Set color of annotation text for developers
    */
@@ -616,31 +616,56 @@ public:
    */
   virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
 
-  //*****************************************************************
-  // Forwarded to orientation axes widget.
+  ///@{
+  /**
+   * Forwarded to orientation axes widget.
+   */
   virtual void SetOrientationAxesInteractivity(bool);
   virtual void SetOrientationAxesVisibility(bool);
+
   void SetOrientationAxesLabelColor(double r, double g, double b);
   void SetOrientationAxesOutlineColor(double r, double g, double b);
 
-  //*****************************************************************
-  // Forwarded to camera orientation widget.
+  void SetOrientationAxesXColor(double r, double g, double b);
+  void SetOrientationAxesYColor(double r, double g, double b);
+  void SetOrientationAxesZColor(double r, double g, double b);
+
+  void SetOrientationAxesXVisibility(bool vis);
+  void SetOrientationAxesYVisibility(bool vis);
+  void SetOrientationAxesZVisibility(bool vis);
+
+  void SetOrientationAxesXLabelText(const char* text);
+  void SetOrientationAxesYLabelText(const char* text);
+  void SetOrientationAxesZLabelText(const char* text);
+  ///@}
+
+  ///@{
+  /**
+   * Forwarded to camera orientation widget.
+   */
   void SetCameraOrientationWidgetVisibility(bool visible);
   void SetCameraOrientationWidgetSize(int size);
   void SetCameraOrientationWidgetPadding(int padding[2]);
   void SetCameraOrientationWidgetAnchor(int anchor);
+  ///@}
 
-  //*****************************************************************
-  // Forwarded to center axes.
+  /**
+   * Forwarded to center axes.
+   */
   virtual void SetCenterAxesVisibility(bool);
 
-  //*****************************************************************
-  // Forward to vtkPVInteractorStyle instances.
+  ///@{
+  /**
+   * Forward to vtkPVInteractorStyle instances.
+   */
   virtual void SetCenterOfRotation(double x, double y, double z);
   virtual void SetRotationFactor(double factor);
+  ///@}
 
-  //*****************************************************************
-  // Forward to vtkLightKit.
+  ///@{
+  /**
+   * Forward to vtkLightKit.
+   */
   void SetKeyLightWarmth(double val);
   void SetKeyLightIntensity(double val);
   void SetKeyLightElevation(double val);
@@ -656,14 +681,18 @@ public:
   void SetHeadLightWarmth(double val);
   void SetKeyToHeadRatio(double val);
   void SetMaintainLuminance(int val);
+  ///@}
 
-  //*****************************************************************
-  // Forward to 3D renderer.
+  ///@{
+  /**
+   * Forward to 3D renderer.
+   */
   vtkSetMacro(UseHiddenLineRemoval, bool);
   virtual void SetUseDepthPeeling(int val);
   virtual void SetUseDepthPeelingForVolumes(bool val);
   virtual void SetMaximumNumberOfPeels(int val);
   virtual void SetBackgroundTexture(vtkTexture* val);
+  ///@}
 
   ///@{
   /**
@@ -686,6 +715,8 @@ public:
   ///@{
   /**
    * API for background color selection.
+   *
+   * @see BackgroundMode
    */
   vtkSetClampMacro(BackgroundColorMode, int, DEFAULT, STEREO_SKYBOX);
   vtkSetVector3Macro(Background, double);
@@ -695,22 +726,30 @@ public:
   vtkSetMacro(UseEnvironmentLighting, bool);
   ///@}
 
-  //*****************************************************************
-  // Entry point for environmental backgrounds
+  ///@{
+  /**
+   * Entry point for environmental backgrounds
+   */
   virtual void SetEnvironmentalBG(double r, double g, double b);
   virtual void SetEnvironmentalBG2(double r, double g, double b);
   virtual void SetEnvironmentalBGTexture(vtkTexture* val);
   virtual void SetGradientEnvironmentalBG(int val);
   virtual void SetTexturedEnvironmentalBG(int val);
   virtual void SetBackgroundMode(int val);
+  ///@}
 
-  //*****************************************************************
-  // Entry point for dynamic lights
+  ///@{
+  /**
+   * Entry point for dynamic lights
+   */
   void AddLight(vtkLight*);
   void RemoveLight(vtkLight*);
+  ///@}
 
-  //*****************************************************************
-  // Forward to vtkRenderWindow.
+  ///@{
+  /**
+   * Forward to vtkRenderWindow.
+   */
   void SetStereoCapableWindow(int val);
   void SetStereoRender(int val);
   vtkSetMacro(StereoType, int);
@@ -718,13 +757,17 @@ public:
   void SetMultiSamples(int val);
   void SetAlphaBitPlanes(int val);
   void SetStencilCapable(int val);
+  ///@}
 
-  //*****************************************************************
-  // Forward to vtkCamera.
+  /**
+   * Forward to vtkCamera.
+   */
   void SetParallelProjection(int mode);
 
-  //*****************************************************************
-  // Forwarded to vtkPVInteractorStyle if present on local processes.
+  ///@{
+  /**
+   * Forwarded to vtkPVInteractorStyle if present on local processes.
+   */
   virtual void SetCamera2DManipulators(const int manipulators[9]);
   virtual void SetCamera3DManipulators(const int manipulators[9]);
   void SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9]);
@@ -732,6 +775,7 @@ public:
   virtual void SetMouseWheelZoomsToCursor(bool value);
   virtual void SetCamera2DMouseWheelMotionFactor(double factor);
   virtual void SetCamera3DMouseWheelMotionFactor(double factor);
+  ///@}
 
   /**
    * Overridden to synchronize information among processes whenever data

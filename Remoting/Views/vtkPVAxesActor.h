@@ -220,6 +220,18 @@ public:
   vtkProperty* GetZAxisLabelProperty();
   ///@}
 
+  ///@{
+  /**
+   * Get/Set the visibitity for each individual axis.
+   */
+  vtkSetMacro(XAxisVisibility, bool);
+  vtkGetMacro(XAxisVisibility, bool);
+  vtkSetMacro(YAxisVisibility, bool);
+  vtkGetMacro(YAxisVisibility, bool);
+  vtkSetMacro(ZAxisVisibility, bool);
+  vtkGetMacro(ZAxisVisibility, bool);
+  ///@{
+
   //
   ///@{
   /**
@@ -296,6 +308,10 @@ protected:
   float XAxisLabelPosition;
   float YAxisLabelPosition;
   float ZAxisLabelPosition;
+
+  bool XAxisVisibility = true;
+  bool YAxisVisibility = true;
+  bool ZAxisVisibility = true;
 
 private:
   vtkPVAxesActor(const vtkPVAxesActor&) = delete;
