@@ -16,7 +16,8 @@ dnf install -y --setopt=install_weak_deps=False \
 
 # Qt dependencies
 dnf install -y --setopt=install_weak_deps=False \
-    qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel qt5-qtmultimedia-devel
+    qt5-qtbase-devel qt5-qtbase-private-devel qt5-qttools-devel qt5-qtsvg-devel \
+    qt5-qtxmlpatterns-devel qt5-qtmultimedia-devel
 
 # GNOME theme requirements
 dnf install -y --setopt=install_weak_deps=False \
