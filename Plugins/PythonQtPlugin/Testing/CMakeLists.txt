@@ -1,15 +1,14 @@
-find_package(Python3 QUIET REQUIRED COMPONENTS Interpreter)
+set(TEST_ROOT ${CMAKE_BINARY_DIR}/Testing/Temporary)
 
-set(decorator_file "${CMAKE_CURRENT_BINARY_DIR}/pqPluginDecorators.h")
+configure_file(
+  TestButtonPythonQt.py
+  ${TEST_ROOT}/TestButtonPythonQt.py COPYONLY)
+configure_file(
+  ResetCameraPythonQt.py
+  ${TEST_ROOT}/ResetCameraPythonQt.py COPYONLY)
 
-add_custom_command(
-  OUTPUT ${decorator_file}
-  COMMAND Python3::Interpreter
-          "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py"
-          -i "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
-          -o "${decorator_file}"
-          --class-prefixes vtk pq
-          --qt-class-prefixes pq
-          --module-name paraview
-  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
-          "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py")
+paraview_add_client_tests(
+  LOAD_PLUGIN "PythonQtPlugin"
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+  TEST_SCRIPTS "TestPythonQt.xml"
+)

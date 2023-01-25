@@ -3,6 +3,8 @@ find_package(Qt5 QUIET REQUIRED COMPONENTS Widgets)
 list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+find_package("Python3" QUIET REQUIRED COMPONENTS Interpreter)
+
 find_package(PythonQt QUIET REQUIRED)
 
 set(decorator_file "${CMAKE_CURRENT_BINARY_DIR}/pqPluginDecorators.h")
@@ -53,8 +55,6 @@ target_compile_definitions(PythonQtPlugin PRIVATE
 target_include_directories(PythonQtPlugin
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-find_package("Python3" QUIET REQUIRED COMPONENTS Interpreter)
-
 add_custom_command(
   OUTPUT  "${decorator_file}"
   COMMAND "$<TARGET_FILE:Python3::Interpreter>"
@@ -66,3 +66,7 @@ add_custom_command(
           --module-name paraview
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
           "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py")
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()
