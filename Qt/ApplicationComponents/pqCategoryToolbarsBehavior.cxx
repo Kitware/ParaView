@@ -48,7 +48,7 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
 void pqCategoryToolbarsBehavior::updateToolbars()
 {
   QStringList toolbarCategories = this->MenuManager->getToolbarCategories();
-  Q_FOREACH (QString category, toolbarCategories)
+  for (const QString& category : toolbarCategories)
   {
     QToolBar* toolbar = this->MainWindow->findChild<QToolBar*>(category);
     if (!toolbar)
@@ -84,7 +84,7 @@ void pqCategoryToolbarsBehavior::updateToolbars()
 
 void pqCategoryToolbarsBehavior::prepareForTest()
 {
-  Q_FOREACH (QAction* toolbar, this->ToolbarsToHide)
+  for (QAction* toolbar : this->ToolbarsToHide)
   {
     if (toolbar && toolbar->isChecked())
     {

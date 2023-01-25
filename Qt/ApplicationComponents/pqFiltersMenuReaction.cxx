@@ -161,7 +161,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   {
     actionsList = mgr->actions();
   }
-  Q_FOREACH (QAction* action, actionsList)
+  for (QAction* action : actionsList)
   {
     vtkSMProxy* prototype = mgr->getPrototype(action);
     if (!prototype || !enabled)
@@ -343,7 +343,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
     vtkSMPropertyHelper helper(filterProxy, inputPortNames[0]);
     helper.RemoveAllValues();
 
-    Q_FOREACH (pqOutputPort* outputPort, selectedOutputPorts)
+    for (pqOutputPort* outputPort : selectedOutputPorts)
     {
       helper.Add(outputPort->getSource()->getProxy(), outputPort->getPortNumber());
     }

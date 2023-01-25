@@ -336,7 +336,7 @@ void pqProxyGroupMenuManager::loadRecentlyUsedItems()
   {
     QString list = settings->value(key).toString();
     QStringList parts = list.split("|", PV_QT_SKIP_EMPTY_PARTS);
-    Q_FOREACH (QString part, parts)
+    for (const QString& part : parts)
     {
       QStringList pieces = part.split(";", PV_QT_SKIP_EMPTY_PARTS);
       if (pieces.size() == 2)
@@ -506,7 +506,7 @@ void pqProxyGroupMenuManager::populateMenu()
   QMenu* _menu = this->menu();
 
   QList<QAction*> menuActions = _menu->actions();
-  Q_FOREACH (QAction* action, menuActions)
+  for (QAction* action : menuActions)
   {
     QObject::disconnect(action, nullptr, this, nullptr);
   }
@@ -517,7 +517,7 @@ void pqProxyGroupMenuManager::populateMenu()
   }
 
   QList<QMenu*> submenus = _menu->findChildren<QMenu*>(QString(), Qt::FindDirectChildrenOnly);
-  Q_FOREACH (QMenu* submenu, submenus)
+  for (QMenu* submenu : submenus)
   {
     delete submenu;
   }
@@ -571,7 +571,7 @@ void pqProxyGroupMenuManager::populateMenu()
 
   // Now sort all actions added in temp based on their texts.
   std::sort(someActions.begin(), someActions.end(), ::actionTextSort);
-  Q_FOREACH (QAction* action, someActions)
+  for (QAction* action : someActions)
   {
     alphabeticalMenu->addAction(action);
   }
@@ -585,7 +585,7 @@ void pqProxyGroupMenuManager::populateMenu()
     {
       QMenu* categoryMenu = _menu->addMenu(categoryIter.value().Label)
         << pqSetName(categoryIter.key());
-      Q_FOREACH (QAction* action, action_list)
+      for (QAction* action : action_list)
       {
         categoryMenu->addAction(action);
       }
@@ -838,8 +838,7 @@ QList<QAction*> pqProxyGroupMenuManager::actionsInToolbars()
     pqInternal::CategoryInfo& category = categoryIter.value();
     if (category.ShowInToolbar)
     {
-      QPair<QString, QString> pname;
-      Q_FOREACH (pname, category.Proxies)
+      for (auto pname : category.Proxies)
       {
         QAction* action = this->getAction(pname.first, pname.second);
         if (action)
@@ -892,7 +891,7 @@ void pqProxyGroupMenuManager::removeProxyDefinitionUpdateListener(const QString&
 void pqProxyGroupMenuManager::removeProxyDefinitionUpdateObservers()
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  Q_FOREACH (unsigned long callbackID, this->Internal->CallBackIDs)
+  for (unsigned long callbackID : this->Internal->CallBackIDs)
   {
     pxm->RemoveObserver(callbackID);
   }
@@ -933,7 +932,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   // Setup definition iterator
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
   iter.TakeReference(pxdm->NewIterator());
-  Q_FOREACH (QString groupName, this->Internal->ProxyDefinitionGroupToListen)
+  for (const QString& groupName : this->Internal->ProxyDefinitionGroupToListen)
   {
     iter->AddTraversalGroupName(groupName.toUtf8().data());
   }
@@ -1001,7 +1000,7 @@ void pqProxyGroupMenuManager::switchActiveServer()
 
     // Clear the QuickSearch QAction pool...
     QList<QAction*> action_list = this->Internal->Widget.actions();
-    Q_FOREACH (QAction* action, action_list)
+    for (QAction* action : action_list)
     {
       this->Internal->Widget.removeAction(action);
     }
