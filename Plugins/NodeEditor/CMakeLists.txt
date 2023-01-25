@@ -11,6 +11,12 @@ list(APPEND sources
   pqNodeEditorUtils.cxx
   pqNodeEditorNode.h
   pqNodeEditorNode.cxx
+  pqNodeEditorNSource.h
+  pqNodeEditorNSource.cxx
+  pqNodeEditorNRepresentation.h
+  pqNodeEditorNRepresentation.cxx
+  pqNodeEditorNView.h
+  pqNodeEditorNView.cxx
   pqNodeEditorPort.h
   pqNodeEditorPort.cxx
   pqNodeEditorEdge.h

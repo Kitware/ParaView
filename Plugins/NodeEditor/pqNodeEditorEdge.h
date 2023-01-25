@@ -25,7 +25,6 @@
 #include <QGraphicsPathItem>
 
 class pqNodeEditorNode;
-class QGraphicsScene;
 
 /**
  * Every instance of this class corresponds to an edge between an output port
@@ -54,7 +53,7 @@ public:
    * The edge is created and added into the specified @c scene.
    * One can also set its type and parent.
    */
-  pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* producer, int producerOutputPortIdx,
+  pqNodeEditorEdge(pqNodeEditorNode* producer, int producerOutputPortIdx,
     pqNodeEditorNode* consumer, int consumerInputPortIdx, Type type = Type::PIPELINE,
     QGraphicsItem* parent = nullptr);
 
@@ -92,7 +91,7 @@ public:
    */
   std::string toString();
 
-public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Recompute the points where the edge should pass by.
    * Should be called whenever one of the port the edge is attached to move.
@@ -104,8 +103,6 @@ protected:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
-  QGraphicsScene* scene;
-
   Type type{ Type::PIPELINE };
   QPointF oPoint;
   QPointF cPoint;

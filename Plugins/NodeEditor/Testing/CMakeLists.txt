@@ -1,4 +1,6 @@
 if (BUILD_SHARED_LIBS)
+  set (TestNodeEditorInterface_FORCE_SERIAL TRUE)
+
   paraview_add_client_tests(
     LOAD_PLUGIN "NodeEditor"
     BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"

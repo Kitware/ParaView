@@ -16,3 +16,9 @@ To select an annotation and make the description visible and editable, Ctrl-Clic
 To delete the annotation, hit Ctrl-N when the annotation is selected.
 
 ![node editor annotation example](node-editor-annotation.png)
+
+### Representation nodes
+
+It's now possible to control the display properties of a representation using the node editor.
+These nodes are only visible when the object itself is visible. They are also hidden if the
+option `View Nodes` is disabled.

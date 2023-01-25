@@ -39,6 +39,7 @@ class pqPipelineFilter;
 class pqPipelineSource;
 class pqOutputPort;
 class pqView;
+class pqRepresentation;
 
 class QAction;
 class QCheckBox;
@@ -76,7 +77,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Update style for the view nodes.
    */
-  int updateActiveView();
+  int updateActiveView(pqView* view = nullptr);
 
   /**
    * Update style for ports and sources according to the current selection and active objects.
@@ -84,17 +85,14 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   int updateActiveSourcesAndPorts();
 
   /**
-   * Sets the style of ports.
-   */
-  int updatePortStyles();
-
-  /**
    * Toggle the visibility of the given output port int the active view.
+   * if exclusive == true then only the given port will be shown.
    */
-  int toggleInActiveView(pqOutputPort* port);
+  int toggleInActiveView(pqOutputPort* port, bool exclusive = false);
 
   /**
    * Hide every actors in the active view
+   *
    */
   int hideAllInActiveView();
 
@@ -110,8 +108,15 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   int createNodeForSource(pqPipelineSource* proxy);
   int createNodeForView(pqView* proxy);
+  int createNodeForRepresentation(pqRepresentation* repr);
   int removeNode(pqProxy* proxy);
   ///@}
+
+  /**
+   * Show/Hide view and representation nodes and edges according to `showViewNodes` and
+   * the visibility of the representation.
+   */
+  void toggleViewNodesVisibility();
 
   /**
    * Given a consumer, set its input port @c idx to be connected with the
@@ -123,11 +128,6 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Given a proxy, remove every edges connected to its input ports. Only affects the UI.
    */
   int removeIncomingEdges(pqProxy* proxy);
-
-  /**
-   * Rebuild every input edges of a given view proxy.
-   */
-  int updateVisibilityEdges(pqView* proxy);
 
   /**
    * Rebuild every input edge of a given source proxy.
@@ -152,18 +152,31 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void annotateNodes(bool del);
 
-protected:
-  void initializeNode(pqNodeEditorNode* node, vtkIdType id);
+protected: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * Register a specific node in the scene and other internals structures.
+   */
+  void registerNode(pqNodeEditorNode* node, vtkIdType id);
 
   int initializeActions();
   int initializeSignals();
   int createToolbar(QLayout* layout);
   int attachServerManagerListeners();
 
-  // Construct the absolute path to the layout file using this->processedStateFile
-  // Returns an empty string if processedStateFile is empty.
-  // This function assume processedStateFile is a valid path (even though the actual file may not
-  // exist)
+  /**
+   * Set the visibility of a specified port. It implements 3 behaviors :
+   * vis == 0: hide the port
+   * vis  > 0: show the port
+   * vis  < 0: toggle the visibility of the port
+   */
+  void setPortVisibility(pqOutputPort* port, pqView* view, int vis);
+
+  /**
+   * Construct the absolute path to the layout file using this->processedStateFile
+   * Returns an empty string if processedStateFile is empty.
+   * This function assume processedStateFile is a valid path (even though the actual file may not
+   * exist)
+   */
   QString constructLayoutFilename() const;
 
 private:
