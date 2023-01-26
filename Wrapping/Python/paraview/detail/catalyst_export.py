@@ -24,7 +24,10 @@ def _get_catalyst_state(options):
 def _get_catalyst_preamble(options):
     """returns the preamble text"""
     return ["# script-version: 2.0",
-            "# Catalyst state generated using %s" % simple.GetParaViewSourceVersion()]
+            "# Catalyst state generated using %s" % simple.GetParaViewSourceVersion(),
+            "import paraview",
+            "paraview.compatibility.major = %d" % servermanager.vtkSMProxyManager.GetVersionMajor(),
+            "paraview.compatibility.minor = %d" % servermanager.vtkSMProxyManager.GetVersionMinor()]
 
 def _get_catalyst_postamble(options):
     """returns the postamble text"""
