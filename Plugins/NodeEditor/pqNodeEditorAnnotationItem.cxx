@@ -128,7 +128,7 @@ void pqNodeEditorAnnotationItem::paint(QPainter* painter, const QStyleOptionGrap
   {
     background = pqNodeEditorUtils::CONSTS::COLOR_GRID;
     background.setAlphaF(0.2);
-    this->setZValue(1);
+    this->setZValue(pqNodeEditorUtils::CONSTS::ANNOTATION_LAYER);
   }
 
   QPen pen(pqNodeEditorUtils::CONSTS::COLOR_CONSTRAST, pqNodeEditorUtils::CONSTS::EDGE_WIDTH - 1);

@@ -282,31 +282,33 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
   toolbar->setObjectName("toolbar");
   layout->addWidget(toolbar);
 
-  auto toolbarLayout = new QHBoxLayout;
-  toolbarLayout->setObjectName("HLayout");
+  auto toolbarLayout = new QGridLayout;
+  toolbarLayout->setObjectName("GLayout");
   toolbar->setLayout(toolbarLayout);
 
-  auto addButton = [=](QString label, QAction* action) {
+  auto addButton = [=](QString label, QAction* action, int row, int col) {
     auto button = new QPushButton(label);
     button->setObjectName(label.simplified().remove(' ') + "Button");
     this->connect(button, &QPushButton::released, action, &QAction::trigger);
-    toolbarLayout->addWidget(button);
+    toolbarLayout->addWidget(button, row, col);
     return 1;
   };
 
-  auto addSeparator = [toolbarLayout]() {
-    const auto separator = new QFrame();
-    separator->setFrameShape(QFrame::VLine);
-    separator->setFrameShadow(QFrame::Sunken);
-    toolbarLayout->addWidget(separator);
-    return 1;
-  };
+  addButton(tr("Apply"), this->actionApply, 0, 0);
+  addButton(tr("Reset"), this->actionReset, 1, 0);
 
-  addButton(tr("Apply"), this->actionApply);
-  addButton(tr("Reset"), this->actionReset);
-  addSeparator();
+  addButton(tr("Verbosity"), this->actionCycleNodeVerbosity, 0, 1);
+  { // add checkbox view nodes
+    auto checkBox = new QCheckBox(tr("View Nodes"));
+    checkBox->setObjectName("ViewNodesCheckbox");
+    checkBox->setCheckState(this->showViewNodes ? Qt::Checked : Qt::Unchecked);
+    this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
+      this->showViewNodes = state;
+      this->toggleViewNodesVisibility();
+    });
+    toolbarLayout->addWidget(checkBox, 1, 1);
+  }
 
-  addButton(tr("Zoom"), this->actionZoom);
   { // addButton "Layout"
     auto button = new QPushButton(tr("Layout"));
     button->setObjectName("LayoutButton");
@@ -314,7 +316,7 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
       this->actionLayout->trigger();
       this->actionZoom->trigger();
     });
-    toolbarLayout->addWidget(button);
+    toolbarLayout->addWidget(button, 0, 2);
   };
   { // add checkbox auto layout
     auto checkBox = new QCheckBox(tr("Auto Layout"));
@@ -325,26 +327,11 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
       this->actionAutoLayout->trigger();
       return 1;
     });
-    toolbarLayout->addWidget(checkBox);
+    toolbarLayout->addWidget(checkBox, 1, 2);
 
     this->autoLayoutCheckbox = checkBox;
   }
-  addSeparator();
-
-  addButton(tr("Cycle Verbosity"), this->actionCycleNodeVerbosity);
-  { // add checkbox view nodes
-    auto checkBox = new QCheckBox(tr("View Nodes"));
-    checkBox->setObjectName("ViewNodesCheckbox");
-    checkBox->setCheckState(this->showViewNodes ? Qt::Checked : Qt::Unchecked);
-    this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
-      this->showViewNodes = state;
-      this->toggleViewNodesVisibility();
-    });
-    toolbarLayout->addWidget(checkBox);
-  }
-
-  // add spacer
-  toolbarLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+  addButton(tr("Zoom"), this->actionZoom, 0, 3);
 
   return 1;
 }
@@ -675,18 +662,32 @@ int pqNodeEditorWidget::createNodeForRepresentation(pqRepresentation* createdRep
   // Create edges related to this representation
   auto* sourcePort = repr->getOutputPortFromInput();
   auto* sourceNode = this->nodeRegistry.at(pqNodeEditorUtils::getID(sourcePort->getSource()));
-  auto* sourceToRepr = new pqNodeEditorEdge(
+  auto* sourceToReprMain = new pqNodeEditorEdge(
     sourceNode, sourcePort->getPortNumber(), reprNode, 0, pqNodeEditorEdge::Type::VIEW);
-  sourceToRepr->setVisible(showNodes);
-  this->scene->addItem(sourceToRepr);
-  this->edgeRegistry.at(repId) = { sourceToRepr };
+  sourceToReprMain->setVisible(showNodes);
+  auto* sourceToReprAux = new pqNodeEditorEdge(
+    sourceNode, sourcePort->getPortNumber(), reprNode, 0, pqNodeEditorEdge::Type::VIEW);
+  sourceToReprAux->setVisible(showNodes);
+  sourceToReprAux->setOpacity(0.5);
+  sourceToReprAux->setLayer(9);
+  this->scene->addItem(sourceToReprMain);
+  this->scene->addItem(sourceToReprAux);
+  this->edgeRegistry.at(repId) = { sourceToReprMain, sourceToReprAux };
 
   const auto viewId = pqNodeEditorUtils::getID(repr->getView());
   auto* viewNode = this->nodeRegistry.at(viewId);
-  auto* reprToView = new pqNodeEditorEdge(reprNode, 0, viewNode, 0, pqNodeEditorEdge::Type::VIEW);
-  reprToView->setVisible(showNodes);
-  this->scene->addItem(reprToView);
-  this->edgeRegistry.at(viewId).emplace_back(reprToView);
+  auto* reprToViewMain =
+    new pqNodeEditorEdge(reprNode, 0, viewNode, 0, pqNodeEditorEdge::Type::VIEW);
+  reprToViewMain->setVisible(showNodes);
+  auto* reprToViewAux =
+    new pqNodeEditorEdge(reprNode, 0, viewNode, 0, pqNodeEditorEdge::Type::VIEW);
+  reprToViewAux->setVisible(showNodes);
+  reprToViewAux->setOpacity(0.5);
+  reprToViewAux->setLayer(9);
+  this->scene->addItem(reprToViewMain);
+  this->scene->addItem(reprToViewAux);
+  this->edgeRegistry.at(viewId).emplace_back(reprToViewMain);
+  this->edgeRegistry.at(viewId).emplace_back(reprToViewAux);
 
   // Make sure to hide those when the representation is not visible anymore
   // XXX: `this` as third argument here is MANDATORY so we're sure that it is not deleted
@@ -694,7 +695,8 @@ int pqNodeEditorWidget::createNodeForRepresentation(pqRepresentation* createdRep
   QObject::connect(repr, &pqRepresentation::visibilityChanged, this, [=](bool visible) {
     if (this->edgeRegistry.count(repId) > 0)
     {
-      sourceToRepr->setVisible(visible && this->showViewNodes);
+      sourceToReprMain->setVisible(visible && this->showViewNodes);
+      sourceToReprAux->setVisible(visible && this->showViewNodes);
     }
     if (this->nodeRegistry.count(repId) > 0)
     {
@@ -702,7 +704,8 @@ int pqNodeEditorWidget::createNodeForRepresentation(pqRepresentation* createdRep
     }
     if (this->edgeRegistry.count(viewId) > 0)
     {
-      reprToView->setVisible(visible && this->showViewNodes);
+      reprToViewMain->setVisible(visible && this->showViewNodes);
+      reprToViewAux->setVisible(visible && this->showViewNodes);
     }
   });
 
@@ -934,10 +937,16 @@ int pqNodeEditorWidget::updatePipelineEdges(pqPipelineFilter* consumer)
       }
 
       // create edge
-      auto* edge = new pqNodeEditorEdge(
+      auto* edgeMain = new pqNodeEditorEdge(
         producerIt->second, producerPort->getPortNumber(), consumerIt->second, iPortIdx);
-      this->scene->addItem(edge);
-      consumerEdgesIt->second.push_back(edge);
+      this->scene->addItem(edgeMain);
+      auto* edgeAux = new pqNodeEditorEdge(
+        producerIt->second, producerPort->getPortNumber(), consumerIt->second, iPortIdx);
+      edgeAux->setOpacity(0.5);
+      edgeAux->setLayer(9);
+      this->scene->addItem(edgeAux);
+      consumerEdgesIt->second.push_back(edgeMain);
+      consumerEdgesIt->second.push_back(edgeAux);
     }
   }
 

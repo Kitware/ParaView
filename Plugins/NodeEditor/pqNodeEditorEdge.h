@@ -22,6 +22,7 @@
 #ifndef pqNodeEditorEdge_h
 #define pqNodeEditorEdge_h
 
+#include "pqNodeEditorUtils.h"
 #include <QGraphicsPathItem>
 
 class pqNodeEditorNode;
@@ -86,6 +87,19 @@ public:
   int getConsumerInputPortIdx() { return this->consumerInputPortIdx; };
   ///@}
 
+  ///@{
+  /*
+   * Get the layer of this edges, used to discriminate between
+   * seveal overlapping edges (different line above boxed)
+   */
+  void setLayer(int l)
+  {
+    this->layer = l;
+    this->setZValue(this->layer * pqNodeEditorUtils::CONSTS::EDGE_LAYER);
+  };
+  int getLayer() { return this->layer; };
+  ///@}
+
   /*
    * Get edge information as string.
    */
@@ -113,6 +127,8 @@ private:
   int producerOutputPortIdx;
   pqNodeEditorNode* consumer;
   int consumerInputPortIdx;
+
+  int layer; // for display purpose, we draw several overlapping edges.
 };
 
 #endif // pqNodeEditorEdge_h

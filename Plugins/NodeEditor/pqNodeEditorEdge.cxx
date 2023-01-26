@@ -45,6 +45,7 @@ pqNodeEditorEdge::pqNodeEditorEdge(pqNodeEditorNode* producerNode, int outputPor
   , producerOutputPortIdx(outputPortIdx)
   , consumer(consumerNode)
   , consumerInputPortIdx(inputPortIdx)
+  , layer(1)
 {
   this->connect(
     this->producer, &pqNodeEditorNode::nodeMoved, this, &pqNodeEditorEdge::updatePoints);
@@ -56,8 +57,7 @@ pqNodeEditorEdge::pqNodeEditorEdge(pqNodeEditorNode* producerNode, int outputPor
     this->consumer, &pqNodeEditorNode::nodeResized, this, &pqNodeEditorEdge::updatePoints);
 
   this->setAcceptedMouseButtons(Qt::NoButton);
-  this->setZValue(type != Type::PIPELINE ? pqNodeEditorUtils::CONSTS::FOREGROUND_LAYER
-                                         : pqNodeEditorUtils::CONSTS::EDGE_LAYER);
+  this->setZValue(pqNodeEditorUtils::CONSTS::EDGE_LAYER);
 
   this->updatePoints();
 }
