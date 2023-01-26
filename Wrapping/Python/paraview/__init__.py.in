@@ -123,10 +123,20 @@ class _version(object):
         return self.__version <= self._convert(other).__version
 
     def __eq__(self, other):
-        raise RuntimeError("Equal operation not supported.")
+         """This will always return True if compatibility is not being forced to
+         a particular version"""
+         if not self:
+               return True
+
+         return self.__version == self._convert(other).__version
 
     def __ne__(self, other):
-        raise RuntimeError("NotEqual operation not supported.")
+         """This will always return False if compatibility is not being forced to
+         a particular version"""
+         if not self:
+               return False
+
+         return self.__version != self._convert(other).__version
 
     def __gt__(self, other):
         """This will always return True if compatibility is not being forced to
