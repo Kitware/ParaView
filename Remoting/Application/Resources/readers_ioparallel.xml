@@ -355,6 +355,30 @@
     </SourceProxy>
     <!-- End of OpenFOAM Reader -->
 
+    <!-- Beginning of Nek5000Reader -->
+    <SourceProxy class="vtkNek5000Reader"
+                 name="Nek5000Reader">
+      <Documentation long_help="Reads Nek5000 data files, producing an unstructured grid dataset."
+                     short_help="Read Nek5000 data files.">The Nek5000 reader
+                     reads Nek5000 data files and outputs an unstructured grid
+                     dataset. This is a distributed reader.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+       <ReaderFactory extensions="nek3d nek2d nek5d nek5000 nek"
+                      file_description="Nek5000 Files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of Nek5000Reader -->
+
     <!-- ================================================================== -->
     <SourceProxy class="vtkMultiBlockPLOT3DReader"
                  label="PLOT3D Reader"
