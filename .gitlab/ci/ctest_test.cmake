@@ -85,6 +85,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21657
     "^pv\\.StreamLinesRepresentationColor$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
+    "\\.ComparativeViewOverlay$"
     )
 endif ()
 
