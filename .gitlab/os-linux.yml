@@ -175,7 +175,13 @@
     stage: test
 
     script:
-        - echo "Forwarding translation artifacts"
+        - echo "Pushing translation artifacts"
+        - git config --global user.email "kwrobot+paraview-ci@kitware.com"
+        - git config --global user.name "gitlab-ci"
+        - git clone https://token:$PARAVIEW_TRANSLATIONS_TOKEN@gitlab.kitware.com/paraview/paraview-translations.git
+        - cmake -DNEW_TRANSLATIONS_DIR=./translations -DTRANSLATIONS_DIR=./paraview-translations/en_US/ -P .gitlab/ci/update_translations.cmake
+        - cd paraview-translations
+        - if [ -n "$( git status -s )" ]; then git add -A; git commit -m "New strings from $CI_COMMIT_SHORT_SHA"; git push; else echo "No new string to push to paraview-translations for $CI_COMMIT_SHORT_SHA"; fi
 
     interruptible: true
 
