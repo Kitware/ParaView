@@ -19,7 +19,7 @@
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Node Editor" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ZoomButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/LayoutButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/CycleVerbosityButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/VerbosityButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ViewNodesCheckbox" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/AutoLayoutCheckbox" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ResetButton" command="activate" arguments="" />
