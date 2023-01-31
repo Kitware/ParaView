@@ -49,12 +49,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkOverlappingAMR.h"
-#include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolygon.h"
+#include "vtkRecoverGeometryWireframe.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
 #include "vtkSmartPointer.h"
@@ -72,6 +72,11 @@
 #include <cmath>
 #include <string>
 #include <vector>
+
+namespace details
+{
+static constexpr const char* ORIGINAL_FACE_IDS = "RecoverWireframeOriginalFaceIds";
+}
 
 template <typename T>
 void GetValidWholeExtent(T* ds, const int wholeExt[6], int validWholeExt[6])
@@ -165,7 +170,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->GeometryFilter->SetFastMode(false);
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
-  this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
+  this->RecoverWireframeFilter = vtkRecoverGeometryWireframe::New();
   this->FeatureEdgesFilter = vtkFeatureEdges::New();
 
   // Setup a callback for the internal readers to report progress.
@@ -216,7 +221,7 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
   }
   if (this->RecoverWireframeFilter)
   {
-    vtkPVRecoverGeometryWireframe* tmp = this->RecoverWireframeFilter;
+    vtkRecoverGeometryWireframe* tmp = this->RecoverWireframeFilter;
     this->RecoverWireframeFilter = nullptr;
     tmp->Delete();
   }
@@ -1408,7 +1413,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
     {
       // Use the vtkUnstructuredGridGeometryFilter to extract 2D surface cells
       // from the geometry.  This is important to extract an appropriate
-      // wireframe in vtkPVRecoverGeometryWireframe.  Also, at the time of this
+      // wireframe in vtkRecoverGeometryWireframe.  Also, at the time of this
       // writing vtkGeometryFilter only properly subdivides 2D cells past level 1.
       this->UnstructuredGridGeometryFilter->SetInputData(input);
 
@@ -1442,13 +1447,12 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
         vtkIdTypeArray::SafeDownCast(input->GetPointData()->GetArray("vtkOriginalPointIds"));
 
       // Flag the data set surface filter to record original cell ids, but do it
-      // in a specially named array that vtkPVRecoverGeometryWireframe will
-      // recognize.  Note that because the data set comes from
+      // in a specially named array that vtkRecoverGeometryWireframe will later
+      // use.  Note that because the data set comes from
       // UnstructuredGridGeometryFilter, the ids will represent the faces rather
       // than the original cells, which is important.
       this->GeometryFilter->PassThroughCellIdsOn();
-      this->GeometryFilter->SetOriginalCellIdsName(
-        vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+      this->GeometryFilter->SetOriginalCellIdsName(details::ORIGINAL_FACE_IDS);
 
       if (this->PassThroughPointIds)
       {
@@ -1482,11 +1486,12 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->GeometryFilter->SetOriginalCellIdsName(nullptr);
       this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
-      // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
+      // Now use vtkRecoverGeometryWireframe to create an edge flag attribute
       // that will cause the wireframe to be rendered correctly.
       vtkNew<vtkPolyData> nextStageInput;
       nextStageInput->ShallowCopy(output); // Yes output is correct.
       this->RecoverWireframeFilter->SetInputData(nextStageInput.Get());
+      this->RecoverWireframeFilter->SetCellIdsAttribute(details::ORIGINAL_FACE_IDS);
       // TODO: Make the consecutive internal filter execution have monotonically
       // increasing progress rather than restarting for every internal filter.
       this->RecoverWireframeFilter->Update();
@@ -1526,7 +1531,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       }
     }
 
-    output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+    output->GetCellData()->RemoveArray(details::ORIGINAL_FACE_IDS);
     return;
   }
 
@@ -1549,7 +1554,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       originalCellIds->SetName("vtkOriginalCellIds");
       originalCellIds->SetNumberOfComponents(1);
       vtkNew<vtkIdTypeArray> originalFaceIds;
-      originalFaceIds->SetName(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+      originalFaceIds->SetName(details::ORIGINAL_FACE_IDS);
       originalFaceIds->SetNumberOfComponents(1);
       vtkCellData* outputCD = output->GetCellData();
       outputCD->AddArray(originalCellIds.Get());
@@ -1588,7 +1593,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       triangleFilter->SetInputData(output);
       triangleFilter->Update();
 
-      // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
+      // Now use vtkRecoverGeometryWireframe to create an edge flag attribute
       // that will cause the wireframe to be rendered correctly.
       this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
       // TODO: Make the consecutive internal filter execution have monotonically
@@ -1599,7 +1604,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       // Get what should be the final output.
       output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
 
-      output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+      output->GetCellData()->RemoveArray(details::ORIGINAL_FACE_IDS);
     }
     return;
   }

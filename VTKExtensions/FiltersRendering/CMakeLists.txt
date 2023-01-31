@@ -44,7 +44,6 @@ set(classes
   vtkNetworkImageSource
   vtkOrderedCompositeDistributor
   vtkPVGeometryFilter
-  vtkPVRecoverGeometryWireframe
   vtkRedistributePolyData
   vtkResampledAMRImageSource
   vtkSelectionDeliveryFilter

@@ -109,7 +109,6 @@
 #include "vtkPVPlane.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVPostFilterExecutive.h"
-#include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVScalarBarActor.h"
 #include "vtkPVSelectionSource.h"
 #include "vtkPVTextSource.h"
@@ -287,7 +286,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
   PRINT_SELF(vtkPVPlane);
   PRINT_SELF(vtkPVPostFilter);
   PRINT_SELF(vtkPVPostFilterExecutive);
-  PRINT_SELF(vtkPVRecoverGeometryWireframe);
   PRINT_SELF(vtkPVScalarBarActor);
   PRINT_SELF(vtkPVSelectionSource);
   PRINT_SELF(vtkPVTextSource);
