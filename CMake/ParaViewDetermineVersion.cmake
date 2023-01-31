@@ -56,7 +56,7 @@ function(determine_version source_dir git_command var_prefix)
   endif()
 
   unset(tmp_VERSION)
-  extract_version_components("${output}" tmp)
+  extract_version_components(${source_dir} "${output}" tmp)
   if(DEFINED tmp_VERSION)
     if (NOT "${tmp_VERSION}" STREQUAL "${${var_prefix}_VERSION}")
       message(WARNING
@@ -73,7 +73,7 @@ function(determine_version source_dir git_command var_prefix)
 endfunction()
 
 # Extracts components from a version string. See determine_version() for usage.
-function(extract_version_components version_string var_prefix)
+function(extract_version_components source_dir version_string var_prefix)
   string(REGEX MATCH "^v?(([0-9]+)\\.([0-9]+)\\.([0-9]+)-?(.*))$"
     version_matches "${version_string}")
   if(CMAKE_MATCH_0)
