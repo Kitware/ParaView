@@ -16,6 +16,8 @@
 #include "vtkNew.h"                      // vtkNew
 #include "vtkPVDataRepresentation.h"
 
+#include <string> // std::string
+
 class vtkPolyData;
 class vtkLabeledContourMapper;
 class vtkPVLODActor;
@@ -53,6 +55,13 @@ public:
    * Return the rendered prop that this representation handle.
    */
   vtkPVLODActor* GetActor() { return this->Actor; }
+
+  /**
+   * Control array for coloring and labeling. If `idx == 0` the array will be used for coloring,
+   * else it will be used for labeling.
+   */
+  void SetInputArrayToProcess(int idx, int port, int connection, int fieldAssociation,
+    const char* attributeTypeorName) override;
 
   ///@{
   /**
@@ -94,6 +103,7 @@ private:
   void operator=(const vtkContourLabelRepresentation&) = delete;
 
   double VisibleDataBounds[6]{ 0.0 };
+  std::string LabelArray;
   vtkNew<vtkPolyData> Cache;
   vtkNew<vtkPVLODActor> Actor;
   vtkNew<vtkLabeledContourMapper> Mapper;
