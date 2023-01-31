@@ -26,13 +26,6 @@
  * points generated from a particular contour value, the scalar array will have
  * exactly the same value.
  *
- * For certain inputs, this filter delegates operation to vtkContour3DLinearGrid.
- * The input must meet the following conditions for this filter to be used:
- *
- * - all cells in the input are linear (i.e., not higher order)
- * - the contour array is one of the types supported by the vtkContour3DLinearGrid
- * - the ComputeScalars option is off
- *
  * @warning
  * Certain flags in vtkAMRDualContour are assumed to be ON.
  *
@@ -55,8 +48,6 @@ public:
 
   static vtkPVContourFilter* New();
 
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
 protected:
   vtkPVContourFilter();
   ~vtkPVContourFilter() override;
@@ -64,11 +55,7 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
-
   int FillInputPortInformation(int port, vtkInformation* info) override;
-  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * Class superclass request data. Also handles iterating over

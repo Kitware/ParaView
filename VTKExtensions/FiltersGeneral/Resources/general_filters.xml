@@ -688,17 +688,12 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
-          <DataType value="vtkNonOverlappingAMR" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="1"
                           data_type="vtkDataSet" />
-        <InputArrayDomain attribute_type="cell"
-                          name="input_array_amr"
-                          number_of_components="1"
-                          data_type="vtkNonOverlappingAMR" />
         <InputArrayDomain attribute_type="cell"
                           name="input_array_htg"
                           number_of_components="1"
@@ -833,6 +828,33 @@ points in the input. Defaults to ***Single***.
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to produce triangles in the output.
         Warning: Many filters do not properly handle non-triangular polygons.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFastMode"
+                         default_values="0"
+                         name="FastMode"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkImageData"
+                                       mode="visibility"/>
+
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="GenerateTriangles"
+                                       value="1"
+                                       mode="enabled_state"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This parameter controls whether to use Fast Mode or not.
+          Fast Mode is only applicable to vtkImageData input and when GenerateTriangles is on.
+          Fast Mode is much faster but it may produce degenerate triangles.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
