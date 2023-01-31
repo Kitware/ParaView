@@ -89,6 +89,12 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
 }
 
 //-----------------------------------------------------------------------------
+pqAnimationScene* pqVCRController::getAnimationScene() const
+{
+  return this->Scene;
+}
+
+//-----------------------------------------------------------------------------
 void pqVCRController::onTimeRangesChanged()
 {
   if (this->Scene)
