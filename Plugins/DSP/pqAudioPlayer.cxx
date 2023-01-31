@@ -354,36 +354,41 @@ bool pqAudioPlayer::pqInternals::fetchAndPrepareData()
   audioFormat.setSampleType(sampleType);
 
   // Look for a device that supports the format
+  auto isDeviceValid = [audioFormat](const QAudioDeviceInfo& info) {
+    return !info.isNull() && info.isFormatSupported(audioFormat) &&
+      !info.supportedCodecs().empty() && !info.supportedSampleRates().empty() &&
+      !info.supportedSampleTypes().empty() && !info.supportedSampleSizes().empty() &&
+      !info.supportedChannelCounts().empty() && !info.supportedByteOrders().empty();
+  };
   QAudioDeviceInfo foundDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
-  if (!foundDeviceInfo.isFormatSupported(audioFormat))
+  if (!isDeviceValid(foundDeviceInfo))
   {
     const auto deviceInfos = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
+    bool foundDeviceValid = false;
     for (const QAudioDeviceInfo& deviceInfo : deviceInfos)
     {
-      if (!deviceInfo.isNull() && deviceInfo != foundDeviceInfo &&
-        deviceInfo.isFormatSupported(audioFormat))
+      if (isDeviceValid(deviceInfo))
       {
-        qInfo() << "Switched audio device from default '" << foundDeviceInfo.deviceName()
-                << "' to '" << deviceInfo.deviceName() << "'";
+        foundDeviceValid = true;
         foundDeviceInfo = deviceInfo;
         break;
       }
     }
-  }
 
-  // If we still couldn't find a device that supports the output format then abort
-  if (!foundDeviceInfo.isFormatSupported(audioFormat))
-  {
-    qWarning() << "This audio format not supported by any of your audio devices "
-                  "(sample rate = "
-               << audioFormat.sampleRate()
-               << " Hz, "
-                  "sample size = "
-               << audioFormat.sampleSize()
-               << " bits, "
-                  "sample type = "
-               << audioFormat.sampleType() << ").";
-    return false;
+    // If we still couldn't find a device that supports the output format then abort
+    if (!foundDeviceValid)
+    {
+      qWarning() << "This audio format is not supported by any of your audio devices "
+                    "(sample rate = "
+                 << audioFormat.sampleRate()
+                 << " Hz, "
+                    "sample size = "
+                 << audioFormat.sampleSize()
+                 << " bits, "
+                    "sample type = "
+                 << audioFormat.sampleType() << ").";
+      return false;
+    }
   }
 
   // Setup final audio buffer
