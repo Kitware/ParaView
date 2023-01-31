@@ -167,7 +167,7 @@ include(ParaViewDetermineVersion)
 # Hardcoded version variables are readin from a separate file. This makes it
 # easier to have a script to update version numbers automatically.
 file(STRINGS version.txt version_txt)
-extract_version_components("${version_txt}" "PARAVIEW")
+extract_version_components("${CMAKE_CURRENT_SOURCE_DIR}" "${version_txt}" "PARAVIEW")
 determine_version("${CMAKE_CURRENT_SOURCE_DIR}" "${GIT_EXECUTABLE}" "PARAVIEW")
 
 # Setting this ensures that "make install" will leave rpaths to external
