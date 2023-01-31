@@ -10,30 +10,30 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="RenameArrays" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelRowCount" arguments="3" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.0,DistanceSquared" />
   <!-- RenameArrays : rename DistanceSquared -> d2 -->
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" command="setCurrent" arguments="0.4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" command="setSelection" arguments="0.4,0.4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" command="doubleClick" arguments="0.4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" command="edit" arguments="0.4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" command="editAccepted" arguments="0.4,d2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.0,d2" />
   <!-- Calculator : add expression. Result array added -->
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,8,6,/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,8,6,/0:0/0:0/0:0" />
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner" command="set_string" arguments="4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,5,5,/0:0/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,5,5,/0:0/0:0/0:0/0:0" />
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelRowCount" arguments="4" />
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" property="modelItemData" arguments="1.4,Result" />
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" property="modelItemData" arguments="0.4,d2" />
    <!-- Calculator : rename Result -> Res -->
@@ -44,7 +44,7 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,5,5,/0:0/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,5,5,/0:0/0:0/0:0/0:0" />
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PointArrayNames/ArrayListWidget/1pqExpandableTableView0" property="modelItemData" arguments="1.4,Res" />
-  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.0,d2" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,Res" />
 </pqevents>
