@@ -478,7 +478,7 @@ void pqVRDockPanel::updateStyleButtons(int row)
     QVBoxLayout* propertiesLayout = layout->findChild<QVBoxLayout*>("stylePropertiesLayout");
     if (propertiesLayout)
     {
-      propertiesLayout->addWidget(proxyWidget, 9, 0);
+      propertiesLayout->addWidget(proxyWidget);
     }
   }
 }
