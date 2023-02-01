@@ -160,8 +160,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
 
   this->GeometryFilter = vtkGeometryFilter::New();
   // we're prepping geometry for rendering
-  // fast mode is adequate.
-  this->GeometryFilter->SetFastMode(true);
+  // fast mode might generate wrong results because of certain assumptions that don't always hold
+  // for that reason, the default is to have fast mode off
+  this->GeometryFilter->SetFastMode(false);
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
