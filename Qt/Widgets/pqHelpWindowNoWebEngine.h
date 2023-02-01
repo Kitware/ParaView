@@ -63,7 +63,8 @@ public:
   static pqTextBrowser* newInstance(QHelpEngine* engine, pqHelpWindow* self)
   {
     pqTextBrowser* instance = new pqTextBrowser(engine, self);
-    self->connect(instance, SIGNAL(anchorClicked(const QUrl&)), SLOT(showPage(const QUrl&)));
+    self->connect(instance, &pqTextBrowser::anchorClicked, self,
+      QOverload<const QUrl&>::of(&pqHelpWindow::showPage));
     self->connect(
       instance, &pqTextBrowser::historyChanged, self, &pqHelpWindow::updateHistoryButtons);
     return instance;

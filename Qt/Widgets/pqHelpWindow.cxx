@@ -109,8 +109,7 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
 
   this->Internals->setupUi(this);
 
-  QObject::connect(
-    this->HelpEngine, SIGNAL(warning(const QString&)), this, SIGNAL(helpWarnings(const QString&)));
+  QObject::connect(this->HelpEngine, &QHelpEngine::warning, this, &pqHelpWindow::helpWarnings);
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
@@ -125,9 +124,11 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
   vbox->addWidget(engine->searchEngine()->resultWidget());
   this->Internals->searchDock->setWidget(searchPane);
 
-  QObject::connect(engine->searchEngine()->queryWidget(), SIGNAL(search()), this, SLOT(search()));
-  QObject::connect(engine->searchEngine()->resultWidget(), SIGNAL(requestShowLink(const QUrl&)),
-    this, SLOT(showPage(const QUrl&)));
+  QObject::connect(engine->searchEngine()->queryWidget(), &QHelpSearchQueryWidget::search, this,
+    &pqHelpWindow::search);
+  QObject::connect(engine->searchEngine()->resultWidget(),
+    &QHelpSearchResultWidget::requestShowLink, this,
+    QOverload<const QUrl&>::of(&pqHelpWindow::showPage));
 
   this->setCentralWidget(this->Browser->widget());
 
