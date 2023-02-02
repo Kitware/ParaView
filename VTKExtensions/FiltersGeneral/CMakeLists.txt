@@ -31,8 +31,6 @@
 set(classes
   vtkAnnotateGlobalDataFilter
   vtkCellIntegrator
-  vtkCleanUnstructuredGrid
-  vtkCleanUnstructuredGridCells
   vtkConvertPolyhedraFilter
   vtkEquivalenceSet
   vtkExtractScatterPlot

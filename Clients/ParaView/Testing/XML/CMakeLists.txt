@@ -72,6 +72,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/TestCompositePropertyWidgetDecoratorPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/TestMultipleNumberOfComponentsPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/VisItBridge/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/nek5000/eddy_uv/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/amr/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/amr/wavelet/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/artifact.dta}"
@@ -938,7 +939,8 @@ else()
   # a reader.
   list(APPEND TESTS_WITH_BASELINES
     MoleculeColoring.xml
-    TruchasReader.xml)
+    TruchasReader.xml
+    Nek5000Reader.xml)
   list(APPEND TESTS_WITH_INLINE_COMPARES
     CONVERGECFDReader.xml)
 endif()
