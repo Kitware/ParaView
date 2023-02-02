@@ -369,11 +369,67 @@
                             number_of_elements="1"
                             panel_visibility="advanced">
         <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the
+      <Documentation>This property specifies the file name for the
         reader.</Documentation>
       </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Variables">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="Merge Points to clean grid"
+        command="SetCleanGrid"
+        number_of_elements="1"
+        default_values="0"
+	label="Merge Points to clean grid" >
+      <BooleanDomain name="bool" />
+      <Documentation>
+            Will call vtkCleanUnstructuredGrid internally. Memory-hungry (optional)
+      </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="Add Spectral Element Ids"
+        command="SetSpectralElementIds"
+        number_of_elements="1"
+        default_values="0"
+        label="Add Spectral Element Ids as cell-data">
+      <BooleanDomain name="bool" />
+      <Documentation>
+            Add Spectral Element Ids as cell-data (optional)
+      </Documentation>
+     </IntVectorProperty>
+
       <Hints>
-       <ReaderFactory extensions="nek3d nek2d nek5d nek5000 nek"
+       <ReaderFactory extensions="nek5000"
                       file_description="Nek5000 Files" />
       </Hints>
     </SourceProxy>
