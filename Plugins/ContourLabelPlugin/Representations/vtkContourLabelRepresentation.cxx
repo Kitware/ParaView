@@ -80,9 +80,13 @@ int vtkContourLabelRepresentation::ProcessViewRequest(
     if (producerPort)
     {
       vtkAlgorithm* producer = producerPort->GetProducer();
-      vtkDataObject* data =
-        vtkDataObject::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
-      this->Mapper->SetInputData(vtkPolyData::SafeDownCast(data));
+      vtkPolyData* data =
+        vtkPolyData::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
+      if (data)
+      {
+        data->GetPointData()->SetActiveScalars(this->LabelArray.c_str());
+      }
+      this->Mapper->SetInputData(data);
       this->UpdateColoringParameters();
     }
   }
@@ -100,11 +104,8 @@ void vtkContourLabelRepresentation::UpdateColoringParameters()
   supportColoring = supportColoring && (fieldName && fieldName[0]);
 
   auto* polyMapper = this->Mapper->GetPolyDataMapper();
-  auto* mapperInput = this->Mapper->GetInput();
   if (supportColoring)
   {
-    this->Mapper->SetInputArrayToProcess(0, 0, 0, fieldAssoc, fieldName);
-
     polyMapper->SetScalarVisibility(true);
     polyMapper->SelectColorArray(fieldName);
     polyMapper->SetUseLookupTableScalarRange(true);
@@ -112,10 +113,6 @@ void vtkContourLabelRepresentation::UpdateColoringParameters()
     {
       case vtkDataObject::FIELD_ASSOCIATION_CELLS:
         polyMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-        if (mapperInput)
-        {
-          mapperInput->GetCellData()->SetActiveScalars(fieldName);
-        }
         break;
       case vtkDataObject::FIELD_ASSOCIATION_NONE:
         polyMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
@@ -124,10 +121,6 @@ void vtkContourLabelRepresentation::UpdateColoringParameters()
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
       default:
         polyMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-        if (mapperInput)
-        {
-          mapperInput->GetPointData()->SetActiveScalars(fieldName);
-        }
     }
   }
   else
@@ -143,6 +136,22 @@ void vtkContourLabelRepresentation::SetVisibility(bool value)
 {
   this->Superclass::SetVisibility(value);
   this->Actor->SetVisibility(value);
+}
+
+//----------------------------------------------------------------------------
+void vtkContourLabelRepresentation::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, const char* attributeTypeorName)
+{
+  if (idx == 0)
+  {
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, attributeTypeorName);
+  }
+  else if (idx == 1 &&
+    fieldAssociation == vtkDataObject::FieldAssociations::FIELD_ASSOCIATION_POINTS)
+  {
+    this->LabelArray = std::string(attributeTypeorName);
+  }
 }
 
 //----------------------------------------------------------------------------

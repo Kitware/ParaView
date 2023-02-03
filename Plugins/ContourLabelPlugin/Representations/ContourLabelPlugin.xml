@@ -11,8 +11,26 @@
           <DataType value="vtkPolyData" />
           <DataType value="vtkCompositeDataSet" />
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_contour"
+                          number_of_components="1"/>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
+
+      <StringVectorProperty name="LabelArray"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            default_values="1 0 0 0 0">
+        <ArrayListDomain attribute_type="Scalars"
+                        input_domain_name="input_array_contour"
+                        name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Set which array will be used to retrieve label informations.</Documentation>
+      </StringVectorProperty>
 
       <!-- Here and below : every "standard" property used when this Proxy is registered as an extension
       of GeometryRepresentation -->
@@ -127,6 +145,7 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Labeled Contour" >
+            <Property name="LabelArray"/>
             <Property name="SkipDistance" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
