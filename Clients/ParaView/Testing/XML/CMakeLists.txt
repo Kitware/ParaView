@@ -1256,6 +1256,7 @@ list(APPEND TESTS_WITH_BASELINES
   TensorGlyph.xml
   TemporalInterpolator.xml
   TemporalShiftScale.xml
+  TestBoundaryMeshQuality.xml
   TestGroupDataFromTimeSeries.xml
   TestSelectionOnMultipiece.xml
   TimeInspector.xml
