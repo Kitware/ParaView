@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderViewSettings.h"
+#include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
@@ -116,6 +117,16 @@ public:
   }
 
   ~pqInternal() = default;
+
+  // Convenience method to update the view widget cursor
+  void UpdateCursor(QWidget* widget)
+  {
+    QCursor cursor = this->CursorVisible ? this->Cursor : QCursor(Qt::BlankCursor);
+    widget->setCursor(cursor);
+  }
+
+  QCursor Cursor;
+  bool CursorVisible = true;
 };
 
 namespace
@@ -201,6 +212,13 @@ void pqRenderView::initialize()
   // initialize the interaction undo-redo stack.
   vtkSMRenderViewProxy* viewProxy = this->getRenderViewProxy();
   this->Internal->UndoStackBuilder->SetRenderView(viewProxy);
+
+  if (vtkPVXMLElement* hints = this->getProxy()->GetHints()
+      ? this->getProxy()->GetHints()->FindNestedElementByName("HideCursor")
+      : nullptr)
+  {
+    this->setCursorVisible(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1123,10 +1141,21 @@ void pqRenderView::onGenericFilmicPresetsChange()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::setCursor(const QCursor& c)
+void pqRenderView::setCursor(const QCursor& cursor)
 {
-  if (QWidget* wdg = this->widget())
-  {
-    wdg->setCursor(c);
-  }
+  this->Internal->Cursor = cursor;
+  this->Internal->UpdateCursor(this->widget());
+}
+
+//-----------------------------------------------------------------------------
+QCursor pqRenderView::cursor()
+{
+  return this->widget()->cursor();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::setCursorVisible(bool visible)
+{
+  this->Internal->CursorVisible = visible;
+  this->Internal->UpdateCursor(this->widget());
 }
