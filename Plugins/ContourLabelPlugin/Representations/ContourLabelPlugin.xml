@@ -95,7 +95,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetLineWidth"
-                            default_values="2.0"
+                            default_values="1.0"
                             name="LineWidth"
                             number_of_elements="1">
         <DoubleRangeDomain min="0" name="range" />

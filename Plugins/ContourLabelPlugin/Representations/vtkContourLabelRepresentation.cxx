@@ -179,6 +179,20 @@ int vtkContourLabelRepresentation::RequestData(
 
   if (validDs != nullptr)
   {
+    vtkNew<vtkCellTypes> cellTypes;
+    validDs->GetCellTypes(cellTypes);
+    for (vtkIdType i = 0; i < cellTypes->GetNumberOfTypes(); ++i)
+    {
+      if (cellTypes->GetCellType(i) != VTK_LINE && cellTypes->GetCellType(i) != VTK_POLY_LINE)
+      {
+        validDs = nullptr;
+        break;
+      }
+    }
+  }
+
+  if (validDs != nullptr)
+  {
     validDs->GetBounds(this->VisibleDataBounds);
 
     vtkNew<vtkStripper> stripper;
@@ -191,6 +205,7 @@ int vtkContourLabelRepresentation::RequestData(
   }
   else
   {
+    vtkWarningMacro("Labeled Contour: input needs to be a poly data of only lines or polylines.");
     vtkMath::UninitializeBounds(this->VisibleDataBounds);
     this->Cache->Initialize();
   }
