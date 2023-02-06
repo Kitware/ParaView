@@ -22,7 +22,7 @@
 
 .fedora35:
     extends: .linux
-    image: "kitware/paraview:ci-fedora35-20230118"
+    image: "kitware/paraview:ci-fedora35-20230206"
 
 .el8_icc:
     extends: .linux
