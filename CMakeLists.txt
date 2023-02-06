@@ -290,6 +290,7 @@ set(paraview_default_plugins
   ArrowGlyph
   BagPlotViewsAndFilters
   CFSReader
+  ContourLabelPlugin
   Datamine
   DigitalRockPhysics
   DigitalSignalProcessing
