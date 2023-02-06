@@ -15,7 +15,6 @@ set(PARAVIEW_RELOCATABLE_INSTALL ON CACHE BOOL "")
 set(PARAVIEW_PLUGIN_ENABLE_TemporalParallelismScriptGenerator ON CACHE BOOL "")
 set(PARAVIEW_PLUGIN_ENABLE_XRInterface ON CACHE BOOL "")
 set(PARAVIEW_XRInterface_OpenVR_Support OFF CACHE BOOL "")
-set(PARAVIEW_PLUGIN_ENABLE_ContourLabelPlugin ON CACHE BOOL "")
 
 # We run the install right after the build. Avoid rerunning it when installing.
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY "ON" CACHE BOOL "")
