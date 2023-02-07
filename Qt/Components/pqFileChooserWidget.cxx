@@ -183,7 +183,8 @@ void pqFileChooserWidget::chooseFile()
     }
   }
 
-  pqFileDialog dialog(this->Server, this, title, QString(), filters, false);
+  pqFileDialog dialog(this->Server, this, title, QString(), filters,
+    !(this->UseDirectoryMode || this->AcceptAnyFile || this->ForceSingleFile));
 
   if (this->UseDirectoryMode)
   {
@@ -193,7 +194,7 @@ void pqFileChooserWidget::chooseFile()
   {
     dialog.setFileMode(pqFileDialog::AnyFile);
   }
-  else if (this->forceSingleFile())
+  else if (this->ForceSingleFile)
   {
     dialog.setFileMode(pqFileDialog::ExistingFile);
   }
