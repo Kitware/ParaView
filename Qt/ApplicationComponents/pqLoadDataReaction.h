@@ -100,9 +100,10 @@ public:
    * readerSet is a set of `readergroup`, `readername` pair to restrict the proposed types
    * of files shown to the user, not using it let the user choose between all files.
    * Returns the list of opened file in the pipeline.
+   * Set groupFiles to false to disable automatic file group mechanisms
    */
-  static QList<pqPipelineSource*> loadData(const ReaderSet& readerSet);
-  static QList<pqPipelineSource*> loadData();
+  static QList<pqPipelineSource*> loadData(const ReaderSet& readerSet, bool groupFiles = true);
+  static QList<pqPipelineSource*> loadData(bool groupFiles = true);
   ///@}
 
   /**

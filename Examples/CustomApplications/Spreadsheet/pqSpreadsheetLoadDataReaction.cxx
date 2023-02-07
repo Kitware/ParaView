@@ -44,7 +44,7 @@ void pqSpreadsheetLoadDataReaction::onTriggered()
 {
   ReaderSet readerSet{ { "sources", "XMLPolyDataReader" }, { "sources", "LegacyVTKFileReader" },
     { "sources", "PVDReader" } };
-  QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData(readerSet);
+  QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData(readerSet, false);
 
   Q_FOREACH (pqPipelineSource* source, sources)
   {
