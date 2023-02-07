@@ -6,6 +6,7 @@ GROUPS
   PARAVIEW_CANONICAL
 DEPENDS
   ParaView::qttesting
+  ParaView::Versioning
   VTK::GUISupportQt
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
