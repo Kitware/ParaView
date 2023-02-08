@@ -51,14 +51,14 @@ tran:Road, bldg:Building, gen:GenericCityObject, luse:LandUse
                          name="BeginBuildingIndex"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <Documentation>Reads buildings between [BeginBuildingIndex, EndBuildingIndex) in the file.</Documentation>
+        <Documentation>Reads buildings between BeginBuildingIndex and EndBuildingIndex - 1 in the file.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetEndBuildingIndex"
                          default_values="2147483647"
                          name="EndBuildingIndex"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <Documentation>Reads buildings between [BeginBuildingIndex, EndBuildingIndex) in the file.</Documentation>
+        <Documentation>Reads buildings between BeginBuildingIndex and EndBuildingIndex - 1 in the file.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfBuildings"
                          default_values="2147483647"
