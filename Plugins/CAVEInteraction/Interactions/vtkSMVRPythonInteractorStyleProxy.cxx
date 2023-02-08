@@ -136,7 +136,7 @@ void vtkSMVRPythonInteractorStyleProxy::SetPythonObject(void* obj)
 
   if (this->Internals->PythonObject)
   {
-    vtkSmartPyObject fname(PyString_FromString("Initialize"));
+    vtkSmartPyObject fname(PyUnicode_FromString("Initialize"));
     vtkSmartPyObject vtkself(vtkPythonUtil::GetObjectFromPointer(this));
     PyObject_CallMethodObjArgs(this->Internals->PythonObject.GetPointer(), fname.GetPointer(),
       vtkself.GetPointer(), nullptr);
@@ -178,9 +178,9 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
   }
 
   // Setup Module with user given script
-  vtkSmartPyObject load_method(PyString_FromString("module_from_string"));
+  vtkSmartPyObject load_method(PyUnicode_FromString("module_from_string"));
   this->Internals->Module.TakeReference(PyObject_CallMethodObjArgs(
-    importedModule, load_method, PyString_FromString(fileContents.c_str()), nullptr));
+    importedModule, load_method, PyUnicode_FromString(fileContents.c_str()), nullptr));
 
   if (!this->Internals->Module || CheckAndFlushPythonErrors())
   {
@@ -189,7 +189,7 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
   }
 
   // call the create_interactor_style() method
-  vtkSmartPyObject create_method(PyString_FromString("create_interactor_style"));
+  vtkSmartPyObject create_method(PyUnicode_FromString("create_interactor_style"));
   vtkSmartPyObject styleObject(
     PyObject_CallMethodObjArgs(this->Internals->Module, create_method, nullptr, nullptr));
   CheckAndFlushPythonErrors();
@@ -222,7 +222,7 @@ void vtkSMVRPythonInteractorStyleProxy::InvokeHandler(const char* mname, const v
     return;
   }
 
-  vtkSmartPyObject fname(PyString_FromString(mname));
+  vtkSmartPyObject fname(PyUnicode_FromString(mname));
   vtkSmartPyObject vtkself(vtkPythonUtil::GetObjectFromPointer(this));
 
   unsigned int eventType = event.eventType;
