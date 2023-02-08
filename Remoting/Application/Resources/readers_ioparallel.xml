@@ -405,7 +405,7 @@
      </StringVectorProperty>
 
      <IntVectorProperty
-        name="Merge Points to clean grid"
+        name="MergePointsToCleanGrid"
         command="SetCleanGrid"
         number_of_elements="1"
         default_values="0"
@@ -417,7 +417,7 @@
      </IntVectorProperty>
 
      <IntVectorProperty
-        name="Add Spectral Element Ids"
+        name="AddSpectralElementIds"
         command="SetSpectralElementIds"
         number_of_elements="1"
         default_values="0"
