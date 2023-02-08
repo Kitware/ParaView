@@ -728,7 +728,6 @@ SET (TESTS_WITHOUT_BASELINES
   ExtractParticlesOverTime.xml
   FavoritesFilters.xml
   GradientBackwardsCompatibility.xml
-  HelpWindowHistory.xml
   ImportCustomPresets.xml
   InformationPanel.xml
   LogViewer.xml
@@ -782,6 +781,11 @@ if (PARAVIEW_USE_PYTHON)
       TooltipCopy.xml
       )
   endif()
+endif()
+
+if (PARAVIEW_USE_QTHELP)
+  list(APPEND TESTS_WITHOUT_BASELINES
+    HelpWindowHistory.xml)
 endif()
 
 SET (TESTS_WITH_INLINE_COMPARES

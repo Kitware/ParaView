@@ -129,6 +129,8 @@ public:
     return instance;
   }
 
+  QUrl url() { return this->history()->currentItem().url(); }
+
   QUrl goBackward()
   {
     this->history()->back();

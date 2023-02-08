@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqHelpWindow.h"
+#include "pqApplicationCore.h"
 #include "pqQtWidgetsConfig.h" // for PARAVIEW_USE_QTWEBENGINE
+#include "pqSettings.h"
 #include "ui_pqHelpWindow.h"
-
-#include <cassert>
 
 #include <QDebug>
 #include <QDesktopServices>
@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QUrl>
 
+#include <cassert>
+
 class pqBrowser
 {
 public:
@@ -53,6 +55,7 @@ public:
   virtual ~pqBrowser() = default;
   virtual QWidget* widget() const = 0;
   virtual void setUrl(const QUrl& url) = 0;
+  virtual QUrl url() = 0;
   virtual QUrl goBackward() = 0;
   virtual QUrl goForward() = 0;
   virtual bool canGoBackward() = 0;
@@ -75,6 +78,7 @@ public:
   ~pqBrowserTemplate() override { delete this->Widget; }
   QWidget* widget() const override { return this->Widget; }
   void setUrl(const QUrl& url) override { this->Widget->setUrl(url); }
+  QUrl url() override { return this->Widget->url(); }
   QUrl goBackward() override { return this->Widget->goBackward(); }
   QUrl goForward() override { return this->Widget->goForward(); }
   bool canGoBackward() override { return this->Widget->canGoBackward(); }
@@ -96,6 +100,8 @@ typedef pqBrowserTemplate<pqTextBrowser> PQBROWSER_TYPE;
 //-----------------------------------------------------------------------------
 class pqHelpWindow::pqInternals : public Ui::pqHelpWindow
 {
+public:
+  QString NameSpaceName;
 };
 
 //-----------------------------------------------------------------------------
@@ -135,7 +141,7 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
   QIcon homeIcon = qApp->style()->standardIcon(QStyle::SP_DirHomeIcon);
   this->Internals->actionHome->setIcon(homeIcon);
   QObject::connect(
-    this->Internals->actionHome, &QAction::triggered, this, &pqHelpWindow::goToHomePage);
+    this->Internals->actionHome, &QAction::triggered, this, [=]() { this->showHomePage(); });
 
   QIcon backIcon = qApp->style()->standardIcon(QStyle::SP_ArrowLeft);
   this->Internals->actionBackward->setIcon(backIcon);
@@ -148,6 +154,16 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
   this->Internals->actionForward->setEnabled(false);
   QObject::connect(
     this->Internals->actionForward, &QAction::triggered, this, &pqHelpWindow::goForward);
+
+  QIcon saveHomePageIcon = qApp->style()->standardIcon(QStyle::SP_DialogSaveButton);
+  this->Internals->actionSaveAsHomepage->setIcon(saveHomePageIcon);
+  QObject::connect(this->Internals->actionSaveAsHomepage, &QAction::triggered, this,
+    &pqHelpWindow::saveCurrentHomePage);
+
+  QWidget* spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  // toolBar is a pointer to an existing toolbar
+  this->Internals->toolBar->insertWidget(this->Internals->actionSaveAsHomepage, spacer);
 
   QObject::connect(this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)), this,
     SLOT(showPage(const QUrl&)));
@@ -183,41 +199,91 @@ void pqHelpWindow::search()
 }
 
 //-----------------------------------------------------------------------------
-void pqHelpWindow::showHomePage(const QString& namespace_name)
+void pqHelpWindow::setNameSpace(const QString& namespace_name)
 {
-  QList<QUrl> html_pages = this->HelpEngine->files(namespace_name, QStringList(), "html");
-  // now try to locate a file named index.html in this collection.
-  Q_FOREACH (QUrl url, html_pages)
-  {
-    if (url.path().endsWith("index.html"))
-    {
-      this->showPage(url);
-      this->HomePage = url;
-      return;
-    }
-  }
-  qWarning() << "Could not locate index.html";
+  this->Internals->NameSpaceName = namespace_name;
 }
 
 //-----------------------------------------------------------------------------
-void pqHelpWindow::goToHomePage()
+// PARAVIEW_DEPRECATED_IN_5_12_0
+void pqHelpWindow::showHomePage(const QString& namespace_name)
 {
-  this->showPage(this->HomePage);
-  this->updateContentWidget(this->HomePage);
+  this->setNameSpace(namespace_name);
+  this->showHomePage();
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::showHomePage()
+{
+  QUrl homePage;
+
+  // First, search for valid saved homepage
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  QString settingKey = QString("HelpWindow.%1.HomePage").arg(this->Internals->NameSpaceName);
+  QUrl savedHomePage =
+    settings->contains(settingKey) ? settings->value(settingKey).toUrl() : QUrl();
+
+  if (!savedHomePage.isEmpty())
+  {
+    if (!this->HelpEngine->fileData(savedHomePage).isEmpty())
+    {
+      homePage = savedHomePage;
+    }
+    else
+    {
+      qWarning() << "Saved custom home page not found : " << savedHomePage
+                 << ".\nDisplaying default home page instead.";
+    }
+  }
+
+  // If no valid homepage is found, search for the default one
+  if (homePage.isEmpty())
+  {
+    // Locate a file named index.html in the help engine registered files to use as homepage.
+    QList<QUrl> html_pages =
+      this->HelpEngine->files(this->Internals->NameSpaceName, QStringList(), "html");
+    Q_FOREACH (QUrl url, html_pages)
+    {
+      if (url.path().endsWith("index.html"))
+      {
+        homePage = url;
+      }
+    }
+  }
+
+  if (homePage.isEmpty())
+  {
+    qWarning() << "Could not locate index.html";
+    return;
+  }
+
+  this->showPage(homePage);
+  QHelpContentWidget* widget = this->HelpEngine->contentWidget();
+  widget->setCurrentIndex(widget->indexOf(homePage));
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::saveCurrentHomePage()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue(
+    QString("HelpWindow.%1.HomePage").arg(this->Internals->NameSpaceName), this->Browser->url());
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::goBackward()
 {
   QUrl newUrl = this->Browser->goBackward();
-  this->updateContentWidget(newUrl);
+  QHelpContentWidget* widget = this->HelpEngine->contentWidget();
+  widget->setCurrentIndex(widget->indexOf(newUrl));
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::goForward()
 {
   QUrl newUrl = this->Browser->goForward();
-  this->updateContentWidget(newUrl);
+  QHelpContentWidget* widget = this->HelpEngine->contentWidget();
+  widget->setCurrentIndex(widget->indexOf(newUrl));
 }
 
 //-----------------------------------------------------------------------------
@@ -225,11 +291,4 @@ void pqHelpWindow::updateHistoryButtons()
 {
   this->Internals->actionBackward->setEnabled(this->Browser->canGoBackward());
   this->Internals->actionForward->setEnabled(this->Browser->canGoForward());
-}
-
-//-----------------------------------------------------------------------------
-void pqHelpWindow::updateContentWidget(const QUrl& url)
-{
-  QHelpContentWidget* widget = this->HelpEngine->contentWidget();
-  widget->setCurrentIndex(widget->indexOf(url));
 }

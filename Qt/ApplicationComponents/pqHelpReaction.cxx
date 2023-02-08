@@ -81,7 +81,8 @@ void pqHelpReaction::showHelp(const QString& url)
   QStringList registeredDocumentations = engine->registeredDocumentations();
   if (!registeredDocumentations.empty())
   {
-    helpWindow->showHomePage(registeredDocumentations[0]);
+    helpWindow->setNameSpace(registeredDocumentations[0]);
+    helpWindow->showHomePage();
   }
   helpWindow->show();
   helpWindow->raise();

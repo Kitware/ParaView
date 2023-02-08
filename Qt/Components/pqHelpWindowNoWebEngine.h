@@ -72,6 +72,8 @@ public:
 
   void setUrl(const QUrl& url) { this->setSource(url); }
 
+  QUrl url() { return this->source(); }
+
   QUrl goBackward()
   {
     this->backward();

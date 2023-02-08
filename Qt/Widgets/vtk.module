@@ -10,7 +10,6 @@ DEPENDS
   VTK::GUISupportQt
 PRIVATE_DEPENDS
   ParaView::RemotingServerManager
-  ParaView::Versioning
   ParaView::VTKExtensionsCore
 TEST_LABELS
   ParaView

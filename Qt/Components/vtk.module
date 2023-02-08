@@ -18,6 +18,7 @@ PRIVATE_DEPENDS
   ParaView::RemotingMisc
   ParaView::RemotingSettings
   ParaView::RemotingViews
+  ParaView::Versioning
   VTK::ChartsCore
   VTK::CommonSystem
   VTK::IOImage
