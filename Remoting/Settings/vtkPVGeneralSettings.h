@@ -202,6 +202,7 @@ public:
   {
     DISPLAY_REALNUMBERS_USING_SCIENTIFIC_NOTATION = 1,
     DISPLAY_REALNUMBERS_USING_FIXED_NOTATION,
+    DISPLAY_REALNUMBERS_USING_FULL_NOTATION,
   };
   /**
    * Get/Set the notation of real number displayed in widgets or views.

@@ -301,6 +301,7 @@
           <Entry text="Mixed" value="0" />
           <Entry text="Scientific" value="1" />
           <Entry text="Fixed" value="2" />
+          <Entry text="Full" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -314,6 +315,13 @@
           toolbar. Should be in the range [1,17].
         </Documentation>
         <IntRangeDomain min="1" max="17" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+              mode="enabled_state"
+              property="AnimationTimeNotation"
+              value="3"
+              inverse="1" />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="ShowAnimationShortcuts"
@@ -352,6 +360,7 @@
           <Entry text="Mixed" value="0" />
           <Entry text="Scientific" value="1" />
           <Entry text="Fixed" value="2" />
+          <Entry text="Full" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -365,6 +374,13 @@
           This does NOT affect the values used in computation.
         </Documentation>
         <IntRangeDomain min="1" max="17" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+              mode="enabled_state"
+              property="RealNumberDisplayedNotation"
+              value="3"
+              inverse="1" />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="InheritRepresentationProperties"

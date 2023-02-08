@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineEdit.h"
 #include "pqWidgetsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 /**
  * @class pqDoubleLineEdit
  * @brief pqLineEdit subclass that supports a low precision view when inactive
@@ -78,7 +80,8 @@ public:
   {
     MixedNotation = 0,
     ScientificNotation,
-    FixedNotation
+    FixedNotation,
+    FullNotation
   };
 
   /**
@@ -117,24 +120,31 @@ public:
    */
   QString simplifiedText() const;
 
-  ///@{
   /**
    * Return a double formatted according to a QTextStream::RealNumberNotation and number
    * of digits of precision.
+   *
+   * @deprecated deprecated in favor of
+   * pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int),
+   * because `QTextStream::RealNumberNotation` cannot cover all cases.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0(
+    "Use `pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int)` instead")
   static QString formatDouble(
     double value, QTextStream::RealNumberNotation notation, int precision);
+
+  /**
+   * Return a double formatted according to a pqDoubleLineEdit::RealNumberNotation
+   * notation and a number of digits of precision.
+   */
   static QString formatDouble(
     double value, pqDoubleLineEdit::RealNumberNotation notation, int precision);
-  ///@}
 
-  ///@{
   /**
    * Return a double formatted according to the values set for global precision
    * and notation.
    */
   static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
-  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

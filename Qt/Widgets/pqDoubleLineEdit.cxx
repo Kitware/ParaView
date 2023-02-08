@@ -43,23 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 //-----------------------------------------------------------------------------
-QTextStream::RealNumberNotation toTextStreamNotation(pqDoubleLineEdit::RealNumberNotation notation)
-{
-  if (notation == pqDoubleLineEdit::FixedNotation)
-  {
-    return QTextStream::FixedNotation;
-  }
-  else if (notation == pqDoubleLineEdit::ScientificNotation)
-  {
-    return QTextStream::ScientificNotation;
-  }
-  else
-  {
-    return QTextStream::SmartNotation;
-  }
-}
-
-//-----------------------------------------------------------------------------
 using InstanceTrackerType = QList<pqDoubleLineEdit*>;
 static InstanceTrackerType* InstanceTracker = nullptr;
 
@@ -107,10 +90,13 @@ public:
     const auto real_notation =
       this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::globalNotation() : this->Notation;
 
-    const QString limited = self->text().isEmpty()
-      ? QString()
-      : pqDoubleLineEdit::formatDouble(
-          self->text().toDouble(), toTextStreamNotation(real_notation), real_precision);
+    // XXX: while we could call `pqDoubleLineEdit::formatDouble` when (real_notation ==
+    // FullNotation), it will not yield the exact same result because we're converting string ->
+    // double -> string (which loses some precision). In this case we just return the text as it is.
+    const QString limited =
+      (self->text().isEmpty() || real_notation == RealNumberNotation::FullNotation)
+      ? self->text()
+      : pqDoubleLineEdit::formatDouble(self->text().toDouble(), real_notation, real_precision);
 
     const bool changed = (limited != this->InactiveLineEdit->text());
     this->InactiveLineEdit->setText(limited);
@@ -306,7 +292,26 @@ QString pqDoubleLineEdit::formatDouble(
 QString pqDoubleLineEdit::formatDouble(
   double value, pqDoubleLineEdit::RealNumberNotation notation, int precision)
 {
-  return pqDoubleLineEdit::formatDouble(value, toTextStreamNotation(notation), precision);
+  char format;
+  switch (notation)
+  {
+    case RealNumberNotation::ScientificNotation:
+      format = 'e';
+      break;
+    case RealNumberNotation::FixedNotation:
+      format = 'f';
+      break;
+    case RealNumberNotation::FullNotation:
+      format = 'f';
+      precision = QLocale::FloatingPointShortest;
+      break;
+    case RealNumberNotation::MixedNotation:
+    default:
+      format = 'g';
+      break;
+  };
+
+  return QString::number(value, format, precision);
 }
 
 //-----------------------------------------------------------------------------
