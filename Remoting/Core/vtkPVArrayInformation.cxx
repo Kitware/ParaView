@@ -109,7 +109,7 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
   }
 
   os << indent << "ComponentNames" << endl;
-  for (int cc = 0; cc < this->Components.size(); ++cc)
+  for (size_t cc = 0; cc < this->Components.size(); ++cc)
   {
     os << i2 << cname(cc).c_str() << ": " << this->Components[cc].Name.c_str() << endl;
   }
@@ -587,6 +587,7 @@ std::string vtkPVArrayInformation::GetRangesAsString() const
     {
       stream << ((cc > 0) ? ", " : "");
       stream << val.c_str();
+      cc++;
     }
   }
   else
