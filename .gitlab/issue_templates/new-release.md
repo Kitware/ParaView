@@ -193,6 +193,7 @@ Show(Text(Text="$A^2$"))
 
   Check that
   - Getting started guide opens
+  - Help lists Readers, Writers, Filters, and Sources properly
   - Examples load and match thumbnails in dialog
   - Python. Open the Python shell and run
   - Plugins are present and load properly
