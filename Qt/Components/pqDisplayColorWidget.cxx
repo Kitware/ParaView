@@ -375,7 +375,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   // property.
   this->connect(repr, SIGNAL(colorTransferFunctionModified()), SLOT(updateColorTransferFunction()));
 
-  this->Internals->Links.addPropertyLink<PropertyLinksConnection>(
+  this->Internals->Links.addPropertyLink<pqDisplayColorWidget::PropertyLinksConnection>(
     this, "notused", SIGNAL(arraySelectionChanged()), proxy, prop);
   // add a link to representation, because some representations don't like Solid Color
   vtkSMProperty* reprProperty = proxy->GetProperty("Representation");
@@ -401,7 +401,7 @@ QPair<int, QString> pqDisplayColorWidget::arraySelection() const
 {
   if (this->Variables->currentIndex() != -1)
   {
-    return PropertyLinksConnection::convert(
+    return pqDisplayColorWidget::PropertyLinksConnection::convert(
       this->Variables->itemData(this->Variables->currentIndex()));
   }
 
@@ -441,7 +441,7 @@ void pqDisplayColorWidget::setArraySelection(const QPair<int, QString>& value)
 //-----------------------------------------------------------------------------
 QVariant pqDisplayColorWidget::itemData(int association, const QString& arrayName) const
 {
-  return PropertyLinksConnection::convert(ValueType(association, arrayName));
+  return pqDisplayColorWidget::PropertyLinksConnection::convert(ValueType(association, arrayName));
 }
 
 //-----------------------------------------------------------------------------
@@ -471,7 +471,7 @@ void pqDisplayColorWidget::refreshColorArrayNames()
 {
   // Simply update the this->Variables combo-box with values from the domain.
   // Try to preserve the current text if possible.
-  QVariant current = PropertyLinksConnection::convert(this->arraySelection());
+  QVariant current = pqDisplayColorWidget::PropertyLinksConnection::convert(this->arraySelection());
 
   bool prev = this->Variables->blockSignals(true);
 
@@ -529,7 +529,8 @@ void pqDisplayColorWidget::refreshColorArrayNames()
     // The previous value set on the widget is no longer available in the
     // "domain". This happens when the pipeline is modified, for example. In
     // that case, the UI still needs to reflect the value. So we add it.
-    QPair<int, QString> currentColoring = PropertyLinksConnection::convert(current);
+    QPair<int, QString> currentColoring =
+      pqDisplayColorWidget::PropertyLinksConnection::convert(current);
     this->Variables->setCurrentIndex(
       this->addOutOfDomainEntry(currentColoring.first, currentColoring.second));
   }
