@@ -16,13 +16,15 @@
  * @class   vtkPVRepresentedArrayListSettings
  * @brief   singleton used to filter out undesired array names from color array list.
  *
+ * Currently represent the "Miscellaneous" section of ParaView settings.
  *
  * vtkPVRepresentedArrayListSettings is a singleton used to keep track
  * of a list of regular expressions that filter out arrays in a
  * RepresentedArrayList domain.
  *
  * It also keeps track of a list of excluded readers used to filter
- * the File .. Open dialog.
+ * the File .. Open dialog, as well as rules on when to compute the magnitude
+ * for data arrays.
  *
  * All calls to
  * vtkPVRepresentedArrayListSettings::New() returns a reference to the
@@ -88,6 +90,36 @@ public:
   /// Provide the list of all name filters
   vtkStringArray* GetAllNameFilters();
 
+  ///@{
+  /**
+   * Setters to control whether ParaView should allow the user to display
+   * the gradient of a given multi-component field.
+   *
+   * If ComputeArrayMagnitude is true then ParaView will always compute the magnitude.
+   * Otherwise it will not.
+   *
+   * ArrayMagnitudeExceptions is the list of exceptions and will behave differently
+   * depending on the value of ComputeArrayMagnitude. If ComputeArrayMagnitude is
+   * false then the list describes the number of components for which ParaView will
+   * still compute the magnitude. Else the list describe the number of components
+   * for which ParaView will not compute the magnitude.
+   *
+   * @see ShouldUseMagnitudeMode
+   */
+  vtkSetMacro(ComputeArrayMagnitude, bool);
+  virtual void SetArrayMagnitudeException(int idx, int ncomp);
+  virtual void SetNumberOfArrayMagnitudeExceptions(int nexceptions);
+  ///@}
+
+  /**
+   * Check if the array mode for this number of components should be the magnitude mode
+   * or not. This will internally use the informations given by ComputeArrayMagnitude
+   * and ArrayMagnitudeExceptions.
+   *
+   * @see SetComputeArrayMagnitude
+   */
+  virtual bool ShouldUseMagnitudeMode(int ncomp) const;
+
 protected:
   vtkPVRepresentedArrayListSettings();
   ~vtkPVRepresentedArrayListSettings() override;
@@ -97,6 +129,8 @@ private:
   void operator=(const vtkPVRepresentedArrayListSettings&) = delete;
 
   static vtkSmartPointer<vtkPVRepresentedArrayListSettings> Instance;
+
+  bool ComputeArrayMagnitude = true;
 
   class vtkInternals;
   vtkInternals* Internals;

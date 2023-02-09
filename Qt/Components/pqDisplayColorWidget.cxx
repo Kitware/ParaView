@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -655,15 +656,19 @@ void pqDisplayColorWidget::refreshComponents()
 
   bool prev = this->Components->blockSignals(true);
 
+  const int nComponents = arrayInfo->GetNumberOfComponents();
   this->Components->clear();
-  for (int cc = 0, max = arrayInfo->GetNumberOfComponents(); cc < max; cc++)
+
+  // add magnitude for non-scalar values when needed
+  auto* arraySettings = vtkPVRepresentedArrayListSettings::GetInstance();
+  if (nComponents > 1 && arraySettings->ShouldUseMagnitudeMode(nComponents))
   {
-    if (cc == 0 && max > 1)
-    {
-      // add magnitude for non-scalar values.
-      this->Components->addItem(arrayInfo->GetComponentName(-1), -1);
-    }
-    this->Components->addItem(arrayInfo->GetComponentName(cc), cc);
+    this->Components->addItem(arrayInfo->GetComponentName(-1), -1);
+  }
+
+  for (int comp = 0; comp < nComponents; comp++)
+  {
+    this->Components->addItem(arrayInfo->GetComponentName(comp), comp);
   }
 
   /// restore component choice if possible.
