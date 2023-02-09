@@ -109,41 +109,16 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
   // Fill Layout
   vtkPVXMLElement* hints = dvp->GetHints();
-  vtkPVXMLElement* showLabels = nullptr;
+  vtkPVXMLElement* showLabelHints = nullptr;
   if (hints != nullptr)
   {
-    showLabels = hints->FindNestedElementByName("ShowComponentLabels");
+    showLabelHints = hints->FindNestedElementByName("ShowComponentLabels");
   }
-
-  int elementCount = dvp->GetNumberOfElements();
-
-  std::vector<const char*> componentLabels(elementCount);
-  if (showLabels)
-  {
-    vtkNew<vtkCollection> elements;
-    showLabels->GetElementsByName("ComponentLabel", elements.GetPointer());
-    int nbCompLabels = elements->GetNumberOfItems();
-    if (elementCount == 0)
-    {
-      elementCount = nbCompLabels;
-      componentLabels.resize(nbCompLabels);
-    }
-    for (int i = 0; i < nbCompLabels; ++i)
-    {
-      vtkPVXMLElement* labelElement = vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
-      if (labelElement)
-      {
-        int component;
-        if (labelElement->GetScalarAttribute("component", &component))
-        {
-          if (component < elementCount)
-          {
-            componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
-          }
-        }
-      }
-    }
-  }
+  const bool showLabels = (showLabelHints != nullptr);
+  const int elementCount = dvp->GetNumberOfElements();
+  const auto componentLabels = showLabels
+    ? pqPropertyWidget::parseComponentLabels(showLabelHints, elementCount)
+    : std::vector<std::string>{};
 
   vtkSMDoubleRangeDomain* range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
   if (this->property()->GetRepeatable())
@@ -156,15 +131,15 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     widget->setObjectName("ScalarValueList");
     widget->setRangeDomain(range);
     this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
-    widget->setShowLabels(showLabels);
-    if (showLabels)
+    widget->setShowLabels(showLabelHints);
+    if (showLabelHints)
     {
       widget->setLabels(componentLabels);
     }
 
     this->setChangeAvailableAsChangeFinished(true);
     layoutLocal->addWidget(widget);
-    this->setShowLabel(showLabels != nullptr);
+    this->setShowLabel(showLabels);
   }
   else if (range)
   {
@@ -212,7 +187,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i));
           if (showLabels)
           {
-            pqLabel* label = new pqLabel(componentLabels[2 * i], this);
+            pqLabel* label = new pqLabel(componentLabels[2 * i].c_str(), this);
             label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             gridLayout->addWidget(label, (i * 2), 0);
             gridLayout->addWidget(lineEdit, (i * 2) + 1, 0);
@@ -230,7 +205,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           lineEdit->setUseGlobalPrecisionAndNotation(true);
           if (showLabels)
           {
-            pqLabel* label = new pqLabel(componentLabels[2 * i + 1], this);
+            pqLabel* label = new pqLabel(componentLabels[2 * i + 1].c_str(), this);
             label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             gridLayout->addWidget(label, (i * 2), 1);
             gridLayout->addWidget(lineEdit, (i * 2) + 1, 1);
@@ -256,7 +231,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
         {
           if (showLabels)
           {
-            pqLabel* label = new pqLabel(componentLabels[i], this);
+            pqLabel* label = new pqLabel(componentLabels[i].c_str(), this);
             label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             layoutLocal->addWidget(label);
           }

@@ -34,9 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidget.h"
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QVariant>
+#include <string>
+#include <vector>
 
 class QListWidgetItem;
+class vtkPVXMLElement;
 class vtkSMDoubleRangeDomain;
 class vtkSMIntRangeDomain;
 
@@ -66,6 +71,10 @@ public:
   void setRangeDomain(vtkSMIntRangeDomain* smRangeDomain);
 
   void setShowLabels(bool);
+  void setLabels(const std::vector<std::string>& labels);
+
+  PARAVIEW_DEPRECATED_IN_5_12_0(
+    "vector of const char* is not memory safe, use std::string version instead");
   void setLabels(std::vector<const char*>&);
 
 Q_SIGNALS:
