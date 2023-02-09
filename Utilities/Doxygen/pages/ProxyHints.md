@@ -405,3 +405,14 @@ usefully.
         <NoSolidColor representation="Volume" />
       </Hints>
     </RepresentationProxy>
+
+HideCursor
+--------------------------
+Hide the mouse cursor when hovering a render view.
+
+    <RenderViewProxy ...>
+      ...
+      <Hints>
+        <HideCursor/>
+      </Hints>
+    </RenderViewProxy>

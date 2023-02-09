@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATION
 #include <QColor>                   // needed for return type.
+#include <QCursor>                  // needed for return type.
 
 class pqDataRepresentation;
 class QAction;
@@ -186,6 +187,7 @@ public:
   virtual void resetViewDirectionToPositiveZ();
   virtual void resetViewDirectionToNegativeZ();
 
+  ///@{
   /**
    * Let internal class handle which internal widget should change its cursor
    * This is usually used for selection and in case of QuadView/SliceView
@@ -193,6 +195,17 @@ public:
    * them to share the same cursor.
    */
   virtual void setCursor(const QCursor&);
+  virtual QCursor cursor();
+  ///@}
+
+  ///@{
+  /**
+   * Set / get the cursor visibility when the mouse hovers the widget
+   * associated with this view.
+   */
+  void setCursorVisible(bool visible);
+  bool cursorVisible();
+  ///@}
 
   ///@{
   /**
