@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/EntityName" command="set_string" arguments="$PARAVIEW_DATA_ROOT" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Navigate" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/EntityName" command="set_string" arguments="Testing" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Navigate" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/EntityName" command="set_string" arguments="Data" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Navigate" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/EntityName" command="set_string" arguments="can.ex2" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/OK" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="true" />
+</pqevents>

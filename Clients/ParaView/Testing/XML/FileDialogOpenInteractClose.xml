@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="false" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/NavigateUp" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Files" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/NavigateBack" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/NavigateForward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/ShowDetail" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/ShowDetail" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Files" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/AddCurrentDirectoryToFavorites" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites" command="setSelection" arguments="0.0,0.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites" command="openContextMenu" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/FileDialogFavoritesContextMenu" command="activate" arguments="Rename label" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="t" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="te" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="tes" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/Favorites/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="test" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/favoritesLayoutWidget/ResetFavortiesToSystemDefault" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Files" command="setSelection" arguments="0.0,0.3" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/locationsLayoutWidget/Locations" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Files" command="setSelection" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/locationsLayoutWidget/Locations" command="doubleClick" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/locationsLayoutWidget/Locations" command="edit" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Files" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/splitter/locationsLayoutWidget/Locations" command="activate" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog/mainWidget/mainSplitter/layoutWidget/Cancel" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="true" />
+</pqevents>

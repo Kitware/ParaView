@@ -736,6 +736,7 @@ SET (TESTS_WITHOUT_BASELINES
   ExpressionsExporter.xml
   ExpressionsSettings.xml
   ExtractParticlesOverTime.xml
+  FileDialogOpenInteractClose.xml
   FavoritesFilters.xml
   GradientBackwardsCompatibility.xml
   ImportCustomPresets.xml
@@ -1132,6 +1133,7 @@ list(APPEND TESTS_WITH_BASELINES
   FeatureEdges.xml
   FFTOverTime.xml
   FieldDataBlocks.xml
+  FileDialogOpenFile.xml
   Flagpole.xml
   Flow.xml
   Flow2.xml

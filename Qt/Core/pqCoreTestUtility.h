@@ -128,6 +128,32 @@ public:
    */
   static QString cleanPath(const QString&);
 
+  /**
+   * Reimplemented to inform this test utility supports dashboard mode
+   * always returns true.
+   */
+  bool supportsDashboardMode() override { return true; };
+
+public Q_SLOTS:
+  /**
+   * put/unset the DASHBOARD_TEST_FROM_CTEST env var
+   * to control if ParaView should behave in dashboard mode
+   * Also update players and translators
+   */
+  void setDashboardMode(bool value) override;
+
+  /**
+   * Reimplemented to add/remove the file dialog player
+   * according to the DASHBOARD_TEST_FROM_CTEST env var
+   */
+  void updatePlayers() override;
+
+  /**
+   * Reimplementated to add/remove the file dialog translator
+   * according to the DASHBOARD_TEST_FROM_CTEST env var
+   */
+  void updateTranslators() override;
+
 private:
   QStringList TestFilenames;
 };
