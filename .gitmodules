@@ -11,4 +11,3 @@
 [submodule "ThirdParty/QtTesting/vtkqttesting"]
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = https://gitlab.kitware.com/paraview/qttesting.git
-	branch = for/paraview

@@ -3,7 +3,7 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/manyTypes.vtu" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Information" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.1,signed char" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.1,double" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.1,float" />
@@ -30,12 +30,12 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/tmp.pvtu" />
   <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/tmp.pvtu" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Information" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.1,signed char" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.1,double" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.1,float" />

@@ -1286,8 +1286,8 @@ list(APPEND TESTS_WITH_BASELINES
   VariableSelector1.xml
   ViewSettingsDialog.xml
   VTPSeriesFile.xml
-  #  XYBarChart.xml
   RandomAttributes.xml
+  XYBarChart.xml
   YoungsMaterialInterface.xml
 )
 
