@@ -1178,12 +1178,7 @@ void vtkPVRenderView::ResetCamera()
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
   double bounds[6];
   this->GeometryBounds.GetBounds(bounds);
-  if (!this->LockBounds)
-  {
-    this->RenderView->GetRenderer()->ResetCamera(bounds);
-  }
-
-  this->InvokeEvent(vtkCommand::ResetCameraEvent);
+  this->ResetCamera(bounds);
 }
 
 //----------------------------------------------------------------------------
