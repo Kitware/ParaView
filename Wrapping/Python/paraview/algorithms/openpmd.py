@@ -8,44 +8,60 @@ from .. import print_error
 try:
     import numpy as np
     import openpmd_api as io
+
     _has_openpmd = True
 except ImportError as ie:
     print_error(
         "Missing required Python modules/packages. Algorithms in this module may "
-        "not work as expected! \n {0}".format(ie))
+        "not work as expected! \n {0}".format(ie)
+    )
     _has_openpmd = False
+
 
 def createModifiedCallback(anobject):
     import weakref
+
     weakref_obj = weakref.ref(anobject)
     anobject = None
+
     def _markmodified(*args, **kwars):
         o = weakref_obj()
         if o is not None:
             o.Modified()
+
     return _markmodified
+
 
 class openPMDReader(VTKPythonAlgorithmBase):
     """A reader that reads openPMD format."""
+
     def __init__(self):
-        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=2, outputType='vtkPartitionedDataSet')
+        VTKPythonAlgorithmBase.__init__(
+            self, nInputPorts=0, nOutputPorts=2, outputType="vtkPartitionedDataSet"
+        )
         self._filename = None
         self._timevalues = None
         self._series = None
         self._timemap = {}
 
         from vtkmodules.vtkCommonCore import vtkDataArraySelection
+
         self._arrayselection = vtkDataArraySelection()
         self._arrayselection.AddObserver("ModifiedEvent", createModifiedCallback(self))
 
         self._speciesselection = vtkDataArraySelection()
-        self._speciesselection.AddObserver("ModifiedEvent", createModifiedCallback(self))
+        self._speciesselection.AddObserver(
+            "ModifiedEvent", createModifiedCallback(self)
+        )
 
         self._particlearrayselection = vtkDataArraySelection()
-        self._particlearrayselection.AddObserver("ModifiedEvent", createModifiedCallback(self))
+        self._particlearrayselection.AddObserver(
+            "ModifiedEvent", createModifiedCallback(self)
+        )
 
     def _get_update_time(self, outInfo):
         from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline
+
         executive = vtkStreamingDemandDrivenPipeline
         timevalues = self._timevalues
         if timevalues is None or len(timevalues) == 0:
@@ -60,7 +76,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
                     dtime = atime
             return dtime
         else:
-            assert(len(timevalues) > 0)
+            assert len(timevalues) > 0
             return timevalues[0]
 
     def _get_array_selection(self):
@@ -95,6 +111,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
     def FillOutputPortInformation(self, port, info):
         from vtkmodules.vtkCommonDataModel import vtkDataObject
+
         if port == 0:
             info.Set(vtkDataObject.DATA_TYPE_NAME(), "vtkPartitionedDataSet")
         else:
@@ -107,26 +124,33 @@ class openPMDReader(VTKPythonAlgorithmBase):
             print_error("Required Python module 'openpmd_api' missing!")
             return 0
 
-        from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline, vtkAlgorithm
+        from vtkmodules.vtkCommonExecutionModel import (
+            vtkStreamingDemandDrivenPipeline,
+            vtkAlgorithm,
+        )
+
         executive = vtkStreamingDemandDrivenPipeline
-        for i in (0,1):
+        for i in (0, 1):
             outInfo = outInfoVec.GetInformationObject(i)
             outInfo.Remove(executive.TIME_STEPS())
             outInfo.Remove(executive.TIME_RANGE())
             outInfo.Set(vtkAlgorithm.CAN_HANDLE_PIECE_REQUEST(), 1)
 
         # Why is this a string when it is None?
-        if self._filename == 'None':
+        if self._filename == "None":
             return 1
 
         mfile = open(self._filename, "r")
         pattern = mfile.readlines()[0][0:-1]
         del mfile
 
-
         import os
+
         if not self._series:
-            self._series = io.Series(os.path.dirname(self._filename)+'/'+pattern, io.Access_Type.read_only)
+            self._series = io.Series(
+                os.path.dirname(self._filename) + "/" + pattern,
+                io.Access_Type.read_only,
+            )
         # This is how we get time values and arrays
         self._timemap = {}
         timevalues = []
@@ -141,18 +165,17 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 time = iteration.time * iteration.time_unit_SI
             timevalues.append(time)
             self._timemap[time] = idx
-            arrays.update([
-                mesh_name
-                for mesh_name, mesh in iteration.meshes.items()])
-            particles.update([
-                species_name + "_" + record_name
-                for species_name, species in iteration.particles.items()
-                for record_name, record in species.items()
-                ])
-            species.update([
-                species_name
-                for species_name, _ in iteration.particles.items()
-                ])
+            arrays.update([mesh_name for mesh_name, mesh in iteration.meshes.items()])
+            particles.update(
+                [
+                    species_name + "_" + record_name
+                    for species_name, species in iteration.particles.items()
+                    for record_name, record in species.items()
+                ]
+            )
+            species.update(
+                [species_name for species_name, _ in iteration.particles.items()]
+            )
 
         for array in arrays:
             self._arrayselection.AddArray(array)
@@ -164,7 +187,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         timesteps = list(self._series.iterations)
         self._timevalues = timevalues
         if len(timevalues) > 0:
-            for i in (0,1):
+            for i in (0, 1):
                 outInfo = outInfoVec.GetInformationObject(i)
                 for t in timevalues:
                     outInfo.Append(executive.TIME_STEPS(), t)
@@ -198,40 +221,42 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
         ncomp = len(var)
         if ncomp > 1:
-            flt = np.ravel(arrays, order='F')
-            return flt.reshape((flt.shape[0]//ncomp, ncomp))
+            flt = np.ravel(arrays, order="F")
+            return flt.reshape((flt.shape[0] // ncomp, ncomp))
         else:
-            return arrays[0].flatten(order='F')
+            return arrays[0].flatten(order="F")
 
     def _find_array(self, itr, name):
         var = itr.meshes[name]
         theta_modes = None
         if var.geometry == io.Geometry.thetaMode:
-            theta_modes = 3 # hardcoded, parse from geometry_parameters
-        return (var,
+            theta_modes = 3  # hardcoded, parse from geometry_parameters
+        return (
+            var,
             np.array(var.grid_spacing) * var.grid_unit_SI,
             np.array(var.grid_global_offset) * var.grid_unit_SI,
-            theta_modes)
+            theta_modes,
+        )
 
     def _get_num_particles(self, itr, species):
         sp = itr.particles[species]
         var = sp["position"]
-        return var['x'].shape[0]
+        return var["x"].shape[0]
 
     def _load_particle_array(self, itr, species, name, start, end):
         sp = itr.particles[species]
         var = sp[name]
         arrays = []
         for name, scalar in var.items():
-            comp = scalar.load_chunk([start], [end-start+1])
+            comp = scalar.load_chunk([start], [end - start + 1])
             self._series.flush()
             comp = comp * scalar.unit_SI
             arrays.append(comp)
 
         ncomp = len(var)
         if ncomp > 1:
-            flt = np.ravel(arrays, order='F')
-            return flt.reshape((flt.shape[0]//ncomp, ncomp))
+            flt = np.ravel(arrays, order="F")
+            return flt.reshape((flt.shape[0] // ncomp, ncomp))
         else:
             return arrays[0]
 
@@ -241,17 +266,17 @@ class openPMDReader(VTKPythonAlgorithmBase):
         ovar = sp["positionOffset"]
         position_arrays = []
         for name, scalar in var.items():
-            pos = scalar.load_chunk([start], [end-start+1])
+            pos = scalar.load_chunk([start], [end - start + 1])
             self._series.flush()
             pos = pos * scalar.unit_SI
-            off = ovar[name].load_chunk([start], [end-start+1])
+            off = ovar[name].load_chunk([start], [end - start + 1])
             self._series.flush()
             off = off * ovar[name].unit_SI
             position_arrays.append(pos + off)
 
-        flt = np.ravel(position_arrays, order='F')
-        num_components = len(var) # 1D, 2D and 3D positions
-        flt = flt.reshape((flt.shape[0]//num_components, num_components))
+        flt = np.ravel(position_arrays, order="F")
+        num_components = len(var)  # 1D, 2D and 3D positions
+        flt = flt.reshape((flt.shape[0] // num_components, num_components))
         # 1D and 2D particles: pad additional components with zero
         while flt.shape[1] < 3:
             flt = np.column_stack([flt, np.zeros_like(flt[:, 0])])
@@ -268,20 +293,22 @@ class openPMDReader(VTKPythonAlgorithmBase):
         npts = pts.shape[0]
         ugrid.Points = pts
         for array in arrays:
-            if array[1] == 'position' or array[1] == 'positionOffset':
+            if array[1] == "position" or array[1] == "positionOffset":
                 continue
             ugrid.PointData.append(
-                self._load_particle_array(itr, array[0], array[1], start, end),
-                array[1])
+                self._load_particle_array(itr, array[0], array[1], start, end), array[1]
+            )
         from vtkmodules.vtkCommonDataModel import vtkCellArray
+
         ca = vtkCellArray()
         if npts < np.iinfo(np.int32).max:
             dtype = np.int32
         else:
             dtype = np.int64
-        offsets = np.linspace(0, npts, npts+1, dtype=dtype)
-        cells = np.linspace(0, npts-1, npts, dtype=dtype)
+        offsets = np.linspace(0, npts, npts + 1, dtype=dtype)
+        cells = np.linspace(0, npts - 1, npts, dtype=dtype)
         from vtkmodules.numpy_interface import dataset_adapter
+
         offsets = dataset_adapter.numpyTovtkDataArray(offsets)
         offsets2 = offsets.NewInstance()
         offsets2.DeepCopy(offsets)
@@ -290,8 +317,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
         cells2.DeepCopy(cells)
         ca.SetData(offsets2, cells2)
         from vtkmodules.util import vtkConstants
-        ugrid.VTKObject.SetCells(vtkConstants.VTK_VERTEX, ca)
 
+        ugrid.VTKObject.SetCells(vtkConstants.VTK_VERTEX, ca)
 
     def _RequestFieldData(self, executive, output, outInfo, timeInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa
@@ -325,24 +352,24 @@ class openPMDReader(VTKPythonAlgorithmBase):
             spc = list(ary[1])
             if not spacing:
                 spacing = spc
-            elif spacing != spc: # all meshes need to have the same spacing
+            elif spacing != spc:  # all meshes need to have the same spacing
                 return 0
             offset = list(ary[2])
             if not grid_offset:
                 grid_offset = offset
-            elif grid_offset != offset: # all meshes need to have the same spacing
+            elif grid_offset != offset:  # all meshes need to have the same spacing
                 return 0
             if not shp:
                 shp = shape
-            elif shape != shp: # all arrays needs to have the same shape
+            elif shape != shp:  # all arrays needs to have the same shape
                 return 0
             if not theta_modes:
                 theta_modes = ary[3]
 
         # fields/meshes: RZ
         if theta_modes and shp is not None:
-            et.SetWholeExtent(0, shp[0]-1, 0, shp[1]-1, 0, shp[2]-1)
-            et.SetSplitModeToZSlab() # note: Y and Z are both fine
+            et.SetWholeExtent(0, shp[0] - 1, 0, shp[1] - 1, 0, shp[2] - 1)
+            et.SetSplitModeToZSlab()  # note: Y and Z are both fine
             et.SetPiece(piece)
             et.SetNumberOfPieces(npieces)
             # et.SetGhostLevel(nghosts)
@@ -350,11 +377,15 @@ class openPMDReader(VTKPythonAlgorithmBase):
             ext = et.GetExtent()
 
             chunk_offset = [ext[0], ext[2], ext[4]]
-            chunk_extent = [ext[1] - ext[0] + 1, ext[3] - ext[2] + 1, ext[5] - ext[4] + 1]
+            chunk_extent = [
+                ext[1] - ext[0] + 1,
+                ext[3] - ext[2] + 1,
+                ext[5] - ext[4] + 1,
+            ]
 
             data = []
             nthetas = 100  # user parameter
-            thetas = np.linspace(0., 2.*np.pi, nthetas)
+            thetas = np.linspace(0.0, 2.0 * np.pi, nthetas)
             chunk_cyl_shape = (chunk_extent[1], chunk_extent[2], nthetas)  # z, r, theta
             for name, var in arrays:
                 cyl_values = np.zeros(chunk_cyl_shape)
@@ -370,10 +401,14 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 # add all other modes via loop
                 # for m in range(theta_modes):
 
-            cyl_spacing = [spacing[0], spacing[1], thetas[1]-thetas[0]]
+            cyl_spacing = [spacing[0], spacing[1], thetas[1] - thetas[0]]
 
-            z_coord = np.linspace(0., cyl_spacing[0] * chunk_cyl_shape[0], chunk_cyl_shape[0])
-            r_coord = np.linspace(0., cyl_spacing[1] * chunk_cyl_shape[1], chunk_cyl_shape[1])
+            z_coord = np.linspace(
+                0.0, cyl_spacing[0] * chunk_cyl_shape[0], chunk_cyl_shape[0]
+            )
+            r_coord = np.linspace(
+                0.0, cyl_spacing[1] * chunk_cyl_shape[1], chunk_cyl_shape[1]
+            )
             t_coord = thetas
 
             # to cartesian
@@ -389,12 +424,15 @@ class openPMDReader(VTKPythonAlgorithmBase):
             # mesh_pts = np.zeros((chunk_cyl_shape[0], chunk_cyl_shape[1], chunk_cyl_shape[2], 3))
             # mesh_pts[:, :, :, 0] = z_coord
 
-
             img = vtkImageData()
             img.SetExtent(
-                chunk_offset[1], chunk_offset[1] + chunk_cyl_shape[0] - 1,
-                chunk_offset[2], chunk_offset[2] + chunk_cyl_shape[1] - 1,
-                0, nthetas-1)
+                chunk_offset[1],
+                chunk_offset[1] + chunk_cyl_shape[0] - 1,
+                chunk_offset[2],
+                chunk_offset[2] + chunk_cyl_shape[1] - 1,
+                0,
+                nthetas - 1,
+            )
             img.SetSpacing(cyl_spacing)
 
             imgw = dsa.WrapDataObject(img)
@@ -402,8 +440,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
             for name, array in data:
                 # print(array.shape)
                 # print(array.transpose(2,1,0).flatten(order='C').shape)
-                imgw.PointData.append(array.transpose(2,1,0).flatten(order='C'), name)
-
+                imgw.PointData.append(array.transpose(2, 1, 0).flatten(order="C"), name)
 
             # data = []
             # for name, var in arrays:
@@ -417,7 +454,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
             # interleave shape with zeros
             for s in shp:
                 whole_extent.append(0)
-                whole_extent.append(s-1)
+                whole_extent.append(s - 1)
             # 1D and 2D data: pad with 0, 0 for extra dimensions
             while len(whole_extent) < 6:
                 whole_extent.append(0)
@@ -431,11 +468,15 @@ class openPMDReader(VTKPythonAlgorithmBase):
             ext = et.GetExtent()
 
             chunk_offset = [ext[0], ext[2], ext[4]]
-            chunk_extent = [ext[1] - ext[0] + 1, ext[3] - ext[2] + 1, ext[5] - ext[4] + 1]
+            chunk_extent = [
+                ext[1] - ext[0] + 1,
+                ext[3] - ext[2] + 1,
+                ext[5] - ext[4] + 1,
+            ]
 
             # 1D and 2D data: remove extra dimensions for load
-            del chunk_offset[len(shp):]
-            del chunk_extent[len(shp):]
+            del chunk_offset[len(shp) :]
+            del chunk_extent[len(shp) :]
 
             data = []
             for name, var in arrays:
@@ -468,7 +509,10 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
     def _RequestParticleData(self, executive, poutput, outInfo, timeInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa
-        from vtkmodules.vtkCommonDataModel import vtkUnstructuredGrid, vtkPartitionedDataSet
+        from vtkmodules.vtkCommonDataModel import (
+            vtkUnstructuredGrid,
+            vtkPartitionedDataSet,
+        )
 
         piece = outInfo.Get(executive.UPDATE_PIECE_NUMBER())
         npieces = outInfo.Get(executive.UPDATE_NUMBER_OF_PIECES())
@@ -482,8 +526,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         for i in range(narrays):
             if self._particlearrayselection.GetArraySetting(i):
                 name = self._particlearrayselection.GetArrayName(i)
-                names = self._get_particle_array_and_component(
-                    itr, name)
+                names = self._get_particle_array_and_component(itr, name)
                 if names[0] and self._speciesselection.ArrayIsEnabled(names[0]):
                     if not names[0] in array_by_species:
                         array_by_species[names[0]] = []
@@ -496,8 +539,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             poutput.SetPartitionedDataSet(ids, pds)
             ids += 1
             self._load_species(
-                itr, species, arrays, piece, npieces, dsa.WrapDataObject(ugrid))
-
+                itr, species, arrays, piece, npieces, dsa.WrapDataObject(ugrid)
+            )
 
     def RequestData(self, request, inInfoVec, outInfoVec):
         global _has_openpmd
@@ -505,7 +548,10 @@ class openPMDReader(VTKPythonAlgorithmBase):
             print_error("Required Python module 'openpmd_api' missing!")
             return 0
 
-        from vtkmodules.vtkCommonDataModel import vtkDataObject, vtkPartitionedDataSet, vtkPartitionedDataSetCollection
+        from vtkmodules.vtkCommonDataModel import (
+            vtkPartitionedDataSet,
+            vtkPartitionedDataSetCollection,
+        )
         from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline
 
         # Which port got an update request: fields (0) or particles (1)
@@ -531,8 +577,9 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 poutput = vtkPartitionedDataSetCollection.GetData(outInfoVec, 1)
                 self._RequestParticleData(executive, poutput, outInfo, timeInfo)
             else:
-                print_error("numInfo number is wrong! "
-                            "It should be exactly 2, is=", numInfo)
+                print_error(
+                    "numInfo number is wrong! " "It should be exactly 2, is=", numInfo
+                )
                 return 0
 
         return 1
