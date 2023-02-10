@@ -220,9 +220,8 @@ void pqRenderView::initialize()
   vtkSMRenderViewProxy* viewProxy = this->getRenderViewProxy();
   this->Internal->UndoStackBuilder->SetRenderView(viewProxy);
 
-  if (vtkPVXMLElement* hints = this->getProxy()->GetHints()
-      ? this->getProxy()->GetHints()->FindNestedElementByName("HideCursor")
-      : nullptr)
+  if (this->getProxy()->GetHints() &&
+    this->getProxy()->GetHints()->FindNestedElementByName("HideCursor"))
   {
     this->setCursorVisible(false);
   }
