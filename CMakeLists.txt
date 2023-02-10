@@ -317,6 +317,7 @@ set(paraview_default_plugins
   Prism
   SaveStateAndScreenshot
   SLACTools
+  StereoCursorView
   StreamLinesRepresentation
   StreamingParticles
   SurfaceLIC
