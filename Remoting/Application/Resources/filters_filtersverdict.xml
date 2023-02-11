@@ -291,5 +291,65 @@
       </IntVectorProperty>
       <!-- End MeshQuality -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkBoundaryMeshQuality"
+                 label="Boundary Mesh Quality"
+                 name="BoundaryMeshQuality">
+      <Documentation long_help="This filter computes metrics on the boundary faces of a volumetric mesh."
+                     short_help="Evaluate metrics on the boundary faces of a volumetric mesh.">
+        This filter computes metrics on the boundary faces of a volumetric mesh.
+        The metrics that can be computed on the boundary faces of the mesh and are:
+        (1) Distance from cell center to face center
+        (2) Distance from cell center to face's plane
+        (3) Angle of face's plane normal and cell center to face center vector
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGridBase"/>
+          <DataType value="vtkImageData"/>
+          <DataType value="vtkRectilinearGrid"/>
+          <DataType value="vtkStructuredGrid"/>
+          <DataType value="vtkExplicitStructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Boundary Mesh Quality filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDistanceFromCellCenterToFaceCenter"
+                         default_values="1"
+                         name="DistanceFromCellCenterToFaceCenter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property indicates whether the distance from cell center to face center will be computed.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDistanceFromCellCenterToFacePlane"
+                         default_values="1"
+                         name="DistanceFromCellCenterToFacePlane"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property indicates whether the distance from cell center to face's plane will be computed.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAngleFaceNormalAndCellCenterToFaceCenterVector"
+                         default_values="1"
+                         name="AngleFaceNormalAndCellCenterToFaceCenterVector"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property indicates whether the angle of face's plane normal and cell center to face center vector will be
+          computed.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End BoundaryMeshQuality -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
