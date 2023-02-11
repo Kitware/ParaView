@@ -23,18 +23,24 @@
 #define pqNodeEditorEdge_h
 
 #include "pqNodeEditorUtils.h"
-#include <QGraphicsPathItem>
+#include <QGraphicsItemGroup>
 
 class pqNodeEditorNode;
+class QGraphicsPathItem;
 
 /**
  * Every instance of this class corresponds to an edge between an output port
  * and an input port. This class internally detects if the positions of the
  * corresponding ports change and updates itself automatically.
+ *
+ * This class also display 2 edges : one at the given Z depth, the other at the
+ * maximum Z layer. The second one will be displayed slighlty transparent. This
+ * is in order to have some informations on the edges even when nodes are above.
+ * The overlay needs to be added manually to the scene.
  */
 class pqNodeEditorEdge
   : public QObject
-  , public QGraphicsPathItem
+  , public QGraphicsItem
 {
   Q_OBJECT
 
@@ -87,18 +93,7 @@ public:
   int getConsumerInputPortIdx() { return this->consumerInputPortIdx; };
   ///@}
 
-  ///@{
-  /*
-   * Get the layer of this edges, used to discriminate between
-   * seveal overlapping edges (different line above boxed)
-   */
-  void setLayer(int l)
-  {
-    this->layer = l;
-    this->setZValue(this->layer * pqNodeEditorUtils::CONSTS::EDGE_LAYER);
-  };
-  int getLayer() { return this->layer; };
-  ///@}
+  QGraphicsPathItem* overlay() const { return this->edgeOverlay; }
 
   /*
    * Get edge information as string.
@@ -113,22 +108,20 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   int updatePoints();
 
 protected:
+  QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
   QRectF boundingRect() const override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
-  Type type{ Type::PIPELINE };
-  QPointF oPoint;
-  QPointF cPoint;
-  QPointF iPoint;
+  Type type = Type::PIPELINE;
+
   QPainterPath path;
+  QGraphicsPathItem* edgeOverlay = nullptr;
 
-  pqNodeEditorNode* producer;
-  int producerOutputPortIdx;
-  pqNodeEditorNode* consumer;
-  int consumerInputPortIdx;
-
-  int layer; // for display purpose, we draw several overlapping edges.
+  pqNodeEditorNode* producer = nullptr;
+  int producerOutputPortIdx = 0;
+  pqNodeEditorNode* consumer = nullptr;
+  int consumerInputPortIdx = 0;
 };
 
 #endif // pqNodeEditorEdge_h

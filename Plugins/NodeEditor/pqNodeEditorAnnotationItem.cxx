@@ -122,7 +122,7 @@ void pqNodeEditorAnnotationItem::paint(QPainter* painter, const QStyleOptionGrap
   {
     background = pqNodeEditorUtils::CONSTS::COLOR_BASE;
     background.setAlphaF(0.85);
-    this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER + 2);
+    this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER + 9);
   }
   else
   {

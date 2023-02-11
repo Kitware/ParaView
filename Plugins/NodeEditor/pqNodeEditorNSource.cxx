@@ -32,8 +32,6 @@
 pqNodeEditorNSource::pqNodeEditorNSource(pqPipelineSource* source, QGraphicsItem* parent)
   : pqNodeEditorNode((pqProxy*)source, parent)
 {
-  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
-
   // create ports ...
   QRectF br = this->boundingRect();
   constexpr auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;

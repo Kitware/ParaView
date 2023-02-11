@@ -32,8 +32,6 @@
 pqNodeEditorNView::pqNodeEditorNView(pqView* view, QGraphicsItem* parent)
   : pqNodeEditorNode((pqProxy*)view, parent)
 {
-  this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER);
-
   auto br = this->boundingRect();
   auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   br.adjust(adjust, adjust, -adjust, -adjust);

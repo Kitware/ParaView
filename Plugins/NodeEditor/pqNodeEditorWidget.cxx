@@ -359,7 +359,7 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   QObject::connect(smm, &pqServerManagerModel::serverAdded, [this](pqServer*) {
     for (auto* annot : this->annotationRegistry)
     {
-      this->scene->removeItem(annot);
+      delete annot;
     }
     this->annotationRegistry.clear();
   });
@@ -556,6 +556,8 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
 void pqNodeEditorWidget::registerNode(pqNodeEditorNode* node, vtkIdType id)
 {
   this->scene->addItem(node);
+  this->scene->clearSelection();
+  node->setSelected(true);
   this->nodeRegistry.insert({ id, node });
   this->edgeRegistry.insert({ id, {} });
 
@@ -662,32 +664,20 @@ int pqNodeEditorWidget::createNodeForRepresentation(pqRepresentation* createdRep
   // Create edges related to this representation
   auto* sourcePort = repr->getOutputPortFromInput();
   auto* sourceNode = this->nodeRegistry.at(pqNodeEditorUtils::getID(sourcePort->getSource()));
-  auto* sourceToReprMain = new pqNodeEditorEdge(
+  auto* sourceToRepr = new pqNodeEditorEdge(
     sourceNode, sourcePort->getPortNumber(), reprNode, 0, pqNodeEditorEdge::Type::VIEW);
-  sourceToReprMain->setVisible(showNodes);
-  auto* sourceToReprAux = new pqNodeEditorEdge(
-    sourceNode, sourcePort->getPortNumber(), reprNode, 0, pqNodeEditorEdge::Type::VIEW);
-  sourceToReprAux->setVisible(showNodes);
-  sourceToReprAux->setOpacity(0.5);
-  sourceToReprAux->setLayer(9);
-  this->scene->addItem(sourceToReprMain);
-  this->scene->addItem(sourceToReprAux);
-  this->edgeRegistry.at(repId) = { sourceToReprMain, sourceToReprAux };
+  sourceToRepr->setVisible(showNodes);
+  this->scene->addItem(sourceToRepr);
+  this->scene->addItem(sourceToRepr->overlay());
+  this->edgeRegistry.at(repId) = { sourceToRepr };
 
   const auto viewId = pqNodeEditorUtils::getID(repr->getView());
   auto* viewNode = this->nodeRegistry.at(viewId);
-  auto* reprToViewMain =
-    new pqNodeEditorEdge(reprNode, 0, viewNode, 0, pqNodeEditorEdge::Type::VIEW);
-  reprToViewMain->setVisible(showNodes);
-  auto* reprToViewAux =
-    new pqNodeEditorEdge(reprNode, 0, viewNode, 0, pqNodeEditorEdge::Type::VIEW);
-  reprToViewAux->setVisible(showNodes);
-  reprToViewAux->setOpacity(0.5);
-  reprToViewAux->setLayer(9);
-  this->scene->addItem(reprToViewMain);
-  this->scene->addItem(reprToViewAux);
-  this->edgeRegistry.at(viewId).emplace_back(reprToViewMain);
-  this->edgeRegistry.at(viewId).emplace_back(reprToViewAux);
+  auto* reprToView = new pqNodeEditorEdge(reprNode, 0, viewNode, 0, pqNodeEditorEdge::Type::VIEW);
+  reprToView->setVisible(showNodes);
+  this->scene->addItem(reprToView);
+  this->scene->addItem(reprToView->overlay());
+  this->edgeRegistry.at(viewId).emplace_back(reprToView);
 
   // Make sure to hide those when the representation is not visible anymore
   // XXX: `this` as third argument here is MANDATORY so we're sure that it is not deleted
@@ -695,8 +685,7 @@ int pqNodeEditorWidget::createNodeForRepresentation(pqRepresentation* createdRep
   QObject::connect(repr, &pqRepresentation::visibilityChanged, this, [=](bool visible) {
     if (this->edgeRegistry.count(repId) > 0)
     {
-      sourceToReprMain->setVisible(visible && this->showViewNodes);
-      sourceToReprAux->setVisible(visible && this->showViewNodes);
+      sourceToRepr->setVisible(visible && this->showViewNodes);
     }
     if (this->nodeRegistry.count(repId) > 0)
     {
@@ -704,8 +693,7 @@ int pqNodeEditorWidget::createNodeForRepresentation(pqRepresentation* createdRep
     }
     if (this->edgeRegistry.count(viewId) > 0)
     {
-      reprToViewMain->setVisible(visible && this->showViewNodes);
-      reprToViewAux->setVisible(visible && this->showViewNodes);
+      reprToView->setVisible(visible && this->showViewNodes);
     }
   });
 
@@ -937,16 +925,11 @@ int pqNodeEditorWidget::updatePipelineEdges(pqPipelineFilter* consumer)
       }
 
       // create edge
-      auto* edgeMain = new pqNodeEditorEdge(
+      auto* edge = new pqNodeEditorEdge(
         producerIt->second, producerPort->getPortNumber(), consumerIt->second, iPortIdx);
-      this->scene->addItem(edgeMain);
-      auto* edgeAux = new pqNodeEditorEdge(
-        producerIt->second, producerPort->getPortNumber(), consumerIt->second, iPortIdx);
-      edgeAux->setOpacity(0.5);
-      edgeAux->setLayer(9);
-      this->scene->addItem(edgeAux);
-      consumerEdgesIt->second.push_back(edgeMain);
-      consumerEdgesIt->second.push_back(edgeAux);
+      this->scene->addItem(edge);
+      this->scene->addItem(edge->overlay());
+      consumerEdgesIt->second.push_back(edge);
     }
   }
 

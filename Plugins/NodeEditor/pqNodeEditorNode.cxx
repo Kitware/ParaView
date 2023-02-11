@@ -62,8 +62,9 @@ pqNodeEditorNode::pqNodeEditorNode(pqProxy* prx, QGraphicsItem* parent)
   , widgetContainer(new QWidget)
   , label(new pqNodeEditorLabel("", this))
 {
-  this->setFlag(GraphicsItemFlag::ItemIsMovable);
-  this->setFlag(GraphicsItemFlag::ItemSendsGeometryChanges);
+  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
+  this->setFlags({ GraphicsItemFlag::ItemSendsGeometryChanges, GraphicsItemFlag::ItemIsMovable,
+    QGraphicsItem::ItemIsSelectable });
   this->setCacheMode(CacheMode::DeviceCoordinateCache);
   this->setCursor(Qt::ArrowCursor);
   this->setObjectName(QString("node") + this->proxy->getSMName());
@@ -141,7 +142,6 @@ pqNodeEditorNode::pqNodeEditorNode(pqProxy* prx, QGraphicsItem* parent)
     graphicsProxyWidget->setWidget(this->widgetContainer);
     graphicsProxyWidget->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     graphicsProxyWidget->setPos(QPointF(0, this->headlineHeight));
-    graphicsProxyWidget->setZValue(pqNodeEditorUtils::CONSTS::WIDGET_LAYER);
 
     this->proxyProperties->setObjectName("proxyPropertiesWidget");
     this->proxyProperties->updatePanel();
@@ -177,7 +177,7 @@ int pqNodeEditorNode::updateSize()
 void pqNodeEditorNode::setNodeActive(bool active)
 {
   this->nodeActive = active;
-  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER + static_cast<int>(active));
+  this->updateZValue();
   this->update(this->boundingRect());
 }
 
@@ -229,7 +229,19 @@ QVariant pqNodeEditorNode::itemChange(GraphicsItemChange change, const QVariant&
     Q_EMIT this->nodeMoved();
   }
 
+  if (change == GraphicsItemChange::ItemSelectedHasChanged)
+  {
+    this->updateZValue();
+  }
+
   return QGraphicsItem::itemChange(change, value);
+}
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorNode::updateZValue()
+{
+  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER + static_cast<int>(this->isSelected() * 2) +
+    static_cast<int>(this->isNodeActive()));
 }
 
 // ----------------------------------------------------------------------------

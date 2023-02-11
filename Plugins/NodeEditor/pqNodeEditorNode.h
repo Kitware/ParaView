@@ -202,6 +202,8 @@ protected:
    */
   int updateSize();
 
+  void updateZValue();
+
   /**
    * Return the node key used to store its layout.
    * Key is "node.<SMGroup>.<SMName>"
