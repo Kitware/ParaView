@@ -25,11 +25,11 @@ Learning Resources
 
 * General information is available at the [ParaView Homepage][].
 
-* [The ParaView Guide][Guide] can be downloaded (as PDF) or purchased (in print).
+* The ParaView User's Guide can be found on the [ParaView Documentation][Guide].
 
 * Community discussion takes place on the [ParaView Discourse][] forum.
 
-* Commercial [support][Kitware Support] and [training][Kitware Training]
+* Commercial [support and training][Kitware Support]
   are available from [Kitware][].
 
 * Additional documentation, including Doxygen-generated nightly
@@ -39,9 +39,9 @@ Learning Resources
 [Documentation]: http://www.paraview.org/documentation/
 [ParaView Discourse]: https://discourse.paraview.org/
 [Kitware]: http://www.kitware.com/
-[Kitware Support]: http://www.kitware.com/products/support.html
+[Kitware Support]: https://www.kitware.com/support/
 [Kitware Training]: http://www.kitware.com/products/protraining.php
-[Guide]: http://www.paraview.org/paraview-guide/
+[Guide]: https://docs.paraview.org/en/latest/
 
 
 Building
