@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPythonQtMethodHelpers_h
 #define pqPythonQtMethodHelpers_h
 
-#include <pqProxy.h>
-#include <pqServerManagerModel.h>
+#include "pqProxy.h"
+#include "pqServerManagerModel.h"
 
 class pqPythonQtMethodHelpers : public QObject
 {

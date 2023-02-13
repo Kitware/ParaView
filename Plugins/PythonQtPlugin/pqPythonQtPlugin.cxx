@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonQtPlugin.h"
 
-#include <vtkPython.h>
-#include <vtkPythonInterpreter.h>
+#include "vtkPython.h"
+#include "vtkPythonInterpreter.h"
 
 #include "pqPluginDecorators.h"
 #include "pqPythonQtWrapperFactory.h"
 
-#include <pqPythonShell.h>
+#include "pqPythonShell.h"
 
 #include <PythonQt.h>
 #if WITH_QtAll

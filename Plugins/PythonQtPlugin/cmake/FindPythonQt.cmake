@@ -1,7 +1,7 @@
 # Find PythonQt
 #
-# Sets PythonQt_FOUND, PythonQt_INCLUDE_DIRS, PythonQt_LIBRARIES
-# PythonQt::PythonQt_QtAll Target is optional and only built if the library is found.
+# Sets PythonQt_FOUND, PythonQt_INCLUDE_DIRS, PythonQt_LIBRARIES and PythonQt_QtAll
+# PythonQt::PythonQt_QtAll Target is optional and only provided if the library is found.
 #
 
 find_path(PythonQt_INCLUDE_DIR
