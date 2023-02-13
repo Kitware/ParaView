@@ -42,11 +42,11 @@ pqNodeEditorEdge::pqNodeEditorEdge(pqNodeEditorNode* producerNode, int outputPor
   pqNodeEditorNode* consumerNode, int inputPortIdx, Type edgeType, QGraphicsItem* parent)
   : QGraphicsItem(parent)
   , type(edgeType)
+  , edgeOverlay(new QGraphicsPathItem(parent))
   , producer(producerNode)
   , producerOutputPortIdx(outputPortIdx)
   , consumer(consumerNode)
   , consumerInputPortIdx(inputPortIdx)
-  , edgeOverlay(new QGraphicsPathItem(parent))
 {
   this->connect(
     this->producer, &pqNodeEditorNode::nodeMoved, this, &pqNodeEditorEdge::updatePoints);
@@ -71,7 +71,7 @@ pqNodeEditorEdge::pqNodeEditorEdge(pqNodeEditorNode* producerNode, int outputPor
 // -----------------------------------------------------------------------------
 pqNodeEditorEdge::~pqNodeEditorEdge()
 {
-  if (this->parentItem() == nullptr)
+  if (this->edgeOverlay->parentItem() == nullptr)
   {
     delete this->edgeOverlay;
   }

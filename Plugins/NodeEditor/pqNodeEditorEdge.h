@@ -23,7 +23,7 @@
 #define pqNodeEditorEdge_h
 
 #include "pqNodeEditorUtils.h"
-#include <QGraphicsItemGroup>
+#include <QGraphicsItem>
 
 class pqNodeEditorNode;
 class QGraphicsPathItem;
@@ -43,6 +43,7 @@ class pqNodeEditorEdge
   , public QGraphicsItem
 {
   Q_OBJECT
+  Q_INTERFACES(QGraphicsItem)
 
 public:
   /**

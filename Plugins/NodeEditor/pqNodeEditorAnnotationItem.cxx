@@ -122,6 +122,8 @@ void pqNodeEditorAnnotationItem::paint(QPainter* painter, const QStyleOptionGrap
   {
     background = pqNodeEditorUtils::CONSTS::COLOR_BASE;
     background.setAlphaF(0.85);
+    // put this above nodes, without conflicting with an eventual future type
+    // as graph elements are separated by step of 10 in pqNodeEditorUtils.h
     this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER + 9);
   }
   else
