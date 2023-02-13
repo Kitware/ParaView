@@ -887,6 +887,7 @@ SET(TESTS_WITH_BASELINES
   CleanToGridRemovePoints.xml
   DataAxesGrid.xml
   EmptyInitialCompositeReader.xml # Issue #21293
+  IOSSMergeExodusEntityBlocks.xml
   MergeVectorComponents.xml
   MoleculeScalarBar.xml
   NetCDFUGRID.xml
