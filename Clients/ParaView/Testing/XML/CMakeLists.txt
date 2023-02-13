@@ -768,6 +768,8 @@ SET (TESTS_WITHOUT_BASELINES
   TextSource.xml
   ThresholdBackwardsCompatibility.xml
   ThresholdTable.xml
+  TimeManagerPanel.xml
+  TimeManagerSequence.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)

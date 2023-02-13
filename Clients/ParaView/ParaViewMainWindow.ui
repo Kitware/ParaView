@@ -356,6 +356,18 @@
     </property>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="timeManagerDock">
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Time Manager</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+  <widget class="pqTimeManagerWidget" name="timeManagerPanel"/>
+  </widget>
   <widget class="QDockWidget" name="timeInspectorDock">
    <property name="allowedAreas">
     <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
@@ -530,6 +542,12 @@
    <class>pqColorMapEditor</class>
    <extends>QWidget</extends>
    <header>pqColorMapEditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqTimeManagerWidget</class>
+   <extends>QWidget</extends>
+   <header>pqTimeManagerWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

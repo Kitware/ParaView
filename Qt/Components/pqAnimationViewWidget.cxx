@@ -225,7 +225,7 @@ public:
         return QString("%1 - %2").arg(pqproxy->getSMName()).arg(p);
       }
     }
-    return QString("<%1>").arg(tr("unrecognized"));
+    return QString("<%1>").arg(QCoreApplication::tr("unrecognized"));
   }
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)

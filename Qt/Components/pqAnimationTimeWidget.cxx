@@ -124,7 +124,7 @@ public:
     return false;
   }
 
-  void updateSequenceTimeSteps() { this->updateSequenceTimeSteps(this->SequenceTimeSteps.size()); }
+  void updateSequenceTimeSteps() { this->updateSequenceTimeSteps(this->numberOfFrames()); }
 
   void updateSequenceTimeSteps(int nbOfFrames)
   {
@@ -143,7 +143,7 @@ public:
     }
   }
 
-  int numberOfFrames() { return this->SequenceTimeSteps.size(); }
+  int numberOfFrames() { return static_cast<int>(this->SequenceTimeSteps.size()); }
 
   bool setTimeSteps(const QList<QVariant>& list)
   {
@@ -184,10 +184,14 @@ public:
     this->Ui.timeValueComboBox->setValidator(new QDoubleValidator(self));
     this->Ui.timeValueComboBox->setLineEdit(new pqDoubleLineEdit(self));
 
-    // setup a min size for combox so it does not resize to often.
+    // setup a min size for input widgets so it do not resize to often
+    // and so avoid a "flickering" effect.
     auto metrics = this->Ui.timeValueComboBox->fontMetrics();
     auto minW = metrics.horizontalAdvance("210.123456789");
     this->Ui.timeValueComboBox->setMinimumWidth(minW);
+    metrics = this->Ui.timestepValue->fontMetrics();
+    minW = metrics.horizontalAdvance("12345 (?) ");
+    this->Ui.timestepValue->setMinimumWidth(minW);
   }
 
   /**
@@ -408,6 +412,7 @@ const QList<QVariant>& pqAnimationTimeWidget::timestepValues() const
 //-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setPrecision(int val)
 {
+  Q_UNUSED(val);
   auto& internals = (*this->Internals);
   internals.render(this);
 }
@@ -421,6 +426,7 @@ int pqAnimationTimeWidget::precision() const
 //-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setNotation(pqAnimationTimeWidget::RealNumberNotation val)
 {
+  Q_UNUSED(val);
   auto& internals = (*this->Internals);
   internals.render(this);
 }

@@ -71,10 +71,8 @@ static const QPair<QString, QString> TRANSLATION_IGNORE_STRINGS[] = {
   QPair<QString, QString>(
     "pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeLabel", "text"),
   QPair<QString, QString>(
-    "pqClientMainWindow/timeInspectorDock/timeInspectorPanel/AnimationTimeWidget/timeLabel",
+    "pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeLabel",
     "text"),
-  QPair<QString, QString>(
-    "pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeLabel", "text"),
   // Text comes from non-Qt world: view registration name is displayed (see pqViewFrame.cxx:205)
   QPair<QString, QString>(
     "pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/"

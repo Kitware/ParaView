@@ -134,6 +134,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     {
       type = pqSMAdaptor::PROXYLIST;
     }
+    if (proxy->GetRepeatable() || proxy->GetNumberOfProxies() > 1)
+    {
+      type = pqSMAdaptor::PROXYLIST;
+    }
     type = pqSMAdaptor::PROXY;
     if (Property->FindDomain<vtkSMProxyListDomain>())
     {
@@ -320,33 +324,34 @@ void pqSMAdaptor::setUncheckedProxyProperty(vtkSMProperty* Property, pqSMProxy V
   }
 }
 
-QList<pqSMProxy> pqSMAdaptor::getProxyListProperty(vtkSMProperty* Property)
+QList<QVariant> pqSMAdaptor::getProxyListProperty(vtkSMProperty* Property)
 {
-  QList<pqSMProxy> value;
+  QList<QVariant> value;
   if (pqSMAdaptor::getPropertyType(Property) == pqSMAdaptor::PROXYLIST)
   {
     vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
     unsigned int num = proxyProp->GetNumberOfProxies();
     for (unsigned int i = 0; i < num; i++)
     {
-      value.append(proxyProp->GetProxy(i));
+      value.push_back(QVariant::fromValue<void*>(proxyProp->GetProxy(i)));
     }
   }
   return value;
 }
 
-void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property, QList<pqSMProxy> Value)
+void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property, QList<QVariant> Values)
 {
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if (proxyProp)
   {
-    vtkSMProxy** proxies = new vtkSMProxy*[Value.size() + 1];
-    for (int cc = 0; cc < Value.size(); cc++)
+    std::vector<vtkSMProxy*> proxies;
+    for (const auto& val : Values)
     {
-      proxies[cc] = Value[cc].GetPointer();
+      vtkSMProxy* aproxy = reinterpret_cast<vtkSMProxy*>(val.value<void*>());
+      proxies.push_back(aproxy);
     }
-    proxyProp->SetProxies(Value.size(), proxies);
-    delete[] proxies;
+    // proxies.push_back(nullptr);
+    proxyProp->SetProxies(Values.size(), proxies.data());
   }
 }
 

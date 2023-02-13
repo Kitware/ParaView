@@ -112,10 +112,14 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
   {
     case pqSMAdaptor::PROXY:
     case pqSMAdaptor::PROXYSELECTION:
-    case pqSMAdaptor::PROXYLIST:
     {
       pqSMProxy smproxy = pqSMAdaptor::getProxyProperty(this->PropertySM, value_type);
       currentSMValue.setValue(smproxy);
+    }
+    break;
+    case pqSMAdaptor::PROXYLIST:
+    {
+      currentSMValue = pqSMAdaptor::getProxyListProperty(this->PropertySM);
     }
     break;
 
@@ -246,9 +250,13 @@ void pqPropertyLinksConnection::setServerManagerValue(bool use_unchecked, const 
         pqSMAdaptor::setMultipleElementProperty(this->PropertySM, this->IndexSM, value, value_type);
       }
       break;
+    case pqSMAdaptor::PROXYLIST:
+    {
+      pqSMAdaptor::setProxyListProperty(this->PropertySM, value.toList());
+    }
+    break;
 
     case pqSMAdaptor::UNKNOWN:
-    case pqSMAdaptor::PROXYLIST:
       break;
   }
 }
