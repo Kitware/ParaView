@@ -13,12 +13,12 @@ has grown through collaborative efforts between [Kitware Inc.][Kitware],
 [Army Research Laboratory][ARL], and various other
 government and commercial institutions, and academic partners.
 
-[ParaView]: http://www.paraview.org
-[VTK]: http://www.vtk.org
-[Kitware]: http://www.kitware.com
-[Sandia]: http://www.sandia.gov/
-[LANL]: http://www.lanl.gov/
-[ARL]: http://www.arl.army.mil/
+[ParaView]: https://www.paraview.org
+[VTK]: https://www.vtk.org
+[Kitware]: https://www.kitware.com
+[Sandia]: https://www.sandia.gov/
+[LANL]: https://www.lanl.gov/
+[ARL]: https://www.arl.army.mil/
 
 Learning Resources
 ==================
@@ -33,14 +33,13 @@ Learning Resources
   are available from [Kitware][].
 
 * Additional documentation, including Doxygen-generated nightly
-  reference documentation, is available [online][Documentation].
+  reference documentation, is available [online][Resources].
 
-[ParaView Homepage]: http://www.paraview.org
-[Documentation]: http://www.paraview.org/documentation/
+[ParaView Homepage]: https://www.paraview.org
+[Resources]: https://www.paraview.org/resources/
 [ParaView Discourse]: https://discourse.paraview.org/
-[Kitware]: http://www.kitware.com/
+[Kitware]: https://www.kitware.com/
 [Kitware Support]: https://www.kitware.com/support/
-[Kitware Training]: http://www.kitware.com/products/protraining.php
 [Guide]: https://docs.paraview.org/en/latest/
 
 
@@ -100,4 +99,4 @@ See [Copyright.txt][] for details. For additional licenses, refer to
 [ParaView Licenses][].
 
 [Copyright.txt]: Copyright.txt
-[ParaView Licenses]: http://www.paraview.org/paraview-license/
+[ParaView Licenses]: https://www.paraview.org/license/
