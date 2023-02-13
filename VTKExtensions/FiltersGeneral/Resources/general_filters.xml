@@ -1837,23 +1837,15 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
+            <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
-              <Expression type="or">
-                <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                         name="vtkImageData"
-                                         exclude="1"
-                                         mode="enabled_state" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         property="BoundaryMethod"
-                                         value="1"
-                                         mode="enabled_state" />
-              </Expression>
+                                       name="vtkImageData"
+                                       exclude="1"
+                                       mode="enabled_state" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="BoundaryMethod"
+                                       value="1"
+                                       mode="enabled_state" />
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -1927,13 +1919,6 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
-              <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
             <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
                                        name="vtkImageData"
@@ -1943,7 +1928,6 @@ Every Nth Point.
                                        property="BoundaryMethod"
                                        value="1"
                                        mode="enabled_state" />
-              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -1958,23 +1942,15 @@ Every Nth Point.
                             panel_visibility="advanced">
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
+            <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
-              <Expression type="or">
-                <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                         name="vtkImageData"
-                                         exclude="1"
-                                         mode="enabled_state" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         property="BoundaryMethod"
-                                         value="1"
-                                         mode="enabled_state" />
-              </Expression>
+                                       name="vtkImageData"
+                                       exclude="1"
+                                       mode="enabled_state" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="BoundaryMethod"
+                                       value="1"
+                                       mode="enabled_state" />
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -1990,23 +1966,15 @@ Every Nth Point.
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
+            <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
-              <Expression type="or">
-                <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                         name="vtkImageData"
-                                         exclude="1"
-                                         mode="enabled_state" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         property="BoundaryMethod"
-                                         value="1"
-                                         mode="enabled_state" />
-              </Expression>
+                                       name="vtkImageData"
+                                       exclude="1"
+                                       mode="enabled_state" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="BoundaryMethod"
+                                       value="1"
+                                       mode="enabled_state" />
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2021,23 +1989,15 @@ Every Nth Point.
                             panel_visibility="advanced">
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
+            <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
-              <Expression type="or">
-                <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                         name="vtkImageData"
-                                         exclude="1"
-                                         mode="enabled_state" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         property="BoundaryMethod"
-                                         value="1"
-                                         mode="enabled_state" />
-              </Expression>
+                                       name="vtkImageData"
+                                       exclude="1"
+                                       mode="enabled_state" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="BoundaryMethod"
+                                       value="1"
+                                       mode="enabled_state" />
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2053,24 +2013,16 @@ Every Nth Point.
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
+        <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
-              <Expression type="or">
-                <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                         name="vtkImageData"
-                                         exclude="1"
-                                         mode="enabled_state" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         property="BoundaryMethod"
-                                         value="1"
-                                         mode="enabled_state" />
-              </Expression>
+                                       name="vtkImageData"
+                                       exclude="1"
+                                       mode="enabled_state" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="BoundaryMethod"
+                                       value="1"
+                                       mode="enabled_state" />
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -2085,23 +2037,15 @@ Every Nth Point.
                             panel_visibility="advanced">
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-
+            <Expression type="or">
               <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-
-              <Expression type="or">
-                <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                         name="vtkImageData"
-                                         exclude="1"
-                                         mode="enabled_state" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         property="BoundaryMethod"
-                                         value="1"
-                                         mode="enabled_state" />
-              </Expression>
+                                       name="vtkImageData"
+                                       exclude="1"
+                                       mode="enabled_state" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       property="BoundaryMethod"
+                                       value="1"
+                                       mode="enabled_state" />
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
