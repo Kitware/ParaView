@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" >
+ <class>pqSelectionListPropertyWidget</class>
+ <widget class="QWidget" name="pqSelectionListPropertyWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>270</width>
+    <height>207</height>
+   </rect>
+  </property>
+  <property name="font" >
+   <font>
+    <pointsize>8</pointsize>
+    <weight>75</weight>
+    <bold>true</bold>
+   </font>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="pqSelectionInputWidget" name="SelectionInput">
+    </widget>
+   </item>
+   <item row="1" column="0">
+      <widget class="QLabel" name="label1">
+       <property name="text">
+        <string>Labels list</string>
+       </property>
+       <property name="alignment" >
+         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QTableWidget" name="labelOnSelection">
+      <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+      </sizepolicy>
+      </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+    <class>pqSelectionInputWidget</class>
+    <extends>QWidget</extends>
+    <header>pqSelectionInputWidget.h</header>
+    <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../Qt/Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <resources/>
+ <connections/>
+</ui>

@@ -608,6 +608,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridVolumeRendering.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TableFFT1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TableFFT2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestAnnotateSelectionFilter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVE-tile0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVE-tile1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVEVolRen-tile0.png}"
@@ -1273,6 +1274,7 @@ list(APPEND TESTS_WITH_BASELINES
   TensorGlyph.xml
   TemporalInterpolator.xml
   TemporalShiftScale.xml
+  TestAnnotateSelectionFilter.xml
   TestBoundaryMeshQuality.xml
   TestGroupDataFromTimeSeries.xml
   TestSelectionOnMultipiece.xml
