@@ -914,6 +914,7 @@ SET(TESTS_WITH_BASELINES
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   TransferFunction2DYScalars.xml
+  ZoomClosestOffsetRatio.xml
   ZoomToBox.xml
   ZoomToData.xml
   ZoomToEmptyData.xml
