@@ -30,16 +30,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#define QT_NO_KEYWORDS
+
+#include "pqPythonQtPlugin.h"
+
 #include "vtkPython.h"
+#include "vtkPythonInterpreter.h"
 
 #include "pqPluginDecorators.h"
-#include "pqPythonQtPlugin.h"
 #include "pqPythonQtWrapperFactory.h"
-#include <PythonQt.h>
-#include <PythonQt_QtBindings.h>
-#include <pqPythonShell.h>
 
-#include "vtkPythonInterpreter.h"
+#include "pqPythonShell.h"
+
+#include <PythonQt.h>
+#if WITH_QtAll
+#include <PythonQt_QtAll.h>
+#else
+#include <PythonQt_QtBindings.h>
+#endif
 
 //-----------------------------------------------------------------------------
 class pqPythonQtPlugin::pqInternal
@@ -73,7 +81,11 @@ void pqPythonQtPlugin::initialize()
   vtkPythonInterpreter::Initialize();
 
   PythonQt::init(PythonQt::PythonAlreadyInitialized);
+#if WITH_QtAll
+  PythonQt_QtAll::init();
+#else
   PythonQt_init_QtBindings();
+#endif
   PythonQt::self()->addWrapperFactory(new pqPythonQtWrapperFactory);
   PythonQt::self()->addDecorators(new pqPluginDecorators());
 }

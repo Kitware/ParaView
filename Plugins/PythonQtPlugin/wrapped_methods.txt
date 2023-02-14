@@ -8,8 +8,6 @@ pqSettings* pqApplicationCore::settings()
 
 pqPythonManager* pqPVApplicationCore::pythonManager() const
 
-pqPythonDialog* pqPythonManager::pythonShellDialog()
-
 pqServer* pqApplicationCore::getActiveServer() const
 
 pqTimeKeeper* pqServer::getTimeKeeper() const

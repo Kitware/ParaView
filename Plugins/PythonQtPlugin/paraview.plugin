@@ -9,3 +9,5 @@ REQUIRES_MODULES
   VTK::Python
   VTK::PythonInterpreter
   VTK::WrappingPythonCore
+  ParaView::pqApplicationComponents
+  ParaView::pqPython
