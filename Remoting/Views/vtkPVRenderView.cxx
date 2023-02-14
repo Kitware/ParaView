@@ -1196,7 +1196,7 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 
 //----------------------------------------------------------------------------
 // Note this is called on all processes.
-void vtkPVRenderView::ResetCameraScreenSpace()
+void vtkPVRenderView::ResetCameraScreenSpace(double offsetRatio)
 {
   // Since ResetCameraScreenSpace() is accessible via a property on the view proxy, this
   // method gets called directly (and on on the vtkSMRenderViewProxy). Hence
@@ -1208,16 +1208,17 @@ void vtkPVRenderView::ResetCameraScreenSpace()
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
   double bounds[6];
   this->GeometryBounds.GetBounds(bounds);
-  this->ResetCameraScreenSpace(bounds);
+  this->ResetCameraScreenSpace(bounds, offsetRatio);
 }
 
 //----------------------------------------------------------------------------
 // Note this is called on all processes.
-void vtkPVRenderView::ResetCameraScreenSpace(double bounds[6])
+void vtkPVRenderView::ResetCameraScreenSpace(double* bounds, double offsetRatio)
 {
   if (!this->LockBounds)
   {
-    this->RenderView->GetRenderer()->ResetCameraScreenSpace(bounds);
+    this->RenderView->GetRenderer()->ResetCameraScreenSpace(
+      bounds, static_cast<double>(offsetRatio));
   }
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }

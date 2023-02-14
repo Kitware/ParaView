@@ -112,17 +112,22 @@ public:
   ///@{
   /**
    * For backwards compatibility in Python scripts.
+   *
+   * OffsetRatio can be used to add a zoom offset (only applicable when closest is true).
    */
-  void ResetCamera(bool closest = false);
-  void ResetCamera(double bounds[6], bool closest = false);
+  void ResetCamera(bool closest = false, const double offsetRatio = 0.9);
+  void ResetCamera(double bounds[6], bool closest = false, const double offsetRatio = 0.9);
   void ResetCamera(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax,
-    bool closest = false);
+    bool closest = false, const double offsetRatio = 0.9);
   ///@}
 
   /**
    * Convenience method for zooming to a representation.
+   *
+   * OffsetRatio can be used to add a zoom offset (only applicable when closest is true).
    */
-  virtual void ZoomTo(vtkSMProxy* representation, bool closest = false);
+  virtual void ZoomTo(
+    vtkSMProxy* representation, bool closest = false, const double offsetRatio = 0.9);
 
   ///@{
   /**

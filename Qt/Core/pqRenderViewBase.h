@@ -65,8 +65,10 @@ public:
    * Resets the camera to include all visible data.
    * It is essential to call this resetCamera, to ensure that the reset camera
    * action gets pushed on the interaction undo stack.
+   *
+   * OffsetRatio can be used to add a zoom offset (only applicable when closest is true).
    */
-  virtual void resetCamera(bool closest = false) = 0;
+  virtual void resetCamera(bool closest = false, double offsetRatio = 0.9) = 0;
 
   /**
    * Called to reset the view's display.  This method calls resetCamera().

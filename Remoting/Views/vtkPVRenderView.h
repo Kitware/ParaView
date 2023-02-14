@@ -171,12 +171,15 @@ public:
   ///@{
   /**
    * Resets the active camera using collective prop-bounds.
+   *
+   * OffsetRatio can be used to add a zoom offset.
    * \note CallOnAllProcesses
    */
   void ResetCamera();
   void ResetCamera(double bounds[6]);
-  void ResetCameraScreenSpace();
-  void ResetCameraScreenSpace(double bounds[6]);
+  void ResetCameraScreenSpace(double offsetRatio = 0.9);
+  void ResetCameraScreenSpace(double* bounds, double offsetRatio = 0.9);
+  // void ResetCameraScreenSpace(double offsetRatio, double bounds[6]);
   ///@}
 
   ///@{

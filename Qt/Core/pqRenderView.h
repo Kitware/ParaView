@@ -77,8 +77,10 @@ public:
    * Resets the camera to include all visible data.
    * It is essential to call this resetCamera, to ensure that the reset camera
    * action gets pushed on the interaction undo stack.
+   *
+   * OffsetRatio can be used to add a zoom offset (only applicable when closest is true).
    */
-  void resetCamera(bool closest = false) override;
+  void resetCamera(bool closest = false, double offsetRatio = 0.9) override;
 
   /**
    * Resets the center of rotation to the focal point.
