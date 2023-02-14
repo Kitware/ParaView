@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Create a wavelet-->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit0" command="set_string" arguments="8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit0" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit2" command="set_string" arguments="8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit2" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit4" command="set_string" arguments="8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit4" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface With Edges" />
+
+  <!-- Open selection editor-->
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Selection Editor" />
+
+  <!-- Do multiple cell selection and set different colors-->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionSelectSurfaceCells" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.303571,0.339658,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.303571,0.339658,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.303571,0.339658,1,0,0)" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/AddActiveSelection" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionSelectSurfaceCells" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.698661,0.669829,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.698661,0.669829,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.698661,0.669829,1,0,0)" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/AddActiveSelection" command="activate" arguments="" />
+
+  <!-- Set different colors-->
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0" command="setChosenColor" arguments="255,255,0" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0" command="setChosenColor" arguments="85,170,0" />
+  <pqevent object="pqClientMainWindow/selectionEditorDock/selectionEditorPanel/ActivateCombinedSelections" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/MultipleColorOnSelectionA.png" width="300" height="300" />
+</pqevents>

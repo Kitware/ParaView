@@ -14,13 +14,16 @@
 =========================================================================*/
 #include "vtkSelectionRepresentation.h"
 
+#include "vtkAppendSelection.h"
 #include "vtkDataLabelRepresentation.h"
+#include "vtkDataObject.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkLabeledDataMapper.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVView.h"
+#include "vtkPointData.h"
 
 vtkStandardNewMacro(vtkSelectionRepresentation);
 vtkCxxSetObjectMacro(vtkSelectionRepresentation, LabelRepresentation, vtkDataLabelRepresentation);
@@ -55,6 +58,14 @@ int vtkSelectionRepresentation::ProcessViewRequest(
 {
   if (request == vtkPVView::REQUEST_UPDATE())
   {
+    // Call 'SetInputArrayToProcess' for selection in macos arm doesn't work, for more details:
+    // https://gitlab.kitware.com/paraview/paraview/-/issues/21786
+#if !(defined(__APPLE__) && defined(__arm64__))
+    // Try to associate a color array to the selection
+    this->GeometryRepresentation->SetInputArrayToProcess(
+      0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, vtkAppendSelection::GetColorArrayName());
+#endif
+
     // skip update requests since this representation doesn't really do anything
     // by itself.
     return 0;

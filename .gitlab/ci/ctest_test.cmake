@@ -114,6 +114,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     "\\.UndoRedo1"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21768
     "^pv\\.ServerConnectConfigured$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21786
+    "^pv\\.MultipleColorOnSelection"
+    "^pvcs\\.MultipleColorOnSelection"
     )
 endif ()
 

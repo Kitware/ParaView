@@ -447,6 +447,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectElementBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-HideBlock1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorWithoutSelectOnClickSetting.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultipleColorOnSelectionA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NestedViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NestedViews_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NetCDFUGRID.png}"
@@ -842,6 +843,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   Molecule.xml
   MultiBlockInspectorSelection.xml
   MultiBlockChartSelection.xml
+  MultipleColorOnSelection.xml
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
   PaletteBackgrounds.xml
@@ -1699,6 +1701,7 @@ endif ()
 # Selection is not available in CRS mode
 set(BlockContextMenu_DISABLE_CRS TRUE)
 set(BlockLinkedSelection_DISABLE_CRS TRUE)
+set(MultipleColorOnSelection_DISABLE_CRS TRUE)
 set(MultiSliceWavelet_DISABLE_CRS TRUE)
 set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(PolygonCellSelection_DISABLE_CRS TRUE)
@@ -1719,6 +1722,7 @@ set(SelectionLinkMultiple_DISABLE_CRS TRUE)
 set(SelectionLinkRemove_DISABLE_CRS TRUE)
 set(SelectionLinkReaction_DISABLE_CRS TRUE)
 set(SelectionLinkScripting_DISABLE_CRS TRUE)
+set(TestAnnotateSelectionFilter_DISABLE_CRS TRUE)
 set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)

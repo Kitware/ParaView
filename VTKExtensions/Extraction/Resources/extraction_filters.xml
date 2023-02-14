@@ -675,6 +675,16 @@
           </RequiredProperties>
         </RegistrationNamesDomain>
       </StringVectorProperty>
+      <DoubleVectorProperty name="SelectionColors"
+                            command="SetInputColor"
+                            number_of_elements_per_command="3"
+                            use_index="1"
+                            repeat_command="1"
+                            clean_command="RemoveAllInputColors">
+        <Documentation>
+          Specify color to use for each input selection.
+        </Documentation>
+      </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="1"/>
       </Hints>
