@@ -112,6 +112,23 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QToolButton" name="GroupFiles">
+          <property name="toolTip">
+           <string>Toggle file sequence grouping.</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="icon">
+           <iconset resource="../../../Components/Resources/pqComponents.qrc">
+            <normaloff>:/pqWidgets/Icons/pqGroupFiles.svg</normaloff>:/pqWidgets/Icons/pqGroupFiles.svg</iconset>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="1" column="0">

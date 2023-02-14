@@ -34,11 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqFileDialogModel_h
 
 #include "pqCoreModule.h"
+
+#include "vtkPVFileInformation.h"
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 #include <QAbstractItemModel>
 #include <QFileIconProvider>
 #include <QObject>
 
-#include "vtkPVFileInformation.h"
 class vtkProcessModule;
 class pqServer;
 class QModelIndex;
@@ -86,12 +89,25 @@ public:
   bool isShowingDetailedInfo();
   ///@}
 
+  ///@{
   /**
-   * Sets the path that the file dialog will display.
-   * If groupFiles is true, then file sequences are grouped into a file name where the sequence
-   * numbers are replaced by `..`
+   * Get/Sets whether the dialog should group numbered files together
+   * into a single file when the sequencs numbers are replaced by `..`.
    */
-  void setCurrentPath(const QString&, bool groupFiles = true);
+  void setGroupFiles(bool group);
+  bool isGroupingFiles();
+  ///@}
+
+  /**
+   * Sets groupFiles to the provided value then set the path that the file dialog will display.
+   */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use setGroupFiles(bool) and setCurrentPath(path) instead.")
+  void setCurrentPath(const QString& path, bool groupFiles);
+
+  /**
+   * Set the path that the file dialog will display.
+   */
+  void setCurrentPath(const QString& path);
 
   /**
    * Returns the path the the file dialog will display

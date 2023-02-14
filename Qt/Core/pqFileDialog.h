@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqFileDialog_h
 
 #include "pqCoreModule.h"
+
 #include <QDialog>
 #include <QStringList>
 
@@ -120,12 +121,12 @@ public:
    * if the server is nullptr, files are browsed locally
    * the title, and start directory may be specified
    * the filter is a string of semi-colon separated filters
-   * if groupFiles is true, then file sequences are grouped into a file name where the sequence
-   * numbers are replaced by `..`
+   * if supportGroupFiles is true, then file sequences will support being grouped into a file name
+   * where the sequence numbers are replaced by `..`
    */
   pqFileDialog(pqServer* server, QWidget* parent, const QString& title = QString(),
     const QString& directory = QString(), const QString& filter = QString(),
-    bool groupFiles = true);
+    bool supportGroupFiles = true);
   ~pqFileDialog() override;
 
   /**
@@ -233,6 +234,8 @@ private Q_SLOTS:
   void onShowHiddenFiles(const bool& hide);
 
   void onShowDetailToggled(bool show);
+
+  void onGroupFilesToggled(bool group);
 
   // Called when the user changes the file selection.
   void fileSelectionChanged();

@@ -85,14 +85,14 @@ void pqLoadDataReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-QList<pqPipelineSource*> pqLoadDataReaction::loadData()
+QList<pqPipelineSource*> pqLoadDataReaction::loadData(bool groupFiles)
 {
   ReaderSet readerSet;
-  return pqLoadDataReaction::loadData(readerSet);
+  return pqLoadDataReaction::loadData(readerSet, groupFiles);
 }
 
 //-----------------------------------------------------------------------------
-QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet)
+QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet, bool groupFiles)
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
@@ -183,7 +183,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
   int constexpr AllFilesFilterIndex = 1;
 
   pqFileDialog fileDialog(
-    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filtersString, true);
+    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filtersString, groupFiles);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFilesAndDirectories);
   QList<pqPipelineSource*> sources;

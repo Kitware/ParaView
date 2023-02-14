@@ -145,9 +145,9 @@ public:
   QList<QStringList> SelectedFiles;
   int SelectedFilterIndex;
   QStringList Filters;
-  bool GroupPaths;
   bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
+  bool SupportsGroupFiles = true;
   QString FileNamesSeperator;
   bool InDoubleClickHandler; //< used to determine if we're "accept"ing as a result of
                              //  double-clicking as that elicits a different
@@ -166,7 +166,6 @@ public:
     , FileFilter(this->Model)
     , Completer(new QCompleter(&this->FileFilter, nullptr))
     , Mode(ExistingFile)
-    , GroupPaths(true)
     , SuppressOverwriteWarning(false)
     , ShowMultipleFileHelp(false)
     , FileNamesSeperator(";")
@@ -225,11 +224,9 @@ public:
     return this->Model->getCurrentPath();
   }
 
-  void setGroupPaths(bool group) { this->GroupPaths = group; }
-
   void setCurrentPath(const QString& p)
   {
-    this->Model->setCurrentPath(p, this->GroupPaths);
+    this->Model->setCurrentPath(p);
     pqServer* s = this->Model->server();
     if (s)
     {
@@ -294,7 +291,7 @@ QString pqFileDialog::pqImplementation::LocalFilePath;
 // pqFileDialog
 
 pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
-  const QString& startDirectory, const QString& nameFilter, bool groupFiles)
+  const QString& startDirectory, const QString& nameFilter, bool supportsGroupFiles)
   : Superclass(p)
   , Implementation(new pqImplementation(this, server))
 {
@@ -448,7 +445,6 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     startPath = impl.getStartPath();
   }
   impl.addHistory(startPath);
-  impl.setGroupPaths(groupFiles);
   impl.setCurrentPath(startPath);
 
   impl.Ui.Files->resizeColumnToContents(0);
@@ -465,19 +461,25 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.Files->setSortingEnabled(true);
   impl.Ui.Files->header()->setSortIndicator(0, Qt::AscendingOrder);
 
-  // Use saved state if any
-  this->restoreState();
-
   bool showDetail = impl.Model->isShowingDetailedInfo();
   impl.Ui.ShowDetail->setChecked(showDetail);
   impl.Ui.Files->setColumnHidden(2, !showDetail);
   impl.Ui.Files->setColumnHidden(3, !showDetail);
+
+  // Group files handling
+  impl.SupportsGroupFiles = supportsGroupFiles;
+  impl.Ui.GroupFiles->setEnabled(impl.SupportsGroupFiles);
+  impl.Ui.GroupFiles->setVisible(impl.SupportsGroupFiles);
+  connect(impl.Ui.GroupFiles, SIGNAL(clicked(bool)), this, SLOT(onGroupFilesToggled(bool)));
 
   // let's manage the default button.
   impl.Ui.OK->setDefault(true);
   impl.Ui.Navigate->setDefault(false);
 
   this->connect(impl.Ui.Navigate, SIGNAL(clicked()), SLOT(onNavigate()));
+
+  // Use saved state if any
+  this->restoreState();
 }
 
 //-----------------------------------------------------------------------------
@@ -1175,6 +1177,13 @@ void pqFileDialog::onShowDetailToggled(bool show)
 }
 
 //-----------------------------------------------------------------------------
+void pqFileDialog::onGroupFilesToggled(bool group)
+{
+  auto& impl = *this->Implementation;
+  impl.Model->setGroupFiles(group);
+}
+
+//-----------------------------------------------------------------------------
 void pqFileDialog::setShowHidden(const bool& hidden)
 {
   this->onShowHiddenFiles(hidden);
@@ -1505,6 +1514,12 @@ void pqFileDialog::saveState()
     settings->setValue("Header", header->saveState());
     settings->setValue("MainSplitter", impl.Ui.mainSplitter->saveState());
     settings->setValue("Splitter", impl.Ui.splitter->saveState());
+
+    if (impl.SupportsGroupFiles)
+    {
+      settings->setValue("GroupFiles", impl.Ui.GroupFiles->isChecked() ? 1 : 0);
+    }
+
     settings->endGroup();
   }
 }
@@ -1532,6 +1547,17 @@ void pqFileDialog::restoreState()
     if (settings->contains("Splitter"))
     {
       impl.Ui.splitter->restoreState(settings->value("Splitter").toByteArray());
+    }
+
+    if (impl.SupportsGroupFiles)
+    {
+      bool groupFiles = settings->value("GroupFiles", true).toBool();
+      impl.Ui.GroupFiles->setChecked(groupFiles);
+      this->onGroupFilesToggled(groupFiles);
+    }
+    else
+    {
+      this->onGroupFilesToggled(false);
     }
     settings->endGroup();
   }
