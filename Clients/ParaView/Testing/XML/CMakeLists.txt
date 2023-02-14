@@ -1730,6 +1730,7 @@ set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (ExpressionChooser_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsDialog_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsExporter_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsSettings_FORCE_SERIAL TRUE) # since this uses combo-box popup-menu
