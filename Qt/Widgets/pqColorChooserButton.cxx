@@ -175,13 +175,14 @@ QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
 //-----------------------------------------------------------------------------
 void pqColorChooserButton::chooseColor()
 {
-  QColorDialog::ColorDialogOptions opts;
+  QColorDialog::ColorDialogOptions opts = QColorDialog::DontUseNativeDialog;
   if (this->ShowAlphaChannel)
   {
     opts |= QColorDialog::ShowAlphaChannel;
   }
 
-  this->setChosenColor(QColorDialog::getColor(this->chosenColor(), this, tr("Select Color"), opts));
+  QColor color = QColorDialog::getColor(this->chosenColor(), this, tr("Set Color"), opts);
+  this->setChosenColor(color);
 }
 
 //-----------------------------------------------------------------------------
