@@ -85,6 +85,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21657
     "^pv\\.StreamLinesRepresentationColor$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
+    "\\.ComparativeViewOverlay$"
     )
 endif ()
 
@@ -103,7 +106,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
     "^pv\\.ExtrusionRepresentationCellData$"
     # paraview/paraview/#21397
-    "^pv\\.TextSourceBorder$"
+    "\\.TextSourceBorder$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
     "\\.UndoRedo1")
 
