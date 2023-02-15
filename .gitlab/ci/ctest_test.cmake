@@ -108,8 +108,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     # paraview/paraview/#21397
     "\\.TextSourceBorder$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
-    "\\.UndoRedo1")
-
+    "\\.UndoRedo1"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21768
+    "^pv\\.ServerConnectConfigured$"
+    )
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
