@@ -23,10 +23,13 @@
 
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
+#include "vtkParaViewDeprecation.h"
+#include "vtkSmartPointer.h"
 
 class vtkImplicitFunction;
 class vtkInformation;
 class vtkInformationVector;
+class vtkIncrementalPointLocator;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVMetaSliceDataSet
   : public vtkPVDataSetAlgorithmSelectorFilter
@@ -86,7 +89,13 @@ public:
 
   /**
    * Expose method from vtkPVCutter
+   *
+   * @deprecated in favor of SetLocator to allow octree locator.
+   * SetMergePoints(true) <=> SetLocator(vtkMergePoints::New())
+   * SetMergePoints(false) <=> SetLocator(vtkNonMergingPointLocator::New())
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0(
+    "Use `vtkPVMetaSliceDataSet::SetLocator(vtkIncrementalPointLocator*)` instead")
   void SetMergePoints(bool status);
 
   /**
@@ -95,6 +104,14 @@ public:
   void SetDual(bool dual);
 
   int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+
+  ///@{
+  /**
+   * Set / get a spatial locator.
+   */
+  void SetLocator(vtkIncrementalPointLocator* locator);
+  vtkIncrementalPointLocator* GetLocator();
+  ///@}
 
 protected:
   vtkPVMetaSliceDataSet();
@@ -108,6 +125,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internal;
+  vtkSmartPointer<vtkIncrementalPointLocator> Locator;
 };
 
 #endif
