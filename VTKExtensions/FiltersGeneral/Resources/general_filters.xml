@@ -910,8 +910,8 @@ points in the input. Defaults to ***Single***.
           <Proxy group="incremental_point_locators"
                  name="NonMergingPointLocator" />
         </ProxyListDomain>
-        <Documentation>This property specifies an incremental point locator for
-        merging duplicate / coincident points.</Documentation>
+        <Documentation>This property specifies which incremental point locator to
+        use for handling duplicate/coincident points.</Documentation>
       </ProxyProperty>
       <!-- incremental point locator end -->
 
