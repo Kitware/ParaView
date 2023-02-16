@@ -125,9 +125,10 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
     }
 
     // describe the overall look of the graph. For example : rankdir=LR -> Left To Right layout
+    // this version is bottom up (default) and try to reduce the overlap
     // See https://www.graphviz.org/pdf/libguide.pdf for more detail
-    dotString += "digraph g {\nrankdir=LR;splines = line;graph[pad=\"0\", ranksep=\"0.6\", "
-                 "nodesep=\"0.6\"];\n" +
+    dotString += "digraph g {\noverlap = true;splines = true;graph[pad=\"0.5\", ranksep=\"0.5\", "
+                 "nodesep=\"0.5\"];\n" +
       nodeString.str() + edgeString.str() + "\n}";
   }
 

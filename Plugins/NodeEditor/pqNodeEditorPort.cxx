@@ -178,7 +178,6 @@ pqNodeEditorPort::pqNodeEditorPort(
   this->label->setPos(xpos, -0.5 * this->label->boundingRect().height());
   this->disc->setBrush(pqNodeEditorUtils::CONSTS::COLOR_BASE_DEEP);
 
-  this->setZValue(PORT_LAYER);
   this->setMarkedAsSelected(false);
   this->setMarkedAsVisible(false);
 }

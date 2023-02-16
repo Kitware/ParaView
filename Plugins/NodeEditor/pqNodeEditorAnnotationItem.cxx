@@ -122,13 +122,15 @@ void pqNodeEditorAnnotationItem::paint(QPainter* painter, const QStyleOptionGrap
   {
     background = pqNodeEditorUtils::CONSTS::COLOR_BASE;
     background.setAlphaF(0.85);
-    this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER + 2);
+    // put this above nodes, without conflicting with an eventual future type
+    // as graph elements are separated by step of 10 in pqNodeEditorUtils.h
+    this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER + 9);
   }
   else
   {
     background = pqNodeEditorUtils::CONSTS::COLOR_GRID;
     background.setAlphaF(0.2);
-    this->setZValue(1);
+    this->setZValue(pqNodeEditorUtils::CONSTS::ANNOTATION_LAYER);
   }
 
   QPen pen(pqNodeEditorUtils::CONSTS::COLOR_CONSTRAST, pqNodeEditorUtils::CONSTS::EDGE_WIDTH - 1);

@@ -65,13 +65,11 @@ const QColor COLOR_BASE_ORANGE = QColor::fromHslF(0.07, 0.666, COLOR_HIGHLIGHT.l
 const QColor COLOR_DULL_ORANGE = QColor::fromHslF(
   COLOR_BASE_ORANGE.hueF(), COLOR_BASE_ORANGE.saturationF() * 0.4, COLOR_CONSTRAST.lightnessF());
 
-// Z depth for graph elements
-constexpr int NODE_LAYER = 10;
-constexpr int EDGE_LAYER = 20;
-constexpr int PORT_LAYER = 30;
-constexpr int FOREGROUND_LAYER = 40;
-constexpr int VIEW_NODE_LAYER = 50;
-constexpr int WIDGET_LAYER = 60;
+// Z depth for graph elements at parent level
+constexpr int ANNOTATION_LAYER = 1;
+constexpr int EDGE_LAYER = 10;
+constexpr int NODE_LAYER = 20;
+constexpr int MAX_LAYER = 99;
 };
 
 // ----------------------------------------------------------------------------

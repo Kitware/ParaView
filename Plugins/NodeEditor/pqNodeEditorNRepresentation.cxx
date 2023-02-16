@@ -34,8 +34,6 @@ pqNodeEditorNRepresentation::pqNodeEditorNRepresentation(
   pqRepresentation* repr, QGraphicsItem* parent)
   : pqNodeEditorNode((pqProxy*)repr, parent)
 {
-  this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER);
-
   auto br = this->boundingRect();
   auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   br.adjust(adjust, adjust, -adjust, -adjust);
