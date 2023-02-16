@@ -173,6 +173,8 @@
 
 .cmake_translations_linux:
     stage: test
+    environment:
+      name: translations
 
     script:
         - echo "Pushing translation artifacts"
