@@ -783,6 +783,11 @@ if (PARAVIEW_USE_PYTHON)
   endif()
 endif()
 
+if (PARAVIEW_USE_QTHELP)
+  list(APPEND TESTS_WITHOUT_BASELINES
+    HelpWindowHistory.xml)
+endif()
+
 SET (TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
   BoundingRuler.xml

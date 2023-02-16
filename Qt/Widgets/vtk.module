@@ -9,8 +9,8 @@ DEPENDS
   ParaView::Versioning
   VTK::GUISupportQt
 PRIVATE_DEPENDS
-  ParaView::VTKExtensionsCore
   ParaView::RemotingServerManager
+  ParaView::VTKExtensionsCore
 TEST_LABELS
   ParaView
 EXCLUDE_WRAP

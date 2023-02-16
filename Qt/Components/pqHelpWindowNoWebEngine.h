@@ -58,14 +58,37 @@ public:
     this->setParent(_parent);
     this->setOpenLinks(false);
   }
+
   ~pqTextBrowser() override = default;
   static pqTextBrowser* newInstance(QHelpEngine* engine, pqHelpWindow* self)
   {
     pqTextBrowser* instance = new pqTextBrowser(engine, self);
-    self->connect(instance, SIGNAL(anchorClicked(const QUrl&)), SLOT(showPage(const QUrl&)));
+    self->connect(instance, &pqTextBrowser::anchorClicked, self,
+      QOverload<const QUrl&>::of(&pqHelpWindow::showPage));
+    self->connect(
+      instance, &pqTextBrowser::historyChanged, self, &pqHelpWindow::updateHistoryButtons);
     return instance;
   }
+
   void setUrl(const QUrl& url) { this->setSource(url); }
+
+  QUrl url() { return this->source(); }
+
+  QUrl goBackward()
+  {
+    this->backward();
+    return this->source();
+  }
+
+  QUrl goForward()
+  {
+    this->forward();
+    return this->source();
+  }
+
+  bool canGoBackward() { return this->isBackwardAvailable(); }
+
+  bool canGoForward() { return this->isForwardAvailable(); }
 
 protected:
   /**

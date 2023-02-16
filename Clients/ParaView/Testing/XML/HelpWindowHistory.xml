@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Show help window -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Help" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionHelp" />
+  <!-- Navigate through content panel -->
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="activate" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="activate" arguments="0.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.2.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="activate" arguments="0.0.2.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.3.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="activate" arguments="0.0.3.0" />
+  <!-- Navigate through content history -->
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionBackward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionBackward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionBackward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionBackward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionForward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionForward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionForward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionForward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionHome" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionBackward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionSaveAsHomepage" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionForward" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/actionHome" command="activate" arguments="" />
+</pqevents>

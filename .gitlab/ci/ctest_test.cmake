@@ -162,6 +162,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Flaky with timeouts paraview/paraview#21591
     "^pvcrs\\.OctreeImageFilters"
+
+    # Fails on windows-vs2019-qt
+    # See https://gitlab.kitware.com/paraview/paraview/-/issues/21771
+    "^pv\\.HelpWindowHistory$"
     )
 endif ()
 

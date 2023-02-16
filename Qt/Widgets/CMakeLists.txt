@@ -112,19 +112,6 @@ if (APPLE)
     PrintSupport)
 endif ()
 
-if (PARAVIEW_USE_QTHELP)
-  list(APPEND classes
-    pqHelpWindow)
-
-  list(APPEND qt_components
-    Help)
-endif ()
-
-if (PARAVIEW_USE_QTWEBENGINE)
-  list(APPEND qt_components
-    WebEngineWidgets)
-endif ()
-
 vtk_module_find_package(
   PACKAGE     Qt5
   COMPONENTS  ${qt_components})
@@ -133,7 +120,6 @@ vtk_module_find_package(
 ## Add *.ui files to be uic processed.
 set(ui_files
   Resources/UI/pqExpanderButton.ui
-  Resources/UI/pqHelpWindow.ui
   Resources/UI/pqQuickLaunchDialog.ui
   Resources/UI/pqSeriesGeneratorDialog.ui)
 
@@ -188,16 +174,4 @@ if (APPLE)
   vtk_module_link(ParaView::pqWidgets
     PRIVATE
       Qt5::PrintSupport)
-endif ()
-
-if (PARAVIEW_USE_QTHELP)
-  vtk_module_link(ParaView::pqWidgets
-    PRIVATE
-      Qt5::Help)
-endif ()
-
-if (PARAVIEW_USE_QTWEBENGINE)
-  vtk_module_link(ParaView::pqWidgets
-    PRIVATE
-      Qt5::WebEngineWidgets)
 endif ()

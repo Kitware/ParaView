@@ -216,6 +216,7 @@ set(ui_files
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
+  Resources/UI/pqHelpWindow.ui
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
@@ -255,9 +256,26 @@ set(ui_files
 set(resource_files
   Resources/pqComponents.qrc)
 
+set(qt_components
+  Network
+  Widgets)
+
+if (PARAVIEW_USE_QTHELP)
+  list(APPEND classes
+    pqHelpWindow)
+
+  list(APPEND qt_components
+    Help)
+endif ()
+
+if (PARAVIEW_USE_QTWEBENGINE)
+  list(APPEND qt_components
+    WebEngineWidgets)
+endif ()
+
 vtk_module_find_package(
   PACKAGE     Qt5
-  COMPONENTS  Network Widgets)
+  COMPONENTS  ${qt_components})
 
 source_group("Resources" FILES
   ${ui_files}
@@ -293,3 +311,15 @@ vtk_module_link(ParaView::pqComponents
     Qt5::Network
     Qt5::Widgets)
 vtk_module_definitions(ParaView::pqComponents PRIVATE QT_NO_KEYWORDS)
+
+if (PARAVIEW_USE_QTHELP)
+  vtk_module_link(ParaView::pqComponents
+    PRIVATE
+      Qt5::Help)
+endif ()
+
+if (PARAVIEW_USE_QTWEBENGINE)
+  vtk_module_link(ParaView::pqComponents
+    PRIVATE
+      Qt5::WebEngineWidgets)
+endif ()

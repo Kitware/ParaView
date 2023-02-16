@@ -32,19 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqHelpWindow_h
 #define pqHelpWindow_h
 
-#include "pqWidgetsModule.h"
+#include "vtkParaViewDeprecation.h" // For deprecation
+
+#include "pqComponentsModule.h" // For export macro
+
 #include <QMainWindow>
 #include <QScopedPointer>
+#include <QUrl>
 
 class QHelpEngine;
-class QUrl;
 class pqBrowser;
 
 /**
  * pqHelpWindow provides a assistant-like window  for showing help provided by
  * a QHelpEngine.
  */
-class PQWIDGETS_EXPORT pqHelpWindow : public QMainWindow
+class PQCOMPONENTS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
@@ -63,10 +66,42 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void showPage(const QUrl& url);
 
   /**
-   * Tires to locate a file name index.html in the given namespace and then
+   * Tries to locate a file name index.html in the current namespace and then
    * shows that page.
    */
+  virtual void showHomePage();
+
+  /**
+   * Set the namespace from the provided one, then tries to locate a file name
+   * index.html in the given namespace and shows that page.
+   */
+  PARAVIEW_DEPRECATED_IN_5_12_0(
+    "Please use separated setNameSpace() and showHomePage() functions instead.")
   virtual void showHomePage(const QString& namespace_name);
+
+  /**
+   * Save current page as home page.
+   * This parameter is saved in a setting.
+   */
+  virtual void saveCurrentHomePage();
+
+  ///@{
+  /**
+   * Navigate through the history of visited pages.
+   */
+  virtual void goBackward();
+  virtual void goForward();
+  ///@}
+
+  /**
+   * Update the state of buttons used to navigate through history.
+   */
+  virtual void updateHistoryButtons();
+
+  /**
+   * Sets the namespace to use in order to find the homepage.
+   */
+  virtual void setNameSpace(const QString& namespace_name);
 
 Q_SIGNALS:
   /**
@@ -83,6 +118,9 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 private:
   Q_DISABLE_COPY(pqHelpWindow)
   const QScopedPointer<pqBrowser> Browser;
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif
