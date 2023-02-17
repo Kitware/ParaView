@@ -168,6 +168,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/spiaggia_di_mondello_1k.hdr}"
+  "DATA{${paraview_test_data_directory_input}/Data/SliceDeprecation.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/SteeringDataGeneratorPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
   "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
@@ -586,6 +587,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ShowMultiPieceFieldData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceDirectDoubleColoring.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceRepresentation.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneCellData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneMultiBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlane.png}"
@@ -744,6 +746,7 @@ SET (TESTS_WITHOUT_BASELINES
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml
+  SliceBackwardsCompatibility.xml
   SpreadSheetFieldData.xml
   SpreadSheetSelectedCellConnectivity.xml
   StringInLineChartView.xml
@@ -856,7 +859,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   SelectionEditor.xml
   SelectionLinkParallelCoordinatesView.xml
   SeparateOpacityArray.xml
-  Slice.xml
+  SliceRepresentation.xml
   SteeringDataGenerator.xml
   TestIsoVolume.xml
   TextSourceBorder.xml
@@ -1223,10 +1226,10 @@ list(APPEND TESTS_WITH_BASELINES
   ShaderReplacements.xml
   ShowAll.xml
   SimpleInteraction.xml
+  Slice.xml
   SliceAlongPolyline.xml
   SliceAlongSpline.xml
   SolidColorSource.xml
-  SphereSlice.xml
   SpherePointSource.xml
   SpreadSheet1.xml
   SpreadSheet2.xml

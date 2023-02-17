@@ -53,6 +53,7 @@ set(PY_TESTS
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   ScalarBarActorBackwardsCompatibility.py,NO_VALID
+  SliceBackwardsCompatibilityTest.py,NO_VALID
   StateWithHiddenRepresentations.py,NO_VALID
   TestFetchData.py,NO_VALID
   TestSAVGReader.py
