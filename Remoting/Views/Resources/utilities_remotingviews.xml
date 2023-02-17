@@ -984,6 +984,37 @@
           </ShowComponentLabels>
         </Hints>
       </StringVectorProperty>
+      <IntVectorProperty name="ComputeArrayMagnitude"
+                        command="SetComputeArrayMagnitude"
+                        number_of_elements="1"
+                        default_values="1"
+                        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Controls whether or not ParaView should compute and display the magnitude for
+          multi-components data attributes.
+        </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty name="ArrayMagnitudeExceptions"
+                        command="SetArrayMagnitudeException"
+                        label="Array Magnitude Exceptions"
+                        number_of_elements_per_command="1"
+                        repeat_command="1"
+                        set_number_command="SetNumberOfArrayMagnitudeExceptions"
+                        use_index="1"
+                        panel_visibility="advanced">
+        <Documentation>
+          List of exceptions for the "ComputeArrayMagnitude" setting. If "ComputeArrayMagnitude" is
+          untoggled then the list describes the number of components for which ParaView will
+          still compute the magnitude. Else the list describes the number of components for which
+          ParaView will not compute the magnitude.
+        </Documentation>
+        <Hints>
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Exceptions"/>
+          </ShowComponentLabels>
+        </Hints>
+      </IntVectorProperty>
 
       <Hints>
         <UseDocumentationForLabels />

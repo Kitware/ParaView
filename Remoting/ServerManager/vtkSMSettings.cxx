@@ -293,14 +293,17 @@ public:
       }
     }
     std::vector<int> vector;
-    if (!this->GetSetting(settingName, vector, maxPriority) ||
-      vector.size() != property->GetNumberOfElements())
+    if (!this->GetSetting(settingName, vector, maxPriority))
     {
       return false;
     }
     if (property->GetRepeatable())
     {
       property->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
+    }
+    if (vector.size() != property->GetNumberOfElements())
+    {
+      return false;
     }
 
     property->SetElements(&vector[0]);

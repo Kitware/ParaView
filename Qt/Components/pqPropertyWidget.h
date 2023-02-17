@@ -156,6 +156,15 @@ public:
    */
   static int hintsWidgetHeightNumberOfRows(vtkPVXMLElement* hints, int defaultValue = 10);
 
+  /**
+   * Parse a XML element as a list of label to use for this widget.
+   * This is usually the XML node named `ShowComponentLabels` in the
+   * hints of a proxy. elemCount is a hint of the number of labels to use.
+   * Set to 0 to use the number of labels existing in the XML.
+   */
+  static std::vector<std::string> parseComponentLabels(
+    vtkPVXMLElement* hints, unsigned int elemCount = 0);
+
 Q_SIGNALS:
   /**
    * This signal is emitted when the current view changes.

@@ -21,6 +21,7 @@
 #include "vtkSMSession.h"
 #include "vtkStringArray.h"
 
+#include <algorithm>
 #include <cassert>
 #include <string>
 #include <vector>
@@ -33,6 +34,7 @@ public:
   std::vector<std::string> FilterExpressions;
   std::vector<std::string> ExcludedNameFilters;
   vtkNew<vtkStringArray> AllNameFilters;
+  std::vector<int> ArrayMagnitudeExceptions;
 };
 
 //----------------------------------------------------------------------------
@@ -168,6 +170,42 @@ const char* vtkPVRepresentedArrayListSettings::GetExcludedNameFilter(int i)
 vtkStringArray* vtkPVRepresentedArrayListSettings::GetAllNameFilters()
 {
   return this->Internals->AllNameFilters;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetNumberOfArrayMagnitudeExceptions(int size)
+{
+  if (static_cast<std::size_t>(size) != this->Internals->ArrayMagnitudeExceptions.size())
+  {
+    this->Internals->ArrayMagnitudeExceptions.resize(size);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetArrayMagnitudeException(int idx, int ncomp)
+{
+  if (idx >= 0 && static_cast<std::size_t>(idx) < this->Internals->ArrayMagnitudeExceptions.size())
+  {
+    if (this->Internals->ArrayMagnitudeExceptions[idx] != ncomp)
+    {
+      this->Internals->ArrayMagnitudeExceptions[idx] = ncomp;
+      this->Modified();
+    }
+  }
+  else
+  {
+    vtkErrorMacro("Index out of range: " << idx);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRepresentedArrayListSettings::ShouldUseMagnitudeMode(int ncomp) const
+{
+  const auto& exceptions = this->Internals->ArrayMagnitudeExceptions;
+  const auto findComp = std::find(exceptions.cbegin(), exceptions.cend(), ncomp);
+
+  return this->ComputeArrayMagnitude != (findComp != exceptions.end());
 }
 
 //----------------------------------------------------------------------------

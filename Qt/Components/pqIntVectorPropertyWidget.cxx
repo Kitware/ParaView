@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqIntVectorPropertyWidget.h"
 
+#include "vtkCollection.h"
 #include "vtkDataObject.h"
 #include "vtkPVLogger.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomain.h"
@@ -79,6 +81,14 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
   }
 
   bool useDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smProxy);
+  bool showLabel = false;
+  vtkPVXMLElement* showComponentLabels = nullptr;
+  vtkPVXMLElement* hints = ivp->GetHints();
+  if (hints)
+  {
+    showLabel = (hints->FindNestedElementByName("ShowLabel") != nullptr);
+    showComponentLabels = hints->FindNestedElementByName("ShowComponentLabels");
+  }
 
   // find the domain
   vtkSmartPointer<vtkSMDomain> domain;
@@ -187,11 +197,17 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
         new pqScalarValueListPropertyWidget(smproperty, smProxy, this);
       widget->setObjectName("ScalarValueList");
       widget->setRangeDomain(range);
+      widget->setShowLabels(showComponentLabels);
+      if (showComponentLabels)
+      {
+        widget->setLabels(
+          pqPropertyWidget::parseComponentLabels(showComponentLabels, elementCount));
+      }
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smproperty);
 
       this->setChangeAvailableAsChangeFinished(true);
       layoutLocal->addWidget(widget);
-      this->setShowLabel(false);
+      this->setShowLabel(showLabel);
     }
     else if (elementCount == 1 && range->GetMinimumExists(0) && range->GetMaximumExists(0))
     {

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkCollection.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
@@ -238,6 +239,42 @@ int pqPropertyWidget::hintsWidgetHeightNumberOfRows(vtkPVXMLElement* hints, int 
   return defaultValue;
 }
 
+//-----------------------------------------------------------------------------
+std::vector<std::string> pqPropertyWidget::parseComponentLabels(
+  vtkPVXMLElement* hints, unsigned int elemCount)
+{
+  if (hints == nullptr)
+  {
+    return {};
+  }
+
+  vtkNew<vtkCollection> elements;
+  hints->GetElementsByName("ComponentLabel", elements.GetPointer());
+
+  const int nbCompLabels = elements->GetNumberOfItems();
+  std::vector<std::string> componentLabels;
+  componentLabels.resize((elemCount != 0) ? elemCount : nbCompLabels);
+
+  for (int i = 0; i < nbCompLabels; ++i)
+  {
+    vtkPVXMLElement* labelElement = vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
+    if (labelElement)
+    {
+      int component = 0;
+      if (labelElement->GetScalarAttribute("component", &component))
+      {
+        if (static_cast<std::size_t>(component) < componentLabels.size())
+        {
+          componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
+        }
+      }
+    }
+  }
+
+  return componentLabels;
+}
+
+//-----------------------------------------------------------------------------
 bool pqPropertyWidget::isSingleRowItem() const
 {
   return false;

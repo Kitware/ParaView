@@ -716,6 +716,7 @@ SET (TESTS_WITHOUT_BASELINES
   AddFieldArrays.xml
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
+  ComputeArrayMagnitudeSetting.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
   DelimitedTextReader.xml

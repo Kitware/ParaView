@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Disallow magnitude computation for all but 3 dimensional arrays -->
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Miscellaneous" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ComputeArrayMagnitude/CheckBoxLabel" command="mousePress" arguments="1,1,0,138,27" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ComputeArrayMagnitude/CheckBoxLabel" command="mouseRelease" arguments="1,0,0,138,27" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ArrayMagnitudeExceptions/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ArrayMagnitudeExceptions/ScalarValueList/Table/qt_scrollarea_viewport/0QExpandingLineEdit0" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Create a sphere with normals (3D) and texture coordinates (2D) on it  -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TextureMapToSphere" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+
+  <!-- Check that Normals display the Magnitude component -->
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Normals" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/displayColor/Components" property="currentText" arguments="Magnitude" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/displayColor/Components" property="count" arguments="4" />
+
+  <!-- Check that TCs display the X component -->
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Texture Coordinates" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/displayColor/Components" property="currentText" arguments="X" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/displayColor/Components" property="count" arguments="2" />
+</pqevents>

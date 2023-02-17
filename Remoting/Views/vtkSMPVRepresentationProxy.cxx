@@ -22,6 +22,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVProminentValuesInformation.h"
+#include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
@@ -601,6 +602,15 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     return true;
   }
 
+  auto* arraySettings = vtkPVRepresentedArrayListSettings::GetInstance();
+  auto* arrayInfo = this->GetArrayInformationForColorArray(false);
+  const bool forceComponentMode = (arrayInfo && arraySettings &&
+    !arraySettings->ShouldUseMagnitudeMode(arrayInfo->GetNumberOfComponents()));
+  if (forceComponentMode && (!useComponent || component < 0))
+  {
+    component = 0;
+  }
+
   // Now, setup transfer functions.
   bool haveComponent = useComponent;
   bool separate = (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt() != 0);
@@ -612,7 +622,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
   {
     lutProxy =
       mgr->GetColorTransferFunction(decoratedArrayName.c_str(), this->GetSessionProxyManager());
-    if (useComponent)
+    if (useComponent || forceComponentMode)
     {
       if (component >= 0)
       {
