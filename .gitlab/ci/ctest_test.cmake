@@ -88,6 +88,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
     "\\.ComparativeViewOverlay$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
+    "pvcs\\.CDISimpleRead$"
     )
 endif ()
 

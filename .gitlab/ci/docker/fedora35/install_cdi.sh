@@ -3,7 +3,7 @@
 set -e
 
 readonly cdi_repo="https://gitlab.dkrz.de/mpim-sw/libcdi.git"
-readonly cdi_commit="cdi-2.0.4"
+readonly cdi_commit="cdi-2.1.0"
 
 readonly cdi_root="$HOME/cdi"
 readonly cdi_src="$cdi_root/src"
@@ -32,6 +32,8 @@ cdi_build () {
 # MPI-less
 cdi_build nompi /usr \
     --enable-mpi=no
+
+cd
 
 rm -rf "$cdi_root"
 
