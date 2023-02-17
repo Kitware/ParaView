@@ -393,7 +393,7 @@
         number_of_elements_per_command="2"
         element_types="2 0"
         information_property="PointArrayInfo"
-        label="Variables">
+        label="PointArrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -409,10 +409,10 @@
         command="SetCleanGrid"
         number_of_elements="1"
         default_values="0"
-	label="Merge Points to clean grid" >
+	label="Merge Points to Clean grid" >
       <BooleanDomain name="bool" />
       <Documentation>
-            Will call vtkCleanUnstructuredGrid internally. Memory-hungry (optional)
+            Clean the dataset by merging coincident points. May use a lot of memory.
       </Documentation>
      </IntVectorProperty>
 
@@ -421,7 +421,7 @@
         command="SetSpectralElementIds"
         number_of_elements="1"
         default_values="0"
-        label="Add Spectral Element Ids as cell-data">
+        label="Add Spectral Element Ids as Cell Data">
       <BooleanDomain name="bool" />
       <Documentation>
             Add Spectral Element Ids as cell-data (optional)
