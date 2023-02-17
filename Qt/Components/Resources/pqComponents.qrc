@@ -81,6 +81,8 @@
         <file>Icons/pqHistogram16.png</file>
         <file>Icons/pqHistogram24.png</file>
         <file>Icons/pqHistogramReload24.png</file>
+        <file>Icons/pqHome.svg</file>
+        <file>Icons/pqHomeWithSave.svg</file>
         <file>Icons/pqInsituServerRunning16.png</file>
         <file>Icons/pqInsituServerPaused16.png</file>
         <file>Icons/pqInsituBreakpoint16.png</file>
@@ -101,6 +103,8 @@
         <file>Icons/pqLock24.png</file>
         <file>Icons/pqMousePick15.png</file>
         <file>Icons/pqMultiBlockData16.png</file>
+        <file>Icons/pqNavBack.svg</file>
+        <file>Icons/pqNavForward.svg</file>
         <file>Icons/pqNewFolder.svg</file>
         <file>Icons/pqNodalData.svg</file>
         <file>Icons/pqNodeMapData.svg</file>

@@ -74,26 +74,44 @@
    <addaction name="actionSaveAsHomepage"/>
   </widget>
   <action name="actionHome">
+   <property name="icon">
+    <iconset resource="../pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqHome.svg</normaloff>:/pqWidgets/Icons/pqHome.svg</iconset>
+   </property>
    <property name="text">
     <string>Home</string>
    </property>
   </action>
   <action name="actionBackward">
+   <property name="icon">
+    <iconset resource="../pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqNavBack.svg</normaloff>:/pqWidgets/Icons/pqNavBack.svg</iconset>
+   </property>
    <property name="text">
     <string>Go backward</string>
    </property>
   </action>
   <action name="actionForward">
+   <property name="icon">
+    <iconset resource="../pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqNavForward.svg</normaloff>:/pqWidgets/Icons/pqNavForward.svg</iconset>
+   </property>
    <property name="text">
     <string>Go forward</string>
    </property>
   </action>
   <action name="actionSaveAsHomepage">
+   <property name="icon">
+    <iconset resource="../pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqHomeWithSave.svg</normaloff>:/pqWidgets/Icons/pqHomeWithSave.svg</iconset>
+   </property>
    <property name="text">
     <string>Save as homepage</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc"/>
+ </resources>
  <connections/>
 </ui>
