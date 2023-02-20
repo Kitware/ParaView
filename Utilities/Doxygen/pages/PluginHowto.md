@@ -125,10 +125,6 @@ There are four ways for loading plugins:
     - Recognized locations are:
       * A `plugins` subdirectory under the `paraview-X.Y` directory in the
         library path (usually `lib` on Unix platforms and `bin` on Windows).
-      * A `plugins` subdirectory in the user's home directory.  On Unix
-        platforms, `$HOME/.config/ParaView/ParaView<version>/Plugins`.  On
-        Windows `%APPDATA$\ParaView\ParaView<version>\Plugins`. (XXX: no
-        evidence of an implementation backing this search path).
 
 ## Debugging Plugins
 
