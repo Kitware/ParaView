@@ -122,7 +122,14 @@ public:
   void UpdateCursor(QWidget* widget)
   {
     QCursor cursor = this->CursorVisible ? this->Cursor : QCursor(Qt::BlankCursor);
-    widget->setCursor(cursor);
+    if (auto* qvtkWidget = qobject_cast<pqQVTKWidget*>(widget))
+    {
+      qvtkWidget->setCursorCustom(cursor);
+    }
+    else
+    {
+      widget->setCursor(cursor);
+    }
   }
 
   QCursor Cursor;
@@ -1150,6 +1157,11 @@ void pqRenderView::setCursor(const QCursor& cursor)
 //-----------------------------------------------------------------------------
 QCursor pqRenderView::cursor()
 {
+  if (auto* qvtkWidget = qobject_cast<pqQVTKWidget*>(this->widget()))
+  {
+    return qvtkWidget->cursorCustom();
+  }
+
   return this->widget()->cursor();
 }
 

@@ -399,3 +399,29 @@ QWidget* pqQVTKWidget::renderWidget() const
   return this->useStereo ? static_cast<QWidget*>(this->baseClass.value<pqQVTKWidgetBase*>())
                          : static_cast<QWidget*>(this->baseClass.value<QVTKOpenGLNativeWidget*>());
 }
+
+//----------------------------------------------------------------------------
+void pqQVTKWidget::setCursorCustom(const QCursor& cursor)
+{
+  if (this->useStereo)
+  {
+    baseClass.value<pqQVTKWidgetBase*>()->setCursorCustom(cursor);
+  }
+  else
+  {
+    baseClass.value<QVTKOpenGLNativeWidget*>()->setCursorCustom(cursor);
+  }
+}
+
+//----------------------------------------------------------------------------
+QCursor pqQVTKWidget::cursorCustom() const
+{
+  if (this->useStereo)
+  {
+    return baseClass.value<pqQVTKWidgetBase*>()->cursorCustom();
+  }
+  else
+  {
+    return baseClass.value<QVTKOpenGLNativeWidget*>()->cursorCustom();
+  }
+}
