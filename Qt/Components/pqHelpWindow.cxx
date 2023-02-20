@@ -138,25 +138,17 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
 
   this->setCentralWidget(this->Browser->widget());
 
-  QIcon homeIcon = qApp->style()->standardIcon(QStyle::SP_DirHomeIcon);
-  this->Internals->actionHome->setIcon(homeIcon);
   QObject::connect(
     this->Internals->actionHome, &QAction::triggered, this, [=]() { this->showHomePage(); });
 
-  QIcon backIcon = qApp->style()->standardIcon(QStyle::SP_ArrowLeft);
-  this->Internals->actionBackward->setIcon(backIcon);
   this->Internals->actionBackward->setEnabled(false);
   QObject::connect(
     this->Internals->actionBackward, &QAction::triggered, this, &pqHelpWindow::goBackward);
 
-  QIcon forwardIcon = qApp->style()->standardIcon(QStyle::SP_ArrowRight);
-  this->Internals->actionForward->setIcon(forwardIcon);
   this->Internals->actionForward->setEnabled(false);
   QObject::connect(
     this->Internals->actionForward, &QAction::triggered, this, &pqHelpWindow::goForward);
 
-  QIcon saveHomePageIcon = qApp->style()->standardIcon(QStyle::SP_DialogSaveButton);
-  this->Internals->actionSaveAsHomepage->setIcon(saveHomePageIcon);
   QObject::connect(this->Internals->actionSaveAsHomepage, &QAction::triggered, this,
     &pqHelpWindow::saveCurrentHomePage);
 

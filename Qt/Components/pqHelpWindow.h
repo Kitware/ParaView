@@ -120,7 +120,7 @@ private:
   const QScopedPointer<pqBrowser> Browser;
 
   class pqInternals;
-  pqInternals* Internals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif
