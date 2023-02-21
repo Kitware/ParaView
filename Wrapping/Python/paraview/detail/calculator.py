@@ -222,7 +222,7 @@ def execute(self, expression):
                 # we can also get a scalar, convert to single element array of correct type
                 vtkRet = numpy.asarray(retVal, get_numpy_array_type(self.GetResultArrayType()))
 
-        if hasattr(retVal, "Association"):
+        if hasattr(retVal, "Association") and retVal.Association is not None:
             output.GetAttributes(retVal.Association).append(vtkRet, self.GetArrayName())
         else:
             # if somehow the association was removed we

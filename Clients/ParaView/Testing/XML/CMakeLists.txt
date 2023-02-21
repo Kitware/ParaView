@@ -1532,6 +1532,7 @@ if(PARAVIEW_USE_PYTHON)
       ExpressionChooser.xml
       PythonCalculator.xml
       PythonCalculatorInput.xml
+      PythonCalculatorCrossComposite.xml
       )
 
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
