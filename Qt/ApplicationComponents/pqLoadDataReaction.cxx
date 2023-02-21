@@ -105,10 +105,9 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
   // retrieve setting that limits the list of readers.
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMProxy* arrayListSettings =
-    proxyManager->GetProxy("settings", "RepresentedArrayListSettings");
+  vtkSMProxy* ioSettings = proxyManager->GetProxy("settings", "IOSettings");
   vtkSMStringVectorProperty* readerSelection =
-    vtkSMStringVectorProperty::SafeDownCast(arrayListSettings->GetProperty("ReaderSelection"));
+    vtkSMStringVectorProperty::SafeDownCast(ioSettings->GetProperty("ReaderSelection"));
   std::vector<std::string> excludedList;
   if (readerSelection)
   {
@@ -230,7 +229,7 @@ QVector<pqPipelineSource*> pqLoadDataReaction::loadFilesForSupportedTypes(QList<
 {
   QVector<pqPipelineSource*> newSources;
   auto* settings = vtkSMSettings::GetInstance();
-  char const* settingName = ".settings.RepresentedArrayListSettings.ReaderDetails";
+  char const* settingName = ".settings.IOSettings.ReaderDetails";
 
   for (auto const& file : files)
   {
@@ -542,12 +541,11 @@ void pqLoadDataReaction::addReaderToDefaults(QString const& readerName, pqServer
   vtkSMReaderFactory* readerFactory, QString const& customPattern)
 {
   auto pxm = server ? server->proxyManager() : nullptr;
-  auto settingsProxy = pxm
-    ? vtkSMSettingsProxy::SafeDownCast(pxm->GetProxy("settings", "RepresentedArrayListSettings"))
-    : nullptr;
+  auto settingsProxy =
+    pxm ? vtkSMSettingsProxy::SafeDownCast(pxm->GetProxy("settings", "IOSettings")) : nullptr;
 
   auto* settings = vtkSMSettings::GetInstance();
-  char const* settingName = ".settings.RepresentedArrayListSettings.ReaderDetails";
+  char const* settingName = ".settings.IOSettings.ReaderDetails";
   unsigned int numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 3;
 
   std::string const readerNameString = readerName.toStdString();

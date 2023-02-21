@@ -14,17 +14,14 @@
 =========================================================================*/
 /**
  * @class   vtkPVRepresentedArrayListSettings
- * @brief   singleton used to filter out undesired array names from color array list.
+ * @brief   singleton used to filter out undesired data attribute from the representation.
  *
- * Currently represent the "Miscellaneous" section of ParaView settings.
+ * Currently represent the "Represented Attributes" section of ParaView settings.
  *
  * vtkPVRepresentedArrayListSettings is a singleton used to keep track
  * of a list of regular expressions that filter out arrays in a
- * RepresentedArrayList domain.
- *
- * It also keeps track of a list of excluded readers used to filter
- * the File .. Open dialog, as well as rules on when to compute the magnitude
- * for data arrays.
+ * RepresentedArrayList domain, and contains other settings controlling which
+ * array should be visible in which situation.
  *
  * All calls to
  * vtkPVRepresentedArrayListSettings::New() returns a reference to the
@@ -35,6 +32,7 @@
 #define vtkPVRepresentedArrayListSettings_h
 
 #include "vtkObject.h"
+#include "vtkParaViewDeprecation.h" // deprecation macros
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 
@@ -72,26 +70,6 @@ public:
 
   ///@{
   /**
-   * Set/get the number of excluded name filters.
-   */
-  virtual void SetNumberOfExcludedNameFilters(int n);
-  virtual int GetNumberOfExcludedNameFilters();
-  ///@}
-
-  ///@{
-  /**
-   * Set/get the excluded name filter at index i. If the index is
-   * outside the valid range, this call is a noop.
-   */
-  virtual void SetExcludedNameFilter(int i, const char* expression);
-  virtual const char* GetExcludedNameFilter(int i);
-  ///@}
-
-  /// Provide the list of all name filters
-  vtkStringArray* GetAllNameFilters();
-
-  ///@{
-  /**
    * Setters to control whether ParaView should allow the user to display
    * the gradient of a given multi-component field.
    *
@@ -119,6 +97,26 @@ public:
    * @see SetComputeArrayMagnitude
    */
   virtual bool ShouldUseMagnitudeMode(int ncomp) const;
+
+  ///@{
+  /**
+   * @deprecated All following settings has been moved from this class to vtkPVIOSettings.
+   */
+  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::SetNumberOfExcludedNameFilters instead")
+  virtual void SetNumberOfExcludedNameFilters(int n);
+
+  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::GetNumberOfExcludedNameFilters instead")
+  virtual int GetNumberOfExcludedNameFilters();
+
+  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::SetExcludedNameFilter instead")
+  virtual void SetExcludedNameFilter(int i, const char* expression);
+
+  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::GetExcludedNameFilter instead")
+  virtual const char* GetExcludedNameFilter(int i);
+
+  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::GetAllNameFilters instead")
+  vtkStringArray* GetAllNameFilters();
+  ///@}
 
 protected:
   vtkPVRepresentedArrayListSettings();

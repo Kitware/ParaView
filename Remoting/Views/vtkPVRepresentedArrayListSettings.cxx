@@ -16,6 +16,7 @@
 
 #include "vtkDataArraySelection.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVIOSettings.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMSession.h"
@@ -32,8 +33,6 @@ class vtkPVRepresentedArrayListSettings::vtkInternals
 {
 public:
   std::vector<std::string> FilterExpressions;
-  std::vector<std::string> ExcludedNameFilters;
-  vtkNew<vtkStringArray> AllNameFilters;
   std::vector<int> ArrayMagnitudeExceptions;
 };
 
@@ -119,60 +118,6 @@ const char* vtkPVRepresentedArrayListSettings::GetFilterExpression(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetNumberOfExcludedNameFilters(int n)
-{
-  if (n != this->GetNumberOfExcludedNameFilters())
-  {
-    this->Internals->ExcludedNameFilters.resize(n);
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-int vtkPVRepresentedArrayListSettings::GetNumberOfExcludedNameFilters()
-{
-  return static_cast<int>(this->Internals->ExcludedNameFilters.size());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetExcludedNameFilter(int i, const char* expression)
-{
-  if (i >= 0 && i < this->GetNumberOfExcludedNameFilters())
-  {
-    if (strcmp(this->Internals->ExcludedNameFilters[i].c_str(), expression) != 0)
-    {
-      this->Internals->ExcludedNameFilters[i] = expression;
-      this->Modified();
-    }
-  }
-  else
-  {
-    vtkErrorMacro("Index out of range: " << i);
-  }
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVRepresentedArrayListSettings::GetExcludedNameFilter(int i)
-{
-  if (i >= 0 && i < this->GetNumberOfExcludedNameFilters())
-  {
-    return this->Internals->ExcludedNameFilters[i].c_str();
-  }
-  else
-  {
-    vtkErrorMacro("Index out of range: " << i);
-  }
-
-  return nullptr;
-}
-
-//------------------------------------------------------------------------------
-vtkStringArray* vtkPVRepresentedArrayListSettings::GetAllNameFilters()
-{
-  return this->Internals->AllNameFilters;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRepresentedArrayListSettings::SetNumberOfArrayMagnitudeExceptions(int size)
 {
   if (static_cast<std::size_t>(size) != this->Internals->ArrayMagnitudeExceptions.size())
@@ -206,6 +151,36 @@ bool vtkPVRepresentedArrayListSettings::ShouldUseMagnitudeMode(int ncomp) const
   const auto findComp = std::find(exceptions.cbegin(), exceptions.cend(), ncomp);
 
   return this->ComputeArrayMagnitude != (findComp != exceptions.end());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetNumberOfExcludedNameFilters(int n)
+{
+  vtkPVIOSettings::GetInstance()->SetNumberOfExcludedNameFilters(n);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRepresentedArrayListSettings::GetNumberOfExcludedNameFilters()
+{
+  return vtkPVIOSettings::GetInstance()->GetNumberOfExcludedNameFilters();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetExcludedNameFilter(int i, const char* expression)
+{
+  vtkPVIOSettings::GetInstance()->SetExcludedNameFilter(i, expression);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVRepresentedArrayListSettings::GetExcludedNameFilter(int i)
+{
+  return vtkPVIOSettings::GetInstance()->GetExcludedNameFilter(i);
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkPVRepresentedArrayListSettings::GetAllNameFilters()
+{
+  return vtkPVIOSettings::GetInstance()->GetAllNameFilters();
 }
 
 //----------------------------------------------------------------------------

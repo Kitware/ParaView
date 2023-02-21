@@ -91,6 +91,7 @@ set(classes
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
   vtkPVInteractiveViewLinkRepresentation
+  vtkPVIOSettings
   vtkPVLODActor
   vtkPVLODVolume
   vtkPVLastSelectionInformation
