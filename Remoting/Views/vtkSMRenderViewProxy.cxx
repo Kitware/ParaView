@@ -729,13 +729,14 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest)
+void vtkSMRenderViewProxy::ZoomTo(
+  vtkSMProxy* representation, bool closest, const double offsetRatio)
 {
   double bounds[6] = { 0.0 };
   this->ComputeVisibleBounds(representation, bounds);
   if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
   {
-    this->ResetCamera(bounds, closest);
+    this->ResetCamera(bounds, closest, offsetRatio);
   }
 }
 
@@ -767,12 +768,13 @@ void vtkSMRenderViewProxy::ComputeVisibleBounds(vtkSMProxy* representation, doub
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera(bool closest)
+void vtkSMRenderViewProxy::ResetCamera(bool closest, const double offsetRatio)
 {
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
     .arg("ResetCamera")
     .arg(closest)
+    .arg(offsetRatio)
     .arg("comment", "reset view to fit data");
 
   this->GetSession()->PrepareProgress();
@@ -780,7 +782,7 @@ void vtkSMRenderViewProxy::ResetCamera(bool closest)
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this);
   if (closest)
   {
-    stream << "ResetCameraScreenSpace";
+    stream << "ResetCameraScreenSpace" << offsetRatio;
   }
   else
   {
@@ -792,15 +794,15 @@ void vtkSMRenderViewProxy::ResetCamera(bool closest)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera(
-  double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, bool closest)
+void vtkSMRenderViewProxy::ResetCamera(double xmin, double xmax, double ymin, double ymax,
+  double zmin, double zmax, bool closest, const double offsetRatio)
 {
   double bds[6] = { xmin, xmax, ymin, ymax, zmin, zmax };
-  this->ResetCamera(bds, closest);
+  this->ResetCamera(bds, closest, offsetRatio);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest)
+void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest, const double offsetRatio)
 {
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
@@ -812,6 +814,7 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest)
     .arg(bounds[4])
     .arg(bounds[5])
     .arg(closest)
+    .arg(offsetRatio)
     .arg("comment", "reset view to fit data bounds");
   this->CreateVTKObjects();
 
@@ -819,13 +822,14 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest)
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this);
   if (closest)
   {
-    stream << "ResetCameraScreenSpace";
+    stream << "ResetCameraScreenSpace" << vtkClientServerStream::InsertArray(bounds, 6)
+           << offsetRatio;
   }
   else
   {
-    stream << "ResetCamera";
+    stream << "ResetCamera" << vtkClientServerStream::InsertArray(bounds, 6);
   }
-  stream << vtkClientServerStream::InsertArray(bounds, 6) << vtkClientServerStream::End;
+  stream << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 }
 

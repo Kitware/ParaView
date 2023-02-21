@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 
 #include "vtkCamera.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
 
@@ -148,7 +149,12 @@ void pqCameraReaction::onTriggered()
 void pqCameraReaction::resetCamera(bool closest)
 {
   pqView* view = pqActiveObjects::instance().activeView();
-  if (view)
+  pqRenderView* ren = qobject_cast<pqRenderView*>(view);
+  if (ren)
+  {
+    ren->resetCamera(closest, vtkPVRenderViewSettings::GetInstance()->GetZoomClosestOffsetRatio());
+  }
+  else if (view)
   {
     view->resetDisplay(closest);
   }
@@ -234,7 +240,8 @@ void pqCameraReaction::zoomToData(bool closest)
   if (renModule && repr)
   {
     vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
-    rm->ZoomTo(repr->getProxy(), closest);
+    rm->ZoomTo(repr->getProxy(), closest,
+      vtkPVRenderViewSettings::GetInstance()->GetZoomClosestOffsetRatio());
     renModule->render();
   }
 }

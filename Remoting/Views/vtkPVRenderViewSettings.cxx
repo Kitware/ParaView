@@ -54,6 +54,7 @@ vtkPVRenderViewSettings::vtkPVRenderViewSettings()
   , BackgroundColor{ 0, 0, 0 }
   , Background2Color{ 0, 0, 0 }
   , BackgroundColorMode(vtkPVRenderView::DEFAULT)
+  , ZoomClosestOffsetRatio(0.9)
 {
 }
 

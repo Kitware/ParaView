@@ -727,6 +727,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty command="SetZoomClosestOffsetRatio"
+                            name="ZoomClosestOffsetRatio"
+                            default_values="0.9"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="1"/>
+        <Documentation>
+          ZoomClosestOffsetRatio is used to control the camera's zoom level when using Reset Camera Closest and
+          Zoom Closest To Data. If the offset is 0, the zoom level will be identical to Reset/Zoom To Data's level.
+          If the offset is 1, the bounding box of the view/dataset will tightly fit to the boundary of the view.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <PropertyGroup label="Geometry Mapper Options">
         <Property name="ResolveCoincidentTopology" />
         <Property name="PolygonOffsetParameters" />
@@ -798,6 +811,7 @@
         <Property name="ShowAnnotation" />
         <Property name="PointPickingRadius" />
         <Property name="DisableIceT" />
+        <Property name="ZoomClosestOffsetRatio" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

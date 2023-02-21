@@ -151,6 +151,18 @@ public:
   vtkSetMacro(BackgroundColorMode, int);
   vtkGetMacro(BackgroundColorMode, int);
   ///@}
+
+  ///@{
+  /**
+   * OffsetRatio is used to add a zoom offset when using Reset Camera Closest and
+   * Zoom Closest To Data.
+   *
+   * Default is 0.9.
+   */
+  vtkSetMacro(ZoomClosestOffsetRatio, double);
+  vtkGetMacro(ZoomClosestOffsetRatio, double);
+  ///@}
+
 protected:
   vtkPVRenderViewSettings();
   ~vtkPVRenderViewSettings() override;
@@ -167,6 +179,7 @@ protected:
   double BackgroundColor[3];
   double Background2Color[3];
   int BackgroundColorMode;
+  double ZoomClosestOffsetRatio;
 
 private:
   vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) = delete;
