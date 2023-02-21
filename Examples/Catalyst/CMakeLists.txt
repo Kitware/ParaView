@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(CatalystExamples C CXX)
 
+#------------------------------------------------------------------------------
+# since we use C++11 in this example.
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 include(CMakeDependentOption)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../VTK/CMake")
 cmake_dependent_option(USE_CATALYST "Link the simulator with Catalyst" ON
