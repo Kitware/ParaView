@@ -1,0 +1,8 @@
+NAME
+  BivariateRepresentations
+DESCRIPTION
+  Representations to visualize bivariate data
+REQUIRES_MODULES
+  ParaView::RemotingViews
+  VTK::CommonCore
+  VTK::RenderingOpenGL2

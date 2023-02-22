@@ -291,6 +291,7 @@ set(paraview_default_plugins
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
   BagPlotViewsAndFilters
+  BivariateRepresentations
   CFSReader
   ContourLabelPlugin
   Datamine

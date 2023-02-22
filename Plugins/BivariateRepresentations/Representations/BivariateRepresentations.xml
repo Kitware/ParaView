@@ -1,0 +1,194 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy name="BivariateNoiseRepresentation"
+                         class="vtkBivariateNoiseRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        This representation displays the values of the secondary array in the form of noise.
+      </Documentation>
+
+      <StringVectorProperty name="NoiseArray"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            default_values="1 0 0 0 0">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="input_array_point_1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the input array displayed with noise.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Granularity"
+                            command="SetFrequency"
+                            number_of_elements="1"
+                            default_values="30.0">
+        <DoubleRangeDomain name="range" min="0.0" max="150.0"/>
+        <Documentation>
+          This property specifies a value for the granularity (frequency) of the noise.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Amplitude"
+                            command="SetAmplitude"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="2.0"/>
+        <Documentation>
+          This property specifies a factor modifying the amplitude of the noise.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Speed"
+                            command="SetSpeed"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="3.0"/>
+        <Documentation>
+          This property specifies a factor modifying the speed of the noise animation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NbOfOctaves"
+                         command="SetNbOfOctaves"
+                         number_of_elements="1"
+                         default_values="3">
+        <IntRangeDomain name="range" min="0" max="5"/>
+        <Documentation>
+          This property specifies the number of octaves of noise (overlaping layers of noise).
+        </Documentation>
+      </IntVectorProperty>
+    <!-- End of BivariateNoiseRepresentation -->
+    </RepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        BivariateNoiseRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BivariateNoiseRepresentation"
+                          text="Bivariate Noise Surface"
+                          subtype="Surface"/>
+
+      <SubProxy>
+        <Proxy name="BivariateNoiseRepresentation"
+               proxygroup="representations"
+               proxyname="BivariateNoiseRepresentation">
+        </Proxy>
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input"/>
+          <Exception name="Visibility"/>
+          <Exception name="Representation"/>
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Bivariate representation">
+            <Property name="NoiseArray"/>
+            <Property name="Granularity"/>
+            <Property name="Amplitude"/>
+            <Property name="Speed"/>
+            <Property name="NbOfOctaves"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bivariate Noise Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of GeometryRepresentation Extension -->
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <Documentation>
+        Extends standard UnstructuredGridRepresentation by adding
+        BivariateNoiseRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BivariateNoiseRepresentation"
+                          text="Bivariate Noise Surface"
+                          subtype="Surface"/>
+
+      <SubProxy>
+        <Proxy name="BivariateNoiseRepresentation"
+               proxygroup="representations"
+               proxyname="BivariateNoiseRepresentation">
+        </Proxy>
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input"/>
+          <Exception name="Visibility"/>
+          <Exception name="Representation"/>
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Bivariate representation">
+            <Property name="NoiseArray"/>
+            <Property name="Granularity"/>
+            <Property name="Amplitude"/>
+            <Property name="Speed"/>
+            <Property name="NbOfOctaves"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bivariate Noise Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of UnstructuredGridRepresentation Extension -->
+    </Extension>
+
+    <Extension name="UniformGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        BivariateNoiseRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BivariateNoiseRepresentation"
+                          text="Bivariate Noise Surface"
+                          subtype="Surface"/>
+
+      <SubProxy>
+        <Proxy name="BivariateNoiseRepresentation"
+               proxygroup="representations"
+               proxyname="BivariateNoiseRepresentation">
+        </Proxy>
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input"/>
+          <Exception name="Visibility"/>
+          <Exception name="Representation"/>
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Bivariate representation">
+            <Property name="NoiseArray"/>
+            <Property name="Granularity"/>
+            <Property name="Amplitude"/>
+            <Property name="Speed"/>
+            <Property name="NbOfOctaves"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bivariate Noise Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of UniformGridRepresentation Extension -->
+    </Extension>
+  </ProxyGroup>
+</ServerManagerConfiguration>
