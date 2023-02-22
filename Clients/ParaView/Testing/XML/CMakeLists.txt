@@ -169,6 +169,11 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/spiaggia_di_mondello_1k.hdr}"
   "DATA{${paraview_test_data_directory_input}/Data/SteeringDataGeneratorPlugin.xml}"
+  "DATA{${paraview_test_data_directory_input}/Data/squareBend/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/squareBend/system/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/squareBend/constant/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/squareBend/50/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/squareBend/100/,RECURSE:,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
   "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol/,REGEX:.*}"
@@ -911,6 +916,7 @@ SET(TESTS_WITH_BASELINES
   TemporalParticleKeepDeadTrails.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
+  TestOpenFOAMWeighByCell.xml
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   TransferFunction2DYScalars.xml
