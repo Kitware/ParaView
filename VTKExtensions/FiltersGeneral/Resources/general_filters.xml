@@ -910,8 +910,8 @@ points in the input. Defaults to ***Single***.
           <Proxy group="incremental_point_locators"
                  name="NonMergingPointLocator" />
         </ProxyListDomain>
-        <Documentation>This property specifies an incremental point locator for
-        merging duplicate / coincident points.</Documentation>
+        <Documentation>This property specifies which incremental point locator to
+        use for handling duplicate/coincident points.</Documentation>
       </ProxyProperty>
       <!-- incremental point locator end -->
 
@@ -2683,27 +2683,6 @@ Every Nth Point.
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
-      <IntVectorProperty command="SetMergePoints"
-                         default_values="1"
-                         name="MergePoints"
-                         label="Merge duplicated points in the slice"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This parameter controls whether to merge duplicated points in the slice.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       exclude="1"
-                                       mode="visibility"/>
-              <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                <Property name="PreserveInputCells" function="boolean_invert" />
-              </PropertyWidgetDecorator>
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
-      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Slice Offset Values"
@@ -2735,6 +2714,26 @@ Every Nth Point.
           </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
+      <!-- incremental point locator begin -->
+      <ProxyProperty command="SetLocator"
+                     label="Point Merge Method"
+                     name="Locator"
+                     panel_visibility="advanced" >
+        <ProxyGroupDomain name="groups">
+          <Group name="incremental_point_locators" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="incremental_point_locators"
+                 name="MergePoints" />
+          <Proxy group="incremental_point_locators"
+                 name="IncrementalOctreeMergePoints" />
+          <Proxy group="incremental_point_locators"
+                 name="NonMergingPointLocator" />
+        </ProxyListDomain>
+        <Documentation>This property specifies which incremental point locator to
+        use for handling duplicate/coincident points.</Documentation>
+      </ProxyProperty>
+      <!-- incremental point locator end -->
       <Hints>
         <Visibility replace_input="2" />
       </Hints>

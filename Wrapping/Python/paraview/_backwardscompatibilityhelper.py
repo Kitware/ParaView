@@ -465,6 +465,19 @@ def setattr(proxy, pname, value):
         elif pname == "NumberOfBlock" and not compatibility_version < (5, 12):
             raise NotSupportedException("'NumberOfBlock' is obsolete.  See 'BlockOverlap' property instead.")
 
+    # 5.11 -> 5.12 we replaced MergePoints with Locator for Cut
+    # Need to specify which locator use instead of toggling
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "Cut":
+        if pname == "MergePoints":
+            if compatibility_version < (5, 12):
+                if value:
+                    proxy.GetProperty("Locator").SetData("Uniform Binning")
+                else:
+                    proxy.GetProperty("Locator").SetData("Don't Merge Points")
+                raise Continue()
+            else:
+                raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -947,6 +960,13 @@ def getattr(proxy, pname):
                     "'OptimizeForRealInput' is obsolete.  Use 'OneSidedSpectrum' property instead.")
         elif pname == "NumberOfBlock" and not compatibility_version < (5, 12):
             raise NotSupportedException("'NumberOfBlock' is obsolete.  See 'BlockOverlap' property instead.")
+
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "Cut":
+        if pname == "MergePoints":
+            if compatibility_version < (5, 12):
+                return proxy.GetProperty("Locator").GetData().SMProxy.GetXMLLabel() == "Uniform Binning"
+            else:
+                raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
 
     raise Continue()
 

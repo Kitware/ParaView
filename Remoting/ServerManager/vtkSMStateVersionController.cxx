@@ -1451,7 +1451,10 @@ struct Process_5_10_to_5_11
 
 struct Process_5_11_to_5_12
 {
-  bool operator()(xml_document& document) { return ConvertTableFFT(document); }
+  bool operator()(xml_document& document)
+  {
+    return ConvertTableFFT(document) && HandleSlice(document);
+  }
 
   static bool ConvertTableFFT(xml_document& document)
   {
@@ -1476,6 +1479,112 @@ struct Process_5_11_to_5_12
       {
         node.remove_child(nblockNode);
       }
+    }
+
+    return true;
+  }
+
+  static bool HandleSlice(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Cut']");
+
+    if (xpath_set.empty())
+    {
+      return true;
+    }
+
+    // generate missing proxies
+    pugi::xml_node smstate = document.root().child("ServerManagerState");
+    UniqueIdGenerator generator(document);
+
+    const vtkTypeUInt32 mergeId = generator.GetNextUniqueId();
+    const vtkTypeUInt32 octreeMergeId = generator.GetNextUniqueId();
+    const vtkTypeUInt32 nonMergeId = generator.GetNextUniqueId();
+
+    std::ostringstream stream;
+    stream << "<Proxy group=\"incremental_point_locators\" type=\"MergePoints\" id=\"" << mergeId
+           << "\" servers=\"1\" >\n";
+    stream << "  <Property name=\"Divisions\" id=\"" << mergeId
+           << ".Divisions\" number_of_elements=\"3\" >\n";
+    stream << "    <Element index=\"0\" value=\"50\"/>\n";
+    stream << "    <Element index=\"1\" value=\"50\"/>\n";
+    stream << "    <Element index=\"2\" value=\"50\"/>\n";
+    stream << "  </Property>\n";
+    stream << "  <Property name=\"NumberOfPointsPerBucket\" id=\"" << mergeId
+           << ".NumberOfPointsPerBucket\" number_of_elements=\"1\" >\n";
+    stream << "    <Element index=\"0\" value=\"8\"/>\n";
+    stream << "  </Property>\n";
+    stream << "</Proxy>\n";
+
+    stream
+      << "<Proxy group=\"incremental_point_locators\" type=\"IncrementalOctreeMergePoints\" id=\""
+      << octreeMergeId << "\" servers=\"1\" >\n";
+    stream << "  <Property name=\"MaxPointsPerLeaf\" id=\"" << octreeMergeId
+           << ".MaxPointsPerLeaf\" number_of_elements=\"1\" >\n";
+    stream << "    <Element index=\"0\" value=\"128\"/>\n";
+    stream << "    <Domain name=\"range\" id=\"" << octreeMergeId
+           << ".MaxPointsPerLeaf.range\"/>\n";
+    stream << "  </Property>\n";
+    stream << "  <Property name=\"Tolerance\" id=\"" << octreeMergeId
+           << ".Tolerance\" number_of_elements=\"1\" >\n";
+    stream << "    <Element index=\"0\" value=\"0\"/>\n";
+    stream << "  </Property>\n";
+    stream << "</Proxy>\n";
+
+    stream << "<Proxy group=\"incremental_point_locators\" type=\"NonMergingPointLocator\" id=\""
+           << nonMergeId << "\" servers=\"1\" >\n";
+    stream << "  <Property name=\"Divisions\" id=\"" << nonMergeId
+           << ".Divisions\" number_of_elements=\"3\" >\n";
+    stream << "    <Element index=\"0\" value=\"50\"/>\n";
+    stream << "    <Element index=\"1\" value=\"50\"/>\n";
+    stream << "    <Element index=\"2\" value=\"50\"/>\n";
+    stream << "  </Property>\n";
+    stream << "  <Property name=\"NumberOfPointsPerBucket\" id=\"" << nonMergeId
+           << ".NumberOfPointsPerBucket\" number_of_elements=\"1\" >\n";
+    stream << "    <Element index=\"0\" value=\"8\"/>\n";
+    stream << "  </Property>\n";
+    stream << "</Proxy>\n";
+
+    std::string buffer = stream.str();
+    if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
+    {
+      vtkGenericWarningMacro("Unable to add locators to match deprecated merge points.");
+    }
+
+    // replace property
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      const std::string id(node.attribute("id").value());
+      bool mergePoints = true;
+
+      // remove MergePoints property
+      if (auto mergeNode = node.find_child_by_attribute("name", "MergePoints"))
+      {
+        mergePoints = mergeNode.child("Element").attribute("value").as_int() == 1;
+        node.remove_child(mergeNode);
+      }
+
+      // add Locator property
+      auto locatorNode = node.append_child("Property");
+      locatorNode.append_attribute("name").set_value("Locator");
+      locatorNode.append_attribute("id").set_value((id + ".Locator").c_str());
+      locatorNode.append_attribute("number_of_elements").set_value(1);
+
+      locatorNode.append_child("Proxy").append_attribute("value").set_value(
+        mergePoints ? mergeId : nonMergeId);
+
+      auto domainGroupsNode = locatorNode.append_child("Domain");
+      domainGroupsNode.append_attribute("name").set_value("groups");
+      domainGroupsNode.append_attribute("id").set_value((id + ".Locator.groups").c_str());
+
+      auto domainListNode = locatorNode.append_child("Domain");
+      domainListNode.append_attribute("name").set_value("proxy_list");
+      domainListNode.append_attribute("id").set_value((id + ".Locator.proxy_list").c_str());
+      domainListNode.append_child("Proxy").append_attribute("value").set_value(mergeId);
+      domainListNode.append_child("Proxy").append_attribute("value").set_value(octreeMergeId);
+      domainListNode.append_child("Proxy").append_attribute("value").set_value(nonMergeId);
     }
 
     return true;

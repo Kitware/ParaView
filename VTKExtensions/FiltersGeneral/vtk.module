@@ -13,6 +13,7 @@ DEPENDS
   VTK::FiltersGeneral
   VTK::FiltersParallel
   VTK::FiltersGeometryPreview
+  ParaView::Versioning
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsAMR
   ParaView::VTKExtensionsCore
