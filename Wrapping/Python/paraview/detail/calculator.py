@@ -212,7 +212,7 @@ def execute(self, expression):
     retVal = compute(inputs, expression, ns=variables)
 
     if retVal is not None:
-        if hasattr(retVal, "Association"):
+        if hasattr(retVal, "Association") and retVal.Association is not None:
             output.GetAttributes(retVal.Association).append(retVal, self.GetArrayName())
         else:
             # if somehow the association was removed we
