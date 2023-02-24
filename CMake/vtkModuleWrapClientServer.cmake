@@ -37,10 +37,32 @@ function (_vtk_module_wrap_client_server_sources module sources classes)
 
   set(_vtk_client_server_args_file "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}-client-server.$<CONFIGURATION>.args")
 
-  set(_vtk_client_server_genex_compile_definitions
-    "$<TARGET_PROPERTY:${_vtk_client_server_target_name},COMPILE_DEFINITIONS>")
-  set(_vtk_client_server_genex_include_directories
-    "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INCLUDE_DIRECTORIES>")
+  set(_vtk_client_server_genex_allowed 1)
+  if (CMAKE_VERSION VERSION_LESS "3.19")
+    get_property(_vtk_client_server_target_type
+      TARGET   "${_vtk_client_server_target_name}"
+      PROPERTY TYPE)
+    if (_vtk_client_server_target_type STREQUAL "INTERFACE_LIBRARY")
+      set(_vtk_client_server_genex_allowed 0)
+    endif ()
+  endif ()
+
+  set(_vtk_client_server_genex_compile_definitions "")
+  set(_vtk_client_server_genex_include_directories "")
+  if (_vtk_client_server_genex_allowed)
+    set(_vtk_client_server_genex_compile_definitions
+      "$<TARGET_PROPERTY:${_vtk_client_server_target_name},COMPILE_DEFINITIONS>")
+    set(_vtk_client_server_genex_include_directories
+      "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INCLUDE_DIRECTORIES>")
+  else ()
+    if (NOT DEFINED ENV{CI})
+      message(AUTHOR_WARNING
+        "ClientServer wrapping is not using target-local compile definitions "
+        "or include directories. This may affect generation of the Client "
+        "Server wrapper sources for the ${module} module. Use CMake 3.19+ to "
+        "guarantee intended behavior.")
+    endif ()
+  endif ()
   file(GENERATE
     OUTPUT  "${_vtk_client_server_args_file}"
     CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions}>:\n-D\'$<JOIN:${_vtk_client_server_genex_compile_definitions},\'\n-D\'>\'>\n
