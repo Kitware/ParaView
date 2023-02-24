@@ -3,6 +3,11 @@
         {
             "group": "master",
             "site": "gitlab-ci",
+            "buildname": "[el7_shared_mindeps_mpi_python]"
+        },
+        {
+            "group": "master",
+            "site": "gitlab-ci",
             "buildname": "[el8_shared_icc_mpi_python]"
         },
         {
