@@ -45,25 +45,38 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
+#include "vtksys/RegularExpression.hxx"
+
 #include <cassert>
 #include <list>
 #include <map>
-#include <regex>
 #include <set>
 #include <vector>
 
 namespace
 {
+vtksys::RegularExpression RegExNodeIdInExpression = "[a-zA-Z0-9]+";
 //------------------------------------------------------------------------------
-void ReplaceString(std::string& source, const std::string& replace, const std::string& with)
+void ReplaceStringUsingRegex(std::string& source, vtksys::RegularExpression& regex,
+  const std::string& replace, const std::string& with)
 {
-  const std::regex reg("[a-zA-Z0-9]+");
-  for (auto match = std::sregex_iterator(source.begin(), source.end(), reg);
-       match != std::sregex_iterator(); ++match)
+  // find all matches
+  std::vector<std::string> matches;
+  for (size_t next = 0; regex.find(source.substr(next)); next += regex.end())
   {
-    if (match->str() == replace)
+    const auto mathWord = source.substr(next + regex.start(), regex.end() - regex.start());
+    if (mathWord == replace)
     {
-      source.replace(match->position(), match->length(), with);
+      matches.push_back(mathWord);
+    }
+  }
+  // replace all matches
+  for (const auto& match : matches)
+  {
+    const auto pos = source.find(match);
+    if (pos != std::string::npos)
+    {
+      source.replace(pos, match.length(), with);
     }
   }
 }
@@ -221,7 +234,8 @@ bool vtkSMSelectionHelper::CombineSelection(vtkSMSourceProxy* appendSelections1,
     // save new selection name
     newSelectionNamesAP2.push_front(newSelectionName);
     // update the expression
-    ReplaceString(newExpressionAP2, oldSelectionName, newSelectionName);
+    ::ReplaceStringUsingRegex(
+      newExpressionAP2, ::RegExNodeIdInExpression, oldSelectionName, newSelectionName);
   }
 
   // create a combined appendSelections
