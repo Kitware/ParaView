@@ -77,6 +77,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -93,6 +95,23 @@ static bool processEvents()
 {
   QApplication::processEvents();
   return ContinueWaiting;
+}
+
+//-----------------------------------------------------------------------------
+QString recoverRegistrationName(vtkSMProxy* proxy)
+{
+  vtkSMProperty* nameProperty = proxy->GetProperty("RegistrationName");
+  if (nameProperty)
+  {
+    proxy->UpdatePropertyInformation(nameProperty);
+    std::string newName = vtkSMPropertyHelper(nameProperty).GetAsString();
+    newName = vtkSMCoreUtilities::SanitizeName(newName);
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
+    newName = spxm->GetUniqueProxyName(proxy->GetXMLGroup(), newName.c_str(), false);
+    return QString::fromStdString(newName);
+  }
+  return QString();
 }
 
 //-----------------------------------------------------------------------------
@@ -162,7 +181,8 @@ pqPipelineSource* pqObjectBuilder::createSource(
     return nullptr;
   }
 
-  pqPipelineSource* source = pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server);
+  pqPipelineSource* source = pqObjectBuilderNS::postCreatePipelineProxy(
+    controller, proxy, server, pqObjectBuilderNS::recoverRegistrationName(proxy));
   Q_EMIT this->sourceCreated(source);
   Q_EMIT this->proxyCreated(source);
   return source;
@@ -202,7 +222,8 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
     }
   }
 
-  pqPipelineSource* filter = pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server);
+  pqPipelineSource* filter = pqObjectBuilderNS::postCreatePipelineProxy(
+    controller, proxy, server, pqObjectBuilderNS::recoverRegistrationName(proxy));
   Q_EMIT this->filterCreated(filter);
   Q_EMIT this->proxyCreated(filter);
   return filter;
@@ -242,7 +263,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
   std::vector<std::string> filesStd(files.size());
   std::transform(files.constBegin(), files.constEnd(), filesStd.begin(),
     [](const QString& str) -> std::string { return str.toStdString(); });
-  QString reg_name = QString(vtkSMCoreUtilities::FindLargestPrefix(filesStd).c_str());
+  QString fileRegName = QString(vtkSMCoreUtilities::FindLargestPrefix(filesStd).c_str());
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
@@ -287,8 +308,14 @@ pqPipelineSource* pqObjectBuilder::createReader(
     proxy->UpdateVTKObjects();
   }
 
+  QString regName = pqObjectBuilderNS::recoverRegistrationName(proxy);
+  if (regName.isEmpty())
+  {
+    regName = fileRegName;
+  }
+
   pqPipelineSource* reader =
-    pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server, reg_name);
+    pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server, regName);
   Q_EMIT this->readerCreated(reader, files[0]);
   Q_EMIT this->readerCreated(reader, files);
   Q_EMIT this->sourceCreated(reader);
@@ -338,10 +365,12 @@ pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
   // this by setting up layouts, etc.
   Q_EMIT this->aboutToCreateView(server);
 
+  QString regName = pqObjectBuilderNS::recoverRegistrationName(proxy);
+
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
   controller->PostInitializeProxy(proxy);
-  controller->RegisterViewProxy(proxy);
+  controller->RegisterViewProxy(proxy, regName.toUtf8().data());
 
   pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
   pqView* view = model->findItem<pqView*>(proxy);
@@ -423,11 +452,13 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(reprProxy);
 
+  QString regName = pqObjectBuilderNS::recoverRegistrationName(reprProxy);
+
   // Set the reprProxy's input.
   pqSMAdaptor::setInputProperty(
     reprProxy->GetProperty("Input"), source->getProxy(), opPort->getPortNumber());
   controller->PostInitializeProxy(reprProxy);
-  controller->RegisterRepresentationProxy(reprProxy);
+  controller->RegisterRepresentationProxy(reprProxy, regName.toUtf8().data());
 
   // Add the reprProxy to render module.
   vtkSMProxy* viewModuleProxy = view->getProxy();
@@ -475,7 +506,8 @@ vtkSMProxy* pqObjectBuilder::createProxy(
     proxy->SetPrototype(true);
   }
 
-  pxm->RegisterProxy(reg_group.toUtf8().data(), proxy);
+  pxm->RegisterProxy(reg_group.toUtf8().data(),
+    pqObjectBuilderNS::recoverRegistrationName(proxy).toUtf8().data(), proxy);
   return proxy;
 }
 

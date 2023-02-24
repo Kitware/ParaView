@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(ReaderName)
+project(RegistrationName)
 
 find_package(ParaView REQUIRED)
 

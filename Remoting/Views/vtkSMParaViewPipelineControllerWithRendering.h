@@ -177,6 +177,7 @@ public:
    */
   virtual const char* GetPipelineIcon(vtkSMSourceProxy* producer, int outputPort);
 
+  using Superclass::RegisterRepresentationProxy;
   /**
    * Overridden to create color and opacity transfer functions if applicable.
    * While it is tempting to add any default property setup logic in such

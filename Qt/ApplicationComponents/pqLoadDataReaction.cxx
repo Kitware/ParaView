@@ -221,21 +221,6 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet
         }
     }
   }
-
-  for (auto& source : sources)
-  {
-    vtkSMProxy* proxy = source->getSourceProxy();
-    vtkSMProperty* nameProperty = proxy->GetProperty("RegistrationName");
-    if (nameProperty)
-    {
-      std::string newName = vtkSMPropertyHelper(nameProperty).GetAsString();
-      newName = vtkSMCoreUtilities::SanitizeName(newName);
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
-      newName = spxm->GetUniqueProxyName(source->getSMGroup().toUtf8(), newName.c_str(), false);
-      source->rename(QString::fromStdString(newName));
-    }
-  }
   return sources;
 }
 

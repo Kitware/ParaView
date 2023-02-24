@@ -19,9 +19,9 @@
 
 #include <vtkPNGReader.h>
 
-#include "PNGReaderModule.h" // for export macro
+#include "MyReaderModule.h" // for export macro
 
-class PNGREADER_EXPORT vtkMyPNGReader : public vtkPNGReader
+class MYREADER_EXPORT vtkMyPNGReader : public vtkPNGReader
 {
 public:
   static vtkMyPNGReader* New();

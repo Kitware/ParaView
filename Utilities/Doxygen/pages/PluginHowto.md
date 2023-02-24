@@ -811,8 +811,9 @@ a `SetFileName` function property. You are free to have other properties as
 well, as with a standard (non-reader) filter. Also, the `Hints` section is needed
 in order to associate the file extension with the reader on the client. The
 `ReaderFactory` hint is what the client uses to identify readers from sources.
+
 Optionally, you can provide an information property `RegistrationName` to specify the reader
-pipeline name to use.
+pipeline name to use. `RegistrationName` is a feature available for any proxy, not just readers.
 
 ```xml
 <ServerManagerConfiguration>

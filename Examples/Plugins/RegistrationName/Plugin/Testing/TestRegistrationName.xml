@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/img1.mypng" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,104,8,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,104,8,/0:0/0:0" />
+  <pqcheck object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/qt_scrollarea_viewport/1QExpandingLineEdit0" property="text" arguments="ReaderDefinedName" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyElevationFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,139,19,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,139,19,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionRename" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/1QInputDialog0/1QLineEdit0" property="text" arguments="FilterDefinedName" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/1QInputDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
+</pqevents>
