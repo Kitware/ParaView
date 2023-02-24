@@ -115,6 +115,17 @@ public:
    */
   QWidget* renderWidget() const;
 
+  ///@{
+  /**
+   * Set / get the cursor shape used when the mouse is over the widget.
+   * You should use these functions instead of QWidget::setCursor / QWidget::cursor.
+   * The reason is that, using original ones do not work properly when ParaView is
+   * launched with stereo mode activated.
+   */
+  void setCursorCustom(const QCursor& cursor);
+  QCursor cursorCustom() const;
+  ///@}
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void paintMousePointer(int x, int y);
 
