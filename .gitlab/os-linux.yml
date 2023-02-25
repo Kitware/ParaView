@@ -24,6 +24,10 @@
     extends: .linux
     image: "kitware/paraview:ci-fedora35-20230215"
 
+.el7_mindeps:
+    extends: .linux
+    image: "kitware/paraview:ci-el7-mindeps-20230224"
+
 .el8_icc:
     extends: .linux
     image: "kitware/paraview:ci-el8-icc-20220809"
@@ -53,6 +57,14 @@
         CMAKE_PREFIX_PATH: /usr/local/intelmpi
         # Disable shared memory; it doesn't work so well inside of containers.
         I_MPI_SHM: disable
+
+.el7_mindeps_shared_mpi_python:
+    extends:
+        - .el7_mindeps
+        - .fedora_mpich_addon
+
+    variables:
+        CMAKE_CONFIGURATION: el7_shared_mindeps_mpi_python
 
 .el8_shared_icc_mpi_python:
     extends:

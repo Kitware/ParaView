@@ -43,6 +43,29 @@ spack-centos7:build:
 
 ## Linux
 
+el7-mindeps-shared-mpi-python:build:
+    extends:
+        - .el7_mindeps_shared_mpi_python
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+# Disable testing for now. Even with a modern Mesa and the llvmpipe backend,
+# modern enough OpenGL is just not working in CI. Rather than disabling just
+# about everything in the test suite, just skip testing altogether.
+# el7-mindeps-shared-mpi-python:test:
+#     extends:
+#         - .el7_mindeps_shared_mpi_python
+#         - .cmake_test_linux
+#         - .linux_tester_tags
+#         - .cmake_test_artifacts
+#         - .run_automatically
+#     dependencies:
+#         - el7-mindeps-shared-mpi-python:build
+#     needs:
+#         - el7-mindeps-shared-mpi-python:build
+
 fedora35-static-mpi-offscreen-osmesa-python:build:
     extends:
         - .fedora35_static_mpi_offscreen_osmesa_python

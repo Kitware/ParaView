@@ -66,7 +66,6 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
-#include <regex>
 #include <sstream>
 
 #if PARAVIEW_USE_QTWEBENGINE
@@ -960,8 +959,8 @@ void vtkPVXRInterfaceWidgets::ShowBillboard(
       std::string fname = (textureFile.c_str() + 7);
 
       // handle non standard \\c:\ format?
-      std::regex matcher(R"=(\\\\[a-zA-Z]:\\)=");
-      if (std::regex_match(fname, matcher))
+      if (fname.size() >= 5 && fname[0] == '\\' && fname[1] == '\\' && std::isalpha(fname[2]) &&
+        fname[3] == ':' && fname[4] == '\\')
       {
         fname = fname.substr(2);
       }
