@@ -193,6 +193,12 @@ public:
 
       vtkSMProxy* pxy = cue->getAnimatedProxy();
       vtkSMProperty* pty = cue->getAnimatedProperty();
+      if (!pty || !pxy)
+      {
+        qCritical() << "Could not recover animated proxy or property";
+        return "";
+      }
+
       QString p = pty->GetXMLLabel();
       if (pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
       {
