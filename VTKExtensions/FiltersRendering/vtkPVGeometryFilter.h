@@ -42,7 +42,7 @@ class vtkInformationVector;
 class vtkMultiProcessController;
 class vtkOutlineSource;
 class vtkPolyData;
-class vtkPVRecoverGeometryWireframe;
+class vtkRecoverGeometryWireframe;
 class vtkRectilinearGrid;
 class vtkStructuredGrid;
 class vtkUnstructuredGridBase;
@@ -314,7 +314,7 @@ protected:
   vtkGeometryFilter* GeometryFilter;
   vtkGenericGeometryFilter* GenericGeometryFilter;
   vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
-  vtkPVRecoverGeometryWireframe* RecoverWireframeFilter;
+  vtkRecoverGeometryWireframe* RecoverWireframeFilter;
   vtkFeatureEdges* FeatureEdgesFilter;
 
   /**
