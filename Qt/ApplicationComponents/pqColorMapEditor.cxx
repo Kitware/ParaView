@@ -354,11 +354,11 @@ void pqColorMapEditor::updateColor2ArraySelectorWidgets()
 
   if (checked && enabled)
   {
-    ui.ColorLabel->setText("Color X");
+    ui.ColorLabel->setText(tr("Color X"));
   }
   else
   {
-    ui.ColorLabel->setText("Color");
+    ui.ColorLabel->setText(tr("Color"));
   }
 }
 
