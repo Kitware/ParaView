@@ -36,8 +36,15 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 
+#include <string>
+#include <vector>
+
 class vtkStringArray;
 class vtkDataArraySelection;
+namespace vtksys
+{
+class RegularExpression;
+}
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVRepresentedArrayListSettings : public vtkObject
 {
@@ -97,6 +104,33 @@ public:
    * @see SetComputeArrayMagnitude
    */
   virtual bool ShouldUseMagnitudeMode(int ncomp) const;
+
+  ///@{
+  /**
+   * ChartsDefaultXAxis is the list of array names that will be selected by default as
+   * the X axis when displaying some data in charts.
+   */
+  virtual void SetNumberOfChartsDefaultXAxis(int n);
+  virtual int GetNumberOfChartsDefaultXAxis() const;
+  virtual void SetChartsDefaultXAxis(int i, const char* expression);
+  virtual const char* GetChartsDefaultXAxis(int i) const;
+  virtual const std::vector<std::string>& GetAllChartsDefaultXAxis() const;
+  ///@}
+
+  ///@{
+  /**
+   * ChartsHiddenAttributes is a list of regex that controls whether or not array should
+   * be visible by defaults in a chart. If the name of the array matches one of the regex
+   * then it will be hidden by defaults, otherwise it will be visible.
+   *
+   * See GetSeriesVisibilityDefault to evaluate the default visibility of a given array name.
+   */
+  virtual void SetNumberOfChartsHiddenAttributes(int n);
+  virtual int GetNumberOfChartsHiddenAttributes() const;
+  virtual void SetChartsHiddenAttributes(int i, const char* expression);
+  virtual const std::vector<vtksys::RegularExpression>& GetAllChartsHiddenAttributes() const;
+  virtual bool GetSeriesVisibilityDefault(const char* name) const;
+  ///@}
 
   ///@{
   /**

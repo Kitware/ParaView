@@ -19,6 +19,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMSourceProxy.h"
@@ -151,24 +152,35 @@ int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLE
 //----------------------------------------------------------------------------
 const char** vtkSMChartSeriesListDomain::GetKnownSeriesNames()
 {
-  static const char* strings_to_check[] = { "bin_extents", "Time", "time", "arc_length", "XArray",
-    "x_array", "Frequency", nullptr };
-  return strings_to_check;
+  static std::vector<const char*> staticStorage;
+
+  // Convert vector of std::string to a const char**
+  const auto& knownSeries =
+    vtkPVRepresentedArrayListSettings::GetInstance()->GetAllChartsDefaultXAxis();
+  staticStorage.resize(knownSeries.size() + 1);
+  for (std::size_t i = 0; i < knownSeries.size(); ++i)
+  {
+    staticStorage[i] = knownSeries[i].c_str();
+  }
+  staticStorage[knownSeries.size()] = nullptr;
+
+  return staticStorage.data();
 }
 //----------------------------------------------------------------------------
 int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  const char** strings_to_check = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
+  const auto& strings_to_check =
+    vtkPVRepresentedArrayListSettings::GetInstance()->GetAllChartsDefaultXAxis();
 
   const std::vector<std::string> domain_strings = this->GetStrings();
-  for (int cc = 0; strings_to_check[cc] != nullptr; cc++)
+  for (const std::string& array_name : strings_to_check)
   {
-    if (std::find(domain_strings.begin(), domain_strings.end(),
-          std::string(strings_to_check[cc])) != domain_strings.end())
+    if (std::find(domain_strings.cbegin(), domain_strings.cend(), array_name) !=
+      domain_strings.end())
     {
       vtkSMPropertyHelper helper(prop);
       helper.SetUseUnchecked(use_unchecked_values);
-      helper.Set(strings_to_check[cc]);
+      helper.Set(array_name.c_str());
       return 1;
     }
   }

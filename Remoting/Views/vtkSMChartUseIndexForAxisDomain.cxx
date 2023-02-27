@@ -15,7 +15,7 @@
 #include "vtkSMChartUseIndexForAxisDomain.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMChartSeriesListDomain.h"
+#include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMChartUseIndexForAxisDomain);
@@ -50,17 +50,21 @@ int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(
     vtkSMPropertyHelper helper2(property);
     helper2.SetUseUnchecked(use_unchecked_values);
 
-    const char* value = helper.GetAsString();
-    const char** known_names = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
-    for (int cc = 0; known_names[cc] != nullptr && value != nullptr; cc++)
+    const std::string value = helper.GetAsString();
+    if (!value.empty())
     {
-      if (strstr(value, known_names[cc]) != nullptr)
+      const auto& known_names =
+        vtkPVRepresentedArrayListSettings::GetInstance()->GetAllChartsDefaultXAxis();
+      for (const std::string& name : known_names)
       {
-        helper2.Set(0);
-        return 1;
+        if (value.find(name) != std::string::npos)
+        {
+          helper2.Set(false);
+          return 1;
+        }
       }
     }
-    helper2.Set(1);
+    helper2.Set(true);
     return 1;
   }
 

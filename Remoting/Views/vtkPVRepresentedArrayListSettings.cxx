@@ -22,6 +22,8 @@
 #include "vtkSMSession.h"
 #include "vtkStringArray.h"
 
+#include <vtksys/RegularExpression.hxx>
+
 #include <algorithm>
 #include <cassert>
 #include <string>
@@ -34,6 +36,9 @@ class vtkPVRepresentedArrayListSettings::vtkInternals
 public:
   std::vector<std::string> FilterExpressions;
   std::vector<int> ArrayMagnitudeExceptions;
+
+  std::vector<std::string> ChartsDefaultXAxis;
+  std::vector<vtksys::RegularExpression> ChartsHiddenAttributes;
 };
 
 //----------------------------------------------------------------------------
@@ -151,6 +156,114 @@ bool vtkPVRepresentedArrayListSettings::ShouldUseMagnitudeMode(int ncomp) const
   const auto findComp = std::find(exceptions.cbegin(), exceptions.cend(), ncomp);
 
   return this->ComputeArrayMagnitude != (findComp != exceptions.end());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetNumberOfChartsDefaultXAxis(int n)
+{
+  if (n != this->GetNumberOfChartsDefaultXAxis())
+  {
+    this->Internals->ChartsDefaultXAxis.resize(n);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRepresentedArrayListSettings::GetNumberOfChartsDefaultXAxis() const
+{
+  return static_cast<int>(this->Internals->ChartsDefaultXAxis.size());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetChartsDefaultXAxis(int i, const char* expression)
+{
+  if (i >= 0 && i < this->GetNumberOfChartsDefaultXAxis())
+  {
+    if (this->Internals->ChartsDefaultXAxis[i] != expression)
+    {
+      this->Internals->ChartsDefaultXAxis[i] = expression;
+      this->Modified();
+    }
+  }
+  else
+  {
+    vtkErrorMacro("Index out of range: " << i);
+  }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVRepresentedArrayListSettings::GetChartsDefaultXAxis(int i) const
+{
+  if (i >= 0 && i < this->GetNumberOfChartsDefaultXAxis())
+  {
+    return this->Internals->ChartsDefaultXAxis[i].c_str();
+  }
+  else
+  {
+    vtkErrorMacro("Index out of range: " << i);
+  }
+
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+const std::vector<std::string>& vtkPVRepresentedArrayListSettings::GetAllChartsDefaultXAxis() const
+{
+  return this->Internals->ChartsDefaultXAxis;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetNumberOfChartsHiddenAttributes(int n)
+{
+  if (n != this->GetNumberOfChartsHiddenAttributes())
+  {
+    this->Internals->ChartsHiddenAttributes.resize(n);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRepresentedArrayListSettings::GetNumberOfChartsHiddenAttributes() const
+{
+  return static_cast<int>(this->Internals->ChartsHiddenAttributes.size());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRepresentedArrayListSettings::SetChartsHiddenAttributes(int i, const char* expression)
+{
+  if (i >= 0 && i < this->GetNumberOfChartsHiddenAttributes())
+  {
+    if (this->Internals->ChartsHiddenAttributes[i] != expression)
+    {
+      this->Internals->ChartsHiddenAttributes[i].compile(expression);
+      this->Modified();
+    }
+  }
+  else
+  {
+    vtkErrorMacro("Index out of range: " << i);
+  }
+}
+
+//----------------------------------------------------------------------------
+const std::vector<vtksys::RegularExpression>&
+vtkPVRepresentedArrayListSettings::GetAllChartsHiddenAttributes() const
+{
+  return this->Internals->ChartsHiddenAttributes;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRepresentedArrayListSettings::GetSeriesVisibilityDefault(const char* name) const
+{
+  for (auto& regex : this->Internals->ChartsHiddenAttributes)
+  {
+    if (regex.is_valid() && regex.find(name))
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

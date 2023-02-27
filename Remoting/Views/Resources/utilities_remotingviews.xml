@@ -972,6 +972,42 @@
         </Hints>
       </IntVectorProperty>
 
+      <StringVectorProperty command="SetChartsDefaultXAxis"
+                            name="ChartsDefaultXAxis"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            default_values_delimiter=";"
+                            default_values="in_extents;Time;time;arc_length;XArray;x_array;Frequency"
+                            number_of_elements="7"
+                            set_number_command="SetNumberOfChartsDefaultXAxis"
+                            use_index="1">
+        <Documentation>
+          List of array names to use as X axis when displaying it in charts.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <AllowRestoreDefaults />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetChartsHiddenAttributes"
+                            name="ChartsHiddenAttributes"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            default_values_delimiter=";"
+                            default_values="^arc_length;^bin_extents;^(GlobalElement|GlobalNode|Object|File)Id;^object_id;^Pedigree;^Points_;^Time;^vtk;^(X|Y|Z|N|ids)( .*|$);^Frequency;^Point Coordinates"
+                            number_of_elements="10"
+                            set_number_command="SetNumberOfChartsHiddenAttributes"
+                            use_index="1">
+        <Documentation>
+          List of regex that describes array to not display by default. Note that "Component" arrays are always hidden by default even it not listed here.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <AllowRestoreDefaults />
+        </Hints>
+      </StringVectorProperty>
+
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
