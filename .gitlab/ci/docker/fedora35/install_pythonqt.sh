@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # Use commontk pythonqt with cmake support
 # CMake support may be added to the official repository in the future. https://github.com/commontk/PythonQt/issues/86
 readonly pythonqt_repo="https://github.com/commontk/PythonQt"
