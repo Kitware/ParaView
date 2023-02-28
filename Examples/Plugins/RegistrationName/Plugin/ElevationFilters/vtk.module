@@ -1,6 +1,6 @@
 NAME
-  PNGReader
+  ElevationFilters
 DEPENDS
-  VTK::IOImage
+  VTK::FiltersCore
 PRIVATE_DEPENDS
   VTK::CommonCore

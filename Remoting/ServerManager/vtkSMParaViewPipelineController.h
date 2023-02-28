@@ -166,12 +166,18 @@ public:
    */
   virtual bool UnRegisterViewProxy(vtkSMProxy* proxy, bool unregister_representations = true);
 
+  ///@{
   /**
    * Registration method for representations to be used after
    * PreInitializeProxy() and PostInitializeProxy(). Register the proxy under
    * the appropriate group.
    */
-  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy);
+  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy)
+  {
+    return this->RegisterRepresentationProxy(proxy, nullptr);
+  }
+  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy, const char* proxyname);
+  ///@}
 
   /**
    * Unregisters a representation proxy.

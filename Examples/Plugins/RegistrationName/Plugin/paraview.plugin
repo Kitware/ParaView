@@ -1,0 +1,7 @@
+NAME
+  RegistrationName
+DESCRIPTION
+  An example plugin of a reader and a filter that rename the pipeline source.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::IOImage

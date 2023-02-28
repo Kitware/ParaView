@@ -74,7 +74,7 @@ add_example(Plugins/MyPNGReader)
 add_example(Plugins/MyTiffWriter)
 add_example(Plugins/OverrideXMLOnly)
 add_example(Plugins/PropertyWidgets)
-add_example(Plugins/ReaderName)
+add_example(Plugins/RegistrationName)
 add_example(Plugins/ReaderXMLOnly)
 add_example(Plugins/Representation)
 # TODO: update this plugin to use the pipeline controller instead.
