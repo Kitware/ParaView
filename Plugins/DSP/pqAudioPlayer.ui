@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
+    <width>314</width>
     <height>351</height>
    </rect>
   </property>
@@ -144,6 +144,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sample rate used when playing audio. &lt;/p&gt;&lt;p&gt;Default value is deduced from the &amp;quot;time&amp;quot; column if found, from the &amp;quot;sample_rate&amp;quot; field array otherwise.&lt;/p&gt;&lt;p&gt;If both of them are not found, the value is set to 44100 Hz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="minimum">
           <number>1</number>
          </property>
@@ -154,7 +157,7 @@
           <number>1000</number>
          </property>
          <property name="value">
-          <number>41000</number>
+          <number>44100</number>
          </property>
         </widget>
        </item>

@@ -42,6 +42,8 @@
 #include <vtkTable.h>
 #include <vtkWeakPointer.h>
 
+#include <vtksys/SystemTools.hxx>
+
 #include <QApplication>
 #include <QAudioOutput>
 #include <QBuffer>
@@ -57,6 +59,8 @@
 
 namespace
 {
+const int DEFAULT_SAMPLE_RATE = 44100;
+
 template <typename ArrayType, typename ValueType>
 void fillByteArray(ArrayType* signal, unsigned int sampleSize, QByteArray* byteArray)
 {
@@ -186,7 +190,7 @@ public:
   QSharedPointer<QBuffer> AudioBuffer;
   QSharedPointer<QAudioOutput> AudioOutput;
   QScopedPointer<QByteArray> ByteArray;
-  int DefaultSampleRate = 44100;
+  int DefaultSampleRate = DEFAULT_SAMPLE_RATE;
   bool NeedUpdate = false;
 };
 
@@ -360,6 +364,7 @@ bool pqAudioPlayer::pqInternals::fetchAndPrepareData()
       !info.supportedSampleTypes().empty() && !info.supportedSampleSizes().empty() &&
       !info.supportedChannelCounts().empty() && !info.supportedByteOrders().empty();
   };
+
   QAudioDeviceInfo foundDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
   if (!isDeviceValid(foundDeviceInfo))
   {
@@ -405,12 +410,16 @@ bool pqAudioPlayer::pqInternals::fetchAndPrepareData()
 //-----------------------------------------------------------------------------
 bool pqAudioPlayer::pqInternals::fetchMetaData()
 {
+  // Default sample rate if no meta-data about it is found
+  this->DefaultSampleRate = DEFAULT_SAMPLE_RATE;
+
   // Retrieve the active source proxy
   if (!this->ActiveSourceProxy)
   {
     // Add bold style
     this->SourcePanel->setText("<span style=\" font-weight:600;\">None</span>\n");
     this->DataSelectionComboBox->clear();
+    this->SampleRateSpinBox->setValue(this->DefaultSampleRate);
     return false;
   }
 
@@ -427,7 +436,7 @@ bool pqAudioPlayer::pqInternals::fetchMetaData()
     return false;
   }
 
-  // Retrieve the sample rate (if it exists)
+  // Search for "sample_rate" field data to extract sample rate from
   vtkPVDataSetAttributesInformation* fieldInfo =
     sourceInfo->GetAttributeInformation(vtkDataObject::FIELD);
   if (!fieldInfo)
@@ -436,10 +445,6 @@ bool pqAudioPlayer::pqInternals::fetchMetaData()
     return false;
   }
 
-  // Default sample rate if no meta-data about it is found
-  this->DefaultSampleRate = 41000;
-
-  // Update the sample rate shown in
   vtkPVArrayInformation* sampleRateArrayInfo = fieldInfo->GetArrayInformation("sample_rate");
 
   if (sampleRateArrayInfo)
@@ -460,9 +465,6 @@ bool pqAudioPlayer::pqInternals::fetchMetaData()
     }
   }
 
-  // Set default value to the sample rate
-  this->SampleRateSpinBox->setValue(this->DefaultSampleRate);
-
   // Retrieve the columns (audio signals) from the table
   vtkPVDataSetAttributesInformation* rowInfo =
     sourceInfo->GetAttributeInformation(vtkDataObject::ROW);
@@ -473,12 +475,39 @@ bool pqAudioPlayer::pqInternals::fetchMetaData()
   }
 
   // Update the data shown in the combo-box
+  // Also search for "time" row data
   this->DataSelectionComboBox->clear();
   for (int i = 0; i < rowInfo->GetNumberOfArrays(); i++)
   {
     const char* arrayName = rowInfo->GetArrayInformation(i)->GetName();
+
+    // If "time" row data is present, extract sample rate from it
+    if (vtksys::SystemTools::Strucmp(arrayName, "time") == 0)
+    {
+      vtkPVArrayInformation* timeArrayInfo = rowInfo->GetArrayInformation(i);
+      if (timeArrayInfo->GetNumberOfComponents() != 1)
+      {
+        qInfo() << "Time data is ill-formed (number of components != 1) - skipping";
+        continue;
+      }
+
+      const int numberOfTimesteps = timeArrayInfo->GetNumberOfTuples();
+      const double* range = timeArrayInfo->GetComponentRange(0);
+      if (range[1] == range[0])
+      {
+        qInfo() << "Time data range should be strictly positive - skipping";
+        continue;
+      }
+
+      // Compute sample rate from time and enable corresponding option
+      this->DefaultSampleRate = numberOfTimesteps / (range[1] - range[0]);
+      continue;
+    }
     this->DataSelectionComboBox->addItem(arrayName);
   }
+
+  // Update the sample rate displayed in the UI
+  this->SampleRateSpinBox->setValue(this->DefaultSampleRate);
 
   return true;
 }
