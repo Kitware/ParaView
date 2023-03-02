@@ -1,0 +1,32 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <RenderViewProxy  name="StereoCursorView"
+                      class="vtkPVStereoCursorView"
+                      label="Stereo Cursor View"
+                      processes="client|renderserver|dataserver"
+                      base_proxygroup="views"
+                      base_proxyname="RenderView">
+      <Documentation>
+        The Stereo Cursor View is a Render View containing a 3D cursor. The 3D cursor is a widget that is created
+        alongside the view. It is placed in the scene depending on the position of the mouse: if it hovers an actor,
+        the cursor is placed on its surface. If not, the cursor is placed on the focal plane of the camera. For now,
+        the cursor only work with surfacic data.
+      </Documentation>
+      <IntVectorProperty name="SetCursorSize"
+                         command="SetCursorSize"
+                         number_of_elements="1"
+                         default_values="15">
+        <Documentation>
+          Set the size of the cursor in pixels.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="100"/>
+      </IntVectorProperty>
+      <PropertyGroup label="Stereo Cursor">
+        <Property name="SetCursorSize"/>
+      </PropertyGroup>
+      <Hints>
+        <HideCursor/>
+      </Hints>
+    </RenderViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

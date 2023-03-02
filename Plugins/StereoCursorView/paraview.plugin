@@ -1,0 +1,9 @@
+NAME
+  StereoCursorView
+DESCRIPTION
+  Render view displaying a 3D cursor widget
+REQUIRES_MODULES
+  ParaView::RemotingViews
+  VTK::CommonCore
+  VTK::InteractionWidgets
+  VTK::RenderingCore

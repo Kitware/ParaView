@@ -1,0 +1,8 @@
+NAME
+  StereoCursorView::StereoCursorViews
+DEPENDS
+  ParaView::RemotingViews
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  VTK::InteractionWidgets
+  VTK::RenderingCore
