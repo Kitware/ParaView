@@ -80,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyCollectionWidget.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqReaderSelectionPropertyWidget.h"
+#include "pqSelectionListPropertyWidget.h"
 #include "pqSelectionQueryPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqSessionTypeDecorator.h"
@@ -372,6 +373,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "MetaDataPropertyWidget")
   {
     return new pqMetaDataPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "SelectionList")
+  {
+    return new pqSelectionListPropertyWidget(proxy, group, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

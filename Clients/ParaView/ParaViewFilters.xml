@@ -125,6 +125,7 @@
   <Category name="Annotation" menu_label="Annotation">
     <Proxy group="filters" name="AnnotateGlobalData" />
     <Proxy group="filters" name="AnnotateAttributeData" />
+    <Proxy group="filters" name="AnnotateSelection" />
     <Proxy group="filters" name="PythonAnnotation" />
     <Proxy group="filters" name="TimeToTextConvertor" />
     <Proxy group="filters" name="TimeStepProgressFilter" />

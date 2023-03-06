@@ -30,6 +30,7 @@
 #==========================================================================
 set(classes
   vtkAnnotateGlobalDataFilter
+  vtkAnnotateSelectionFilter
   vtkCellIntegrator
   vtkConvertPolyhedraFilter
   vtkEquivalenceSet

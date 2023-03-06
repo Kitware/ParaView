@@ -184,6 +184,7 @@ set(classes
   pqScalarBarVisibilityReaction
   pqSearchItemReaction
   pqSelectionEditor
+  pqSelectionListPropertyWidget
   pqSelectionQueryPropertyWidget
   pqSelectionReaction
   pqSeriesEditorPropertyWidget
@@ -290,6 +291,7 @@ set(ui_files
   Resources/UI/pqVCRToolbar.ui
   Resources/UI/pqViewResolutionPropertyWidget.ui
   Resources/UI/pqWelcomeDialog.ui
+  Resources/UI/pqSelectionListPropertyWidget.ui
   Resources/UI/pqYoungsMaterialPropertyWidget.ui)
 
 set(resource_files
