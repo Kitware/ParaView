@@ -66,7 +66,7 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
 
   this->OneLiner = new pqOneLinerTextEdit(this);
   this->OneLiner->setObjectName("OneLiner");
-  grid->addWidget(this->OneLiner, 0, 0, 1, 4);
+  grid->addWidget(this->OneLiner, 0, 0, 1, 5);
 
   // add stats line
   auto statusLine = new QLabel(this);
@@ -89,6 +89,11 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
   openManager->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
   openManager->setToolTip(tr("Open Expressions Manager"));
   grid->addWidget(openManager, 1, 3);
+  auto clearExpression = new QToolButton(this);
+  clearExpression->setObjectName("ClearExpression");
+  clearExpression->setIcon(QIcon(":/pqWidgets/Icons/pqCancel.svg"));
+  clearExpression->setToolTip(tr("Clear expression"));
+  grid->addWidget(clearExpression, 1, 4);
 
   QObject::connect(chooser, SIGNAL(expressionSelected(const QString&)), this->OneLiner,
     SLOT(setPlainText(const QString&)));
@@ -108,6 +113,8 @@ void pqExpressionsWidget::setupButtons(const QString& groupName)
       &QTextEdit::setPlainText);
     dialog.exec();
   });
+
+  this->connect(clearExpression, &QToolButton::clicked, [=]() { this->OneLiner->clear(); });
 }
 
 pqOneLinerTextEdit* pqExpressionsWidget::lineEdit()
