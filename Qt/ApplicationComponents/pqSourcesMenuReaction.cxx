@@ -135,7 +135,7 @@ bool pqSourcesMenuReaction::warnOnCreate(
           session->GatherInformation(vtkPVSession::SERVERS, infos, 0);
           session->GatherInformation(vtkPVSession::SERVERS, serverInfos, 0);
 
-          long long worstRemainingMemory = std::numeric_limits<long long>::infinity();
+          long long worstRemainingMemory = std::numeric_limits<long long>::max();
           for (size_t rank = 0; rank < infos->GetSize(); ++rank)
           {
             long long hostMemoryUse = infos->GetHostMemoryUse(rank);
