@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -43,6 +44,26 @@ struct vtkPVTrivialProducerInternal
       }
     }
     return nearest_time;
+  }
+
+  // ensure unicity and ordering.
+  void addTime(double time)
+  {
+    auto timeIt = this->TimeSteps.begin();
+    for (; timeIt != this->TimeSteps.end(); timeIt++)
+    {
+      if (*timeIt == time)
+      {
+        return;
+      }
+
+      if (*timeIt > time)
+      {
+        vtkGenericWarningMacro("New time step is not after last time step.");
+        break;
+      }
+    }
+    this->TimeSteps.insert(timeIt, time);
   }
 };
 
@@ -72,11 +93,7 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output)
 //----------------------------------------------------------------------------
 void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
 {
-  if (this->Internals->TimeSteps.empty() == false && time <= this->Internals->TimeSteps.back())
-  {
-    vtkWarningMacro("New time step is not after last time step.");
-  }
-  this->Internals->TimeSteps.push_back(time);
+  this->Internals->addTime(time);
 
   this->Modified();
   this->SetOutput(output);
@@ -121,7 +138,7 @@ int vtkPVTrivialProducer::ProcessRequest(
   {
     if (!internals.TimeSteps.empty())
     {
-      outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &internals.TimeSteps[0],
+      outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), internals.TimeSteps.data(),
         static_cast<int>(internals.TimeSteps.size()));
       double timeRange[2] = { this->Internals->TimeSteps.front(),
         this->Internals->TimeSteps.back() };
