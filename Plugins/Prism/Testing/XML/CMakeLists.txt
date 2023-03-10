@@ -15,6 +15,7 @@ if (BUILD_SHARED_LIBS)
     SandiaLoadSESAME.xml
     SESAMEContouring.xml
     SimulationData.xml
+    SimulationDataCellDataToPointData.xml
     SimulationDataMulti.xml
     SimulationDataSelections.xml
     ViewAspectRatio.xml
