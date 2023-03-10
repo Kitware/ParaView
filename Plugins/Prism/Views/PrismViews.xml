@@ -315,6 +315,14 @@
           Set the input to the representation.
         </Documentation>
       </InputProperty>
+      <DoubleVectorProperty command="SetPointSize"
+                            default_values="4.0"
+                            name="PointSize"
+                            number_of_elements="1"
+                            override="1">
+        <DoubleRangeDomain min="0"
+                           name="range"/>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetBackfaceRepresentation"
                          default_values="400"
                          name="BackfaceRepresentation"
