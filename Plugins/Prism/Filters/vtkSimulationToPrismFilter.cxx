@@ -182,16 +182,25 @@ struct SimulationToPrismWorker
 int vtkSimulationToPrismFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  // get the input and output
+  vtkDataSet* input = vtkDataSet::SafeDownCast(vtkDataObject::GetData(inputVector[0], 0));
+  vtkPolyData* output = vtkPolyData::SafeDownCast(vtkDataObject::GetData(outputVector, 0));
+  if (input == nullptr || output == nullptr)
+  {
+    vtkErrorMacro(<< "Invalid or missing input and/or output!");
+    return 0;
+  }
+  if (input->GetNumberOfPoints() == 0)
+  {
+    return 1;
+  }
+
   // check that array names are set
   if (this->XArrayName == nullptr || this->YArrayName == nullptr || this->ZArrayName == nullptr)
   {
     vtkErrorMacro(<< "No array names were set!");
     return 1;
   }
-
-  // get the input and output
-  vtkDataSet* input = vtkDataSet::SafeDownCast(vtkDataObject::GetData(inputVector[0], 0));
-  vtkPolyData* output = vtkPolyData::SafeDownCast(vtkDataObject::GetData(outputVector, 0));
 
   vtkFieldData* inFD = input->GetAttributesAsFieldData(this->AttributeType);
 
