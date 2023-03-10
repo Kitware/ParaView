@@ -274,8 +274,6 @@ int vtkPrismGeometryRepresentation::ProcessViewRequest(
       this->vtkPVDataRepresentation::ProcessViewRequest(
         vtkPVView::REQUEST_UPDATE(), inInfo, outInfo);
 
-      // add no simulation data bounds
-      prismView->SetPrismBounds(inInfo, this->NonSimulationDataInputBounds);
       // set view axis if available
       if (this->GetXAxisName() && this->GetYAxisName() && this->GetZAxisName())
       {
