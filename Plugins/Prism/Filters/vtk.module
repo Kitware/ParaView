@@ -8,4 +8,5 @@ PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::FiltersCore
+  VTK::FiltersGeneral
   VTK::fmt

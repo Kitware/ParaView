@@ -29,6 +29,7 @@
 #include "vtkPVTrivialProducer.h"
 #include "vtkPrismGeometryConverter.h"
 #include "vtkPrismView.h"
+#include "vtkSimulationPointCloudFilter.h"
 #include "vtkSimulationToPrismFilter.h"
 #include "vtkStringArray.h"
 
@@ -79,6 +80,7 @@ void vtkPrismGeometryRepresentation::SetAttributeType(int type)
 {
   if (this->SimulationToPrismFilter->GetAttributeType() != type)
   {
+    this->SimulationPointCloudFilter->SetAttributeType(type);
     this->SimulationToPrismFilter->SetAttributeType(type);
     this->MarkModified();
   }
@@ -224,7 +226,9 @@ int vtkPrismGeometryRepresentation::RequestData(
       }
       if (this->IsSimulationData)
       {
-        this->SimulationToPrismFilter->SetInputConnection(this->GetInternalOutputPort());
+        this->SimulationPointCloudFilter->SetInputConnection(this->GetInternalOutputPort());
+        this->SimulationToPrismFilter->SetInputConnection(
+          this->SimulationPointCloudFilter->GetOutputPort());
         this->GeometryFilter->SetInputConnection(this->SimulationToPrismFilter->GetOutputPort());
       }
       else

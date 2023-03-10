@@ -29,6 +29,7 @@
 
 class vtkExtractPolyDataGeometry;
 class vtkPrismGeometryConverter;
+class vtkSimulationPointCloudFilter;
 class vtkSimulationToPrismFilter;
 
 class VTKPRISMVIEWS_EXPORT vtkPrismGeometryRepresentation : public vtkGeometryRepresentation
@@ -123,6 +124,7 @@ protected:
 
   bool IsSimulationData = false;
   bool EnableThresholding = false;
+  vtkNew<vtkSimulationPointCloudFilter> SimulationPointCloudFilter;
   vtkNew<vtkSimulationToPrismFilter> SimulationToPrismFilter;
   vtkNew<vtkExtractPolyDataGeometry> ThresholdFilter;
   vtkNew<vtkPrismGeometryConverter> GeometryConverter;
