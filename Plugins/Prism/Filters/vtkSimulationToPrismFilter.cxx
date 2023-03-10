@@ -203,7 +203,18 @@ int vtkSimulationToPrismFilter::RequestData(vtkInformation* vtkNotUsed(request),
   // check that the arrays were found
   if (xFD == nullptr || yFD == nullptr || zFD == nullptr)
   {
-    vtkErrorMacro(<< "One or more of the arrays were not found!");
+    if (xFD == nullptr)
+    {
+      vtkErrorMacro(<< "X array " << this->XArrayName << " not found!");
+    }
+    if (yFD == nullptr)
+    {
+      vtkErrorMacro(<< "Y array " << this->YArrayName << " not found!");
+    }
+    if (zFD == nullptr)
+    {
+      vtkErrorMacro(<< "Z array " << this->ZArrayName << " not found!");
+    }
     return 1;
   }
   // check that all arrays are scalars
