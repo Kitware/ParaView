@@ -61,6 +61,14 @@ int vtkPrismGeometryConverter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // transform points to be in the cubic space and apply log scale if needed
+  if (this->PrismBounds[0] == VTK_DOUBLE_MAX && this->PrismBounds[2] == VTK_DOUBLE_MAX &&
+    this->PrismBounds[4] == VTK_DOUBLE_MAX && this->PrismBounds[1] == VTK_DOUBLE_MIN &&
+    this->PrismBounds[3] == VTK_DOUBLE_MIN && this->PrismBounds[5] == VTK_DOUBLE_MIN)
+  {
+    vtkWarningMacro(
+      "No Valid Prism Bounds found. This is likely due to the absence of a prism surface.\n"
+      "A prism view requires to first load a prism surface e.g. from a SESAME file.");
+  }
   double* aspectRatio = this->AspectRatio;
   double prismBounds[6];
   std::copy_n(this->PrismBounds, 6, prismBounds);
