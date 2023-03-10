@@ -1,6 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="writers">
     <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="ParallelWriterBase"
                   name="CGNSWriter"
                   class="vtkCGNSWriter">
       <Documentation short_help="Write a dataset in CGNS format."
@@ -22,13 +23,6 @@
           The input filter/source whose output dataset is written to the file.
         </Documentation>
       </InputProperty>
-      <StringVectorProperty command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1">
-        <Documentation>
-          The name of the file to be written.
-        </Documentation>
-      </StringVectorProperty>
       <IntVectorProperty command="SetUseHDF5"
                          number_of_elements="1"
                          name="UseHDF5"
