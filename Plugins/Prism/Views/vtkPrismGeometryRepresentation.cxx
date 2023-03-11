@@ -18,8 +18,9 @@
 #include "vtkBox.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
-#include "vtkExtractPolyDataGeometry.h"
+#include "vtkExtractGeometry.h"
 #include "vtkFieldData.h"
+#include "vtkGeometryFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -238,7 +239,8 @@ int vtkPrismGeometryRepresentation::RequestData(
       if (this->EnableThresholding)
       {
         this->ThresholdFilter->SetInputConnection(this->GeometryFilter->GetOutputPort());
-        this->GeometryConverter->SetInputConnection(this->ThresholdFilter->GetOutputPort());
+        this->ThresholdGeometryFilter->SetInputConnection(this->ThresholdFilter->GetOutputPort());
+        this->GeometryConverter->SetInputConnection(this->ThresholdGeometryFilter->GetOutputPort());
       }
       else
       {
