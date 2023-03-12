@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Open file Mesh_Only.cfs -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/CFSReader/Testing/Data/openCFS/Mesh_Only.cfs" />
+
+  <!-- Select origElementNums element result and hide decoration-->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel" command="mousePress" arguments="1,1,0,74,55" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel" command="mouseRelease" arguments="1,0,0,74,55" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="origElementNums" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+</pqevents>

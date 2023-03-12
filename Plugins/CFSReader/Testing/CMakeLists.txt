@@ -6,10 +6,12 @@ set(_paraview_add_tests_default_test_data_target ParaViewData)
 
 ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/openCFS/Single_Region_Opt.cfs}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/openCFS/Mesh_Only.cfs}"
 )
 
 set(module_tests
-   CFSReaderTest.xml)
+   CFSReaderTest.xml
+   MeshOnlyTest.xml)
 
 paraview_add_client_tests(
   LOAD_PLUGIN   "CFSReader"

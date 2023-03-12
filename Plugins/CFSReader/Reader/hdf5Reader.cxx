@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <iostream>
 
-#include <vtksys/SystemTools.hxx>
-
 #include "hdf5Reader.h" // same directory
+#include <vtkLogger.h>
+#include <vtksys/SystemTools.hxx>
 
 namespace H5CFS
 {
@@ -56,9 +56,17 @@ void Hdf5Reader::CloseFile()
 {
   if (this->MainFile != -1)
   {
+    H5Gclose(this->MeshRoot);
+    this->MeshRoot = -1;
+
     H5Gclose(this->MainRoot);
+    this->MainRoot = -1;
+
     H5Fclose(this->MainFile);
     this->MainFile = -1;
+
+    H5Pclose(this->FileProperties);
+    this->FileProperties = -1;
   }
 }
 
@@ -71,19 +79,33 @@ void Hdf5Reader::LoadFile(const std::string& fileName)
   this->BaseDir =
     vtksys::SystemTools::GetParentDirectory(this->FileName); // used to load external results
 
+  this->FileProperties = H5Pcreate(H5P_FILE_ACCESS);
+  if (this->FileProperties < 0)
+  {
+    throw std::runtime_error(std::string("cannot properly access ") + this->FileName);
+  }
+
   // open file and store main group and mesh group
   this->MainFile = H5Fopen(this->FileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
   if (this->MainFile < 0)
   {
+    vtkLog(INFO, "Hdf5Reader::LoadFile: cannot load " + this->FileName);
     throw std::runtime_error(std::string("cannot open file ") + this->FileName);
   }
+  vtkLog(INFO, "Hdf5Reader::LoadFile: successfully opened " + this->FileName);
 
   this->MainRoot = H5CFS::OpenGroup(this->MainFile, "/");
   this->MeshRoot = H5CFS::OpenGroup(this->MainRoot, "Mesh");
 
+  // check if we have results or if this is pure mesh file (e.g. generated via cfs -g)
+  // to check this, we may not read "Results/Mesh" but need to check layers manually
+  bool PureGeometry = !H5CFS::TestGroupChild(this->MainRoot, "Results", "Mesh");
+  vtkLog(INFO, "Hdf5Reader::LoadFile: PureGeometry=" + std::to_string(PureGeometry));
+
   // check for use of external files (uint to bool)
-  this->HasExternalFiles =
-    H5CFS::ReadAttribute<unsigned int>(this->MainRoot, "Results/Mesh", "ExternalFiles") != 0;
+  this->HasExternalFiles = PureGeometry
+    ? false
+    : H5CFS::ReadAttribute<unsigned int>(this->MainRoot, "Results/Mesh", "ExternalFiles") != 0;
 
   // read general mesh information
   this->ReadMeshStatusInformations();
@@ -238,15 +260,18 @@ void Hdf5Reader::GetNumberOfMultiSequenceSteps(
 
   // search for all MultiStep_n with n >= 1 and very often 1 in either
   // - /Results/History (history results are (scalar) region results
-  //  - /Results/Mesh for the common nodes and elements results (almost always present)
-  std::string key = "/Results/" + std::string(isHistory ? "History" : "Mesh");
-  hid_t baseGroup = H5CFS::OpenGroup(this->MainRoot, key, false); // no exception
-  if (baseGroup < 0)
+  // - /Results/Mesh for the common nodes and elements results (almost always present)
+
+  // hdf5 indicates with OpenGroup() if a group does not exist, but then also prints output
+  // this output makes ctest to trigger an error. Therefore we check before.
+  std::string test = std::string(isHistory ? "History" : "Mesh");
+  if (!H5CFS::TestGroupChild(this->MainRoot, "/Results", test))
   {
     // group does not exist, hence don't add anything.
-    // nothing to close, we may exit
     return;
   }
+
+  hid_t baseGroup = H5CFS::OpenGroup(this->MainRoot, "/Results/" + test);
 
   // next count the MultiStep_n
   H5G_info_t info = H5CFS::GetInfo(baseGroup);
@@ -416,7 +441,9 @@ void Hdf5Reader::GetMeshResult(unsigned int sequenceStep, unsigned int stepNum, 
     // construct the path with BaseDir. Convert makes sure this is also nice for Windows
     std::string extFileNameComplete =
       vtksys::SystemTools::ConvertToOutputPath(BaseDir + "/" + extFileString);
+
     extFile = H5Fopen(extFileNameComplete.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
     if (extFile < 0)
     {
       throw std::runtime_error(std::string("cannot open external file ") + extFileNameComplete);
