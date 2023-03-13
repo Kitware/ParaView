@@ -167,10 +167,24 @@ public:
 
   /**
    * Converts a double value to a full precision QString.
-   * Internally uses `vtkNumberToString` for lossless conversion from double to
-   * string.
+   * Internally uses pqDoubleLineEdit with FullConversion, which relies on
+   * `vtkNumberToString` for lossless conversion from double to string.
    */
   static QString number(double value);
+
+  ///@{
+  /**
+   * Convert double value to string, handling formating.
+   */
+  // Format with given precision and notation and shortAccurate flag
+  static QString formatDouble(double value, int notation, bool shortAccurate, int precision);
+
+  // Format with RealNumberDisplayed settings
+  static QString formatNumber(double value);
+
+  // Format with AnimationTime settings
+  static QString formatTime(double value);
+  ///@}
 
   /**
    * Convert a double KiB value to an easily readable QString

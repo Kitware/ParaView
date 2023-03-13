@@ -8,6 +8,8 @@ DEPENDS
   VTK::CommonCore
 KIT
   ParaView::ServerManagerKit
+DEPENDS
+  ParaView::Versioning
 PRIVATE_DEPENDS
   ParaView::RemotingCore
   ParaView::RemotingServerManager

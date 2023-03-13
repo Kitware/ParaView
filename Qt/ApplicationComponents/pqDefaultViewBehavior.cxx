@@ -153,7 +153,7 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   if (core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0 && server->isMaster())
   {
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-    const QString viewType = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
+    const QString viewType = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType().c_str();
 
     if (viewType != "None" && !viewType.isEmpty() &&
       RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL))

@@ -305,6 +305,24 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty name="AnimationTimeShortestAccuratePrecision"
+        number_of_elements="1"
+        default_values="0"
+        command="SetAnimationTimeShortestAccuratePrecision"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to use shortest accurate precision instead of actual precision to display animation time.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="AnimationTimeNotation"
+            value="3"
+            inverse="1" />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AnimationTimePrecision"
         number_of_elements="1"
         default_values="6"
@@ -316,11 +334,12 @@
         </Documentation>
         <IntRangeDomain min="1" max="17" />
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-              mode="enabled_state"
-              property="AnimationTimeNotation"
-              value="3"
-              inverse="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="AnimationTimeShortestAccuratePrecision" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="AnimationTimeNotation" value="3" inverse="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
 
@@ -364,6 +383,24 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty name="RealNumberDisplayedShortestAccuratePrecision"
+        number_of_elements="1"
+        default_values="0"
+        command="SetRealNumberDisplayedShortestAccuratePrecision"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to use shortest accurate precision instead of actual precision to display real numbers.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="RealNumberDisplayedNotation"
+            value="3"
+            inverse="1" />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="RealNumberDisplayedPrecision"
         number_of_elements="1"
         default_values="6"
@@ -375,11 +412,12 @@
         </Documentation>
         <IntRangeDomain min="1" max="17" />
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-              mode="enabled_state"
-              property="RealNumberDisplayedNotation"
-              value="3"
-              inverse="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="RealNumberDisplayedShortestAccuratePrecision" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="RealNumberDisplayedNotation" value="3" inverse="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
 
@@ -525,8 +563,9 @@
         <!--
         <Property name="AnimationGeometryCacheLimit" />
         -->
-        <Property name="AnimationTimePrecision" />
         <Property name="AnimationTimeNotation" />
+        <Property name="AnimationTimeShortestAccuratePrecision" />
+        <Property name="AnimationTimePrecision" />
         <Property name="ShowAnimationShortcuts" />
       </PropertyGroup>
 
@@ -537,6 +576,7 @@
       <PropertyGroup label="Miscellaneous">
         <Property name="ResetDisplayEmptyViews" />
         <Property name="RealNumberDisplayedNotation" />
+        <Property name="RealNumberDisplayedShortestAccuratePrecision" />
         <Property name="RealNumberDisplayedPrecision" />
         <Property name="InheritRepresentationProperties" />
         <Property name="DefaultTimeStep" />

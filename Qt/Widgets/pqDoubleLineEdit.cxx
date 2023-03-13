@@ -37,7 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QTextStream>
 
+// VTK includes
+#include "vtkNumberToString.h"
+
+// System includes
 #include <cassert>
+#include <sstream>
 
 //=============================================================================
 namespace
@@ -80,23 +85,23 @@ public:
 
   bool useFullPrecision(const pqDoubleLineEdit* self) const
   {
-    return this->AlwaysUseFullPrecision || self->hasFocus();
+    const auto realNotation =
+      this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::globalNotation() : this->Notation;
+
+    return this->AlwaysUseFullPrecision || self->hasFocus() ||
+      realNotation == RealNumberNotation::FullNotation;
   }
 
   void sync(pqDoubleLineEdit* self)
   {
-    const auto real_precision =
+    const auto realPrecision =
       this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::globalPrecision() : this->Precision;
-    const auto real_notation =
+    const auto realNotation =
       this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::globalNotation() : this->Notation;
 
-    // XXX: while we could call `pqDoubleLineEdit::formatDouble` when (real_notation ==
-    // FullNotation), it will not yield the exact same result because we're converting string ->
-    // double -> string (which loses some precision). In this case we just return the text as it is.
-    const QString limited =
-      (self->text().isEmpty() || real_notation == RealNumberNotation::FullNotation)
+    const QString limited = self->text().isEmpty()
       ? self->text()
-      : pqDoubleLineEdit::formatDouble(self->text().toDouble(), real_notation, real_precision);
+      : pqDoubleLineEdit::formatDouble(self->text().toDouble(), realNotation, realPrecision);
 
     const bool changed = (limited != this->InactiveLineEdit->text());
     this->InactiveLineEdit->setText(limited);
@@ -292,26 +297,29 @@ QString pqDoubleLineEdit::formatDouble(
 QString pqDoubleLineEdit::formatDouble(
   double value, pqDoubleLineEdit::RealNumberNotation notation, int precision)
 {
-  char format;
   switch (notation)
   {
     case RealNumberNotation::ScientificNotation:
-      format = 'e';
+      return QString::number(value, 'e', precision);
       break;
     case RealNumberNotation::FixedNotation:
-      format = 'f';
-      break;
-    case RealNumberNotation::FullNotation:
-      format = 'f';
-      precision = QLocale::FloatingPointShortest;
+      return QString::number(value, 'f', precision);
       break;
     case RealNumberNotation::MixedNotation:
+      return QString::number(value, 'g', precision);
+      break;
+    case RealNumberNotation::FullNotation:
+    {
+      std::ostringstream stream;
+      stream << vtkNumberToString()(value);
+      return QString::fromStdString(stream.str());
+    }
+    break;
     default:
-      format = 'g';
+      return "";
       break;
   };
-
-  return QString::number(value, format, precision);
+  return "";
 }
 
 //-----------------------------------------------------------------------------
