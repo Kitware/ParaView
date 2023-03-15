@@ -90,10 +90,9 @@ protected:
   void EndLoop() override;
   double GetNextTime(double currentime) override;
   double GetPreviousTime(double currenttime) override;
-  ///@}
-
   double GoToNext(double start, double end, double currenttime) override;
   double GoToPrevious(double start, double end, double currenttime) override;
+  ///@}
 
   vtkAnimationPlayer* GetActivePlayer();
 
