@@ -81,6 +81,12 @@ void DoubleLineEditTester::useGlobalPrecision_data()
   QTest::newRow("case 4") << 1 << 1 << pqDoubleLineEdit::FullNotation
                           << pqDoubleLineEdit::FixedNotation << "3.98888888"
                           << "3.98888888";
+
+  QTest::newRow("case 5") << static_cast<int>(QLocale::FloatingPointShortest)
+                          << static_cast<int>(QLocale::FloatingPointShortest)
+                          << pqDoubleLineEdit::FixedNotation << pqDoubleLineEdit::FixedNotation
+                          << "3.98888888"
+                          << "3.98888888";
 }
 
 void DoubleLineEditTester::useGlobalPrecision()

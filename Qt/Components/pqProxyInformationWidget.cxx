@@ -67,15 +67,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView components includes
 
-static QString formatTime(double time)
-{
-  auto settings = vtkPVGeneralSettings::GetInstance();
-  const auto precision = settings->GetAnimationTimePrecision();
-  const auto notation =
-    static_cast<pqDoubleLineEdit::RealNumberNotation>(settings->GetAnimationTimeNotation());
-  return pqDoubleLineEdit::formatDouble(time, notation, precision);
-}
-
 static QString formatMemory(vtkTypeInt64 msize)
 {
   auto l = QLocale::system();
@@ -279,7 +270,7 @@ public:
         case 0:
           return indx.row();
         case 1:
-          return formatTime(this->TimeSteps[indx.row()]);
+          return pqCoreUtilities::formatTime(this->TimeSteps[indx.row()]);
       }
     }
     return QVariant();
@@ -627,7 +618,7 @@ public:
     if (dinfo && dinfo->GetHasTime())
     {
       ui.currentTime->setText(tr("%1 (range: [%2, %3])")
-                                .arg(formatTime(dinfo->GetTime()))
+                                .arg(pqCoreUtilities::formatTime(dinfo->GetTime()))
                                 .arg(dinfo->GetTimeRange()[0])
                                 .arg(dinfo->GetTimeRange()[1]));
     }

@@ -125,8 +125,7 @@ public:
    * of digits of precision.
    *
    * @deprecated deprecated in favor of
-   * pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int),
-   * because `QTextStream::RealNumberNotation` cannot cover all cases.
+   * pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int)
    */
   PARAVIEW_DEPRECATED_IN_5_12_0(
     "Use `pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int)` instead")
@@ -135,7 +134,8 @@ public:
 
   /**
    * Return a double formatted according to a pqDoubleLineEdit::RealNumberNotation
-   * notation and a number of digits of precision.
+   * notation and a number of digits of precision. Supports QLocale::FloatingPointShortest as
+   * precision.
    */
   static QString formatDouble(
     double value, pqDoubleLineEdit::RealNumberNotation notation, int precision);

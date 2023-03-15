@@ -44,16 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 
 #include "pqApplicationCore.h"
+#include "pqDoubleLineEdit.h"
 #include "pqSettings.h"
-#include "vtkNumberToString.h"
 #include "vtkObject.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkWeakPointer.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
-#include <sstream>
 
 QPointer<QWidget> pqCoreUtilities::MainWidget = nullptr;
 
@@ -310,9 +310,58 @@ QMessageBox::Button pqCoreUtilities::promptUserGeneric(const QString& title, con
 //-----------------------------------------------------------------------------
 QString pqCoreUtilities::number(double value)
 {
-  std::ostringstream stream;
-  stream << vtkNumberToString()(value);
-  return QString::fromStdString(stream.str());
+  // When using FullNotation, precision parameter does not matter
+  return pqDoubleLineEdit::formatDouble(
+    value, pqDoubleLineEdit::RealNumberNotation::FullNotation, 0);
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::formatDouble(
+  double value, int notation, bool shortestAccurate, int precision)
+{
+  pqDoubleLineEdit::RealNumberNotation dNotation;
+  switch (notation)
+  {
+    case (vtkPVGeneralSettings::RealNumberNotation::FIXED):
+      dNotation = pqDoubleLineEdit::RealNumberNotation::FixedNotation;
+      break;
+    case (vtkPVGeneralSettings::RealNumberNotation::SCIENTIFIC):
+      dNotation = pqDoubleLineEdit::RealNumberNotation::ScientificNotation;
+      break;
+    case (vtkPVGeneralSettings::RealNumberNotation::MIXED):
+      dNotation = pqDoubleLineEdit::RealNumberNotation::MixedNotation;
+      break;
+    case (vtkPVGeneralSettings::RealNumberNotation::FULL):
+      dNotation = pqDoubleLineEdit::RealNumberNotation::FullNotation;
+      break;
+    default:
+      return "";
+      break;
+  }
+  return pqDoubleLineEdit::formatDouble(
+    value, dNotation, shortestAccurate ? QLocale::FloatingPointShortest : precision);
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::formatTime(double value)
+{
+  auto settings = vtkPVGeneralSettings::GetInstance();
+  int notation = settings->GetAnimationTimeNotation();
+  bool shortAccurate = settings->GetAnimationTimeShortestAccuratePrecision();
+  int precision = settings->GetAnimationTimePrecision();
+
+  return pqCoreUtilities::formatDouble(value, notation, shortAccurate, precision);
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::formatNumber(double value)
+{
+  auto settings = vtkPVGeneralSettings::GetInstance();
+  int notation = settings->GetRealNumberDisplayedNotation();
+  bool shortAccurate = settings->GetRealNumberDisplayedShortestAccuratePrecision();
+  int precision = settings->GetRealNumberDisplayedPrecision();
+
+  return pqCoreUtilities::formatDouble(value, notation, shortAccurate, precision);
 }
 
 //-----------------------------------------------------------------------------

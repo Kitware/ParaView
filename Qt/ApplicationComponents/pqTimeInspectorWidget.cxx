@@ -668,6 +668,7 @@ void pqTimeInspectorWidget::generalSettingsChanged()
   this->Internals->Ui.AnimationTimeWidget->setNotation(
     static_cast<pqAnimationTimeWidget::RealNumberNotation>(timeNotation));
 
+  // XXX should be reworked to use pqCoreUtilities::formatDouble
   QChar cnotation;
   switch (timeNotation)
   {

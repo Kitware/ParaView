@@ -27,6 +27,7 @@
 #define vtkPVGeneralSettings_h
 
 #include "vtkObject.h"
+#include "vtkParaViewDeprecation.h"    // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingSettingsModule.h" //needed for exports
 #include "vtkSmartPointer.h"           // needed for vtkSmartPointer.
 
@@ -98,8 +99,8 @@ public:
   /**
    * Get/Set the default view type.
    */
-  vtkGetStringMacro(DefaultViewType);
-  vtkSetStringMacro(DefaultViewType);
+  vtkGetMacro(DefaultViewType, std::string);
+  vtkSetMacro(DefaultViewType, std::string);
   ///@}
 
   ///@{
@@ -151,19 +152,12 @@ public:
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
   ///@}
 
-  ///@{
-  /**
-   * Set the precision of the animation time toolbar.
-   */
-  vtkSetClampMacro(AnimationTimePrecision, int, 1, 17);
-  vtkGetMacro(AnimationTimePrecision, int);
-  ///@}
-
-  enum
+  enum RealNumberNotation
   {
     MIXED = 0,
     SCIENTIFIC,
-    FIXED
+    FIXED,
+    FULL
   };
 
   ///@{
@@ -173,6 +167,22 @@ public:
    */
   vtkSetMacro(AnimationTimeNotation, int);
   vtkGetMacro(AnimationTimeNotation, int);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the usage of shortest accurate precision instead of actual precision for animation time
+   */
+  vtkSetMacro(AnimationTimeShortestAccuratePrecision, bool);
+  vtkGetMacro(AnimationTimeShortestAccuratePrecision, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set the precision of the animation time toolbar.
+   */
+  vtkSetClampMacro(AnimationTimePrecision, int, 1, 17);
+  vtkGetMacro(AnimationTimePrecision, int);
   ///@}
 
   ///@{
@@ -196,19 +206,18 @@ public:
 
   ///@{
   /**
-   * This enum specifies which notations to use for displaying real number values.
-   */
-  enum
-  {
-    DISPLAY_REALNUMBERS_USING_SCIENTIFIC_NOTATION = 1,
-    DISPLAY_REALNUMBERS_USING_FIXED_NOTATION,
-    DISPLAY_REALNUMBERS_USING_FULL_NOTATION,
-  };
-  /**
    * Get/Set the notation of real number displayed in widgets or views.
    */
   vtkSetMacro(RealNumberDisplayedNotation, int);
   vtkGetMacro(RealNumberDisplayedNotation, int);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the usage of shortest accurate precision instead of actual precision for real numbers
+   */
+  vtkSetMacro(RealNumberDisplayedShortestAccuratePrecision, bool);
+  vtkGetMacro(RealNumberDisplayedShortestAccuratePrecision, bool);
   ///@}
 
   ///@{
@@ -287,10 +296,12 @@ public:
 
   ///@{
   /**
-   * Console font size.
+   * This method has no effect and should not be used.
    */
-  vtkSetClampMacro(ConsoleFontSize, int, 8, VTK_INT_MAX);
-  vtkGetMacro(ConsoleFontSize, int);
+  PARAVIEW_DEPRECATED_IN_5_12_0("SetConsoleFontSize has no effect, do not use it.")
+  void SetConsoleFontSize(int vtkNotUsed(val)){};
+  PARAVIEW_DEPRECATED_IN_5_12_0("GetConsoleFontSize has no effect, do not use it.")
+  int GetConsoleFontSize() { return 0; };
   ///@}
 
   ///@{
@@ -329,32 +340,33 @@ public:
   ///@}
 
 protected:
-  vtkPVGeneralSettings();
-  ~vtkPVGeneralSettings() override;
+  vtkPVGeneralSettings() = default;
+  ~vtkPVGeneralSettings() override = default;
 
-  int BlockColorsDistinctValues;
-  bool AutoApply;
+  int BlockColorsDistinctValues = 7;
+  bool AutoApply = false;
   int AutoApplyDelay = 0;
-  bool AutoApplyActiveOnly;
-  char* DefaultViewType;
+  bool AutoApplyActiveOnly = false;
+  std::string DefaultViewType = "RenderView";
   std::string InterfaceLanguage = "en_US";
-  int ScalarBarMode;
-  bool CacheGeometryForAnimation;
-  unsigned long AnimationGeometryCacheLimit;
-  int AnimationTimePrecision;
-  bool ShowAnimationShortcuts;
-  int RealNumberDisplayedNotation;
-  int RealNumberDisplayedPrecision;
-  bool ResetDisplayEmptyViews;
-  int PropertiesPanelMode;
-  bool LockPanels;
-  int GUIFontSize;
-  bool GUIOverrideFont;
-  int ConsoleFontSize;
-  bool ColorByBlockColorsOnApply;
-  int AnimationTimeNotation;
-  bool EnableStreaming;
-  bool SelectOnClickMultiBlockInspector;
+  int ScalarBarMode = AUTOMATICALLY_HIDE_SCALAR_BARS;
+  bool CacheGeometryForAnimation = false;
+  unsigned long AnimationGeometryCacheLimit = 0;
+  int AnimationTimeNotation = MIXED;
+  bool AnimationTimeShortestAccuratePrecision = false;
+  int AnimationTimePrecision = 6;
+  bool ShowAnimationShortcuts = false;
+  int RealNumberDisplayedNotation = MIXED;
+  bool RealNumberDisplayedShortestAccuratePrecision = false;
+  int RealNumberDisplayedPrecision = 6;
+  bool ResetDisplayEmptyViews = false;
+  int PropertiesPanelMode = ALL_IN_ONE;
+  bool LockPanels = false;
+  int GUIFontSize = 0;
+  bool GUIOverrideFont = false;
+  bool ColorByBlockColorsOnApply = true;
+  bool EnableStreaming = false;
+  bool SelectOnClickMultiBlockInspector = true;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;

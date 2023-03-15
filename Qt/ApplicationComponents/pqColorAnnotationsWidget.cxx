@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqChooseColorPresetReaction.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
-#include "pqDoubleLineEdit.h"
 #include "pqDoubleRangeDialog.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqHeaderView.h"
@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAbstractArray.h"
 #include "vtkCollection.h"
 #include "vtkNew.h"
-#include "vtkNumberToString.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -375,17 +374,13 @@ bool pqColorAnnotationsWidget::pqInternals::updateAnnotations(vtkAbstractArray* 
     const auto val = values->GetVariantValue(idx);
     if (val.IsDouble())
     {
-      std::ostringstream str;
-      str << vtkNumberToString()(val.ToDouble());
-      candidate_tuples.push_back(std::make_pair(QString(str.str().c_str()),
-        pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(val.ToDouble())));
+      candidate_tuples.push_back(std::make_pair(
+        pqCoreUtilities::number(val.ToDouble()), pqCoreUtilities::formatNumber(val.ToDouble())));
     }
     else if (val.IsFloat())
     {
-      std::ostringstream str;
-      str << vtkNumberToString()(val.ToFloat());
-      candidate_tuples.push_back(std::make_pair(QString(str.str().c_str()),
-        pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(val.ToDouble())));
+      candidate_tuples.push_back(std::make_pair(
+        pqCoreUtilities::number(val.ToFloat()), pqCoreUtilities::formatNumber(val.ToFloat())));
     }
     else
     {

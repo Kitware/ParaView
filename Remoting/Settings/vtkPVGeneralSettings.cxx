@@ -54,37 +54,6 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 }
 
 //----------------------------------------------------------------------------
-vtkPVGeneralSettings::vtkPVGeneralSettings()
-  : BlockColorsDistinctValues(7)
-  , AutoApply(false)
-  , AutoApplyActiveOnly(false)
-  , DefaultViewType(nullptr)
-  , ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
-  , AnimationGeometryCacheLimit(0)
-  , AnimationTimePrecision(6)
-  , ShowAnimationShortcuts(0)
-  , RealNumberDisplayedNotation(vtkPVGeneralSettings::DISPLAY_REALNUMBERS_USING_FIXED_NOTATION)
-  , RealNumberDisplayedPrecision(6)
-  , ResetDisplayEmptyViews(0)
-  , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
-  , LockPanels(false)
-  , GUIFontSize(0)
-  , GUIOverrideFont(false)
-  , ColorByBlockColorsOnApply(true)
-  , AnimationTimeNotation(vtkPVGeneralSettings::MIXED)
-  , EnableStreaming(false)
-  , SelectOnClickMultiBlockInspector(true)
-{
-  this->SetDefaultViewType("RenderView");
-}
-
-//----------------------------------------------------------------------------
-vtkPVGeneralSettings::~vtkPVGeneralSettings()
-{
-  this->SetDefaultViewType(nullptr);
-}
-
-//----------------------------------------------------------------------------
 vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
 {
   if (!vtkPVGeneralSettings::Instance)

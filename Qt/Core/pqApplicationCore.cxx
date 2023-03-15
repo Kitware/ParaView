@@ -743,9 +743,13 @@ void pqApplicationCore::generalSettingsChanged()
 {
   if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
   {
-    pqDoubleLineEdit::setGlobalPrecisionAndNotation(pvsettings->GetRealNumberDisplayedPrecision(),
+    pqDoubleLineEdit::RealNumberNotation realNotation =
       static_cast<pqDoubleLineEdit::RealNumberNotation>(
-        pvsettings->GetRealNumberDisplayedNotation()));
+        pvsettings->GetRealNumberDisplayedNotation());
+    int realPrecision = pvsettings->GetRealNumberDisplayedShortestAccuratePrecision()
+      ? QLocale::FloatingPointShortest
+      : pvsettings->GetRealNumberDisplayedPrecision();
+    pqDoubleLineEdit::setGlobalPrecisionAndNotation(realPrecision, realNotation);
   }
 }
 

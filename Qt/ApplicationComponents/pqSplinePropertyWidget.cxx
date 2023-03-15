@@ -32,9 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSplinePropertyWidget.h"
 #include "ui_pqSplinePropertyWidget.h"
 
-#include "pqDoubleLineEdit.h"
+#include "pqCoreUtilities.h"
 #include "pqPointPickingHelper.h"
-#include "vtkNumberToString.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
@@ -79,14 +78,11 @@ public:
   {
     if (role == Qt::DisplayRole)
     {
-      return pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(
-        this->Points[idx.row()][idx.column()]);
+      return pqCoreUtilities::formatNumber(this->Points[idx.row()][idx.column()]);
     }
     else if (role == Qt::EditRole || role == Qt::ToolTipRole)
     {
-      std::ostringstream str;
-      str << vtkNumberToString()(this->Points[idx.row()][idx.column()]);
-      return str.str().c_str();
+      return pqCoreUtilities::number(this->Points[idx.row()][idx.column()]);
     }
 
     return QVariant();
