@@ -69,10 +69,10 @@ static const QPair<QString, QString> TRANSLATION_IGNORE_STRINGS[] = {
   // Text comes from property value (TimeLabel property of TimeKeeper proxy)
   // (see pqAnimationTimeWidget.cxx)
   QPair<QString, QString>(
-    "pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeLabel", "text"),
-  QPair<QString, QString>(
     "pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeLabel",
     "text"),
+  QPair<QString, QString>(
+    "pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeLabel", "text"),
   // Text comes from non-Qt world: view registration name is displayed (see pqViewFrame.cxx:205)
   QPair<QString, QString>(
     "pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/"

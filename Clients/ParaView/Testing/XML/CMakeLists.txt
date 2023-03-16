@@ -727,6 +727,7 @@ SET (TESTS_WITHOUT_BASELINES
   AddFieldArrays.xml
   ArrayBoundsScaleDomain.xml
   ArraySelectionWidget.xml
+  AnimateProperty.xml
   ComputeArrayMagnitudeSetting.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
@@ -762,12 +763,12 @@ SET (TESTS_WITHOUT_BASELINES
   SpreadSheetSelectedCellConnectivity.xml
   StringInLineChartView.xml
   TableHistogram.xml
-  TestAnimationStride.xml
   TestCompositePropertyWidgetDecorator.xml
   TestFileListPropertyWidget.xml
   TextSource.xml
   ThresholdBackwardsCompatibility.xml
   ThresholdTable.xml
+  TimeKeeper.xml
   TimeManagerPanel.xml
   TimeManagerSequence.xml
 )
@@ -1060,9 +1061,9 @@ list(APPEND TESTS_WITH_BASELINES
   AMRContour.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
-  AnimationUseCamera.xml
   AnimationFollowPath.xml
   AnimationSetTimeCursor.xml
+  AnimationUseCamera.xml
   AnisotropyPBR.xml
   Annotations.xml
   ClearCoatPBR.xml
@@ -1236,7 +1237,7 @@ list(APPEND TESTS_WITH_BASELINES
   RotateAroundOriginTransform.xml
   RotateCamera90.xml
   RotationalExtrusionFilter.xml
-#  SaveAnimationGeometry.xml
+  # SaveAnimationGeometry.xml # see #20236
   SaveColorMap.xml
   SaveCSV.xml
   SaveMultiBlockCSV.xml
@@ -1289,7 +1290,6 @@ list(APPEND TESTS_WITH_BASELINES
   TestBoundaryMeshQuality.xml
   TestGroupDataFromTimeSeries.xml
   TestSelectionOnMultipiece.xml
-  TimeInspector.xml
   TimeStepProgressBar.xml
   Tessellate.xml
   Text2D.xml
@@ -1747,6 +1747,7 @@ set(ZoomToData_DISABLE_CRS TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
+set (AnimateProperty_FORCE_SERIAL TRUE) # since this uses popup window
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 set (CGNSReaderDataLocation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRBaseline_FORCE_SERIAL TRUE)  # since this uses popup-menu
@@ -1789,8 +1790,9 @@ set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
-set (TooltipCopy_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
+set (TimeKeeper_FORCE_SERIAL TRUE) # since this uses popup window
+set (TooltipCopy_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu

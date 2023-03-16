@@ -3,12 +3,12 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
+  <!-- create an animation track -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
-
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo" command="set_string" arguments="Start Theta" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" command="activated" arguments="Sphere1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/propertiesBox" command="activated" arguments="Start Theta" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveGeometry" />
   <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SaveAnimationGeometry.pvd" />
@@ -22,5 +22,5 @@
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/animationViewDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 </pqevents>

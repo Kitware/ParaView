@@ -8,11 +8,12 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mousePress" arguments="1,1,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseDblClick" arguments="1,1,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/advancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="expand" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.0.0" />
+
   <pqevent object="pqPipelineTimeKeyFrameEditor/variableRadio" command="set_boolean" arguments="true" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/pbNew" command="activate" arguments="" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,52,19,/1:2" />
@@ -26,6 +27,6 @@
   <pqevent object="pqPipelineTimeKeyFrameEditor/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="VEL" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/animationViewDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/qt_dockwidget_closebutton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
 </pqevents>
