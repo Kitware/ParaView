@@ -80,6 +80,18 @@ public:
 
   ///@{
   /**
+   * Sets the GhostLevel. Currently, this does
+   * nothing, but this property is present
+   * to ensure compatibility with ParaView.
+   *
+   * The Default is 0.
+   */
+  vtkSetMacro(GhostLevel, int);
+  vtkGetMacro(GhostLevel, int);
+  ///@}
+
+  ///@{
+  /**
    * Provides an option to pad the time step when writing out time series data.
    * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
    * or may not exist and d must exist and d must be the last character
@@ -115,6 +127,7 @@ protected:
   bool WriteAllTimeSteps = false;
   char* FileNameSuffix = nullptr;
 
+  int GhostLevel = 0;
   int NumberOfTimeSteps = 0;
   int CurrentTimeIndex = 0;
   vtkDoubleArray* TimeValues = nullptr;

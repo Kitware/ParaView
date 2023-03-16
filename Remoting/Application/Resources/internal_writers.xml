@@ -83,8 +83,8 @@
         <IntRangeDomain min="0"
                         name="range" />
         <Documentation>The number of ghost levels to include in the output
-        file(s). Note that some writers (such as ExodusIIWriter) may not
-        support writing ghost levels.</Documentation>
+        file(s). Note that some writers (such as ExodusIIWriter and CGNSWriter)
+        may not support writing ghost levels.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <SourceProxy class="vtkCompleteArrays"
