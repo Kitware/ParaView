@@ -296,7 +296,6 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   this->Internal->PlayMode->addItem(tr("Snap to Timesteps"));
   hboxlayout->addWidget(this->Internal->PlayMode);
   this->Internal->AnimationTimeWidget = new pqAnimationTimeWidget(this);
-  this->Internal->AnimationTimeWidget->setPlayModeReadOnly(true);
   hboxlayout->addWidget(this->Internal->AnimationTimeWidget);
 
   this->Internal->StartTimeLabel = new QLabel(tr("Start Time:"), this);

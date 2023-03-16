@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include "pqDoubleLineEdit.h" // for pqDoubleLineEdit::RealNumberNotation.
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QList>
 #include <QScopedPointer>
 #include <QVariant>
@@ -50,19 +52,15 @@ class vtkSMProxy;
  * The widget allow the user to do the following:
  * \li View and/or change the current time value (in seq/realtime modes), or
  *     current time step value (in snap-to-timesteps mode).
- * \li View and/or change the play mode (from seq to snap-to-timesteps). While
- *     the widget behaves acceptably if the application externally changes the
- *     animation play mode to realtime, the widget itself doesn't allow the
- *     user to do that. This mode is optional. You can disabling allowing the
- *     user to change the play mode by setting playModeReadOnly to true
- *     (default is false).
  */
 class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 {
   Q_OBJECT
   Q_ENUMS(RealNumberNotation)
   Q_PROPERTY(QString playMode READ playMode WRITE setPlayMode NOTIFY playModeChanged)
-  Q_PROPERTY(bool playModeReadOnly READ playModeReadOnly WRITE setPlayModeReadOnly)
+  Q_PROPERTY(int numberOfFrames READ numberOfFrames WRITE setNumberOfFrames)
+  Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
+  Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
   Q_PROPERTY(QString timeLabel READ timeLabel WRITE setTimeLabel)
   Q_PROPERTY(QList<QVariant> timestepValues READ timestepValues WRITE setTimestepValues)
 
@@ -93,6 +91,30 @@ public:
   const QList<QVariant>& timestepValues() const;
   ///@}
 
+  ///@{
+  /**
+   * Get/Set the animation start time.
+   */
+  void setStartTime(double start);
+  double startTime() const;
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the animation end time.
+   */
+  void setEndTime(double end);
+  double endTime() const;
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the number of frames.
+   */
+  void setNumberOfFrames(int nbOfFrame);
+  int numberOfFrames() const;
+  ///@}
+
   /**
    * Set the current animation time
    */
@@ -120,15 +142,6 @@ public:
 
   ///@{
   /**
-   * Get/set whether the user should be able to change the animation
-   * play mode using this widget.
-   */
-  void setPlayModeReadOnly(bool val);
-  bool playModeReadOnly() const;
-  ///@}
-
-  ///@{
-  /**
    * Get/set the label text to use for the "time" parameter.
    */
   void setTimeLabel(const QString& val);
@@ -144,13 +157,21 @@ public Q_SLOTS:
    * Set the notation used to display the number.
    * \sa notation()
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Unused. Display rely on global setting")
   void setNotation(RealNumberNotation _notation);
 
   /**
    * Set the precision used to display the number.
    * \sa precision()
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Unused. Display rely on global setting")
   void setPrecision(int precision);
+
+  /**
+   * Re render the widget.
+   * This can be helpful when notation/precision settings have changed.
+   */
+  void render();
 
 protected Q_SLOTS:
   /**

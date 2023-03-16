@@ -59,16 +59,32 @@ namespace
 {
 class WidgetState
 {
+  // Timesteps comes from TimeKeeper
   std::vector<double> TimeSteps;
+  // Computed from AnimationSceneProperty, this is not the same as TimeSteps but as same usage here.
+  // We store it appart to be safe with PropertyLinks.
+  std::vector<double> SequenceTimeSteps;
   double Time = 0.0;
   bool PlayModeSnapToTimeSteps = false;
 
 public:
   bool DisableModifications = false;
 
+  double StartTime = 0;
+  double EndTime = 1;
+
   bool playModeSnapToTimeSteps() const { return this->PlayModeSnapToTimeSteps; }
   double time() const { return this->Time; }
-  const std::vector<double>& timeSteps() const { return this->TimeSteps; }
+
+  /**
+   * TimeSteps is up to date with TimeKeeper, while SequenceTimeSteps is computed from
+   * AnimationScene properties. They differ in origin but are similar in use in this class. This
+   * method allows to use the relevant one, hiding the switch logic.
+   */
+  const std::vector<double>& timeSteps() const
+  {
+    return playModeSnapToTimeSteps() ? this->TimeSteps : this->SequenceTimeSteps;
+  }
   const QList<QVariant>& timeStepsAsVariantList() const
   {
     this->TimeStepsVariants.clear();
@@ -84,9 +100,9 @@ public:
   bool checkTimeStepFromIndex(int index, double& timestep)
   {
     if (!this->DisableModifications && index >= 0 &&
-      index < static_cast<int>(this->TimeSteps.size()))
+      index < static_cast<int>(this->timeSteps().size()))
     {
-      timestep = this->TimeSteps[index];
+      timestep = this->timeSteps()[index];
       return this->canTimeBeSet(timestep);
     }
     return false;
@@ -107,6 +123,27 @@ public:
     }
     return false;
   }
+
+  void updateSequenceTimeSteps() { this->updateSequenceTimeSteps(this->SequenceTimeSteps.size()); }
+
+  void updateSequenceTimeSteps(int nbOfFrames)
+  {
+    this->SequenceTimeSteps.resize(nbOfFrames);
+    if (nbOfFrames > 1)
+    {
+      double step = (this->EndTime - this->StartTime) / (nbOfFrames - 1);
+      for (int idx = 0; idx < nbOfFrames; idx++)
+      {
+        this->SequenceTimeSteps[idx] = this->StartTime + idx * step;
+      }
+    }
+    else if (nbOfFrames == 1)
+    {
+      this->SequenceTimeSteps[0] = this->StartTime;
+    }
+  }
+
+  int numberOfFrames() { return this->SequenceTimeSteps.size(); }
 
   bool setTimeSteps(const QList<QVariant>& list)
   {
@@ -144,7 +181,13 @@ public:
     : AnimationSceneVoidPtr(nullptr)
   {
     this->Ui.setupUi(self);
-    this->Ui.timeValue->setValidator(new QDoubleValidator(self));
+    this->Ui.timeValueComboBox->setValidator(new QDoubleValidator(self));
+    this->Ui.timeValueComboBox->setLineEdit(new pqDoubleLineEdit(self));
+
+    // setup a min size for combox so it does not resize to often.
+    auto metrics = this->Ui.timeValueComboBox->fontMetrics();
+    auto minW = metrics.horizontalAdvance("210.123456789");
+    this->Ui.timeValueComboBox->setMinimumWidth(minW);
   }
 
   /**
@@ -169,33 +212,13 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
   QScopedValueRollback<bool> rollback(this->State.DisableModifications, true);
 
   auto& ui = this->Ui;
-  const auto& state = this->State;
+  auto& state = this->State;
 
-  // first, update enabled state and visibilities based on playmode.
-  if (state.playModeSnapToTimeSteps())
-  {
-    ui.timeValue->hide();
-    ui.timeValueComboBox->show();
-    ui.timestepCountLabel->show();
-    ui.radioButtonStep->setChecked(true);
-  }
-  else
-  {
-    ui.timeValue->show();
-    ui.timeValueComboBox->hide();
-    ui.timestepCountLabel->hide();
-    ui.radioButtonValue->setChecked(true);
-  }
-
-  // TODO should use formatTime
-  ui.timeValue->setText(pqCoreUtilities::number(state.time()));
+  ui.timestepCountLabel->setVisible(state.playModeSnapToTimeSteps());
 
   // update combo-box.
   ui.timeValueComboBox->clear();
   int currentIndex = -1;
-  // TODO handle low/high exponent
-  const auto precision = ui.timeValue->precision();
-  const auto notation = ui.timeValue->notation();
   for (const auto& val : state.timeSteps())
   {
     if (val == state.time())
@@ -206,12 +229,10 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
     {
       // `state.time()` is not part of the current timesteps, insert it.
       currentIndex = ui.timeValueComboBox->count();
-      ui.timeValueComboBox->addItem(
-        QString("%1 (?)").arg(pqDoubleLineEdit::formatDouble(state.time(), notation, precision)),
-        state.time());
+      ui.timeValueComboBox->addItem(pqCoreUtilities::formatTime(state.time())), state.time();
     }
 
-    ui.timeValueComboBox->addItem(pqDoubleLineEdit::formatDouble(val, notation, precision), val);
+    ui.timeValueComboBox->addItem(pqCoreUtilities::formatTime(val), val);
   }
 
   if (currentIndex == -1)
@@ -219,8 +240,7 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
     // `state.time()` is not part of the current timesteps, append it.
     currentIndex = ui.timeValueComboBox->count();
     ui.timeValueComboBox->addItem(
-      QString("%1 (?)").arg(pqDoubleLineEdit::formatDouble(state.time(), notation, precision)),
-      state.time());
+      QString("%1 (?)").arg(pqCoreUtilities::formatTime(state.time())), state.time());
   }
   ui.timeValueComboBox->setCurrentIndex(currentIndex);
 
@@ -229,7 +249,15 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
   {
     const int count = static_cast<int>(state.timeSteps().size());
     ui.timestepValue->setMaximum(count - 1);
-    auto idx = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), state.time());
+    int idx = 0;
+    for (auto ts : state.timeSteps())
+    {
+      if (ts >= state.time())
+      {
+        break;
+      }
+      idx++;
+    }
     ui.timestepValue->setValue(idx);
     ui.timestepValue->setSuffix(state.timeSteps()[idx] == state.time() ? "" : " (?)");
     ui.timestepCountLabel->setText(tr("max is %1").arg(count - 1));
@@ -252,15 +280,14 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
 
   auto& internals = (*this->Internals);
   auto& ui = internals.Ui;
-  ui.timeValueComboBox->setVisible(false);
 
   QObject::connect(
-    ui.timeValue, &pqDoubleLineEdit::textChangedAndEditingFinished, [this, &internals, &ui]() {
-      // user has manually changed the time-value in the line edit.
-      const double time = ui.timeValue->text().toDouble();
+    ui.timeValueComboBox->lineEdit(), &QLineEdit::editingFinished, [this, &internals, &ui]() {
+      // user has selected a timestep using the combo-box.
+      const double time = ui.timeValueComboBox->currentData().toDouble();
       if (internals.State.canTimeBeSet(time))
       {
-        setCurrentTime(time);
+        this->setCurrentTime(time);
       }
     });
 
@@ -269,16 +296,7 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
     const double time = ui.timeValueComboBox->currentData().toDouble();
     if (internals.State.canTimeBeSet(time))
     {
-      setCurrentTime(time);
-    }
-  });
-
-  QObject::connect(ui.radioButtonValue, &QRadioButton::toggled, [this, &internals, &ui]() {
-    const bool playModeSnapToTimeSteps = (ui.radioButtonValue->isChecked() == false);
-    if (internals.State.setPlayModeSnapToTimeSteps(playModeSnapToTimeSteps))
-    {
-      internals.render(this);
-      Q_EMIT this->playModeChanged();
+      this->setCurrentTime(time);
     }
   });
 
@@ -293,7 +311,7 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
     double time;
     if (internals.State.checkTimeStepFromIndex(timeIndex, time))
     {
-      setCurrentTime(time);
+      this->setCurrentTime(time);
     }
   });
 
@@ -358,9 +376,17 @@ void pqAnimationTimeWidget::setAnimationScene(pqAnimationScene* ascene)
   internals.Links.addTraceablePropertyLink(
     this, "playMode", SIGNAL(playModeChanged()), asceneProxy, asceneProxy->GetProperty("PlayMode"));
 
+  internals.Links.addTraceablePropertyLink(this, "numberOfFrames", SIGNAL(dummySignal()),
+    asceneProxy, asceneProxy->GetProperty("NumberOfFrames"));
+  internals.Links.addTraceablePropertyLink(
+    this, "startTime", SIGNAL(dummySignal()), asceneProxy, asceneProxy->GetProperty("StartTime"));
+  internals.Links.addTraceablePropertyLink(
+    this, "endTime", SIGNAL(dummySignal()), asceneProxy, asceneProxy->GetProperty("EndTime"));
+
   // uni-directional links.
   internals.Links.addPropertyLink(
     this, "timeLabel", SIGNAL(dummySignal()), atimekeeper, atimekeeper->GetProperty("TimeLabel"));
+
   internals.Links.addPropertyLink(this, "timestepValues", SIGNAL(dummySignal()), atimekeeper,
     atimekeeper->GetProperty("TimestepValues"));
 }
@@ -383,40 +409,34 @@ const QList<QVariant>& pqAnimationTimeWidget::timestepValues() const
 void pqAnimationTimeWidget::setPrecision(int val)
 {
   auto& internals = (*this->Internals);
-  internals.Ui.timeValue->setPrecision(val);
   internals.render(this);
 }
 
 //-----------------------------------------------------------------------------
 int pqAnimationTimeWidget::precision() const
 {
-  auto& internals = (*this->Internals);
-  return internals.Ui.timeValue->precision();
+  return pqDoubleLineEdit::globalPrecision();
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setNotation(pqAnimationTimeWidget::RealNumberNotation val)
 {
   auto& internals = (*this->Internals);
-  internals.Ui.timeValue->setNotation(val);
   internals.render(this);
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationTimeWidget::RealNumberNotation pqAnimationTimeWidget::notation() const
 {
-  auto& internals = (*this->Internals);
-  return internals.Ui.timeValue->notation();
+  return pqDoubleLineEdit::globalNotation();
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setPlayMode(const QString& value)
 {
   auto& internals = (*this->Internals);
-  if (internals.State.setPlayModeSnapToTimeSteps(value == "Snap To TimeSteps"))
-  {
-    internals.render(this);
-  }
+  internals.State.setPlayModeSnapToTimeSteps(value == "Snap To TimeSteps");
+  internals.render(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -424,6 +444,47 @@ QString pqAnimationTimeWidget::playMode() const
 {
   auto& internals = (*this->Internals);
   return internals.State.playModeSnapToTimeSteps() == false ? "Sequence" : "Snap To TimeSteps";
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setStartTime(double start)
+{
+  this->Internals->State.StartTime = start;
+  this->Internals->State.updateSequenceTimeSteps();
+  this->Internals->render(this);
+}
+
+//-----------------------------------------------------------------------------
+double pqAnimationTimeWidget::startTime() const
+{
+  return this->Internals->State.StartTime;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setEndTime(double start)
+{
+  this->Internals->State.EndTime = start;
+  this->Internals->State.updateSequenceTimeSteps();
+  this->Internals->render(this);
+}
+
+//-----------------------------------------------------------------------------
+double pqAnimationTimeWidget::endTime() const
+{
+  return this->Internals->State.EndTime;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setNumberOfFrames(int nbOfFrames)
+{
+  this->Internals->State.updateSequenceTimeSteps(nbOfFrames);
+  this->Internals->render(this);
+}
+
+//-----------------------------------------------------------------------------
+int pqAnimationTimeWidget::numberOfFrames() const
+{
+  return this->Internals->State.numberOfFrames();
 }
 
 //-----------------------------------------------------------------------------
@@ -442,21 +503,6 @@ QString pqAnimationTimeWidget::timeLabel() const
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::setPlayModeReadOnly(bool val)
-{
-  Ui::AnimationTimeWidget& ui = this->Internals->Ui;
-  ui.radioButtonValue->setVisible(!val);
-  ui.radioButtonStep->setVisible(!val);
-}
-
-//-----------------------------------------------------------------------------
-bool pqAnimationTimeWidget::playModeReadOnly() const
-{
-  Ui::AnimationTimeWidget& ui = this->Internals->Ui;
-  return !ui.radioButtonStep->isVisible();
-}
-
-//-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setTimestepValues(const QList<QVariant>& list)
 {
   auto& internals = (*this->Internals);
@@ -464,4 +510,10 @@ void pqAnimationTimeWidget::setTimestepValues(const QList<QVariant>& list)
   {
     internals.render(this);
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::render()
+{
+  this->Internals->render(this);
 }

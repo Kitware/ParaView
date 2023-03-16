@@ -44,7 +44,6 @@ void pqAnimationTimeToolbar::constructor()
 {
   this->setWindowTitle(tr("Current Time Controls"));
   this->AnimationTimeWidget = new pqAnimationTimeWidget(this);
-  this->AnimationTimeWidget->setPlayModeReadOnly(true);
   this->addWidget(this->AnimationTimeWidget);
   this->connect(pqPVApplicationCore::instance()->animationManager(),
     SIGNAL(activeSceneChanged(pqAnimationScene*)), SLOT(setAnimationScene(pqAnimationScene*)));
