@@ -163,22 +163,19 @@ ParaViewMainWindow::ParaViewMainWindow()
     this->Internals->colorMapEditorDock, this->Internals->multiBlockInspectorDock);
 
   this->Internals->findDataDock->hide();
-  this->Internals->animationViewDock->hide();
   this->Internals->statisticsDock->hide();
   this->Internals->comparativePanelDock->hide();
   this->Internals->collaborationPanelDock->hide();
   this->Internals->memoryInspectorDock->hide();
   this->Internals->multiBlockInspectorDock->hide();
   this->Internals->colorMapEditorDock->hide();
-  this->Internals->timeInspectorDock->hide();
   this->Internals->timeManagerDock->hide();
   this->Internals->lightInspectorDock->hide();
   this->Internals->selectionEditorDock->hide();
 
-  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
-  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
-  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->pythonShellDock);
-  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->timeManagerDock);
+  this->tabifyDockWidget(this->Internals->timeManagerDock, this->Internals->statisticsDock);
+  this->tabifyDockWidget(this->Internals->timeManagerDock, this->Internals->outputWidgetDock);
+  this->tabifyDockWidget(this->Internals->timeManagerDock, this->Internals->pythonShellDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);

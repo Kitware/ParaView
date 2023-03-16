@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QAbstractScrollArea>
 #include <QStandardItemModel>
 
@@ -43,7 +45,9 @@ class QHeaderView;
 class pqAnimationModel;
 class pqAnimationTrack;
 
-class PQWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "See `pqTimeManagerWidget` for new design.") PQWIDGETS_EXPORT pqAnimationWidget
+  : public QAbstractScrollArea
 {
   Q_OBJECT;
   using Superclass = QAbstractScrollArea;

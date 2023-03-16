@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QGraphicsScene>
 #include <QObject>
 #include <QPolygonF>
@@ -46,7 +48,9 @@ class QGraphicsView;
 class pqCheckBoxPixMaps;
 
 // a model that represents a collection of animation tracks
-class PQWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "See `pqTimeManagerWidget` for new design") PQWIDGETS_EXPORT pqAnimationModel
+  : public QGraphicsScene
 {
   Q_OBJECT
   Q_ENUMS(ModeType)

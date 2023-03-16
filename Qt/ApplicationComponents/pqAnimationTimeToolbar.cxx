@@ -60,10 +60,7 @@ void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::updateTimeDisplay()
 {
-  this->AnimationTimeWidget->setPrecision(
-    vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
-  this->AnimationTimeWidget->setNotation(static_cast<pqAnimationTimeWidget::RealNumberNotation>(
-    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation()));
+  this->AnimationTimeWidget->render();
 }
 
 //-----------------------------------------------------------------------------
