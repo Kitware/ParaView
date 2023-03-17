@@ -897,7 +897,6 @@ if(NOT APPLE)
 endif()
 
 SET(TESTS_WITH_BASELINES
-  Protractor.xml
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
@@ -912,6 +911,7 @@ SET(TESTS_WITH_BASELINES
   PassArrays.xml
   PerlinNoise.xml
   PickCenter.xml
+  Protractor.xml
   ResampleToLine.xml
   ReverseSense.xml
   SaveLoadScreenShotWithEmbedState.xml
@@ -1545,6 +1545,7 @@ if(PARAVIEW_USE_PYTHON)
     list(APPEND TESTS_WITHOUT_BASELINES
       ExpressionChooser.xml
       ExpressionClear.xml
+      FieldDataDomainDefault.xml
       PythonCalculator.xml
       PythonCalculatorInput.xml
       PythonCalculatorCrossComposite.xml

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RandomHyperTreeGridSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="AddFieldArrays" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/FileName/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/FileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/field.vtk" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PythonAnnotation" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="KE" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[2959999.75  2942042.    2911410.25  2876401.    2826567.75  2770796.&#xA; 2724313.    2681394.75  2641663.25  2603437.    2564334.5   2527693.5&#xA; 2487645.75  2455275.5   2427335.    2400915.    2368938.75  2334671.75&#xA; 2300865.5   2269482.5   2241783.75  2217424.5   2194718.    2168026.25&#xA; 2142954.75  2119744.25  2096398.    2071764.25  2044943.5   2019585.&#xA; 1995577.25  1972173.75  1948188.375 1917682.125 1879103.    1827445.375&#xA; 1761633.375 1686351.5   1612799.25  1555177.    1515738.25  1492315.5&#xA; 1477435.125 1467643.625]" />
+</pqevents>
