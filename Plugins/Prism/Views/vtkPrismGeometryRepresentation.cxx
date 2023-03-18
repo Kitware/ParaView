@@ -18,8 +18,9 @@
 #include "vtkBox.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
-#include "vtkExtractPolyDataGeometry.h"
+#include "vtkExtractGeometry.h"
 #include "vtkFieldData.h"
+#include "vtkGeometryFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -29,6 +30,7 @@
 #include "vtkPVTrivialProducer.h"
 #include "vtkPrismGeometryConverter.h"
 #include "vtkPrismView.h"
+#include "vtkSimulationPointCloudFilter.h"
 #include "vtkSimulationToPrismFilter.h"
 #include "vtkStringArray.h"
 
@@ -79,6 +81,7 @@ void vtkPrismGeometryRepresentation::SetAttributeType(int type)
 {
   if (this->SimulationToPrismFilter->GetAttributeType() != type)
   {
+    this->SimulationPointCloudFilter->SetAttributeType(type);
     this->SimulationToPrismFilter->SetAttributeType(type);
     this->MarkModified();
   }
@@ -224,7 +227,9 @@ int vtkPrismGeometryRepresentation::RequestData(
       }
       if (this->IsSimulationData)
       {
-        this->SimulationToPrismFilter->SetInputConnection(this->GetInternalOutputPort());
+        this->SimulationPointCloudFilter->SetInputConnection(this->GetInternalOutputPort());
+        this->SimulationToPrismFilter->SetInputConnection(
+          this->SimulationPointCloudFilter->GetOutputPort());
         this->GeometryFilter->SetInputConnection(this->SimulationToPrismFilter->GetOutputPort());
       }
       else
@@ -234,7 +239,8 @@ int vtkPrismGeometryRepresentation::RequestData(
       if (this->EnableThresholding)
       {
         this->ThresholdFilter->SetInputConnection(this->GeometryFilter->GetOutputPort());
-        this->GeometryConverter->SetInputConnection(this->ThresholdFilter->GetOutputPort());
+        this->ThresholdGeometryFilter->SetInputConnection(this->ThresholdFilter->GetOutputPort());
+        this->GeometryConverter->SetInputConnection(this->ThresholdGeometryFilter->GetOutputPort());
       }
       else
       {
@@ -274,8 +280,6 @@ int vtkPrismGeometryRepresentation::ProcessViewRequest(
       this->vtkPVDataRepresentation::ProcessViewRequest(
         vtkPVView::REQUEST_UPDATE(), inInfo, outInfo);
 
-      // add no simulation data bounds
-      prismView->SetPrismBounds(inInfo, this->NonSimulationDataInputBounds);
       // set view axis if available
       if (this->GetXAxisName() && this->GetYAxisName() && this->GetZAxisName())
       {

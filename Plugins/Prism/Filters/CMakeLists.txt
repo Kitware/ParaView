@@ -1,5 +1,6 @@
 set(classes
   vtkPrismGeometryConverter
+  vtkSimulationPointCloudFilter
   vtkSimulationToPrismFilter
   )
 

@@ -578,8 +578,10 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
     }
     else
     {
-      vtkErrorMacro("Could not create object of type: " << name.str().c_str()
-                                                        << ". Did you specify wrong xml element?");
+      vtkWarningMacro("Could not create object of type: "
+        << name.str().c_str()
+        << ". Make sure that this xml domain is correct.\nIf this error occurred when loading a "
+           "plugin in client/server mode, first load the client plugin.");
     }
   }
 

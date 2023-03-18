@@ -27,8 +27,10 @@
 #include "vtkGeometryRepresentation.h"
 #include "vtkPrismViewsModule.h" // needed for exports
 
-class vtkExtractPolyDataGeometry;
+class vtkExtractGeometry;
+class vtkGeometryFilter;
 class vtkPrismGeometryConverter;
+class vtkSimulationPointCloudFilter;
 class vtkSimulationToPrismFilter;
 
 class VTKPRISMVIEWS_EXPORT vtkPrismGeometryRepresentation : public vtkGeometryRepresentation
@@ -123,8 +125,10 @@ protected:
 
   bool IsSimulationData = false;
   bool EnableThresholding = false;
+  vtkNew<vtkSimulationPointCloudFilter> SimulationPointCloudFilter;
   vtkNew<vtkSimulationToPrismFilter> SimulationToPrismFilter;
-  vtkNew<vtkExtractPolyDataGeometry> ThresholdFilter;
+  vtkNew<vtkExtractGeometry> ThresholdFilter;
+  vtkNew<vtkGeometryFilter> ThresholdGeometryFilter;
   vtkNew<vtkPrismGeometryConverter> GeometryConverter;
   // Axis names are extracted from the field data of the input of the representation.
   char* XAxisName = nullptr;

@@ -167,9 +167,8 @@ public:
 
   ///@{
   /**
-   * Set/Get the prism bounds.
+   * Get the prism bounds.
    */
-  void SetPrismBounds(vtkInformation* info, const double bounds[6]);
   vtkGetVector6Macro(PrismBounds, double);
   ///@}
 

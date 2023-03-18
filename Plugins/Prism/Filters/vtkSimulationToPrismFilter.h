@@ -13,12 +13,15 @@
 
 =========================================================================*/
 /**
- * @class   vtkSimulationToPrismGeometryFilter
+ * @class   vtkSimulationToPrismFilter
  * @brief   Convert from Simulation Space to Prism Space for Prism View
  *
  * Given a vtkDataset and an Attribute type, such as, PointData or Cell Data, that has 3+ scalar
  * arrays, you can create a PolyData with vertices that their coordinates are the values of the
  * 3 selected arrays.
+ *
+ * @warning
+ * The input of this filter MUST be the output of vtkSimulationPointCloudFilter
  *
  * Examples:
  * 1) If input is a dataset that has 1000 cells and the 3 chosen scalar Cell arrays are "a", "b",
@@ -29,10 +32,8 @@
  * "b", "c", then the output will have 1000 vertices with "a" as the x-coordinate, "b" as the
  * y-coordinate, and "c" as the z-coordinate.
  *
- * @warning
- * This class has been threaded with vtkSMPTools. Using TBB or other
- * non-sequential type (set in the CMake variable
- * VTK_SMP_IMPLEMENTATION_TYPE) may improve performance significantly.
+ * @sa
+ * vtkSimulationPointCloudFilter
  */
 
 #ifndef vtkSimulationToPrismGeometryFilter_h
@@ -90,7 +91,6 @@ protected:
   vtkSimulationToPrismFilter();
   ~vtkSimulationToPrismFilter() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int AttributeType;

@@ -174,18 +174,6 @@ void vtkPrismView::AboutToRenderOnLocalProcess(bool interactive)
   this->Superclass::AboutToRenderOnLocalProcess(interactive);
 }
 
-//------------------------------------------------------------------------------
-void vtkPrismView::SetPrismBounds(vtkInformation* info, const double* bounds)
-{
-  auto self = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
-  if (!self)
-  {
-    vtkGenericWarningMacro("Missing VIEW().");
-    return;
-  }
-  this->PrismBoundsBBox.AddBounds(bounds);
-}
-
 //----------------------------------------------------------------------------
 void vtkPrismView::SynchronizeGeometryBounds()
 {
@@ -298,7 +286,7 @@ void vtkPrismView::AllReduceString(
 //------------------------------------------------------------------------------
 void vtkPrismView::Update()
 {
-  // first call update data on all vtkPrismGeometryRepresentation representations to get
+  // first call update data on all vtkPrismGeometryRepresentation representations to compute
   // the input bounds of non simulation data, a.k.a. prism bounds and axis name (if available)
   this->SetXAxisName(nullptr);
   this->SetYAxisName(nullptr);
@@ -307,6 +295,18 @@ void vtkPrismView::Update()
   this->RequestDataMode = RequestDataModes::REQUEST_BOUNDS;
   this->CallProcessViewRequest(
     vtkPrismView::REQUEST_BOUNDS(), this->RequestInformation, this->ReplyInformationVector);
+
+  // aggregate the bounds of the non simulation data. This done here instead inside
+  // ProcessViewRequest, because it will only process visible representations, but we want to
+  // always have the bounds of the prism surface as a reference, not only when it's visible.
+  for (int cc = 0, numReprs = this->GetNumberOfRepresentations(); cc < numReprs; cc++)
+  {
+    auto repr = vtkPrismGeometryRepresentation::SafeDownCast(this->GetRepresentation(cc));
+    if (repr && !repr->GetIsSimulationData())
+    {
+      this->PrismBoundsBBox.AddBounds(repr->GetNonSimulationDataInputBounds());
+    }
+  }
 
   // synchronize the prism bounds
   vtkBoundingBox result;

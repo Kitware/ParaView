@@ -213,6 +213,9 @@
         </Documentation>
       </IntVectorProperty>
 
+      <PropertyGroup label="Prism Parameters">
+        <Property name="EnableThresholding"/>
+      </PropertyGroup>
       <PropertyGroup label="X Axis">
         <Property name="LowerThresholdX"/>
         <Property name="UpperThresholdX"/>
@@ -234,6 +237,30 @@
       <PropertyGroup label="Selections">
         <Property name="EnableNonSimulationDataSelection"/>
       </PropertyGroup>
+
+      <!-- Redefinitions of properties in the RenderView to change the panel_visibility      -->
+      <IntVectorProperty command="SetCameraOrientationWidgetVisibility"
+                         name="CameraOrientationWidgetVisibility"
+                         label="Visible"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced"
+                         override="1">
+      <BooleanDomain name="bool"/>
+        <Documentation>Visibility of the camera orientation widget.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetCenterAxesVisibility"
+                         default_values="0"
+                         name="CenterAxesVisibility"
+                         number_of_elements="1"
+                         panel_visibility="advanced"
+                         override="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>Toggle the visibility of the axes showing the center of
+          rotation in the scene.
+        </Documentation>
+      </IntVectorProperty>
     </PrismViewProxy>
   </ProxyGroup>
 
@@ -288,6 +315,14 @@
           Set the input to the representation.
         </Documentation>
       </InputProperty>
+      <DoubleVectorProperty command="SetPointSize"
+                            default_values="4.0"
+                            name="PointSize"
+                            number_of_elements="1"
+                            override="1">
+        <DoubleRangeDomain min="0"
+                           name="range"/>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetBackfaceRepresentation"
                          default_values="400"
                          name="BackfaceRepresentation"
@@ -919,7 +954,7 @@
             <Property name="Interpolation"
                       panel_visibility="advanced"/>
             <Property name="Specular"
-                      panel_visibility="default"/>
+                      panel_visibility="advanced"/>
             <Property name="SpecularColor"
                       panel_widget="color_selector"
                       panel_visibility="advanced"/>
