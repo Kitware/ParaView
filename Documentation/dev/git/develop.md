@@ -1,9 +1,10 @@
 Develop ParaView with Git
 =========================
 
-This page documents how to develop ParaView through [Git][].
+This page documents how to develop ParaView using [GitLab][] and [Git][].
 See the [README](README.md) for more information.
 
+[GitLab]: https://gitlab.kitware.com/
 [Git]: http://git-scm.com
 
 Git is an extremely powerful version control tool that supports many
@@ -12,8 +13,8 @@ Here we document procedures used by the ParaView development community.
 In the interest of simplicity and brevity we do *not* provide an
 explanation of why we use this approach.
 
-Setup
------
+Initial Setup
+-------------
 
 Before you begin, perform initial setup:
 
@@ -22,32 +23,238 @@ Before you begin, perform initial setup:
 2.  [Fork ParaView][] into your user's namespace on GitLab.
 
 3.  Follow the [download instructions](download.md#clone) to create a
-    local clone of the main ParaView repository.  Optionally configure
-    Git to [use SSH instead of HTTPS](download.md#use-ssh-instead-of-https).
-    Then clone:
+    local clone of the main ParaView repository.
 
         $ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git ParaView
-        $ cd ParaView
+
     The main repository will be configured as your `origin` remote.
 
 4.  Run the [developer setup script][] to prepare your ParaView work tree and
     create Git command aliases used below:
 
         $ ./Utilities/SetupForDevelopment.sh
-    This will prompt for your GitLab user name and configure a remote
-    called `gitlab` to refer to it.
 
-5.  (Optional but highly recommended.)
-    [Register][cdash-registration] with the ParaView project
-    on Kitware's CDash instance to better know how your code performs in
-    regression tests.  After registering and signing in, click on
-    "All Dashboards" link in the upper left corner, scroll down and click
-    "Subscribe to this project" on the right of ParaView.
+    This will prompt for your GitLab username and configure a remote
+    called `gitlab` to refer to your fork. It will also setup a data directory for you.
+    No need to do anything else.
 
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
 [Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/-/forks/new
 [developer setup script]: /Utilities/SetupForDevelopment.sh
-[cdash-registration]: https://open.cdash.org/register
+
+Quick Start Guide
+-----------------
+
+This is a quick start guide so that you can start contributing to ParaView easily.
+To understand the process more deeply, you can jump to the [workflow](#workflow)
+section.
+
+### Developement
+
+Create a local branch for your changes:
+
+```
+git checkout -b your_branch
+```
+
+Make the needed changes in ParaView and use git locally to create logically separated commits.
+There is no strict requirements regarding git commit messages syntax but a good rule of
+thumb to follow is: `Location of Change: reason for change`:
+
+```
+git commit -m "Location of change: Short yet informative reason for the change"
+```
+
+Build ParaView following the [guide](Documentation/dev/build.md#) and fix any build warnings or issues that arise and seems related to your changes.
+
+### Bringing in VTK changes
+
+If you are working on a change that is accross both VTK and ParaView, you can work directly on the VTK that is
+inside your repository of ParaView. Just follow the steps in the [VTK develop guide](https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/dev/git/develop.md#initial-setup)
+starting at the usage of `SetupForDevelopment.sh` script.
+
+You can then develop in the VTK directory as if it was any VTK repository, where you can make changes, commit and push to your VTK fork.
+
+If you want to test the integration of your VTK changes in ParaView [continuous integration](continuous-integration), just commit
+the VTK submodule with your changes in a separate commit in your ParaView branch, it will be found without issue.
+
+Once your VTK changes are merged into VTK master, you can cleanup your history and commit the submodule update cleanly like this
+(this will remove local non commited changes and also rebase your branch on the last master):
+
+```
+git fetch origin
+git rebase -i origin/master # delete any VTK submodule update commit
+git submodule update
+git bump VTK master
+```
+
+### Testing
+
+Every changes and new features needs to be tested. In ParaView, there are mainly two types of tests.
+Python tests and XML tests. While both types of tests are as valid to add, XML tests should be preferred for standard
+feature test when possible as they can be considered more generic.
+
+#### XML Tests
+
+To add a XML test, use the Tools -> Record Test menu in ParaView. Interact with ParaView in a way that test your feature
+then record the XML test file.
+You may need to edit this file slightly to make it work as expected, do not hesitate to look at other files.
+Add the file to `Client/ParaView/Testing/XML` folder and list it in `Client/ParaView/Testing/XML/CMakeLists.txt`.
+There are different categories of tests, but the safest bet is probably the `DATA_WITH_BASELINES` category.
+
+You can then configure ParaView and run your test from the build directory and check that they pass:
+
+```
+cmake . && cmake --build .
+ctest -VV -R yourTest
+```
+
+#### Python Tests
+
+To add a Python test, write a pvpython script testing the feature, add it in `Client/ParaView/Testing/Python` folder
+and list it in `Client/ParaView/Testing/Python/CMakeLists.txt`. There are different categories of tests,
+but the safest bet is probably the `paraview_add_test_python` category.
+
+```
+cmake . && cmake --build .
+ctest -VV -R yourTest
+```
+
+### Upload
+
+Push your changes to the gitlab fork that you created in the [initial setup](#initial-setup) stage:
+
+```
+git push gitlab
+```
+
+### Data
+
+If your test uses new data or baselines, you will need to add it to your fork.
+For data, add the file names to the list in the corresponding `Clients/ParaView/Testing/*/CMakeLists.txt` and drop the files in `Testing/Data/`.
+For baselines, just drop the file in `Clients/ParaView/Testing/Data/Baseline/` and run the following commands from your build directory:
+
+```
+cmake . && cmake --build .
+```
+
+This will transform your files into .sha512 files. Check your test is passing by running from your build directory:
+
+```
+ctest -VV -R yourTest
+```
+
+If it passes, add these .sha512 files and commit them, then push with:
+
+```
+git gitlab-push
+```
+
+### Create a Merge Request
+
+Once you are happy with the state of your development on your fork, the next step is to create a merge request back into the main ParaView repository.
+
+Open [](https://gitlab.kitware.com/username/paraview/-/merge_requests/new) in a browser, select your branch in the list and create a Merge Request against master.
+
+In the description, write an informative explanation of your added features or bugfix. If there is an associated issue, link it with the `#number` in the description.
+
+Tag some ParaView maintainers in the description to ensure someone will see it, eg: @cory.quammen, @ben.boeckel or @mwestphal.
+
+### Robot Checks
+
+Once the MR is created, our gitlab robot will check multiple things and make automated suggestions. Please read them and try to follow the instructions.
+The two standard suggestions are related to formatting errors and adding markdown changelog.
+
+To fix the formatting, just add a comment containing:
+
+```
+Do: reformat
+```
+
+Then, once the robot has fixed the formatting, fetch the changes locally (this will remove any local changes to your branch)
+
+```
+git fetch gitlab
+git reset --hard gitlab/your_branch
+```
+
+To fix the changelog warning, create, add, commit and push a markdown (.md) file in `Documentation/release/dev` folder.
+In this file, write a small markdown paragraph describing the development.
+See other .md files in this folder for examples. It may look like this:
+
+```
+## Development title
+
+A new feature that does this and that has been introduced.
+This specific issue has been fixed in this particular way.
+```
+
+Suggestions and best practices on writing the changelog can be found in the `Documentation/release/dev/0-sample-topic.md` file.
+This is an optional step but recommended to do for any new feature and user facing issues.
+
+### Reviews
+
+ParaView maintainers and developers will review your MR by leaving comments on it. Try to follow their instructions and be patient.
+It can take a while to get a MR into mergeable form. This is a mandatory step, and it is absolutely normal to get change requests.
+
+Review comments can be resolved, please resolve a comment once you've taken it into account and pushed related changes
+or once you've reached an agreement with the commenter that nothing should be changed.
+
+Once a reviewer is happy with your changes, they will add a `+X` comment. You need at least one `+2` or higher to consider
+merging the MR. Two `+1`s do not equal a `+2`. If a reviewer leave a `-1` comment, please discuss with them to understand what is the issue and how it could be fixed.
+
+Once you have pushed new changes, please tag reviewers again so that they can take a look.
+If you do not tag reviewers, they may not know to revisit your changes. _Do not hesitate to tag them and ask for help_.
+
+### Continuous Integration
+
+Before merging a MR, the ParaView continuous integration (CI) needs to run and be green.
+For CI to be functional, please read and follow this [guide](https://discourse.vtk.org/t/the-ultimate-how-to-make-ci-work-with-my-fork-guide/7581).
+It was written for VTK but is as valid for ParaView.
+
+To run the CI:
+ - Click on the Pipelines Tab
+ - Click on the last pipeline status badge
+ - Press the `Play all manual` arrows on top of the Build and Test stages
+
+Do not hesitate to tag a ParaView developer for help if needed.
+
+You then need to wait for CI to run, it can take a while, up to a full day.
+
+A successful CI should be fully green. If that is so, then your MR is ready !
+
+If not, you need to analyse the issues and fix them. Recover the failure information this way:
+
+Click on the pipelines tab, then on the last status badge, then on the `cdash-commit` job.
+It will take you to the related CDash report where you will find all information.
+
+Everything in the CDash report should be green except the `NotRun` and `Time` column. Take a look into each issue and fix them locally.
+If there are issues in the pipeline but nothing is visible in the CDash, please ask a maintainer for help to figure out if anything should be done.
+You can always try to rerun the failed job by clicking on the arrow of the job in the pipeline.
+
+Once you have fixed some issues locally, commit and push them to gitlab, run the CI again and tag reviewers again for follow-up reviews.
+
+### Merging
+
+Once the MR has green CI and you have at least one `+2`, you can ask for a merge. Before that please make sure that:
+ - Your commit history is logical (or squashed into a single commit) and cleaned up with good commit messages
+ - You are rebased on a fairly recent version of master
+
+If that is not the case, please rebase on master using the following commands:
+
+```
+git fetch origin
+git rebase -i origin/master
+git push gitlab -f
+```
+
+The interactive rebase will let you squash commits, reorganize commits and edit commit messages.
+
+After the force push, make sure to run CI again.
+
+Once all is done, tag a ParaView developer so that they can perform the merge command.
+
+__Congratulations ! You just contributed to ParaView !__
 
 Workflow
 --------
