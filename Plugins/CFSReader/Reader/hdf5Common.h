@@ -215,6 +215,27 @@ hid_t OpenDataSet(hid_t loc, const std::string& name);
 H5G_info_t GetInfo(hid_t group_id);
 
 /**
+ * Parses the labels of a group content using H5Giterate()
+ *
+ * @return a vector of all labels within the specified group
+ */
+std::vector<std::string> ParseGroup(hid_t loc_id, const std::string& name);
+
+/**
+ * This is a helper function of ParseGroup()
+ *
+ * This is the callback function for H5Giterate from ParseGroup()
+ */
+herr_t FileInfo(hid_t loc_id, const char* name, void* opdata);
+
+/**
+ * This is a service function based on ParseGroup()
+ *
+ * @param child test if this label is in the group
+ */
+bool TestGroupChild(hid_t loc_id, const std::string& group, const std::string& child);
+
+/**
  * Wrapper for H5 c-api H5LTget_dataset_ndims
  *
  * @throws std::runtime_error

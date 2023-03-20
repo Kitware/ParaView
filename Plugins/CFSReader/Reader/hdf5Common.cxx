@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------*/
 
 #include "hdf5Common.h"
+#include <algorithm>
 #include <cassert>
 
 namespace H5CFS
@@ -103,6 +104,36 @@ H5G_info_t GetInfo(hid_t group_id)
   }
 
   return info;
+}
+
+//-----------------------------------------------------------------------------
+// FileInfo() is a callback function for H5Giterate().
+// By comment we prevent warnings for unused loc_id
+herr_t FileInfo(hid_t /* loc_id */, const char* name, void* opdata)
+{
+  std::vector<std::string>* names = reinterpret_cast<std::vector<std::string>*>(opdata);
+  assert(names != nullptr);
+  names->push_back(std::string(name));
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+std::vector<std::string> ParseGroup(hid_t loc_id, const std::string& name)
+{
+  std::vector<std::string> result;
+
+  H5Giterate(loc_id, name.c_str(), nullptr, H5CFS::FileInfo, &result);
+
+  return result;
+}
+
+//-----------------------------------------------------------------------------
+bool TestGroupChild(hid_t loc_id, const std::string& group, const std::string& child)
+{
+  std::vector<std::string> list = ParseGroup(loc_id, group);
+
+  return std::find(list.begin(), list.end(), child) != list.end();
 }
 
 //-----------------------------------------------------------------------------

@@ -181,6 +181,11 @@ private:
   void ReadMeshStatusInformations();
 
   /**
+   * File property obtained by H5Pcreate() before opening MainFile via H5Fopen()
+   */
+  hid_t FileProperties = -1;
+
+  /**
    * Main hdf5 file, HDF-C-API object type
    */
   hid_t MainFile = -1;

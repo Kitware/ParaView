@@ -34,27 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Copyright (c) 2022 Verein zur Foerderung der Software openCFS
 -------------------------------------------------------------------------*/
 
+#include <vtkBiQuadraticQuad.h>
 #include <vtkCFSReader.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
 #include <vtkErrorCode.h>
+#include <vtkHexahedron.h>
 #include <vtkInformation.h>
 #include <vtkInformationStringKey.h>
 #include <vtkInformationVector.h>
 #include <vtkIntArray.h>
+#include <vtkLine.h>
 #include <vtkMath.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
-#include <vtkUnsignedIntArray.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtksys/SystemTools.hxx>
-
-#include <vtkStreamingDemandDrivenPipeline.h>
-
-#include <vtkBiQuadraticQuad.h>
-#include <vtkHexahedron.h>
-#include <vtkLine.h>
 #include <vtkPyramid.h>
 #include <vtkQuad.h>
 #include <vtkQuadraticEdge.h>
@@ -64,11 +58,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkQuadraticTetra.h>
 #include <vtkQuadraticTriangle.h>
 #include <vtkQuadraticWedge.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkTetra.h>
 #include <vtkTriQuadraticHexahedron.h>
 #include <vtkTriangle.h>
+#include <vtkUnsignedIntArray.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkVertex.h>
 #include <vtkWedge.h>
+#include <vtksys/SystemTools.hxx>
 
 #include <list>
 #include <sstream>
