@@ -24,3 +24,7 @@ paraview_add_plugin(BivariateRepresentations
   MODULES BivariateRepresentations::vtkBivariateRepresentations
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
   XML_DOCUMENTATION OFF)
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

@@ -39,20 +39,20 @@
       <DoubleVectorProperty name="Amplitude"
                             command="SetAmplitude"
                             number_of_elements="1"
-                            default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.0" max="2.0"/>
+                            default_values="0.5">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
         <Documentation>
-          This property specifies a factor modifying the amplitude of the noise.
+          This property specifies a value for the amplitude of the noise.
         </Documentation>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="Speed"
+      <DoubleVectorProperty name="AnimationSpeedFactor"
                             command="SetSpeed"
                             number_of_elements="1"
                             default_values="1.0">
         <DoubleRangeDomain name="range" min="0.0" max="3.0"/>
         <Documentation>
-          This property specifies a factor modifying the speed of the noise animation.
+          This property specifies a factor modifying the speed animation of the noise animation.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -95,7 +95,7 @@
             <Property name="NoiseArray"/>
             <Property name="Granularity"/>
             <Property name="Amplitude"/>
-            <Property name="Speed"/>
+            <Property name="AnimationSpeedFactor"/>
             <Property name="NbOfOctaves"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
@@ -136,7 +136,7 @@
             <Property name="NoiseArray"/>
             <Property name="Granularity"/>
             <Property name="Amplitude"/>
-            <Property name="Speed"/>
+            <Property name="AnimationSpeedFactor"/>
             <Property name="NbOfOctaves"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
@@ -177,7 +177,7 @@
             <Property name="NoiseArray"/>
             <Property name="Granularity"/>
             <Property name="Amplitude"/>
-            <Property name="Speed"/>
+            <Property name="AnimationSpeedFactor"/>
             <Property name="NbOfOctaves"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"

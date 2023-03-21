@@ -31,7 +31,7 @@
 struct vtkBivariateNoiseMapper::vtkInternals
 {
   double Frequency = 30.0;
-  double Amplitude = 1.0;
+  double Amplitude = 0.5;
   double Speed = 1.0;
   int NbOfOctaves = 3;
   long StartTime = 0;
@@ -196,16 +196,16 @@ float noise(in vec4 inVec)
 float fNoise (in vec4 inVec, in int nbOfOctaves)
 {
   float result = 0.;
-  float frequency = 1.;
-  float amplitude = 1.;
+  float freqMultiplier = 1.;
+  float ampMultiplier = 1.;
 
   // Loop over each octave. At each step,
   // double the frequency and divide by 2 the amplitude.
   for (int i = 0; i < nbOfOctaves; i++)
   {
-    result += amplitude * noise(inVec * frequency);
-    frequency *= 2.;
-    amplitude *= 0.5;
+    result += ampMultiplier * noise(inVec * freqMultiplier);
+    freqMultiplier *= 2.;
+    ampMultiplier *= 0.5;
   }
   return result;
 }
@@ -224,9 +224,8 @@ in float vertexBivariateDataVSOut;
   vec4 inVec = vec4(vertexMCVSOutput.xyz * frequency, currentTime * speed);
 
   // Compute and apply the noise value to modify the color texture coordinates.
-  // Amplitude multiplier is multiplied by 0.5 for better results with the default value (1.)
   float noise = fNoise(inVec, nbOfOctaves);
-  vec2 _texCoord = tcoordVCVSOutput.st + vec2(noise, 0.) * amplitude  * 0.5 * vertexBivariateDataVSOut;
+  vec2 _texCoord = tcoordVCVSOutput.st + vec2(noise, 0.) * amplitude * vertexBivariateDataVSOut;
   )";
 
     vtkShaderProgram::Substitute(
