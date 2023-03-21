@@ -849,7 +849,11 @@ function (paraview_client_generate_help)
   endif ()
 
   include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
-  find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} QUIET REQUIRED COMPONENTS Help Tools)
+  if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+    find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} QUIET REQUIRED COMPONENTS Help Tools)
+  else ()
+    find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} QUIET REQUIRED COMPONENTS Help)
+  endif ()
 
   set(_paraview_client_help_copy_sources)
   set(_paraview_client_help_copied_sources)
