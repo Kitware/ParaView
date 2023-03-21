@@ -32,8 +32,10 @@
  *
  * @section DefaultValue Selecting the default value
  *
- * vtkSMFieldDataDomain picks the default value to be the first attribute type that has non empty
- * arrays
+ * vtkSMFieldDataDomain tries to respect the provided default_values.
+ * eg `default_values=1` correspond to `vtkDataObject::CELL`
+ * If it is non-positive or not available,
+ * it will pick the default value to be the first attribute type that has non empty arrays
  * and non-zero tuples. If all attributes have no tuples, then the first attribute with non empty
  * arrays is selected. If all attributes have no arrays, then vtkSMEnumerationDomain
  * picks the default. For this to work, the domain must be provided an `Input` property as a
@@ -110,7 +112,13 @@ private:
   vtkSMFieldDataDomain(const vtkSMFieldDataDomain&) = delete;
   void operator=(const vtkSMFieldDataDomain&) = delete;
 
-  int ComputeDefaultValue(int currentValue);
+  /**
+   * Find a FieldAssociations enum value that contains data
+   * If an originalDefaultValue >= 0 is provided, it will only consider this one
+   * if not, it will look for any value containing data, starting from the first one
+   * Return the found value if any, -1 otherwise.
+   */
+  int ComputeDefaultValue(int originalDefaultValue);
 };
 
 #endif
