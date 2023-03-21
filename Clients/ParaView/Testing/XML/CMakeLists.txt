@@ -254,6 +254,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsF.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsG.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsH.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartDefaultSettings_A.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartDefaultSettings_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartLoadNoVariablesA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartLoadNoVariablesA_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartLoadNoVariablesA_2.png}"
@@ -810,6 +812,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   CalculatorQuotedVariable.xml
   CameraLink.xml
   CGNSReaderDataLocation.xml
+  ChartDefaultSettings.xml
   ChartLoadNoVariables.xml
   ClampAndUpdateColorMap.xml
   ColorOpacityTableEditorHistogram.xml
