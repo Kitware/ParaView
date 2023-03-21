@@ -102,6 +102,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const char* pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME = "PQ_COMPAREVIEW_PROPERTY_NAME";
 
+static constexpr const char* DASHBOARD_MODE_ENV_VAR = "DASHBOARD_TEST_FROM_CTEST";
+
 template <typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 {
@@ -134,7 +136,6 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
 #endif
 
   this->eventTranslator()->addWidgetEventTranslator(new pqQVTKWidgetEventTranslator(this));
-  this->eventTranslator()->addWidgetEventTranslator(new pqFileDialogEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqFlatTreeViewEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqColorButtonEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqColorDialogEventTranslator(this));
@@ -143,12 +144,39 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
   this->eventPlayer()->addWidgetEventPlayer(new pqFileUtilitiesEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqLineEditEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqQVTKWidgetEventPlayer(this));
-  this->eventPlayer()->addWidgetEventPlayer(new pqFileDialogEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqFlatTreeViewEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqColorButtonEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqColorDialogEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqCollaborationEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqConsoleWidgetEventPlayer(this));
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreTestUtility::updatePlayers()
+{
+  if (vtksys::SystemTools::HasEnv(DASHBOARD_MODE_ENV_VAR))
+  {
+    // Safe to add multiple times
+    this->eventPlayer()->addWidgetEventPlayer(new pqFileDialogEventPlayer(this));
+  }
+  else
+  {
+    this->eventPlayer()->removeWidgetEventPlayer("pqFileDialogEventPlayer");
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreTestUtility::updateTranslators()
+{
+  if (vtksys::SystemTools::HasEnv(DASHBOARD_MODE_ENV_VAR))
+  {
+    // Safe to add multiple times
+    this->eventTranslator()->addWidgetEventTranslator(new pqFileDialogEventTranslator(this));
+  }
+  else
+  {
+    this->eventTranslator()->removeWidgetEventTranslator("pqFileDialogEventTranslator");
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -471,4 +499,19 @@ bool pqCoreTestUtility::CompareTile(pqView* view, int rank, int tdx, int tdy,
     QString("%1/tile-%2.png").arg(tempDirectory).arg(QFileInfo(baseline).baseName());
   layout->SaveAsPNG(rank, imagepath.toUtf8().data());
   return pqCoreTestUtility::CompareImage(imagepath, baseline, threshold, output, tempDirectory);
+}
+
+// ----------------------------------------------------------------------------
+void pqCoreTestUtility::setDashboardMode(bool value)
+{
+  if (value)
+  {
+    qputenv(DASHBOARD_MODE_ENV_VAR, "1");
+  }
+  else
+  {
+    qunsetenv(DASHBOARD_MODE_ENV_VAR);
+  }
+  this->updatePlayers();
+  this->updateTranslators();
 }
