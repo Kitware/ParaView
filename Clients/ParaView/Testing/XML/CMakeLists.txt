@@ -1752,6 +1752,7 @@ set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (ComputeArrayMagnitudeSetting_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
