@@ -161,7 +161,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
   proxy = pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
   if (!proxy)
   {
-    vtkErrorMacro("Failed to create PVLookupTable proxy.");
+    vtkErrorMacro("Failed to create PiecewiseFunction proxy.");
     return nullptr;
   }
 

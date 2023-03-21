@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "vtkAxis.h"
 #include "vtkBoundingBox.h"
+#include "vtkBrush.h"
 #include "vtkChartXY.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkColorTransferFunctionItem.h"
@@ -47,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkContextView.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkGenericOpenGLRenderWindow.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVColorTransferControlPointsItem.h"
@@ -197,6 +199,7 @@ public:
   vtkNew<vtkTransferFunctionChartXY> ChartXY;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
+  vtkNew<vtkBrush> CheckerBrush;
 
   pqTimer Timer;
   pqTimer RangeTimer;
@@ -259,6 +262,58 @@ public:
   }
   ~pqInternals() { this->cleanup(); }
 
+  void initializeCheckerBoardBrush()
+  {
+    vtkNew<vtkImageData> texture;
+    const int numPtsX = 32;
+    const int numPtsY = 32;
+    const int ncomp = 3;
+    texture->SetDimensions(numPtsX, numPtsY, 1);
+    texture->AllocateScalars(VTK_UNSIGNED_CHAR, ncomp);
+    // assumes origin at lower left corner in a 32x32 square.
+    // create a checkerboard with 4 sub-squares. texture property repeat
+    // ensures this pattern is repeated.
+    for (int i = 0; i < numPtsY; ++i)
+    {
+      for (int j = 0; j < numPtsX; ++j)
+      {
+        double val = 0;
+        // lower left
+        if (i < numPtsY / 2 && j < numPtsX / 2)
+        {
+          val = 225; // grey
+        }
+        // upper right
+        else if (i >= numPtsY / 2 && j >= numPtsX / 2)
+        {
+          val = 225; // grey
+        }
+        // lower right
+        else if (j >= numPtsX / 2)
+        {
+          val = 255; // white
+        }
+        // upper left
+        else if (i >= numPtsY / 2)
+        {
+          val = 255; // white
+        }
+        for (int comp = 0; comp < ncomp; ++comp)
+        {
+          texture->SetScalarComponentFromDouble(i, j, 0, comp, val);
+        }
+      }
+    }
+    this->CheckerBrush->SetTexture(texture);
+    this->CheckerBrush->SetTextureProperties(
+      vtkBrush::TextureProperty::Repeat | vtkBrush::TextureProperty::Nearest);
+  }
+
+  void setUseCheckerBoardBrush(bool use)
+  {
+    this->ChartXY->SetBackgroundBrush(use ? this->CheckerBrush.GetPointer() : nullptr);
+  }
+
   void cleanup()
   {
     this->RangeTimer.disconnect();
@@ -289,6 +344,8 @@ pqTransferFunctionWidget::pqTransferFunctionWidget(QWidget* parentObject)
     }
   });
 
+  this->Internals->initializeCheckerBoardBrush();
+  this->Internals->setUseCheckerBoardBrush(true);
   this->connect(&this->Internals->EditColorPointTimer, SIGNAL(timeout()),
     SLOT(editColorAtCurrentControlPoint()));
 }

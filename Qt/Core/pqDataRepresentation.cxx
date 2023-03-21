@@ -101,6 +101,20 @@ pqDataRepresentation::pqDataRepresentation(
   {
     vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(attrArrayNameModified()));
   }
+  if (vtkSMProperty* prop = repr->GetProperty("Representation"))
+  {
+    vtkconnector->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(representationTypeModified()));
+  }
+  if (vtkSMProperty* prop = repr->GetProperty("UseSeparateOpacityArray"))
+  {
+    vtkconnector->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(useSeparateOpacityArrayModified()));
+  }
+  if (vtkSMProperty* prop = repr->GetProperty("UseTransfer2D"))
+  {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(useTransfer2DModified()));
+  }
 }
 
 //-----------------------------------------------------------------------------

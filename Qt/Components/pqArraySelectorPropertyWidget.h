@@ -33,7 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqArraySelectorPropertyWidget_h
 
 #include "pqPropertyWidget.h"
+#include <QPair>          // need for ctor arg
 #include <QScopedPointer> // needed for ivar
+
+#include <initializer_list> // need for ctor arg
 
 /**
  * @class pqArraySelectorPropertyWidget
@@ -56,6 +59,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * `pqStringVectorPropertyWidget::createWidget` instantiates this for
  * any string vector property with a vtkSMArrayListDomain that is not
  * repeatable.
+ *
+ * Pre-defined entries can be provided with the KnownArrays argument when constructing
+ * the widget.
  */
 class PQCOMPONENTS_EXPORT pqArraySelectorPropertyWidget : public pqPropertyWidget
 {
@@ -68,6 +74,8 @@ class PQCOMPONENTS_EXPORT pqArraySelectorPropertyWidget : public pqPropertyWidge
 public:
   pqArraySelectorPropertyWidget(
     vtkSMProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent = nullptr);
+  pqArraySelectorPropertyWidget(vtkSMProperty* smproperty, vtkSMProxy* smproxy,
+    std::initializer_list<QPair<int, QString>> knownArrays, QWidget* parent = nullptr);
   ~pqArraySelectorPropertyWidget() override;
 
   /**

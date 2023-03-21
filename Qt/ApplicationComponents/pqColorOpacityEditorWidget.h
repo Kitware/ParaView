@@ -93,7 +93,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
       setScalarOpacityFunctionProxy)
   Q_PROPERTY(
     pqSMProxy transferFunction2DProxy READ transferFunction2DProxy WRITE setTransferFunction2DProxy)
-  Q_PROPERTY(bool use2DTransferFunction READ use2DTransferFunction WRITE setUse2DTransferFunction)
   Q_PROPERTY(QList<QVariant> transfer2DBoxes READ transfer2DBoxes WRITE setTransfer2DBoxes)
 
   typedef pqPropertyWidget Superclass;
@@ -102,6 +101,11 @@ public:
   pqColorOpacityEditorWidget(
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqColorOpacityEditorWidget() override;
+
+  /**
+   * updates the panel to show/hide advanced settings
+   */
+  void updateWidget(bool showing_advanced_properties) override;
 
   /**
    * Returns the current list of control points for the color transfer
@@ -157,9 +161,9 @@ public:
   pqSMProxy transferFunction2DProxy() const;
 
   /**
-   * Returns the value for use2DTransferFunction
+   * Returns the value for Using2DTransferFunction internal server-manager property.
    */
-  bool use2DTransferFunction() const;
+  bool using2DTransferFunction() const;
 
   /**
    * Returns the current list of boxes for the 2D transfer
@@ -255,6 +259,12 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void saveAsPreset();
 
+  /**
+   * Compute the data histogram 1D or 2D. Depends on the "Using2DTransferFunction" internal
+   * property.
+   */
+  void computeDataHistogram();
+
   void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
 
   /**
@@ -262,11 +272,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * to -1 which sets its text to an empty string
    */
   void resetColorMapComboBox();
-
-  /**
-   * Set whether to use a 2D transfer function.
-   */
-  void setUse2DTransferFunction(bool value);
 
   /**
    * Sets the box items that control the 2D transfer function.
@@ -332,11 +337,6 @@ Q_SIGNALS:
   void transferFunction2DProxyChanged();
 
   /**
-   * Signal fired when use2DTransferFunction changes.
-   */
-  void use2DTransferFunctionChanged();
-
-  /**
    * Signal fired when the transfer function 2d boxes change.
    */
   void transfer2DBoxesChanged();
@@ -348,11 +348,6 @@ protected Q_SLOTS:
    */
   void opacityCurrentChanged(vtkIdType);
   void colorCurrentChanged(vtkIdType);
-
-  /**
-   * updates the panel to show/hide advanced settings
-   */
-  void updatePanel();
 
   /**
    * updates the text shown in the "current data" input.
@@ -373,12 +368,6 @@ protected Q_SLOTS:
    * Updates the default presets combo box when the list changes
    */
   void updateDefaultPresetsList();
-
-  /**
-   * Ensures that the color-swatches for indexedColors are shown only when this
-   * is set to true.
-   */
-  void updateIndexedLookupState();
 
   /**
    * called when "MultiComponentsMappingChanged" checkbox is modified.
@@ -472,6 +461,12 @@ protected Q_SLOTS:
   void transfer2DChanged();
 
   /**
+   * Slot to update active representation when the piecewise function for opacity is modified.
+   * For ex, editing the midpoint, sharpness around a piecewise control point modifies the function.
+   */
+  void opacityFunctionModified();
+
+  /**
    * Slot to update the 2D transfer function proxy when the Y axis scalar array is changed.
    */
   void updateTransferFunction2DProxy();
@@ -491,6 +486,11 @@ protected: // NOLINT(readability-redundant-access-specifiers)
    * Initialize the 2D transfer function editor
    */
   void initializeTransfer2DEditor(vtkPVTransferFunction2D* tf2d);
+
+  /**
+   * When representation has changed, gotta reconnect some internal observers.
+   */
+  void observeRepresentationModified(vtkSMProxy* reprProxy, vtkPiecewiseFunction* pwf);
 
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)

@@ -159,6 +159,31 @@ public:
     vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
     return self ? self->SetRepresentationType(type) : false;
   }
+  const char* GetRepresentationType();
+  static const char* GetRepresentationType(vtkSMProxy* repr)
+  {
+    vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
+    return self ? self->GetRepresentationType() : nullptr;
+  }
+  ///@}
+
+  ///@{
+  /**
+   * Convenient method to check if this representation is currently rendering volumes, using 2D
+   * Transfer function.
+   */
+  static bool IsVolumeRendering(vtkSMProxy* repr)
+  {
+    vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
+    return self ? self->IsVolumeRendering() : false;
+  }
+  bool IsVolumeRendering();
+  static bool GetUsing2DTransferFunction(vtkSMProxy* repr)
+  {
+    vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
+    return self ? self->GetUsing2DTransferFunction() : false;
+  }
+  bool GetUsing2DTransferFunction();
   ///@}
 
   void MarkDirty(vtkSMProxy* modifiedProxy) override;
