@@ -1186,6 +1186,7 @@ list(APPEND TESTS_WITH_BASELINES
   # MultiBlockAttributes1.xml
   MultiBlockInspector.xml
   MultiBlockInspectorAssembly.xml
+  MultiBlockInspectorAssemblyExtractBlocks.xml
   MultiBlockInspectorExtractBlocks.xml
   MultiBlockSingleBlock.xml
   MultiBlockVolumeRendering.xml
