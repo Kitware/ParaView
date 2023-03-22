@@ -270,12 +270,10 @@ public:
    * Get/Set the name of the assembly to use for mapping block visibilities,
    * colors and opacities.
    *
-   * TODO: this is simply a placeholder for the future. Since this
-   * representation doesn't really support PartitionedDataSetCollections and
-   * hence assembly, the only assembly supported is the
-   * `vtkDataAssemblyUtilities::HierarchyName`. All others are simply ignored.
+   * The default is Hierarchy.
    */
-  void SetActiveAssembly(const char*){};
+  vtkSetStringMacro(ActiveAssembly);
+  vtkGetStringMacro(ActiveAssembly);
   ///@}
 
   ///@{
@@ -433,7 +431,7 @@ protected:
    * the mapper's attributes with those cached in this representation; This is done
    * after the data has updated (multi-block nodes change after an update).
    */
-  void PopulateBlockAttributes(vtkCompositeDataDisplayAttributes* attrs, vtkDataObject* data) const;
+  void PopulateBlockAttributes(vtkCompositeDataDisplayAttributes* attrs, vtkDataObject* outputData);
 
   /**
    * Computes the bounds of the visible data based on the block visibilities in the
@@ -469,6 +467,7 @@ protected:
   vtkPVLODActor* Actor;
   vtkProperty* Property;
 
+  char* ActiveAssembly = nullptr;
   bool RepeatTextures;
   bool InterpolateTextures;
   bool UseMipmapTextures;
