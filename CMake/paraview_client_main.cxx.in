@@ -74,8 +74,7 @@ int main(int argc, char* argv[])
 #endif
 
   // When playing tests, disable all effects.
-  if (vtksys::SystemTools::HasEnv("DART_TEST_FROM_DART") ||
-      vtksys::SystemTools::HasEnv("DASHBOARD_TEST_FROM_CTEST"))
+  if (vtksys::SystemTools::HasEnv("DASHBOARD_TEST_FROM_CTEST"))
   {
     QApplication::setDesktopSettingsAware(false);
     QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
