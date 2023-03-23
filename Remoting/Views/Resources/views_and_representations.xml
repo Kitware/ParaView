@@ -7339,7 +7339,6 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssembly"
         number_of_elements="1"
-        default_values="Hierarchy"
         panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
@@ -10677,7 +10676,6 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssemblyForSelectors"
         number_of_elements="1"
-        default_values="Hierarchy"
         panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
@@ -14368,7 +14366,6 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssembly"
         number_of_elements="1"
-        default_values="Hierarchy"
         panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>

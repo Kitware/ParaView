@@ -84,8 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <Proxy ...>
  *   <StringVectorProperty name="Assembly"
  *                         command="SetAssemblyName"
- *                         number_of_elements="1"
- *                         default_values="Hierarchy">
+ *                         number_of_elements="1">
  *     <DataAssemblyListDomain name="data_assembly_list">
  *       <RequiredProperties>
  *         <Property function="Input" name="Input" />

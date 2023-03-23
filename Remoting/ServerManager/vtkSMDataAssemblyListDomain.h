@@ -25,8 +25,7 @@
  * <SourceProxy ...>
  *   <StringVectorProperty name="BlockAssembly"
  *      command="SetSelectorAssembly"
- *      number_of_elements="1"
- *      default_values="Hierarchy">
+ *      number_of_elements="1">
  *      <DataAssemblyListDomain name="data_assembly_list">
  *        <RequiredProperties>
  *          <Property function="Input" name="Input" />
@@ -51,6 +50,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void Update(vtkSMProperty* requestingProperty) override;
+
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMDataAssemblyListDomain();
