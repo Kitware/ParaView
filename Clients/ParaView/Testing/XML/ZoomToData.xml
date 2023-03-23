@@ -13,6 +13,8 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+    <!-- set assembly name to be hierarchy instead of assembly -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/assemblyCombo" command="activated" arguments="Hierarchy"/>
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0.0.0,0" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionZoomToData" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ZoomToData_A.png" threshold="5" width="300" height="300" />

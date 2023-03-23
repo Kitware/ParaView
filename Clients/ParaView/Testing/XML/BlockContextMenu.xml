@@ -3,6 +3,9 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.e.4/can.e.4" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/assemblyCombo" command="activated" arguments="Hierarchy"/>
+
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
@@ -50,6 +53,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/assemblyCombo" command="activated" arguments="Hierarchy"/>
 
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.526667,0.493333,2,2,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.526667,0.493333,2,0,0)" />
@@ -81,7 +85,6 @@
   <pqevent object="PipelineContextMenu" command="activate" arguments="Hide Block" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/BlockContextMenu-bake-ShowZeroBlock.png" width="300" height="300" />
 
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0,2" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.42,0.48,2,2,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.42,0.48,2,0,0)" />

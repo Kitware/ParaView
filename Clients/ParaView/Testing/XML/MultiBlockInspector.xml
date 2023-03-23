@@ -7,6 +7,9 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
 
+  <!-- set assembly name to be hierarchy instead of assembly -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/assemblyCombo" command="activated" arguments="Hierarchy"/>
+
   <!-- set color for "block_4" -->
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="doubleClick" arguments="0.0.2.1" />
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/1QColorDialog0" command="setChosenColor" arguments="0,255,0" />

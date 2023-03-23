@@ -14,6 +14,8 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.506667,0.546667,1,0,0)" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
+  <!-- set assembly name to be hierarchy instead of assembly -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/assemblyCombo" command="activated" arguments="Hierarchy"/>
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCurrent" arguments="0.0.1.0" />
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setSelection" arguments="0.0.0.0,0.0.0.0,0.0.1.0,0.0.1.2" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/BlockLinkedSelection-PDC.png" width="300" height="300" />
