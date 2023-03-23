@@ -61,6 +61,10 @@ function(determine_version source_dir git_command var_prefix)
     if (NOT "${tmp_VERSION}" STREQUAL "${${var_prefix}_VERSION}")
       message(WARNING
         "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). Either update the git tags or version.txt.")
+      if (NOT "$ENV{CI}" STREQUAL "")
+        message(WARNING
+          "Please update your fork tags, using this command: `git fetch origin --tags && git push gitlab --tags`.")
+      endif ()
     endif()
     foreach(suffix BRANCH VERSION VERSION_MAJOR VERSION_MINOR VERSION_PATCH
                    VERSION_PATCH_EXTRA VERSION_FULL VERSION_IS_RELEASE)
