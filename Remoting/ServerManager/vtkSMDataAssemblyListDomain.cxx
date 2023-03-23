@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMDataAssemblyListDomain.h"
 
+#include "vtkDataAssembly.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 
@@ -40,9 +41,13 @@ void vtkSMDataAssemblyListDomain::Update(vtkSMProperty*)
   {
     strings.emplace_back("Hierarchy");
   }
-  if (dinfo->GetDataAssembly())
+  if (auto dataAssembly = dinfo->GetDataAssembly())
   {
-    strings.emplace_back("Assembly");
+    const auto hasChildren = dataAssembly->GetNumberOfChildren(dataAssembly->GetRootNode()) > 0;
+    if (hasChildren)
+    {
+      strings.emplace_back("Assembly");
+    }
   }
   this->SetStrings(strings);
 }
