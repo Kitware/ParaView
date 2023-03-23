@@ -121,7 +121,7 @@ public:
 
     delete parentWdg->layout();
     QVBoxLayout* layout = new QVBoxLayout(parentWdg);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     this->Panel->setObjectName("ProxyPanel");
     this->Panel->setParent(parentWdg);

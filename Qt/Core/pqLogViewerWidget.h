@@ -36,7 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QModelIndex>    // for QModelIndex
 #include <QScopedPointer> // for QScopedPointer
-#include <QWidget>        // for QWidget
+#include <QString>
+#include <QStringRef>
+#include <QVector>
+#include <QWidget> // for QWidget
 
 /**
  * @class pqLogViewerWidget
@@ -80,7 +83,7 @@ public:
    * @param is_raw Return parameter stating whether the log is in the log format or just raw text.
    * @return A QVector containing different parts of the log.
    */
-  static QVector<QString> extractLogParts(const QStringRef& txt, bool& is_raw);
+  static QVector<QString> extractLogParts(const QString& txt, bool& is_raw);
 
   /**
    * Update log table column visibilities.

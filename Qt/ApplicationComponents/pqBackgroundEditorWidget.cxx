@@ -83,12 +83,18 @@ public:
     : PreviousType(SINGLE_COLOR_TYPE)
   {
     this->setupUi(self);
-    this->mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->mainLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->mainLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    this->page1Layout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->page1Layout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->page1Layout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
     this->page1Layout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    this->page3Layout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->page3Layout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->page3Layout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   }
 };

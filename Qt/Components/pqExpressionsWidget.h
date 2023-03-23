@@ -60,6 +60,7 @@ public:
    * Set buttons up for "groupName" expressions group.
    */
   void setupButtons(const QString& groupName);
+  void clear();
 
 private:
   Q_DISABLE_COPY(pqExpressionsWidget)

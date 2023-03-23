@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 #include <QMap>
+#include <QObject>
 #include <QPointer>
 
 #include "vtkType.h"

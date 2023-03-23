@@ -133,7 +133,7 @@ void pqProxiesWidget::updateLayout()
   internals.clearExpanders();
   delete this->layout();
   QVBoxLayout* vbox = new QVBoxLayout(this);
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
   vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
   // Don't add expander buttons if there's only 1 component and that components

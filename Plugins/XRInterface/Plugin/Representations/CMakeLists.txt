@@ -6,7 +6,7 @@ set(sources)
 set(xrInterfaceXMLs XRInterfaceRepresentations.xml)
 
 if (TARGET VTK::RenderingFFMPEGOpenGL2)
-  find_package(Qt5 REQUIRED QUIET COMPONENTS Multimedia)
+  find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS Multimedia)
   set(CMAKE_AUTOMOC 1)
   set(CMAKE_AUTOUIC 1)
 
@@ -15,7 +15,7 @@ if (TARGET VTK::RenderingFFMPEGOpenGL2)
 endif()
 
 if (PARAVIEW_USE_QTWEBENGINE)
-  find_package(Qt5 REQUIRED QUIET COMPONENTS WebEngineWidgets Multimedia)
+  find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS WebEngineWidgets Multimedia)
   set(CMAKE_AUTOMOC 1)
   set(CMAKE_AUTOUIC 1)
 

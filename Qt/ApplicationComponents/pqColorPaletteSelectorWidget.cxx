@@ -56,7 +56,7 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
 
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setSpacing(0);
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
 
   vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();
   vtkSMProxyDefinitionManager* pdmgr = pxm->GetProxyDefinitionManager();
@@ -94,7 +94,7 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
       mainPalettes.cend())
     {
       cbbox->addItem(QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()),
-        prototype->GetXMLName());
+        QString(prototype->GetXMLName()));
     }
   }
 

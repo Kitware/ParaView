@@ -185,7 +185,7 @@ Optional dependencies:
   * [Python][python]
     - At least 3.3 is required
   * [Qt5][qt]
-    - Version 5.12 or newer. Qt6 is not supported.
+    - Version 5.12 or newer. Qt6 support is experimental and not tested yet.
 
 ##### Installing CMake
 

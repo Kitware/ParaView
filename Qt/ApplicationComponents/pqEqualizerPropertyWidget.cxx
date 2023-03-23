@@ -67,7 +67,9 @@ pqEqualizerPropertyWidget::pqEqualizerPropertyWidget(
 
   // Setup GUI
   QGridLayout* layout = new QGridLayout(this);
-  layout->setMargin(pqPropertiesPanel::suggestedMargin());
+  layout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   layout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   layout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 

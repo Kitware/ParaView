@@ -117,7 +117,7 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   QVBoxLayout* _layout = new QVBoxLayout(this);
   if (_layout)
   {
-    _layout->setMargin(0);
+    _layout->setContentsMargins(0, 0, 0, 0);
     _layout->addWidget(this->View);
   }
 

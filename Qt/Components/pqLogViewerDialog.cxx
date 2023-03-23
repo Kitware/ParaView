@@ -308,7 +308,7 @@ void pqLogViewerDialog::recordRefTimes()
       this->LogRecorderProxies[i]->GatherInformation(refTimeInfo);
       auto startingLog = QString::fromStdString(refTimeInfo->GetStartingLogs());
       bool isRawLog;
-      auto parts = pqLogViewerWidget::extractLogParts(&startingLog, isRawLog);
+      auto parts = pqLogViewerWidget::extractLogParts(startingLog, isRawLog);
       this->RefTimes[LogLocation(this->LogRecorderProxies[i], j)] =
         parts[0].replace('s', '0').toDouble();
     }

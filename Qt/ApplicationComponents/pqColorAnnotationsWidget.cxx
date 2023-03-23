@@ -337,10 +337,14 @@ public:
   {
     this->SetCurrentPresetName("");
     this->Ui.setupUi(self);
-    this->Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
     this->Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-    this->Ui.verticalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.verticalLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
     this->Model = new pqAnnotationsModel(self);

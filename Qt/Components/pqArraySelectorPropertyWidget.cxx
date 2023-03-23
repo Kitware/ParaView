@@ -256,7 +256,7 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(vtkSMProperty* smpr
 
   auto l = new QVBoxLayout(this);
   l->setSpacing(0);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
 
   auto combobox = new QComboBox(this);
   combobox->setObjectName("ComboBox");

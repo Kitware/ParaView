@@ -1,4 +1,4 @@
-find_package(Qt5 QUIET REQUIRED COMPONENTS Network)
+find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} QUIET REQUIRED COMPONENTS Network)
 
 list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -8,7 +8,7 @@ mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
 option(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI "Build CAVEInteraction plugin with VRUI support" OFF)
 mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI)
 
-find_package(Qt5 REQUIRED COMPONENTS Network)
+find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Network)
 
 # TODO: Should something be done with the files in samples/?
 
@@ -123,7 +123,7 @@ target_link_libraries(CAVEInteraction
     VTK::CommonMath
     VTK::CommonTransforms
     VTK::RenderingCore
-    Qt5::Network)
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Network)
 target_compile_definitions(CAVEInteraction PRIVATE QT_NO_KEYWORDS)
 
 if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)

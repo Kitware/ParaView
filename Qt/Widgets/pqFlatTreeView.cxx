@@ -2649,7 +2649,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
 QStyleOptionViewItem pqFlatTreeView::getViewOptions() const
 {
   QStyleOptionViewItem option;
-  option.init(this);
+  option.initFrom(this);
   option.font = this->font();
   option.state &= ~QStyle::State_HasFocus;
   int iconSize = this->getIconSize();

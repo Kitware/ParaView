@@ -1776,7 +1776,7 @@ QVariant pqSMAdaptor::convertToQVariant(const vtkVariant& variant)
     case VTK_STRING:
       return QString::fromUtf8(variant.ToString().c_str());
     case VTK_OBJECT:
-      return QVariant(QMetaType::VoidStar, variant.ToVTKObject());
+      return QVariant::fromValue(reinterpret_cast<void*>(variant.ToVTKObject()));
     default:
       return QVariant();
   }

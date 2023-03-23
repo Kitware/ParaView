@@ -44,7 +44,7 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
 {
   auto l = new QVBoxLayout(this);
   l->setSpacing(0);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
 
   auto button =
     new QPushButton(QCoreApplication::translate("ServerManagerXML", smproperty->GetXMLLabel()));

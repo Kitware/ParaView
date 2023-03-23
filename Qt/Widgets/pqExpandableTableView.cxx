@@ -29,6 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+#define NOMINMAX
+
 #include "pqExpandableTableView.h"
 #include "pqQtDeprecated.h"
 
@@ -38,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QMimeData>
-#include <QRegExp>
+#include <QRegularExpression>
 
 //-----------------------------------------------------------------------------
 pqExpandableTableView::pqExpandableTableView(QWidget* parentObject)
@@ -125,21 +127,22 @@ void pqExpandableTableView::keyPressEvent(QKeyEvent* e)
     const QClipboard* clipboard = QApplication::clipboard();
     const QMimeData* mimeData = clipboard->mimeData();
 
-    int numModelRows = this->model()->rowCount();
-    int numModelColumns = this->model()->columnCount();
+    qsizetype numModelRows = this->model()->rowCount();
+    qsizetype numModelColumns = this->model()->columnCount();
 
     if (mimeData->hasText())
     {
       // Split the lines in the text
       QString text = mimeData->text();
       QStringList lines = text.split("\n", PV_QT_SKIP_EMPTY_PARTS);
-      for (int row = 0; row < std::min(lines.size(), numModelRows); ++row)
+      for (qsizetype row = 0; row < std::min((qsizetype)lines.size(), numModelRows); ++row)
       {
         // Split within each line
-        QStringList items = lines[row].split(QRegExp("\\s+"));
+        QStringList items = lines[row].split(QRegularExpression("\\s+"));
 
         // Set the data in the table
-        for (int column = 0; column < std::min(items.size(), numModelColumns); ++column)
+        for (qsizetype column = 0; column < std::min((qsizetype)items.size(), numModelColumns);
+             ++column)
         {
           QVariant value(items[column]);
           QModelIndex index = this->model()->index(row, column);

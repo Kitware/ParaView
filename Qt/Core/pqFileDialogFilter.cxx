@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QFileIconProvider>
 #include <QIcon>
+#include <QRegularExpression>
 #include <QStringBuilder>
 
 #include "pqFileDialogModel.h"
@@ -75,7 +76,7 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     f = f.trimmed();
 
     // convert all spaces into |
-    f.replace(QRegExp("[\\s+;]+"), "|");
+    f.replace(QRegularExpression("[\\s+;]+"), "|");
 
     QStringList strings = f.split("|");
     QStringList extensions_list, filepatterns_list;

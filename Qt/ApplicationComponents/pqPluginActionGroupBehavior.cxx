@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqQtDeprecated.h"
 
+#include <QActionGroup>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>

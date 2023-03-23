@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QTextStream>
 
@@ -598,7 +599,7 @@ QString pqServerConfiguration::execCommand(double& processWait, double& delay) c
       if (value)
       {
         // if value contains space, quote it.
-        if (QRegExp("\\s").indexIn(value) == -1)
+        if (!QRegularExpression("\\s").match(value).hasMatch())
         {
           stream << " " << value;
         }

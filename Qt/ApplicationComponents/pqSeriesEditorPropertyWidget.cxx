@@ -130,7 +130,9 @@ public:
     vtkSMPropertyHelper(lutProxy, "IndexedLookup").Set(1);
 
     this->Ui.setupUi(self);
-    this->Ui.wdgLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.wdgLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.wdgLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
     this->Ui.wdgLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 

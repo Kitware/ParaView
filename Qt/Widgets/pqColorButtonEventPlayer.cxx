@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTestUtility.h"
 
 #include <QColor>
-#include <QRegExp>
+#include <QRegularExpression>
 
 //----------------------------------------------------------------------------
 pqColorButtonEventPlayer::pqColorButtonEventPlayer(QObject* parentObject)
@@ -56,10 +56,11 @@ bool pqColorButtonEventPlayer::playEvent(
     return false;
   }
 
-  QRegExp regExp("^(\\d+),(\\d+),(\\d+)$");
-  if ((command == pqColorButtonEventPlayer::EVENT_NAME()) && (regExp.indexIn(arguments) != -1))
+  QRegularExpression regExp("^(\\d+),(\\d+),(\\d+)$");
+  QRegularExpressionMatch match = regExp.match(arguments);
+  if ((command == pqColorButtonEventPlayer::EVENT_NAME()) && match.hasMatch())
   {
-    QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(), regExp.cap(3).toInt());
+    QColor rgb(match.captured(1).toInt(), match.captured(2).toInt(), match.captured(3).toInt());
     button->setChosenColor(rgb);
     return true;
   }

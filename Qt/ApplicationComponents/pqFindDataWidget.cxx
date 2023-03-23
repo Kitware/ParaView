@@ -272,7 +272,9 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
 {
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
-  internals.Ui.verticalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  internals.Ui.verticalLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   internals.Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
   // change the findData button palette so it is green when it is enabled.

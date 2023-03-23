@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h" // For the connector
 #include "vtkNew.h"                // For the connector
 
+#include <QVariant>
+
 class vtkSMProxyProperty;
 
 /// Base class to represent the "ArraysToGenerate" Property.

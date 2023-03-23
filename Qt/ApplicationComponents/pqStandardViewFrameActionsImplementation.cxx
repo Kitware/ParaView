@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSmartPointer.h"
 
+#include <QActionGroup>
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QMenu>

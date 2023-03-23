@@ -59,7 +59,7 @@ pqLanguageChooserWidget::pqLanguageChooserWidget(
   this->ComboBox = new QComboBox(this);
   this->ComboBox->setObjectName("LanguageComboBox");
   QVBoxLayout* vbox = new QVBoxLayout(this);
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
   vbox->addWidget(this->ComboBox);
 
   QList<QDir> paths;

@@ -50,7 +50,9 @@ public:
   pqInternals(pqFontPropertyWidget* self)
   {
     this->Ui.setupUi(self);
-    this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.mainLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.mainLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   }
 

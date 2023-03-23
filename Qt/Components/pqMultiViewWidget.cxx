@@ -128,7 +128,7 @@ public:
       });
 
     QVBoxLayout* slayout = new QVBoxLayout(self);
-    slayout->setMargin(0);
+    slayout->setContentsMargins(0, 0, 0, 0);
     slayout->addWidget(this->Container);
 
     this->PopoutPlaceholder.reset(new QWidget());
@@ -907,7 +907,7 @@ bool pqMultiViewWidget::togglePopout()
           Qt::WindowCloseButtonHint));
       internals.PopoutWindow->setObjectName("PopoutWindow");
       auto l = new QVBoxLayout(internals.PopoutWindow.data());
-      l->setMargin(0);
+      l->setContentsMargins(0, 0, 0, 0);
       internals.PopoutWindow->resize(this->size());
     }
 

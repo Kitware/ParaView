@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QIntValidator>
 #include <QMenu>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 
 #include <cassert>
@@ -68,20 +68,22 @@ QString generateText(int dx, int dy, const QString& label = QString())
 
 QString extractLabel(const QString& txt)
 {
-  QRegExp re("^(\\d+) x (\\d+) \\((.*)\\)$");
-  if (re.indexIn(txt) != -1)
+  QRegularExpression re("^(\\d+) x (\\d+) \\((.*)\\)$");
+  QRegularExpressionMatch match = re.match(txt);
+  if (match.hasMatch())
   {
-    return re.cap(3);
+    return match.captured(3);
   }
   return QString();
 }
 
 QSize extractSize(const QString& txt)
 {
-  QRegExp re("^(\\d+) x (\\d+)");
-  if (re.indexIn(txt) != -1)
+  QRegularExpression re("^(\\d+) x (\\d+)");
+  QRegularExpressionMatch match = re.match(txt);
+  if (match.hasMatch())
   {
-    return QSize(re.cap(1).toInt(), re.cap(2).toInt());
+    return QSize(match.captured(1).toInt(), match.captured(2).toInt());
   }
   return QSize();
 }

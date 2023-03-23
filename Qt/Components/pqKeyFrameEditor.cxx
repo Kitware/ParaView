@@ -103,7 +103,7 @@ public:
     , Child(child)
   {
     QVBoxLayout* l = new QVBoxLayout(this);
-    l->setMargin(0);
+    l->setContentsMargins(0, 0, 0, 0);
     l->addWidget(this->Child);
     this->Child->show();
   }
@@ -156,7 +156,7 @@ public:
     : CamWidget(&this->Widget)
   {
     QVBoxLayout* l = new QVBoxLayout(&this->Widget);
-    l->setMargin(0);
+    l->setContentsMargins(0, 0, 0, 0);
     l->addWidget(&this->CamWidget);
   }
 

@@ -78,7 +78,7 @@ pqShaderReplacementsSelectorPropertyWidget::pqShaderReplacementsSelectorProperty
   this->Internal = new pqInternal(vtkSMStringVectorProperty::SafeDownCast(smProperty));
 
   QVBoxLayout* l = new QVBoxLayout;
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
 
   QGridLayout* gridLayout = new QGridLayout;
   gridLayout->setColumnStretch(0, 0);

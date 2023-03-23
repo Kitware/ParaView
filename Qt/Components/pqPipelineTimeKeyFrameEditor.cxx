@@ -73,7 +73,7 @@ pqPipelineTimeKeyFrameEditor::pqPipelineTimeKeyFrameEditor(
   this->Internal->Editor =
     new pqKeyFrameEditor(scene, cue, QString(), this->Internal->Ui.container);
   QHBoxLayout* l = new QHBoxLayout(this->Internal->Ui.container);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
   l->addWidget(this->Internal->Editor);
 
   connect(this, SIGNAL(accepted()), this, SLOT(writeKeyFrameData()));

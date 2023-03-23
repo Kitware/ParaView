@@ -1,4 +1,4 @@
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
+find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Widgets)
 
 set(interfaces)
 set(sources
@@ -29,4 +29,4 @@ paraview_add_plugin(ExampleDockPanel
 
 target_link_libraries(ExampleDockPanel
   PRIVATE
-    Qt5::Widgets)
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)

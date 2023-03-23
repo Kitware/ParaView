@@ -88,7 +88,7 @@ public:
 
     this->Widget->setParent(editor);
     QVBoxLayout* layout = new QVBoxLayout(editor);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(this->Widget);
 
     this->Chart->SetAutoSize(true);

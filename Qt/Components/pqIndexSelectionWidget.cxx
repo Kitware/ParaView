@@ -117,7 +117,7 @@ Widgets::Widgets(pqIndexSelectionWidget* parent, const QString& key, int current
   this->slider->setProperty(keyPropertyName, key);
   this->edit->setProperty(keyPropertyName, key);
 
-  this->layout->setMargin(0);
+  this->layout->setContentsMargins(0, 0, 0, 0);
   this->layout->addWidget(this->slider);
   this->layout->addWidget(this->edit);
 
@@ -246,10 +246,14 @@ pqIndexSelectionWidget::pqIndexSelectionWidget(
 
   this->GroupBox->setAlignment(Qt::AlignLeft);
 
-  this->VBox->setMargin(pqPropertiesPanel::suggestedMargin());
+  this->VBox->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   this->VBox->addWidget(this->GroupBox);
 
-  this->Form->setMargin(pqPropertiesPanel::suggestedMargin());
+  this->Form->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   this->Form->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   this->Form->setLabelAlignment(Qt::AlignLeft);
 

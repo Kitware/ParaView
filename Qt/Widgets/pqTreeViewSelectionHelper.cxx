@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemSelection>
 #include <QLineEdit>
 #include <QMenu>
+#include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QVBoxLayout>
 #include <QWidgetAction>
@@ -71,7 +72,8 @@ void updateFilter(QAbstractItemView* tree, int section, const QString& txt)
 
   if (sfmodel)
   {
-    sfmodel->setFilterRegExp(QRegExp(txt, Qt::CaseInsensitive));
+    sfmodel->setFilterRegularExpression(
+      QRegularExpression(txt, QRegularExpression::CaseInsensitiveOption));
     sfmodel->setFilterKeyColumn(section);
   }
   if (pqheader && sfmodel)
@@ -179,7 +181,7 @@ void pqTreeViewSelectionHelper::buildupMenu(QMenu& menu, int section, const QPoi
       searchLineEdit = new QLineEdit(&menu);
       searchLineEdit->setPlaceholderText(tr("Filter items (regex)"));
       searchLineEdit->setClearButtonEnabled(true);
-      searchLineEdit->setText(sfmodel->filterRegExp().pattern());
+      searchLineEdit->setText(sfmodel->filterRegularExpression().pattern());
 
       auto container = new QWidget(&menu);
       auto l = new QVBoxLayout(container);

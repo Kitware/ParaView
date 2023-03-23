@@ -133,7 +133,7 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent /*=0*/)
 {
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->setSpacing(2);
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
 
   this->AbortButton = new QToolButton(this);
   this->AbortButton->setObjectName("AbortButton");

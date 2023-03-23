@@ -40,11 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 #include <QDialog>
+#include <QStringList>
 
 class pqCustomFilterManagerForm;
 class pqCustomFilterManagerModel;
 class QItemSelection;
-class QStringList;
 
 /**
  * \class pqCustomFilterManager

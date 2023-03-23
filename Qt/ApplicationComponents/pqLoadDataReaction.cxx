@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QInputDialog>
 #include <QMap>
+#include <QRegExp>
 
 #include <algorithm>
 #include <cassert>

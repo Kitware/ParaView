@@ -67,7 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QFile>
 #include <QMainWindow>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 
@@ -152,7 +152,7 @@ void pqCommandLineOptionsBehavior::processServerConnection()
     if (serverURL.indexOf('|') != -1)
     {
       // We should connect multiple times
-      const QStringList urls = serverURL.split(QRegExp("\\|"), PV_QT_SKIP_EMPTY_PARTS);
+      const QStringList urls = serverURL.split(QRegularExpression("\\|"), PV_QT_SKIP_EMPTY_PARTS);
       for (const QString& url : urls)
       {
         if (!pqServerConnectReaction::connectToServer(pqServerResource(url), false))

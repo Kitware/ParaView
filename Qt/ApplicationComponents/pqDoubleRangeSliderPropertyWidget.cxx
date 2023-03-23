@@ -64,7 +64,9 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   Ui::DoubleRangeSliderPropertyWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
 
-  ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 

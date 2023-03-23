@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 
 #include <QCoreApplication>
-#include <QDesktopWidget>
 #include <QDialog>
 #include <QDockWidget>
 #include <QFile>
@@ -180,11 +179,11 @@ void pqSettings::saveInQSettings(const char* key, vtkSMProperty* smproperty)
 //-----------------------------------------------------------------------------
 void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
 {
-  QDesktopWidget desktop;
   if (nullptr == dock_widget)
   {
     return;
   }
+  auto desktop = dock_widget->screen();
 
   QPoint dockTopLeft = dock_widget->pos();
   QRect dockRect(dockTopLeft, dock_widget->size());
@@ -192,7 +191,7 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
   QRect geometry = QRect(dockTopLeft, dock_widget->frameSize());
   int titleBarHeight = geometry.height() - dockRect.height();
 
-  QRect screenRect = desktop.availableGeometry(dock_widget);
+  QRect screenRect = desktop->availableGeometry();
   QRect desktopRect = QGuiApplication::primaryScreen()
                         ->availableGeometry(); // Should give us the entire Desktop geometry
   // Ensure the top left corner of the window is on the screen

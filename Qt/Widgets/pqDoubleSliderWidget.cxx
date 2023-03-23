@@ -30,7 +30,7 @@ pqDoubleSliderWidget::pqDoubleSliderWidget(QWidget* parent)
   this->DeferredValueEdited = false;
 
   QHBoxLayout* l = new QHBoxLayout(this);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
   this->Slider = new QSlider(Qt::Horizontal, this);
   this->Slider->setRange(0, 100);
   l->addWidget(this->Slider);

@@ -136,7 +136,7 @@ pqSettingsDialog::pqSettingsDialog(
     container->setContentsMargins(6, 0, 6, 0);
 
     QVBoxLayout* vbox = new QVBoxLayout(container);
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(0);
 
     pqProxyWidget* widget = new pqProxyWidget(proxy, container);

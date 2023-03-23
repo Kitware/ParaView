@@ -197,7 +197,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
   this->Internal->PSplineWidget->filterWidgets();
 
   (new QVBoxLayout(this->Internal->positionContainer))->addWidget(this->Internal->PSplineWidget);
-  this->Internal->positionContainer->layout()->setMargin(0);
+  this->Internal->positionContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
   this->Internal->FSplineProxy.TakeReference(pxm->NewProxy("parametric_functions", "Spline"));
   this->Internal->PSplineProxy->SetLocation(vtkPVSession::CLIENT);
@@ -210,7 +210,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
   this->Internal->FSplineWidget->filterWidgets();
 
   (new QVBoxLayout(this->Internal->focusContainer))->addWidget(this->Internal->FSplineWidget);
-  this->Internal->focusContainer->layout()->setMargin(0);
+  this->Internal->focusContainer->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 //-----------------------------------------------------------------------------

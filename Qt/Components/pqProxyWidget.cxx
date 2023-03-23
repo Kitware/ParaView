@@ -835,7 +835,9 @@ pqProxyWidget::pqProxyWidget(vtkSMProxy* smproxy, const QStringList& properties,
   this->connect(&internals.RequestUpdatePanel, SIGNAL(timeout()), SLOT(updatePanel()));
 
   QGridLayout* gridLayout = new QGridLayout(this);
-  gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 

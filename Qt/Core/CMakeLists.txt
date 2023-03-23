@@ -168,13 +168,18 @@ endif ()
 set(qt_components
   Widgets)
 
+if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+  list(APPEND qt_components
+    Core5Compat)
+endif()
+
 if (PARAVIEW_USE_QTHELP)
   list(APPEND qt_components
     Help)
 endif ()
 
 vtk_module_find_package(
-  PACKAGE     Qt5
+  PACKAGE     Qt${PARAVIEW_QT_MAJOR_VERSION}
   COMPONENTS  ${qt_components}
   VERSION     5.12
   FORWARD_VERSION_REQ MINOR)
@@ -210,11 +215,18 @@ vtk_module_add_module(ParaView::pqCore
   HEADERS ${headers})
 vtk_module_link(ParaView::pqCore
   PRIVATE
-    Qt5::Widgets)
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+
+if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+  vtk_module_link(ParaView::pqCore
+    PRIVATE
+      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat)
+endif()
+
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqCore
     PRIVATE
-      Qt5::Help)
+      Qt${PARAVIEW_QT_MAJOR_VERSION}::Help)
 endif ()
 vtk_module_definitions(ParaView::pqCore PRIVATE QT_NO_KEYWORDS)
 

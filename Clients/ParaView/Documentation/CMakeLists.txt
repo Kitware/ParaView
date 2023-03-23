@@ -43,7 +43,7 @@ paraview_client_generate_help(
 
 set(CMAKE_AUTORCC 1)
 
-find_package(Qt5 REQUIRED QUIET COMPONENTS Core)
+find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS Core)
 
 add_library(vtkParaViewDocumentation STATIC
   ParaViewDocumentationInitializer.cxx
@@ -54,7 +54,7 @@ target_include_directories(vtkParaViewDocumentation
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
 target_link_libraries(vtkParaViewDocumentation
   PRIVATE
-    Qt5::Core)
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Core)
 
 install(
   FILES       "${paraview_qch}"

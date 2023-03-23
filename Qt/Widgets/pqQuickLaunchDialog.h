@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqQuickLaunchDialog_h
 
 #include "pqWidgetsModule.h"
+
+#include <QAction>
 #include <QDialog>
 
 /**

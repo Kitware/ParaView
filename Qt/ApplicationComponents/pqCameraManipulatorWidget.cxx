@@ -120,7 +120,7 @@ pqCameraManipulatorWidget::pqCameraManipulatorWidget(
   ui.setupUi(this);
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-  ui.gridLayout->setMargin(0);
+  ui.gridLayout->setContentsMargins(0, 0, 0, 0);
 
   QPointer<QComboBox>* boxes = this->Internals->Boxes;
   boxes[0] = ui.comboBox_1;

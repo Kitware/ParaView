@@ -283,12 +283,12 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
 {
   this->Internal = new pqAnimationViewWidget::pqInternal();
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
-  vboxlayout->setMargin(2);
+  vboxlayout->setContentsMargins(2, 2, 2, 2);
   vboxlayout->setSpacing(2);
 
   QHBoxLayout* hboxlayout = new QHBoxLayout;
   vboxlayout->addLayout(hboxlayout);
-  hboxlayout->setMargin(0);
+  hboxlayout->setContentsMargins(0, 0, 0, 0);
   hboxlayout->setSpacing(2);
 
   hboxlayout->addWidget(new QLabel(tr("Mode:"), this));
@@ -356,7 +356,7 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   this->Internal->AnimationWidget->animationModel()->setTimePrecision(
     vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
   this->Internal->AnimationWidget->animationModel()->setTimeNotation(
-    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation());
+    QChar(vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation()));
 
   pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
     SLOT(generalSettingsChanged()));
@@ -372,7 +372,7 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   this->Internal->CreateSource->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   this->Internal->CreateProperty->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   QHBoxLayout* l = new QHBoxLayout(w);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
   l->addSpacing(6);
   l->addWidget(this->Internal->CreateSource);
   l->addWidget(this->Internal->CreateProperty);
@@ -1147,7 +1147,7 @@ void pqAnimationViewWidget::generalSettingsChanged()
   this->Internal->AnimationWidget->animationModel()->setTimePrecision(
     vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
   this->Internal->AnimationWidget->animationModel()->setTimeNotation(
-    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation());
+    QChar(vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation()));
 }
 
 //-----------------------------------------------------------------------------

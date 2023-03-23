@@ -50,7 +50,9 @@ public:
   pqInternals(pqTextLocationWidget* self)
   {
     this->Ui.setupUi(self);
-    this->Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.gridLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
     // Add location enum values to the buttons

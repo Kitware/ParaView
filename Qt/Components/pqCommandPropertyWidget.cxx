@@ -56,7 +56,7 @@ pqCommandPropertyWidget::pqCommandPropertyWidget(
   QObject::connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
 
   QHBoxLayout* layoutLocal = new QHBoxLayout(this);
-  layoutLocal->setMargin(0);
+  layoutLocal->setContentsMargins(0, 0, 0, 0);
   layoutLocal->addWidget(button);
   layoutLocal->addStretch();
   this->setShowLabel(false);

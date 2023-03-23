@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDir>
 #include <QPointer>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrl>
 #include <QtDebug>
 
@@ -73,25 +73,28 @@ public:
       // we had conflicting documentation!!! The doc said that the render server
       // is separated by a "/" while the code looks for "//". Updating the
       // regular expressions so that both cases are handled.
-      QRegExp render_server_host("//?([^:/]*)");
-      if (0 == render_server_host.indexIn(temp.path()))
+      QRegularExpression render_server_host("//?([^:/]*)");
+      QRegularExpressionMatch match = render_server_host.match(temp.path());
+      if (match.hasMatch())
       {
-        this->RenderServerHost = render_server_host.cap(1);
+        this->RenderServerHost = match.captured(1);
       }
 
-      QRegExp render_server_port("//?[^:]*:([^/]*)");
-      if (0 == render_server_port.indexIn(temp.path()))
+      QRegularExpression render_server_port("//?[^:]*:([^/]*)");
+      match = render_server_port.match(temp.path());
+      if (match.hasMatch())
       {
         bool ok = false;
-        const int port = render_server_port.cap(1).toInt(&ok);
+        const int port = match.captured(1).toInt(&ok);
         if (ok)
           this->RenderServerPort = port;
       }
 
-      QRegExp path("(//[^/]*)(.*)");
-      if (0 == path.indexIn(temp.path()))
+      QRegularExpression path("(//[^/]*)(.*)");
+      match = path.match(temp.path());
+      if (match.hasMatch())
       {
-        this->Path = path.cap(2);
+        this->Path = match.captured(2);
       }
     }
     else

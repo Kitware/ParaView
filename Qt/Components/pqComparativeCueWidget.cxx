@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeCueWidget.h"
 #include "ui_pqComparativeParameterRangeDialog.h"
 
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 #include "pqQtDeprecated.h"
 #include "pqUndoStack.h"
@@ -249,10 +250,12 @@ void pqComparativeCueWidget::editRange()
   ui.multivalueHint->setVisible(csv);
   ui.mode->setVisible(ranges[0].rowCount() > 1 && ranges[0].columnCount() > 1);
 
-  QRegExp floatNum = QRegExp("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
-  QRegExp csvFloatNum = QRegExp(QString("%1(,%1)*").arg(floatNum.pattern()));
-  ui.minValue->setValidator(new QRegExpValidator(csv ? csvFloatNum : floatNum, ui.minValue));
-  ui.maxValue->setValidator(new QRegExpValidator(csv ? csvFloatNum : floatNum, ui.maxValue));
+  QRegularExpression floatNum = QRegularExpression("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
+  QRegularExpression csvFloatNum = QRegularExpression(QString("%1(,%1)*").arg(floatNum.pattern()));
+  ui.minValue->setValidator(
+    new QRegularExpressionValidator(csv ? csvFloatNum : floatNum, ui.minValue));
+  ui.maxValue->setValidator(
+    new QRegularExpressionValidator(csv ? csvFloatNum : floatNum, ui.maxValue));
 
   if (dialog.exec() != QDialog::Accepted)
   {

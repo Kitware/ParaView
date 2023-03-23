@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQtDeprecated.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <QTreeWidget>
 
 //-----------------------------------------------------------------------------
@@ -99,8 +100,9 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
     return false;
   }
 
-  QRegExp regExp0("^([\\d\\.]+),(\\d+),(\\d+)$");
-  if (command == "setTreeItemCheckState" && regExp0.indexIn(arguments) != -1)
+  QRegularExpression regExp0("^([\\d\\.]+),(\\d+),(\\d+)$");
+  QRegularExpressionMatch match = regExp0.match(arguments);
+  if (command == "setTreeItemCheckState" && match.hasMatch())
   {
     // legacy command recorded from tree widgets.
     QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(object);
@@ -108,9 +110,9 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
     {
       return false;
     }
-    QString str_index = regExp0.cap(1);
-    int column = regExp0.cap(2).toInt();
-    int check_state = regExp0.cap(3).toInt();
+    QString str_index = match.captured(1);
+    int column = match.captured(2).toInt();
+    int check_state = match.captured(3).toInt();
 
     QStringList indices = str_index.split(".", PV_QT_SKIP_EMPTY_PARTS);
     QTreeWidgetItem* cur_item = nullptr;
@@ -137,11 +139,12 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
     return true;
   }
 
-  QRegExp regExp1("^([\\d\\.]+),(\\d+)$");
-  if (command == "setCheckState" && regExp1.indexIn(arguments) != -1)
+  QRegularExpression regExp1("^([\\d\\.]+),(\\d+)$");
+  match = regExp1.match(arguments);
+  if (command == "setCheckState" && match.hasMatch())
   {
-    const QString& str_index = regExp1.cap(1);
-    int check_state = regExp1.cap(2).toInt();
+    const QString& str_index = match.captured(1);
+    int check_state = match.captured(2).toInt();
 
     QModelIndex index = ::pqPluginTreeWidgetEventPlayerGetIndex(str_index, treeView, error);
     if (error)

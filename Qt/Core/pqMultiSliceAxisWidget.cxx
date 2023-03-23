@@ -109,7 +109,7 @@ pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(QWidget* parentW /*=nullptr*/)
   this->Internal = new pqMultiSliceAxisWidget::pqInternal(*this);
   this->Internal->init();
   QVBoxLayout* vLayout = new QVBoxLayout(this);
-  vLayout->setMargin(0);
+  vLayout->setContentsMargins(0, 0, 0, 0);
   vLayout->addWidget(this->Internal->View);
 
   this->Internal->SliceItem->AddObserver(

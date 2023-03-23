@@ -49,7 +49,7 @@ pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(
 {
   QVBoxLayout* l = new QVBoxLayout;
   l->setSpacing(0);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
 
   QPushButton* button =
     new QPushButton(QCoreApplication::translate("ServerManagerXML", proxyProperty->GetXMLLabel()));
