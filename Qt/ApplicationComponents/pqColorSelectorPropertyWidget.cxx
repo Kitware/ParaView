@@ -51,7 +51,7 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
 
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setSpacing(0);
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
 
   if (useDocumentationForLabels)
   {

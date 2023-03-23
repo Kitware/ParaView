@@ -64,9 +64,13 @@ public:
   {
     this->Ui.setupUi(self);
     this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    this->Ui.verticalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.verticalLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-    this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.horizontalLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.frameLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   }
 

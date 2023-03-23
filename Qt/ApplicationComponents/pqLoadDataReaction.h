@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 #include <QList>
+#include <QStringList>
 
-class QStringList;
 class pqPipelineSource;
 class pqServer;
 class vtkSMReaderFactory;

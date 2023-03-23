@@ -41,7 +41,7 @@ pqDisplayPanelPropertyWidget::pqDisplayPanelPropertyWidget(
   this->DisplayPanel = panel;
 
   QVBoxLayout* layoutLocal = new QVBoxLayout;
-  layoutLocal->setMargin(0);
+  layoutLocal->setContentsMargins(0, 0, 0, 0);
   layoutLocal->addWidget(panel);
   setLayout(layoutLocal);
 }

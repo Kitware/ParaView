@@ -155,12 +155,15 @@ public:
   QString modificationTimeString() const
   {
     return QLocale::system().toString(
-      QDateTime::fromTime_t(this->ModificationTime), QLocale::ShortFormat);
+      QDateTime::fromSecsSinceEpoch(this->ModificationTime), QLocale::ShortFormat);
   }
 
   qulonglong size() const { return static_cast<qulonglong>(this->Size); }
 
-  QDateTime modificationTime() const { return QDateTime::fromTime_t(this->ModificationTime); }
+  QDateTime modificationTime() const
+  {
+    return QDateTime::fromSecsSinceEpoch(this->ModificationTime);
+  }
 
 private:
   QString Label;

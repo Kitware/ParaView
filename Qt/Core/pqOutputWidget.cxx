@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDockWidget>
 #include <QMutexLocker>
 #include <QPointer>
+#include <QRegularExpression>
 #include <QScopedValueRollback>
 #include <QStandardItemModel>
 #include <QStringList>
@@ -515,11 +516,13 @@ QString pqOutputWidget::extractSummary(const QString& message, QtMsgType)
     return message.section('\n', -1);
   }
 
-  QRegExp vtkMessage("^(?:error|warning|debug|generic warning): In (.*), line (\\d+)\n[^:]*:(.*)$",
-    Qt::CaseInsensitive);
-  if (vtkMessage.exactMatch(message))
+  QRegularExpression vtkMessage(
+    "^(?:error|warning|debug|generic warning): In (.*), line (\\d+)\n[^:]*:(.*)$",
+    QRegularExpression::CaseInsensitiveOption);
+  auto match = vtkMessage.match(message);
+  if (match.hasMatch())
   {
-    QString summary = vtkMessage.cap(3);
+    QString summary = match.captured(3);
     summary.replace('\n', ' ');
     return summary;
   }

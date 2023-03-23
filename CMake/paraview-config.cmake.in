@@ -12,6 +12,7 @@ The following variables are provided by this module:
   * `ParaView_VERSION_PATCH`: The patch version of ParaView found.
   * `ParaView_PREFIX_PATH`: Install prefix for ParaView.
   * `PARAVIEW_USE_QT`: If ParaView's Qt GUI is available.
+  * `PARAVIEW_QT_MAJOR_VERSION`: Major version of Qt used by ParaView if PARAVIEW_USE_QT is TRUE
   * `PARAVIEW_USE_MPI`: If ParaView is built with MPI support.
   * `PARAVIEW_USE_PYTHON`: If ParaView is built with Python support.
   * `PARAVIEW_USE_QTWEBENGINE`: If ParaView uses Qt's WebEngine for its help.
@@ -70,6 +71,7 @@ endif ()
 unset(_paraview_use_external_vtk)
 
 set(PARAVIEW_USE_QT "@PARAVIEW_USE_QT@")
+set(PARAVIEW_QT_MAJOR_VERSION "@PARAVIEW_QT_MAJOR_VERSION@")
 set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
 set(PARAVIEW_USE_PYTHON "@PARAVIEW_USE_PYTHON@")
 set(PARAVIEW_USE_QTWEBENGINE "@PARAVIEW_USE_QTWEBENGINE@")

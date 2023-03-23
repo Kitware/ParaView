@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 
 #include "pqCoreUtilities.h"
@@ -71,7 +72,7 @@ public:
     this->Ui.details->setText(tr(""));
   }
 
-  void addLines(const QVector<QStringRef>& lines)
+  void addLines(const QStringList& lines)
   {
     QRegularExpression scopeBegin(R"==(^\s*{ (?<label>.*))==");
     QRegularExpression scopeEnd(R"==(^\s*} (?<time>[^:]+):.*)==");
@@ -104,7 +105,7 @@ public:
           auto litem = this->ActiveScopeItem.last();
           auto txt = litem->data(Qt::DisplayRole).toString();
           litem->setData(txt + " - " + ematch.captured("time"), Qt::DisplayRole);
-          litem->setData(line.toString(), RAW_DATA_SUFFIX_ROLE);
+          litem->setData(line, RAW_DATA_SUFFIX_ROLE);
           this->ActiveScopeItem.pop_back();
           this->LastItem = nullptr;
           continue;
@@ -117,7 +118,7 @@ public:
         auto item4 = new QStandardItem(parts[4]);
         const int height = this->Ui.treeView->fontMetrics().boundingRect("(").height();
         item4->setData(QSize(0, height * 1.50), Qt::SizeHintRole);
-        item4->setData(line.toString(), RAW_DATA_ROLE);
+        item4->setData(line, RAW_DATA_ROLE);
         // item4->setData(QVariant(Qt::AlignLeft|Qt::AlignTop),
         // Qt::TextAlignmentRole);
 
@@ -271,7 +272,7 @@ void pqLogViewerWidget::setLog(const QString& text)
 void pqLogViewerWidget::appendLog(const QString& text)
 {
   auto& internals = (*this->Internals);
-  auto lines = text.splitRef('\n'); // TODO: handle '\r'?
+  auto lines = text.split('\n'); // TODO: handle '\r'?
   internals.addLines(lines);
 }
 
@@ -318,7 +319,7 @@ void pqLogViewerWidget::scrollToTime(double time)
 }
 
 //-----------------------------------------------------------------------------
-QVector<QString> pqLogViewerWidget::extractLogParts(const QStringRef& txt, bool& is_raw)
+QVector<QString> pqLogViewerWidget::extractLogParts(const QString& txt, bool& is_raw)
 {
   QVector<QString> parts{ 5 };
   QRegularExpression re(
@@ -336,7 +337,7 @@ QVector<QString> pqLogViewerWidget::extractLogParts(const QStringRef& txt, bool&
   else
   {
     is_raw = true;
-    parts[4] = txt.toString();
+    parts[4] = txt;
   }
   return parts;
 }

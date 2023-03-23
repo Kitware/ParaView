@@ -125,7 +125,7 @@ pqArrayListWidget::pqArrayListWidget(QWidget* parent)
   auto lay = new QVBoxLayout(this);
   this->TableView = new pqExpandableTableView(this);
   lay->addWidget(this->TableView);
-  lay->setMargin(0);
+  lay->setContentsMargins(0, 0, 0, 0);
   lay->setSpacing(2);
 
   pqHeaderView* myheader = new pqHeaderView(Qt::Horizontal, this->TableView);

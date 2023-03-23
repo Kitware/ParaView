@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h" // for vtkSmartPointer
 #include <QObject>
 #include <QPointer>
+#include <QStringList>
 #include <QTranslator>
 #include <exception> // for std::exception
 
@@ -57,7 +58,6 @@ class pqTestUtility;
 class pqUndoStack;
 class QApplication;
 class QHelpEngine;
-class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMStateLoader;

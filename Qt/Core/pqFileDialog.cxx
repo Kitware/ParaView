@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMessageBox>
 #include <QPoint>
+#include <QRegularExpression>
 #include <QScopedValueRollback>
 #include <QShortcut>
 #include <QtDebug>
@@ -114,7 +115,7 @@ QStringList GetWildCardsFromFilter(const QString& filter)
   }
 
   // separated by spaces or semi-colons
-  QStringList fs = f.split(QRegExp("[\\s+;]"), PV_QT_SKIP_EMPTY_PARTS);
+  QStringList fs = f.split(QRegularExpression("[\\s+;]"), PV_QT_SKIP_EMPTY_PARTS);
 
   // add a *.ext.* for every *.ext we get to support file groups
   QStringList ret = fs;
@@ -642,7 +643,7 @@ void pqFileDialog::RemoveDirectoryFromFavorites(QString const& directory)
 //-----------------------------------------------------------------------------
 void pqFileDialog::FilterDirectoryFromFavorites(const QString& filter)
 {
-  this->Implementation->proxyFavoriteModel->setFilterRegExp(filter);
+  this->Implementation->proxyFavoriteModel->setFilterRegularExpression(filter);
 }
 
 //-----------------------------------------------------------------------------

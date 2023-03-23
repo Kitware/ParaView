@@ -36,8 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 #include <QScopedPointer> // for QScopedPointer.
-
-class QStringList;
+#include <QStringList>
 
 /**
  * @class pqSelectionQueryPropertyWidget

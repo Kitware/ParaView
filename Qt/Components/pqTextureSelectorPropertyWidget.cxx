@@ -60,7 +60,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   this->setToolTip(tr("Select/Load texture to apply."));
 
   QVBoxLayout* l = new QVBoxLayout;
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
 
   // Create the combobox selector and set its value
   auto* domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();

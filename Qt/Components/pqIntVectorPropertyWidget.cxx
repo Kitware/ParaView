@@ -105,7 +105,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
   }
 
   QHBoxLayout* layoutLocal = new QHBoxLayout;
-  layoutLocal->setMargin(0);
+  layoutLocal->setContentsMargins(0, 0, 0, 0);
 
   if (vtkSMBooleanDomain::SafeDownCast(domain))
   {

@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 
+#include <QRegularExpression>
+
 //-----------------------------------------------------------------------------
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
   : QFrame(parentObject)
@@ -115,7 +117,7 @@ QString pqPropertyWidget::getTooltip(vtkSMProperty* smproperty)
     QString doc = pqProxy::rstToHtml(QCoreApplication::translate(
       "ServerManagerXML", smproperty->GetDocumentation()->GetDescription()));
     doc = doc.trimmed();
-    doc = doc.replace(QRegExp("\\s+"), " ");
+    doc = doc.replace(QRegularExpression("\\s+"), " ");
     return QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc);
   }
   return QString();

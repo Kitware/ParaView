@@ -62,7 +62,9 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy* smProxy, QW
 
   Ui::ColorEditorPropertyWidget& Ui = this->Internals->Ui;
   Ui.setupUi(this);
-  Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 

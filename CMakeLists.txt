@@ -99,6 +99,8 @@ include(vtkCompilerPlatformFlags)
 include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
+include(vtkQt)
+set(PARAVIEW_QT_MAJOR_VERSION "${vtk_qt_major_version}")
 
 include(CMakeDependentOption)
 include(ParaViewOptions)
@@ -582,7 +584,6 @@ else ()
 
   set(VTK_BUILD_QT_DESIGNER_PLUGIN OFF)
   set(VTK_INSTALL_PYTHON_EXES OFF)
-  set(VTK_QT_VERSION 5)
 
   cmake_dependent_option(VTK_NO_PYTHON_THREADS "Disable Python Threads support" ON
     "PARAVIEW_USE_PYTHON" OFF)

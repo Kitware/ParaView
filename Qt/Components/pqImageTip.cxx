@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolTip>
 #include <qapplication.h>
 #include <qdebug.h>
-#include <qdesktopwidget.h>
 #include <qevent.h>
 #include <qhash.h>
 #include <qlabel.h>
@@ -138,7 +137,11 @@ bool pqImageTip::eventFilter(QObject*, QEvent* e)
   return false;
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void pqImageTip::enterEvent(QEvent*)
+#else
+void pqImageTip::enterEvent(QEnterEvent*)
+#endif
 {
   hide();
 }
@@ -153,7 +156,7 @@ void pqImageTip::paintEvent(QPaintEvent* ev)
 {
   QStylePainter p(this);
   QStyleOptionFrame opt;
-  opt.init(this);
+  this->initStyleOption(&opt);
   p.drawPrimitive(QStyle::PE_PanelTipLabel, opt);
   p.end();
 

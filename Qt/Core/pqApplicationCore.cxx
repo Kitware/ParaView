@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
+#include <QRegularExpression>
 #include <QSize>
 #include <QTemporaryFile>
 #include <QtDebug>
@@ -487,7 +488,7 @@ void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
   if (!QApplication::applicationName().isEmpty())
   {
     // Change root element to match the application name.
-    QString valid_name = QApplication::applicationName().replace(QRegExp("\\W"), "_");
+    QString valid_name = QApplication::applicationName().replace(QRegularExpression("\\W"), "_");
     root->SetName(valid_name.toUtf8().data());
   }
   Q_EMIT this->stateSaved(root);

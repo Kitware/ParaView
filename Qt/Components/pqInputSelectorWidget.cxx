@@ -96,7 +96,8 @@ pqInputSelectorWidget::pqInputSelectorWidget(
   this->setProperty(smproperty);
 
   auto l = new QVBoxLayout(this);
-  l->setMargin(pqPropertiesPanel::suggestedMargin());
+  l->setContentsMargins(pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin());
   l->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   l->addWidget(this->ComboBox);
 

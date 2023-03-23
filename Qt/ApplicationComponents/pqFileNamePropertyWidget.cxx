@@ -73,7 +73,7 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   }
 
   QHBoxLayout* layoutLocal = new QHBoxLayout;
-  layoutLocal->setMargin(0);
+  layoutLocal->setContentsMargins(0, 0, 0, 0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   QLineEdit* lineEdit = new pqLineEdit(this);

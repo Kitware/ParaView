@@ -206,7 +206,7 @@ void pqComparativeContextView::updateViewWidgets()
   QGridLayout* layout = new QGridLayout(wdg);
   layout->setHorizontalSpacing(vtkSMPropertyHelper(compView, "Spacing").GetAsInt(0));
   layout->setVerticalSpacing(vtkSMPropertyHelper(compView, "Spacing").GetAsInt(1));
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   for (int x = 0; x < dimensions[0]; ++x)
   {
     for (int y = 0; y < dimensions[1]; ++y)

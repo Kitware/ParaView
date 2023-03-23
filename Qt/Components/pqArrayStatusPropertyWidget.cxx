@@ -138,7 +138,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
   hbox->setSpacing(4);
 
   for (unsigned int cc = 0; cc < smgroup->GetNumberOfProperties(); cc++)
@@ -213,7 +213,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
   hbox->setSpacing(4);
 
   const char* property_name = smproxy->GetPropertyName(smproperty);

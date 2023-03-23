@@ -44,7 +44,7 @@ pqTimelineScrollbar::pqTimelineScrollbar(QWidget* p)
   : QWidget(p)
 {
   QHBoxLayout* timeLayout = new QHBoxLayout(this);
-  timeLayout->setMargin(0);
+  timeLayout->setContentsMargins(0, 0, 0, 0);
   this->TimeScrollBar = new QScrollBar;
   this->TimeScrollBar->setOrientation(Qt::Orientation::Horizontal);
   this->ScrollBarSpacer = new QSpacerItem(0, 0);

@@ -46,7 +46,7 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(
   : pqPropertyWidget(smProxy, parentObject)
 {
   QVBoxLayout* vbox = new QVBoxLayout;
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
   vbox->setSpacing(0);
 
   bool selection_input =

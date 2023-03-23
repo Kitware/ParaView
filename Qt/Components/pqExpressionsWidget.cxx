@@ -49,7 +49,7 @@ pqExpressionsWidget::pqExpressionsWidget(QWidget* parent, const QString& groupNa
   , OneLiner(nullptr)
 {
   QGridLayout* grid = new QGridLayout(this);
-  grid->setMargin(0);
+  grid->setContentsMargins(0, 0, 0, 0);
   grid->setSpacing(0);
 
   if (!groupName.isEmpty())
@@ -58,6 +58,11 @@ pqExpressionsWidget::pqExpressionsWidget(QWidget* parent, const QString& groupNa
   }
 
   this->setLayout(grid);
+}
+
+void pqExpressionsWidget::clear()
+{
+  lineEdit()->clear();
 }
 
 void pqExpressionsWidget::setupButtons(const QString& groupName)

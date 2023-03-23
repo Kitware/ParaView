@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QPixmap>
 #include <QPointer>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSize>
 #include <QSortFilterProxyModel>
 #include <QtDebug>

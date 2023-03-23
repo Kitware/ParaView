@@ -131,7 +131,7 @@ pqReaderSelectionPropertyWidget::pqReaderSelectionPropertyWidget(
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
   hbox->setSpacing(4);
 
   const char* property_name = smproxy->GetPropertyName(smproperty);

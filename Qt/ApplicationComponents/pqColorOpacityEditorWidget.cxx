@@ -199,7 +199,9 @@ public:
     , SignalsBlocker(new pqSignalsBlocker(self))
   {
     this->Ui.setupUi(self);
-    this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.mainLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+      pqPropertiesPanel::suggestedMargin());
     this->Ui.ColorTable->setModel(&this->ColorTableModel);
     this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.ColorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);

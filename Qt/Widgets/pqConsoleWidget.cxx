@@ -436,7 +436,7 @@ pqConsoleWidget::pqConsoleWidget(QWidget* Parent)
   , FontSize(12)
 {
   QVBoxLayout* const l = new QVBoxLayout(this);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
   l->addWidget(this->Implementation);
 }
 

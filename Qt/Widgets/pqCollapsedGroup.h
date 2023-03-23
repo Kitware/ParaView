@@ -61,6 +61,7 @@ protected:
   bool Pressed;
 
 private:
+  static QStyleOptionGroupBox pqCollapseGroupGetStyleOption(const pqCollapsedGroup* p);
   QRect textRect();
   QRect collapseRect();
 };

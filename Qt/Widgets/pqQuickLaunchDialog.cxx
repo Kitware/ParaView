@@ -39,8 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QListWidgetItem>
 #include <QMap>
+#include <QMenu>
 #include <QPointer>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QtDebug>
 #include <algorithm>
@@ -73,7 +75,7 @@ void fillSearchSpace(QStringList& searchSpace, const QStringList& searchComponen
   Q_FOREACH (const QStringList& exp, searchExpressions)
   {
     QString part = exp.join("\\w*\\W+");
-    QRegExp regExp("^" + part, Qt::CaseInsensitive);
+    QRegularExpression regExp("^" + part, QRegularExpression::CaseInsensitiveOption);
     searchSpace += keys.filter(regExp);
   }
 
@@ -83,7 +85,8 @@ void fillSearchSpace(QStringList& searchSpace, const QStringList& searchComponen
   QStringList filteredkeys = keys;
   Q_FOREACH (const QString& component, searchComponents)
   {
-    filteredkeys = filteredkeys.filter(QRegExp(component, Qt::CaseInsensitive));
+    filteredkeys =
+      filteredkeys.filter(QRegularExpression(component, QRegularExpression::CaseInsensitiveOption));
   }
   searchSpace += filteredkeys;
 }

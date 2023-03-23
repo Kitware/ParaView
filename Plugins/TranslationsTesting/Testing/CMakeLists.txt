@@ -1,4 +1,4 @@
-find_package(Qt5 REQUIRED QUIET COMPONENTS LinguistTools)
+find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS LinguistTools)
 find_package(Python3 REQUIRED QUIET COMPONENTS Interpreter)
 
 
@@ -6,7 +6,7 @@ set(TS_TEMPORARY_DIR "${CMAKE_BINARY_DIR}/Testing/Temporary/TranslationsTest")
 set(DESTINATION_QM "${TS_TEMPORARY_DIR}/paraview_fa_IR.qm")
 set(PYTHON3_INTERPRETER "$<TARGET_FILE:Python3::Interpreter>")
 set(PYTHON3_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/TranslationsFilling.py")
-set(LCONVERT_EXECUTABLE "$<TARGET_FILE:Qt5::lconvert>")
+set(LCONVERT_EXECUTABLE "$<TARGET_FILE:Qt${PARAVIEW_QT_MAJOR_VERSION}::lconvert>")
 
 add_custom_command(
   OUTPUT ${DESTINATION_QM}

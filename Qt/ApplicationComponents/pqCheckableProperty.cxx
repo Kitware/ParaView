@@ -76,7 +76,9 @@ pqCheckableProperty::pqCheckableProperty(
   this->setChangeAvailableAsChangeFinished(true);
 
   auto* layoutLocal = new QHBoxLayout;
-  layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
+  layoutLocal->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+    pqPropertiesPanel::suggestedMargin());
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   this->setLayout(layoutLocal);
 

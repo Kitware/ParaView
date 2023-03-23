@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAction>
 #include <QIntValidator>
+#include <QRegularExpression>
 #include <QStyle>
 
 class pqViewResolutionPropertyWidget::pqInternals
@@ -198,13 +199,15 @@ void pqViewResolutionPropertyWidget::scale(double factor)
 //-----------------------------------------------------------------------------
 void pqViewResolutionPropertyWidget::applyPreset()
 {
-  QRegExp re("^(\\d+) x (\\d+)"); // parse the width and height from the resolution string (w x h)
+  QRegularExpression re(
+    "^(\\d+) x (\\d+)"); // parse the width and height from the resolution string (w x h)
   QAction* actn = qobject_cast<QAction*>(this->sender());
-  if (actn != nullptr && re.indexIn(actn->text()) != -1)
+  QRegularExpressionMatch match = re.match(actn != nullptr ? actn->text() : QString());
+  if (match.hasMatch())
   {
     Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
-    ui.width->setTextAndResetCursor(QString::number(static_cast<int>(re.cap(1).toInt())));
-    ui.height->setTextAndResetCursor(QString::number(static_cast<int>(re.cap(2).toInt())));
+    ui.width->setTextAndResetCursor(QString::number(static_cast<int>(match.captured(1).toInt())));
+    ui.height->setTextAndResetCursor(QString::number(static_cast<int>(match.captured(2).toInt())));
   }
 }
 

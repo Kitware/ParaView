@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 #include <QLabel>
+#include <QtGlobal>
 
 class QBasicTimer;
 class QPixmap;
@@ -60,7 +61,11 @@ private:
   QBasicTimer* const hideTimer;
 
   bool eventFilter(QObject*, QEvent*) override;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   void enterEvent(QEvent*) override;
+#else
+  void enterEvent(QEnterEvent*) override;
+#endif
   void timerEvent(QTimerEvent* e) override;
   void paintEvent(QPaintEvent* e) override;
 };

@@ -304,6 +304,11 @@ set(qt_components
   Widgets
   Svg)
 
+if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+  list(APPEND qt_components
+    Core5Compat)
+endif()
+
 if (paraview_use_materialeditor)
   list(APPEND classes
     pqMaterialAttributesDelegate
@@ -327,7 +332,7 @@ if (PARAVIEW_USE_QTHELP)
 endif ()
 
 vtk_module_find_package(
-  PACKAGE     Qt5
+  PACKAGE     Qt${PARAVIEW_QT_MAJOR_VERSION}
   COMPONENTS  ${qt_components})
 
 source_group("Resources" FILES
@@ -360,12 +365,19 @@ vtk_module_add_module(ParaView::pqApplicationComponents
           ${resource_files})
 vtk_module_link(ParaView::pqApplicationComponents
   PRIVATE
-    Qt5::Widgets
-    Qt5::Svg
-    Qt5::Network)
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Svg
+    Qt${PARAVIEW_QT_MAJOR_VERSION}::Network)
 vtk_module_definitions(ParaView::pqApplicationComponents PRIVATE QT_NO_KEYWORDS)
+
+if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+  vtk_module_link(ParaView::pqApplicationComponents
+    PRIVATE
+      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat)
+endif()
+
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqApplicationComponents
     PRIVATE
-      Qt5::Help)
+      Qt${PARAVIEW_QT_MAJOR_VERSION}::Help)
 endif ()

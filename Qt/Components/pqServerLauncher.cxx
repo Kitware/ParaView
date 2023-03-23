@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QSpinBox>
 #include <QTimer>
 #include <QtDebug>
@@ -774,15 +775,16 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
   }
 
   // replace all $FOO$ with values for QProcessEnvironment.
-  QRegExp regex("\\$([^$ ]*)\\$");
-
+  QRegularExpression regex("\\$([^$ ]*)\\$");
+  QRegularExpressionMatch match = regex.match(command);
   // Do string-substitution for the command line.
-  while (regex.indexIn(command) > -1)
+  while (match.hasMatch())
   {
-    QString before = regex.cap(0);
-    QString variable = regex.cap(1);
+    QString before = match.captured(0);
+    QString variable = match.captured(1);
     QString after = this->Internals->Options.value(variable, variable);
     command.replace(before, after);
+    match = regex.match(command);
   }
 
   return this->processCommand(command, processWait, delay, &this->Internals->Options);

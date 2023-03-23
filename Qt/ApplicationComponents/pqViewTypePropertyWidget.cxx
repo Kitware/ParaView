@@ -50,7 +50,7 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
   this->ComboBox = new QComboBox(this);
   this->ComboBox->setObjectName("ComboBox");
   QVBoxLayout* vbox = new QVBoxLayout(this);
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
   vbox->addWidget(this->ComboBox);
 
   this->ComboBox->addItem(tr("None"), QVariant("None"));

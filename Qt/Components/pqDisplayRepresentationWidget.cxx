@@ -253,7 +253,7 @@ pqDisplayRepresentationPropertyWidget::pqDisplayRepresentationPropertyWidget(
   : pqPropertyWidget(smProxy, parentObject)
 {
   QVBoxLayout* layoutLocal = new QVBoxLayout;
-  layoutLocal->setMargin(0);
+  layoutLocal->setContentsMargins(0, 0, 0, 0);
   this->Widget = new pqDisplayRepresentationWidget(this);
   layoutLocal->addWidget(this->Widget);
   setLayout(layoutLocal);

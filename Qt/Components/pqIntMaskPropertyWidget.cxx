@@ -52,7 +52,7 @@ public:
     : Mask(0)
   {
     QHBoxLayout* hbox = new QHBoxLayout(self);
-    hbox->setMargin(0);
+    hbox->setContentsMargins(0, 0, 0, 0);
 
     this->Button = new QPushButton(self);
     hbox->addWidget(this->Button);

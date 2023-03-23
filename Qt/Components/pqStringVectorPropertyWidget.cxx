@@ -78,7 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QLabel>
 #include <QPushButton>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStyle>
 #include <QTextEdit>
 #include <QTreeWidget>
@@ -163,7 +163,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   domainIter->Delete();
 
   QVBoxLayout* vbox = new QVBoxLayout;
-  vbox->setMargin(0);
+  vbox->setContentsMargins(0, 0, 0, 0);
   vbox->setSpacing(0);
 
   if (fileListDomain)
@@ -321,7 +321,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     QWidget* w = new QWidget(this);
     QHBoxLayout* hbox = new QHBoxLayout(this);
-    hbox->setMargin(0);
+    hbox->setContentsMargins(0, 0, 0, 0);
     hbox->setSpacing(0);
     QLabel* label =
       new QLabel(QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel()), w);
@@ -507,7 +507,7 @@ void pqStringVectorPropertyWidget::processFileChooserHints(vtkPVXMLElement* hint
       else
       {
         QStringList lextensions =
-          QString(extensions).split(QRegExp("\\s+"), PV_QT_SKIP_EMPTY_PARTS);
+          QString(extensions).split(QRegularExpression("\\s+"), PV_QT_SKIP_EMPTY_PARTS);
         supportedExtensions.push_back(
           QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
       }

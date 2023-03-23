@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorDialogEventPlayer.h"
 
 #include <QColorDialog>
-#include <QRegExp>
+#include <QRegularExpression>
 
 //----------------------------------------------------------------------------
 pqColorDialogEventPlayer::pqColorDialogEventPlayer(QObject* parentObject)
@@ -53,10 +53,11 @@ bool pqColorDialogEventPlayer::playEvent(
     return false;
   }
 
-  QRegExp regExp("^(\\d+),(\\d+),(\\d+)$");
-  if ((command == pqColorDialogEventPlayer::EVENT_NAME()) && (regExp.indexIn(arguments) != -1))
+  QRegularExpression regExp("^(\\d+),(\\d+),(\\d+)$");
+  QRegularExpressionMatch match = regExp.match(arguments);
+  if ((command == pqColorDialogEventPlayer::EVENT_NAME()) && match.hasMatch())
   {
-    QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(), regExp.cap(3).toInt());
+    QColor rgb(match.captured(1).toInt(), match.captured(2).toInt(), match.captured(3).toInt());
     dialog->setCurrentColor(rgb);
     return true;
   }

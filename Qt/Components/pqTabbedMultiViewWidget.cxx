@@ -482,7 +482,7 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
     this, SLOT(contextMenuRequested(const QPoint&)));
 
   QGridLayout* glayout = new QGridLayout(this);
-  glayout->setMargin(0);
+  glayout->setContentsMargins(0, 0, 0, 0);
   glayout->setSpacing(0);
   glayout->addWidget(this->Internals->TabWidget, 0, 0);
 
@@ -567,7 +567,7 @@ void pqTabbedMultiViewWidget::toggleFullScreen()
 
     QGridLayout* glayout = new QGridLayout(fullScreenWindow);
     glayout->setSpacing(0);
-    glayout->setMargin(0);
+    glayout->setContentsMargins(0, 0, 0, 0);
     glayout->addWidget(internals.TabWidget, 0, 0);
     fullScreenWindow->showFullScreen();
     fullScreenWindow->show();

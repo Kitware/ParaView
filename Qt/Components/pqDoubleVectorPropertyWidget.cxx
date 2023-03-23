@@ -102,7 +102,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   }
 
   QHBoxLayout* layoutLocal = new QHBoxLayout;
-  layoutLocal->setMargin(0);
+  layoutLocal->setContentsMargins(0, 0, 0, 0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   this->setLayout(layoutLocal);

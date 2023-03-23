@@ -1,8 +1,8 @@
-find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets)
+find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS Core Widgets)
 set(CMAKE_AUTOMOC 1)
 vtk_module_test_executable(pqFileDialogTest
   pqFileDialogTest.cxx pqFileDialogTest.h)
-target_link_libraries(pqFileDialogTest LINK_PRIVATE Qt5::Core Qt5::Widgets)
+target_link_libraries(pqFileDialogTest LINK_PRIVATE Qt${PARAVIEW_QT_MAJOR_VERSION}::Core Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
 
 add_test(
   NAME pqFileDialogTest

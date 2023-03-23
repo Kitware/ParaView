@@ -76,7 +76,7 @@ pqPopOutWidget::pqPopOutWidget(QWidget* widgetToPopOut, const QString& dialogTit
 {
   this->Internals->Title = dialogTitle;
   this->Internals->Layout = new QHBoxLayout(this);
-  this->Internals->Layout->setMargin(0);
+  this->Internals->Layout->setContentsMargins(0, 0, 0, 0);
   this->Internals->Layout->setSpacing(0);
   this->Internals->WidgetToPopOut = widgetToPopOut;
   this->Internals->Layout->addWidget(this->Internals->WidgetToPopOut);

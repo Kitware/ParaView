@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt
 #include <QDropEvent>
 #include <QHeaderView>
+#include <QRegularExpression>
+#include <QSequentialIterable>
 #include <QSet>
 #include <QShortcut>
 #include <QStringList>
@@ -63,12 +65,12 @@ void ensureUniqueCategoryName(QTreeWidgetItem* parent, QTreeWidgetItem* item, in
     QTreeWidgetItem* child = parent->child(i);
     if (child != item && isItemCategory(child) && child->text(0) == itemText)
     {
-      QRegExp rx("(.*)_([0-9]+)");
-      int p = rx.indexIn(itemText);
-      if (p > -1)
+      QRegularExpression rx("(.*)_([0-9]+)");
+      QRegularExpressionMatch match = rx.match(itemText);
+      if (match.hasMatch())
       {
-        itemText = rx.cap(1);
-        v = rx.cap(2).toInt();
+        itemText = match.captured(1);
+        v = match.captured(2).toInt();
       }
       item->setText(0, QString("%1_%2").arg(itemText, QString::number(v + 1)));
       ensureUniqueCategoryName(parent, item, v + 1);

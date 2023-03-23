@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+#include <QRegularExpression>
 #include <QSortFilterProxyModel>
 
 namespace
@@ -433,9 +434,10 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
   connect(this->Internals->Ui.recordButton, &QAbstractButton::clicked, this,
     [this]() { this->Internals->Ui.keySequenceEdit->setFocus(); });
   connect(this->Internals->Ui.searchBox, &pqSearchBox::textChanged, this, [this]() {
-    QRegExp regex(this->Internals->Ui.searchBox->text(), Qt::CaseInsensitive);
+    QRegularExpression regex(
+      this->Internals->Ui.searchBox->text(), QRegularExpression::CaseInsensitiveOption);
 
-    this->Internals->FilterModel->setFilterRegExp(regex);
+    this->Internals->FilterModel->setFilterRegularExpression(regex);
     this->Internals->Ui.treeView->expandAll();
   });
   this->setWindowTitle(tr("Customize Shortcuts"));

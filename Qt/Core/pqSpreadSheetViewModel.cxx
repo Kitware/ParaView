@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 // Qt Includes.
+#include <QIODevice>
 #include <QItemSelectionModel>
 #include <QPointer>
 #include <QtDebug>

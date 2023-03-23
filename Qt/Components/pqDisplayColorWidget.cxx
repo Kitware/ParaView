@@ -258,7 +258,7 @@ pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor.svg");
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
   hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   this->Variables = new QComboBox(this);

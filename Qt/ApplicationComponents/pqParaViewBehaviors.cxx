@@ -318,7 +318,8 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     QShortcut* ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space, mainWindow);
     QObject::connect(
       ctrlSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
-    QShortcut* ctrlShiftSpace = new QShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Space, mainWindow);
+    QShortcut* ctrlShiftSpace =
+      new QShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Space), mainWindow);
     QObject::connect(
       ctrlShiftSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
     QShortcut* altSpace = new QShortcut(Qt::ALT + Qt::Key_Space, mainWindow);

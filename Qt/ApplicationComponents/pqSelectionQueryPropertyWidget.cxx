@@ -223,7 +223,7 @@ private:
       case COMMA_SEPARATED_VALUES:
       {
         auto vbox = new QVBoxLayout(this);
-        vbox->setMargin(0);
+        vbox->setContentsMargins(0, 0, 0, 0);
         vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
         auto edit = new pqLineEdit(this);
         this->LineEdits.push_back(edit);
@@ -244,7 +244,7 @@ private:
       case RANGE_PAIR:
       {
         auto hbox = new QHBoxLayout(this);
-        hbox->setMargin(0);
+        hbox->setContentsMargins(0, 0, 0, 0);
         hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
         auto editMin = new pqLineEdit(this);
@@ -269,7 +269,7 @@ private:
       case LOCATION_WITH_TOLERANCE:
       {
         auto grid = new QGridLayout(this);
-        grid->setMargin(0);
+        grid->setContentsMargins(0, 0, 0, 0);
         grid->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
         grid->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
         auto editX = new pqDoubleLineEdit(this);
@@ -342,7 +342,7 @@ public:
     this->Operator->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     auto hbox = new QHBoxLayout(this);
-    hbox->setMargin(0);
+    hbox->setContentsMargins(0, 0, 0, 0);
     hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
     hbox->addWidget(this->Term, 0, Qt::AlignTop);
     hbox->addWidget(this->Operator, 0, Qt::AlignTop);
@@ -630,7 +630,7 @@ class pqSelectionQueryPropertyWidget::pqInternals
   void insertQuery(int index, const QString& expr = QString())
   {
     auto hbox = new QHBoxLayout();
-    hbox->setMargin(0);
+    hbox->setContentsMargins(0, 0, 0, 0);
     hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
     auto wdg = new QueryWidgetType(this->Parent);
@@ -714,7 +714,7 @@ public:
     : Parent(self)
   {
     auto vbox = new QVBoxLayout(self);
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   }
 

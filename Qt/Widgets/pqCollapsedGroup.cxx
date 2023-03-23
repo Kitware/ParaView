@@ -39,10 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyleOptionGroupBox>
 #include <QStylePainter>
 
-static QStyleOptionGroupBox pqCollapseGroupGetStyleOption(const pqCollapsedGroup* p)
+QStyleOptionGroupBox pqCollapsedGroup::pqCollapseGroupGetStyleOption(const pqCollapsedGroup* p)
 {
   QStyleOptionGroupBox option;
-  option.init(p);
+  p->initStyleOption(&option);
   option.text = p->title();
   option.lineWidth = 1;
   option.midLineWidth = 0;

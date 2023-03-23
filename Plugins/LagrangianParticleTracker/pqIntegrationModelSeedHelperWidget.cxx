@@ -119,7 +119,9 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
 
       // Create main layout
       QGridLayout* gridLayout = new QGridLayout(this);
-      gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+      gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+        pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+        pqPropertiesPanel::suggestedMargin());
       gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
       gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
       gridLayout->setColumnStretch(0, 0);
@@ -143,7 +145,9 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
 
         // Add a layout in each
         QGridLayout* gbLayout = new QGridLayout(gb);
-        gbLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+        gbLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
+          pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
+          pqPropertiesPanel::suggestedMargin());
         gbLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
         gbLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
         gb->setLayout(gbLayout);

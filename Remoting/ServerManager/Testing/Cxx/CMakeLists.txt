@@ -1,5 +1,5 @@
 if (PARAVIEW_USE_QT)
-  find_package(Qt5 REQUIRED COMPONENTS Test)
+  find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Test)
   set(CMAKE_AUTOMOC 1)
   set(UNITTESTS
     SMProxy
@@ -38,7 +38,7 @@ vtk_test_cxx_executable(vtkRemotingServerManagerCxxTests tests
   ${extra_sources})
 
 if (PARAVIEW_USE_QT)
-  target_link_libraries(vtkRemotingServerManagerCxxTests PRIVATE Qt5::Test)
+  target_link_libraries(vtkRemotingServerManagerCxxTests PRIVATE Qt${PARAVIEW_QT_MAJOR_VERSION}::Test)
 endif ()
 
 set_property(SOURCE TestValidateProxies.cxx APPEND

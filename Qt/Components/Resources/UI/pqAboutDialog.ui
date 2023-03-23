@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+<customwidgets>
+  <customwidget>
+   <class>pqAboutDialog</class>
+   <extends>QDialog</extends>
+   <header>pqAboutDialog.h</header>
+  </customwidget>
+</customwidgets>
  <class>pqAboutDialog</class>
- <widget class="QDialog" name="pqAboutDialog">
+ <widget class="pqAboutDialog" name="pqAboutDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

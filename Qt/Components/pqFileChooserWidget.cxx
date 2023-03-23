@@ -51,7 +51,7 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   this->AcceptAnyFile = false;
 
   QHBoxLayout* l = new QHBoxLayout(this);
-  l->setMargin(0);
+  l->setContentsMargins(0, 0, 0, 0);
   l->setSpacing(2);
   this->LineEdit = new QLineEdit(this);
   this->LineEdit->setObjectName("FileLineEdit");

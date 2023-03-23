@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMStringListDomain.h"
 
+#include <QIODevice>
 #include <QMimeData>
 #include <QPainter>
 #include <QPixmap>

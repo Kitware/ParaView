@@ -69,7 +69,7 @@ KeySequencesWidget::KeySequencesWidget(const std::string& label, const std::stri
   auto* hl = new QHBoxLayout(this);
   hl->addWidget(m_label);
   hl->addWidget(m_button);
-  hl->setMargin(1);
+  hl->setContentsMargins(1, 1, 1, 1);
   m_shortcut = pqKeySequences::instance().addModalShortcut(shortcut, m_action, this);
   m_shortcut->setObjectName(label.c_str());
   QObject::connect(
@@ -203,7 +203,7 @@ void KeySequencesTester::basic()
   auto* widget = new QWidget(window);
   window->setCentralWidget(widget);
   auto* layout = new QVBoxLayout(widget);
-  layout->setMargin(1);
+  layout->setContentsMargins(1, 1, 1, 1);
   layout->setSpacing(1);
 
   auto* w1 = new KeySequencesWidget("Thing 1", "1", QKeySequence(tr("Ctrl+A")), widget);

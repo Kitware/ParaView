@@ -73,7 +73,7 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
   }
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
   hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   if (this->Checkbox)
   {

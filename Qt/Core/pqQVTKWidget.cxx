@@ -65,7 +65,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
   , useStereo(isStereo)
 {
   auto* layout = new QVBoxLayout();
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
 
   if (useStereo)
   {

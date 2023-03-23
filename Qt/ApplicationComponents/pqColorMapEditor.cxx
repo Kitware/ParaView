@@ -86,7 +86,7 @@ public:
     this->Ui.setupUi(self);
 
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(0);
   }
 
