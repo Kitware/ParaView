@@ -154,13 +154,20 @@ public:
                                                  : helperProxy->GetProperty("Selectors"));
     Q_ASSERT(selectorsProperty != nullptr);
     std::vector<std::string> selectors(selectorsProperty->GetUncheckedElements());
+    // get assembly
+    const auto repr = this->representation();
+    std::string assemblyName = "Hierarchy";
+    if (repr && repr->getProxy() && repr->getProxy()->GetProperty("Assembly"))
+    {
+      assemblyName = vtkSMPropertyHelper(repr->getProxy(), "Assembly").GetAsString();
+    }
     // create extract block filter
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
     auto extractBlockFilter = builder->createFilter(
       "filters", "ExtractBlock", this->OutputPort->getSource(), this->OutputPort->getPortNumber());
     auto extractBlockProxy = extractBlockFilter->getProxy();
     // set assembly
-    vtkSMPropertyHelper(extractBlockProxy, "Assembly").Set("Hierarchy");
+    vtkSMPropertyHelper(extractBlockProxy, "Assembly").Set(assemblyName.c_str());
     // copy selectors
     unsigned int idx = 0;
     for (const auto& selector : selectors)
