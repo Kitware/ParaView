@@ -1383,7 +1383,7 @@ function (paraview_add_plugin name)
         Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
     set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       PROPERTY
-        Qt5Core_VERSION_MINOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
+        Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MINOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
   endif ()
 
   set(_paraview_add_plugin_with_python 0)
