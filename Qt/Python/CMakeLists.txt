@@ -57,7 +57,7 @@ set(CMAKE_AUTOMOC 1)
 set(CMAKE_AUTOUIC 1)
 
 vtk_module_find_package(
-  PACKAGE     Qt${PARAVIEW_QT_MAJOR_VERSION}
+  PACKAGE     "Qt${PARAVIEW_QT_MAJOR_VERSION}"
   COMPONENTS  Widgets)
 
 source_group("Resources" FILES
@@ -86,5 +86,5 @@ vtk_module_add_module(ParaView::pqPython
 
 vtk_module_link(ParaView::pqPython
   PRIVATE
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets")
 vtk_module_definitions(ParaView::pqPython PRIVATE QT_NO_KEYWORDS)

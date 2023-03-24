@@ -1,4 +1,4 @@
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Widgets Network)
+find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED COMPONENTS Widgets Network)
 
 set(required_modules "")
 set(openxr_support FALSE)

@@ -1,4 +1,4 @@
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} QUIET REQUIRED COMPONENTS Network)
+find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" QUIET REQUIRED COMPONENTS Network)
 
 list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -121,7 +121,7 @@ target_link_libraries(CAVEInteraction
     VTK::CommonMath
     VTK::CommonTransforms
     VTK::RenderingCore
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Network)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Network")
 target_compile_definitions(CAVEInteraction PRIVATE QT_NO_KEYWORDS)
 
 if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)

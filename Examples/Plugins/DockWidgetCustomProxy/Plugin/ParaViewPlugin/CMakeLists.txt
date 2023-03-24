@@ -1,4 +1,4 @@
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Widgets)
+find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED COMPONENTS Widgets)
 
 set(interfaces)
 set(sources
@@ -30,4 +30,4 @@ paraview_add_plugin(DockWidgetCustomProxy
 target_link_libraries(DockWidgetCustomProxy
   PRIVATE
     DockWidgetCustomProxy::Writer
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets")

@@ -94,7 +94,7 @@ function(paraview_create_translation)
     endif ()
     list(APPEND _pv_create_tr_files ${_pv_create_tr_in_file})
   endforeach ()
-  find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS LinguistTools)
+  find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED QUIET COMPONENTS LinguistTools)
   get_filename_component(_pv_create_tr_directory ${_pv_create_tr_OUTPUT_TS} DIRECTORY)
   file(MAKE_DIRECTORY "${_pv_create_tr_directory}")
   # List of files is stored in a .pro file because the command can reach the Windows limit of character

@@ -281,7 +281,7 @@ if (PARAVIEW_USE_QTWEBENGINE)
 endif ()
 
 vtk_module_find_package(
-  PACKAGE     Qt${PARAVIEW_QT_MAJOR_VERSION}
+  PACKAGE     "Qt${PARAVIEW_QT_MAJOR_VERSION}"
   COMPONENTS  ${qt_components})
 
 source_group("Resources" FILES
@@ -315,24 +315,24 @@ vtk_module_add_module(ParaView::pqComponents
           ${resource_files})
 vtk_module_link(ParaView::pqComponents
   PRIVATE
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Network
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Network"
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets")
 vtk_module_definitions(ParaView::pqComponents PRIVATE QT_NO_KEYWORDS)
 
 if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   vtk_module_link(ParaView::pqComponents
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat")
 endif()
 
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqComponents
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Help)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Help")
 endif ()
 
 if (PARAVIEW_USE_QTWEBENGINE)
   vtk_module_link(ParaView::pqComponents
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::WebEngineWidgets)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::WebEngineWidgets")
 endif ()
