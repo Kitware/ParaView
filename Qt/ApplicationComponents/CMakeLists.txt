@@ -307,7 +307,7 @@ set(qt_components
 if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   list(APPEND qt_components
     Core5Compat)
-endif()
+endif ()
 
 if (paraview_use_materialeditor)
   list(APPEND classes
@@ -347,10 +347,10 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 set(translatable_files)
 if (PARAVIEW_BUILD_TRANSLATIONS)
   list(APPEND translatable_files ${ui_files})
-  foreach(el IN LISTS classes)
+  foreach (el IN LISTS classes)
     list(APPEND translatable_files "${el}.cxx")
     list(APPEND translatable_files "${el}.h")
-  endforeach()
+  endforeach ()
 
   paraview_create_translation(
     TARGET "ApplicationComponents.ts"
@@ -370,11 +370,11 @@ vtk_module_link(ParaView::pqApplicationComponents
     "Qt${PARAVIEW_QT_MAJOR_VERSION}::Network")
 vtk_module_definitions(ParaView::pqApplicationComponents PRIVATE QT_NO_KEYWORDS)
 
-if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+if (PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   vtk_module_link(ParaView::pqApplicationComponents
     PRIVATE
       "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat")
-endif()
+endif ()
 
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqApplicationComponents

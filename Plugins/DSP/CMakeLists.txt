@@ -12,7 +12,7 @@ if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
     message(FATAL_ERROR
       "Component 'Qt5::Multimedia' required for the DSP plugin not found. Use "
       "PARAVIEW_PLUGIN_dsp_enable_audio_player to disable the audio player if necessary, or install 'Qt5::Multimedia'")
-  endif()
+  endif ()
 
   list(APPEND sources
     pqAudioPlayer.cxx
@@ -29,7 +29,7 @@ if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
   list(APPEND sources
     ${dock_sources})
   list(APPEND uifiles pqAudioPlayer.ui)
-endif()
+endif ()
 
 paraview_add_plugin(DigitalSignalProcessing
   VERSION "1.0"
