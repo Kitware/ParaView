@@ -8,8 +8,6 @@ mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
 option(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI "Build CAVEInteraction plugin with VRUI support" OFF)
 mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI)
 
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Network)
-
 # TODO: Should something be done with the files in samples/?
 
 configure_file(
