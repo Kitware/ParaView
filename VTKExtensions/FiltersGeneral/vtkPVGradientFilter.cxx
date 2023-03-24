@@ -117,10 +117,19 @@ int vtkPVGradientFilter::RequestData(
   {
     vtkNew<vtkHyperTreeGridGradient> htgGradient;
     htgGradient->SetInputData(0, inHTG);
-    htgGradient->SetResultArrayName(this->ResultArrayName);
     htgGradient->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
     htgGradient->SetMode(this->HTGMode);
     htgGradient->SetExtensiveComputation(this->HTGExtensiveComputation);
+
+    htgGradient->SetComputeGradient(this->GetComputeGradient());
+    htgGradient->SetGradientArrayName(this->GetResultArrayName());
+    htgGradient->SetComputeDivergence(this->GetComputeDivergence());
+    htgGradient->SetDivergenceArrayName(this->GetDivergenceArrayName());
+    htgGradient->SetComputeVorticity(this->GetComputeVorticity());
+    htgGradient->SetVorticityArrayName(this->GetVorticityArrayName());
+    htgGradient->SetComputeQCriterion(this->GetComputeQCriterion());
+    htgGradient->SetQCriterionArrayName(this->GetQCriterionArrayName());
+
     htgGradient->Update();
     outDataObj->ShallowCopy(htgGradient->GetOutput(0));
 
