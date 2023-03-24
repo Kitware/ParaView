@@ -46,9 +46,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Set the size of the cursor (in pixels);
+   * Set the size of the cursor (in pixels)
    */
   void SetCursorSize(int size);
+
+  /**
+   * Set the cursor shape.
+   */
+  void SetCursorShape(int cursorShape);
 
 protected:
   vtkPVStereoCursorView();
