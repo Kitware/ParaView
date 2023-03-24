@@ -265,7 +265,7 @@ set(qt_components
 if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   list(APPEND qt_components
     Core5Compat)
-endif()
+endif ()
 
 if (PARAVIEW_USE_QTHELP)
   list(APPEND classes
@@ -281,7 +281,7 @@ if (PARAVIEW_USE_QTWEBENGINE)
 endif ()
 
 vtk_module_find_package(
-  PACKAGE     Qt${PARAVIEW_QT_MAJOR_VERSION}
+  PACKAGE     "Qt${PARAVIEW_QT_MAJOR_VERSION}"
   COMPONENTS  ${qt_components})
 
 source_group("Resources" FILES
@@ -296,10 +296,10 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 set(translatable_files)
 if (PARAVIEW_BUILD_TRANSLATIONS)
   list(APPEND translatable_files ${ui_files})
-  foreach(el IN LISTS classes)
+  foreach (el IN LISTS classes)
     list(APPEND translatable_files "${el}.cxx")
     list(APPEND translatable_files "${el}.h")
-  endforeach()
+  endforeach ()
 
   paraview_create_translation(
     TARGET "Components.ts"
@@ -315,24 +315,24 @@ vtk_module_add_module(ParaView::pqComponents
           ${resource_files})
 vtk_module_link(ParaView::pqComponents
   PRIVATE
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Network
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Network"
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets")
 vtk_module_definitions(ParaView::pqComponents PRIVATE QT_NO_KEYWORDS)
 
-if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+if (PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   vtk_module_link(ParaView::pqComponents
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat)
-endif()
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat")
+endif ()
 
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqComponents
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Help)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Help")
 endif ()
 
 if (PARAVIEW_USE_QTWEBENGINE)
   vtk_module_link(ParaView::pqComponents
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::WebEngineWidgets)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::WebEngineWidgets")
 endif ()

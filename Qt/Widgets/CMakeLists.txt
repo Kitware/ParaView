@@ -112,13 +112,13 @@ if (APPLE)
     PrintSupport)
 endif ()
 
-if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+if (PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   list(APPEND qt_components
     Core5Compat)
-endif()
+endif ()
 
 vtk_module_find_package(
-  PACKAGE     Qt${PARAVIEW_QT_MAJOR_VERSION}
+  PACKAGE     "Qt${PARAVIEW_QT_MAJOR_VERSION}"
   COMPONENTS  ${qt_components})
 
 ##########################################################################
@@ -168,21 +168,21 @@ vtk_module_add_module(ParaView::pqWidgets
   HEADERS ${headers})
 vtk_module_link(ParaView::pqWidgets
   PUBLIC
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Core
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Gui
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core"
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Gui"
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets"
   PRIVATE
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Network)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Network")
 vtk_module_definitions(ParaView::pqWidgets PRIVATE QT_NO_KEYWORDS)
 
-if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
+if (PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   vtk_module_link(ParaView::pqWidgets
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat)
-endif()
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat")
+endif ()
 
 if (APPLE)
   vtk_module_link(ParaView::pqWidgets
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::PrintSupport)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::PrintSupport")
 endif ()

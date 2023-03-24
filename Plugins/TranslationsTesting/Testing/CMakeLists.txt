@@ -1,4 +1,4 @@
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS LinguistTools)
+find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED QUIET COMPONENTS LinguistTools)
 find_package(Python3 REQUIRED QUIET COMPONENTS Interpreter)
 
 

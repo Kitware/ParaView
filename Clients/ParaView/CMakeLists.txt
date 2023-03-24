@@ -33,7 +33,7 @@ set(sources
   ParaViewMainWindow.h
   ParaViewMainWindow.ui)
 
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS Core Widgets)
+find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED QUIET COMPONENTS Core Widgets)
 
 if (APPLE)
   # Enable high resolution when using Qt5
@@ -88,13 +88,13 @@ if (PARAVIEW_BUILD_TRANSLATIONS AND TARGET "localization")
   add_dependencies(localization "ParaViewClient.ts")
 endif()
 
-find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED QUIET COMPONENTS Widgets)
+find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED QUIET COMPONENTS Widgets)
 
 target_link_libraries(paraview
   PRIVATE
     ParaView::RemotingSettings
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Core
-    Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core"
+    "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets")
 
 target_compile_definitions(paraview
   PRIVATE
@@ -106,10 +106,10 @@ if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 endif ()
 
 if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
-  find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} REQUIRED COMPONENTS Core5Compat)
+  find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" REQUIRED COMPONENTS Core5Compat)
   target_link_libraries(paraview
     PRIVATE
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core5Compat")
 endif()
 
 target_compile_definitions(paraview

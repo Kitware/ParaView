@@ -1352,16 +1352,16 @@ function (paraview_add_plugin name)
     list(APPEND _paraview_add_plugin_qt_extra_components
       Widgets)
     list(APPEND _paraview_add_plugin_required_libraries
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets")
     list(APPEND _paraview_add_plugin_ui_sources
       ${_paraview_add_plugin_UI_FILES})
   endif ()
 
   if (_paraview_add_plugin_with_ui OR _paraview_add_plugin_with_resources)
     include("${_ParaViewPlugin_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
-    find_package(Qt${PARAVIEW_QT_MAJOR_VERSION} QUIET REQUIRED COMPONENTS Core ${_paraview_add_plugin_qt_extra_components})
+    find_package("Qt${PARAVIEW_QT_MAJOR_VERSION}" QUIET REQUIRED COMPONENTS Core ${_paraview_add_plugin_qt_extra_components})
     list(APPEND _paraview_add_plugin_required_libraries
-      Qt${PARAVIEW_QT_MAJOR_VERSION}::Core)
+      "Qt${PARAVIEW_QT_MAJOR_VERSION}::Core")
     if (_paraview_add_plugin_with_ui)
       list(APPEND _paraview_add_plugin_required_libraries
         ParaView::pqCore)
@@ -1375,15 +1375,15 @@ function (paraview_add_plugin name)
 
     # Fix for 3.13.0–3.13.3. Does not work if `paraview_add_plugin` is called
     # from another function.
-    set(Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}" PARENT_SCOPE)
-    set(Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MINOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MINOR}" PARENT_SCOPE)
+    set("Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR" "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}" PARENT_SCOPE)
+    set("Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MINOR" "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MINOR}" PARENT_SCOPE)
     # Fix for 3.13.4+.
     set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       PROPERTY
-        Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
+        "Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR" "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
     set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       PROPERTY
-        Qt5Core_VERSION_MINOR "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
+        "Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MINOR" "${Qt${PARAVIEW_QT_MAJOR_VERSION}Core_VERSION_MAJOR}")
   endif ()
 
   set(_paraview_add_plugin_with_python 0)
