@@ -68,7 +68,7 @@ const char* vtkSMFieldDataDomain::GetElementTypeAsString(int attrType)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMFieldDataDomain::ComputeDefaultValue(int currentValue)
+int vtkSMFieldDataDomain::ComputeDefaultValue(int originalDefaultValue)
 {
   auto dataInfo = this->GetInputDataInformation("Input");
   if (!dataInfo)
@@ -76,25 +76,31 @@ int vtkSMFieldDataDomain::ComputeDefaultValue(int currentValue)
     return -1;
   }
 
-  // first, find an attribute with non-empty arrays and tuples
-  for (unsigned int cc = 0, max = this->GetNumberOfEntries(); cc < max; ++cc)
+  // Find an attribute with non-empty arrays and tuples
+  for (unsigned int cc = 0; cc < this->GetNumberOfEntries(); ++cc)
   {
-    const int attrType = this->GetEntryValue((cc + currentValue) % max);
-    auto attrInfo = dataInfo->GetAttributeInformation(attrType);
-    if (attrInfo && attrInfo->GetNumberOfArrays() > 0 && attrInfo->GetMaximumNumberOfTuples() > 0)
+    const int attrType = this->GetEntryValue(cc);
+    if (originalDefaultValue == -1 || originalDefaultValue == attrType)
     {
-      return attrType;
+      auto attrInfo = dataInfo->GetAttributeInformation(attrType);
+      if (attrInfo && attrInfo->GetNumberOfArrays() > 0 && attrInfo->GetMaximumNumberOfTuples() > 0)
+      {
+        return attrType;
+      }
     }
   }
 
   // if that fails, find an attribute with non-empty arrays
-  for (unsigned int cc = 0, max = this->GetNumberOfEntries(); cc < max; ++cc)
+  for (unsigned int cc = 0; cc < this->GetNumberOfEntries(); ++cc)
   {
-    const int attrType = this->GetEntryValue((cc + currentValue) % max);
-    auto attrInfo = dataInfo->GetAttributeInformation(attrType);
-    if (attrInfo && attrInfo->GetNumberOfArrays() > 0)
+    const int attrType = this->GetEntryValue(cc);
+    if (originalDefaultValue == -1 || originalDefaultValue == attrType)
     {
-      return attrType;
+      auto attrInfo = dataInfo->GetAttributeInformation(attrType);
+      if (attrInfo && attrInfo->GetNumberOfArrays() > 0)
+      {
+        return attrType;
+      }
     }
   }
 
@@ -106,8 +112,15 @@ int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
 {
   if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop))
   {
-    int currentValue = ivp->GetElement(0);
-    const int defaultValue = this->ComputeDefaultValue(currentValue);
+    // Check provided default_values contains data
+    int originalDefaultValue = ivp->GetDefaultValue(0);
+    int defaultValue = this->ComputeDefaultValue(originalDefaultValue);
+    if (defaultValue == -1)
+    {
+      // If not, try to find a default_values that contains data
+      defaultValue = this->ComputeDefaultValue(-1);
+    }
+
     if (defaultValue != -1)
     {
       if (use_unchecked_values)
