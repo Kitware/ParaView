@@ -32,10 +32,14 @@ endfunction ()
 function (_paraview_add_tests function)
   cmake_parse_arguments(_paraview_add_tests
     "FORCE_SERIAL;FORCE_LOCK;SMTESTING_ALLOW_ERRORS"
-    "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS"
+    "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS;NUMSERVERS"
     "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;TEST_NAME;ENVIRONMENT;ARGS;CLIENT_ARGS"
     ${ARGN})
-
+  # NUMSERVERS is not used here, but is used by paraview_add_client_server_tests function.
+  # It is kept here to avoid filtering it out from ARGN in the caller.
+  # If it were not present here, nor filtered out in the caller, then it would be considered
+  # as part of "TEST_SCRIPTS" multivalue argument.
+  
   if (_paraview_add_tests_UNPARSED_ARGUMENTS)
     message(FATAL_ERROR
       "Unparsed arguments for ${function}: "
