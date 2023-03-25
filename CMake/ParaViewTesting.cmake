@@ -322,28 +322,47 @@ endfunction ()
 
 function (paraview_add_client_server_tests)
   _get_prefix(chosen_prefix "pvcs" ${ARGN})
-  _get_num_ranks(num_ranks 2 ${ARGN})
-  _paraview_add_tests("paraview_add_client_server_tests"
-    PREFIX "${chosen_prefix}"
-    _DISABLE_SUFFIX "_DISABLE_CS"
-    # Set the number of pvservers through the SMTESTDRIVER_MPI_NUMPROCS environment variable.
-    ENVIRONMENT
-      SMTESTDRIVER_MPI_NUMPROCS=${num_ranks}
-    # Requires CTest to reserve NUMPROCS among the available processors
-    NUMPROCS "${num_ranks}"
-    _COMMAND_PATTERN
-      __paraview_smtesting_args__
-      --server "$<TARGET_FILE:ParaView::pvserver>"
-        --enable-bt
-        __paraview_args__
-      --client __paraview_client__
-        --enable-bt
-        __paraview_args__
-        __paraview_script__
-        __paraview_client_args__
-        --dr
-        --exit
-    ${ARGN})
+  _get_num_servers(num_servers ${ARGN})
+  if (num_servers STREQUAL "NOT_FOUND")
+    _paraview_add_tests("paraview_add_client_server_tests"
+      PREFIX "${chosen_prefix}"
+      _DISABLE_SUFFIX "_DISABLE_CS"
+      _COMMAND_PATTERN
+        __paraview_smtesting_args__
+        --server "$<TARGET_FILE:ParaView::pvserver>"
+          --enable-bt
+          __paraview_args__
+        --client __paraview_client__
+          --enable-bt
+          __paraview_args__
+          __paraview_script__
+          __paraview_client_args__
+          --dr
+          --exit
+      ${ARGN})
+  else() 
+    _paraview_add_tests("paraview_add_client_server_tests"
+      PREFIX "${chosen_prefix}"
+      _DISABLE_SUFFIX "_DISABLE_CS"
+      # Set the number of pvservers through the SMTESTDRIVER_MPI_NUMPROCS environment variable.
+      ENVIRONMENT
+        SMTESTDRIVER_MPI_NUMPROCS=${num_servers}
+      # Requires CTest to reserve NUMPROCS among the available processors
+      NUMPROCS "${num_servers}"
+      _COMMAND_PATTERN
+        __paraview_smtesting_args__
+        --server "$<TARGET_FILE:ParaView::pvserver>"
+          --enable-bt
+          __paraview_args__
+        --client __paraview_client__
+          --enable-bt
+          __paraview_args__
+          __paraview_script__
+          __paraview_client_args__
+          --dr
+          --exit
+      ${ARGN})
+    endif()
 endfunction ()
 
 function (paraview_add_client_server_render_tests)
