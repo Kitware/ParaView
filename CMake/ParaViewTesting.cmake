@@ -288,24 +288,18 @@ function(_get_prefix varname default)
   endif()
 endfunction()
 
-# If NUM_RANKS is specified in ${ARGN} then returns in varname the number of ranks to use for the test, 
-# otherwise returns the default value.
-function(_get_num_ranks varname default)
-  cmake_parse_arguments(_get_num_ranks
+# If NUMSERVERS is specified in ${ARGN} then returns in varname the number of servers to use for the test, 
+# otherwise returns the "NOT_FOUND" value.
+function(_get_num_servers varname)
+  cmake_parse_arguments(_get_num_servers
     ""
-    "NUM_RANKS"
+    "NUMSERVERS"
     ""
     ${ARGN})
-  if (_get_num_ranks_NUM_RANKS)
-    set(${varname} "${_get_num_ranks_NUM_RANKS}" PARENT_SCOPE)
-
-    # Removes the NUM_RANKS and NUM_RANKS value from ARGN otherwise it will be passed to the _paraview_add_tests function.
-    list(FIND ARGN "NUM_RANKS" NUM_RANKS_INDEX)
-    math(EXPR NUM_RANKS_VALUE_INDEX "${NUM_RANKS_INDEX}+1")
-    list(REMOVE_AT ARGN ${NUM_RANKS_INDEX} ${NUM_RANKS_VALUE_INDEX})
-    set(ARGN ${ARGN} PARENT_SCOPE)
+  if (_get_num_servers_NUMSERVERS)
+    set(${varname} "${_get_num_servers_NUMSERVERS}" PARENT_SCOPE)
   else()
-    set(${varname} "${default}" PARENT_SCOPE)
+    set(${varname} "NOT_FOUND" PARENT_SCOPE)
   endif()
 endfunction()
 
