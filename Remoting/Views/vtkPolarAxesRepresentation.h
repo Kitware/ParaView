@@ -24,11 +24,12 @@
 
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVRenderView.h"        // needed for renderer enum
+#include "vtkParaViewDeprecation.h" // needed for macro
+#include "vtkWeakPointer.h"         // needed for vtkWeakPointer.
 
 class vtkPolarAxesActor;
 class vtkPolyData;
-class vtkPVRenderView;
 class vtkTextProperty;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPolarAxesRepresentation : public vtkPVDataRepresentation
@@ -118,8 +119,13 @@ public:
   // Forwarded to internal vtkPolarAxesActor
   virtual void SetLog(bool active);
   virtual void SetNumberOfRadialAxes(vtkIdType val);
+  virtual void SetNumberOfPolarAxes(vtkIdType val);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Set DeltaRangeMajor instead or enable AxisTickMatchesPolarAxes");
   virtual void SetNumberOfPolarAxisTicks(int val);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Set DeltaRangePolarAxes instead");
   virtual void SetAutoSubdividePolarAxis(bool active);
+  virtual void SetDeltaAngleRadialAxes(double angle);
+  virtual void SetDeltaRangePolarAxes(double range);
   virtual void SetMinimumRadius(double radius);
   virtual void SetMinimumAngle(double angle);
   virtual void SetMaximumAngle(double angle);
@@ -141,14 +147,21 @@ public:
   virtual void SetPolarTitleVisibility(int visible);
   virtual void SetRadialAxisTitleLocation(int location);
   virtual void SetPolarAxisTitleLocation(int location);
+  virtual void SetRadialTitleOffset(double offsetX, double offsetY);
+  virtual void SetPolarTitleOffset(double offsetX, double offsetY);
+  virtual void SetPolarLabelOffset(double offsetY);
+  virtual void SetPolarExponentOffset(double offsetY);
   virtual void SetPolarLabelVisibility(int visible);
   virtual void SetArcTicksOriginToPolarAxis(int use);
   virtual void SetRadialAxesOriginToPolarAxis(int use);
   virtual void SetPolarTickVisibility(int visible);
   virtual void SetAxisTickVisibility(int visible);
   virtual void SetAxisMinorTickVisibility(int visible);
+  virtual void SetAxisTickMatchesPolarAxes(int enable);
   virtual void SetArcTickVisibility(int visible);
   virtual void SetArcMinorTickVisibility(int visible);
+  virtual void SetArcTickMatchesRadialAxes(int enable);
+  virtual void SetTickRatioRadiusSize(double ratio);
   virtual void SetArcMajorTickSize(double size);
   virtual void SetPolarAxisMajorTickSize(double size);
   virtual void SetLastRadialAxisMajorTickSize(double size);
@@ -168,8 +181,9 @@ public:
   virtual void SetPolarArcsVisibility(int visible);
   virtual void SetUse2DMode(int use);
   virtual void SetRatio(double ratio);
-  virtual double GetDeltaRangeMinor();
-  virtual double GetDeltaRangeMajor();
+  virtual void SetPolarArcResolutionPerDegree(double resolution);
+  virtual void SetDeltaRangeMinor(double delta);
+  virtual void SetDeltaRangeMajor(double delta);
 
   // Description:
   // Set the renderer to use. Default is to use the
@@ -201,19 +215,19 @@ protected:
   bool RemoveFromView(vtkView* view) override;
 
   vtkNew<vtkPolyData> OutlineGeometry;
+  vtkNew<vtkPolarAxesActor> PolarAxesActor;
   vtkWeakPointer<vtkPVRenderView> RenderView;
-  vtkPolarAxesActor* PolarAxesActor;
-  double Position[3];
-  double Scale[3];
-  double Orientation[3];
-  double CustomBounds[6];
-  int EnableCustomBounds[3];
-  double CustomRange[2];
-  bool EnableCustomRange;
-  double DataBounds[6];
-  int RendererType;
+  double Position[3] = { 0.0 };
+  double Scale[3] = { 1.0 };
+  double Orientation[3] = { 0.0 };
+  double CustomBounds[6] = { 0.0, 1.0, 0.0, 1.0, 0.0, 1.0 };
+  int EnableCustomBounds[3] = { 0 };
+  double CustomRange[2] = { 0.0, 1.0 };
+  bool EnableCustomRange = false;
+  double DataBounds[6] = { 0.0 };
+  int RendererType = vtkPVRenderView::DEFAULT_RENDERER;
+  bool ParentVisibility = true;
   vtkTimeStamp DataBoundsTime;
-  bool ParentVisibility;
 
 private:
   vtkPolarAxesRepresentation(const vtkPolarAxesRepresentation&) = delete;

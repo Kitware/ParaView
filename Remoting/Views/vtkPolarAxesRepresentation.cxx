@@ -12,6 +12,9 @@
     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// VTK_DEPRECATED_IN_9_3_0() warnings for this class.
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkPolarAxesRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
@@ -45,30 +48,12 @@ vtkStandardNewMacro(vtkPolarAxesRepresentation);
 //----------------------------------------------------------------------------
 vtkPolarAxesRepresentation::vtkPolarAxesRepresentation()
 {
-  this->PolarAxesActor = vtkPolarAxesActor::New();
   this->PolarAxesActor->PickableOff();
-
-  this->Position[0] = this->Position[1] = this->Position[2] = 0.0;
-  this->Orientation[0] = this->Orientation[1] = this->Orientation[2] = 0.0;
-  this->Scale[0] = this->Scale[1] = this->Scale[2] = 1.0;
-  this->CustomBounds[0] = this->CustomBounds[2] = this->CustomBounds[4] = 0.0;
-  this->CustomBounds[1] = this->CustomBounds[3] = this->CustomBounds[5] = 1.0;
-  this->EnableCustomBounds[0] = 0;
-  this->EnableCustomBounds[1] = 0;
-  this->EnableCustomBounds[2] = 0;
-  this->CustomRange[0] = 0.0;
-  this->CustomRange[1] = 1.0;
-  this->EnableCustomRange = 0;
-  this->RendererType = vtkPVRenderView::DEFAULT_RENDERER;
-  this->ParentVisibility = true;
   vtkMath::UninitializeBounds(this->DataBounds);
 }
 
 //----------------------------------------------------------------------------
-vtkPolarAxesRepresentation::~vtkPolarAxesRepresentation()
-{
-  this->PolarAxesActor->Delete();
-}
+vtkPolarAxesRepresentation::~vtkPolarAxesRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetVisibility(bool val)
@@ -382,21 +367,33 @@ void vtkPolarAxesRepresentation::SetNumberOfRadialAxes(vtkIdType val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetNumberOfPolarAxisTicks(int vtkNotUsed(val))
+void vtkPolarAxesRepresentation::SetNumberOfPolarAxes(vtkIdType val)
 {
-  // Deactivation of this property since the use of the method is marked as deprecated in VTK
-  // Should be handled by a current MR:
-  // https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6279
-  // this->PolarAxesActor->SetNumberOfPolarAxisTicks(val);
+  this->PolarAxesActor->SetRequestedNumberOfPolarAxes(val);
 }
 
 //----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetAutoSubdividePolarAxis(bool vtkNotUsed(active))
+void vtkPolarAxesRepresentation::SetNumberOfPolarAxisTicks(int val)
 {
-  // Deactivation of this property since the use of the method is marked as deprecated in VTK
-  // Should be handled by a current MR:
-  // https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6279
-  // this->PolarAxesActor->SetAutoSubdividePolarAxis(active);
+  this->PolarAxesActor->SetNumberOfPolarAxisTicks(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetAutoSubdividePolarAxis(bool active)
+{
+  this->PolarAxesActor->SetAutoSubdividePolarAxis(active);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetDeltaAngleRadialAxes(double angle)
+{
+  this->PolarAxesActor->SetRequestedDeltaAngleRadialAxes(angle);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetDeltaRangePolarAxes(double range)
+{
+  this->PolarAxesActor->SetRequestedDeltaRangePolarAxes(range);
 }
 
 //----------------------------------------------------------------------------
@@ -526,6 +523,30 @@ void vtkPolarAxesRepresentation::SetPolarAxisTitleLocation(int location)
 }
 
 //----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetRadialTitleOffset(double offsetX, double offsetY)
+{
+  this->PolarAxesActor->SetRadialTitleOffset(offsetX, offsetY);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetPolarTitleOffset(double offsetX, double offsetY)
+{
+  this->PolarAxesActor->SetPolarTitleOffset(offsetX, offsetY);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetPolarLabelOffset(double offsetY)
+{
+  this->PolarAxesActor->SetPolarLabelOffset(offsetY);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetPolarExponentOffset(double offsetY)
+{
+  this->PolarAxesActor->SetPolarExponentOffset(offsetY);
+}
+
+//----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetPolarLabelVisibility(int visible)
 {
   this->PolarAxesActor->SetPolarLabelVisibility(visible);
@@ -562,6 +583,12 @@ void vtkPolarAxesRepresentation::SetAxisMinorTickVisibility(int visible)
 }
 
 //----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetAxisTickMatchesPolarAxes(int enable)
+{
+  this->PolarAxesActor->SetAxisTickMatchesPolarAxes(enable);
+}
+
+//----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetArcTickVisibility(int visible)
 {
   this->PolarAxesActor->SetArcTickVisibility(visible);
@@ -571,6 +598,18 @@ void vtkPolarAxesRepresentation::SetArcTickVisibility(int visible)
 void vtkPolarAxesRepresentation::SetArcMinorTickVisibility(int visible)
 {
   this->PolarAxesActor->SetArcMinorTickVisibility(visible);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetArcTickMatchesRadialAxes(int enable)
+{
+  this->PolarAxesActor->SetArcTickMatchesRadialAxes(enable);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetTickRatioRadiusSize(double ratio)
+{
+  this->PolarAxesActor->SetTickRatioRadiusSize(ratio);
 }
 
 //----------------------------------------------------------------------------
@@ -688,13 +727,19 @@ void vtkPolarAxesRepresentation::SetRatio(double ratio)
 }
 
 //----------------------------------------------------------------------------
-double vtkPolarAxesRepresentation::GetDeltaRangeMajor()
+void vtkPolarAxesRepresentation::SetPolarArcResolutionPerDegree(double resolution)
 {
-  return this->PolarAxesActor->GetDeltaRangeMajor();
+  this->PolarAxesActor->SetPolarArcResolutionPerDegree(resolution);
 }
 
 //----------------------------------------------------------------------------
-double vtkPolarAxesRepresentation::GetDeltaRangeMinor()
+void vtkPolarAxesRepresentation::SetDeltaRangeMajor(double delta)
 {
-  return this->PolarAxesActor->GetDeltaRangeMinor();
+  this->PolarAxesActor->SetDeltaRangeMajor(delta);
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetDeltaRangeMinor(double delta)
+{
+  this->PolarAxesActor->SetDeltaRangeMinor(delta);
 }
