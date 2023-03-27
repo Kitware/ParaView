@@ -144,6 +144,30 @@
     <string>Paste copied properties</string>
    </property>
   </action>
+  <action name="actionCopyPipeline">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqCopy.svg</normaloff>:/pqWidgets/Icons/pqCopy.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Pipeline</string>
+   </property>
+   <property name="statusTip">
+    <string>Copy Pipeline</string>
+   </property>
+  </action>
+  <action name="actionPastePipeline">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqPaste.svg</normaloff>:/pqWidgets/Icons/pqPaste.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Paste Pipeline</string>
+   </property>
+   <property name="statusTip">
+    <string>Paste copied pipeline</string>
+   </property>
+  </action>
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
@@ -299,6 +323,8 @@
   <addaction name="separator"/>
   <addaction name="actionCopy"/>
   <addaction name="actionPaste"/>
+  <addaction name="actionCopyPipeline"/>
+  <addaction name="actionPastePipeline"/>
   <addaction name="separator"/>
   <addaction name="actionDelete"/>
   <addaction name="actionDeleteTree"/>

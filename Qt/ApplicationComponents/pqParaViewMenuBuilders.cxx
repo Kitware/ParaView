@@ -225,6 +225,8 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqSaveScreenshotReaction(ui.actionCopyScreenshotToClipboard, true);
   new pqCopyReaction(ui.actionCopy);
   new pqCopyReaction(ui.actionPaste, true);
+  new pqCopyReaction(ui.actionCopyPipeline, false, true);
+  new pqCopyReaction(ui.actionPastePipeline, true, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
   new pqSearchItemReaction(ui.actionSearch);
@@ -477,6 +479,26 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
     QCoreApplication::translate("pqPipelineBrowserContextMenu", "Paste Properties", Q_NULLPTR));
 #endif // QT_NO_STATUSTIP
 
+  QAction* actionPBCopyPipeline = new QAction(menu.parent());
+  actionPBCopyPipeline->setObjectName(QStringLiteral("actionPBCopyPipeline"));
+  actionPBCopyPipeline->setIcon(icon2);
+  actionPBCopyPipeline->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Copy Pipeline", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBCopyPipeline->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Copy Pipeline", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBPastePipeline = new QAction(menu.parent());
+  actionPBPastePipeline->setObjectName(QStringLiteral("actionPBPastePipeline"));
+  actionPBPastePipeline->setIcon(icon3);
+  actionPBPastePipeline->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Paste Pipeline", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBPastePipeline->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Paste Pipeline", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
   QAction* actionPBChangeInput = new QAction(menu.parent());
   actionPBChangeInput->setObjectName(QStringLiteral("actionPBChangeInput"));
   actionPBChangeInput->setText(
@@ -592,6 +614,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   menu.addSeparator();
   menu.addAction(actionPBCopy);
   menu.addAction(actionPBPaste);
+  menu.addAction(actionPBCopyPipeline);
+  menu.addAction(actionPBPastePipeline);
   menu.addSeparator();
   menu.addAction(actionPBDelete);
   menu.addAction(actionPBDeleteTree);
@@ -616,6 +640,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   new pqShowHideAllReaction(actionPBHideAll, pqShowHideAllReaction::ActionType::Hide);
   new pqCopyReaction(actionPBCopy);
   new pqCopyReaction(actionPBPaste, true);
+  new pqCopyReaction(actionPBCopyPipeline, false, true);
+  new pqCopyReaction(actionPBPastePipeline, true, true);
   new pqChangePipelineInputReaction(actionPBChangeInput);
   new pqReloadFilesReaction(actionPBReloadFiles);
   new pqIgnoreSourceTimeReaction(actionPBIgnoreTime);

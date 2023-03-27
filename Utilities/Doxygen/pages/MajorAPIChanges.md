@@ -16,6 +16,13 @@ determine if everything should be deleted or only the selection, there is now as
 are passed to enable deleting only the selection or deleting everything, respectively.
 `DeleteModes::TREE` enables the new functionality added to `pqDeleteReaction`.
 
+###pqCopyReaction###
+
+To add support for copying/pasting a pipeline in the pipeline browser, the constructor
+of `pqCopyReaction` was changed. A second bool `pipeline_mode` (with default value of
+false) was added. When `pipeline_mode` is false, the original functionality is used
+(i.e., copying/pasting properties only), whereas when it's true, it will create the pipeline.
+
 Changes in 5.10
 ----------------
 

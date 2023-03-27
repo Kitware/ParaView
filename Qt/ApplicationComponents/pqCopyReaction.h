@@ -34,6 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+#include <QPointer>
+#include <QSet>
+
+class pqPipelineSource;
 class vtkSMProxy;
 /**
  * @ingroup Reactions
@@ -45,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCopyReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqCopyReaction(QAction* parent, bool paste_mode = false);
+  pqCopyReaction(QAction* parent, bool paste_mode = false, bool pipeline_mode = false);
   ~pqCopyReaction() override;
 
   /**
@@ -56,6 +60,10 @@ public:
 
   static void copy();
   static void paste();
+  void copyPipeline();
+  void pastePipeline();
+  bool canCopyPipeline();
+  bool canPastePipeline();
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -69,16 +77,34 @@ protected:
    */
   void onTriggered() override
   {
-    if (this->Paste)
+    if (this->Paste && !this->CreatePipeline)
     {
       pqCopyReaction::paste();
     }
-    else
+    else if (this->Paste && this->CreatePipeline)
+    {
+      this->pastePipeline();
+    }
+    else if (!this->Paste && !this->CreatePipeline)
     {
       pqCopyReaction::copy();
     }
+    else
+    {
+      this->copyPipeline();
+    }
   }
   bool Paste;
+  bool CreatePipeline;
+
+  /**
+   * Used for copy/paste pipeline. pqApplicationCore::registerManager() requires
+   * a QObject, but we need to track potentially multiple pipeline sources.
+   * Also using QPointer, so that way if any pqPipelineSource in this selection
+   * is deleted between Copy Pipeline and Paste Pipeline, we will be able to easily
+   * determine this.
+   */
+  static QSet<QPointer<pqPipelineSource>> FilterSelection;
 
 private:
   Q_DISABLE_COPY(pqCopyReaction)
