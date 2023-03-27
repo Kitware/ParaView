@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QModelIndex>    // for QModelIndex
 #include <QScopedPointer> // for QScopedPointer
 #include <QString>
-#include <QStringRef>
 #include <QVector>
 #include <QWidget> // for QWidget
 
