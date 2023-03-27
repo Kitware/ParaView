@@ -39,6 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QScreen>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#include <QDesktopWidget>
+#endif
+
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
@@ -183,7 +187,6 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
   {
     return;
   }
-  auto desktop = dock_widget->screen();
 
   QPoint dockTopLeft = dock_widget->pos();
   QRect dockRect(dockTopLeft, dock_widget->size());
@@ -191,7 +194,14 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
   QRect geometry = QRect(dockTopLeft, dock_widget->frameSize());
   int titleBarHeight = geometry.height() - dockRect.height();
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+  QDesktopWidget desktop;
+  QRect screenRect = desktop.availableGeometry(dock_widget);
+#else
+  auto desktop = dock_widget->screen();
   QRect screenRect = desktop->availableGeometry();
+#endif
+
   QRect desktopRect = QGuiApplication::primaryScreen()
                         ->availableGeometry(); // Should give us the entire Desktop geometry
   // Ensure the top left corner of the window is on the screen
