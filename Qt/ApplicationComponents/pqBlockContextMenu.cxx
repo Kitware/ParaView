@@ -85,8 +85,9 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
     return false;
   }
 
-  const auto blockNames =
-    dataInfo->GetBlockNames(dataBlockContext, vtkDataAssemblyUtilities::HierarchyName());
+  const auto assemblyName = vtkSMPropertyHelper(repr->getProxy(), "Assembly").GetAsString();
+
+  const auto blockNames = dataInfo->GetBlockNames(dataBlockContext, assemblyName);
   if (blockNames.empty())
   {
     return false;
@@ -108,12 +109,12 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
     menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeballClosed.svg"), tr("Hide Block"), [=]() {
       // use pqDataAssemblyTreeModel to avoid having to handle the complexity of
       // updating properties respecting hierarchical relationships.
-      const auto hierarchy = dataInfo->GetHierarchy();
+      const auto assembly = dataInfo->GetDataAssembly(assemblyName);
       auto model = new pqDataAssemblyTreeModel();
       model->setUserCheckable(true);
-      model->setDataAssembly(hierarchy);
+      model->setDataAssembly(assembly);
       model->setCheckedNodes({ "/" });
-      const auto nodes = hierarchy->SelectNodes(dataBlockContext);
+      const auto nodes = assembly->SelectNodes(dataBlockContext);
       QList<int> iListNodes;
       std::copy(nodes.begin(), nodes.end(), std::back_inserter(iListNodes));
       auto indexes = model->index(iListNodes);
@@ -129,7 +130,8 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
 
       const std::vector<std::string>& prevValues = smProperty->GetElements();
 
-      if (!prevValues.empty() && prevValues[0] != "/" && prevValues[0] != "/Root")
+      const auto rootName = std::string("/") + assembly->GetRootNodeName();
+      if (!prevValues.empty() && prevValues[0] != "/" && prevValues[0] != rootName)
       {
         // If there were blocks that were already hidden in the past, we want to keep them hidden.
         // We don't have the information in the parameters of the method about the previous state,
