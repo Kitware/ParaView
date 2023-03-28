@@ -59,10 +59,11 @@ git checkout -b your_branch
 
 Make the needed changes in ParaView and use git locally to create logically separated commits.
 There is no strict requirements regarding git commit messages syntax but a good rule of
-thumb to follow is: `Location of Change: reason for change`:
+thumb to follow is: `General domain: reason for change`, General domain being a class, a module
+, a specific system like build or CI.
 
 ```
-git commit -m "Location of change: Short yet informative reason for the change"
+git commit -m "General domain: Short yet informative reason for the change"
 ```
 
 Build ParaView following the [guide](Documentation/dev/build.md#) and fix any build warnings or issues that arise and seems related to your changes.
@@ -75,13 +76,18 @@ starting at the usage of `SetupForDevelopment.sh` script.
 
 You can then develop in the VTK directory as if it was any VTK repository, where you can make changes, commit and push to your VTK fork.
 
-If you want to test the integration of your VTK changes in ParaView [continuous integration](continuous-integration), just commit
-the VTK submodule with your changes in a separate commit in your ParaView branch, it will be found without issue.
+If you want to test the integration of your VTK changes in ParaView [continuous integration](continuous-integration), commit and push your changes
+to your VTK fork, then commit the VTK submodule update with your changes in a separate commit in your ParaView branch, it will be found without issue.
 
 Once your VTK changes are merged into VTK master, you can cleanup your history and commit the submodule update cleanly like this
 (this will remove local non commited changes and also rebase your branch on the last master):
 
 ```
+cd VTK
+git fetch origin
+git checkout master
+git pull
+cd ../
 git fetch origin
 git rebase -i origin/master # delete any VTK submodule update commit
 git submodule update
