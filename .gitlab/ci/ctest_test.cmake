@@ -101,7 +101,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
 
     # Unstructured grid volume rendering (paraview/paraview#19130)
     "\\.MultiBlockVolumeRendering$"
-    "\\.UnstructuredVolumeRenderingVectorComponent$")
+    "\\.UnstructuredVolumeRenderingVectorComponent$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
+    "\\.PythonEditorRun$"
+    )
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
@@ -118,13 +122,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     "^pv\\.MultipleColorOnSelection"
     "^pvcs\\.MultipleColorOnSelection"
     )
-endif ()
-
-if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
-  list(APPEND test_exclusions
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
-    "\\.PythonEditorRun$")
-
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
@@ -172,6 +169,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     # Fails on windows-vs2019-qt
     # See https://gitlab.kitware.com/paraview/paraview/-/issues/21771
     "^pv\\.HelpWindowHistory$"
+
+    # Flaky for some reasons
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
+    "\\.PythonEditorRun$"
     )
 endif ()
 
