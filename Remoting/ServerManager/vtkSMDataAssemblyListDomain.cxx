@@ -68,7 +68,8 @@ int vtkSMDataAssemblyListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_
   vtkSMPropertyHelper helper(stringVectorProp);
   helper.SetUseUnchecked(use_unchecked_values);
   const auto& strings = this->GetStrings();
-  if (std::find(strings.begin(), strings.end(), "Assembly") != strings.end())
+  if (!this->BackwardCompatibilityMode &&
+    std::find(strings.begin(), strings.end(), "Assembly") != strings.end())
   {
     helper.Set(0, "Assembly");
     return 1;

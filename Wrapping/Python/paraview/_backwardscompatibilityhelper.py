@@ -1020,6 +1020,15 @@ def GetProxy(module, key, **kwargs):
             particleTracerBase = builtins.getattr(module, key)(**kwargs)
             particleTracerBase.MeshOverTime = 0
             return particleTracerBase
+    if compatibility_version <= (5, 11):
+        proxy = builtins.getattr(module, key)(**kwargs)
+        if hasattr(proxy, "Assembly"):
+            assemblyProperty = proxy.SMProxy.GetProperty("Assembly")
+            if assemblyProperty:
+                assemblyDomain = assemblyProperty.FindDomain("vtkSMDataAssemblyListDomain")
+                if assemblyDomain:
+                    assemblyDomain.SetBackwardCompatibilityMode(True)
+                    return proxy
 
     return builtins.getattr(module, key)(**kwargs)
 
