@@ -120,6 +120,32 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkFLUENTCFFReader" name="FLUENTCFFReaderCore">
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <!-- FLUENTCFFReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy class="vtkTecplotReader"
                  label="VTK Tecplot Reader"
                  name="TecplotReaderCore">
@@ -504,6 +530,43 @@
                        file_description="Fluent Case Files" />
       </Hints>
       <!-- FLUENTReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Fluent CFF Case Reader"
+                 name="FLUENTCFFReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a dataset in Fluent CFF file format."
+                     short_help="Reads a dataset in Fluent CFF file format.">
+                     FLUENTCFFReader creates an unstructured grid dataset. It
+                     reads .cas.h5 and .dat.h5 files stored in FLUENT CFF format.
+                     </Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The name of the files to load.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="FLUENTCFFReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="cas.h5"
+                       file_description="Fluent CFF Case Files" />
+      </Hints>
+      <!-- FLUENTCFFReader -->
     </SourceProxy>
 
     <!-- ================================================================== -->
