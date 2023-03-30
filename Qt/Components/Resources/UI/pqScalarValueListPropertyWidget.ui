@@ -100,6 +100,20 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="RestoreDefaults">
+       <property name="toolTip">
+        <string>Restore default values of the property</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="RemoveAll">
        <property name="toolTip">
         <string>Remove all entries</string>

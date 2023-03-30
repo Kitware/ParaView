@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMProperty.h"
@@ -385,6 +386,7 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   : Superclass(smProxy, pWidget)
 {
   this->setShowLabel(false);
+  this->setProperty(smProperty);
 
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(smProperty);
   assert(vp != nullptr);
@@ -399,11 +401,16 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   // this will be added back.
   ui.AddRange->hide();
 
+  auto* hints = smProperty->GetHints();
+  const bool showRestoreButton = hints && hints->FindNestedElementByName("AllowRestoreDefaults");
+  ui.RestoreDefaults->setVisible(showRestoreButton);
+
   QObject::connect(ui.Add, SIGNAL(clicked()), this, SLOT(add()));
   QObject::connect(ui.AddRange, SIGNAL(clicked()), this, SLOT(addRange()));
   QObject::connect(ui.Remove, SIGNAL(clicked()), this, SLOT(remove()));
   QObject::connect(ui.RemoveAll, SIGNAL(clicked()), this, SLOT(removeAll()));
   QObject::connect(ui.Table, SIGNAL(editPastLastRow()), this, SLOT(editPastLastRow()));
+  QObject::connect(ui.RestoreDefaults, SIGNAL(clicked()), this, SLOT(restoreDefaults()));
 
   // update `Remove` button enabled state based on selection.
   ui.Remove->setEnabled(false);
@@ -678,4 +685,11 @@ bool pqScalarValueListPropertyWidget::getRange(int& rangeMin, int& rangeMax)
     return (min_exists && max_exists);
   }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarValueListPropertyWidget::restoreDefaults()
+{
+  this->property()->ResetToXMLDefaults();
+  Q_EMIT this->scalarsChanged();
 }

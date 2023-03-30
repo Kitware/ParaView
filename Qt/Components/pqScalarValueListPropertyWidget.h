@@ -48,6 +48,9 @@ class vtkSMIntRangeDomain;
 /**
  * pqScalarValueListPropertyWidget provides a table widget to which users are
  * add values e.g. for IsoValues for the Contour filter.
+ *
+ * This widget supports the `AllowRestoreDefaults` hints, which adds a button that
+ * allow users to restore the default value of the property.
  */
 class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWidget
 {
@@ -91,6 +94,7 @@ private Q_SLOTS:
   void remove();
   void removeAll();
   void editPastLastRow();
+  void restoreDefaults();
 
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget)

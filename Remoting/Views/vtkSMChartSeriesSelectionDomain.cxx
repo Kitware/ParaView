@@ -22,6 +22,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMProperty.h"
@@ -46,49 +47,7 @@ vtkStandardNewMacro(vtkSMChartSeriesSelectionDomain);
 namespace
 {
 // match string like: "ACCL (0)" or "VEL (1)"
-static vtksys::RegularExpression PotentailComponentNameRe(".*\\([0-9]+\\)");
-
-typedef std::pair<vtksys::RegularExpression, bool> SeriesVisibilityPair;
-static std::vector<SeriesVisibilityPair> SeriesVisibilityDefaults;
-static void InitSeriesVisibilityDefaults()
-{
-  // initialize SeriesVisibilityDefaults the first time.
-  if (SeriesVisibilityDefaults.empty())
-  {
-    const char* defaults[] = { "^arc_length", "^bin_extents", "^FileId", "^GlobalElementId",
-      "^GlobalNodeId", "^ObjectId", "^object_id", "^Pedigree.*", "^Points_.*", "^Time",
-      "^vtkOriginal.*", "^ids$", "^ids .*", "^vtkValidPointMask", "^N .*", "^X$", "^X .*", "^Y$",
-      "^Y .*", "^Z$", "^Z .*", "^vtkGhostType$", "^Frequency", "^Point Coordinates", nullptr };
-    for (int cc = 0; defaults[cc] != nullptr; cc++)
-    {
-      SeriesVisibilityDefaults.push_back(
-        SeriesVisibilityPair(vtksys::RegularExpression(defaults[cc]), false));
-    }
-  }
-}
-static void AddSeriesVisibilityDefault(const char* regex, bool value)
-{
-  InitSeriesVisibilityDefaults();
-  if (regex && regex[0])
-  {
-    SeriesVisibilityDefaults.push_back(
-      SeriesVisibilityPair(vtksys::RegularExpression(regex), value));
-  }
-}
-
-static bool GetSeriesVisibilityDefault(const char* regex, bool& value)
-{
-  InitSeriesVisibilityDefaults();
-  for (size_t cc = 0; cc < SeriesVisibilityDefaults.size(); cc++)
-  {
-    if (SeriesVisibilityDefaults[cc].first.find(regex))
-    {
-      value = SeriesVisibilityDefaults[cc].second;
-      return true;
-    }
-  }
-  return false;
-}
+static vtksys::RegularExpression PotentialComponentNameRe(".*\\([0-9]+\\)");
 }
 
 class vtkSMChartSeriesSelectionDomain::vtkInternals
@@ -363,7 +322,7 @@ void vtkSMChartSeriesSelectionDomain::PopulateArrayComponents(vtkChartRepresenta
             // (See BUG #15512).
             std::string seriesNameWithoutTableName =
               chartRepr->GetDefaultSeriesLabel(std::string(), arrayName);
-            if (PotentailComponentNameRe.find(seriesNameWithoutTableName))
+            if (PotentialComponentNameRe.find(seriesNameWithoutTableName))
             {
               this->SetDefaultVisibilityOverride(seriesName, false);
             }
@@ -476,24 +435,16 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMChartSeriesSelectionDomain::AddSeriesVisibilityDefault(const char* name, bool value)
-{
-  ::AddSeriesVisibilityDefault(name, value);
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* name)
 {
-  bool result;
   if (vtkSMChartSeriesSelectionDomain::LoadNoVariables)
   {
     return false;
   }
-  if (::GetSeriesVisibilityDefault(name, result))
+  if (!vtkPVRepresentedArrayListSettings::GetInstance()->GetSeriesVisibilityDefault(name))
   {
-    return result;
+    return false;
   }
-
   if (this->Internals->VisibilityOverrides.find(name) != this->Internals->VisibilityOverrides.end())
   {
     //  hide components by default, we'll show the magnitudes for them.

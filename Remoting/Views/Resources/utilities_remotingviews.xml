@@ -922,9 +922,8 @@
     </SettingsProxy>
 
     <!-- ================================================================== -->
-    <!-- TODO change this setting organization later -->
     <SettingsProxy name="RepresentedArrayListSettings"
-                   label="Miscellaneous"
+                   label="Represented Attributes"
                    processes="client"
                    class="vtkPVRepresentedArrayListSettings">
       <StringVectorProperty command="SetFilterExpression"
@@ -941,6 +940,83 @@
           <ShowLabel />
         </Hints>
       </StringVectorProperty>
+      <IntVectorProperty name="ComputeArrayMagnitude"
+                        command="SetComputeArrayMagnitude"
+                        number_of_elements="1"
+                        default_values="1"
+                        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Controls whether or not ParaView should compute and display the magnitude for
+          multi-components data attributes.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ArrayMagnitudeExceptions"
+                        command="SetArrayMagnitudeException"
+                        label="Array Magnitude Exceptions"
+                        number_of_elements_per_command="1"
+                        repeat_command="1"
+                        set_number_command="SetNumberOfArrayMagnitudeExceptions"
+                        use_index="1"
+                        panel_visibility="advanced">
+        <Documentation>
+          List of exceptions for the "ComputeArrayMagnitude" setting. If "ComputeArrayMagnitude" is
+          untoggled then the list describes the number of components for which ParaView will
+          still compute the magnitude. Else the list describes the number of components for which
+          ParaView will not compute the magnitude.
+        </Documentation>
+        <Hints>
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Exceptions"/>
+          </ShowComponentLabels>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetChartsDefaultXAxis"
+                            name="ChartsDefaultXAxis"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            default_values_delimiter=";"
+                            default_values="in_extents;Time;time;arc_length;XArray;x_array;Frequency"
+                            number_of_elements="7"
+                            set_number_command="SetNumberOfChartsDefaultXAxis"
+                            use_index="1">
+        <Documentation>
+          List of array names to use as X axis when displaying it in charts.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <AllowRestoreDefaults />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetChartsHiddenAttributes"
+                            name="ChartsHiddenAttributes"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            default_values_delimiter=";"
+                            default_values="^arc_length;^bin_extents;^(GlobalElement|GlobalNode|Object|File)Id;^object_id;^Pedigree;^Points_;^Time;^vtk;^(X|Y|Z|N|ids)( .*|$);^Frequency;^Point Coordinates"
+                            number_of_elements="10"
+                            set_number_command="SetNumberOfChartsHiddenAttributes"
+                            use_index="1">
+        <Documentation>
+          List of regex that describes array to not display by default. Note that "Component" arrays are always hidden by default even it not listed here.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <AllowRestoreDefaults />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+
+    <SettingsProxy name="IOSettings"
+                   label="IO"
+                   processes="client"
+                   class="vtkPVIOSettings">
       <StringVectorProperty name="ReaderDetails"
                             label="Default reader details"
                             number_of_elements_per_command="3"
@@ -999,37 +1075,6 @@
           </ShowComponentLabels>
         </Hints>
       </StringVectorProperty>
-      <IntVectorProperty name="ComputeArrayMagnitude"
-                        command="SetComputeArrayMagnitude"
-                        number_of_elements="1"
-                        default_values="1"
-                        panel_visibility="advanced">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Controls whether or not ParaView should compute and display the magnitude for
-          multi-components data attributes.
-        </Documentation>
-     </IntVectorProperty>
-     <IntVectorProperty name="ArrayMagnitudeExceptions"
-                        command="SetArrayMagnitudeException"
-                        label="Array Magnitude Exceptions"
-                        number_of_elements_per_command="1"
-                        repeat_command="1"
-                        set_number_command="SetNumberOfArrayMagnitudeExceptions"
-                        use_index="1"
-                        panel_visibility="advanced">
-        <Documentation>
-          List of exceptions for the "ComputeArrayMagnitude" setting. If "ComputeArrayMagnitude" is
-          untoggled then the list describes the number of components for which ParaView will
-          still compute the magnitude. Else the list describes the number of components for which
-          ParaView will not compute the magnitude.
-        </Documentation>
-        <Hints>
-          <ShowComponentLabels>
-            <ComponentLabel component="0" label="Exceptions"/>
-          </ShowComponentLabels>
-        </Hints>
-      </IntVectorProperty>
 
       <Hints>
         <UseDocumentationForLabels />
