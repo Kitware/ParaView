@@ -26,8 +26,9 @@
 #include "vtkAnimationPlayer.h"
 #include "vtkRemotingAnimationModule.h" // needed for export macro
 
+#include "vtkParaViewDeprecation.h"
+
 class vtkSequenceAnimationPlayer;
-class vtkRealtimeAnimationPlayer;
 class vtkTimestepsAnimationPlayer;
 
 class VTKREMOTINGANIMATION_EXPORT vtkCompositeAnimationPlayer : public vtkAnimationPlayer
@@ -40,7 +41,6 @@ public:
   enum Modes
   {
     SEQUENCE = 0,
-    REAL_TIME = 1,
     SNAP_TO_TIMESTEPS = 2
   };
 
@@ -60,6 +60,7 @@ public:
   /**
    * Forwarded to vtkRealtimeAnimationPlayer.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use `SetStride` and vtkSequenceAnimationPlayer instead")
   void SetDuration(int val);
 
   ///@{
@@ -97,7 +98,6 @@ protected:
   vtkAnimationPlayer* GetActivePlayer();
 
   vtkSequenceAnimationPlayer* SequenceAnimationPlayer;
-  vtkRealtimeAnimationPlayer* RealtimeAnimationPlayer;
   vtkTimestepsAnimationPlayer* TimestepsAnimationPlayer;
 
   int PlayMode;

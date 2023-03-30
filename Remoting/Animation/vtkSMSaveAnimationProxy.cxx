@@ -487,10 +487,6 @@ bool vtkSMSaveAnimationProxy::WriteAnimationLocally(const char* filename)
     }
 
     break;
-    case vtkCompositeAnimationPlayer::REAL_TIME:
-      // this should not happen. vtkSMSaveAnimationProxy::Prepare() should have
-      // changed the play mode to SEQUENCE or SNAP_TO_TIMESTEPS.
-      abort();
   }
   writer->SetStartFileCount(frameWindow[0]);
   writer->SetPlaybackTimeWindow(playbackTimeWindow);
@@ -571,26 +567,6 @@ bool vtkSMSaveAnimationProxy::Prepare()
   // save scene state to restore later.
   this->SceneState.TakeReference(scene->SaveXMLState(nullptr));
 
-  int frameRate = vtkSMPropertyHelper(this, "FrameRate").GetAsInt();
-
-  // Update playmode and duration.
-  vtkSMPropertyHelper playModeHelper(scene, "PlayMode");
-
-  // If current playMode was real-time, we change it to sequence since we cannot
-  // really save in real-time mode, and adjust the frames.
-  if (playModeHelper.GetAsInt() == vtkCompositeAnimationPlayer::REAL_TIME)
-  {
-    playModeHelper.Set(vtkCompositeAnimationPlayer::SEQUENCE);
-    // change length of seq. animation to match the length in real-time mode.
-    // (see #17031)
-    vtkSMPropertyHelper(scene, "NumberOfFrames")
-      .Set(1 + frameRate * vtkSMPropertyHelper(scene, "Duration").GetAsInt());
-  }
-  else
-  {
-    // for SEQUENCE and SNAP_TO_TIMESTEPS, we don't need to change anything as far as
-    // playing of the animation goes.
-  }
   scene->UpdateVTKObjects();
   return true;
 }

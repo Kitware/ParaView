@@ -268,8 +268,6 @@
         <EnumerationDomain name="enum">
           <Entry text="Sequence"
                  value="0" />
-          <Entry text="Real Time"
-                 value="1" />
           <Entry text="Snap To TimeSteps"
                  value="2" />
         </EnumerationDomain>
@@ -282,13 +280,6 @@
                         name="range" />
         <Documentation>Set the number of frames in which to play the
         animation.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetDuration"
-                         default_values="10"
-                         name="Duration"
-                         number_of_elements="1">
-        <Documentation>Set the duration for playing the animation in
-        seconds.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetFramesPerTimestep"
                          default_values="1"

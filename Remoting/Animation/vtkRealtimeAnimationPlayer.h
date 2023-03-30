@@ -24,8 +24,13 @@
 #include "vtkAnimationPlayer.h"
 #include "vtkRemotingAnimationModule.h" // needed for export macro
 
+#include "vtkParaViewDeprecation.h"
+
 class vtkTimerLog;
-class VTKREMOTINGANIMATION_EXPORT vtkRealtimeAnimationPlayer : public vtkAnimationPlayer
+
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "Use `vtkSequenceAnimationPlayer` instead") VTKREMOTINGANIMATION_EXPORT vtkRealtimeAnimationPlayer
+  : public vtkAnimationPlayer
 {
 public:
   static vtkRealtimeAnimationPlayer* New();

@@ -50,7 +50,7 @@ class vtkSMProxy;
  * pqAnimationTimeWidget is a widget that can be used to show/set the current
  * animation time.
  * The widget allow the user to do the following:
- * \li View and/or change the current time value (in seq/realtime modes), or
+ * \li View and/or change the current time value (in seq modes), or
  *     current time step value (in snap-to-timesteps mode).
  */
 class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget

@@ -58,15 +58,6 @@ void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)
         values.push_back(vtkEntry(0, numFrames - 1));
       }
       break;
-      case vtkCompositeAnimationPlayer::REAL_TIME:
-      {
-        int frameRate = vtkSMUncheckedPropertyHelper(frameRateProperty).GetAsInt();
-        double duration = vtkSMUncheckedPropertyHelper(scene, "Duration").GetAsInt();
-        // (see #17031)
-        int numFrames = 1 + (frameRate * duration);
-        values.push_back(vtkEntry(0, numFrames - 1));
-      }
-      break;
       case vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS:
       {
         vtkSMProxy* timeKeeper = vtkSMUncheckedPropertyHelper(scene, "TimeKeeper").GetAsProxy();

@@ -1484,6 +1484,33 @@ struct Process_5_11_to_5_12
     return true;
   }
 
+  // RealTime is replaced by sequence
+  static bool HandlePlayMode(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='animation' and @type='AnimationScene']");
+
+    if (xpath_set.empty())
+    {
+      return true;
+    }
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+
+      if (auto playmodeNode = node.find_child_by_attribute("name", "PlayMode"))
+      {
+        if (playmodeNode.child("Element").attribute("value").as_int() == 1)
+        {
+          playmodeNode.child("Element").attribute("value").set_value("0");
+        }
+      }
+    }
+
+    return true;
+  }
+
   static bool HandleSlice(xml_document& document)
   {
     pugi::xpath_node_set xpath_set =
