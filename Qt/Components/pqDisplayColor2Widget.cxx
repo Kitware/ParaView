@@ -86,7 +86,7 @@ pqDisplayColor2Widget::pqDisplayColor2Widget(QWidget* parent)
   , Internals(std::unique_ptr<pqInternals>(new pqInternals()))
 {
   auto hbox = new QHBoxLayout();
-  hbox->setMargin(0);
+  hbox->setContentsMargins(0, 0, 0, 0);
   hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   this->setLayout(hbox);
   // default, show empty comboboxes. populated when a valid representation is available.

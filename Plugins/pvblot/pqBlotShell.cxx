@@ -40,7 +40,7 @@ pqBlotShell::pqBlotShell(QWidget* p)
   : QWidget(p)
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
-  boxLayout->setMargin(0);
+  boxLayout->setContentsMargins(0, 0, 0, 0);
 
   this->Console = new pqConsoleWidget(this);
   boxLayout->addWidget(this->Console);
