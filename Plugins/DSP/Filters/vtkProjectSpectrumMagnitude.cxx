@@ -156,17 +156,22 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
 
   // Retrieve the frequency range we should process.
   // We assume frequency bins are the same for all blocks and frequency is sorted
-  const std::array<vtkIdType, 2> freqRange = [&] {
+  const double lowerFrequency =
+    this->FreqFromOctave ? this->ComputedLowerFrequency : this->LowerFrequency;
+  const double upperFrequency =
+    this->FreqFromOctave ? this->ComputedUpperFrequency : this->UpperFrequency;
+
+  const std::array<vtkIdType, 2> freqRangeIndices = [&] {
     const vtkIdType nvalues = freqArray->GetNumberOfValues();
     vtkIdType idx = 0;
-    while (idx < nvalues && freqArray->GetTuple1(idx) < this->LowerFrequency)
+    while (idx < nvalues && freqArray->GetTuple1(idx) < lowerFrequency)
     {
       idx++;
     }
     const vtkIdType begin = idx;
 
     idx = nvalues - 1;
-    while (idx >= 0 && freqArray->GetTuple1(idx) > this->UpperFrequency)
+    while (idx >= 0 && freqArray->GetTuple1(idx) > upperFrequency)
     {
       idx--;
     }
@@ -224,7 +229,8 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
       }
 
       // Mean all values inside frequency range
-      const auto inRange = vtk::DataArrayTupleRange(inArray, freqRange[0], freqRange[1]);
+      const auto inRange =
+        vtk::DataArrayTupleRange(inArray, freqRangeIndices[0], freqRangeIndices[1]);
       for (const auto inTuple : inRange)
       {
         auto outComponent = outIterator->begin();
@@ -247,8 +253,97 @@ void vtkProjectSpectrumMagnitude::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "LowerFrequency: " << this->LowerFrequency << std::endl;
-  os << indent << "UpperFrequency: " << this->UpperFrequency << std::endl;
+  os << indent << "LowerFrequency: "
+     << (this->FreqFromOctave ? this->ComputedLowerFrequency : this->LowerFrequency) << std::endl;
+  os << indent << "UpperFrequency: "
+     << (this->FreqFromOctave ? this->ComputedUpperFrequency : this->UpperFrequency) << std::endl;
   os << indent << "ColumnSelection:\n";
   this->ColumnSelection->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "FreqFromOctave: " << (this->FreqFromOctave ? "On" : "Off") << std::endl;
+  if (this->FreqFromOctave)
+  {
+    os << indent << "BaseTwoOctave: " << (this->BaseTwoOctave ? "On (base-2)" : "Off (base-10)")
+       << std::endl;
+    os << indent << "Octave: " << this->Octave << std::endl;
+    os << indent << "OctaveSubdivision: " << this->OctaveSubdivision << std::endl;
+  }
+}
+
+//--------------------------------------- --------------------------------------
+void vtkProjectSpectrumMagnitude::ComputeFreqFromOctave()
+{
+  const std::array<double, 2> freqRange =
+    vtkFFT::GetOctaveFrequencyRange(static_cast<vtkFFT::Octave>(this->Octave),
+      static_cast<vtkFFT::OctaveSubdivision>(this->OctaveSubdivision), this->BaseTwoOctave);
+
+  this->ComputedLowerFrequency = freqRange[0];
+  this->ComputedUpperFrequency = freqRange[1];
+}
+
+//--------------------------------------- --------------------------------------
+void vtkProjectSpectrumMagnitude::SetFreqFromOctave(bool freqFromOctave)
+{
+  if (this->FreqFromOctave != freqFromOctave)
+  {
+    this->FreqFromOctave = freqFromOctave;
+    this->Modified();
+
+    if (this->FreqFromOctave)
+    {
+      this->ComputeFreqFromOctave();
+    }
+  }
+}
+
+//--------------------------------------- --------------------------------------
+void vtkProjectSpectrumMagnitude::SetBaseTwoOctave(bool baseTwoOctave)
+{
+  if (this->BaseTwoOctave != baseTwoOctave)
+  {
+    this->BaseTwoOctave = baseTwoOctave;
+    this->Modified();
+
+    if (this->FreqFromOctave)
+    {
+      this->ComputeFreqFromOctave();
+    }
+  }
+}
+
+//--------------------------------------- --------------------------------------
+void vtkProjectSpectrumMagnitude::SetOctave(int octave)
+{
+  octave = octave < vtkFFT::Octave::Hz_31_5
+    ? vtkFFT::Octave::Hz_31_5
+    : (octave > vtkFFT::Octave::kHz_16 ? vtkFFT::Octave::kHz_16 : octave);
+  if (this->Octave != octave)
+  {
+    this->Octave = octave;
+    this->Modified();
+
+    if (this->FreqFromOctave)
+    {
+      this->ComputeFreqFromOctave();
+    }
+  }
+}
+
+//--------------------------------------- --------------------------------------
+void vtkProjectSpectrumMagnitude::SetOctaveSubdivision(int octaveSubdivision)
+{
+  octaveSubdivision = octaveSubdivision < vtkFFT::OctaveSubdivision::Full
+    ? vtkFFT::OctaveSubdivision::Full
+    : (octaveSubdivision > vtkFFT::OctaveSubdivision::ThirdThird
+          ? vtkFFT::OctaveSubdivision::ThirdThird
+          : octaveSubdivision);
+  if (this->OctaveSubdivision != octaveSubdivision)
+  {
+    this->OctaveSubdivision = octaveSubdivision;
+    this->Modified();
+
+    if (this->FreqFromOctave)
+    {
+      this->ComputeFreqFromOctave();
+    }
+  }
 }

@@ -33,6 +33,7 @@
 
 #include "vtkDSPFiltersPluginModule.h"
 #include "vtkDataSetAlgorithm.h"
+#include "vtkFFT.h" // for Octave and OctaveSubdivision
 #include "vtkNew.h" // for vtkNew
 
 class vtkDataArraySelection;
@@ -85,6 +86,60 @@ public:
   vtkSetMacro(UpperFrequency, double);
   ///@}
 
+  ///@{
+  /**
+   * Get the lower/upper bound of the frequency range to project when using octave bands.
+   * This parameter is automatically computed.
+   * Default is 0.0 Hz.
+   */
+  vtkGetMacro(ComputedLowerFrequency, double);
+  vtkGetMacro(ComputedUpperFrequency, double);
+  ///@}
+
+  ///@{
+  /**
+   * Get/set whether to compute lower/upper frequency from band octave band number.
+   * Default is true.
+   */
+  vtkGetMacro(FreqFromOctave, bool);
+  void SetFreqFromOctave(bool freqFromOctave);
+  vtkBooleanMacro(FreqFromOctave, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Get/set whether to use base-two (or base-ten) when computing frequencies with octave.
+   * Base-two when true, base-ten when false.
+   * Has no effect if FreqFromOctave is false.
+   * Default is true.
+   */
+  vtkGetMacro(BaseTwoOctave, bool);
+  void SetBaseTwoOctave(bool baseTwoOctave);
+  vtkBooleanMacro(BaseTwoOctave, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Get/set the octave used to compute frequencies.
+   * Setter clamps value to enum.
+   * Has no effect if FreqFromOctave is false.
+   * Default is Hz_500.
+   */
+  vtkGetMacro(Octave, int);
+  void SetOctave(int octave);
+  ///@}
+
+  ///@{
+  /**
+   * Get/set which subdivision of octave used to compute octave frequency range.
+   * Setter clamps value to enum.
+   * Has no effect if FreqFromOctave is false.
+   * Default is Full.
+   */
+  vtkGetMacro(OctaveSubdivision, int);
+  void SetOctaveSubdivision(int octaveSubdivision);
+  ///@}
+
 protected:
   vtkProjectSpectrumMagnitude();
   ~vtkProjectSpectrumMagnitude() override = default;
@@ -96,6 +151,12 @@ protected:
     vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
+  /**
+   * Compute frequencies from octave parameters.
+   * This must be called in setters because frequencies are gotten in ParaView as information.
+   */
+  void ComputeFreqFromOctave();
+
 private:
   vtkProjectSpectrumMagnitude(const vtkProjectSpectrumMagnitude&) = delete;
   void operator=(const vtkProjectSpectrumMagnitude&) = delete;
@@ -103,6 +164,12 @@ private:
   vtkNew<vtkDataArraySelection> ColumnSelection;
   double LowerFrequency = 0.0;
   double UpperFrequency = 0.0;
+  double ComputedLowerFrequency = 0.0;
+  double ComputedUpperFrequency = 0.0;
+  bool FreqFromOctave = false;
+  bool BaseTwoOctave = true;
+  int Octave = vtkFFT::Octave::Hz_500;
+  int OctaveSubdivision = vtkFFT::OctaveSubdivision::Full;
 };
 
 #endif // vtkProjectSpectrumMagnitude_h
