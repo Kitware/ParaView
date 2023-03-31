@@ -60,6 +60,7 @@ public:
    * Control array for coloring and labeling. If `idx == 0` the array will be used for coloring,
    * else it will be used for labeling.
    */
+  using Superclass::SetInputArrayToProcess; // Force overload lookup on superclass
   void SetInputArrayToProcess(int idx, int port, int connection, int fieldAssociation,
     const char* attributeTypeorName) override;
 
