@@ -293,7 +293,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         ugrid.VTKObject.SetCells(vtkConstants.VTK_VERTEX, ca)
 
 
-    def _RequestFieldData(self, executive, output, outInfo):
+    def _RequestFieldData(self, executive, output, outInfo, timeInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa
         from vtkmodules.vtkCommonDataModel import vtkImageData
         from vtkmodules.vtkCommonExecutionModel import vtkExtentTranslator
@@ -303,7 +303,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
         nghosts = outInfo.Get(executive.UPDATE_NUMBER_OF_GHOST_LEVELS())
         et = vtkExtentTranslator()
 
-        data_time = self._get_update_time(outInfo)
+        data_time = self._get_update_time(timeInfo)
         idx = self._timemap[data_time]
         itr = self._series.iterations[idx]
 
@@ -466,14 +466,14 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 imgw.PointData.append(array, name)
 
 
-    def _RequestParticleData(self, executive, poutput, outInfo):
+    def _RequestParticleData(self, executive, poutput, outInfo, timeInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa
         from vtkmodules.vtkCommonDataModel import vtkUnstructuredGrid, vtkPartitionedDataSet
 
         piece = outInfo.Get(executive.UPDATE_PIECE_NUMBER())
         npieces = outInfo.Get(executive.UPDATE_NUMBER_OF_PIECES())
 
-        data_time = self._get_update_time(outInfo)
+        data_time = self._get_update_time(timeInfo)
         idx = self._timemap[data_time]
         itr = self._series.iterations[idx]
 
@@ -505,20 +505,31 @@ class openPMDReader(VTKPythonAlgorithmBase):
             print_error("Required Python module 'openpmd_api' missing!")
             return 0
 
-        from vtkmodules.vtkCommonDataModel import vtkPartitionedDataSet, vtkPartitionedDataSetCollection
+        from vtkmodules.vtkCommonDataModel import vtkDataObject, vtkPartitionedDataSet, vtkPartitionedDataSetCollection
         from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline
 
+        # Which port got an update request: fields (0) or particles (1)
         executive = vtkStreamingDemandDrivenPipeline
+        from_port = request.Get(executive.FROM_OUTPUT_PORT())
         numInfo = outInfoVec.GetNumberOfInformationObjects()
 
         for i in range(numInfo):
+            # dictionary-kind object that has all data info requests and output
+            # this might only be on port 0 or 1
             outInfo = outInfoVec.GetInformationObject(i)
+
+            # Always get the update time step info from the port
+            # that is being updated. Update time may be outdated
+            # in the other port - this keeps field & particles in
+            # time in sync
+            timeInfo = outInfoVec.GetInformationObject(from_port)
+
             if i == 0:
                 output = vtkPartitionedDataSet.GetData(outInfoVec, 0)
-                self._RequestFieldData(executive, output, outInfo)
+                self._RequestFieldData(executive, output, outInfo, timeInfo)
             elif i == 1:
                 poutput = vtkPartitionedDataSetCollection.GetData(outInfoVec, 1)
-                self._RequestParticleData(executive, poutput, outInfo)
+                self._RequestParticleData(executive, poutput, outInfo, timeInfo)
             else:
                 print_error("numInfo number is wrong! "
                             "It should be exactly 2, is=", numInfo)
