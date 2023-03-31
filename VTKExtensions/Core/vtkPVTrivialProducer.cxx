@@ -125,10 +125,10 @@ int vtkPVTrivialProducer::ProcessRequest(
       // satisfy. In that case, let's report a warning.
       if (internals.FindNearestTime(uTime) != internals.TimeSteps.back())
       {
-        vtkNumberToString convert;
-        vtkWarningMacro("Cannot produce requested time '" << convert(uTime) << "', only '"
-                                                          << convert(internals.TimeSteps.back())
-                                                          << "' is available.");
+        vtkNumberToString converter;
+        vtkWarningMacro("Cannot produce requested time '"
+          << converter.Convert(uTime) << "', only '"
+          << converter.Convert(internals.TimeSteps.back()) << "' is available.");
       }
 
       dobj->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), internals.TimeSteps.back());

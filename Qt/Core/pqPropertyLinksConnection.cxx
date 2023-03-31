@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPropertyLinksConnection.h"
 
+#include "pqCoreUtilities.h"
 #include "pqSMAdaptor.h"
 #include "vtkCommand.h"
 #include "vtkSMTrace.h"
@@ -265,7 +266,18 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
   QVariant smValue = this->currentServerManagerValue(use_unchecked);
   if (qtValue != smValue)
   {
-    this->setQtValue(smValue);
+    if (static_cast<QMetaType::Type>(smValue.type()) == QMetaType::Double)
+    {
+      // QVariant is able to convert double to string but we need to be able
+      // to specify how it should be formatted using settings, which
+      // is provided by pqCoreUtilities
+      double doubleVal = smValue.toDouble();
+      this->setQtValue(pqCoreUtilities::formatFullNumber(doubleVal));
+    }
+    else
+    {
+      this->setQtValue(smValue);
+    }
   }
   this->blockSignals(prev);
 }

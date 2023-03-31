@@ -55,6 +55,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * simply respect a global precision and notation specification by using the
  * property `useGlobalPrecisionAndNotation` (which is default).
  *
+ * When using FullNotation, the displayed text logic is deactivated and the
+ * user will be able to see the value that they will edit directly.
+ *
  * Since pqDoubleLineEdit is intended for numeric values, in its constructor, a
  * `QDoubleValidator` is created for convenience.
  *
@@ -134,11 +137,14 @@ public:
 
   /**
    * Return a double formatted according to a pqDoubleLineEdit::RealNumberNotation
-   * notation and a number of digits of precision. Supports QLocale::FloatingPointShortest as
-   * precision.
+   * notation and a number of digits of precision.
+   * Supports QLocale::FloatingPointShortest as precision.
+   * When using pqDoubleLineEdit::RealNumberNotation::FullNotation, precision if not used and
+   * fullLowExponent and fullHighExponent will be used to determine when to switch between
+   * scientific notation and fixed notation.
    */
-  static QString formatDouble(
-    double value, pqDoubleLineEdit::RealNumberNotation notation, int precision);
+  static QString formatDouble(double value, pqDoubleLineEdit::RealNumberNotation notation,
+    int precision, int fullLowExponent = -6, int fullHighExponent = 20);
 
   /**
    * Return a double formatted according to the values set for global precision

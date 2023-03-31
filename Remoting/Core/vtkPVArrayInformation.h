@@ -63,7 +63,7 @@ public:
    * Returns range as a string. For string arrays, this lists string values
    * instead.
    */
-  std::string GetRangesAsString() const;
+  std::string GetRangesAsString(int lowExponent = -6, int highExponent = 20) const;
 
   /**
    * Get array's name

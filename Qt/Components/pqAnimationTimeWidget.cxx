@@ -187,11 +187,13 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
     ui.radioButtonValue->setChecked(true);
   }
 
+  // TODO should use formatTime
   ui.timeValue->setText(pqCoreUtilities::number(state.time()));
 
   // update combo-box.
   ui.timeValueComboBox->clear();
   int currentIndex = -1;
+  // TODO handle low/high exponent
   const auto precision = ui.timeValue->precision();
   const auto notation = ui.timeValue->notation();
   for (const auto& val : state.timeSteps())

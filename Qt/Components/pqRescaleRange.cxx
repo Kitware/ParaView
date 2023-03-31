@@ -77,8 +77,8 @@ void pqRescaleRange::setRange(double min, double max)
   }
 
   // Update the displayed range.
-  this->Form->MinimumScalar->setText(pqCoreUtilities::number(min));
-  this->Form->MaximumScalar->setText(pqCoreUtilities::number(max));
+  this->Form->MinimumScalar->setText(pqCoreUtilities::formatFullNumber(min));
+  this->Form->MaximumScalar->setText(pqCoreUtilities::formatFullNumber(max));
 }
 
 void pqRescaleRange::setOpacityRange(double min, double max)
@@ -89,8 +89,8 @@ void pqRescaleRange::setOpacityRange(double min, double max)
   }
 
   // Update the displayed opacity range.
-  this->Form->MinimumOpacityScalar->setText(pqCoreUtilities::number(min));
-  this->Form->MaximumOpacityScalar->setText(pqCoreUtilities::number(max));
+  this->Form->MinimumOpacityScalar->setText(pqCoreUtilities::formatFullNumber(min));
+  this->Form->MaximumOpacityScalar->setText(pqCoreUtilities::formatFullNumber(max));
 }
 
 double pqRescaleRange::minimum() const

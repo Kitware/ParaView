@@ -332,7 +332,7 @@
           Set the number of significant digits displayed for the time in the animation
           toolbar. Should be in the range [1,17].
         </Documentation>
-        <IntRangeDomain min="1" max="17" />
+        <IntRangeDomain name="range" min="1" max="17" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
@@ -410,7 +410,7 @@
           Set the number of significant digits to display in real numbers.
           This does NOT affect the values used in computation.
         </Documentation>
-        <IntRangeDomain min="1" max="17" />
+        <IntRangeDomain name="range" min="1" max="17" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
@@ -419,6 +419,30 @@
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FullNotationLowExponent"
+        number_of_elements="1"
+        default_values="-6"
+        command="SetFullNotationLowExponent"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="-30" max="0" />
+        <Documentation>
+          When showing an accurate, full precision, real number, scientific or fixed notation can be used. This setting is the lowest exponent value
+          that will be represented with a fixed notation instead of a scientific notation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FullNotationHighExponent"
+        number_of_elements="1"
+        default_values="20"
+        command="SetFullNotationHighExponent"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="30" />
+        <Documentation>
+          When showing an accurate, full precision, real number, scientific or fixed notation can be used. This setting is the highest exponent value
+          that will be represented with a fixed notation instead of a scientific notation.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty name="InheritRepresentationProperties"
@@ -567,6 +591,18 @@
         <Property name="AnimationTimeShortestAccuratePrecision" />
         <Property name="AnimationTimePrecision" />
         <Property name="ShowAnimationShortcuts" />
+        <Property name="DefaultTimeStep" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Real Number Display">
+        <Property name="RealNumberDisplayedNotation" />
+        <Property name="RealNumberDisplayedShortestAccuratePrecision" />
+        <Property name="RealNumberDisplayedPrecision" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Full Notation">
+        <Property name="FullNotationLowExponent" />
+        <Property name="FullNotationHighExponent" />
       </PropertyGroup>
 
       <PropertyGroup label="Interface language">
@@ -575,11 +611,7 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="ResetDisplayEmptyViews" />
-        <Property name="RealNumberDisplayedNotation" />
-        <Property name="RealNumberDisplayedShortestAccuratePrecision" />
-        <Property name="RealNumberDisplayedPrecision" />
         <Property name="InheritRepresentationProperties" />
-        <Property name="DefaultTimeStep" />
         <Property name="MaximumNumberOfDataRepresentationLabels" />
         <Property name="IgnoreNegativeLogAxisWarning" />
         <Property name="SelectOnClickInMultiBlockInspector" />
