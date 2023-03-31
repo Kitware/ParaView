@@ -126,8 +126,10 @@ void vtkPVCompositeRepresentation::MarkModified()
 void vtkPVCompositeRepresentation::SetUpdateTime(double time)
 {
   this->SelectionRepresentation->SetUpdateTime(time);
-  this->GridAxesRepresentation->SetUpdateTime(time);
-
+  if (this->GridAxesRepresentation)
+  {
+    this->GridAxesRepresentation->SetUpdateTime(time);
+  }
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->SetUpdateTime(time);
