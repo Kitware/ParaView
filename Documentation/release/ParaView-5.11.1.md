@@ -36,19 +36,15 @@ pqLoadDataReaction: fix default reader logic [(details)](https://gitlab.kitware.
 
 # Bug fixes
 
-Updating VTK to get critical VTK fixes [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6211).
+vtkSMFieldDataDomain: Fix default_values selection [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6248)
 
 Fix a potential segfault by adding sanity check in pqAnimationViewWidget [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6204).
-
-Update VTK paraview/release branch [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6206).
 
 vtkSMSelectionHelper: Remove usage of regex [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6199).
 
 calculator: Check if association is not None [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6201).
 
 Add catalyst cxx11 check [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6200).
-
-Updating VTK paraview/release branch [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6192).
 
 Fix BagPlot test [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6166)
 
@@ -88,13 +84,7 @@ XRInterface: Fix properties initial values between successive XR views [(details
 
 Fix LiveSource interval initialization [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6059).
 
-Update VTK from paraview/release [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6056).
-
 Multiblock inspector color and opacity default to 1 [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6054).
-
-Update VTK with new fixes [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6046).
-
-Updating VTK for vtkImageDifference fixes [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6041).
 
 pqFileDialog: parent Favorites context menu [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6038).
 
@@ -212,19 +202,62 @@ Add missing vtkMatplotlibMathTextUtilities [(details)](https://gitlab.kitware.co
 
 Fix vtkImageDifference [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9717)
 
-## Release backports
+Fix vtkLagrangianParticleTracker members initialization [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9856)
 
-[vtk!9856](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9856)
-[vtk!9853](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9853)
-[vtk!9896](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9896)
-[vtk!9904](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9904)
-[vtk!9902](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9902)
-[vtk!9900](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9900)
-[vtk!9870](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9870)
-[vtk!9913](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9913)
-[vtk!9923](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9923)
-[vtk!9915](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9915)
-[vtk!9907](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9907)
-[vtk!9898](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9898)
-[vtk!9836](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9836)
-[vtk!9827](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9827)
+OSPRAY private link instead of public [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9853)
+
+Only pass ContextScene mouse event when item is interactive [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9896)
+
+Makes RenderingContextOpenGL2 module buildable with Emscripten [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9904)
+
+vtkPointSet returned in vtkDataObjectTypes::NewDataObject [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9902)
+
+vtkExtractBlockUsingDataAssembly sanity check [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9900)
+
+vtkPolygon: fix normal computation instability [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9870)
+
+X11 `ProcessEvents` will dispatch all pending messages [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9913)
+
+Avoid setting null shader in PolyDataMapper [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9923)
+
+Fix missing symbol on Emscripten [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9915)
+
+Fix SSAO render pass [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9907)
+
+Fix magnifier viewport with multiple renderers [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9898)
+
+Minor progress reporting fixes for vtkThreshold and vtkContour filters [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9836)
+
+vtkOBJReader: avoid a possible null buffer access [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9827)
+
+vtkPLYWriter: Fix can't change the texture coordinates name after writing data once [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9978)
+
+Resolve stuttering dolly with SDL2 interactor in browsers [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9993)
+
+Allow to change cursor in QVTKOpenGLStereoWidget [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9985)
+
+Fix PDAL link on windows [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9991)
+
+vtkEnSightWriter: write .case file in RequestData [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9712)
+
+ExprTkFunctionParser: Fix missing sstream include [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10004)
+
+Fix delayed title update [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10029)
+
+Fixed integer size to match what ex_get_block() requires [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10053)
+
+Fixed / suppressed cppcheck 2.10 warnings [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10049)
+
+Fix io xml htg writer and reader v2 [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10067)
+
+vtkConstrainedPointHandleRepresentation - incorrectly checking this->CursorShape [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10075)
+
+Trivial casts [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9966)
+
+Make Cocoa context-view connection before MakeCurrent [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9845)
+
+vtkStructuredDataPlaneCutter now pass field data [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10024)
+
+Fix an incorrect usage of vtkDataAssembly::MakeValidNodeName in vtkDataAssemblyUtilities [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10023)
+
+vtkCocoaRenderWindow: check if Initialized before calling Initialize()  [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10060)
