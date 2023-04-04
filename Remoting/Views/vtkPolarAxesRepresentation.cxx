@@ -78,33 +78,139 @@ void vtkPolarAxesRepresentation::SetParentVisibility(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetEnableOverallColor(bool enable)
+{
+  if (this->EnableOverallColor != enable)
+  {
+    this->EnableOverallColor = enable;
+    this->Modified();
+
+    if (this->EnableOverallColor)
+    {
+      this->PolarAxesActor->GetLastRadialAxisProperty()->SetColor(
+        this->OverallColor[0], this->OverallColor[1], this->OverallColor[2]);
+      this->PolarAxesActor->GetSecondaryRadialAxesProperty()->SetColor(
+        this->OverallColor[0], this->OverallColor[1], this->OverallColor[2]);
+      this->PolarAxesActor->GetPolarArcsProperty()->SetColor(
+        this->OverallColor[0], this->OverallColor[1], this->OverallColor[2]);
+      this->PolarAxesActor->GetSecondaryPolarArcsProperty()->SetColor(
+        this->OverallColor[0], this->OverallColor[1], this->OverallColor[2]);
+      this->PolarAxesActor->GetPolarAxisProperty()->SetColor(
+        this->OverallColor[0], this->OverallColor[1], this->OverallColor[2]);
+    }
+    else
+    {
+      this->PolarAxesActor->GetLastRadialAxisProperty()->SetColor(
+        this->LastRadialAxisColor[0], this->LastRadialAxisColor[1], this->LastRadialAxisColor[2]);
+      this->PolarAxesActor->GetSecondaryRadialAxesProperty()->SetColor(
+        this->SecondaryRadialAxesColor[0], this->SecondaryRadialAxesColor[1],
+        this->SecondaryRadialAxesColor[2]);
+      this->PolarAxesActor->GetPolarArcsProperty()->SetColor(
+        this->PolarArcsColor[0], this->PolarArcsColor[1], this->PolarArcsColor[2]);
+      this->PolarAxesActor->GetSecondaryPolarArcsProperty()->SetColor(
+        this->SecondaryPolarArcsColor[0], this->SecondaryPolarArcsColor[1],
+        this->SecondaryPolarArcsColor[2]);
+      this->PolarAxesActor->GetPolarAxisProperty()->SetColor(
+        this->PolarAxisColor[0], this->PolarAxisColor[1], this->PolarAxisColor[2]);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPolarAxesRepresentation::SetOverallColor(double r, double g, double b)
+{
+  if (this->EnableOverallColor &&
+    (this->OverallColor[0] != r || this->OverallColor[1] != g || this->OverallColor[2] != b))
+  {
+    this->OverallColor[0] = r;
+    this->OverallColor[1] = g;
+    this->OverallColor[2] = b;
+    this->Modified();
+
+    this->PolarAxesActor->GetLastRadialAxisProperty()->SetColor(r, g, b);
+    this->PolarAxesActor->GetSecondaryRadialAxesProperty()->SetColor(r, g, b);
+    this->PolarAxesActor->GetPolarArcsProperty()->SetColor(r, g, b);
+    this->PolarAxesActor->GetSecondaryPolarArcsProperty()->SetColor(r, g, b);
+    this->PolarAxesActor->GetPolarAxisProperty()->SetColor(r, g, b);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetLastRadialAxisColor(double r, double g, double b)
 {
-  this->PolarAxesActor->GetLastRadialAxisProperty()->SetColor(r, g, b);
+  if (!this->EnableOverallColor &&
+    (this->LastRadialAxisColor[0] != r || this->LastRadialAxisColor[1] != g ||
+      this->LastRadialAxisColor[2] != b))
+  {
+    this->LastRadialAxisColor[0] = r;
+    this->LastRadialAxisColor[1] = g;
+    this->LastRadialAxisColor[2] = b;
+    this->Modified();
+
+    this->PolarAxesActor->GetLastRadialAxisProperty()->SetColor(r, g, b);
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetSecondaryRadialAxesColor(double r, double g, double b)
 {
-  this->PolarAxesActor->GetSecondaryRadialAxesProperty()->SetColor(r, g, b);
+  if (!this->EnableOverallColor &&
+    (this->SecondaryRadialAxesColor[0] != r || this->SecondaryRadialAxesColor[1] != g ||
+      this->SecondaryRadialAxesColor[2] != b))
+  {
+    this->SecondaryRadialAxesColor[0] = r;
+    this->SecondaryRadialAxesColor[1] = g;
+    this->SecondaryRadialAxesColor[2] = b;
+    this->Modified();
+
+    this->PolarAxesActor->GetSecondaryRadialAxesProperty()->SetColor(r, g, b);
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetPolarArcsColor(double r, double g, double b)
 {
-  this->PolarAxesActor->GetPolarArcsProperty()->SetColor(r, g, b);
+  if (!this->EnableOverallColor &&
+    (this->PolarArcsColor[0] != r || this->PolarArcsColor[1] != g || this->PolarArcsColor[2] != b))
+  {
+    this->PolarArcsColor[0] = r;
+    this->PolarArcsColor[1] = g;
+    this->PolarArcsColor[2] = b;
+    this->Modified();
+
+    this->PolarAxesActor->GetPolarArcsProperty()->SetColor(r, g, b);
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetSecondaryPolarArcsColor(double r, double g, double b)
 {
-  this->PolarAxesActor->GetSecondaryPolarArcsProperty()->SetColor(r, g, b);
+  if (!this->EnableOverallColor &&
+    (this->SecondaryPolarArcsColor[0] != r || this->SecondaryPolarArcsColor[1] != g ||
+      this->SecondaryPolarArcsColor[2] != b))
+  {
+    this->SecondaryPolarArcsColor[0] = r;
+    this->SecondaryPolarArcsColor[1] = g;
+    this->SecondaryPolarArcsColor[2] = b;
+    this->Modified();
+
+    this->PolarAxesActor->GetSecondaryPolarArcsProperty()->SetColor(r, g, b);
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::SetPolarAxisColor(double r, double g, double b)
 {
-  this->PolarAxesActor->GetPolarAxisProperty()->SetColor(r, g, b);
+  if (!this->EnableOverallColor &&
+    (this->PolarAxisColor[0] != r || this->PolarAxisColor[1] != g || this->PolarAxisColor[2] != b))
+  {
+    this->PolarAxisColor[0] = r;
+    this->PolarAxisColor[1] = g;
+    this->PolarAxisColor[2] = b;
+    this->Modified();
+
+    this->PolarAxesActor->GetPolarAxisProperty()->SetColor(r, g, b);
+  }
 }
 
 //----------------------------------------------------------------------------

@@ -11740,6 +11740,30 @@
         <Property name="Ratio" />
       </PropertyGroup>
 
+      <IntVectorProperty command="SetEnableOverallColor"
+                         default_values="1"
+                         name="EnableOverallColor"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+        <Documentation>If On, the whole polar axes is unicolor.
+        If Off, you can specify a color for each feature.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOverallColor"
+                            default_values="1 1 1"
+                            name="OverallColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the overall color.</Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPolarAxisColor"
                             default_values="1 1 1"
                             name="PolarAxisColor"
@@ -11748,6 +11772,12 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the Polar Axis color.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPolarArcsColor"
@@ -11758,6 +11788,12 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the Polar Arcs color.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLastRadialAxisColor"
@@ -11768,6 +11804,12 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the Last Radial Axis color.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSecondaryPolarArcsColor"
@@ -11778,6 +11820,12 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the Secondary Polar Arcs color.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSecondaryRadialAxesColor"
@@ -11788,9 +11836,17 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="EnableOverallColor"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the Secondary Radial Axes color.</Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Colors">
+        <Property name="EnableOverallColor"/>
+        <Property name="OverallColor"/>
         <Property name="PolarAxisColor"/>
         <Property name="PolarArcsColor"/>
         <Property name="LastRadialAxisColor"/>

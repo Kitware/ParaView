@@ -84,6 +84,9 @@ public:
 
   // Description:
   // Set the actor color.
+  vtkGetMacro(EnableOverallColor, bool);
+  virtual void SetEnableOverallColor(bool enable);
+  virtual void SetOverallColor(double r, double g, double b);
   virtual void SetPolarAxisColor(double r, double g, double b);
   virtual void SetPolarArcsColor(double r, double g, double b);
   virtual void SetSecondaryPolarArcsColor(double r, double g, double b);
@@ -224,6 +227,13 @@ protected:
   int EnableCustomBounds[3] = { 0 };
   double CustomRange[2] = { 0.0, 1.0 };
   bool EnableCustomRange = false;
+  bool EnableOverallColor = true;
+  double OverallColor[3] = { 1.0 };
+  double PolarAxisColor[3] = { 1.0 };
+  double PolarArcsColor[3] = { 1.0 };
+  double SecondaryPolarArcsColor[3] = { 1.0 };
+  double SecondaryRadialAxesColor[3] = { 1.0 };
+  double LastRadialAxisColor[3] = { 1.0 };
   double DataBounds[6] = { 0.0 };
   int RendererType = vtkPVRenderView::DEFAULT_RENDERER;
   bool ParentVisibility = true;
