@@ -99,8 +99,10 @@ include(vtkCompilerPlatformFlags)
 include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
-include(vtkQt)
-set(PARAVIEW_QT_MAJOR_VERSION "${vtk_qt_major_version}")
+
+if (PARAVIEW_USE_QT)
+  include(paraviewQt)
+endif()
 
 include(CMakeDependentOption)
 include(ParaViewOptions)
