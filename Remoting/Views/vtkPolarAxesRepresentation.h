@@ -83,6 +83,37 @@ public:
   vtkGetVector2Macro(CustomRange, double);
 
   // Description:
+  // Get/Set the use of automatically placed pole (origin of the axes).
+  // If on, pole is placed at the center of the bounding box.
+  vtkSetMacro(EnableAutoPole, bool);
+  vtkGetMacro(EnableAutoPole, bool);
+
+  // Description:
+  // Get/Set the use of custom min/max angles.
+  // If off, min/max angles are computed relatively to pole position.
+  vtkSetMacro(EnableCustomAngle, bool);
+  vtkGetMacro(EnableCustomAngle, bool);
+
+  // Description:
+  // Get/Set the custom min/max angles when EnableCustomAngle is On.
+  vtkSetMacro(MinAngle, double);
+  vtkGetMacro(MinAngle, double);
+  vtkSetMacro(MaxAngle, double);
+  vtkGetMacro(MaxAngle, double);
+
+  // Description:
+  // Get/Set the use of custom min radius.
+  // If off, min radius is computed relatively to pole position.
+  // Max radius is always computed because not exposed.
+  vtkSetMacro(EnableCustomRadius, bool);
+  vtkGetMacro(EnableCustomRadius, bool);
+
+  // Description:
+  // Get/Set the custom min radius when EnableCustomRadius is On.
+  vtkSetMacro(MinRadius, double);
+  vtkGetMacro(MinRadius, double);
+
+  // Description:
   // Set the actor color.
   vtkGetMacro(EnableOverallColor, bool);
   virtual void SetEnableOverallColor(bool enable);
@@ -129,9 +160,6 @@ public:
   virtual void SetAutoSubdividePolarAxis(bool active);
   virtual void SetDeltaAngleRadialAxes(double angle);
   virtual void SetDeltaRangePolarAxes(double range);
-  virtual void SetMinimumRadius(double radius);
-  virtual void SetMinimumAngle(double angle);
-  virtual void SetMaximumAngle(double angle);
   virtual void SetSmallestVisiblePolarAngle(double angle);
   virtual void SetTickLocation(int location);
   virtual void SetRadialUnits(bool use);
@@ -227,6 +255,12 @@ protected:
   int EnableCustomBounds[3] = { 0 };
   double CustomRange[2] = { 0.0, 1.0 };
   bool EnableCustomRange = false;
+  bool EnableAutoPole = true;
+  bool EnableCustomAngle = true;
+  double MinAngle = 0.0;
+  double MaxAngle = 90.0;
+  bool EnableCustomRadius = true;
+  double MinRadius = 0.0;
   bool EnableOverallColor = true;
   double OverallColor[3] = { 1.0 };
   double PolarAxisColor[3] = { 1.0 };

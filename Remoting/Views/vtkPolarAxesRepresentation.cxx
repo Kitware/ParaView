@@ -427,21 +427,144 @@ void vtkPolarAxesRepresentation::UpdateBounds()
       bds[pos + 1] = this->CustomBounds[pos + 1];
     }
   }
+
   this->PolarAxesActor->SetBounds(bds);
 
-  // calcul du pole
-  this->PolarAxesActor->SetPole((bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5, 0);
+  double pole[3] = { 0.0 };
+  double center[2] = { (bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5 };
+  double maxRadius = 0.0;
+  double minRadius = EnableCustomRadius ? this->MinRadius : 0.0;
+  double minAngle = EnableCustomAngle ? this->MinAngle : 0.0;
+  double maxAngle = EnableCustomAngle ? this->MaxAngle : 360.0;
 
-  double maxradius = 0.0;
-  double pole[3];
-  this->PolarAxesActor->GetPole(pole);
-  for (int i = 0; i < 2; i++)
+  if (this->EnableAutoPole)
   {
-    double currentradius = 0.0;
-    currentradius = sqrt(pow(bds[i] - pole[0], 2) + pow(bds[i + 2] - pole[1], 2));
-    maxradius = (maxradius < currentradius) ? currentradius : maxradius;
+    this->PolarAxesActor->SetPole(center);
+
+    maxRadius = sqrt(pow(bds[1] - center[0], 2) + pow(bds[3] - center[1], 2));
   }
-  this->PolarAxesActor->SetMaximumRadius(maxradius);
+  else
+  {
+    this->PolarAxesActor->SetPole(pole);
+
+    // Compute the max length between pole and bounds for maximum radius
+    // Check bottom-left, top-left, bottom-right, top-right
+    if (pole[0] < center[0])
+    {
+      if (pole[1] < center[1])
+      {
+        maxRadius = sqrt(pow(bds[1] - pole[0], 2) + pow(bds[3] - pole[1], 2));
+      }
+      else
+      {
+        maxRadius = sqrt(pow(bds[1] - pole[0], 2) + pow(bds[2] - pole[1], 2));
+      }
+    }
+    else
+    {
+      if (pole[1] < center[1])
+      {
+        maxRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[3] - pole[1], 2));
+      }
+      else
+      {
+        maxRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[2] - pole[1], 2));
+      }
+    }
+    // Compute the min length between pole and bounds if pole is outside box for minimum radius and
+    // min/max angle
+    // Check bottom-left, top-left, left, bottom-right, top-right, right, bottom, top
+    // If inside, keep default values
+    if (pole[0] < bds[0])
+    {
+      if (!this->EnableCustomRadius)
+      {
+        if (pole[1] < bds[2])
+        {
+          minRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[2] - pole[1], 2));
+        }
+        else if (pole[1] > bds[3])
+        {
+          minRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(pole[1] - bds[3], 2));
+        }
+        else
+        {
+          minRadius = bds[0] - pole[0];
+        }
+      }
+
+      if (!this->EnableCustomAngle)
+      {
+        maxAngle = ((pole[1] < bds[3]) ? atan((bds[3] - pole[1]) / (bds[0] - pole[0]))
+                                       : atan((bds[3] - pole[1]) / (bds[1] - pole[0]))) *
+          180.0 / vtkMath::Pi();
+        minAngle = ((pole[1] < bds[2]) ? atan((bds[2] - pole[1]) / (bds[1] - pole[0]))
+                                       : atan((bds[2] - pole[1]) / (bds[0] - pole[0]))) *
+          180.0 / vtkMath::Pi();
+      }
+    }
+    else if (pole[0] > bds[1])
+    {
+      if (!this->EnableCustomRadius)
+      {
+        if (pole[1] < bds[2])
+        {
+          minRadius = sqrt(pow(pole[0] - bds[1], 2) + pow(bds[2] - pole[1], 2));
+        }
+        else if (pole[1] > bds[3])
+        {
+          minRadius = sqrt(pow(pole[0] - bds[1], 2) + pow(pole[1] - bds[3], 2));
+        }
+        else
+        {
+          minRadius = pole[0] - bds[1];
+        }
+      }
+
+      if (!this->EnableCustomAngle)
+      {
+        maxAngle = 180 +
+          ((pole[1] < bds[2]) ? atan((bds[2] - pole[1]) / (bds[0] - pole[0]))
+                              : atan((bds[2] - pole[1]) / (bds[1] - pole[0]))) *
+            180 / vtkMath::Pi();
+        minAngle = 180 +
+          ((pole[1] < bds[3]) ? atan((bds[3] - pole[1]) / (bds[1] - pole[0]))
+                              : atan((bds[3] - pole[1]) / (bds[0] - pole[0]))) *
+            180 / vtkMath::Pi();
+      }
+    }
+    else if (pole[1] < bds[2])
+    {
+      if (!this->EnableCustomRadius)
+      {
+        minRadius = bds[2] - pole[1];
+      }
+
+      if (!this->EnableCustomAngle)
+      {
+        maxAngle = 180 + atan((bds[2] - pole[1]) / (bds[0] - pole[0])) * 180 / vtkMath::Pi();
+        minAngle = atan((bds[2] - pole[1]) / (bds[1] - pole[0])) * 180 / vtkMath::Pi();
+      }
+    }
+    else if (pole[1] > bds[3])
+    {
+      if (!this->EnableCustomRadius)
+      {
+        minRadius = pole[1] - bds[3];
+      }
+
+      if (!this->EnableCustomAngle)
+      {
+        maxAngle = atan((bds[3] - pole[1]) / (bds[1] - pole[0])) * 180 / vtkMath::Pi();
+        minAngle = 180 + atan((bds[3] - pole[1]) / (bds[0] - pole[0])) * 180 / vtkMath::Pi();
+      }
+    }
+  }
+
+  this->PolarAxesActor->SetMinimumRadius(minRadius);
+  this->PolarAxesActor->SetMaximumRadius(maxRadius);
+  this->PolarAxesActor->SetMinimumAngle(minAngle);
+  this->PolarAxesActor->SetMaximumAngle(maxAngle);
 
   if (this->EnableCustomRange)
   {
@@ -449,7 +572,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   }
   else
   {
-    this->PolarAxesActor->SetRange(0, maxradius);
+    this->PolarAxesActor->SetRange(minRadius, maxRadius);
   }
 }
 
@@ -500,24 +623,6 @@ void vtkPolarAxesRepresentation::SetDeltaAngleRadialAxes(double angle)
 void vtkPolarAxesRepresentation::SetDeltaRangePolarAxes(double range)
 {
   this->PolarAxesActor->SetRequestedDeltaRangePolarAxes(range);
-}
-
-//----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetMinimumRadius(double radius)
-{
-  this->PolarAxesActor->SetMinimumRadius(radius);
-}
-
-//----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetMinimumAngle(double angle)
-{
-  this->PolarAxesActor->SetMinimumAngle(angle);
-}
-
-//----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetMaximumAngle(double angle)
-{
-  this->PolarAxesActor->SetMaximumAngle(angle);
 }
 
 //----------------------------------------------------------------------------

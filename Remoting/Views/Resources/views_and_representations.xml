@@ -11561,11 +11561,20 @@
         </Hints>
         <Documentation>Set the polar axes custom range.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableAutoPole"
+                         default_values="1"
+                         name="AutoPole"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the automatic placement of the pole (origin of the axes) at the center of the bounding box.
+        </Documentation>
+      </IntVectorProperty>
       <PropertyGroup label="Custom Bounds and Range">
         <Property name="EnableCustomBounds"/>
         <Property name="CustomBounds"/>
         <Property name="EnableCustomRange"/>
         <Property name="CustomRange"/>
+        <Property name="AutoPole"/>
       </PropertyGroup>
 
       <IntVectorProperty command="SetPolarAxisVisibility"
@@ -11671,31 +11680,66 @@
         Depends on the Number Of Polar Axes for automatic computation.
         </Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMinimumRadius"
+      <IntVectorProperty command="SetEnableCustomRadius"
+                         default_values="1"
+                         name="CustomMinRadius"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom minimum radius.
+        If off, Minimum Radius is computed relatively to pole position.
+        Maximum radius is always automatically computed.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMinRadius"
                             default_values="0"
                             name="MinimumRadius"
                             number_of_elements="1">
         <DoubleRangeDomain min="0"
                            max="100"
                            name="range" />
-        <Documentation>Set the minimum radius, Maximum radius is automatically computed.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomMinRadius"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the minimum radius.</Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMinimumAngle"
+      <IntVectorProperty command="SetEnableCustomAngle"
+                         default_values="1"
+                         name="CustomAngles"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom min/max angle.
+        If off, Minimum/Maximum Angle are computed relatively to pole position.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMinAngle"
                             default_values="0"
                             name="MinimumAngle"
                             number_of_elements="1">
         <DoubleRangeDomain min="-180"
                            max="180"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomAngles"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the minimum angle (in degrees).</Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMaximumAngle"
+      <DoubleVectorProperty command="SetMaxAngle"
                             default_values="90"
                             name="MaximumAngle"
                             number_of_elements="1">
         <DoubleRangeDomain min="-180"
                            max="180"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomAngles"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the maximum angle (in degrees).</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetRadialAxesOriginToPolarAxis"
@@ -11732,7 +11776,9 @@
         <Property name="DeltaAngleRadialAxes" />
         <Property name="NumberOfPolarAxes" />
         <Property name="DeltaRangePolarAxes" />
+        <Property name="CustomMinRadius" />
         <Property name="MinimumRadius" />
+        <Property name="CustomAngles" />
         <Property name="MinimumAngle" />
         <Property name="MaximumAngle" />
         <Property name="RadialAxesOriginToPolarAxis" />
