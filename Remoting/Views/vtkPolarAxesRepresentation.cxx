@@ -382,15 +382,21 @@ void vtkPolarAxesRepresentation::SetNumberOfRadialAxes(vtkIdType val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetNumberOfPolarAxisTicks(int val)
+void vtkPolarAxesRepresentation::SetNumberOfPolarAxisTicks(int vtkNotUsed(val))
 {
-  this->PolarAxesActor->SetNumberOfPolarAxisTicks(val);
+  // Deactivation of this property since the use of the method is marked as deprecated in VTK
+  // Should be handled by a current MR:
+  // https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6279
+  // this->PolarAxesActor->SetNumberOfPolarAxisTicks(val);
 }
 
 //----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetAutoSubdividePolarAxis(bool active)
+void vtkPolarAxesRepresentation::SetAutoSubdividePolarAxis(bool vtkNotUsed(active))
 {
-  this->PolarAxesActor->SetAutoSubdividePolarAxis(active);
+  // Deactivation of this property since the use of the method is marked as deprecated in VTK
+  // Should be handled by a current MR:
+  // https://gitlab.kitware.com/paraview/paraview/-/merge_requests/6279
+  // this->PolarAxesActor->SetAutoSubdividePolarAxis(active);
 }
 
 //----------------------------------------------------------------------------
