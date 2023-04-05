@@ -16,9 +16,10 @@ if (NOT DEFINED PARAVIEW_QT_VERSION)
 endif()
 
 if (NOT PARAVIEW_QT_VERSION IN_LIST paraview_supported_qt_versions)
+  string(REPLACE ";" "\", \"" paraview_supported_qt_versions_string "${paraview_supported_qt_versions}")
   message(FATAL_ERROR
-    "Supported Qt versions are \"${paraview_supported_qt_versions}\". But "
-    "PARAVIEW_QT_VERSION is set to ${PARAVIEW_QT_VERSION}.")
+    "Supported Qt versions are \"${paraview_supported_qt_versions_string}\". "
+    "But `PARAVIEW_QT_VERSION` is set to \"${PARAVIEW_QT_VERSION}\".")
 endif ()
 
 if (NOT PARAVIEW_QT_VERSION STREQUAL "Auto")
