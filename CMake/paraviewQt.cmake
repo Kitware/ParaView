@@ -15,12 +15,13 @@ if (NOT DEFINED PARAVIEW_QT_VERSION)
   set_property(CACHE PARAVIEW_QT_VERSION PROPERTY STRINGS "${paraview_supported_qt_versions}")
 endif()
 
+if (NOT PARAVIEW_QT_VERSION IN_LIST paraview_supported_qt_versions)
+  message(FATAL_ERROR
+    "Supported Qt versions are \"${paraview_supported_qt_versions}\". But "
+    "PARAVIEW_QT_VERSION is set to ${PARAVIEW_QT_VERSION}.")
+endif ()
+
 if (NOT PARAVIEW_QT_VERSION STREQUAL "Auto")
-  if (NOT PARAVIEW_QT_VERSION IN_LIST paraview_supported_qt_versions)
-    message(FATAL_ERROR
-      "Supported Qt versions are \"${paraview_supported_qt_versions}\". But "
-      "PARAVIEW_QT_VERSION is set to ${PARAVIEW_QT_VERSION}.")
-  endif ()
   set(_paraview_qt_version "${PARAVIEW_QT_VERSION}")
 else ()
   find_package(Qt6 QUIET COMPONENTS Core)
