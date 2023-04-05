@@ -13,7 +13,7 @@ if (NOT DEFINED PARAVIEW_QT_VERSION)
   set(PARAVIEW_QT_VERSION "Auto" CACHE
     STRING "Expected Qt major version. Valid values are Auto, 5, 6.")
   set_property(CACHE PARAVIEW_QT_VERSION PROPERTY STRINGS "${paraview_supported_qt_versions}")
-endif()
+endif ()
 
 if (NOT PARAVIEW_QT_VERSION IN_LIST paraview_supported_qt_versions)
   string(REPLACE ";" "\", \"" paraview_supported_qt_versions_string "${paraview_supported_qt_versions}")
