@@ -37,5 +37,4 @@ else ()
   set(_paraview_qt_version "${PARAVIEW_QT_VERSION}")
 endif ()
 
-set(PARAVIEW_QT_MAJOR_VERSION "${_paraview_qt_version}" CACHE INTERNAL
-  "Major version number for the Qt installation used.")
+set(PARAVIEW_QT_MAJOR_VERSION "${_paraview_qt_version}")
