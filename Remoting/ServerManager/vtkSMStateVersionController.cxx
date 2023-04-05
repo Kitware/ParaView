@@ -1453,7 +1453,7 @@ struct Process_5_11_to_5_12
 {
   bool operator()(xml_document& document)
   {
-    return ConvertTableFFT(document) && HandleSlice(document);
+    return ConvertTableFFT(document) && HandleSlice(document) && HandlePolarAxes(document);
   }
 
   static bool ConvertTableFFT(xml_document& document)
@@ -1585,6 +1585,84 @@ struct Process_5_11_to_5_12
       domainListNode.append_child("Proxy").append_attribute("value").set_value(mergeId);
       domainListNode.append_child("Proxy").append_attribute("value").set_value(octreeMergeId);
       domainListNode.append_child("Proxy").append_attribute("value").set_value(nonMergeId);
+    }
+
+    return true;
+  }
+
+  static bool HandlePolarAxes(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='representations' and @type='PolarAxesRepresentation']");
+
+    // replace and add properties
+    // adding only properties that shouldn't have default values
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      const std::string id(node.attribute("id").value());
+
+      // update and rename NumberOfPolarAxes
+      if (auto nbPolarAxesNode = node.find_child_by_attribute("name", "NumberOfPolarAxis"))
+      {
+        auto autoNode = node.find_child_by_attribute("name", "AutoSubdividePolarAxis");
+        bool isAuto = autoNode.child("Element").attribute("value").as_bool();
+        if (isAuto)
+        {
+          nbPolarAxesNode.child("Element").attribute("value").set_value(5);
+        }
+        nbPolarAxesNode.attribute("name").set_value("NumberOfPolarAxes");
+      }
+
+      // add DeltaAngleRadialAxes if NumberOfRadialAxes is specified
+      if (auto nbRadialAxesNode = node.find_child_by_attribute("name", "NumberOfRadialAxes"))
+      {
+        bool isNotAuto = nbRadialAxesNode.child("Element").attribute("value").as_int() > 0;
+        if (isNotAuto)
+        {
+          // add DeltaAngleRadialAxes property
+          auto propertyNode = node.append_child("Property");
+          propertyNode.append_attribute("name").set_value("DeltaAngleRadialAxes");
+          propertyNode.append_attribute("id").set_value((id + ".DeltaAngleRadialAxes").c_str());
+          propertyNode.append_attribute("number_of_elements").set_value(1);
+
+          auto elementNode = propertyNode.append_child("Element");
+          elementNode.append_attribute("index").set_value(0);
+          elementNode.append_attribute("value").set_value(0.0);
+
+          auto domainNode = propertyNode.append_child("Domain");
+          domainNode.append_attribute("name").set_value("range");
+          domainNode.append_attribute("id").set_value((id + ".DeltaAngleRadialAxes.range").c_str());
+        }
+      }
+
+      // add ArcTickMatchesRadialAxes property
+      auto propertyNode = node.append_child("Property");
+      propertyNode.append_attribute("name").set_value("ArcTickMatchesRadialAxes");
+      propertyNode.append_attribute("id").set_value((id + ".ArcTickMatchesRadialAxes").c_str());
+      propertyNode.append_attribute("number_of_elements").set_value(1);
+
+      auto elementNode = propertyNode.append_child("Element");
+      elementNode.append_attribute("index").set_value(0);
+      elementNode.append_attribute("value").set_value(false);
+
+      auto domainNode = propertyNode.append_child("Domain");
+      domainNode.append_attribute("name").set_value("bool");
+      domainNode.append_attribute("id").set_value((id + ".ArcTickMatchesRadialAxes.bool").c_str());
+
+      // add EnableOverallColor property
+      propertyNode = node.append_child("Property");
+      propertyNode.append_attribute("name").set_value("EnableOverallColor");
+      propertyNode.append_attribute("id").set_value((id + ".EnableOverallColor").c_str());
+      propertyNode.append_attribute("number_of_elements").set_value(1);
+
+      elementNode = propertyNode.append_child("Element");
+      elementNode.append_attribute("index").set_value(0);
+      elementNode.append_attribute("value").set_value(false);
+
+      domainNode = propertyNode.append_child("Domain");
+      domainNode.append_attribute("name").set_value("bool");
+      domainNode.append_attribute("id").set_value((id + ".EnableOverallColor.bool").c_str());
     }
 
     return true;
