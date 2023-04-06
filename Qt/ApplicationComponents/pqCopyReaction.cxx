@@ -44,7 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInformation.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMDataTypeDomain.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyClipboard.h"
@@ -56,6 +59,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSet>
 
+#include <stack>
+#include <unordered_map>
+
 // necessary for using QPointer in a QSet
 template <class T>
 static uint qHash(QPointer<T> p)
@@ -63,7 +69,12 @@ static uint qHash(QPointer<T> p)
   return qHash(static_cast<T*>(p));
 }
 
-QSet<QPointer<pqPipelineSource>> pqCopyReaction::FilterSelection;
+QSet<QPointer<pqProxy>> pqCopyReaction::FilterSelection;
+pqProxy* pqCopyReaction::SelectionRoot = nullptr;
+
+QSet<pqCopyReaction*> pqCopyReaction::PastePipelineContainer;
+QSet<pqCopyReaction*> pqCopyReaction::CopyPipelineContainer;
+QMap<pqProxy*, QMetaObject::Connection> pqCopyReaction::SelectedProxyConnections;
 
 //-----------------------------------------------------------------------------
 pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode, bool pipeline_mode)
@@ -74,10 +85,38 @@ pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode, bool pipe
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
     SLOT(updateEnableState()));
   this->updateEnableState();
+  if (!this->Paste && this->CreatePipeline)
+  {
+    for (auto paster : this->PastePipelineContainer)
+    {
+      QObject::connect(
+        this, &pqCopyReaction::pipelineCopied, paster, &pqCopyReaction::updateEnableState);
+    }
+    this->CopyPipelineContainer.insert(this);
+  }
+  else if (this->Paste && this->CreatePipeline)
+  {
+    for (auto copier : this->CopyPipelineContainer)
+    {
+      QObject::connect(
+        copier, &pqCopyReaction::pipelineCopied, this, &pqCopyReaction::updateEnableState);
+    }
+    this->PastePipelineContainer.insert(this);
+  }
 }
 
 //-----------------------------------------------------------------------------
-pqCopyReaction::~pqCopyReaction() = default;
+pqCopyReaction::~pqCopyReaction()
+{
+  if (this->Paste && this->CreatePipeline)
+  {
+    this->PastePipelineContainer.remove(this);
+  }
+  else if (!this->Paste && this->CreatePipeline)
+  {
+    this->CopyPipelineContainer.remove(this);
+  }
+}
 
 //-----------------------------------------------------------------------------
 void pqCopyReaction::updateEnableState()
@@ -99,7 +138,7 @@ void pqCopyReaction::updateEnableState()
   }
   else
   {
-    this->parentAction()->setEnabled(pqCopyReaction::canCopyPipeline());
+    this->parentAction()->setEnabled(pqCopyReaction::getSelectedPipelineRoot() != nullptr);
   }
 }
 
@@ -159,132 +198,172 @@ bool checkDownstream(QList<pqPipelineSource*>& selection, pqPipelineSource* sour
   return false;
 }
 
-// for a given filter, checks if their parent filter is contained in selection
-template <typename T>
-bool selectionContainsParent(T& selection, pqPipelineSource* source)
+//-----------------------------------------------------------------------------
+// Returns nullptr if there are more than 1 input port to the whole pipeline
+pqProxy* getPipelineRoot(const pqProxySelection& sel)
 {
-  for (auto& item : selection)
+  if (sel.empty())
   {
-    auto parent = qobject_cast<pqPipelineSource*>(item);
-    if (parent == source)
+    return nullptr;
+  }
+
+  // For each proxy, we count how many input and output ports are connected to proxies within the
+  // selection. We want at most one proxy with one input port to not be connected within the
+  // selection. Every proxy in the selection should have either all its output ports connected or
+  // none.
+  // Each proxy is mapped to ninputs
+  std::unordered_map<pqProxy*, unsigned int> connections;
+
+  for (pqServerManagerModelItem* item : sel)
+  {
+    if (auto proxy = qobject_cast<pqProxy*>(item))
     {
-      continue;
-    }
-    auto consumers = parent->getAllConsumers();
-    if (consumers.contains(source))
-    {
-      return true;
+      if (auto port = qobject_cast<pqOutputPort*>(proxy))
+      {
+        connections.emplace(port->getSource(), 0);
+      }
+      else
+      {
+        connections.emplace(proxy, 0);
+      }
     }
   }
-  return false;
+
+  // Count the number of input connections of each source
+  for (auto& pair : connections)
+  {
+    pqProxy* proxy = pair.first;
+
+    if (auto source = qobject_cast<pqPipelineSource*>(proxy))
+    {
+      for (int i = 0; i < source->getNumberOfOutputPorts(); ++i)
+      {
+        pqOutputPort* port = source->getOutputPort(i);
+        int noutputs = 0;
+        // consumers include lots of other proxies but it will include pipeline ones
+        for (int j = 0; j < port->getNumberOfConsumers(); ++j)
+        {
+          auto it = connections.find(port->getConsumer(j));
+          if (it != connections.end())
+          {
+            ++it->second;
+            ++noutputs;
+          }
+        }
+        if (noutputs && noutputs != port->getNumberOfConsumers())
+        {
+          return nullptr;
+        }
+      }
+    }
+  }
+
+  pqProxy* root = nullptr;
+  for (auto& pair : connections)
+  {
+    pqProxy* proxy = pair.first;
+    unsigned int ninputs = pair.second;
+
+    if (auto source = qobject_cast<pqPipelineSource*>(proxy))
+    {
+      if (ninputs && source->getSourceProxy()->GetNumberOfAlgorithmRequiredInputPorts() != ninputs)
+      {
+        return nullptr;
+      }
+      else if (!ninputs)
+      {
+        if (root)
+        {
+          return nullptr;
+        }
+        root = proxy;
+      }
+    }
+  }
+
+  return root;
 }
-}
+} // anonymous namespace
 
 //-----------------------------------------------------------------------------
-bool pqCopyReaction::canCopyPipeline()
+pqProxy* pqCopyReaction::getSelectedPipelineRoot()
 {
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
   if (!selModel || selModel->GetNumberOfSelectedProxies() == 0)
   {
-    return false;
+    return nullptr;
   }
 
   pqProxySelection selection;
   pqProxySelectionUtilities::copy(selModel, selection);
-  selection = pqProxySelectionUtilities::getPipelineProxies(selection);
-  for (auto& item1 : selection)
-  {
-    auto source1 = qobject_cast<pqPipelineSource*>(item1);
-    // make sure a data source wasn't selected
-    // only want to copy filters
-    if (!source1 || source1->getSourceProxy()->GetNumberOfProducers() == 0)
-    {
-      return false;
-    }
-
-    // we don't want to copy selected filters if they're not contiguous
-    // check for other filters in the selection that are downstream of
-    // source1, but their input is not in the selection
-    auto consumers1 = source1->getAllConsumers();
-    for (auto& item2 : selection)
-    {
-      if (item1 == item2)
-      {
-        continue;
-      }
-      auto source2 = qobject_cast<pqPipelineSource*>(item2);
-      if (!source2 ||
-        (checkDownstream(consumers1, source2) && !selectionContainsParent(selection, source2)))
-      {
-        return false;
-      }
-    }
-  }
-  return true;
+  return ::getPipelineRoot(selection);
 }
 
 //-----------------------------------------------------------------------------
 bool pqCopyReaction::canPastePipeline()
 {
   pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
+
+  // There is nothing selected
+  if (!SelectionRoot)
+  {
+    return false;
+  }
+
+  // If there is no active source selected, we can only paste sources with no input
   if (!activeSource)
   {
-    return false;
+    return !SelectionRoot->getProxy()->GetProperty("Input");
   }
 
-  if (FilterSelection.empty())
+  // If the root is a pipeline source, at this point, it needs to have input port
+  auto root = qobject_cast<pqPipelineSource*>(SelectionRoot);
+  if (root)
   {
-    return false;
-  }
-
-  auto activeSourceDI = activeSource->getSourceProxy()->GetDataInformation();
-  for (auto source : FilterSelection)
-  {
-    if (!source)
+    if (!root->getSourceProxy()->GetNumberOfAlgorithmRequiredInputPorts())
     {
-      // Since we have an invalid entry in FilterSelection (i.e., some filter
-      // has been deleted since the initial copyPipeline(), we'll just clear
-      // out FilterSelection)
-      FilterSelection.clear();
       return false;
     }
+  }
 
-    // now check that the copied filters can accept the type of the active source
-    auto obj = vtkAlgorithm::SafeDownCast(source->getSourceProxy()->GetClientSideObject());
-    if (obj)
+  // We now check if we can stitch the active source to the root of the selection
+  // We only support copying pipelines with 1 input port to filters with 1 output port
+  if (vtkSMSourceProxy* activeSourceProxy = activeSource->getSourceProxy())
+  {
+    if (activeSourceProxy->GetNumberOfAlgorithmOutputPorts() == 1)
     {
-      auto filterInfo = obj->GetInputPortInformation(0);
-      if (filterInfo->Has(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()) &&
-        filterInfo->Length(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()) > 0)
+      if (auto inputProperty =
+            vtkSMInputProperty::SafeDownCast(root->getSourceProxy()->GetProperty("Input")))
       {
-        auto length = filterInfo->Length(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
-        bool found = false;
-        for (int i = 0; i < length; i++)
+        if (inputProperty->GetNumberOfProxies() == 1)
         {
-          const char* inputType = filterInfo->Get(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), i);
-          if (activeSourceDI->DataSetTypeIsA(inputType))
+          if (auto inputTypes =
+                vtkSMDataTypeDomain::SafeDownCast(inputProperty->GetDomain("input_type")))
           {
-            found = true;
+            if (inputTypes->IsInDomain(activeSourceProxy))
+            {
+              return true;
+            }
           }
-        }
-        if (!found)
-        {
-          return false;
         }
       }
     }
   }
 
-  return true;
+  return false;
 }
 
 //-----------------------------------------------------------------------------
 void pqCopyReaction::copyPipeline()
 {
-  if (!canCopyPipeline())
+  pqProxy* root = getSelectedPipelineRoot();
+
+  if (!root)
   {
     return;
   }
+
+  SelectionRoot = root;
 
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
   if (!selModel || selModel->GetNumberOfSelectedProxies() == 0)
@@ -294,20 +373,30 @@ void pqCopyReaction::copyPipeline()
   }
 
   FilterSelection.clear();
+  for (auto& connection : SelectedProxyConnections)
+  {
+    QObject::disconnect(connection);
+  }
+  SelectedProxyConnections.clear();
   pqProxySelection selection;
   pqProxySelectionUtilities::copy(selModel, selection);
-  selection = pqProxySelectionUtilities::getPipelineProxies(selection);
-  for (auto& item : selection)
+  for (auto item : selection)
   {
-    // make sure we haven't selected a data source
-    // only want to copy filters
-    if (auto source = qobject_cast<pqPipelineSource*>(item))
-    {
-      if (source->getSourceProxy()->GetNumberOfProducers() > 0)
+    auto proxy = qobject_cast<pqProxy*>(item);
+    SelectedProxyConnections.insert(proxy, QObject::connect(proxy, &QObject::destroyed, [proxy] {
+      auto& connection = SelectedProxyConnections[proxy];
+      QObject::disconnect(connection);
+      SelectedProxyConnections.remove(proxy);
+      FilterSelection.clear();
+      SelectionRoot = nullptr;
+
+      for (auto paster : PastePipelineContainer)
       {
-        FilterSelection.insert(source);
+        paster->updateEnableState();
       }
-    }
+    }));
+
+    FilterSelection.insert(proxy);
   }
 }
 
@@ -315,13 +404,15 @@ namespace
 {
 //-----------------------------------------------------------------------------
 void copyDescendants(pqObjectBuilder* builder, pqPipelineSource* source, pqPipelineSource* parent,
-  QSet<QPointer<pqPipelineSource>>& selection, int port = 0)
+  QSet<QPointer<pqProxy>>& selection, int port = 0)
 {
   vtkSMSourceProxy* proxy = source->getSourceProxy();
 
   // Create a copy
-  pqPipelineSource* child =
-    builder->createFilter(proxy->GetXMLGroup(), proxy->GetXMLName(), parent, port);
+  pqPipelineSource* child = parent
+    ? builder->createFilter(proxy->GetXMLGroup(), proxy->GetXMLName(), parent, port)
+    : builder->createSource(
+        proxy->GetXMLGroup(), proxy->GetXMLName(), pqActiveObjects::instance().activeServer());
   selection.remove(source);
 
   // Copy properties into the new filter
@@ -374,32 +465,23 @@ void pqCopyReaction::pastePipeline()
   }
 
   pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
-  if (FilterSelection.empty())
-  {
-    qDebug("No source on clipboard to copy from.");
-    return;
-  }
 
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
-  QSet<QPointer<pqPipelineSource>> selection = FilterSelection;
+  auto selection = FilterSelection;
   BEGIN_UNDO_SET(QString("Paste Pipeline"));
-
-  do
-  {
-    for (auto source : selection)
-    {
-      if (selectionContainsParent(selection, source))
-      {
-        continue;
-      }
-      copyDescendants(builder, source, activeSource, selection);
-      break;
-    }
-  } while (!selection.empty());
+  copyDescendants(builder, qobject_cast<pqPipelineSource*>(SelectionRoot), activeSource, selection);
   END_UNDO_SET();
-  activeSource->renderAllViews();
+
+  if (activeSource)
+  {
+    activeSource->renderAllViews();
+  }
+  else if (pqView* view = pqActiveObjects::instance().activeView())
+  {
+    view->render();
+  }
 }
 
 //-----------------------------------------------------------------------------

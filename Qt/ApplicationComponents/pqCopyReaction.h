@@ -34,10 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+#include <QMap>
 #include <QPointer>
 #include <QSet>
 
-class pqPipelineSource;
+#include <iostream>
+
+class pqProxy;
 class vtkSMProxy;
 /**
  * @ingroup Reactions
@@ -60,16 +63,19 @@ public:
 
   static void copy();
   static void paste();
-  void copyPipeline();
-  void pastePipeline();
-  bool canCopyPipeline();
-  bool canPastePipeline();
+  static void copyPipeline();
+  static void pastePipeline();
+  static pqProxy* getSelectedPipelineRoot();
+  static bool canPastePipeline();
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
   void updateEnableState() override;
+
+Q_SIGNALS:
+  void pipelineCopied();
 
 protected:
   /**
@@ -92,11 +98,13 @@ protected:
     else
     {
       this->copyPipeline();
+      Q_EMIT this->pipelineCopied();
     }
   }
   bool Paste;
   bool CreatePipeline;
 
+  ///@{
   /**
    * Used for copy/paste pipeline. pqApplicationCore::registerManager() requires
    * a QObject, but we need to track potentially multiple pipeline sources.
@@ -104,7 +112,20 @@ protected:
    * is deleted between Copy Pipeline and Paste Pipeline, we will be able to easily
    * determine this.
    */
-  static QSet<QPointer<pqPipelineSource>> FilterSelection;
+  static QSet<QPointer<pqProxy>> FilterSelection;
+  static pqProxy* SelectionRoot;
+  ///@}
+
+  ///@{
+  /**
+   * Containers storing all instances of pipeline paster / copier.
+   * They enable to trigger `updateEnableState` of pasters once a pipeline
+   * has been copied in the clipboard.
+   */
+  static QSet<pqCopyReaction*> PastePipelineContainer;
+  static QSet<pqCopyReaction*> CopyPipelineContainer;
+  static QMap<pqProxy*, QMetaObject::Connection> SelectedProxyConnections;
+  ///@}
 
 private:
   Q_DISABLE_COPY(pqCopyReaction)
