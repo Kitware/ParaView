@@ -12,6 +12,18 @@
         the cursor is placed on its surface. If not, the cursor is placed on the focal plane of the camera. For now,
         the cursor only work with surfacic data.
       </Documentation>
+      <IntVectorProperty name="CursorShape"
+                         command="SetCursorShape"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Cross" value="0"/>
+          <Entry text="Sphere" value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set the shape of the cursor.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty name="SetCursorSize"
                          command="SetCursorSize"
                          number_of_elements="1"
@@ -22,6 +34,7 @@
         <IntRangeDomain name="range" min="1" max="100"/>
       </IntVectorProperty>
       <PropertyGroup label="Stereo Cursor">
+        <Property name="CursorShape"/>
         <Property name="SetCursorSize"/>
       </PropertyGroup>
       <Hints>

@@ -176,6 +176,13 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     )
 endif ()
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_vtkmoverride")
+    list(APPEND test_exclusions
+      # Fails with changes to vtkm see issue https://gitlab.kitware.com/paraview/paraview/-/issues/21852
+    "\\.ImageDataToUniformGrid$"
+    )
+endif ()
+
 if ("$ENV{CC}" STREQUAL "icx")
   list(APPEND test_exclusions
     # OpenMPI outputs text that ends up getting detected as a test failure.
