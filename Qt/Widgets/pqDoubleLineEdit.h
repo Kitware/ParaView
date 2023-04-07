@@ -139,7 +139,7 @@ public:
    * Return a double formatted according to a pqDoubleLineEdit::RealNumberNotation
    * notation and a number of digits of precision.
    * Supports QLocale::FloatingPointShortest as precision.
-   * When using pqDoubleLineEdit::RealNumberNotation::FullNotation, precision if not used and
+   * When using pqDoubleLineEdit::RealNumberNotation::FullNotation, precision is not used and
    * fullLowExponent and fullHighExponent will be used to determine when to switch between
    * scientific notation and fixed notation.
    */
@@ -150,6 +150,7 @@ public:
    * Return a double formatted according to the values set for global precision
    * and notation.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use `pqCoreUtilities::formatNumber()` instead")
   static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
@@ -174,6 +175,8 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set whether to always render at full precision
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0(
+    "Use `pqDoubleLineEdit::setNotation(pqDoubleLineEdit::FullNotation)` instead")
   void setAlwaysUseFullPrecision(bool value);
 
 protected:
