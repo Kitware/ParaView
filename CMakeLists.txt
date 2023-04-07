@@ -99,14 +99,13 @@ include(vtkCompilerPlatformFlags)
 include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
+include(CMakeDependentOption)
+include(ParaViewOptions)
+include(ParaViewMigrations)
 
 if (PARAVIEW_USE_QT)
   include(paraviewQt)
 endif()
-
-include(CMakeDependentOption)
-include(ParaViewOptions)
-include(ParaViewMigrations)
 
 # Some flags are really bad for caching. Replace them with better variants.
 if (paraview_replace_uncacheable_flags)
