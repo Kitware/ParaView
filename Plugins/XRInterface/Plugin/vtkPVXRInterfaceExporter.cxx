@@ -86,14 +86,14 @@ template <typename T>
 void setVectorAttribute(vtkXMLDataElement* el, const char* name, int count, T* data)
 {
   std::ostringstream o;
-  vtkNumberToString convert;
+  vtkNumberToString converter;
   for (int i = 0; i < count; ++i)
   {
     if (i)
     {
       o << " ";
     }
-    o << convert(data[i]);
+    o << converter.Convert(data[i]);
   }
   el->SetAttribute(name, o.str().c_str());
 }

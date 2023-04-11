@@ -824,14 +824,14 @@ template <typename T>
 void addVectorAttribute(vtkPVXMLElement* el, const char* name, T* data, int count)
 {
   std::ostringstream o;
-  vtkNumberToString convert;
+  vtkNumberToString converter;
   for (int i = 0; i < count; ++i)
   {
     if (i)
     {
       o << " ";
     }
-    o << convert(data[i]);
+    o << converter.Convert(data[i]);
   }
   el->AddAttribute(name, o.str().c_str());
 }
