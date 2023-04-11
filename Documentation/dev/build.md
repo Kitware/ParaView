@@ -388,6 +388,8 @@ More advanced / less common options include:
     files.
   * `PARAVIEW_ENABLE_LAS` (default `OFF`): Enable support for reading LAS
     files.
+  * `PARAVIEW_ENABLE_GEOVIS` (default `OFF`): Enable support for geographic
+    projections and transformations.
   * `PARAVIEW_ENABLE_OPENTURNS` (default `OFF`): Enable support for reading
     OpenTURNS files.
   * `PARAVIEW_ENABLE_PDAL` (default `OFF`): Enable support for reading PDAL
