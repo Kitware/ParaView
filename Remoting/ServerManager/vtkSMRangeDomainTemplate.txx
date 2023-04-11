@@ -73,7 +73,7 @@ bool vtkSMRangeDomainTemplate<T>::IsInDomain(unsigned int idx, T val)
   {
     return 0;
   }
-  if (this->Entries[idx].Valid[1] && val < this->Entries[idx].Value[1])
+  if (this->Entries[idx].Valid[1] && val > this->Entries[idx].Value[1])
   {
     return 0;
   }
