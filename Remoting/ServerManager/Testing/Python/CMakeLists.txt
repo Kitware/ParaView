@@ -19,4 +19,5 @@ paraview_add_test_python(
   TestMultiplexerSourceProxy.py
   TestGlobbing.py
   TestGetRenderViewAfterConnectToCatalyst.py
+  TestRangeDomain.py
   )
