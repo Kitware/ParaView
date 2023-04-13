@@ -33,15 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqMaterialEditor.h"
 
 #include "vtkBMPReader.h"
+#include "vtkJPEGReader.h"
+#include "vtkPNGReader.h"
+#include "vtkPNMReader.h"
+
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkImageData.h"
-#include "vtkJPEGReader.h"
+#include "vtkImageReader2.h"
+#include "vtkImageReader2Factory.h"
 #include "vtkMath.h"
 #include "vtkOSPRayMaterialLibrary.h"
 #include "vtkOSPRayRendererNode.h"
-#include "vtkPNGReader.h"
-#include "vtkPNMReader.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVRenderView.h"
 #include "vtkSMMaterialLibraryProxy.h"
@@ -72,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVector>
 
 #include <array>
+#include <map>
 #include <sstream>
 
 namespace
@@ -94,7 +98,7 @@ void AddDefaultValue(
       ml->AddShaderVariable(matName, variable, { 1.0 });
       break;
     case vtkOSPRayMaterialLibrary::ParameterType::VEC2:
-      ml->AddShaderVariable(matName, variable, { 0.0, 0.0 });
+      ml->AddShaderVariable(matName, variable, { 1.0, 1.0 });
       break;
     case vtkOSPRayMaterialLibrary::ParameterType::VEC3:
       ml->AddShaderVariable(matName, variable, { 0.0, 0.0, 0.0 });
@@ -110,6 +114,8 @@ void AddDefaultValue(
       break;
   }
 }
+
+static constexpr int NUMBER_OF_MAP_PROPERTIES = 8;
 }
 
 /**
@@ -118,6 +124,13 @@ void AddDefaultValue(
 class pqMaterialProxyModel : public QAbstractTableModel
 {
 public:
+  enum class Column
+  {
+    NAME = 0,
+    PROPERTY,
+    COUNT
+  };
+
   /**
    * Default constructor initialize the Qt hierarchy
    */
@@ -144,9 +157,21 @@ public:
 
     const auto& variables = ml->GetDoubleShaderVariableList(name);
     const auto& textures = ml->GetTextureList(name);
-    this->beginInsertRows(QModelIndex(), 0, variables.size() + textures.size() - 1);
+
+    int numberOfVarForMap = std::count_if(variables.begin(), variables.end(),
+      [](std::string var) { return var.find(".") != std::string::npos; });
+
+    int numberOfRow = variables.size() + textures.size() - numberOfVarForMap;
+    this->beginInsertRows(QModelIndex(), 0, numberOfRow);
     for (const auto& var : variables)
     {
+      if (var.find(".") != std::string::npos)
+      {
+        int pos = var.find(".");
+        std::string mapName = var.substr(0, pos);
+        this->VariableForMapNames[mapName].push_back(var);
+        continue;
+      }
       this->VariableNames.push_back(var);
     }
     for (const auto& tex : textures)
@@ -161,7 +186,12 @@ public:
    */
   Qt::ItemFlags flags(const QModelIndex& idx) const override
   {
-    return QAbstractTableModel::flags(idx) | Qt::ItemIsEditable;
+    if (idx.column() == static_cast<int>(Column::PROPERTY))
+    {
+      return QAbstractTableModel::flags(idx) | Qt::ItemIsEditable;
+    }
+
+    return QAbstractTableModel::flags(idx);
   }
 
   /**
@@ -183,7 +213,7 @@ public:
   /**
    * Returns the number of columns (two in our case)
    */
-  int columnCount(const QModelIndex&) const override { return 2; }
+  int columnCount(const QModelIndex&) const override { return static_cast<int>(Column::COUNT); }
 
   ///@{
   /**
@@ -197,6 +227,8 @@ public:
    * Return the data at index with role
    */
   QVariant data(const QModelIndex& index, int role) const override;
+
+  QVariant getVariant(const std::string& name) const;
 
   /**
    * Overrides the data at index and role with the input variant
@@ -212,6 +244,7 @@ private:
   vtkOSPRayMaterialLibrary* MaterialLibrary = nullptr;
   std::string MaterialName;
   std::vector<std::string> VariableNames;
+  std::map<std::string, std::vector<std::string>> VariableForMapNames;
   std::string MaterialType;
 };
 
@@ -229,6 +262,7 @@ void pqMaterialProxyModel::reset()
   this->MaterialType = "";
   this->MaterialName = "";
   this->VariableNames.clear();
+  this->VariableForMapNames.clear();
   this->endResetModel();
 }
 
@@ -237,11 +271,11 @@ QVariant pqMaterialProxyModel::headerData(int section, Qt::Orientation orientati
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
   {
-    switch (section)
+    switch (static_cast<Column>(section))
     {
-      case 0:
+      case Column::NAME:
         return "Name";
-      case 1:
+      case Column::PROPERTY:
         return "Value";
     }
   }
@@ -262,16 +296,62 @@ int pqMaterialProxyModel::rowCount(const QModelIndex& index) const
 }
 
 //-----------------------------------------------------------------------------
-QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
+QVariant pqMaterialProxyModel::getVariant(const std::string& name) const
 {
   vtkOSPRayMaterialLibrary* ml = this->MaterialLibrary;
-  if (!ml || index.row() >= static_cast<long>(this->VariableNames.size()))
+  auto value = ml->GetDoubleShaderVariable(this->MaterialName, name);
+  const auto& paramDic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+
+  switch (paramDic.at(ml->LookupImplName(this->MaterialName)).at(name))
+  {
+    case vtkOSPRayMaterialLibrary::ParameterType::BOOLEAN:
+      return static_cast<bool>(value[0]);
+    case vtkOSPRayMaterialLibrary::ParameterType::FLOAT:
+      return value[0];
+    case vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT:
+      return value[0];
+    case vtkOSPRayMaterialLibrary::ParameterType::VEC2:
+    {
+      QVector2D vec2;
+      vec2.setX(value[0]);
+      vec2.setY(value[1]);
+      return vec2;
+    }
+    case vtkOSPRayMaterialLibrary::ParameterType::VEC3:
+    {
+      QVector3D vec3;
+      vec3.setX(value[0]);
+      vec3.setY(value[1]);
+      vec3.setZ(value[2]);
+      return vec3;
+    }
+    case vtkOSPRayMaterialLibrary::ParameterType::COLOR_RGB:
+    {
+      QColor color;
+      color.setRedF(value[0]);
+      color.setGreenF(value[1]);
+      color.setBlueF(value[2]);
+      return color;
+    };
+    case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
+    {
+      return QString(ml->GetTextureName(this->MaterialName, name).c_str());
+    };
+    default:
+      return QVariant();
+  }
+}
+
+//-----------------------------------------------------------------------------
+QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
+{
+  if (!this->MaterialLibrary || index.row() >= static_cast<long>(this->VariableNames.size()))
   {
     return QVariant();
   }
-  const std::string& variableName = this->VariableNames[index.row()];
+  std::string variableName = this->VariableNames[index.row()];
 
-  if (index.column() == 0)
+  if (index.column() == static_cast<int>(Column::NAME))
   {
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
@@ -282,12 +362,12 @@ QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
       return QString(this->MaterialType.c_str());
     }
   }
-  else if (index.column() == 1 &&
+  else if (index.column() == static_cast<int>(Column::PROPERTY) &&
     this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
     const auto& paramDic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
-    auto value = ml->GetDoubleShaderVariable(this->MaterialName, variableName);
-    switch (paramDic.at(ml->LookupImplName(this->MaterialName)).at(variableName))
+    auto value = this->MaterialLibrary->GetDoubleShaderVariable(this->MaterialName, variableName);
+    switch (paramDic.at(this->MaterialLibrary->LookupImplName(this->MaterialName)).at(variableName))
     {
       case vtkOSPRayMaterialLibrary::ParameterType::BOOLEAN:
         return static_cast<bool>(value[0]);
@@ -320,7 +400,25 @@ QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
       };
       case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
       {
-        return QString(ml->GetTextureName(this->MaterialName, variableName).c_str());
+        QList<QVariant> list;
+        for (auto& pair : this->VariableForMapNames)
+        {
+          if (pair.first != variableName)
+          {
+            continue;
+          }
+          for (auto var : pair.second)
+          {
+            list.append(QString(var.c_str()));
+            list.append(this->getVariant(var));
+          }
+        }
+
+        list.append(QString(variableName.c_str()));
+        list.append(QString(
+          this->MaterialLibrary->GetTextureFilename(this->MaterialName, variableName).c_str()));
+
+        return list;
       };
       default:
         return QVariant();
@@ -339,7 +437,7 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
     return false;
   }
 
-  if (index.column() == 0 && role == Qt::EditRole)
+  if (index.column() == static_cast<int>(Column::NAME) && role == Qt::EditRole)
   {
     int row = index.row();
     ml->RemoveTexture(this->MaterialName, this->VariableNames[row]);
@@ -351,79 +449,93 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
     Q_EMIT this->dataChanged(index, sibling);
     return true;
   }
-  if (index.column() == 1 &&
+
+  if (index.column() == static_cast<int>(Column::PROPERTY) &&
     this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
-    std::stringstream ss;
-    const std::string& varName = this->VariableNames[index.row()];
-    switch (static_cast<QMetaType::Type>(variant.type()))
+    // item in Property column can contains a single value or a list of 8 elements which it
+    // represents all properties related to a specific map.
+    auto list = variant.toList();
+    if (list.count() != ::NUMBER_OF_MAP_PROPERTIES)
     {
-      case QMetaType::QVector2D:
+      const std::string& varName = this->VariableNames[index.row()];
+      switch (static_cast<QMetaType::Type>(variant.type()))
       {
-        QVector2D vec = variant.value<QVector2D>();
-        ml->AddShaderVariable(this->MaterialName, varName, { vec.x(), vec.y() });
-      }
-      break;
-      case QMetaType::QVector3D:
-      {
-        QVector3D vec = variant.value<QVector3D>();
-        ml->AddShaderVariable(this->MaterialName, varName, { vec.x(), vec.y(), vec.z() });
-      }
-      break;
-      case QMetaType::QColor:
-      {
-        QColor col = variant.value<QColor>();
-        ml->AddShaderVariable(
-          this->MaterialName, varName, { col.redF(), col.greenF(), col.blueF() });
-      }
-      break;
-      case QMetaType::QString:
-      {
-        QString filePath = variant.value<QString>();
-        QFileInfo fileInfo(filePath);
-        if (fileInfo.isFile() && fileInfo.isReadable())
+        case QMetaType::QVector2D:
         {
-          vtkSmartPointer<vtkImageReader2> reader;
-          const QString& ext = fileInfo.suffix();
-          if (ext == "bmp")
-          {
-            reader.TakeReference(vtkBMPReader::New());
-          }
-          else if (ext == "jpg")
-          {
-            reader.TakeReference(vtkJPEGReader::New());
-          }
-          else if (ext == "png")
-          {
-            reader.TakeReference(vtkPNGReader::New());
-          }
-          else if (ext == "ppm")
-          {
-            reader.TakeReference(vtkPNMReader::New());
-          }
-          if (reader)
-          {
-            reader->SetFileName(filePath.toUtf8().data());
-            reader->Update();
-            vtkNew<vtkTexture> texture;
-            texture->SetInputData(reader->GetOutput());
-            texture->Update();
-            ml->AddTexture(this->MaterialName, varName, texture, fileInfo.baseName().toStdString(),
-              fileInfo.absoluteFilePath().toStdString());
-          }
-          else
-          {
-            ml->AddTexture(this->MaterialName, varName, nullptr, "<None>");
-          }
+          QVector2D vec = variant.value<QVector2D>();
+          ml->AddShaderVariable(this->MaterialName, varName, { vec.x(), vec.y() });
         }
-        else
+        break;
+        case QMetaType::QVector3D:
         {
-          ml->AddTexture(this->MaterialName, varName, nullptr, "<None>");
+          QVector3D vec = variant.value<QVector3D>();
+          ml->AddShaderVariable(this->MaterialName, varName, { vec.x(), vec.y(), vec.z() });
+        }
+        break;
+        case QMetaType::QColor:
+        {
+          QColor col = variant.value<QColor>();
+          ml->AddShaderVariable(
+            this->MaterialName, varName, { col.redF(), col.greenF(), col.blueF() });
+        }
+        break;
+        default:
+          ml->AddShaderVariable(this->MaterialName, varName, { variant.toDouble() });
+      }
+    }
+    else
+    {
+      for (int i = 0; i < list.size(); i += 2)
+      {
+        std::string label = list[i].value<QString>().toStdString();
+        QVariant content = list[i + 1];
+        switch (static_cast<QMetaType::Type>(content.type()))
+        {
+          case QMetaType::QVector2D:
+          {
+            QVector2D vec = content.value<QVector2D>();
+            ml->AddShaderVariable(this->MaterialName, label, { vec.x(), vec.y() });
+          }
+          break;
+          case QMetaType::Float:
+          {
+            ml->AddShaderVariable(this->MaterialName, label, { content.toDouble() });
+          }
+          break;
+          case QMetaType::QString:
+          {
+            const std::string& filePath = content.value<QString>().toStdString();
+            QFileInfo fileInfo(filePath.c_str());
+            if (fileInfo.isFile() && fileInfo.isReadable())
+            {
+              auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+                vtkImageReader2Factory::CreateImageReader2(filePath.c_str()));
+              if (reader)
+              {
+                reader->SetFileName(filePath.c_str());
+                reader->Update();
+                vtkNew<vtkTexture> texture;
+                texture->SetInputData(reader->GetOutput());
+                texture->Update();
+                ml->AddTexture(
+                  this->MaterialName, label, texture, fileInfo.baseName().toStdString(), filePath);
+              }
+              else
+              {
+                ml->AddTexture(this->MaterialName, label, nullptr, "<None>");
+              }
+            }
+            else
+            {
+              ml->AddTexture(this->MaterialName, label, nullptr, "<None>");
+            }
+          }
+          break;
+          default:
+            break;
         }
       }
-      break;
-      default:
-        ml->AddShaderVariable(this->MaterialName, varName, { variant.toDouble() });
     }
 
     Q_EMIT this->dataChanged(index, index);
@@ -469,6 +581,7 @@ public:
 
     this->Ui.RenderWidget->hide();
 
+    this->Ui.PropertiesView->setMinimumSize(100, 295);
     this->Ui.PropertiesView->horizontalHeader()->setHighlightSections(false);
     this->Ui.PropertiesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.PropertiesView->horizontalHeader()->setStretchLastSection(true);
@@ -513,12 +626,6 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* vtkNotUse
   QObject::connect(this->Internals->Ui.SelectMaterial,
     QOverload<int>::of(&QComboBox::currentIndexChanged), this,
     &pqMaterialEditor::updateCurrentMaterialWithIndex);
-  QObject::connect(
-    this->Internals->Ui.AddProperty, &QPushButton::clicked, this, &pqMaterialEditor::addProperty);
-  QObject::connect(this->Internals->Ui.RemoveProperty, &QPushButton::clicked, this,
-    &pqMaterialEditor::removeProperty);
-  QObject::connect(this->Internals->Ui.DeleteProperties, &QPushButton::clicked, this,
-    &pqMaterialEditor::removeAllProperties);
 
   QObject::connect(&this->Internals->AttributesModel, &QAbstractTableModel::dataChanged, this,
     &pqMaterialEditor::propertyChanged);
@@ -577,12 +684,9 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* vtkNotUse
       // Grey out the material editor if CS mode or if we didn't find the ML object
       this->Internals->Ui.AddMaterial->setEnabled(enable);
       this->Internals->Ui.RemoveMaterial->setEnabled(enable);
-      this->Internals->Ui.AddProperty->setEnabled(enable);
-      this->Internals->Ui.RemoveProperty->setEnabled(enable);
       this->Internals->Ui.PropertiesView->setEnabled(enable);
       this->Internals->Ui.AttachMaterial->setEnabled(enable);
       this->Internals->Ui.SelectMaterial->setEnabled(enable);
-      this->Internals->Ui.DeleteProperties->setEnabled(enable);
     });
 }
 
@@ -625,6 +729,8 @@ void pqMaterialEditor::addMaterial()
     ml->Fire();
 
     this->Internals->Ui.SelectMaterial->setCurrentText(QString(matName.c_str()));
+
+    this->addProperty();
   });
 }
 
@@ -778,6 +884,7 @@ std::vector<std::string> pqMaterialEditor::availableParameters()
 void pqMaterialEditor::loadMaterials()
 {
   pqLoadMaterialsReaction::loadMaterials();
+  this->addProperty();
 }
 
 //-----------------------------------------------------------------------------
@@ -788,56 +895,11 @@ void pqMaterialEditor::addProperty()
   if (ml && !params.empty())
   {
     std::string matName = this->currentMaterialName().toStdString();
-    ::AddDefaultValue(ml, matName, params[0]);
-    this->Internals->AttributesModel.setMaterial(ml, matName);
-
-    this->updateCurrentMaterial(matName);
-    this->Internals->ShaderBall->Modified();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqMaterialEditor::removeProperty()
-{
-  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
-
-  if (ml)
-  {
-    QItemSelectionModel* selectionModel = this->Internals->Ui.PropertiesView->selectionModel();
-    if (selectionModel->hasSelection())
+    for (std::size_t index = 0; index < params.size(); index++)
     {
-      QModelIndexList selectedCells = selectionModel->selectedIndexes();
-
-      QSet<QString> selectedVariables;
-      for (auto index : selectedCells)
-      {
-        selectedVariables.insert(index.sibling(index.row(), 0).data(Qt::EditRole).toString());
-      }
-
-      std::string matName = this->currentMaterialName().toStdString();
-      for (const auto& var : selectedVariables)
-      {
-        // There is no variables with the same name in textures and double variable so
-        // we can remove them safely
-        ml->RemoveTexture(matName, var.toStdString());
-        ml->RemoveShaderVariable(matName, var.toStdString());
-      }
-      this->updateCurrentMaterial(matName);
-      this->Internals->ShaderBall->Modified();
+      ::AddDefaultValue(ml, matName, params[index]);
     }
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqMaterialEditor::removeAllProperties()
-{
-  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
-
-  if (ml)
-  {
-    std::string matName = this->currentMaterialName().toStdString();
-    ml->RemoveAllShaderVariables(matName);
-    ml->RemoveAllTextures(matName);
+    this->Internals->AttributesModel.setMaterial(ml, matName);
 
     this->updateCurrentMaterial(matName);
     this->Internals->ShaderBall->Modified();
