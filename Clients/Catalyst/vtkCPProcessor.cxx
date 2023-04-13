@@ -25,6 +25,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTemporalDataSetCache.h"
 
@@ -416,6 +417,7 @@ void vtkCPProcessor::MakeTemporalCache(const char* name)
     vtkTemporalDataSetCache::SafeDownCast(producer->GetClientSideObject());
   tc->SetCacheSize(this->TemporalCacheSize);
   tc->CacheInMemkindOn();
+  tc->SetNoPriorTemporalAccessInformationKey();
   this->Internal->TemporalCaches[name] = producer;
 }
 

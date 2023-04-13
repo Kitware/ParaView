@@ -22,6 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
@@ -470,6 +471,14 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       else if (type == "fides")
       {
         update_producer_fides(channel_name, cpp_params["catalyst/fides"], time);
+      }
+
+      // Set in situ mode. Temporal filters are notified that they don't have the whole time
+      // series up front
+      auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
+      if (auto algo = vtkAlgorithm::SafeDownCast(producer->GetClientSideObject()))
+      {
+        algo->SetNoPriorTemporalAccessInformationKey();
       }
     }
   }
