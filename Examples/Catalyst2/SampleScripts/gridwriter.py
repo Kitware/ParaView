@@ -50,7 +50,9 @@ def create_extractor(data):
     elif  grid.IsA('vtkHyperTreeGrid'):
         return CreateExtractor('HTG', data, registrationName='HTG')
     else:
-        raise RuntimeError("Unsupported data type: %s", grid.GetClassName())
+        raise RuntimeError("Unsupported data type: %s. Check that the adaptor "
+                           "is providing channel named %s",
+                           grid.GetClassName(), catalystChannel)
 
 
 # Pipeline
