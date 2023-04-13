@@ -1748,6 +1748,7 @@ set(ZoomToData_DISABLE_CRS TRUE)
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
 set (AnimateProperty_FORCE_SERIAL TRUE) # since this uses popup window
+set (AnimationFollowPath_FORCE_SERIAL TRUE) # since this uses popup window
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 set (CGNSReaderDataLocation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRBaseline_FORCE_SERIAL TRUE)  # since this uses popup-menu
