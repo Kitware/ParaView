@@ -1515,6 +1515,7 @@ if(PARAVIEW_USE_PYTHON)
     PythonResetSessionMacro.xml
     ProgrammableSourcePythonEditorLink.xml
     TraceIntegrateVariables.xml
+    FullNotation.xml
   )
 
   # Check that matplotlib is available

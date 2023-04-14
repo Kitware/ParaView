@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // System includes
 #include <cassert>
-#include <sstream>
 
 //=============================================================================
 namespace
@@ -106,7 +105,7 @@ public:
     const bool changed = (limited != this->InactiveLineEdit->text());
     this->InactiveLineEdit->setText(limited);
 
-    if (changed & !this->useFullPrecision(self))
+    if (changed)
     {
       // ensures that if the low precision text changed and it was being shown on screen,
       // we repaint it.
@@ -294,8 +293,8 @@ QString pqDoubleLineEdit::formatDouble(
 }
 
 //-----------------------------------------------------------------------------
-QString pqDoubleLineEdit::formatDouble(
-  double value, pqDoubleLineEdit::RealNumberNotation notation, int precision)
+QString pqDoubleLineEdit::formatDouble(double value, pqDoubleLineEdit::RealNumberNotation notation,
+  int precision, int fullLowExponent, int fullHighExponent)
 {
   switch (notation)
   {
@@ -310,9 +309,10 @@ QString pqDoubleLineEdit::formatDouble(
       break;
     case RealNumberNotation::FullNotation:
     {
-      std::ostringstream stream;
-      stream << vtkNumberToString()(value);
-      return QString::fromStdString(stream.str());
+      vtkNumberToString converter;
+      converter.SetLowExponent(fullLowExponent);
+      converter.SetHighExponent(fullHighExponent);
+      return QString::fromStdString(converter.Convert(value));
     }
     break;
     default:

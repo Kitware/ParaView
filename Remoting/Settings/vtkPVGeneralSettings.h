@@ -181,7 +181,7 @@ public:
   /**
    * Set the precision of the animation time toolbar.
    */
-  vtkSetClampMacro(AnimationTimePrecision, int, 1, 17);
+  vtkSetMacro(AnimationTimePrecision, int);
   vtkGetMacro(AnimationTimePrecision, int);
   ///@}
 
@@ -226,6 +226,22 @@ public:
    */
   vtkSetMacro(RealNumberDisplayedPrecision, int);
   vtkGetMacro(RealNumberDisplayedPrecision, int);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the low exponent used with full notation
+   */
+  vtkSetMacro(FullNotationLowExponent, int);
+  vtkGetMacro(FullNotationLowExponent, int);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the high exponent used with full notation
+   */
+  vtkSetMacro(FullNotationHighExponent, int);
+  vtkGetMacro(FullNotationHighExponent, int);
   ///@}
 
   /**
@@ -359,6 +375,8 @@ protected:
   int RealNumberDisplayedNotation = MIXED;
   bool RealNumberDisplayedShortestAccuratePrecision = false;
   int RealNumberDisplayedPrecision = 6;
+  int FullNotationLowExponent = -6;
+  int FullNotationHighExponent = 20;
   bool ResetDisplayEmptyViews = false;
   int PropertiesPanelMode = ALL_IN_ONE;
   bool LockPanels = false;
