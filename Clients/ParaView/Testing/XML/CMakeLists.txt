@@ -621,6 +621,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCompositedGeometryCulling.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestGeometryBoundsClobber.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume3.png}"
@@ -885,6 +888,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   SeparateOpacityArray.xml
   SliceRepresentation.xml
   SteeringDataGenerator.xml
+  TestHTGSelection.xml
   TestIsoVolume.xml
   TextSourceBorder.xml
   Threshold.xml
@@ -1725,6 +1729,7 @@ set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
+set(TestHTGSelection_DISABLE_CRS TRUE)
 set(SelectionBlocks_DISABLE_CRS TRUE)
 set(SelectionEditor_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
