@@ -1625,6 +1625,8 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
     vtkNew<vtkHyperTreeGrid> htgCopy;
     htgCopy->ShallowCopy(input);
     internalFilter->SetInputData(htgCopy);
+    internalFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+    internalFilter->SetOriginalCellIdArrayName("vtkOriginalCellIds");
     internalFilter->Update();
     output->ShallowCopy(internalFilter->GetOutput());
     return;
