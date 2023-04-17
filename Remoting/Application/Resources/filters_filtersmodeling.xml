@@ -301,5 +301,69 @@
       </DoubleVectorProperty>
       <!-- End RotationalExtrusionFilter -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="VolumeOfRevolution"
+                 class="vtkVolumeOfRevolutionFilter"
+                 label="Volume Of Revolution">
+      <Documentation long_help="Create point attribute array by projecting points onto an elevation vector."
+                     short_help="Create a point array representing elevation.">
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty name="AxisDirection"
+                            command="SetAxisDirection"
+                            label="Axis Direction"
+                            number_of_elements="3"
+                            default_values="1.0 0.0 0.0">
+        <Documentation>
+        The direction of the axis of revolution.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SweepAngle"
+                             command="SetSweepAngle"
+                             number_of_elements="1"
+                             label="Sweep Angle"
+                             default_values="360">
+        <DoubleRangeDomain max="360"
+                           min="0"
+                           name="range" />
+        <Documentation>
+        Sets the angle (in degrees) of the rotational sweep to perform. Valid range is 0 to 360.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="AxisPosition"
+                            command="SetAxisPosition"
+                            label="Axis Position"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0">
+        <Documentation>
+        Position of the rotational axis in 3D space.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Resolution"
+                            command="SetResolution"
+                            label="Resolution"
+                            number_of_elements="1"
+                            default_values="12">
+        <Documentation>
+          Sets the number of samples to create about the **Sweep Angle**. Each segment in the output is
+          created in equal-angle segments.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End VolumeOfRevolution -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

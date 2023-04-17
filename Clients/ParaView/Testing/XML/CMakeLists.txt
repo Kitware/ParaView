@@ -693,6 +693,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UseDataPartitions4.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeCellSelection.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeCrop.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeOfRevolution.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeIsosurfaceBlendMode.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeNoMapScalars.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeSliceBlendMode.png}"
@@ -931,6 +932,7 @@ SET(TESTS_WITH_BASELINES
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
   TransferFunction2DYScalars.xml
+  VolumeOfRevolution.xml
   ZoomClosestOffsetRatio.xml
   ZoomToBox.xml
   ZoomToData.xml
