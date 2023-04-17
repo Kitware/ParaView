@@ -38,6 +38,7 @@ set(classes
   pqAnimationManager
   pqAnimationProgressDialog
   pqAnimationTimeWidget
+  pqAnimationTrackEditor
   pqAnimationViewWidget
   pqArrayListDomain
   pqArrayListWidget

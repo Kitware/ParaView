@@ -50,11 +50,6 @@ public:
   pqAnimatablePropertiesComboBox(QWidget* parent = nullptr);
   ~pqAnimatablePropertiesComboBox() override;
 
-  /**
-   * Returns the source whose properties are currently being listed, if any.
-   */
-  vtkSMProxy* source() const;
-
   vtkSMProxy* getCurrentProxy() const;
   QString getCurrentPropertyName() const;
   int getCurrentIndex() const;

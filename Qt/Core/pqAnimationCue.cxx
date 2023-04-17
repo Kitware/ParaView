@@ -32,16 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVCameraCueManipulator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 
+#include <QCoreApplication>
 #include <QList>
 #include <QtDebug>
 
+#include "pqApplicationCore.h"
 #include "pqSMAdaptor.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 pqAnimationCue::pqAnimationCue(const QString& group, const QString& name, vtkSMProxy* proxy,
@@ -105,6 +109,42 @@ vtkSMProxy* pqAnimationCue::getAnimatedProxy() const
 }
 
 //-----------------------------------------------------------------------------
+QString pqAnimationCue::getCameraModeName(int mode)
+{
+  switch (mode)
+  {
+    case vtkPVCameraCueManipulator::PATH:
+      return QString("path");
+    case vtkPVCameraCueManipulator::FOLLOW_DATA:
+      return QString("data");
+    case vtkPVCameraCueManipulator::CAMERA:
+      return QString("camera");
+    default:
+      break;
+  }
+
+  return QString("");
+}
+
+//-----------------------------------------------------------------------------
+QString pqAnimationCue::getAnimatedPropertyName() const
+{
+  vtkSMProxy* selfProxy = this->getProxy();
+  if (selfProxy->GetProperty("AnimatedPropertyName"))
+  {
+    return pqSMAdaptor::getElementProperty(selfProxy->GetProperty("AnimatedPropertyName"))
+      .toString();
+  }
+  else if (selfProxy->GetProperty("Mode"))
+  {
+    int mode = pqSMAdaptor::getElementProperty(selfProxy->GetProperty("Mode")).toInt();
+    return pqAnimationCue::getCameraModeName(mode);
+  }
+
+  return QString("");
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProperty* pqAnimationCue::getAnimatedProperty() const
 {
   vtkSMProxy* selfProxy = this->getProxy();
@@ -144,6 +184,7 @@ bool pqAnimationCue::isEnabled() const
 //-----------------------------------------------------------------------------
 void pqAnimationCue::onEnabledModified()
 {
+  this->getProxy()->UpdateVTKObjects();
   Q_EMIT this->enabled(this->isEnabled());
 }
 
@@ -308,4 +349,77 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
 
   kf->Delete();
   return kf;
+}
+
+//-----------------------------------------------------------------------------
+QString pqAnimationCue::getDisplayName()
+{
+  if (this->isCameraCue())
+  {
+    vtkSMProxy* pxy = this->getAnimatedProxy();
+    pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
+    if (pqProxy* animation_pqproxy = model->findItem<pqProxy*>(pxy))
+    {
+      return QString("Camera - %1").arg(animation_pqproxy->getSMName());
+    }
+
+    return "Camera";
+  }
+  else if (this->isPythonCue())
+  {
+    return "Python";
+  }
+  else
+  {
+    pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
+
+    vtkSMProxy* pxy = this->getAnimatedProxy();
+    vtkSMProperty* pty = this->getAnimatedProperty();
+    QString propertyLabel = QCoreApplication::translate(
+      "ServerManagerXML", this->getAnimatedPropertyName().toUtf8().data());
+    if (pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
+    {
+      propertyLabel = QString("%1 (%2)").arg(propertyLabel).arg(this->getAnimatedPropertyIndex());
+    }
+
+    if (pqProxy* animation_pqproxy = model->findItem<pqProxy*>(pxy))
+    {
+      return QString("%1 - %2").arg(animation_pqproxy->getSMName()).arg(propertyLabel);
+    }
+
+    // could be a helper proxy
+    QString helper_key;
+    if (pqProxy* pqproxy = pqProxy::findProxyWithHelper(pxy, helper_key))
+    {
+      vtkSMProperty* prop = pqproxy->getProxy()->GetProperty(helper_key.toUtf8().data());
+      if (prop)
+      {
+        return QString("%1 - %2 - %3")
+          .arg(pqproxy->getSMName())
+          .arg(QCoreApplication::translate("ServerManagerXML", prop->GetXMLLabel()))
+          .arg(propertyLabel);
+      }
+      return QString("%1 - %2").arg(pqproxy->getSMName()).arg(propertyLabel);
+    }
+  }
+
+  return QString("<%1>").arg(tr("unrecognized"));
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimationCue::isCameraCue()
+{
+  return QString("CameraAnimationCue") == this->getProxy()->GetXMLName();
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimationCue::isPythonCue()
+{
+  return QString("PythonAnimationCue") == this->getProxy()->GetXMLName();
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimationCue::isTimekeeperCue()
+{
+  return QString("TimeAnimationCue") == this->getProxy()->GetXMLName();
 }

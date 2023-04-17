@@ -1,37 +1,52 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- lock view -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
+  <!-- create a Box -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="CubeSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mousePress" arguments="1,1,0,0,0,2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseDblClick" arguments="1,1,0,0,0,2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,2" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.2" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.2" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="2" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,2" />
-  <pqevent object="1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Duration" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Duration" command="set_string" arguments="25" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Duration" command="key" arguments="16777220" />
+  <!-- open time manager -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+
+  <!-- create track for Box Center (0) -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" command="activated" arguments="Box1" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/propertiesBox" property="currentText" arguments="Center (0)" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />
+  <!-- edit keyframe to set end time value -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="expand" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="edit" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="activate" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0" command="key" arguments="16777299" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+
+  <!-- change number of frames -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="25" />
+
+  <!-- VCR controls are not in undo stack -->
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
   <pqcheck object="pqClientMainWindow/MainControlsToolbar/1QToolButton8" property="enabled" arguments="false" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" command="set_string" arguments="0." />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" command="set_string" arguments="0.5" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" command="key" arguments="16777220" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mousePress" arguments="1,1,0,86,16" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mouseMove" arguments="1,0,0,85,17" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mouseRelease" arguments="1,0,0,85,17" />
+
+  <!-- set time -->
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="0.5" />
+  <!-- grab time cursor, go to third timestep -->
+  <!-- TODO: simulated for now -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777235" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777235" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777235" />
+
+  <!-- check empty undo stack -->
   <pqcheck object="pqClientMainWindow/MainControlsToolbar/1QToolButton8" property="enabled" arguments="false" />
 </pqevents>

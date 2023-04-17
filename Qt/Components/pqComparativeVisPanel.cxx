@@ -52,18 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqActiveObjects.h"
-#include "pqAnimationCue.h"
-#include "pqAnimationKeyFrame.h"
-#include "pqAnimationModel.h"
-#include "pqAnimationTrack.h"
 #include "pqApplicationCore.h"
-#include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSignalAdaptors.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
@@ -466,98 +460,3 @@ void pqComparativeVisPanel::removeParameter(int index)
 
   this->Internal->View->render();
 }
-
-//-----------------------------------------------------------------------------
-/*
-void pqComparativeVisPanel::setTimeRangeFromSource(vtkSMProxy* source)
-{
-  if (!source || !this->Internal->View)
-    {
-    return;
-    }
-
-  // Get TimeRange property
-  vtkSMDoubleVectorProperty* timeRangeProp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->Internal->View->getProxy()->GetProperty("TimeRange"));
-
-  // Try to get TimestepValues property from the source proxy
-  vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
-    source->GetProperty("TimestepValues"));
-
-  // Set the TimeRange to the first and last of TimestepValues.
-  if (tsv && timeRangeProp && tsv->GetNumberOfElements())
-    {
-    double tBegin = tsv->GetElement(0);
-    double tEnd = tsv->GetElement(tsv->GetNumberOfElements()-1);
-    timeRangeProp->SetElement(0, tBegin);
-    timeRangeProp->SetElement(1, tEnd);
-    this->Internal->View->getProxy()->UpdateProperty("TimeRange");
-    }
-}
-*/
-
-//-----------------------------------------------------------------------------
-/*
-void pqComparativeVisPanel::activateCue(
-  vtkSMProperty* cuesProperty,
-  vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex)
-{
-  if (!cuesProperty || !animatedProxy || animatedPName.isEmpty())
-    {
-    return;
-    }
-
-  // Try to locate the cue, if already present.
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(cuesProperty);
-  vtkSmartPointer<vtkSMAnimationCueProxy> cueProxy;
-
-  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
-    {
-    vtkSMAnimationCueProxy* cur = vtkSMAnimationCueProxy::SafeDownCast(
-      pp->GetProxy(cc));
-    if (cur && cur->GetAnimatedProxy() == animatedProxy &&
-      cur->GetAnimatedPropertyName() == animatedPName &&
-      cur->GetAnimatedElement() == animatedIndex)
-      {
-      cueProxy = cur;
-      }
-    else if (cur)
-      {
-      pqSMAdaptor::setElementProperty(cur->GetProperty("Enabled"), 0);
-      cur->UpdateVTKObjects();
-      }
-    }
-
-  if (!cueProxy)
-    {
-    vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
-
-    // Create a new cueProxy.
-    cueProxy.TakeReference(
-      vtkSMAnimationCueProxy::SafeDownCast(pxm->NewProxy("animation", "KeyFrameAnimationCue")));
-    cueProxy->SetServers(vtkProcessModule::CLIENT);
-    cueProxy->SetConnectionID(this->Internal->View->getProxy()->GetConnectionID());
-
-    pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedPropertyName"),
-      animatedPName);
-    pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedElement"),
-      animatedIndex);
-    pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"),
-        animatedProxy);
-
-    // This cueProxy must be registered so that state works fine. For that
-    // purpose we just make it an helper of the view.
-    this->Internal->View->addHelperProxy("AnimationCues", cueProxy);
-
-    // We want to add default keyframes to this cue.
-    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-    pqAnimationCue* pqcue = smmodel->findItem<pqAnimationCue*>(cueProxy);
-    pqcue->insertKeyFrame(0);
-    pqcue->insertKeyFrame(1);
-    }
-
-  pqSMAdaptor::addProxyProperty(cuesProperty, cueProxy);
-  pqSMAdaptor::setElementProperty(cueProxy->GetProperty("Enabled"), 1);
-  cueProxy->UpdateVTKObjects();
-}
-*/

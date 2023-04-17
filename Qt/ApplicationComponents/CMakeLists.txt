@@ -208,6 +208,12 @@ set(classes
   pqTestingReaction
   pqTextLocationWidget
   pqTimeInspectorWidget
+  pqTimelineItemDelegate
+  pqTimelineModel
+  pqTimelinePainter
+  pqTimelineView
+  pqTimelineWidget
+  pqTimeManagerWidget
   pqTimerLogReaction
   pqToggleInteractionViewMode
   pqTransferFunctionWidgetPropertyDialog
@@ -289,6 +295,7 @@ set(ui_files
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTextLocationWidget.ui
   Resources/UI/pqTimeInspectorWidget.ui
+  Resources/UI/pqTimeManagerWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyDialog.ui
   Resources/UI/pqVCRToolbar.ui
   Resources/UI/pqViewResolutionPropertyWidget.ui

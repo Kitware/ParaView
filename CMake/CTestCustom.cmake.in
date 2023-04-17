@@ -39,6 +39,17 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   "paraview/tpl/cinemasci/viewers/readme.md:10: warning: unable to resolve reference to `doc/readme_view.md' for"
   "warning: unable to resolve reference to `https:' for \ref command"
   "md:.*: warning:" # Disable all warnings in .md files
+  # DEPRECATED_IN_PARAVIEW_5_12_0: doxygen is confused with deprecation macro for full class
+  "pqPVAnimationWidget.h:.*: warning: Found ';' while parsing initializer list"
+  "pqAnimationWidget.h:.*: warning: Found ';' while parsing initializer list"
+  "pqTimeInspectorWidget.h:.*: warning: Found ';' while parsing initializer list"
+  "pqAnimationViewWidget.h:.*: warning: Found ';' while parsing initializer list"
+  "pqAnimationKeyFrame.h:.*: warning: Found ';' while parsing initializer list"
+  "pqAnimationModel.h:.*: warning: Found ';' while parsing initializer list"
+  "pqAnimationTrack.h:.*: warning: Found ';' while parsing initializer list"
+  "pqTimelineScrollbar.h:.*: warning: Found ';' while parsing initializer list"
+  "vtkRealtimeAnimationPlayer.h:.*: warning: Found ';' while parsing initializer list"
+  # end of 5.12 deprecation
 )
 
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION

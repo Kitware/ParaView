@@ -17,7 +17,9 @@ Show()
 
 animationScene1 = GetAnimationScene()
 animationScene1.GoToNext()
-animationScene1.GoToNext()
+
+tk=GetTimeKeeper()
+assert(tk.Time == 2)
 
 view = Render()
 

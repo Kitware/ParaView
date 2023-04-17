@@ -968,6 +968,10 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
 
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "AnimationScene":
+        if pname == "PlayMode" and proxy.GetProperty(pname).GetData() == "Real Time":
+            raise NotSupportedException("'Real Time' is an obsolete value for 'PlayMode'. Use 'Sequence' instead.")
+
     raise Continue()
 
 

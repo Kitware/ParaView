@@ -2479,12 +2479,18 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
 
 def AnimateReader(reader, view):
     """This is a utility function that, given a reader and a view
-    animates over all time steps of the reader."""
+    animates over all time steps of the reader.
+    It creates an AnimationScene and add a new TimeAnimationCue in it.
+
+    When running from the GUI and python shell, prefer using the
+    existing scene and cue to maintain time consistency in the
+    application."""
     if not reader:
         raise RuntimeError ("No reader was specified, cannot animate.")
     if not view:
         raise RuntimeError ("No view was specified, cannot animate.")
     # Create an animation scene
+    # This is why it is not recommended to use this method from the GUI. See #18984
     scene = animation.AnimationScene()
 
     # We need to have the reader and the view registered with

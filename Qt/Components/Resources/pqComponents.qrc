@@ -102,6 +102,7 @@
         <file>Icons/pqLoadState.svg</file>
         <file>Icons/pqLoadWindow.svg</file>
         <file>Icons/pqLock24.png</file>
+        <file>Icons/pqLock.svg</file>
         <file>Icons/pqMousePick15.png</file>
         <file>Icons/pqMultiBlockData16.png</file>
         <file>Icons/pqNavBack.svg</file>
@@ -215,6 +216,7 @@
         <file>Icons/pqUndo.svg</file>
         <file>Icons/pqUndoCamera.svg</file>
         <file>Icons/pqUnknownData16.png</file>
+        <file>Icons/pqUnlock.svg</file>
         <file>Icons/pqUnstructuredGrid16.png</file>
         <file>Icons/pqVcrBack.svg</file>
         <file>Icons/pqVcrFirst.svg</file>

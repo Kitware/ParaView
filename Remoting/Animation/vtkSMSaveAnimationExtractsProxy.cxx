@@ -154,10 +154,6 @@ bool vtkSMSaveAnimationExtractsProxy::SaveExtracts()
     }
 
     break;
-    case vtkCompositeAnimationPlayer::REAL_TIME:
-      // this should not happen. vtkSMSaveAnimationProxy::Prepare() should have
-      // changed the play mode to SEQUENCE or SNAP_TO_TIMESTEPS.
-      abort();
   }
   writer->SetStartFileCount(frameWindow[0]);
   writer->SetPlaybackTimeWindow(playbackTimeWindow);

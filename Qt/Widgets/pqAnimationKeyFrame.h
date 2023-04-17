@@ -35,13 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QGraphicsItem>
 #include <QIcon>
 #include <QObject>
 class pqAnimationTrack;
 
 // represents a key frame
-class PQWIDGETS_EXPORT pqAnimationKeyFrame
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "See `pqTimeManagerWidget` for new design") PQWIDGETS_EXPORT pqAnimationKeyFrame
   : public QObject
   , public QGraphicsItem
 {
