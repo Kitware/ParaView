@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStandardItemModel>
 
+#include <memory> // for std::unique_ptr
+
 namespace pqTimelineItemRole
 {
 enum Role
