@@ -154,6 +154,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/pointSet.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/ParaView_Mark.png}"
   "DATA{${paraview_test_data_directory_input}/Data/ParaView_Logo.png}"
+  "DATA{${paraview_test_data_directory_input}/Data/PolarAxesDeprecation.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/porphyrin.cml}"
   "DATA{${paraview_test_data_directory_input}/Data/quadraticTetra01.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells.pvtu}"
@@ -753,6 +754,7 @@ SET (TESTS_WITHOUT_BASELINES
   PartialArrayInLineChart.xml
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
+  PolarAxesBackwardsCompatibility.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
   ReloadCGNSFile.xml
