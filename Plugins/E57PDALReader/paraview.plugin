@@ -1,0 +1,6 @@
+NAME
+  E57PDALReader
+DESCRIPTION
+  A plugin which adds a E57 (point cloud) reader via a PDAL plugin.
+REQUIRES_MODULES
+  VTK::IOPDAL

@@ -1,0 +1,26 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkPDALReader"
+                 label="PDAL e57 Reader"
+                 name="PDALe57Reader">
+      <Documentation short_help="Reads e57 data using PDAL."
+      long_help="Reads e57 point cloud data using a PDAL library plugin">The PDAL
+      e57 reader reads e57 data using the PDAL library and PDAL xerces plugin.
+      It produces a vtkPolyData with point data arrays for attributes such as
+      Intensity, Classification, Color, etc.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        PDAL reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="e57"
+                       file_description="PDAL e57 Files" />
+      </Hints>
+    </SourceProxy>
+      <!-- End PDALReader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>
