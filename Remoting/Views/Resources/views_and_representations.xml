@@ -11317,6 +11317,9 @@
                proxygroup="representations"
                proxyname="LogoWidgetRepresentation"></Proxy>
         <ExposedProperties>
+          <Property name="ShowBorder" />
+          <Property name="BorderThickness" />
+          <Property name="BorderColor" />
           <PropertyGroup name="LogoPosition" label="Logo Position" panel_widget="TextLocationEditor">
             <Property name="WindowLocation" />
             <Property name="Position" />
