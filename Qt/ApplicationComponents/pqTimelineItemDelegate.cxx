@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
+#include <QAbstractScrollArea>
 #include <QCoreApplication>
 #include <QLineEdit>
 #include <QMouseEvent>
@@ -88,7 +89,8 @@ struct pqTimelineItemDelegate::pqInternals
   pqInternals(pqTimelineItemDelegate* self, QWidget* parentWidget)
     : Self(self)
   {
-    this->LockStart = new QToolButton(parentWidget);
+    auto scrollArea = dynamic_cast<QAbstractScrollArea*>(parentWidget);
+    this->LockStart = new QToolButton(scrollArea->viewport());
     this->LockStart->setObjectName("LockStart");
     this->LockStart->setToolTip(this->lockTooltip().arg(tr("Start time")));
     this->LockStart->setCheckable(true);
@@ -101,13 +103,13 @@ struct pqTimelineItemDelegate::pqInternals
       }
       else
       {
-        this->LockStart->setIcon(QIcon(":/pqWidgets/Icons/pqLock.svg"));
+        this->LockStart->setIcon(QIcon(":/pqWidgets/Icons/pqUnlock.svg"));
         this->LockStart->setToolTip(this->unlockTooltip().arg(tr("Start time")));
       }
       this->Self->TimelinePainter->setSceneLockStart(this->LockStart->isChecked());
     });
 
-    this->LockEnd = new QToolButton(parentWidget);
+    this->LockEnd = new QToolButton(scrollArea->viewport());
     this->LockEnd->setObjectName("LockEnd");
     this->LockEnd->setToolTip(this->lockTooltip().arg(tr("End Time")));
     this->LockEnd->setCheckable(true);
@@ -120,7 +122,7 @@ struct pqTimelineItemDelegate::pqInternals
       }
       else
       {
-        this->LockEnd->setIcon(QIcon(":/pqWidgets/Icons/pqLock.svg"));
+        this->LockEnd->setIcon(QIcon(":/pqWidgets/Icons/pqUnlock.svg"));
         this->LockEnd->setToolTip(this->unlockTooltip().arg(tr("End time")));
       }
 

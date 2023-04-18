@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
+#include <memory> // for std::unique_ptr
+
 class pqAnimationCue;
 class pqAnimationScene;
 class pqServerManagerModelItem;
