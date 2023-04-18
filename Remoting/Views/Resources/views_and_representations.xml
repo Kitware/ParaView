@@ -11303,6 +11303,33 @@
           Set whether user should be able to interactively place the Logo in the view.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetInteractiveScaling"
+                         default_values="1"
+                         name="InteractiveScaling"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether user should be able to interactively scale the Logo in the view (when checked)
+          or choose the scaling in the properties panel (when unchecked).
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetImageScale"
+                            default_values="0.075"
+                            name="ImageScale"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="2"
+                           min="0.01"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="InteractiveScaling"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Scale of the logo, relative to render view height. Ratio is preserved.
+        </Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
                             name="Opacity"

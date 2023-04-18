@@ -61,6 +61,25 @@ public:
   vtkGetMacro(Opacity, double);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get the scaling interactivity.
+   */
+  vtkSetMacro(InteractiveScaling, bool);
+  vtkGetMacro(InteractiveScaling, bool);
+  vtkBooleanMacro(InteractiveScaling, bool);
+  ///@}
+
+  static constexpr double VTK_MINIMUM_IMAGE_SCALE = 0.01;
+  static constexpr double VTK_MAXIMUM_IMAGE_SCALE = 2.0;
+  ///@{
+  /**
+   * Set/Get the scale of the image relatively to screen height.
+   */
+  vtkSetClampMacro(ImageScale, double, VTK_MINIMUM_IMAGE_SCALE, VTK_MAXIMUM_IMAGE_SCALE);
+  vtkGetMacro(ImageScale, double);
+  ///@}
+
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
    * typically called by the vtkView to request meta-data from the
@@ -101,6 +120,8 @@ protected:
   vtkNew<vtkImageData> ImageCache;
   vtk3DWidgetRepresentation* LogoWidgetRepresentation = nullptr;
   double Opacity = 1.0;
+  bool InteractiveScaling = true;
+  double ImageScale = 0.075; // Defined by Position2 in vtkLogoRepresentation
 
 private:
   vtkLogoSourceRepresentation(const vtkLogoSourceRepresentation&) = delete;
