@@ -391,6 +391,7 @@
   <Proxy group="filters" name="TriangleFilter" />
   <Proxy group="filters" name="TubeFilter" />
   <Proxy group="filters" name="ValidateCells" />
+  <Proxy group="filters" name="VolumeOfRevolution" />
   <Proxy group="filters" name="VortexCores" />
   <Proxy group="filters" name="WarpScalar" />
   <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp.svg" />
