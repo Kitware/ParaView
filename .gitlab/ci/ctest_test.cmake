@@ -98,7 +98,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
 
     # Unstructured grid volume rendering (paraview/paraview#19130)
     "\\.MultiBlockVolumeRendering$"
-    "\\.UnstructuredVolumeRenderingVectorComponent$")
+    "\\.UnstructuredVolumeRenderingVectorComponent$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
+    "\\.PythonEditorRun$"
+    )
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
@@ -109,13 +113,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
     "\\.TextSourceBorder$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21462
     "\\.UndoRedo1")
-
-endif ()
-
-if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
-  list(APPEND test_exclusions
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
-    "\\.PythonEditorRun$")
 
 endif ()
 
@@ -165,6 +162,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Fails consistently, needs debugging (paraview/paraview#20742)
     "^pv\\.PythonAlgorithmPlugin$"
+
+    # Flaky for some reasons
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
+    "\\.PythonEditorRun$"
     )
 endif ()
 
