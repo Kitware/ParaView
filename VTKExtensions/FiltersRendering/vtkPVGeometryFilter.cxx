@@ -26,6 +26,7 @@
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataAssembly.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkExplicitStructuredGrid.h"
 #include "vtkExplicitStructuredGridSurfaceFilter.h"
@@ -59,6 +60,7 @@
 #include "vtkRectilinearGridOutlineFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
@@ -1071,6 +1073,19 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     // Add block colors to root-node's field data to keep it from being flagged as
     // partial.
     this->AddBlockColors(output, 0);
+  }
+  // vtkPVGeometryFilter does not support PDC as of now, therefore we need to encode the assembly
+  // as a field data array in the output.
+  if (auto inputPDC = vtkPartitionedDataSetCollection::SafeDownCast(input))
+  {
+    if (inputPDC->GetDataAssembly())
+    {
+      const auto dataAssemblyString = inputPDC->GetDataAssembly()->SerializeToXML(vtkIndent());
+      vtkNew<vtkStringArray> dataAssemblyArray;
+      dataAssemblyArray->SetName("vtkDataAssembly");
+      dataAssemblyArray->InsertNextValue(dataAssemblyString.c_str());
+      output->GetFieldData()->AddArray(dataAssemblyArray);
+    }
   }
 
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestDataObjectTree");

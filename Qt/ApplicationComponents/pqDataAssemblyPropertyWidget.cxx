@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVGeneralSettings.h"
 
+#include "pqSMAdaptor.h"
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -656,14 +657,15 @@ void hookupTableView(QTableView* view, TableModel* model, QAbstractButton* addBu
 //=================================================================================
 // Helper to create a selection for the producerPort to select blocks using the
 // specified selectors.
-void selectBlocks(vtkSMOutputPort* producerPort, const std::set<std::string>& selectors)
+void selectBlocks(vtkSMOutputPort* producerPort, const std::string& assemblyName,
+  const std::set<std::string>& selectors)
 {
   auto producer = producerPort->GetSourceProxy();
 
   vtkNew<vtkSelectionSource> selectionSource;
   selectionSource->SetFieldType(vtkSelectionNode::CELL);
   selectionSource->SetContentType(vtkSelectionNode::BLOCK_SELECTORS);
-  selectionSource->SetArrayName("Hierarchy");
+  selectionSource->SetArrayName(assemblyName.c_str());
   for (const auto& selector : selectors)
   {
     selectionSource->AddBlockSelector(selector.c_str());
@@ -743,7 +745,12 @@ void hookupActiveSelection(
       // make active selection.
       auto producerPort = vtkSMPropertyHelper(repr, "Input").GetAsOutputPort();
       selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", true);
-      selectBlocks(producerPort, selectors);
+      std::string assemblyName = "Hierarchy";
+      if (repr && repr->GetProperty("Assembly"))
+      {
+        assemblyName = vtkSMPropertyHelper(repr, "Assembly").GetAsString();
+      }
+      selectBlocks(producerPort, assemblyName, selectors);
       selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
     });
 
@@ -1067,11 +1074,28 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.selectorsTab));
   }
 
-  if (auto smproperty = smgroup->GetProperty("ActiveAssembly"))
+  auto assemblyProp = smgroup->GetProperty("ActiveAssembly");
+  if (assemblyProp)
   {
-    auto adaptor = new pqSignalAdaptorComboBox(internals.Ui.assemblyCombo);
-    new pqComboBoxDomain(internals.Ui.assemblyCombo, smproperty);
-    this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), smproperty);
+    const std::string assemblyName = vtkSMPropertyHelper(assemblyProp).GetAsString();
+    const auto availableAssemblyChoices = pqSMAdaptor::getEnumerationPropertyDomain(assemblyProp);
+    const bool isFindDataHelper = strcmp(smproxy->GetXMLName(), "FindDataHelper") == 0;
+    // we create a property link in 2 cases:
+    // 1) if assembly name is not empty, which means we're showing a composite-dataset, and
+    //    there are choices available for the assembly.
+    // 2) if the proxy is a FindDataHelper, which is a special case because the assembly name is
+    //    empty initially but it will be populated in the future.
+    if ((!assemblyName.empty() && !availableAssemblyChoices.empty()) || isFindDataHelper)
+    {
+      auto adaptor = new pqSignalAdaptorComboBox(internals.Ui.assemblyCombo);
+      new pqComboBoxDomain(internals.Ui.assemblyCombo, assemblyProp);
+      this->addPropertyLink(
+        adaptor, "currentText", SIGNAL(currentTextChanged(QString)), assemblyProp);
+    }
+    else
+    {
+      internals.Ui.assemblyCombo->hide();
+    }
   }
   else
   {

@@ -4559,10 +4559,7 @@
           <PropertyGroup label="Blocks"
                          panel_widget="DataAssemblyEditor"
                          panel_visibility="multiblock_inspector">
-            <!--
-               place holder for future work
-               <Property name="Assembly"       function="ActiveAssembly" />
-            -->
+            <Property name="Assembly"       function="ActiveAssembly" />
             <Property name="BlockSelectors" function="Selectors" />
             <Property name="BlockColors"    function="Colors" />
             <Property name="BlockOpacities" function="Opacities" />
@@ -7342,7 +7339,6 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssembly"
         number_of_elements="1"
-        default_values="Hierarchy"
         panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
@@ -10680,7 +10676,6 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssemblyForSelectors"
         number_of_elements="1"
-        default_values="Hierarchy"
         panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
@@ -14613,7 +14608,6 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssembly"
         number_of_elements="1"
-        default_values="Hierarchy"
         panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>

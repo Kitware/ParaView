@@ -1195,6 +1195,9 @@ list(APPEND TESTS_WITH_BASELINES
   MoleculeToLines.xml
   # MultiBlockAttributes1.xml
   MultiBlockInspector.xml
+  MultiBlockInspectorAssembly.xml
+  MultiBlockInspectorAssemblyExtractBlocks.xml
+  MultiBlockInspectorAssemblyWithoutSelectOnClickSetting.xml
   MultiBlockInspectorExtractBlocks.xml
   MultiBlockSingleBlock.xml
   MultiBlockVolumeRendering.xml
