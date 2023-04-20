@@ -38,12 +38,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqRescaleRange_h
 #define pqRescaleRange_h
 
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 #include "pqComponentsModule.h"
 #include <QDialog>
 
 class pqRescaleRangeForm;
 
-class PQCOMPONENTS_EXPORT pqRescaleRange : public QDialog
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "Use pqRescaleScalarRangeToCustomDialog instead") PQCOMPONENTS_EXPORT pqRescaleRange
+  : public QDialog
 {
   Q_OBJECT
 public:

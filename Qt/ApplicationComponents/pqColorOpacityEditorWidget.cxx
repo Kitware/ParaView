@@ -44,7 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
-#include "pqResetScalarRangeReaction.h"
+#include "pqRescaleScalarRangeReaction.h"
+#include "pqRescaleScalarRangeToCustomDialog.h"
+#include "pqRescaleScalarRangeToDataOverTimeDialog.h"
 #include "pqSettings.h"
 #include "pqSignalsBlocker.h"
 #include "pqTimer.h"
@@ -1037,8 +1039,8 @@ void pqColorOpacityEditorWidget::prepareRangeForLogScaling()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToData()
 {
-  // passing in nullptr ensure pqResetScalarRangeReaction simply uses active representation.
-  if (pqResetScalarRangeReaction::resetScalarRangeToData(nullptr))
+  // passing in nullptr ensure pqRescaleScalarRangeReaction simply uses active representation.
+  if (pqRescaleScalarRangeReaction::rescaleScalarRangeToData(nullptr))
   {
     this->setHistogramOutdated();
     this->Internals->render();
@@ -1049,11 +1051,15 @@ void pqColorOpacityEditorWidget::resetRangeToData()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
 {
-  // passing in nullptr ensure pqResetScalarRangeReaction simply uses active representation.
-  if (pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(nullptr))
+  // passing in nullptr ensure pqRescaleScalarRangeReaction simply uses active representation.
+  pqRescaleScalarRangeToDataOverTimeDialog* dialog =
+    pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(nullptr);
+  if (dialog)
   {
-    this->Internals->render();
-    Q_EMIT this->changeFinished();
+    QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply, [=]() {
+      this->Internals->render();
+      Q_EMIT this->changeFinished();
+    });
   }
 }
 
@@ -1096,24 +1102,26 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToCustom()
 {
-  bool changed = false;
+  pqRescaleScalarRangeToCustomDialog* dialog;
   pqPipelineRepresentation* repr =
     qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
   if (repr)
   {
-    changed = pqResetScalarRangeReaction::resetScalarRangeToCustom(repr);
+    dialog = pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(repr);
   }
   else
   {
     // Shouldn't happen, but fall back to the active lut if there is no active representation
-    changed = pqResetScalarRangeReaction::resetScalarRangeToCustom(this->proxy());
+    dialog = pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(this->proxy());
   }
 
-  if (changed)
+  if (dialog)
   {
-    this->setHistogramOutdated();
-    this->Internals->render();
-    Q_EMIT this->changeFinished();
+    QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
+      this->setHistogramOutdated();
+      this->Internals->render();
+      Q_EMIT this->changeFinished();
+    });
   }
 }
 

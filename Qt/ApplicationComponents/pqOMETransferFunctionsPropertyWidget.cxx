@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqPresetDialog.h"
 #include "pqProxyWidget.h"
-#include "pqResetScalarRangeReaction.h"
+#include "pqRescaleScalarRangeReaction.h"
+#include "pqRescaleScalarRangeToCustomDialog.h"
 #include "vtkCommand.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkPiecewiseFunction.h"
@@ -157,10 +158,14 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
         pageUi.OpacityEditor, &pqTransferFunctionWidget::rangeHandlesRangeChanged, callback);
 
       auto callback2 = [lut, lutWidget, sofWidget, this]() {
-        if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut))
+        pqRescaleScalarRangeToCustomDialog* dialog =
+          pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(lut);
+        if (dialog != nullptr)
         {
-          this->stcChanged(lutWidget);
-          this->pwfChanged(sofWidget);
+          QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
+            this->stcChanged(lutWidget);
+            this->pwfChanged(sofWidget);
+          });
         }
       };
 

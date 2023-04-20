@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEditColorMapReaction.h"
 #include "pqEditScalarBarReaction.h"
 #include "pqPropertiesPanel.h"
-#include "pqResetScalarRangeReaction.h"
+#include "pqRescaleScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqServerManagerModel.h"
 #include "pqUseSeparateColorMapReaction.h"
@@ -112,21 +112,21 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy* smProxy, QW
   // reset range button
   QAction* resetRangeAction = new QAction(this);
   QObject::connect(Ui.Rescale, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
-  pqResetScalarRangeReaction* rsrr = new pqResetScalarRangeReaction(resetRangeAction, false);
+  pqRescaleScalarRangeReaction* rsrr = new pqRescaleScalarRangeReaction(resetRangeAction, false);
   rsrr->setRepresentation(representation);
 
   // reset custom range button
   QAction* resetCustomRangeAction = new QAction(this);
   resetCustomRangeAction->connect(Ui.RescaleCustom, SIGNAL(clicked()), SLOT(trigger()));
-  rsrr = new pqResetScalarRangeReaction(
-    resetCustomRangeAction, false, pqResetScalarRangeReaction::CUSTOM);
+  rsrr = new pqRescaleScalarRangeReaction(
+    resetCustomRangeAction, false, pqRescaleScalarRangeReaction::CUSTOM);
   rsrr->setRepresentation(representation);
 
   // reset custom range button
   QAction* resetTemporalRangeAction = new QAction(this);
   resetTemporalRangeAction->connect(Ui.RescaleTemporal, SIGNAL(clicked()), SLOT(trigger()));
-  rsrr = new pqResetScalarRangeReaction(
-    resetTemporalRangeAction, false, pqResetScalarRangeReaction::TEMPORAL);
+  rsrr = new pqRescaleScalarRangeReaction(
+    resetTemporalRangeAction, false, pqRescaleScalarRangeReaction::TEMPORAL);
   rsrr->setRepresentation(representation);
 
   // choose preset button.

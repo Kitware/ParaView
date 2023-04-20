@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 #include "vtkSmartPointer.h"
 
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 #include <QPointer>
 
 class pqPipelineRepresentation;
@@ -50,7 +52,8 @@ class vtkSMProxy;
  * instead explicitly provide one using setRepresentation() by pass
  * track_active_objects as false to the constructor.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReaction
+class PARAVIEW_DEPRECATED_IN_5_12_0("Use pqRescaleScalarRangeReaction instead")
+  PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
@@ -74,6 +77,7 @@ public:
   /**
    * @deprecated Use resetScalarRangeToData().
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use resetScalarRangeToData() instead")
   static void resetScalarRange(pqPipelineRepresentation* repr = nullptr)
   {
     pqResetScalarRangeReaction::resetScalarRangeToData(repr);
