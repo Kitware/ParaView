@@ -172,6 +172,7 @@ set(classes
   pqRenameProxyReaction
   pqRenderViewSelectionReaction
   pqRepresentationToolbar
+  pqRescaleScalarRangeReaction
   pqResetScalarRangeReaction
   pqResetDefaultSettingsReaction
   pqSaveAnimationGeometryReaction

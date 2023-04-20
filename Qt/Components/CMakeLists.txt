@@ -144,6 +144,8 @@ set(classes
   pqRemoteCommandDialog
   pqRemoteCommandTemplateDialog
   pqRescaleRange
+  pqRescaleScalarRangeToCustomDialog
+  pqRescaleScalarRangeToDataOverTimeDialog
   pqSingleLogViewerWidget
   pqSMSignalAdaptors
   pqScalarSetModel
@@ -244,6 +246,8 @@ set(ui_files
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRescaleRangeDialog.ui
+  Resources/UI/pqRescaleScalarRangeToCustomDialog.ui
+  Resources/UI/pqRescaleScalarRangeToDataOverTimeDialog.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSearchBox.ui
   Resources/UI/pqSelectReaderDialog.ui
