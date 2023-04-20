@@ -56,6 +56,12 @@ pqRescaleScalarRangeToDataOverTimeDialog::pqRescaleScalarRangeToDataOverTimeDial
 pqRescaleScalarRangeToDataOverTimeDialog::~pqRescaleScalarRangeToDataOverTimeDialog() = default;
 
 //-----------------------------------------------------------------------------
+void pqRescaleScalarRangeToDataOverTimeDialog::setLock(bool lock)
+{
+  this->Form->AutomaticRescaling->setChecked(!lock);
+}
+
+//-----------------------------------------------------------------------------
 bool pqRescaleScalarRangeToDataOverTimeDialog::doLock() const
 {
   return !this->Form->AutomaticRescaling->isChecked();

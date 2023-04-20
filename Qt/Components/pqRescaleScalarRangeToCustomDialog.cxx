@@ -143,6 +143,12 @@ void pqRescaleScalarRangeToCustomDialog::validate()
 }
 
 //-----------------------------------------------------------------------------
+void pqRescaleScalarRangeToCustomDialog::setLock(bool lock)
+{
+  this->Form->AutomaticRescaling->setChecked(!lock);
+}
+
+//-----------------------------------------------------------------------------
 bool pqRescaleScalarRangeToCustomDialog::doLock() const
 {
   return !this->Form->AutomaticRescaling->isChecked();

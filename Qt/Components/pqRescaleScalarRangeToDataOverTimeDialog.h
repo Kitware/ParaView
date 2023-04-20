@@ -52,6 +52,11 @@ public:
   ~pqRescaleScalarRangeToDataOverTimeDialog() override;
 
   /**
+   * Initialize AutomaticRescaling checkbox value.
+   */
+  void setLock(bool lock);
+
+  /**
    * Get lock value from AutomaticRescaling checkbox.
    */
   bool doLock() const;

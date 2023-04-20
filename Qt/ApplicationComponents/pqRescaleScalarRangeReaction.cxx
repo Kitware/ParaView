@@ -207,7 +207,7 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
   vtkSMProxy* lut, bool separateOpacity)
 {
   vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
-  if (tfProxy == nullptr)
+  if (tfProxy == nullptr || lut == nullptr)
   {
     return nullptr;
   }
@@ -219,8 +219,12 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
     range[1] = 1.0;
   }
 
+  int lockInfo = 0;
+  vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Get(&lockInfo);
+
   pqRescaleScalarRangeToCustomDialog* dialog =
     new pqRescaleScalarRangeToCustomDialog(pqCoreUtilities::mainWidget());
+  dialog->setLock(lockInfo == vtkSMTransferFunctionManager::NEVER);
   dialog->setRange(range[0], range[1]);
   dialog->showOpacityControls(separateOpacity);
   vtkSMTransferFunctionProxy* sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
@@ -269,7 +273,7 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
     }
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
-    if (dialog->lock())
+    if (dialog->doLock())
     {
       vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
         .Set(vtkSMTransferFunctionManager::NEVER);
@@ -296,8 +300,14 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(pqPipelineReprese
     }
   }
 
+  int lockInfo = 0;
+  if (vtkSMProxy* lut = lutProxy(repr))
+  {
+    vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Get(&lockInfo);
+  }
   pqRescaleScalarRangeToDataOverTimeDialog* dialog =
     new pqRescaleScalarRangeToDataOverTimeDialog(pqCoreUtilities::mainWidget());
+  dialog->setLock(lockInfo == vtkSMTransferFunctionManager::NEVER);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
 
@@ -307,7 +317,7 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(pqPipelineReprese
 
     // disable auto-rescale of transfer function since the user has set one
     // explicitly (BUG #14371).
-    if (dialog->lock())
+    if (dialog->doLock())
     {
       if (vtkSMProxy* lut = lutProxy(repr))
       {
