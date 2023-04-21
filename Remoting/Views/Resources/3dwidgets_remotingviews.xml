@@ -878,6 +878,9 @@
                proxyname="LogoRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
+          <Property name="ShowBorder" />
+          <Property name="BorderThickness" />
+          <Property name="BorderColor" />
           <Property name="WindowLocation" />
           <Property name="Position" />
           <Property name="Position2" />
@@ -2636,6 +2639,34 @@
                  value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetShowBorder"
+                         default_values="2"
+                         name="ShowBorder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Never"
+                 value="0" />
+          <Entry text="Always"
+                 value="1" />
+          <Entry text="On Hover"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBorderThickness"
+                            default_values="1"
+                            name="BorderThickness"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="1"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBorderColor"
+                            default_values="1 1 1"
+                            name="BorderColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
   <!-- ****************************************************************** -->

@@ -24,6 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkProperty2D.h"
+#include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkLogoSourceRepresentation);
 vtkCxxSetObjectMacro(
@@ -139,8 +140,12 @@ int vtkLogoSourceRepresentation::ProcessViewRequest(
       repr->SetImage(image);
       repr->GetImageProperty()->SetOpacity(this->Opacity);
       repr->SetVisibility(true);
-      float height = repr->GetPosition2()[1];
-      repr->SetPosition2(height * dims[0] / dims[1], height);
+
+      const int* size = repr->GetRenderer()->GetSize();
+      double height =
+        (this->InteractiveScaling ? repr->GetPosition2()[1] : this->ImageScale) * size[1];
+      double width = height * dims[0] / dims[1];
+      repr->SetPosition2(width / size[0], height / size[1]);
     }
     else
     {
