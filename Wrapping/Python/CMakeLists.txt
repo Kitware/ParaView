@@ -46,6 +46,7 @@ set(python_files
   paraview/detail/pythonalgorithm.py
   paraview/detail/python_selector.py
   paraview/detail/catalyst_export.py
+  paraview/inspect.py
   paraview/live.py
   paraview/lookuptable.py
   paraview/modules/__init__.py.in
