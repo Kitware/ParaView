@@ -51,7 +51,9 @@
     <Proxy group="filters" name="HyperTreeGridCellCenters" />
     <Proxy group="filters" name="Contour" />
     <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
+    <Proxy group="filters" name="HyperTreeGridGeometry" />
     <Proxy group="filters" name="GroupDataSets" />
+    <Proxy group="filters" name="HyperTreeGridEvaluateCoarse" />
     <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
     <Proxy group="filters" name="Threshold" />
     <Proxy group="filters" name="HyperTreeGridToDualGrid" />
@@ -265,6 +267,8 @@
   <Proxy group="filters" name="HyperTreeGridAxisReflection" />
   <Proxy group="filters" name="HyperTreeGridCellCenters" />
   <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
+  <Proxy group="filters" name="HyperTreeGridEvaluateCoarse" />
+  <Proxy group="filters" name="HyperTreeGridGeometry" />
   <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
   <Proxy group="filters" name="HyperTreeGridToDualGrid" />
   <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />

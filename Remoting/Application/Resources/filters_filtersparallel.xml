@@ -871,7 +871,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridGhostCellsGenerator"
-                 label="Hyper Tree Grid Ghost Cells Generator"
+                 label="HyperTreeGrid Ghost Cells Generator"
                  name="HyperTreeGridGhostCellsGenerator">
       <Documentation long_help="Generate Ghost Cells for HyperTreeGrid."
                      short_help="Generate Ghost Cells for HyperTreeGrid.">

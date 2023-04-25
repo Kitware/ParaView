@@ -2637,7 +2637,17 @@ Every Nth Point.
                             use_index="1"
                             panel_visibility="advanced">
         <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator" name="vtkHyperTreeGrid" exclude="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="PreserveInputCells" function="boolean_invert" />
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
         <BoundsDomain mode="magnitude"
                       name="bounds">
@@ -2652,11 +2662,6 @@ Every Nth Point.
         shifted by the offset value. The 'Values Range' information is the
         range based on the global bounding box, not necessarily on the current
         slice geometry configuration.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PreserveInputCells" function="boolean_invert" />
-          </PropertyWidgetDecorator>
-        </Hints>
       </DoubleVectorProperty>
       <!-- incremental point locator begin -->
       <ProxyProperty command="SetLocator"
