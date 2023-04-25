@@ -21,6 +21,16 @@
 #include <QCoreApplication>
 #include <cassert>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define vtk_qVariantType(variant) variant.type()
+#define vtk_qMetaType(name) QVariant::name
+#define vtk_qMetaType_Q(name) vtk_qMetaType(name)
+#else
+#define vtk_qVariantType(variant) variant.typeId()
+#define vtk_qMetaType(name) QMetaType::name
+#define vtk_qMetaType_Q(name) vtk_qMetaType(Q##name)
+#endif
+
 //-----------------------------------------------------------------------------
 pqColorChooserButtonWithPalettes::pqColorChooserButtonWithPalettes(QWidget* parentObject)
   : Superclass(parentObject)
@@ -114,12 +124,7 @@ void pqColorChooserButtonWithPalettes::updateMenu()
 void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
 {
   QColor color;
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  QMetaType::Type typeId = static_cast<QMetaType::Type>(action->data().type());
-#else
-  auto typeId = action->data().typeId();
-#endif
-  if (typeId == QMetaType::QString)
+  if (vtk_qVariantType(action->data()) == vtk_qMetaType_Q(String))
   {
     QString prop_name = action->data().toString();
     vtkSMProxy* globalProps = this->colorPalette();
@@ -134,7 +139,7 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
       helper->setSelectedPaletteColor(prop_name);
     }
   }
-  else if (typeId == QMetaType::QColor)
+  else if (vtk_qVariantType(action->data()) == vtk_qMetaType_Q(Color))
   {
     color = action->data().value<QColor>();
   }

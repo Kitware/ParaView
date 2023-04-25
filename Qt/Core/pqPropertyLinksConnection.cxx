@@ -11,6 +11,14 @@
 #include <QStringList>
 #include <QtDebug>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define vtk_qVariantType(variant) variant.type()
+#define vtk_qMetaType(name) QVariant::name
+#else
+#define vtk_qVariantType(variant) variant.typeId()
+#define vtk_qMetaType(name) QMetaType::name
+#endif
+
 //-----------------------------------------------------------------------------
 pqPropertyLinksConnection::pqPropertyLinksConnection(QObject* qobject, const char* qproperty,
   const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
@@ -246,12 +254,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
   QVariant smValue = this->currentServerManagerValue(use_unchecked);
   if (qtValue != smValue)
   {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    auto typeId = static_cast<QMetaType::Type>(smValue.type());
-#else
-    auto typeId = smValue.typeId();
-#endif
-    if (typeId == QMetaType::Double)
+    if (vtk_qVariantType(smValue) == vtk_qMetaType(Double))
     {
       // QVariant is able to convert double to string but we need to be able
       // to specify how it should be formatted using settings, which

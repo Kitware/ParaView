@@ -28,6 +28,16 @@
 
 #include <algorithm>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define vtk_qVariantType(variant) variant.type()
+#define vtk_qMetaType(name) QVariant::name
+#define vtk_qMetaType_Q(name) vtk_qMetaType(name)
+#else
+#define vtk_qVariantType(variant) variant.typeId()
+#define vtk_qMetaType(name) QMetaType::name
+#define vtk_qMetaType_Q(name) vtk_qMetaType(Q##name)
+#endif
+
 class pqFlatTreeViewColumn
 {
 public:
@@ -910,12 +920,7 @@ bool pqFlatTreeView::startEditing(const QModelIndex& index)
 
     // Create an editor appropriate for the value.
     const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
-#else
-    auto typeId = value.typeId();
-#endif
-    this->Internal->Editor = factory->createEditor(typeId, this->viewport());
+    this->Internal->Editor = factory->createEditor(vtk_qVariantType(value), this->viewport());
     if (!this->Internal->Editor)
     {
       return false;
@@ -925,7 +930,7 @@ bool pqFlatTreeView::startEditing(const QModelIndex& index)
     this->Internal->Index = index;
 
     // Set the editor value.
-    QByteArray name = factory->valuePropertyName(typeId);
+    QByteArray name = factory->valuePropertyName(vtk_qVariantType(value));
     if (!name.isEmpty())
     {
       this->Internal->Editor->setProperty(name.data(), value);
@@ -958,12 +963,7 @@ void pqFlatTreeView::finishEditing()
     QModelIndex index = this->Internal->Index;
     QVariant value = this->Model->data(index, Qt::DisplayRole);
     const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
-#else
-    auto typeId = value.typeId();
-#endif
-    QByteArray name = factory->valuePropertyName(typeId);
+    QByteArray name = factory->valuePropertyName(vtk_qVariantType(value));
     if (!name.isEmpty())
     {
       value = this->Internal->Editor->property(name.data());
@@ -1495,12 +1495,7 @@ void pqFlatTreeView::updateData(const QModelIndex& topLeft, const QModelIndex& b
         {
           QVariant value = this->Model->data(this->Internal->Index, Qt::EditRole);
           const QItemEditorFactory* factory = QItemEditorFactory::defaultFactory();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-          QMetaType::Type typeId = static_cast<QMetaType::Type>(value.type());
-#else
-          auto typeId = value.typeId();
-#endif
-          QByteArray name = factory->valuePropertyName(typeId);
+          QByteArray name = factory->valuePropertyName(vtk_qVariantType(value));
           if (!name.isEmpty())
           {
             this->Internal->Editor->setProperty(name.data(), value);
@@ -3063,12 +3058,7 @@ int pqFlatTreeView::getDataWidth(const QModelIndex& index, const QFontMetrics& f
   // item is an image or list of images, the desired width is
   // the image width(s).
   QVariant indexData = index.data();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  QMetaType::Type typeId = static_cast<QMetaType::Type>(indexData.type());
-#else
-  auto typeId = indexData.typeId();
-#endif
-  if (typeId == QMetaType::QPixmap)
+  if (vtk_qVariantType(indexData) == vtk_qMetaType_Q(Pixmap))
   {
     // Make sure the pixmap is scaled to fit the item height.
     QSize pixmapSize = qvariant_cast<QPixmap>(indexData).size();
@@ -3626,16 +3616,11 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
   bool selected)
 {
   QVariant indexData = this->Model->data(index);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  QMetaType::Type typeId = static_cast<QMetaType::Type>(indexData.type());
-#else
-  auto typeId = indexData.typeId();
-#endif
-  if (typeId == QMetaType::QPixmap || indexData.canConvert<QIcon>())
+  if (vtk_qVariantType(indexData) == vtk_qMetaType_Q(Pixmap) || indexData.canConvert<QIcon>())
   {
     QIcon icon;
     QPixmap pixmap;
-    if (typeId == QMetaType::QPixmap)
+    if (vtk_qVariantType(indexData) == vtk_qMetaType_Q(Pixmap))
     {
       pixmap = qvariant_cast<QPixmap>(indexData);
       if (pixmap.height() > itemHeight)

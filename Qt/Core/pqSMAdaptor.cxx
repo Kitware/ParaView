@@ -64,6 +64,14 @@
 #define QT_ENDL Qt::endl
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define vtk_qVariantType(variant) variant.type()
+#define vtk_qMetaType(name) QVariant::name
+#else
+#define vtk_qVariantType(variant) variant.typeId()
+#define vtk_qMetaType(name) QMetaType::name
+#endif
+
 namespace
 {
 template <class T>
@@ -682,12 +690,7 @@ void pqSMAdaptor::setSelectionProperty(
 
   QString name = value[0].toString();
   QVariant status = value[1];
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  auto typeId = static_cast<QMetaType::Type>(status.type());
-#else
-  auto typeId = status.typeId();
-#endif
-  if (typeId == QMetaType::Bool)
+  if (vtk_qVariantType(status) == vtk_qMetaType(Bool))
   {
     status = status.toInt();
   }
