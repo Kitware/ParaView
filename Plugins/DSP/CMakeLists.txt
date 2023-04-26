@@ -12,7 +12,8 @@ if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
   if (NOT TARGET "Qt${PARAVIEW_QT_MAJOR_VERSION}::Multimedia")
     message(FATAL_ERROR
       "Component 'Qt5::Multimedia' required for the DSP plugin not found. Use "
-      "PARAVIEW_PLUGIN_dsp_enable_audio_player to disable the audio player if necessary, or install 'Qt5::Multimedia'")
+      "PARAVIEW_PLUGIN_dsp_enable_audio_player to disable the audio player if "
+      "necessary, or install 'Qt5::Multimedia'")
   endif ()
 
   list(APPEND sources
@@ -64,9 +65,11 @@ if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
       "Qt${PARAVIEW_QT_MAJOR_VERSION}::Widgets"
       "Qt${PARAVIEW_QT_MAJOR_VERSION}::Multimedia")
 
-  target_compile_definitions(DigitalSignalProcessing PRIVATE QT_NO_KEYWORDS)
-endif()
+  target_compile_definitions(DigitalSignalProcessing
+    PRIVATE
+      QT_NO_KEYWORDS)
+endif ()
 
 if (BUILD_TESTING AND BUILD_SHARED_LIBS)
   add_subdirectory(Testing)
-endif()
+endif ()

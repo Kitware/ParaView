@@ -1,10 +1,10 @@
-set(MODULE_HEADERS
+set(headers
   vtkArrayDispatchDSPArrayList.h
   vtkMultiDimensionalArray.h
   vtkMultiDimensionalImplicitBackend.h
 )
 
-set(MODULE_PRIVATE_CLASSES
+set(private_classes
   vtkDSPIterator
   vtkDSPMultiBlockIterator
   vtkDSPTableIterator
@@ -12,6 +12,6 @@ set(MODULE_PRIVATE_CLASSES
 
 vtk_module_add_module(DigitalSignalProcessing::DSPDataModel
   FORCE_STATIC  # build static library, to avoid confusion when loading
-  NOWRAP_HEADERS  ${MODULE_HEADERS}
-  PRIVATE_CLASSES ${MODULE_PRIVATE_CLASSES}
+  NOWRAP_HEADERS  ${headers}
+  PRIVATE_CLASSES ${private_classes}
 )
