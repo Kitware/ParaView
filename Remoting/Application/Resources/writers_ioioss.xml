@@ -65,17 +65,31 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <IntVectorProperty name="MaximumTimeStepsPerFile"
-          command="SetMaximumTimeStepsPerFile"
-          number_of_elements="1"
-          default_values="0">
-        <IntRangeDomain name="range" min="0" />
+      <IntVectorProperty name="TimeStepRange"
+                         command="SetTimeStepRange"
+                         number_of_elements="2"
+                         default_values="0 1"
+                         panel_visibility="advanced">
+        <TimeStepIndexDomain name="timestep_index_range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </TimeStepIndexDomain>
         <Documentation>
-          A debugging option, set this to non-zero positive number to save at most
-          the specified number of timesteps in a single file before starting a new
-          one. The writer may start new files (aka restarts) automatically if it
-          determines that the mesh has changed. Defaults to 0 i.e.
-          unlimited timesteps per file.
+          To limit writing a subset of the timesteps, specify a valid range. You may also use **FileStride** to step over
+          timesteps in this range.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TimeStepStride"
+                         command="SetTimeStepStride"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1" max="100"/>
+        <Documentation>
+          Specify the stride to use when writing a subset of timesteps
+          as dictated by the **TimeStepRange**.
         </Documentation>
       </IntVectorProperty>
 
