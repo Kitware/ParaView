@@ -48,6 +48,17 @@ public:
   virtual void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
   /**
+   * Utility method to add 2 proxies, both as INPUT and OUTPUT.
+   * This is equivalent to call 4 times AddLinkedProxy() with each combination.
+   */
+  virtual void LinkProxies(vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+
+  /**
+   * Utility method to link the proxies stored as proxy property of input proxies.
+   */
+  virtual void LinkProxyPropertyProxies(vtkSMProxy* proxy1, vtkSMProxy* proxy2, const char* pname);
+
+  /**
    * Remove a linked proxy.
    */
   virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
