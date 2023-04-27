@@ -179,6 +179,7 @@ int vtkRemotingCoreConfiguration::GetEGLDeviceIndex()
     {
       this->EGLDeviceIndex = std::stoi(display);
       vtkLogF(TRACE, "Setting EGLDeviceIndex to %d", this->EGLDeviceIndex);
+      return this->EGLDeviceIndex;
     }
     catch (std::invalid_argument&)
     {
