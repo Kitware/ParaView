@@ -420,6 +420,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LinkCameraFromView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LinkCameraFromView_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LinkCameraFromView_2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LinkViewsLinked.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LoadStateMultiView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap2.png}"
@@ -1512,6 +1513,8 @@ if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ColorByComponentNames.xml # needs programmable filter
     LiveProgrammableSource.xml
+    LinkRenderViews.xml
+    LinkViews.xml
     PythonShellRunScript.xml
     PythonEditorRun.xml
     SaveLoadStatePython.xml
@@ -1856,6 +1859,9 @@ SET (XYChart_THRESHOLD 150)
 SET (CheckableHeader_THRESHOLD 150)
 # Since the test uses surface-selection, it cannot work in render-server mode.
 set(XYChart_DISABLE_CRS TRUE)
+# this uses charts: nb of points changes in client server, so graphs differs
+set(LinkViews_DISABLE_CS TRUE)
+set(LinkViews_DISABLE_CRS TRUE)
 
 SET (XYHistogram_THRESHOLD 150)
 set (ChartAxisRangeAndLabels_THRESHOLD 5)
