@@ -27,6 +27,17 @@
         written to the file.</Documentation>
       </InputProperty>
 
+      <IntVectorProperty command="SetRemoveGhosts"
+                         default_values="1"
+                         name="RemoveGhosts"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Property to control whether to remove ghost cells from the input or not.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="OffsetGlobalIds"
           command="SetOffsetGlobalIds"
           number_of_elements="1"
