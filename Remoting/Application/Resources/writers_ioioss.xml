@@ -19,8 +19,9 @@
                      name="Input">
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkCompositeDataSet" />
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkPartitionedDataSet"/>
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
