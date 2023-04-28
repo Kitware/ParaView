@@ -1,0 +1,7 @@
+NAME
+  LiveSourceDummyFilter
+DESCRIPTION
+  Filter that creates a dummy live source for PV
+REQUIRES_MODULES
+  VTK::CommonDataModel
+  VTK::FiltersCore

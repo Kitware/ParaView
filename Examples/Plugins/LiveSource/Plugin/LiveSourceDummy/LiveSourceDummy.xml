@@ -1,0 +1,30 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="LiveSourceDummy" class="vtkLiveSourceDummy" label="Live Souce (dummy)">
+      <Documentation
+        short_help="Live souce."
+        long_help="Live souce dummy.">
+      </Documentation>
+
+      <IntVectorProperty name="MaxIterations"
+        command="SetMaxIterations"
+        label="#Max Iterations"
+        number_of_elements="1"
+        default_values="2000">
+        <Documentation>
+          The number of iterations before the live source stop.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Property name="PauseLiveSource" panel_widget="pause_livesource">
+        <Documentation>
+          Pause live source.
+        </Documentation>
+      </Property>
+
+      <Hints>
+        <LiveSource interval="50"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

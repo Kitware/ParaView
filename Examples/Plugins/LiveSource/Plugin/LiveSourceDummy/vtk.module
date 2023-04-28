@@ -1,0 +1,6 @@
+NAME
+  LiveSourceDummy
+DEPENDS
+  VTK::FiltersCore
+PRIVATE_DEPENDS
+  VTK::CommonCore
