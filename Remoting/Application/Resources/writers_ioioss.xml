@@ -51,6 +51,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="PreserveOriginalIds"
+          command="SetPreserveOriginalIds"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If input is transformed, e.g. through clipping, new element blocks may be created.
+          This flag can be used to indicate whether to preserve the original ids from blocks or not.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="DisplacementMagnitude"
           command="SetDisplacementMagnitude"
           number_of_elements="1"
