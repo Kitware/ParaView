@@ -33,7 +33,7 @@
  *                      panel_visibility="default"
  *                      repeat_command="1"
  *                      animateable="0">
- *     <DataAssemblyDomain name="data_assembly">
+ *     <DataAssemblyDomain name="data_assembly" (optional)entity_type=3>
  *       <RequiredProperties>
  *         <Property function="Input" name="Input" />
  *       </RequiredProperties>
@@ -127,6 +127,8 @@ public:
 
   void Update(vtkSMProperty* requestingProperty) override;
 
+  int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) override;
+
 protected:
   vtkSMDataAssemblyDomain();
   ~vtkSMDataAssemblyDomain() override;
@@ -138,10 +140,18 @@ private:
   void ChooseAssembly(const std::string& name, vtkDataAssembly* assembly);
   void FetchAssembly(int tag);
 
+  /**
+   * entity_type is an optional attribute that can be used to specify the default
+   * IOSS selector (based on vtkIOSSReader::EntityTypes) to use when
+   * building the data assembly. If not specified, the default is nothing.
+   */
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
+
   int LastTag = 0;
 
   vtkSmartPointer<vtkDataAssembly> Assembly;
   std::string Name;
+  int EntityType = -1;
 };
 
 #endif

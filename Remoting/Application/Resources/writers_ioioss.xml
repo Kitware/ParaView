@@ -27,6 +27,114 @@
         written to the file.</Documentation>
       </InputProperty>
 
+      <StringVectorProperty name="Assembly"
+                            command="SetAssemblyName"
+                            number_of_elements="1">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose blocks to write.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="EntityType"
+                         default_values="0"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Element Blocks"
+                 value="3"/>
+          <Entry text="Node Sets"
+                 value="5"/>
+          <Entry text="Side Sets"
+                 value="9"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ElementBlockSelectors"
+                            command="AddElementBlockSelector"
+                            clean_command="ClearElementBlockSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="3">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the element block selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="NodeSetSelectors"
+                            command="AddNodeSetSelector"
+                            clean_command="ClearNodeSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="5">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the node sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SideSetSelectors"
+                            command="AddSideSetSelector"
+                            clean_command="ClearSideSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="9">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the side sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="ElementBlocks" panel_widget="DataAssemblyEditor">
+        <Property name="ElementBlockSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="3"/>
+        </Hints>
+      </PropertyGroup>
+
+      <PropertyGroup label="NodeSets" panel_widget="DataAssemblyEditor">
+        <Property name="NodeSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="5"/>
+        </Hints>
+      </PropertyGroup>
+
+      <PropertyGroup label="SideSets" panel_widget="DataAssemblyEditor">
+        <Property name="SideSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="9"/>
+        </Hints>
+      </PropertyGroup>
+
       <IntVectorProperty command="SetRemoveGhosts"
                          default_values="1"
                          name="RemoveGhosts"
