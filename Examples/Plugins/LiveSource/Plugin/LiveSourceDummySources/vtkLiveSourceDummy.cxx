@@ -1,33 +1,27 @@
-#include <iostream>
+#include <vtkCellArray.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkLiveSourceDummy.h>
+#include <vtkPoints.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 vtkStandardNewMacro(vtkLiveSourceDummy);
 
+//------------------------------------------------------------------------------
 vtkLiveSourceDummy::vtkLiveSourceDummy()
 {
   this->SetNumberOfInputPorts(0);
 }
 
+//------------------------------------------------------------------------------
 bool vtkLiveSourceDummy::GetNeedsUpdate()
 {
   if (this->CurIteration < this->MaxIterations)
   {
-    std::cout << "New iteration: " << this->CurIteration << std::endl;
     this->Modified();
     return true;
   }
   return false;
-}
-
-//------------------------------------------------------------------------------
-int vtkLiveSourceDummy::RequestInformation(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
-{
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
-  return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -44,7 +38,7 @@ int vtkLiveSourceDummy::RequestData(vtkInformation*, vtkInformationVector** vtkN
 
   this->Cells->InsertNextCell(1);
   this->Cells->InsertCellPoint(this->CurIteration++);
-  polydata->SetPolys(this->Cells);
+  polydata->SetVerts(this->Cells);
 
   return 1;
 }

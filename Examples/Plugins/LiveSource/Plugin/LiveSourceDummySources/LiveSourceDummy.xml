@@ -2,13 +2,12 @@
   <ProxyGroup name="sources">
     <SourceProxy name="LiveSourceDummy" class="vtkLiveSourceDummy" label="Live Souce (dummy)">
       <Documentation
-        short_help="Live souce."
-        long_help="Live souce dummy.">
+        short_help="Live source."
+        long_help="Live source dummy.">
       </Documentation>
 
       <IntVectorProperty name="MaxIterations"
         command="SetMaxIterations"
-        label="#Max Iterations"
         number_of_elements="1"
         default_values="2000">
         <Documentation>
@@ -16,6 +15,7 @@
         </Documentation>
       </IntVectorProperty>
 
+      <!-- Optional, specifically for live sources -->
       <Property name="PauseLiveSource" panel_widget="pause_livesource">
         <Documentation>
           Pause live source.
@@ -23,6 +23,7 @@
       </Property>
 
       <Hints>
+        <!-- Required for live sources -->
         <LiveSource interval="50"/>
       </Hints>
     </SourceProxy>

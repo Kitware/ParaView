@@ -1,7 +1,7 @@
 NAME
-  LiveSourceDummyFilter
+  LiveSourceDummy
 DESCRIPTION
-  Filter that creates a dummy live source for PV
+  A plugin that adds a dummy live source.
 REQUIRES_MODULES
   VTK::CommonDataModel
   VTK::FiltersCore

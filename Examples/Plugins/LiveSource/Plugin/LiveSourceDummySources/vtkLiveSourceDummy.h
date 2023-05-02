@@ -1,9 +1,12 @@
 #pragma once
 
-#include "LiveSourceDummyModule.h"
+#include "LiveSourceDummySourcesModule.h"
 #include "vtkPolyDataAlgorithm.h"
 
 #include <array>
+
+class vtkPoints;
+class vtkCellArray;
 
 struct Coords
 {
@@ -18,7 +21,7 @@ struct Coords
 
 struct TriangleBase
 {
-  std::array<Coords, 3> tri = { { { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.5, 0.5 } } };
+  std::array<Coords, 3> tri = { { { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.5, 0.66 } } };
 
   Coords middle(Coords pl, Coords pr)
   {
@@ -32,28 +35,40 @@ struct TriangleBase
   }
 };
 
-class LIVESOURCEDUMMY_EXPORT vtkLiveSourceDummy : public vtkPolyDataAlgorithm
+class LIVESOURCEDUMMYSOURCES_EXPORT vtkLiveSourceDummy : public vtkPolyDataAlgorithm
 {
 public:
   static vtkLiveSourceDummy* New();
   vtkTypeMacro(vtkLiveSourceDummy, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
+  /**
+   * Set/Get the maximum number of iteration before the live source stops.
+   */
   vtkSetMacro(MaxIterations, int);
   vtkGetMacro(MaxIterations, int);
+  ///@}
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
+  /**
+   * Check if the RequestUpdateExtent/RequestData need to be called again to refresh the output.
+   * Return true if an update is needed.
+   *
+   * This method is required for Live Source.
+   */
   bool GetNeedsUpdate();
 
 protected:
   vtkLiveSourceDummy();
-  virtual ~vtkLiveSourceDummy() {}
+  ~vtkLiveSourceDummy() override = default;
+
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
+  // This parameter can be modified by the user and serve to demonstrate how a live source can stop
+  // updating
   int MaxIterations = 2000;
+  // This parameter is used to store and update the current iteration
   int CurIteration = 0;
 
   vtkNew<vtkPoints> Points;

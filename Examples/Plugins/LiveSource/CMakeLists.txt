@@ -5,15 +5,15 @@ if (NOT ParaView_BINARY_DIR)
   find_package(ParaView REQUIRED)
 endif()
 
+enable_testing()
+
 include(GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-message("ParaView version: ${ParaView_VERSION}")
-
 paraview_plugin_scan(
-  PLUGIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/LiveSourceDummyFilter.plugin"
+  PLUGIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/LiveSourceDummy.plugin"
   ENABLE_BY_DEFAULT ON
   HIDE_PLUGINS_FROM_CACHE ON
   PROVIDES_PLUGINS  plugins
