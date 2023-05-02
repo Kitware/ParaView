@@ -591,6 +591,13 @@ void pqLinksModel::addProxyLink(
   link->Delete();
   Q_EMIT this->linkAdded(pqLinksModel::Proxy);
   CLEAR_UNDO_STACK();
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("AddProxyLink")
+    .arg(inputProxy)
+    .arg(outputProxy)
+    .arg(name.toUtf8().data())
+    .arg("comment", qPrintable(tr("link proxies")));
 }
 
 void pqLinksModel::addCameraLink(
