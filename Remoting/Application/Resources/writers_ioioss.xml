@@ -1,7 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="writers">
- <!-- ================================================================= -->
+    <!-- ================================================================= -->
     <PWriterProxy class="vtkIOSSWriter"
+                  file_name_method="SetFileName"
                   name="IOSSWriter">
       <Documentation short_help="Write Exodus II files using IOSS.">
         Write Exodus files using IOSS library.
@@ -11,7 +12,9 @@
                             name="FileName"
                             number_of_elements="1"
                             panel_visibility="never">
-        <Documentation>The name of the file to be written.</Documentation>
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
 
       <InputProperty command="SetInputConnection"
@@ -23,8 +26,9 @@
           <DataType value="vtkPartitionedDataSet"/>
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to
-        written to the file.</Documentation>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the file.
+        </Documentation>
       </InputProperty>
 
       <StringVectorProperty name="Assembly"
@@ -36,8 +40,7 @@
           </RequiredProperties>
         </DataAssemblyListDomain>
         <Documentation>
-          Select which assembly is used when specify selectors
-          to choose blocks to write.
+          Select which assembly is used when specify selectors to choose blocks to write.
         </Documentation>
       </StringVectorProperty>
 
@@ -147,10 +150,10 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="OffsetGlobalIds"
-          command="SetOffsetGlobalIds"
-          number_of_elements="1"
-          default_values="0">
-        <BooleanDomain name="bool" />
+                         command="SetOffsetGlobalIds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Exodus wants global ids to start with 1, while VTK generally produces
           global ids starting with 0. Set this to true (default false), if the global
@@ -160,10 +163,10 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="PreserveOriginalIds"
-          command="SetPreserveOriginalIds"
-          number_of_elements="1"
-          default_values="0">
-        <BooleanDomain name="bool" />
+                         command="SetPreserveOriginalIds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
           If input is transformed, e.g. through clipping, new element blocks may be created.
           This flag can be used to indicate whether to preserve the original ids from blocks or not.
@@ -183,10 +186,10 @@
       </IntVectorProperty>
 
       <DoubleVectorProperty name="DisplacementMagnitude"
-          command="SetDisplacementMagnitude"
-          number_of_elements="1"
-          default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.0" />
+                            command="SetDisplacementMagnitude"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0"/>
         <Documentation>
           If input dataset has displacements pre-applied, setting the displacement
           magnitude to non-zero ensures that the point coordinates in the dataset are
@@ -205,8 +208,8 @@
           </RequiredProperties>
         </TimeStepIndexDomain>
         <Documentation>
-          To limit writing a subset of the timesteps, specify a valid range. You may also use **FileStride** to step over
-          timesteps in this range.
+          To limit writing a subset of the timesteps, specify a valid range. You may also use **FileStride** to step
+          over timesteps in this range.
         </Documentation>
       </IntVectorProperty>
 
@@ -223,7 +226,7 @@
       </IntVectorProperty>
 
       <Hints>
-        <WriterFactory extensions="exo" file_description="IOSS Exodus File" />
+        <WriterFactory extensions="exo" file_description="IOSS Exodus File"/>
       </Hints>
       <!-- End of IOSSWriter -->
     </PWriterProxy>
