@@ -170,6 +170,18 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="WriteQAAndInformationRecords"
+                         label="Write QA And Information Records"
+                         command="SetWriteQAAndInformationRecords"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When checked, the writer will write quality assurance and information records, if available.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="DisplacementMagnitude"
           command="SetDisplacementMagnitude"
           number_of_elements="1"
