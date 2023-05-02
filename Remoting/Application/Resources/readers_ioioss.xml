@@ -714,8 +714,7 @@
         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          When checked, the reader will read quality assurance and
-          information records, if available.
+          When checked, the reader will read global fields, if available.
         </Documentation>
       </IntVectorProperty>
 
@@ -727,7 +726,8 @@
         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          When checked, the reader will read global fields, if available.
+          When checked, the reader will read quality assurance and
+          information records, if available.
         </Documentation>
       </IntVectorProperty>
 
