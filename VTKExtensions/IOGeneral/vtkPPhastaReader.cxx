@@ -231,7 +231,8 @@ int vtkPPhastaReader::RequestData(
     }
     else
     {
-      strcpy(geom_name, geometryPattern);
+      strncpy(geom_name, geometryPattern, geom_name_sz);
+      geom_name[geom_name_sz - 1] = '\0';
     }
 
     if (fieldHasTime && fieldHasPiece)
@@ -250,7 +251,8 @@ int vtkPPhastaReader::RequestData(
     }
     else
     {
-      strcpy(field_name, fieldPattern);
+      strncpy(field_name, fieldPattern, field_name_sz);
+      field_name[field_name_sz - 1] = '\0';
     }
 
     std::ostringstream geomFName;
