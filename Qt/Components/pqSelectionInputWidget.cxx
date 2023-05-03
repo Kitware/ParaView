@@ -32,19 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionInputWidget.h"
 #include "ui_pqSelectionInputWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqLiveInsituManager.h"
+#include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
 #include "pqSMAdaptor.h"
 #include "pqSelectionManager.h"
+#include "pqServerManagerModel.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMFieldDataDomain.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSelection.h"
@@ -404,11 +410,31 @@ void pqSelectionInputWidget::copyActiveSelection()
     return;
   }
 
-  vtkSMSessionProxyManager* pxm = activeSelection->GetSessionProxyManager();
   vtkSmartPointer<vtkSMProxy> newSource;
+  vtkSMSessionProxyManager* pxm = nullptr;
+
+  // Ensure that the selection set by the widget will be in the same server as the proxy which
+  // provide this widget
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (pqLiveInsituManager::isInsituServer(server))
+  {
+    pxm = server->session()->GetSessionProxyManager();
+  }
+  else
+  {
+    pxm = activeSelection->GetSessionProxyManager();
+  }
+
+  if (!pxm)
+  {
+    qWarning() << "Can't find suitable Session Proxy Manager to send the active selection";
+    return;
+  }
+
   newSource.TakeReference(
     pxm->NewProxy(activeSelection->GetXMLGroup(), activeSelection->GetXMLName()));
   newSource->Copy(activeSelection);
+
   newSource->UpdateVTKObjects();
   this->setSelection(newSource);
 }
