@@ -250,7 +250,7 @@ int vtkPPhastaReader::RequestData(
     }
     else
     {
-      strcpy(geom_name, fieldPattern);
+      strcpy(field_name, fieldPattern);
     }
 
     std::ostringstream geomFName;
