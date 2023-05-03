@@ -207,24 +207,26 @@ int vtkPPhastaReader::RequestData(
     return 0;
   }
 
-  char* geom_name = new char[strlen(geometryPattern) + 60];
-  char* field_name = new char[strlen(fieldPattern) + 60];
+  size_t geom_name_sz = strlen(geometryPattern) + 60;
+  char* geom_name = new char[geom_name_sz];
+  size_t field_name_sz = strlen(fieldPattern) + 60;
+  char* field_name = new char[field_name_sz];
 
   // now loop over all of the files that I should load
   for (int loadingPiece = piece; loadingPiece < numPieces; loadingPiece += numProcPieces)
   {
     if (geomHasTime && geomHasPiece)
     {
-      sprintf(geom_name, geometryPattern,
+      snprintf(geom_name, geom_name_sz, geometryPattern,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, loadingPiece + 1);
     }
     else if (geomHasPiece)
     {
-      sprintf(geom_name, geometryPattern, loadingPiece + 1);
+      snprintf(geom_name, geom_name_sz, geometryPattern, loadingPiece + 1);
     }
     else if (geomHasTime)
     {
-      sprintf(geom_name, geometryPattern,
+      snprintf(geom_name, geom_name_sz, geometryPattern,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
     }
     else
@@ -234,17 +236,17 @@ int vtkPPhastaReader::RequestData(
 
     if (fieldHasTime && fieldHasPiece)
     {
-      sprintf(field_name, fieldPattern,
+      snprintf(field_name, field_name_sz, fieldPattern,
         this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex, loadingPiece + 1);
     }
     else if (fieldHasPiece)
     {
-      sprintf(field_name, fieldPattern, loadingPiece + 1);
+      snprintf(field_name, field_name_sz, fieldPattern, loadingPiece + 1);
     }
     else if (fieldHasTime)
     {
-      sprintf(
-        field_name, fieldPattern, this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
+      snprintf(field_name, field_name_sz, fieldPattern,
+        this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
     }
     else
     {

@@ -393,7 +393,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
 
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);
+  snprintf(addrofthis, sizeof(addrofthis), "%p", this);
   char* aplusthis = addrofthis;
   if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
   {
@@ -412,7 +412,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
   {
     // Set pointer to request
     char addrofrequest[1024];
-    sprintf(addrofrequest, "%p", this->Request);
+    snprintf(addrofrequest, sizeof(addrofrequest), "%p", this->Request);
     char* aplusrequest = addrofrequest;
     if ((addrofrequest[0] == '0') && ((addrofrequest[1] == 'x') || addrofrequest[1] == 'X'))
     {

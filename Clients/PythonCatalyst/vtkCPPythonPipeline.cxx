@@ -273,11 +273,7 @@ void vtkCPPythonPipeline::FixEOL(std::string& str)
 std::string vtkCPPythonPipeline::GetPythonAddress(void* pointer)
 {
   char addressOfPointer[1024];
-#ifdef COPROCESSOR_WIN32_BUILD
-  sprintf_s(addressOfPointer, "%p", pointer);
-#else
-  sprintf(addressOfPointer, "%p", pointer);
-#endif
+  snprintf(addressOfPointer, sizeof(addressOfPointer), "%p", pointer);
   char* aplus = addressOfPointer;
   if ((addressOfPointer[0] == '0') && ((addressOfPointer[1] == 'x') || addressOfPointer[1] == 'X'))
   {
