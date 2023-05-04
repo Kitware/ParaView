@@ -148,9 +148,19 @@ void vtkSMTestDriver::CollectConfiguredOptions()
 #ifdef PARAVIEW_MPI_PREFLAGS
   this->SeparateArguments(PARAVIEW_MPI_PREFLAGS, this->MPIPreFlags);
 #endif
+  if (vtksys::SystemTools::HasEnv("SMTESTDRIVER_MPI_PREFLAGS"))
+  {
+    this->SeparateArguments(
+      vtksys::SystemTools::GetEnv("SMTESTDRIVER_MPI_PREFLAGS"), this->MPIPreFlags);
+  }
 #ifdef PARAVIEW_MPI_POSTFLAGS
   this->SeparateArguments(PARAVIEW_MPI_POSTFLAGS, this->MPIPostFlags);
 #endif
+  if (vtksys::SystemTools::HasEnv("SMTESTDRIVER_MPI_POSTFLAGS"))
+  {
+    this->SeparateArguments(
+      vtksys::SystemTools::GetEnv("SMTESTDRIVER_MPI_POSTFLAGS"), this->MPIPostFlags);
+  }
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
   this->MPIServerNumProcessFlag = buf;
