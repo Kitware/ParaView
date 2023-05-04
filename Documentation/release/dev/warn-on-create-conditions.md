@@ -5,3 +5,5 @@ and relative memory conditions. See ProxyHints.md for the documentation.
 
 WarnOnCreate hint has been added to many filters, which should help
 users avoid out of memory or swapping issues.
+
+![Illustration of a warning on creation of a Clip filter](warn-on-create-conditions.png)
