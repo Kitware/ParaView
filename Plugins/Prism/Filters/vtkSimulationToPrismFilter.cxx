@@ -111,7 +111,6 @@ int vtkSimulationToPrismFilter::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   // create points
-  const vtkIdType numberOfOutputPoints = xFD->GetNumberOfTuples();
   vtkNew<vtkMergeVectorComponents> merge;
   merge->SetContainerAlgorithm(this);
   merge->SetInputData(input);
