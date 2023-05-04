@@ -94,7 +94,7 @@ def recursiveStringCrawl(file: str, context: str, node) -> list:
     elif "ShowInMenu" in node.tag and "category" in node.attrib:
         res.append(translationUnit(file, node.line, context, node.attrib["category"]))
 
-    if "Proxy" in node.tag and "name" in node.attrib:
+    if node.tag.endswith("Proxy") and "name" in node.attrib:
         context = node.attrib["name"]
     for child in node:
         res += recursiveStringCrawl(file, context, child)
