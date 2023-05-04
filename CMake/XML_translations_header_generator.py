@@ -40,7 +40,7 @@ import os
 def translationUnit(file: str, line: int, context: str, content: str) -> str:
     if not content:
         return ""
-    content = content.replace('"', '\\"')
+    content = ' '.join(content.replace('"', '\\"').split())
     res = f"\t//: Real source: {file}:{str(line)} - {context}\n"
     res += f"\tQT_TRANSLATE_NOOP(\"ServerManagerXML\", R\"({content})\"),\n\n"
     return res
@@ -87,16 +87,18 @@ def recursiveStringCrawl(file: str, context: str, node) -> list:
             res.append(translationUnit(file, node.line, context, node.attrib["long_help"]))
         if "short_help" in node.attrib:
             res.append(translationUnit(file, node.line, context, node.attrib["short_help"]))
-    elif "name" in node.attrib and "Property" in node.tag:
+    elif "Property" in node.tag and "name" in node.attrib:
+        res.append(translationUnit(file, node.line, context, createPrettyLabel(node.attrib["name"])))
+    elif node.tag.endswith("Proxy") and "name" in node.attrib:
         res.append(translationUnit(file, node.line, context, createPrettyLabel(node.attrib["name"])))
     elif "ShowInMenu" in node.tag and "category" in node.attrib:
         res.append(translationUnit(file, node.line, context, node.attrib["category"]))
-    elif "name" in node.attrib:
-        res.append(translationUnit(file, node.line, context, node.attrib["name"]))
+
     if "Proxy" in node.tag and "name" in node.attrib:
         context = node.attrib["name"]
     for child in node:
         res += recursiveStringCrawl(file, context, child)
+
     return res
 
 
