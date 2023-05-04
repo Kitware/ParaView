@@ -268,6 +268,20 @@ cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
   "PARAVIEW_USE_MPI" OFF)
 mark_as_advanced(PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
 
+set(PARAVIEW_LOGGING_TIME_PRECISION "3"
+  CACHE STRING "Precision of loguru scope timers. 3=ms, 6=us, 9=ns")
+mark_as_advanced(PARAVIEW_LOGGING_TIME_PRECISION)
+set(known_logging_precisions 3 6 9)
+set_property(CACHE PARAVIEW_LOGGING_TIME_PRECISION
+  PROPERTY
+    STRINGS ${known_logging_precisions})
+if (NOT PARAVIEW_LOGGING_TIME_PRECISION IN_LIST known_logging_precisions)
+  string(REPLACE ";" ", " known_logging_precisions_list "${known_logging_precisions}")
+  message(FATAL_ERROR
+    "`PARAVIEW_LOGGING_TIME_PRECISION` must be one of "
+    "${known_logging_precisions_list}; given '${PARAVIEW_LOGGING_TIME_PRECISION}'")
+endif ()
+
 #========================================================================
 # OBSOLETE OPTIONS: mark obsolete settings
 #========================================================================

@@ -361,6 +361,8 @@ Less common, but potentially useful variables are:
   * `PARAVIEW_USE_CUDA` (default `OFF`): Enable CUDA support in ParaView.
   * `PARAVIEW_USE_HIP` (default `OFF`, requires CMake >= 3.21 and NOT
     `PARAVIEW_USE_CUDA`): Enable HIP support in ParaView.
+  * `PARAVIEW_LOGGING_TIME_PRECISION` (default `3`): Change the precision of
+    times output. Possible values are 3 for ms, 6 for us, 9 for ns.
 
 #### Feature settings
 
