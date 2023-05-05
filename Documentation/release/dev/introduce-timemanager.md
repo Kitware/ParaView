@@ -15,3 +15,5 @@ This rework was a good opportunity to improve the user experience and to fix sev
 including the settings usage for time notation.
 
 For more informations, see the [official documentation](https://docs.paraview.org/en/latest/UsersGuide/animation.html)
+
+![Overview of the TimeManager](TimeManagerOverview.png)

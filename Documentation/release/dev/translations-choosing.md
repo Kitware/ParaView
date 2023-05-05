@@ -12,3 +12,5 @@ If a language is not available anymore, its name will be followed by `(?)` in th
 
 Qt-provided translations for its standard widgets are also loaded, either from the
 translations directory of the Qt installation, or from ParaView resource directory.
+
+![Protoype of french translation](translations-choosing.png)
