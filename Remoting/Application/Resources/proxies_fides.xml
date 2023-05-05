@@ -105,9 +105,9 @@
       <Hints>
         <ReaderFactory extensions="bp"
                        file_description="ADIOS2 BP3 File (using Fides)" />
-        <ReaderFactory extensions="bp"
+        <ReaderFactory extensions="bp bp4 bp5"
                        is_directory="1"
-                       file_description="ADIOS2 BP4 Directory (using Fides)" />
+            file_description="ADIOS2 BP4/5 Directory (using Fides)" />
       </Hints>
     </SourceProxy>
 
