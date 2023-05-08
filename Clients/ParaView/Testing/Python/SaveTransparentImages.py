@@ -35,8 +35,10 @@ renderView1.CameraParallelScale = 17.320508075688775
 
 # save screenshot
 testimage = join(vtkGetTempDir(), "SaveTransparentImages-Test.png")
-SaveScreenshot(testimage, renderView1, ImageResolution=[300, 300],
+SaveScreenshot(testimage, renderView1, saveInBackground = True, ImageResolution=[300, 300],
     TransparentBackground=1)
+
+servermanager.vtkRemoteWriterHelper.Wait(testimage)
 
 testing = vtkTesting()
 for arg in sys.argv:

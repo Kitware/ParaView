@@ -1,5 +1,6 @@
 from paraview.simple import *
 
+from paraview import servermanager
 from paraview.vtk.vtkTestingRendering import vtkTesting
 from os.path import join
 import sys
@@ -18,7 +19,8 @@ r.Representation = "Surface With Edges"
 Render()
 
 fname = join(testing.GetTempDirectory(), "TestStereoSaveScreenshot.png")
-SaveScreenshot(fname, ImageResolution=[800, 800])
+SaveScreenshot(fname, ImageResolution=[800, 800], saveInBackground = True)
+servermanager.vtkRemoteWriterHelper.Wait(fname)
 
 result = testing.RegressionTest(fname, 10)
 if result == testing.DO_INTERACTOR:

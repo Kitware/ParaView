@@ -1318,7 +1318,7 @@ def _SaveScreenshotLegacy(filename,
         return SaveScreenshot(filename, viewOrLayout,
             ImageResolution=imageResolution)
 
-def SaveScreenshot(filename, viewOrLayout=None, **params):
+def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **params):
     """Save screenshot for a view or layout (collection of views) to an image.
 
     `SaveScreenshot` is used to save the rendering results to an image.
@@ -1335,6 +1335,11 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
           the active view is used, if available. To save image from a single
           view, this must be set to a view, to save an image from all views in a
           layout, pass the layout.
+
+        saveInBackground (bool)
+          If set to `True`, the screenshot will be saved by a different thread
+          and run in the background. In such circumstances, one can wait
+          until the file is written by calling `WaitForFile(filename)`.
 
     **Keyword Parameters (optional)**
 
@@ -1439,6 +1444,7 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
     options = servermanager.misc.SaveScreenshot()
     controller.PreInitializeProxy(options)
 
+    options.SaveInBackground = saveInBackground;
     options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False

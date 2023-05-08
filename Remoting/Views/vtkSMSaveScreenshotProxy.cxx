@@ -602,6 +602,8 @@ bool vtkSMSaveScreenshotProxy::WriteImage(
     vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("misc", "RemoteWriterHelper")));
   vtkSMPropertyHelper(remoteWriter, "Writer").Set(format);
   vtkSMPropertyHelper(remoteWriter, "OutputDestination").Set(static_cast<int>(location));
+  vtkSMPropertyHelper(remoteWriter, "TryWritingInBackground")
+    .Set(vtkSMPropertyHelper(this, "SaveInBackground").GetAsInt());
   remoteWriter->UpdateVTKObjects();
 
   vtkTimerLog::MarkStartEvent("Write image to disk");

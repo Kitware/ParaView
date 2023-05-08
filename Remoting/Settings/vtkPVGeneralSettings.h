@@ -355,6 +355,14 @@ public:
   vtkSetMacro(SelectOnClickMultiBlockInspector, bool);
   ///@}
 
+  ///@{
+  /**
+   * Sets the number of threads that are used for `vtkPVSession::ThreadedCallbackQueue`.
+   */
+  int GetNumberOfCallbackThreads();
+  void SetNumberOfCallbackThreads(int);
+  ///@}
+
 protected:
   vtkPVGeneralSettings() = default;
   ~vtkPVGeneralSettings() override = default;

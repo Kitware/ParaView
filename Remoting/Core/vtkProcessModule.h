@@ -23,6 +23,7 @@
 #ifndef vtkProcessModule_h
 #define vtkProcessModule_h
 
+#include "vtkNew.h" // needed for vtkNew
 #include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 #include "vtkSmartPointer.h"       // needed for vtkSmartPointer.
@@ -35,6 +36,7 @@ class vtkNetworkAccessManager;
 class vtkProcessModuleInternals;
 class vtkSession;
 class vtkSessionIterator;
+class vtkThreadedCallbackQueue;
 
 class VTKREMOTINGCORE_EXPORT vtkProcessModule : public vtkObject
 {
@@ -276,6 +278,11 @@ public:
    */
   static int GetNumberOfGhostLevelsToRequest(vtkInformation* outInfo);
 
+  /**
+   * Returns a callback queue in which one can defer tasks that can run asynchronously.
+   */
+  static vtkThreadedCallbackQueue* GetCallbackQueue();
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule() override;
@@ -338,6 +345,7 @@ private:
 
   static vtkSmartPointer<vtkProcessModule> Singleton;
   static vtkSmartPointer<vtkMultiProcessController> GlobalController;
+  static vtkNew<vtkThreadedCallbackQueue> CallbackQueue;
 
   bool MultipleSessionsSupport;
 

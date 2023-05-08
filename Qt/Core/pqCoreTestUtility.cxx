@@ -83,6 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNMWriter.h"
 #include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkRemoteWriterHelper.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMViewLayoutProxy.h"
@@ -432,6 +433,10 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
 bool pqCoreTestUtility::CompareImage(const QString& testPNGImage, const QString& referenceImage,
   double threshold, ostream& output, const QString& tempDirectory)
 {
+  // We need to make sure that all the screenshot saved are entirely written to disk.
+  // This is done by looking at the collected futures in vtkRemoteWriterHelper.
+  vtkRemoteWriterHelper::Wait(testPNGImage.toStdString());
+
   vtkNew<vtkPNGReader> reader;
   if (!reader->CanReadFile(testPNGImage.toUtf8().data()))
   {

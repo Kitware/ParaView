@@ -459,6 +459,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="NumberOfCallbackThreads"
+        command="SetNumberOfCallbackThreads"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the number of threads that are spawned to run certain jobs asynchronously
+          on the root data server rank, or in the client in built-in mode.
+          Saving screenshot is typically delegated to those threads.
+        </Documentation>
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="DefaultTimeStep"
         number_of_elements="1"
         default_values="1">

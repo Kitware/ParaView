@@ -18,11 +18,13 @@
 #include "vtkAlgorithm.h"
 #include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMTrace.h"
+#include "vtkThreadedCallbackQueue.h"
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingAnimation
 #include "vtkSMAnimationScene.h"
@@ -250,6 +252,27 @@ bool vtkPVGeneralSettings::GetUseAcceleratedFilters()
 #else
   return false;
 #endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeneralSettings::GetNumberOfCallbackThreads()
+{
+  return vtkProcessModule::GetCallbackQueue()->GetNumberOfThreads();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetNumberOfCallbackThreads(int n)
+{
+  auto session =
+    vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
+
+  // We change the number of threads in built-in mode or if current process is the root server node
+  if (session->GetProcessRoles() & vtkPVSession::DATA_SERVER_ROOT ||
+    (session->GetProcessRoles() & vtkPVSession::CLIENT &&
+      !session->GetController(vtkPVSession::DATA_SERVER_ROOT)))
+  {
+    vtkProcessModule::GetCallbackQueue()->SetNumberOfThreads(n);
+  }
 }
 
 //----------------------------------------------------------------------------
