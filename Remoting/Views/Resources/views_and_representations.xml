@@ -4404,6 +4404,8 @@
                       panel_visibility="advanced" />
             <Property name="InterpolateScalarsBeforeMapping"
                       panel_visibility="advanced" />
+            <Property name="UseNanColorForMissingArrays"
+                      panel_visibility="advanced" />
           </PropertyGroup>
 
           <PropertyGroup label="Styling">
@@ -13702,6 +13704,18 @@
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetColorMissingArraysWithNanColor"
+                         default_values="0"
+                         name="UseNanColorForMissingArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If any leaves of a composite dataset are missing the
+          color array (that is, the composite dataset has a partial array),
+          the datasets with missing data will be colored using the NaN value
+          set in the color table. Otherwise, the specified Ambient and
+          Diffuse colors will be used.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty command="SetRepresentation"
                             default_values="Surface"
                             name="Representation"

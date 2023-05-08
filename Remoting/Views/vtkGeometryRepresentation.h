@@ -241,6 +241,7 @@ public:
   // Forwarded to Mapper and LODMapper.
   virtual void SetInterpolateScalarsBeforeMapping(int val);
   virtual void SetLookupTable(vtkScalarsToColors* val);
+  virtual void SetColorMissingArraysWithNanColor(bool val);
   virtual void SetSeamlessU(bool);
   virtual void SetSeamlessV(bool);
   ///@{
