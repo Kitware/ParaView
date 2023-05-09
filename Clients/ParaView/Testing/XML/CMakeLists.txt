@@ -931,6 +931,7 @@ SET(TESTS_WITH_BASELINES
   IOSSMergeExodusEntityBlocks.xml
   LogoSource.xml
   MergeVectorComponents.xml
+  MissingPartialArraysColoredByNaN.xml
   MoleculeScalarBar.xml
   NetCDFUGRID.xml
   ParticleTracerGlyph.xml
