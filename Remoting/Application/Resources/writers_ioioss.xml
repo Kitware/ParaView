@@ -642,4 +642,33 @@
     </PWriterProxy>
     <!-- end of  "writers" -->
   </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="extract_writers">
+    <DataExtractWriterProxy name="IOSS"
+                            label="IOSS Exodus">
+      <Documentation>
+        Extract writer to write data using the Exodus file format.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_{timestep:06d}.ex2">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="IOSSWriter"/>
+        <ExposedProperties>
+          <Property name="Input"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data"/>
+      </Hints>
+      <!-- end of IOSS -->
+    </DataExtractWriterProxy>
+    <!-- end of "extract_writers" -->
+  </ProxyGroup>
 </ServerManagerConfiguration>
