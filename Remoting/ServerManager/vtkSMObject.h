@@ -33,6 +33,8 @@ public:
   vtkTypeMacro(vtkSMObject, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  static std::string CreatePrettyLabel(const std::string& name);
+
 protected:
   vtkSMObject();
   ~vtkSMObject() override;

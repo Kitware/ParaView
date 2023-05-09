@@ -51,7 +51,7 @@ def _insertSpace(string: str, index: int) -> str:
 
 
 # This function MUST have the same behavior as
-# vtkSMProperty::CreateNewPrettyLabel()
+# vtkSMObject::CreatePrettyLabel()
 def createPrettyLabel(label: str) -> str:
     """
     Create a proper label from a name.

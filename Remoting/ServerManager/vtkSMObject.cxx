@@ -28,3 +28,38 @@ void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//---------------------------------------------------------------------------
+std::string vtkSMObject::CreatePrettyLabel(const std::string& name)
+{
+  /* Add space hence:
+   "MYSpace" ==> "MY Space"
+   "MYSPACE" ==> "MYSPACE"
+   "My Space" ==> "My Space"
+   "MySPACE" ==> "My SPACE"
+   "MySPace" ==> "My S Pace"
+   "MySPAce" ==> "My SP Ace"
+   "MySPACE" ==> "My SPACE"
+   "MySpACE" ==> "My Sp ACE"
+   "MYSuperSpacer" ==> "MY Super Spacer" */
+
+  std::string label = " " + name + " ";
+  for (std::string::iterator it = label.begin() + 1; it != label.end() - 1; ++it)
+  {
+    if (std::isspace(*(it - 1)) || std::isspace(*(it + 1)))
+    {
+      continue;
+    }
+    if (std::isupper(*it) && std::islower(*(it + 1)))
+    {
+      it = label.insert(it, ' ');
+      continue;
+    }
+    if (std::islower(*it) && std::isupper(*(it + 1)))
+    {
+      it = label.insert(it + 1, ' ');
+      continue;
+    }
+  }
+  return label.substr(1, label.size() - 2);
+}
