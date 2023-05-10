@@ -29,13 +29,35 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSteeringDataGenerator.h"
+#include "vtkStringArray.h"
 #include "vtkVector.h"
+
+#include <numeric> // for std::iota
 
 const char* test_xml = R"(
 <ServerManagerConfiguration>
  <ProxyGroup name="sources">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkSteeringDataGenerator" name="TestSteeringDataGeneratorSource">
+
+      <InputProperty command="SetSelectionConnection"
+                    name="Selection"
+                    panel_visibility="default"
+                    port_index="0">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input that provides the selection object.
+        </Documentation>
+        <Hints>
+          <Optional/>
+          <SelectionInput/>
+        </Hints>
+      </InputProperty>
 
       <IntVectorProperty name="PartitionType"
                          command="SetPartitionType"
@@ -141,6 +163,48 @@ int TestSteeringDataGenerator(int argc, char* argv[])
     vtkVector2<vtkIdType>(idsA->GetPointer(2)) != ids[1])
   {
     vtkLogF(ERROR, "'Id' array mismatch!");
+    return EXIT_FAILURE;
+  }
+
+  // Test with dummy selection as input to check that field data will have 'selection_indices' and
+  // 'selection_fieldtype' array.
+  vtkNew<vtkSelection> selection;
+  vtkNew<vtkSelectionNode> node;
+
+  node->Initialize();
+  node->SetContentType(vtkSelectionNode::INDICES);
+  node->SetFieldType(vtkSelectionNode::CELL);
+
+  vtkNew<vtkIdTypeArray> selIds;
+  selIds->SetNumberOfTuples(10);
+  std::iota(selIds->GetPointer(0), selIds->GetPointer(0) + 10, 0);
+
+  node->SetSelectionList(selIds);
+  selection->AddNode(node);
+
+  algo->AddInputDataObject(0, selection);
+  algo->Update();
+
+  mb = vtkMultiBlockDataSet::SafeDownCast(algo->GetOutputDataObject(0));
+  pld = vtkPolyData::SafeDownCast(mb->GetBlock(0));
+  if (!pld->GetFieldData()->HasArray("selection_indices"))
+  {
+    vtkLogF(ERROR, "Missing field data array named 'selection_indices' ");
+    return EXIT_FAILURE;
+  }
+
+  auto* selectionArray =
+    vtkIntArray::SafeDownCast(pld->GetFieldData()->GetArray("selection_indices"));
+  if (selectionArray->GetNumberOfTuples() != 10)
+  {
+    vtkLogF(ERROR, "Field data array 'selection_indices' expected 10 tuples but got %d",
+      (int)selectionArray->GetNumberOfTuples());
+    return EXIT_FAILURE;
+  }
+
+  if (!pld->GetFieldData()->HasArray("selection_fieldtype"))
+  {
+    vtkLogF(ERROR, "Missing field data array named 'selection_fieldtype' ");
     return EXIT_FAILURE;
   }
 

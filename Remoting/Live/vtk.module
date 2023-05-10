@@ -10,6 +10,7 @@ KIT
   ParaView::ServerManagerKit
 DEPENDS
   ParaView::RemotingServerManager
+  ParaView::VTKExtensionsExtraction
 PRIVATE_DEPENDS
   VTK::CommonSystem
 TEST_DEPENDS
