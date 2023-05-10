@@ -881,6 +881,20 @@ void vtkGeometryRepresentation::SetLookupTable(vtkScalarsToColors* val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetColorMissingArraysWithNanColor(bool val)
+{
+  // Only implemented in OpenGL2, refactor once CPDM2 gets deprecated in VTK.
+  if (auto cpdm2 = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper))
+  {
+    cpdm2->SetColorMissingArraysWithNanColor(val);
+  }
+  if (auto cpdm2 = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper))
+  {
+    cpdm2->SetColorMissingArraysWithNanColor(val);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMapScalars(int val)
 {
   if (val < 0 || val > 1)
