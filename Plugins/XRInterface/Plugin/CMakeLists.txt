@@ -38,6 +38,8 @@ set(sources
   pqXRInterfaceControls.h
   pqXRInterfaceDockPanel.cxx
   pqXRInterfaceDockPanel.h
+  pqXRCustomViewpointsController.h
+  pqXRCustomViewpointsController.cxx
   vtkXRInterfacePolyfill.cxx
   vtkXRInterfacePolyfill.h
   vtkPVXRInterfaceCollaborationClient.cxx

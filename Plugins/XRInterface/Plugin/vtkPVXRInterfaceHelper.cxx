@@ -94,18 +94,6 @@
 #include <sstream>
 #include <thread>
 
-//----------------------------------------------------------------------------
-vtkPVXRInterfaceHelperLocation::vtkPVXRInterfaceHelperLocation()
-{
-  this->Pose = new vtkVRCamera::Pose();
-}
-
-//----------------------------------------------------------------------------
-vtkPVXRInterfaceHelperLocation::~vtkPVXRInterfaceHelperLocation()
-{
-  delete this->Pose;
-}
-
 struct vtkPVXRInterfaceHelper::vtkInternals
 {
   vtkNew<vtkQWidgetWidget> QWidgetWidget;
@@ -114,9 +102,9 @@ struct vtkPVXRInterfaceHelper::vtkInternals
   vtkSmartPointer<vtkRenderWindowInteractor> Interactor;
   vtkTimeStamp PropUpdateTime;
   bool Done = false;
-  std::map<int, vtkVRCamera::Pose> SavedCameraPoses;
-  int LastCameraPoseIndex = 0;
-  std::map<int, vtkPVXRInterfaceHelperLocation> Locations;
+  std::vector<vtkVRCamera::Pose> SavedCameraPoses;
+  std::size_t LastCameraPoseIndex = 0;
+  std::vector<vtkPVXRInterfaceHelperLocation> Locations;
   int LoadLocationValue = -1;
   QVTKOpenGLWindow* ObserverWidget = nullptr;
   vtkNew<vtkOpenGLCamera> ObserverCamera;
@@ -268,6 +256,12 @@ void vtkPVXRInterfaceHelper::RemoveAllCropPlanesAndThickCrops()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::ShowCropPlanes(bool visible)
+{
+  this->Widgets->ShowCropPlanes(visible);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::collabRemoveAllCropPlanes()
 {
   this->Widgets->collabRemoveAllCropPlanes();
@@ -286,7 +280,7 @@ void vtkPVXRInterfaceHelper::AddAThickCrop(vtkTransform* intrans)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SetCropSnapping(int val)
+void vtkPVXRInterfaceHelper::SetCropSnapping(bool val)
 {
   this->Widgets->SetCropSnapping(val);
 }
@@ -363,37 +357,51 @@ void vtkPVXRInterfaceHelper::LoadNextCameraPose()
     return;
   }
 
-  auto lowerIter =
-    this->Internals->SavedCameraPoses.upper_bound(this->Internals->LastCameraPoseIndex);
-  int nextValue = lowerIter != this->Internals->SavedCameraPoses.end()
-    ? lowerIter->first
-    : this->Internals->SavedCameraPoses.begin()->first;
-
-  this->LoadCameraPose(nextValue);
+  this->Internals->LastCameraPoseIndex =
+    (this->Internals->LastCameraPoseIndex + 1) % this->Internals->SavedCameraPoses.size();
+  this->LoadCameraPose(this->Internals->LastCameraPoseIndex);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot)
+QStringList vtkPVXRInterfaceHelper::GetCustomViewpointToolTips()
 {
-  auto p_iter = this->Internals->SavedCameraPoses.find(slot);
-  if (p_iter != this->Internals->SavedCameraPoses.end())
+  QStringList output;
+  for (std::size_t i = 0; i < this->Internals->SavedCameraPoses.size(); ++i)
+  {
+    output << QString::number(i);
+  }
+
+  return output;
+}
+
+//----------------------------------------------------------------------------
+std::size_t vtkPVXRInterfaceHelper::GetNextPoseIndex()
+{
+  return this->Internals->SavedCameraPoses.size();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::LoadPoseInternal(vtkVRRenderWindow* vr_rw, std::size_t slot)
+{
+  if (slot < this->Internals->SavedCameraPoses.size())
   {
     // If we ever add ability to remove camera poses from the SavedCameraPoses
     // map, be sure to check that LastCameraPoseIndex isn't left holding a key
     // which is no longer valid.
     this->Internals->LastCameraPoseIndex = slot;
-    vtkVRCamera::Pose pose = p_iter->second;
+    vtkVRCamera::Pose pose = this->Internals->SavedCameraPoses[slot];
     vtkRenderer* ren = vr_rw->GetRenderers()->GetFirstRenderer();
     vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
     cam->ApplyPoseToCamera(&pose, vr_rw);
     ren->ResetCameraClippingRange();
     // NOLINTNEXTLINE(performance-no-int-to-ptr)
-    this->InvokeEvent(vtkCommand::LoadStateEvent, reinterpret_cast<void*>(slot));
+    auto slotPtr = reinterpret_cast<void*>(static_cast<std::uintptr_t>(slot));
+    this->InvokeEvent(vtkCommand::LoadStateEvent, slotPtr);
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::LoadCameraPose(int slot)
+void vtkPVXRInterfaceHelper::LoadCameraPose(std::size_t slot)
 {
   if (this->Internals->RenderWindow)
   {
@@ -405,19 +413,31 @@ void vtkPVXRInterfaceHelper::LoadCameraPose(int slot)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot)
+void vtkPVXRInterfaceHelper::SavePoseInternal(vtkVRRenderWindow* vr_rw, std::size_t slot)
 {
+  if (slot >= this->Internals->SavedCameraPoses.size())
+  {
+    this->Internals->SavedCameraPoses.resize(slot + 1);
+  }
+
   vtkVRCamera::Pose& pose = this->Internals->SavedCameraPoses[slot];
   vtkRenderer* ren = vr_rw->GetRenderers()->GetFirstRenderer();
   vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
   cam->SetPoseFromCamera(&pose, vr_rw);
   // NOLINTNEXTLINE(performance-no-int-to-ptr)
-  this->InvokeEvent(vtkCommand::SaveStateEvent, reinterpret_cast<void*>(slot));
+  auto slotPtr = reinterpret_cast<void*>(static_cast<std::uintptr_t>(slot));
+  this->InvokeEvent(vtkCommand::SaveStateEvent, slotPtr);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SaveCameraPose(int slot)
+void vtkPVXRInterfaceHelper::SaveCameraPose(std::size_t slot)
 {
+  static constexpr std::size_t maxSlots = 6; // maximum number of saved camera poses
+  if (slot >= maxSlots)
+  {
+    return;
+  }
+
   if (this->Internals->RenderWindow)
   {
     auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
@@ -430,6 +450,14 @@ void vtkPVXRInterfaceHelper::SaveCameraPose(int slot)
       this->SaveLocationState(slot);
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::ClearCameraPoses()
+{
+  this->Internals->SavedCameraPoses.clear();
+  this->Internals->Locations.clear();
+  this->Internals->LastCameraPoseIndex = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -587,16 +615,16 @@ void vtkPVXRInterfaceHelper::ToggleShowControls()
       camDOP.Normalize();
       vtkVector3d vRight;
       vRight = camDOP.Cross(physUp);
-      vtkVector3d center = camPos + camDOP * scale * 2.7;
+      vtkVector3d center = camPos + camDOP * scale * 2.0;
 
       vtkPlaneSource* ps =
         this->Internals->QWidgetWidget->GetQWidgetRepresentation()->GetPlaneSource();
 
-      vtkVector3d pos = center - 2.6 * physUp * scale * aspect - 2.0 * vRight * scale;
+      vtkVector3d pos = center - 1.3 * physUp * scale * aspect - vRight * scale;
       ps->SetOrigin(pos.GetData());
-      pos = center - 2.6 * physUp * scale * aspect + 2.0 * vRight * scale;
+      pos = center - 1.3 * physUp * scale * aspect + vRight * scale;
       ps->SetPoint1(pos.GetData());
-      pos = center + 1.4 * physUp * scale * aspect - 2.0 * vRight * scale;
+      pos = center + 0.7 * physUp * scale * aspect - vRight * scale;
       ps->SetPoint2(pos.GetData());
 
       this->Internals->QWidgetWidget->SetInteractor(this->Internals->Interactor);
@@ -847,9 +875,8 @@ void vtkPVXRInterfaceHelper::HandleDeleteEvent(vtkObject* caller)
   }
 
   // remove the proxy from all visibility lists
-  for (auto& loci : this->Internals->Locations)
+  for (auto& loc : this->Internals->Locations)
   {
-    auto& loc = loci.second;
     for (auto it = loc.Visibility.begin(); it != loc.Visibility.end();)
     {
       if (it->first == proxy)
@@ -872,20 +899,20 @@ void vtkPVXRInterfaceHelper::SaveState(vtkPVXMLElement* root)
   // save the locations
   vtkNew<vtkPVXMLElement> e;
   e->SetName("Locations");
-  for (auto& loci : this->Internals->Locations)
+  for (std::size_t i = 0; i < this->Internals->Locations.size(); ++i)
   {
-    auto& loc = loci.second;
+    auto& loc = this->Internals->Locations[i];
 
-    vtkVRCamera::Pose& pose = *(loc.Pose);
+    vtkVRCamera::Pose& pose = *loc.Pose;
     vtkNew<vtkPVXMLElement> locel;
     locel->SetName("Location");
-    locel->AddAttribute("PoseNumber", loci.first);
+    locel->AddAttribute("PoseNumber", static_cast<int>(i));
 
     // camera pose
     {
       vtkNew<vtkPVXMLElement> el;
       el->SetName("CameraPose");
-      el->AddAttribute("PoseNumber", loci.first);
+      el->AddAttribute("PoseNumber", static_cast<int>(i));
       addVectorAttribute(el, "Position", pose.Position, 3);
       el->AddAttribute("Distance", pose.Distance, 20);
       el->AddAttribute("MotionFactor", pose.MotionFactor, 20);
@@ -901,16 +928,16 @@ void vtkPVXRInterfaceHelper::SaveState(vtkPVXMLElement* root)
     { // regular crops
       vtkNew<vtkPVXMLElement> el;
       el->SetName("CropPlanes");
-      for (auto i : loc.CropPlaneStates)
+      for (auto cps : loc.CropPlaneStates)
       {
         vtkNew<vtkPVXMLElement> child;
         child->SetName("Crop");
-        child->AddAttribute("origin0", i.first[0], 20);
-        child->AddAttribute("origin1", i.first[1], 20);
-        child->AddAttribute("origin2", i.first[2], 20);
-        child->AddAttribute("normal0", i.second[0], 20);
-        child->AddAttribute("normal1", i.second[1], 20);
-        child->AddAttribute("normal2", i.second[2], 20);
+        child->AddAttribute("origin0", cps.first[0], 20);
+        child->AddAttribute("origin1", cps.first[1], 20);
+        child->AddAttribute("origin2", cps.first[2], 20);
+        child->AddAttribute("normal0", cps.second[0], 20);
+        child->AddAttribute("normal1", cps.second[1], 20);
+        child->AddAttribute("normal2", cps.second[2], 20);
         el->AddNestedElement(child);
       }
       locel->AddNestedElement(el);
@@ -923,11 +950,11 @@ void vtkPVXRInterfaceHelper::SaveState(vtkPVXMLElement* root)
       {
         vtkNew<vtkPVXMLElement> child;
         child->SetName("Crop");
-        for (int i = 0; i < 16; ++i)
+        for (int j = 0; j < 16; ++j)
         {
           std::ostringstream o;
-          o << "transform" << i;
-          child->AddAttribute(o.str().c_str(), t[i]);
+          o << "transform" << j;
+          child->AddAttribute(o.str().c_str(), t[j]);
         }
         el->AddNestedElement(child);
       }
@@ -1076,14 +1103,6 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
       this->ApplyState();
     }
 
-    // update the lost of locations in the GUI
-    std::vector<int> locs;
-    for (auto& l : this->Internals->Locations)
-    {
-      locs.push_back(l.first);
-    }
-    this->XRInterfaceControls->SetAvailablePositions(locs);
-
     return;
   }
 
@@ -1147,10 +1166,8 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
     }
   }
 
-  for (auto& loci : this->Internals->Locations)
+  for (auto& loc : this->Internals->Locations)
   {
-    auto& loc = loci.second;
-
     // navigation panel
     e->GetScalarAttribute("NavigationPanel", &loc.NavigationPanelVisibility);
 
@@ -1176,14 +1193,6 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
         }
       }
     }
-
-    // update the lost of locations in the GUI
-    std::vector<int> locs;
-    for (auto& l : this->Internals->Locations)
-    {
-      locs.push_back(l.first);
-    }
-    this->XRInterfaceControls->SetAvailablePositions(locs);
 
     // load thick crops
     {
@@ -1224,12 +1233,12 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
 void vtkPVXRInterfaceHelper::ApplyState()
 {
   // set camera poses
-  for (auto& loci : this->Internals->Locations)
+  for (std::size_t i = 0; i < this->Internals->Locations.size(); ++i)
   {
-    if (loci.second.Pose)
+    if (this->Internals->Locations[i].Pose)
     {
-      auto& src = loci.second.Pose;
-      auto& dst = this->Internals->SavedCameraPoses[loci.first];
+      auto& src = this->Internals->Locations[i].Pose;
+      auto& dst = this->Internals->SavedCameraPoses[i];
 
       dst.Position[0] = src->Position[0];
       dst.Position[1] = src->Position[1];
@@ -1284,12 +1293,12 @@ bool vtkPVXRInterfaceHelper::EventCallback(vtkObject* caller, unsigned long even
     break;
     case vtkCommand::SaveStateEvent:
     {
-      this->SaveLocationState(reinterpret_cast<vtkTypeInt64>(calldata));
+      this->SaveLocationState(reinterpret_cast<std::uintptr_t>(calldata));
     }
     break;
     case vtkCommand::LoadStateEvent:
     {
-      this->Internals->LoadLocationValue = reinterpret_cast<vtkTypeInt64>(calldata);
+      this->Internals->LoadLocationValue = reinterpret_cast<std::intptr_t>(calldata);
     }
     break;
     case vtkCommand::EndPickEvent:
@@ -1324,16 +1333,17 @@ bool vtkPVXRInterfaceHelper::EventCallback(vtkObject* caller, unsigned long even
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::GoToSavedLocation(int pos, double* collabTrans, double* collabDir)
+void vtkPVXRInterfaceHelper::GoToSavedLocation(
+  std::size_t pos, double* collabTrans, double* collabDir)
 {
-  this->CollaborationClient->SetCurrentLocation(pos);
-
-  auto sdi = this->Internals->Locations.find(pos);
-  if (sdi == this->Internals->Locations.end())
+  if (pos >= this->Internals->Locations.size())
   {
     return;
   }
-  auto& loc = sdi->second;
+
+  this->CollaborationClient->SetCurrentLocation(static_cast<int>(pos));
+
+  auto& loc = this->Internals->Locations[pos];
 
   if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow))
   {
@@ -1345,23 +1355,23 @@ void vtkPVXRInterfaceHelper::GoToSavedLocation(int pos, double* collabTrans, dou
   }
   else
   {
-    this->XRInterfacePolyfill->ApplyPose(loc.Pose, this->Renderer, this->Internals->RenderWindow);
-    this->Internals->LoadLocationValue = pos;
+    this->XRInterfacePolyfill->ApplyPose(
+      loc.Pose.get(), this->Renderer, this->Internals->RenderWindow);
+    this->Internals->LoadLocationValue = static_cast<int>(pos);
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::LoadLocationState(int slot)
+void vtkPVXRInterfaceHelper::LoadLocationState(std::size_t slot)
 {
-  auto sdi = this->Internals->Locations.find(slot);
-  if (sdi == this->Internals->Locations.end())
+  if (slot >= this->Internals->Locations.size())
   {
     return;
   }
 
-  this->CollaborationClient->GoToSavedLocation(slot);
+  this->CollaborationClient->GoToSavedLocation(static_cast<int>(slot));
 
-  auto& loc = sdi->second;
+  auto& loc = this->Internals->Locations[slot];
 
   // apply navigation panel
   this->SetShowNavigationPanel(loc.NavigationPanelVisibility);
@@ -1377,9 +1387,9 @@ void vtkPVXRInterfaceHelper::LoadLocationState(int slot)
     vtkSMProperty* prop = repr ? repr->GetProperty("Visibility") : nullptr;
     if (prop)
     {
-      auto ri = sdi->second.Visibility.find(repr);
+      auto ri = loc.Visibility.find(repr);
       bool vis = (vtkSMPropertyHelper(repr, "Visibility").GetAsInt() != 0 ? true : false);
-      if (ri != sdi->second.Visibility.end() && vis != ri->second)
+      if (ri != loc.Visibility.end() && vis != ri->second)
       {
         vtkSMPropertyHelper(repr, "Visibility").Set((ri->second ? 1 : 0));
         repr->UpdateVTKObjects();
@@ -1401,23 +1411,19 @@ void vtkPVXRInterfaceHelper::LoadLocationState(int slot)
     this->AddAThickCrop(t);
   }
 
-  this->XRInterfaceControls->SetCurrentPosition(slot);
-  this->XRInterfaceControls->SetCurrentScaleFactor(loc.Pose->Distance);
   this->XRInterfaceControls->SetCurrentMotionFactor(loc.Pose->MotionFactor);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SaveLocationState(int slot)
+void vtkPVXRInterfaceHelper::SaveLocationState(std::size_t slot)
 {
-  vtkPVXRInterfaceHelperLocation& sd = this->Internals->Locations[slot];
-
-  auto p_iter = this->Internals->SavedCameraPoses.find(slot);
-  if (p_iter == this->Internals->SavedCameraPoses.end())
+  if (slot >= this->Internals->Locations.size())
   {
-    return;
+    this->Internals->Locations.resize(slot + 1);
   }
 
-  *sd.Pose = p_iter->second;
+  vtkPVXRInterfaceHelperLocation& sd = this->Internals->Locations[slot];
+  *sd.Pose = this->Internals->SavedCameraPoses[slot];
 
   this->Widgets->SaveLocationState(sd);
 
@@ -1432,14 +1438,6 @@ void vtkPVXRInterfaceHelper::SaveLocationState(int slot)
         (vtkSMPropertyHelper(repr, "Visibility").GetAsInt() != 0 ? true : false);
     }
   }
-
-  // update the lost of locations in the GUI
-  std::vector<int> locs;
-  for (auto& l : this->Internals->Locations)
-  {
-    locs.push_back(l.first);
-  }
-  this->XRInterfaceControls->SetAvailablePositions(locs);
 }
 
 //----------------------------------------------------------------------------
@@ -2087,10 +2085,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
     this->SetRightTriggerMode(vtkPVXRInterfaceHelper::PICK);
     this->XRInterfaceControls->SetRightTriggerMode(vtkPVXRInterfaceHelper::PICK);
     this->XRInterfaceControls->SetMovementStyle(vtkVRInteractorStyle::FLY_STYLE);
-    this->XRInterfaceControls->SetCurrentScaleFactor(1);
     this->XRInterfaceControls->SetCurrentMotionFactor(1);
-    this->XRInterfaceControls->SetCurrentSavedPosition(-1);
-    this->XRInterfaceControls->SetCurrentPosition(-1);
     this->XRInterfaceControls->SetShowFloor(true);
     this->XRInterfaceControls->SetInteractiveRay(false);
     this->XRInterfaceControls->SetNavigationPanel(false);

@@ -110,8 +110,7 @@ void writeTextureReference(vtkXMLDataElement* adatael, vtkTexture* texture, cons
 
 //-----------------------------------------------------------------------------
 void vtkPVXRInterfaceExporter::ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper* helper,
-  vtkSMViewProxy* smview, std::map<int, vtkPVXRInterfaceHelperLocation>& locations,
-  vtkRenderer* ren)
+  vtkSMViewProxy* smview, std::vector<vtkPVXRInterfaceHelperLocation>& locations, vtkRenderer* ren)
 {
   auto* view = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
   vtkRenderer* pvRenderer = view->GetRenderView()->GetRenderer();
@@ -160,17 +159,15 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper*
           "\"arguments\": { \"poseIndex\": { \"values\": [";
 
   int count = 0;
-  for (auto& loci : locations)
+  for (std::size_t i = 0; i < locations.size(); ++i)
   {
-    auto& loc = loci.second;
     // create subdir for each pose
     std::ostringstream sdir;
     sdir << dir << count;
     vtksys::SystemTools::MakeDirectory(sdir.str());
 
-    helper->LoadLocationState(loci.first);
-
-    auto& camPose = *loc.Pose;
+    helper->LoadLocationState(i);
+    auto& camPose = *locations[i].Pose;
 
     renWin->Render();
 
@@ -263,7 +260,7 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper*
 
 //-----------------------------------------------------------------------------
 void vtkPVXRInterfaceExporter::ExportLocationsAsView(vtkPVXRInterfaceHelper* helper,
-  vtkSMViewProxy* smview, std::map<int, vtkPVXRInterfaceHelperLocation>& locations)
+  vtkSMViewProxy* smview, std::vector<vtkPVXRInterfaceHelperLocation>& locations)
 {
   auto* view = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
   vtkRenderer* pvRenderer = view->GetRenderView()->GetRenderer();
@@ -301,12 +298,11 @@ void vtkPVXRInterfaceExporter::ExportLocationsAsView(vtkPVXRInterfaceHelper* hel
   vtkNew<vtkXMLDataElement> posesel;
   posesel->SetName("CameraPoses");
   size_t count = 0;
-  for (auto& loci : locations)
+  for (std::size_t i = 0; i < locations.size(); ++i)
   {
-    auto& loc = loci.second;
-    vtkVRCamera::Pose& pose = *loc.Pose;
+    vtkVRCamera::Pose& pose = *locations[i].Pose;
 
-    helper->LoadLocationState(loci.first);
+    helper->LoadLocationState(i);
 
     QCoreApplication::processEvents();
     smview->StillRender();

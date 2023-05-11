@@ -24,7 +24,7 @@
 #include <map> // for ivar
 
 class vtkSMViewProxy;
-class vtkPVXRInterfaceHelperLocation;
+struct vtkPVXRInterfaceHelperLocation;
 class vtkPVXRInterfaceHelper;
 class vtkRenderer;
 
@@ -37,14 +37,14 @@ public:
   // export the data for each saved location
   // as a skybox
   void ExportLocationsAsSkyboxes(vtkPVXRInterfaceHelper* helper, vtkSMViewProxy* view,
-    std::map<int, vtkPVXRInterfaceHelperLocation>& locations, vtkRenderer* ren);
+    std::vector<vtkPVXRInterfaceHelperLocation>& locations, vtkRenderer* ren);
 
   // export the data for each saved location
   // in a form mineview can load. Bacially
   // as imple XML format with the surface geometry
   // stored as vtp files.
   void ExportLocationsAsView(vtkPVXRInterfaceHelper* helper, vtkSMViewProxy* view,
-    std::map<int, vtkPVXRInterfaceHelperLocation>& locations);
+    std::vector<vtkPVXRInterfaceHelperLocation>& locations);
 
 protected:
   vtkPVXRInterfaceExporter(){};
