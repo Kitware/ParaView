@@ -76,7 +76,7 @@
         <item>
          <widget class="QComboBox" name="chooseBackendCombo">
           <property name="toolTip">
-           <string>"When sending to VR, both OpenVR and OpenXR runtimes are available.  This option determines which should be used."</string>
+           <string>&quot;When sending to VR, both OpenVR and OpenXR runtimes are available.  This option determines which should be used.&quot;</string>
           </property>
          </widget>
         </item>
@@ -125,114 +125,6 @@
          <string>Export Locations as Skyboxes</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLineEdit" name="cropThickness">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>60</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string extracomment="Thickness to use for new thick crops. A value of 0 defaults to automatic thickness."/>
-          </property>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="cropThicknessLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="toolTip">
-           <string extracomment="When using thick cropping planes this specifies the thickness of those planes."/>
-          </property>
-          <property name="text">
-           <string>Crop Thickness</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="scalarFieldLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Editable Field</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="editableField">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="toolTip">
-           <string extracomment="What scalar field can be edited in XR. This is an advanced feature still in development. You must specify field values below for this to work and the editable field specified must be a scalar array present in your data."/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="fieldValuesLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Field Values</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="fieldValues">
-          <property name="toolTip">
-           <string extracomment="The options available when editing a field in XR. These values, text or numeric will be stored in the currently selected point/cell for the specified editable field array above. This is in development."/>
-          </property>
-          <property name="text">
-           <string>Yes, No</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </item>
       <item>
        <widget class="Line" name="imagoLine">
@@ -501,9 +393,6 @@
   <tabstop>showXRViewButton</tabstop>
   <tabstop>exportLocationsAsViewButton</tabstop>
   <tabstop>exportLocationsAsSkyboxesButton</tabstop>
-  <tabstop>cropThickness</tabstop>
-  <tabstop>editableField</tabstop>
-  <tabstop>fieldValues</tabstop>
   <tabstop>imagoUserValue</tabstop>
   <tabstop>imagoPasswordValue</tabstop>
   <tabstop>imagoWorkspaceCombo</tabstop>

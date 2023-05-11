@@ -86,18 +86,10 @@ void pqXRInterfaceDockPanel::constructor()
   connect(this->Internals->Ui.exportLocationsAsViewButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsView()));
 
-  connect(this->Internals->Ui.editableField, SIGNAL(textChanged(const QString&)), this,
-    SLOT(editableFieldChanged(const QString&)));
-  connect(this->Internals->Ui.fieldValues, SIGNAL(textChanged(const QString&)), this,
-    SLOT(fieldValuesChanged(const QString&)));
-
   QObject::connect(this->Internals->Ui.multisamples, &QCheckBox::stateChanged,
     [&](int state) { this->Internals->Helper->SetMultiSample(state == Qt::Checked); });
   QObject::connect(this->Internals->Ui.baseStationVisibility, &QCheckBox::stateChanged,
     [&](int state) { this->Internals->Helper->SetBaseStationVisibility(state == Qt::Checked); });
-
-  connect(this->Internals->Ui.cropThickness, SIGNAL(textChanged(const QString&)), this,
-    SLOT(defaultCropThicknessChanged(const QString&)));
 
   connect(pqApplicationCore::instance(), SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
     this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
@@ -289,25 +281,6 @@ void pqXRInterfaceDockPanel::constructor()
 }
 
 //-----------------------------------------------------------------------------
-void pqXRInterfaceDockPanel::editableFieldChanged(const QString& text)
-{
-  this->Internals->Helper->SetEditableField(text.toUtf8().data());
-}
-
-//-----------------------------------------------------------------------------
-void pqXRInterfaceDockPanel::fieldValuesChanged(const QString& text)
-{
-  // Split string with comma as separator and remove extra whitespaces
-  QStringList list = text.split(u',');
-  for (auto& str : list)
-  {
-    str = str.trimmed();
-  }
-
-  this->Internals->XRInterfaceControls->SetFieldValues(list);
-}
-
-//-----------------------------------------------------------------------------
 void pqXRInterfaceDockPanel::sendToXRInterface()
 {
   if (!this->Internals->XREnabled)
@@ -467,18 +440,8 @@ void pqXRInterfaceDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator*
       this->Internals->Helper->SetMultiSample(ms);
       this->Internals->Ui.multisamples->setCheckState(ms ? Qt::Checked : Qt::Unchecked);
     }
-    double dcropThickness = 0;
-    if (e->GetScalarAttribute("DefaultCropThickness", &dcropThickness))
-    {
-      this->Internals->Ui.cropThickness->setText(QString::number(dcropThickness));
-    }
 
-    std::string tmp = e->GetAttributeOrEmpty("EditableField");
-    this->Internals->Ui.editableField->setText(QString(tmp.c_str()));
-    tmp = e->GetAttributeOrEmpty("FieldValues");
-    this->Internals->Ui.fieldValues->setText(QString(tmp.c_str()));
-
-    tmp = e->GetAttributeOrEmpty("CollaborationServer");
+    std::string tmp = e->GetAttributeOrEmpty("CollaborationServer");
     if (!tmp.empty())
     {
       this->Internals->Ui.cServerValue->setText(QString(tmp.c_str()));
@@ -550,9 +513,6 @@ void pqXRInterfaceDockPanel::saveState(vtkPVXMLElement* root)
 {
   vtkNew<vtkPVXMLElement> e;
   e->SetName("XRInterface");
-
-  e->AddAttribute("EditableField", this->Internals->Ui.editableField->text().toUtf8().data());
-  e->AddAttribute("FieldValues", this->Internals->Ui.fieldValues->text().toUtf8().data());
 
   e->AddAttribute(
     "BaseStationVisibility", this->Internals->Helper->GetBaseStationVisibility() ? 1 : 0);
