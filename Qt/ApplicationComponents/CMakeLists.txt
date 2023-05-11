@@ -83,6 +83,8 @@ set(classes
   pqCustomizeShortcutsDialog
   pqCheckableProperty
   pqCoordinateFramePropertyWidget
+  pqCustomViewpointsController
+  pqCustomViewpointsDefaultController
   pqCustomViewpointsToolbar
   pqCylinderPropertyWidget
   pqDataAssemblyPropertyWidget
