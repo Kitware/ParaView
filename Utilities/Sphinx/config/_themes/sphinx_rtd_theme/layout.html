@@ -41,12 +41,8 @@
   {%- endfor -%}
 
   {#- FAVICON #}
-  {%- if favicon %}
-    {%- if sphinx_version_info < (4, 0) -%}
-    <link rel="shortcut icon" href="{{ pathto('_static/' + favicon, 1) }}"/>
-    {%- else %}
+  {%- if favicon_url %}
     <link rel="shortcut icon" href="{{ favicon_url }}"/>
-    {%- endif %}
   {%- endif -%}
 
   {#- CANONICAL URL (deprecated) #}
@@ -135,10 +131,8 @@
 
           <ul>
             <li> <a href="{{ pathto(master_doc) }}">
-              {%- if logo %}
-              <img src="{{ pathto('_static/' + logo, 1) }}" alt="{{ project }}"></img>
-              {%- endif %}
-              </a> </li>
+              <img src="{{ pathto('_static/' + logo_url, 1) }}" alt="{{ project }}"></img>
+            </a> </li>
             <li class="version"> version {{ release }}</li>
           </ul>
 
