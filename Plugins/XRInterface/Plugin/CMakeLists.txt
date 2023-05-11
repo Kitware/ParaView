@@ -130,6 +130,7 @@ endif()
 set_property(
   SOURCE
   vtkPVXRInterfaceCollaborationClient.cxx
+  pqXRInterfaceControls.cxx
   APPEND PROPERTY
     COMPILE_DEFINITIONS "XRINTERFACE_HAS_COLLABORATION=$<BOOL:${VTK_ENABLE_VR_COLLABORATION}>")
 

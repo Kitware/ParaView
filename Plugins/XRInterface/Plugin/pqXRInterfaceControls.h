@@ -55,39 +55,14 @@ public:
   void SetMovementStyle(vtkVRInteractorStyle::MovementStyle style);
 
   /**
-   * Set the available camera pose indices of the Load Camera Pose combobox.
-   */
-  void SetAvailablePositions(std::vector<int> const& slots);
-
-  /**
-   * Set the value of the Save Camera Pose combobox.
-   */
-  void SetCurrentSavedPosition(int val);
-
-  /**
-   * Set the value of the Load Camera Pose combobox.
-   */
-  void SetCurrentPosition(int val);
-
-  /**
    * Set the value of the Motion Factor combobox.
    */
   void SetCurrentMotionFactor(double val);
 
   /**
-   * Set the value of the Scale Factor combobox.
-   */
-  void SetCurrentScaleFactor(double val);
-
-  /**
    * Set the value of the View Up combobox.
    */
   void SetCurrentViewUp(std::string dir);
-
-  /**
-   * Set the available values of the Field Value combobox.
-   */
-  void SetFieldValues(const QStringList& values);
 
   /**
    * Set check state of the Show Floor checkbox.
@@ -112,7 +87,6 @@ public:
 protected Q_SLOTS:
   void resetCamera();
   void resetPositions();
-  void assignFieldValue();
 
 private:
   void constructor(vtkPVXRInterfaceHelper* val);

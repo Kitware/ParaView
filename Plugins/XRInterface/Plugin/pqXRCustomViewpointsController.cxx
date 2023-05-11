@@ -53,7 +53,7 @@ void pqXRCustomViewpointsController::applyCustomViewpoint(int index)
 void pqXRCustomViewpointsController::deleteCustomViewpoint(int index)
 {
   // N/A
-  static_cast<void>(index); // suppress unused warning
+  Q_UNUSED(index);
 }
 
 //----------------------------------------------------------------------------

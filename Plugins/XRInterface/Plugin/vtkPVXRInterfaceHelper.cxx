@@ -432,7 +432,7 @@ void vtkPVXRInterfaceHelper::SavePoseInternal(vtkVRRenderWindow* vr_rw, std::siz
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SaveCameraPose(std::size_t slot)
 {
-  static constexpr std::size_t maxSlots = 6; // maximum number of saved camera poses
+  constexpr std::size_t maxSlots = 6; // maximum number of saved camera poses
   if (slot >= maxSlots)
   {
     return;
