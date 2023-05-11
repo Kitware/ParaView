@@ -32,17 +32,6 @@ void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 std::string vtkSMObject::CreatePrettyLabel(const std::string& name)
 {
-  /* Add space hence:
-   "MYSpace" ==> "MY Space"
-   "MYSPACE" ==> "MYSPACE"
-   "My Space" ==> "My Space"
-   "MySPACE" ==> "My SPACE"
-   "MySPace" ==> "My S Pace"
-   "MySPAce" ==> "My SP Ace"
-   "MySPACE" ==> "My SPACE"
-   "MySpACE" ==> "My Sp ACE"
-   "MYSuperSpacer" ==> "MY Super Spacer" */
-
   std::string label = " " + name + " ";
   for (std::string::iterator it = label.begin() + 1; it != label.end() - 1; ++it)
   {

@@ -33,6 +33,23 @@ public:
   vtkTypeMacro(vtkSMObject, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  /**
+   * Return a well-formated label using provided name by adding
+   * spaces between lower cases and upper cases:
+   *
+   * "MYSpace" ==> "MY Space"
+   * "MYSPACE" ==> "MYSPACE"
+   * "My Space" ==> "My Space"
+   * "MySPACE" ==> "My SPACE"
+   * "MySPace" ==> "My S Pace"
+   * "MySPAce" ==> "My SP Ace"
+   * "MySPACE" ==> "My SPACE"
+   * "MySpACE" ==> "My Sp ACE"
+   * "MYSuperSpacer" ==> "MY Super Spacer"
+   *
+   * Please note non-alphabetical char are not handled and may require manual
+   * creation of a label instead of relying on this method.
+   */
   static std::string CreatePrettyLabel(const std::string& name);
 
 protected:
