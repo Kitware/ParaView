@@ -2457,6 +2457,7 @@
 
     <!-- ================================================================== -->
     <Proxy name="GridAxes3DActor"
+           label="Grid Axes 3D Actor"
            class="vtkPVGridAxes3DActor"
            processes="client|dataserver|renderserver">
       <Documentation>
