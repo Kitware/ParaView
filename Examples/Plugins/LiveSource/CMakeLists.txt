@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.1...3.13 FATAL_ERROR)
+project(LiveSourceDummy)
+
+if (NOT ParaView_BINARY_DIR)
+  find_package(ParaView REQUIRED)
+endif()
+
+enable_testing()
+
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+
+paraview_plugin_scan(
+  PLUGIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/LiveSourceDummy.plugin"
+  ENABLE_BY_DEFAULT ON
+  HIDE_PLUGINS_FROM_CACHE ON
+  PROVIDES_PLUGINS  plugins
+  REQUIRES_MODULES  required_modules)
+
+foreach(module IN LISTS required_modules)
+  if(NOT TARGET "${module}")
+    message("Missing required module: ${module}")
+    return()
+  endif()
+endforeach()
+
+paraview_plugin_build(
+  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
+  PLUGINS ${plugins})

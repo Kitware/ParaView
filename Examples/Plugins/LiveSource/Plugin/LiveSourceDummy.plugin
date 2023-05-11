@@ -1,0 +1,7 @@
+NAME
+  LiveSourceDummy
+DESCRIPTION
+  A plugin that adds a dummy live source.
+REQUIRES_MODULES
+  VTK::CommonDataModel
+  VTK::FiltersCore
