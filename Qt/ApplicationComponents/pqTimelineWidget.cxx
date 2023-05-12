@@ -671,13 +671,12 @@ void pqTimelineWidget::addCueTrack(pqAnimationCue* cue)
     newRow[pqTimelineColumn::TIMELINE]->setData(toolTip, Qt::ToolTipRole);
   }
 
+  this->Internals->Cues[cue->getSMName()] = cue;
   this->Internals->updateCueKeyframesData(cue, newRow);
 
   this->connect(
     cue, &pqAnimationCue::keyframesModified, this, &pqTimelineWidget::updateCueTracksData);
   this->connect(cue, &pqAnimationCue::enabled, this, &pqTimelineWidget::updateCueTracksState);
-
-  this->Internals->Cues[cue->getSMName()] = cue;
 }
 
 //-----------------------------------------------------------------------------
