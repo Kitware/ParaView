@@ -48,6 +48,11 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/1QInputDialog0" command="key" arguments="16777220" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.1.0,MySource" />
 
+  <!-- set start time -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/StartTime" command="set_string" arguments="0.001" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/StartTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="0.001" />
   <!-- set end time and reset -->
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/EndTime" command="set_string" arguments="0.002" />
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/EndTime" command="key" arguments="16777220" />

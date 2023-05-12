@@ -143,13 +143,25 @@ struct pqTimelineItemDelegate::pqInternals
 
     // Avoid Start == End. As validator is an inclusive range, use some epsilon.
     QObject::connect(this->EditStart, &pqDoubleLineEdit::editingFinished, [&]() {
+      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+      pqAnimationScene* scene = animationManager->getActiveScene();
       this->EndValidator->setBottom(
-        this->EditStart->text().toDouble() + std::numeric_limits<double>::epsilon());
+        vtkSMPropertyHelper(scene->getProxy()->GetProperty("StartTime")).GetAsDouble() +
+        std::numeric_limits<double>::epsilon());
     });
+
     QObject::connect(this->EditEnd, &pqDoubleLineEdit::editingFinished, [&]() {
+      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+      pqAnimationScene* scene = animationManager->getActiveScene();
       this->StartValidator->setTop(
-        this->EditStart->text().toDouble() - std::numeric_limits<double>::epsilon());
+        vtkSMPropertyHelper(scene->getProxy()->GetProperty("EndTime")).GetAsDouble() -
+        std::numeric_limits<double>::epsilon());
     });
+
+    QObject::connect(
+      this->EditStart, &pqDoubleLineEdit::textChanged, [&]() { this->EditStart->adjustSize(); });
+    QObject::connect(
+      this->EditEnd, &pqDoubleLineEdit::textChanged, [&]() { this->EditEnd->adjustSize(); });
   }
 };
 
