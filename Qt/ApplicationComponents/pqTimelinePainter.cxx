@@ -132,6 +132,9 @@ void pqTimelinePainter::paintTimeTrack(
   // draw labels on the top half
   QStyleOptionViewItem labelOption = option;
   labelOption.rect.adjust(0, 0, 0, -0.5 * height);
+
+  this->Internals->LabelRects.clear();
+
   this->paintTimeline(painter, sourceOption, item, true, labelOption);
 
   this->paintSceneCurrentTime(painter, sourceOption);
@@ -270,11 +273,6 @@ void pqTimelinePainter::paintTimeline(QPainter* painter, const QStyleOptionViewI
 {
   painter->save();
   std::vector<double> times = this->getTimes(item);
-
-  if (paintLabels)
-  {
-    this->Internals->LabelRects.clear();
-  }
 
   // if not enough timesteps
   if (times.size() < 2)
