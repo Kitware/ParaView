@@ -78,39 +78,39 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void updateTimeTrackFromScene();
 
-  ///@{
-  /**
+  /** @name Scene update
    * Update the AnimationScene from the timeline track states.
    */
-  // Update the scene and underlying timekeeper from the sources track states.
+  ///@{
+  /// Update the scene and underlying timekeeper from the sources track states.
   void updateSceneFromEnabledSources();
-  // Update the cues from the animation tracks.
+  /// Update the cues from the animation tracks.
   void updateSceneFromEnabledAnimations();
   ///@}
 
-  ///@{
-  /**
+  /** @name Track update
    * Update track data when proxy is updated
    */
-  // Update DisplayRole and REGISTRATIONNAME data
+  ///@{
+  /// Update DisplayRole and REGISTRATIONNAME data
   void renameTrackFromProxy(pqServerManagerModelItem* item);
-  // Update SOURCETIME data
+  /// Update SOURCETIME data
   void updateSourceTimeFromProxy(pqServerManagerModelItem* item);
-  // Update cue cache. Useful to cleanup on proxy removal.
+  /// Update cue cache. Useful to cleanup on proxy removal.
   void updateCueCache(const QString& group, const QString& name, vtkSMProxy* proxy);
   ///@}
 
-  ///@{
-  /**
+  /** @name Cue update
    * Update animation tracks when cues changes.
    */
-  // Add a track for new cue.
+  ///@{
+  /// Add a track for new cue.
   void addCueTrack(pqAnimationCue* cue);
-  // Remove the track from cue.
+  /// Remove the track from cue.
   void removeCueTrack(pqAnimationCue* cue);
-  // Update track data from cue keyframes.
+  /// Update track data from cue keyframes.
   void updateCueTracksData();
-  // Update track checkstate from cue enabled state.
+  /// Update track checkstate from cue enabled state.
   void updateCueTracksState();
   ///@}
 
