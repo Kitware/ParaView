@@ -471,9 +471,9 @@ def setattr(proxy, pname, value):
         if pname == "MergePoints":
             if compatibility_version < (5, 12):
                 if value:
-                    proxy.GetProperty("Locator").SetData("Uniform Binning")
+                    proxy.GetProperty("Locator").SetData("UniformBinning")
                 else:
-                    proxy.GetProperty("Locator").SetData("Don't Merge Points")
+                    proxy.GetProperty("Locator").SetData("NotMergingPoints")
                 raise Continue()
             else:
                 raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
@@ -542,6 +542,15 @@ def setattr_fix_value(proxy, pname, value, setter_func):
                                'UpperCenter': 'Upper Center'}
         new_value = window_location_map[value]
         if compatibility_version <= (5, 9):
+            setter_func(proxy, new_value)
+            raise Continue()
+        else:
+            raise NotSupportedException("%s is an obsolete value. Use %s instead." % (value, new_value))
+
+    if pname == "PointMergeMethod" and proxy.SMProxy.GetXMLName() in ["Contour", "Cut", "GenericContour"]:
+        if compatibility_version < (5, 12):
+            if value == "Don't Merge Points":
+                new_value = "NotMergingPoints"
             setter_func(proxy, new_value)
             raise Continue()
         else:
