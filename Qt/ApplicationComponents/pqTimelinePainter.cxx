@@ -414,13 +414,28 @@ bool pqTimelinePainter::isTimeTrack(QStandardItem* item)
 }
 
 //-----------------------------------------------------------------------------
+bool pqTimelinePainter::isAnimationTrack(QStandardItem* item)
+{
+  QVariant dataVariant = item->data(pqTimelineItemRole::TYPE);
+  return dataVariant.toInt() == pqTimelineTrack::ANIMATION;
+}
+
+//-----------------------------------------------------------------------------
 std::vector<double> pqTimelinePainter::getTimes(QStandardItem* item)
 {
   std::vector<double> times;
   QVariant dataVariant = item->data(pqTimelineItemRole::TIMES);
   for (auto time : dataVariant.toList())
   {
-    times.push_back(time.toDouble());
+    double adjustedTime = time.toDouble();
+    // animation keyframes store relative times.
+    if (this->isAnimationTrack(item))
+    {
+      adjustedTime =
+        this->SceneStartTime + adjustedTime * (this->SceneEndTime - this->SceneStartTime);
+    }
+
+    times.push_back(adjustedTime);
   }
 
   return times;
