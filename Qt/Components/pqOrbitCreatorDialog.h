@@ -58,9 +58,9 @@ public:
   QList<QVariant> orbitPoints(int resolution) const;
 
   /**
-   * Returns the center for the orbit.
+   * Returns the normal of the orbit.
    */
-  QList<QVariant> center() const;
+  QVector3D normal() const;
 
   void setNormal(double xyz[3]);
   void setCenter(double xyz[3]);

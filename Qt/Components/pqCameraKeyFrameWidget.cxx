@@ -264,6 +264,12 @@ void pqCameraKeyFrameWidget::setFocalPoints(const std::vector<double>& focals)
 }
 
 //-----------------------------------------------------------------------------
+void pqCameraKeyFrameWidget::setViewUp(double viewUp[3])
+{
+  this->Internal->setViewUp(viewUp);
+}
+
+//-----------------------------------------------------------------------------
 /// Initialize the widget using the values from the key frame proxy.
 void pqCameraKeyFrameWidget::initializeUsingKeyFrame(vtkSMProxy* keyFrame)
 {
