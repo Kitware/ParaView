@@ -105,6 +105,26 @@ public:
    */
   double positionFromTime(double time, const QStyleOptionViewItem& option);
 
+  /**
+   * Return the time of the corresponding position.
+   * If given index has stored times, return the nearest one.
+   */
+  double timeFromPosition(double pos, const QStyleOptionViewItem& option, const QModelIndex& index);
+
+  ///@{
+  /**
+   * Extract information from the item data.
+   */
+  // return true if item is the main time track
+  bool isTimeTrack(QStandardItem* item);
+  // get item times using relevant data role.
+  std::vector<double> getTimes(QStandardItem* item);
+  // get source time using relevant data role.
+  double getSourceTime(QStandardItem* item);
+  // return label for given index
+  QString getLabel(QStandardItem* item, int index);
+  ///@}
+
 protected:
   ///@{
   /**
@@ -140,20 +160,6 @@ protected:
   // Do not add label that collides on previously added labels.
   bool paintLabel(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
     double time, const QString& label);
-  ///@}
-
-  ///@{
-  /**
-   * Extract information from the item data.
-   */
-  // return true if item is the main time track
-  bool isTimeTrack(QStandardItem* item);
-  // get item times using relevant data role.
-  std::vector<double> getTimes(QStandardItem* item);
-  // get source time using relevant data role.
-  double getSourceTime(QStandardItem* item);
-  // return label for given index
-  QString getLabel(QStandardItem* item, int index);
   ///@}
 
   double SceneCurrentTime = 0;

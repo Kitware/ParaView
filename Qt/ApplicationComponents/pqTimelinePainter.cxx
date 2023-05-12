@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqTimelineModel.h"
 
+#include "vtkMathUtilities.h"
+
 #include <QModelIndex>
 #include <QPainter>
 #include <QStandardItem>
@@ -354,6 +356,43 @@ void pqTimelinePainter::paintSourcePipelineTime(
   double pos = this->positionFromTime(this->getSourceTime(item), option);
   this->paintTimeMark(painter, option, pos);
   painter->restore();
+}
+
+//-----------------------------------------------------------------------------
+double pqTimelinePainter::timeFromPosition(
+  double pos, const QStyleOptionViewItem& option, const QModelIndex& index)
+{
+  auto model = dynamic_cast<const QStandardItemModel*>(index.model());
+  auto item = model->itemFromIndex(index);
+
+  double width = option.rect.width();
+  double clickedTime = this->SceneStartTime +
+    (this->SceneEndTime - this->SceneStartTime) * (pos - option.rect.x()) / width;
+
+  auto times = this->getTimes(item);
+  if (times.empty())
+  {
+    return clickedTime;
+  }
+
+  double time = times[0];
+  for (auto sceneTime : times)
+  {
+    if (vtkMathUtilities::FuzzyCompare(clickedTime, sceneTime))
+    {
+      return clickedTime;
+    }
+
+    double tolerance = (sceneTime - time);
+    if (sceneTime - tolerance / 2 > clickedTime)
+    {
+      return time;
+    }
+
+    time = sceneTime;
+  }
+
+  return time;
 }
 
 //-----------------------------------------------------------------------------
