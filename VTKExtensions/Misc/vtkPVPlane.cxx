@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVPlane.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -18,25 +18,44 @@
 
 #include <cmath>
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlane);
+
 //----------------------------------------------------------------------------
 vtkPVPlane::vtkPVPlane()
+  : Offset(0.0)
+  , AxisAligned(false)
 {
-  this->Plane = vtkPlane::New();
-  this->Offset = 0;
-  this->AxisAligned = false;
 }
 
 //----------------------------------------------------------------------------
-vtkPVPlane::~vtkPVPlane()
+vtkPVPlane::~vtkPVPlane() = default;
+
+//----------------------------------------------------------------------------
+void vtkPVPlane::InternalPlaneUpdate()
 {
-  this->Plane->Delete();
+  this->Plane->SetNormal(this->Normal);
+  this->Plane->SetOrigin(this->Origin);
+  this->Plane->Push(this->Offset);
+  this->Plane->SetTransform(this->Transform);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlane::SetNormal(const double* x)
+void vtkPVPlane::SetOffset(double offset)
 {
-  this->SetNormal(x[0], x[1], x[2]);
+  if (this->Offset != offset)
+  {
+    this->Offset = offset;
+    this->Modified();
+    this->InternalPlaneUpdate();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlane::SetOrigin(double x, double y, double z)
+{
+  this->Superclass::SetOrigin(x, y, z);
+  this->InternalPlaneUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -49,49 +68,48 @@ void vtkPVPlane::SetNormal(double x, double y, double z)
     z = std::fabs(z) >= std::fabs(x) && std::fabs(z) >= std::fabs(y) ? 1 : 0;
   }
   this->Superclass::SetNormal(x, y, z);
+  this->InternalPlaneUpdate();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlane::SetAxisAligned(bool axisAligned)
+{
+  if (this->AxisAligned != axisAligned)
+  {
+    this->AxisAligned = axisAligned;
+    this->Modified();
+    this->SetNormal(this->GetNormal());
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlane::SetTransform(vtkAbstractTransform* transform)
 {
   this->Superclass::SetTransform(transform);
-  this->Plane->SetTransform(transform);
+  this->InternalPlaneUpdate();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVPlane::SetTransform(const double elements[16])
+{
+  this->Superclass::SetTransform(elements);
+  this->InternalPlaneUpdate();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPlane::EvaluateFunction(vtkDataArray* input, vtkDataArray* output)
 {
-  if (this->GetMTime() > this->Plane->GetMTime())
-  {
-    this->Plane->SetNormal(this->Normal);
-    this->Plane->SetOrigin(this->Origin);
-    this->Plane->Push(this->Offset);
-  }
-
   return this->Plane->EvaluateFunction(input, output);
 }
 //----------------------------------------------------------------------------
 double vtkPVPlane::EvaluateFunction(double x[3])
 {
-  if (this->GetMTime() > this->Plane->GetMTime())
-  {
-    this->Plane->SetNormal(this->Normal);
-    this->Plane->SetOrigin(this->Origin);
-    this->Plane->Push(this->Offset);
-  }
-
   return this->Plane->EvaluateFunction(x);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlane::EvaluateGradient(double x[3], double g[3])
 {
-  if (this->GetMTime() > this->Plane->GetMTime())
-  {
-    this->Plane->SetNormal(this->Normal);
-    this->Plane->SetOrigin(this->Origin);
-    this->Plane->Push(this->Offset);
-  }
-
   this->Plane->EvaluateGradient(x, g);
 }
 
@@ -100,4 +118,6 @@ void vtkPVPlane::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Offset: " << this->Offset << endl;
+  os << indent << "AxisAligned: " << (this->AxisAligned ? "On" : "Off") << endl;
+  this->Plane->PrintSelf(os, indent);
 }
