@@ -810,6 +810,7 @@ if (PARAVIEW_USE_PYTHON)
   if(NOT APPLE)
     list(APPEND TESTS_WITHOUT_BASELINES
       TooltipCopy.xml
+      TestHTGHoverOnCell.xml
       )
   endif()
 endif()
@@ -1815,7 +1816,7 @@ set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (TestHTGSelection_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
+set (TestHTGHoverOnCell_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (TimeKeeper_FORCE_SERIAL TRUE) # since this uses popup window
