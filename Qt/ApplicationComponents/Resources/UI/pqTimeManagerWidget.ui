@@ -49,6 +49,9 @@
        <widget class="pqAnimationTimeWidget" name="currentTime" native="true"/>
       </item>
       <item>
+       <widget class="pqVCRToolbar" name="vcrBar" native="true"/>
+      </item>
+      <item>
        <widget class="QWidget" name="nbOfFrames" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <property name="spacing">
@@ -184,6 +187,12 @@
    <class>pqAnimationTimeWidget</class>
    <extends>QWidget</extends>
    <header>pqAnimationTimeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqVCRToolbar</class>
+   <extends>QWidget</extends>
+   <header>pqVCRToolbar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
