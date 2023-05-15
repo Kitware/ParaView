@@ -134,6 +134,13 @@ protected:
   void UpdateProperty(vtkSMProxy* caller, const char* pname) override;
 
   /**
+   * Get tag name to use in statefile. This should match
+   * the class name without "vtkSM" prefix.
+   * see vtkSMStateLoader::HandleLinks
+   */
+  virtual std::string GetXMLTagName() { return "ProxyLink"; }
+
+  /**
    * Save the state of the link.
    */
   void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) override;

@@ -346,7 +346,7 @@ void vtkSMProxyLink::UpdateVTKObjects(vtkSMProxy* caller)
 void vtkSMProxyLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();
-  root->SetName("ProxyLink");
+  root->SetName(this->GetXMLTagName().c_str());
   root->AddAttribute("name", linkname);
   vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
     this->Internals->LinkedProxies.begin();

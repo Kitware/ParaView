@@ -109,9 +109,9 @@ protected:
   void UpdateProperty(vtkSMProxy*, const char*) override {}
 
   /**
-   * Save the state of the link.
+   * Override to ajust to this class name.
    */
-  void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) override;
+  std::string GetXMLTagName() override { return "CameraLink"; }
 
   /**
    * Internal method to copy vtkSMproperty values from caller to all linked

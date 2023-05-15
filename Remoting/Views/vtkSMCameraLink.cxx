@@ -253,21 +253,6 @@ void vtkSMCameraLink::ResetCamera(vtkObject* caller)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
-{
-  vtkPVXMLElement* root = vtkPVXMLElement::New();
-  Superclass::SaveXMLState(linkname, root);
-  unsigned int numElems = root->GetNumberOfNestedElements();
-  for (unsigned int cc = 0; cc < numElems; cc++)
-  {
-    vtkPVXMLElement* child = root->GetNestedElement(cc);
-    child->SetName("CameraLink");
-    parent->AddNestedElement(child);
-  }
-  root->Delete();
-}
-
-//---------------------------------------------------------------------------
 void vtkSMCameraLink::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

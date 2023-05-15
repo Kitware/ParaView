@@ -68,6 +68,11 @@ protected:
   ~vtkSMViewLink() override;
 
   /**
+   * Override to ajust to this class name.
+   */
+  std::string GetXMLTagName() override { return "ViewLink"; }
+
+  /**
    * Called when an input proxy is updated (UpdateEvent).
    * Argument is the input proxy.
    * Reimplemented to force an update on the view.
