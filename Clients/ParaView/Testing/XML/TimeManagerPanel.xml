@@ -14,7 +14,7 @@
 
   <!-- check default displayed tracks -->
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelRowCount" arguments="2" />
-  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.,Time" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.,Time Sources" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="1.0,Animations" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.0.0,can.ex2" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" property="currentText" arguments="can.ex2" />
