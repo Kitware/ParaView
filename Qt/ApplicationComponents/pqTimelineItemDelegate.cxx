@@ -74,6 +74,8 @@ struct pqTimelineItemDelegate::pqInternals
   QDoubleValidator* StartValidator;
   QDoubleValidator* EndValidator;
 
+  bool Interaction = false;
+
   QString lockTooltip() const
   {
     return QCoreApplication::translate("pqTimelineItemDelegate",
@@ -143,13 +145,25 @@ struct pqTimelineItemDelegate::pqInternals
 
     // Avoid Start == End. As validator is an inclusive range, use some epsilon.
     QObject::connect(this->EditStart, &pqDoubleLineEdit::editingFinished, [&]() {
+      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+      pqAnimationScene* scene = animationManager->getActiveScene();
       this->EndValidator->setBottom(
-        this->EditStart->text().toDouble() + std::numeric_limits<double>::epsilon());
+        vtkSMPropertyHelper(scene->getProxy()->GetProperty("StartTime")).GetAsDouble() +
+        std::numeric_limits<double>::epsilon());
     });
+
     QObject::connect(this->EditEnd, &pqDoubleLineEdit::editingFinished, [&]() {
+      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+      pqAnimationScene* scene = animationManager->getActiveScene();
       this->StartValidator->setTop(
-        this->EditStart->text().toDouble() - std::numeric_limits<double>::epsilon());
+        vtkSMPropertyHelper(scene->getProxy()->GetProperty("EndTime")).GetAsDouble() -
+        std::numeric_limits<double>::epsilon());
     });
+
+    QObject::connect(
+      this->EditStart, &pqDoubleLineEdit::textChanged, [&]() { this->EditStart->adjustSize(); });
+    QObject::connect(
+      this->EditEnd, &pqDoubleLineEdit::textChanged, [&]() { this->EditEnd->adjustSize(); });
   }
 };
 
@@ -224,10 +238,11 @@ QSize pqTimelineItemDelegate::sizeHint(
 }
 
 //-----------------------------------------------------------------------------
-bool pqTimelineItemDelegate::editorEvent(
-  QEvent* event, QAbstractItemModel*, const QStyleOptionViewItem&, const QModelIndex&)
+bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model,
+  const QStyleOptionViewItem& option, const QModelIndex& index)
 {
   auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+  // edit start / end time
   if (mouseEvent && this->TimelinePainter->hasStartEndLabels())
   {
     QRect startRect = this->TimelinePainter->getStartLabelRect();
@@ -246,9 +261,38 @@ bool pqTimelineItemDelegate::editorEvent(
     }
   }
 
+  // move scene time
+  if (mouseEvent &&
+    (index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::TIME ||
+      index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::SOURCE))
+  {
+    double time = this->TimelinePainter->timeFromPosition(mouseEvent->pos().x(), option, index);
+
+    if (mouseEvent->type() == QEvent::MouseButtonPress && mouseEvent->button() == Qt::LeftButton)
+    {
+      this->Internals->Interaction = true;
+    }
+
+    if (this->Internals->Interaction && mouseEvent->type() == QEvent::MouseMove)
+    {
+      this->TimelinePainter->setSceneCurrentTime(time);
+      Q_EMIT this->needsRepaint();
+    }
+
+    if (mouseEvent->type() == QEvent::MouseButtonRelease && mouseEvent->button() == Qt::LeftButton)
+    {
+      this->Internals->Interaction = false;
+      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+      pqAnimationScene* scene = animationManager->getActiveScene();
+
+      scene->setAnimationTime(time);
+    }
+  }
+
   this->Internals->EditStart->hide();
   this->Internals->EditEnd->hide();
-  return Superclass::event(event);
+
+  return Superclass::editorEvent(event, model, option, index);
 }
 
 //-----------------------------------------------------------------------------

@@ -52,7 +52,7 @@ class QStandardItem;
  *  * pqTimelineItemRole::SOURCE_TIME : one double to paint a special mark on given time.
  *  * pqTimelineItemRole::LABELS : (opt) list of labels that can be used when painting a tick
  *
- * Drawing also depends on the pqTimelineTrack::TYPE of the current item.
+ * Drawing also depends on the pqTimelineItemRole::TYPE of the current item.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTimelinePainter : public QObject
 {
@@ -68,12 +68,12 @@ public:
    */
   void paint(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option);
 
-  ///@{
-  /**
+  /** @name Scene informations
    * Cache information about scene.
    * This is useful to compute tick position, and to do specific label display
    * for locked start and end end.
    */
+  ///@{
   // cache scene start time.
   void setSceneStartTime(double time);
   // cache scene end time.
@@ -86,15 +86,15 @@ public:
   void setSceneLockEnd(bool lock);
   ///@}
 
-  ///@{
-  /**
+  /** @name Start and End rectangles
    * Get Start and End labels rectangle.
    */
-  // Return true if there is at least 2 rects in cache.
+  ///@{
+  /// Return true if there is at least 2 rects in cache.
   bool hasStartEndLabels();
-  // Return first cached rect.
+  /// Return first cached rect.
   QRect getStartLabelRect();
-  // Return second cached rect.
+  /// Return second cached rect.
   QRect getEndLabelRect();
   ///@}
 
@@ -105,55 +105,63 @@ public:
    */
   double positionFromTime(double time, const QStyleOptionViewItem& option);
 
-protected:
-  ///@{
   /**
+   * Return the time of the corresponding position.
+   * If given index has stored times, return the nearest one.
+   */
+  double timeFromPosition(double pos, const QStyleOptionViewItem& option, const QModelIndex& index);
+
+  /** @name Items infos
+   * Extract information from the item data.
+   */
+  ///@{
+  /// return true if item is the main time track
+  bool isTimeTrack(QStandardItem* item);
+  /// return true if item is an animation track
+  bool isAnimationTrack(QStandardItem* item);
+  /// get item times using relevant data role.
+  std::vector<double> getTimes(QStandardItem* item);
+  /// get source time using relevant data role.
+  double getSourceTime(QStandardItem* item);
+  /// return label for given index
+  QString getLabel(QStandardItem* item, int index);
+  ///@}
+
+protected:
+  /** @name Paint methods
    * Paint the different elements of the track.
    * Those are mainly called from internal code.
    * @sa paint
    */
-  // paint background
+  ///@{
+  /// paint background
   void paintBackground(QPainter* painter, const QStyleOptionViewItem& option, bool alternate);
-  // Paint the whole timeline for given track, i.e. loop over times to draw ticks and optionnal
-  // labels. Special code path to ensure Start and End visibility and position.
+  /// Paint the whole timeline for given track, i.e. loop over times to draw ticks and optionnal
+  /// labels. Special code path to ensure Start and End visibility and position.
   void paintTimeline(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
     bool paintLabels, const QStyleOptionViewItem& labelsOption);
-  // Paint the main timeline, with time labels and a mark for current scene time.
+  /// Paint the main timeline, with time labels and a mark for current scene time.
   void paintTimeTrack(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item);
-  // Paint a temporal source times. Has a mark for scene time and one for source time.
+  /// a temporal source times. Has a mark for scene time and one for source time.
   void paintSourceTrack(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item);
-  // Paint animation track. One mark per keyframe.
+  /// animation track. One mark per keyframe.
   void paintAnimationTrack(
     QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item);
-  // Paint time mark for source time
+  /// time mark for source time
   void paintSourcePipelineTime(
     QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item);
-  // Paint time mark for scene time
+  /// Paint time mark for scene time
   void paintSceneCurrentTime(QPainter* painter, const QStyleOptionViewItem& option);
-  // Paint a tick, i.e. a mark corresponding to given time. Optionnally paint the associated label.
-  // When painting labels, the non-labeled ticks are half-sized, for readability.
+  /// a tick, i.e. a mark corresponding to given time. Optionnally paint the associated label.
+  /// When painting labels, the non-labeled ticks are half-sized, for readability.
   void paintTick(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
     double time, bool paintLabels, const QStyleOptionViewItem& labelsOption, const QString& label);
-  // Paint a time mark, i.e a vertical line at given position.
+  /// a time mark, i.e a vertical line at given position.
   void paintTimeMark(QPainter* painter, const QStyleOptionViewItem& option, double pos);
-  // Paint labels as annotation. Return true if the annotation is effectively painted.
-  // Do not add label that collides on previously added labels.
+  /// Paint labels as annotation. Return true if the annotation is effectively painted.
+  /// Do not add label that collides on previously added labels.
   bool paintLabel(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
     double time, const QString& label);
-  ///@}
-
-  ///@{
-  /**
-   * Extract information from the item data.
-   */
-  // return true if item is the main time track
-  bool isTimeTrack(QStandardItem* item);
-  // get item times using relevant data role.
-  std::vector<double> getTimes(QStandardItem* item);
-  // get source time using relevant data role.
-  double getSourceTime(QStandardItem* item);
-  // return label for given index
-  QString getLabel(QStandardItem* item, int index);
   ///@}
 
   double SceneCurrentTime = 0;

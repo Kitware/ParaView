@@ -101,6 +101,11 @@ public Q_SLOTS:
    */
   void setFocalPoints(const std::vector<double>&);
 
+  /**
+   * Set the view up for path-based keyframe.
+   */
+  void setViewUp(double viewUp[3]);
+
 protected:
   // Overridden to update the 3D widget's visibility states.
   void showEvent(QShowEvent*) override;

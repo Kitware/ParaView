@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqTimelineModel.h"
 
+#include "vtkMathUtilities.h"
+
 #include <QModelIndex>
 #include <QPainter>
 #include <QStandardItem>
@@ -130,6 +132,9 @@ void pqTimelinePainter::paintTimeTrack(
   // draw labels on the top half
   QStyleOptionViewItem labelOption = option;
   labelOption.rect.adjust(0, 0, 0, -0.5 * height);
+
+  this->Internals->LabelRects.clear();
+
   this->paintTimeline(painter, sourceOption, item, true, labelOption);
 
   this->paintSceneCurrentTime(painter, sourceOption);
@@ -269,11 +274,6 @@ void pqTimelinePainter::paintTimeline(QPainter* painter, const QStyleOptionViewI
   painter->save();
   std::vector<double> times = this->getTimes(item);
 
-  if (paintLabels)
-  {
-    this->Internals->LabelRects.clear();
-  }
-
   // if not enough timesteps
   if (times.size() < 2)
   {
@@ -357,6 +357,43 @@ void pqTimelinePainter::paintSourcePipelineTime(
 }
 
 //-----------------------------------------------------------------------------
+double pqTimelinePainter::timeFromPosition(
+  double pos, const QStyleOptionViewItem& option, const QModelIndex& index)
+{
+  auto model = dynamic_cast<const QStandardItemModel*>(index.model());
+  auto item = model->itemFromIndex(index);
+
+  double width = option.rect.width();
+  double clickedTime = this->SceneStartTime +
+    (this->SceneEndTime - this->SceneStartTime) * (pos - option.rect.x()) / width;
+
+  auto times = this->getTimes(item);
+  if (times.empty())
+  {
+    return clickedTime;
+  }
+
+  double time = times[0];
+  for (auto sceneTime : times)
+  {
+    if (vtkMathUtilities::FuzzyCompare(clickedTime, sceneTime))
+    {
+      return clickedTime;
+    }
+
+    double tolerance = (sceneTime - time);
+    if (sceneTime - tolerance / 2 > clickedTime)
+    {
+      return time;
+    }
+
+    time = sceneTime;
+  }
+
+  return time;
+}
+
+//-----------------------------------------------------------------------------
 double pqTimelinePainter::positionFromTime(double time, const QStyleOptionViewItem& option)
 {
   if (time > this->SceneEndTime || time < this->SceneStartTime)
@@ -377,13 +414,28 @@ bool pqTimelinePainter::isTimeTrack(QStandardItem* item)
 }
 
 //-----------------------------------------------------------------------------
+bool pqTimelinePainter::isAnimationTrack(QStandardItem* item)
+{
+  QVariant dataVariant = item->data(pqTimelineItemRole::TYPE);
+  return dataVariant.toInt() == pqTimelineTrack::ANIMATION;
+}
+
+//-----------------------------------------------------------------------------
 std::vector<double> pqTimelinePainter::getTimes(QStandardItem* item)
 {
   std::vector<double> times;
   QVariant dataVariant = item->data(pqTimelineItemRole::TIMES);
   for (auto time : dataVariant.toList())
   {
-    times.push_back(time.toDouble());
+    double adjustedTime = time.toDouble();
+    // animation keyframes store relative times.
+    if (this->isAnimationTrack(item))
+    {
+      adjustedTime =
+        this->SceneStartTime + adjustedTime * (this->SceneEndTime - this->SceneStartTime);
+    }
+
+    times.push_back(adjustedTime);
   }
 
   return times;

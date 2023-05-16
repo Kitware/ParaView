@@ -140,7 +140,7 @@ struct pqTimelineWidget::pqInternals
     QMap<int, QVariant> timeData;
     timeData[Qt::ToolTipRole] = tr("If checked, scene use times from time sources.\nOtherwise, "
                                    "generate NumberOfFrames time entries.");
-    this->TimeModel->createRow(pqTimelineTrack::TIME, tr("Time"), timeData);
+    this->TimeModel->createRow(pqTimelineTrack::TIME, tr("Time Sources"), timeData);
     this->TimeModel->setRowEnabled(pqTimelineTrack::TIME, false);
 
     // create animation header row
@@ -671,13 +671,12 @@ void pqTimelineWidget::addCueTrack(pqAnimationCue* cue)
     newRow[pqTimelineColumn::TIMELINE]->setData(toolTip, Qt::ToolTipRole);
   }
 
+  this->Internals->Cues[cue->getSMName()] = cue;
   this->Internals->updateCueKeyframesData(cue, newRow);
 
   this->connect(
     cue, &pqAnimationCue::keyframesModified, this, &pqTimelineWidget::updateCueTracksData);
   this->connect(cue, &pqAnimationCue::enabled, this, &pqTimelineWidget::updateCueTracksState);
-
-  this->Internals->Cues[cue->getSMName()] = cue;
 }
 
 //-----------------------------------------------------------------------------

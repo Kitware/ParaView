@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMUtilities.h"
 
 #include <QDoubleValidator>
+#include <QVector3D>
 
 class pqOrbitCreatorDialog::pqInternals : public Ui::OrbitCreatorDialog
 {
@@ -126,12 +127,12 @@ void pqOrbitCreatorDialog::resetCenter()
 }
 
 //-----------------------------------------------------------------------------
-QList<QVariant> pqOrbitCreatorDialog::center() const
+QVector3D pqOrbitCreatorDialog::normal() const
 {
-  QList<QVariant> value;
-  value << this->Internals->center0->text().toDouble();
-  value << this->Internals->center1->text().toDouble();
-  value << this->Internals->center2->text().toDouble();
+  QVector3D value;
+  value.setX(this->Internals->normal0->text().toDouble());
+  value.setY(this->Internals->normal1->text().toDouble());
+  value.setZ(this->Internals->normal2->text().toDouble());
   return value;
 }
 
