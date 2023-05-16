@@ -320,67 +320,11 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::CreateAndSetPrettyLabel(const char* xmlname)
-{
-  const char* label = vtkSMProperty::CreateNewPrettyLabel(xmlname);
-  this->SetXMLLabel(label);
-  delete[] label;
-}
-
-//---------------------------------------------------------------------------
 const char* vtkSMProperty::CreateNewPrettyLabel(const char* xmlname)
 {
-
-  /* Add space hence:
-   "MYSpace" ==> "MY Space"
-   "MYSPACE" ==> "MYSPACE"
-   "My Space" ==> "My Space"
-   "MySPACE" ==> "My SPACE"
-   "MySPace" ==> "My S Pace"
-   "MySPAce" ==> "My SP Ace"
-   "MySPACE" ==> "My SPACE"
-   "MySpACE" ==> "My Sp ACE"
-   "MYSuperSpacer" ==> "MY Super Spacer" */
-
-  // If xmlname is nullptr, returns empty string
-  if (xmlname == nullptr)
-  {
-    vtkDebugWithObjectMacro(nullptr, "No 'name' label was provided.");
-    return new char[1]{};
-  }
-
-  // If xmlname is empty string, returns empty string
-  if (xmlname[0] == '\0')
-  {
-    return new char[1]{};
-  }
-
-  int max = static_cast<int>(strlen(xmlname));
-  char* label = new char[2 * max + 1]{};
-
-  int spaces = 0;
-  label[0] = xmlname[0];
-  bool skip = false;
-  for (int i = 1; xmlname[i] != '\0'; i++)
-  {
-    // skip indicates if the letter is before or after a space
-    skip = (label[i + spaces + 1] == ' ' || label[i + spaces - 1] == ' ');
-    // Add space before uppercase letter succeded by a lowercase letter
-    if (!skip && isupper(xmlname[i]) && islower(xmlname[i + 1]))
-    {
-      label[i + spaces] = ' ';
-      spaces++;
-    }
-    // Copies the character with the correct offset between xmlname and label
-    label[i + spaces] = xmlname[i];
-    // Add space after lowercase letter succeded by an uppercase letter
-    if (!skip && islower(xmlname[i]) && isupper(xmlname[i + 1]))
-    {
-      spaces++;
-      label[i + spaces] = ' ';
-    }
-  }
-  return label;
+  std::string label = vtkSMObject::CreatePrettyLabel(std::string(xmlname));
+  char* clabel = strcpy(new char[label.length() + 1], label.c_str());
+  return clabel;
 }
 
 //---------------------------------------------------------------------------
@@ -402,7 +346,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   }
   else
   {
-    this->CreateAndSetPrettyLabel(xmlname);
+    this->SetXMLLabel(vtkSMObject::CreatePrettyLabel(xmlname).c_str());
   }
 
   const char* command = element->GetAttribute("command");

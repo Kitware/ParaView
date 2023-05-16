@@ -133,6 +133,7 @@
 #ifndef vtkSMProperty_h
 #define vtkSMProperty_h
 
+#include "vtkParaViewDeprecation.h"         // for deprecation
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMDomainIterator.h"            // needed for vtkSMDomainIterator
 #include "vtkSMMessageMinimal.h"            // needed for vtkSMMessage
@@ -539,6 +540,8 @@ public:
    (1) - before every uppercase letter succeded by a lowercase letter
    (2) - after every lowercase letter succeded by an uppercase letter
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0(
+    "Use vtkSMObject::CreatePrettyLabel(const std::string& name) instead.")
   static const char* CreateNewPrettyLabel(const char* name);
 
 protected:
@@ -720,12 +723,6 @@ private:
   // Callback to fire vtkCommand::DomainModifiedEvent every time any of the
   // domains change.
   void InvokeDomainModifiedEvent();
-
-  /**
-   * Given the string, this method will create and set a well-formated
-   * string as XMLLabel.
-   */
-  void CreateAndSetPrettyLabel(const char* name);
 
   bool PendingModifiedEvents;
   bool BlockModifiedEvents;

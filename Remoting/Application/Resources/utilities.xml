@@ -73,7 +73,7 @@
       </IntVectorProperty>
     </Proxy>
     <Proxy class="vtkNonMergingPointLocator"
-           label="Don't Merge Points"
+           label="Not Merging Points"
            name="NonMergingPointLocator">
       <Documentation>
         Perform direct / check-free point insertion (any point is

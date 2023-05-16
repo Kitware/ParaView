@@ -495,13 +495,17 @@ class Proxy(object):
             try:
                 setter(self, value)
             except ValueError:
-                # Let the backwards compatibility helper try to handle this
+                # Try without spaces
                 try:
-                    _bc.setattr_fix_value(self, name, value, setter)
-                except _bc.Continue:
-                    pass
+                    setter(self, _make_name_valid(value))
                 except ValueError:
-                    raise ValueError("%s is not a valid value for attribute %s." % (value, name))
+                    # Let the backwards compatibility helper try to handle this
+                    try:
+                        _bc.setattr_fix_value(self, name, value, setter)
+                    except _bc.Continue:
+                        pass
+                    except ValueError:
+                        raise ValueError("%s is not a valid value for attribute %s." % (value, name))
 
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
@@ -1273,7 +1277,7 @@ class ProxyProperty(Property):
         if listdomain:
             for i in range(listdomain.GetNumberOfProxies()):
                 proxy = listdomain.GetProxy(i)
-                retval.append(proxy.GetXMLLabel())
+                retval.append(_make_name_valid(proxy.GetXMLLabel()))
         return retval
 
     Available = property(GetAvailable, None, None,

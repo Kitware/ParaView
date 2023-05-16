@@ -146,18 +146,17 @@ void pqIntegrationModelSurfaceHelperWidget::resetSurfaceWidget(bool force)
       for (unsigned int i = 0; i < nArrays; i++)
       {
         const char* arrayName = namesProp->GetElement(i);
-        const char* labelName = vtkSMProperty::CreateNewPrettyLabel(arrayName);
+        std::string labelName = vtkSMObject::CreatePrettyLabel(arrayName);
         int nComponents = compsProp->GetElement(i);
         int type = typesProp->GetElement(i);
 
         // Create a group box for each array
-        QGroupBox* gb = new QGroupBox(labelName, this);
+        QGroupBox* gb = new QGroupBox(labelName.c_str(), this);
         gb->setCheckable(true);
         gb->setChecked(false);
         gb->setProperty("name", arrayName);
         gb->setProperty("type", type);
         QObject::connect(gb, SIGNAL(toggled(bool)), this, SIGNAL(arrayToGenerateChanged()));
-        delete[] labelName;
 
         // And associated layout
         QGridLayout* gbLayout = new QGridLayout(gb);

@@ -30,6 +30,7 @@ set(PY_TESTS
   GhostCellsInMergeBlocks.py
   GradientBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
+  LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID
   LookupTable.py,NO_VALID
   MultiServer.py,NO_VALID
   PointGaussianProperties.py
