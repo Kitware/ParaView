@@ -14,9 +14,9 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="radius" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleCustomRange" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="10" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MinimumScalar" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,47,4,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,47,4,/0:0/0:0" />

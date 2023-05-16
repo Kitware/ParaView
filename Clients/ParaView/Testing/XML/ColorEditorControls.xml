@@ -54,21 +54,21 @@
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/SearchBox/SearchLineEdit" command="key" arguments="16777216" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ResetRangeToCustom" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="3" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="30" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="300" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MinimumScalar" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="300" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ResetRangeToData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ResetRangeToCustom" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="3" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="35" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="350" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MinimumScalar" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="35" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="350" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/InvertTransferFunctions" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />

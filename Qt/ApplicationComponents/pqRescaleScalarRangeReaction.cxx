@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqResetScalarRangeReaction.cxx
+   Module:    pqRescaleScalarRangeReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,14 +29,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqResetScalarRangeReaction.h"
-#include "ui_pqResetScalarRangeToDataOverTime.h"
+#include "pqRescaleScalarRangeReaction.h"
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
-#include "pqRescaleRange.h"
+#include "pqRescaleScalarRangeToCustomDialog.h"
+#include "pqRescaleScalarRangeToDataOverTimeDialog.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
@@ -48,8 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunction2DProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
-
-#include <QDebug>
 
 namespace
 {
@@ -65,8 +63,8 @@ vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
 }
 
 //-----------------------------------------------------------------------------
-pqResetScalarRangeReaction::pqResetScalarRangeReaction(
-  QAction* parentObject, bool track_active_objects, pqResetScalarRangeReaction::Modes mode)
+pqRescaleScalarRangeReaction::pqRescaleScalarRangeReaction(
+  QAction* parentObject, bool track_active_objects, pqRescaleScalarRangeReaction::Modes mode)
   : Superclass(parentObject)
   , Mode(mode)
   , Connection(nullptr)
@@ -91,7 +89,7 @@ pqResetScalarRangeReaction::pqResetScalarRangeReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqResetScalarRangeReaction::~pqResetScalarRangeReaction()
+pqRescaleScalarRangeReaction::~pqRescaleScalarRangeReaction()
 {
   if (this->Connection)
   {
@@ -100,14 +98,14 @@ pqResetScalarRangeReaction::~pqResetScalarRangeReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqResetScalarRangeReaction::setRepresentation(pqDataRepresentation* repr)
+void pqRescaleScalarRangeReaction::setRepresentation(pqDataRepresentation* repr)
 {
   this->Representation = qobject_cast<pqPipelineRepresentation*>(repr);
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
-void pqResetScalarRangeReaction::updateEnableState()
+void pqRescaleScalarRangeReaction::updateEnableState()
 {
   bool enabled = this->Representation != nullptr;
   if (enabled && this->Mode == TEMPORAL)
@@ -122,30 +120,30 @@ void pqResetScalarRangeReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqResetScalarRangeReaction::onTriggered()
+void pqRescaleScalarRangeReaction::onTriggered()
 {
   switch (this->Mode)
   {
     case DATA:
-      pqResetScalarRangeReaction::resetScalarRangeToData(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToData(this->Representation);
       break;
 
     case CUSTOM:
-      pqResetScalarRangeReaction::resetScalarRangeToCustom(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(this->Representation);
       break;
 
     case TEMPORAL:
-      pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(this->Representation);
       break;
 
     case VISIBLE:
-      pqResetScalarRangeReaction::resetScalarRangeToVisible(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToVisible(this->Representation);
       break;
   }
 }
 
 //-----------------------------------------------------------------------------
-bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation* repr)
+bool pqRescaleScalarRangeReaction::rescaleScalarRangeToData(pqPipelineRepresentation* repr)
 {
   if (repr == nullptr)
   {
@@ -158,8 +156,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
     }
   }
 
-  BEGIN_UNDO_SET(QCoreApplication::translate(
-    "pqResetScalarRangeReaction", "Reset transfer function ranges using data range"));
+  BEGIN_UNDO_SET(tr("Reset transfer function ranges using data range"));
   repr->resetLookupTableScalarRange();
   repr->renderViewEventually();
   if (vtkSMProxy* lut = lutProxy(repr))
@@ -171,7 +168,8 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
 }
 
 //-----------------------------------------------------------------------------
-bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentation* repr)
+pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(
+  pqPipelineRepresentation* repr)
 {
   if (repr == nullptr)
   {
@@ -180,7 +178,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
     if (!repr)
     {
       qCritical() << "No representation provided.";
-      return false;
+      return nullptr;
     }
   }
 
@@ -194,90 +192,102 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
   }
 
   vtkSMProxy* lut = lutProxy(repr);
-  if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut, separateOpacity))
+  pqRescaleScalarRangeToCustomDialog* dialog =
+    pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(lut, separateOpacity);
+  if (dialog != nullptr)
   {
-    repr->renderViewEventually();
-    return true;
+    QObject::connect(
+      dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() { repr->renderViewEventually(); });
   }
-  return false;
+  return dialog;
 }
 
 //-----------------------------------------------------------------------------
-bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool separateOpacity)
+pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(
+  vtkSMProxy* lut, bool separateOpacity)
 {
   vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
-  if (tfProxy)
+  if (tfProxy == nullptr || lut == nullptr)
   {
-    double range[2];
-    if (!tfProxy->GetRange(range))
+    return nullptr;
+  }
+
+  double range[2] = { 0, 0 };
+  if (!tfProxy->GetRange(range))
+  {
+    range[0] = 0;
+    range[1] = 1.0;
+  }
+
+  int lockInfo = 0;
+  vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Get(&lockInfo);
+
+  pqRescaleScalarRangeToCustomDialog* dialog =
+    new pqRescaleScalarRangeToCustomDialog(pqCoreUtilities::mainWidget());
+  dialog->setLock(lockInfo == vtkSMTransferFunctionManager::NEVER);
+  dialog->setRange(range[0], range[1]);
+  dialog->showOpacityControls(separateOpacity);
+  vtkSMTransferFunctionProxy* sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
+    vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy());
+  vtkSMTransferFunction2DProxy* tf2dProxy = vtkSMTransferFunction2DProxy::SafeDownCast(
+    vtkSMPropertyHelper(lut, "TransferFunction2D", true).GetAsProxy());
+  if (sofProxy && true)
+  {
+    if (!sofProxy->GetRange(range))
     {
       range[0] = 0;
       range[1] = 1.0;
     }
+    dialog->setOpacityRange(range[0], range[1]);
+  };
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->show();
 
-    pqRescaleRange dialog(pqCoreUtilities::mainWidget());
-    dialog.setRange(range[0], range[1]);
-    dialog.showOpacityControls(separateOpacity);
-    vtkSMTransferFunctionProxy* sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
-      vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy());
-    vtkSMTransferFunction2DProxy* tf2dProxy = vtkSMTransferFunction2DProxy::SafeDownCast(
-      vtkSMPropertyHelper(lut, "TransferFunction2D", true).GetAsProxy());
-    if (sofProxy && true)
+  QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
+    BEGIN_UNDO_SET(tr("Reset transfer function ranges"));
+    double tRange[2];
+    tRange[0] = dialog->minimum();
+    tRange[1] = dialog->maximum();
+    tfProxy->RescaleTransferFunction(tRange[0], tRange[1]);
+    if (sofProxy)
     {
-      if (!sofProxy->GetRange(range))
+      // If we are using a separate opacity range, get those values from the GUI
+      if (separateOpacity)
       {
-        range[0] = 0;
-        range[1] = 1.0;
+        tRange[0] = dialog->opacityMinimum();
+        tRange[1] = dialog->opacityMaximum();
       }
-      dialog.setOpacityRange(range[0], range[1]);
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, tRange[0], tRange[1]);
     }
-    if (dialog.exec() == QDialog::Accepted)
+    if (tf2dProxy)
     {
-      BEGIN_UNDO_SET(QCoreApplication::translate(
-        "pqResetScalarRangeReaction", "Reset transfer function ranges"));
-      range[0] = dialog.minimum();
-      range[1] = dialog.maximum();
-      tfProxy->RescaleTransferFunction(range[0], range[1]);
-      if (sofProxy)
+      double tf2dRange[4];
+      if (!tf2dProxy->GetRange(tf2dRange))
       {
-        // If we are using a separate opacity range, get those values from the GUI
-        if (separateOpacity)
-        {
-          range[0] = dialog.opacityMinimum();
-          range[1] = dialog.opacityMaximum();
-        }
-        vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, range[0], range[1]);
+        tf2dRange[1] = 0.0;
+        tf2dRange[2] = 1.0;
       }
-      if (tf2dProxy)
-      {
-        double tf2dRange[4];
-        if (!tf2dProxy->GetRange(tf2dRange))
-        {
-          tf2dRange[1] = 0.0;
-          tf2dRange[2] = 1.0;
-        }
-        tf2dRange[0] = range[0];
-        tf2dRange[1] = range[1];
-        tf2dProxy->RescaleTransferFunction(tf2dRange);
-      }
-      // disable auto-rescale of transfer function since the user has set on
-      // explicitly (BUG #14371).
-      if (dialog.lock())
-      {
-        vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
-          .Set(vtkSMTransferFunctionManager::NEVER);
-        lut->UpdateVTKObjects();
-      }
-      END_UNDO_SET();
-      return true;
+      tf2dRange[0] = tRange[0];
+      tf2dRange[1] = tRange[1];
+      tf2dProxy->RescaleTransferFunction(tf2dRange);
     }
-    return false;
-  }
-  return false;
+    // disable auto-rescale of transfer function since the user has set on
+    // explicitly (BUG #14371).
+    if (dialog->doLock())
+    {
+      vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+        .Set(vtkSMTransferFunctionManager::NEVER);
+      lut->UpdateVTKObjects();
+    }
+    END_UNDO_SET();
+  });
+
+  return dialog;
 }
 
 //-----------------------------------------------------------------------------
-bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr)
+pqRescaleScalarRangeToDataOverTimeDialog*
+pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(pqPipelineRepresentation* repr)
 {
   if (repr == nullptr)
   {
@@ -286,29 +296,28 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     if (!repr)
     {
       qCritical() << "No representation provided.";
-      return false;
+      return nullptr;
     }
   }
 
-  QDialog dialog(pqCoreUtilities::mainWidget());
-  Ui::ResetScalarRangeToDataOverTime ui;
-  ui.setupUi(&dialog);
-
-  connect(ui.RescaleButton, &QPushButton::clicked, [&]() { dialog.done(QDialog::Accepted); });
-  connect(ui.RescaleAndLockButton, &QPushButton::clicked,
-    [&]() { dialog.done(static_cast<int>(QDialog::Accepted) + 1); });
-  connect(ui.CancelButton, &QPushButton::clicked, [&]() { dialog.done(QDialog::Rejected); });
-
-  int retcode = dialog.exec();
-  if (retcode != QDialog::Rejected)
+  int lockInfo = 0;
+  if (vtkSMProxy* lut = lutProxy(repr))
   {
-    BEGIN_UNDO_SET(QCoreApplication::translate(
-      "pqResetScalarRangeReaction", "Reset transfer function ranges using temporal data range"));
+    vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Get(&lockInfo);
+  }
+  pqRescaleScalarRangeToDataOverTimeDialog* dialog =
+    new pqRescaleScalarRangeToDataOverTimeDialog(pqCoreUtilities::mainWidget());
+  dialog->setLock(lockInfo == vtkSMTransferFunctionManager::NEVER);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  dialog->show();
+
+  QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply, [=]() {
+    BEGIN_UNDO_SET(tr("Reset transfer function ranges using temporal data range"));
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
 
     // disable auto-rescale of transfer function since the user has set one
     // explicitly (BUG #14371).
-    if (retcode == static_cast<int>(QDialog::Accepted) + 1)
+    if (dialog->doLock())
     {
       if (vtkSMProxy* lut = lutProxy(repr))
       {
@@ -319,13 +328,12 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     }
     repr->renderViewEventually();
     END_UNDO_SET();
-    return true;
-  }
-  return false;
+  });
+  return dialog;
 }
 
 //-----------------------------------------------------------------------------
-bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentation* repr)
+bool pqRescaleScalarRangeReaction::rescaleScalarRangeToVisible(pqPipelineRepresentation* repr)
 {
   if (repr == nullptr)
   {
@@ -345,8 +353,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentat
     return false;
   }
 
-  BEGIN_UNDO_SET(QCoreApplication::translate(
-    "pqResetScalarRangeReaction", "Reset transfer function ranges to visible data range"));
+  BEGIN_UNDO_SET(tr("Reset transfer function ranges to visible data range"));
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
     repr->getProxy(), view->getProxy());
   repr->renderViewEventually();
@@ -355,7 +362,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentat
 }
 
 //-----------------------------------------------------------------------------
-void pqResetScalarRangeReaction::onServerAdded(pqServer* server)
+void pqRescaleScalarRangeReaction::onServerAdded(pqServer* server)
 {
   if (server)
   {
@@ -367,7 +374,7 @@ void pqResetScalarRangeReaction::onServerAdded(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqResetScalarRangeReaction::onAboutToRemoveServer(pqServer* server)
+void pqRescaleScalarRangeReaction::onAboutToRemoveServer(pqServer* server)
 {
   if (server)
   {

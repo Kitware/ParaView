@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqDisplayColorWidget.h"
 #include "pqEditColorMapReaction.h"
-#include "pqResetScalarRangeReaction.h"
+#include "pqRescaleScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqSetName.h"
 #include "pqUseSeparateColorMapReaction.h"
@@ -48,13 +48,13 @@ void pqColorToolbar::constructor()
 
   new pqScalarBarVisibilityReaction(ui.actionScalarBarVisibility);
   new pqEditColorMapReaction(ui.actionEditColorMap);
-  new pqResetScalarRangeReaction(ui.actionResetRange, true, pqResetScalarRangeReaction::DATA);
-  new pqResetScalarRangeReaction(
-    ui.actionRescaleCustomRange, true, pqResetScalarRangeReaction::CUSTOM);
-  new pqResetScalarRangeReaction(
-    ui.actionRescaleTemporalRange, true, pqResetScalarRangeReaction::TEMPORAL);
-  new pqResetScalarRangeReaction(
-    ui.actionRescaleVisibleRange, true, pqResetScalarRangeReaction::VISIBLE);
+  new pqRescaleScalarRangeReaction(ui.actionResetRange, true, pqRescaleScalarRangeReaction::DATA);
+  new pqRescaleScalarRangeReaction(
+    ui.actionRescaleCustomRange, true, pqRescaleScalarRangeReaction::CUSTOM);
+  new pqRescaleScalarRangeReaction(
+    ui.actionRescaleTemporalRange, true, pqRescaleScalarRangeReaction::TEMPORAL);
+  new pqRescaleScalarRangeReaction(
+    ui.actionRescaleVisibleRange, true, pqRescaleScalarRangeReaction::VISIBLE);
 
   pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this) << pqSetName("displayColor");
   this->addWidget(display_color);

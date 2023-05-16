@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRescaleRange.h
+   Module:  pqRescaleScalarRangeToCustomDialog.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,60 +30,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/**
- * \file pqRescaleRange.h
- * \date 3/28/2007
- */
-
-#ifndef pqRescaleRange_h
-#define pqRescaleRange_h
-
-#include "vtkParaViewDeprecation.h" // for deprecation
+#ifndef pqRescaleScalarRangeCustomDialog_h
+#define pqRescaleScalarRangeCustomDialog_h
 
 #include "pqComponentsModule.h"
+
 #include <QDialog>
+#include <memory>
 
-class pqRescaleRangeForm;
+class pqRescaleScalarRangeToCustomDialogForm;
 
-class PARAVIEW_DEPRECATED_IN_5_12_0(
-  "Use pqRescaleScalarRangeToCustomDialog instead") PQCOMPONENTS_EXPORT pqRescaleRange
-  : public QDialog
+/**
+ * pqRescaleScalarRangeToCustomDialog provides a dialog to be able to
+ * rescale the active lookup table's range to a custom range.
+ */
+class PQCOMPONENTS_EXPORT pqRescaleScalarRangeToCustomDialog : public QDialog
 {
   Q_OBJECT
 public:
-  pqRescaleRange(QWidget* parent = nullptr);
-  ~pqRescaleRange() override;
+  pqRescaleScalarRangeToCustomDialog(QWidget* parent = nullptr);
+  ~pqRescaleScalarRangeToCustomDialog() override;
 
-  // Get the minimum of the color map range
+  /**
+   * Get the minimum of the color map range
+   */
   double minimum() const;
 
-  // Get the maximum of the color map range
+  /**
+   * Get the maximum of the color map range
+   */
   double maximum() const;
 
-  // Show or hide the opacity controls
+  /**
+   * Show or hide the opacity controls
+   */
   void showOpacityControls(bool show);
 
-  // Get the minimum of the opacity map range
+  /**
+   * Get the minimum of the opacity map range
+   */
   double opacityMinimum() const;
 
-  // Get the maximum of the opacity map range
+  /**
+   * Get the maximum of the opacity map range
+   */
   double opacityMaximum() const;
 
-  // Initialize the range for the color map
+  /**
+   * Initialize the range for the color map
+   */
   void setRange(double min, double max);
 
-  // Initialize the range for a separate opacity map, if the option is available
+  /**
+   * Initialize the range for a separate opacity map,
+   * if the option is available
+   */
   void setOpacityRange(double min, double max);
 
-  bool lock() const { return this->Lock; }
+  /**
+   * Initialize AutomaticRescaling checkbox value.
+   */
+  void setLock(bool lock);
+
+  /**
+   * Get lock value from AutomaticRescaling checkbox.
+   */
+  bool doLock() const;
+
+Q_SIGNALS:
+  /**
+   * Fired when the user wants to apply his changes.
+   */
+  void apply();
 
 protected Q_SLOTS:
+  /**
+   * Check that minimum scalar value < maximum scalar value.
+   * Deactivate apply and rescale button if that's not the case.
+   */
   void validate();
-  void rescaleAndLock();
 
-protected: // NOLINT(readability-redundant-access-specifiers)
-  pqRescaleRangeForm* Form;
-  bool Lock;
+  /**
+   * Emit apply and close the dialog.
+   */
+  void rescale();
+
+protected:
+  std::unique_ptr<pqRescaleScalarRangeToCustomDialogForm> Form;
 };
 
 #endif

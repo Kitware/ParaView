@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqResetScalarRangeReaction.h
+   Module:  pqRescaleScalarRangeReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqResetScalarRangeReaction_h
-#define pqResetScalarRangeReaction_h
+#ifndef pqRescaleScalarRangeReaction_h
+#define pqRescaleScalarRangeReaction_h
 
 #include "pqReaction.h"
 #include "vtkSmartPointer.h"
 
-#include "vtkParaViewDeprecation.h" // for deprecation
-
 #include <QPointer>
 
-class pqPipelineRepresentation;
 class pqDataRepresentation;
+class pqPipelineRepresentation;
+class pqRescaleScalarRangeToCustomDialog;
+class pqRescaleScalarRangeToDataOverTimeDialog;
 class pqServer;
 class vtkEventQtSlotConnect;
 class vtkSMProxy;
 
 /**
  * @ingroup Reactions
- * Reaction to reset the active lookup table's range to match the active
+ * Reaction to rescale the active lookup table's range to match the active
  * representation. You can disable tracking of the active representation,
  * instead explicitly provide one using setRepresentation() by pass
  * track_active_objects as false to the constructor.
  */
-class PARAVIEW_DEPRECATED_IN_5_12_0("Use pqRescaleScalarRangeReaction instead")
-  PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqRescaleScalarRangeReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
@@ -71,68 +70,63 @@ public:
    * if \c track_active_objects is false, then the reaction will not track
    * pqActiveObjects automatically.
    */
-  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects = true, Modes mode = DATA);
-  ~pqResetScalarRangeReaction() override;
+  pqRescaleScalarRangeReaction(
+    QAction* parent, bool track_active_objects = true, Modes mode = DATA);
+  ~pqRescaleScalarRangeReaction() override;
 
   /**
-   * @deprecated Use resetScalarRangeToData().
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use resetScalarRangeToData() instead")
-  static void resetScalarRange(pqPipelineRepresentation* repr = nullptr)
-  {
-    pqResetScalarRangeReaction::resetScalarRangeToData(repr);
-  }
-
-  /**
-   * Reset to current data range.
+   * Rescale to current data range.
    *
    * @param[in] repr The data representation to use to determine the data range.
    *                 If `nullptr`, then the active representation is used, if
    *                 available.
    * @returns `true` if the operation was successful, otherwise `false`.
    */
-  static bool resetScalarRangeToData(pqPipelineRepresentation* repr = nullptr);
+  static bool rescaleScalarRangeToData(pqPipelineRepresentation* repr = nullptr);
 
   /**
-   * Reset range to a custom range.
+   * Rescale range to a custom range.
    *
    * @param[in] repr The representation used to determine the transfer function
    *                 to change range on. If \c repr is `nullptr`, then the active
    *                 representation is used, if available.
-   * @returns `true` if the operation was successful, otherwise `false`.
+   * @returns a pointer to the dialog if the operation was successful, otherwise `nullptr`.
    */
-  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr = nullptr);
+  static pqRescaleScalarRangeToCustomDialog* rescaleScalarRangeToCustom(
+    pqPipelineRepresentation* repr = nullptr);
 
   /**
-   * Reset range to a custom range.
+   * Rescale range to a custom range.
    *
-   * @param[in] tfProxy The transfer function proxy to reset the range on.
+   * @param[in] tfProxy The transfer function proxy to rescale the range on.
    * @param[in] separateOpacity Show controls for setting the opacity function range
    *                            separately from the color transfer function.
    *
-   * @returns `true` if the operation was successful, otherwise `false`.
+   * @returns a pointer to the dialog if the operation was successful, otherwise `nullptr`.
    */
-  static bool resetScalarRangeToCustom(vtkSMProxy* tfProxy, bool separateOpacity = false);
+  static pqRescaleScalarRangeToCustomDialog* rescaleScalarRangeToCustom(
+    vtkSMProxy* tfProxy, bool separateOpacity = false);
 
   /**
-   * Reset range to data range over time.
+   * Rescale range to data range over time.
    *
    * @param[in] repr The data representation to use to determine the data range.
    *                 If `nullptr`, then the active representation is used, if
    *                 available.
    * @returns `true` if the operation was successful, otherwise `false`.
    */
-  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr = nullptr);
+  static pqRescaleScalarRangeToDataOverTimeDialog* rescaleScalarRangeToDataOverTime(
+    pqPipelineRepresentation* repr = nullptr);
 
   /**
-   * Reset range to data range for data visible in the view.
+   * Rescale range to data range for data visible in the view.
    *
    * @param[in] repr The data representation to use to determine the data range.
    *                 If `nullptr`, then the active representation is used, if
    *                 available.
    * @returns `true` if the operation was successful, otherwise `false`.
    */
-  static bool resetScalarRangeToVisible(pqPipelineRepresentation* repr = nullptr);
+  static bool rescaleScalarRangeToVisible(pqPipelineRepresentation* repr = nullptr);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -156,7 +150,7 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void onAboutToRemoveServer(pqServer* server);
 
 private:
-  Q_DISABLE_COPY(pqResetScalarRangeReaction)
+  Q_DISABLE_COPY(pqRescaleScalarRangeReaction)
   QPointer<pqPipelineRepresentation> Representation;
   Modes Mode;
   vtkSmartPointer<vtkEventQtSlotConnect> Connection;

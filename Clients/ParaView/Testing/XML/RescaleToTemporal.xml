@@ -14,7 +14,8 @@
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777221" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleTemporalRange" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ResetScalarRangeToDataOverTime/RescaleAndLockButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToDataOverTimeDialog/AutomaticRescaling" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToDataOverTimeDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
   <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton5" property="enabled" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
