@@ -1907,22 +1907,88 @@ def RemoveLink(linkName):
     """Remove a link with the given name."""
     servermanager.ProxyManager().UnRegisterLink(linkName)
 
+
+def AddProxyLink(proxy1, proxy2, linkName='', link=None):
+    """Create a link between two proxies and return its name.
+
+    An instance of a vtkSMProxyLink subclass can be given, otherwise
+    a vtkSMProxyLink is created.
+    This does not link proxy properties. See vtkSMProxyLink.LinkProxyPropertyProxies
+
+    If linkName is empty, a default one is created for registration.
+    If a link with the given name already exists it will be removed first.
+
+    Return the link registration name.
+    """
+    if link == None:
+        link = servermanager.vtkSMProxyLink()
+
+    link.LinkProxies(proxy1.SMProxy, proxy2.SMProxy)
+    pm = servermanager.ProxyManager()
+    if linkName == '':
+        name1 = pm.GetProxyName(proxy1.SMProxy.GetXMLGroup(), proxy1.SMProxy)
+        name2 = pm.GetProxyName(proxy2.SMProxy.GetXMLGroup(), proxy2.SMProxy)
+        linkName = name1 + '-' + name2 + '-link'
+
+    RemoveLink(linkName)
+    pm.RegisterLink(linkName, link)
+    return linkName
+
+#==============================================================================
+# ViewLink methods
+#==============================================================================
+
+def AddViewLink(viewProxy, viewProxyOther, linkName=''):
+    """Create a view link between two view proxies.
+
+    A view link is an extension of a proxy link, that also do
+    a rendering when a property changes.
+
+    Cameras are not linked.
+
+    If a link with the given name already exists it will be removed first.
+
+    Return the link registration name.
+    """
+    link = servermanager.vtkSMViewLink()
+    return AddProxyLink(viewProxy, viewProxyOther, linkName, link)
+
+def AddRenderViewLink(viewProxy, viewProxyOther, linkName = '', linkCameras=False):
+    """Create a view link between two render view proxies.
+
+    It also creates links for the AxesGrid proxy property.
+    By default, cameras are not linked.
+
+    If a link with the given name already exists it will be removed first.
+
+    Return the link registration name.
+    """
+    linkName = AddViewLink(viewProxy, viewProxyOther, linkName)
+    pm = servermanager.ProxyManager()
+    link = pm.GetRegisteredLink(linkName)
+    link.EnableCameraLink(linkCameras)
+    link.LinkProxyPropertyProxies(viewProxy.SMProxy, viewProxyOther.SMProxy, "AxesGrid")
+    return linkName
+
 #==============================================================================
 # CameraLink methods
 #==============================================================================
 
-def AddCameraLink(viewProxy, viewProxyOther, linkName):
+def AddCameraLink(viewProxy, viewProxyOther, linkName = ''):
     """Create a camera link between two view proxies.  A name must be given
     so that the link can be referred to by name.  If a link with the given
-    name already exists it will be removed first."""
+    name already exists it will be removed first.
+
+    Return the link registration name.
+    """
     if not viewProxyOther: viewProxyOther = GetActiveView()
     link = servermanager.vtkSMCameraLink()
-    link.AddLinkedProxy(viewProxy.SMProxy, 1)
-    link.AddLinkedProxy(viewProxyOther.SMProxy, 2)
-    link.AddLinkedProxy(viewProxyOther.SMProxy, 1)
-    link.AddLinkedProxy(viewProxy.SMProxy, 2)
-    RemoveCameraLink(linkName)
-    servermanager.ProxyManager().RegisterLink(linkName, link)
+    if linkName == '':
+        name1 = pm.GetProxyName(proxy1.SMProxy.GetXMLGroup(), proxy1.SMProxy)
+        name2 = pm.GetProxyName(proxy2.SMProxy.GetXMLGroup(), proxy2.SMProxy)
+        linkName = name1 + '-' + name2 + '-cameraLink'
+
+    return AddProxyLink(viewProxy, viewProxyOther, linkName, link)
 
 # -----------------------------------------------------------------------------
 
@@ -1948,6 +2014,7 @@ def AddSelectionLink(objProxy, objProxyOther, linkName, convertToIndices = True)
     link.AddLinkedSelection(objProxy.SMProxy, 1)
     RemoveSelectionLink(linkName)
     servermanager.ProxyManager().RegisterLink(linkName, link)
+    return link
 
 # -----------------------------------------------------------------------------
 

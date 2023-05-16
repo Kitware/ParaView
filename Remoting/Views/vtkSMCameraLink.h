@@ -29,6 +29,8 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMProxyLink.h"
 
+#include <set>
+
 class VTKREMOTINGVIEWS_EXPORT vtkSMCameraLink : public vtkSMProxyLink
 {
 public:
@@ -45,6 +47,13 @@ public:
   vtkGetMacro(SynchronizeInteractiveRenders, int);
   vtkBooleanMacro(SynchronizeInteractiveRenders, int);
   ///@}
+
+  /**
+   * Get the list of camera properties to link.
+   * For each pair, first item is the (information) property to read and
+   * the second is the property to set.
+   */
+  static std::set<std::pair<std::string, std::string>> CameraProperties();
 
   /**
    * Add a property to the link. updateDir determines whether a property of
@@ -100,9 +109,9 @@ protected:
   void UpdateProperty(vtkSMProxy*, const char*) override {}
 
   /**
-   * Save the state of the link.
+   * Override to ajust to this class name.
    */
-  void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) override;
+  std::string GetXMLTagName() override { return "CameraLink"; }
 
   /**
    * Internal method to copy vtkSMproperty values from caller to all linked

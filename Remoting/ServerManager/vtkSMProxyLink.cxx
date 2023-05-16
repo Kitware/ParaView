@@ -21,6 +21,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <list>
@@ -56,6 +57,8 @@ struct vtkSMProxyLinkInternals
 
   typedef std::set<std::string> ExceptionPropertiesType;
   ExceptionPropertiesType ExceptionProperties;
+
+  std::set<vtkSmartPointer<vtkSMProxyLink>> ProxyPropLinks;
 };
 
 //---------------------------------------------------------------------------
@@ -68,6 +71,55 @@ vtkSMProxyLink::vtkSMProxyLink()
 vtkSMProxyLink::~vtkSMProxyLink()
 {
   delete this->Internals;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyLink::LinkProxies(vtkSMProxy* proxy1, vtkSMProxy* proxy2)
+{
+  this->AddLinkedProxy(proxy1, vtkSMLink::INPUT);
+  this->AddLinkedProxy(proxy2, vtkSMLink::OUTPUT);
+  this->AddLinkedProxy(proxy2, vtkSMLink::INPUT);
+  this->AddLinkedProxy(proxy1, vtkSMLink::OUTPUT);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyLink::LinkProxyPropertyProxies(
+  vtkSMProxy* proxy1, vtkSMProxy* proxy2, const char* pname)
+{
+  if (!proxy1 || !proxy2)
+  {
+    vtkErrorMacro("Invalid proxies. Please provide 2 existing proxies.");
+    return;
+  }
+
+  if (!pname)
+  {
+    vtkErrorMacro("Undefined proxy property name");
+    return;
+  }
+
+  // also link axes grids for renderview
+  auto proxy1Prop = vtkSMProxyProperty::SafeDownCast(proxy1->GetProperty(pname));
+  auto proxy2Prop = vtkSMProxyProperty::SafeDownCast(proxy2->GetProperty(pname));
+  if (!proxy1Prop || !proxy2Prop)
+  {
+    vtkErrorMacro("Specified proxy property does not exist.");
+    return;
+  }
+
+  if (!proxy1Prop->GetProxy(0u) || !proxy2Prop->GetProxy(0u))
+  {
+    vtkErrorMacro("Specified proxy property does not have proxy.");
+    return;
+  }
+
+  // create their own link.
+  vtkNew<vtkSMProxyLink> proxyPropLink;
+  proxyPropLink->LinkProxies(proxy1Prop->GetProxy(0u), proxy2Prop->GetProxy(0u));
+  // observe them with our own observer, to update consumer if needed.
+  this->ObserveProxyUpdates(proxy1Prop->GetProxy(0u));
+  this->ObserveProxyUpdates(proxy2Prop->GetProxy(0u));
+  this->Internals->ProxyPropLinks.insert(proxyPropLink);
 }
 
 //---------------------------------------------------------------------------
@@ -294,7 +346,7 @@ void vtkSMProxyLink::UpdateVTKObjects(vtkSMProxy* caller)
 void vtkSMProxyLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();
-  root->SetName("ProxyLink");
+  root->SetName(this->GetXMLTagName().c_str());
   root->AddAttribute("name", linkname);
   vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
     this->Internals->LinkedProxies.begin();

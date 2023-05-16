@@ -181,6 +181,7 @@ set(classes
   vtkSMTransferFunctionProxy
   vtkSMUtilities
   vtkSMViewLayoutProxy
+  vtkSMViewLink
   vtkSMViewProxy
   vtkSMViewProxyInteractorHelper
   vtkSMViewResolutionDomain

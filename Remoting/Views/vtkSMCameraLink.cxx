@@ -88,8 +88,6 @@ public:
 
   bool Updating;
 
-  static const char* LinkedPropertyNames[];
-
   vtkInternals() { this->Updating = false; }
   ~vtkInternals()
   {
@@ -101,16 +99,18 @@ public:
   }
 };
 
-//---------------------------------------------------------------------------
-const char* vtkSMCameraLink::vtkInternals::LinkedPropertyNames[] = {
-  /* from */ /* to */
-  "CameraPositionInfo", "CameraPosition", "CameraViewAngleInfo", "CameraViewAngle",
-  "CameraFocalPointInfo", "CameraFocalPoint", "CameraViewUpInfo", "CameraViewUp",
-  "CenterOfRotation", "CenterOfRotation", "CameraParallelScaleInfo", "CameraParallelScale",
-  "RotationFactor", "RotationFactor", "CameraParallelProjection", "CameraParallelProjection",
-  "CameraFocalDisk", "CameraFocalDiskInfo", "CameraFocalDistance", "CameraFocalDistanceInfo",
-  "InteractionMode", "InteractionMode", nullptr
-};
+std::set<std::pair<std::string, std::string>> vtkSMCameraLink::CameraProperties()
+{
+  return { /* from */ /* to */
+    { "CameraPositionInfo", "CameraPosition" }, { "CameraViewAngleInfo", "CameraViewAngle" },
+    { "CameraFocalPointInfo", "CameraFocalPoint" }, { "CameraViewUpInfo", "CameraViewUp" },
+    { "CenterOfRotation", "CenterOfRotation" },
+    { "CameraParallelScaleInfo", "CameraParallelScale" }, { "RotationFactor", "RotationFactor" },
+    { "CameraParallelProjection", "CameraParallelProjection" },
+    { "CameraFocalDiskInfo", "CameraFocalDisk" },
+    { "CameraFocalDistanceInfo", "CameraFocalDistance" },
+    { "InteractionMode", "InteractionMode" } };
+}
 
 //---------------------------------------------------------------------------
 vtkSMCameraLink::vtkSMCameraLink()
@@ -183,11 +183,9 @@ void vtkSMCameraLink::UpdateVTKObjects(vtkSMProxy* vtkNotUsed(fromProxy))
 //---------------------------------------------------------------------------
 void vtkSMCameraLink::CopyProperties(vtkSMProxy* caller)
 {
-  const char** props = this->Internals->LinkedPropertyNames;
-
-  for (; *props; props += 2)
+  for (const auto& propPair : vtkSMCameraLink::CameraProperties())
   {
-    vtkSMProperty* fromProp = caller->GetProperty(props[0]);
+    vtkSMProperty* fromProp = caller->GetProperty(propPair.first.c_str());
 
     int numObjects = this->GetNumberOfLinkedObjects();
     for (int i = 0; i < numObjects; i++)
@@ -195,9 +193,9 @@ void vtkSMCameraLink::CopyProperties(vtkSMProxy* caller)
       vtkSMProxy* p = this->GetLinkedProxy(i);
       if (p != caller && this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT)
       {
-        vtkSMProperty* toProp = p->GetProperty(props[1]);
+        vtkSMProperty* toProp = p->GetProperty(propPair.second.c_str());
         toProp->Copy(fromProp);
-        p->UpdateProperty(props[1]);
+        p->UpdateProperty(propPair.second.c_str());
       }
     }
   }
@@ -252,21 +250,6 @@ void vtkSMCameraLink::ResetCamera(vtkObject* caller)
   this->Internals->Updating = true;
   this->CopyProperties(vtkSMProxy::SafeDownCast(caller));
   this->Internals->Updating = false;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMCameraLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
-{
-  vtkPVXMLElement* root = vtkPVXMLElement::New();
-  Superclass::SaveXMLState(linkname, root);
-  unsigned int numElems = root->GetNumberOfNestedElements();
-  for (unsigned int cc = 0; cc < numElems; cc++)
-  {
-    vtkPVXMLElement* child = root->GetNestedElement(cc);
-    child->SetName("CameraLink");
-    parent->AddNestedElement(child);
-  }
-  root->Delete();
 }
 
 //---------------------------------------------------------------------------
