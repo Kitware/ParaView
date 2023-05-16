@@ -132,6 +132,8 @@ struct pqTimelineWidget::pqInternals
 
     auto delegate = new pqTimelineItemDelegate(self, this->TimelineView);
     this->TimelineView->setItemDelegateForColumn(pqTimelineColumn::TIMELINE, delegate);
+    // allow to handle mouse events in delegate
+    this->TimelineView->viewport()->installEventFilter(delegate);
 
     QObject::connect(delegate, &pqTimelineItemDelegate::needsRepaint,
       [&]() { this->TimelineView->updateTimelines(); });

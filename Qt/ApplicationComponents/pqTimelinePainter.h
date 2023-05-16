@@ -80,6 +80,8 @@ public:
   void setSceneEndTime(double time);
   // cache scene current time.
   void setSceneCurrentTime(double time);
+  /// get scene cursor time
+  double getSceneCurrentTime();
   // cache scene lock start.
   void setSceneLockStart(bool lock);
   // cache scene lock end

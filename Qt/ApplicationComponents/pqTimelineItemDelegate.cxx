@@ -243,7 +243,8 @@ bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* mode
 {
   auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
   // edit start / end time
-  if (mouseEvent && this->TimelinePainter->hasStartEndLabels())
+  if (mouseEvent && mouseEvent->type() == QEvent::MouseButtonDblClick &&
+    this->TimelinePainter->hasStartEndLabels())
   {
     QRect startRect = this->TimelinePainter->getStartLabelRect();
     if (startRect.contains(mouseEvent->pos()))
@@ -264,6 +265,7 @@ bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* mode
   // move scene time
   if (mouseEvent &&
     (index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::TIME ||
+      index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::ANIMATION ||
       index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::SOURCE))
   {
     double time = this->TimelinePainter->timeFromPosition(mouseEvent->pos().x(), option, index);
@@ -271,6 +273,8 @@ bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* mode
     if (mouseEvent->type() == QEvent::MouseButtonPress && mouseEvent->button() == Qt::LeftButton)
     {
       this->Internals->Interaction = true;
+      this->TimelinePainter->setSceneCurrentTime(time);
+      Q_EMIT this->needsRepaint();
     }
 
     if (this->Internals->Interaction && mouseEvent->type() == QEvent::MouseMove)
@@ -278,21 +282,49 @@ bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* mode
       this->TimelinePainter->setSceneCurrentTime(time);
       Q_EMIT this->needsRepaint();
     }
-
-    if (mouseEvent->type() == QEvent::MouseButtonRelease && mouseEvent->button() == Qt::LeftButton)
-    {
-      this->Internals->Interaction = false;
-      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
-      pqAnimationScene* scene = animationManager->getActiveScene();
-
-      scene->setAnimationTime(time);
-    }
   }
 
   this->Internals->EditStart->hide();
   this->Internals->EditEnd->hide();
 
   return Superclass::editorEvent(event, model, option, index);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTimelineItemDelegate::eventFilter(QObject* watched, QEvent* event)
+{
+  if (!this->Internals->Interaction)
+  {
+    return false;
+  }
+
+  auto widget = dynamic_cast<QWidget*>(watched);
+  auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+  if (!widget || !mouseEvent)
+  {
+    return false;
+  }
+
+  if (event->type() == QEvent::MouseButtonRelease)
+  {
+    pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+    pqAnimationScene* scene = animationManager->getActiveScene();
+
+    // if mouse is released outside of the widget, cancel changes
+    if (!widget->geometry().contains(mouseEvent->pos()))
+    {
+      this->TimelinePainter->setSceneCurrentTime(scene->getAnimationTime());
+      Q_EMIT this->needsRepaint();
+    }
+    else
+    {
+      scene->setAnimationTime(this->TimelinePainter->getSceneCurrentTime());
+    }
+
+    this->Internals->Interaction = false;
+  }
+
+  return this->Superclass::eventFilter(watched, event);
 }
 
 //-----------------------------------------------------------------------------

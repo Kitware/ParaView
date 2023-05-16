@@ -480,6 +480,12 @@ void pqTimelinePainter::setSceneCurrentTime(double time)
 }
 
 //-----------------------------------------------------------------------------
+double pqTimelinePainter::getSceneCurrentTime()
+{
+  return this->SceneCurrentTime;
+}
+
+//-----------------------------------------------------------------------------
 void pqTimelinePainter::setSceneLockStart(bool lock)
 {
   this->SceneLockStart = lock;

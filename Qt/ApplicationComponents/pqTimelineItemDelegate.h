@@ -78,6 +78,16 @@ public:
   bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option,
     const QModelIndex& index) override;
 
+  /**
+   * Reimplemented to handle more mouse events from parent view.
+   *
+   * editorEvent is useful to get the concerned index and option, but it is pretty
+   * restricted. For instance no release event is catched if it occurs outside
+   * of the index that received the corresponding press event. Thus we need this
+   * eventFilter, to watch the full pqTimelineView.
+   */
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the active scene connections.
