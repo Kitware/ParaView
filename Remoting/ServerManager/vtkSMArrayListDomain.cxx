@@ -22,6 +22,7 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMInputArrayDomain.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -408,12 +409,34 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   // we use a set so that the list gets sorted as well as helps us
   // avoid duplicates esp. when processing two datainformation objects.
   vtkSMArrayListDomainInternals::DomainValuesSet set;
-  this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, dataInfo);
-
-  vtkPVDataInformation* extraInfo = this->GetExtraDataInformation();
-  if (extraInfo)
+  const auto activeAssemblyProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("ActiveAssembly"));
+  const auto selectors =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("Selectors"));
+  const auto inputProperty = vtkSMInputProperty::SafeDownCast(input);
+  const auto inputProxy = inputProperty ? inputProperty->GetProxy(0) : nullptr;
+  if (activeAssemblyProp && activeAssemblyProp->GetNumberOfElements() == 1 && selectors &&
+    inputProxy)
   {
-    this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, extraInfo);
+    vtkNew<vtkPVDataInformation> subsetInfo;
+    subsetInfo->SetPortNumber(dataInfo->GetPortNumber());
+    subsetInfo->SetSubsetAssemblyName(activeAssemblyProp->GetElement(0));
+    for (unsigned int i = 0; i < selectors->GetNumberOfElements(); ++i)
+    {
+      subsetInfo->SetSubsetSelector(selectors->GetElement(i));
+      inputProxy->GatherInformation(subsetInfo);
+      this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, subsetInfo);
+    }
+  }
+  else
+  {
+    this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, dataInfo);
+
+    vtkPVDataInformation* extraInfo = this->GetExtraDataInformation();
+    if (extraInfo)
+    {
+      this->ALDInternals->BuildArrayList(set, this, fieldDataSelection, iad, extraInfo);
+    }
   }
 
   vtkSMArrayListDomainInternals::DomainValuesVector values;

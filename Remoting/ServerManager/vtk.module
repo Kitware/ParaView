@@ -21,6 +21,7 @@ PRIVATE_DEPENDS
   VTK::doubleconversion
   VTK::fmt
 OPTIONAL_DEPENDS
+  VTK::IOIOSS
   VTK::Python
   VTK::PythonInterpreter
   VTK::RenderingRayTracing
