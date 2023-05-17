@@ -232,7 +232,7 @@ option(PARAVIEW_ENABLE_OCCT "Enable OCCT Support." OFF)
 
 option(PARAVIEW_BUILD_TRANSLATIONS "Generate translation files" OFF)
 if (PARAVIEW_BUILD_TRANSLATIONS)
-  set(PARAVIEW_TRANSLATIONS_DIRECTORY "${CMAKE_BINARY_DIR}/Translation" CACHE STRING
+  set(PARAVIEW_TRANSLATIONS_DIRECTORY "${CMAKE_BINARY_DIR}/Translations" CACHE STRING
     "The directory containing translation files")
 endif()
 
