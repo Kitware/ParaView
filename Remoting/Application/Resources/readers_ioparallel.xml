@@ -115,9 +115,9 @@
                      short_help="Read OpenFOAM data files.">The OpenFOAM reader
                      reads OpenFOAM data files and outputs multiblock
                      datasets. Mesh information and time dependent data are
-                     supported. This is a distributed reader. The OpenFOAM format
-                     is described fully at
-                     http://www.openfoam.com/docs/user/basic-file-format.php.
+                     supported. This is a distributed reader. See
+                     https://www.openfoam.com/documentation/user-guide
+                     for a description of the OpenFOAM format.
       </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -293,14 +293,13 @@
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetDecomposePolyhedra"
-                         default_values="1"
+                         default_values="0"
                          label="Decompose polyhedra"
                          name="DecomposePolyhedra"
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>Decompose polyhedra into tetrahedra and
-        pyramids.</Documentation>
+        <Documentation>Decompose polyhedra into tets/pyramids (deprecated)</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetSizeAverageCellToPoint"
