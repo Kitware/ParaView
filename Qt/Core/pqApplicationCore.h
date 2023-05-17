@@ -325,7 +325,7 @@ public:
    * returns interface language in use in a locale code form.
    * It is first read from PV_INTERFACE_LANGUAGE environment
    * variable if defined, then recovered from user settings.
-   * If not set, return `en_US`.
+   * If not set, return `en`.
    */
   QString getInterfaceLanguage();
 

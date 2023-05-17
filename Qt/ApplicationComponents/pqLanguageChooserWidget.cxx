@@ -76,9 +76,9 @@ pqLanguageChooserWidget::pqLanguageChooserWidget(
     thus translationsPath has to be added lastly */
   paths.append(translationsPath);
 
-  /* en_US is the language used in source string, therefore it does not need a translation file
+  /* en is the language used in source string, therefore it does not need a translation file
     and is always available */
-  this->ComboBox->addItem(QLocale("en_US").nativeLanguageName(), QVariant("en_US"));
+  this->ComboBox->addItem(QLocale("en").nativeLanguageName(), QVariant("en"));
   for (QDir directory : paths)
   {
     for (QFileInfo fileInfo : directory.entryInfoList(QDir::Files))
