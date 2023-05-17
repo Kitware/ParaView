@@ -128,11 +128,10 @@ static bool update_producer_ioss(const std::string& channel_name, const conduit_
 #endif
 }
 
-#if VTK_MODULE_ENABLE_VTK_IOFides
-static bool create_producer_fides(const std::string& channel_name, const conduit_cpp::Node& node)
+static bool update_producer_fides(
+  const std::string& channel_name, const conduit_cpp::Node& node, double& time)
 {
-  // For the ADIOS Inline engine, the reader proxy must be created before simulation
-  // steps can start
+#if VTK_MODULE_ENABLE_VTK_IOFides
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
   {
@@ -158,20 +157,6 @@ static bool create_producer_fides(const std::string& channel_name, const conduit
     // Required so that vtkFidesReader will setup the inline reader
     producer->UpdatePipelineInformation();
     producer->Delete();
-  }
-
-  return true;
-}
-#endif
-
-static bool update_producer_fides(const std::string& channel_name, double& time)
-{
-#if VTK_MODULE_ENABLE_VTK_IOFides
-  auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
-  if (producer == nullptr)
-  {
-    vtkLogF(ERROR, "Fides producer doesn't exist!");
-    return false;
   }
   auto algo = vtkFidesReader::SafeDownCast(producer->GetClientSideObject());
   algo->PrepareNextStep();
@@ -339,16 +324,6 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
       "analysis pipelines will be executed.");
   }
 
-#if VTK_MODULE_ENABLE_VTK_IOFides
-  // For the ADIOS Inline engine, the reader proxy must be created before simulation
-  // steps can start
-  if (cpp_params.has_path("catalyst/fides"))
-  {
-    auto& fidesParams = cpp_params["catalyst/fides"];
-    create_producer_fides("fides", fidesParams);
-  }
-#endif
-
   return catalyst_status_ok;
 }
 
@@ -506,7 +481,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       }
       else if (type == "fides")
       {
-        update_producer_fides(channel_name, time);
+        update_producer_fides(channel_name, cpp_params["catalyst/fides"], time);
       }
     }
   }

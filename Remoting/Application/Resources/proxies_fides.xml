@@ -20,6 +20,26 @@
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty
+            name="StreamSteps"
+            command="SetStreamSteps"
+            label="StreamSteps"
+            number_of_elements="1"
+            default_values="0"
+            panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty
+            name="DataSourceEngine"
+            animateable="0"
+            command="SetDataSourceEngine"
+            label="DataSourceEngines"
+            repeat_command="1"
+            element_types="2 2"
+            number_of_elements="2"
+            number_of_elements_per_command="2"
+            panel_visibility="advanced">
+      </StringVectorProperty>
+      <IntVectorProperty
             name="ConvertToVTK"
             command="SetConvertToVTK"
             label="Convert To VTK"
@@ -85,9 +105,9 @@
       <Hints>
         <ReaderFactory extensions="bp"
                        file_description="ADIOS2 BP3 File (using Fides)" />
-        <ReaderFactory extensions="bp"
+        <ReaderFactory extensions="bp bp4 bp5"
                        is_directory="1"
-                       file_description="ADIOS2 BP4 Directory (using Fides)" />
+            file_description="ADIOS2 BP4/5 Directory (using Fides)" />
       </Hints>
     </SourceProxy>
 
@@ -120,6 +140,17 @@
             number_of_elements_per_command="2"
             panel_visibility="default">
       </StringVectorProperty>
+      <StringVectorProperty
+            name="DataSourceEngine"
+            animateable="0"
+            command="SetDataSourceEngine"
+            label="DataSourceEngines"
+            repeat_command="1"
+            element_types="2 2"
+            number_of_elements="2"
+            number_of_elements_per_command="2"
+            panel_visibility="advanced">
+      </StringVectorProperty>
       <IntVectorProperty
             name="ConvertToVTK"
             command="SetConvertToVTK"
@@ -127,6 +158,15 @@
             number_of_elements="1"
             default_values="1"
             panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+            name="StreamSteps"
+            command="SetStreamSteps"
+            label="StreamSteps"
+            number_of_elements="1"
+            default_values="0"
+            panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <StringVectorProperty
