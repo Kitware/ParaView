@@ -407,6 +407,20 @@
           The input that provides the selection object.
         </Documentation>
       </InputProperty>
+      <IntVectorProperty name="HyperTreeGridToUnstructuredGrid"
+        command="SetHyperTreeGridToUnstructuredGrid"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Output an unstructured grid instead of a hyper tree grid for input hyper tree grids.
+        </Documentation>
+       <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
       <!-- End ExtractSelection -->
     </SourceProxy>
 
@@ -538,6 +552,20 @@
           an insidedness array to mark which cells are inside or out. If 0 then the output is
           an unstructured grid which contains only the subset of cells that are inside.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="HyperTreeGridToUnstructuredGrid"
+        command="SetHyperTreeGridToUnstructuredGrid"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Output an unstructured grid instead of a hyper tree grid for input hyper tree grids.
+        </Documentation>
+       <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"/>
+        </Hints>
       </IntVectorProperty>
       <Hints>
         <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper"/>

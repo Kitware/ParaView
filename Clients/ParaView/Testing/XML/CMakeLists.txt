@@ -632,6 +632,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume3.png}"
@@ -810,6 +811,7 @@ if (PARAVIEW_USE_PYTHON)
   if(NOT APPLE)
     list(APPEND TESTS_WITHOUT_BASELINES
       TooltipCopy.xml
+      TestHTGHoverOnCell.xml
       )
   endif()
 endif()
@@ -1817,6 +1819,7 @@ set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SeriesPreset_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (TestHTGHoverOnCell_FORCE_SERIAL TRUE)  # since this uses QTooltip and QShortcut
 set (TestIsoVolume_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (TimeKeeper_FORCE_SERIAL TRUE) # since this uses popup window
