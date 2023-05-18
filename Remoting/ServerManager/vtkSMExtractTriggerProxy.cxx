@@ -169,7 +169,6 @@ bool vtkSMExtractTriggerProxy::IsActivated(vtkSMExtractsController* controller)
     }
     else if (doIt == true && (timevalue > (this->LastOutputTimeValue + length - .5 * average)))
     {
-      const int timestep = controller->GetTimeStep();
       this->LastOutputTimeValue = timevalue;
     }
     else
