@@ -326,11 +326,12 @@ std::string vtkXMLPVAnimationWriterInternals::CreateFileName(
   char pt[100];
   if (this->GroupMap[this->InputGroupNames[index]] > 1)
   {
-    sprintf(pt, "P%02dT%04d", this->InputPartNumbers[index], this->InputChangeCounts[index] - 1);
+    snprintf(pt, sizeof(pt), "P%02dT%04d", this->InputPartNumbers[index],
+      this->InputChangeCounts[index] - 1);
   }
   else
   {
-    sprintf(pt, "T%04d", this->InputChangeCounts[index] - 1);
+    snprintf(pt, sizeof(pt), "T%04d", this->InputChangeCounts[index] - 1);
   }
   fn_with_warning_C4701 << pt;
 

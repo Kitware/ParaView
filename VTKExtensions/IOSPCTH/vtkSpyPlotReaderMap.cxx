@@ -174,14 +174,14 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   int maximum = currentNum;
   while (1)
   {
-    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+    snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
     // cerr << "buffer1 == " << buffer << endl;
     if (!vtksys::SystemTools::FileExists(buffer))
     {
       int next = idx;
       for (idx = last; idx > next; idx--)
       {
-        sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+        snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
         if (!vtksys::SystemTools::FileExists(buffer))
         {
           break;
@@ -202,14 +202,14 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   found = currentNum;
   while (1)
   {
-    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+    snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
     // cerr << "buffer2 == " << buffer << endl;
     if (!vtksys::SystemTools::FileExists(buffer))
     {
       int next = idx;
       for (idx = last; idx < next; idx++)
       {
-        sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+        snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
         if (!vtksys::SystemTools::FileExists(buffer))
         {
           break;
@@ -227,7 +227,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   maximum = found;
   for (idx = minimum; idx <= maximum; ++idx)
   {
-    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+    snprintf(buffer, sizeof(buffer), "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
     // cerr << "buffer3 == " << buffer << endl;
     this->Files[buffer] = nullptr;
   }
