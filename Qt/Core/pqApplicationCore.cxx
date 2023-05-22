@@ -780,7 +780,7 @@ QString pqApplicationCore::getInterfaceLanguage()
   {
     return this->settings()->value("GeneralSettings.InterfaceLanguage").toString();
   }
-  return QString("en_US");
+  return QString("en");
 }
 
 //-----------------------------------------------------------------------------

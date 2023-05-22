@@ -103,7 +103,7 @@
 
       <StringVectorProperty name="InterfaceLanguage"
         number_of_elements="1"
-        default_values="en_US"
+        default_values="en"
         command="SetInterfaceLanguage"
         panel_widget="language_selector">
         <Documentation>

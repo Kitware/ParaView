@@ -106,7 +106,7 @@ public:
   ///@{
   /**
    * Get/Set the default interface language.
-   * Default is en_US
+   * Default is en
    */
   vtkGetMacro(InterfaceLanguage, std::string);
   vtkSetMacro(InterfaceLanguage, std::string);
@@ -372,7 +372,7 @@ protected:
   int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly = false;
   std::string DefaultViewType = "RenderView";
-  std::string InterfaceLanguage = "en_US";
+  std::string InterfaceLanguage = "en";
   int ScalarBarMode = AUTOMATICALLY_HIDE_SCALAR_BARS;
   bool CacheGeometryForAnimation = false;
   unsigned long AnimationGeometryCacheLimit = 0;
