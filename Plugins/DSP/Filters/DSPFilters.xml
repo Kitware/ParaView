@@ -737,6 +737,70 @@
       </IntVectorProperty>
 
     </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkTemporalMultiplexing"
+                 label="Temporal Multiplexing"
+                 name="TemporalMultiplexing">
+      <Documentation short_help="Create table with 3D arrays from temporal data.">
+        This filter creates a vtkTable containing 3D arrays based on a temporal input.
+        Each point/cell array of the input is converted to a 3D array defined by
+        (index, tuple, component), corresponding to (point/cell, timestep, component).
+        The arrays are vtkMultiDimensionalArray objects.
+        Note: the filter currently does not support composite datasets.
+      </Documentation>
+
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="FieldAssociation"
+                         command="SetFieldAssociation"
+                         default_values="0"
+                         number_of_elements="1">
+        <FieldDataDomain enable_field_data="0"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          Select the attribute data to filter.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SelectArrays"
+                            label="Data Arrays"
+                            command="EnableAttributeArray"
+                            clean_command="ClearAttributeArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="FieldDataSelection"
+                      name="FieldAssociation" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Arrays to be transformed into multidimensional arrays.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- Prevent automatic display to avoid crash in Spreadsheet View
+          due to multidimensional arrays -->
+      <Hints>
+        <View type="None" />
+      </Hints>
+
+    </SourceProxy>
   </ProxyGroup>
 
   <ParaViewFilters>
@@ -749,6 +813,7 @@
       <Proxy group="filters" name="TableFFT" />
       <Proxy group="filters" name="EqualizerFilter"/>
       <Proxy group="filters" name="BandFiltering"/>
+      <Proxy group="filters" name="TemporalMultiplexing" />
     </Category>
   </ParaViewFilters>
 </ServerManagerConfiguration>
