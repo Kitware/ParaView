@@ -36,7 +36,6 @@ import argparse
 from collections.abc import Iterable
 import os
 
-
 def translationUnit(file: str, line: int, context: str, content: str) -> str:
     if not content:
         return ""
@@ -45,10 +44,8 @@ def translationUnit(file: str, line: int, context: str, content: str) -> str:
     res += f"\tQT_TRANSLATE_NOOP(\"ServerManagerXML\", R\"({content})\"),\n\n"
     return res
 
-
 def _insertSpace(string: str, index: int) -> str:
     return string[:index] + ' ' + string[index:]
-
 
 # This function MUST have the same behavior as
 # vtkSMObject::CreatePrettyLabel()
@@ -68,39 +65,45 @@ def createPrettyLabel(label: str) -> str:
             label = _insertSpace(label, i + 1)
     return label[1:-2]
 
-
-def recursiveStringCrawl(file: str, context: str, node) -> list:
+def recursiveStringCrawl(file: str, context: str, group: str, node) -> list:
     """
     Recursive function searching for node labels to translate.
     Return a list of its translatable attributes (and from its children)
     to translate as Qt header format.
     """
-    res = []
-    if "label" in node.attrib:
-        res.append(translationUnit(file, node.line, context, node.attrib["label"]))
-    elif "menu_label" in node.attrib:
-        res.append(translationUnit(file, node.line, context, node.attrib["menu_label"]))
-    elif "Documentation" in node.tag:
-        if node.text:
-            res.append(translationUnit(file, node.line, context, node.text))
-        if "long_help" in node.attrib:
-            res.append(translationUnit(file, node.line, context, node.attrib["long_help"]))
-        if "short_help" in node.attrib:
-            res.append(translationUnit(file, node.line, context, node.attrib["short_help"]))
-    elif "Property" in node.tag and "name" in node.attrib:
-        res.append(translationUnit(file, node.line, context, createPrettyLabel(node.attrib["name"])))
-    elif node.tag.endswith("Proxy") and "name" in node.attrib:
-        res.append(translationUnit(file, node.line, context, createPrettyLabel(node.attrib["name"])))
-    elif "ShowInMenu" in node.tag and "category" in node.attrib:
-        res.append(translationUnit(file, node.line, context, node.attrib["category"]))
 
-    if node.tag.endswith("Proxy") and "name" in node.attrib:
-        context = node.attrib["name"]
+    res = []
+
+    # Identify proxy group
+    if node.tag == "ProxyGroup":
+      group = node.attrib["name"]
+
+    else:
+      if "label" in node.attrib:
+          res.append(translationUnit(file, node.line, context, node.attrib["label"]))
+      elif "menu_label" in node.attrib:
+          res.append(translationUnit(file, node.line, context, node.attrib["menu_label"]))
+      elif "Documentation" in node.tag:
+          if node.text:
+              res.append(translationUnit(file, node.line, context, node.text))
+          if "long_help" in node.attrib:
+              res.append(translationUnit(file, node.line, context, node.attrib["long_help"]))
+          if "short_help" in node.attrib:
+              res.append(translationUnit(file, node.line, context, node.attrib["short_help"]))
+      elif "Property" in node.tag and "name" in node.attrib:
+          res.append(translationUnit(file, node.line, context, createPrettyLabel(node.attrib["name"])))
+      elif node.tag.endswith("Proxy") and not group.startswith("internal_") and "name" in node.attrib:
+          res.append(translationUnit(file, node.line, context, createPrettyLabel(node.attrib["name"])))
+      elif "ShowInMenu" in node.tag and "category" in node.attrib:
+          res.append(translationUnit(file, node.line, context, node.attrib["category"]))
+
+      if node.tag.endswith("Proxy") and "name" in node.attrib:
+          context = node.attrib["name"]
+
     for child in node:
-        res += recursiveStringCrawl(file, context, child)
+        res += recursiveStringCrawl(file, context, group, child)
 
     return res
-
 
 class LineParser(ET.XMLParser):
     """
@@ -111,12 +114,10 @@ class LineParser(ET.XMLParser):
         el.line = self.parser.CurrentLineNumber
         return el
 
-
 def removePrefix(string: str, prefix: str):
     if string.startswith(prefix):
         return string[len(prefix):]
     return string
-
 
 def fileParsing(fileIn: str, sourceDir: str) -> str:
     """
@@ -125,10 +126,9 @@ def fileParsing(fileIn: str, sourceDir: str) -> str:
     Qt header format.
     """
     xmlTree = ET.parse(fileIn, parser=LineParser())
-    stringsList = recursiveStringCrawl(removePrefix(fileIn, sourceDir), removePrefix(fileIn, sourceDir), xmlTree.getroot())
+    stringsList = recursiveStringCrawl(removePrefix(fileIn, sourceDir), removePrefix(fileIn, sourceDir), "root", xmlTree.getroot())
     res = "".join(stringsList)
     return res
-
 
 def filesManager(filesIn: list, fileOut: str, sourceDir: str):
     """
@@ -148,7 +148,6 @@ def filesManager(filesIn: list, fileOut: str, sourceDir: str):
     with open(fileOut, 'w', encoding='utf-8') as f:
         f.write(res)
 
-
 def __main__():
     """
     Asks for an ouput file and for one or more input files.
@@ -166,7 +165,6 @@ def __main__():
     else:
         for i in args.inFiles:
             filesManager([i], os.path.splitext(i)[0] + ".h")
-
 
 if __name__ == "__main__":
     __main__()
