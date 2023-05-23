@@ -15,6 +15,7 @@
 #include "vtkMySpecialPolyDataMapper.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLMySpecialPolyDataMapperDelegator.h"
 
 vtkStandardNewMacro(vtkMySpecialPolyDataMapper);
 //----------------------------------------------------------------------------
@@ -27,4 +28,9 @@ vtkMySpecialPolyDataMapper::~vtkMySpecialPolyDataMapper() = default;
 void vtkMySpecialPolyDataMapper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+vtkCompositePolyDataMapperDelegator* vtkMySpecialPolyDataMapper::CreateADelegator()
+{
+  return vtkOpenGLMySpecialPolyDataMapperDelegator::New();
 }

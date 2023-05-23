@@ -1,5 +1,6 @@
 set(classes
   vtkMySpecialPolyDataMapper
+  vtkOpenGLMySpecialPolyDataMapperDelegator
   vtkMySpecialRepresentation)
 
 vtk_module_add_module(GeometryRepresentations
