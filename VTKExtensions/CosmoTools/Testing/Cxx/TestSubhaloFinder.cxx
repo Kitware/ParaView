@@ -18,7 +18,7 @@
 #include "vtkActor.h"
 #include "vtkCamera.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkMPIController.h"
 #include "vtkMaskPoints.h"
 #include "vtkNew.h"
@@ -98,7 +98,7 @@ int runSubhaloFinderTest(int argc, char* argv[])
   lut->AddRGBPoint(range[1], 180 / 255.0, 4 / 255.0, 38 / 255.0);
   lut->SetColorSpaceToDiverging();
 
-  vtkNew<vtkCompositePolyDataMapper2> mapper;
+  vtkNew<vtkCompositePolyDataMapper> mapper;
   mapper->SetInputConnection(maskPoints->GetOutputPort());
   mapper->ScalarVisibilityOn();
   mapper->SetLookupTable(lut.GetPointer());

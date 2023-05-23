@@ -1,5 +1,5 @@
 #include "vtkActor.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDummyController.h"
 #include "vtkPVAMRDualClip.h"
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
   typedef vtkSmartPointer<vtkDataSetSurfaceFilter> vtkDataSetSurfaceFilterRefPtr;
   typedef vtkSmartPointer<vtkPVAMRDualClip> vtkPVAMRDualClipRefPtr;
   typedef vtkSmartPointer<vtkSpyPlotReader> vtkSpyPlotReaderRefPtr;
-  typedef vtkSmartPointer<vtkCompositePolyDataMapper2> vtkPolyDataMapperRefPtr;
+  typedef vtkSmartPointer<vtkCompositePolyDataMapper> vtkPolyDataMapperRefPtr;
   typedef vtkSmartPointer<vtkActor> vtkActorRefPtr;
   typedef vtkSmartPointer<vtkRenderer> vtkRenderRefPtr;
   typedef vtkSmartPointer<vtkRenderWindow> vtkRenderWindowRefPtr;
