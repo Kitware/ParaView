@@ -15,6 +15,10 @@
 #include "vtkOpenXRRenderer.h"
 #endif
 
+#if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+#include "vtkOpenXRRemotingRenderWindow.h"
+#endif
+
 #include "vtkVRRenderWindow.h"
 
 #include "QVTKOpenGLWindow.h"
@@ -286,6 +290,19 @@ void vtkPVXRInterfaceHelper::SetUseOpenXR(bool useOpenXr)
   if (useOpenXr)
   {
     vtkWarningMacro("Attempted to enable UseOpenXR without OpenXR support");
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::SetUseOpenXRRemoting(bool useOpenXRREmoting)
+{
+#if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+  this->UseOpenXRRemoting = useOpenXRREmoting;
+#else
+  if (this->UseOpenXRRemoting)
+  {
+    vtkWarningMacro("Attempted to enable UseOpenXRREmoting without OpenXRRemoting support");
   }
 #endif
 }
@@ -1882,7 +1899,21 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 #if XRINTERFACE_HAS_OPENXR_SUPPORT
   if (this->UseOpenXR)
   {
-    renWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
+    if (this->UseOpenXRRemoting)
+    {
+      vtkWarningMacro("Enable OpenXRRemoting scene");
+      renWin = vtkSmartPointer<vtkOpenXRRemotingRenderWindow>::New();
+      auto* renWinRemote = dynamic_cast<vtkOpenXRRemotingRenderWindow*>(renWin.Get());
+      if (renWinRemote)
+      {
+        vtkWarningMacro("Set IP: " << this->RemotingAddress);
+        renWinRemote->SetRemotingIPAddress(this->RemotingAddress.c_str());
+      }
+    }
+    else
+    {
+      renWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
+    }
     renWin->MakeCurrent();
     renWin->SetHelperWindow(pvRenderWindow);
     ren = vtkSmartPointer<vtkOpenXRRenderer>::New();
@@ -2086,7 +2117,17 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 
     // Ensure that the floor actor is displayed in case the checkbox
     // "Show Floor" stays checked between sessions
-    ren->SetShowFloor(true);
+    bool shouldShowTheFloor = true;
+
+    // As the OpenXRRemoting is only for the Hololens2 which is for AR application only,
+    // we force to not display the floor for such context as it's not relevant
+#if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+    if (this->UseOpenXRRemoting)
+    {
+      shouldShowTheFloor = false;
+    }
+#endif
+    ren->SetShowFloor(shouldShowTheFloor);
 
     // Retrieve initial View Up direction
     double* viewUpDir = renWin->GetPhysicalViewUp();

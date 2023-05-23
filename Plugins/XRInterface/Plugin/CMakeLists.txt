@@ -32,6 +32,20 @@ if (NOT (PARAVIEW_XRInterface_OpenXR_Support OR PARAVIEW_XRInterface_OpenVR_Supp
   message(STATUS "XRInterface plugin is enabled but neither OpenVR or OpenXR support are enabled, the plugin may not be usable")
 endif ()
 
+option(PARAVIEW_XRInterface_OpenXRRemoting_Support  "Turn on support for OpenXR in XRInterface plugin for the Hololens2" OFF)
+if (PARAVIEW_XRInterface_OpenXRRemoting_Support)
+  if (TARGET VTK::RenderingOpenXRRemoting AND PARAVIEW_XRInterface_OpenXR_Support)
+    list(APPEND required_modules
+      VTK::RenderingOpenXRRemoting
+    )
+    set(openxrremoting_support TRUE)
+  else ()
+    message(FATAL_ERROR
+      "PARAVIEW_XRInterface_OpenXRRemoting_Support is ON but VTK::RenderingOpenXRRemoting and PARAVIEW_XRInterface_OpenXR_Support are not,
+      please enable VTK::RenderingOpenXRRemoting and PARAVIEW_XRInterface_OpenXR_Support for Hololens2 support")
+  endif ()
+endif ()
+
 set(interfaces)
 set(sources
   pqXRInterfaceControls.cxx
@@ -108,7 +122,8 @@ set_property(
   pqXRInterfaceDockPanel.cxx
   vtkPVXRInterfaceHelper.cxx
   APPEND PROPERTY
-    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>")
+    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>"
+    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT=$<BOOL:${openxrremoting_support}>")
 
 set_property(
   SOURCE
@@ -146,6 +161,27 @@ install(
   DESTINATION "${_paraview_build_plugin_directory}"
   COMPONENT   "${_paraview_build_PLUGINS_COMPONENT}"
 )
+
+# install also XRRemoting dll and json config file
+# at the root for now
+if (PARAVIEW_XRInterface_OpenXR_Support AND PARAVIEW_XRInterface_OpenXRRemoting_Support)
+  set(openxrremoting_dependencies
+    RemotingXR.json
+    Microsoft.Holographic.AppRemoting.OpenXr.dll
+  )
+
+  foreach(openxrremoting_dependency IN LISTS openxrremoting_dependencies)
+    configure_file(
+      ${OpenXRRemoting_BIN_DIR}/${openxrremoting_dependency}
+      "${CMAKE_BINARY_DIR}/bin/${openxrremoting_dependency}"
+      COPYONLY)
+  endforeach()
+
+  install(
+    FILES ${openxrremoting_dependencies}
+    DESTINATION "${CMAKE_BINARY_DIR}/bin"
+  )
+endif()
 
 list(APPEND required_modules
   ParaView::pqApplicationComponents
