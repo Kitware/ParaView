@@ -20,7 +20,7 @@
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataDisplayAttributes.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -50,6 +50,7 @@
 #include "vtkScalarsToColors.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
+#include "vtkShader.h"
 #include "vtkShaderProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTexture.h"
@@ -231,7 +232,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
-  vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::New();
+  vtkCompositePolyDataMapper* mapper = vtkCompositePolyDataMapper::New();
   mapper->SetProcessIdArrayName("vtkProcessId");
   mapper->SetCompositeIdArrayName("vtkCompositeIndex");
 
@@ -239,7 +240,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 
   this->SetArrayIdNames(nullptr, nullptr);
 
-  this->LODMapper = vtkCompositePolyDataMapper2::New();
+  this->LODMapper = vtkCompositePolyDataMapper::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
 
@@ -287,13 +288,13 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
 void vtkGeometryRepresentation::SetupDefaults()
 {
   // setup composite display attributes
-  if (auto cpdm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper))
+  if (auto cpdm = vtkCompositePolyDataMapper::SafeDownCast(this->Mapper))
   {
     vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
     cpdm->SetCompositeDataDisplayAttributes(compositeAttributes);
   }
 
-  if (auto cpdm = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper))
+  if (auto cpdm = vtkCompositePolyDataMapper::SafeDownCast(this->LODMapper))
   {
     vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributesLOD;
     cpdm->SetCompositeDataDisplayAttributes(compositeAttributesLOD);
@@ -462,7 +463,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     if (outputData && (this->BlockAttributeTime < outputData->GetMTime() || this->BlockAttrChanged))
     {
-      if (auto cmapper = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper))
+      if (auto cmapper = vtkCompositePolyDataMapper::SafeDownCast(this->Mapper))
       {
         this->PopulateBlockAttributes(cmapper->GetCompositeDataDisplayAttributes(), outputData);
       }
@@ -476,7 +477,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     if (lod && dataLOD && this->UpdateBlockAttrLOD)
     {
-      if (auto cmapper = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper))
+      if (auto cmapper = vtkCompositePolyDataMapper::SafeDownCast(this->LODMapper))
       {
         this->PopulateBlockAttributes(cmapper->GetCompositeDataDisplayAttributes(), dataLOD);
       }
@@ -772,12 +773,7 @@ void vtkGeometryRepresentation::SetVisibility(bool val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetCoordinateShiftScaleMethod(int val)
 {
-  vtkOpenGLPolyDataMapper* mapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
-  if (mapper)
-  {
-    mapper->SetVBOShiftScaleMethod(val);
-  }
-  mapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(this->Mapper);
   if (mapper)
   {
     mapper->SetVBOShiftScaleMethod(val);
@@ -786,7 +782,7 @@ void vtkGeometryRepresentation::SetCoordinateShiftScaleMethod(int val)
 
 int vtkGeometryRepresentation::GetCoordinateShiftScaleMethod()
 {
-  vtkOpenGLPolyDataMapper* mapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(this->Mapper);
   if (mapper)
   {
     return mapper->GetVBOShiftScaleMethod();
@@ -883,14 +879,9 @@ void vtkGeometryRepresentation::SetLookupTable(vtkScalarsToColors* val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetColorMissingArraysWithNanColor(bool val)
 {
-  // Only implemented in OpenGL2, refactor once CPDM2 gets deprecated in VTK.
-  if (auto cpdm2 = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper))
+  if (auto cpdm = vtkCompositePolyDataMapper::SafeDownCast(this->Mapper))
   {
-    cpdm2->SetColorMissingArraysWithNanColor(val);
-  }
-  if (auto cpdm2 = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper))
-  {
-    cpdm2->SetColorMissingArraysWithNanColor(val);
+    cpdm->SetColorMissingArraysWithNanColor(val);
   }
 }
 
@@ -1786,7 +1777,7 @@ void vtkGeometryRepresentation::UpdateShaderReplacements()
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetArrayIdNames(const char* pointArray, const char* cellArray)
 {
-  vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+  vtkCompositePolyDataMapper* mapper = vtkCompositePolyDataMapper::SafeDownCast(this->Mapper);
   mapper->SetPointIdArrayName(pointArray ? pointArray : "vtkOriginalPointIds");
   mapper->SetCellIdArrayName(cellArray ? cellArray : "vtkOriginalCellIds");
 }

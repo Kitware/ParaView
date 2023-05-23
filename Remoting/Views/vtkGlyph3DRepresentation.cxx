@@ -17,7 +17,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkArrowSource.h"
 #include "vtkCompositeDataDisplayAttributes.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTree.h"
 #include "vtkDataObjectTreeIterator.h"
@@ -121,13 +121,13 @@ void vtkGlyph3DRepresentation::SetupDefaults()
 {
   this->Superclass::SetupDefaults();
 
-  if (auto compositeAttributes = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)
-                                   ->GetCompositeDataDisplayAttributes())
+  if (auto compositeAttributes =
+        vtkCompositePolyDataMapper::SafeDownCast(this->Mapper)->GetCompositeDataDisplayAttributes())
   {
     this->GlyphMapper->SetBlockAttributes(compositeAttributes);
   }
 
-  if (auto compositeAttributes = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)
+  if (auto compositeAttributes = vtkCompositePolyDataMapper::SafeDownCast(this->LODMapper)
                                    ->GetCompositeDataDisplayAttributes())
   {
     this->LODGlyphMapper->SetBlockAttributes(compositeAttributes);
