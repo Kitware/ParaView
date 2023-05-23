@@ -15,7 +15,8 @@
 #include "vtkPrismGeometryRepresentationWithFaces.h"
 
 #include "vtkAlgorithmOutput.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLODActor.h"
 #include "vtkPrismView.h"
