@@ -18,7 +18,7 @@
 #include "vtkAppendCompositeDataLeaves.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkFieldData.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
@@ -75,7 +75,7 @@ vtkStreamingParticlesRepresentation::vtkStreamingParticlesRepresentation()
 
   this->PriorityQueue = vtkSmartPointer<vtkStreamingParticlesPriorityQueue>::New();
   this->PriorityQueue->UseBlockDetailInformationOn();
-  this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
+  this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper>::New();
 
   this->Actor = vtkSmartPointer<vtkPVLODActor>::New();
   this->Actor->SetMapper(this->Mapper);
