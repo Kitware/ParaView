@@ -25,22 +25,22 @@
  * This work was supported by the German Climate Computing Center (DKRZ).
  *
  * @sa
- * vtkCompositePolyDataMapper2
+ * vtkCompositePolyDataMapper
  */
 
 #ifndef vtkBumpMapMapper_h
 #define vtkBumpMapMapper_h
 
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkEmbossingRepresentationsModule.h" // for export macro
 
 class vtkMultiProcessController;
 
-class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkBumpMapMapper : public vtkCompositePolyDataMapper2
+class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkBumpMapMapper : public vtkCompositePolyDataMapper
 {
 public:
   static vtkBumpMapMapper* New();
-  vtkTypeMacro(vtkBumpMapMapper, vtkCompositePolyDataMapper2);
+  vtkTypeMacro(vtkBumpMapMapper, vtkCompositePolyDataMapper);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -58,13 +58,11 @@ protected:
   ~vtkBumpMapMapper() override = default;
 
   /**
-   * Creation of a helper
+   * Creation of a delegator
    */
-  vtkCompositeMapperHelper2* CreateHelper() override;
+  vtkCompositePolyDataMapperDelegator* CreateADelegator() override;
 
   float BumpMappingFactor = 50.f;
-
-  friend class vtkBumpMapMapperHelper;
 
 private:
   vtkBumpMapMapper(const vtkBumpMapMapper&) = delete;
