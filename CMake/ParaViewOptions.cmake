@@ -99,7 +99,7 @@ endif()
 #========================================================================
 
 # XXX(VTK): External VTK is not yet actually supported.
-if (FALSE)
+if (TRUE)
 option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
 mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
 else ()
