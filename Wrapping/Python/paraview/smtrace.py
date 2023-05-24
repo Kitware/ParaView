@@ -267,7 +267,7 @@ class Trace(object):
                 ctor_args="%s, %s" % (lutAccessor, viewAccessor)))
             cls.Output.append_separated(trace.raw_data())
             return True
-        if cls.get_registered_name(obj, "animation"):
+        if not skip_rendering and cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
         if obj.SMProxy.GetXMLName() == "RepresentationAnimationHelper":
             sourceAccessor = cls.get_accessor(obj.Source)
@@ -862,11 +862,18 @@ class ViewProxyFilter(ProxyFilter):
             "ViewTime", "CacheKey", "Representations"]: return True
         return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
+class TimeKeeperProxyFilter(ProxyFilter):
+    def should_never_trace(self, prop):
+        if ProxyFilter.should_never_trace(self, prop): return True
+        if prop.get_property_name() in ["Views", "TimeSources", "Time"]:
+            return True
+        return False
+
 class AnimationProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.get_property_name() in ["AnimatedProxy", "AnimatedPropertyName",
-            "AnimatedElement", "AnimatedDomainName"]:
+            "AnimatedElement", "AnimatedDomainName", "TimeKeeper"]:
             return True
         return False
 
@@ -1282,6 +1289,51 @@ class RegisterLightProxy(RenderingMixin, TraceItem):
             trace.append(accessor.trace_ctor("CreateLight", filter))
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
+
+class TraceAnimationProxy(RenderingMixin, TraceItem):
+    """Traces all changes in an animation proxy."""
+    def __init__(self, proxy):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        assert not self.Proxy is None
+
+    def finalize(self):
+        # trace timekeeper
+        if hasattr(self.Proxy, "TimeKeeper"):
+          tkTrace = TraceProxy(self.Proxy.TimeKeeper, TimeKeeperProxyFilter(), "# initialize the timekeeper")
+          tkTrace.finalize()
+
+        # create dynamic animation cues as needed.
+        if hasattr(self.Proxy, "Cues"):
+            for cue in self.Proxy.Cues:
+              cueTrace = TraceProxy(cue, AnimationProxyFilter(), "# initialize the animation track")
+              cueTrace.finalize()
+
+        animTrace = TraceProxy(self.Proxy, AnimationProxyFilter(), "# initialize the animation scene")
+        animTrace.finalize()
+        TraceItem.finalize(self)
+
+class TraceProxy(TraceItem):
+    """Traces all changes in a provided proxy."""
+    def __init__(self, proxy, filter, description):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        self.Filter = filter
+        self.Description = description
+        assert not self.Proxy is None
+
+    def finalize(self):
+        TraceItem.finalize(self)
+
+        # We let Trace create an accessor for the proxy. We will then simply log the
+        # default property values.
+        accessor = Trace.get_accessor(self.Proxy) # type: RealProxyAccessor
+
+        # Now trace properties on the proxy.
+        trace = TraceOutput()
+        trace.append_separated(self.Description)
+        trace.append(accessor.trace_ctor(None, self.Filter))
+        Trace.Output.append_separated(trace.raw_data())
 
 class ExportView(RenderingMixin, TraceItem):
     def __init__(self, view, exporter, filename):

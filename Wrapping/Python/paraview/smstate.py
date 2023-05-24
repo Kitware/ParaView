@@ -23,12 +23,11 @@ RECORD_ALL_PROPERTIES = sm.vtkSMTrace.RECORD_ALL_PROPERTIES
 
 class supported_proxies(object):
     """filter object used to hide proxies that are currently not supported by
-    the state saving mechanism or those that are generally skipped in state e.g.
-    animation proxies and time keeper."""
+    the state saving mechanism or those that are generally skipped in state.
+    There is none currently but keeping the method for backward compatibility
+    and future proofing."""
     def __call__(self, proxy):
-        return proxy and \
-            not proxy.GetXMLGroup() == "animation" and \
-            not proxy.GetXMLName() == "TimeKeeper"
+        return proxy
 
 class visible_representations(object):
     """filter object to skip hidden representations from being saved in state file"""
@@ -137,6 +136,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         # if nothing is specified, we save all views and sources.
         start_set = [x for x in simple.GetSources().values()] + simple.GetViews()
     start_set = [x for x in start_set if filter(x)]
+    start_set += [simple.GetAnimationScene()]
 
     # now, locate dependencies for the start_set, pruning irrelevant branches
     consumers = set(start_set)
@@ -281,7 +281,6 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                       "# set color bar visibility", "%s.Visibility = %s" % (\
                     smtrace.Trace.get_accessor(rep), rep.Visibility)])
 
-
             for rep in view_representations:
                 try:
                     producer = rep.Input
@@ -311,13 +310,30 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     if not skipRenderingComponents and ctfs:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
-            "# setup color maps and opacity mapes used in the visualization",
+            "# setup color maps and opacity maps used in the visualization",
             "# note: the Get..() functions create a new object, if needed",
             "# ----------------------------------------------------------------"])
         for ctf in ctfs:
             smtrace.Trace.get_accessor(ctf)
             if ctf.ScalarOpacityFunction in proxies_of_interest:
                 smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
+    #--------------------------------------------------------------------------
+    # Now, trace the animation scenes
+    # There should be only one but keep the code generic
+    anims = set([x for x in proxies_of_interest \
+        if smtrace.Trace.get_registered_name(x, "animation")])
+    if not skipRenderingComponents and anims:
+        trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# setup animation scene, tracks and keyframes",
+            "# note: the Get..() functions create a new object, if needed",
+            "# ----------------------------------------------------------------"])
+        for anim in anims:
+           traceitem = smtrace.TraceAnimationProxy(anim)
+           traceitem.finalize()
+           del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     # Trace extractors.
