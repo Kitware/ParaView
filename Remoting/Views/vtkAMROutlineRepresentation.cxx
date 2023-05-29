@@ -18,7 +18,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkAppendCompositeDataLeaves.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -49,7 +49,7 @@ vtkAMROutlineRepresentation::vtkAMROutlineRepresentation()
   this->InStreamingUpdate = false;
 
   this->PriorityQueue = vtkSmartPointer<vtkAMRStreamingPriorityQueue>::New();
-  this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
+  this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper>::New();
 
   this->Actor = vtkSmartPointer<vtkPVLODActor>::New();
   this->Actor->SetMapper(this->Mapper.Get());

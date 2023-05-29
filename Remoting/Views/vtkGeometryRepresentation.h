@@ -38,7 +38,6 @@
 #include <unordered_map> // needed for std::unordered_map
 
 class vtkCompositeDataDisplayAttributes;
-class vtkCompositePolyDataMapper2;
 class vtkMapper;
 class vtkPiecewiseFunction;
 class vtkPVGeometryFilter;

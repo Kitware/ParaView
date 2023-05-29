@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkGeometryRepresentationWithFaces.h"
 
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLODActor.h"
@@ -28,8 +28,8 @@ vtkGeometryRepresentationWithFaces::vtkGeometryRepresentationWithFaces()
 {
   this->BackfaceActor = vtkPVLODActor::New();
   this->BackfaceProperty = vtkProperty::New();
-  this->BackfaceMapper = vtkCompositePolyDataMapper2::New();
-  this->LODBackfaceMapper = vtkCompositePolyDataMapper2::New();
+  this->BackfaceMapper = vtkCompositePolyDataMapper::New();
+  this->LODBackfaceMapper = vtkCompositePolyDataMapper::New();
   this->BackfaceRepresentation = FOLLOW_FRONTFACE;
 
   // Since we are overriding SetupDefaults(), we need to call it again.

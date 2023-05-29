@@ -30,23 +30,23 @@
  * This work was supported by the German Climate Computing Center (DKRZ).
  *
  * @sa
- * vtkCompositePolyDataMapper2
+ * vtkCompositePolyDataMapper
  *
  */
 
 #ifndef vtkExtrusionMapper_h
 #define vtkExtrusionMapper_h
 
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkEmbossingRepresentationsModule.h" // for export macro
 
 class vtkMultiProcessController;
 
-class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionMapper : public vtkCompositePolyDataMapper2
+class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionMapper : public vtkCompositePolyDataMapper
 {
 public:
   static vtkExtrusionMapper* New();
-  vtkTypeMacro(vtkExtrusionMapper, vtkCompositePolyDataMapper2);
+  vtkTypeMacro(vtkExtrusionMapper, vtkCompositePolyDataMapper);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -127,9 +127,9 @@ protected:
   ~vtkExtrusionMapper() override;
 
   /**
-   * Creation of a helper
+   * Creation of a delegator
    */
-  vtkCompositeMapperHelper2* CreateHelper() override;
+  vtkCompositePolyDataMapperDelegator* CreateADelegator() override;
 
   /**
    * Extends bounds to take into account extrusion
@@ -137,9 +137,10 @@ protected:
   void ComputeBounds() override;
 
   /**
-   * Override to compute data range
+   * Override to collect global data range in a distributed environment.
    */
-  void InitializeHelpersBeforeRendering(vtkRenderer* ren, vtkActor* actor) override;
+  void PreRender(const std::vector<vtkSmartPointer<vtkCompositePolyDataMapperDelegator>>&,
+    vtkRenderer*, vtkActor*) override;
 
   vtkMultiProcessController* Controller = nullptr;
   bool NormalizeData = true;
@@ -153,7 +154,7 @@ protected:
   bool BasisVisibility = false;
   bool AutoScaling = true;
 
-  friend class vtkExtrusionMapperHelper;
+  friend class vtkOpenGLBatchedExtrusionMapper;
 
 private:
   vtkExtrusionMapper(const vtkExtrusionMapper&) = delete;

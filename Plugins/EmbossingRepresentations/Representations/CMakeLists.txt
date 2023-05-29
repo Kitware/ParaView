@@ -1,6 +1,8 @@
 set(classes
   vtkBumpMapMapper
   vtkBumpMapRepresentation
+  vtkOpenGLBumpMapMapperDelegator
+  vtkOpenGLExtrusionMapperDelegator
   vtkExtrusionMapper
   vtkExtrusionRepresentation)
 
