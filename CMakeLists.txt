@@ -501,6 +501,7 @@ else ()
 
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)
+  set(VTK_LOGGING_TIME_PRECISION "${PARAVIEW_LOGGING_TIME_PRECISION}")
 
   # Create a translation source file generation target and create the
   # option-specified source files directory if not already created
