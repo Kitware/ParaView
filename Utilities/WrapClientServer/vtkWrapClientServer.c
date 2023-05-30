@@ -134,9 +134,6 @@ void output_temp(FILE* fp, int i, unsigned int argType, const char* Id, int coun
     case VTK_PARSE_LONG_LONG:
       fprintf(fp, "long long ");
       break;
-    case VTK_PARSE___INT64:
-      fprintf(fp, "__int64 ");
-      break;
     case VTK_PARSE_SIGNED_CHAR:
       fprintf(fp, "signed char ");
       break;
@@ -219,7 +216,6 @@ void use_hints(FILE* fp)
       case VTK_PARSE_LONG:
       case VTK_PARSE_ID_TYPE:
       case VTK_PARSE_LONG_LONG:
-      case VTK_PARSE___INT64:
       case VTK_PARSE_UNSIGNED_CHAR:
       case VTK_PARSE_SIGNED_CHAR:
       case VTK_PARSE_UNSIGNED_INT:
@@ -227,7 +223,6 @@ void use_hints(FILE* fp)
       case VTK_PARSE_UNSIGNED_LONG:
       case VTK_PARSE_UNSIGNED_ID_TYPE:
       case VTK_PARSE_UNSIGNED_LONG_LONG:
-      case VTK_PARSE_UNSIGNED___INT64:
         fprintf(fp,
           "      resultStream.Reset();\n"
           "      resultStream << vtkClientServerStream::Reply << "
@@ -260,7 +255,6 @@ void return_result(FILE* fp)
     case VTK_PARSE_DOUBLE:
     case VTK_PARSE_ID_TYPE:
     case VTK_PARSE_LONG_LONG:
-    case VTK_PARSE___INT64:
     case VTK_PARSE_SIGNED_CHAR:
     case VTK_PARSE_BOOL:
     case VTK_PARSE_UNSIGNED_CHAR:
@@ -269,7 +263,6 @@ void return_result(FILE* fp)
     case VTK_PARSE_UNSIGNED_LONG:
     case VTK_PARSE_UNSIGNED_ID_TYPE:
     case VTK_PARSE_UNSIGNED_LONG_LONG:
-    case VTK_PARSE_UNSIGNED___INT64:
     case VTK_PARSE_STRING:
       if ((rType & VTK_PARSE_INDIRECT) == 0 ||
         (((rType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
@@ -362,7 +355,6 @@ void get_args(FILE* fp, int i)
     case VTK_PARSE_LONG:
     case VTK_PARSE_ID_TYPE:
     case VTK_PARSE_LONG_LONG:
-    case VTK_PARSE___INT64:
     case VTK_PARSE_SIGNED_CHAR:
     case VTK_PARSE_BOOL:
     case VTK_PARSE_CHAR:
@@ -372,7 +364,6 @@ void get_args(FILE* fp, int i)
     case VTK_PARSE_UNSIGNED_LONG:
     case VTK_PARSE_UNSIGNED_ID_TYPE:
     case VTK_PARSE_UNSIGNED_LONG_LONG:
-    case VTK_PARSE_UNSIGNED___INT64:
     case VTK_PARSE_STRING:
       if (((argType & VTK_PARSE_INDIRECT) == 0) ||
         ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF) ||
@@ -614,8 +605,7 @@ int managableArguments(FunctionInfo* curFunction)
     VTK_PARSE_DOUBLE, VTK_PARSE_CHAR, VTK_PARSE_UNSIGNED_CHAR, VTK_PARSE_SIGNED_CHAR, VTK_PARSE_INT,
     VTK_PARSE_UNSIGNED_INT, VTK_PARSE_SHORT, VTK_PARSE_UNSIGNED_SHORT, VTK_PARSE_LONG,
     VTK_PARSE_UNSIGNED_LONG, VTK_PARSE_ID_TYPE, VTK_PARSE_UNSIGNED_ID_TYPE, VTK_PARSE_LONG_LONG,
-    VTK_PARSE_UNSIGNED_LONG_LONG, VTK_PARSE___INT64, VTK_PARSE_UNSIGNED___INT64,
-    VTK_PARSE_VTK_OBJECT, VTK_PARSE_STRING, 0 };
+    VTK_PARSE_UNSIGNED_LONG_LONG, VTK_PARSE_VTK_OBJECT, VTK_PARSE_STRING, 0 };
 
   int i, j;
   int args_ok = 1;
@@ -789,7 +779,6 @@ int managableArguments(FunctionInfo* curFunction)
       case VTK_PARSE_LONG:
       case VTK_PARSE_ID_TYPE:
       case VTK_PARSE_LONG_LONG:
-      case VTK_PARSE___INT64:
       case VTK_PARSE_SIGNED_CHAR:
       case VTK_PARSE_UNSIGNED_CHAR:
       case VTK_PARSE_UNSIGNED_INT:
@@ -797,7 +786,6 @@ int managableArguments(FunctionInfo* curFunction)
       case VTK_PARSE_UNSIGNED_LONG:
       case VTK_PARSE_UNSIGNED_ID_TYPE:
       case VTK_PARSE_UNSIGNED_LONG_LONG:
-      case VTK_PARSE_UNSIGNED___INT64:
         args_ok = curFunction->HaveHint;
         break;
 
