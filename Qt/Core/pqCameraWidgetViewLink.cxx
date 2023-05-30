@@ -71,8 +71,8 @@ struct pqCameraWidgetViewLink::pqInternal
 {
   vtkNew<vtkCamera3DWidget> CameraWidget;
   vtkNew<vtkCamera3DRepresentation> CameraRepresentation;
-  vtkNew<vtkViewCallback> Callback;
 
+  vtkNew<vtkViewCallback> Callback;
   QPointer<pqRenderView> DisplayView;
   QPointer<pqRenderView> LinkedView;
   vtkPVRenderView* LinkedPVView = nullptr;
