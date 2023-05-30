@@ -1764,12 +1764,6 @@ QVariant pqSMAdaptor::convertToQVariant(const vtkVariant& variant)
       return variant.ToInt();
     case VTK_UNSIGNED_INT:
       return variant.ToUnsignedInt();
-#ifdef VTK_TYPE_USE___INT64
-    case VTK___INT64:
-      return variant.ToTypeInt64();
-    case VTK_UNSIGNED___INT64:
-      return variant.ToTypeUInt64();
-#endif
     case VTK_LONG_LONG:
       return variant.ToLongLong();
     case VTK_UNSIGNED_LONG_LONG:
