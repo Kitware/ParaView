@@ -35,6 +35,7 @@ set(classes
   pqApplicationCore
   pqAutoStartInterface
   pqBoxChartView
+  pqCameraWidgetViewLink
   pqCheckBoxDelegate
   pqCollaborationEventPlayer
   pqCollaborationManager

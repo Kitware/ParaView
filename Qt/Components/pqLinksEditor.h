@@ -104,6 +104,11 @@ public:
   bool interactiveViewLinkChecked();
 
   /**
+   * Get the check state of camera widget view link check box
+   */
+  bool cameraWidgetViewLinkChecked();
+
+  /**
    * Get the check state of convert to indices check box
    */
   bool convertToIndicesChecked();

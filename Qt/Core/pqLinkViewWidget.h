@@ -66,9 +66,10 @@ protected:
   bool event(QEvent* e) override;
 
 private:
-  pqRenderView* RenderView;
-  QLineEdit* LineEdit;
-  QCheckBox* InteractiveViewLinkCheckBox;
+  pqRenderView* RenderView = nullptr;
+  QLineEdit* LineEdit = nullptr;
+  QCheckBox* InteractiveViewLinkCheckBox = nullptr;
+  QCheckBox* CameraWidgetViewLinkCheckBox = nullptr;
 };
 
 #endif

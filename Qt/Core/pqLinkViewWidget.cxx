@@ -65,6 +65,20 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   hl->addWidget(this->LineEdit);
   this->InteractiveViewLinkCheckBox = new QCheckBox(tr("Interactive View Link"), this);
   l->addWidget(this->InteractiveViewLinkCheckBox);
+  this->CameraWidgetViewLinkCheckBox = new QCheckBox(tr("Camera Widget View Link"), this);
+  l->addWidget(this->CameraWidgetViewLinkCheckBox);
+
+  QObject::connect(
+    this->InteractiveViewLinkCheckBox, &QCheckBox::stateChanged, this,
+    [this](
+      int state) { this->CameraWidgetViewLinkCheckBox->setEnabled(!static_cast<bool>(state)); },
+    Qt::QueuedConnection);
+
+  QObject::connect(
+    this->CameraWidgetViewLinkCheckBox, &QCheckBox::stateChanged, this,
+    [this](int state) { this->InteractiveViewLinkCheckBox->setEnabled(!static_cast<bool>(state)); },
+    Qt::QueuedConnection);
+
   QPushButton* button = new QPushButton(this);
   l->addWidget(button);
   button->setText(tr("Cancel"));
@@ -138,8 +152,15 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
         model->removeLink(name);
       }
 
-      model->addCameraLink(name, this->RenderView->getProxy(), otherView->getProxy(),
-        this->InteractiveViewLinkCheckBox->isChecked());
+      if (this->CameraWidgetViewLinkCheckBox->isChecked())
+      {
+        model->addCameraWidgetLink(name, this->RenderView->getProxy(), otherView->getProxy());
+      }
+      else
+      {
+        model->addCameraLink(name, this->RenderView->getProxy(), otherView->getProxy(),
+          this->InteractiveViewLinkCheckBox->isChecked());
+      }
 
       this->close();
     }
