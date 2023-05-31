@@ -1541,25 +1541,11 @@ class LoadPlugin(TraceItem):
                 "# load plugin",
                 "LoadPlugin('%s', remote=%s, ns=globals())" % (filename, remote)])
 
-class CreateAnimationTrack(TraceItem):
+class CreateAnimationTrack(TraceProxy):
     # FIXME: animation tracing support in general needs to be revamped after moving
     # animation control logic to the server manager from Qt layer.
     def __init__(self, cue):
-        TraceItem.__init__(self)
-        self.Cue = sm._getPyProxy(cue)
-
-    def finalize(self):
-        TraceItem.finalize(self)
-
-        # We let Trace create an accessor for the cue. We will then simply log the
-        # default property values.
-        accessor = Trace.get_accessor(self.Cue) # type: RealProxyAccessor
-
-        # Now trace properties on the cue.
-        trace = TraceOutput()
-        trace.append_separated("# initialize the animation track")
-        trace.append(accessor.trace_ctor(None, AnimationProxyFilter()))
-        Trace.Output.append_separated(trace.raw_data())
+        TraceProxy.__init__(self, cue, AnimationProxyFilter(), "# initialize the animation track")
 
 class RenameProxy(TraceItem):
     "Trace renaming of a source proxy."
