@@ -227,6 +227,8 @@ endif()
 set(paraview_python_state_tests
   SavePythonState
   ScalarOpacityFunctionPythonState
+  SavePythonStateCameraAndTime
+  SavePythonStateSliceOffset
 )
 foreach(python_state_test ${paraview_python_state_tests})
   if (TARGET ParaView::paraview OR paraview_will_be_built)
@@ -239,6 +241,7 @@ foreach(python_state_test ${paraview_python_state_tests})
       -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.py
       -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${python_state_test}.xml
       -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
+      -DDATA_DIR:PATH=${paraview_test_data_directory_output}
       -DPYTHON_STATE_TEST_NAME:STRING=${python_state_test}
       -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.cmake
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/${python_state_test}.png}
