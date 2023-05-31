@@ -146,6 +146,10 @@ int vtkLogoSourceRepresentation::ProcessViewRequest(
         (this->InteractiveScaling ? repr->GetPosition2()[1] : this->ImageScale) * size[1];
       double width = height * dims[0] / dims[1];
       repr->SetPosition2(width / size[0], height / size[1]);
+      if (repr->GetWindowLocation() != vtkBorderRepresentation::AnyLocation)
+      {
+        repr->UpdateWindowLocation();
+      }
     }
     else
     {
