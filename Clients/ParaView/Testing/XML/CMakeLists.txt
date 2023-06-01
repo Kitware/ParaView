@@ -625,6 +625,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCleanGridPointDataStrategies_0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCleanGridPointDataStrategies_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCleanGridPointDataStrategies_2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorMapModificationRendersAllViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestClipCylinder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCompositedGeometryCulling.png}"
@@ -902,6 +903,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   SliceRepresentation.xml
   SteeringDataGenerator.xml
   TestCleanGridPointDataStrategies.xml
+  TestColorMapModificationRendersAllViews.xml
   TestHTGSelection.xml
   TestIsoVolume.xml
   TextSourceBorder.xml

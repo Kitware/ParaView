@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Data Objects" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="UnstructuredCellTypes" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="DistanceToCenter" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,7,11,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,7,11,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="DistanceToCenter" />
+
+  <!-- Undock the color map editor for uniform viewport sizes -->
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_floatbutton" command="activate" arguments="" />
+
+  <!-- change color map preset from default to Black-Body Radiation -->
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/DefaultPresetsComboBox" command="activated" arguments="Black-Body Radiation" />
+
+  <!-- save a multiview screenshot -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TestColorMapModificationRendersAllViews.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TestColorMapModificationRendersAllViews.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="500" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="500" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- compare screenshot saved during xml test playback -->
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TestColorMapModificationRendersAllViews.png" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TestColorMapModificationRendersAllViews.png" />
+
+</pqevents>
