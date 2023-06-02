@@ -6,6 +6,7 @@ REQUIRES_MODULES
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
+  VTK::CommonImplicitArrays
   VTK::FiltersGeneral
   VTK::FiltersCore
   VTK::FiltersExtraction

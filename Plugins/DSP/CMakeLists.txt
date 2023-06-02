@@ -39,8 +39,10 @@ paraview_add_plugin(DigitalSignalProcessing
   REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   MODULES
+    DigitalSignalProcessing::DSPDataModel
     DigitalSignalProcessing::DSPFiltersPlugin
   MODULE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/DataModel/vtk.module"
     "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
 
 if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player)
