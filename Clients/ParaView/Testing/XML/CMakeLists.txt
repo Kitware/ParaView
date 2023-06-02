@@ -262,6 +262,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartLoadNoVariablesA_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartLoadNoVariablesA_2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartLoadNoVariablesB.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartsClearSelection.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ClampAndUpdateColorMap-TS12-Clamped.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ClampAndUpdateColorMap-TS12-Unchanged.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ClampAndUpdateColorMap-TS6.png}"
@@ -929,6 +930,7 @@ SET(TESTS_WITH_BASELINES
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
+  ChartsClearSelection.xml
   CleanToGridRemovePoints.xml
   DataAxesGrid.xml
   EmptyInitialCompositeReader.xml # Issue #21293

@@ -231,6 +231,17 @@ void pqStandardViewFrameActionsImplementation::addContextViewActions(
     group->addAction(chartSelectRectangularAction);
   }
 
+  if (this->isButtonVisible("ClearSelection", chart_view))
+  {
+    QStyle* style = qApp->style();
+    QAction* chartClearAction = frame->addTitleBarAction(
+      style->standardIcon(QStyle::SP_DialogDiscardButton), tr("Clear selection"));
+    chartClearAction->setObjectName("actionClearSelection");
+    chartClearAction->setData(QVariant(pqChartSelectionReaction::CLEAR_SELECTION));
+    new pqChartSelectionReaction(chartClearAction, chart_view, modeGroup);
+    group->addAction(chartClearAction);
+  }
+
   /// If a QAction is added to an exclusive QActionGroup, then a checked action
   /// cannot be unchecked by clicking on it. We need that to work. Hence, we
   /// manually manage the exclusivity of the action group.
@@ -852,7 +863,7 @@ void pqStandardViewFrameActionsImplementation::escTriggered()
 //-----------------------------------------------------------------------------
 void pqStandardViewFrameActionsImplementation::manageGroupExclusivity(QAction* curAction)
 {
-  if (!curAction || !curAction->isChecked())
+  if (!curAction || (curAction->isCheckable() && !curAction->isChecked()))
   {
     return;
   }

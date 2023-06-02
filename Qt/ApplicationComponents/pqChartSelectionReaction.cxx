@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqContextView.h"
 #include "pqCoreUtilities.h"
-#include "vtkChart.h"
+#include "pqPVApplicationCore.h"
+#include "pqSelectionManager.h"
+
 #include "vtkCommand.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
@@ -60,6 +62,17 @@ pqChartSelectionReaction::pqChartSelectionReaction(
   {
     pqCoreUtilities::connect(
       interactor, vtkCommand::LeftButtonReleaseEvent, this, SLOT(stopSelection()));
+  }
+
+  if (parentObject->data().isValid() &&
+    parentObject->data().toInt() == pqChartSelectionReaction::CLEAR_SELECTION)
+  {
+    if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+    {
+      this->connect(core->selectionManager(), SIGNAL(selectionChanged(pqOutputPort*)),
+        SLOT(updateEnableState()));
+      this->updateEnableState();
+    }
   }
 }
 
@@ -135,14 +148,24 @@ void pqChartSelectionReaction::triggered(bool checked)
       selectionType = _action->data().toInt();
     }
 
-    int selectionModifier = this->getSelectionModifier();
-    if (checked)
+    if (selectionType == pqChartSelectionReaction::CLEAR_SELECTION)
     {
-      pqChartSelectionReaction::startSelection(this->View, selectionType, selectionModifier);
+      if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+        core->selectionManager()->clearSelection();
+      }
     }
-    else
+    else // Do selection
     {
-      pqChartSelectionReaction::stopSelection();
+      int selectionModifier = this->getSelectionModifier();
+      if (checked)
+      {
+        pqChartSelectionReaction::startSelection(this->View, selectionType, selectionModifier);
+      }
+      else
+      {
+        pqChartSelectionReaction::stopSelection();
+      }
     }
   }
 }
@@ -166,5 +189,25 @@ int pqChartSelectionReaction::getSelectionModifier()
     default:
       return vtkContextScene::SELECTION_DEFAULT;
       break;
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqChartSelectionReaction::updateEnableState()
+{
+  if (!this->View || !this->View->supportsSelection())
+  {
+    return;
+  }
+
+  this->stopSelection();
+  auto parentAction = this->parentAction();
+  if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+  {
+    parentAction->setEnabled(core->selectionManager()->hasActiveSelection());
+  }
+  else
+  {
+    parentAction->setEnabled(false);
   }
 }
