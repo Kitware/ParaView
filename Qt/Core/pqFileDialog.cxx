@@ -57,8 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 #include <QtDebug>
 
-#include <QKeyEvent>
-#include <QMouseEvent>
 #include <QShowEvent>
 
 #include <string>
