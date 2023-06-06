@@ -109,6 +109,11 @@ public:
    */
   virtual bool IsSelectionAvailable();
 
+  /**
+   * Call SynchronizeGeometryBounds server side
+   */
+  void SynchronizeGeometryBounds();
+
   ///@{
   /**
    * For backwards compatibility in Python scripts.
