@@ -318,12 +318,9 @@ bool pqCopyReaction::canPastePipeline()
 
   // If the root is a pipeline source, at this point, it needs to have input port
   auto root = qobject_cast<pqPipelineSource*>(SelectionRoot);
-  if (root)
+  if (root && !root->getSourceProxy()->GetNumberOfAlgorithmRequiredInputPorts())
   {
-    if (!root->getSourceProxy()->GetNumberOfAlgorithmRequiredInputPorts())
-    {
-      return false;
-    }
+    return true;
   }
 
   // We now check if we can stitch the active source to the root of the selection
@@ -469,9 +466,14 @@ void pqCopyReaction::pastePipeline()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
+  auto root = qobject_cast<pqPipelineSource*>(SelectionRoot);
+
+  pqPipelineSource* parent =
+    root->getSourceProxy()->GetNumberOfAlgorithmRequiredInputPorts() ? activeSource : nullptr;
+
   auto selection = FilterSelection;
   BEGIN_UNDO_SET(QString("Paste Pipeline"));
-  copyDescendants(builder, qobject_cast<pqPipelineSource*>(SelectionRoot), activeSource, selection);
+  copyDescendants(builder, root, parent, selection);
   END_UNDO_SET();
 
   if (activeSource)
