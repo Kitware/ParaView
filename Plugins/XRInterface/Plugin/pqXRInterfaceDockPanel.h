@@ -72,9 +72,6 @@ protected Q_SLOTS:
   void collaborationConnect();
   void collaborationCallback(std::string const& data, vtkLogger::Verbosity verbosity);
 
-  void editableFieldChanged(const QString& text);
-  void fieldValuesChanged(const QString& text);
-
   void xrBackendChanged(int index);
 
 private:

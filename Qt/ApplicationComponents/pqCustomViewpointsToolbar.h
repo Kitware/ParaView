@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * custom views (aka camera positions)
  */
 class QAction;
+class pqCustomViewpointsController;
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomViewpointsToolbar : public QToolBar
 {
@@ -50,14 +51,18 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomViewpointsToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqCustomViewpointsToolbar(const QString& title, QWidget* parentObject = nullptr)
+  pqCustomViewpointsToolbar(
+    const QString& title, pqCustomViewpointsController* controller, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
+    , Controller(controller)
     , BasePixmap(64, 64)
   {
     this->constructor();
   }
-  pqCustomViewpointsToolbar(QWidget* parentObject = nullptr)
+  pqCustomViewpointsToolbar(
+    pqCustomViewpointsController* controller, QWidget* parentObject = nullptr)
     : Superclass(parentObject)
+    , Controller(controller)
     , BasePixmap(64, 64)
   {
     this->constructor();
@@ -111,6 +116,7 @@ private:
   Q_DISABLE_COPY(pqCustomViewpointsToolbar)
   void constructor();
 
+  pqCustomViewpointsController* Controller;
   QPointer<QAction> PlusAction;
   QPointer<QAction> ConfigAction;
   QPixmap BasePixmap;

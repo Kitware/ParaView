@@ -752,6 +752,22 @@ void vtkPVXRInterfaceWidgets::collabUpdateThickCrop(int index, double* matrix)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXRInterfaceWidgets::ShowCropPlanes(bool visible)
+{
+  for (std::size_t i = 0; i < this->CropPlanes.size(); ++i)
+  {
+    this->CropPlanes[i]->SetEnabled(visible);
+    this->Helper->GetCollaborationClient()->UpdateCropPlane(i, this->CropPlanes[i]);
+  }
+
+  for (std::size_t i = 0; i < this->ThickCrops.size(); ++i)
+  {
+    this->ThickCrops[i]->SetEnabled(visible);
+    this->Helper->GetCollaborationClient()->UpdateThickCrop(i, this->ThickCrops[i]);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::SetCropSnapping(int val)
 {
   this->CropSnapping = val;
