@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 
 #include <algorithm>
+#include <cmath>
 
 // this struct is responsible for drawing elements in timelines.
 //
@@ -143,27 +144,26 @@ struct pqTimelineItemDelegate::pqInternals
     this->EndValidator = new QDoubleValidator(parentWidget);
     this->EditEnd->setValidator(this->EndValidator);
 
-    // Avoid Start == End. As validator is an inclusive range, use some epsilon.
-    QObject::connect(this->EditStart, &pqDoubleLineEdit::editingFinished, [&]() {
-      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
-      pqAnimationScene* scene = animationManager->getActiveScene();
-      this->EndValidator->setBottom(
-        vtkSMPropertyHelper(scene->getProxy()->GetProperty("StartTime")).GetAsDouble() +
-        std::numeric_limits<double>::epsilon());
-    });
-
-    QObject::connect(this->EditEnd, &pqDoubleLineEdit::editingFinished, [&]() {
-      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
-      pqAnimationScene* scene = animationManager->getActiveScene();
-      this->StartValidator->setTop(
-        vtkSMPropertyHelper(scene->getProxy()->GetProperty("EndTime")).GetAsDouble() -
-        std::numeric_limits<double>::epsilon());
-    });
+    this->updateValidators();
 
     QObject::connect(
       this->EditStart, &pqDoubleLineEdit::textChanged, [&]() { this->EditStart->adjustSize(); });
     QObject::connect(
       this->EditEnd, &pqDoubleLineEdit::textChanged, [&]() { this->EditEnd->adjustSize(); });
+  }
+
+  void updateValidators()
+  {
+    pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+    pqAnimationScene* scene = animationManager->getActiveScene();
+    if (!scene)
+    {
+      return;
+    }
+
+    auto timeRange = scene->getClockTimeRange();
+    this->StartValidator->setTop(std::nextafter(timeRange.second, timeRange.second - 1));
+    this->EndValidator->setBottom(std::nextafter(timeRange.first, timeRange.first + 1));
   }
 };
 
@@ -184,13 +184,13 @@ pqTimelineItemDelegate::pqTimelineItemDelegate(QObject* parent, QWidget* parentW
     this->Internals->LockStart, &QToolButton::clicked, this, &pqTimelineItemDelegate::needsRepaint);
   this->connect(
     this->Internals->LockEnd, &QToolButton::clicked, this, &pqTimelineItemDelegate::needsRepaint);
-  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::editingFinished,
+  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::textChangedAndEditingFinished,
     this->Internals->EditStart, &pqDoubleLineEdit::hide);
-  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::editingFinished, this,
+  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::textChangedAndEditingFinished, this,
     &pqTimelineItemDelegate::needsRepaint);
-  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::editingFinished,
+  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::textChangedAndEditingFinished,
     this->Internals->EditEnd, &pqDoubleLineEdit::hide);
-  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::editingFinished, this,
+  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::textChangedAndEditingFinished, this,
     &pqTimelineItemDelegate::needsRepaint);
 }
 
@@ -315,13 +315,6 @@ void pqTimelineItemDelegate::setActiveSceneConnections(pqAnimationScene* scene)
   this->Internals->SceneLinks.addPropertyLink(this->Internals->EditEnd, "text",
     SIGNAL(editingFinished()), sceneProxy, sceneProxy->GetProperty("EndTime"));
 
-  this->Internals->StartValidator->setTop(
-    vtkSMPropertyHelper(sceneProxy->GetProperty("EndTime")).GetAsDouble() -
-    std::numeric_limits<double>::epsilon());
-  this->Internals->EndValidator->setBottom(
-    vtkSMPropertyHelper(sceneProxy->GetProperty("StartTime")).GetAsDouble() +
-    std::numeric_limits<double>::epsilon());
-
   this->connect(scene, &pqAnimationScene::clockTimeRangesChanged, this,
     &pqTimelineItemDelegate::updateSceneTimeRange);
   this->connect(scene, &pqAnimationScene::animationTime, [&](double time) {
@@ -340,5 +333,6 @@ void pqTimelineItemDelegate::updateSceneTimeRange()
   pqAnimationScene* scene = animationManager->getActiveScene();
   this->TimelinePainter->setSceneStartTime(scene->getClockTimeRange().first);
   this->TimelinePainter->setSceneEndTime(scene->getClockTimeRange().second);
+  this->Internals->updateValidators();
   Q_EMIT this->needsRepaint();
 }
