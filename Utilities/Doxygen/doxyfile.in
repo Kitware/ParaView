@@ -73,6 +73,7 @@ EXCLUDE              = \
     "@ParaView_SOURCE_DIR@/Utilities/VisItBridge" \
     "@ParaView_SOURCE_DIR@/VTK" \
     "@ParaView_SOURCE_DIR@/Web/Documentation" \
+    "@ParaView_BINARY_DIR@/@vtk_cmake_destination@" \
 
 
 # Exclude module testing directories.
