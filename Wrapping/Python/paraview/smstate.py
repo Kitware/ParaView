@@ -366,12 +366,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             "# ----------------------------------------------------------------"])
 
     if postamble is None:
-        if options and exgens: # Add an option in ParaView to control this behavior ? TODO
-            # add coda about extracts generation.
-            trace.append_separated(["",
-                "if __name__ == '__main__':",
-                "    # generate extracts",
-                "    SaveExtracts(ExtractsOutputDirectory='%s')" % options.ExtractsOutputDirectory])
+        trace.append_separated(smtrace._get_standard_postamble_comment())
     elif postamble:
         trace.append_separated(postamble)
 

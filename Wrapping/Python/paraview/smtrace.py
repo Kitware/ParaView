@@ -1887,12 +1887,7 @@ def _stop_trace_internal():
                 "#-----------------------------------",
                 "# saving camera placements for views"])
             Trace.Output.append_separated(camera_trace)
-        Trace.Output.append_separated([\
-            "#--------------------------------------------",
-            "# uncomment the following to render all views",
-            "# RenderAllViews()",
-            "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
-            ])
+        Trace.Output.append_separated(_get_standard_postamble_comment())
     trace = str(Trace.Output)
     Trace.reset()
 
@@ -1903,6 +1898,34 @@ def _stop_trace_internal():
     gc.collect()
     gc.collect()
     return trace
+
+def _get_standard_postamble_comment():
+    """**internal** get a standard postamble comment."""
+    return """
+##--------------------------------------------
+## You may need to add some code at the end of this python script depending on your usage, eg:
+#
+## Render all views to see them appears
+# RenderAllViews()
+#
+## Interact with the view, usefull when running from pvpython
+# Interact()
+#
+## Save a screenshot of the active view
+# SaveScreenshot("path/to/screenshot.png")
+#
+## Save a screenshot of a layout (multiple splitted view)
+# SaveScreenshot("path/to/screenshot.png", GetLayout())
+#
+## Save all "Extractors" from the pipeline browser
+# SaveExtracts()
+#
+## Save a animation of the current active view
+# SaveAnimation()
+#
+## Please refer to the documentation of paraview.simple
+## https://kitware.github.io/paraview-docs/latest/python/paraview.simple.html
+##--------------------------------------------"""
 
 #------------------------------------------------------------------------------
 # Public methods
