@@ -291,8 +291,16 @@ pqPipelineSource* pqXRInterfaceControls::GetSelectedPipelineSource()
 void pqXRInterfaceControls::SetCurrentMotionFactor(double val)
 {
   this->Internals->NoForward = true;
-  val = std::min(std::max(val, 0.01), 100.0);                       // clamp [0.01; 100]
-  const auto scale = static_cast<int>(25.0 * std::log(val) + 50.0); // [0.01; 100] -> [0; 100]
+
+  const auto scale = std::min(std::max(val, 0.01), 100.0); // clamp [0.01; 100]
+  const auto logScale = std::log(scale) / std::log(10.0);
+  const auto sliderValue = static_cast<int>(25.0 * logScale + 50.0); // [0.01; 100] -> [0; 100]
+  const auto precision = 2 - static_cast<int>(logScale);
+
+  this->Internals->Ui.movementSpeedLabel->setText(
+    tr("Movement speed: x%1").arg(scale, 0, 'f', precision));
+  this->Internals->Ui.movementSpeedSlider->setValue(sliderValue);
+
   this->Internals->NoForward = false;
 }
 
