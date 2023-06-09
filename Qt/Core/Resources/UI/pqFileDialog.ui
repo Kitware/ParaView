@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>pqFileDialog</class>
- <widget class="QDialog" name="pqFileDialog">
+ <widget class="QWidget" name="pqFileDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -479,38 +479,4 @@
   <tabstop>Files</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>OK</sender>
-   <signal>clicked()</signal>
-   <receiver>pqFileDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>487</x>
-     <y>371</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>60</x>
-     <y>368</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>Cancel</sender>
-   <signal>clicked()</signal>
-   <receiver>pqFileDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>487</x>
-     <y>404</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>84</x>
-     <y>388</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
 </ui>
