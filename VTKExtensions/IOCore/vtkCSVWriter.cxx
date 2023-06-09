@@ -345,7 +345,7 @@ public:
       bool add_delimiter = false;
       if (this->TimeStep >= 0)
       {
-        this->Stream << "TimeStep";
+        this->Stream << self->GetString("TimeStep");
         add_delimiter = true;
       }
       if (!vtkMath::IsNan(this->Time))
@@ -356,7 +356,7 @@ public:
           this->Stream << self->GetFieldDelimiter();
         }
         // add a time column.
-        this->Stream << "Time";
+        this->Stream << self->GetString("Time");
         add_delimiter = true;
       }
       for (int cc = 0, numArrays = dsa->GetNumberOfArrays(); cc < numArrays; ++cc)

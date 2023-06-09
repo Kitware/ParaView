@@ -276,6 +276,30 @@
           the delimiter character to a tab. Otherwise a comma will be used as the delimiter.
         </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUseStringDelimiter"
+                         default_values="1"
+                         name="UseStringDelimiter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+         Used to enable StringDelimiter for string data. Enabled by default. Turn this off if you do not want
+         quotes around the column headers.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetStringDelimiter"
+                      name="StringDelimiter"
+                      default_values='"'
+                      number_of_elements="1"
+                      panel_visibility="never">
+        <Documentation>
+          Used to set the delimiter used for string data, if any, eg. double quotes(").
+        </Documentation>
+         <Hints>
+              <PropertyWidgetDecorator type="EnableWidgetDecorator"
+                                       property="UseStringDelimiter"/>
+              <!-- enable this widget when UseStringDelimiter==1 -->
+          </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetUseScientificNotation"
                          default_values="0"
                          name="UseScientificNotation"
@@ -383,6 +407,8 @@
           <Property name="AddMetaData" panel_visibility="advanced"/>
           <Property name="AddTimeStep" panel_visibility="advanced"/>
           <Property name="AddTime" panel_visibility="advanced"/>
+          <Property name="UseStringDelimiter" panel_visibility="advanced"/>
+          <Property name="StringDelimiter" panel_visibility="advanced"/>
         </ExposedProperties>
       </SubProxy>
 
