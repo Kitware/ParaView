@@ -44,6 +44,7 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="EntityType"
+                         label="Choose the output blocks/arrays for the Exodus Entity Type"
                          default_values="3"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -68,6 +69,9 @@
           <Entry text="Side Sets"
                  value="9"/>
         </EnumerationDomain>
+        <Documentation>
+          This property allows the user to choose the output blocks/arrays for the selected Exodus Entity Type.
+        </Documentation>
       </IntVectorProperty>
 
       <StringVectorProperty name="NodeBlockArrays"
