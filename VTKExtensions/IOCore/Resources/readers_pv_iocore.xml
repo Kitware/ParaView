@@ -1,4 +1,37 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <SourceProxy class="vtkStringReader"
+                 label="String Reader"
+                 name="StringReader">
+      <Documentation long_help="Reads a string from a file."
+                     short_help="Reads a string from a file.">
+        This reader reads a string from a file.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="String"
+                            command="GetString"
+                            information_only="1">
+        <Documentation>
+          This property specifies the read string.
+        </Documentation>
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="txt"
+                       file_description="Text File"/>
+      </Hints>
+    </SourceProxy>
+    <!-- End of StringReader -->
+  </ProxyGroup>
   <ProxyGroup name="sources">
     <!-- ================================================================== -->
     <SourceProxy class="vtkPVDReader"
