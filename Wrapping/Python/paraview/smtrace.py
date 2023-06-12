@@ -267,7 +267,7 @@ class Trace(object):
                 ctor_args="%s, %s" % (lutAccessor, viewAccessor)))
             cls.Output.append_separated(trace.raw_data())
             return True
-        if cls.get_registered_name(obj, "animation"):
+        if not skip_rendering and cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
         if obj.SMProxy.GetXMLName() == "RepresentationAnimationHelper":
             sourceAccessor = cls.get_accessor(obj.Source)
@@ -862,11 +862,18 @@ class ViewProxyFilter(ProxyFilter):
             "ViewTime", "CacheKey", "Representations"]: return True
         return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
+class TimeKeeperProxyFilter(ProxyFilter):
+    def should_never_trace(self, prop):
+        if ProxyFilter.should_never_trace(self, prop): return True
+        if prop.get_property_name() in ["Views", "TimeSources", "Time"]:
+            return True
+        return False
+
 class AnimationProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.get_property_name() in ["AnimatedProxy", "AnimatedPropertyName",
-            "AnimatedElement", "AnimatedDomainName"]:
+            "AnimatedElement", "AnimatedDomainName", "TimeKeeper"]:
             return True
         return False
 
@@ -1283,6 +1290,51 @@ class RegisterLightProxy(RenderingMixin, TraceItem):
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
+class TraceAnimationProxy(RenderingMixin, TraceItem):
+    """Traces all changes in an animation proxy."""
+    def __init__(self, proxy):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        assert not self.Proxy is None
+
+    def finalize(self):
+        # trace timekeeper
+        if hasattr(self.Proxy, "TimeKeeper"):
+          tkTrace = TraceProxy(self.Proxy.TimeKeeper, TimeKeeperProxyFilter(), "# initialize the timekeeper")
+          tkTrace.finalize()
+
+        # create dynamic animation cues as needed.
+        if hasattr(self.Proxy, "Cues"):
+            for cue in self.Proxy.Cues:
+              cueTrace = TraceProxy(cue, AnimationProxyFilter(), "# initialize the animation track")
+              cueTrace.finalize()
+
+        animTrace = TraceProxy(self.Proxy, AnimationProxyFilter(), "# initialize the animation scene")
+        animTrace.finalize()
+        TraceItem.finalize(self)
+
+class TraceProxy(TraceItem):
+    """Traces all changes in a provided proxy."""
+    def __init__(self, proxy, filter, description):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        self.Filter = filter
+        self.Description = description
+        assert not self.Proxy is None
+
+    def finalize(self):
+        TraceItem.finalize(self)
+
+        # We let Trace create an accessor for the proxy. We will then simply log the
+        # default property values.
+        accessor = Trace.get_accessor(self.Proxy) # type: RealProxyAccessor
+
+        # Now trace properties on the proxy.
+        trace = TraceOutput()
+        trace.append_separated(self.Description)
+        trace.append(accessor.trace_ctor(None, self.Filter))
+        Trace.Output.append_separated(trace.raw_data())
+
 class ExportView(RenderingMixin, TraceItem):
     def __init__(self, view, exporter, filename):
         TraceItem.__init__(self)
@@ -1489,25 +1541,11 @@ class LoadPlugin(TraceItem):
                 "# load plugin",
                 "LoadPlugin('%s', remote=%s, ns=globals())" % (filename, remote)])
 
-class CreateAnimationTrack(TraceItem):
+class CreateAnimationTrack(TraceProxy):
     # FIXME: animation tracing support in general needs to be revamped after moving
     # animation control logic to the server manager from Qt layer.
     def __init__(self, cue):
-        TraceItem.__init__(self)
-        self.Cue = sm._getPyProxy(cue)
-
-    def finalize(self):
-        TraceItem.finalize(self)
-
-        # We let Trace create an accessor for the cue. We will then simply log the
-        # default property values.
-        accessor = Trace.get_accessor(self.Cue) # type: RealProxyAccessor
-
-        # Now trace properties on the cue.
-        trace = TraceOutput()
-        trace.append_separated("# initialize the animation track")
-        trace.append(accessor.trace_ctor(None, AnimationProxyFilter()))
-        Trace.Output.append_separated(trace.raw_data())
+        TraceProxy.__init__(self, cue, AnimationProxyFilter(), "# initialize the animation track")
 
 class RenameProxy(TraceItem):
     "Trace renaming of a source proxy."
@@ -1849,12 +1887,7 @@ def _stop_trace_internal():
                 "#-----------------------------------",
                 "# saving camera placements for views"])
             Trace.Output.append_separated(camera_trace)
-        Trace.Output.append_separated([\
-            "#--------------------------------------------",
-            "# uncomment the following to render all views",
-            "# RenderAllViews()",
-            "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
-            ])
+        Trace.Output.append_separated(_get_standard_postamble_comment())
     trace = str(Trace.Output)
     Trace.reset()
 
@@ -1865,6 +1898,34 @@ def _stop_trace_internal():
     gc.collect()
     gc.collect()
     return trace
+
+def _get_standard_postamble_comment():
+    """**internal** get a standard postamble comment."""
+    return """
+##--------------------------------------------
+## You may need to add some code at the end of this python script depending on your usage, eg:
+#
+## Render all views to see them appears
+# RenderAllViews()
+#
+## Interact with the view, usefull when running from pvpython
+# Interact()
+#
+## Save a screenshot of the active view
+# SaveScreenshot("path/to/screenshot.png")
+#
+## Save a screenshot of a layout (multiple splitted view)
+# SaveScreenshot("path/to/screenshot.png", GetLayout())
+#
+## Save all "Extractors" from the pipeline browser
+# SaveExtracts()
+#
+## Save a animation of the current active view
+# SaveAnimation()
+#
+## Please refer to the documentation of paraview.simple
+## https://kitware.github.io/paraview-docs/latest/python/paraview.simple.html
+##--------------------------------------------"""
 
 #------------------------------------------------------------------------------
 # Public methods

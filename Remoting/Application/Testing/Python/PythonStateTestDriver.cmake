@@ -20,6 +20,7 @@ execute_process(
   COMMAND ${PARAVIEW_EXECUTABLE} -dr
           --test-directory=${TEMPORARY_DIR}
           --test-script=${TEST_SCRIPT}
+          --data-directory=${DATA_DIR}
           --exit
   RESULT_VARIABLE rv)
 if(NOT rv EQUAL 0)
