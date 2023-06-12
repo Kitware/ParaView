@@ -37,6 +37,7 @@ set(classes
   vtkParallelSerialWriter
   vtkPVDReader
   vtkStringReader
+  vtkStringWriter
   vtkXMLCollectionReader
   vtkXMLPVDWriter)
 

@@ -1,4 +1,35 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <WriterProxy class="vtkStringWriter"
+                 name="StringWriter">
+      <Documentation>
+        This writer writes a string to a file.
+      </Documentation>
+      <InputProperty name="DummyInput" panel_visibility="never">
+      </InputProperty>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            command="SetFileName"
+                            default_values="">
+        <Documentation>
+          The name of the file to write to.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="String"
+                            number_of_elements="1"
+                            command="SetString"
+                            default_values="">
+        <Documentation>
+          The string to write to the file.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <WriterFactory extensions="txt" file_description="Text File"/>
+      </Hints>
+    </WriterProxy>
+    <!-- End of StringWriter -->
+  </ProxyGroup>
   <!-- =================================================================== -->
   <ProxyGroup name="writers">
     <!-- ================================================================= -->
