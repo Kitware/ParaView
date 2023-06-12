@@ -102,6 +102,9 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 Q_SIGNALS:
   void needsRepaint();
 
+protected:
+  double Zoom = 1.;
+
 private:
   struct pqInternals;
   std::unique_ptr<pqInternals> Internals;

@@ -88,6 +88,14 @@ public:
   void setSceneLockEnd(bool lock);
   ///@}
 
+  ///@{
+  /**
+   * Set / Get the time range to display.
+   */
+  void setDisplayTimeRange(double start, double end);
+  QPair<double, double> displayTimeRange();
+  ///@}
+
   /** @name Start and End rectangles
    * Get Start and End labels rectangle.
    */
@@ -100,18 +108,26 @@ public:
   QRect getEndLabelRect();
   ///@}
 
+  ///@{
   /**
    * Return position of the given time.
-   * Return -1 if outside the painting area, i.e. if time is not inside [SceneStartTime,
-   * SceneEndTime].
+   * Return -1 if outside the painting area, i.e. if time is not inside [DisplayStartTime,
+   * DisplayEndTime].
    */
   double positionFromTime(double time, const QStyleOptionViewItem& option);
+  double positionFromTime(double time);
+  ///@}
 
   /**
    * Return the time of the corresponding position.
    * If given index has stored times, return the nearest one.
    */
-  double timeFromPosition(double pos, const QStyleOptionViewItem& option, const QModelIndex& index);
+  ///@{
+  double indexTimeFromPosition(
+    double pos, const QStyleOptionViewItem& option, const QModelIndex& index);
+  double timeFromPosition(double pos, const QStyleOptionViewItem& option);
+  double timeFromPosition(double pos);
+  ///@}
 
   /** @name Items infos
    * Extract information from the item data.
@@ -156,7 +172,8 @@ protected:
   void paintSceneCurrentTime(QPainter* painter, const QStyleOptionViewItem& option);
   /// a tick, i.e. a mark corresponding to given time. Optionnally paint the associated label.
   /// When painting labels, the non-labeled ticks are half-sized, for readability.
-  void paintTick(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
+  /// Return true if the label was painted.
+  bool paintTick(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
     double time, bool paintLabels, const QStyleOptionViewItem& labelsOption, const QString& label);
   /// a time mark, i.e a vertical line at given position.
   void paintTimeMark(QPainter* painter, const QStyleOptionViewItem& option, double pos);
@@ -169,6 +186,9 @@ protected:
   double SceneCurrentTime = 0;
   double SceneStartTime = 0;
   double SceneEndTime = 1;
+
+  double DisplayStartTime = 0.;
+  double DisplayEndTime = 1.;
 
   bool SceneLockStart = false;
   bool SceneLockEnd = false;
