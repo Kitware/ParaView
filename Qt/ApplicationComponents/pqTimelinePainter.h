@@ -69,22 +69,22 @@ public:
   void paint(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option);
 
   /** @name Scene informations
-   * Cache information about scene.
+   * Cache information about scene for display purpose.
    * This is useful to compute tick position, and to do specific label display
    * for locked start and end end.
    */
   ///@{
-  // cache scene start time.
+  /// cache scene start time.
   void setSceneStartTime(double time);
-  // cache scene end time.
+  /// cache scene end time.
   void setSceneEndTime(double time);
-  // cache scene current time.
+  /// cache scene current time.
   void setSceneCurrentTime(double time);
   /// get scene cursor time
   double getSceneCurrentTime();
-  // cache scene lock start.
+  /// cache scene lock start.
   void setSceneLockStart(bool lock);
-  // cache scene lock end
+  /// cache scene lock end
   void setSceneLockEnd(bool lock);
   ///@}
 
