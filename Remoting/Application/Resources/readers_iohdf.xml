@@ -153,9 +153,8 @@
         <FileListDomain name="files" />
         <Documentation>The list of files to be read by the reader. Each file is
         expected to be in the VTKHDF data format storing the same data type. The
-        standard extension is .hdf. If more than one file is specified, the
-        reader will switch to file series mode in which it will pretend that it
-        can support time and provide one file per time step.</Documentation>
+        standard extension is .vtkhdf. If more than one file is specified, the
+        reader will switch to file series mode and provide one file per time step.</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
@@ -164,7 +163,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="hdf hdf.series"
+        <ReaderFactory extensions="vtkhdf vtkhdf.series hdf hdf.series"
                        file_description="VTKHDF Files" />
       </Hints>
       <!-- HDFReader -->
