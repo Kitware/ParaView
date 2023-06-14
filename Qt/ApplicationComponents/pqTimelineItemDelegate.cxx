@@ -56,6 +56,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 
 #include <algorithm>
+#include <cmath>
+
+constexpr int MOUSE_WHEEL_STEPS_FACTOR = 120;
+constexpr double ZOOM_BASE = 1.5;
 
 // this struct is responsible for drawing elements in timelines.
 //
@@ -74,7 +78,41 @@ struct pqTimelineItemDelegate::pqInternals
   QDoubleValidator* StartValidator;
   QDoubleValidator* EndValidator;
 
-  bool Interaction = false;
+  enum class InteractionMode
+  {
+    None,
+    Scroll,
+    GrabMark
+  };
+
+  InteractionMode Interaction = InteractionMode::None;
+  double ClickedTime = 0.;
+
+  void endInteraction() { this->Interaction = InteractionMode::None; }
+
+  bool startGrabMark()
+  {
+    if (this->Interaction == InteractionMode::None)
+    {
+      this->Interaction = InteractionMode::GrabMark;
+      return true;
+    }
+    return false;
+  }
+
+  bool startScroll()
+  {
+    if (this->Interaction == InteractionMode::None)
+    {
+      this->Interaction = InteractionMode::Scroll;
+      return true;
+    }
+    return false;
+  }
+
+  bool isScrolling() { return this->Interaction == InteractionMode::Scroll; }
+
+  bool isGrabbing() { return this->Interaction == InteractionMode::GrabMark; }
 
   QString lockTooltip() const
   {
@@ -143,27 +181,26 @@ struct pqTimelineItemDelegate::pqInternals
     this->EndValidator = new QDoubleValidator(parentWidget);
     this->EditEnd->setValidator(this->EndValidator);
 
-    // Avoid Start == End. As validator is an inclusive range, use some epsilon.
-    QObject::connect(this->EditStart, &pqDoubleLineEdit::editingFinished, [&]() {
-      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
-      pqAnimationScene* scene = animationManager->getActiveScene();
-      this->EndValidator->setBottom(
-        vtkSMPropertyHelper(scene->getProxy()->GetProperty("StartTime")).GetAsDouble() +
-        std::numeric_limits<double>::epsilon());
-    });
-
-    QObject::connect(this->EditEnd, &pqDoubleLineEdit::editingFinished, [&]() {
-      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
-      pqAnimationScene* scene = animationManager->getActiveScene();
-      this->StartValidator->setTop(
-        vtkSMPropertyHelper(scene->getProxy()->GetProperty("EndTime")).GetAsDouble() -
-        std::numeric_limits<double>::epsilon());
-    });
+    this->updateValidators();
 
     QObject::connect(
       this->EditStart, &pqDoubleLineEdit::textChanged, [&]() { this->EditStart->adjustSize(); });
     QObject::connect(
       this->EditEnd, &pqDoubleLineEdit::textChanged, [&]() { this->EditEnd->adjustSize(); });
+  }
+
+  void updateValidators()
+  {
+    pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+    pqAnimationScene* scene = animationManager->getActiveScene();
+    if (!scene)
+    {
+      return;
+    }
+
+    auto timeRange = scene->getClockTimeRange();
+    this->StartValidator->setTop(std::nextafter(timeRange.second, timeRange.second - 1));
+    this->EndValidator->setBottom(std::nextafter(timeRange.first, timeRange.first + 1));
   }
 };
 
@@ -184,13 +221,13 @@ pqTimelineItemDelegate::pqTimelineItemDelegate(QObject* parent, QWidget* parentW
     this->Internals->LockStart, &QToolButton::clicked, this, &pqTimelineItemDelegate::needsRepaint);
   this->connect(
     this->Internals->LockEnd, &QToolButton::clicked, this, &pqTimelineItemDelegate::needsRepaint);
-  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::editingFinished,
+  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::textChangedAndEditingFinished,
     this->Internals->EditStart, &pqDoubleLineEdit::hide);
-  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::editingFinished, this,
+  this->connect(this->Internals->EditStart, &pqDoubleLineEdit::textChangedAndEditingFinished, this,
     &pqTimelineItemDelegate::needsRepaint);
-  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::editingFinished,
+  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::textChangedAndEditingFinished,
     this->Internals->EditEnd, &pqDoubleLineEdit::hide);
-  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::editingFinished, this,
+  this->connect(this->Internals->EditEnd, &pqDoubleLineEdit::textChangedAndEditingFinished, this,
     &pqTimelineItemDelegate::needsRepaint);
 }
 
@@ -206,11 +243,6 @@ void pqTimelineItemDelegate::paint(
 
   this->TimelinePainter->paint(painter, index, itemOption);
 
-  if (!this->TimelinePainter->hasStartEndLabels())
-  {
-    return;
-  }
-
   // update Start/End widgets on TIME item only
   if (index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::TIME)
   {
@@ -218,11 +250,13 @@ void pqTimelineItemDelegate::paint(
     int buttonSide = startRect.height();
     auto buttonRect = QRect(startRect.right(), startRect.top(), buttonSide, buttonSide);
     this->Internals->LockStart->setGeometry(buttonRect);
+    this->Internals->LockStart->setVisible(startRect.isValid());
 
     auto endRect = this->TimelinePainter->getEndLabelRect();
     buttonSide = endRect.height();
     buttonRect = QRect(endRect.left() - buttonSide, endRect.top(), buttonSide, buttonSide);
     this->Internals->LockEnd->setGeometry(buttonRect);
+    this->Internals->LockEnd->setVisible(endRect.isValid());
   }
 
   Superclass::paint(painter, option, index);
@@ -241,9 +275,22 @@ QSize pqTimelineItemDelegate::sizeHint(
 bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model,
   const QStyleOptionViewItem& option, const QModelIndex& index)
 {
+  if (index.data(pqTimelineItemRole::TYPE) != pqTimelineTrack::TIME &&
+    index.data(pqTimelineItemRole::TYPE) != pqTimelineTrack::ANIMATION &&
+    index.data(pqTimelineItemRole::TYPE) != pqTimelineTrack::SOURCE)
+  {
+    return false;
+  }
+
   auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+  if (!mouseEvent)
+  {
+    return false;
+  }
+
   // edit start / end time
-  if (mouseEvent && this->TimelinePainter->hasStartEndLabels())
+  if (mouseEvent->type() == QEvent::MouseButtonDblClick &&
+    this->TimelinePainter->hasStartEndLabels())
   {
     QRect startRect = this->TimelinePainter->getStartLabelRect();
     if (startRect.contains(mouseEvent->pos()))
@@ -261,38 +308,123 @@ bool pqTimelineItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* mode
     }
   }
 
-  // move scene time
-  if (mouseEvent &&
-    (index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::TIME ||
-      index.data(pqTimelineItemRole::TYPE) == pqTimelineTrack::SOURCE))
+  double trackTime =
+    this->TimelinePainter->indexTimeFromPosition(mouseEvent->pos().x(), option, index);
+  double mouseTime = this->TimelinePainter->timeFromPosition(mouseEvent->pos().x());
+
+  if (mouseEvent->type() == QEvent::MouseButtonPress && mouseEvent->button() == Qt::LeftButton)
   {
-    double time = this->TimelinePainter->timeFromPosition(mouseEvent->pos().x(), option, index);
-
-    if (mouseEvent->type() == QEvent::MouseButtonPress && mouseEvent->button() == Qt::LeftButton)
+    if (mouseEvent->modifiers().testFlag(Qt::ControlModifier) && this->Internals->startScroll())
     {
-      this->Internals->Interaction = true;
+      this->Internals->ClickedTime = mouseTime;
+      return true;
     }
-
-    if (this->Internals->Interaction && mouseEvent->type() == QEvent::MouseMove)
+    else if (this->Internals->startGrabMark())
     {
-      this->TimelinePainter->setSceneCurrentTime(time);
-      Q_EMIT this->needsRepaint();
-    }
-
-    if (mouseEvent->type() == QEvent::MouseButtonRelease && mouseEvent->button() == Qt::LeftButton)
-    {
-      this->Internals->Interaction = false;
-      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
-      pqAnimationScene* scene = animationManager->getActiveScene();
-
-      scene->setAnimationTime(time);
+      this->TimelinePainter->setSceneCurrentTime(trackTime);
+      return true;
     }
   }
 
-  this->Internals->EditStart->hide();
-  this->Internals->EditEnd->hide();
+  if (mouseEvent->type() == QEvent::MouseMove)
+  {
+    if (this->Internals->isGrabbing())
+    {
+      this->TimelinePainter->setSceneCurrentTime(trackTime);
+      Q_EMIT this->needsRepaint();
+      return true;
+    }
+    else if (this->Internals->isScrolling() &&
+      mouseEvent->modifiers().testFlag(Qt::ControlModifier))
+    {
+      pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+      pqAnimationScene* scene = animationManager->getActiveScene();
+      auto displayRange = this->TimelinePainter->displayTimeRange();
+      auto sceneRange = scene->getClockTimeRange();
+
+      double timeScroll = mouseTime - this->Internals->ClickedTime;
+      auto newStart = displayRange.first - timeScroll;
+      auto newEnd = displayRange.second - timeScroll;
+
+      if (newStart < sceneRange.first)
+      {
+        newStart = sceneRange.first;
+        timeScroll = newStart - displayRange.first;
+        newEnd = displayRange.second - timeScroll;
+      }
+      if (newEnd > sceneRange.second)
+      {
+        newEnd = sceneRange.second;
+        timeScroll = newEnd - displayRange.second;
+        newStart = displayRange.first - timeScroll;
+      }
+
+      this->TimelinePainter->setDisplayTimeRange(newStart, newEnd);
+      Q_EMIT this->needsRepaint();
+      return true;
+    }
+  }
 
   return Superclass::editorEvent(event, model, option, index);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTimelineItemDelegate::eventFilter(QObject* watched, QEvent* event)
+{
+  auto widget = dynamic_cast<QWidget*>(watched);
+  auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+  auto wheelEvent = dynamic_cast<QWheelEvent*>(event);
+  if (!widget && !mouseEvent && !wheelEvent)
+  {
+    return false;
+  }
+
+  pqAnimationManager* animationManager = pqPVApplicationCore::instance()->animationManager();
+  pqAnimationScene* scene = animationManager->getActiveScene();
+
+  if (mouseEvent && event->type() == QEvent::MouseButtonRelease)
+  {
+    // if mouse is released outside of the widget, cancel changes
+    if (!widget->geometry().contains(mouseEvent->pos()))
+    {
+      this->TimelinePainter->setSceneCurrentTime(scene->getAnimationTime());
+      Q_EMIT this->needsRepaint();
+    }
+    else if (this->Internals->isGrabbing())
+    {
+      scene->setAnimationTime(this->TimelinePainter->getSceneCurrentTime());
+    }
+
+    this->Internals->endInteraction();
+  }
+
+  // zoom on ctrl (or cmd) + wheel
+  if (wheelEvent && wheelEvent->modifiers().testFlag(Qt::ControlModifier) &&
+    wheelEvent->buttons() == Qt::NoButton)
+  {
+    double steps = static_cast<double>(wheelEvent->angleDelta().y()) / MOUSE_WHEEL_STEPS_FACTOR;
+    this->Zoom = std::max(1., this->Zoom * std::pow(ZOOM_BASE, steps));
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+    double mousePos = wheelEvent->pos().x();
+#else
+    double mousePos = wheelEvent->position().x();
+#endif
+
+    double mouseTime = this->TimelinePainter->timeFromPosition(mousePos);
+    auto start = scene->getClockTimeRange().first;
+    auto end = scene->getClockTimeRange().second;
+
+    double newStart = mouseTime - (mouseTime - start) / this->Zoom;
+    double newEnd = mouseTime - (mouseTime - end) / this->Zoom;
+
+    this->TimelinePainter->setDisplayTimeRange(newStart, newEnd);
+
+    Q_EMIT this->needsRepaint();
+    return true;
+  }
+
+  return this->Superclass::eventFilter(watched, event);
 }
 
 //-----------------------------------------------------------------------------
@@ -315,13 +447,6 @@ void pqTimelineItemDelegate::setActiveSceneConnections(pqAnimationScene* scene)
   this->Internals->SceneLinks.addPropertyLink(this->Internals->EditEnd, "text",
     SIGNAL(editingFinished()), sceneProxy, sceneProxy->GetProperty("EndTime"));
 
-  this->Internals->StartValidator->setTop(
-    vtkSMPropertyHelper(sceneProxy->GetProperty("EndTime")).GetAsDouble() -
-    std::numeric_limits<double>::epsilon());
-  this->Internals->EndValidator->setBottom(
-    vtkSMPropertyHelper(sceneProxy->GetProperty("StartTime")).GetAsDouble() +
-    std::numeric_limits<double>::epsilon());
-
   this->connect(scene, &pqAnimationScene::clockTimeRangesChanged, this,
     &pqTimelineItemDelegate::updateSceneTimeRange);
   this->connect(scene, &pqAnimationScene::animationTime, [&](double time) {
@@ -340,5 +465,8 @@ void pqTimelineItemDelegate::updateSceneTimeRange()
   pqAnimationScene* scene = animationManager->getActiveScene();
   this->TimelinePainter->setSceneStartTime(scene->getClockTimeRange().first);
   this->TimelinePainter->setSceneEndTime(scene->getClockTimeRange().second);
+  this->TimelinePainter->setDisplayTimeRange(
+    scene->getClockTimeRange().first, scene->getClockTimeRange().second);
+  this->Internals->updateValidators();
   Q_EMIT this->needsRepaint();
 }

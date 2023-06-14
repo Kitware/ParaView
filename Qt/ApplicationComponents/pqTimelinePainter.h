@@ -69,21 +69,31 @@ public:
   void paint(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option);
 
   /** @name Scene informations
-   * Cache information about scene.
+   * Cache information about scene for display purpose.
    * This is useful to compute tick position, and to do specific label display
    * for locked start and end end.
    */
   ///@{
-  // cache scene start time.
+  /// cache scene start time.
   void setSceneStartTime(double time);
-  // cache scene end time.
+  /// cache scene end time.
   void setSceneEndTime(double time);
-  // cache scene current time.
+  /// cache scene current time.
   void setSceneCurrentTime(double time);
-  // cache scene lock start.
+  /// get scene cursor time
+  double getSceneCurrentTime();
+  /// cache scene lock start.
   void setSceneLockStart(bool lock);
-  // cache scene lock end
+  /// cache scene lock end
   void setSceneLockEnd(bool lock);
+  ///@}
+
+  ///@{
+  /**
+   * Set / Get the time range to display.
+   */
+  void setDisplayTimeRange(double start, double end);
+  QPair<double, double> displayTimeRange();
   ///@}
 
   /** @name Start and End rectangles
@@ -98,18 +108,26 @@ public:
   QRect getEndLabelRect();
   ///@}
 
+  ///@{
   /**
    * Return position of the given time.
-   * Return -1 if outside the painting area, i.e. if time is not inside [SceneStartTime,
-   * SceneEndTime].
+   * Return -1 if outside the painting area, i.e. if time is not inside [DisplayStartTime,
+   * DisplayEndTime].
    */
   double positionFromTime(double time, const QStyleOptionViewItem& option);
+  double positionFromTime(double time);
+  ///@}
 
   /**
    * Return the time of the corresponding position.
    * If given index has stored times, return the nearest one.
    */
-  double timeFromPosition(double pos, const QStyleOptionViewItem& option, const QModelIndex& index);
+  ///@{
+  double indexTimeFromPosition(
+    double pos, const QStyleOptionViewItem& option, const QModelIndex& index);
+  double timeFromPosition(double pos, const QStyleOptionViewItem& option);
+  double timeFromPosition(double pos);
+  ///@}
 
   /** @name Items infos
    * Extract information from the item data.
@@ -154,7 +172,8 @@ protected:
   void paintSceneCurrentTime(QPainter* painter, const QStyleOptionViewItem& option);
   /// a tick, i.e. a mark corresponding to given time. Optionnally paint the associated label.
   /// When painting labels, the non-labeled ticks are half-sized, for readability.
-  void paintTick(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
+  /// Return true if the label was painted.
+  bool paintTick(QPainter* painter, const QStyleOptionViewItem& option, QStandardItem* item,
     double time, bool paintLabels, const QStyleOptionViewItem& labelsOption, const QString& label);
   /// a time mark, i.e a vertical line at given position.
   void paintTimeMark(QPainter* painter, const QStyleOptionViewItem& option, double pos);
@@ -167,6 +186,9 @@ protected:
   double SceneCurrentTime = 0;
   double SceneStartTime = 0;
   double SceneEndTime = 1;
+
+  double DisplayStartTime = 0.;
+  double DisplayEndTime = 1.;
 
   bool SceneLockStart = false;
   bool SceneLockEnd = false;

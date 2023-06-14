@@ -46,6 +46,10 @@ struct pqTimelinePainter::pqInternals
 {
   // list displayed rectangles, to manage collisions.
   QList<QRect> LabelRects;
+  QRect StartLabelRect;
+  QRect EndLabelRect;
+
+  QStyleOptionViewItem LastSceneTimeOption;
 
   // define several brushes based on palette
   QBrush backgroundBrush(const QStyleOptionViewItem& option, bool alternate = false)
@@ -133,7 +137,33 @@ void pqTimelinePainter::paintTimeTrack(
   QStyleOptionViewItem labelOption = option;
   labelOption.rect.adjust(0, 0, 0, -0.5 * height);
 
+  // invalidate cache
   this->Internals->LabelRects.clear();
+  this->Internals->StartLabelRect = QRect();
+  this->Internals->EndLabelRect = QRect();
+
+  // start and end time have specific painting. Handle them first.
+  painter->save();
+  // setup a background
+  QStyleOptionViewItem startOption = labelOption;
+  startOption.backgroundBrush = this->SceneLockStart
+    ? this->Internals->lockedTimeBrush(labelOption)
+    : this->Internals->editableTimeBrush(labelOption);
+  if (this->paintTick(painter, option, item, this->SceneStartTime, true, startOption,
+        pqCoreUtilities::formatTime(this->SceneStartTime)))
+  {
+    this->Internals->StartLabelRect = this->Internals->LabelRects.last();
+  }
+
+  QStyleOptionViewItem endOption = labelOption;
+  endOption.backgroundBrush = this->SceneLockEnd ? this->Internals->lockedTimeBrush(labelOption)
+                                                 : this->Internals->editableTimeBrush(labelOption);
+  if (this->paintTick(painter, option, item, this->SceneEndTime, true, endOption,
+        pqCoreUtilities::formatTime(this->SceneEndTime)))
+  {
+    this->Internals->EndLabelRect = this->Internals->LabelRects.last();
+  }
+  painter->restore();
 
   this->paintTimeline(painter, sourceOption, item, true, labelOption);
 
@@ -240,22 +270,24 @@ bool pqTimelinePainter::paintLabel(QPainter* painter, const QStyleOptionViewItem
 }
 
 //-----------------------------------------------------------------------------
-void pqTimelinePainter::paintTick(QPainter* painter, const QStyleOptionViewItem& option,
+bool pqTimelinePainter::paintTick(QPainter* painter, const QStyleOptionViewItem& option,
   QStandardItem* item, double time, bool paintLabels, const QStyleOptionViewItem& labelsOption,
   const QString& label)
 {
   double tickPos = this->positionFromTime(time, option);
-  if (tickPos == -1)
+  if (time < this->DisplayStartTime || time > this->DisplayEndTime)
   {
     // outside painting area, return.
-    return;
+    return false;
   }
 
+  bool painted = false;
   QRect timelineRect = option.rect;
   int height = timelineRect.height();
   if (paintLabels)
   {
-    if (!this->paintLabel(painter, labelsOption, item, time, label))
+    painted = this->paintLabel(painter, labelsOption, item, time, label);
+    if (!painted)
     {
       // non labelized ticks are half size.
       height /= 2;
@@ -265,6 +297,8 @@ void pqTimelinePainter::paintTick(QPainter* painter, const QStyleOptionViewItem&
   // draw tick
   QLineF line(tickPos, timelineRect.bottom() - height, tickPos, timelineRect.bottom());
   painter->drawLine(line);
+
+  return painted;
 }
 
 //-----------------------------------------------------------------------------
@@ -282,28 +316,6 @@ void pqTimelinePainter::paintTimeline(QPainter* painter, const QStyleOptionViewI
     this->Internals->LabelRects << QRect();
     painter->restore();
     return;
-  }
-
-  // start and end time have specific painting. Handle them first.
-  if (paintLabels && this->isTimeTrack(item))
-  {
-    painter->save();
-    // setup a background
-    QStyleOptionViewItem startOption = labelsOption;
-    startOption.backgroundBrush = this->SceneLockStart
-      ? this->Internals->lockedTimeBrush(labelsOption)
-      : this->Internals->editableTimeBrush(labelsOption);
-    this->paintTick(painter, option, item, this->SceneStartTime, paintLabels, startOption,
-      pqCoreUtilities::formatTime(this->SceneStartTime));
-
-    QStyleOptionViewItem endOption = labelsOption;
-    endOption.backgroundBrush = this->SceneLockEnd
-      ? this->Internals->lockedTimeBrush(labelsOption)
-      : this->Internals->editableTimeBrush(labelsOption);
-    this->paintTick(painter, option, item, this->SceneEndTime, paintLabels, endOption,
-      pqCoreUtilities::formatTime(this->SceneEndTime));
-
-    painter->restore();
   }
 
   // draw times
@@ -343,6 +355,7 @@ void pqTimelinePainter::paintSceneCurrentTime(QPainter* painter, const QStyleOpt
   double pos = this->positionFromTime(this->SceneCurrentTime, option);
   this->paintTimeMark(painter, option, pos);
   painter->restore();
+  this->Internals->LastSceneTimeOption = option;
 }
 
 //-----------------------------------------------------------------------------
@@ -357,15 +370,40 @@ void pqTimelinePainter::paintSourcePipelineTime(
 }
 
 //-----------------------------------------------------------------------------
-double pqTimelinePainter::timeFromPosition(
+QPair<double, double> pqTimelinePainter::displayTimeRange()
+{
+  return QPair<double, double>(this->DisplayStartTime, this->DisplayEndTime);
+}
+
+//-----------------------------------------------------------------------------
+void pqTimelinePainter::setDisplayTimeRange(double start, double end)
+{
+  this->DisplayStartTime = start;
+  this->DisplayEndTime = end;
+}
+
+//-----------------------------------------------------------------------------
+double pqTimelinePainter::timeFromPosition(double pos, const QStyleOptionViewItem& option)
+{
+  double width = option.rect.width();
+  return this->DisplayStartTime +
+    (this->DisplayEndTime - this->DisplayStartTime) * (pos - option.rect.x()) / width;
+}
+
+//-----------------------------------------------------------------------------
+double pqTimelinePainter::timeFromPosition(double pos)
+{
+  return this->timeFromPosition(pos, this->Internals->LastSceneTimeOption);
+}
+
+//-----------------------------------------------------------------------------
+double pqTimelinePainter::indexTimeFromPosition(
   double pos, const QStyleOptionViewItem& option, const QModelIndex& index)
 {
   auto model = dynamic_cast<const QStandardItemModel*>(index.model());
   auto item = model->itemFromIndex(index);
 
-  double width = option.rect.width();
-  double clickedTime = this->SceneStartTime +
-    (this->SceneEndTime - this->SceneStartTime) * (pos - option.rect.x()) / width;
+  double clickedTime = this->timeFromPosition(pos, option);
 
   auto times = this->getTimes(item);
   if (times.empty())
@@ -394,16 +432,17 @@ double pqTimelinePainter::timeFromPosition(
 }
 
 //-----------------------------------------------------------------------------
+double pqTimelinePainter::positionFromTime(double time)
+{
+  return this->positionFromTime(time, this->Internals->LastSceneTimeOption);
+}
+
+//-----------------------------------------------------------------------------
 double pqTimelinePainter::positionFromTime(double time, const QStyleOptionViewItem& option)
 {
-  if (time > this->SceneEndTime || time < this->SceneStartTime)
-  {
-    return -1;
-  }
-
   double width = option.rect.width();
   return option.rect.x() +
-    (time - this->SceneStartTime) * width / (this->SceneEndTime - this->SceneStartTime);
+    (time - this->DisplayStartTime) * width / (this->DisplayEndTime - this->DisplayStartTime);
 }
 
 //-----------------------------------------------------------------------------
@@ -480,6 +519,12 @@ void pqTimelinePainter::setSceneCurrentTime(double time)
 }
 
 //-----------------------------------------------------------------------------
+double pqTimelinePainter::getSceneCurrentTime()
+{
+  return this->SceneCurrentTime;
+}
+
+//-----------------------------------------------------------------------------
 void pqTimelinePainter::setSceneLockStart(bool lock)
 {
   this->SceneLockStart = lock;
@@ -494,17 +539,17 @@ void pqTimelinePainter::setSceneLockEnd(bool lock)
 //-----------------------------------------------------------------------------
 bool pqTimelinePainter::hasStartEndLabels()
 {
-  return this->Internals->LabelRects.size() > 1;
+  return this->Internals->StartLabelRect.isValid() || this->Internals->EndLabelRect.isValid();
 }
 
 //-----------------------------------------------------------------------------
 QRect pqTimelinePainter::getStartLabelRect()
 {
-  return this->hasStartEndLabels() ? this->Internals->LabelRects[0] : QRect();
+  return this->Internals->StartLabelRect;
 }
 
 //-----------------------------------------------------------------------------
 QRect pqTimelinePainter::getEndLabelRect()
 {
-  return this->hasStartEndLabels() ? this->Internals->LabelRects[1] : QRect();
+  return this->Internals->EndLabelRect;
 }
