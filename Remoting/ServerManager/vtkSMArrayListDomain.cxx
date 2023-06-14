@@ -263,6 +263,10 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
       }
 
       // Then, check if the array name is acceptable
+      if (!arrayInfo->GetName())
+      {
+        continue;
+      }
       if (self->IsFilteredArray(dataInfo, type, arrayInfo->GetName()))
       {
         continue;
