@@ -1906,8 +1906,8 @@ class ProxyManager(object):
     def LoadState(self, filename, loader = None):
         self.SMProxyManager.LoadXMLState(filename, loader)
 
-    def SaveState(self, filename):
-        self.SMProxyManager.SaveXMLState(filename)
+    def SaveState(self, filename, location=vtkPVSession.CLIENT):
+        self.SMProxyManager.SaveXMLState(filename, location)
 
 class PropertyIterator(object):
     """Wrapper for a vtkSMPropertyIterator class to satisfy
@@ -2117,11 +2117,11 @@ class Connection(object):
         if self.Alive:
            self.close()
 
-def SaveState(filename):
+def SaveState(filename, location=vtkPVSession.CLIENT):
     """Given a state filename, saves the state of objects registered
     with the proxy manager."""
     pm = ProxyManager()
-    pm.SaveState(filename)
+    pm.SaveState(filename, location)
 
 def LoadState(filename, connection=None):
     """Given a state filename and an optional connection, loads the server

@@ -687,8 +687,8 @@ def _LoadStateLegacy(filename, connection=None, **extraArgs):
 
 # -----------------------------------------------------------------------------
 
-def SaveState(filename):
-    servermanager.SaveState(filename)
+def SaveState(filename, location=vtkPVSession.CLIENT):
+    servermanager.SaveState(filename, location)
 
 #==============================================================================
 # Representation methods

@@ -18,19 +18,20 @@
 #include "vtkFileSequenceParser.h"
 #include "vtkLogger.h"
 #include "vtkObjectFactory.h"
-#include "vtkPNGReader.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMDomainIterator.h"
 #include "vtkSMFileListDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 
 #include <vtk_pugixml.h>
@@ -471,32 +472,43 @@ void ReplaceEnvironmentVariables(std::string& contents)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMLoadStateOptionsProxy::PNGHasStateFile(const char* statefilename, std::string& contents)
+bool vtkSMLoadStateOptionsProxy::PNGHasStateFile(
+  const char* statefilename, std::string& contents, vtkTypeUInt32 location)
 {
-  vtkNew<vtkPNGReader> reader;
-  if (!reader->CanReadFile(statefilename))
+  const auto pxm = vtkSMProxyManager::GetProxyManager();
+  auto proxy = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "PNGSeriesReader"));
+  if (!proxy)
   {
-    vtkErrorWithObjectMacro(nullptr, "Failed to open state file '" << statefilename << "'.");
+    vtkErrorWithObjectMacro(nullptr, "Failed to create png proxy reader");
     return false;
   }
-  reader->SetFileName(statefilename);
-  reader->Update();
-  auto pngTextChunks = reader->GetNumberOfTextChunks();
+  proxy->SetLocation(location);
+  vtkSMPropertyHelper(proxy, "FileNames").Set(statefilename);
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePipeline();
+
+  auto textKeysProp = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("TextKeys"));
+  auto textValuesProp = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("TextValues"));
+  proxy->UpdatePropertyInformation(textKeysProp);
+  proxy->UpdatePropertyInformation(textValuesProp);
+
+  auto pngTextChunks = textKeysProp->GetNumberOfElements();
   bool stateFound = false;
-  for (int i = 0; i < pngTextChunks; ++i)
+  for (unsigned int i = 0; i < pngTextChunks; ++i)
   {
-    if (strcmp(reader->GetTextKey(i), "ParaViewState") == 0)
+    if (strcmp(textKeysProp->GetElement(i), "ParaViewState") == 0)
     {
-      contents = reader->GetTextValue(i);
+      contents = textValuesProp->GetElement(i);
       stateFound = true;
       break;
     }
   }
+  proxy->Delete();
   return stateFound;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
+bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename, vtkTypeUInt32 location)
 {
   this->SetStateFileName(statefilename);
   std::string contents;

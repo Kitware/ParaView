@@ -181,7 +181,7 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addDataFilesToRecentRes
 
 //-----------------------------------------------------------------------------
 bool pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-  pqServer* server, const QString& filename)
+  pqServer* server, const QString& filename, vtkTypeUInt32 location)
 {
   if (server)
   {
@@ -196,6 +196,7 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentRes
     // Add this to the list of recent server resources ...
     resource.setPath(filename);
     resource.addData("PARAVIEW_STATE", "1");
+    resource.addData("FILE_LOCATION", QString::number(location));
     pqApplicationCore* core = pqApplicationCore::instance();
     core->recentlyUsedResources().add(resource);
     core->recentlyUsedResources().save(*core->settings());

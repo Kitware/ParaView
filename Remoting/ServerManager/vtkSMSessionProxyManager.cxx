@@ -30,6 +30,7 @@
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMPipelineState.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -39,7 +40,9 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMSessionProxyManagerInternals.h"
 #include "vtkSMSettingsProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStack.h"
@@ -56,8 +59,6 @@
 #include <set>
 #include <sstream>
 #include <vector>
-
-#include "vtkSMSessionProxyManagerInternals.h"
 
 #if 0 // for debugging
 class vtkSMProxyRegObserver : public vtkCommand
@@ -1252,17 +1253,38 @@ void vtkSMSessionProxyManager::LoadXMLState(vtkPVXMLElement* rootElement,
 }
 
 //---------------------------------------------------------------------------
-bool vtkSMSessionProxyManager::SaveXMLState(const char* filename)
+bool vtkSMSessionProxyManager::SaveString(
+  const char* string, const char* filename, vtkTypeUInt32 location)
 {
-  vtkPVXMLElement* rootElement = this->SaveXMLState();
-  vtksys::ofstream os(filename, ios::out);
-  if (!os.is_open())
+  if (string == nullptr || filename == nullptr)
   {
+    vtkErrorMacro("Invalid arguments");
     return false;
   }
-  rootElement->PrintXML(os, vtkIndent());
-  rootElement->Delete();
+
+  auto proxy = vtkSMSourceProxy::SafeDownCast(this->NewProxy("internal_writers", "StringWriter"));
+  if (!proxy)
+  {
+    vtkErrorMacro("Failed to create string proxy writer");
+    return false;
+  }
+  proxy->SetLocation(location);
+  vtkSMPropertyHelper(proxy, "FileName").Set(filename);
+  vtkSMPropertyHelper(proxy, "String").Set(string);
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePipeline();
+  proxy->Delete();
   return true;
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMSessionProxyManager::SaveXMLState(const char* filename, vtkTypeUInt32 location)
+{
+  vtkPVXMLElement* rootElement = this->SaveXMLState();
+  std::ostringstream xmlStream;
+  rootElement->PrintXML(xmlStream, vtkIndent());
+  rootElement->Delete();
+  return this->SaveString(xmlStream.str().c_str(), filename, location);
 }
 
 //---------------------------------------------------------------------------

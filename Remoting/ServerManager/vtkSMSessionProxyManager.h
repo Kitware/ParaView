@@ -429,11 +429,16 @@ public:
   vtkGetMacro(InLoadXMLState, bool);
 
   /**
+   * Save a string to a file at the given location.
+   */
+  bool SaveString(const char* string, const char* filename, vtkTypeUInt32 location);
+
+  /**
    * Save the state of the server manager in XML format in a file.
    * This saves the state of all proxies and properties.
    * Return true if the operation succeeded otherwise return false.
    */
-  bool SaveXMLState(const char* filename);
+  bool SaveXMLState(const char* filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Saves the state of the server manager as XML, and returns the

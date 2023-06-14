@@ -35,8 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRecentlyUsedResourceLoaderInterface.h"
 
 #include "pqApplicationComponentsModule.h" // needed for export macros
-#include <QObject>                         // needed for QObject
-#include <QStringList>                     // needed for QStringList
+
+#include "vtkType.h" // needed for vtkTypeUInt32
+
+#include <QObject>     // needed for QObject
+#include <QStringList> // needed for QStringList
 
 /**
  * @class pqStandardRecentlyUsedResourceLoaderImplementation
@@ -75,7 +78,8 @@ public:
   /**
    * Add state file to the recently used resources list.
    */
-  static bool addStateFileToRecentResources(pqServer* server, const QString& file);
+  static bool addStateFileToRecentResources(
+    pqServer* server, const QString& file, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
 private:
   Q_DISABLE_COPY(pqStandardRecentlyUsedResourceLoaderImplementation)

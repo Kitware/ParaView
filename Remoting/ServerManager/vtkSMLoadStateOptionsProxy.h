@@ -49,10 +49,13 @@ public:
   vtkTypeMacro(vtkSMLoadStateOptionsProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
   /**
    * Check if a PNG has a paraview state embedded in it. Contents will include the state if present.
    */
-  static bool PNGHasStateFile(const char* statefilename, std::string& contents);
+  static bool PNGHasStateFile(const char* statefilename, std::string& contents,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
+  ///@}
 
   /**
    * Set the state file to load. This may read the file and collect information

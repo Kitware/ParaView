@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSaveStateReaction_h
 
 #include "pqReaction.h"
+#include "vtkType.h" // needed for vtkTypeUInt32
 
 /**
  * @ingroup Reactions
@@ -63,7 +64,8 @@ public:
    * having to create a reaction instance.
    * Return true if the operation succeeded otherwise return false.
    */
-  static bool saveState(const QString& filename);
+  static bool saveState(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Saves the state file as a python state.
@@ -71,7 +73,8 @@ public:
    * having to create a reaction instance.
    * Return true if the operation succeeded otherwise return false.
    */
-  static bool savePythonState(const QString& filename);
+  static bool savePythonState(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
