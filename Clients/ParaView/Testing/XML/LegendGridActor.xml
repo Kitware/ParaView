@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- legend grid needs parallel projection -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/CameraParallelProjection/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/1QCheckBox0" command="set_boolean" arguments="true" />
+
+  <!-- modify text size and axes offsets -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/PushButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontSize" command="set_int" arguments="36" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/RightBorderOffset/IntRangeWidget/LineEdit" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LeftBorderOffset/IntRangeWidget/LineEdit" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/TopBorderOffset/IntRangeWidget/LineEdit" command="set_string" arguments="80" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/BottomBorderOffset/IntRangeWidget/LineEdit" command="set_string" arguments="80" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/widget/OKButton" command="activate" arguments="" />
+</pqevents>

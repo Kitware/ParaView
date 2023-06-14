@@ -3119,6 +3119,103 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy name="LegendGridActor"
+           label="Legend Grid Actor"
+           class="vtkLegendScaleActor"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        LegendGridActor can be used to render an axes grid in a render view.
+      </Documentation>
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the axes grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RightBorderOffset"
+                        command="SetRightBorderOffset"
+                        number_of_elements="1"
+                        default_values="50"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of right axis from the border.  This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TopBorderOffset"
+                        command="SetTopBorderOffset"
+                        number_of_elements="1"
+                        default_values="30"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of top axis from the border. This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LeftBorderOffset"
+                        command="SetLeftBorderOffset"
+                        number_of_elements="1"
+                        default_values="50"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of left axis from the border. This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="BottomBorderOffset"
+                        command="SetBottomBorderOffset"
+                        number_of_elements="1"
+                        default_values="30"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of bottom axis from the border. This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy command="SetAxesTextProperty">
+        <Proxy name="AxesTextProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="LegendLabelColor" name="Color" />
+          <Property exposed_name="LegendLabelOpacity" name="Opacity" />
+          <Property exposed_name="LegendLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="LegendLabelFontFile" name="FontFile" />
+          <Property exposed_name="LegendLabelBold" name="Bold" />
+          <Property exposed_name="LegendLabelItalic" name="Italic" />
+          <Property exposed_name="LegendLabelShadow" name="Shadow" />
+          <Property exposed_name="LegendLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Axis Label Font Properties" panel_widget="FontEditor">
+        <Property name="LegendLabelColor" function="Color"/>
+        <Property name="LegendLabelFontFamily" function="Family"/>
+        <Property name="LegendLabelFontFile" function="File"/>
+        <Property name="LegendLabelBold" function="Bold" />
+        <Property name="LegendLabelItalic" function="Italics"/>
+        <Property name="LegendLabelFontSize" function="Size" />
+        <Property name="LegendLabelShadow" function="Shadow" />
+        <Property name="LegendLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+    </Proxy>
+
+    <!-- ================================================================== -->
     <!-- End of ProxyGroup annotations -->
   </ProxyGroup>
 
