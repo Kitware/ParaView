@@ -591,7 +591,7 @@ def UpdateSteerableParameters(steerable_proxy, steerable_source_name):
 #==============================================================================
 
 def LoadState(statefile, data_directory = None, restrict_to_data_directory = False,
-        filenames = None, *args, **kwargs):
+        filenames = None, location=vtkPVSession.CLIENT, *args, **kwargs):
     """
     Load PVSM state file.
 
@@ -635,7 +635,7 @@ def LoadState(statefile, data_directory = None, restrict_to_data_directory = Fal
 
     pxm = servermanager.ProxyManager()
     pyproxy = servermanager._getPyProxy(pxm.NewProxy('options', 'LoadStateOptions'))
-    if pyproxy.PrepareToLoad(statefile):
+    if pyproxy.PrepareToLoad(statefile, location):
         pyproxy.LoadStateDataFileOptions = pyproxy.SMProxy.USE_FILES_FROM_STATE
         if pyproxy.HasDataFiles():
             if data_directory is not None:

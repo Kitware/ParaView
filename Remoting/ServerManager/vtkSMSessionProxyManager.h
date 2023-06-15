@@ -417,7 +417,8 @@ public:
    * When loading XML state, `vtkSMSessionProxyManager::GetInLoadXMLState` will
    * return true.
    */
-  void LoadXMLState(const char* filename, vtkSMStateLoader* loader = nullptr);
+  void LoadXMLState(const char* filename, vtkSMStateLoader* loader = nullptr,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
   void LoadXMLState(
     vtkPVXMLElement* rootElement, vtkSMStateLoader* loader = nullptr, bool keepOriginalIds = false);
   ///@}
@@ -432,6 +433,11 @@ public:
    * Save a string to a file at the given location.
    */
   bool SaveString(const char* string, const char* filename, vtkTypeUInt32 location);
+
+  /**
+   * Load a string from a file at the given location.
+   */
+  std::string LoadString(const char* filename, vtkTypeUInt32 location);
 
   /**
    * Save the state of the server manager in XML format in a file.

@@ -70,7 +70,8 @@ void pqLoadStateReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked, pqServer* server)
+void pqLoadStateReaction::loadState(
+  const QString& filename, bool dialogBlocked, pqServer* server, vtkTypeUInt32 location)
 {
   if (server == nullptr)
   {
@@ -93,7 +94,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
 
     Q_EMIT pqPVApplicationCore::instance()->aboutToReadState(filename);
 
-    if (proxy && proxy->PrepareToLoad(filename.toUtf8().data()))
+    if (proxy && proxy->PrepareToLoad(filename.toUtf8().data(), location))
     {
       vtkNew<vtkSMParaViewPipelineController> controller;
       controller->InitializeProxy(proxy);
@@ -114,7 +115,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
       if (proxy->Load())
       {
         pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-          server, filename);
+          server, filename, location);
       }
       pqPVApplicationCore::instance()->setLoadingState(false);
 
@@ -132,7 +133,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
     // pqPVApplicationCore::loadStateFromPythonFile already emits aboutToReadState
     pqPVApplicationCore::instance()->loadStateFromPythonFile(filename, server);
     pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-      server, filename);
+      server, filename, location);
 #else
     qWarning("ParaView was not built with Python support so it cannot open a python file");
 #endif
@@ -142,22 +143,21 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
 //-----------------------------------------------------------------------------
 void pqLoadStateReaction::loadState()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
-    tr("ParaView state file") +
-      " (*.pvsm"
-      " *.png"
+  QString fileExt = tr("ParaView state file") + QString(" (*.pvsm *.png);;");
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-      " *.py"
+  fileExt += tr("Python state file") + QString(" (*.py);;");
 #endif
-      ");;" +
-      tr("All files") + " (*)",
-    false);
+  fileExt += tr("All Files") + QString(" (*)");
+
+  auto server = pqActiveObjects::instance().activeServer();
+  pqFileDialog fileDialog(
+    server, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(), fileExt, false, false);
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
   {
-    QString selectedFile = fileDialog.getSelectedFiles()[0];
-    pqLoadStateReaction::loadState(selectedFile);
+    const QString selectedFile = fileDialog.getSelectedFiles()[0];
+    pqLoadStateReaction::loadState(selectedFile, false, server, fileDialog.getSelectedLocation());
   }
 }
 

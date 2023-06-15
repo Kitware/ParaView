@@ -38,13 +38,9 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
-using namespace vtksys;
-
 #include <algorithm>
-#include <fstream>
 #include <set>
 #include <sstream>
-#include <streambuf>
 
 //---------------------------------------------------------------------------
 class vtkSMLoadStateOptionsProxy::vtkInternals
@@ -435,18 +431,6 @@ vtkPVXMLElement* ConvertXML(vtkPVXMLParser* parser, pugi::xml_node& node)
   return parser->GetRootElement();
 }
 
-// Read contents of a file.
-std::string GetContents(std::ifstream& ifp)
-{
-  std::string str;
-  ifp.seekg(0, std::ios::end);
-  str.reserve(ifp.tellg());
-  ifp.seekg(0, std::ios::beg);
-
-  str.assign((std::istreambuf_iterator<char>(ifp)), std::istreambuf_iterator<char>());
-  return str;
-}
-
 // Replace all "$FOO" with environment variable values, if present. Otherwise
 // they are left unchanged.
 void ReplaceEnvironmentVariables(std::string& contents)
@@ -510,12 +494,18 @@ bool vtkSMLoadStateOptionsProxy::PNGHasStateFile(
 //----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename, vtkTypeUInt32 location)
 {
+  const auto pxm = this->GetSession()->GetSessionProxyManager();
+  if (!pxm)
+  {
+    vtkErrorWithObjectMacro(nullptr, "Proxy manager is invalid");
+    return false;
+  }
   this->SetStateFileName(statefilename);
   std::string contents;
   const auto fileNameExt = vtksys::SystemTools::GetFilenameLastExtension(statefilename);
   if (fileNameExt == ".png")
   {
-    if (!vtkSMLoadStateOptionsProxy::PNGHasStateFile(statefilename, contents))
+    if (!vtkSMLoadStateOptionsProxy::PNGHasStateFile(statefilename, contents, location))
     {
       vtkErrorMacro("Failed to find state in png file '" << statefilename << "'.");
       return false;
@@ -523,13 +513,12 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename, vtkTyp
   }
   else
   {
-    std::ifstream xmlfile(statefilename);
-    if (!xmlfile.is_open())
+    contents = pxm->LoadString(statefilename, location);
+    if (contents.empty())
     {
-      vtkErrorMacro("Failed to open state file '" << statefilename << "'.");
+      vtkErrorMacro("Failed to load state file '" << statefilename << "'.");
       return false;
     }
-    contents = ::GetContents(xmlfile);
   }
   ::ReplaceEnvironmentVariables(contents);
 
@@ -584,8 +573,8 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
       if (!locatedPath.empty())
       {
         *fIter = locatedPath;
-        if (SystemTools::GetParentDirectory(locatedPath) ==
-          SystemTools::GetParentDirectory(lastLocatedPath))
+        if (vtksys::SystemTools::GetParentDirectory(locatedPath) ==
+          vtksys::SystemTools::GetParentDirectory(lastLocatedPath))
         {
           numOfPathMatches++;
         }
@@ -608,10 +597,10 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
     else
     {
       std::vector<std::string> directoryPathComponents;
-      SystemTools::SplitPath(
-        SystemTools::GetParentDirectory(lastLocatedPath), directoryPathComponents);
-      directoryPathComponents.push_back(SystemTools::GetFilenameName(*fIter));
-      *fIter = SystemTools::JoinPath(directoryPathComponents);
+      vtksys::SystemTools::SplitPath(
+        vtksys::SystemTools::GetParentDirectory(lastLocatedPath), directoryPathComponents);
+      directoryPathComponents.push_back(vtksys::SystemTools::GetFilenameName(*fIter));
+      *fIter = vtksys::SystemTools::JoinPath(directoryPathComponents);
     }
   }
   return true;

@@ -40,7 +40,10 @@
 #include "vtkNew.h"                         // for vtkNew
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMProxy.h"
+
 #include <vector> // needed for std::vector
+
+class vtkSMSessionProxyManager;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
@@ -61,7 +64,8 @@ public:
    * Set the state file to load. This may read the file and collect information
    * about the file. Returns false if the filename is invalid or cannot be read.
    */
-  virtual bool PrepareToLoad(const char* statefilename);
+  virtual bool PrepareToLoad(
+    const char* statefilename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Check if state file has any data files.

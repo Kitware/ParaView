@@ -1903,8 +1903,8 @@ class ProxyManager(object):
             pass
         return getattr(self.SMProxyManager, name)
 
-    def LoadState(self, filename, loader = None):
-        self.SMProxyManager.LoadXMLState(filename, loader)
+    def LoadState(self, filename, loader = None, location=vtkPVSession.CLIENT):
+        self.SMProxyManager.LoadXMLState(filename, loader, location)
 
     def SaveState(self, filename, location=vtkPVSession.CLIENT):
         self.SMProxyManager.SaveXMLState(filename, location)
@@ -2123,7 +2123,7 @@ def SaveState(filename, location=vtkPVSession.CLIENT):
     pm = ProxyManager()
     pm.SaveState(filename, location)
 
-def LoadState(filename, connection=None):
+def LoadState(filename, connection=None, location=vtkPVSession.CLIENT):
     """Given a state filename and an optional connection, loads the server
     manager state."""
     if not connection:
@@ -2131,7 +2131,7 @@ def LoadState(filename, connection=None):
     if not connection:
         raise RuntimeError ("Cannot load state without a connection")
     pm = ProxyManager()
-    pm.LoadState(filename, None)
+    pm.LoadState(filename, None, location)
     views = GetRenderViews()
     for view in views:
         # Make sure that the client window size matches the

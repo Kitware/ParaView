@@ -45,6 +45,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSmartPointer.h"
@@ -1211,11 +1212,11 @@ int vtkSMSessionProxyManager::AreProxiesModified()
 
 //---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::LoadXMLState(
-  const char* filename, vtkSMStateLoader* loader /*=nullptr*/)
+  const char* filename, vtkSMStateLoader* loader /*=nullptr*/, vtkTypeUInt32 location)
 {
+  const std::string contents = this->LoadString(filename, location);
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
-  parser->SetFileName(filename);
-  parser->Parse();
+  parser->Parse(contents.c_str());
 
   this->LoadXMLState(parser->GetRootElement(), loader);
   parser->Delete();
@@ -1275,6 +1276,33 @@ bool vtkSMSessionProxyManager::SaveString(
   proxy->UpdatePipeline();
   proxy->Delete();
   return true;
+}
+
+//---------------------------------------------------------------------------
+std::string vtkSMSessionProxyManager::LoadString(const char* filename, vtkTypeUInt32 location)
+{
+  if (filename == nullptr)
+  {
+    vtkErrorMacro("Invalid arguments");
+    return std::string();
+  }
+
+  auto proxy = vtkSMSourceProxy::SafeDownCast(this->NewProxy("internal_sources", "StringReader"));
+  if (!proxy)
+  {
+    vtkErrorMacro("Failed to create string proxy reader");
+    return std::string();
+  }
+  proxy->SetLocation(location);
+  vtkSMPropertyHelper(proxy, "FileName").Set(filename);
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePipeline();
+
+  auto stringProp = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("String"));
+  proxy->UpdatePropertyInformation(stringProp);
+  const std::string contents = stringProp->GetElement(0);
+  proxy->Delete();
+  return contents;
 }
 
 //---------------------------------------------------------------------------

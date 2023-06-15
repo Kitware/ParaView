@@ -84,7 +84,8 @@ public:
 private:
   Q_DISABLE_COPY(pqStandardRecentlyUsedResourceLoaderImplementation)
 
-  bool loadState(const pqServerResource& resource, pqServer* server);
+  bool loadState(const pqServerResource& resource, pqServer* server,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
   bool loadData(const pqServerResource& resource, pqServer* server);
 };
 

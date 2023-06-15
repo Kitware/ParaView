@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
+#include "vtkPVSession.h"
 
 #include <QFileInfo>
 #include <QtDebug>
@@ -71,7 +72,14 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::load(
   assert(this->canLoad(resource));
   if (resource.hasData("PARAVIEW_STATE"))
   {
-    return this->loadState(resource, server);
+    if (resource.hasData("FILE_LOCATION"))
+    {
+      return this->loadState(resource, server, resource.data("FILE_LOCATION").toUInt());
+    }
+    else
+    {
+      return this->loadState(resource, server, vtkPVSession::CLIENT);
+    }
   }
   else if (resource.hasData("PARAVIEW_DATA"))
   {
@@ -102,17 +110,10 @@ QString pqStandardRecentlyUsedResourceLoaderImplementation::label(const pqServer
 
 //-----------------------------------------------------------------------------
 bool pqStandardRecentlyUsedResourceLoaderImplementation::loadState(
-  const pqServerResource& resource, pqServer* server)
+  const pqServerResource& resource, pqServer* server, vtkTypeUInt32 location)
 {
   QString stateFile = resource.path();
-
-  QFileInfo finfo(stateFile);
-  if (!finfo.isFile() || !finfo.isReadable())
-  {
-    qCritical() << "State file no longer exists: '" << stateFile << "'";
-    return false;
-  }
-  pqLoadStateReaction::loadState(stateFile, server);
+  pqLoadStateReaction::loadState(stateFile, false, server, location);
   return true;
 }
 
