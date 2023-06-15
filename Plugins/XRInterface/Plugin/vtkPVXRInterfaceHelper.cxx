@@ -17,6 +17,7 @@
 
 #if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
 #include "vtkOpenXRRemotingRenderWindow.h"
+#include "vtkWin32OpenGLDXRenderWindow.h"
 #endif
 
 #include "vtkVRRenderWindow.h"
@@ -1909,13 +1910,17 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
         vtkWarningMacro("Set IP: " << this->RemotingAddress);
         renWinRemote->SetRemotingIPAddress(this->RemotingAddress.c_str());
       }
+      vtkNew<vtkWin32OpenGLDXRenderWindow> dxw;
+      dxw->SetSharedRenderWindow(pvRenderWindow);
+      renWin->SetHelperWindow(dxw);
     }
     else
     {
       renWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
+      renWin->MakeCurrent();
+      renWin->SetHelperWindow(pvRenderWindow);
     }
-    renWin->MakeCurrent();
-    renWin->SetHelperWindow(pvRenderWindow);
+
     ren = vtkSmartPointer<vtkOpenXRRenderer>::New();
     vtkNew<vtkOpenXRRenderWindowInteractor> oxriren;
     vriren = oxriren;
