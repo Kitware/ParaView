@@ -86,7 +86,7 @@ std::atomic_int FutureWorker::Counter{ 0 };
 vtkRemoteWriterHelper::vtkRemoteWriterHelper()
 {
   this->SetNumberOfInputPorts(1);
-  this->SetNumberOfOutputPorts(1);
+  this->SetNumberOfOutputPorts(0);
   this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
 }
 
@@ -134,6 +134,10 @@ int vtkRemoteWriterHelper::RequestData(
     {
       this->Writer->SetInputDataObject(std::move(input));
       {
+        if (this->GetState() != vtkRemoteWriterHelper::WRITE)
+        {
+          return;
+        }
         ::FutureWorker worker{ imageWriter->GetFileName() };
         // We need to lock guard modifying SharedFutures because the function
         // we are pushing removes its futures from it in an asynchronous way
@@ -237,8 +241,23 @@ void vtkRemoteWriterHelper::WriteLocally(vtkDataObject* input)
   {
     vtkLogF(TRACE, "Writing file locally using writer %s", vtkLogIdentifier(this->Writer));
     this->Writer->SetInputDataObject(input);
+    std::string function;
+    switch (this->GetState())
+    {
+      case vtkRemoteWriterHelper::START:
+        function = "Start";
+        break;
+      case vtkRemoteWriterHelper::WRITE:
+        function = "Write";
+        break;
+      case vtkRemoteWriterHelper::END:
+        function = "End";
+        break;
+      default:
+        break;
+    }
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->Writer << "Write"
+    stream << vtkClientServerStream::Invoke << this->Writer << function.c_str()
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     this->Writer->SetInputDataObject(nullptr);
@@ -247,4 +266,13 @@ void vtkRemoteWriterHelper::WriteLocally(vtkDataObject* input)
   {
     vtkErrorMacro("No writer specified! Failed to write.");
   }
+}
+
+//----------------------------------------------------------------------------
+int vtkRemoteWriterHelper::Write()
+{
+  // always write even if the data hasn't changed
+  this->Modified();
+  this->Update();
+  return 1;
 }

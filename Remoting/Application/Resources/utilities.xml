@@ -841,14 +841,21 @@
     </Proxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver">
+    <WriterProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver">
       <Documentation>
         Proxy used internally to help write data generated on the client-side on the data-server side.
       </Documentation>
+      <InputProperty name="DummyInput" panel_visibility="never">
+      </InputProperty>
       <IntVectorProperty name="OutputDestination"
                          command="SetOutputDestination"
                          number_of_elements="1"
                          default_values="0"
+                         panel_visibility="never"/>
+      <IntVectorProperty name="State"
+                         command="SetState"
+                         number_of_elements="1"
+                         default_values="1"
                          panel_visibility="never"/>
       <IntVectorProperty name="TryWritingInBackground"
                          command="SetTryWritingInBackground"
@@ -862,7 +869,7 @@
         </Documentation>
       </IntVectorProperty>
       <ProxyProperty name="Writer" command="SetWriter"/>
-    </SourceProxy>
+    </WriterProxy>
 
     <!-- ================================================================= -->
     <Proxy name="MultiBlockInspectorHelper">

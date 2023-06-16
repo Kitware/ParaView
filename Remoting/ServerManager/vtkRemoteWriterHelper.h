@@ -80,6 +80,32 @@ public:
   vtkBooleanMacro(TryWritingInBackground, bool);
   ///@}
 
+  /**
+   * Writer States
+   *
+   * START and END are used only by vtkGenericMovieWriter subclasses, while WRITE
+   * is used by any writer.
+   */
+  enum
+  {
+    START = 0,
+    WRITE = 1,
+    END = 2
+  };
+
+  ///@{
+  /**
+   * Set the state of the writer.
+   *
+   * Make sure that the given writer has a Start and End functions if you want to use
+   * START and END states.
+   *
+   * The default is WRITE.
+   */
+  vtkSetClampMacro(State, int, START, END);
+  vtkGetMacro(State, int);
+  ///@}
+
   ///@{
   /**
    * Set the interpreter to use to call methods on the writer. Initialized to
@@ -108,6 +134,11 @@ public:
    */
   static void Wait();
 
+  /**
+   * Write the data.
+   */
+  int Write();
+
 protected:
   vtkRemoteWriterHelper();
   ~vtkRemoteWriterHelper() override;
@@ -122,6 +153,7 @@ protected:
   void WriteLocally(vtkDataObject* input);
 
   vtkTypeUInt32 OutputDestination = vtkPVSession::CLIENT;
+  int State = WRITE;
   vtkAlgorithm* Writer = nullptr;
   vtkClientServerInterpreter* Interpreter = nullptr;
   bool TryWritingInBackground = false;

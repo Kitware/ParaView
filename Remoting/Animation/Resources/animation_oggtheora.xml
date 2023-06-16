@@ -1,10 +1,15 @@
 <!-- Proxy definitions for OggTheora writer -->
 <ServerManagerConfiguration>
   <ProxyGroup name="animation_writers">
-    <Proxy name="OggTheora" class="vtkOggTheoraWriter" processes="client" label="Ogg-Theora">
+    <Proxy name="OggTheora" class="vtkOggTheoraWriter" processes="client|dataserver" label="Ogg-Theora">
       <Documentation>
         Writer for saving ogv files.
       </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
 
       <IntVectorProperty name="Quality"
         command="SetQuality"
@@ -49,6 +54,29 @@
           When checked, the video will be encoded using 4:2:0 subsampling for the color channels.
         </Documentation>
       </IntVectorProperty>
+
+      <Property command="Start"
+                label="Start"
+                name="Start"
+                panel_widget="command_button"
+                panel_visibility="default">
+        <Documentation>Press this to start writing the movie</Documentation>
+      </Property>
+      <Property command="Write"
+                label="Write"
+                name="Write"
+                panel_widget="command_button"
+                panel_visibility="default">
+        <Documentation>Press this to write the movie</Documentation>
+      </Property>
+      <Property command="End"
+                label="End"
+                name="End"
+                panel_widget="command_button"
+                panel_visibility="default">
+        <Documentation>Press this to end writing the movie</Documentation>
+      </Property>
+
       <Hints>
         <FormatOptions extensions="ogv"
           file_description="Ogg-Theora video files" />
