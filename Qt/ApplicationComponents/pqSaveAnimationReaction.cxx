@@ -107,7 +107,8 @@ void pqSaveAnimationReaction::saveAnimation()
   }
 
   // Get the filename first, this will determine some of the options shown.
-  QString filename = pqSaveScreenshotReaction::promptFileName(ahProxy, "*.png");
+  vtkTypeUInt32 location;
+  QString filename = pqSaveScreenshotReaction::promptFileName(ahProxy, "*.png", location);
   if (filename.isEmpty())
   {
     return;

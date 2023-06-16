@@ -40,6 +40,7 @@ from __future__ import absolute_import, division, print_function
 import paraview
 from paraview import servermanager
 import paraview._backwardscompatibilityhelper
+from paraview.modules.vtkRemotingCore import vtkPVSession
 
 # Bring OutputPort in our namespace.
 from paraview.servermanager import OutputPort
@@ -1318,7 +1319,7 @@ def _SaveScreenshotLegacy(filename,
         return SaveScreenshot(filename, viewOrLayout,
             ImageResolution=imageResolution)
 
-def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **params):
+def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, location=vtkPVSession.CLIENT, **params):
     """Save screenshot for a view or layout (collection of views) to an image.
 
     `SaveScreenshot` is used to save the rendering results to an image.
@@ -1340,6 +1341,11 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
           If set to `True`, the screenshot will be saved by a different thread
           and run in the background. In such circumstances, one can wait
           until the file is written by calling `WaitForScreenshot(filename)`.
+
+        location (int)
+          Location where the screenshot should be saved. This can be one of
+          the following values: `vtkPVSession.CLIENT`, `vtkPVSession.DATA_SERVER`.
+          The default is `vtkPVSession.CLIENT`.
 
     **Keyword Parameters (optional)**
 
@@ -1444,7 +1450,7 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
     options = servermanager.misc.SaveScreenshot()
     controller.PreInitializeProxy(options)
 
-    options.SaveInBackground = saveInBackground;
+    options.SaveInBackground = saveInBackground
     options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
@@ -1463,7 +1469,7 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
             del params[prop]
 
     SetProperties(options, **params)
-    return options.WriteImage(filename)
+    return options.WriteImage(filename, location)
 
 # -----------------------------------------------------------------------------
 def SetNumberOfCallbackThreads(n):

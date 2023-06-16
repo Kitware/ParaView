@@ -69,6 +69,7 @@ import paraview.servermanager as sm
 import paraview.simple as simple
 import sys
 from paraview.vtk import vtkTimeStamp
+from paraview.modules.vtkRemotingCore import vtkPVSession
 
 if sys.version_info >= (3,):
     xrange = range
@@ -1381,7 +1382,7 @@ class SaveData(TraceItem):
         Trace.Output.append_separated(trace.raw_data())
 
 class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
-    def __init__(self, helper, filename, view, layout, mode_screenshot=False):
+    def __init__(self, helper, filename, view, layout, mode_screenshot=False, location=vtkPVSession.CLIENT):
         TraceItem.__init__(self)
         assert(view != None or layout != None)
 
@@ -1415,7 +1416,7 @@ class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
                 helperAccessor.trace_ctor(\
                 "SaveScreenshot" if mode_screenshot else "SaveAnimation",
                     ScreenShotHelperProxyFilter(),
-                    ctor_args="'%s', %s" % (filename, ctor_args_1),
+                    ctor_args="'%s', %s, %s" % (filename, ctor_args_1, location),
                     ctor_extra_args=format_txt,
                     skip_assignment=True))
         helperAccessor.finalize()

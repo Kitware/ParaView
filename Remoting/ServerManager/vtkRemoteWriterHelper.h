@@ -22,7 +22,7 @@
  * state files, etc. that are generated on the client-side but sometimes needs
  * to be saved remotely on the data-server root node instead.
  *
- * To use, simply create the ("misc", "NetworkImageWriter") proxy. The proxy
+ * To use, simply create the ("misc", "RemoteWriterHelper") proxy. The proxy
  * creates this class on client and data-server. Next, using the client-side
  * object, pass the input data to the client-instance and then set
  * `OutputDestination` property as needed. The actual writer to use must be set
