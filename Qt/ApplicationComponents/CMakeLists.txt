@@ -141,7 +141,9 @@ set(classes
   pqPointPickingHelper
   pqPreviewMenuManager
   pqPropertyCollectionWidget
+  pqProxyCategory
   pqProxyGroupMenuManager
+  pqProxyInfo
   pqReaction
   pqReloadFilesReaction
   pqRenameProxyReaction

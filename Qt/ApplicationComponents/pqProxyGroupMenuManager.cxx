@@ -8,6 +8,7 @@
 #include "pqCoreUtilities.h"
 #include "pqManageFavoritesReaction.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyCategory.h"
 #include "pqQtDeprecated.h"
 #include "pqServerManagerModel.h"
 #include "pqSetData.h"
@@ -21,6 +22,7 @@
 #include "vtkSMSessionProxyManager.h"
 
 #include "vtkNew.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 
 #include <QApplication>
@@ -34,67 +36,138 @@
 
 #include <algorithm>
 
-class pqProxyGroupMenuManager::pqInternal
+struct pqProxyGroupMenuManager::pqInternal
 {
-public:
-  struct Info
-  {
-    QString Icon; //<-- Name of the icon to use, if any.
-    QStringList
-      OmitFromToolbar; //<-- a list of category names whose toolbars should not contain this action.
-    QPointer<QAction> Action; //<-- Action for this proxy.
-  };
 
-  typedef QMap<QPair<QString, QString>, Info> ProxyInfoMap;
+  static const char* FAVORITES_CATEGORY() { return "Favorites"; }
 
-  struct CategoryInfo
+  pqInternal()
+    : ApplicationCategory(new pqProxyCategory())
+    , SettingsCategory(new pqProxyCategory())
   {
-    QString Label;
-    bool PreserveOrder;
-    bool ShowInToolbar;
-    bool HideForTests;
-    QList<QPair<QString, QString>> Proxies;
-    CategoryInfo()
+  }
+
+  //-----------------------------------------------------------------------------
+  pqProxyCategory* menuCategory()
+  {
+    if (this->SettingsCategory->isEmpty())
     {
-      this->PreserveOrder = false;
-      this->ShowInToolbar = false;
-      this->HideForTests = false;
+      return this->ApplicationCategory.get();
     }
-  };
 
-  typedef QMap<QString, CategoryInfo> CategoryInfoMap;
+    return this->SettingsCategory.get();
+  }
 
-  pqInternal() { this->LocalActiveSession = nullptr; }
-
-  void addProxy(const QString& pgroup, const QString& pname, const QString& icon,
-    const QString& omitFromToolbar = QString())
+  /**
+   * Return true if new proxies/categories definition should be added to the settings tree.
+   * If settings are present we do not want to add application-defined proxies (loaded at startup).
+   * Once client is set up, new proxies comes from plugins and should be added.
+   */
+  bool allowSettingsUpdate()
   {
-    if (!pname.isEmpty() && !pgroup.isEmpty())
+    return this->ClientEnvironmentDone && !this->SettingsCategory->isEmpty();
+  }
+
+  //-----------------------------------------------------------------------------
+  vtkSMProxy* getPrototype(QAction* action) const
+  {
+    if (!action)
     {
-      Info& info = this->Proxies[QPair<QString, QString>(pgroup, pname)];
-      if (!omitFromToolbar.isEmpty())
+      return nullptr;
+    }
+    QStringList data_list = action->data().toStringList();
+    if (data_list.size() != 2)
+    {
+      return nullptr;
+    }
+
+    QPair<QString, QString> key(data_list[0], data_list[1]);
+    vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    return pxm->GetPrototypeProxy(key.first.toUtf8().data(), key.second.toUtf8().data());
+  }
+
+  /**
+   * Proxy action update.
+   */
+  ///@{
+  /**
+   * Update action properties from proxy information.
+   * See updateActionIcon, updateActionOmitFromToolbar, updateActionShortcut
+   */
+  void updateAction(QAction* action, pqProxyInfo* proxyInfo)
+  {
+    this->updateActionShortcut(action, proxyInfo);
+    this->updateActionIcon(action, proxyInfo);
+    this->updateActionOmitFromToolbar(action, proxyInfo);
+  }
+
+  /**
+   * Update action icon from proxy info.
+   * For CustomFilters, fallback to a default icon.
+   */
+  void updateActionIcon(QAction* action, pqProxyInfo* proxyInfo)
+  {
+    const QString group = proxyInfo->group();
+    const QString name = proxyInfo->name();
+    QString icon = proxyInfo->icon();
+
+    if (icon.isEmpty())
+    {
+      vtkSMProxy* prototype = this->getPrototype(action);
+      // Try to add some default icons if none is specified.
+      if (prototype && prototype->IsA("vtkSMCompoundSourceProxy"))
       {
-        info.OmitFromToolbar << omitFromToolbar;
+        icon = ":/pqWidgets/Icons/pqBundle32.png";
       }
-      if (!icon.isEmpty())
-      {
-        info.Icon = icon;
-      }
+    }
+
+    if (!icon.isEmpty())
+    {
+      action->setIcon(QIcon(icon));
     }
   }
 
-  void removeProxy(const QString& pgroup, const QString& pname)
+  /**
+   * Update action "omit from toolbar" property from proxy info.
+   */
+  void updateActionOmitFromToolbar(QAction* action, pqProxyInfo* proxy)
   {
-    if (!pname.isEmpty() && !pgroup.isEmpty())
+    QStringList omittedToolbars = proxy->omitFromToolbar();
+    QVariant omitFromToolbar = action->property("OmitFromToolbar");
+    if (omitFromToolbar.isValid() && !omitFromToolbar.toStringList().empty())
     {
-      QPair<QString, QString> pair(pgroup, pname);
-      this->Proxies.remove(pair);
+      omittedToolbars << omitFromToolbar.toStringList();
+    }
+
+    if (!omittedToolbars.empty())
+    {
+      action->setProperty("OmitFromToolbar", omittedToolbars);
     }
   }
 
-  // Proxies and Categories is what gets shown in the menu.
-  ProxyInfoMap Proxies;
-  CategoryInfoMap Categories;
+  /**
+   * Update action shortcut from settings.
+   */
+  void updateActionShortcut(QAction* action, pqProxyInfo* proxyInfo)
+  {
+    const QString group = proxyInfo->group();
+    pqSettings settings;
+
+    if (group == "filters" || group == "sources")
+    {
+      QString menuName = group == "filters" ? "Filters" : "Sources";
+      auto variant = settings.value(
+        QString("pqCustomShortcuts/%1/Alphabetical/%2").arg(menuName, proxyInfo->label()),
+        QVariant());
+      if (variant.canConvert<QKeySequence>())
+      {
+        action->setShortcut(variant.value<QKeySequence>());
+      }
+    }
+  }
+  ///@}
+
   QList<QPair<QString, QString>> RecentlyUsed;
   // list of favorites. Each pair is {filterGroup, filterPath} where filterPath
   // is the category path to access the favorite: category1;category2;...;filterName
@@ -103,24 +176,38 @@ public:
   QSet<unsigned long> CallBackIDs;
   QWidget Widget;
   QPointer<QAction> SearchAction;
-  unsigned long ProxyManagerCallBackId;
-  void* LocalActiveSession;
+  unsigned long ProxyManagerCallBackId = 0;
+  void* LocalActiveSession = nullptr;
 
   QPointer<QMenu> RecentMenu;
   QPointer<QMenu> FavoritesMenu;
+  QPointer<QMenu> AlphabeticalMenu;
+  QPointer<QMenu> MiscMenu;
+  QList<QPointer<QMenu>> CategoriesMenus;
+
+  std::unique_ptr<pqProxyCategory> ApplicationCategory;
+  std::unique_ptr<pqProxyCategory> SettingsCategory;
+
+  QMap<QString, QPointer<QAction>> CachedActions;
+
+  bool ClientEnvironmentDone = false;
+  bool IsWritingSettings = false;
 };
 
 //-----------------------------------------------------------------------------
 pqProxyGroupMenuManager::pqProxyGroupMenuManager(
-  QMenu* _menu, const QString& resourceTagName, bool quickLaunchable)
-  : Superclass(_menu)
+  QMenu* mainMenu, const QString& resourceTagName, bool quickLaunchable)
+  : Superclass(mainMenu)
+  , ResourceTagName(resourceTagName)
+  , Internal(new pqInternal())
   , SupportsQuickLaunch(quickLaunchable)
 {
-  this->ResourceTagName = resourceTagName;
-  this->Internal = new pqInternal();
-  this->RecentlyUsedMenuSize = 0;
-  this->Enabled = true;
-  this->EnableFavorites = false;
+  this->loadCategorySettings();
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  QObject::connect(settings, &pqSettings::modified, [&]() { this->loadCategorySettings(); });
+
+  QObject::connect(pqApplicationCore::instance(), &pqApplicationCore::clientEnvironmentDone, this,
+    [&]() { this->Internal->ClientEnvironmentDone = true; });
 
   QObject::connect(pqApplicationCore::instance(), SIGNAL(loadXML(vtkPVXMLElement*)), this,
     SLOT(loadConfiguration(vtkPVXMLElement*)));
@@ -146,6 +233,10 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   {
     pvappcore->registerForQuicklaunch(this->widgetActionsHolder());
   }
+
+  this->connect(mainMenu, SIGNAL(aboutToShow()), SLOT(populateCategoriesMenus()));
+
+  this->populateMenu();
 }
 
 //-----------------------------------------------------------------------------
@@ -156,57 +247,27 @@ pqProxyGroupMenuManager::~pqProxyGroupMenuManager()
   {
     vtkSMProxyManager::GetProxyManager()->RemoveObserver(this->Internal->ProxyManagerCallBackId);
   }
-  delete this->Internal;
-  this->Internal = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::addProxy(const QString& xmlgroup, const QString& xmlname)
 {
-  this->Internal->addProxy(xmlgroup.toUtf8().data(), xmlname.toUtf8().data(), QString());
+  if (!xmlname.isEmpty() && !xmlgroup.isEmpty())
+  {
+    auto proxy =
+      new pqProxyInfo(this->Internal->ApplicationCategory.get(), xmlname, xmlgroup, xmlname);
+    this->Internal->ApplicationCategory->addProxy(proxy);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::removeProxy(const QString& xmlgroup, const QString& xmlname)
 {
-  this->Internal->removeProxy(xmlgroup.toUtf8().data(), xmlname.toUtf8().data());
-}
-
-//-----------------------------------------------------------------------------
-namespace
-{
-void pqProxyGroupMenuManagerConvertLegacyXML(vtkPVXMLElement* root)
-{
-  if (!root | !root->GetName())
+  if (!xmlname.isEmpty() && !xmlgroup.isEmpty())
   {
-    return;
-  }
-  if (strcmp(root->GetName(), "Source") == 0)
-  {
-    root->SetName("Proxy");
-    root->AddAttribute("group", "sources");
-  }
-  else if (strcmp(root->GetName(), "Filter") == 0)
-  {
-    root->SetName("Proxy");
-    root->AddAttribute("group", "filters");
-  }
-  else if (strcmp(root->GetName(), "Reader") == 0)
-  {
-    root->SetName("Proxy");
-    root->AddAttribute("group", "sources");
-  }
-  else if (strcmp(root->GetName(), "Writer") == 0)
-  {
-    root->SetName("Proxy");
-    root->AddAttribute("group", "writers");
-  }
-  for (unsigned int cc = 0; cc < root->GetNumberOfNestedElements(); cc++)
-  {
-    pqProxyGroupMenuManagerConvertLegacyXML(root->GetNestedElement(cc));
+    this->Internal->ApplicationCategory->removeProxy(xmlname);
   }
 }
-};
 
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
@@ -222,88 +283,99 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
   }
 
   // Convert legacy xml to new style.
-  pqProxyGroupMenuManagerConvertLegacyXML(root);
+  pqProxyCategory::convertLegacyXML(root);
 
-  // Iterate over Category elements and find items with tag name "Proxy".
-  // Iterate over elements with tag "Proxy" and add them to the
-  // this->Internal->Proxies map.
-  unsigned int numElems = root->GetNumberOfNestedElements();
-  for (unsigned int cc = 0; cc < numElems; cc++)
+  bool modified = this->Internal->ApplicationCategory->parseXML(root);
+  // do not re-add application defined categories inside settings.
+
+  if (modified && this->Internal->allowSettingsUpdate())
   {
-    vtkPVXMLElement* curElem = root->GetNestedElement(cc);
-    if (!curElem || !curElem->GetName())
+    modified = this->Internal->SettingsCategory->parseXML(root);
+    if (modified)
     {
-      continue;
-    }
-
-    if (strcmp(curElem->GetName(), "Category") == 0 && curElem->GetAttribute("name"))
-    {
-      // We need to be certain if this group is for the elements we are concerned
-      // with. i.e. is there at least one element with tag "Proxy" in this
-      // category?
-      if (!curElem->FindNestedElementByName("Proxy"))
-      {
-        continue;
-      }
-      QString categoryName = curElem->GetAttribute("name");
-      QString categoryLabel = curElem->GetAttribute("menu_label")
-        ? QCoreApplication::translate("ServerManagerXML", curElem->GetAttribute("menu_label"))
-        : categoryName;
-      int preserve_order = 0;
-      curElem->GetScalarAttribute("preserve_order", &preserve_order);
-      int show_in_toolbar = 0;
-      curElem->GetScalarAttribute("show_in_toolbar", &show_in_toolbar);
-      int hide_for_tests = 0;
-      curElem->GetScalarAttribute("hide_for_tests", &hide_for_tests);
-
-      // Valid category encountered. Update the Internal datastructures.
-      pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
-      category.Label = categoryLabel;
-      category.PreserveOrder = category.PreserveOrder || (preserve_order == 1);
-      category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar == 1);
-      category.HideForTests = category.HideForTests || (hide_for_tests == 1);
-      unsigned int numCategoryElems = curElem->GetNumberOfNestedElements();
-      for (unsigned int kk = 0; kk < numCategoryElems; ++kk)
-      {
-        vtkPVXMLElement* child = curElem->GetNestedElement(kk);
-        if (child && child->GetName() && strcmp(child->GetName(), "Proxy") == 0)
-        {
-          const char* name = child->GetAttribute("name");
-          const char* group = child->GetAttribute("group");
-          const char* icon = child->GetAttribute("icon");
-          int omit = 0;
-          child->GetScalarAttribute("omit_from_toolbar", &omit);
-          if (!name || !group)
-          {
-            continue;
-          }
-          this->Internal->addProxy(group, name, icon, omit ? categoryName : QString());
-          if (!category.Proxies.contains(QPair<QString, QString>(group, name)))
-          {
-            category.Proxies.push_back(QPair<QString, QString>(group, name));
-          }
-        }
-      }
-    }
-    else if (strcmp(curElem->GetName(), "Proxy") == 0)
-    {
-      const char* name = curElem->GetAttribute("name");
-      const char* group = curElem->GetAttribute("group");
-      const char* icon = curElem->GetAttribute("icon");
-      if (!name || !group)
-      {
-        continue;
-      }
-      this->Internal->addProxy(group, name, icon);
+      this->writeCategoryToSettings();
     }
   }
 
   this->populateMenu();
 }
 
+//-----------------------------------------------------------------------------
 static bool actionTextSort(QAction* a, QAction* b)
 {
   return a->text() < b->text();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::populateMiscMenu()
+{
+  if (!this->Internal->MiscMenu)
+  {
+    return;
+  }
+
+  this->Internal->MiscMenu->clear();
+
+  // get proxies that are under a category.
+  QStringList categorizedProxyNames;
+  auto categories = this->getMenuCategory()->getSubCategories();
+  for (auto category : categories)
+  {
+    auto categoryProxies = category->getProxiesRecursive();
+    for (auto proxy : categoryProxies)
+    {
+      if (proxy->hideFromMenu())
+      {
+        continue;
+      }
+      categorizedProxyNames << proxy->name();
+    }
+  }
+
+  // add in Misc menu each application-defined proxy that is not under a category.
+  auto applicationProxies = this->Internal->ApplicationCategory->getProxiesRecursive();
+  for (auto proxy : applicationProxies)
+  {
+    if (categorizedProxyNames.contains(proxy->name()))
+    {
+      continue;
+    }
+    auto action = this->getAction(proxy);
+    if (action)
+    {
+      this->Internal->MiscMenu->addAction(action);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::populateAlphabeticalMenu()
+{
+  if (!this->Internal->AlphabeticalMenu)
+  {
+    return;
+  }
+
+  this->Internal->AlphabeticalMenu->clear();
+
+  auto applicationProxies = this->Internal->ApplicationCategory->getProxiesRecursive();
+  QList<QAction*> allProxiesActions;
+
+  for (auto proxy : applicationProxies)
+  {
+    QAction* action = this->getAction(proxy);
+    if (action && !allProxiesActions.contains(action))
+    {
+      allProxiesActions.push_back(action);
+    }
+  }
+
+  // Now sort all actions added in temp based on their texts.
+  std::sort(allProxiesActions.begin(), allProxiesActions.end(), ::actionTextSort);
+  for (QAction* action : allProxiesActions)
+  {
+    this->Internal->AlphabeticalMenu->addAction(action);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -364,21 +436,80 @@ void pqProxyGroupMenuManager::saveRecentlyUsedItems()
 }
 
 //-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::populateCategoryMenu(QMenu* parentMenu, pqProxyCategory* category)
+{
+  QList<QAction*> action_list = this->categoryActions(category);
+
+  QMenu* subMenu = new QMenu(category->label(), parentMenu) << pqSetName(category->name());
+  parentMenu->insertMenu(this->Internal->MiscMenu->menuAction(), subMenu);
+
+  this->populateSubCategoriesMenus(subMenu, category);
+  for (auto action : action_list)
+  {
+    subMenu->addAction(action);
+  }
+
+  this->Internal->CategoriesMenus.append(subMenu);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::clearCategoriesMenus()
+{
+  for (auto menu : this->Internal->CategoriesMenus)
+  {
+    if (menu)
+    {
+      this->menu()->removeAction(menu->menuAction());
+      delete menu;
+    }
+  }
+  this->Internal->CategoriesMenus.clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::populateSubCategoriesMenus(QMenu* parent, pqProxyCategory* category)
+{
+  QList<pqProxyCategory*> sortedCategories = category->getCategoriesAlphabetically();
+
+  for (auto subCategory : sortedCategories)
+  {
+    this->populateCategoryMenu(parent, subCategory);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::populateCategoriesMenus()
+{
+  this->clearCategoriesMenus();
+
+  this->populateSubCategoriesMenus(this->menu(), this->Internal->menuCategory());
+
+  this->populateMiscMenu();
+
+  Q_EMIT this->menuPopulated();
+}
+
+//-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::populateFavoritesMenu()
 {
   this->loadFavoritesItems();
-  if (this->Internal->FavoritesMenu)
+  if (!this->Internal->FavoritesMenu)
   {
-    this->Internal->FavoritesMenu->clear();
+    return;
+  }
 
-    QAction* manageFavoritesAction =
-      this->Internal->FavoritesMenu->addAction(tr("&Manage Favorites..."))
-      << pqSetName("actionManage_Favorites");
-    new pqManageFavoritesReaction(manageFavoritesAction, this);
+  this->Internal->FavoritesMenu->clear();
 
-    this->Internal->FavoritesMenu->addAction(this->getAddToCategoryAction(QString()));
-    this->Internal->FavoritesMenu->addSeparator();
+  QAction* manageFavoritesAction =
+    this->Internal->FavoritesMenu->addAction(tr("&Manage Favorites..."))
+    << pqSetName("actionManage_Favorites");
+  new pqManageFavoritesReaction(manageFavoritesAction, this);
 
+  this->Internal->FavoritesMenu->addAction(this->getAddToCategoryAction(QString()));
+  this->Internal->FavoritesMenu->addSeparator();
+
+  if (!this->Internal->Favorites.empty())
+  {
     for (const QPair<QString, QString>& key : this->Internal->Favorites)
     {
       QStringList categories = key.second.split(";", PV_QT_SKIP_EMPTY_PARTS);
@@ -489,23 +620,24 @@ QMenu* pqProxyGroupMenuManager::getFavoritesMenu()
 //-----------------------------------------------------------------------------
 QString pqProxyGroupMenuManager::categoryLabel(const QString& category)
 {
-  if (this->Internal->Categories.contains(category))
+  pqCategoryMap allCategories = this->Internal->ApplicationCategory->getSubCategoriesRecursive();
+  if (allCategories.contains(category))
   {
-    return this->Internal->Categories[category].Label;
+    return allCategories[category]->label();
   }
 
   return QString();
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyGroupMenuManager::populateMenu()
+void pqProxyGroupMenuManager::clearMenu()
 {
   // We reuse QAction instances, yet we don't want to have callbacks set up for
   // actions that are no longer shown in the menu. Hence we disconnect all
   // signal connections.
-  QMenu* _menu = this->menu();
+  QMenu* mainMenu = this->menu();
 
-  QList<QAction*> menuActions = _menu->actions();
+  QList<QAction*> menuActions = mainMenu->actions();
   for (QAction* action : menuActions)
   {
     QObject::disconnect(action, nullptr, this, nullptr);
@@ -516,27 +648,35 @@ void pqProxyGroupMenuManager::populateMenu()
     this->Internal->SearchAction->deleteLater();
   }
 
-  QList<QMenu*> submenus = _menu->findChildren<QMenu*>(QString(), Qt::FindDirectChildrenOnly);
+  QList<QMenu*> submenus = mainMenu->findChildren<QMenu*>(QString(), Qt::FindDirectChildrenOnly);
   for (QMenu* submenu : submenus)
   {
     delete submenu;
   }
-  _menu->clear();
+  mainMenu->clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::populateMenu()
+{
+  this->clearMenu();
+
+  QMenu* mainMenu = this->menu();
 
   if (this->supportsQuickLaunch())
   {
 #if defined(Q_WS_MAC) || defined(Q_OS_MAC)
     this->Internal->SearchAction =
-      _menu->addAction(tr("Search...\tAlt+Space"), this, SLOT(quickLaunch()));
+      mainMenu->addAction(tr("Search...\tAlt+Space"), this, SLOT(quickLaunch()));
 #else
     this->Internal->SearchAction =
-      _menu->addAction(tr("Search...\tCtrl+Space"), this, SLOT(quickLaunch()));
+      mainMenu->addAction(tr("Search...\tCtrl+Space"), this, SLOT(quickLaunch()));
 #endif
   }
 
   if (this->RecentlyUsedMenuSize > 0)
   {
-    auto* rmenu = _menu->addMenu(tr("&Recent")) << pqSetName("Recent");
+    auto* rmenu = mainMenu->addMenu(tr("&Recent")) << pqSetName("Recent");
     this->Internal->RecentMenu = rmenu;
     this->connect(rmenu, SIGNAL(aboutToShow()), SLOT(populateRecentlyUsedMenu()));
   }
@@ -551,46 +691,13 @@ void pqProxyGroupMenuManager::populateMenu()
   _menu->addSeparator();
 
   // Add alphabetical list.
-  QMenu* alphabeticalMenu = _menu;
-  if (!this->Internal->Categories.empty() || this->RecentlyUsedMenuSize > 0)
-  {
-    alphabeticalMenu = _menu->addMenu(tr("&Alphabetical")) << pqSetName("Alphabetical");
-  }
+  this->Internal->AlphabeticalMenu = mainMenu->addMenu(tr("&Alphabetical"))
+    << pqSetName("Alphabetical");
+  this->populateAlphabeticalMenu();
 
-  pqInternal::ProxyInfoMap::iterator proxyIter = this->Internal->Proxies.begin();
+  this->Internal->MiscMenu = mainMenu->addMenu(tr("&Miscellaneous")) << pqSetName("Miscellaneous");
 
-  QList<QAction*> someActions;
-  for (; proxyIter != this->Internal->Proxies.end(); ++proxyIter)
-  {
-    QAction* action = this->getAction(proxyIter.key().first, proxyIter.key().second);
-    if (action)
-    {
-      someActions.push_back(action);
-    }
-  }
-
-  // Now sort all actions added in temp based on their texts.
-  std::sort(someActions.begin(), someActions.end(), ::actionTextSort);
-  for (QAction* action : someActions)
-  {
-    alphabeticalMenu->addAction(action);
-  }
-
-  // Add categories.
-  pqInternal::CategoryInfoMap::iterator categoryIter = this->Internal->Categories.begin();
-  for (; categoryIter != this->Internal->Categories.end(); ++categoryIter)
-  {
-    QList<QAction*> action_list = this->actions(categoryIter.key());
-    if (!action_list.empty())
-    {
-      QMenu* categoryMenu = _menu->addMenu(categoryIter.value().Label)
-        << pqSetName(categoryIter.key());
-      for (QAction* action : action_list)
-      {
-        categoryMenu->addAction(action);
-      }
-    }
-  }
+  mainMenu->addSeparator();
 
   Q_EMIT this->menuPopulated();
 }
@@ -623,79 +730,73 @@ void pqProxyGroupMenuManager::updateMenuStyle()
 }
 
 //-----------------------------------------------------------------------------
+QAction* pqProxyGroupMenuManager::getAction(pqProxyInfo* proxyInfo)
+{
+  // look in cache for non null action.
+  if (this->Internal->CachedActions.contains(proxyInfo->name()))
+  {
+    auto action = this->Internal->CachedActions[proxyInfo->name()];
+    this->Internal->updateAction(action, proxyInfo);
+    return action;
+  }
+
+  return this->createAction(proxyInfo);
+}
+
+//-----------------------------------------------------------------------------
+QAction* pqProxyGroupMenuManager::createAction(pqProxyInfo* proxyInfo)
+{
+  const QString& group = proxyInfo->group();
+  const QString& name = proxyInfo->name();
+
+  auto action = new QAction(this);
+
+  QStringList data_list;
+  data_list << group << name;
+  action << pqSetName(name) << pqSetData(data_list);
+  action->setText(proxyInfo->label());
+
+  // create action only for valid proxies
+  if (!this->getPrototype(action))
+  {
+    action->deleteLater();
+    return nullptr;
+  }
+
+  // Add action in the pool for the QuickSearch...
+  this->Internal->Widget.addAction(action);
+  this->Internal->CachedActions[proxyInfo->name()] = action;
+  this->Internal->updateAction(action, proxyInfo);
+
+  // this avoids creating duplicate connections.
+  this->connect(action, SIGNAL(triggered()), SLOT(triggered()), Qt::UniqueConnection);
+
+  return action;
+}
+
+//-----------------------------------------------------------------------------
 QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString& pname)
 {
   if (pname.isEmpty() || pgroup.isEmpty())
   {
+    vtkGenericWarningMacro("Cannot find action for proxy, no name or group.");
     return nullptr;
   }
 
-  // Since Proxies map keeps the QAction instance, we will reuse the QAction
-  // instance whenever possible.
-  QPair<QString, QString> key(pgroup, pname);
-  pqInternal::ProxyInfoMap::iterator iter = this->Internal->Proxies.find(key);
-  QString name = QString("%1").arg(pname);
-  if (iter == this->Internal->Proxies.end())
+  if (this->Internal->CachedActions.contains(pname))
   {
-    return nullptr;
+    return this->Internal->CachedActions[pname];
   }
 
-  vtkSMSessionProxyManager* pxm =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  if (!pxm)
+  auto proxyList = this->Internal->ApplicationCategory->getProxiesRecursive();
+  for (auto proxy : proxyList)
   {
-    return nullptr;
+    if (proxy->name() == pname && proxy->group() == pgroup)
+    {
+      return this->createAction(proxy);
+    }
   }
-  vtkSMProxy* prototype = pxm->GetPrototypeProxy(pgroup.toUtf8().data(), pname.toUtf8().data());
-  if (prototype)
-  {
-    QString label = QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel());
-    QAction* action = iter.value().Action;
-    if (!action)
-    {
-      action = new QAction(this);
-      QStringList data_list;
-      data_list << pgroup << pname;
-      action << pqSetName(name) << pqSetData(data_list);
-      pqSettings settings;
-      if (pgroup == "filters" || pgroup == "sources")
-      {
-        QString menuName = pgroup == "filters" ? "Filters" : "Sources";
-        auto variant = settings.value(
-          QString("pqCustomShortcuts/%1/Alphabetical/%2").arg(menuName, label), QVariant());
-        if (variant.canConvert<QKeySequence>())
-        {
-          action->setShortcut(variant.value<QKeySequence>());
-        }
-      }
-      if (!iter.value().OmitFromToolbar.empty())
-      {
-        action->setProperty("OmitFromToolbar", iter.value().OmitFromToolbar);
-      }
-      iter.value().Action = action;
-    }
 
-    // Add action in the pool for the QuickSearch...
-    this->Internal->Widget.addAction(action);
-
-    action->setText(label);
-    QString icon = this->Internal->Proxies[key].Icon;
-
-    // Try to add some default icons if none is specified.
-    if (icon.isEmpty() && prototype->IsA("vtkSMCompoundSourceProxy"))
-    {
-      icon = ":/pqWidgets/Icons/pqBundle32.png";
-    }
-
-    if (!icon.isEmpty())
-    {
-      action->setIcon(QIcon(icon));
-    }
-
-    // this avoids creating duplicate connections.
-    this->connect(action, SIGNAL(triggered()), SLOT(triggered()), Qt::UniqueConnection);
-    return action;
-  }
   return nullptr;
 }
 
@@ -754,20 +855,7 @@ QList<QAction*> pqProxyGroupMenuManager::actions() const
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
 {
-  if (!action)
-  {
-    return nullptr;
-  }
-  QStringList data_list = action->data().toStringList();
-  if (data_list.size() != 2)
-  {
-    return nullptr;
-  }
-
-  QPair<QString, QString> key(data_list[0], data_list[1]);
-  vtkSMSessionProxyManager* pxm =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  return pxm->GetPrototypeProxy(key.first.toUtf8().data(), key.second.toUtf8().data());
+  return this->Internal->getPrototype(action);
 }
 
 //-----------------------------------------------------------------------------
@@ -775,71 +863,77 @@ QStringList pqProxyGroupMenuManager::getToolbarCategories() const
 {
   QStringList categories_in_toolbar;
 
-  pqInternal::CategoryInfoMap::iterator categoryIter = this->Internal->Categories.begin();
-  for (; categoryIter != this->Internal->Categories.end(); ++categoryIter)
+  auto categories = this->Internal->ApplicationCategory->getSubCategoriesRecursive();
+  for (auto category : categories)
   {
-    if (categoryIter.value().ShowInToolbar)
+    if (category->showInToolbar())
     {
-      categories_in_toolbar.push_back(categoryIter.key());
+      categories_in_toolbar.push_back(category->name());
     }
   }
   return categories_in_toolbar;
 }
 
 //-----------------------------------------------------------------------------
-QList<QAction*> pqProxyGroupMenuManager::actions(const QString& category)
+QList<QAction*> pqProxyGroupMenuManager::categoryActions(const QString& categoryName)
 {
   QList<QAction*> category_actions;
-  pqInternal::CategoryInfoMap::iterator categoryIter = this->Internal->Categories.find(category);
-  if (categoryIter == this->Internal->Categories.end())
+  auto categories = this->Internal->ApplicationCategory->getSubCategoriesRecursive();
+  if (!categories.contains(categoryName))
   {
     return category_actions;
   }
 
-  for (int cc = 0; cc < categoryIter.value().Proxies.size(); cc++)
+  return this->categoryActions(categories[categoryName]);
+}
+
+//-----------------------------------------------------------------------------
+QList<QAction*> pqProxyGroupMenuManager::categoryActions(pqProxyCategory* category)
+{
+  QList<QAction*> category_actions;
+  if (category->isEmpty())
   {
-    QPair<QString, QString> pname = categoryIter.value().Proxies[cc];
-    QAction* action = this->getAction(pname.first, pname.second);
-    if (action)
+    return category_actions;
+  }
+
+  auto proxies = category->getRootProxies();
+  auto orderedProxies = category->getOrderedRootProxiesNames();
+  if (!category->preserveOrder())
+  {
+    // alphabetical sort unless the XML overrode the sorting using the "preserve_order"
+    // attribute. (see #8364)
+    std::sort(orderedProxies.begin(), orderedProxies.end());
+  }
+
+  for (auto proxyName : orderedProxies)
+  {
+    auto proxy = category->findProxy(proxyName);
+    QAction* action = this->getAction(proxy);
+    if (action && !proxy->hideFromMenu())
     {
-      // build an action list, so that we can sort it and then add to the
-      // menu (BUG #8364).
       category_actions.push_back(action);
     }
   }
-  if (categoryIter.value().PreserveOrder == false)
-  {
-    // sort unless the XML overrode the sorting using the "preserve_order"
-    // attribute.
-    std::sort(category_actions.begin(), category_actions.end(), ::actionTextSort);
-  }
+
   return category_actions;
 }
 
+//-----------------------------------------------------------------------------
 QList<QAction*> pqProxyGroupMenuManager::actionsInToolbars()
 {
+  auto categories = this->getToolbarCategories();
   QList<QAction*> actions_in_toolbars;
-  for (pqInternal::CategoryInfoMap::iterator categoryIter = this->Internal->Categories.begin();
-       categoryIter != this->Internal->Categories.end(); ++categoryIter)
+
+  for (const auto& categoryName : categories)
   {
-    const QString& categoryName = categoryIter.key();
-    pqInternal::CategoryInfo& category = categoryIter.value();
-    if (category.ShowInToolbar)
+    auto categoryActions = this->categoryActions(categoryName);
+
+    for (auto action : categoryActions)
     {
-      for (auto pname : category.Proxies)
+      QVariant omitFromToolbar = action->property("OmitFromToolbar");
+      if (!omitFromToolbar.isValid() || !omitFromToolbar.toStringList().contains(categoryName))
       {
-        QAction* action = this->getAction(pname.first, pname.second);
-        if (action)
-        {
-          QVariant v = action->property("OmitFromToolbar");
-          if (!v.isValid() || !v.toStringList().contains(categoryName))
-          {
-            if (!actions_in_toolbars.contains(action))
-            {
-              actions_in_toolbars.push_back(action);
-            }
-          }
-        }
+        actions_in_toolbars.push_back(action);
       }
     }
   }
@@ -914,54 +1008,32 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   }
 
   // Loop over proxy that should be inserted inside the UI
-  QSet<QPair<QString, QString>> definitionSet;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     const char* group = iter->GetGroupName();
     const char* name = iter->GetProxyName();
     vtkPVXMLElement* hints = iter->GetProxyHints();
-    if (hints != nullptr)
+    if (!hints || hints->FindNestedElementByName("ReaderFactory") != nullptr)
     {
-      if (hints->FindNestedElementByName("ReaderFactory") != nullptr)
-      {
-        // skip readers.
-        continue;
-      }
-      for (unsigned int cc = 0; cc < hints->GetNumberOfNestedElements(); cc++)
-      {
-        vtkPVXMLElement* showInMenu = hints->GetNestedElement(cc);
-        if (showInMenu == nullptr || showInMenu->GetName() == nullptr ||
-          strcmp(showInMenu->GetName(), "ShowInMenu") != 0)
-        {
-          continue;
-        }
+      // skip readers.
+      continue;
+    }
 
-        definitionSet.insert(QPair<QString, QString>(group, name));
-        this->Internal->addProxy(group, name, showInMenu->GetAttribute("icon"));
-        if (const char* categoryName = showInMenu->GetAttribute("category"))
-        {
-          pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
-          // If no label just make it up
-          if (category.Label.isEmpty())
-          {
-            category.Label = QCoreApplication::translate("ServerManagerXML", categoryName);
-          }
-          int show_in_toolbar = 0;
-          if (showInMenu->GetScalarAttribute("show_in_toolbar", &show_in_toolbar))
-          {
-            category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar == 1);
-          }
-          if (!category.Proxies.contains(QPair<QString, QString>(group, name)))
-          {
-            category.Proxies.push_back(QPair<QString, QString>(group, name));
-          }
-        }
+    bool modified = this->Internal->ApplicationCategory->parseXMLHintsTag(group, name, hints);
+    // do not re-add application defined categories inside settings.
+    if (modified && this->Internal->allowSettingsUpdate())
+    {
+      modified = this->Internal->SettingsCategory->parseXMLHintsTag(group, name, hints);
+      if (modified)
+      {
+        this->writeCategoryToSettings();
       }
     }
   }
-  // Update the menu with the current definition
+
   this->populateMenu();
 }
+
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::switchActiveServer()
 {
@@ -979,9 +1051,44 @@ void pqProxyGroupMenuManager::switchActiveServer()
     for (QAction* action : action_list)
     {
       this->Internal->Widget.removeAction(action);
+      delete action;
     }
+    this->Internal->CachedActions.clear();
 
-    // Fill is back by updating the menu
+    // Fill it back by updating the menu
     this->lookForNewDefinitions();
   }
+}
+
+//-----------------------------------------------------------------------------
+pqProxyCategory* pqProxyGroupMenuManager::getApplicationCategory()
+{
+  return this->Internal->ApplicationCategory.get();
+}
+
+//-----------------------------------------------------------------------------
+pqProxyCategory* pqProxyGroupMenuManager::getMenuCategory()
+{
+  return this->Internal->menuCategory();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::loadCategorySettings()
+{
+  if (this->Internal->IsWritingSettings)
+  {
+    return;
+  }
+
+  this->Internal->SettingsCategory->loadSettings(this->ResourceTagName);
+  Q_EMIT this->categoriesUpdated();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::writeCategoryToSettings()
+{
+  bool prev = this->Internal->IsWritingSettings;
+  this->Internal->IsWritingSettings = true;
+  this->Internal->SettingsCategory->writeSettings(this->ResourceTagName);
+  this->Internal->IsWritingSettings = prev;
 }

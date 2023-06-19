@@ -243,35 +243,24 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   }
 
   // Hide unused submenus
-  if (this->HideDisabledActions)
+  QMenu* menu = mgr->menu();
+  bool anyMenuShown = false;
+  QList<QAction*> menuActions = menu->actions();
+  for (QAction* menuAction : menuActions)
   {
-    QMenu* menu = mgr->menu();
-    bool anyMenuShown = false;
-    QList<QAction*> menuActions = menu->actions();
-    for (QAction* menuAction : menuActions)
+    if (menuAction->isSeparator() || !menuAction->menu() ||
+      menuAction->menu() == mgr->getFavoritesMenu())
     {
-      if (menuAction->isSeparator() || !menuAction->menu() ||
-        menuAction->menu() == mgr->getFavoritesMenu())
-      {
-        continue;
-      }
-      bool anySubMenuShown = false;
-      QList<QAction*> subMenuActions = menuAction->menu()->actions();
-
-      for (QAction* subMenuAction : subMenuActions)
-      {
-        if (subMenuAction->isVisible())
-        {
-          anySubMenuShown = true;
-          anyMenuShown = true;
-          break;
-        }
-      }
-
-      menuAction->setVisible(anySubMenuShown);
+      continue;
     }
-    menu->setEnabled(anyMenuShown);
+
+    bool visible = (menuAction->menu() && !menuAction->menu()->isEmpty());
+    menuAction->setVisible(visible);
+    anyMenuShown = anyMenuShown || visible;
+
+    QList<QAction*> subMenuActions = menuAction->menu()->actions();
   }
+  menu->setEnabled(anyMenuShown);
 
   // If we updated only the toolbars, then the state of other actions may still
   // be dirty

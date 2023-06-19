@@ -74,4 +74,13 @@
    <!-- End MyElevationFilter -->
    </SourceProxy>
  </ProxyGroup>
+
+ <!-- add this filter into its own hierarchical category -->
+ <ParaViewFilters>
+   <Category name="Plugins">
+     <Category name="ElevationFilters">
+       <Proxy group="filters" name="MyElevationFilter" />
+     </Category>
+   </Category>
+ </ParaViewFilters>
 </ServerManagerConfiguration>

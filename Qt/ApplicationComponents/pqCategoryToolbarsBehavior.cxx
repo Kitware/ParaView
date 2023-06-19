@@ -52,7 +52,7 @@ void pqCategoryToolbarsBehavior::updateToolbars()
         this->ToolbarsToHide << toolbar->toggleViewAction();
       }
     }
-    QList<QAction*> toolbarActions = this->MenuManager->actions(category);
+    QList<QAction*> toolbarActions = this->MenuManager->categoryActions(category);
     toolbar->clear();
     for (int cc = 0; cc < toolbarActions.size(); cc++)
     {
