@@ -46,7 +46,7 @@ public:
    * Save animation as images/video. The properties on this proxy provide all
    * the necessary information to save the animation.
    */
-  virtual bool WriteAnimation(const char* filename);
+  virtual bool WriteAnimation(const char* filename, vtkTypeUInt32 location = vtkPVSession::CLIENT);
 
   /**
    * Overridden to update visibility state of "FrameRate" property.
@@ -60,7 +60,8 @@ protected:
   /**
    * Write animation on local process.
    */
-  virtual bool WriteAnimationLocally(const char* filename);
+  virtual bool WriteAnimationInternal(
+    const char* filename, vtkTypeUInt32 location = vtkPVSession::CLIENT);
 
   /**
    * Prepares for saving animation.

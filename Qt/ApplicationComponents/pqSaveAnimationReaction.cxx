@@ -179,7 +179,7 @@ void pqSaveAnimationReaction::saveAnimation()
     // as modal, we don't need to that. Plus, we want the cancel button on the
     // dialog to work.
     const auto prev = pgm->unblockEvents(true);
-    ahProxy->WriteAnimation(filename.toUtf8().data());
+    ahProxy->WriteAnimation(filename.toUtf8().data(), location);
     pgm->unblockEvents(prev);
   }
 

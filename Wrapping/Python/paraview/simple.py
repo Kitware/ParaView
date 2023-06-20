@@ -1496,7 +1496,7 @@ def WaitForScreenshot(filename = None):
         paraview.servermanager.vtkRemoteWriterHelper.Wait(filename)
 
 # -----------------------------------------------------------------------------
-def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
+def SaveAnimation(filename, viewOrLayout=None, scene=None, location=vtkPVSession.CLIENT, **params):
     """Save animation as a movie file or series of images.
 
     `SaveAnimation` is used to save an animation as a movie file (avi or ogv) or
@@ -1519,6 +1519,11 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         scene (``proxy``, optional)
           Animation scene to save. If None, then the active scene returned by
           `GetAnimationScene` is used.
+
+        location (int)
+          Location where the screenshot should be saved. This can be one of
+          the following values: `vtkPVSession.CLIENT`, `vtkPVSession.DATA_SERVER`.
+          The default is `vtkPVSession.CLIENT`.
 
     **Keyword Parameters (optional)**
 
@@ -1608,7 +1613,7 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
                 del params[prop]
 
     SetProperties(options, **params)
-    return options.WriteAnimation(filename)
+    return options.WriteAnimation(filename, location)
 
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
