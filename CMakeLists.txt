@@ -51,6 +51,10 @@ if (NOT CMAKE_INSTALL_LICENSEDIR)
 endif ()
 
 set(paraview_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
+option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
+mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
+
 if (PARAVIEW_USE_EXTERNAL_VTK)
   find_package(VTK CONFIG REQUIRED)
   get_filename_component(vtk_cmake_dir "${VTK_CONFIG}" DIRECTORY )

@@ -98,14 +98,6 @@ endif()
 # These should begin with `PARAVIEW_USE_`.
 #========================================================================
 
-# XXX(VTK): External VTK is not yet actually supported.
-if (TRUE)
-option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
-mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
-else ()
-set(PARAVIEW_USE_EXTERNAL_VTK OFF)
-endif ()
-
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_SERIAL_TESTS_USE_MPIEXEC
   "Used on HPC to run serial tests on compute nodes" OFF)
