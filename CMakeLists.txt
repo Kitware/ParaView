@@ -499,8 +499,8 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     message(STATUS "REJECTED MODULES: ${paraview_rejected_modules}")
     message(STATUS "UNRECOGNIZED WITHOUT REJECTED AND KNOWN TARGETS: ${paraview_unrecognized_modules}")
     message(STATUS "ALL PROVIDED MODULES: ${paraview_modules}")
-    set(_unnecessary_moduls ${paraview_modules})
-    list(REMOVE_ITEM _unnecessary_moduls ${paraview_required_modules})
+    set(_unnecessary_modules ${paraview_modules})
+    list(REMOVE_ITEM _unnecessary_modules ${paraview_required_modules})
     if(modules_notarget)
         message(FATAL_ERROR
           "The following modules were requested or required, but not found: "
