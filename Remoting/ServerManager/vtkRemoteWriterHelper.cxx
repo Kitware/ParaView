@@ -175,7 +175,7 @@ int vtkRemoteWriterHelper::RequestData(
     {
       // on server-rank. this can be on any of the data-server ranks or render-server ranks. We
       // only want to write data on data-server-root node.
-      if ((roles & vtkPVSession::DATA_SERVER_ROOT) != 0)
+      if ((roles & vtkPVSession::DATA_SERVER) != 0)
       {
         if (auto controller = session->GetController(vtkPVSession::CLIENT))
         {
