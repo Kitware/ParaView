@@ -48,6 +48,7 @@ class vtkInformationIntegerKey;
 class vtkInteractorStyleDrawPolygon;
 class vtkInteractorStyleRubberBand3D;
 class vtkInteractorStyleRubberBandZoom;
+class vtkLegendScaleActor;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
@@ -618,6 +619,11 @@ public:
    * Set the vtkPVGridAxes3DActor to use for the view.
    */
   virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
+
+  /**
+   * Set the vtkLegendScaleActor to use for the view.
+   */
+  virtual void SetLegendGridActor(vtkLegendScaleActor*);
 
   ///@{
   /**
@@ -1249,6 +1255,7 @@ protected:
   vtkSmartPointer<vtkPVHardwareSelector> Selector;
   vtkSelection* LastSelection;
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
+  vtkSmartPointer<vtkLegendScaleActor> LegendGridActor;
   vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCameraOrientationWidget> CameraOrientationWidget;
 

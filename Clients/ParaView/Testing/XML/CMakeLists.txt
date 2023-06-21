@@ -1194,6 +1194,7 @@ list(APPEND TESTS_WITH_BASELINES
   InteractiveViewLinkOffscreen.xml
   InteractiveViewLinkOnscreen.xml
   InteractiveViewLinkState.xml
+  LegendGridActor.xml
   LightWidget.xml
   LinearCellExtrusion.xml
   LinesAsTubes.xml
