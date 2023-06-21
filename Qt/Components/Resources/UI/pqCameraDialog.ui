@@ -462,13 +462,58 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="1" column="2">
-          <widget class="pqDoubleLineEdit" name="focalPoint1"/>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="pqDoubleLineEdit" name="position0"/>
+         </item>
+         <item row="0" column="2">
+          <widget class="pqDoubleLineEdit" name="position1"/>
+         </item>
+         <item row="0" column="3">
+          <widget class="pqDoubleLineEdit" name="position2"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string>Focal Point</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="pqDoubleLineEdit" name="focalPoint0"/>
+         </item>
+         <item row="1" column="2">
+          <widget class="pqDoubleLineEdit" name="focalPoint1"/>
+         </item>
+         <item row="1" column="3">
+          <widget class="pqDoubleLineEdit" name="focalPoint2"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>View Up</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="pqDoubleLineEdit" name="viewUp0"/>
+         </item>
+         <item row="2" column="2">
+          <widget class="pqDoubleLineEdit" name="viewUp1"/>
+         </item>
+         <item row="2" column="3">
+          <widget class="pqDoubleLineEdit" name="viewUp2"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>View Angle</string>
            </property>
           </widget>
          </item>
@@ -482,16 +527,6 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="3">
-          <widget class="QDoubleSpinBox" name="eyeAngle">
-           <property name="toolTip">
-            <string>The separation between eyes (in degrees). This is used when rendering in stereo mode.</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="pqDoubleLineEdit" name="focalPoint2"/>
-         </item>
          <item row="3" column="2">
           <widget class="QLabel" name="label_8">
            <property name="text">
@@ -499,11 +534,19 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="pqDoubleLineEdit" name="position0"/>
+         <item row="3" column="3">
+          <widget class="QDoubleSpinBox" name="eyeAngle">
+           <property name="toolTip">
+            <string>The separation between eyes (in degrees). This is used when rendering in stereo mode.</string>
+           </property>
+          </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="pqDoubleLineEdit" name="focalPoint0"/>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Focal Disk</string>
+           </property>
+          </widget>
          </item>
          <item row="4" column="1">
           <widget class="QDoubleSpinBox" name="focalDisk">
@@ -519,10 +562,10 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_9">
+         <item row="4" column="2">
+          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>Focal Disk</string>
+            <string>Focal Distance</string>
            </property>
           </widget>
          </item>
@@ -539,23 +582,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
-          <widget class="pqDoubleLineEdit" name="position2"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_23">
-           <property name="text">
-            <string>View Angle</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_14">
-           <property name="text">
-            <string>View Up</string>
-           </property>
-          </widget>
-         </item>
          <item row="5" column="0">
           <widget class="QPushButton" name="loadCameraConfiguration">
            <property name="toolTip">
@@ -563,22 +589,6 @@
            </property>
            <property name="text">
             <string>Load</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="3">
-          <widget class="pqDoubleLineEdit" name="viewUp2"/>
-         </item>
-         <item row="2" column="1">
-          <widget class="pqDoubleLineEdit" name="viewUp0"/>
-         </item>
-         <item row="2" column="2">
-          <widget class="pqDoubleLineEdit" name="viewUp1"/>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>Position</string>
            </property>
           </widget>
          </item>
@@ -591,16 +601,6 @@
             <string>Save</string>
            </property>
           </widget>
-         </item>
-         <item row="4" column="2">
-          <widget class="QLabel" name="label_10">
-           <property name="text">
-            <string>Focal Distance</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="pqDoubleLineEdit" name="position1"/>
          </item>
         </layout>
        </item>
@@ -649,17 +649,53 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
-           <item row="2" column="1">
-            <widget class="QPushButton" name="azimuthMinusButton">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Roll</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="rollMinusButton">
              <property name="text">
               <string>-</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_15">
+           <item row="0" column="2">
+            <widget class="pqScaledSpinBox" name="rollAngle">
+             <property name="suffix">
+              <string>°</string>
+             </property>
+             <property name="minimum">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>360.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.000010000000000</double>
+             </property>
+             <property name="value">
+              <double>5.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QPushButton" name="rollPlusButton">
              <property name="text">
-              <string>Azimuth</string>
+              <string>+</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Elevation</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -673,6 +709,25 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="2">
+            <widget class="pqScaledSpinBox" name="elevationAngle">
+             <property name="suffix">
+              <string>°</string>
+             </property>
+             <property name="minimum">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>360.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.000010000000000</double>
+             </property>
+             <property name="value">
+              <double>5.000000000000000</double>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="3">
             <widget class="QPushButton" name="elevationPlusButton">
              <property name="text">
@@ -680,13 +735,20 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_11">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_15">
              <property name="text">
-              <string>Zoom</string>
+              <string>Azimuth</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QPushButton" name="azimuthMinusButton">
+             <property name="text">
+              <string>-</string>
              </property>
             </widget>
            </item>
@@ -716,46 +778,18 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="pqScaledSpinBox" name="rollAngle">
-             <property name="suffix">
-              <string>°</string>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Zoom</string>
              </property>
-             <property name="minimum">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>360.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.000010000000000</double>
-             </property>
-             <property name="value">
-              <double>5.000000000000000</double>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="pqScaledSpinBox" name="elevationAngle">
-             <property name="suffix">
-              <string>°</string>
-             </property>
-             <property name="minimum">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>360.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.000010000000000</double>
-             </property>
-             <property name="value">
-              <double>5.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="rollMinusButton">
+           <item row="3" column="1">
+            <widget class="QPushButton" name="zoomOutButton">
              <property name="text">
               <string>-</string>
              </property>
@@ -783,44 +817,10 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>Elevation</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QPushButton" name="rollPlusButton">
-             <property name="text">
-              <string>+</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QPushButton" name="zoomOutButton">
-             <property name="text">
-              <string>-</string>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="3">
             <widget class="QPushButton" name="zoomInButton">
              <property name="text">
               <string>+</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>Roll</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -880,6 +880,13 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1">
+         <item row="0" column="0" colspan="2">
+          <widget class="QComboBox" name="interactiveViewLinkComboBox">
+           <property name="toolTip">
+            <string>Select Interactive View Link to manage.</string>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="0" colspan="2">
           <widget class="QCheckBox" name="interactiveViewLinkBackground">
            <property name="toolTip">
@@ -901,13 +908,6 @@
           <widget class="pqDoubleRangeWidget" name="interactiveViewLinkOpacity" native="true">
            <property name="toolTip">
             <string>Define the view link opacity.</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QComboBox" name="interactiveViewLinkComboBox">
-           <property name="toolTip">
-            <string>Select Interactive View Link to manage.</string>
            </property>
           </widget>
          </item>
