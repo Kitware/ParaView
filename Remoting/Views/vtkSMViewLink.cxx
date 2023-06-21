@@ -24,6 +24,12 @@
 vtkStandardNewMacro(vtkSMViewLink);
 
 //---------------------------------------------------------------------------
+vtkSMViewLink::vtkSMViewLink()
+{
+  this->AddException("Representations");
+}
+
+//---------------------------------------------------------------------------
 vtkSMViewLink::~vtkSMViewLink()
 {
   for (auto& obs : this->RenderObservers)

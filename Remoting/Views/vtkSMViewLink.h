@@ -18,7 +18,10 @@
  *
  * vtkSMViewLink is a proxy link to synchronize views properties.
  *
- * Camera properties can be excluded from the link.
+ * The "Representations" property is excluded by default
+ * as representations should not be duplicated in different views.
+ *
+ * Camera properties can be excluded fault from the link, see EnableCameraLink.
  */
 
 #ifndef vtkSMViewLink_h
@@ -64,7 +67,7 @@ public:
   virtual void UpdateViews(vtkSMProxy* caller);
 
 protected:
-  vtkSMViewLink() = default;
+  vtkSMViewLink();
   ~vtkSMViewLink() override;
 
   /**
