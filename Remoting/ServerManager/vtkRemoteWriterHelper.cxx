@@ -106,7 +106,8 @@ int vtkRemoteWriterHelper::RequestData(
     vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
   const vtkPVSession::ServerFlags roles = session->GetProcessRoles();
 
-  vtkThreadedCallbackQueue* callbackQueue = vtkProcessModule::GetCallbackQueue();
+  vtkThreadedCallbackQueue* callbackQueue =
+    vtkProcessModule::GetProcessModule()->GetCallbackQueue();
 
   auto writeLocally = [this, callbackQueue](vtkSmartPointer<vtkDataObject>&& input) {
     if (!this->TryWritingInBackground)
@@ -201,6 +202,17 @@ void vtkRemoteWriterHelper::Wait(const std::string& fileName)
   {
     it->second.second->Wait();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkRemoteWriterHelper::Wait()
+{
+  std::vector<vtkThreadedCallbackQueue::SharedFutureBasePointer> filenames;
+  for (auto& item : ::SharedFutures)
+  {
+    filenames.push_back(item.second.second);
+  }
+  vtkProcessModule::GetProcessModule()->GetCallbackQueue()->Wait(filenames);
 }
 
 //----------------------------------------------------------------------------

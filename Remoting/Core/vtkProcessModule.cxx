@@ -152,7 +152,6 @@ bool vtkProcessModule::FinalizePython = false;
 
 vtkSmartPointer<vtkProcessModule> vtkProcessModule::Singleton;
 vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
-vtkNew<vtkThreadedCallbackQueue> vtkProcessModule::CallbackQueue;
 
 int vtkProcessModule::DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines = 1;
 int vtkProcessModule::DefaultMinimumGhostLevelsToRequestForStructuredPipelines = 0;
@@ -408,7 +407,7 @@ vtkProcessModule* vtkProcessModule::GetProcessModule()
 //----------------------------------------------------------------------------
 vtkThreadedCallbackQueue* vtkProcessModule::GetCallbackQueue()
 {
-  return vtkProcessModule::CallbackQueue;
+  return this->Internals->CallbackQueue;
 }
 
 //----------------------------------------------------------------------------
