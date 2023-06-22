@@ -135,7 +135,12 @@ Use 'X'/'Y'/'Z'/'L' to constrain the movement to the X / Y / Z / Line axis respe
    <item row="1" column="0" colspan="4">
     <widget class="QLabel" name="labelLength">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Length: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;na&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Length: </string>
+     </property>
+     <property name="font">
+      <font>
+       <weight>600</weight>
+      </font>
      </property>
     </widget>
    </item>

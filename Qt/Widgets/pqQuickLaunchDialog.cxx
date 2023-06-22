@@ -98,6 +98,17 @@ pqQuickLaunchDialog::pqQuickLaunchDialog(QWidget* p)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  this->Internal->label->setText(
+    QString("<html><head/><body><p>%1 <span style=\" font-weight:600; font-style:italic;\"> %2 "
+            "</span> %3 <span style=\" font-weight:600; font-style:italic;\"> %4 </span> %5 <span "
+            "style=\" font-weight:600; font-style:italic;\"> %6 </span> %7 </p></body></html>")
+      .arg(tr("Type to search."))
+      .arg(tr("Enter"))
+      .arg(tr("to create selected source/filter."))
+      .arg(tr("Shift + Enter"))
+      .arg(tr("to create and apply selected source/filter. "))
+      .arg(tr("Esc"))
+      .arg(tr("to cancel.")));
   this->installEventFilter(this);
   this->Internal->options->installEventFilter(this);
 

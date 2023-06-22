@@ -17,7 +17,7 @@
    <item>
     <widget class="QCheckBox" name="saveColors">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to save colors to the preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Check to save colors to the preset.</string>
      </property>
      <property name="text">
       <string>Save colors</string>
@@ -27,7 +27,7 @@
    <item>
     <widget class="QCheckBox" name="saveOpacities">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to save opacities to the preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Check to save opacities to the preset.</string>
      </property>
      <property name="text">
       <string>Save opacities</string>
@@ -37,7 +37,7 @@
    <item>
     <widget class="QCheckBox" name="saveAnnotations">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to save annotations to the preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Check to save annotations to the preset.</string>
      </property>
      <property name="text">
       <string>Save annotations</string>
@@ -56,7 +56,7 @@
      <item>
       <widget class="QLineEdit" name="presetName">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set a name to the preset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Set a name to the preset.</string>
        </property>
        <property name="text">
         <string>Preset</string>

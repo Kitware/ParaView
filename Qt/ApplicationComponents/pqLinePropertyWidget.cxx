@@ -169,7 +169,7 @@ void pqLinePropertyWidget::updateLengthLabel()
 
   double distance = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
   Ui::LinePropertyWidget& ui = this->Internals->Ui;
-  ui.labelLength->setText(QString("<b>Length:</b> <i>%1</i> ").arg(distance));
+  ui.labelLength->setText(QString("<b>%1</b> <i>%2</i> ").arg(tr("Length: ")).arg(distance));
 }
 
 //-----------------------------------------------------------------------------

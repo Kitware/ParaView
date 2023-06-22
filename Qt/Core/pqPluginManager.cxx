@@ -329,6 +329,17 @@ bool pqPluginManager::confirmEULA(vtkPVPlugin* plugin)
   QDialog dialog(pqCoreUtilities::mainWidget());
   Ui::PluginEULADialog ui;
   ui.setupUi(&dialog);
+  ui.textEdit->setHtml(
+    QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" "
+            "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+            "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+            "p, li { white-space: pre-wrap; }\n"
+            "</style></head><body style=\" font-family:'Sans Serif'; font-size:9pt; "
+            "font-weight:400; font-style:normal;\">\n"
+            "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; "
+            "-qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">EULA for "
+            "plugin</span></p></body></html>"));
+
   ui.buttonBox->button(QDialogButtonBox::Yes)->setText(tr("Accept"));
   ui.buttonBox->button(QDialogButtonBox::No)->setText(tr("Decline"));
   ui.buttonBox->button(QDialogButtonBox::No)->setDefault(true);

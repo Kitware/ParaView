@@ -152,7 +152,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="labelYAxis">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.</string>
        </property>
        <property name="text">
         <string>Y Axis</string>
@@ -202,7 +202,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="labelXAxis">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.</string>
        </property>
        <property name="text">
         <string>X Axis</string>
@@ -212,7 +212,7 @@
      <item row="3" column="0">
       <widget class="QLabel" name="labelZAxis">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Click the button to the right of an axis to normalize manually-entered values to a unit-length vector. The axis values do not auto-update the widget because the normalization required would prevent you from entering a desired direction.</string>
        </property>
        <property name="text">
         <string>Z Axis</string>
