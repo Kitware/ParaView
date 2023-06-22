@@ -1984,8 +1984,9 @@ def AddCameraLink(viewProxy, viewProxyOther, linkName = ''):
     if not viewProxyOther: viewProxyOther = GetActiveView()
     link = servermanager.vtkSMCameraLink()
     if linkName == '':
-        name1 = pm.GetProxyName(proxy1.SMProxy.GetXMLGroup(), proxy1.SMProxy)
-        name2 = pm.GetProxyName(proxy2.SMProxy.GetXMLGroup(), proxy2.SMProxy)
+        pm = servermanager.ProxyManager()
+        name1 = pm.GetProxyName(viewProxy.SMProxy.GetXMLGroup(), viewProxy.SMProxy)
+        name2 = pm.GetProxyName(viewProxyOther.SMProxy.GetXMLGroup(), viewProxyOther.SMProxy)
         linkName = name1 + '-' + name2 + '-cameraLink'
 
     return AddProxyLink(viewProxy, viewProxyOther, linkName, link)
