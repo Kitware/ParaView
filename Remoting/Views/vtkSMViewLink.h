@@ -56,7 +56,7 @@ public:
   void EnableCameraLink(bool enable);
 
   /**
-   * Callback to render output views.
+   * Callback to render output views. This is useful to update render view when camera changes.
    */
   static void UpdateViewCallback(
     vtkObject* caller, unsigned long eid, void* clientData, void* callData);
@@ -85,6 +85,7 @@ protected:
   std::map<vtkSMProxy*, vtkSmartPointer<vtkCallbackCommand>> RenderObservers;
 
   bool Updating = false;
+  bool UpdateViewsOnEndEvent = true;
 };
 
 #endif

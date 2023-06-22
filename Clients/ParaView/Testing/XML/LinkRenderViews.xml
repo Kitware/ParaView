@@ -37,8 +37,38 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/AxesGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontSize" command="set_int" arguments="25" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/AxesGrid/EditProxy" command="key" arguments="16777220" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
-  <!-- store this camera to use the same on the second view -->
-  <pqevent object="pqClientMainWindow/customViewpointsToolbar/PlusAction" command="activate" arguments="" />
+
+  <!-- combine this with a Camera Link, and rotate view by 45 degrees -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsAddCameraLink" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.0845324,0.345656,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.0845324,0.345656,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.0845324,0.345656,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/actionAdjustCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollAngle" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollPlusButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/0QPushButton0" command="activate" arguments="" />
+
+  <!-- remove links -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageLinks" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/treeView" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/treeView" command="setSelection" arguments="0.0,0.4" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/removeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/treeView" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/treeView" command="setSelection" arguments="0.0,0.4" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/removeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/buttonBox/0QPushButton0" command="activate" arguments="" />
+
+  <!-- recreate a renderview link with camera -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="AddRenderViewLink(GetViews()[0], GetViews()[1], linkCameras=True)" />
+
+  <!-- Roll camera -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/actionAdjustCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollAngle" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollPlusButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/0QPushButton0" command="activate" arguments="" />
+
 
   <!-- render views should be the identical, so use the the actual baseline for 2nd view. First will be tested by the default sshot comparison -->
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/LinkRenderViews.png" threshold="5" />
@@ -47,7 +77,6 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.672584,0.388446,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.672584,0.388446,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.672584,0.388446,1,0,0)" />
-  <pqevent object="pqClientMainWindow/customViewpointsToolbar/ViewpointAction0" command="activate" arguments="" />
 
   <!-- check modified properties -->
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/UseColorPaletteForBackground/CheckBox" property="checked" arguments="false" />
