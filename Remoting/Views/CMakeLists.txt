@@ -91,6 +91,7 @@ set(classes
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
   vtkPVInteractiveViewLinkRepresentation
+  vtkPVIOSettings
   vtkPVLODActor
   vtkPVLODVolume
   vtkPVLastSelectionInformation
@@ -180,6 +181,7 @@ set(classes
   vtkSMTransferFunctionProxy
   vtkSMUtilities
   vtkSMViewLayoutProxy
+  vtkSMViewLink
   vtkSMViewProxy
   vtkSMViewProxyInteractorHelper
   vtkSMViewResolutionDomain

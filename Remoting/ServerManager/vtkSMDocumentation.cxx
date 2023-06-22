@@ -17,6 +17,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
+#include <algorithm>
+#include <regex>
+
 vtkStandardNewMacro(vtkSMDocumentation);
 vtkCxxSetObjectMacro(vtkSMDocumentation, DocumentationElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
@@ -58,7 +61,36 @@ const char* vtkSMDocumentation::GetDescription()
   {
     return nullptr;
   }
-  return this->DocumentationElement->GetCharacterData();
+  if (this->Description.empty())
+  {
+    // Record string from XML
+    this->Description = std::string(this->DocumentationElement->GetCharacterData());
+
+    // Replace eol by space
+    std::replace(this->Description.begin(), this->Description.end(), '\n', ' ');
+
+    // Once GCC 4.8 support is dropped, following block can be replace by this one liner:
+    //  Remove leading, trailing and extra spaces
+    //  this->Description = std::regex_replace(this->Description, std::regex("^ +| +$|( ) +"),
+    //  "$1");
+
+    // Remove duplicated spaces
+    std::string::iterator new_end = std::unique(this->Description.begin(), this->Description.end(),
+      [](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); });
+    this->Description.erase(new_end, this->Description.end());
+
+    // Remove single leading/trailing space
+    if (this->Description.size() >= 2)
+    {
+      this->Description.erase(
+        std::remove(this->Description.begin(), this->Description.begin() + 1, ' '),
+        this->Description.begin() + 1);
+      this->Description.erase(
+        std::remove(this->Description.end() - 1, this->Description.end(), ' '),
+        this->Description.end());
+    }
+  }
+  return this->Description.c_str();
 }
 
 //-----------------------------------------------------------------------------

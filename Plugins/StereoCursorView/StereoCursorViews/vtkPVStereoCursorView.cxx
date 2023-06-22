@@ -14,11 +14,11 @@
 =========================================================================*/
 #include "vtkPVStereoCursorView.h"
 
+#include "vtk3DCursorRepresentation.h"
 #include "vtk3DCursorWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkWidgetRepresentation.h"
 
 struct vtkPVStereoCursorView::vtkInternals
 {
@@ -63,4 +63,18 @@ void vtkPVStereoCursorView::SetCursorSize(int size)
   }
 
   representation->SetHandleSize(static_cast<double>(size));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVStereoCursorView::SetCursorShape(int shape)
+{
+  vtk3DCursorRepresentation* representation =
+    vtk3DCursorRepresentation::SafeDownCast(this->Internals->Cursor->GetRepresentation());
+  if (!representation)
+  {
+    vtkWarningMacro("Unable to retrieve the widget representation.");
+    return;
+  }
+
+  representation->SetCursorShape(shape);
 }

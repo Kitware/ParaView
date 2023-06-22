@@ -922,9 +922,8 @@
     </SettingsProxy>
 
     <!-- ================================================================== -->
-    <!-- TODO change this setting organization later -->
     <SettingsProxy name="RepresentedArrayListSettings"
-                   label="Miscellaneous"
+                   label="Represented Attributes"
                    processes="client"
                    class="vtkPVRepresentedArrayListSettings">
       <StringVectorProperty command="SetFilterExpression"
@@ -941,6 +940,83 @@
           <ShowLabel />
         </Hints>
       </StringVectorProperty>
+      <IntVectorProperty name="ComputeArrayMagnitude"
+                        command="SetComputeArrayMagnitude"
+                        number_of_elements="1"
+                        default_values="1"
+                        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Controls whether or not ParaView should compute and display the magnitude for
+          multi-components data attributes.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ArrayMagnitudeExceptions"
+                        command="SetArrayMagnitudeException"
+                        label="Array Magnitude Exceptions"
+                        number_of_elements_per_command="1"
+                        repeat_command="1"
+                        set_number_command="SetNumberOfArrayMagnitudeExceptions"
+                        use_index="1"
+                        panel_visibility="advanced">
+        <Documentation>
+          List of exceptions for the "ComputeArrayMagnitude" setting. If "ComputeArrayMagnitude" is
+          untoggled then the list describes the number of components for which ParaView will
+          still compute the magnitude. Else the list describes the number of components for which
+          ParaView will not compute the magnitude.
+        </Documentation>
+        <Hints>
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Exceptions"/>
+          </ShowComponentLabels>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetChartsDefaultXAxis"
+                            name="ChartsDefaultXAxis"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            default_values_delimiter=";"
+                            default_values="in_extents;Time;time;arc_length;XArray;x_array;Frequency"
+                            number_of_elements="7"
+                            set_number_command="SetNumberOfChartsDefaultXAxis"
+                            use_index="1">
+        <Documentation>
+          List of array names to use as X axis when displaying it in charts.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <AllowRestoreDefaults />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetChartsHiddenAttributes"
+                            name="ChartsHiddenAttributes"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            default_values_delimiter=";"
+                            default_values="^arc_length;^bin_extents;^(GlobalElement|GlobalNode|Object|File)Id;^object_id;^Pedigree;^Points_;^Time;^vtk;^(X|Y|Z|N|ids)( .*|$);^Frequency;^Point Coordinates"
+                            number_of_elements="10"
+                            set_number_command="SetNumberOfChartsHiddenAttributes"
+                            use_index="1">
+        <Documentation>
+          List of regex that describes array to not display by default. Note that "Component" arrays are always hidden by default even it not listed here.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+          <AllowRestoreDefaults />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+
+    <SettingsProxy name="IOSettings"
+                   label="IO"
+                   processes="client"
+                   class="vtkPVIOSettings">
       <StringVectorProperty name="ReaderDetails"
                             label="Default reader details"
                             number_of_elements_per_command="3"
@@ -999,37 +1075,6 @@
           </ShowComponentLabels>
         </Hints>
       </StringVectorProperty>
-      <IntVectorProperty name="ComputeArrayMagnitude"
-                        command="SetComputeArrayMagnitude"
-                        number_of_elements="1"
-                        default_values="1"
-                        panel_visibility="advanced">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Controls whether or not ParaView should compute and display the magnitude for
-          multi-components data attributes.
-        </Documentation>
-     </IntVectorProperty>
-     <IntVectorProperty name="ArrayMagnitudeExceptions"
-                        command="SetArrayMagnitudeException"
-                        label="Array Magnitude Exceptions"
-                        number_of_elements_per_command="1"
-                        repeat_command="1"
-                        set_number_command="SetNumberOfArrayMagnitudeExceptions"
-                        use_index="1"
-                        panel_visibility="advanced">
-        <Documentation>
-          List of exceptions for the "ComputeArrayMagnitude" setting. If "ComputeArrayMagnitude" is
-          untoggled then the list describes the number of components for which ParaView will
-          still compute the magnitude. Else the list describes the number of components for which
-          ParaView will not compute the magnitude.
-        </Documentation>
-        <Hints>
-          <ShowComponentLabels>
-            <ComponentLabel component="0" label="Exceptions"/>
-          </ShowComponentLabels>
-        </Hints>
-      </IntVectorProperty>
 
       <Hints>
         <UseDocumentationForLabels />
@@ -2412,6 +2457,7 @@
 
     <!-- ================================================================== -->
     <Proxy name="GridAxes3DActor"
+           label="Grid Axes 3D Actor"
            class="vtkPVGridAxes3DActor"
            processes="client|dataserver|renderserver">
       <Documentation>
@@ -3073,6 +3119,103 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy name="LegendGridActor"
+           label="Legend Grid Actor"
+           class="vtkLegendScaleActor"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        LegendGridActor can be used to render an axes grid in a render view.
+      </Documentation>
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the axes grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RightBorderOffset"
+                        command="SetRightBorderOffset"
+                        number_of_elements="1"
+                        default_values="50"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of right axis from the border.  This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TopBorderOffset"
+                        command="SetTopBorderOffset"
+                        number_of_elements="1"
+                        default_values="30"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of top axis from the border. This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LeftBorderOffset"
+                        command="SetLeftBorderOffset"
+                        number_of_elements="1"
+                        default_values="50"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of left axis from the border. This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="BottomBorderOffset"
+                        command="SetBottomBorderOffset"
+                        number_of_elements="1"
+                        default_values="30"
+                        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="5" max="100" />
+        <Documentation>
+          Set the offset of bottom axis from the border. This number is expressed in
+          pixels, and represents the approximate distance of the axes from the sides
+          of the renderer.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy command="SetAxesTextProperty">
+        <Proxy name="AxesTextProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="LegendLabelColor" name="Color" />
+          <Property exposed_name="LegendLabelOpacity" name="Opacity" />
+          <Property exposed_name="LegendLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="LegendLabelFontFile" name="FontFile" />
+          <Property exposed_name="LegendLabelBold" name="Bold" />
+          <Property exposed_name="LegendLabelItalic" name="Italic" />
+          <Property exposed_name="LegendLabelShadow" name="Shadow" />
+          <Property exposed_name="LegendLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Axis Label Font Properties" panel_widget="FontEditor">
+        <Property name="LegendLabelColor" function="Color"/>
+        <Property name="LegendLabelFontFamily" function="Family"/>
+        <Property name="LegendLabelFontFile" function="File"/>
+        <Property name="LegendLabelBold" function="Bold" />
+        <Property name="LegendLabelItalic" function="Italics"/>
+        <Property name="LegendLabelFontSize" function="Size" />
+        <Property name="LegendLabelShadow" function="Shadow" />
+        <Property name="LegendLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+    </Proxy>
+
+    <!-- ================================================================== -->
     <!-- End of ProxyGroup annotations -->
   </ProxyGroup>
 
@@ -3295,6 +3438,17 @@
           <ProxySelectionWidget enabled="0" />
         </Hints>
       </ProxyProperty>
+
+      <IntVectorProperty name="SaveInBackground"
+                         command="SetSaveInBackground"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If turned ON, screenshots are saved in a pool of threads running in the background
+          instead of running serially.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty name="EmbedParaViewState"
                          label="Embed ParaView State"

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
+#include <QVector3D>
 
 #include <vtkCamera.h>
 #include <vtkSMRenderViewProxy.h>
@@ -829,8 +830,11 @@ void pqKeyFrameEditor::createOrbitalKeyFrame()
   {
     pos[i] = orbit[i].toDouble();
   }
-
   camItem->CamWidget.setPositionPoints(pos);
+
+  QVector3D normals = creator.normal();
+  std::vector<double> norm{ normals.x(), normals.y(), normals.z() };
+  camItem->CamWidget.setViewUp(norm.data());
 
   this->Internal->Cue->triggerKeyFramesModified();
   this->Internal->Cue->getProxy()->UpdateVTKObjects();

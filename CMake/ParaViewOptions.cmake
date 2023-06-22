@@ -39,7 +39,7 @@ set(PARAVIEW_BUILD_TESTING "OFF"
   CACHE STRING "Enable testing")
 set_property(CACHE PARAVIEW_BUILD_TESTING
   PROPERTY
-    STRINGS "ON;OFF;WANT")
+    STRINGS "ON;OFF;WANT;DEFAULT")
 
 cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "Enable VTK testing" OFF
   "PARAVIEW_BUILD_TESTING" OFF)
@@ -197,6 +197,8 @@ option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
 
 option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
 
+option(PARAVIEW_ENABLE_GEOVIS "Enable GeoVis support." OFF)
+
 option(PARAVIEW_ENABLE_OPENTURNS "Enable OpenTURNS support." OFF)
 
 option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
@@ -230,7 +232,7 @@ option(PARAVIEW_ENABLE_OCCT "Enable OCCT Support." OFF)
 
 option(PARAVIEW_BUILD_TRANSLATIONS "Generate translation files" OFF)
 if (PARAVIEW_BUILD_TRANSLATIONS)
-  set(PARAVIEW_TRANSLATIONS_DIRECTORY "${CMAKE_BINARY_DIR}/Translation" CACHE STRING
+  set(PARAVIEW_TRANSLATIONS_DIRECTORY "${CMAKE_BINARY_DIR}/Translations" CACHE STRING
     "The directory containing translation files")
 endif()
 
@@ -267,6 +269,20 @@ cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
   "Initialize MPI on client-processes by default. Can be overridden using command line arguments" ON
   "PARAVIEW_USE_MPI" OFF)
 mark_as_advanced(PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
+
+set(PARAVIEW_LOGGING_TIME_PRECISION "3"
+  CACHE STRING "Precision of loguru scope timers. 3=ms, 6=us, 9=ns")
+mark_as_advanced(PARAVIEW_LOGGING_TIME_PRECISION)
+set(known_logging_precisions 3 6 9)
+set_property(CACHE PARAVIEW_LOGGING_TIME_PRECISION
+  PROPERTY
+    STRINGS ${known_logging_precisions})
+if (NOT PARAVIEW_LOGGING_TIME_PRECISION IN_LIST known_logging_precisions)
+  string(REPLACE ";" ", " known_logging_precisions_list "${known_logging_precisions}")
+  message(FATAL_ERROR
+    "`PARAVIEW_LOGGING_TIME_PRECISION` must be one of "
+    "${known_logging_precisions_list}; given '${PARAVIEW_LOGGING_TIME_PRECISION}'")
+endif ()
 
 #========================================================================
 # OBSOLETE OPTIONS: mark obsolete settings
@@ -390,6 +406,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_LAS
   MODULES   VTK::IOLAS
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_GEOVIS
+  MODULES   VTK::GeovisCore
   EXCLUSIVE)
 
 paraview_require_module(

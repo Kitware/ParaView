@@ -29,6 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+// Hide PARAVIEW_DEPRECATED_IN_5_12_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqTimeInspectorWidget.h"
 #include "ui_pqTimeInspectorWidget.h"
 

@@ -133,7 +133,7 @@ set(classes
   vtkPVGUIPluginInterface)
 
 set(headers
-    pqQVTKWidgetBase.h)
+  pqQVTKWidgetBase.h)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/pqQtConfig.h.in"

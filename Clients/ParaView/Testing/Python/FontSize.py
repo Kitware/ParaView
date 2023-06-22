@@ -7,7 +7,7 @@ paraview.simple._DisableFirstRenderCameraReset()
 # Create a new 'Render View'
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [1280, 800]
-renderView1.AxesGrid = 'GridAxes3DActor'
+renderView1.AxesGrid = 'Grid Axes 3D Actor'
 renderView1.OrientationAxesVisibility = 0
 renderView1.StereoType = 'Crystal Eyes'
 renderView1.CameraPosition = [0.0, 0.0, 6.6921304299024635]

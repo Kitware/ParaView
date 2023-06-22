@@ -475,6 +475,113 @@
         </Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty command="SetFreqFromOctave"
+                         default_values="0"
+                         name="UseOctave"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Whether to compute frequencies from octave bands or not.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetBaseTwoOctave"
+                         default_values="1"
+                         name="BaseTwoOctave"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Whether to compute frequencies using base-two or base-ten power.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetOctave"
+                         default_values="9"
+                         name="Octave"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="5" text="31.5 Hz"/>
+          <Entry value="6" text="63 Hz"/>
+          <Entry value="7" text="125 Hz"/>
+          <Entry value="8" text="250 Hz"/>
+          <Entry value="9" text="500 Hz"/>
+          <Entry value="10" text="1 kHz"/>
+          <Entry value="11" text="2 kHz"/>
+          <Entry value="12" text="4 kHz"/>
+          <Entry value="13" text="8 kHz"/>
+          <Entry value="14" text="16 kHz"/>
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Octave used to compute frequencies, referred to by its nominal band frequency.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetOctaveSubdivision"
+                         default_values="0"
+                         name="OctaveSubdivision"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Full"/>
+          <Entry value="1" text="First Half"/>
+          <Entry value="2" text="Second Half"/>
+          <Entry value="3" text="First Third"/>
+          <Entry value="4" text="Second Third"/>
+          <Entry value="5" text="Third Third"/>
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Which subdivision of octave used to compute octave frequency range.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="GetComputedLowerFrequency"
+                            name="ComputedLowerFrequency"
+                            information_only="1"
+                            panel_visibility="default">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Lower bound of the frequency range.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetComputedUpperFrequency"
+                            name="ComputedUpperFrequency"
+                            information_only="1"
+                            panel_visibility="default">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Upper bound of the frequency range.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty command="SetLowerFrequency"
                             name="LowerFrequency"
                             default_values="0"
@@ -488,6 +595,12 @@
                       name="FrequencyArray" />
           </RequiredProperties>
         </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>
           Lower bound of the frequency range.
         </Documentation>
@@ -506,6 +619,12 @@
                       name="FrequencyArray" />
           </RequiredProperties>
         </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseOctave"
+                      function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>
           Upper bound of the frequency range.
         </Documentation>

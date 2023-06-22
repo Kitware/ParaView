@@ -353,14 +353,17 @@ public:
   //---------------------------------------------------------------------------
   void ResetToXMLDefaults()
   {
-    if (this->DefaultsValid && this->DefaultValues != this->Values)
+    if (this->DefaultsValid)
     {
-      this->Values = this->DefaultValues;
-      // Make sure to initialize BEFORE Modified() is called. Otherwise,
-      // the value would not be pushed.
-      this->Initialized = true;
-      this->Property->Modified();
-      this->ClearUncheckedElements();
+      if (this->DefaultValues != this->Values || this->DefaultValues != this->UncheckedValues)
+      {
+        this->Values = this->DefaultValues;
+        // Make sure to initialize BEFORE Modified() is called. Otherwise,
+        // the value would not be pushed.
+        this->Initialized = true;
+        this->Property->Modified();
+        this->ClearUncheckedElements();
+      }
     }
     else if (this->Property->GetRepeatable())
     {

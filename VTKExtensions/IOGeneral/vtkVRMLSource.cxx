@@ -178,7 +178,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         {
           if (array->GetName() == nullptr)
           {
-            sprintf(name, "VRMLArray%d", ++arrayCount);
+            snprintf(name, sizeof(name), "VRMLArray%d", ++arrayCount);
             array->SetName(name);
           }
           output->GetPointData()->AddArray(array);
@@ -194,7 +194,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         {
           if (array->GetName() == nullptr)
           {
-            sprintf(name, "VRMLArray%d", ++arrayCount);
+            snprintf(name, sizeof(name), "VRMLArray%d", ++arrayCount);
             array->SetName(name);
           }
           output->GetCellData()->AddArray(array);

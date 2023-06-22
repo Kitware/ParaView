@@ -378,13 +378,13 @@ bool pqColorAnnotationsWidget::pqInternals::updateAnnotations(vtkAbstractArray* 
     const auto val = values->GetVariantValue(idx);
     if (val.IsDouble())
     {
-      candidate_tuples.push_back(std::make_pair(
-        pqCoreUtilities::number(val.ToDouble()), pqCoreUtilities::formatNumber(val.ToDouble())));
+      candidate_tuples.push_back(std::make_pair(pqCoreUtilities::formatFullNumber(val.ToDouble()),
+        pqCoreUtilities::formatNumber(val.ToDouble())));
     }
     else if (val.IsFloat())
     {
-      candidate_tuples.push_back(std::make_pair(
-        pqCoreUtilities::number(val.ToFloat()), pqCoreUtilities::formatNumber(val.ToFloat())));
+      candidate_tuples.push_back(std::make_pair(pqCoreUtilities::formatFullNumber(val.ToFloat()),
+        pqCoreUtilities::formatNumber(val.ToFloat())));
     }
     else
     {

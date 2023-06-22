@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QWidget>
 
 class QScrollBar;
@@ -46,7 +48,8 @@ class pqAnimationModel;
  * A widget offering a scrollbar useful to interact with the timeline
  * from the animation model.
  */
-class PQWIDGETS_EXPORT pqTimelineScrollbar : public QWidget
+class PARAVIEW_DEPRECATED_IN_5_11_0(
+  "See `pqTimeManagerWidget` for new design.") PQWIDGETS_EXPORT pqTimelineScrollbar : public QWidget
 {
   Q_OBJECT
 

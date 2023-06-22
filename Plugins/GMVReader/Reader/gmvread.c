@@ -4914,7 +4914,7 @@ void readvects(FILE* gmvin, int ftype)
       for (i = 0; i < ncomps; i++)
         {
          char cvname2[2*MAXCUSTOMNAMELENGTH];
-         sprintf(cvname2,"%d-%s",i+1,vectname);
+         snprintf(cvname2,sizeof(cvname2),"%d-%s",i+1,vectname);
          strncpy(&cvnames[i*MAXCUSTOMNAMELENGTH],cvname,MAXCUSTOMNAMELENGTH-1);
          *(cvnames+i*MAXCUSTOMNAMELENGTH+charsize_in) = (char) 0;
         }

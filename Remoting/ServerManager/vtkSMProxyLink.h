@@ -48,6 +48,17 @@ public:
   virtual void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
   /**
+   * Utility method to add 2 proxies, both as INPUT and OUTPUT.
+   * This is equivalent to call 4 times AddLinkedProxy() with each combination.
+   */
+  virtual void LinkProxies(vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+
+  /**
+   * Utility method to link the proxies stored as proxy property of input proxies.
+   */
+  virtual void LinkProxyPropertyProxies(vtkSMProxy* proxy1, vtkSMProxy* proxy2, const char* pname);
+
+  /**
    * Remove a linked proxy.
    */
   virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
@@ -121,6 +132,13 @@ protected:
    * pname :- name of property that was pushed.
    */
   void UpdateProperty(vtkSMProxy* caller, const char* pname) override;
+
+  /**
+   * Get tag name to use in statefile. This should match
+   * the class name without "vtkSM" prefix.
+   * see vtkSMStateLoader::HandleLinks
+   */
+  virtual std::string GetXMLTagName() { return "ProxyLink"; }
 
   /**
    * Save the state of the link.

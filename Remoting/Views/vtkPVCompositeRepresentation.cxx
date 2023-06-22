@@ -56,7 +56,10 @@ void vtkPVCompositeRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
   this->SetSelectionVisibility(this->SelectionVisibility);
-  this->GridAxesRepresentation->SetVisibility(visible);
+  if (this->GridAxesRepresentation)
+  {
+    this->GridAxesRepresentation->SetVisibility(visible);
+  }
   this->SetPolarAxesVisibility(visible);
 }
 
@@ -111,9 +114,15 @@ bool vtkPVCompositeRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::MarkModified()
 {
-  this->SelectionRepresentation->MarkModified();
-  this->GridAxesRepresentation->MarkModified();
 
+  if (this->SelectionRepresentation)
+  {
+    this->SelectionRepresentation->MarkModified();
+  }
+  if (this->GridAxesRepresentation)
+  {
+    this->GridAxesRepresentation->MarkModified();
+  }
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->MarkModified();
@@ -126,8 +135,10 @@ void vtkPVCompositeRepresentation::MarkModified()
 void vtkPVCompositeRepresentation::SetUpdateTime(double time)
 {
   this->SelectionRepresentation->SetUpdateTime(time);
-  this->GridAxesRepresentation->SetUpdateTime(time);
-
+  if (this->GridAxesRepresentation)
+  {
+    this->GridAxesRepresentation->SetUpdateTime(time);
+  }
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->SetUpdateTime(time);

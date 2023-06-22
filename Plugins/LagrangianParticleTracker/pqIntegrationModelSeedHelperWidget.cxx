@@ -130,18 +130,17 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
       for (unsigned int i = 0; i < nArrays; i++)
       {
         const char* arrayName = namesProp->GetElement(i);
-        const char* labelName = vtkSMProperty::CreateNewPrettyLabel(arrayName);
+        std::string labelName = vtkSMProperty::CreateNewPrettyLabel(arrayName);
         int type = typesProp->GetElement(i);
         int nComponents = compsProp->GetElement(i);
 
         // Create a group box for each array to generate
-        QGroupBox* gb = new QGroupBox(labelName, this);
+        QGroupBox* gb = new QGroupBox(labelName.c_str(), this);
         gb->setCheckable(true);
         gb->setChecked(false);
         gb->setProperty("name", arrayName);
         gb->setProperty("type", type);
         QObject::connect(gb, SIGNAL(toggled(bool)), this, SIGNAL(arrayToGenerateChanged()));
-        delete labelName;
 
         // Add a layout in each
         QGridLayout* gbLayout = new QGridLayout(gb);

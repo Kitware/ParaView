@@ -231,8 +231,7 @@
       </IntVectorProperty>
       <StringVectorProperty name="Assembly"
                             command="SetAssemblyName"
-                            number_of_elements="1"
-                            default_values="Hierarchy">
+                            number_of_elements="1">
         <DataAssemblyListDomain name="data_assembly_list">
           <RequiredProperties>
             <Property function="Input" name="Input"/>
@@ -388,6 +387,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>
           The input from which the selection is extracted.
@@ -407,6 +407,20 @@
           The input that provides the selection object.
         </Documentation>
       </InputProperty>
+      <IntVectorProperty name="HyperTreeGridToUnstructuredGrid"
+        command="SetHyperTreeGridToUnstructuredGrid"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Output an unstructured grid instead of a hyper tree grid for input hyper tree grids.
+        </Documentation>
+       <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
       <!-- End ExtractSelection -->
     </SourceProxy>
 
@@ -502,6 +516,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
           <DataType value="vtkTable"/>
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>
           This property specifies the input from which the selection is extracted.
@@ -537,6 +552,20 @@
           an insidedness array to mark which cells are inside or out. If 0 then the output is
           an unstructured grid which contains only the subset of cells that are inside.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="HyperTreeGridToUnstructuredGrid"
+        command="SetHyperTreeGridToUnstructuredGrid"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Output an unstructured grid instead of a hyper tree grid for input hyper tree grids.
+        </Documentation>
+       <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"/>
+        </Hints>
       </IntVectorProperty>
       <Hints>
         <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper"/>

@@ -32,10 +32,14 @@ endfunction ()
 function (_paraview_add_tests function)
   cmake_parse_arguments(_paraview_add_tests
     "FORCE_SERIAL;FORCE_LOCK;SMTESTING_ALLOW_ERRORS"
-    "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS"
+    "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS;NUMSERVERS"
     "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;TEST_NAME;ENVIRONMENT;ARGS;CLIENT_ARGS"
     ${ARGN})
-
+  # NUMSERVERS is not used here, but is used by paraview_add_client_server_tests function.
+  # It is kept here to avoid filtering it out from ARGN in the caller.
+  # If it were not present here, nor filtered out in the caller, then it would be considered
+  # as part of "TEST_SCRIPTS" multivalue argument.
+  
   if (_paraview_add_tests_UNPARSED_ARGUMENTS)
     message(FATAL_ERROR
       "Unparsed arguments for ${function}: "
@@ -284,6 +288,21 @@ function(_get_prefix varname default)
   endif()
 endfunction()
 
+# If NUMSERVERS is specified in ${ARGN} then returns in varname the number of servers to use for the test, 
+# otherwise returns the "NOT_FOUND" value.
+function(_get_num_servers varname)
+  cmake_parse_arguments(_get_num_servers
+    ""
+    "NUMSERVERS"
+    ""
+    ${ARGN})
+  if (_get_num_servers_NUMSERVERS)
+    set(${varname} "${_get_num_servers_NUMSERVERS}" PARENT_SCOPE)
+  else()
+    set(${varname} "NOT_FOUND" PARENT_SCOPE)
+  endif()
+endfunction()
+
 function (paraview_add_client_tests)
   _get_prefix(chosen_prefix "pv" ${ARGN})
   _paraview_add_tests("paraview_add_client_tests"
@@ -303,7 +322,7 @@ endfunction ()
 
 function (paraview_add_client_server_tests)
   _get_prefix(chosen_prefix "pvcs" ${ARGN})
-  _paraview_add_tests("paraview_add_client_server_tests"
+  set(_paraview_add_tests_args
     PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_CS"
     _COMMAND_PATTERN
@@ -318,7 +337,21 @@ function (paraview_add_client_server_tests)
         __paraview_client_args__
         --dr
         --exit
-    ${ARGN})
+    ${ARGN}
+  )
+
+  _get_num_servers(num_servers ${ARGN})
+  if (NOT num_servers STREQUAL "NOT_FOUND")
+    set(_paraview_add_tests_args ${_paraview_add_tests_args};
+    # Set the number of pvservers through the SMTESTDRIVER_MPI_NUMPROCS environment variable.
+      ENVIRONMENT
+        SMTESTDRIVER_MPI_NUMPROCS=${num_servers}
+      # Requires CTest to reserve NUMPROCS among the available processors
+      NUMPROCS "${num_servers}"
+    )
+  endif()
+
+  _paraview_add_tests("paraview_add_client_server_tests" ${_paraview_add_tests_args})
 endfunction ()
 
 function (paraview_add_client_server_render_tests)

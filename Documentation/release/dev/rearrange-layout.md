@@ -9,3 +9,6 @@ However, it may get frustrating to create an evenly spaced layout manually.
 Now you can use the "Rearrange Views" action from the "Views" menu to independently resize
 width, height or both (horizontal, vertical or grid mode).
 This is also available in context menu from Layout tab.
+
+![Before rearranging](rearrange-layout-creation.png)
+![After rearranging](rearrange-layout-grid.png)

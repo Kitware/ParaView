@@ -632,7 +632,7 @@ std::vector<FileTypeDetailed> vtkSMReaderFactory::GetSupportedFileTypesDetailed(
 
   // Add custom patterns to supported files
   auto* settings = vtkSMSettings::GetInstance();
-  char const* settingName = ".settings.RepresentedArrayListSettings.ReaderDetails";
+  char const* settingName = ".settings.IOSettings.ReaderDetails";
   unsigned int const numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 3;
   for (unsigned int entryIndex = 0; entryIndex < numberOfEntries; ++entryIndex)
   {

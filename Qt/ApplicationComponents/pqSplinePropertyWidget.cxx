@@ -82,7 +82,7 @@ public:
     }
     else if (role == Qt::EditRole || role == Qt::ToolTipRole)
     {
-      return pqCoreUtilities::number(this->Points[idx.row()][idx.column()]);
+      return pqCoreUtilities::formatFullNumber(this->Points[idx.row()][idx.column()]);
     }
 
     return QVariant();

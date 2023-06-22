@@ -28,7 +28,7 @@
 #include "vtkWeakPointer.h"              // for weak pointer.
 #include <vector>                        // needed for std::vector
 
-class vtkCompositePolyDataMapper2;
+class vtkCompositePolyDataMapper;
 class vtkMultiBlockDataSet;
 class vtkPVLODActor;
 class vtkScalarsToColors;
@@ -207,7 +207,7 @@ protected:
 
   // Description:
   // Actor used to render the outlines in the view.
-  vtkSmartPointer<vtkCompositePolyDataMapper2> Mapper;
+  vtkSmartPointer<vtkCompositePolyDataMapper> Mapper;
   vtkSmartPointer<vtkPVLODActor> Actor;
 
   // Description:

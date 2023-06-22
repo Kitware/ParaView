@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -96,6 +97,9 @@ vtkSMSourceProxy* vtkSMPreselectionPipeline::ConnectPVExtractSelection(
   {
     extract =
       vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", "PVExtractSelection"));
+    vtkSMIntVectorProperty* HTG2UG =
+      vtkSMIntVectorProperty::SafeDownCast(extract->GetProperty("HyperTreeGridToUnstructuredGrid"));
+    HTG2UG->SetElement(0, 1);
   }
   else
   {

@@ -223,7 +223,10 @@ QVariant pqArraysModel::data(const QModelIndex& indx, int role) const
       return ainfo->GetDataTypeAsString();
 
     case 2:
-      return ainfo->GetRangesAsString().c_str();
+      auto settings = vtkPVGeneralSettings::GetInstance();
+      int lowExponent = settings->GetFullNotationLowExponent();
+      int highExponent = settings->GetFullNotationHighExponent();
+      return ainfo->GetRangesAsString(lowExponent, highExponent).c_str();
   }
   return QVariant();
 }

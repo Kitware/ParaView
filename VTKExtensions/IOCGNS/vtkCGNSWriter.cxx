@@ -1301,7 +1301,12 @@ void vtkCGNSWriter::WriteData()
   }
 
   write_info info;
-  std::ostringstream fileNameWithTimeStep;
+  std::stringstream fileNameWithTimeStep;
+
+  // formattedFileName string must be on outer context
+  // such that the c_str() pointer is kept alive
+  // while writing with it stored in info.FileName
+  std::string formattedFileName;
   if (this->TimeValues && this->CurrentTimeIndex < this->TimeValues->GetNumberOfValues())
   {
     if (this->WriteAllTimeSteps && this->TimeValues->GetNumberOfValues() > 1)
@@ -1319,7 +1324,8 @@ void vtkCGNSWriter::WriteData()
           fileNameWithTimeStep << fileNamePath << "/";
         }
         fileNameWithTimeStep << filenameNoExt << suffix << extension;
-        info.FileName = fileNameWithTimeStep.str().c_str();
+        formattedFileName = fileNameWithTimeStep.str();
+        info.FileName = formattedFileName.c_str();
         info.TimeStep = this->TimeValues->GetValue(this->CurrentTimeIndex);
       }
       else

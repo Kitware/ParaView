@@ -198,7 +198,7 @@ void pqFileDialogLocationModel::LoadSpecialsFromSystem()
   vtkNew<vtkPVEnvironmentInformation> envInfo;
   auto* settings = vtkSMSettings::GetInstance();
   // this setting is a list of labels and env-var pairs, the env-vars should store directory paths
-  char const* settingName = ".settings.RepresentedArrayListSettings.LocationEnvironmentVariables";
+  char const* settingName = ".settings.IOSettings.LocationEnvironmentVariables";
   unsigned int const numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 2;
   std::vector<std::pair<QString, QString>> envVarList;
 

@@ -1,5 +1,6 @@
 set(classes
   vtkBivariateNoiseMapper
+  vtkOpenGLBivariateNoiseMapperDelegator
   vtkBivariateNoiseRepresentation)
 
 vtk_module_add_module(BivariateRepresentations::vtkBivariateRepresentations

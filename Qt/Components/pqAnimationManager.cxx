@@ -77,10 +77,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
 
-#define SEQUENCE 0
-#define REALTIME 1
-#define SNAP_TO_TIMESTEPS 2
-
 //-----------------------------------------------------------------------------
 class pqAnimationManager::pqInternals
 {

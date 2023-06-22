@@ -35,7 +35,7 @@ class vtkImageData;
 class vtkImplicitPlaneWidget2;
 class vtkOpenGLRenderWindow;
 class vtkPVXRInterfaceHelper;
-class vtkPVXRInterfaceHelperLocation;
+struct vtkPVXRInterfaceHelperLocation;
 class vtkStringArray;
 class vtkTransform;
 
@@ -108,6 +108,7 @@ public:
   void collabAddAThickCrop(vtkTransform* t);
   void collabRemoveAllThickCrops();
   void collabUpdateThickCrop(int count, double* matrix);
+  void ShowCropPlanes(bool visible);
   ///@}
 
   /**

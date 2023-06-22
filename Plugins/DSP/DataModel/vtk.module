@@ -1,0 +1,10 @@
+NAME
+  DigitalSignalProcessing::DSPDataModel
+LIBRARY_NAME
+  vtkDSPDataModel
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonImplicitArrays
+TEST_DEPENDS
+  VTK::IOIOSS
+  VTK::TestingCore

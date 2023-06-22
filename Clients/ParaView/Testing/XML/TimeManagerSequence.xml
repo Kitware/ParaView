@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- open Time Manager -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="expand" arguments="0.0" />
+
+  <!-- default values -->
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.,Time Sources" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" property="value" arguments="10" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="0" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" property="currentText" arguments="0" />
+
+  <!-- test VCR controls -->
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="0" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="0" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="1" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="0.111111" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="2" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="3" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="4" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="5" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="6" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="7" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="8" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="9" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="0" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="9" />
+
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="1" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="8" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="0.888889" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+
+  <!-- set time and timesteps -->
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777235" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" property="currentText" arguments="0.111111" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.888889" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="0.888889" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="8" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" command="activated" arguments="0" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue" property="value" arguments="0" />
+
+  <!-- change number of frames -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="11" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777235" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" property="currentText" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="10" />
+  <!-- 0.1 is not an exact time anymore -->
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" property="currentText" arguments="0.1" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="1 (?)" />
+
+  <!-- test stride (advanced mode) -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" command="activated" arguments="0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/advancedButton" command="set_boolean" arguments="true" />
+  <!-- go next timestep -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue" command="key" arguments="16777235" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="1" />
+  <!-- increase stride -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/stride/strideStep" command="key" arguments="16777235" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/stride/strideStep/qt_spinbox_lineedit" property="text" arguments="2" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="3" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/stride/strideStep" command="key" arguments="16777235" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/stride/strideStep" command="key" arguments="16777235" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/stride/strideStep/qt_spinbox_lineedit" property="text" arguments="4" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="7" />
+  <!-- cannot go past-the-end with "next", no changes. -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="7" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="9" />
+</pqevents>

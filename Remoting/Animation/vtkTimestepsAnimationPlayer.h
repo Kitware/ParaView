@@ -80,18 +80,18 @@ protected:
   ~vtkTimestepsAnimationPlayer() override;
   ///@}
 
-  void StartLoop(double, double, double, double*) override;
+  ///@{
+  /**
+   * Manage loop inside playbackwindow.
+   */
+  // Initialize inner variables. Call it before any GetNextTime/GetPreviousTime call.
+  void StartLoop(double, double, double, double* playbackWindow) override;
   void EndLoop() override{};
-
-  /**
-   * Return the next time given the current time.
-   */
+  // Get next time in loop. Take Count and Stride into account.
   double GetNextTime(double currentime) override;
-
-  /**
-   * Return the previous time given the current time.
-   */
+  // Get previous time in loop. Take Count and Stride into account.
   double GetPreviousTime(double currenttime) override;
+  ///@}
 
   double GoToNext(double, double, double currenttime) override
   {
@@ -111,6 +111,9 @@ private:
   vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) = delete;
   void operator=(const vtkTimestepsAnimationPlayer&) = delete;
 
+  /**
+   * Return next time from TimeSteps, using Stride.
+   */
   double GetNextInternal(double time, double defaultVal);
 
   vtkTimestepsAnimationPlayerSetOfDouble* TimeSteps;

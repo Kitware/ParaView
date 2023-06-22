@@ -1,7 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="writers">
- <!-- ================================================================= -->
+    <!-- ================================================================= -->
     <PWriterProxy class="vtkIOSSWriter"
+                  file_name_method="SetFileName"
                   name="IOSSWriter">
       <Documentation short_help="Write Exodus II files using IOSS.">
         Write Exodus files using IOSS library.
@@ -11,7 +12,9 @@
                             name="FileName"
                             number_of_elements="1"
                             panel_visibility="never">
-        <Documentation>The name of the file to be written.</Documentation>
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
 
       <InputProperty command="SetInputConnection"
@@ -19,18 +22,552 @@
                      name="Input">
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkCompositeDataSet" />
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkPartitionedDataSet"/>
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to
-        written to the file.</Documentation>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1"/>
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1"/>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the file.
+        </Documentation>
       </InputProperty>
 
+      <IntVectorProperty command="SetChooseFieldsToWrite"
+                         default_values="0"
+                         name="ChooseArraysToWrite"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Property to control whether to choose arrays to write.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EntityType"
+                         label="Choose the output blocks/arrays for the Exodus Entity Type"
+                         default_values="3"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Node Blocks"
+                 value="0"/>
+          <Entry text="Edge Blocks"
+                 value="1"/>
+          <Entry text="Face Blocks"
+                 value="2"/>
+          <Entry text="Element Blocks"
+                 value="3"/>
+          <!-- <Entry text="Structured Blocks"-->
+          <!--        value="4"/>-->
+          <Entry text="Node Sets"
+                 value="5"/>
+          <Entry text="Edge Sets"
+                 value="6"/>
+          <Entry text="Face Sets"
+                 value="7"/>
+          <Entry text="Element Sets"
+                 value="8"/>
+          <Entry text="Side Sets"
+                 value="9"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property allows the user to choose the output blocks/arrays for the selected Exodus Entity Type.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="NodeBlockArrays"
+                            command="GetNodeBlockFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the node block arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="0"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Assembly"
+                            command="SetAssemblyName"
+                            number_of_elements="1">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors to choose blocks to write.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeBlockSelectors"
+                            command="AddEdgeBlockSelector"
+                            clean_command="ClearEdgeBlockSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the edge block selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Edge Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="EdgeBlockSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="1"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="EdgeBlockArrays"
+                            command="GetEdgeBlockFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="EdgeBlockSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the edge block arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceBlockSelectors"
+                            command="AddFaceBlockSelector"
+                            clean_command="ClearFaceBlockSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="2">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the face block selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Face Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="FaceBlockSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="2"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="FaceBlockArrays"
+                            command="GetFaceBlockFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="FaceBlockSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the face block arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="face"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="2"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ElementBlockSelectors"
+                            command="AddElementBlockSelector"
+                            clean_command="ClearElementBlockSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="3">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the element block selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Element Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="ElementBlockSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="3"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="ElementBlockArrays"
+                            command="GetElementBlockFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="ElementBlockSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the element block arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="3"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="NodeSetSelectors"
+                            command="AddNodeSetSelector"
+                            clean_command="ClearNodeSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="5">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the node sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="NodeSets" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="NodeSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="5"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="NodeSetArrays"
+                            command="GetNodeSetFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="NodeSetSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the node set arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="node-set"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="5"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeSetSelectors"
+                            command="AddEdgeSetSelector"
+                            clean_command="ClearEdgeSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="6">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the edge sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Edge Sets" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="EdgeSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="6"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="EdgeSetArrays"
+                            command="GetEdgeSetFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="EdgeSetSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the edge set arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge-set"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="6"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceSetSelectors"
+                            command="AddFaceSetSelector"
+                            clean_command="ClearFaceSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="7">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the face sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Face Sets" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="FaceSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="7"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="FaceSetArrays"
+                            command="GetFaceSetFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="FaceSetSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the face set arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="face-set"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="7"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ElementSetSelectors"
+                            command="AddElementSetSelector"
+                            clean_command="ClearElementSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="8">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the element sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Element Sets" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="ElementSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="8"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="ElementSetArrays"
+                            command="GetElementSetFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="ElementSetSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the element set arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell-set"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="8"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SideSetSelectors"
+                            command="AddSideSetSelector"
+                            clean_command="ClearSideSetSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly" entity_type="9">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the side sets selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to write from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Side Sets" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="SideSetSelectors" function="Selectors"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EntityType"
+                                   value="9"/>
+        </Hints>
+      </PropertyGroup>
+
+      <StringVectorProperty name="SideSetArrays"
+                            command="GetSideSetFieldSelection"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="SideSetSelectors" function="Selectors"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Select the side set arrays to pass through.
+        </Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="side-set"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="EntityType" value="9"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+                                       property="ChooseArraysToWrite" value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetRemoveGhosts"
+                         default_values="1"
+                         name="RemoveGhosts"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Property to control whether to remove ghost cells from the input or not.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="OffsetGlobalIds"
-          command="SetOffsetGlobalIds"
-          number_of_elements="1"
-          default_values="0">
-        <BooleanDomain name="bool" />
+                         command="SetOffsetGlobalIds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Exodus wants global ids to start with 1, while VTK generally produces
           global ids starting with 0. Set this to true (default false), if the global
@@ -39,25 +576,34 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="PreserveInputEntityGroups"
-          command="SetPreserveInputEntityGroups"
-          number_of_elements="1"
-          default_values="1">
-        <BooleanDomain name="bool" />
+      <IntVectorProperty name="PreserveOriginalIds"
+                         command="SetPreserveOriginalIds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
-          If input is untransformed IOSS dataset, then the writer can preserve entity
-          group classifications, such as element blocks, side sets etc. The same is
-          not true if the input has been transformed e.g. through a clip filter. Thus
-          flag is used to indicate whether the input has valid element
-          classifications.
+          If input is transformed, e.g. through clipping, new element blocks may be created.
+          This flag can be used to indicate whether to preserve the original ids from blocks or not.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="WriteQAAndInformationRecords"
+                         label="Write QA And Information Records"
+                         command="SetWriteQAAndInformationRecords"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When checked, the writer will write quality assurance and information records, if available.
         </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty name="DisplacementMagnitude"
-          command="SetDisplacementMagnitude"
-          number_of_elements="1"
-          default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.0" />
+                            command="SetDisplacementMagnitude"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0"/>
         <Documentation>
           If input dataset has displacements pre-applied, setting the displacement
           magnitude to non-zero ensures that the point coordinates in the dataset are
@@ -65,25 +611,68 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <IntVectorProperty name="MaximumTimeStepsPerFile"
-          command="SetMaximumTimeStepsPerFile"
-          number_of_elements="1"
-          default_values="0">
-        <IntRangeDomain name="range" min="0" />
+      <IntVectorProperty name="TimeStepRange"
+                         command="SetTimeStepRange"
+                         number_of_elements="2"
+                         default_values="0 1"
+                         panel_visibility="advanced">
+        <TimeStepIndexDomain name="timestep_index_range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </TimeStepIndexDomain>
         <Documentation>
-          A debugging option, set this to non-zero positive number to save at most
-          the specified number of timesteps in a single file before starting a new
-          one. The writer may start new files (aka restarts) automatically if it
-          determines that the mesh has changed. Defaults to 0 i.e.
-          unlimited timesteps per file.
+          To limit writing a subset of the timesteps, specify a valid range. You may also use **FileStride** to step
+          over timesteps in this range.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TimeStepStride"
+                         command="SetTimeStepStride"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1" max="100"/>
+        <Documentation>
+          Specify the stride to use when writing a subset of timesteps
+          as dictated by the **TimeStepRange**.
         </Documentation>
       </IntVectorProperty>
 
       <Hints>
-        <WriterFactory extensions="exo" file_description="IOSS Exodus File" />
+        <WriterFactory extensions="exo" file_description="IOSS Exodus File"/>
       </Hints>
       <!-- End of IOSSWriter -->
     </PWriterProxy>
     <!-- end of  "writers" -->
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="extract_writers">
+    <DataExtractWriterProxy name="IOSS"
+                            label="IOSS Exodus">
+      <Documentation>
+        Extract writer to write data using the Exodus file format.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_{timestep:06d}.ex2">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="IOSSWriter"/>
+        <ExposedProperties>
+          <Property name="Input"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data"/>
+      </Hints>
+      <!-- end of IOSS -->
+    </DataExtractWriterProxy>
+    <!-- end of "extract_writers" -->
   </ProxyGroup>
 </ServerManagerConfiguration>

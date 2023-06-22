@@ -105,8 +105,8 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   {
     this->PVApp->settings()->setValue("GeneralSettings.InterfaceLanguage", locale);
   }
-  // en_US is default ParaView language, so no need to load en_US translators
-  if (locale != "en_US")
+  // en is default ParaView language, so no need to load en translators
+  if (locale != "en")
   {
     // Load ParaView translations
     QTranslator* UITranslator = this->PVApp->getQtTranslations("paraview", locale);

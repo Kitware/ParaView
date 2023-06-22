@@ -106,7 +106,7 @@ public:
   ///@{
   /**
    * Get/Set the default interface language.
-   * Default is en_US
+   * Default is en
    */
   vtkGetMacro(InterfaceLanguage, std::string);
   vtkSetMacro(InterfaceLanguage, std::string);
@@ -181,7 +181,7 @@ public:
   /**
    * Set the precision of the animation time toolbar.
    */
-  vtkSetClampMacro(AnimationTimePrecision, int, 1, 17);
+  vtkSetMacro(AnimationTimePrecision, int);
   vtkGetMacro(AnimationTimePrecision, int);
   ///@}
 
@@ -226,6 +226,22 @@ public:
    */
   vtkSetMacro(RealNumberDisplayedPrecision, int);
   vtkGetMacro(RealNumberDisplayedPrecision, int);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the low exponent used with full notation
+   */
+  vtkSetMacro(FullNotationLowExponent, int);
+  vtkGetMacro(FullNotationLowExponent, int);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the high exponent used with full notation
+   */
+  vtkSetMacro(FullNotationHighExponent, int);
+  vtkGetMacro(FullNotationHighExponent, int);
   ///@}
 
   /**
@@ -339,6 +355,14 @@ public:
   vtkSetMacro(SelectOnClickMultiBlockInspector, bool);
   ///@}
 
+  ///@{
+  /**
+   * Sets the number of threads that are used for `vtkPVSession::ThreadedCallbackQueue`.
+   */
+  int GetNumberOfCallbackThreads();
+  void SetNumberOfCallbackThreads(int);
+  ///@}
+
 protected:
   vtkPVGeneralSettings() = default;
   ~vtkPVGeneralSettings() override = default;
@@ -348,7 +372,7 @@ protected:
   int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly = false;
   std::string DefaultViewType = "RenderView";
-  std::string InterfaceLanguage = "en_US";
+  std::string InterfaceLanguage = "en";
   int ScalarBarMode = AUTOMATICALLY_HIDE_SCALAR_BARS;
   bool CacheGeometryForAnimation = false;
   unsigned long AnimationGeometryCacheLimit = 0;
@@ -359,6 +383,8 @@ protected:
   int RealNumberDisplayedNotation = MIXED;
   bool RealNumberDisplayedShortestAccuratePrecision = false;
   int RealNumberDisplayedPrecision = 6;
+  int FullNotationLowExponent = -6;
+  int FullNotationHighExponent = 20;
   bool ResetDisplayEmptyViews = false;
   int PropertiesPanelMode = ALL_IN_ONE;
   bool LockPanels = false;

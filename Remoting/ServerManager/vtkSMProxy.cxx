@@ -1552,7 +1552,7 @@ int vtkSMProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement*
   }
   else
   {
-    this->SetXMLLabel(this->GetXMLName());
+    this->SetXMLLabel(vtkSMObject::CreatePrettyLabel(this->GetXMLName()).c_str());
   }
 
   const char* processes = element->GetAttribute("processes");

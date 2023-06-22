@@ -36,6 +36,13 @@
  *                FieldDataSelection is specified and no vtkSMInputArrayDomain
  *                is found, then this domain assumes that all array associations
  *                are valid.
+ * \li \c AssemblyName : (optional) Instead of checking all the arrays, you can
+ *                check only the arrays that are part of a specific assembly using
+ *                specified selectors. This is useful when you want to get a subset
+ *                of the arrays.
+ * \li \c Selectors : (optional) The selectors are used in conjunction with the
+ *                AssemblyName property. The selectors are used to filter the arrays
+ *                that are part of the assembly.
  *
  * Supported XML attributes:
  * \li \c attribute_type : (optional) when specified, this is used to pick the

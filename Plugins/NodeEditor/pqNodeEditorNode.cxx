@@ -149,7 +149,7 @@ pqNodeEditorNode::pqNodeEditorNode(pqProxy* prx, QGraphicsItem* parent)
     // Disable the simplified notation rendering for pqDoubleLineEdit widgets.
     for (auto element : this->proxyProperties->findChildren<pqDoubleLineEdit*>())
     {
-      element->setAlwaysUseFullPrecision(true);
+      element->setNotation(pqDoubleLineEdit::FullNotation);
     }
 
     containerLayout->addWidget(this->proxyProperties);

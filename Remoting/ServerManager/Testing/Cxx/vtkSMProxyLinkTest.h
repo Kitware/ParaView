@@ -23,6 +23,7 @@ class vtkSMProxyLinkTest : public QObject
   Q_OBJECT
 
 private Q_SLOTS:
+  void LinkProxies();
   void AddLinkedProxy();
   void AddException();
 };

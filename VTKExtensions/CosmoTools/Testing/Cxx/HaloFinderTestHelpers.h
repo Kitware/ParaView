@@ -14,7 +14,7 @@
 =========================================================================*/
 
 #include "vtkActor.h"
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkMaskPoints.h"
 #include "vtkNew.h"
 #include "vtkPANLHaloFinder.h"
@@ -43,7 +43,7 @@ struct HaloFinderTestVTKObjects
     haloFinder = vtkSmartPointer<vtkPANLHaloFinder>::New();
     onlyPointsInHalos = vtkSmartPointer<vtkThreshold>::New();
     maskPoints = vtkSmartPointer<vtkMaskPoints>::New();
-    mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
+    mapper = vtkSmartPointer<vtkCompositePolyDataMapper>::New();
   }
   vtkSmartPointer<vtkRenderWindow> renWin;
   vtkSmartPointer<vtkRenderWindowInteractor> iren;
@@ -51,7 +51,7 @@ struct HaloFinderTestVTKObjects
   vtkSmartPointer<vtkPANLHaloFinder> haloFinder;
   vtkSmartPointer<vtkThreshold> onlyPointsInHalos;
   vtkSmartPointer<vtkMaskPoints> maskPoints;
-  vtkSmartPointer<vtkCompositePolyDataMapper2> mapper;
+  vtkSmartPointer<vtkCompositePolyDataMapper> mapper;
 };
 
 inline std::set<std::string> getFirstOutputArrays()

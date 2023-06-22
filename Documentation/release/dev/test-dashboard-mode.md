@@ -18,6 +18,7 @@ is also deactivated.
 
 FileDialog player/tranlators are now also only enabled when using dashboard mode.
 
+![Illustration of using the dashboard mode when recording a test](test-dashboard-mode.png)
 
 Developer notes:
 

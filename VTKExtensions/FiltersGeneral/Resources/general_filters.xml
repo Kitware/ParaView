@@ -65,6 +65,24 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty name="PointDataWeighingStrategy"
+                         command="SetPointDataWeighingStrategy"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Take First Point" value="0" />
+          <Entry text="Average by Number" value="1" />
+          <Entry text="Average by Spatial Density" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Select how to merge data located on merged points:
+           - Take First Point (default): the point with the lowest index imposes its data on to the merged point
+           - Average by Number: a number average is performed on all the duplicate points
+           - Average by Spatial Density: an average by attached cell volume (i.e. for every cell the point is
+           connected to sum cell_volume/number_cell_points) is performed on the point data
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <WarnOnCreate>
           <DataTypeDomain name="input_type">
@@ -2637,7 +2655,17 @@ Every Nth Point.
                             use_index="1"
                             panel_visibility="advanced">
         <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator" name="vtkHyperTreeGrid" exclude="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="PreserveInputCells" function="boolean_invert" />
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
         <BoundsDomain mode="magnitude"
                       name="bounds">
@@ -2652,11 +2680,6 @@ Every Nth Point.
         shifted by the offset value. The 'Values Range' information is the
         range based on the global bounding box, not necessarily on the current
         slice geometry configuration.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PreserveInputCells" function="boolean_invert" />
-          </PropertyWidgetDecorator>
-        </Hints>
       </DoubleVectorProperty>
       <!-- incremental point locator begin -->
       <ProxyProperty command="SetLocator"

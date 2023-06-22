@@ -13,3 +13,5 @@ Would be grouped into:
 
 Now, this feature can be enabled/disabled with this button.
 The state of the button is saved in the settings when closing the dialog and ParaView.
+
+![Illustration of unchecking the GroupFiles button](file-dialog-add-grouping-control.png)

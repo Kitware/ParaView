@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVClipDataSet.h"
 
+#include "vtkCellData.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetTriangleFilter.h"
@@ -28,11 +29,13 @@
 #include "vtkMathUtilities.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
+#include "vtkNonMergingPointLocator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVBox.h"
 #include "vtkPVCylinder.h"
 #include "vtkPVPlane.h"
 #include "vtkPVThreshold.h"
+#include "vtkPointData.h"
 #include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphere.h"
@@ -485,6 +488,15 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
   instance->SetGenerateClippedOutput(this->GetGenerateClippedOutput());
   instance->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
   instance->SetBatchSize(this->GetBatchSize());
+
+  // Dataset with "normals" will use non merging point locator instead of vtkMergePoints to avoid
+  // potential artefacts
+  vtkDataSet* inputDS = vtkDataSet::SafeDownCast(inputDO);
+  vtkNew<vtkNonMergingPointLocator> locator;
+  if (inputDS->GetPointData()->GetNormals() || inputDS->GetCellData()->GetNormals())
+  {
+    instance->SetLocator(locator);
+  }
 
   instance->SetInputDataObject(inputDO);
   instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));

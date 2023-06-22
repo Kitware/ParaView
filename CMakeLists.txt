@@ -99,12 +99,13 @@ include(vtkCompilerPlatformFlags)
 include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
-include(vtkQt)
-set(PARAVIEW_QT_MAJOR_VERSION "${vtk_qt_major_version}")
-
 include(CMakeDependentOption)
 include(ParaViewOptions)
 include(ParaViewMigrations)
+
+if (PARAVIEW_USE_QT)
+  include(paraviewQt)
+endif()
 
 # Some flags are really bad for caching. Replace them with better variants.
 if (paraview_replace_uncacheable_flags)
@@ -500,6 +501,7 @@ else ()
 
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)
+  set(VTK_LOGGING_TIME_PRECISION "${PARAVIEW_LOGGING_TIME_PRECISION}")
 
   # Create a translation source file generation target and create the
   # option-specified source files directory if not already created

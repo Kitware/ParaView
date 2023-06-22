@@ -7,8 +7,8 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function/OneLiner" command="set_string" arguments="pointTensors_XZ - pointTensors_YZ" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleCustomRange" command="activate" arguments="" />
-  <pqevent object="pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="-0.1" />
-  <pqevent object="pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="0.1" />
-  <pqevent object="pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+  <pqevent object="RescaleScalarRangeToCustomDialog/MinimumScalar" command="set_string" arguments="-0.1" />
+  <pqevent object="RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="0.1" />
+  <pqevent object="RescaleScalarRangeToCustomDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 </pqevents>

@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 #include <QScopedPointer>
 #include <QVariant>
 #include <QWidget>
@@ -60,7 +62,10 @@ class vtkSMProxy;
  * the other public API which is internally "linked" to the properties on the
  * animation scene proxy.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
+
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "Use `pqTimeManagerWidget` instead") PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget
+  : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(double sceneStartTime READ sceneStartTime WRITE setSceneStartTime)

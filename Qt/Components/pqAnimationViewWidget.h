@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QWidget>
 
+#include "vtkParaViewDeprecation.h"
+
 class pqAnimationKeyFrame;
 class pqAnimationScene;
 class pqAnimationTrack;
@@ -47,7 +49,9 @@ class vtkSMProxy;
  * of the Animation panel which includes adding of key frames,
  * changing of keyframes etc etc.
  */
-class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
+
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "Use `pqTimeManagerWidget` instead") PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;

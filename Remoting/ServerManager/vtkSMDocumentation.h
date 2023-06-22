@@ -69,6 +69,8 @@ protected:
 private:
   vtkSMDocumentation(const vtkSMDocumentation&) = delete;
   void operator=(const vtkSMDocumentation&) = delete;
+
+  std::string Description;
 };
 
 #endif

@@ -35,6 +35,22 @@
  *     <!-- ==================================================================== -->
  *     <SourceProxy class="vtkSteeringDataGenerator" name="TestSteeringDataGeneratorSource">
  *
+ *      <InputProperty command="SetSelectionConnection"
+ *                    name="Selection"
+ *                    panel_visibility="default"
+ *                    port_index="0">
+ *        <DataTypeDomain name="input_type">
+ *          <DataType value="vtkSelection"/>
+ *        </DataTypeDomain>
+ *        <Documentation>
+ *          The input that provides the selection object.
+ *        </Documentation>
+ *        <Hints>
+ *          <Optional/>
+ *          <SelectionInput/>
+ *        </Hints>
+ *      </InputProperty>
+ *
  *       <IntVectorProperty name="PartitionType"
  *                          command="SetPartitionType"
  *                          number_of_elements="1"
@@ -88,8 +104,11 @@
 #ifndef vtkSteeringDataGenerator_h
 #define vtkSteeringDataGenerator_h
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkRemotingLiveModule.h" //needed for exports
+
+class vtkSelection;
 
 class VTKREMOTINGLIVE_EXPORT vtkSteeringDataGenerator : public vtkDataObjectAlgorithm
 {
@@ -100,7 +119,7 @@ public:
 
   ///@{
   /**
-   * Choose the type for a parition in the output vtkMultiBlockDataSet.
+   * Choose the type for a partition in the output vtkMultiBlockDataSet.
    * Accepted values are any non-composite dataset type know to
    * vtkDataObjectTypes.
    */
@@ -117,6 +136,25 @@ public:
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
+  ///@}
+
+  ///@{
+  /**
+   * Convenience method to specify the selection connection (2nd input
+   * port).
+   *
+   * Note that for now only the first node of the selection will be considered as we didn't support
+   * expresion.
+   */
+  void SetSelectionConnection(int index, vtkAlgorithmOutput* algOutput)
+  {
+    this->SetInputConnection(index, algOutput);
+  }
+
+  void SetSelectionConnection(vtkAlgorithmOutput* algOutput)
+  {
+    this->SetInputConnection(0u, algOutput);
+  }
   ///@}
 
   ///@{
@@ -145,10 +183,16 @@ public:
    */
   void Clear(const char* arrayname);
 
+  /**
+   * Append as array the list of selected id and the field type of the current selection.
+   */
+  void TransferSelectionToInternals(vtkSelection* selection);
+
 protected:
   vtkSteeringDataGenerator();
   ~vtkSteeringDataGenerator() override;
 
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info) override;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;

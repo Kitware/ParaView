@@ -100,7 +100,7 @@ void vtkStringList::AddFormattedString(const char* format, ...)
 
   va_list var_args;
   va_start(var_args, format);
-  vsprintf(event, format, var_args);
+  vsnprintf(event, sizeof(event), format, var_args);
   va_end(var_args);
 
   this->AddString(event);

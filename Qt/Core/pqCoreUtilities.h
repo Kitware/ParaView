@@ -169,15 +169,26 @@ public:
    * Converts a double value to a full precision QString.
    * Internally uses pqDoubleLineEdit with FullConversion, which relies on
    * `vtkNumberToString` for lossless conversion from double to string.
+   * Set lowExponent and highExponent to control the range of exponents where
+   * a fixed precision should be used instead of scientific notation.
+   * Outside this range, scientific notation is preferred.
+   * Default values of -6 and 20 correspond to the ECMAScript standard.
    */
-  static QString number(double value);
+  static QString number(double value, int lowExponent = -6, int highExponent = 20);
+
+  /**
+   * Convert double value to string according to FullNotation settings, rely on
+   * pqCoreUtilities::number.
+   */
+  static QString formatFullNumber(double value);
 
   ///@{
   /**
    * Convert double value to string, handling formating.
    */
   // Format with given precision and notation and shortAccurate flag
-  static QString formatDouble(double value, int notation, bool shortAccurate, int precision);
+  static QString formatDouble(double value, int notation, bool shortAccurate, int precision,
+    int fullLowExponent = -6, int fullHighExponent = 20);
 
   // Format with RealNumberDisplayed settings
   static QString formatNumber(double value);

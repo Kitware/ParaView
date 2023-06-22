@@ -35,11 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationViewWidget.h"
 #include "pqApplicationComponentsModule.h"
 
+#include "vtkParaViewDeprecation.h"
+
 /**
  * pqPVAnimationWidget is subclass of pqAnimationViewWidget that connects with
  * the pqAnimationManager maintained by pqPVApplicationCore.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqPVAnimationWidget : public pqAnimationViewWidget
+class PARAVIEW_DEPRECATED_IN_5_12_0(
+  "Use `pqTimeManagerWidget` instead") PQAPPLICATIONCOMPONENTS_EXPORT pqPVAnimationWidget
+  : public pqAnimationViewWidget
 {
   Q_OBJECT
   typedef pqAnimationViewWidget Superclass;

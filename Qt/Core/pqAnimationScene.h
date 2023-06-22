@@ -37,13 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPair>
 #include <QSet>
 
+struct pqAnimatedPropertyInfo;
 class pqAnimationCue;
 class QSize;
 class vtkObject;
 
 /**
- * pqAnimationScene is a representation for a vtkSMAnimationScene
- * proxy. It provides API to access AnimationCues in the scene.
+ * pqAnimationScene is a representation for a vtkSMAnimationScene proxy.
+ *
+ * It provides API to access AnimationCues in the scene and to the scene times.
  */
 class PQCORE_EXPORT pqAnimationScene : public pqProxy
 {
@@ -62,6 +64,7 @@ public:
    */
   pqAnimationCue* getCue(vtkSMProxy* proxy, const char* propertyname, int index) const;
 
+  ///@{
   /**
    * Creates and initializes a new cue that can animate
    * the \c index of the \c property on the given \c proxy
@@ -72,6 +75,8 @@ public:
   pqAnimationCue* createCue(
     vtkSMProxy* proxy, const char* propertyname, int index, const QString& cuetype);
   pqAnimationCue* createCue(const QString& cuetype);
+  pqAnimationCue* createCue(const pqAnimatedPropertyInfo& propInfo);
+  ///@}
 
   /**
    * Removes all cues which animate the indicated proxy, if any.

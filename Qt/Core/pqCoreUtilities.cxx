@@ -308,16 +308,26 @@ QMessageBox::Button pqCoreUtilities::promptUserGeneric(const QString& title, con
 }
 
 //-----------------------------------------------------------------------------
-QString pqCoreUtilities::number(double value)
+QString pqCoreUtilities::number(double value, int lowExponent, int highExponent)
 {
   // When using FullNotation, precision parameter does not matter
   return pqDoubleLineEdit::formatDouble(
-    value, pqDoubleLineEdit::RealNumberNotation::FullNotation, 0);
+    value, pqDoubleLineEdit::RealNumberNotation::FullNotation, 0, lowExponent, highExponent);
 }
 
 //-----------------------------------------------------------------------------
-QString pqCoreUtilities::formatDouble(
-  double value, int notation, bool shortestAccurate, int precision)
+QString pqCoreUtilities::formatFullNumber(double value)
+{
+  auto settings = vtkPVGeneralSettings::GetInstance();
+  int lowExponent = settings->GetFullNotationLowExponent();
+  int highExponent = settings->GetFullNotationHighExponent();
+
+  return pqCoreUtilities::number(value, lowExponent, highExponent);
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::formatDouble(double value, int notation, bool shortestAccurate,
+  int precision, int fullLowExponent, int fullHighExponent)
 {
   pqDoubleLineEdit::RealNumberNotation dNotation;
   switch (notation)
@@ -338,8 +348,9 @@ QString pqCoreUtilities::formatDouble(
       return "";
       break;
   }
-  return pqDoubleLineEdit::formatDouble(
-    value, dNotation, shortestAccurate ? QLocale::FloatingPointShortest : precision);
+  return pqDoubleLineEdit::formatDouble(value, dNotation,
+    shortestAccurate ? QLocale::FloatingPointShortest : precision, fullLowExponent,
+    fullHighExponent);
 }
 
 //-----------------------------------------------------------------------------
@@ -349,8 +360,11 @@ QString pqCoreUtilities::formatTime(double value)
   int notation = settings->GetAnimationTimeNotation();
   bool shortAccurate = settings->GetAnimationTimeShortestAccuratePrecision();
   int precision = settings->GetAnimationTimePrecision();
+  int lowExponent = settings->GetFullNotationLowExponent();
+  int highExponent = settings->GetFullNotationHighExponent();
 
-  return pqCoreUtilities::formatDouble(value, notation, shortAccurate, precision);
+  return pqCoreUtilities::formatDouble(
+    value, notation, shortAccurate, precision, lowExponent, highExponent);
 }
 
 //-----------------------------------------------------------------------------
@@ -360,8 +374,11 @@ QString pqCoreUtilities::formatNumber(double value)
   int notation = settings->GetRealNumberDisplayedNotation();
   bool shortAccurate = settings->GetRealNumberDisplayedShortestAccuratePrecision();
   int precision = settings->GetRealNumberDisplayedPrecision();
+  int lowExponent = settings->GetFullNotationLowExponent();
+  int highExponent = settings->GetFullNotationHighExponent();
 
-  return pqCoreUtilities::formatDouble(value, notation, shortAccurate, precision);
+  return pqCoreUtilities::formatDouble(
+    value, notation, shortAccurate, precision, lowExponent, highExponent);
 }
 
 //-----------------------------------------------------------------------------

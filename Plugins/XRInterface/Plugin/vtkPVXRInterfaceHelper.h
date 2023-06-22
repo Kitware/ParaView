@@ -42,9 +42,11 @@
 #include "vtkOpenGLRenderer.h" // TODO should not be needed
 
 #include <array>  // for method sig
-#include <map>    // for ivar
+#include <map>    // for map
 #include <memory> // for unique_ptr
-#include <vector> // for ivar
+#include <vector> // for vector
+
+#include <QStringList>
 
 class pqXRInterfaceControls;
 class vtkOpenGLRenderer;
@@ -61,16 +63,18 @@ class vtkVRRenderer;
 class vtkXRInterfacePolyfill;
 
 // helper class to store information per location
-class vtkPVXRInterfaceHelperLocation
+struct vtkPVXRInterfaceHelperLocation
 {
-public:
-  vtkPVXRInterfaceHelperLocation();
-  ~vtkPVXRInterfaceHelperLocation();
+  vtkPVXRInterfaceHelperLocation()
+    : Pose{ new vtkVRCamera::Pose{} }
+  {
+  }
+
   int NavigationPanelVisibility;
   std::vector<std::pair<std::array<double, 3>, std::array<double, 3>>> CropPlaneStates;
   std::vector<std::array<double, 16>> ThickCropStates;
   std::map<vtkSMProxy*, bool> Visibility;
-  vtkVRCamera::Pose* Pose;
+  std::unique_ptr<vtkVRCamera::Pose> Pose;
 };
 
 class vtkPVXRInterfaceHelper : public vtkObject
@@ -167,7 +171,7 @@ public:
   }
   bool CollaborationConnect();
   bool CollaborationDisconnect();
-  void GoToSavedLocation(int, double*, double*);
+  void GoToSavedLocation(std::size_t, double*, double*);
   ///@}
 
   ///@{
@@ -193,8 +197,9 @@ public:
   void AddAThickCrop(vtkTransform* t);
   void collabRemoveAllThickCrops();
   void collabUpdateThickCrop(int count, double* matrix);
-  void SetCropSnapping(int val);
+  void SetCropSnapping(bool val);
   void RemoveAllCropPlanesAndThickCrops();
+  void ShowCropPlanes(bool visible);
   ///@}
 
   ///@{
@@ -233,16 +238,19 @@ public:
 
   ///@{
   /**
-   * Save/load a camera position.
+   * Save/load/remove a camera position.
    */
-  void SaveCameraPose(int loc);
-  void LoadCameraPose(int loc);
+  QStringList GetCustomViewpointToolTips();
+  std::size_t GetNextPoseIndex();
+  void SaveCameraPose(std::size_t index);
+  void LoadCameraPose(std::size_t index);
+  void ClearCameraPoses();
   ///@}
 
   /**
    * Load a saved location with the given index.
    */
-  void LoadLocationState(int slot);
+  void LoadLocationState(std::size_t slot);
 
   /**
    * Set whether to display the XR menu.
@@ -378,28 +386,19 @@ protected:
   void HandleDeleteEvent(vtkObject* caller);
   void UpdateBillboard(bool updatePosition);
 
-  void SaveLocationState(int slot);
-
-  void SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot);
-  void LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot);
   void LoadNextCameraPose();
 
   void DoOneEvent();
   void RenderXRView();
 
-  // To simulate dpad with a trackpad on OpenXR we need to
-  // store the last position
-  double LeftTrackPadPosition[2];
-
-  std::map<int, vtkVRCamera::Pose> SavedCameraPoses;
-  int LastCameraPoseIndex = 0;
-
-  std::map<int, vtkPVXRInterfaceHelperLocation> Locations;
-  int LoadLocationValue = -1;
-
 private:
   vtkPVXRInterfaceHelper(const vtkPVXRInterfaceHelper&) = delete;
   void operator=(const vtkPVXRInterfaceHelper&) = delete;
+
+  void SaveLocationState(std::size_t slot);
+
+  void SavePoseInternal(vtkVRRenderWindow* vr_rw, std::size_t slot);
+  void LoadPoseInternal(vtkVRRenderWindow* vr_rw, std::size_t slot);
 
   // state settings that the helper loads
   bool MultiSample = false;

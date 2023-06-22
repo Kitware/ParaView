@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RescaleScalarRangeToCustomDialog</class>
+ <widget class="QDialog" name="RescaleScalarRangeToCustomDialog">
+  <property name="windowTitle">
+   <string>Set Range</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0">
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="ColorMapLabel">
+     <property name="text">
+      <string>Enter the range for the color map</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="pqDoubleLineEdit" name="MinimumScalar">
+     <property name="toolTip">
+      <string>Enter the new range minimum for the color map here.</string>
+     </property>
+     <property name="placeholderText">
+      <string>minimum</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="ColorHyphenLabel">
+     <property name="text">
+      <string>-</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="pqDoubleLineEdit" name="MaximumScalar">
+     <property name="toolTip">
+      <string>Enter the new range maximum for the color map here.</string>
+     </property>
+     <property name="placeholderText">
+      <string>maximum</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QLabel" name="OpacityLabel">
+     <property name="text">
+      <string>Enter the range for the opacity map</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="pqDoubleLineEdit" name="MinimumOpacityScalar">
+     <property name="toolTip">
+      <string>Enter the new range minimum for the opacity map here.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="OpacityHyphenLabel">
+     <property name="text">
+      <string>-</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqDoubleLineEdit" name="MaximumOpacityScalar">
+     <property name="toolTip">
+      <string>Enter the new range maximum for the opacity map here.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="3">
+    <widget class="QCheckBox" name="AutomaticRescaling">
+     <property name="toolTip">
+      <string>If off lock the color map to avoid automatic rescaling</string>
+     </property>
+     <property name="text">
+      <string>Enable automatic rescaling</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="3">
+    <layout class="QHBoxLayout">
+     <item>
+      <widget class="QPushButton" name="ApplyButton">
+       <property name="toolTip">
+        <string>Apply rescale.</string>
+       </property>
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="CancelButton">
+       <property name="toolTip">
+        <string>Close without rescaling</string>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="RescaleButton">
+       <property name="toolTip">
+        <string>Rescale and update automatic rescaling if changed.</string>
+       </property>
+       <property name="text">
+        <string>Ok</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

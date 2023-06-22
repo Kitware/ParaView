@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create a sphere -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <!-- animate Start Theta -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" command="activated" arguments="Sphere1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/propertiesBox" command="activated" arguments="Start Theta" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="expand" arguments="1.0" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="1.0.1.0,Sphere1 - StartTheta" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="0" />
+
+  <!-- Can only add track if not already existing -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/propertiesBox" command="activated" arguments="End Theta" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" property="enabled" arguments="false" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/removeKeyFrameAnimationCue2Button" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" property="enabled" arguments="true" />
+
+  <!-- go next time, property should be updated linearly -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="40" />
+  <!-- disable track: no more update -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCheckState" arguments="1.0.1.0,0" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="2" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="40" />
+  <!-- enable track: update -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCheckState" arguments="1.0,2" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="80" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="120" />
+  <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timestepValue/qt_spinbox_lineedit" property="text" arguments="3" />
+
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="21" />
+
+  <!-- change interpolation -->
+
+  <!-- exponential -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="edit" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="activate" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/pqKeyFrameTypeWidget/Type" command="activated" arguments="Exponential" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="0" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="12.69537258289593" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="39.44500994442422" />
+
+  <!-- step mode at time 0.5 -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="edit" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="activate" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/pqKeyFrameTypeWidget/Type" command="activated" arguments="Step" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.0,0.5" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <!-- navigate through timesteps -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" command="editTextChanged" arguments="0.45" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" command="editTextChanged" arguments="0.5" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="360" />
+
+  <!-- sinusoid freq 2, phase 45degree, offset 180 -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="edit" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="activate" arguments="1.0.1.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/pqKeyFrameTypeWidget/Type" command="activated" arguments="Sinusoid" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/pqKeyFrameTypeWidget/sinusoidGroup/Phase" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/pqKeyFrameTypeWidget/sinusoidGroup/Frequency" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/pqKeyFrameTypeWidget/sinusoidGroup/Offset" command="set_string" arguments="180" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <!-- Value[0] is the amplitude. Value[1] is the value for the last time. Time[1] is 1 -->
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="180" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="0.2,180" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="360" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,360" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.0,1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <!-- navigate trough timesteps -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="307.2792206135786" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/currentTime/timeValueComboBox" command="activated" arguments="0.6" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="340.3811743539062" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/StartTheta/DoubleRangeWidget/DoubleLineEdit" property="text" arguments="360" />
+</pqevents>

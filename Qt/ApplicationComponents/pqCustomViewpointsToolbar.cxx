@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCameraDialog.h"
 #include "pqCustomViewpointButtonDialog.h"
+#include "pqCustomViewpointsController.h"
 #include "pqRenderView.h"
 #include "pqSettings.h"
 #include <QApplication>
@@ -43,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::constructor()
 {
+  this->Controller->setToolbar(this);
+
   // Create base pixmap
   this->BasePixmap.fill(QColor(0, 0, 0, 0));
   QPainter pixPaint(&this->BasePixmap);
@@ -62,8 +65,6 @@ void pqCustomViewpointsToolbar::constructor()
   this->updateCustomViewpointActions();
   this->connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), SLOT(updateEnabledState()));
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  this->connect(settings, SIGNAL(modified()), SLOT(updateCustomViewpointActions()));
 }
 
 //-----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ void pqCustomViewpointsToolbar::updateEnabledState()
 void pqCustomViewpointsToolbar::updateCustomViewpointActions()
 {
   // Recover tooltips from settings
-  QStringList tooltips = pqCameraDialog::CustomViewpointToolTips();
+  QStringList tooltips = this->Controller->getCustomViewpointToolTips();
 
   if (!this->ConfigAction)
   {
@@ -141,82 +142,54 @@ void pqCustomViewpointsToolbar::updateCustomViewpointActions()
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::configureCustomViewpoints()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (view)
-  {
-    pqCameraDialog::configureCustomViewpoints(this, view->getRenderViewProxy());
-  }
+  this->Controller->configureCustomViewpoints();
+  this->updateCustomViewpointActions();
 }
 
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::setToCurrentViewpoint()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (view)
+  QAction* action = qobject_cast<QAction*>(this->sender());
+  if (!action)
   {
-    int customViewpointIndex;
-    QAction* action = qobject_cast<QAction*>(this->sender());
-    if (!action)
-    {
-      return;
-    }
-
-    customViewpointIndex = action->data().toInt();
-    if (pqCameraDialog::setToCurrentViewpoint(customViewpointIndex, view->getRenderViewProxy()))
-    {
-      view->render();
-    }
+    return;
   }
+
+  const int customViewpointIndex = action->data().toInt();
+  this->Controller->setToCurrentViewpoint(customViewpointIndex);
+  this->updateCustomViewpointActions();
 }
 
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::deleteCustomViewpoint()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (view)
+  QAction* action = qobject_cast<QAction*>(this->sender());
+  if (!action)
   {
-    int customViewpointIndex;
-    QAction* action = qobject_cast<QAction*>(this->sender());
-    if (!action)
-    {
-      return;
-    }
-
-    customViewpointIndex = action->data().toInt();
-    if (pqCameraDialog::deleteCustomViewpoint(customViewpointIndex, view->getRenderViewProxy()))
-    {
-      view->render();
-    }
+    return;
   }
+
+  const int customViewpointIndex = action->data().toInt();
+  this->Controller->deleteCustomViewpoint(customViewpointIndex);
+  this->updateCustomViewpointActions();
 }
 
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::addCurrentViewpointToCustomViewpoints()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (view)
-  {
-    pqCameraDialog::addCurrentViewpointToCustomViewpoints(view->getRenderViewProxy());
-  }
+  this->Controller->addCurrentViewpointToCustomViewpoints();
+  this->updateCustomViewpointActions();
 }
 
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::applyCustomViewpoint()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (view)
+  QAction* action = qobject_cast<QAction*>(this->sender());
+  if (!action)
   {
-    int customViewpointIndex;
-    QAction* action = qobject_cast<QAction*>(this->sender());
-    if (!action)
-    {
-      return;
-    }
-
-    customViewpointIndex = action->data().toInt();
-    if (pqCameraDialog::applyCustomViewpoint(customViewpointIndex, view->getRenderViewProxy()))
-    {
-      view->render();
-    }
+    return;
   }
+
+  const int customViewpointIndex = action->data().toInt();
+  this->Controller->applyCustomViewpoint(customViewpointIndex);
 }

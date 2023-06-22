@@ -41,6 +41,7 @@
 #include "vtkInteractorStyleDrawPolygon.h"
 #include "vtkInteractorStyleRubberBand3D.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
+#include "vtkLegendScaleActor.h"
 #include "vtkLight.h"
 #include "vtkLightKit.h"
 #include "vtkMPIMoveData.h"
@@ -747,6 +748,32 @@ void vtkPVRenderView::SetInteractionMode(int mode)
           this->Interactor->SetInteractorStyle(this->RubberBandZoom);
         }
         break;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLegendGridActor(vtkLegendScaleActor* gridActor)
+{
+  if (this->LegendGridActor != gridActor)
+  {
+    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler.GetPointer());
+    if (this->LegendGridActor)
+    {
+      this->GetRenderer()->RemoveViewProp(this->LegendGridActor);
+      culler->DoNotCullList.erase(this->LegendGridActor);
+    }
+    this->LegendGridActor = gridActor;
+    if (this->LegendGridActor)
+    {
+      this->LegendGridActor->SetUseFontSizeFromProperty(true);
+      this->LegendGridActor->SetAdjustLabels(true);
+      this->LegendGridActor->SetLabelModeToXYCoordinates();
+      this->LegendGridActor->LegendVisibilityOff();
+      this->LegendGridActor->SetCornerOffsetFactor(1);
+
+      this->GetRenderer()->AddViewProp(this->LegendGridActor);
+      culler->DoNotCullList.insert(this->LegendGridActor);
     }
   }
 }

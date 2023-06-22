@@ -1078,12 +1078,9 @@
           <PropertyGroup label="Blocks"
                          panel_widget="DataAssemblyEditor"
                          panel_visibility="multiblock_inspector">
-            <!--
-               place holder for future work
-               <Property name="Assembly"       function="ActiveAssembly" />
-            -->
+            <Property name="Assembly"       function="ActiveAssembly" />
             <Property name="BlockSelectors" function="Selectors"/>
-            <Property name="BlockColors" function="Colors"/>
+            <Property name="BlockColors"    function="Colors"/>
             <Property name="BlockOpacities" function="Opacities"/>
             <Hints>
               <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>

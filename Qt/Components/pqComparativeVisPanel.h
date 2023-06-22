@@ -69,12 +69,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 protected Q_SLOTS:
   /**
-   * If vtkSMProxy has a TimestepValues property then this method will set the
-   * TimeRange property of vtkSMComparativeViewProxy to reflect the values.
-   */
-  // void setTimeRangeFromSource(vtkSMProxy*);
-
-  /**
    * Called when the "+" button is clicked to add a new parameter.
    */
   void addParameter();
@@ -97,9 +91,6 @@ protected Q_SLOTS:
   void removeParameter(int index);
 
 protected: // NOLINT(readability-redundant-access-specifiers)
-  // void activateCue(vtkSMProperty* cuesProperty,
-  // vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
-
   /**
    * Finds the row (-1 if none found) for the given (proxy,property).
    */

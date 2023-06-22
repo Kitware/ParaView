@@ -314,9 +314,10 @@ Less common, but variables which may be of interest to some:
   * `PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION` (default `OFF`): Whether
     plugin XML documentation is forcefully disabled.
   * `PARAVIEW_BUILD_TESTING` (default `OFF`): Whether to build tests or not.
-    Valid values are `OFF` (no testing), `WANT` (enable tests as possible), and
-    `ON` (enable all tests; may error out if features otherwise disabled are
-    required by test code).
+    Valid values are `OFF` (no testing), `DEFAULT` (enable tests which have all
+    test dependencies satisfied), `WANT` (enable test dependencies as possible;
+    see vtk/vtk#17509), and `ON` (enable all tests; may error out if features
+    otherwise disabled are required by test code).
   * `PARAVIEW_BUILD_VTK_TESTING` (default `OFF`): Whether to build tests for the
     VTK codebase built by ParaView. Valid values are same as
     `PARAVIEW_BUILD_TESTING`.
@@ -361,6 +362,8 @@ Less common, but potentially useful variables are:
   * `PARAVIEW_USE_CUDA` (default `OFF`): Enable CUDA support in ParaView.
   * `PARAVIEW_USE_HIP` (default `OFF`, requires CMake >= 3.21 and NOT
     `PARAVIEW_USE_CUDA`): Enable HIP support in ParaView.
+  * `PARAVIEW_LOGGING_TIME_PRECISION` (default `3`): Change the precision of
+    times output. Possible values are 3 for ms, 6 for us, 9 for ns.
 
 #### Feature settings
 
@@ -388,6 +391,8 @@ More advanced / less common options include:
     files.
   * `PARAVIEW_ENABLE_LAS` (default `OFF`): Enable support for reading LAS
     files.
+  * `PARAVIEW_ENABLE_GEOVIS` (default `OFF`): Enable support for geographic
+    projections and transformations.
   * `PARAVIEW_ENABLE_OPENTURNS` (default `OFF`): Enable support for reading
     OpenTURNS files.
   * `PARAVIEW_ENABLE_PDAL` (default `OFF`): Enable support for reading PDAL

@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPropertyLinksConnection.h"
 
+#include "pqCoreUtilities.h"
 #include "pqSMAdaptor.h"
 #include "vtkCommand.h"
 #include "vtkSMTrace.h"
@@ -111,10 +112,14 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
   {
     case pqSMAdaptor::PROXY:
     case pqSMAdaptor::PROXYSELECTION:
-    case pqSMAdaptor::PROXYLIST:
     {
       pqSMProxy smproxy = pqSMAdaptor::getProxyProperty(this->PropertySM, value_type);
       currentSMValue.setValue(smproxy);
+    }
+    break;
+    case pqSMAdaptor::PROXYLIST:
+    {
+      currentSMValue = pqSMAdaptor::getProxyListProperty(this->PropertySM);
     }
     break;
 
@@ -245,9 +250,13 @@ void pqPropertyLinksConnection::setServerManagerValue(bool use_unchecked, const 
         pqSMAdaptor::setMultipleElementProperty(this->PropertySM, this->IndexSM, value, value_type);
       }
       break;
+    case pqSMAdaptor::PROXYLIST:
+    {
+      pqSMAdaptor::setProxyListProperty(this->PropertySM, value.toList());
+    }
+    break;
 
     case pqSMAdaptor::UNKNOWN:
-    case pqSMAdaptor::PROXYLIST:
       break;
   }
 }
@@ -265,7 +274,18 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
   QVariant smValue = this->currentServerManagerValue(use_unchecked);
   if (qtValue != smValue)
   {
-    this->setQtValue(smValue);
+    if (static_cast<QMetaType::Type>(smValue.type()) == QMetaType::Double)
+    {
+      // QVariant is able to convert double to string but we need to be able
+      // to specify how it should be formatted using settings, which
+      // is provided by pqCoreUtilities
+      double doubleVal = smValue.toDouble();
+      this->setQtValue(pqCoreUtilities::formatFullNumber(doubleVal));
+    }
+    else
+    {
+      this->setQtValue(smValue);
+    }
   }
   this->blockSignals(prev);
 }

@@ -85,7 +85,11 @@ void KeySequencesWidget::demo()
   pqKeySequences::instance().dumpShortcuts(m_shortcut->keySequence());
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void KeySequencesWidget::enterEvent(QEvent* e)
+#else
+void KeySequencesWidget::enterEvent(QEnterEvent* e)
+#endif
 {
   this->setFrameShape(QFrame::Box);
   if (!m_shortcut->isEnabled())

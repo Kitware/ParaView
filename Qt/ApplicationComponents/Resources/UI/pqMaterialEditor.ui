@@ -242,65 +242,6 @@
        <item>
         <widget class="pqExpandableTableView" name="PropertiesView"/>
        </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayoutToolbar">
-         <item>
-          <widget class="QToolButton" name="AddProperty">
-           <property name="toolTip">
-            <string>Add new shader variable</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-             <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="RemoveProperty">
-           <property name="toolTip">
-            <string>Remove selected shader variable. This reset the value to its default value.</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-             <normaloff>:/QtWidgets/Icons/pqMinus.svg</normaloff>:/QtWidgets/Icons/pqMinus.svg</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="VerticalSpacerToolbar">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QToolButton" name="DeleteProperties">
-           <property name="toolTip">
-            <string>Remove all shader variables of the current material and reset them to their default value.</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-             <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
       </layout>
      </widget>
     </widget>

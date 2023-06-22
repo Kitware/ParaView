@@ -27,6 +27,7 @@
 #include "vtkPrismViewsModule.h" // For export macro
 
 class vtkMapper;
+class vtkCompositePolyDataMapper;
 
 class VTKPRISMVIEWS_EXPORT vtkPrismGeometryRepresentationWithFaces
   : public vtkPrismGeometryRepresentation
@@ -105,8 +106,8 @@ protected:
 
   bool NeedsOrderedCompositing() override;
 
-  vtkNew<vtkCompositePolyDataMapper2> BackfaceMapper;
-  vtkNew<vtkCompositePolyDataMapper2> LODBackfaceMapper;
+  vtkNew<vtkCompositePolyDataMapper> BackfaceMapper;
+  vtkNew<vtkCompositePolyDataMapper> LODBackfaceMapper;
   vtkNew<vtkPVLODActor> BackfaceActor;
   vtkNew<vtkProperty> BackfaceProperty;
   int BackfaceRepresentation = FOLLOW_FRONTFACE;

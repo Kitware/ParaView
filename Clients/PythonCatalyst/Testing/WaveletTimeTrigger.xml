@@ -29,7 +29,7 @@
   <!-- Create extractor -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractors" />
   <pqevent object="pqClientMainWindow/menubar/menuExtractors/Image" command="activate" arguments="PNG" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/comboBox" command="activated" arguments="TimeValue" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/comboBox" command="activated" arguments="Time Value" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/frame/ChosenProxyWidget/Length/DoubleLineEdit0" command="set_string" arguments=".5" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 

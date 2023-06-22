@@ -100,6 +100,19 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
     ui.pickLabel->setText(ui.pickLabel->text().arg(tr("Origin")));
   }
 
+  bool normalEditing = true;
+  if (vtkSMIntVectorProperty* alwaysSnapToNearestAxis =
+        vtkSMIntVectorProperty::SafeDownCast(smgroup->GetProperty("AlwaysSnapToNearestAxis")))
+  {
+    if (alwaysSnapToNearestAxis->GetNumberOfElements())
+    {
+      normalEditing = !static_cast<bool>(alwaysSnapToNearestAxis->GetElements()[0]);
+      vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+      vtkSMPropertyHelper(wdgProxy, "AlwaysSnapToNearestAxis")
+        .Set(alwaysSnapToNearestAxis->GetElements()[0]);
+    }
+  }
+
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
   {
     this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
@@ -108,24 +121,16 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
     ui.labelNormal->setText(QCoreApplication::translate("ServerManagerXML", normal->GetXMLLabel()));
     QString tooltip = this->getTooltip(normal);
     ui.normalX->setToolTip(tooltip);
+    ui.normalX->setEnabled(normalEditing);
     ui.normalY->setToolTip(tooltip);
+    ui.normalY->setEnabled(normalEditing);
     ui.normalZ->setToolTip(tooltip);
+    ui.normalZ->setEnabled(normalEditing);
     ui.labelNormal->setToolTip(tooltip);
   }
   else
   {
     qCritical("Missing required property for function 'Normal'.");
-  }
-
-  if (vtkSMIntVectorProperty* alwaysSnapToNearestAxis =
-        vtkSMIntVectorProperty::SafeDownCast(smgroup->GetProperty("AlwaysSnapToNearestAxis")))
-  {
-    if (alwaysSnapToNearestAxis->GetNumberOfElements())
-    {
-      vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-      vtkSMPropertyHelper(wdgProxy, "AlwaysSnapToNearestAxis")
-        .Set(alwaysSnapToNearestAxis->GetElements()[0]);
-    }
   }
 
   // link a few buttons

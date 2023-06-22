@@ -105,22 +105,28 @@ protected:
 
   friend class vtkCompositeAnimationPlayer;
 
+  ///@{
+  /**
+   * Manage loop inside playbackwindow.
+   */
+  // initialize inner variables. Call it before any GetNextTime/GetPreviousTime call.
   virtual void StartLoop(
     double starttime, double endtime, double curtime, double* playbackWindow) = 0;
+  // finalize loop
   virtual void EndLoop() = 0;
-
-  /**
-   * Return the next time given the current time.
-   */
+  // Return the next time in the loop given the current time.
   virtual double GetNextTime(double currentime) = 0;
-
-  /**
-   * Return the previous time given the current time.
-   */
+  // Return the previous time in the loop given the current time.
   virtual double GetPreviousTime(double currenttime) = 0;
+  ///@}
 
+  ///@{
+  /**
+   * Return next/previous time knowing start, end and current.
+   */
   virtual double GoToNext(double start, double end, double currenttime) = 0;
   virtual double GoToPrevious(double start, double end, double currenttime) = 0;
+  ///@}
 
 private:
   vtkAnimationPlayer(const vtkAnimationPlayer&) = delete;

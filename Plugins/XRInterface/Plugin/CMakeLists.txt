@@ -38,6 +38,8 @@ set(sources
   pqXRInterfaceControls.h
   pqXRInterfaceDockPanel.cxx
   pqXRInterfaceDockPanel.h
+  pqXRCustomViewpointsController.h
+  pqXRCustomViewpointsController.cxx
   vtkXRInterfacePolyfill.cxx
   vtkXRInterfacePolyfill.h
   vtkPVXRInterfaceCollaborationClient.cxx
@@ -128,6 +130,7 @@ endif()
 set_property(
   SOURCE
   vtkPVXRInterfaceCollaborationClient.cxx
+  pqXRInterfaceControls.cxx
   APPEND PROPERTY
     COMPILE_DEFINITIONS "XRINTERFACE_HAS_COLLABORATION=$<BOOL:${VTK_ENABLE_VR_COLLABORATION}>")
 

@@ -104,12 +104,12 @@ public:
    * get the list of proxies for a property
    * for example, append filter accepts a list of proxies
    */
-  static QList<pqSMProxy> getProxyListProperty(vtkSMProperty* Property);
+  static QList<QVariant> getProxyListProperty(vtkSMProperty* Property);
   /**
    * get the list of proxies for a property
    * for example, append filter accepts a list of proxies
    */
-  static void setProxyListProperty(vtkSMProperty* Property, QList<pqSMProxy> Value);
+  static void setProxyListProperty(vtkSMProperty* Property, QList<QVariant> Value);
 
   /**
    * get the list of possible proxies for a property

@@ -1,5 +1,4 @@
 SET(MyTests
-  Animation.cxx
   FlatTreeView.cxx
   HeaderViewCheckState.cxx
   TreeViewSelectionAndCheckState.cxx

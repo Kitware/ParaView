@@ -73,7 +73,7 @@
       </IntVectorProperty>
     </Proxy>
     <Proxy class="vtkNonMergingPointLocator"
-           label="Don't Merge Points"
+           label="Not Merging Points"
            name="NonMergingPointLocator">
       <Documentation>
         Perform direct / check-free point insertion (any point is
@@ -850,6 +850,17 @@
                          number_of_elements="1"
                          default_values="0"
                          panel_visibility="never"/>
+      <IntVectorProperty name="TryWritingInBackground"
+                         command="SetTryWritingInBackground"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turns ON/OFF writing files in the background when possible.
+          This is typically the case for writing screenshots.
+        </Documentation>
+      </IntVectorProperty>
       <ProxyProperty name="Writer" command="SetWriter"/>
     </SourceProxy>
 
@@ -864,8 +875,7 @@
       <InputProperty name="Input"/>
 
       <StringVectorProperty name="Assembly"
-                            number_of_elements="1"
-                            default_values="Hierarchy">
+                            number_of_elements="1">
         <DataAssemblyListDomain name="data_assembly_list">
           <RequiredProperties>
             <Property function="Input" name="Input"/>
@@ -984,8 +994,7 @@
       </IntVectorProperty>
 
       <StringVectorProperty name="Assembly"
-                            number_of_elements="1"
-                            default_values="Hierarchy">
+                            number_of_elements="1">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input"/>

@@ -228,6 +228,10 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
     {
       Q_EMIT pqApplicationCore::instance()->aboutToWriteState(filename);
     }
+    else
+    {
+      stateXMLRoot = nullptr;
+    }
     shProxy->WriteImage(filename.toUtf8().data(), vtkPVSession::CLIENT, stateXMLRoot);
   }
 

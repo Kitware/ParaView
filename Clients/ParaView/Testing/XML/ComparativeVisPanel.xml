@@ -15,7 +15,8 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ResetRangeToDataOverTime" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ResetScalarRangeToDataOverTime/RescaleAndLockButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToDataOverTimeDialog/AutomaticRescaling" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToDataOverTimeDialog/RescaleButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 </pqevents>

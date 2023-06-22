@@ -44,7 +44,6 @@ void pqAnimationTimeToolbar::constructor()
 {
   this->setWindowTitle(tr("Current Time Controls"));
   this->AnimationTimeWidget = new pqAnimationTimeWidget(this);
-  this->AnimationTimeWidget->setPlayModeReadOnly(true);
   this->addWidget(this->AnimationTimeWidget);
   this->connect(pqPVApplicationCore::instance()->animationManager(),
     SIGNAL(activeSceneChanged(pqAnimationScene*)), SLOT(setAnimationScene(pqAnimationScene*)));
@@ -61,10 +60,7 @@ void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::updateTimeDisplay()
 {
-  this->AnimationTimeWidget->setPrecision(
-    vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
-  this->AnimationTimeWidget->setNotation(static_cast<pqAnimationTimeWidget::RealNumberNotation>(
-    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation()));
+  this->AnimationTimeWidget->render();
 }
 
 //-----------------------------------------------------------------------------

@@ -134,6 +134,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     {
       type = pqSMAdaptor::PROXYLIST;
     }
+    if (proxy->GetRepeatable() || proxy->GetNumberOfProxies() > 1)
+    {
+      type = pqSMAdaptor::PROXYLIST;
+    }
     type = pqSMAdaptor::PROXY;
     if (Property->FindDomain<vtkSMProxyListDomain>())
     {
@@ -320,33 +324,34 @@ void pqSMAdaptor::setUncheckedProxyProperty(vtkSMProperty* Property, pqSMProxy V
   }
 }
 
-QList<pqSMProxy> pqSMAdaptor::getProxyListProperty(vtkSMProperty* Property)
+QList<QVariant> pqSMAdaptor::getProxyListProperty(vtkSMProperty* Property)
 {
-  QList<pqSMProxy> value;
+  QList<QVariant> value;
   if (pqSMAdaptor::getPropertyType(Property) == pqSMAdaptor::PROXYLIST)
   {
     vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
     unsigned int num = proxyProp->GetNumberOfProxies();
     for (unsigned int i = 0; i < num; i++)
     {
-      value.append(proxyProp->GetProxy(i));
+      value.push_back(QVariant::fromValue<void*>(proxyProp->GetProxy(i)));
     }
   }
   return value;
 }
 
-void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property, QList<pqSMProxy> Value)
+void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property, QList<QVariant> Values)
 {
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if (proxyProp)
   {
-    vtkSMProxy** proxies = new vtkSMProxy*[Value.size() + 1];
-    for (int cc = 0; cc < Value.size(); cc++)
+    std::vector<vtkSMProxy*> proxies;
+    for (const auto& val : Values)
     {
-      proxies[cc] = Value[cc].GetPointer();
+      vtkSMProxy* aproxy = reinterpret_cast<vtkSMProxy*>(val.value<void*>());
+      proxies.push_back(aproxy);
     }
-    proxyProp->SetProxies(Value.size(), proxies);
-    delete[] proxies;
+    // proxies.push_back(nullptr);
+    proxyProp->SetProxies(Values.size(), proxies.data());
   }
 }
 
@@ -1759,12 +1764,6 @@ QVariant pqSMAdaptor::convertToQVariant(const vtkVariant& variant)
       return variant.ToInt();
     case VTK_UNSIGNED_INT:
       return variant.ToUnsignedInt();
-#ifdef VTK_TYPE_USE___INT64
-    case VTK___INT64:
-      return variant.ToTypeInt64();
-    case VTK_UNSIGNED___INT64:
-      return variant.ToTypeUInt64();
-#endif
     case VTK_LONG_LONG:
       return variant.ToLongLong();
     case VTK_UNSIGNED_LONG_LONG:

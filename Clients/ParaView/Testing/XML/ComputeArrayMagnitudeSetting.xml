@@ -2,7 +2,7 @@
 <pqevents>
   <!-- Disallow magnitude computation for all but 3 dimensional arrays -->
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Miscellaneous" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Represented Attributes" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ComputeArrayMagnitude/CheckBoxLabel" command="mousePress" arguments="1,1,0,138,27" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ComputeArrayMagnitude/CheckBoxLabel" command="mouseRelease" arguments="1,0,0,138,27" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ArrayMagnitudeExceptions/ScalarValueList/Add" command="activate" arguments="" />

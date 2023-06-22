@@ -31,7 +31,6 @@
 set(classes
   vtkAppendRectilinearGrid
   vtkAttributeDataReductionFilter
-  vtkAttributeDataToTableFilter
   vtkCleanArrays
   vtkCompleteArrays
   vtkEnvironmentAnnotationFilter

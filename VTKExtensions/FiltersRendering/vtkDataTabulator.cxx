@@ -16,6 +16,8 @@
 
 #include "vtkAttributeDataToTableFilter.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyUtilities.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkFieldData.h"
@@ -33,7 +35,6 @@
 #include "vtkUniformGridAMRDataIterator.h"
 
 #include <cassert>
-#include <map>
 #include <string>
 
 namespace
@@ -105,8 +106,12 @@ int vtkDataTabulator::RequestData(
   {
     if (!this->Selectors.empty())
     {
+      auto assembly =
+        vtkDataAssemblyUtilities::GetDataAssembly(this->ActiveAssemblyForSelectors, inputCD);
+      const std::string activeAssemblyName =
+        assembly ? this->ActiveAssemblyForSelectors : "Hierarchy";
       vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
-      extractor->SetAssemblyName(this->ActiveAssemblyForSelectors);
+      extractor->SetAssemblyName(activeAssemblyName.c_str());
       for (const auto& selector : this->Selectors)
       {
         extractor->AddSelector(selector.c_str());

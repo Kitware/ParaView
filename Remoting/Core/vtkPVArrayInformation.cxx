@@ -582,7 +582,7 @@ const char* vtkPVArrayInformation::GetStringValue(int index)
 }
 
 //----------------------------------------------------------------------------
-std::string vtkPVArrayInformation::GetRangesAsString() const
+std::string vtkPVArrayInformation::GetRangesAsString(int lowExponent, int highExponent) const
 {
   std::ostringstream stream;
 
@@ -599,14 +599,16 @@ std::string vtkPVArrayInformation::GetRangesAsString() const
   else
   {
     vtkNumberToString formatter;
+    formatter.SetLowExponent(lowExponent);
+    formatter.SetHighExponent(highExponent);
     bool first = true;
     for (int cc = 0, max = this->GetNumberOfComponents(); cc < max; ++cc)
     {
       auto& cinfo = this->Components[cc + 1];
       if (cinfo.Range[0] <= cinfo.Range[1])
       {
-        stream << (first ? "" : ", ") << "[" << formatter(cinfo.Range[0]) << ", "
-               << formatter(cinfo.Range[1]) << "]";
+        stream << (first ? "" : ", ") << "[" << formatter.Convert(cinfo.Range[0]) << ", "
+               << formatter.Convert(cinfo.Range[1]) << "]";
         first = false;
       }
     }

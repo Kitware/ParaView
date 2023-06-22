@@ -3,35 +3,26 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 
+  <!-- open temporal data -->
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/singleSphereAnimation.pvd" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="1" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="2" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="3" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="4" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777221" />
-
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- setup pipeline for interpolator -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/SplitHorizontal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalCache" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalInterpolator" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- open TimeManager and, turn sequence mode and set a time between two data timesteps -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
-  <pqevent object="pqClientMainWindow/animationViewDock/animationView/PlayMode" command="set_string" arguments="Real Time" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="key" arguments="46" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="0.2" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="0.4" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="0.6" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="0.8" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="key" arguments="46" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="1.2" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="1.4" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="key" arguments="16777220" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValue" command="set_string" arguments="1.5" />
-  <pqevent object="pqClientMainWindow/animationViewDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCheckState" arguments="0.0,0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/nbOfFrames/nbOfFramesValue" command="set_int" arguments="21" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="1.5" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="1.5" />
+
+  <pqevent object="pqClientMainWindow/timeManagerDock/qt_dockwidget_closebutton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 </pqevents>

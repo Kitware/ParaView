@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionLink.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -110,6 +111,22 @@ static QString propertyType(vtkSMProperty* p)
   }
 
   return "Unknown";
+}
+
+QString representationTip(vtkSMProxy* proxy)
+{
+  pqServerManagerModel* mgr = pqApplicationCore::instance()->getServerManagerModel();
+  pqDataRepresentation* repr = mgr->findItem<pqDataRepresentation*>(proxy);
+  pqPipelineSource* source = repr ? repr->getInput() : nullptr;
+  pqView* view = repr ? repr->getView() : nullptr;
+  if (source && view)
+  {
+    return QString(QCoreApplication::translate("pqLinksEditor", "Source %1 in View %2"))
+      .arg(QString("<b>%1</b>").arg(source->getSMName()))
+      .arg(QString("<b>%1</b>").arg(view->getSMName()));
+  }
+
+  return QString();
 }
 }
 
@@ -297,19 +314,9 @@ public:
         if (!ri.u.idx.hasIndex)
         {
           vtkSMProxy* pxy = this->getProxy(idx);
-          pqServerManagerModel* m;
-          m = pqApplicationCore::instance()->getServerManagerModel();
           if (pxy)
           {
-            pqDataRepresentation* repr = m->findItem<pqDataRepresentation*>(pxy);
-            pqPipelineSource* source = repr ? repr->getInput() : nullptr;
-            pqView* view = repr ? repr->getView() : nullptr;
-            if (source && view)
-            {
-              return QString(tr("Source <b>%1</b><br/>View <b>%2</b>"))
-                .arg(source->getSMName())
-                .arg(view->getSMName());
-            }
+            return ::representationTip(pxy);
           }
         }
       }
@@ -722,6 +729,8 @@ void pqLinksEditor::updateSelectedProxies()
 void pqLinksEditor::updateEnabledState()
 {
   bool enabled = true;
+  QString status = "";
+
   if (!this->SelectedProxy1 || !this->SelectedProxy2 || this->linkName().isEmpty())
   {
     enabled = false;
@@ -757,6 +766,23 @@ void pqLinksEditor::updateEnabledState()
       enabled = false;
     }
   }
+
+  // linking view means linking cameras for now
+  if (this->linkType() == pqLinksModel::Proxy &&
+    (vtkSMViewProxy::SafeDownCast(this->SelectedProxy1) != nullptr ||
+      vtkSMViewProxy::SafeDownCast(this->SelectedProxy2) != nullptr))
+  {
+    status = tr("Linking views will link only cameras.");
+  }
+  // add status helper for representations
+  if (vtkSMRepresentationProxy::SafeDownCast(this->SelectedProxy1) != nullptr ||
+    vtkSMRepresentationProxy::SafeDownCast(this->SelectedProxy2) != nullptr)
+  {
+    status = QString("%1 - %2")
+               .arg(::representationTip(this->SelectedProxy1))
+               .arg(::representationTip(this->SelectedProxy2));
+  }
+  this->Ui->status->setText(status);
 
   this->Ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 

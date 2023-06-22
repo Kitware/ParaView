@@ -131,6 +131,7 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->LastProgressText = nullptr;
 
   // use higher frequency for client while lower for server (or batch).
+  // DEBUG it may be useful to set this to 0.001 for debugging progress with fast filters.
   this->ProgressInterval =
     vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT ? 0.1 : 1.0;
   this->AddedHandlers = false;
@@ -388,7 +389,8 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
 
   this->SetLastProgressText(progress_text);
   this->LastProgress = static_cast<int>(progress * 100.0);
-  // cout << "Progress: " << progress_text << " " << progress * 100 << endl;
+  // DEBUG useful for diagnosing filter progress events.
+  // std::cout << "Progress: " << progress_text << " " << progress * 100 << endl;
   this->InvokeEvent(vtkCommand::ProgressEvent, this);
   this->SetLastProgressText(nullptr);
   this->LastProgress = 0;
@@ -431,8 +433,6 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
     return true;
   }
 
-  // We won't handle this event, let the default handler take care of it.
-  // Default handler is defined in vtkPVSession::OnWrongTagEvent().
   if (tag == vtkPVProgressHandler::PROGRESS_EVENT_TAG)
   {
     // Secondary client PrepareProgress is never called by

@@ -45,7 +45,8 @@ pqMyPropertyWidgetForProperty::pqMyPropertyWidgetForProperty(
   this->setShowLabel(false);
 
   QGridLayout* gridLayout = new QGridLayout(this);
-  gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  const int margin = pqPropertiesPanel::suggestedMargin();
+  gridLayout->setContentsMargins(margin, margin, margin, margin);
   gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   gridLayout->setColumnStretch(0, 0);

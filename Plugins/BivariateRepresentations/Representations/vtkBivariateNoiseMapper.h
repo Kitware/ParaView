@@ -52,17 +52,17 @@
 #ifndef vtkBivariateNoiseMapper_h
 #define vtkBivariateNoiseMapper_h
 
+#include "vtkCompositePolyDataMapper.h"
+
 #include "vtkBivariateRepresentationsModule.h" // for export macro
-#include "vtkCompositePolyDataMapper2.h"
 
 #include <memory> // for unique_ptr
 
-class VTKBIVARIATEREPRESENTATIONS_EXPORT vtkBivariateNoiseMapper
-  : public vtkCompositePolyDataMapper2
+class VTKBIVARIATEREPRESENTATIONS_EXPORT vtkBivariateNoiseMapper : public vtkCompositePolyDataMapper
 {
 public:
   static vtkBivariateNoiseMapper* New();
-  vtkTypeMacro(vtkBivariateNoiseMapper, vtkCompositePolyDataMapper2);
+  vtkTypeMacro(vtkBivariateNoiseMapper, vtkCompositePolyDataMapper);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -72,6 +72,7 @@ public:
    * Default is 30.0.
    */
   void SetFrequency(double frequency);
+  double GetFrequency() const;
 
   /**
    * Set the final amplitude of the noise.
@@ -80,6 +81,7 @@ public:
    * Default is 1.0.
    */
   void SetAmplitude(double amplitude);
+  double GetAmplitude() const;
 
   /**
    * Set the speed of the nois animation.
@@ -87,6 +89,7 @@ public:
    * Default is 1.0.
    */
   void SetSpeed(double speed);
+  double GetSpeed() const;
 
   /**
    * Set the number of layers of noise.
@@ -97,11 +100,14 @@ public:
    * Default is 3.0.
    */
   void SetNbOfOctaves(int nbOctaves);
+  int GetNbOfOctaves() const;
 
   /**
    * Initialize the mapper if needed then render.
    */
   void Render(vtkRenderer* ren, vtkActor* act) override;
+
+  long GetStartTime() const;
 
 protected:
   vtkBivariateNoiseMapper();
@@ -113,19 +119,7 @@ protected:
    */
   void Initialize();
 
-  /**
-   * Override the creation of the helper to create a dedicated mapper helper.
-   * This helper inheritate indirectly from vtkOpenGLPolydataMapper and contains
-   * most of the rendering code specific to the vtkBivariateNoiseMapper.
-   */
-  vtkCompositeMapperHelper2* CreateHelper() override;
-
-  /**
-   * Overriden to pass the noise array to the helper.
-   * The noise array should be passed to this mapper through the
-   * SetInputArrayToProcess method.
-   */
-  void CopyMapperValuesToHelper(vtkCompositeMapperHelper2* helper) override;
+  vtkCompositePolyDataMapperDelegator* CreateADelegator() override;
 
 private:
   vtkBivariateNoiseMapper(const vtkBivariateNoiseMapper&) = delete;
@@ -133,8 +127,6 @@ private:
 
   struct vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
-
-  friend class vtkBivariateNoiseMapperHelper;
 };
 
 #endif

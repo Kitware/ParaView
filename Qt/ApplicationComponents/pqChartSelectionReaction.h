@@ -33,7 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqChartSelectionReaction_h
 
 #include "pqSelectionReaction.h"
-#include <QPointer> // needed for QPointer.
+
+#include "vtkChart.h" // for vtkChart::ACTION_TYPES_COUNT
+
+#include <QPointer> // for QPointer
 
 class pqContextView;
 class vtkObject;
@@ -49,8 +52,17 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqSelecti
 
 public:
   /**
+   * ParaView-specific selection modes
+   */
+  enum SelectionMode
+  {
+    CLEAR_SELECTION = vtkChart::ACTION_TYPES_COUNT
+  };
+
+  /**
    * Constructor. \c parent is expected to have data() that indicates the
    * selection type e.g. vtkChart::SELECT_RECTANGLE or vtkChart::SELECT_POLYGON.
+   * One can also use vtkChart::CLEAR_SELECTION to clear the current selection.
    * QActionGroup \c modifierGroup is used to determine selection modifier. If
    * there's a non-null checkedAction() in the group, we use that action's
    * data() to determine the selection mode e.g.
@@ -62,9 +74,10 @@ public:
   pqChartSelectionReaction(QAction* parent, pqContextView* view, QActionGroup* modifierGroup);
 
   /**
-   * start selection on the view where selectionType is one of
-   * vtkChart::SELECT_POLYGON, vtkChart::SELECT_RECTANGLE, etc., and
-   * selectionModifier is one of vtkContextScene::SELECTION_DEFAULT,
+   * Start selection on the view where:
+   * - selectionType is one of vtkChart::SELECT_POLYGON, vtkChart::SELECT_RECTANGLE, etc. or
+   * pqChartSelectionReaction::CLEAR_SELECTION
+   * - selectionModifier is one of vtkContextScene::SELECTION_DEFAULT,
    * vtkContextScene::SELECTION_ADDITION, etc.
    */
   static void startSelection(pqContextView* view, int selectionType, int selectionModifier);
@@ -76,17 +89,24 @@ protected Q_SLOTS:
   virtual void triggered(bool);
 
   /**
-   * stops selecting on the view
+   * Stops selecting on the view.
    */
   void stopSelection();
 
   /**
-   * called when modifier group is changed.
+   * Called when modifier group is changed.
    */
   void modifiersChanged() override;
 
-  // Get the current state of selection modifier, converting it to vtkScene enum
+  /**
+   * Get the current state of selection modifier, converting it to vtkScene enum.
+   */
   int getSelectionModifier() override;
+
+  /**
+   * Handles enable state for `CLEAR_SELECTION` action.
+   */
+  void updateEnableState() override;
 
 private:
   Q_DISABLE_COPY(pqChartSelectionReaction)

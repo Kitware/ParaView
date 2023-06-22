@@ -15,4 +15,4 @@ assert(sliceFilter.GetProperty("Locator").GetData().SMProxy.GetXMLLabel() == "Un
 
 sliceFilter.MergePoints = 0
 assert(sliceFilter.MergePoints == 0)
-assert(sliceFilter.GetProperty("Locator").GetData().SMProxy.GetXMLLabel() == "Don't Merge Points")
+assert(sliceFilter.GetProperty("Locator").GetData().SMProxy.GetXMLLabel() == "Not Merging Points")

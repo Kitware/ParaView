@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Represented Attributes" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Table" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Table" command="setSelection" arguments="0.0,0.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Remove" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Table" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Table" command="setSelection" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Table" command="setSelection" arguments="0.0,0.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" command="setCurrent" arguments="3.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" command="setSelection" arguments="3.0,3.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Remove" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" command="setCurrent" arguments="2.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" command="setSelection" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" command="setSelection" arguments="3.0,3.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" command="setCurrent" arguments="3.0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ChartDefaultSettings_A.png" threshold="5" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Represented Attributes" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/RemoveAll" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" property="modelRowCount" arguments="0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/RestoreDefaults" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsDefaultXAxis/ScalarValueList/Table" property="modelItemData" arguments="0.0,in_extents" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/RestoreDefaults" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ChartsHiddenAttributes/ScalarValueList/Table" property="modelItemData" arguments="0.0,^arc_length" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="+" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Layout #2" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,15,12,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,15,12,/0:0/0:0/0:1" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ChartDefaultSettings_B.png" threshold="5" />
+</pqevents>

@@ -8,9 +8,9 @@
 
 
   <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleCustomRange" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="240" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="305" />
-  <pqevent object="pqClientMainWindow/pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MinimumScalar" command="set_string" arguments="240" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/MaximumScalar" command="set_string" arguments="305" />
+  <pqevent object="pqClientMainWindow/RescaleScalarRangeToCustomDialog/RescaleButton" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />

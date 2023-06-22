@@ -33,7 +33,7 @@
 #include "vtkWeakPointer.h"         // for weak pointer.
 
 class vtkAMRStreamingPriorityQueue;
-class vtkCompositePolyDataMapper2;
+class vtkCompositePolyDataMapper;
 class vtkPVLODActor;
 
 class VTKREMOTINGVIEWS_EXPORT vtkAMROutlineRepresentation : public vtkPVDataRepresentation
@@ -187,7 +187,7 @@ protected:
   /**
    * Actor used to render the outlines in the view.
    */
-  vtkSmartPointer<vtkCompositePolyDataMapper2> Mapper;
+  vtkSmartPointer<vtkCompositePolyDataMapper> Mapper;
   vtkSmartPointer<vtkPVLODActor> Actor;
   ///@}
 
