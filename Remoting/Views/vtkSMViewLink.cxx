@@ -24,6 +24,12 @@
 vtkStandardNewMacro(vtkSMViewLink);
 
 //---------------------------------------------------------------------------
+vtkSMViewLink::vtkSMViewLink()
+{
+  this->AddException("Representations");
+}
+
+//---------------------------------------------------------------------------
 vtkSMViewLink::~vtkSMViewLink()
 {
   for (auto& obs : this->RenderObservers)
@@ -48,6 +54,7 @@ void vtkSMViewLink::EnableCameraLink(bool enable)
       this->RemoveException(propPair.first.c_str());
       this->RemoveException(propPair.second.c_str());
     }
+    this->UpdateViewsOnEndEvent = true;
   }
   else
   {
@@ -57,6 +64,7 @@ void vtkSMViewLink::EnableCameraLink(bool enable)
       this->AddException(propPair.first.c_str());
       this->AddException(propPair.second.c_str());
     }
+    this->UpdateViewsOnEndEvent = false;
   }
 }
 
@@ -103,7 +111,7 @@ void vtkSMViewLink::UpdateViewCallback(
     return;
   }
 
-  if (eid == vtkCommand::EndEvent && clientData && caller)
+  if (viewLink->UpdateViewsOnEndEvent && eid == vtkCommand::EndEvent && clientData && caller)
   {
     viewLink->UpdateViews(vtkSMProxy::SafeDownCast(caller));
   }

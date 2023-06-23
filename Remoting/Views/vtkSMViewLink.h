@@ -18,7 +18,10 @@
  *
  * vtkSMViewLink is a proxy link to synchronize views properties.
  *
- * Camera properties can be excluded from the link.
+ * The "Representations" property is excluded by default
+ * as representations should not be duplicated in different views.
+ *
+ * Camera properties can be excluded fault from the link, see EnableCameraLink.
  */
 
 #ifndef vtkSMViewLink_h
@@ -53,7 +56,7 @@ public:
   void EnableCameraLink(bool enable);
 
   /**
-   * Callback to render output views.
+   * Callback to render output views. This is useful to update render view when camera changes.
    */
   static void UpdateViewCallback(
     vtkObject* caller, unsigned long eid, void* clientData, void* callData);
@@ -64,7 +67,7 @@ public:
   virtual void UpdateViews(vtkSMProxy* caller);
 
 protected:
-  vtkSMViewLink() = default;
+  vtkSMViewLink();
   ~vtkSMViewLink() override;
 
   /**
@@ -82,6 +85,7 @@ protected:
   std::map<vtkSMProxy*, vtkSmartPointer<vtkCallbackCommand>> RenderObservers;
 
   bool Updating = false;
+  bool UpdateViewsOnEndEvent = true;
 };
 
 #endif
