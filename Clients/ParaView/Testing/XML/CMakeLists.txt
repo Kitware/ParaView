@@ -514,6 +514,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadFLUENTCFFFormat.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RectilinearVolumeRendering.png}"
@@ -885,6 +886,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ReadPartitionedCGNS.xml
   ReadCGNSBCDataset.xml
   ReadIOHDFFileSeries.xml
+  ReadFLUENTCFFFormat.xml
   RearrangeLayout.xml
   RectilinearFractal.xml
   ReloadAMReXGrid.xml
