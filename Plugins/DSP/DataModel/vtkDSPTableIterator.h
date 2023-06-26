@@ -1,0 +1,61 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
+
+/**
+ * @class    vtkDSPTableIterator
+ * @brief    Iterator for vtkTable containing vtkMultiDimensionalArrays.
+ *
+ * Iterate over implicit/hidden indices of vtkMultiDimensionalArrays
+ * contained in a vtkTable.
+ */
+
+#ifndef vtkDSPTableIterator_h
+#define vtkDSPTableIterator_h
+
+#include "vtkDSPIterator.h"
+
+#include <memory> // for std::unique_ptr
+
+class vtkTable;
+
+class vtkDSPTableIterator : public vtkDSPIterator
+{
+public:
+  vtkTypeMacro(vtkDSPTableIterator, vtkDSPIterator);
+  static vtkDSPTableIterator* New(vtkTable* table);
+
+  /**
+   * Move the iterator to the first item.
+   */
+  virtual void GoToFirstItem() override;
+
+  /**
+   * Move the iterator to the next item.
+   */
+  virtual void GoToNextItem() override;
+
+  /**
+   * Return true if the iterator reached the end.
+   */
+  virtual bool IsDoneWithTraversal() override;
+
+  /**
+   * Get the current item as a table.
+   */
+  virtual vtkTable* GetCurrentTable() override;
+
+protected:
+  vtkDSPTableIterator();
+  ~vtkDSPTableIterator() override = default;
+
+private:
+  vtkDSPTableIterator(const vtkDSPTableIterator&) = delete;
+  void operator=(const vtkDSPTableIterator&) = delete;
+
+  static vtkDSPTableIterator* New();
+
+  struct vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
+};
+
+#endif // vtkDSPTableIterator_h
