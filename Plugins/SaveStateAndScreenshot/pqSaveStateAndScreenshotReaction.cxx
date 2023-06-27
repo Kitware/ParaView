@@ -148,27 +148,26 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
     QDateTime dateTime = QDateTime::currentDateTime();
     QString dateTimeString = dateTime.toString("-yyyyMMdd-hhmmss");
     QString nameNoExt = this->Name + (this->FromCTest ? "" : dateTimeString);
-    ;
     QString pathNoExt = this->Directory + "/" + nameNoExt;
     QString stateFile = pathNoExt + ".pvsm";
-    pqSaveStateReaction::saveState(stateFile);
+    pqSaveStateReaction::saveState(stateFile, this->Location);
     QString screenshotFile = pathNoExt + ".png";
-    shProxy->WriteImage(screenshotFile.toUtf8().data());
+    shProxy->WriteImage(screenshotFile.toUtf8().data(), this->Location);
     QString textFile = pathNoExt + ".txt";
-    std::ofstream ofs(textFile.toUtf8().data(), std::ofstream::out);
-    ofs << nameNoExt.toUtf8().data() << std::endl;
-    ofs.close();
+    auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    pxm->SaveString(nameNoExt.toUtf8().data(), textFile.toUtf8().data(), this->Location);
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqSaveStateAndScreenshotReaction::onSettings()
 {
+  pqServer* server = pqActiveObjects::instance().activeServer();
   // Configure directory and name
   QString fileExt =
     QString("%1 (*.pvsm);;%2 (*)").arg(tr("ParaView state file")).arg(tr("All files"));
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"),
-    QString(), fileExt, false);
+  pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"),
+    QString(), fileExt, false, false);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
@@ -176,6 +175,7 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   if (fileDialog.exec() == QDialog::Accepted)
   {
     QString selectedFile = fileDialog.getSelectedFiles()[0];
+    this->Location = fileDialog.getSelectedLocation();
     QFileInfo info(selectedFile);
     this->Directory = info.dir().absolutePath();
     this->Name = info.baseName();

@@ -84,6 +84,7 @@ private:
 
   QString Directory;
   QString Name;
+  vtkTypeUInt32 Location;
   bool FromCTest;
   // vtkSaveScreenshotProxy
   vtkSmartPointer<vtkSMProxy> Proxy;
