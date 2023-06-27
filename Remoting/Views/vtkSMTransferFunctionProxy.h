@@ -381,7 +381,8 @@ public:
    * upon importing the transfer function back into ParaView.
    */
   static bool ExportTransferFunction(vtkSMTransferFunctionProxy* colorTransferFunction,
-    vtkSMTransferFunctionProxy* opacityTransferFunction, const char* tfname, const char* filename);
+    vtkSMTransferFunctionProxy* opacityTransferFunction, const char* tfname, const char* filename,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
 protected:
   vtkSMTransferFunctionProxy() = default;
