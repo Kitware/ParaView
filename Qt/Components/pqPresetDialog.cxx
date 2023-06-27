@@ -563,7 +563,10 @@ public:
 
 //-----------------------------------------------------------------------------
 pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode)
-  : Superclass(parentObject)
+  // Set the hints to place in Qt::Tool layer, same as dock widgets, so this doesn't stay behind
+  // docks on MacOs
+  : Superclass(parentObject,
+      Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::Tool)
   , Internals(new pqPresetDialog::pqInternals(mode, this))
 {
   const Ui::pqPresetDialog& ui = this->Internals->Ui;
