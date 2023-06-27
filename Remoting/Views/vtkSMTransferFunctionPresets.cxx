@@ -17,6 +17,9 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionProxy.h"
@@ -149,26 +152,20 @@ public:
     return false;
   }
 
-  bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets)
+  bool ImportPresets(std::string contents, std::vector<ImportedPreset>* importedPresets)
   {
     Json::CharReaderBuilder builder;
     builder["collectComments"] = false;
     Json::Value root;
-    vtksys::ifstream file;
-    file.open(filename);
-    if (!file)
+    std::istringstream inputStream(contents);
+    if (!parseFromStream(builder, inputStream, &root, nullptr))
     {
-      vtkGenericWarningMacro("Failed to open file: " << filename);
-      return false;
-    }
-    if (!parseFromStream(builder, file, &root, nullptr))
-    {
-      vtkGenericWarningMacro("File is not is a format suitable for presets: " << filename);
+      vtkGenericWarningMacro("File is not is a format suitable for presets");
       return false;
     }
     if (!root.isArray())
     {
-      vtkGenericWarningMacro("File may not contain presets: " << filename);
+      vtkGenericWarningMacro("File may not contain presets");
       return false;
     }
 
@@ -180,9 +177,9 @@ public:
 
     for (Json::Value& preset : root)
     {
-      std::string basename = preset.get("Name", "Preset").asString();
+      const std::string basename = preset.get("Name", "Preset").asString();
 
-      std::string name = this->FindUniquePresetNameWithinPresets(basename, presetNames);
+      const std::string name = this->FindUniquePresetNameWithinPresets(basename, presetNames);
 
       preset["Name"] = name;
       presetNames.insert(name);
@@ -539,14 +536,14 @@ bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
+bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename, vtkTypeUInt32 location)
 {
-  return this->ImportPresets(filename, nullptr);
+  return this->ImportPresets(filename, nullptr, location);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionPresets::ImportPresets(
-  const char* filename, std::vector<ImportedPreset>* importedPresets)
+  const char* filename, std::vector<ImportedPreset>* importedPresets, vtkTypeUInt32 location)
 {
   if (!filename)
   {
@@ -554,18 +551,29 @@ bool vtkSMTransferFunctionPresets::ImportPresets(
     return false;
   }
 
-  SM_SCOPED_TRACE(CallFunction).arg("ImportPresets").arg("filename", filename);
-  if (vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename)) ==
-    ".xml")
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("ImportPresets")
+    .arg("filename", filename)
+    .arg("location", static_cast<int>(location));
+  const auto ext =
+    vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename));
+  std::string contents;
+  if (auto activePxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager())
   {
-    vtksys::ifstream in(filename);
-    if (in)
+    contents = activePxm->LoadString(filename, location);
+  }
+  else
+  {
+    vtkNew<vtkSMSession> session;
+    auto pxm = session->GetSessionProxyManager();
+    contents = pxm->LoadString(filename, location);
+  }
+  if (ext == ".xml")
+  {
+    if (!contents.empty())
     {
-      std::ostringstream contents;
-      contents << in.rdbuf();
-      in.close();
       return this->ImportPresets(
-        vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(contents.str().c_str()));
+        vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(contents.c_str()));
     }
     else
     {
@@ -573,17 +581,11 @@ bool vtkSMTransferFunctionPresets::ImportPresets(
       return false;
     }
   }
-  else if (vtksys::SystemTools::LowerCase(
-             vtksys::SystemTools::GetFilenameLastExtension(filename)) == ".ct")
+  else if (ext == ".ct")
   {
-    vtksys::ifstream in(filename);
-    if (in)
+    if (!contents.empty())
     {
-      std::ostringstream contents;
-      contents << in.rdbuf();
-      in.close();
-      auto converted =
-        vtkSMTransferFunctionProxy::ConvertVisItColorMapXMLToJSON(contents.str().c_str());
+      auto converted = vtkSMTransferFunctionProxy::ConvertVisItColorMapXMLToJSON(contents.c_str());
       if (!converted.empty())
       {
         // VisIt colormaps are named only by their filename
@@ -602,7 +604,7 @@ bool vtkSMTransferFunctionPresets::ImportPresets(
   }
   else
   {
-    return this->Internals->ImportPresets(filename, importedPresets);
+    return this->Internals->ImportPresets(contents, importedPresets);
   }
 }
 

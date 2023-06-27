@@ -1806,11 +1806,11 @@ def GetTransferFunction2D(arrayname, array2name=None, representation=None, separ
     return tf2d
 
 # -----------------------------------------------------------------------------
-def ImportPresets(filename):
+def ImportPresets(filename, location=vtkPVSession.CLIENT):
     """Import presets from a file. The file can be in the legacy color map xml
     format or in the new JSON format. Returns True on success."""
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
-    return presets.ImportPresets(filename)
+    return presets.ImportPresets(filename, location)
 
 # -----------------------------------------------------------------------------
 def ExportTransferFunction(colortransferfunction, opacitytransferfunction, tfname, filename,

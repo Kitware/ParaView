@@ -105,11 +105,13 @@ public:
 
   ~pqPresetDialogTableModel() override = default;
 
-  void importPresets(const QString& filename)
+  void importPresets(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/)
   {
     this->beginResetModel();
     std::vector<vtkSMTransferFunctionPresets::ImportedPreset> importedPresets;
-    bool imported = this->Presets->ImportPresets(filename.toStdString().c_str(), &importedPresets);
+    const bool imported =
+      this->Presets->ImportPresets(filename.toStdString().c_str(), &importedPresets, location);
     if (imported)
     {
       for (auto const& importedPreset : importedPresets)
@@ -887,20 +889,22 @@ bool pqPresetDialog::usePresetRange() const
 //-----------------------------------------------------------------------------
 void pqPresetDialog::importPresets()
 {
-  pqFileDialog dialog(nullptr, this, tr("Import Presets"), QString(),
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Import Presets"), QString(),
     tr("Supported Presets/Color Map Files") + QString(" (*.json *.xml *.ct);;") +
       tr("ParaView Color/Opacity Presets") + QString(" (*.json);;") + tr("Legacy Color Maps") +
       QString(" (*.xml);;") + tr("VisIt Color Table") + QString(" (*.ct);;") + tr("All Files") +
       QString(" (*)"),
-    false);
+    false, false);
   dialog.setObjectName("ImportPresets");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted && !dialog.getSelectedFiles().empty())
   {
     QString filename = dialog.getSelectedFiles()[0];
+    vtkTypeUInt32 location = dialog.getSelectedLocation();
     const pqInternals& internals = *this->Internals;
     int oldCount = internals.Model->rowCount(QModelIndex());
-    internals.Model->importPresets(filename);
+    internals.Model->importPresets(filename, location);
     int newCount = internals.Model->rowCount(QModelIndex());
 
     // highlight the newly imported presets for the user.
