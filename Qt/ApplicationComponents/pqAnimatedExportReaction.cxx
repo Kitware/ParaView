@@ -84,8 +84,8 @@ void pqAnimatedExportReaction::Export()
   }
 
   QString filters = "vtk.js Web Archives (*.vtkjs)";
-  pqFileDialog fileDialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
-    tr("Export Animated Scene ..."), QString(), filters, false);
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Export Animated Scene ..."),
+    QString(), filters, false);
   fileDialog.setObjectName("ExportAnimatedSceneFileDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)
