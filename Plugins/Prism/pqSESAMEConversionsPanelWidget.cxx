@@ -15,6 +15,7 @@
 #include "pqSESAMEConversionsPanelWidget.h"
 #include "ui_pqSESAMEConversionsPanelWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 
@@ -24,6 +25,8 @@
 #include "vtkXMLDataElement.h"
 #include "vtkXMLUtilities.h"
 
+#include "vtkPVSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <QComboBox>
@@ -414,25 +417,34 @@ public:
   /**
    * Load a conversion file.
    */
-  bool loadConversionFile(const QString& filename)
+  bool loadConversionFile(const QString& filename, vtkTypeUInt32 location)
   {
     this->SESAMEConversions.clear();
     if (filename.isEmpty())
     {
       return false;
     }
-    // First check to make sure file is valid
-    QFile file(filename);
-    if (!file.open(QFile::ReadOnly))
+    std::string conversionData;
+    if (location == vtkPVSession::CLIENT)
     {
-      qCritical() << "Failed to open file : " << filename;
-      return false;
+      // client could use the same path as the server, but it would not work for Qt registered files
+      QFile file(filename);
+      // First check to make sure file is valid
+      if (!file.open(QFile::ReadOnly))
+      {
+        qCritical() << "Failed to open file : " << filename;
+        return false;
+      }
+      conversionData = file.readAll().toStdString();
+      file.close();
     }
-    QString conversionData(file.readAll());
-    file.close();
+    else // data server
+    {
+      auto pxm = pqActiveObjects::instance().activeServer()->proxyManager();
+      conversionData = pxm->LoadString(filename.toStdString().c_str(), location);
+    }
 
-    vtkXMLDataElement* rootElement =
-      vtkXMLUtilities::ReadElementFromString(conversionData.toStdString().c_str());
+    vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromString(conversionData.c_str());
     if (!rootElement)
     {
       return false;
@@ -773,10 +785,10 @@ QVector<QPair<QString, double>> pqSESAMEConversionsPanelWidget::getConversionOpt
 //=============================================================================
 void pqSESAMEConversionsPanelWidget::onConversionFileChanged()
 {
+  pqServer* server = pqActiveObjects::instance().activeServer();
   QString filters = tr("Conversion files (*.xml)");
-  // Note: As of now files are only loaded from the client and not the server
-  pqFileDialog fileDialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Conversions File"), QString(), filters, false);
+  pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Conversions File"), QString(),
+    filters, false, false);
   fileDialog.setObjectName("OpenConversionFileDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
@@ -785,7 +797,8 @@ void pqSESAMEConversionsPanelWidget::onConversionFileChanged()
     if (!fileDialog.getSelectedFiles().empty())
     {
       auto conversionFilename = fileDialog.getSelectedFiles()[0];
-      if (this->UI->loadConversionFile(conversionFilename))
+      auto location = fileDialog.getSelectedLocation();
+      if (this->UI->loadConversionFile(conversionFilename, location))
       {
         this->UI->updateConversionLabels();
         if (this->UI->updateConversionsValues())
@@ -812,7 +825,7 @@ void pqSESAMEConversionsPanelWidget::onConversionFileChanged()
 void pqSESAMEConversionsPanelWidget::onRestoreDefaultConversionsFile()
 {
   this->UI->ConversionFile->setText(tr("Default"));
-  this->UI->loadConversionFile(":/Prism/SESAMEConversions.xml");
+  this->UI->loadConversionFile(":/Prism/SESAMEConversions.xml", vtkPVSession::CLIENT);
   this->UI->updateConversionLabels();
   if (this->UI->updateConversionsValues())
   {
