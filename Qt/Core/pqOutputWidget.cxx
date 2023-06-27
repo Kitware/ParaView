@@ -35,13 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqServer.h"
 #include "pqSettings.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 
+#include "vtkSMSessionProxyManager.h"
+
 #include <QClipboard>
-#include <QCoreApplication>
+#include <QDebug>
 #include <QDockWidget>
 #include <QMutexLocker>
 #include <QPointer>
@@ -50,8 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStandardItemModel>
 #include <QStringList>
 #include <QStyle>
-
-#include <fstream>
 
 namespace OutputWidgetInternals
 {
@@ -450,8 +451,9 @@ void pqOutputWidget::suppress(const QStringList& substrs)
 void pqOutputWidget::saveToFile()
 {
   QString text = this->Internals->Ui.consoleWidget->text();
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save output"), QString(),
-    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)", false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Save output"), QString(),
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)", false, false);
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {
@@ -459,14 +461,13 @@ void pqOutputWidget::saveToFile()
     return;
   }
 
-  QString filename = fileDialog.getSelectedFiles().first();
+  QString filename = fileDialog.getSelectedFiles()[0];
   QByteArray filename_ba = filename.toUtf8();
-  std::ofstream fileStream;
-  fileStream.open(filename_ba.data());
-  if (fileStream.is_open())
+  vtkTypeUInt32 location = fileDialog.getSelectedLocation();
+  auto pxm = server->proxyManager();
+  if (!pxm->SaveString(text.toStdString().c_str(), filename_ba.data(), location))
   {
-    fileStream << text.toStdString();
-    fileStream.close();
+    qCritical() << tr("Failed to save output to ") << filename;
   }
 }
 
