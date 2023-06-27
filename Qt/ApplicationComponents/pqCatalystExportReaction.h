@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqReaction.h"
 
+#include "vtkType.h" // For vtkTypeUInt32
+
 /**
  * @ingroup Reactions
  * Reaction to export a Catalyst script that will produce configured catalyst data products.
@@ -52,7 +54,8 @@ public:
   /**
    * Export a Catalyst script. Returns true on success.
    */
-  static bool exportScript(const QString& name);
+  static bool exportScript(
+    const QString& name, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Export a Catalyst script. Returns the non-empty name of the file

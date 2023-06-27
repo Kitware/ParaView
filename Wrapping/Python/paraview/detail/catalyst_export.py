@@ -1,6 +1,8 @@
 r"""Module used to generate Catalyst export scripts"""
 from .. import simple, smstate, smtrace, servermanager
 
+from paraview.modules.vtkRemotingCore import vtkPVSession
+
 def _get_catalyst_state(options):
     # build a `source_set` comprising of the extractor proxies.
     # if not extracts have been configured, then there's nothing to generate.
@@ -57,7 +59,7 @@ def _get_catalyst_postamble(options):
         "    SaveExtractsUsingCatalystOptions(options)"])
     return str(trace)
 
-def save_catalyst_state(fname, options):
+def save_catalyst_state(fname, options, location=vtkPVSession.CLIENT):
     options = servermanager._getPyProxy(options)
     state = _get_catalyst_state(options)
     if not state:
@@ -65,6 +67,6 @@ def save_catalyst_state(fname, options):
         print_error('No state generated')
         return
 
-    with open(fname, 'w') as file:
-        file.write(state)
-        file.write('\n')
+    pxm = servermanager.ProxyManager()
+    state += '\n'
+    pxm.SaveString(state, fname, location)

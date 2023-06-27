@@ -69,8 +69,14 @@ pqCatalystExportReaction::~pqCatalystExportReaction() = default;
 //-----------------------------------------------------------------------------
 QString pqCatalystExportReaction::exportScript()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Catalyst State:"),
-    QString(), tr("Python file") + QString(" (*.py);;") + tr("All files") + QString(" (*)"), false);
+  QString fileExt;
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+  fileExt += tr("Catalyst state file") + QString(" (*.py);;");
+#endif
+  fileExt += tr("All files") + QString(" (*)");
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Save Catalyst State:"),
+    QString(), fileExt, false, false);
   fileDialog.setObjectName("SaveCatalystStateFileDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (!fileDialog.exec())
@@ -78,12 +84,13 @@ QString pqCatalystExportReaction::exportScript()
     return QString();
   }
 
-  auto fname = fileDialog.getSelectedFiles()[0];
-  return pqCatalystExportReaction::exportScript(fname) ? fname : QString();
+  auto filename = fileDialog.getSelectedFiles()[0];
+  auto location = fileDialog.getSelectedLocation();
+  return pqCatalystExportReaction::exportScript(filename, location) ? filename : QString();
 }
 
 //-----------------------------------------------------------------------------
-bool pqCatalystExportReaction::exportScript(const QString& filename)
+bool pqCatalystExportReaction::exportScript(const QString& filename, vtkTypeUInt32 location)
 {
   if (filename.isEmpty())
   {
@@ -120,8 +127,9 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
   vtkSmartPyObject name(PyUnicode_FromString("save_catalyst_state"));
   vtkSmartPyObject pyfilename(PyUnicode_FromString(filename.toUtf8().data()));
   vtkSmartPyObject pyproxy(vtkPythonUtil::GetObjectFromPointer(proxy));
+  vtkSmartPyObject pylocation(PyLong_FromUnsignedLong(location));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
-    module, name, pyfilename.GetPointer(), pyproxy.GetPointer(), nullptr));
+    module, name, pyfilename.GetPointer(), pyproxy.GetPointer(), pylocation.GetPointer(), nullptr));
   if (PyErr_Occurred())
   {
     PyErr_Print();
@@ -130,6 +138,7 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
   }
   return true;
 #else
+  Q_UNUSED(location);
   qCritical("Catalyst state cannot be exported since Python support not enabled in this build.");
   return false;
 #endif
