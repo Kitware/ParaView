@@ -33,8 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqLogViewerWidget.h"
 
 #include "vtkPVLogger.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QByteArray>
+#include <QDebug>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollBar>
@@ -44,8 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QTextStream>
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqServer.h"
 
 #include <cassert>
 #include <cmath>
@@ -353,8 +357,9 @@ void pqLogViewerWidget::toggleAdvanced()
 void pqLogViewerWidget::exportLog()
 {
   QString text = this->Internals->Ui.details->toPlainText();
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save log"), QString(),
-    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)", false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Save log"), QString(),
+    tr("Text Files") + " (*.txt);;" + tr("All Files") + " (*)", false, false);
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)
   {
@@ -362,14 +367,13 @@ void pqLogViewerWidget::exportLog()
     return;
   }
 
-  QString filename = fileDialog.getSelectedFiles().first();
+  QString filename = fileDialog.getSelectedFiles()[0];
   QByteArray filename_ba = filename.toUtf8();
-  std::ofstream fileStream;
-  fileStream.open(filename_ba.data());
-  if (fileStream.is_open())
+  vtkTypeUInt32 location = fileDialog.getSelectedLocation();
+  auto pxm = server->proxyManager();
+  if (!pxm->SaveString(text.toStdString().c_str(), filename_ba.data(), location))
   {
-    fileStream << text.toStdString();
-    fileStream.close();
+    qCritical() << tr("Failed to save log to ") << filename;
   }
 }
 
