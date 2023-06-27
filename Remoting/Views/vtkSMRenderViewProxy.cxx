@@ -768,6 +768,22 @@ void vtkSMRenderViewProxy::ComputeVisibleBounds(vtkSMProxy* representation, doub
 }
 
 //----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SynchronizeGeometryBounds()
+{
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("SynchronizeGeometryBounds")
+    .arg("comment", "synchronize geometry bounds");
+
+  this->GetSession()->PrepareProgress();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SynchronizeGeometryBounds";
+  stream << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  this->GetSession()->CleanupPendingProgress();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera(bool closest, const double offsetRatio)
 {
   SM_SCOPED_TRACE(CallMethod)

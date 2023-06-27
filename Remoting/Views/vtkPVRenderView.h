@@ -787,6 +787,13 @@ public:
   ///@}
 
   /**
+   * Synchronizes bounds information on all nodes and
+   * reset camera clipping planes.
+   * \note CallOnAllProcesses
+   */
+  virtual void SynchronizeGeometryBounds();
+
+  /**
    * Overridden to synchronize information among processes whenever data
    * changes. The vtkSMViewProxy ensures that this method is called only when
    * something has changed on the view-proxy or one of its representations or
@@ -1156,12 +1163,6 @@ protected:
    * geometry i.e. geometry rendered in view that is composited together.
    */
   bool IsProcessRenderingGeometriesForCompositing(bool using_distributed_rendering);
-
-  /**
-   * Synchronizes bounds information on all nodes.
-   * \note CallOnAllProcesses
-   */
-  virtual void SynchronizeGeometryBounds();
 
   /**
    * Set the last selection object.

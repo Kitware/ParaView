@@ -25,6 +25,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00050.temp/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/3GQP.pdb}"
   "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}"
+  "DATA{${paraview_test_data_directory_input}/Data/CameraWidgetViewLinkState.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/can-restarts/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CellDataWithNan.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/cloud_layers_1k.jpg}"
@@ -1112,6 +1113,8 @@ list(APPEND TESTS_WITH_BASELINES
   CalcParens.xml
   Calculator.xml
   CalculatorInput.xml
+  CameraWidgetViewLink.xml
+  CameraWidgetViewLinkState.xml
   CategoriesWithNaN.xml
   CGNSIOSSReader.xml
   # Disabled due to #20508

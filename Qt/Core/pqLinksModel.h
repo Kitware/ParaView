@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 
 class vtkCollection;
+class pqCameraWidgetViewLink;
 class pqInteractiveViewLink;
 class pqProxy;
 class pqRenderView;
@@ -66,6 +67,7 @@ public:
     Unknown,
     Proxy,
     Camera,
+    CameraWidget,
     Property,
     Selection
   };
@@ -158,6 +160,11 @@ public:
     const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2, bool interactiveViewLink = false);
 
   /**
+   * add a camera widget based link
+   */
+  void addCameraWidgetLink(const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+
+  /**
    * return true if pqLinksModels contain an interactive view link associated to name
    */
   bool hasInteractiveViewLink(const QString& name);
@@ -166,6 +173,16 @@ public:
    * return pointer to the interactive view link associated to name
    */
   pqInteractiveViewLink* getInteractiveViewLink(const QString& name);
+
+  /**
+   * return true if pqLinksModels contain an camera widget view link associated to name
+   */
+  bool hasCameraWidgetViewLink(const QString& name);
+
+  /**
+   * return pointer to the interactive view link associated to name
+   */
+  pqCameraWidgetViewLink* getCameraWidgetViewLink(const QString& name);
 
   /**
    * add a property based link
@@ -234,6 +251,12 @@ protected Q_SLOTS:
   void createInteractiveViewLink(const QString& name, vtkSMProxy* displayView,
     vtkSMProxy* linkedView, double xPos = 0.375, double yPos = 0.375, double xSize = 0.25,
     double ySize = 0.25);
+
+  /**
+   * Create a camera widget view link with provided parameters
+   */
+  void createCameraWidgetViewLink(
+    const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView);
 
   /**
    * Convenience method used by the internal

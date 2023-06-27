@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksEditor.h"
 #include "pqLinksModel.h"
 
+//------------------------------------------------------------------------------
 pqLinksManager::pqLinksManager(QWidget* p)
   : QDialog(p)
   , Ui(new Ui::pqLinksManager())
@@ -72,8 +73,10 @@ pqLinksManager::pqLinksManager(QWidget* p)
   this->Ui->removeButton->setEnabled(false);
 }
 
+//------------------------------------------------------------------------------
 pqLinksManager::~pqLinksManager() = default;
 
+//------------------------------------------------------------------------------
 void pqLinksManager::addLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
@@ -88,7 +91,14 @@ void pqLinksManager::addLink()
 
       if (inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
       {
-        model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
+        if (editor.cameraWidgetViewLinkChecked())
+        {
+          model->addCameraWidgetLink(editor.linkName(), inP, outP);
+        }
+        else
+        {
+          model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
+        }
       }
       else
       {
@@ -108,6 +118,7 @@ void pqLinksManager::addLink()
   }
 }
 
+//------------------------------------------------------------------------------
 void pqLinksManager::editLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
@@ -126,7 +137,14 @@ void pqLinksManager::editLink()
 
       if (inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
       {
-        model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
+        if (editor.cameraWidgetViewLinkChecked())
+        {
+          model->addCameraWidgetLink(editor.linkName(), inP, outP);
+        }
+        else
+        {
+          model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
+        }
       }
       else
       {
@@ -146,6 +164,7 @@ void pqLinksManager::editLink()
   }
 }
 
+//------------------------------------------------------------------------------
 void pqLinksManager::removeLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
@@ -167,6 +186,7 @@ void pqLinksManager::removeLink()
   }
 }
 
+//------------------------------------------------------------------------------
 void pqLinksManager::selectionChanged(const QModelIndex& idx)
 {
   if (!idx.isValid())
