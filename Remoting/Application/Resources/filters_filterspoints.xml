@@ -57,5 +57,116 @@
 
       <!-- End of ConvertToPointCloud -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPCANormalEstimation"
+                 name="PCANormalEstimation"
+                 label="PCA Normal Estimation">
+      <Documentation long_help="Estimate normals using PCA."
+                     short_help="Estimate normals using Principal Component Analysis.">
+        The PCANormalEstimation estimates normals of points using Principal Component Analysis. Add a PCANormals
+        field to the output data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+        name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input from which the normals are estimated.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="SearchMode"
+        command="SetSearchMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="KNN"/>
+          <Entry value="1" text="Radius"/>
+        </EnumerationDomain>
+        <Documentation>
+          Configure how the filter selects the neighbor points used to calculate the PCA. With KNN mode K (SampleSize)
+          points are selected regardless of their location relative to the sampled point. The radius can also be set
+          to ensure that a sufficiently large neighborhood is taken into account, if not (i.e. all points fall inside
+          the radius), the second approach is performed. With Radius mode, neighboring points are selected inside a
+          radius (RADIUS), only the neighborhood of the sampled point is considered. If K (SampleSize) is also set, the
+          number of points found inside the radius must be larger than K, if not the first approach is performed.
+          Both approaches give the same results. The first approach is faster for uniform point clouds, in other cases,
+          the second approach is faster.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SampleSize"
+        command="SetSampleSize"
+        number_of_elements="1"
+        default_values="25">
+        <IntRangeDomain min="0" name="range" />
+        <Documentation>
+          Number of points to sample for PCA.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetRadius"
+          default_values="0"
+          name="Radius"
+          number_of_elements="1">
+        <DoubleRangeDomain min="0" name="range" />
+        <Documentation>
+          Radius of the sphere to use for the search of nearest neighbors.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="NormalOrientation"
+        command="SetNormalOrientation"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="As Computed"/>
+          <Entry value="1" text="Point"/>
+          <Entry value="3" text="Graph Traversal"/>
+        </EnumerationDomain>
+        <Documentation>
+          Orientation mode of the normals.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetOrientationPoint"
+        default_values="0 0 0"
+        name="OrientationPoint"
+        number_of_elements="3"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Point used to orient the normals.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="NormalOrientation" value="1" inverse="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+          <!-- show this widget when SetNormalOrientation==1 (POINT)-->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FlipNormals"
+        command="SetFlipNormals"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Flip the normals.
+        </Documentation>
+      </IntVectorProperty>
+
+    <!-- End PCANormalEstimation -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
