@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExpressionsManager.h"
 #include "pqExpressionsTableModel.h"
 #include "pqFileDialog.h"
+#include "pqServer.h"
 #include "pqSettings.h"
 
 #include <QKeyEvent>
@@ -45,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyledItemDelegate>
 #include <QtDebug>
 
+#include "vtkSMSessionProxyManager.h"
 #include "vtksys/FStream.hxx"
 
 #include "vtk_nlohmannjson.h"
@@ -481,8 +483,10 @@ void pqExpressionsManagerDialog::onClose()
 //----------------------------------------------------------------------------
 void pqExpressionsManagerDialog::exportToFile()
 {
-  pqFileDialog dialog(nullptr, this, tr("Export Expressions(s)"), QString(),
-    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Export Expressions(s)"), QString(),
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false,
+    false);
   dialog.setObjectName("ExportExpressions");
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -490,14 +494,8 @@ void pqExpressionsManagerDialog::exportToFile()
     return;
   }
 
-  vtksys::ofstream outfs;
-  QString filename = dialog.getSelectedFiles()[0];
-  outfs.open(filename.toUtf8());
-  if (!outfs.is_open())
-  {
-    qCritical() << "Failed to open file for writing: " << filename;
-    return;
-  }
+  const QString filename = dialog.getSelectedFiles()[0];
+  const vtkTypeUInt32 location = dialog.getSelectedLocation();
 
   json root;
   root[JSON_FILE_VERSION_KEY] = JSON_FILE_VERSION;
@@ -515,8 +513,11 @@ void pqExpressionsManagerDialog::exportToFile()
   }
   root[JSON_EXPRESSIONS_LIST_KEY] = list;
 
-  outfs << root.dump(2) << endl;
-  outfs.close();
+  auto pxm = server->proxyManager();
+  if (!pxm->SaveString(root.dump(2).c_str(), filename.toStdString().c_str(), location))
+  {
+    qCritical() << tr("Failed to save expressions to ") << filename;
+  }
 }
 
 //----------------------------------------------------------------------------
