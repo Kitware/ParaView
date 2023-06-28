@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonModule.h"
 
+#include "vtkType.h" // For vtkTypeUInt32
+
 #include <QLabel>
 #include <QMouseEvent>
 #include <QStyle>
@@ -57,7 +59,7 @@ class PQPYTHON_EXPORT pqPythonTabWidget : public QTabWidget
 
 public:
   /**
-   * @brief Default contructor
+   * @brief Default constructor
    * @param[in] parent the QWidget owning this widget
    */
   pqPythonTabWidget(QWidget* parent);
@@ -124,7 +126,8 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * and not linked to another QText.
    * Otherwise adds a new tab.
    */
-  void addNewTextArea(const QString& filename);
+  void addNewTextArea(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * @brief Request to close the current tab

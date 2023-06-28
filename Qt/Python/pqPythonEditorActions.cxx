@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonEditorActions.h"
 
+#include "pqApplicationCore.h"
 #include "pqFileDialog.h"
 #include "pqPythonFileIO.h"
 #include "pqPythonManager.h"
@@ -378,15 +379,17 @@ void pqPythonEditorActions::connect<pqPythonTabWidget>(
   QObject::connect(
     &actions[Action::NewFile], &QAction::triggered, tWidget, &pqPythonTabWidget::createNewEmptyTab);
   QObject::connect(&actions[Action::OpenFile], &QAction::triggered, [tWidget]() {
-    pqFileDialog dialog(nullptr, pqPythonScriptEditor::getUniqueInstance(),
+    pqServer* server = pqApplicationCore::instance()->getActiveServer();
+    pqFileDialog dialog(server, pqPythonScriptEditor::getUniqueInstance(),
       QCoreApplication::translate("pqPythonEditorActions", "Open File"), QString(),
       QCoreApplication::translate("pqPythonEditorActions", "Python Files") + QString(" (*.py);;"),
-      false);
+      false, false);
     dialog.setObjectName("FileOpenDialog");
     if (QFileDialog::Accepted == dialog.exec())
     {
-      QList<QStringList> files = dialog.getAllSelectedFiles();
-      tWidget->addNewTextArea(files.begin()->first());
+      const QString filename = dialog.getAllSelectedFiles().begin()->first();
+      const vtkTypeUInt32 location = dialog.getSelectedLocation();
+      tWidget->addNewTextArea(filename, location);
     }
 
     pqPythonScriptEditor::bringFront();
