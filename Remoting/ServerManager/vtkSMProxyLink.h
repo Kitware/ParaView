@@ -105,6 +105,7 @@ public:
    */
   void AddException(const char* propertyname);
   void RemoveException(const char* propertyname);
+  void ClearExceptions();
   ///@}
 
   /**
