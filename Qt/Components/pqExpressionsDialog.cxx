@@ -47,7 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "vtkSMSessionProxyManager.h"
-#include "vtksys/FStream.hxx"
+
+#include <sstream>
 
 #include "vtk_nlohmannjson.h"
 #include VTK_NLOHMANN_JSON(json.hpp)
@@ -523,8 +524,10 @@ void pqExpressionsManagerDialog::exportToFile()
 //----------------------------------------------------------------------------
 bool pqExpressionsManagerDialog::importFromFile()
 {
-  pqFileDialog dialog(nullptr, this, tr("Import Expressions(s)"), QString(),
-    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Import Expressions(s)"), QString(),
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false,
+    false);
   dialog.setObjectName("ImportExpressions");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -532,21 +535,18 @@ bool pqExpressionsManagerDialog::importFromFile()
     return false;
   }
 
-  QString filename = dialog.getSelectedFiles()[0];
-  vtksys::ifstream file;
-  file.open(filename.toUtf8());
-  if (!file)
-  {
-    qWarning() << "Failed to open file: " << filename;
-    return false;
-  }
+  const QString filename = dialog.getSelectedFiles()[0];
+  const vtkTypeUInt32 location = dialog.getSelectedLocation();
+  auto pxm = server->proxyManager();
+  const std::string contents = pxm->LoadString(filename.toStdString().c_str(), location);
+  std::istringstream inputStream(contents);
   json root;
-  file >> root;
+  inputStream >> root;
 
   QList<pqExpressionsManager::pqExpression> expressionsList;
   try
   {
-    std::string fileVersion = root.at(JSON_FILE_VERSION_KEY);
+    const std::string fileVersion = root.at(JSON_FILE_VERSION_KEY);
     if (fileVersion != JSON_FILE_VERSION)
     {
       qWarning() << "File version is " << fileVersion.c_str() << " but reader is "
@@ -555,9 +555,9 @@ bool pqExpressionsManagerDialog::importFromFile()
 
     for (auto expression : root[JSON_EXPRESSIONS_LIST_KEY])
     {
-      std::string exprValue = expression.at(JSON_EXPRESSION_KEY);
-      std::string exprName = expression.at(JSON_EXPRESSION_NAME_KEY);
-      std::string exprGroup = expression.at(JSON_EXPRESSION_GROUP_KEY);
+      const std::string exprValue = expression.at(JSON_EXPRESSION_KEY);
+      const std::string exprName = expression.at(JSON_EXPRESSION_NAME_KEY);
+      const std::string exprGroup = expression.at(JSON_EXPRESSION_GROUP_KEY);
       expressionsList.push_back({ exprGroup.c_str(), exprName.c_str(), exprValue.c_str() });
     }
   }
