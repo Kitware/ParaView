@@ -34,7 +34,7 @@
      </item>
      <item>
       <widget class="pqHighlightableToolButton" name="resetButton">
-      </widget>>
+      </widget>
      </item>
     </layout>
    </item>

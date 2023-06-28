@@ -26,7 +26,7 @@
    <item>
     <widget class="QCheckBox" name="ShowDataHistogram">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, a data histogram will be shown below the opacity function. Please update it by clicking on its dedicated button when needed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>When checked, a data histogram will be shown below the opacity function. Please update it by clicking on its dedicated button when needed.</string>
      </property>
      <property name="text">
       <string>Display Data Histogram</string>
@@ -36,7 +36,7 @@
    <item>
     <widget class="QCheckBox" name="AutomaticDataHistogramComputation">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the data histogram will be automatically recomputed when needed instead of needing to click on the compute data histogram button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>When checked, the data histogram will be automatically recomputed when needed instead of needing to click on the compute data histogram button.</string>
      </property>
      <property name="text">
       <string>Automatically recompute data histogram</string>
@@ -143,7 +143,7 @@
        <item>
         <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be &quot;drawn&quot; instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>When checked, the control point of the opacity transfer fonction can be &quot;drawn&quot; instead of being placed one by one.</string>
          </property>
          <property name="text">
           <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
@@ -218,7 +218,7 @@
        <item>
         <widget class="QCheckBox" name="UseLogScale">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the mapping from data to colors is done using a log-scale. Note that this does not affect the mapping of data to opacity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>When checked, the mapping from data to colors is done using a log-scale. Note that this does not affect the mapping of data to opacity.</string>
          </property>
          <property name="text">
           <string>Use Log Scale When Mapping Data To Colors</string>

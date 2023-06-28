@@ -20,7 +20,7 @@
       <string/>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Determining range over all timesteps can potentially take a long time to complete. Are you sure you want to continue?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Determining range over all timesteps can potentially take a long time to complete. Are you sure you want to continue?</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

@@ -182,7 +182,7 @@ void pqAnglePropertyWidget::updateLabels()
   const auto vec2 = pnt2 - center;
   const double angle =
     vtkMath::DegreesFromRadians(std::acos(vec1.Dot(vec2) / (vec1.Norm() * vec2.Norm())));
-  ui.labelAngle->setText(QString("<b>Angle:</b> <i>%1</i> ").arg(angle));
+  ui.labelAngle->setText(QString("<b>%1</b> <i>%2</i> ").arg(tr("Angle: ")).arg(angle));
 }
 
 //-----------------------------------------------------------------------------

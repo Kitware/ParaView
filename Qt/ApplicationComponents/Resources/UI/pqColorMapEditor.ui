@@ -295,7 +295,7 @@
          <item>
           <widget class="QPushButton" name="Update">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update views.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Update views.</string>
            </property>
            <property name="text">
             <string>Render Views</string>
@@ -312,7 +312,7 @@
          <item>
           <widget class="QPushButton" name="AutoUpdate">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Render view(s) automatically.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Render view(s) automatically.</string>
            </property>
            <property name="text">
             <string/>

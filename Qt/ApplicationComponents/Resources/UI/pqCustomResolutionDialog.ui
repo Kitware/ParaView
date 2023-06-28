@@ -89,7 +89,7 @@
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add custom resolution&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Add custom resolution</string>
      </property>
     </widget>
    </item>

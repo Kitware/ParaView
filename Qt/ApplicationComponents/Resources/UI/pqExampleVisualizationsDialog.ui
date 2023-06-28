@@ -44,7 +44,7 @@
    <item row="5" column="0">
     <widget class="QLabel" name="HotGasAnalysisExampleDescription">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Data analysis of hot gas from Exodus II file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Data analysis of hot gas from Exodus II file</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignHCenter|Qt::AlignTop</set>
@@ -75,7 +75,7 @@
    <item row="5" column="1">
     <widget class="QLabel" name="WaveletExampleDescription">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Wavelet with volume rendering and contours&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Wavelet with volume rendering and contours</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignHCenter|Qt::AlignTop</set>
@@ -88,7 +88,7 @@
    <item row="8" column="1">
     <widget class="QLabel" name="HeadSQExampleDescription">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Contouring CT scan of a head&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Contouring CT scan of a head</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignHCenter|Qt::AlignTop</set>
