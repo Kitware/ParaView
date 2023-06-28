@@ -715,6 +715,8 @@ void pqLinksModel::addCameraWidgetLink(
   pxm->RegisterLink(name.toUtf8().data(), link);
   link->LinkProxies(inputProxy, outputProxy);
   link->SetExceptionBehaviorToWhitelist();
+  // Ensure that nothing stay linked. (especially "Representations" property)
+  link->ClearExceptions();
 
   this->createCameraWidgetViewLink(name, inputProxy, outputProxy);
 

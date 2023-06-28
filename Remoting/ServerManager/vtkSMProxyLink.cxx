@@ -270,6 +270,16 @@ void vtkSMProxyLink::RemoveException(const char* propertyname)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyLink::ClearExceptions()
+{
+  this->Internals->ExceptionProperties.clear();
+
+  // Update state and push it to share
+  this->UpdateState();
+  this->PushStateToSession();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 {
   if (!this->isPropertyLinked(pname))
