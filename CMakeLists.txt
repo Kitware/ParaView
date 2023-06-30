@@ -484,7 +484,7 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
         if(NOT TARGET "${mod}")
             list(APPEND modules_notarget ${mod})
         endif()
-        if(${mod} MATCHES "VTK::") # For better debugging
+        if(${mod} MATCHES "^VTK::") # For better debugging
             list(APPEND vtk_modules ${mod})
         endif()
     endforeach()
