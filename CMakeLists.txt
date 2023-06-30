@@ -480,8 +480,8 @@ endif ()
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
   if (paraview_required_modules OR paraview_unrecognized_modules)
-    foreach(mod ${paraview_required_modules})
-        if(NOT TARGET ${mod})
+    foreach(mod IN LISTS paraview_required_modules)
+        if(NOT TARGET "${mod}")
             list(APPEND modules_notarget ${mod})
         endif()
         if(${mod} MATCHES "VTK::") # For better debugging
