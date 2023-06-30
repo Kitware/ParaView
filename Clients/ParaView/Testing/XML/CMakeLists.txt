@@ -1153,6 +1153,7 @@ list(APPEND TESTS_WITH_BASELINES
   DataOutlines.xml
   DisableResetDisplayEmptyViews.xml
   DualSphereAnimation.xml
+  EdgeOpacity.xml
   EdgeTintPBR.xml
   EnSight.xml
   EnSightTensorInversion.xml

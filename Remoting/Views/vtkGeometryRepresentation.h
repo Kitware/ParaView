@@ -188,6 +188,7 @@ public:
   virtual void SetInterpolation(int val);
   virtual void SetLineWidth(double val);
   virtual void SetOpacity(double val);
+  virtual void SetEdgeOpacity(double val);
   virtual void SetPointSize(double val);
   virtual void SetSpecularColor(double r, double g, double b);
   virtual void SetSpecularPower(double val);

@@ -4514,6 +4514,9 @@
                       panel_widget="color_selector_with_palette"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="Surface With Edges" />
+            <Property name="EdgeOpacity"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="Surface With Edges" />
           </PropertyGroup>
 
           <PropertyGroup label="Backface Styling">
@@ -14509,6 +14512,14 @@
         <Hints>
           <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
         </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEdgeOpacity"
+                            default_values="1.0"
+                            name="EdgeOpacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetInteractiveSelectionColor"
                             default_values="0.5 0.0 1.0"

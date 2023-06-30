@@ -202,6 +202,7 @@ void vtkGeometryRepresentationWithFaces::UpdateColoringParameters()
 
     // Copy parameters from this->Property
     this->BackfaceProperty->SetEdgeColor(this->Property->GetEdgeColor());
+    this->BackfaceProperty->SetEdgeOpacity(this->Property->GetEdgeOpacity());
     this->BackfaceProperty->SetInterpolation(this->Property->GetInterpolation());
     this->BackfaceProperty->SetLineWidth(this->Property->GetLineWidth());
     this->BackfaceProperty->SetPointSize(this->Property->GetPointSize());
