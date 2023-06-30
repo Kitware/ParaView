@@ -150,7 +150,7 @@
       </IntVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="tif gen thf adf arg blx xlb bmp kap bt byn cad cpg ctg doq dt0 dt1 dt2 xml ers nl hdr gif grb img mpr mpl mem jpg kro l1b lan gis lcp los las map mff nat ntf nsf png ppm pgm prf x-dem rik rsw mtw grd ter til dem vrt xpm"
+        <ReaderFactory extensions="tif gen thf adf arg blx xlb kap bt byn cad cpg ctg doq dt0 dt1 dt2 ers nl hdr gif grb img mpr mpl mem kro l1b lan gis lcp los map mff nat ntf nsf ppm pgm prf x-dem rik rsw mtw grd ter til dem vrt xpm"
                        file_description="GDAL Raster Files" />
       </Hints>
       <!-- End GDALRasterReader -->
