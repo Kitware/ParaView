@@ -161,6 +161,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/random_torus.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/room.cas.h5}"
+  "DATA{${paraview_test_data_directory_input}/Data/room.dat.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/sample.h5part}"
   "DATA{${paraview_test_data_directory_input}/Data/servers-wiki.pvsc}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/coneScript.py}"
