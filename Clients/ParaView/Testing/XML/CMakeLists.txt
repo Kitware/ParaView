@@ -1519,6 +1519,13 @@ if (PARAVIEW_USE_MPI)
   set(PointInterpolator_DISABLE_CRS TRUE)
   set(PointInterpolator_DISABLE_CS TRUE)
   set(PointVolumeInterpolator_DISABLE_CS TRUE)
+
+  # The following tests are only run in client-server mode.
+  # They are needed to verify the remote saving/loading of different files, such as states and screenshots, work.
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS SaveLoadRemoteState.xml
+  )
 endif()
 
 if(PARAVIEW_USE_PYTHON)
