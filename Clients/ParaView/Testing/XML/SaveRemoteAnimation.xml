@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveAnimation" />
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="false"/>
+  <pqevent object="pqClientMainWindow/SaveAnimationFileDialog/tabWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Remote File System" />
+  <pqevent object="pqClientMainWindow" command="dashboard_mode" arguments="true"/>
+  <pqevent object="pqClientMainWindow/SaveAnimationFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/remote_animation.png" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionDelete" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/remote_animation.0043.png" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionZoomClosestToData" command="activate" arguments="" />
+</pqevents>
