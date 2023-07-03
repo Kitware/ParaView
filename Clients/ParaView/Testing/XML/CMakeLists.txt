@@ -1526,6 +1526,10 @@ if (PARAVIEW_USE_MPI)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS SaveLoadRemoteState.xml
   )
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS SaveRemoteScreenshot.xml
+  )
 endif()
 
 if(PARAVIEW_USE_PYTHON)
