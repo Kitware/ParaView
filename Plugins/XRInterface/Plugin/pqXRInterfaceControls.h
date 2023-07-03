@@ -84,6 +84,13 @@ public:
    */
   void SetSnapCropPlanes(bool checked);
 
+  /**
+   * Update custom viewpoints toolbar.
+   *
+   * Useful when helper modifies locations directly (e.g state loading)
+   */
+  void UpdateCustomViewpointsToolbar();
+
 protected Q_SLOTS:
   void resetCamera();
   void resetPositions();

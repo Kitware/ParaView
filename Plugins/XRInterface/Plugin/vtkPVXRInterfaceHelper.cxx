@@ -1261,6 +1261,8 @@ void vtkPVXRInterfaceHelper::ApplyState()
       dst.MotionFactor = src->MotionFactor;
     }
   }
+
+  this->XRInterfaceControls->UpdateCustomViewpointsToolbar();
 }
 
 //----------------------------------------------------------------------------
