@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraDialog.h"
 #include "pqCustomViewpointButtonDialog.h"
 #include "pqCustomViewpointsController.h"
+#include "pqCustomViewpointsDefaultController.h"
 #include "pqRenderView.h"
 #include "pqSettings.h"
 #include <QApplication>
@@ -44,6 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 void pqCustomViewpointsToolbar::constructor()
 {
+  // Use the default controller if no controller was given.
+  if (!this->Controller)
+  {
+    this->Controller = new pqCustomViewpointsDefaultController(this);
+  }
+
   this->Controller->setToolbar(this);
 
   // Create base pixmap
