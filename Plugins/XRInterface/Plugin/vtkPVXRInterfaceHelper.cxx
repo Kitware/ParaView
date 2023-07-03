@@ -1008,6 +1008,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
   if (locels)
   {
     int numnest = locels->GetNumberOfNestedElements();
+    this->Internals->Locations.resize(numnest);
     for (int li = 0; li < numnest; ++li)
     {
       vtkPVXMLElement* locel = locels->GetNestedElement(li);
@@ -1233,6 +1234,7 @@ void vtkPVXRInterfaceHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* lo
 void vtkPVXRInterfaceHelper::ApplyState()
 {
   // set camera poses
+  this->Internals->SavedCameraPoses.resize(this->Internals->Locations.size());
   for (std::size_t i = 0; i < this->Internals->Locations.size(); ++i)
   {
     if (this->Internals->Locations[i].Pose)
