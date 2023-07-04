@@ -203,8 +203,8 @@ in float vertexBivariateDataVSOut;
 )";
 
     // Here we apply the value of the 4D Perlin noise (depending on the noise array)
-    // on the value of 2D texture coordinates (tcoordVCVSOutput.s corresponds to the 1st data
-    // array with values clamped between 0.0 and 1.0, tcoordVCVSOutput.t is always equal to 0).
+    // on the value of 2D texture coordinates (colorTCoordVCVSOutput.s corresponds to the 1st data
+    // array with values clamped between 0.0 and 1.0, colorTCoordVCVSOutput.t is always equal to 0).
     // This ends up oscillating over the color texture (1D).
     // Bigger is the noise array value, bigger is the amplitude.
     std::string colorImplFS =
@@ -214,7 +214,7 @@ in float vertexBivariateDataVSOut;
 
   // Compute and apply the noise value to modify the color texture coordinates.
   float noise = fNoise(inVec, nbOfOctaves);
-  vec2 _texCoord = tcoordVCVSOutput.st + vec2(noise, 0.) * amplitude * vertexBivariateDataVSOut;
+  vec2 _texCoord = colorTCoordVCVSOutput.st + vec2(noise, 0.) * amplitude * vertexBivariateDataVSOut;
   )";
 
     vtkShaderProgram::Substitute(
@@ -231,7 +231,7 @@ in float vertexBivariateDataVSOut;
     // Now we need to override the texColor value (after the replacements defined in
     // vtkOpenGLPolyDataMapper) in order to use our custom _texCoord value.
     vtkShaderProgram::Substitute(shaders[vtkShader::Fragment],
-      "vec4 texColor = texture(colortexture, tcoordVCVSOutput.st);",
+      "vec4 texColor = texture(colortexture, colorTCoordVCVSOutput.st);",
       "vec4 texColor = texture(colortexture, _texCoord);");
   }
   else
