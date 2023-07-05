@@ -27,6 +27,7 @@ vtkStandardNewMacro(vtkSMViewLink);
 vtkSMViewLink::vtkSMViewLink()
 {
   this->AddException("Representations");
+  this->AddException("ViewSize");
 }
 
 //---------------------------------------------------------------------------
