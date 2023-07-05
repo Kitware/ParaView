@@ -112,9 +112,16 @@ public:
   void indexedLookupStateUpdated(bool indexed);
 
   /**
-   * Use active representation to create annotations.
+   * Use active representation to create annotations. This method grows the list of annotations.
+   * It is equivalent to calling pqColorAnnotationsWidget::addActiveAnnotations(force, true)
    */
   bool addActiveAnnotations(bool force);
+
+  /**
+   * Setting extend=true grows the list of annotations resulting in a union of previous annotations
+   * and annotations for the data range of the active source proxy.
+   */
+  bool addActiveAnnotations(bool force, bool extend);
 
   /**
    * Return current model index from table.

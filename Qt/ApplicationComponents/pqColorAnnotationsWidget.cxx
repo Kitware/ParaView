@@ -30,6 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqColorAnnotationsWidget.h"
+#include "pqAnimationManager.h"
+#include "pqAnimationScene.h"
+#include "pqPVApplicationCore.h"
 #include "ui_pqColorAnnotationsWidget.h"
 #include "ui_pqSavePresetOptions.h"
 
@@ -53,12 +56,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkVariant.h"
 #include "vtkVariantArray.h"
 
+#include <qnamespace.h>
 #include <vtk_jsoncpp.h>
 
 #include <QColorDialog>
@@ -447,6 +452,35 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
     ui.EnableOpacityMapping, SIGNAL(stateChanged(int)), SLOT(updateOpacityColumnState()));
   this->connect(ui.EnableOpacityMapping, SIGNAL(clicked()), SIGNAL(opacityMappingChanged()));
 
+  // Animation tick events will update list of available annotations.
+  if (auto manager = pqPVApplicationCore::instance()->animationManager())
+  {
+    if (auto scene = manager->getActiveScene())
+    {
+      QObject::connect(scene, &pqAnimationScene::tick, this, [this](const int) {
+        const auto& internals = *(this->Internals);
+        if (internals.LookupTableProxy != nullptr)
+        {
+          int rescaleMode =
+            vtkSMPropertyHelper(internals.LookupTableProxy, "AutomaticRescaleRangeMode", true)
+              .GetAsInt();
+          if (rescaleMode ==
+            vtkSMTransferFunctionManager::TransferFunctionResetMode::GROW_ON_APPLY_AND_TIMESTEP)
+          {
+            // extends the list of annotations.
+            this->addActiveAnnotations(/*force=*/false, /*extend=*/true);
+          }
+          else if (rescaleMode ==
+            vtkSMTransferFunctionManager::TransferFunctionResetMode::RESET_ON_APPLY_AND_TIMESTEP)
+          {
+            // clamps the list of annotations to the scalar range of the active source.
+            this->addActiveAnnotations(/*force=*/false, /*extend=*/false);
+          }
+        }
+      });
+    }
+  }
+
   this->updateOpacityColumnState();
 
   this->setSupportsReorder(false);
@@ -807,6 +841,12 @@ void pqColorAnnotationsWidget::addActiveAnnotations()
 //-----------------------------------------------------------------------------
 bool pqColorAnnotationsWidget::addActiveAnnotations(bool force)
 {
+  return this->addActiveAnnotations(force, true);
+}
+
+//-----------------------------------------------------------------------------
+bool pqColorAnnotationsWidget::addActiveAnnotations(bool force, bool extend)
+{
   // obtain prominent values from the server and add them
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
   if (!repr)
@@ -843,7 +883,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotations(bool force)
 
   // Set the merged annotations
   auto& internals = (*this->Internals);
-  if (internals.updateAnnotations(uniqueValues, true))
+  if (internals.updateAnnotations(uniqueValues, extend))
   {
     Q_EMIT this->annotationsChanged();
   }
