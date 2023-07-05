@@ -13,7 +13,7 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/vtk/in/LeftGripAction",
+      "name": "/actions/vtk/in/ComplexGestureAction",
       "type": "boolean"
     },
     {
@@ -26,10 +26,6 @@
     },
     {
       "name": "/actions/vtk/in/PositionProp",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/vtk/in/RightGripAction",
       "type": "boolean"
     },
     {
@@ -76,11 +72,10 @@
       "/actions/vtk/in/BackThickCrop": "Move Thick Crop Back",
       "/actions/vtk/in/Elevation": "Trackpad Elevation",
       "/actions/vtk/in/ForwardThickCrop": "Move Thick Crop Forward",
-      "/actions/vtk/in/LeftGripAction": "Left Grip Action",
+      "/actions/vtk/in/ComplexGestureAction": "Complex Gesture Action",
       "/actions/vtk/in/Movement": "Movement",
       "/actions/vtk/in/NextCameraPose": "Next Camera Pose",
       "/actions/vtk/in/PositionProp": "Position Prop",
-      "/actions/vtk/in/RightGripAction": "Right Grip Action",
       "/actions/vtk/in/ShowMenu": "Show Menu",
       "/actions/vtk/in/ShowNavigationPanel": "Show Navigation Panel",
       "/actions/vtk/in/StartElevation": "Start Elevation",

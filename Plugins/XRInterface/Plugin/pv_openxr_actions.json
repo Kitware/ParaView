@@ -25,7 +25,7 @@
       "type": "vibration"
     },
     {
-      "name": "leftgripaction",
+      "name": "complexgestureaction",
       "type": "boolean"
     },
     {
@@ -38,10 +38,6 @@
     },
     {
       "name": "positionprop",
-      "type": "boolean"
-    },
-    {
-      "name": "rightgripaction",
       "type": "boolean"
     },
     {
@@ -105,11 +101,10 @@
       "handpose": "Hand Pose",
       "handposegrip": "Hand Pose Grip",
       "haptic": "Haptic Vibration",
-      "leftgripaction": "Left Grip Action",
+      "complexgestureaction": "Complex Gesture Action",
       "movement": "Trackpad Movement",
       "nextcamerapose": "Next Camera Pose",
       "positionprop": "Position Prop",
-      "rightgripaction": "Right Grip Action",
       "showmenu": "Show Menu",
       "shownavigationpanel": "Show Navigation Panel",
       "startelevation": "Start Elevation",
