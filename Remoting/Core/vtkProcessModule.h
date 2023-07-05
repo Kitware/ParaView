@@ -281,7 +281,7 @@ public:
   /**
    * Returns a callback queue in which one can defer tasks that can run asynchronously.
    */
-  static vtkThreadedCallbackQueue* GetCallbackQueue();
+  vtkThreadedCallbackQueue* GetCallbackQueue();
 
 protected:
   vtkProcessModule();
@@ -345,7 +345,6 @@ private:
 
   static vtkSmartPointer<vtkProcessModule> Singleton;
   static vtkSmartPointer<vtkMultiProcessController> GlobalController;
-  static vtkNew<vtkThreadedCallbackQueue> CallbackQueue;
 
   bool MultipleSessionsSupport;
 

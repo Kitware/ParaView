@@ -257,21 +257,21 @@ bool vtkPVGeneralSettings::GetUseAcceleratedFilters()
 //----------------------------------------------------------------------------
 int vtkPVGeneralSettings::GetNumberOfCallbackThreads()
 {
-  return vtkProcessModule::GetCallbackQueue()->GetNumberOfThreads();
+  return vtkProcessModule::GetProcessModule()->GetCallbackQueue()->GetNumberOfThreads();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetNumberOfCallbackThreads(int n)
 {
-  auto session =
-    vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
+  vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
+  auto session = vtkPVSession::SafeDownCast(processModule->GetSession());
 
   // We change the number of threads in built-in mode or if current process is the root server node
-  if (session->GetProcessRoles() & vtkPVSession::DATA_SERVER_ROOT ||
+  if (session->GetProcessRoles() & vtkPVSession::DATA_SERVER ||
     (session->GetProcessRoles() & vtkPVSession::CLIENT &&
-      !session->GetController(vtkPVSession::DATA_SERVER_ROOT)))
+      !session->GetController(vtkPVSession::DATA_SERVER)))
   {
-    vtkProcessModule::GetCallbackQueue()->SetNumberOfThreads(n);
+    processModule->GetCallbackQueue()->SetNumberOfThreads(n);
   }
 }
 

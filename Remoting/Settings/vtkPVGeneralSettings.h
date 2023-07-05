@@ -359,8 +359,8 @@ public:
   /**
    * Sets the number of threads that are used for `vtkPVSession::ThreadedCallbackQueue`.
    */
-  int GetNumberOfCallbackThreads();
-  void SetNumberOfCallbackThreads(int);
+  static int GetNumberOfCallbackThreads();
+  static void SetNumberOfCallbackThreads(int);
   ///@}
 
 protected:

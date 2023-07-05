@@ -103,6 +103,11 @@ public:
    */
   static void Wait(const std::string& fileName);
 
+  /**
+   * Wait for all jobs saving screenshot to finish.
+   */
+  static void Wait();
+
 protected:
   vtkRemoteWriterHelper();
   ~vtkRemoteWriterHelper() override;

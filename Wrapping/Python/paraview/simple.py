@@ -1339,7 +1339,7 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
         saveInBackground (bool)
           If set to `True`, the screenshot will be saved by a different thread
           and run in the background. In such circumstances, one can wait
-          until the file is written by calling `WaitForFile(filename)`.
+          until the file is written by calling `WaitForScreenshot(filename)`.
 
     **Keyword Parameters (optional)**
 
@@ -1464,6 +1464,30 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
 
     SetProperties(options, **params)
     return options.WriteImage(filename)
+
+# -----------------------------------------------------------------------------
+def SetNumberOfCallbackThreads(n):
+    """Sets the number of threads used by the threaded callback queue that can be used for saving
+    screenshots.
+    """
+    paraview.modules.vtkRemotingSetting.GetInstance().SetNumberOfCallbackThreads(n)
+
+# -----------------------------------------------------------------------------
+    """Gets the number of threads used by the threaded callback queue that can be used for saving
+    screenshots.
+    """
+def GetNumberOfCallbackThreads(n):
+    paraview.modules.vtkRemotingSetting.GetInstance().GetNumberOfCallbackThreads()
+
+# -----------------------------------------------------------------------------
+def WaitForScreenshot(filename = None):
+    """Pause this thread until screenshot named filename has terminated.
+    If no filename is provided, then this thread pauses until all screenshot have been saved.
+    """
+    if not filename:
+        paraview.servermanager.vtkRemoteWriterHelper.Wait()
+    else:
+        paraview.servermanager.vtkRemoteWriterHelper.Wait(filename)
 
 # -----------------------------------------------------------------------------
 def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
