@@ -1143,6 +1143,71 @@ found and the point will be rejected.</Documentation>
     <!-- End AppendMolecule -->
     </SourceProxy>
 
+    <SourceProxy class="vtkFieldDataToDataSetAttribute"
+                 label="Field Data to Attribute"
+                 name="FieldDataToDataSetAttribute">
+      <Documentation long_help="Create attribute data arrays (like cell or point array) from field data arrays."
+        short_help="Pass field data arrays to the requested attribute.">
+        This filter creates single-value arrays in the requested field
+        from the selected Field Data arrays.
+
+        It uses only the first component of the first tuple of the input arrays.
+        This filter operates on any type of dataset, and the output dataset is the same type as the input.
+        String arrays are not supported.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="field_arrays" attribute_type="field" />
+        <FixedTypeDomain name="fixed_type" />
+        <Documentation>This property specifies the input of this filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetProcessAllArrays"
+                         default_values="0"
+                         name="ProcessAllArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether all input
+        field arrays will be processed and converted.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="ClearFieldDataArrays"
+                            command="AddFieldDataArray"
+                            name="FieldDataArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a field array by name to be converted.</Documentation>
+        <ArrayListDomain input_domain_name="field_arrays" data_type="VTK_DATA_ARRAY" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ProcessAllArrays" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetOutputFieldType"
+                         default_values="0"
+                         name="OutputFieldType"
+                         number_of_elements="1">
+        <Documentation>Select the output attribute type</Documentation>
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+      <!-- End PointDataToCellData -->
+    </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPointDataToCellData"
                  label="Point Data to Cell Data"
