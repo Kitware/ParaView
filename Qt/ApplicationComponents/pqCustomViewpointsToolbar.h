@@ -67,16 +67,23 @@ public:
   {
     this->constructor();
   }
+  pqCustomViewpointsToolbar(QWidget* parentObject = nullptr)
+    : Superclass(parentObject)
+    , Controller(nullptr)
+    , BasePixmap(64, 64)
+  {
+    this->constructor();
+  }
   ~pqCustomViewpointsToolbar() override = default;
 
-protected Q_SLOTS:
-
+public:
   /**
    * Clear and recreate all custom viewpoint actions
    * based on current settings
    */
   void updateCustomViewpointActions();
 
+protected Q_SLOTS:
   /**
    * Update the state of the toolbuttons
    * depending of the type of the current active view

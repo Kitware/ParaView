@@ -50,6 +50,7 @@ struct pqXRInterfaceControls::pqInternals
   Ui::pqXRInterfaceControls Ui;
   QButtonGroup* ViewUpGroup = nullptr;
   vtkPVXRInterfaceHelper* Helper = nullptr;
+  pqCustomViewpointsToolbar* CustomViewpointsToolbar = nullptr;
   bool NoForward = false;
 };
 
@@ -81,6 +82,8 @@ pqXRInterfaceControls::pqXRInterfaceControls(vtkPVXRInterfaceHelper* val, QWidge
 
   this->Internals->Ui.movementPageVLayout->insertWidget(4, toolbar);
   this->Internals->Ui.pqXRInterfaceTabs->tabBar()->setExpanding(true);
+
+  this->Internals->CustomViewpointsToolbar = toolbar;
 }
 
 //------------------------------------------------------------------------------
@@ -343,4 +346,10 @@ void pqXRInterfaceControls::SetSnapCropPlanes(bool checked)
 void pqXRInterfaceControls::SetShowFloor(bool checked)
 {
   this->Internals->Ui.showFloorButton->setChecked(checked);
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::UpdateCustomViewpointsToolbar()
+{
+  this->Internals->CustomViewpointsToolbar->updateCustomViewpointActions();
 }
