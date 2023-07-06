@@ -1618,6 +1618,11 @@ void vtkPVXRInterfaceHelper::RenderXRView()
   {
     vtkRenderer* ren = this->Internals->RenderWindow->GetRenderers()->GetFirstRenderer();
 
+    vtkWin32OpenGLDXRenderWindow* hw = vtkWin32OpenGLDXRenderWindow::SafeDownCast(
+      vtkOpenXRRemotingRenderWindow::SafeDownCast(this->Internals->RenderWindow)
+        ->GetHelperWindow());
+    hw->Lock();
+
     vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
 
     // bind framebuffer with texture
@@ -1713,6 +1718,7 @@ void vtkPVXRInterfaceHelper::RenderXRView()
     // do a FSQ render
     this->Internals->ObserverWidget->renderWindow()->Render();
     this->Internals->RenderWindow->MakeCurrent();
+    hw->Unlock();
   }
 }
 
