@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqEditScalarBarReaction.h"
+#include "pqPipelineSource.h"
 #include "pqProxyWidget.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqSMAdaptor.h"
@@ -381,9 +382,15 @@ void pqColorMapEditor::updateOpacityArraySelectorWidgets()
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::renderViews()
 {
-  if (this->Internals->ActiveRepresentation)
+  const auto source = this->Internals->ActiveRepresentation->getInput();
+  // render all views which display the representation of this pqPipelineSource
+  for (auto& view : source->getViews())
   {
-    this->Internals->ActiveRepresentation->renderViewEventually();
+    const auto representation = source->getRepresentation(view);
+    if (representation->isVisible())
+    {
+      representation->renderViewEventually();
+    }
   }
 }
 
