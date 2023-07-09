@@ -34,12 +34,12 @@ stages:
 
 ## Spack
 
-spack-centos7:build:
-    extends:
-        - .centos7
-        - .spack_build_linux
-        - .linux_builder_tags
-        - .run_scheduled
+# spack-centos7:build:
+#     extends:
+#         - .centos7
+#         - .spack_build_linux
+#         - .linux_builder_tags
+#         - .run_scheduled
 
 ## Linux
 
