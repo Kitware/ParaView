@@ -48,17 +48,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkPythonInteractiveInterpreter.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
-#include <QFileDialog>
 #include <QInputDialog>
 #include <QLayout>
-#include <QMainWindow>
-#include <QSplitter>
 #include <QStatusBar>
 #include <QTextStream>
 #include <sstream>
@@ -242,7 +240,7 @@ void pqPythonManager::updateMacroList()
 }
 
 //----------------------------------------------------------------------------
-void pqPythonManager::addMacro(const QString& fileName)
+void pqPythonManager::addMacro(const QString& fileName, vtkTypeUInt32 location)
 {
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
   QDir dir;
@@ -257,7 +255,20 @@ void pqPythonManager::addMacro(const QString& fileName)
   QString expectedFilePath = userMacroDir + "/" + QFileInfo(fileName).fileName();
   expectedFilePath = pqCoreUtilities::getNoneExistingFileName(expectedFilePath);
 
-  QFile::copy(fileName, expectedFilePath);
+  // read python script from file
+  auto pxm = pqApplicationCore::instance()->getActiveServer()->proxyManager();
+  const auto pyScript = pxm->LoadString(fileName.toUtf8().data(), location);
+
+  // write python script to file in user directory
+  QFile file(expectedFilePath);
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+  {
+    qWarning() << "Could not create user Macro file:" << expectedFilePath;
+    return;
+  }
+  QTextStream out(&file);
+  out << pyScript.c_str();
+  file.close();
 
   // Register the inner one
   this->Internal->MacroSupervisor->addMacro(expectedFilePath);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPythonTabWidget.h
+   Module:    pqPythonTabWidget.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -138,7 +138,7 @@ pqPythonTextArea* pqPythonTabWidget::getCurrentTextArea() const
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonTabWidget::addNewTextArea(const QString& fileName)
+void pqPythonTabWidget::addNewTextArea(const QString& fileName, vtkTypeUInt32 location)
 {
   // If the fileName is empty abort
   if (fileName.isEmpty())
@@ -161,7 +161,7 @@ void pqPythonTabWidget::addNewTextArea(const QString& fileName)
   }
 
   // If not create a new tab
-  tArea->openFile(fileName);
+  tArea->openFile(fileName, location);
 }
 
 //-----------------------------------------------------------------------------

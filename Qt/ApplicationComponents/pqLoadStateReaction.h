@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqLoadStateReaction_h
 
 #include "pqReaction.h"
+#include "vtkType.h"
 
 class pqServer;
 
@@ -58,8 +59,8 @@ public:
    * having to create a reaction instance.
    * If no server is specified, active server is used.
    */
-  static void loadState(
-    const QString& filename, bool dialogBlocked = false, pqServer* server = nullptr);
+  static void loadState(const QString& filename, bool dialogBlocked = false,
+    pqServer* server = nullptr, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
   static void loadState();
 
   /**

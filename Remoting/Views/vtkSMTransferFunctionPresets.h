@@ -173,8 +173,9 @@ public:
    * If the filename ends with a .xml, it's assumed to be a legacy color map XML
    * and will be converted to the new format before processing.
    */
-  bool ImportPresets(const char* filename);
-  bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets);
+  bool ImportPresets(const char* filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
+  bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
   bool ImportPresets(const Json::Value& presets);
   bool ImportPresets(const Json::Value& presets, std::vector<ImportedPreset>* importedPresets);
   ///@}

@@ -32,9 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonFileIO.h"
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqPythonScriptEditor.h"
+#include "pqServer.h"
+
+#include "vtkPVSession.h"
+#include "vtkSMFileUtilities.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QApplication>
 #include <QFile>
@@ -42,18 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QTextEdit>
 #include <QTextStream>
-
-#define Q_OPEN_FILE_(FILENAME, FLAGS)                                                              \
-  QFile file(FILENAME);                                                                            \
-  if (!file.open(FLAGS))                                                                           \
-  {                                                                                                \
-    QMessageBox::warning(pqCoreUtilities::mainWidget(),                                            \
-      QCoreApplication::translate("pqPythonFileIO", "Sorry!"),                                     \
-      qPrintable(QCoreApplication::translate("pqPythonFileIO", "Cannot open file %1:\n%2.")        \
-                   .arg(FILENAME)                                                                  \
-                   .arg(file.errorString())));                                                     \
-    return false;                                                                                  \
-  }
 
 namespace details
 {
@@ -89,14 +83,18 @@ QString GetSwapFilename(const QString& filepath)
 }
 
 //-----------------------------------------------------------------------------
-bool Write(const QString& filename, const QString& content)
+//-----------------------------------------------------------------------------
+QString Read(const QString& filename, vtkTypeUInt32 location)
 {
-  Q_OPEN_FILE_(filename, QFile::WriteOnly | QFile::Text);
+  auto pxm = pqApplicationCore::instance()->getActiveServer()->proxyManager();
+  return QString(pxm->LoadString(filename.toStdString().c_str(), location).c_str());
+}
 
-  QTextStream out(&file);
-  out << content;
-
-  return true;
+//-----------------------------------------------------------------------------
+bool Write(const QString& filename, vtkTypeUInt32 location, const QString& content)
+{
+  auto pxm = pqApplicationCore::instance()->getActiveServer()->proxyManager();
+  return pxm->SaveString(content.toStdString().c_str(), filename.toStdString().c_str(), location);
 }
 }
 
@@ -111,7 +109,7 @@ bool pqPythonFileIO::PythonFile::writeToFile() const
     return false;
   }
 
-  return details::Write(this->Name, this->Text->toPlainText());
+  return details::Write(this->Name, this->Location, this->Text->toPlainText());
 }
 
 //-----------------------------------------------------------------------------
@@ -128,16 +126,18 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
   const QString swapFilename = details::GetSwapFilename(this->Name);
   if (QFileInfo::exists(swapFilename))
   {
-    switch (pqCoreUtilities::promptUserGeneric(tr("Script Editor"),
+    const auto userAnswer = pqCoreUtilities::promptUserGeneric(tr("Script Editor"),
       tr("Paraview found an old automatic save file %1. Would you like to recover its content?"),
-      QMessageBox::Warning, QMessageBox::Yes | QMessageBox::Discard | QMessageBox::Cancel, nullptr))
+      QMessageBox::Warning, QMessageBox::Yes | QMessageBox::Discard | QMessageBox::Cancel, nullptr);
+    switch (userAnswer)
     {
       case QMessageBox::Yes:
-        QFile::remove(this->Name);
-        QFile::copy(swapFilename, this->Name);
+      {
+        const auto contents = details::Read(swapFilename, vtkPVSession::CLIENT);
+        details::Write(this->Name, this->Location, contents);
         QFile::remove(swapFilename);
         break;
-
+      }
       case QMessageBox::Discard:
         QFile::remove(swapFilename);
         break;
@@ -148,11 +148,8 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
     }
   }
 
-  Q_OPEN_FILE_(Name, QFile::ReadOnly | QFile::Text);
-
-  QTextStream in(&file);
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  str = in.readAll();
+  str = details::Read(this->Name, this->Location);
   QApplication::restoreOverrideCursor();
 
   pqPythonScriptEditor::bringFront();
@@ -169,7 +166,7 @@ void pqPythonFileIO::PythonFile::start()
       const QString swapFilename = details::GetSwapFilename(this->Name);
       if (!swapFilename.isEmpty())
       {
-        details::Write(swapFilename, this->Text->toPlainText());
+        details::Write(swapFilename, vtkPVSession::CLIENT, this->Text->toPlainText());
       }
     }
   });
@@ -234,14 +231,14 @@ bool pqPythonFileIO::saveOnClose()
 }
 
 //-----------------------------------------------------------------------------
-bool pqPythonFileIO::openFile(const QString& filename)
+bool pqPythonFileIO::openFile(const QString& filename, vtkTypeUInt32 location)
 {
   if (!this->saveOnClose())
   {
     return false;
   }
 
-  const PythonFile file(filename, &this->TextEdit);
+  const PythonFile file(filename, location, &this->TextEdit);
   QString fileContent;
   if (!file.readFromFile(fileContent))
   {
@@ -267,7 +264,7 @@ bool pqPythonFileIO::save()
   }
   else
   {
-    return this->saveBuffer(this->File.Name);
+    return this->saveBuffer(this->File.Name, this->File.Location);
   }
 }
 
@@ -284,23 +281,26 @@ void pqPythonFileIO::setModified(bool modified)
 //-----------------------------------------------------------------------------
 bool pqPythonFileIO::saveAs()
 {
-  QString filename =
-    pqFileDialog::getSaveFileName(nullptr, pqPythonScriptEditor::getUniqueInstance(),
-      tr("Save File As"), this->DefaultSaveDirectory, tr("Python Files") + QString(" (*.py);;"));
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  auto filenameAndLocation = pqFileDialog::getSaveFileNameAndLocation(server,
+    pqPythonScriptEditor::getUniqueInstance(), tr("Save File As"), this->DefaultSaveDirectory,
+    tr("Python Files") + QString(" (*.py);;"), false, false);
 
-  if (filename.isEmpty())
+  auto& fileName = filenameAndLocation.first;
+  auto& location = filenameAndLocation.second;
+  if (fileName.isEmpty())
   {
     return false;
   }
 
-  if (!filename.endsWith(".py"))
+  if (!fileName.endsWith(".py"))
   {
-    filename.append(".py");
+    fileName.append(".py");
   }
 
   pqPythonScriptEditor::bringFront();
 
-  return this->saveBuffer(filename);
+  return this->saveBuffer(fileName, location);
 }
 
 //-----------------------------------------------------------------------------
@@ -321,7 +321,7 @@ bool pqPythonFileIO::saveAsMacro()
 
   pqPythonScriptEditor::bringFront();
 
-  if (this->saveBuffer(filename))
+  if (this->saveBuffer(filename, vtkPVSession::CLIENT))
   {
     pqPythonScriptEditor::updateMacroList();
     return true;
@@ -342,13 +342,14 @@ bool pqPythonFileIO::saveAsScript()
     return false;
   }
 
-  const QString filename =
-    pqFileDialog::getSaveFileName(nullptr, pqPythonScriptEditor::getUniqueInstance(),
-      tr("Save As Script"), userScriptDir, tr("Python Files") + QString(" (*.py);;"));
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  const auto filenameAndLocation =
+    pqFileDialog::getSaveFileNameAndLocation(server, pqPythonScriptEditor::getUniqueInstance(),
+      tr("Save As Script"), userScriptDir, tr("Python Files") + QString(" (*.py);;"), false, false);
 
   pqPythonScriptEditor::bringFront();
 
-  if (this->saveBuffer(filename))
+  if (this->saveBuffer(filenameAndLocation.first, filenameAndLocation.second))
   {
     pqPythonScriptEditor::updateScriptList();
     return true;
@@ -358,14 +359,14 @@ bool pqPythonFileIO::saveAsScript()
 }
 
 //-----------------------------------------------------------------------------
-bool pqPythonFileIO::saveBuffer(const QString& filename)
+bool pqPythonFileIO::saveBuffer(const QString& filename, vtkTypeUInt32 location)
 {
   if (filename.isEmpty())
   {
     return false;
   }
 
-  const PythonFile file(filename, &this->TextEdit);
+  const PythonFile file(filename, location, &this->TextEdit);
   if (file.writeToFile())
   {
     if (file != this->File)

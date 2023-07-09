@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="TraceOptionsDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0" command="dashboard_mode" arguments="false"/>
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog/tabWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Remote File System"/>
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0" command="dashboard_mode" arguments="true"/>
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/python_script.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionDelete" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsOpenScriptEditor" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="&amp;Open..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0" command="dashboard_mode" arguments="false"/>
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog/tabWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Remote File System"/>
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0" command="dashboard_mode" arguments="true"/>
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/python_script.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Run..." />
+</pqevents>

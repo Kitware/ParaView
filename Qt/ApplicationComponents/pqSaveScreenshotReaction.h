@@ -91,7 +91,7 @@ public:
    * given proxy.
    */
   static QString promptFileName(
-    vtkSMSaveScreenshotProxy* saveProxy, const QString& defaultExtension);
+    vtkSMSaveScreenshotProxy* saveProxy, const QString& defaultExtension, vtkTypeUInt32& location);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

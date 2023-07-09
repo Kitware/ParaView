@@ -124,6 +124,22 @@
           Set the spacing to use for the image output by this reader.
         </Documentation>
       </DoubleVectorProperty>
+      <StringVectorProperty command="GetTextKeys"
+                            information_only="1"
+                            name="TextKeys">
+        <StringArrayHelper/>
+        <Documentation>
+          Get the text keys from the PNG file.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetTextValues"
+                            information_only="1"
+                            name="TextValues">
+        <StringArrayHelper/>
+        <Documentation>
+          Get the text values from the PNG file.
+        </Documentation>
+      </StringVectorProperty>
       <!-- End PNGReader -->
     </Proxy>
 
@@ -481,6 +497,8 @@
                proxyname="PNGReader"></Proxy>
         <ExposedProperties>
           <Property name="DataSpacing" />
+          <Property name="TextKeys" />
+          <Property name="TextValues" />
         </ExposedProperties>
       </SubProxy>
       <Hints>

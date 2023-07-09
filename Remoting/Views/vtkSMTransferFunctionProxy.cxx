@@ -257,7 +257,8 @@ bool vtkSMTransferFunctionProxy::GetRange(double range[2])
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::ExportTransferFunction(
   vtkSMTransferFunctionProxy* colorTransferFunction,
-  vtkSMTransferFunctionProxy* opacityTransferFunction, const char* tfname, const char* filename)
+  vtkSMTransferFunctionProxy* opacityTransferFunction, const char* tfname, const char* filename,
+  vtkTypeUInt32 location)
 {
   Json::Value exportCollection(Json::arrayValue);
   Json::Value transferFunction =
@@ -275,16 +276,8 @@ bool vtkSMTransferFunctionProxy::ExportTransferFunction(
 
   exportCollection.append(transferFunction);
 
-  vtksys::ofstream outfs;
-  outfs.open(filename);
-  if (!outfs.is_open())
-  {
-    std::cerr << "Failed to open file for writing: " << filename;
-    return false;
-  }
-  outfs << exportCollection.toStyledString().c_str() << endl;
-  outfs.close();
-  return true;
+  auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  return pxm->SaveString(exportCollection.toStyledString().c_str(), filename, location);
 }
 
 //----------------------------------------------------------------------------

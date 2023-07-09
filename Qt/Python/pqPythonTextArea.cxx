@@ -156,9 +156,9 @@ void pqPythonTextArea::setText(const QString& text)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPythonTextArea::openFile(const QString& filename)
+bool pqPythonTextArea::openFile(const QString& filename, vtkTypeUInt32 location)
 {
-  return this->FileIO->openFile(filename);
+  return this->FileIO->openFile(filename, location);
 }
 
 //-----------------------------------------------------------------------------

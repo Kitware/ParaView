@@ -40,6 +40,7 @@ from __future__ import absolute_import, division, print_function
 import paraview
 from paraview import servermanager
 import paraview._backwardscompatibilityhelper
+from paraview.modules.vtkRemotingCore import vtkPVSession
 
 # Bring OutputPort in our namespace.
 from paraview.servermanager import OutputPort
@@ -591,7 +592,7 @@ def UpdateSteerableParameters(steerable_proxy, steerable_source_name):
 #==============================================================================
 
 def LoadState(statefile, data_directory = None, restrict_to_data_directory = False,
-        filenames = None, *args, **kwargs):
+        filenames = None, location=vtkPVSession.CLIENT, *args, **kwargs):
     """
     Load PVSM state file.
 
@@ -635,7 +636,7 @@ def LoadState(statefile, data_directory = None, restrict_to_data_directory = Fal
 
     pxm = servermanager.ProxyManager()
     pyproxy = servermanager._getPyProxy(pxm.NewProxy('options', 'LoadStateOptions'))
-    if pyproxy.PrepareToLoad(statefile):
+    if pyproxy.PrepareToLoad(statefile, location):
         pyproxy.LoadStateDataFileOptions = pyproxy.SMProxy.USE_FILES_FROM_STATE
         if pyproxy.HasDataFiles():
             if data_directory is not None:
@@ -687,8 +688,8 @@ def _LoadStateLegacy(filename, connection=None, **extraArgs):
 
 # -----------------------------------------------------------------------------
 
-def SaveState(filename):
-    servermanager.SaveState(filename)
+def SaveState(filename, location=vtkPVSession.CLIENT):
+    servermanager.SaveState(filename, location)
 
 #==============================================================================
 # Representation methods
@@ -1318,7 +1319,7 @@ def _SaveScreenshotLegacy(filename,
         return SaveScreenshot(filename, viewOrLayout,
             ImageResolution=imageResolution)
 
-def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **params):
+def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, location=vtkPVSession.CLIENT, **params):
     """Save screenshot for a view or layout (collection of views) to an image.
 
     `SaveScreenshot` is used to save the rendering results to an image.
@@ -1340,6 +1341,11 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
           If set to `True`, the screenshot will be saved by a different thread
           and run in the background. In such circumstances, one can wait
           until the file is written by calling `WaitForScreenshot(filename)`.
+
+        location (int)
+          Location where the screenshot should be saved. This can be one of
+          the following values: `vtkPVSession.CLIENT`, `vtkPVSession.DATA_SERVER`.
+          The default is `vtkPVSession.CLIENT`.
 
     **Keyword Parameters (optional)**
 
@@ -1444,7 +1450,7 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
     options = servermanager.misc.SaveScreenshot()
     controller.PreInitializeProxy(options)
 
-    options.SaveInBackground = saveInBackground;
+    options.SaveInBackground = saveInBackground
     options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
@@ -1463,7 +1469,7 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, **para
             del params[prop]
 
     SetProperties(options, **params)
-    return options.WriteImage(filename)
+    return options.WriteImage(filename, location)
 
 # -----------------------------------------------------------------------------
 def SetNumberOfCallbackThreads(n):
@@ -1490,7 +1496,7 @@ def WaitForScreenshot(filename = None):
         paraview.servermanager.vtkRemoteWriterHelper.Wait(filename)
 
 # -----------------------------------------------------------------------------
-def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
+def SaveAnimation(filename, viewOrLayout=None, scene=None, location=vtkPVSession.CLIENT, **params):
     """Save animation as a movie file or series of images.
 
     `SaveAnimation` is used to save an animation as a movie file (avi or ogv) or
@@ -1513,6 +1519,11 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         scene (``proxy``, optional)
           Animation scene to save. If None, then the active scene returned by
           `GetAnimationScene` is used.
+
+        location (int)
+          Location where the screenshot should be saved. This can be one of
+          the following values: `vtkPVSession.CLIENT`, `vtkPVSession.DATA_SERVER`.
+          The default is `vtkPVSession.CLIENT`.
 
     **Keyword Parameters (optional)**
 
@@ -1602,7 +1613,7 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
                 del params[prop]
 
     SetProperties(options, **params)
-    return options.WriteAnimation(filename)
+    return options.WriteAnimation(filename, location)
 
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
@@ -1795,20 +1806,21 @@ def GetTransferFunction2D(arrayname, array2name=None, representation=None, separ
     return tf2d
 
 # -----------------------------------------------------------------------------
-def ImportPresets(filename):
+def ImportPresets(filename, location=vtkPVSession.CLIENT):
     """Import presets from a file. The file can be in the legacy color map xml
     format or in the new JSON format. Returns True on success."""
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
-    return presets.ImportPresets(filename)
+    return presets.ImportPresets(filename, location)
 
 # -----------------------------------------------------------------------------
-def ExportTransferFunction(colortransferfunction, opacitytransferfunction, tfname, filename):
+def ExportTransferFunction(colortransferfunction, opacitytransferfunction, tfname, filename,
+                           location=vtkPVSession.CLIENT):
     """Export transfer function to a file. The file will be saved in the new JSON format.
     Note that opacitytransferfunction can be None. The tfname is the name that will be
     given to the transfer function preset when imported back into ParaView.
     Returns True on success."""
     return servermanager.vtkSMTransferFunctionProxy.ExportTransferFunction(\
-             colortransferfunction.SMProxy, opacitytransferfunction.SMProxy, tfname, filename)
+             colortransferfunction.SMProxy, opacitytransferfunction.SMProxy, tfname, filename, location)
 
 # -----------------------------------------------------------------------------
 def CreateLookupTable(**params):

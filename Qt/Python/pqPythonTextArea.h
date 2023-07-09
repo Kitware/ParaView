@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonUtils.h"
 #include "pqTextLinkerPython.h"
 
+#include "vtkType.h" // For vtkTypeUInt32
+
 #include <QKeyEvent>
 #include <QUndoStack>
 #include <QWidget>
@@ -88,7 +90,7 @@ public:
    * Triggers a saving wizard if the current buffer
    * has not beed saved on the disk.
    */
-  bool openFile(const QString& filename);
+  bool openFile(const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * @brief Sets the default save directory.

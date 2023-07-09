@@ -89,8 +89,9 @@ void pqSaveScreenshotReaction::updateEnableState()
 
 //-----------------------------------------------------------------------------
 QString pqSaveScreenshotReaction::promptFileName(
-  vtkSMSaveScreenshotProxy* prototype, const QString& defaultExtension)
+  vtkSMSaveScreenshotProxy* prototype, const QString& defaultExtension, vtkTypeUInt32& location)
 {
+  location = vtkPVSession::CLIENT;
   if (!prototype)
   {
     qWarning("No `prototype` proxy specified.");
@@ -111,9 +112,10 @@ QString pqSaveScreenshotReaction::promptFileName(
     return QString();
   }
 
-  pqFileDialog file_dialog(nullptr, pqCoreUtilities::mainWidget(),
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  pqFileDialog file_dialog(server, pqCoreUtilities::mainWidget(),
     QCoreApplication::translate("ServerManagerXML", prototype->GetXMLLabel()), QString(),
-    filters.c_str(), false);
+    filters.c_str(), false, false);
   file_dialog.setRecentlyUsedExtension(lastUsedExt);
   file_dialog.setObjectName(QString("%1FileDialog").arg(prototype->GetXMLName()));
   file_dialog.setFileMode(pqFileDialog::AnyFile);
@@ -121,6 +123,7 @@ QString pqSaveScreenshotReaction::promptFileName(
   {
     return QString();
   }
+  location = file_dialog.getSelectedLocation();
 
   QString file = file_dialog.getSelectedFiles()[0];
   const QFileInfo fileInfo(file);
@@ -161,7 +164,8 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   }
 
   // Get the filename first, this will determine some options shown.
-  const QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png");
+  vtkTypeUInt32 location;
+  const QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png", location);
   if (filename.isEmpty())
   {
     return false;
@@ -232,7 +236,7 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
     {
       stateXMLRoot = nullptr;
     }
-    shProxy->WriteImage(filename.toUtf8().data(), vtkPVSession::CLIENT, stateXMLRoot);
+    shProxy->WriteImage(filename.toUtf8().data(), location, stateXMLRoot);
   }
 
   if (layout)

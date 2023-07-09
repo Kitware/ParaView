@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPVApplicationCore.h"
 #include "pqPythonManager.h"
 
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
-#include "pqPythonMacroSupervisor.h"
 
 //-----------------------------------------------------------------------------
 pqMacroReaction::pqMacroReaction(QAction* parentObject)
@@ -56,14 +56,15 @@ void pqMacroReaction::createMacro()
     return;
   }
 
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(),
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(),
     tr("Open Python File to create a Macro:"), QString(),
-    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"), false);
+    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"), false, false);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
   {
-    pythonManager->addMacro(fileDialog.getSelectedFiles()[0]);
+    pythonManager->addMacro(fileDialog.getSelectedFiles()[0], fileDialog.getSelectedLocation());
   }
 }
 //-----------------------------------------------------------------------------

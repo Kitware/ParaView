@@ -252,7 +252,7 @@ public:
    * Save the ServerManager state to a file.
    * Return true if the operation succeeded otherwise return false.
    */
-  bool saveState(const QString& filename);
+  bool saveState(const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Loads the ServerManager state. Emits the signal

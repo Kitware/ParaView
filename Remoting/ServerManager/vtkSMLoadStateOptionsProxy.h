@@ -40,7 +40,10 @@
 #include "vtkNew.h"                         // for vtkNew
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMProxy.h"
+
 #include <vector> // needed for std::vector
+
+class vtkSMSessionProxyManager;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
@@ -49,16 +52,20 @@ public:
   vtkTypeMacro(vtkSMLoadStateOptionsProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
   /**
    * Check if a PNG has a paraview state embedded in it. Contents will include the state if present.
    */
-  static bool PNGHasStateFile(const char* statefilename, std::string& contents);
+  static bool PNGHasStateFile(const char* statefilename, std::string& contents,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
+  ///@}
 
   /**
    * Set the state file to load. This may read the file and collect information
    * about the file. Returns false if the filename is invalid or cannot be read.
    */
-  virtual bool PrepareToLoad(const char* statefilename);
+  virtual bool PrepareToLoad(
+    const char* statefilename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Check if state file has any data files.

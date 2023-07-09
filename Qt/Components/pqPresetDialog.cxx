@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
 #include "pqQVTKWidget.h"
+#include "pqServer.h"
 #include "pqSettings.h"
-#include "vtkNew.h"
+
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 
@@ -103,11 +105,13 @@ public:
 
   ~pqPresetDialogTableModel() override = default;
 
-  void importPresets(const QString& filename)
+  void importPresets(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/)
   {
     this->beginResetModel();
     std::vector<vtkSMTransferFunctionPresets::ImportedPreset> importedPresets;
-    bool imported = this->Presets->ImportPresets(filename.toStdString().c_str(), &importedPresets);
+    const bool imported =
+      this->Presets->ImportPresets(filename.toStdString().c_str(), &importedPresets, location);
     if (imported)
     {
       for (auto const& importedPreset : importedPresets)
@@ -885,20 +889,22 @@ bool pqPresetDialog::usePresetRange() const
 //-----------------------------------------------------------------------------
 void pqPresetDialog::importPresets()
 {
-  pqFileDialog dialog(nullptr, this, tr("Import Presets"), QString(),
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Import Presets"), QString(),
     tr("Supported Presets/Color Map Files") + QString(" (*.json *.xml *.ct);;") +
       tr("ParaView Color/Opacity Presets") + QString(" (*.json);;") + tr("Legacy Color Maps") +
       QString(" (*.xml);;") + tr("VisIt Color Table") + QString(" (*.ct);;") + tr("All Files") +
       QString(" (*)"),
-    false);
+    false, false);
   dialog.setObjectName("ImportPresets");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted && !dialog.getSelectedFiles().empty())
   {
     QString filename = dialog.getSelectedFiles()[0];
+    vtkTypeUInt32 location = dialog.getSelectedLocation();
     const pqInternals& internals = *this->Internals;
     int oldCount = internals.Model->rowCount(QModelIndex());
-    internals.Model->importPresets(filename);
+    internals.Model->importPresets(filename, location);
     int newCount = internals.Model->rowCount(QModelIndex());
 
     // highlight the newly imported presets for the user.
@@ -924,10 +930,11 @@ void pqPresetDialog::importPresets()
 //-----------------------------------------------------------------------------
 void pqPresetDialog::exportPresets()
 {
-  pqFileDialog dialog(nullptr, this, tr("Export Preset(s)"), QString(),
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Export Preset(s)"), QString(),
     tr("ParaView Color/Opacity Presets") + QString(" (*.json);;") + tr("All Files") +
       QString(" (*)"),
-    false);
+    false, false);
   dialog.setObjectName("ExportPresets");
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -936,6 +943,7 @@ void pqPresetDialog::exportPresets()
   }
 
   QString filename = dialog.getSelectedFiles()[0];
+  vtkTypeUInt32 location = dialog.getSelectedLocation();
   const pqInternals& internals = *this->Internals;
   const Ui::pqPresetDialog& ui = this->Internals->Ui;
 
@@ -950,15 +958,12 @@ void pqPresetDialog::exportPresets()
   }
   assert(presetCollection.size() > 0);
 
-  vtksys::ofstream outfs;
-  outfs.open(filename.toStdString().c_str());
-  if (!outfs.is_open())
+  auto pxm = server->proxyManager();
+  if (!pxm->SaveString(
+        presetCollection.toStyledString().c_str(), filename.toStdString().c_str(), location))
   {
-    qCritical() << "Failed to open file for writing: " << filename;
-    return;
+    qCritical() << tr("Failed to save preset collection to ") << filename;
   }
-  outfs << presetCollection.toStyledString().c_str() << endl;
-  outfs.close();
 }
 
 //-----------------------------------------------------------------------------

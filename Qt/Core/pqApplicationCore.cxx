@@ -331,7 +331,7 @@ QObject* pqApplicationCore::manager(const QString& function)
 }
 
 //-----------------------------------------------------------------------------
-bool pqApplicationCore::saveState(const QString& filename)
+bool pqApplicationCore::saveState(const QString& filename, vtkTypeUInt32 location)
 {
   // * Save the Proxy Manager state.
   vtkSMSessionProxyManager* pxm =
@@ -339,7 +339,7 @@ bool pqApplicationCore::saveState(const QString& filename)
 
   Q_EMIT this->aboutToWriteState(filename);
 
-  return pxm->SaveXMLState(filename.toUtf8().data());
+  return pxm->SaveXMLState(filename.toUtf8().data(), location);
 }
 
 //-----------------------------------------------------------------------------

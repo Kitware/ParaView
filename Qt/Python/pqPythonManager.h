@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPythonManager_h
 
 #include "pqPythonModule.h" // for exports
+#include "vtkType.h"        // for vtkTypeUInt32
 
 #include <QObject>
 #include <QVector>
@@ -40,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QWidget;
 class QToolBar;
 class pqServer;
-class pqPythonDialog;
 
 /**
  * pqPythonManager is a class to facilitate the use of a python interpreter
@@ -85,7 +85,7 @@ public:
   /**
    * Save the macro in ParaView configuration and update widget automatically
    */
-  void addMacro(const QString& fileName);
+  void addMacro(const QString& fileName, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Invalidate the macro list, so the menu/toolbars are updated according to

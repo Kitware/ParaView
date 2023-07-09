@@ -40,16 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsoleWidget.h"
 #include "pqFileDialog.h"
 #include "pqPythonShellCompleter.h"
+#include "pqServer.h"
 #include "pqUndoStack.h"
 
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
-
-#include "vtkPythonCompatibility.h"
 #include "vtkPythonInteractiveInterpreter.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringOutputWindow.h"
 
@@ -59,9 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QInputDialog>
 #include <QPointer>
-#include <QStringListModel>
 #include <QTextCharFormat>
-#include <QVBoxLayout>
 #include <QtDebug>
 
 #include <cassert>
@@ -454,29 +451,32 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
 //-----------------------------------------------------------------------------
 void pqPythonShell::runScript()
 {
-  pqFileDialog dialog(nullptr, this, tr("Run Script"), QString(),
-    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"), false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Run Script"), QString(),
+    tr("Python Files") + QString(" (*.py);;") + tr("All Files") + QString(" (*)"), false, false);
   dialog.setObjectName("PythonShellRunScriptDialog");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted)
   {
+    const auto pxm = server->proxyManager();
+    const vtkTypeUInt32 location = dialog.getSelectedLocation();
     for (const QString& filename : dialog.getSelectedFiles())
     {
-      QFile file(filename);
-      if (file.open(QIODevice::ReadOnly))
+      const std::string contents = pxm->LoadString(filename.toStdString().c_str(), location);
+      if (!contents.empty())
       {
         QString code;
         // First inject code to let the script know its own path
         code.append(QString("__file__ = r'%1'\n").arg(filename));
         // Then append the file content
-        code.append(file.readAll());
+        code.append(contents.c_str());
         code.append("\n");
         code.append("del __file__\n");
         this->executeScript(code.toUtf8().data());
       }
       else
       {
-        qCritical() << "Error opening '" << filename << "'";
+        qCritical() << tr("Error: script ") << filename << tr(" was empty or could not be opened.");
       }
     }
   }

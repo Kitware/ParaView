@@ -39,5 +39,5 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="7:16777237:0:1:0:1" />
   <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="6:16777220:0:1:0:1" />
   <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="7:16777220:0:1:0:1" />
-
+  <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments=""/>
 </pqevents>

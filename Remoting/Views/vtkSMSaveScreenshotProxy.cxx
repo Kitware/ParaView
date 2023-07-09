@@ -563,7 +563,8 @@ bool vtkSMSaveScreenshotProxy::WriteImage(
     .arg("filename", filename.c_str())
     .arg("view", view)
     .arg("layout", layout)
-    .arg("mode_screenshot", 1);
+    .arg("mode_screenshot", 1)
+    .arg("location", static_cast<int>(location));
 
   if (!this->Prepare())
   {
@@ -620,29 +621,31 @@ bool vtkSMSaveScreenshotProxy::WriteImage(
     metadata.Set(1, stream.str().c_str());
   }
 
-  // write right-eye image first.
   if (image_pair.second)
   {
+    // write right-eye.
     vtkSMPropertyHelper(format, "FileName")
       .Set(this->GetStereoFileName(filename, /*left=*/false).c_str());
     format->UpdateVTKObjects();
     remoteWriterAlgorithm->SetInputDataObject(image_pair.second);
     remoteWriter->UpdatePipeline();
 
-    // change left-eye filename too
+    // write left-eye.
     vtkSMPropertyHelper(format, "FileName")
       .Set(this->GetStereoFileName(filename, /*left=*/true).c_str());
     format->UpdateVTKObjects();
+    remoteWriterAlgorithm->SetInputDataObject(image_pair.first);
+    remoteWriter->UpdatePipeline();
   }
   else
   {
+    // write left-eye.
     vtkSMPropertyHelper(format, "FileName").Set(filename.c_str());
     format->UpdateVTKObjects();
+    remoteWriterAlgorithm->SetInputDataObject(image_pair.first);
+    remoteWriter->UpdatePipeline();
   }
 
-  // now write left-eye.
-  remoteWriterAlgorithm->SetInputDataObject(image_pair.first);
-  remoteWriter->UpdatePipeline();
   remoteWriterAlgorithm->SetInputDataObject(nullptr);
   vtkTimerLog::MarkEndEvent("Write image to disk");
 

@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
-#include "pqPVApplicationCore.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
@@ -75,29 +74,28 @@ void pqSaveStateReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 bool pqSaveStateReaction::saveState()
 {
+  QString fileExt = tr("ParaView state file") + QString(" (*.pvsm);;");
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-  QString fileExt = tr("ParaView state file") + QString(" (*.pvsm);;") + tr("Python state file") +
-    QString(" (*.py);;") + tr("All Files") + QString(" (*)");
-#else
-  QString fileExt =
-    tr("ParaView state file") + QString(" (*.pvsm);;") + tr("All Files") + QString(" (*)");
+  fileExt += tr("Python state file") + QString(" (*.py);;");
 #endif
+  fileExt += tr("All Files") + QString(" (*)");
+  pqServer* server = pqActiveObjects::instance().activeServer();
   pqFileDialog fileDialog(
-    nullptr, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt, false);
+    server, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt, false, false);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
   if (fileDialog.exec() == QDialog::Accepted)
   {
-    QString selectedFile = fileDialog.getSelectedFiles()[0];
+    const QString selectedFile = fileDialog.getSelectedFiles()[0];
     if (selectedFile.endsWith(".py"))
     {
-      pqSaveStateReaction::savePythonState(selectedFile);
+      pqSaveStateReaction::savePythonState(selectedFile, fileDialog.getSelectedLocation());
     }
     else
     {
-      pqSaveStateReaction::saveState(selectedFile);
+      pqSaveStateReaction::saveState(selectedFile, fileDialog.getSelectedLocation());
     }
     return true;
   }
@@ -105,9 +103,9 @@ bool pqSaveStateReaction::saveState()
 }
 
 //-----------------------------------------------------------------------------
-bool pqSaveStateReaction::saveState(const QString& filename)
+bool pqSaveStateReaction::saveState(const QString& filename, vtkTypeUInt32 location)
 {
-  if (!pqApplicationCore::instance()->saveState(filename))
+  if (!pqApplicationCore::instance()->saveState(filename, location))
   {
     qCritical() << "Failed to save " << filename;
     return false;
@@ -115,12 +113,12 @@ bool pqSaveStateReaction::saveState(const QString& filename)
   pqServer* server = pqActiveObjects::instance().activeServer();
   // Add this to the list of recent server resources ...
   pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-    server, filename);
+    server, filename, location);
   return true;
 }
 
 //-----------------------------------------------------------------------------
-bool pqSaveStateReaction::savePythonState(const QString& filename)
+bool pqSaveStateReaction::savePythonState(const QString& filename, vtkTypeUInt32 location)
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
@@ -145,29 +143,28 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
     return false;
   }
 
-  std::string state = vtkSMTrace::GetState(options);
+  const std::string state = vtkSMTrace::GetState(options);
   if (state.empty())
   {
     qWarning("Empty state generated.");
     return false;
   }
-  QFile file(filename);
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-  {
-    qWarning() << "Could not open file:" << filename;
-    return false;
-  }
 
   Q_EMIT pqApplicationCore::instance()->aboutToWriteState(filename);
 
-  QTextStream out(&file);
-  out << state.c_str();
+  if (!pxm->SaveString(state.c_str(), filename.toStdString().c_str(), location))
+  {
+    qCritical() << tr("Failed to save state in ") << filename;
+    return false;
+  }
+
   pqServer* server = pqActiveObjects::instance().activeServer();
   // Add this to the list of recent server resources ...
   pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-    server, filename);
+    server, filename, location);
   return true;
 #else
+  Q_UNUSED(location);
   qCritical() << "Failed to save '" << filename
               << "' since Python support in not enabled in this build.";
   return false;

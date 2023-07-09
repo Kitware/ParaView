@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonUtils.h"
 
+#include "vtkType.h" // For vtkTypeUInt32
+
 #include <QAction>
 #include <QDir>
 #include <QObject>
@@ -85,9 +87,10 @@ public:
   /**
    * @brief Opens and load the given file.
    * @param[in] filename the file to be opened
+   * @param[in] location the location of the file
    * @returns false if the file is invalid
    */
-  bool openFile(const QString& filename);
+  bool openFile(const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * @brief Sets the default save directory
@@ -98,6 +101,11 @@ public:
    * @brief Returns the filename the editor acts on
    */
   const QString& getFilename() const { return this->File.Name; }
+
+  /**
+   * @brief Returns the location of the file that the editor acts on
+   */
+  const vtkTypeUInt32 getLocation() const { return this->File.Location; }
 
   /**
    * @brief Returns true if the buffer content has been saved on the disk
@@ -160,8 +168,9 @@ private:
   {
     PythonFile() = default;
 
-    PythonFile(const QString& str, QTextEdit* textEdit)
+    PythonFile(const QString& str, const vtkTypeUInt32 location, QTextEdit* textEdit)
       : Name(str)
+      , Location(location)
       , Text(textEdit)
     {
     }
@@ -177,10 +186,11 @@ private:
     void removeSwap() const;
 
     QString Name = "";
+    vtkTypeUInt32 Location = 0x10 /*vtkPVSession::CLIENT*/;
     QTextEdit* Text = nullptr;
   } File;
 
-  bool saveBuffer(const QString& file);
+  bool saveBuffer(const QString& file, const vtkTypeUInt32 location);
 
   QTextEdit& TextEdit;
 

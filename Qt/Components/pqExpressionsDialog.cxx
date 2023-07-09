@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExpressionsManager.h"
 #include "pqExpressionsTableModel.h"
 #include "pqFileDialog.h"
+#include "pqServer.h"
 #include "pqSettings.h"
 
 #include <QKeyEvent>
@@ -45,7 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyledItemDelegate>
 #include <QtDebug>
 
-#include "vtksys/FStream.hxx"
+#include "vtkSMSessionProxyManager.h"
+
+#include <sstream>
 
 #include "vtk_nlohmannjson.h"
 #include VTK_NLOHMANN_JSON(json.hpp)
@@ -481,8 +484,10 @@ void pqExpressionsManagerDialog::onClose()
 //----------------------------------------------------------------------------
 void pqExpressionsManagerDialog::exportToFile()
 {
-  pqFileDialog dialog(nullptr, this, tr("Export Expressions(s)"), QString(),
-    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Export Expressions(s)"), QString(),
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false,
+    false);
   dialog.setObjectName("ExportExpressions");
   dialog.setFileMode(pqFileDialog::AnyFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -490,14 +495,8 @@ void pqExpressionsManagerDialog::exportToFile()
     return;
   }
 
-  vtksys::ofstream outfs;
-  QString filename = dialog.getSelectedFiles()[0];
-  outfs.open(filename.toUtf8());
-  if (!outfs.is_open())
-  {
-    qCritical() << "Failed to open file for writing: " << filename;
-    return;
-  }
+  const QString filename = dialog.getSelectedFiles()[0];
+  const vtkTypeUInt32 location = dialog.getSelectedLocation();
 
   json root;
   root[JSON_FILE_VERSION_KEY] = JSON_FILE_VERSION;
@@ -515,15 +514,20 @@ void pqExpressionsManagerDialog::exportToFile()
   }
   root[JSON_EXPRESSIONS_LIST_KEY] = list;
 
-  outfs << root.dump(2) << endl;
-  outfs.close();
+  auto pxm = server->proxyManager();
+  if (!pxm->SaveString(root.dump(2).c_str(), filename.toStdString().c_str(), location))
+  {
+    qCritical() << tr("Failed to save expressions to ") << filename;
+  }
 }
 
 //----------------------------------------------------------------------------
 bool pqExpressionsManagerDialog::importFromFile()
 {
-  pqFileDialog dialog(nullptr, this, tr("Import Expressions(s)"), QString(),
-    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false);
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqFileDialog dialog(server, this, tr("Import Expressions(s)"), QString(),
+    tr("ParaView Expressions") + QString(" (*.json);;") + tr("All Files") + QString(" (*)"), false,
+    false);
   dialog.setObjectName("ImportExpressions");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
@@ -531,21 +535,18 @@ bool pqExpressionsManagerDialog::importFromFile()
     return false;
   }
 
-  QString filename = dialog.getSelectedFiles()[0];
-  vtksys::ifstream file;
-  file.open(filename.toUtf8());
-  if (!file)
-  {
-    qWarning() << "Failed to open file: " << filename;
-    return false;
-  }
+  const QString filename = dialog.getSelectedFiles()[0];
+  const vtkTypeUInt32 location = dialog.getSelectedLocation();
+  auto pxm = server->proxyManager();
+  const std::string contents = pxm->LoadString(filename.toStdString().c_str(), location);
+  std::istringstream inputStream(contents);
   json root;
-  file >> root;
+  inputStream >> root;
 
   QList<pqExpressionsManager::pqExpression> expressionsList;
   try
   {
-    std::string fileVersion = root.at(JSON_FILE_VERSION_KEY);
+    const std::string fileVersion = root.at(JSON_FILE_VERSION_KEY);
     if (fileVersion != JSON_FILE_VERSION)
     {
       qWarning() << "File version is " << fileVersion.c_str() << " but reader is "
@@ -554,9 +555,9 @@ bool pqExpressionsManagerDialog::importFromFile()
 
     for (auto expression : root[JSON_EXPRESSIONS_LIST_KEY])
     {
-      std::string exprValue = expression.at(JSON_EXPRESSION_KEY);
-      std::string exprName = expression.at(JSON_EXPRESSION_NAME_KEY);
-      std::string exprGroup = expression.at(JSON_EXPRESSION_GROUP_KEY);
+      const std::string exprValue = expression.at(JSON_EXPRESSION_KEY);
+      const std::string exprName = expression.at(JSON_EXPRESSION_NAME_KEY);
+      const std::string exprGroup = expression.at(JSON_EXPRESSION_GROUP_KEY);
       expressionsList.push_back({ exprGroup.c_str(), exprName.c_str(), exprValue.c_str() });
     }
   }
