@@ -124,12 +124,13 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       }
 
       const auto checkedNodes = model->checkedNodes();
-      std::vector<std::string> value(checkedNodes.size());
-      std::transform(checkedNodes.begin(), checkedNodes.end(), value.begin(),
+      std::vector<std::string> checkedValues(checkedNodes.size());
+      std::transform(checkedNodes.begin(), checkedNodes.end(), checkedValues.begin(),
         [](const QString& qstring) { return qstring.toStdString(); });
 
       const std::vector<std::string>& prevValues = smProperty->GetElements();
 
+      std::vector<std::string> finalValues;
       const auto rootName = std::string("/") + assembly->GetRootNodeName();
       if (!prevValues.empty() && prevValues[0] != "/" && prevValues[0] != rootName)
       {
@@ -149,22 +150,42 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
           prevValuesDictionary.insert(val);
         }
 
-        for (auto it = value.begin(); it != value.end();)
+        for (const auto& val : checkedValues)
         {
-          if (!prevValuesDictionary.count(*it))
+          const auto valNodeId = assembly->GetFirstNodeByPath(val.c_str());
+          const auto parentValNodeId = assembly->GetParent(valNodeId);
+          // check if val exists in the dictionary
+          const bool foundPath = prevValuesDictionary.find(val) != prevValuesDictionary.end();
+          // check if a parent path of val exists in the dictionary
+          const auto parentPath = std::find_if(
+            prevValuesDictionary.begin(), prevValuesDictionary.end(), [&](const std::string& str) {
+              return assembly->GetFirstNodeByPath(str.c_str()) == parentValNodeId;
+            });
+          const bool foundParentPath = parentPath != prevValuesDictionary.end();
+          // check if a child path of val exists in the dictionary
+          const auto childPath = std::find_if(
+            prevValuesDictionary.begin(), prevValuesDictionary.end(), [&](const std::string& str) {
+              return assembly->GetParent(assembly->GetFirstNodeByPath(str.c_str())) == valNodeId;
+            });
+          const bool foundChildPath = childPath != prevValuesDictionary.end();
+          if (foundPath || foundParentPath)
           {
-            it = value.erase(it);
+            finalValues.push_back(val);
           }
-          else
+          else if (foundChildPath)
           {
-            ++it;
+            finalValues.push_back(*childPath);
           }
         }
+      }
+      else
+      {
+        finalValues = checkedValues;
       }
 
       SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
       BEGIN_UNDO_SET(tr("Hide Block"));
-      smProperty->SetElements(value);
+      smProperty->SetElements(finalValues);
       reprProxy->UpdateVTKObjects();
       END_UNDO_SET();
       repr->renderViewEventually();
