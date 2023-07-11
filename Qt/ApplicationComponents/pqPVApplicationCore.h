@@ -101,7 +101,8 @@ public:
    */
   virtual void registerForQuicklaunch(QWidget*);
 
-  void loadStateFromPythonFile(const QString& filename, pqServer* server);
+  void loadStateFromPythonFile(const QString& filename, pqServer* server,
+    vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
