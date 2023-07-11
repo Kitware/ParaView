@@ -109,14 +109,16 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Executes the given script.  If the python interpreter hasn't been initialized
    * yet it will be initialized.
    */
-  void executeScript(const QString& filename);
+  void executeScript(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Same as `executeScript()` except that is also triggers a render on all
    * views in the application after the script has been processed. This is used
    * when playing back macros, for example.
    */
-  void executeScriptAndRender(const QString& filename);
+  void executeScriptAndRender(
+    const QString& filename, vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
 
   /**
    * Launch python editor to edit the macro

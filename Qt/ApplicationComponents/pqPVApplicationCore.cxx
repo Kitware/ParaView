@@ -256,7 +256,8 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
 }
 
 //-----------------------------------------------------------------------------
-void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqServer* server)
+void pqPVApplicationCore::loadStateFromPythonFile(
+  const QString& filename, pqServer* server, vtkTypeUInt32 location)
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   Q_EMIT this->aboutToReadState(filename);
@@ -266,12 +267,13 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   // comment in pqApplicationCore says this->LoadingState is unreliable, but it is still
   // necessary to avoid warning messages
   this->LoadingState = true;
-  pythonMgr->executeScriptAndRender(filename);
+  pythonMgr->executeScriptAndRender(filename, location);
   this->LoadingState = false;
 #else
   // Avoid unused parameter warnings
   (void)filename;
   (void)server;
+  (void)location;
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
 #endif
 }

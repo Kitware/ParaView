@@ -209,27 +209,28 @@ void pqPythonManager::executeCode(
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::executeScript(const QString& filename)
+void pqPythonManager::executeScript(const QString& filename, vtkTypeUInt32 location)
 {
-  QFile file(filename);
-  if (file.open(QIODevice::ReadOnly))
+  // read python script from file
+  auto pxm = pqApplicationCore::instance()->getActiveServer()->proxyManager();
+  const auto pyScript = pxm->LoadString(filename.toUtf8().data(), location);
+  if (pyScript.empty())
   {
-    const QByteArray code = file.readAll();
-    const QVector<QByteArray> pre_cmd = { "import sys",
-      QString("__file__ = r'%1'").arg(filename).toUtf8() };
-    const QVector<QByteArray> post_cmd = { "del __file__" };
-    this->executeCode(code, pre_cmd, post_cmd);
+    qCritical() << "Failed to open file : " << filename;
+    return;
   }
-  else
-  {
-    qWarning() << "Error opening '" << filename << "'.";
-  }
+
+  const QByteArray code = QString(pyScript.c_str()).toLocal8Bit();
+  const QVector<QByteArray> pre_cmd = { "import sys",
+    QString("__file__ = r'%1'").arg(filename).toUtf8() };
+  const QVector<QByteArray> post_cmd = { "del __file__" };
+  this->executeCode(code, pre_cmd, post_cmd);
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::executeScriptAndRender(const QString& filename)
+void pqPythonManager::executeScriptAndRender(const QString& filename, vtkTypeUInt32 location)
 {
-  this->executeScript(filename);
+  this->executeScript(filename, location);
   pqApplicationCore::instance()->render();
 }
 

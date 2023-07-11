@@ -131,7 +131,7 @@ void pqLoadStateReaction::loadState(
   { // python file
 #if VTK_MODULE_ENABLE_ParaView_pqPython
     // pqPVApplicationCore::loadStateFromPythonFile already emits aboutToReadState
-    pqPVApplicationCore::instance()->loadStateFromPythonFile(filename, server);
+    pqPVApplicationCore::instance()->loadStateFromPythonFile(filename, server, location);
     pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
       server, filename, location);
 #else
