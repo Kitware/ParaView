@@ -17,7 +17,7 @@ class pqRenderView;
 class pqView;
 class vtkIntArray;
 class vtkObject;
-class vtkSMPVRepresentationProxy;
+class vtkSMRepresentationProxy;
 
 /**
  * pqRenderViewSelectionReaction handles various selection modes available on
@@ -189,7 +189,7 @@ private:
   bool MouseMoving;
   int MousePosition[2];
   bool DisablePreSelection = false;
-  vtkSMPVRepresentationProxy* CurrentRepresentation = nullptr;
+  vtkSMRepresentationProxy* CurrentRepresentation = nullptr;
   QShortcut* CopyToolTipShortcut = nullptr;
   QString PlainTooltipText;
 

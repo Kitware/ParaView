@@ -5,7 +5,7 @@
 
 #include "vtkPVArrayInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 
 #include <sstream>
@@ -27,10 +27,8 @@ pqMultiComponentsDecorator::pqMultiComponentsDecorator(
 //-----------------------------------------------------------------------------
 bool pqMultiComponentsDecorator::canShowWidget(bool show_advanced) const
 {
-  vtkSMPVRepresentationProxy* proxy =
-    vtkSMPVRepresentationProxy::SafeDownCast(this->parentWidget()->proxy());
-
-  vtkPVArrayInformation* info = proxy->GetArrayInformationForColorArray();
+  vtkSMProxy* proxy = this->parentWidget()->proxy();
+  vtkPVArrayInformation* info = vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(proxy);
 
   if (info)
   {

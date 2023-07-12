@@ -174,7 +174,10 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   {
     if (proxy->IsA("vtkSMRepresentationProxy") && proxy->GetProperty("Input"))
     {
-      if (proxy->IsA("vtkSMPVRepresentationProxy") || xml_type == "ImageSliceRepresentation")
+      // TODO: Should update if as everyone may need lookup table updates!
+      // Should I redesign this too?
+      if (proxy->IsA("vtkSMPVRepresentationProxy") || xml_type == "ImageSliceRepresentation" ||
+        xml_type == "XYImageChartRepresentation")
       {
         // pqPipelineRepresentation is a design flaw! We need to get rid of it
         // and have helper code that manages the crap in that class

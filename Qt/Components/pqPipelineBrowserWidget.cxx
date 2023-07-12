@@ -20,10 +20,11 @@
 #include "pqView.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
@@ -320,14 +321,14 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
       auto activeLayout = activeObjects.activeLayout();
       const auto location = activeObjects.activeLayoutLocation();
 
-      vtkSMProxy* repr = controller->SetVisibility(
+      vtkSMProxy* reprProxy = controller->SetVisibility(
         port->getSourceProxy(), port->getPortNumber(), viewProxy, visible);
-      if (visible && viewProxy == nullptr && repr)
+      if (visible && viewProxy == nullptr && reprProxy)
       {
         // this implies that the controller would have created a new view.
         // let's get that view so we toggle scalar bar visibility in that view
         // and also add it to layout.
-        viewProxy = vtkSMViewProxy::FindView(repr);
+        viewProxy = vtkSMViewProxy::FindView(reprProxy);
         controller->AssignViewToLayout(viewProxy, activeLayout, location);
         activeView =
           pqApplicationCore::instance()->getServerManagerModel()->findItem<pqView*>(viewProxy);
@@ -341,21 +342,21 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
       {
         // This gets executed if scalar bar mode is
         // AUTOMATICALLY_HIDE_SCALAR_BARS or AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS
-        vtkSMPVRepresentationProxy* PVRepr = vtkSMPVRepresentationProxy::SafeDownCast(repr);
-        if (visible && PVRepr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+        if (visible && vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
         {
-          int stickyVisible = PVRepr->IsScalarBarStickyVisible(viewProxy);
+          int stickyVisible =
+            vtkSMColorMapEditorHelper::IsScalarBarStickyVisible(reprProxy, viewProxy);
           if (stickyVisible != -1)
           {
-            PVRepr->SetScalarBarVisibility(viewProxy, stickyVisible);
+            vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, stickyVisible);
           }
           else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
           {
-            PVRepr->SetScalarBarVisibility(viewProxy, true);
+            vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, true);
           }
           else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
           {
-            PVRepr->SetScalarBarVisibility(viewProxy, false);
+            vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, false);
           }
           else
           {

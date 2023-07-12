@@ -24,7 +24,6 @@
 #include "vtkSMFieldDataDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMInteractiveSelectionPipeline.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMRenderViewProxy.h"

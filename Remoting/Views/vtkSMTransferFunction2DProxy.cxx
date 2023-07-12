@@ -7,10 +7,11 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTransferFunction2DBox.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 
@@ -444,7 +445,7 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
     proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    vtkSMRepresentationProxy* consumer = vtkSMRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
       vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
@@ -452,7 +453,8 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
       usedProxy.find(consumer) == usedProxy.end())
     {
       // Recover consumer color array
-      vtkPVArrayInformation* tmpArrayInfo = consumer->GetArrayInformationForColorArray(false);
+      vtkPVArrayInformation* tmpArrayInfo =
+        vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(consumer, false);
       if (!tmpArrayInfo)
       {
         continue;

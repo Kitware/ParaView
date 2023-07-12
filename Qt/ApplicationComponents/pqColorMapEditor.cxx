@@ -22,8 +22,8 @@
 
 #include "vtkCommand.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -176,7 +176,7 @@ void pqColorMapEditor::updateActive()
   this->setDataRepresentation(repr);
 
   // Set the current LUT proxy to edit.
-  if (repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
+  if (repr && vtkSMColorMapEditorHelper::GetUsingScalarColoring(repr->getProxy()))
   {
     vtkSMProxy* lutProxy = vtkSMPropertyHelper(repr->getProxy(), "LookupTable", true).GetAsProxy();
     if (lutProxy)

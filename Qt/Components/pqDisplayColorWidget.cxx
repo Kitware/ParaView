@@ -18,7 +18,7 @@
 #include "vtkPVRepresentedArrayListSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTrace.h"
@@ -62,7 +62,7 @@ bool supportedAssociation(int assoc)
 /// This class makes it possible to add custom logic when updating the
 /// "ColorArrayName" property instead of directly setting the SMProperty. The
 /// custom logic, in this case, ensures that the LUT is setup and initialized
-/// (all done by vtkSMPVRepresentationProxy::SetScalarColoring()).
+/// (all done by vtkSMColorMapEditorHelper::SetScalarColoring()).
 class pqDisplayColorWidget::PropertyLinksConnection : public pqPropertyLinksConnection
 {
   typedef pqPropertyLinksConnection Superclass;
@@ -122,8 +122,7 @@ protected:
     // scalar bar later, if needed.
     vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
 
-    vtkSMPVRepresentationProxy::SetScalarColoring(
-      reprProxy, arrayName.toUtf8().data(), association);
+    vtkSMColorMapEditorHelper::SetScalarColoring(reprProxy, arrayName.toUtf8().data(), association);
 
     vtkNew<vtkSMTransferFunctionManager> tmgr;
     pqDisplayColorWidget* widget = qobject_cast<pqDisplayColorWidget*>(this->objectQt());
@@ -153,7 +152,7 @@ protected:
     Q_UNUSED(use_unchecked);
     ValueType val;
     vtkSMProxy* reprProxy = this->proxySM();
-    if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+    if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
     {
       vtkSMPropertyHelper helper(this->propertySM());
       val.first = helper.GetInputArrayAssociation();
@@ -185,7 +184,7 @@ void pqDisplayColorWidget::updateScalarBarVisibility(vtkSMViewProxy* view, vtkSM
 {
   // we could now respect some application setting to determine if the LUT is
   // to be reset.
-  vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
+  vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
     reprProxy, /*extend*/ true, /*force*/ false);
 
   /// BUG #0011858. Users often do silly things!
@@ -198,7 +197,7 @@ void pqDisplayColorWidget::updateScalarBarVisibility(vtkSMViewProxy* view, vtkSM
   if (reprVisibility &&
     gsettings->GetScalarBarMode() == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
   {
-    vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
+    vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, view, true);
   }
 }
 
@@ -578,7 +577,7 @@ void pqDisplayColorWidget::componentNumberChanged()
     // we could now respect some application setting to determine if the LUT is
     // to be reset.
     vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : nullptr;
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
+    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
       reprProxy, /*extend*/ false, /*force*/ false);
 
     // Update scalar bars.

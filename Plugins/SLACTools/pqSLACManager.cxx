@@ -28,7 +28,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMChartSeriesSelectionDomain.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -416,7 +416,7 @@ void pqSLACManager::showField(const char* name)
   this->CurrentFieldName = name;
 
   // Set the field to color by.
-  vtkSMPVRepresentationProxy::SetScalarColoring(repr->getProxy(), name, vtkDataObject::POINT);
+  vtkSMColorMapEditorHelper::SetScalarColoring(repr->getProxy(), name, vtkDataObject::POINT);
 
   // Adjust the color map to be rainbow.
   pqScalarsToColors* lut = repr->getLookupTable();

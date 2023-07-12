@@ -7,9 +7,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkProcessModule.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarRepresentation.h"
 #include "vtkTuple.h"
@@ -306,16 +307,16 @@ void vtkSMScalarBarWidgetRepresentationProxy::ScalarBarLengthToScalarBarWidgetPo
 }
 
 //----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::AddRange(vtkSMPVRepresentationProxy* proxy)
+void vtkSMScalarBarWidgetRepresentationProxy::AddRange(vtkSMRepresentationProxy* proxy)
 {
-  if (proxy->GetArrayInformationForColorArray())
+  if (vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(proxy))
   {
     this->Proxies.emplace(proxy, proxy);
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::RemoveRange(vtkSMPVRepresentationProxy* proxy)
+void vtkSMScalarBarWidgetRepresentationProxy::RemoveRange(vtkSMRepresentationProxy* proxy)
 {
   try
   {
@@ -337,18 +338,19 @@ void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2])
     double min = std::numeric_limits<double>::infinity();
     double max = -min;
 
-    std::vector<vtkSMPVRepresentationProxy*> trash;
+    std::vector<vtkSMRepresentationProxy*> trash;
 
     for (const auto& pair : this->Proxies)
     {
-      vtkSMPVRepresentationProxy* proxy = pair.second;
+      vtkSMRepresentationProxy* proxy = pair.second;
       if (!proxy)
       {
         // The weak pointer is nullptr, we need to delete this proxy.
         trash.emplace_back(pair.first);
         continue;
       }
-      vtkPVArrayInformation* info = proxy->GetArrayInformationForColorArray();
+      vtkPVArrayInformation* info =
+        vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(proxy);
       if (!info)
       {
         continue;
@@ -362,7 +364,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2])
     range[0] = min;
     range[1] = max;
 
-    for (vtkSMPVRepresentationProxy* proxy : trash)
+    for (vtkSMRepresentationProxy* proxy : trash)
     {
       this->Proxies.erase(proxy);
     }

@@ -19,7 +19,7 @@
 
 class vtkPVArrayInformation;
 class vtkSMProxy;
-class vtkSMPVRepresentationProxy;
+class vtkSMRepresentationProxy;
 class vtkSMViewProxy;
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMScalarBarWidgetRepresentationProxy
@@ -63,14 +63,14 @@ public:
    * This allows to display the combined range
    * of multiple data sets that hold the same array.
    */
-  void AddRange(vtkSMPVRepresentationProxy* proxy);
+  void AddRange(vtkSMRepresentationProxy* proxy);
 
   /**
    * Remove range to current scalar bar for a given representation proxy.
    * This allows to display the combined range
    * of multiple data sets that hold the same array.
    */
-  void RemoveRange(vtkSMPVRepresentationProxy* proxy);
+  void RemoveRange(vtkSMRepresentationProxy* proxy);
 
   /**
    * Get the current range of the scalar bar.
@@ -104,13 +104,12 @@ protected:
    * Storing a list of proxies linked to this scalar bar.
    *
    * @note
-   * We need 2 instances of `vtkSMPVRepresentation*` per item, as the proxy can become unused before
+   * We need 2 instances of `vtkSMRepresentation*` per item, as the proxy can become unused before
    * this class is aware of it. The weak pointer helps not interfere with the life span of this
    * proxy, and the raw pointer is used as key because of its constness: the weak pointer can become
    * `nullptr` and would invalidate the container is used as key.
    */
-  std::unordered_map<vtkSMPVRepresentationProxy*, vtkWeakPointer<vtkSMPVRepresentationProxy>>
-    Proxies;
+  std::unordered_map<vtkSMRepresentationProxy*, vtkWeakPointer<vtkSMRepresentationProxy>> Proxies;
   ///@}
 
 private:

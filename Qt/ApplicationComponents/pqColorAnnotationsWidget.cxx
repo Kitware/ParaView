@@ -24,9 +24,10 @@
 #include "vtkNew.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVProminentValuesInformation.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionPresets.h"
@@ -827,7 +828,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotations(bool force, bool extend)
   }
 
   vtkPVProminentValuesInformation* info =
-    vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
+    vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(
       repr->getProxy(), 1e-3, 1e-6, force);
   if (!info || !info->GetValid())
   {
@@ -919,15 +920,15 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
     return false;
   }
 
-  vtkSMPVRepresentationProxy* activeRepresentationProxy =
-    vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMRepresentationProxy* activeRepresentationProxy =
+    vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
   if (!activeRepresentationProxy)
   {
     return false;
   }
 
   vtkPVArrayInformation* activeArrayInfo =
-    vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(activeRepresentationProxy);
+    vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(activeRepresentationProxy);
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
 
@@ -945,7 +946,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
     }
 
     vtkPVArrayInformation* currentArrayInfo =
-      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(representationProxy);
+      vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(representationProxy);
     if (!activeArrayInfo || !activeArrayInfo->GetName() || !currentArrayInfo ||
       !currentArrayInfo->GetName() ||
       strcmp(activeArrayInfo->GetName(), currentArrayInfo->GetName()) != 0)
@@ -954,7 +955,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
     }
 
     vtkPVProminentValuesInformation* info =
-      vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
+      vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(
         representationProxy, 1e-3, 1e-6, force);
     if (!info)
     {

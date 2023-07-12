@@ -10,13 +10,14 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMDomain.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
@@ -138,8 +139,8 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
 
   // Irrespective of other properties, scalar coloring is inherited if
   // possible.
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(inputRepr) &&
-    !vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(inputRepr) &&
+    !vtkSMColorMapEditorHelper::GetUsingScalarColoring(repr))
   {
     vtkSMPropertyHelper colorArrayHelper(inputRepr, "ColorArrayName");
     const char* arrayName = colorArrayHelper.GetInputArrayNameToProcess();
@@ -148,7 +149,7 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     if (producer->GetDataInformation(producerPort)
           ->GetArrayInformation(arrayName, arrayAssociation))
     {
-      vtkSMPVRepresentationProxy::SetScalarColoring(repr,
+      vtkSMColorMapEditorHelper::SetScalarColoring(repr,
         colorArrayHelper.GetInputArrayNameToProcess(), colorArrayHelper.GetInputArrayAssociation());
     }
   }
@@ -347,7 +348,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
     return false;
   }
 
-  vtkSMPVRepresentationProxy::SetupLookupTable(proxy);
+  vtkSMColorMapEditorHelper::SetupLookupTable(proxy);
   return true;
 }
 
@@ -534,7 +535,7 @@ void vtkSMParaViewPipelineControllerWithRendering::Hide(vtkSMProxy* repr, vtkSMV
 
     if (vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide)
     {
-      vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(repr, view);
+      vtkSMColorMapEditorHelper::HideScalarBarIfNotNeeded(repr, view);
     }
   }
 }

@@ -33,8 +33,8 @@
 #include "vtkQWidgetRepresentation.h"
 #include "vtkQWidgetWidget.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -1559,9 +1559,7 @@ void vtkPVXRInterfaceWidgets::SetEditableFieldValue(std::string value)
   vtkSMPropertyHelper helper(this->Helper->GetSMView(), "Representations");
   for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
   {
-    vtkSMPVRepresentationProxy* repr2 =
-      vtkSMPVRepresentationProxy::SafeDownCast(helper.GetAsProxy(i));
-
+    vtkSMRepresentationProxy* repr2 = vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(i));
     if (repr2)
     {
       if (vtkPVDataRepresentation::SafeDownCast(repr2->GetClientSideObject())

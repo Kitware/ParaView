@@ -7,7 +7,6 @@
 #include "pqApplicationCore.h"
 #include "pqPropertyGroupWidget.h"
 #include "pqUndoStack.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"

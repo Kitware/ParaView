@@ -23,9 +23,9 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMInteractiveSelectionPipeline.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -801,8 +801,8 @@ void pqRenderViewSelectionReaction::fastPreSelection()
 
   if (status)
   {
-    vtkSMPVRepresentationProxy* repr =
-      vtkSMPVRepresentationProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0));
+    vtkSMRepresentationProxy* repr =
+      vtkSMRepresentationProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0));
 
     if (this->CurrentRepresentation != nullptr && repr != this->CurrentRepresentation)
     {

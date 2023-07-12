@@ -7,8 +7,8 @@
 #include "pqDataRepresentation.h"
 #include "pqIntVectorPropertyWidget.h"
 #include "pqPropertiesPanel.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -24,7 +24,7 @@ public:
   QPointer<QWidget> Components;
 
   // Locks in the opacity array name on the representation.
-  void FinalizeColorArray2Name(vtkSMPVRepresentationProxy* reprProxy)
+  void FinalizeColorArray2Name(vtkSMRepresentationProxy* reprProxy)
   {
     vtkSMPropertyHelper helper(reprProxy, "ColorArray2Name");
     helper.SetUseUnchecked(true);
@@ -43,7 +43,7 @@ public:
     }
   }
   // Locks in the opacity array component on the representation.
-  void FinalizeColorArray2Component(vtkSMPVRepresentationProxy* reprProxy)
+  void FinalizeColorArray2Component(vtkSMRepresentationProxy* reprProxy)
   {
     vtkSMPropertyHelper helper(reprProxy, "ColorArray2Component");
     helper.SetUseUnchecked(true);
@@ -135,8 +135,8 @@ void pqDisplayColor2Widget::onArrayModified()
   {
     return;
   }
-  vtkSMPVRepresentationProxy* reprProxy =
-    vtkSMPVRepresentationProxy::SafeDownCast(this->Internals->Representation->getProxy());
+  vtkSMRepresentationProxy* reprProxy =
+    vtkSMRepresentationProxy::SafeDownCast(this->Internals->Representation->getProxy());
   if (reprProxy == nullptr)
   {
     return;

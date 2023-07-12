@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqPipelineRepresentation.h"
-
-#include "vtkSMPVRepresentationProxy.h"
-
 #include "pqView.h"
+
+#include "vtkSMColorMapEditorHelper.h"
+#include "vtkSMRepresentationProxy.h"
 
 //-----------------------------------------------------------------------------
 pqPipelineRepresentation::pqPipelineRepresentation(const QString& group, const QString& name,
@@ -44,9 +44,9 @@ void pqPipelineRepresentation::setView(pqView* view)
 void pqPipelineRepresentation::resetLookupTableScalarRange()
 {
   vtkSMProxy* proxy = this->getProxy();
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
   {
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy);
+    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(proxy);
   }
 }
 
@@ -54,8 +54,8 @@ void pqPipelineRepresentation::resetLookupTableScalarRange()
 void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime()
 {
   vtkSMProxy* proxy = this->getProxy();
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
   {
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(proxy);
+    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(proxy);
   }
 }

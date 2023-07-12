@@ -11,6 +11,7 @@
 #include "pqPropertyLinks.h"
 #include "pqUndoStack.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
@@ -56,7 +57,7 @@ protected:
       // (it means that the user clicked on `Volume` while no array was selected)
       // This needs to be done before calling SetRepresentationType, as this method
       // will setup a LUT proxy.
-      vtkSMProxy* lutProxy = reprPVProxy->GetLUTProxy(view);
+      vtkSMProxy* lutProxy = vtkSMColorMapEditorHelper::GetLUTProxy(reprPVProxy, view);
       const QString& type = value.toString();
 
       // Let'set the new representation

@@ -113,6 +113,7 @@ set(classes
   vtkSMChartSeriesSelectionDomain
   vtkSMChartUseIndexForAxisDomain
   vtkSMCinemaVolumetricImageExtractWriterProxy
+  vtkSMColorMapEditorHelper
   vtkSMComparativeAnimationCueProxy
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy

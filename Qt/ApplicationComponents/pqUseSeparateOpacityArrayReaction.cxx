@@ -5,9 +5,10 @@
 
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 
 //-----------------------------------------------------------------------------
 pqUseSeparateOpacityArrayReaction::pqUseSeparateOpacityArrayReaction(
@@ -78,7 +79,7 @@ void pqUseSeparateOpacityArrayReaction::setRepresentation(pqDataRepresentation* 
   bool canUseSepOpacityArray = usingTf2D
     ? false
     : (reprProxy && useSepOpacityProp && vtkSMRepresentationProxy::IsVolumeRendering(reprProxy) &&
-        vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy));
+        vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy));
   action->setEnabled(canUseSepOpacityArray);
   action->setChecked(false);
   if (useSepOpacityProp && reprProxy)

@@ -9,7 +9,7 @@
 #include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "vtkAbstractArray.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
@@ -78,7 +78,7 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
   vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
   pqView* view = repr ? repr->getView() : nullptr;
 
-  bool can_show_sb = repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy);
+  bool can_show_sb = repr && vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy);
   bool is_shown = false;
   if (repr)
   {
@@ -114,7 +114,7 @@ vtkSMProxy* pqScalarBarVisibilityReaction::scalarBarProxy() const
   pqDataRepresentation* repr = this->CachedRepresentation;
   vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
   pqView* view = repr ? repr->getView() : nullptr;
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
   {
     return vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
       repr->getLookupTableProxy(), view->getProxy());
@@ -138,7 +138,7 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
   }
 
   if (visible &&
-    vtkSMPVRepresentationProxy::GetEstimatedNumberOfAnnotationsOnScalarBar(
+    vtkSMColorMapEditorHelper::GetEstimatedNumberOfAnnotationsOnScalarBar(
       repr->getProxy(), repr->getView()->getProxy()) > vtkAbstractArray::MAX_DISCRETE_VALUES)
   {
     QMessageBox* box = new QMessageBox(QMessageBox::Warning, tr("Number of annotations warning"),
@@ -157,7 +157,7 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
     delete box;
   }
   BEGIN_UNDO_SET(tr("Toggle Color Legend Visibility"));
-  vtkSMPVRepresentationProxy::SetScalarBarVisibility(
+  vtkSMColorMapEditorHelper::SetScalarBarVisibility(
     repr->getProxy(), repr->getView()->getProxy(), visible);
   END_UNDO_SET();
   repr->renderViewEventually();

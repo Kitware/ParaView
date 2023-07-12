@@ -34,12 +34,14 @@
 #include "vtkPVTransferFunction2DBox.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunction2DProxy.h"
 #include "vtkSMTransferFunctionPresets.h"
@@ -577,7 +579,7 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
   if (internals.ScalarOpacityFunctionProxy)
   {
     pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-    vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+    vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
 
     // When representation changes, we have to initialize the opacity widget when
     // "MultiComponentsMapping" is modified
@@ -629,8 +631,7 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
   if (internals.TransferFunction2DProxy)
   {
     pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-    vtkSMPVRepresentationProxy* reprProxy =
-      vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+    vtkSMRepresentationProxy* reprProxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
 
     this->Internals->TransferFunction2DConnector->Disconnect();
     vtkSMProperty* colorArray2Property = reprProxy->GetProperty("ColorArray2Name");
@@ -664,15 +665,14 @@ pqSMProxy pqColorOpacityEditorWidget::transferFunction2DProxy() const
 void pqColorOpacityEditorWidget::updateTransferFunction2DProxy()
 {
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  vtkSMPVRepresentationProxy* reprProxy =
-    vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMRepresentationProxy* reprProxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
   vtkSMProperty* colorArrayProperty = reprProxy->GetProperty("ColorArrayName");
   if (colorArrayProperty)
   {
     vtkSMPropertyHelper colorArrayHelper(colorArrayProperty);
     std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
     int association = colorArrayHelper.GetInputArrayAssociation();
-    vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy, arrayName.c_str(), association);
+    vtkSMColorMapEditorHelper::SetScalarColoring(reprProxy, arrayName.c_str(), association);
   }
 }
 
@@ -681,9 +681,10 @@ void pqColorOpacityEditorWidget::multiComponentsMappingChanged(vtkObject* vtkNot
   unsigned long vtkNotUsed(event), void* clientData, void* vtkNotUsed(callData))
 {
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMPVRepresentationProxy* pvProxy = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
 
-  if (proxy->GetVolumeIndependentRanges())
+  if (pvProxy && pvProxy->GetVolumeIndependentRanges())
   {
     // force separate color map
     vtkSMProperty* separateProperty = proxy->GetProperty("UseSeparateColorMap");
@@ -691,15 +692,16 @@ void pqColorOpacityEditorWidget::multiComponentsMappingChanged(vtkObject* vtkNot
     if (!sepEnabled)
     {
       vtkSMPropertyHelper(separateProperty).Set(1);
-      vtkSMPropertyHelper helper(proxy->GetProperty("ColorArrayName"));
-      proxy->SetScalarColoring(helper.GetAsString(4), vtkDataObject::POINT);
-      proxy->RescaleTransferFunctionToDataRange();
+      vtkSMPropertyHelper helper(pvProxy->GetProperty("ColorArrayName"));
+      vtkSMColorMapEditorHelper::SetScalarColoring(
+        pvProxy, helper.GetAsString(4), vtkDataObject::POINT);
+      vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(pvProxy);
       return;
     }
   }
 
   this->initializeOpacityEditor(static_cast<vtkPiecewiseFunction*>(clientData));
-  proxy->RescaleTransferFunctionToDataRange();
+  vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(proxy);
 }
 
 //-----------------------------------------------------------------------------
@@ -707,11 +709,12 @@ void pqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMPVRepresentationProxy* pvProxy = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
   vtkScalarsToColors* stc = nullptr;
   vtkSMProperty* separateProperty = proxy->GetProperty("UseSeparateColorMap");
   bool sepEnabled = vtkSMPropertyHelper(separateProperty).GetAsInt() != 0;
-  if (!proxy->GetVolumeIndependentRanges() || !sepEnabled)
+  if (!pvProxy || !pvProxy->GetVolumeIndependentRanges() || !sepEnabled)
   {
     stc = vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject());
   }
@@ -1046,7 +1049,7 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
     return;
   }
 
-  vtkSMPVRepresentationProxy* repProxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMRepresentationProxy* repProxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
   if (!repProxy)
   {
     return;
@@ -1066,7 +1069,7 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
   }
 
   BEGIN_UNDO_SET(tr("Reset transfer function ranges using visible data"));
-  vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
+  vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
   this->Internals->render();
   END_UNDO_SET();
 }
@@ -1336,7 +1339,7 @@ void pqColorOpacityEditorWidget::realShowDataHistogram()
     {
       vtkSMProxy* proxy = tfProxy->GetConsumerProxy(cc);
       proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-      vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+      vtkSMRepresentationProxy* consumer = vtkSMRepresentationProxy::SafeDownCast(proxy);
       if (consumer && usedProxy.find(consumer) == usedProxy.end())
       {
         this->Internals->ConsumerConnector->Connect(consumer->GetProperty("Visibility"),
@@ -1372,7 +1375,7 @@ void pqColorOpacityEditorWidget::realShow2DHistogram()
     {
       vtkSMProxy* proxy = tfProxy->GetConsumerProxy(cc);
       proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-      vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+      vtkSMRepresentationProxy* consumer = vtkSMRepresentationProxy::SafeDownCast(proxy);
       if (consumer && usedProxy.find(consumer) == usedProxy.end())
       {
         this->Internals->ConsumerConnector->Connect(consumer->GetProperty("Visibility"),

@@ -35,7 +35,6 @@
 #include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
