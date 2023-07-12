@@ -87,11 +87,11 @@ set_property(CACHE BUILD_TESTING
   PROPERTY
     TYPE INTERNAL)
 
-include(vtkCompilerChecks)
-include(vtkCompilerPlatformFlags)
-include(vtkCompilerExtraFlags)
-include(vtkInitializeBuildType)
-include(vtkSupportMacros)
+include(ParaViewCompilerChecks)
+include(ParaViewCompilerPlatformFlags)
+include(ParaViewCompilerExtraFlags)
+include(ParaViewInitializeBuildType)
+include(ParaViewSupportMacros)
 include(CMakeDependentOption)
 include(ParaViewOptions)
 include(ParaViewMigrations)
@@ -139,7 +139,7 @@ endif ()
 #-----------------------------------------------------------------------------
 # Does VTK require support for 64 bit file systems
 include(CheckCXXSourceRuns)
-file(READ "${vtk_cmake_dir}/vtkRequireLargeFilesSupport.cxx"
+file(READ "${paraview_cmake_dir}/ParaViewRequireLargeFilesSupport.cxx"
   VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE)
 check_cxx_source_runs("${VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE}"
   CMAKE_REQUIRE_LARGE_FILE_SUPPORT)
