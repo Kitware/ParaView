@@ -839,7 +839,6 @@ SET (TESTS_WITHOUT_BASELINES
   ExtractParticlesOverTime.xml
   FieldDataToAttribute.xml
   FileDialogOpenInteractClose.xml
-  FavoritesFilters.xml
   GradientBackwardsCompatibility.xml
   ImportCustomPresets.xml
   InformationPanel.xml
@@ -2001,7 +2000,6 @@ set (ExpressionChooser_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsDialog_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsExporter_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsSettings_FORCE_SERIAL TRUE) # since this uses combo-box popup-menu
-set (FavoritesFilters_FORCE_SERIAL TRUE)
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window

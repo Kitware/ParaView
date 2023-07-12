@@ -55,7 +55,6 @@
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageExpressionsReaction.h"
-#include "pqManageFavoritesReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
 #include "pqPVApplicationCore.h"
@@ -250,7 +249,6 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  mgr->setEnableFavorites(true);
   pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
 
   // Connect the filters menu about to show and the quick-launch dialog about to show
@@ -326,11 +324,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   QMenu* dummyMenu = new QMenu();
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false);
   mgr->addProxyDefinitionUpdateListener("filters");
-
-  QAction* manageFavoritesAction =
-    menu.addAction(QCoreApplication::translate("pqToolsMenu", "Manage Favorites..."))
-    << pqSetName("actionManage_Favorites");
-  new pqManageFavoritesReaction(manageFavoritesAction, mgr);
 
   QAction* configureCategoriesAction =
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Configure Categories"))
