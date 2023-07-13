@@ -7,6 +7,10 @@ Created with the Valve Index controller, some adaptations may be needed for othe
  - Create a “Wavelet”, Apply
  - Set “Surface With Edges” representation
  - Set “RTData” as coloring array
+ - Open “Time Manager” (View -> Time Manager)
+ - Create a “Slice” on the Wavelet, Apply
+   - This will hide the Wavelet, set it back to visible using the Pipeline Browser
+ - In “Time Manager”, click the “+” button to add a default animation for the Slice
  - Create a “Poly Line Source”, Apply
  - Load the “XRInterface” plugin
 
@@ -78,8 +82,12 @@ Created with the Valve Index controller, some adaptations may be needed for othe
  - Toggle “Hide Crop Planes” to ensure it hides the thick crop
  - Press “Remove All Crop Planes”
 
-## In the XR menu - Bottom left section:
+## In the XR menu:
 
+  - Hide the wavelet from the XR menu pipeline browser, so you can see the slice:
+   - Play slice animation from XR menu, test all buttons (goto begin/end, single step, play, loop)
+   - Let the animation loop, and check that the animation is also played in Paraview Desktop view.
+   - Check that the loop button is synced between Paraview Desktop and the XR menu
  - Press “Exit XR” button and confirm XR is closed
 
 ## After exiting XR:

@@ -242,6 +242,16 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
     }
   });
 
+  // This centers the toolbar actions
+  auto leftSpacer = new QWidget(this);
+  leftSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  leftSpacer->setVisible(true);
+  this->Internals->Ui.VCR->insertWidget(this->Internals->Ui.VCR->actions()[0], leftSpacer);
+  auto rightSpacer = new QWidget(this);
+  rightSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  rightSpacer->setVisible(true);
+  this->Internals->Ui.VCR->addWidget(rightSpacer);
+
 #ifndef XRINTERFACE_HAS_COLLABORATION
   this->Internals->Ui.comeToMeButton->setVisible(false);
 #endif
