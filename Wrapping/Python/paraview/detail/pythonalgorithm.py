@@ -152,7 +152,7 @@ class smproperty(object):
 
     @staticmethod
     def _update_proxyproperty_attrs(func, attrs):
-        return _update_property_defaults(func, attrs)
+        return smproperty._update_property_defaults(func, attrs)
 
     @staticmethod
     def xml(xmlstr):
