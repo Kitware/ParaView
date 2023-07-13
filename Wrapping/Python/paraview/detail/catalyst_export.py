@@ -9,8 +9,7 @@ def _get_catalyst_state(options):
     extractors = simple.GetExtractors()
     if not extractors:
         from .. import print_warning
-        print_warning('No extractors defined. Extractors are required to export a Catalyst state.')
-        return None
+        print_warning('No extractors defined. This script will do nothing until LiveVisualisation is on.')
 
     # convert catalyst options to PythonStateOptions.
     soptions = servermanager.ProxyManager().NewProxy("pythontracing", "PythonStateOptions")
