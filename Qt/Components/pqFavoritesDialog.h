@@ -9,6 +9,8 @@
 #include <QDialog>
 #include <QPointer>
 
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 class QVariant;
 class QString;
 class QTreeWidgetItem;
@@ -22,7 +24,9 @@ class pqFavoritesDialog;
  * pqFavoritesDialog is the Manage Favorites dialog used by ParaView.
  * It allows to create Favorites and organize them under custom categories.
  */
-class PQCOMPONENTS_EXPORT pqFavoritesDialog : public QDialog
+class PARAVIEW_DEPRECATED_IN_5_13_0(
+  "Favorites should be replaced by Categories configuration. See pqConfigureCategories instead.")
+  PQCOMPONENTS_EXPORT pqFavoritesDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;

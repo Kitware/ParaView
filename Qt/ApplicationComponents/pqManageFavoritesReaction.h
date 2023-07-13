@@ -6,6 +6,8 @@
 
 #include "pqMasterOnlyReaction.h"
 
+#include "vtkParaViewDeprecation.h" // for deprecation
+
 class QAction;
 class pqProxyGroupMenuManager;
 
@@ -13,7 +15,9 @@ class pqProxyGroupMenuManager;
  * @ingroup Reactions
  * pqManageFavoritesReaction is the reaction to pop-up the favorites manager dialog.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManageFavoritesReaction : public pqMasterOnlyReaction
+class PARAVIEW_DEPRECATED_IN_5_13_0(
+  "Favorites should be replaced by Categories configuration. See pqConfigureCategories instead.")
+  PQAPPLICATIONCOMPONENTS_EXPORT pqManageFavoritesReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
   typedef pqMasterOnlyReaction Superclass;

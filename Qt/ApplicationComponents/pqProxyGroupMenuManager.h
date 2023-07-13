@@ -219,6 +219,8 @@ protected Q_SLOTS:
    * called when "favorites" menu is being shown.
    * create the menu (and submenu) with actions for the filters in the favorites list.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "Favorites are now a specific category, configurable as the others.")
   void populateFavoritesMenu();
 
   /**
@@ -240,6 +242,8 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Load the favorites from settings.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "Favorites are now a specific category, configurable as the others.")
   void loadFavoritesItems();
 
   QAction* getAddToCategoryAction(const QString& path);
