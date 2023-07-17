@@ -875,6 +875,26 @@ points in the input. Defaults to ***Single***.
           Fast Mode is much faster but it may produce degenerate triangles.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetHTGStrategy3D"
+                         name="HTGStrategy3D"
+                         label="Contour strategy (3D)"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Use Voxels" value="0" />
+          <Entry text="Use Decomposed Polyhedra" value="1" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility" />
+        </Hints>
+        <Documentation>
+          Choose the contour strategy to apply (3D case only). **IMPORTANT**: the
+          **Use Decomposed Polyhedra** strategy generally leads to better results
+          but can take significantly more time to complete.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Isosurfaces"
@@ -896,6 +916,7 @@ points in the input. Defaults to ***Single***.
         isosurfaces/isolines and also the number of such
         values.</Documentation>
       </DoubleVectorProperty>
+
       <Hints>
         <Visibility replace_input="2" />
         <WarnOnCreate>
@@ -933,6 +954,9 @@ points in the input. Defaults to ***Single***.
       </ProxyProperty>
       <!-- incremental point locator end -->
 
+      <PropertyGroup label="Hyper Tree Grid Contour">
+        <Property name="HTGStrategy3D" />
+      </PropertyGroup>
       <PropertyGroup label="Isosurfaces">
         <Property name="ContourValues" />
       </PropertyGroup>

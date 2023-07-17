@@ -37,7 +37,8 @@
 #define vtkPVContourFilter_h
 
 #include "vtkContourFilter.h"
-#include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
+#include "vtkHyperTreeGridContour.h"                // for vtkHyperTreeGridContour
+#include "vtkPVVTKExtensionsFiltersGeneralModule.h" // needed for exports
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVContourFilter : public vtkContourFilter
 {
@@ -47,6 +48,22 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVContourFilter* New();
+
+  ///@{
+  /**
+   * Get/set the contour strategy to apply in case of a HTG input.
+   * By default, the strategy is vtkHyperTreeGridContour::USE_VOXELS.
+   * This method is time-efficient but can lead to bad results in the 3D case, where generated dual
+   * cells can be concave.
+   * vtkHyperTreeGridContour::USE_DECOMPOSED_POLYHEDRA allows better results in such cases (3D HTGs
+   * only). It takes advantage of the vtkPolyhedronUtilities::Decompose method to generate better
+   * contours. The dowside is that this method is much slower than
+   * vtkHyperTreeGridContour::USE_VOXELS.
+   */
+  vtkGetMacro(HTGStrategy3D, int);
+  vtkSetClampMacro(HTGStrategy3D, int, vtkHyperTreeGridContour::USE_VOXELS,
+    vtkHyperTreeGridContour::USE_DECOMPOSED_POLYHEDRA);
+  ///@}
 
 protected:
   vtkPVContourFilter();
@@ -77,6 +94,9 @@ protected:
 private:
   vtkPVContourFilter(const vtkPVContourFilter&) = delete;
   void operator=(const vtkPVContourFilter&) = delete;
+
+  // Strategy used to represent HTG dual cells in 3D
+  int HTGStrategy3D = vtkHyperTreeGridContour::USE_VOXELS;
 };
 
 #endif // vtkPVContourFilter_h
