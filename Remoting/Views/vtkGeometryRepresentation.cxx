@@ -931,6 +931,12 @@ void vtkGeometryRepresentation::SetOpacity(double val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetEdgeOpacity(double val)
+{
+  this->Property->SetEdgeOpacity(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetLuminosity(double val)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
