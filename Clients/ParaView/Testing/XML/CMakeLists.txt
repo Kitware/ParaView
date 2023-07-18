@@ -758,6 +758,7 @@ SET (TESTS_WITHOUT_BASELINES
   ExpressionsExporter.xml
   ExpressionsSettings.xml
   ExtractParticlesOverTime.xml
+  FieldDataToAttribute.xml
   FileDialogOpenInteractClose.xml
   FavoritesFilters.xml
   GradientBackwardsCompatibility.xml
