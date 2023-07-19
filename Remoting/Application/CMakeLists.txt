@@ -197,6 +197,11 @@ if (TARGET VTK::FiltersParallelVerdict)
     Resources/filters_filtersparallelverdict.xml)
 endif ()
 
+if (TARGET VTK::FiltersTensor)
+  list(APPEND xml_files
+    Resources/filters_filterstensors.xml)
+endif ()
+
 if (TARGET VTK::FiltersTexture)
   list(APPEND xml_files
     Resources/filters_filterstexture.xml)

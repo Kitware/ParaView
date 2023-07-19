@@ -385,6 +385,7 @@
   <Proxy group="filters" name="TemporalSnapToTimeStep" />
   <Proxy group="filters" name="TemporalStatistics" />
   <Proxy group="filters" name="TensorGlyph" />
+  <Proxy group="filters" name="TensorPrincipalInvariants" />
   <Proxy group="filters" name="TessellatorFilter" />
   <Proxy group="filters" name="TextureMapToCylinder" />
   <Proxy group="filters" name="TextureMapToPlane" />
@@ -402,5 +403,6 @@
   <Proxy group="filters" name="VortexCores" />
   <Proxy group="filters" name="WarpScalar" />
   <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp.svg" />
+  <Proxy group="filters" name="YieldCriteria" />
   <Proxy group="filters" name="YoungsMaterialInterface" icon=":/pqWidgets/Icons/pqYoungsMaterialInterface.svg" />
 </ParaViewFilters>
