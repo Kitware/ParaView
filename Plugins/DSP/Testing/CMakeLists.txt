@@ -7,6 +7,7 @@ if (NOT PARAVIEW_USE_PYTHON OR NOT numpy_found)
 endif()
 
 set (tests_with_baselines
+  "${CMAKE_CURRENT_SOURCE_DIR}/BandFiltering.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/MeanPowerSpectralDensity.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/MergeReduceTableBlocks.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/ProjectSpectrumMagnitude.xml"
