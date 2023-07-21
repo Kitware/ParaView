@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtkPVGhostCellsGenerator
   vtkPVProbeLineFilter)
 
 vtk_module_add_module(ParaView::VTKExtensionsFiltersParallelDIY2
