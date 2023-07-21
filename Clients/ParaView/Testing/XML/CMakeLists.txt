@@ -49,6 +49,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/LoadState.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadStateDialog.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadStateTextSourceRepresentation.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/MinimalTensors.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_0_0.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_1_0.vtp}"
@@ -784,6 +785,7 @@ SET (TESTS_WITHOUT_BASELINES
   SpreadSheetSelectedCellConnectivity.xml
   StringInLineChartView.xml
   TableHistogram.xml
+  TensorPrincipalInvariants.xml
   TestCompositePropertyWidgetDecorator.xml
   TestFileListPropertyWidget.xml
   TextSource.xml
@@ -792,6 +794,7 @@ SET (TESTS_WITHOUT_BASELINES
   TimeKeeper.xml
   TimeManagerPanel.xml
   TimeManagerSequence.xml
+  YieldCriteria.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)

@@ -1,0 +1,191 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTensorPrincipalInvariants"
+                 name="TensorPrincipalInvariants">
+      <Documentation long_help="Computes principal values and directions from 2D and 3D tensors."
+                     short_help="Computes tensor principal values and directions.">
+                     This filter computes principal values and directions for
+                     2D and 3D tensors. The principal vectors can be scaled by
+                     their corresponding principal values.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="PointDataArrayInfo"
+                            command="GetPointDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointTensors"
+                            command="GetPointDataArraySelection"
+                            information_property="PointDataArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointDataArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Point tensors from which to compute principal invariants.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellDataArrayInfo"
+                            command="GetCellDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellTensors"
+                            command="GetCellDataArraySelection"
+                            information_property="CellDataArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellDataArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Cell tensors from which to compute principal invariants.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ScalePrincipalVectorsWithPrincipalValues"
+                         command="SetScaleVectors"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Principal vectors can be scaled by the principal values instead of being unitary.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkYieldCriteria"
+                 name="YieldCriteria">
+      <Documentation long_help="Computes yield criteria from 2D and 3D tensors."
+                     short_help="Computes yield criteria from tensors.">
+                     This filter computes yield criteria such as the Tresca or
+                     Von Mises criteria for 2D and 3D tensors.
+                     Principal values and directions can also be included in
+                     the output. The principal vectors can be scaled by their
+                     corresponding principal values.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="PointDataArrayInfo"
+                            command="GetPointDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointTensors"
+                            command="GetPointDataArraySelection"
+                            information_property="PointDataArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointDataArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Point tensors from which to compute principal invariants.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellDataArrayInfo"
+                            command="GetCellDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellTensors"
+                            command="GetCellDataArraySelection"
+                            information_property="CellDataArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellDataArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Cell tensors from which to compute principal invariants.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CriteriaInfo"
+                            command="GetCriteriaSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="YieldCriteria"
+                            command="GetCriteriaSelection"
+                            information_property="CriteriaInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CriteriaInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Quantities to compute.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ScalePrincipalVectorsWithPrincipalValues"
+                         command="SetScaleVectors"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Principal vectors can be scaled by the principal values instead of being unitary.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+  </ProxyGroup>
+</ServerManagerConfiguration>
