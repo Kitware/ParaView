@@ -14,10 +14,10 @@
 =========================================================================*/
 /**
  * @class vtkPVGhostCellsGenerator
- * @brief Ghost Cells Generator that add support for vtkHyperTreeGrid.
+ * @brief Ghost Cells Generator that adds support for vtkHyperTreeGrid.
  *
- * This is a subclass of vtkGhostCellsGenerator that allows selection of
- * input vtkHyperTreeGrid
+ * Meta class that switches between ghost cells generator filters to
+ * select the right one depending on the input type.
  */
 
 #ifndef vtkPVGhostCellsGenerator_h
@@ -41,7 +41,7 @@ public:
   /**
    * Get/Set the controller to use. By default
    * vtkMultiProcessController::GlobalController will be used.
-   * Do not apply to Hyper Tree Grid.
+   * Does not apply to Hyper Tree Grid.
    */
   void SetController(vtkMultiProcessController* controller);
 
@@ -49,7 +49,7 @@ public:
    * Specify if the filter must generate the ghost cells only if required by
    * the pipeline.
    * If false, ghost cells are computed even if they are not required.
-   * Do not apply to Hyper Tree Grid.
+   * Does not apply to Hyper Tree Grid.
    * Default is TRUE.
    */
   void SetBuildIfRequired(bool enable);
@@ -60,7 +60,7 @@ public:
    * ghost levels than the number specified here, then the filter will generate
    * those extra ghost levels as needed. Accepted values are in the interval
    * [1, VTK_INT_MAX].
-   * Do not apply to Hyper Tree Grid.
+   * Does not apply to Hyper Tree Grid.
    * Default is 1.
    */
   void SetNumberOfGhostLayers(int nbGhostLayers);

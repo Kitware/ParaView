@@ -91,6 +91,7 @@ int vtkPVGhostCellsGenerator::RequestDataObject(vtkInformation* vtkNotUsed(reque
 
   if (!input)
   {
+    vtkErrorMacro("Missing input!");
     return 0;
   }
 
