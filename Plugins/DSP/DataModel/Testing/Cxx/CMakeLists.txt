@@ -11,15 +11,15 @@ endif ()
 # Point to ParaView ExternalData when finding test data (used in vtk_add_test_cxx)
 set(_vtk_build_TEST_OUTPUT_DATA_DIRECTORY ${paraview_test_data_directory_output})
 
-vtk_add_test_cxx(vtkDigitalSignalProcessingCxxTests tests
+vtk_add_test_cxx(vtkDigitalSignalProcessingDSPDataModelCxxTests tests
   NO_DATA NO_OUTPUT NO_VALID
   TestMultiDimensionalArray.cxx
   TestMultiDimensionalImplicitBackend.cxx
 )
 
-vtk_add_test_cxx(vtkDigitalSignalProcessingCxxTests tests
+vtk_add_test_cxx(vtkDigitalSignalProcessingDSPDataModelCxxTests tests
   NO_OUTPUT NO_VALID
   TestTemporalDataToMultiDimensionalArray.cxx
 )
 
-vtk_test_cxx_executable(vtkDigitalSignalProcessingCxxTests tests)
+vtk_test_cxx_executable(vtkDigitalSignalProcessingDSPDataModelCxxTests tests)

@@ -4,6 +4,7 @@ set(MODULE_CLASSES
   vtkProjectSpectrumMagnitude
   vtkSoundQuantitiesCalculator
   vtkSpectrogramFilter
+  vtkTemporalMultiplexing
 )
 
 set(MODULE_HEADERS

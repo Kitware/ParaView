@@ -8,5 +8,10 @@ DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
 PRIVATE_DEPENDS
+  DigitalSignalProcessing::DSPDataModel
   VTK::FiltersCore
   VTK::FiltersExtraction
+TEST_DEPENDS
+  DigitalSignalProcessing::DSPDataModel
+  VTK::IOHDF
+  VTK::TestingCore
