@@ -106,6 +106,7 @@ int vtkSpreadSheetRepresentation::ProcessViewRequest(
     if (vtkSpreadSheetView* view = vtkSpreadSheetView::SafeDownCast(inInfo->Get(vtkPVView::VIEW())))
     {
       this->SetGenerateCellConnectivity(view->GetGenerateCellConnectivity());
+      this->SetShowFieldData(view->GetShowFieldData());
       this->SetFieldAssociation(view->GetFieldAssociation());
     }
   }
@@ -167,6 +168,16 @@ vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetSelectionProducer()
 void vtkSpreadSheetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetRepresentation::SetShowFieldData(bool show)
+{
+  if (this->ShowFieldData != show)
+  {
+    this->ShowFieldData = show;
+    this->MarkModified();
+  }
 }
 
 //----------------------------------------------------------------------------

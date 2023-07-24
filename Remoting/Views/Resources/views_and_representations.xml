@@ -4203,6 +4203,14 @@
         <BooleanDomain name="bool" />
         <Documentation>Generation of the cell connectivity.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetShowFieldData"
+                         default_values="0"
+                         name="ShowFieldData"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Show the field data associated to the points / cells.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty command="SetColumnNameToSort"
                             name="ColumnToSort"
                             number_of_elements="1"

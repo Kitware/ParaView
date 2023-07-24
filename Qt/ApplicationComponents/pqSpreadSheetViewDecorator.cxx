@@ -120,6 +120,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
 
   this->connect(internal.Attribute, SIGNAL(currentIndexChanged(int)), SIGNAL(uiModified()));
   this->connect(internal.ToggleCellConnectivity, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
+  this->connect(internal.ToggleFieldData, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
   this->connect(internal.SelectionOnly, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
 
   internal.Links.setUseUncheckedProperties(true);
@@ -131,6 +132,8 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
 
   internal.Links.addPropertyLink(this, "generateCellConnectivity", SIGNAL(uiModified()), proxy,
     proxy->GetProperty("GenerateCellConnectivity"));
+  internal.Links.addPropertyLink(
+    this, "showFieldData", SIGNAL(uiModified()), proxy, proxy->GetProperty("ShowFieldData"));
   internal.Links.addPropertyLink(this, "showSelectedElementsOnly", SIGNAL(uiModified()), proxy,
     proxy->GetProperty("SelectionOnly"));
   internal.Links.addPropertyLink<SpreadsheetConnection>(
@@ -196,6 +199,20 @@ void pqSpreadSheetViewDecorator::setGenerateCellConnectivity(bool val)
 {
   auto& internal = *this->Internal;
   internal.ToggleCellConnectivity->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewDecorator::showFieldData() const
+{
+  auto& internal = *this->Internal;
+  return internal.ToggleFieldData->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::setShowFieldData(bool val)
+{
+  auto& internal = *this->Internal;
+  internal.ToggleFieldData->setChecked(val);
 }
 
 //-----------------------------------------------------------------------------

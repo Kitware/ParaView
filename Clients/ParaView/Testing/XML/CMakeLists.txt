@@ -2254,6 +2254,7 @@ endif()
 #   script
 #----------------------------------------------------------------------
 set(paraview_python_verify_tests
+  ExportMultiblockFieldDataSpreadsheet
   ExportSceneSpreadSheetView
 )
 

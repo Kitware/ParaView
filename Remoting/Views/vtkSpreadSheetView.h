@@ -81,6 +81,16 @@ public:
 
   ///@{
   /**
+   * Allow user to enable/disable field data visibility.
+   * Default to false.
+   */
+  vtkSetMacro(ShowFieldData, bool);
+  vtkGetMacro(ShowFieldData, bool);
+  vtkBooleanMacro(ShowFieldData, bool);
+  ///@}
+
+  ///@{
+  /**
    * Specify the field association for the data to be shown in the view.
    * This is passed on to the vtkSpreadSheetRepresentation in `Update` pass.
    */
@@ -247,8 +257,9 @@ protected:
 
   virtual vtkTable* FetchBlock(vtkIdType blockindex);
 
-  bool ShowExtractedSelection;
-  bool GenerateCellConnectivity;
+  bool ShowExtractedSelection = false;
+  bool GenerateCellConnectivity = false;
+  bool ShowFieldData = false;
   vtkSortedTableStreamer* TableStreamer;
   vtkMarkSelectedRows* TableSelectionMarker;
   vtkReductionFilter* ReductionFilter;

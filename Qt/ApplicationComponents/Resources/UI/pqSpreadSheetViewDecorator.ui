@@ -161,6 +161,23 @@
     </widget>
    </item>
    <item>
+    <widget class="QToolButton" name="ToggleFieldData">
+     <property name="toolTip">
+      <string>Toggle field data visibility</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/pqWidgets/Icons/pqGlobalData.svg</normaloff>:/pqWidgets/Icons/pqGlobalData.svg</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QToolButton" name="ExportSpreadsheet"/>
    </item>
    <item>

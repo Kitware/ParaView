@@ -30,6 +30,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
    */
   Q_PROPERTY(
     bool generateCellConnectivity READ generateCellConnectivity WRITE setGenerateCellConnectivity);
+  Q_PROPERTY(bool showFieldData READ showFieldData WRITE setShowFieldData);
   Q_PROPERTY(
     bool showSelectedElementsOnly READ showSelectedElementsOnly WRITE setShowSelectedElementsOnly);
   Q_PROPERTY(int fieldAssociation READ fieldAssociation WRITE setFieldAssociation);
@@ -46,6 +47,8 @@ public:
    */
   bool generateCellConnectivity() const;
   void setGenerateCellConnectivity(bool);
+  bool showFieldData() const;
+  void setShowFieldData(bool);
   bool showSelectedElementsOnly() const;
   void setShowSelectedElementsOnly(bool);
   int fieldAssociation() const;
