@@ -133,6 +133,7 @@ public:
       SLOT(showSelectedData(pqOutputPort*)));
     self->connect(
       this->Ui.showTypeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(updateFieldType()));
+    self->connect(this->Ui.ToggleFieldData, SIGNAL(toggled(bool)), SLOT(showFieldData(bool)));
     self->connect(
       this->Ui.invertSelectionCheckBox, SIGNAL(toggled(bool)), SLOT(invertSelection(bool)));
 
@@ -288,6 +289,16 @@ public:
     }
   }
 
+  void showFieldData(bool show)
+  {
+    if (this->ViewProxy)
+    {
+      vtkSMPropertyHelper(this->ViewProxy, "ShowFieldData").Set(show);
+      this->ViewProxy->UpdateVTKObjects();
+      this->ViewProxy->StillRender();
+    }
+  }
+
   void updateSpreadSheet() { this->UpdateSpreadSheetTimer.start(); }
 
   void updateSpreadSheetNow()
@@ -349,6 +360,12 @@ pqOutputPort* pqFindDataCurrentSelectionFrame::showingPort() const
 void pqFindDataCurrentSelectionFrame::updateFieldType()
 {
   this->Internals->updateFieldType();
+}
+
+//-----------------------------------------------------------------------------
+void pqFindDataCurrentSelectionFrame::showFieldData(bool show)
+{
+  this->Internals->showFieldData(show);
 }
 
 //-----------------------------------------------------------------------------
