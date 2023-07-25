@@ -106,9 +106,9 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   mesh["coordsets/coords/origin/z"].set(localOrigin[2]);
 
   const auto spacing = grid.GetSpacing();
-  mesh["coordsets/coords/spacing/x"].set(spacing[0]);
-  mesh["coordsets/coords/spacing/y"].set(spacing[1]);
-  mesh["coordsets/coords/spacing/z"].set(spacing[2]);
+  mesh["coordsets/coords/spacing/dx"].set(spacing[0]);
+  mesh["coordsets/coords/spacing/dy"].set(spacing[1]);
+  mesh["coordsets/coords/spacing/dz"].set(spacing[2]);
 
   // Next, add topology
   mesh["topologies/mesh/type"].set("uniform");
