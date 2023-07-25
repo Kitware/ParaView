@@ -23,7 +23,6 @@
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkHyperTreeGridContour.h"
 #include "vtkInformation.h"
 #include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
@@ -99,6 +98,7 @@ int vtkPVContourFilter::RequestData(
     vtkNew<vtkHyperTreeGridContour> contourFilter;
     contourFilter->SetInputData(0, inDataObj);
     contourFilter->SetInputArrayToProcess(0, inArrayInfo);
+    contourFilter->SetStrategy3D(this->HTGStrategy3D);
     for (vtkIdType i = 0; i < this->GetNumberOfContours(); ++i)
     {
       contourFilter->SetValue(i, this->GetValue(i));
