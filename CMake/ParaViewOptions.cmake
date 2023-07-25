@@ -562,7 +562,8 @@ paraview_require_module(
             VTK::IOSegY
             VTK::IOTRUCHAS
             VTK::IOVeraOut
-            VTK::IOTecplotTable)
+            VTK::IOTecplotTable
+            VTK::IOFLUENTCFF)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_RENDERING AND PARAVIEW_BUILD_CANONICAL
