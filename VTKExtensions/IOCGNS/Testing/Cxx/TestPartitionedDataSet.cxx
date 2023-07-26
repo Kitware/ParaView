@@ -1,16 +1,6 @@
-/*=========================================================================
-
-  Program:   ParaView
-  Module:    TestPartitionedDataSet.cxx
-
-  Copyright (c) Menno Deij - van Rijswijk, MARIN, The Netherlands
-  All rights reserved.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Menno Deij - van Rijswijk, MARIN, The Netherlands
+// SPDX-License-Identifier: BSD-3-Clause
 #include "TestFunctions.h"
 #include "vtkCGNSReader.h"
 #include "vtkCGNSWriter.h"
