@@ -1,17 +1,6 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkNvPipeCompressor.h
-
-  Copyright (c) 2016-2017, NVIDIA CORPORATION.
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) 2016-2017, NVIDIA CORPORATION
+// SPDX-License-Identifier: BSD-3-CLAUSE
 
 // .NAME vtkNvPipeCompressor - Image compressor/decompressor using NvPipe.
 // .SECTION Description
