@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-FileCopyrightText: Copyright (c) CEA
 // SPDX-License-Identifier: BSD-3-CLAUSE
 /**
  * @class   vtkPEnSightReader
@@ -14,7 +15,6 @@
  * supervision of CEA (http://www.cea.fr) and EDF (http://www.edf.fr) by
  * Oxalya (http://www.oxalya.com)
  *
- *  Copyright (c) CEA
  * \endverbatim
  */
 

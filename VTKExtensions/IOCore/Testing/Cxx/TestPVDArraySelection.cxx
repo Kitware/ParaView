@@ -1,16 +1,5 @@
-/*=========================================================================
-
-  Program:   ParaView
-  Module:    TestPVDArraySelection.cxx
-
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArraySelection.h"

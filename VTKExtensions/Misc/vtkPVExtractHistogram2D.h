@@ -1,6 +1,5 @@
-/*=============================================================================
-Copyright and License information
-=============================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class vtkPVExtractHistogram2D
  * @brief Extract 2D histogram for a parallel dataset

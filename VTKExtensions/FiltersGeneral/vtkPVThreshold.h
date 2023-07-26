@@ -1,17 +1,5 @@
-/*=========================================================================
-
-  program: ParaView
-  module:  vtkPVThreshold.h
-
-  copyright (c) kitware, inc.
-  all rights reserved.
-  see copyright.txt or http://www.paraview.org/html/copyright.html for details.
-
-     this software is distributed without any warranty; without even
-     the implied warranty of merchantability or fitness for a particular
-     purpose.  see the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-CLAUSE
 /**
  * @class vtkPVThreshold
  * @brief threshold filter to add support for vtkHyperTreeGrid.

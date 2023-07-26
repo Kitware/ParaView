@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-FileCopyrightText: Copyright 2020 Menno Deij - van Rijswijk (MARIN)
 // SPDX-License-Identifier: BSD-3-CLAUSE
-/*-------------------------------------------------------------------------
-  Copyright 2020 Menno Deij - van Rijswijk (MARIN)
--------------------------------------------------------------------------*/
 
 /**
  * @class   vtkConvertPolyhedraFilter
