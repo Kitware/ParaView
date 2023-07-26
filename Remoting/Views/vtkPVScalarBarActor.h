@@ -1,12 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-// SPDX-License-Identifier: BSD-3-CLAUSE
-
-/*-------------------------------------------------------------------------
-  Copyright 2008 Sandia Corporation.
-  Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
-  the U.S. Government retains certain rights in this software.
--------------------------------------------------------------------------*/
+// SPDX-FileCopyrightText: Copyright 2008 Sandia Corporation
+// SPDX-License-Identifier: LicenseRef-BSD-3-Clause-Sandia-USGov
 
 /**
  * @class   vtkPVScalarBarActor
