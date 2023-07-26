@@ -2,8 +2,4 @@ NAME
   ParaView::protobuf
 LIBRARY_NAME
   vtkprotobuf
-SPDX_LICENSE_IDENTIFIER
-  BSD-3-CLAUSE
-SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
 THIRD_PARTY

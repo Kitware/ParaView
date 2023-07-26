@@ -2,10 +2,6 @@ NAME
   ParaView::cosmohalofinder
 LIBRARY_NAME
   vtkcosmohalofinder
-SPDX_LICENSE_IDENTIFIER
-  BSD-3-CLAUSE
-SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
 CONDITION
   NOT WIN32 AND PARAVIEW_ENABLE_COSMOTOOLS
 PRIVATE_DEPENDS

@@ -2,10 +2,6 @@ NAME
   ParaView::qttesting
 LIBRARY_NAME
   vtkqttesting
-SPDX_LICENSE_IDENTIFIER
-  BSD-3-CLAUSE
-SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
 CONDITION
   PARAVIEW_USE_QT
 GROUPS
