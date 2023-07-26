@@ -1,10 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Los Alamos National Laboratory
 // SPDX-License-Identifier: BSD-3-Clause
-/*----------------------------------------------------------------------------
- Copyright (c) Los Alamos National Laboratory
- See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-----------------------------------------------------------------------------*/
-
 #define DO_TIMING 0
 #include "vtkAllToNRedistributePolyData.h"
 #include "vtkMath.h"

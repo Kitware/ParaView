@@ -1,10 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Los Alamos National Laboratory
 // SPDX-License-Identifier: BSD-3-Clause
-/*----------------------------------------------------------------------------
- Copyright (c) Los Alamos National Laboratory
- See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-----------------------------------------------------------------------------*/
-
 #include "vtkBalancedRedistributePolyData.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
