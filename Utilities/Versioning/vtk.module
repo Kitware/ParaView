@@ -2,5 +2,9 @@ NAME
   ParaView::Versioning
 LIBRARY_NAME
   vtkPVVersioning
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 GROUPS
   PARAVIEW_CORE

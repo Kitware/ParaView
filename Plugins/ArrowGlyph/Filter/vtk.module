@@ -2,6 +2,10 @@ NAME
   ArrowGlyph::ArrowGlyphFilter
 LIBRARY_NAME
   vtkArrowGlyphFilter
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   VTK::CommonExecutionModel
   VTK::CommonCore

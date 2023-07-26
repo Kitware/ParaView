@@ -2,6 +2,10 @@ NAME
   ParaView::VTKExtensionsPoints
 LIBRARY_NAME
   vtkPVVTKExtensionsPoints
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 KIT
   ParaView::CoreKit
 GROUPS

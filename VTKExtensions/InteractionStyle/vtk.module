@@ -2,6 +2,10 @@ NAME
   ParaView::VTKExtensionsInteractionStyle
 LIBRARY_NAME
   vtkPVVTKExtensionsInteractionStyle
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 KIT
   ParaView::CoreKit
 DEPENDS

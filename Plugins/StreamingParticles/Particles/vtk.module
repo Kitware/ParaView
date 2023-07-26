@@ -2,6 +2,10 @@ NAME
   StreamingParticles::vtkStreamingParticles
 LIBRARY_NAME
   vtkStreamingParticles
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   ParaView::VTKExtensionsFiltersRendering
   ParaView::RemotingViews

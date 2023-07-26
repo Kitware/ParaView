@@ -2,6 +2,10 @@ NAME
   StreamLinesRepresentation::vtkStreamLines
 LIBRARY_NAME
   vtkStreamLines
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   ParaView::RemotingViews
   ParaView::VTKExtensionsMisc

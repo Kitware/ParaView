@@ -2,6 +2,10 @@ NAME
   CDIReader::vtkCDIReader
 LIBRARY_NAME
   vtkCDIReader
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   ParaView::VTKExtensionsCore
   VTK::CommonCore

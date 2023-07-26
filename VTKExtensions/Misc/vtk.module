@@ -2,6 +2,10 @@ NAME
   ParaView::VTKExtensionsMisc
 LIBRARY_NAME
   vtkPVVTKExtensionsMisc
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DESCRIPTION
   Miscellaneous filters used by ParaView. These
   are filters that don't really have any dependencies on other modules

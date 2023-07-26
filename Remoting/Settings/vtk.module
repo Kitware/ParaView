@@ -4,6 +4,10 @@ GROUPS
   PARAVIEW_CORE
 LIBRARY_NAME
   vtkRemotingSettings
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   VTK::CommonCore
 KIT

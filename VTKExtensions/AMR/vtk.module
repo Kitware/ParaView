@@ -2,6 +2,10 @@ NAME
   ParaView::VTKExtensionsAMR
 LIBRARY_NAME
   vtkPVVTKExtensionsAMR
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 KIT
   ParaView::CoreKit
 GROUPS

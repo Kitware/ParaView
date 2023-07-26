@@ -2,6 +2,10 @@ NAME
   GMVReader::vtkGMVReader
 LIBRARY_NAME
   vtkGMVReader
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-CLAUSE
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
