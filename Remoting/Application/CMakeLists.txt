@@ -374,6 +374,11 @@ if (TARGET VTK::IOCGNSReader)
     Resources/readers_iocgns.xml)
 endif()
 
+if (TARGET VTK::IOFLUENTCFF)
+  list(APPEND xml_files
+    Resources/readers_iofluentcff.xml)
+endif()
+
 if (TARGET ParaView::VTKExtensionsIOCGNSWriter)
   list(APPEND xml_files
     Resources/writers_iocgns.xml)

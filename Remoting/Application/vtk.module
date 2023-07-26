@@ -52,6 +52,7 @@ OPTIONAL_DEPENDS
   VTK::IOADIOS2
   VTK::IOCGNSReader
   VTK::IOFides
+  VTK::IOFLUENTCFF
   VTK::IOCatalystConduit
   VTK::IOChemistry
   VTK::IOCityGML

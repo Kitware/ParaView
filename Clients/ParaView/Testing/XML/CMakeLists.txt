@@ -163,6 +163,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/random_torus.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/room.cas.h5}"
+  "DATA{${paraview_test_data_directory_input}/Data/room.dat.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/sample.h5part}"
   "DATA{${paraview_test_data_directory_input}/Data/servers-wiki.pvsc}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/coneScript.py}"
@@ -519,6 +521,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadFLUENTCFFFormat.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RectilinearVolumeRendering.png}"
@@ -895,6 +898,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ReadPartitionedCGNS.xml
   ReadCGNSBCDataset.xml
   ReadIOHDFFileSeries.xml
+  ReadFLUENTCFFFormat.xml
   RearrangeLayout.xml
   RectilinearFractal.xml
   ReloadAMReXGrid.xml
