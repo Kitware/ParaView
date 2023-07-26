@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-License-Identifier: BSD-3-Clause
+
 r"""collaboration is a helper module useful for handling synchronisation
 in multi-client configuration as well as providing other collaboration
 related methods
@@ -7,20 +10,6 @@ A simple example:
 
   collaboration.processServerEvents()
 """
-#==============================================================================
-#
-#  Program:   ParaView
-#  Module:    collaboration.py
-#
-#  Copyright (c) Kitware, Inc.
-#  All rights reserved.
-#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-#
-#     This software is distributed WITHOUT ANY WARRANTY; without even
-#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE.  See the above copyright notice for more information.
-#
-#==============================================================================
 
 import paraview, re, types, sys, vtk
 from paraview import servermanager

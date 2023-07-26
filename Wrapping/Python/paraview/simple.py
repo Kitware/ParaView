@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-License-Identifier: BSD-3-Clause
+
 r"""simple is a module for using paraview server manager in Python. It
 provides a simple convenience layer to functionality provided by the
 C++ classes wrapped to Python as well as the servermanager module.
@@ -20,20 +23,6 @@ A simple example::
   Render()
 
 """
-#==============================================================================
-#
-#  Program:   ParaView
-#  Module:    simple.py
-#
-#  Copyright (c) Kitware, Inc.
-#  All rights reserved.
-#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-#
-#     This software is distributed WITHOUT ANY WARRANTY; without even
-#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE.  See the above copyright notice for more information.
-#
-#==============================================================================
 
 from __future__ import absolute_import, division, print_function
 

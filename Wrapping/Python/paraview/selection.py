@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-License-Identifier: BSD-3-Clause
+
 """selection is a module for defining and using selections via Python. It provides
 a convenience layer to provide functionality provided by the underlying C++ classes.
 
@@ -27,20 +30,6 @@ A simple example::
   Show(es)
 
 """
-# ==============================================================================
-#
-#  Program:   ParaView
-#  Module:    selection.py
-#
-#  Copyright (c) Kitware, Inc.
-#  All rights reserved.
-#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-#
-#     This software is distributed WITHOUT ANY WARRANTY; without even
-#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE.  See the above copyright notice for more information.
-#
-# ==============================================================================
 
 from __future__ import absolute_import, division, print_function
 

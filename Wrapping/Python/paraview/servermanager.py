@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-License-Identifier: BSD-3-Clause
+
 r"""servermanager is a module for using paraview server manager in Python.
 One can always use the server manager API directly. However, this module
 provides an interface easier to use from Python by wrapping several VTK
@@ -31,20 +34,6 @@ A simple example::
   renModule.StillRender()
 
 """
-#==============================================================================
-#
-#  Program:   ParaView
-#  Module:    servermanager.py
-#
-#  Copyright (c) Kitware, Inc.
-#  All rights reserved.
-#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-#
-#     This software is distributed WITHOUT ANY WARRANTY without even
-#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE.  See the above copyright notice for more information.
-#
-#==============================================================================
 from __future__ import print_function
 import paraview, re, os, os.path, types, sys
 
