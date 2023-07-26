@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #ifndef pqTimeManagerWidget_h
 #define pqTimeManagerWidget_h
 

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 
 /*-------------------------------------------------------------------------
    Copyright (c) 2022 Verein zur Foerderung der Software openCFS

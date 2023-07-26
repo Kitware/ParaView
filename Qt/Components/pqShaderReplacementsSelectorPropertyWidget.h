@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 
 #ifndef pqShaderReplacementsSelectorPropertyWidget_h
 #define pqShaderReplacementsSelectorPropertyWidget_h

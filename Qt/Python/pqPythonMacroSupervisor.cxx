@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #include "pqPythonMacroSupervisor.h"
 #include "pqApplicationCore.h"
 #include "pqServer.h"

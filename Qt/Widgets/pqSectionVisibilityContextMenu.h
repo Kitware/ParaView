@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #ifndef pqSectionVisibilityContextMenu_h
 #define pqSectionVisibilityContextMenu_h
 

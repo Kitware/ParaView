@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #include "pqOMETransferFunctionsPropertyWidget.h"
 #include "ui_pqOMETransferFunctionsPropertyWidget.h"
 #include "ui_pqOMETransferFunctionsPropertyWidgetPage.h"

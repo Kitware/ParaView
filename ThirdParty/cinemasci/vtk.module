@@ -5,7 +5,7 @@ CONDITION
 LICENSE_FILES
   paraview/tpl/license.md
 SPDX_LICENSE_IDENTIFIER
-  BSD-3-CLAUSE
+  BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
   Copyright (c) 2018-2019, Triad National Security, LLC
 GROUPS

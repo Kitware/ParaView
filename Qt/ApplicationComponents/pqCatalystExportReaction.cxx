@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPython.h" // must be first
 

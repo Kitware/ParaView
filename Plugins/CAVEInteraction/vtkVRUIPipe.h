@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #ifndef vtkVRUIPipe_h
 #define vtkVRUIPipe_h
 #include <stdint.h> /* for uint32_t declaration */

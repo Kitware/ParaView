@@ -5,7 +5,7 @@ CONDITION
 LICENSE_FILES
   paraview/tpl/LICENSE
 SPDX_LICENSE_IDENTIFIER
-  BSD-3-CLAUSE
+  BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
   Copyright (c) 2015-2017,  Kitware Inc., Los Alamos National Laboratory
 GROUPS

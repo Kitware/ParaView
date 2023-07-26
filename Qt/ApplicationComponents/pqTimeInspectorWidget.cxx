@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 // Hide PARAVIEW_DEPRECATED_IN_5_12_0() warnings for this class.
 #define PARAVIEW_DEPRECATION_LEVEL 0
 

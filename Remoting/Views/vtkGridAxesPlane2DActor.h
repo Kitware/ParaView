@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkGridAxesPlane2DActor
  * @brief   renders a 2D grid for vtkGridAxes2DActor.

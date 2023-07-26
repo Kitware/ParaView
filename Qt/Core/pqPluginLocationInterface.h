@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) 2007, Sandia Corporation
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 
 #ifndef pqPluginLocationInterface_h
 #define pqPluginLocationInterface_h

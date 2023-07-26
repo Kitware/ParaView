@@ -5,7 +5,7 @@ GROUPS
 LIBRARY_NAME
   vtkRemotingSettings
 SPDX_LICENSE_IDENTIFIER
-  BSD-3-CLAUSE
+  BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
   Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS

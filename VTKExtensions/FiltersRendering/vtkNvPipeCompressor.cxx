@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) 2016-2017, NVIDIA CORPORATION
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #include "vtkNvPipeCompressor.h"
 #include "vtkDataArrayTemplate.h"
 #include "vtkInformation.h"

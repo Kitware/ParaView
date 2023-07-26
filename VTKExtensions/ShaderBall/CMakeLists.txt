@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-# SPDX-License-Identifier: BSD-3-CLAUSE
+# SPDX-License-Identifier: BSD-3-Clause
 
 # HDRi created by Andreas Mischok, shared under CC-0, from: https://polyhaven.com/a/spiaggia_di_mondello
 vtk_encode_string(

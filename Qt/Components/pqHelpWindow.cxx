@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-// SPDX-License-Identifier: BSD-3-CLAUSE
+// SPDX-License-Identifier: BSD-3-Clause
 #include "pqHelpWindow.h"
 #include "pqApplicationCore.h"
 #include "pqQtWidgetsConfig.h" // for PARAVIEW_USE_QTWEBENGINE

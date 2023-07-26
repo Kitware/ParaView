@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (c) 2009 Kitware Inc.
-# SPDX-License-Identifier: BSD-3-CLAUSE
+# SPDX-License-Identifier: BSD-3-Clause
 function (check_fortran_support)
   if (DEFINED CMAKE_Fortran_COMPILER)
     return ()

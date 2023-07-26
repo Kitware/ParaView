@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-# SPDX-License-Identifier: BSD-3-CLAUSE
+# SPDX-License-Identifier: BSD-3-Clause
 cmake_minimum_required(VERSION 3.12...3.16 FATAL_ERROR)
 project(ParaView)
 
