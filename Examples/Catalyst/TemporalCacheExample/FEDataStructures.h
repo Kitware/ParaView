@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 /**
 The code for the toy simulation itself is here. In this example we
 make a configurable number of random sized spheres, and make them
