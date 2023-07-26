@@ -1,10 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-FileCopyrightText: Copyright (c) Maritime Research Institute Netherlands (MARIN)
 // SPDX-License-Identifier: BSD-3-CLAUSE
-/*----------------------------------------------------------------------------
-Copyright (c) Maritime Research Institute Netherlands (MARIN)
-See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-----------------------------------------------------------------------------*/
 
 #include "vtkPCGNSWriter.h"
 
