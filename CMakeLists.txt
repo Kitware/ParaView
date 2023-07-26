@@ -774,7 +774,10 @@ paraview_plugin_build(
   PLUGINS_COMPONENT "plugins"
   PLUGINS ${paraview_plugins}
   AUTOLOAD ${autoload_plugins}
-  DISABLE_XML_DOCUMENTATION "${PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION}")
+  DISABLE_XML_DOCUMENTATION "${PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION}"
+  GENERATE_SPDX "${PARAVIEW_GENERATE_SPDX}"
+  SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
+  SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
 set(CMAKE_INSTALL_RPATH
   "${_paraview_CMAKE_INSTALL_RPATH_save}")

@@ -297,6 +297,10 @@ paraview_plugin_build(
 
   [PLUGINS_FILE_NAME <filename>]
   [DISABLE_XML_DOCUMENTATION <ON|OFF>])
+
+  [GENERATE_SPDX            <ON|OFF>]
+  [SPDX_DOCUMENT_NAMESPACE  <uri>]
+  [SPDX_DOWNLOAD_LOCATION   <url>]
 ```
 
   * `PLUGINS`: (Required) The list of plugins to build. May be empty.
@@ -334,11 +338,17 @@ paraview_plugin_build(
     the `plugin` component.
   * `DISABLE_XML_DOCUMENTATION`: (Defaults to `OFF`) Whether to forcefully
     disable XML documentation or not.
+  * ``GENERATE_SPDX``: (Defaults to ``OFF``) Whether or not to generate and install
+    SPDX file for each modules.
+  * ``SPDX_DOCUMENT_NAMESPACE``: (Defaults to ``""``) Document namespace to use when
+    generating SPDX files.
+  * ``SPDX_DOWNLOAD_LOCATION``: (Defaults to ``""``) Download location to use when
+    generating SPDX files.
 #]==]
 function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
-    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS;DISABLE_XML_DOCUMENTATION"
+    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS;DISABLE_XML_DOCUMENTATION;GENERATE_SPDX;SPDX_DOCUMENT_NAMESPACE;SPDX_DOWNLOAD_LOCATION"
     "PLUGINS;AUTOLOAD"
     ${ARGN})
 
@@ -369,6 +379,18 @@ function (paraview_plugin_build)
 
   if (NOT _paraview_build_DISABLE_XML_DOCUMENTATION)
     set(_paraview_build_DISABLE_XML_DOCUMENTATION OFF)
+  endif ()
+
+  if (NOT DEFINED _paraview_build_GENERATE_SPDX)
+      set(_paraview_build_GENERATE_SPDX OFF)
+  endif ()
+
+  if (NOT _paraview_build_SPDX_DOCUMENT_NAMESPACE)
+    set(_paraview_build_SPDX_DOCUMENT_NAMESPACE "")
+  endif ()
+
+  if (NOT _paraview_build_SPDX_DOWNLOAD_LOCATION)
+    set(_paraview_build_SPDX_DOWNLOAD_LOCATION "")
   endif ()
 
   if (NOT DEFINED _paraview_build_INSTALL_HEADERS)
@@ -1112,7 +1134,10 @@ function (paraview_add_plugin name)
       LIBRARY_DESTINATION "${_paraview_plugin_subdir}"
       RUNTIME_DESTINATION "${_paraview_plugin_subdir}"
       CMAKE_DESTINATION   "${_paraview_build_CMAKE_DESTINATION}"
-      ${_paraview_add_plugin_MODULE_ARGS})
+      ${_paraview_add_plugin_MODULE_ARGS}
+      GENERATE_SPDX       "${_paraview_build_GENERATE_SPDX}"
+      SPDX_DOCUMENT_NAMESPACE "${_paraview_build_SPDX_DOCUMENT_NAMESPACE}"
+      SPDX_DOWNLOAD_LOCATION  "${_paraview_build_SPDX_DOWNLOAD_LOCATION}")
 
     set_property(GLOBAL APPEND
       PROPERTY
