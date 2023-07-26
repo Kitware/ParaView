@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 #include "vtkCellTypes.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"

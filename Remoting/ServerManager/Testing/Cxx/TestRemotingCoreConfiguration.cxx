@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 #include "vtkCLIOptions.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"

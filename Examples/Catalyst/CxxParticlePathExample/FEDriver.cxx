@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 #include "FEDataStructures.h"
 #include <mpi.h>
 #include <string>
