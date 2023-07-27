@@ -1,3 +1,5 @@
+import os
+import glob
 import sys
 import catalyst
 import catalyst_conduit
@@ -10,7 +12,6 @@ def initialize():
     rank = comm.Get_rank()
 
     node = catalyst_conduit.Node()
-    node = catalyst_conduit.Node()
     count = 0
     for i in sys.argv[1:]:
         node['catalyst/scripts/script'+str(count)] = i
@@ -18,7 +19,20 @@ def initialize():
         if rank == 0:
             print('Using Catalyst script', i)
     node['catalyst_load/implementation'] = 'paraview'
-    node['catalyst_load/search_paths/paraview'] = '/home/acbauer/Code/ParaView/debug/lib64/catalyst'
+
+    exe = os.environ['_']
+    if os.path.basename(exe) != 'pvpython' and os.path.basename(exe) != 'pvbatch':
+        print("WARNING: may need to run with pvpython or pvbatch to get proper environment")
+
+    # can possibly do something like the following to set the libcatalyst-paraview.so location in code
+    #path = os.path.dirname(exe)+'/../'
+    #search = path+'**/libcatalyst-paraview.so'
+    #files = glob.glob(search, recursive=True)
+    #if len(files) == 1:
+    #    node['catalyst_load/search_paths/paraview'] = os.path.dirname(files[0])
+    #elif not 'CATALYST_IMPLEMENTATION_PATHS' in os.environ:
+    #    print("WARNING: unable to find libcatalyst-paraview.so and 'CATALYST_IMPLEMENTATION_PATHS' not set")
+
     catalyst.initialize(node)
 
 def finalize():
@@ -32,10 +46,10 @@ def coprocess(time, timeStep, grid, attributes):
     node['catalyst/state/timestep'] = timeStep
     node['catalyst/state/time'] = time
 
-    # the Catalyst channel is "grid"
-    node['catalyst/channels/grid/type'] = 'mesh'
+    # the Catalyst channel is "input"
+    node['catalyst/channels/input/type'] = 'mesh'
 
-    mesh = node['catalyst/channels/grid/data']
+    mesh = node['catalyst/channels/input/data']
 
     mesh['coordsets/coords/type'] = 'uniform'
 
@@ -74,7 +88,6 @@ def coprocess(time, timeStep, grid, attributes):
     # pressure is zero-copied into Catalyst because the simulation
     # stores the data the same way that Conduit expects it and it is scalar.
     fields['pressure/values'].set_external(attributes.Pressure)
-    #print("pressure ", fields['pressure'])
 
     # zero-copied numpy arrays don't seem to work yet
     # for non-flat, non-scalar arrays. it should look something like

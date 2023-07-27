@@ -20,8 +20,6 @@ class GridClass:
         self.NumberOfZPoints = pointDimensions[2]
         self.NumberOfGlobalXPoints = pointDimensions[0]
 
-        print(rank, self.XStartPoint, self.XEndPoint)
-
         self.PointDimensions = pointDimensions
         self.Spacing = spacing
 

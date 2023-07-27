@@ -1,14 +1,17 @@
 """
-A simple example of a Python simulation code working with Catalyst V2.
+A simple example of a Python simulation code working with ParaView Catalyst V2.
 It depends on numpy and mpi4py being available. The environment
 variables need to be set up properly to find Catalyst when running directly
-from python. For Linux
+from Python. For Linux
 and Mac machines they should be:
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:<Catalyst build dir>/lib
-export PYTHONPATH=<Catalyst build dir>/lib:<Catalyst build dir>/lib/site-packages
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:<ParaView build dir>/lib
+export PYTHONPATH=<ParaView build dir>/lib:<ParaView build dir>/lib/site-packages
 
 Alternatively, pvbatch or pvpython can be used which will automatically set up
-system paths for using Catalyst.
+system paths for using ParaView Catalyst.
+
+The location of the Catalyst Python wrapped libraries still need to be specified though:
+export PYTHONPATH=<Catalyst build dir>/lib64/python<version>/site-packages:$PYTHONPATH
 
 When running, Catalyst scripts must be added in on the command line. For example:
 </path/to/pvpython> fedriver.py cpscript.py
@@ -27,14 +30,14 @@ attributes = fedatastructures.AttributesClass(grid)
 doCoprocessing = True
 
 if doCoprocessing:
-    import coprocessor
-    coprocessor.initialize()
+    import catalyst_adaptor
+    catalyst_adaptor.initialize()
 
 
 for i in range(100):
     attributes.Update(i)
     if doCoprocessing:
-        coprocessor.coprocess(i, i, grid, attributes)
+        catalyst_adaptor.coprocess(i, i, grid, attributes)
 
 if doCoprocessing:
-    coprocessor.finalize()
+    catalyst_adaptor.finalize()
