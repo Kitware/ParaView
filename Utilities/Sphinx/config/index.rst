@@ -24,6 +24,7 @@ Main modules
    simple <paraview.simple>
    servermanager <paraview.servermanager>
 
+   catalyst <paraview.catalyst>
    coprocessing <paraview.coprocessing>
    benchmark <paraview.benchmark>
 
