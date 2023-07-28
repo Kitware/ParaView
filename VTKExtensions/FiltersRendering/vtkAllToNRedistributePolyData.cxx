@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Los Alamos National Laboratory
 // SPDX-License-Identifier: BSD-3-Clause
 #define DO_TIMING 0

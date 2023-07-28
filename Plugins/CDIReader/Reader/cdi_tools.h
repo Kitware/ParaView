@@ -1,9 +1,7 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
+// SPDX-FileCopyrightText: Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
 // SPDX-License-Identifier: BSD-3-Clause
-
-/*-------------------------------------------------------------------------
-   Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
-  -------------------------------------------------------------------------*/
 
 #ifndef CDI_TOOLS
 #define CDI_TOOLS

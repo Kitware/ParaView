@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0" >
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<ui version="4.0"> >
  <class>pqSelectionListPropertyWidget</class>
  <widget class="QWidget" name="pqSelectionListPropertyWidget" >
   <property name="geometry" >

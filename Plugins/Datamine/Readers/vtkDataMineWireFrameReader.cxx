@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // .NAME vtkDataMineWireFrameReader.cxx
 // Read DataMine binary files for single objects.
 // point, perimeter (polyline), wframe<points/triangle>

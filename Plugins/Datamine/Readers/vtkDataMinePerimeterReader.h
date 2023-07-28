@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // .NAME DataMinePointReader from vtkDataMinePerimeterReader
 // .SECTION Description
 // vtkDataMinePerimeterReader is a subclass of vtkPolyDataAlgorithm

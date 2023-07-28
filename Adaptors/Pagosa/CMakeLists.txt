@@ -21,6 +21,7 @@ set(sources
 )
 
 vtk_module_add_module(ParaView::AdaptorsPagosa
+  SPDX_SKIP_REGEX   "PagosaAdaptorAPIMangling.h"
   HEADERS           ${header}
   PRIVATE_HEADERS   ${private_headers}
   SOURCES           ${sources}

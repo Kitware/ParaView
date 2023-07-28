@@ -1,14 +1,7 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-FileCopyrightText: Copyright (c) 2013 Karthik Krishnan
 // SPDX-License-Identifier: BSD-3-Clause
-/*=========================================================================
-
-  Copyright (c) 2013 Karthik Krishnan.
-  Contributed to the VisualizationToolkit by the author under the terms
-  of the Visualization Toolkit copyright
-
-=========================================================================*/
-
 // .NAME vtkPolyDataGeodesicDistance - Abstract base for classes that generate a geodesic path
 // .SECTION Description
 // Serves as a base class for algorithms that trace a geodesic path on a

@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (C) 2015 Cenaero
 // SPDX-License-Identifier: BSD-3-Clause
 
 /**
@@ -6,11 +7,6 @@
  *
  * Reader for visualization of high-order polynomial solutions under
  * the Gmsh format.
- * @par Thanks:
- * ParaViewGmshReaderPlugin - Copyright (C) 2015 Cenaero
- * See the Copyright.txt and License.txt files provided
- * with ParaViewGmshReaderPlugin for license information.
- *
  */
 
 #ifndef vtkGmshReader_h

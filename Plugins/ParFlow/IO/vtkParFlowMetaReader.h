@@ -1,4 +1,5 @@
-// See license.md for copyright information.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 #ifndef vtkParFlowMetaReader_h
 #define vtkParFlowMetaReader_h
 

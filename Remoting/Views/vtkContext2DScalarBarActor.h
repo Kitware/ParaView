@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 /** @class   vtkContext2DScalarBarActor
  *  @brief   Custom scalar bar actor for ParaView that uses the Charts API.

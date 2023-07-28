@@ -1,4 +1,5 @@
-# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
   CPythonAdaptorAPI
@@ -41,6 +42,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
 endif ()
 
 vtk_module_add_module(ParaView::PythonCatalyst
+  SPDX_SKIP_REGEX "FortranPythonAdaptorAPIMangling.h"
   CLASSES ${classes}
   SOURCES ${sources}
   HEADERS ${headers})

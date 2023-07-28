@@ -1,4 +1,4 @@
-c$$$ SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+c$$$ SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 c$$$ SPDX-License-Identifier: BSD-3-Clause
 
 c...==============================================================

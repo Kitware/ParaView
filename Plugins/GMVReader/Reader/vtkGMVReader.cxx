@@ -1,18 +1,6 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkGMVReader.cxx
-
-  Copyright (c) 2009-2012 Sven Buijssen, Jens Acker, TU Dortmund
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) 2009-2012 Sven Buijssen, Jens Acker, TU Dortmund
+// SPDX-License-Identifier: BSD-3-Clause
 #include "vtkGMVReader.h"
 
 #include "vtkByteSwap.h"

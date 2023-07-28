@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright 2000 Jeremy Maccelari
+// SPDX-License-Identifier: BSD-3-Clause
 /*
    Implementation of the TDMFile and TDMVar classes. Look at dmfile.hxx
    for full info.

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 # SPDX-License-Identifier: BSD-3-Clause
 
 r"""python_view is a module providing access to a PythonView. It is

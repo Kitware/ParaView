@@ -1,10 +1,7 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
+// SPDX-FileCopyrightText: Copyright (c) 2022 Verein zur Foerderung der Software openCFS
 // SPDX-License-Identifier: BSD-3-Clause
-
-/*-------------------------------------------------------------------------
-   Copyright (c) 2022 Verein zur Foerderung der Software openCFS
--------------------------------------------------------------------------*/
-
 /**
  * @class   hdf5Reader
  * @brief   holds a hdf5 based openCFS file and serves logical features to vtkCFSReader

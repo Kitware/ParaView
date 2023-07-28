@@ -1,13 +1,6 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (C) 2015 Cenaero
 // SPDX-License-Identifier: BSD-3-Clause
-// -------------------------------------------------------------------
-// ParaViewGmshReaderPlugin - Copyright (C) 2015 Cenaero
-//
-// See the Copyright.txt and License.txt files provided
-// with ParaViewGmshReaderPlugin for license information.
-//
-// -------------------------------------------------------------------
-
 #include "vtkGmshMetaReader.h"
 
 #include "vtkCallbackCommand.h"

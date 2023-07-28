@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // .NAME vtkDataMineWireFrameReader from vtkDataMineWireFrameReader
 // .SECTION Description
 // vtkDataMineWireFrameReader is a subclass of vtkPolyDataAlgorithm

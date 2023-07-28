@@ -3,9 +3,10 @@ NAME
 LIBRARY_NAME
   vtkCFSReader
 SPDX_LICENSE_IDENTIFIER
-  BSD-3-Clause
+  BSD-3-Clause AND MIT
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Kitware Inc.
+  Copyright (c) 2020 Verein zur Förderung der Software openCFS
 DEPENDS
   VTK::CommonCore
   VTK::CommonMisc

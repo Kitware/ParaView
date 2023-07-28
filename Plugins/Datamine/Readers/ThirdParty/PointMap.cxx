@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright 2000 Jeremy Maccelari
+// SPDX-License-Identifier: BSD-3-Clause
 // it is used to keep the id reference for points from a datamine file
 // to the point ids used in vtkPointData
 

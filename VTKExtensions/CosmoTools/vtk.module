@@ -5,7 +5,7 @@ LIBRARY_NAME
 SPDX_LICENSE_IDENTIFIER
   LicenseRef-BSD-3-Clause-LANL-USGov
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Kitware Inc.
   Copyright (c) Los Alamos National Security, LLC
 SPDX_CUSTOM_LICENSE_FILE
   LICENSE

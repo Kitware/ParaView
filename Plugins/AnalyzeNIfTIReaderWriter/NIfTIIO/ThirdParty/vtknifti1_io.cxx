@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: NONE
+// SPDX-License-Identifier: LicenseRef-PublicDomain-nifti 
+
 #define _NIFTI1_IO_C_
 
 #include "vtknifti1_io.h"   /* typedefs, prototypes, macros, etc. */
