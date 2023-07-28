@@ -71,6 +71,9 @@
             # translation source files
             - translations/*.ts
 
+            # SPDX files
+            - build/**/*.spdx
+
 .cmake_test_artifacts:
     artifacts:
         expire_in: 1d

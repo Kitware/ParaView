@@ -11,6 +11,9 @@ set(VTK_USE_LARGE_DATA ON CACHE BOOL "")
 # default location.
 set(PARAVIEW_RELOCATABLE_INSTALL ON CACHE BOOL "")
 
+# Enable SPDX generation
+set(PARAVIEW_GENERATE_SPDX ON CACHE BOOL "")
+
 # Enable default-off plugins.
 set(PARAVIEW_PLUGIN_ENABLE_TemporalParallelismScriptGenerator ON CACHE BOOL "")
 set(PARAVIEW_PLUGIN_ENABLE_XRInterface ON CACHE BOOL "")
