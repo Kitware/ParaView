@@ -172,8 +172,8 @@ int vtkAppendRectilinearGrid::RequestData(vtkInformation* vtkNotUsed(request),
     input->GetExtent(inputExtent);
 
     this->CopyArray(output->GetXCoordinates(), outUpdateExt, input->GetXCoordinates(), inputExtent);
-    this->CopyArray(output->GetYCoordinates(), outUpdateExt, input->GetXCoordinates(), inputExtent);
-    this->CopyArray(output->GetZCoordinates(), outUpdateExt, input->GetXCoordinates(), inputExtent);
+    this->CopyArray(output->GetYCoordinates(), outUpdateExt, input->GetYCoordinates(), inputExtent);
+    this->CopyArray(output->GetZCoordinates(), outUpdateExt, input->GetZCoordinates(), inputExtent);
 
     for (int cc = 0; cc < output->GetPointData()->GetNumberOfArrays(); cc++)
     {
