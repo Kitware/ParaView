@@ -19,19 +19,13 @@ def initialize():
         if rank == 0:
             print('Using Catalyst script', i)
     node['catalyst_load/implementation'] = 'paraview'
+    # if we know the location of libcatalyst-paraview.so and want to pass that along via
+    # Python we would do that like:
+    # node['catalyst_load/search_paths/paraview'] = </full/path/to/libcatalyst-paraview.so>
 
     exe = os.environ['_']
     if os.path.basename(exe) != 'pvpython' and os.path.basename(exe) != 'pvbatch':
         print("WARNING: may need to run with pvpython or pvbatch to get proper environment")
-
-    # can possibly do something like the following to set the libcatalyst-paraview.so location in code
-    #path = os.path.dirname(exe)+'/../'
-    #search = path+'**/libcatalyst-paraview.so'
-    #files = glob.glob(search, recursive=True)
-    #if len(files) == 1:
-    #    node['catalyst_load/search_paths/paraview'] = os.path.dirname(files[0])
-    #elif not 'CATALYST_IMPLEMENTATION_PATHS' in os.environ:
-    #    print("WARNING: unable to find libcatalyst-paraview.so and 'CATALYST_IMPLEMENTATION_PATHS' not set")
 
     catalyst.initialize(node)
 
