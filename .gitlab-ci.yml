@@ -290,6 +290,7 @@ windows-vs2022-qt:build:
         - .windows_builder_tags
         - .cmake_build_artifacts
         - .run_manually
+    timeout: 90 minutes
 
 windows-vs2022-qt:test:
     extends:
@@ -302,6 +303,7 @@ windows-vs2022-qt:test:
         - windows-vs2022-qt:build
     needs:
         - windows-vs2022-qt:build
+    timeout: 90 minutes
 
 # Deployment
 
