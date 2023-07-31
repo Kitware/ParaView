@@ -342,6 +342,9 @@ More advanced build options are:
   * `PARAVIEW_BUILD_ID` (default `""`): A build ID for the ParaView build. It
     can be any arbitrary value which can be used to indicate the provenance of
     ParaView.
+  * `PARAVIEW_GENERATE_SPDX` (default `OFF`): When compiling ParaView, generate
+    a SPDX file for each of ParaView modules containing license and copyright
+    information.
 
 #### Capability settings
 

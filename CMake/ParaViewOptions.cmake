@@ -118,6 +118,9 @@ endif ()
 
 option(PARAVIEW_ENABLE_OPENVDB  "Enable the OpenVDB Writer" OFF)
 
+option(PARAVIEW_GENERATE_SPDX  "Generate SPDX file for each module (Experimental)." OFF)
+mark_as_advanced(PARAVIEW_GENERATE_SPDX)
+
 # Add option to disable Fortran
 if (NOT WIN32)
   include(CheckFortran)

@@ -631,7 +631,10 @@ else ()
     ENABLE_WRAPPING     ON
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
     TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing"
-    TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
+    TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
+    GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
+    SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
+    SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/vtk/vtk/-/tree/master")
 
   if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
     set(CMAKE_C_CLANG_TIDY "${CMAKE_C_CLANG_TIDY_save}")
@@ -681,7 +684,10 @@ vtk_module_build(
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
-  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
+  GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
+  SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
+  SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
 vtk_module_build(
   MODULES             ${paraview_client_modules}
@@ -701,7 +707,10 @@ vtk_module_build(
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
-  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
+  GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
+  SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
+  SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
 # Catalyst sanity check. Ensure every module is using the same Catalyst dependency.
 if (PARAVIEW_ENABLE_CATALYST)
@@ -765,7 +774,10 @@ paraview_plugin_build(
   PLUGINS_COMPONENT "plugins"
   PLUGINS ${paraview_plugins}
   AUTOLOAD ${autoload_plugins}
-  DISABLE_XML_DOCUMENTATION "${PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION}")
+  DISABLE_XML_DOCUMENTATION "${PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION}"
+  GENERATE_SPDX "${PARAVIEW_GENERATE_SPDX}"
+  SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
+  SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
 set(CMAKE_INSTALL_RPATH
   "${_paraview_CMAKE_INSTALL_RPATH_save}")
