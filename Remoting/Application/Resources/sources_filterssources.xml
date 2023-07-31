@@ -656,6 +656,58 @@
         <Documentation>Set the x, y, z coordinates of the origin of the 2D
         glyph.</Documentation>
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetTipLength"
+                            default_values="0.3"
+                            name="TipLength"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="range" />
+        <Documentation>
+          Length of the arrow tip.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="GlyphType"
+                                   value="9" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetDoublePointed"
+                         default_values="0"
+                         name="DoublePointed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Display double pointed arrow.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="GlyphType"
+                                   value="9" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetPointInwards"
+                         default_values="0"
+                         name="PointInwards"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Make the arrow tip point inwards.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="GlyphType"
+                                   value="9" />
+        </Hints>
+      </IntVectorProperty>
+
       <!-- End 2DGlyph -->
     </SourceProxy>
 
