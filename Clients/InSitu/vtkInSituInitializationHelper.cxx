@@ -28,6 +28,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSteeringDataGenerator.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <algorithm>
 #include <cctype>
@@ -222,18 +223,38 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
 
   if (path.empty())
   {
-    vtkLogF(WARNING, "Empty path specified.");
+    vtkLogF(WARNING, "Empty file for script specified.");
     return nullptr;
   }
-
+  std::string tmp = path;
   if (!vtkPSystemTools::FileExists(path.c_str()))
   {
-    vtkLogF(WARNING, "File/path does not exist: '%s'. Skipping", path.c_str());
-    return nullptr;
+    tmp.clear();
+    if (vtksys::SystemTools::HasEnv("PYTHONPATH"))
+    {
+      std::string pythonPath;
+      vtksys::SystemTools::GetEnv("PYTHONPATH", pythonPath);
+      std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, ':');
+      for (auto& p : paths)
+      {
+        std::string testPath = p + "/" + path;
+        if (vtkPSystemTools::FileExists(testPath.c_str()))
+        {
+          tmp = testPath;
+          break;
+        }
+      }
+    }
+    if (tmp.empty())
+    {
+      vtkLogF(
+        WARNING, "File/path does not exist and not in PYTHONPATH: '%s'. Skipping.", path.c_str());
+      return nullptr;
+    }
   }
 
   vtkNew<vtkInSituPipelinePython> pipeline;
-  pipeline->SetFileName(path.c_str());
+  pipeline->SetFileName(tmp.c_str());
   vtkInSituInitializationHelper::AddPipeline(pipeline);
   return pipeline;
 }
