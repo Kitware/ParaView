@@ -8,6 +8,8 @@ SPDX_LICENSE_IDENTIFIER
   BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
   Copyright (c) 2015-2017,  Kitware Inc., Los Alamos National Laboratory
+SPDX_DOWNLOAD_LOCATION
+  git+https://gitlab.kitware.com/third-party/cinema_python.git@for/paraview-20200303
 GROUPS
   PARAVIEW_CANONICAL
 THIRD_PARTY
