@@ -23,10 +23,6 @@ def initialize():
     # Python we would do that like:
     # node['catalyst_load/search_paths/paraview'] = </full/path/to/libcatalyst-paraview.so>
 
-    exe = os.environ['_']
-    if os.path.basename(exe) != 'pvpython' and os.path.basename(exe) != 'pvbatch':
-        print("WARNING: may need to run with pvpython or pvbatch to get proper environment")
-
     catalyst.initialize(node)
 
 def finalize():
@@ -35,6 +31,7 @@ def finalize():
     catalyst.finalize(node)
 
 def coprocess(time, timeStep, grid, attributes):
+    # do the actual in situ analysis and visualization.
     node = catalyst_conduit.Node()
 
     node['catalyst/state/timestep'] = timeStep
