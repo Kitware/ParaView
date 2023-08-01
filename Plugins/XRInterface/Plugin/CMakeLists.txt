@@ -142,6 +142,12 @@ if (openxr_support)
   )
 endif()
 
+if (openxrremoting_support)
+  list(APPEND xr_input_files
+    pv_openxr_binding_microsoft_hand_interaction.json
+  )
+endif()
+
 set_property(
   SOURCE
   vtkPVXRInterfaceCollaborationClient.cxx
