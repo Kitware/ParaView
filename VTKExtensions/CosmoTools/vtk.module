@@ -2,6 +2,17 @@ NAME
   ParaView::VTKExtensionsCosmoTools
 LIBRARY_NAME
   vtkPVVTKExtensionsCosmoTools
+SPDX_LICENSE_IDENTIFIER
+  LicenseRef-BSD-3-Clause-LANL-USGov
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Los Alamos National Security, LLC
+SPDX_CUSTOM_LICENSE_FILE
+  LICENSE
+SPDX_CUSTOM_LICENSE_NAME
+  BSD-3-Clause-LANL-USGov
+LICENSE_FILES
+  LICENSE
 CONDITION
   PARAVIEW_ENABLE_COSMOTOOLS
 GROUPS

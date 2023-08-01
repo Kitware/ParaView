@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // Adaptor for getting Fortran simulation code into ParaView CoProcessor.
 
 // CoProcessor specific headers

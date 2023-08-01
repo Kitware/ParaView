@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 static vtkRectilinearGridConnectivityMarchingCubesVolumeCases
   RECTILINEAR_GRID_CONNECTIVITY_MARCHING_CUBES_VOLUME_CASES[] = {
     { { -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,

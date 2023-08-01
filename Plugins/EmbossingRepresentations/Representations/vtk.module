@@ -2,6 +2,10 @@ NAME
   EmbossingRepresentations::vtkEmbossingRepresentations
 LIBRARY_NAME
   vtkEmbossingRepresentations
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   ParaView::RemotingViews
   VTK::RenderingOpenGL2

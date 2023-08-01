@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 #ifndef pqGMVReaderPanel_h
 #define pqGMVReaderPanel_h
 

@@ -1,17 +1,5 @@
-/*=========================================================================
-
-  Program:   ParaView
-  Module:    AdaptorDriver.cxx
-
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // Give an example of creating an unstructured grid with point data
 // and cell data to demonstrate how other people can pass their
 // simulation data to the coprocessors.

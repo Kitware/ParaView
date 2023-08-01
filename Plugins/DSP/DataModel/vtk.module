@@ -2,6 +2,10 @@ NAME
   DigitalSignalProcessing::DSPDataModel
 LIBRARY_NAME
   vtkDSPDataModel
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   VTK::CommonCore
   VTK::CommonImplicitArrays

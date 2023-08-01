@@ -2,6 +2,10 @@ NAME
   ParaView::VTKExtensionsShaderBall
 LIBRARY_NAME
   vtkExtensionsShaderBall
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 KIT
   ParaView::CoreKit
 GROUPS

@@ -2,6 +2,10 @@ NAME
   ParaView::RemotingLive
 LIBRARY_NAME
   vtkRemotingLive
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DESCRIPTION
   Catalyst LIVE
 GROUPS

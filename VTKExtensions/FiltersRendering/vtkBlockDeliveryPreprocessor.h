@@ -1,17 +1,5 @@
-/*=========================================================================
-
-  Program:   ParaView
-  Module:    vtkBlockDeliveryPreprocessor.h
-
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class vtkBlockDeliveryPreprocessor
  * @brief prepares data for certain table-based representations

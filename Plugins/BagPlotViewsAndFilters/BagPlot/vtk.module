@@ -2,6 +2,10 @@ NAME
   BagPlotViewsAndFilters::BagPlotViewsAndFiltersBagPlot
 LIBRARY_NAME
   vtkBagPlotViewsAndFiltersBagPlot
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   ParaView::RemotingViews
   VTK::CommonExecutionModel

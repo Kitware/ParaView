@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 /**
 An example catalyst pipeline that includes temporal processing.
 The "simulation" has a number of particles bouncing around in a cube.

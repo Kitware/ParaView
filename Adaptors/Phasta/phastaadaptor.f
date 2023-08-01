@@ -1,18 +1,5 @@
-c$$$=========================================================================
-c$$$
-c$$$  Program:   ParaView
-c$$$  Module:    phastaadaptor.f
-c$$$
-c$$$  Copyright (c) Kitware, Inc.
-c$$$  All rights reserved.
-c$$$  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-c$$$
-c$$$     This software is distributed WITHOUT ANY WARRANTY; without even
-c$$$     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-c$$$     PURPOSE.  See the above copyright notice for more information.
-c$$$
-c$$$=========================================================================
-
+c$$$ SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+c$$$ SPDX-License-Identifier: BSD-3-Clause
 
 c...==============================================================
 c... subroutine to do the coprocessing

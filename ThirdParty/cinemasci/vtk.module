@@ -4,6 +4,12 @@ CONDITION
   PARAVIEW_USE_PYTHON
 LICENSE_FILES
   paraview/tpl/license.md
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) 2018-2019, Triad National Security, LLC
+SPDX_DOWNLOAD_LOCATION
+  git+https://github.com/cinemascience/cinemasci.git@e7666713075c42f41bef9fc1fa9d19a76163de93
 GROUPS
   PARAVIEW_CANONICAL
 THIRD_PARTY

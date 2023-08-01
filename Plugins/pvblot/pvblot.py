@@ -1,24 +1,11 @@
+# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+# SPDX-License-Identifier: BSD-3-Clause
 r"""
 
 An interpreter that provides blot-like syntax and functionality.  To run
 the interpreter simply call the start function.
 
 """
-
-#==============================================================================
-#
-#  Program:   ParaView
-#  Module:    pvblot.py
-#
-#  Copyright (c) Kitware, Inc.
-#  All rights reserved.
-#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-#
-#     This software is distributed WITHOUT ANY WARRANTY; without even
-#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE.  See the above copyright notice for more information.
-#
-#==============================================================================
 
 #-------------------------------------------------------------------------
 # Copyright 2009 Sandia Corporation.

@@ -2,6 +2,10 @@ NAME
   VDFReaderPlugin::vtkVaporReaders
 LIBRARY_NAME
   vtkVaporReaders
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS

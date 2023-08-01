@@ -1,17 +1,5 @@
-/*=========================================================================
-
-  Program:   ParaView
-  Module:    vtkPVMultiClientsInformation.h
-
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkPVMultiClientsInformation
  * @brief   Gets Multi-clients information from the server.

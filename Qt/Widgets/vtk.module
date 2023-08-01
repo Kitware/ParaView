@@ -1,5 +1,9 @@
 NAME
   ParaView::pqWidgets
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 CONDITION
   PARAVIEW_USE_QT
 GROUPS

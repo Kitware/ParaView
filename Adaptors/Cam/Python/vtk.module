@@ -2,6 +2,10 @@ NAME
   ParaView::AdaptorsCamPython
 LIBRARY_NAME
   vtkPVAdaptorsCamPython
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Sandia Corporation, Kitware Inc.
 GROUPS
   PARAVIEW_CANONICAL
 CONDITION

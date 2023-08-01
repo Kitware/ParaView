@@ -1,22 +1,6 @@
-/*=========================================================================
-
-  Program:   ParaView
-  Module:    vtkWeightedRedistributePolyData.h
-
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-/*----------------------------------------------------------------------------
- Copyright (c) Los Alamos National Laboratory
- See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-----------------------------------------------------------------------------*/
-
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Los Alamos National Laboratory
+// SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class   vtkWeightedRedistributePolyData
  * @brief   do weighted balance of cells on processors

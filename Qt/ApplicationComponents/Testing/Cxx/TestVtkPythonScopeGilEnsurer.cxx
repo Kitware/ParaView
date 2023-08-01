@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // Include vtkPython.h first to avoid pythonXY_d.lib not found linking error on
 // Windows debug builds.
 #include "vtkPython.h"
