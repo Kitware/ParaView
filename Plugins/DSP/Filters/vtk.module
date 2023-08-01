@@ -17,5 +17,6 @@ PRIVATE_DEPENDS
   VTK::FiltersExtraction
 TEST_DEPENDS
   DigitalSignalProcessing::DSPDataModel
+  VTK::IOExodus
   VTK::IOHDF
   VTK::TestingCore

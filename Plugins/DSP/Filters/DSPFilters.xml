@@ -746,7 +746,6 @@
         Each point/cell array of the input is converted to a 3D array defined by
         (index, tuple, component), corresponding to (point/cell, timestep, component).
         The arrays are vtkMultiDimensionalArray objects.
-        Note: the filter currently does not support composite datasets.
       </Documentation>
 
       <InputProperty name="Input"
@@ -755,7 +754,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
