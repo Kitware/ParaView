@@ -961,7 +961,6 @@ endif()
 
 install(
   FILES       "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt"
-              "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.2.txt"
   DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
   COMPONENT   "license")
 

@@ -1,9 +1,4 @@
-Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
-Sandia National Laboratories, New Mexico PO Box 5800 Albuquerque, NM 87185
-Kitware Inc., 28 Corporate Drive, Clifton Park, NY 12065, USA
-
-Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive license
-for use of this work by or on behalf of the U.S. Government.
+Copyright (c) 2000 Kitware Inc.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
