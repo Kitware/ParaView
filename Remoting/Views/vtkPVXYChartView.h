@@ -431,6 +431,7 @@ public:
   GENERATE_AXIS_FUNCTIONS3(AxisLabels, int, const std::string&, const std::string&);
   ///@}
 
+  void SetTooltipLabelFormat(const vtkStdString& labelFormat);
   void SetTooltipNotation(int notation);
   void SetTooltipPrecision(int precision);
 

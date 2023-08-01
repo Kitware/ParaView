@@ -757,6 +757,15 @@ void vtkPVXYChartView::SetAxisLabels(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTooltipLabelFormat(const vtkStdString& labelFormat)
+{
+  for (int i = 0; i < this->Chart->GetNumberOfPlots(); i++)
+  {
+    this->Chart->GetPlot(i)->SetTooltipLabelFormat(labelFormat);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetTooltipNotation(int notation)
 {
   for (int i = 0; i < this->Chart->GetNumberOfPlots(); i++)
