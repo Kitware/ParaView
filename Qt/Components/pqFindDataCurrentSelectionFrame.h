@@ -51,6 +51,11 @@ private Q_SLOTS:
   void updateFieldType();
 
   /**
+   * update the spreadsheet to show field data associated to points / cells
+   */
+  void showFieldData(bool show);
+
+  /**
    * set the value for the "invert selection" property on the extract-selection
    * source to the one specified.
    */

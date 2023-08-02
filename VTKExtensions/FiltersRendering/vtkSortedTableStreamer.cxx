@@ -130,6 +130,57 @@ public:
       }
     }
   }
+
+  /**
+   * Merge block-defined field data in one table.
+   * For each field data array in otherTable get the corresponding column in mergedTable
+   * or create a new one. Then copy the field data for each point / cell.
+   */
+  static void MergeFieldDataInTable(
+    vtkTable* otherTable, vtkTable* mergedTable, vtkIdType size, vtkIdType offset)
+  {
+    vtkAbstractArray* otherArray = nullptr;
+    vtkSmartPointer<vtkAbstractArray> dstArray;
+    bool needNewArray = false;
+
+    vtkFieldData* otherFieldData = otherTable->GetFieldData();
+    if (otherFieldData)
+    {
+      for (vtkIdType i_arr = 0; i_arr < otherFieldData->GetNumberOfArrays(); i_arr++)
+      {
+        otherArray = otherFieldData->GetAbstractArray(i_arr);
+        dstArray = mergedTable->GetColumnByName(otherArray->GetName());
+        needNewArray = (dstArray == nullptr);
+
+        if (!otherArray || otherArray->GetNumberOfTuples() != 1)
+        {
+          continue;
+        }
+
+        if (needNewArray)
+        {
+          dstArray.TakeReference(otherArray->NewInstance());
+          dstArray->SetNumberOfComponents(otherArray->GetNumberOfComponents());
+          dstArray->SetName(otherArray->GetName());
+          dstArray->SetNumberOfTuples(size);
+          if (auto oinfo = otherArray->GetInformation())
+          {
+            dstArray->CopyInformation(oinfo);
+          }
+        }
+
+        for (vtkIdType idx = 0; idx < otherTable->GetNumberOfRows(); ++idx)
+        {
+          dstArray->InsertTuple(idx + offset, 0, otherArray);
+        }
+
+        if (needNewArray)
+        {
+          mergedTable->GetRowData()->AddArray(dstArray);
+        }
+      }
+    }
+  }
 };
 //----------------------------------------------------------------------------
 template <class T>
@@ -1390,6 +1441,25 @@ vtkSmartPointer<vtkTable> vtkSortedTableStreamer::MergeBlocks(vtkPartitionedData
 }
 
 //----------------------------------------------------------------------------
+void vtkSortedTableStreamer::PopulateFieldDataArrays(
+  vtkPartitionedDataSet* ptd, vtkSmartPointer<vtkTable> outTable)
+{
+  vtkIdType tableOffset = 0;
+
+  const vtkIdType allocationSize = ptd->GetNumberOfElements(vtkDataObject::ROW);
+  for (unsigned int cc = 0, max = ptd->GetNumberOfPartitions(); cc < max; ++cc)
+  {
+    auto table = vtkTable::SafeDownCast(ptd->GetPartitionAsDataObject(cc));
+    if (!table)
+    {
+      continue;
+    }
+    InternalsBase::MergeFieldDataInTable(table, outTable.GetPointer(), allocationSize, tableOffset);
+    tableOffset += table->GetNumberOfRows();
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkSmartPointer<vtkUnsignedIntArray> vtkSortedTableStreamer::GenerateCompositeIndexArray(
   vtkPartitionedDataSet* ptd, vtkIdType maxSize)
 {
@@ -1499,6 +1569,10 @@ int vtkSortedTableStreamer::RequestData(vtkInformation* vtkNotUsed(request),
   auto inputPTD = vtkPartitionedDataSet::GetData(inputVector[0], 0);
 
   vtkSmartPointer<vtkTable> input = this->MergeBlocks(inputPTD);
+  if (this->ShowFieldData)
+  {
+    this->PopulateFieldDataArrays(inputPTD, input);
+  }
   if (vtkDataTabulator::HasInputCompositeIds(inputPTD))
   {
     if (input->GetColumnByName("vtkCompositeIndexArray") == nullptr)

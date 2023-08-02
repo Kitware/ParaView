@@ -79,6 +79,16 @@ public:
 
   ///@{
   /**
+   * Allow user to enable/disable field data visibility.
+   * Default to false.
+   */
+  vtkSetMacro(ShowFieldData, bool);
+  vtkGetMacro(ShowFieldData, bool);
+  vtkBooleanMacro(ShowFieldData, bool);
+  ///@}
+
+  ///@{
+  /**
    * Get/Set the MPI controller used for gathering.
    */
   void SetController(vtkMultiProcessController*);
@@ -119,6 +129,7 @@ protected:
   vtkMultiProcessController* Controller;
 
   char* ColumnToSort;
+  bool ShowFieldData = false;
   int SelectedComponent;
   int InvertOrder;
 
@@ -127,6 +138,12 @@ private:
   void operator=(const vtkSortedTableStreamer&) = delete;
 
   vtkSmartPointer<vtkTable> MergeBlocks(vtkPartitionedDataSet* cd);
+
+  /**
+   * Add field data columns defined by block to the output table.
+   */
+  void PopulateFieldDataArrays(vtkPartitionedDataSet* ptd, vtkSmartPointer<vtkTable> outTable);
+
   vtkSmartPointer<vtkUnsignedIntArray> GenerateCompositeIndexArray(
     vtkPartitionedDataSet* cd, vtkIdType maxSize);
   std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray>>

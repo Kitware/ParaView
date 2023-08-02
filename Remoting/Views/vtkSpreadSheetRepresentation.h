@@ -31,8 +31,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Overridden to update state of `GenerateCellConnectivity` and `FieldAssociation`
-   * which is specified on the view.
+   * Overridden to update state of `GenerateCellConnectivity`, `ShowFieldData` and
+   * `FieldAssociation` which is specified on the view.
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
@@ -65,6 +65,7 @@ protected:
    * `vtkPVView::REQUEST_UPDATE` pass.
    */
   void SetGenerateCellConnectivity(bool);
+  void SetShowFieldData(bool);
   void SetFieldAssociation(int val);
   ///@}
 
@@ -77,6 +78,8 @@ protected:
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+
+  bool ShowFieldData = false;
 
   vtkNew<vtkCleanArrays> CleanArrays;
   vtkNew<vtkDataTabulator> DataConditioner;

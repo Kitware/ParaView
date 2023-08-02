@@ -560,8 +560,6 @@ vtkStandardNewMacro(vtkSpreadSheetView);
 //----------------------------------------------------------------------------
 vtkSpreadSheetView::vtkSpreadSheetView()
   : Superclass(/*create_render_window=*/false)
-  , ShowExtractedSelection(false)
-  , GenerateCellConnectivity(false)
   , TableStreamer(vtkSortedTableStreamer::New())
   , TableSelectionMarker(vtkMarkSelectedRows::New())
   , ReductionFilter(vtkReductionFilter::New())
@@ -903,6 +901,7 @@ vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
   }
 
   this->TableStreamer->SetBlock(blockindex);
+  this->TableStreamer->SetShowFieldData(this->ShowFieldData);
   this->TableStreamer->Modified();
   this->TableSelectionMarker->SetFieldAssociation(this->FieldAssociation);
   this->ReductionFilter->Modified();
