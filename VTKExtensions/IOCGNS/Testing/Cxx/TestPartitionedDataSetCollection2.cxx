@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Menno Deij - van Rijswijk, MARIN, The Netherlands
 // SPDX-License-Identifier: BSD-3-Clause
 

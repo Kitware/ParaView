@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: NONE
+// SPDX-License-Identifier: LicenseRef-PublicDomain-nifti 
+
 /** \file nifti1.h
     \brief Official definition of the nifti1 header.  Written by Bob Cox, SSCC, NIMH.
 

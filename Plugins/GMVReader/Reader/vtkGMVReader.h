@@ -1,17 +1,6 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkGMVReader.h
-
-  Copyright (c) 2009-2012 Sven Buijssen, Jens Acker, TU Dortmund
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-  =========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) 2009-2012 Sven Buijssen, Jens Acker, TU Dortmund
+// SPDX-License-Identifier: BSD-3-Clause
 // .NAME vtkGMVReader - reads a dataset in GeneralMeshViewer "GMV" format
 // .SECTION Description
 // vtkGMVReader creates a multi-block dataset and reads unstructured grids,

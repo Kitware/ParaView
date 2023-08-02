@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
 // .NAME DataMineReader from vtkDataMineReader
 // .SECTION Description
 // vtkDataMineReader is a subclass of vtkPolyDataAlgorithm

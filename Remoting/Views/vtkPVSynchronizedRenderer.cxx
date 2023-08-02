@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) 2017, NVIDIA CORPORATION
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVSynchronizedRenderer.h"

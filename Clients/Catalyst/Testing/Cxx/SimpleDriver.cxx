@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 // Create a simple driver for the co-processing library by
 // setting the desired classes inside of other classes.

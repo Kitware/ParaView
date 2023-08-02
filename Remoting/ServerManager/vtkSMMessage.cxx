@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 // bring in the definition for VTK_PROTOBUF_EXPORT.
 #include "vtkSMMessage.h"

@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #ifndef pqUndoStack_h
 #define pqUndoStack_h

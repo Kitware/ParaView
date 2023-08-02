@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: NONE
+// SPDX-License-Identifier: LicenseRef-PublicDomain-nifti 
+
 /** \file vtkznzlib.cxx
     \brief Low level i/o interface to compressed and noncompressed files.
         Written by Mark Jenkinson, FMRIB

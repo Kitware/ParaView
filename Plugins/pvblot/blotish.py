@@ -1,5 +1,6 @@
-# SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
-# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+# SPDX-FileCopyrightText: Copyright 2009 Sandia Corporation
+# SPDX-License-Identifier: LicenseRef-BSD-3-Clause-Sandia-USGov
 
 """
 
@@ -11,12 +12,6 @@ driven by pvblot.  The pvblot module creates an interpreter that translates
 blot syntax to botish method calls.  See pvblot.
 
 """
-
-#-------------------------------------------------------------------------
-# Copyright 2009 Sandia Corporation.
-# Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
-# the U.S. Government retains certain rights in this software.
-#-------------------------------------------------------------------------
 
 import paraview.simple
 import async_io_helper

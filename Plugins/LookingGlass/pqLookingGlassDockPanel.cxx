@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqLookingGlassDockPanel.h"
 #include "ui_pqLookingGlassDockPanel.h"

@@ -1,4 +1,6 @@
-<!-- Copyright (c) 2017 Battelle Energy Alliance, LLC  -->
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-FileCopyrightText: Copyright (c) 2017 Battelle Energy Alliance, LLC -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <SourceProxy name="MooseXfemClip" class="vtkMooseXfemClip" label="MooseXfemClip">

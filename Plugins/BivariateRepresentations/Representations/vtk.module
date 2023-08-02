@@ -1,5 +1,9 @@
 NAME
   BivariateRepresentations::vtkBivariateRepresentations
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Kitware Inc.
 DEPENDS
   ParaView::RemotingViews
   VTK::RenderingOpenGL2

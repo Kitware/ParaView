@@ -1,14 +1,7 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-FileCopyrightText: Copyright (c) 2013 Karthik Krishnan
 // SPDX-License-Identifier: BSD-3-Clause
-/*=========================================================================
-
-  Copyright (c) 2013 Karthik Krishnan.
-  Contributed to the VisualizationToolkit by the author under the terms
-  of the Visualization Toolkit copyright
-
-=========================================================================*/
-
 #include "vtkFastMarchingGeodesicDistance.h"
 
 #include "vtkCellArray.h"

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright 2000 Jeremy Maccelari
+// SPDX-License-Identifier: BSD-3-Clause
 // Wrapper class for a stl map
 
 #ifndef vtkDataMinePointMap_h

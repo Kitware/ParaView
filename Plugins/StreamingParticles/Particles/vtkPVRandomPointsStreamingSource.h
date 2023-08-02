@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
+
 #ifndef vtkPVRandomPointsStreamingSource_h
 #define vtkPVRandomPointsStreamingSource_h
 

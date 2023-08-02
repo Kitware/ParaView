@@ -42,7 +42,7 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 [Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
 
 ### License
-Copyright 2017 Battelle Energy Alliance, LLC
+Copyright (c) 2017 Battelle Energy Alliance, LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

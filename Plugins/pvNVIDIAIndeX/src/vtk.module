@@ -5,7 +5,7 @@ LIBRARY_NAME
 SPDX_LICENSE_IDENTIFIER
   BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Copyright 2021 NVIDIA Corporation
 DEPENDS
   ParaView::RemotingServerManager
   ParaView::RemotingViews

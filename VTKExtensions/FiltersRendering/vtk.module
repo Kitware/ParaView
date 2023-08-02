@@ -7,7 +7,7 @@ LIBRARY_NAME
 SPDX_LICENSE_IDENTIFIER
   LicenseRef-BSD-3-Clause-Sandia-USGov
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Kitware Inc.
 SPDX_CUSTOM_LICENSE_FILE
   LICENSE
 SPDX_CUSTOM_LICENSE_NAME

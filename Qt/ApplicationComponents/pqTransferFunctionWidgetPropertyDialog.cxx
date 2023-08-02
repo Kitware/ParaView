@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqTransferFunctionWidgetPropertyDialog.h"
 #include "ui_pqTransferFunctionWidgetPropertyDialog.h"

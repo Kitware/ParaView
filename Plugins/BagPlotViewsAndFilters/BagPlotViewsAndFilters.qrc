@@ -1,3 +1,5 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
 <RCC>
   <qresource prefix="/BagPlotViewsAndFilters" >
     <file>Icons/pqBagChart16.png</file>

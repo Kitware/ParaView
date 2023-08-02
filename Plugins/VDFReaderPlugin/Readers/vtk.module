@@ -3,9 +3,14 @@ NAME
 LIBRARY_NAME
   vtkVaporReaders
 SPDX_LICENSE_IDENTIFIER
-  BSD-3-Clause
+  BSD-3-Clause AND LicenseRef-EULA-VAPOR
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Kitware Inc.
+  Copyright (c) 2006 University Corporation for Atmospheric Research
+SPDX_CUSTOM_LICENSE_FILE
+  LICENSE
+SPDX_CUSTOM_LICENSE_NAME
+  EULA-VAPOR
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS

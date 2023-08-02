@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright 2000 Jeremy Maccelari
+// SPDX-License-Identifier: BSD-3-Clause
 /*
    Global definitions, etc for the Datamine reader
    project. See dmfile.hxx for full description.

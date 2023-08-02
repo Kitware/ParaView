@@ -5,7 +5,9 @@ LIBRARY_NAME
 SPDX_LICENSE_IDENTIFIER
   BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Kitware Inc.
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) 2017 Battelle Energy Alliance, LLC All rights reserved.
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS

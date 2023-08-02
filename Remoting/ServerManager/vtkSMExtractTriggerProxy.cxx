@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) Sandia Corporation, Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #define vtkSMExtractTriggerProxy_ENABLE_PYTHON 1

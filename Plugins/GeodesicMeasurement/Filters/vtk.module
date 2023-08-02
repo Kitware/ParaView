@@ -3,9 +3,19 @@ NAME
 LIBRARY_NAME
   vtkGeodesicMeasurementFilters
 SPDX_LICENSE_IDENTIFIER
-  BSD-3-Clause
+  BSD-3-Clause AND LicenseRef-PublicDomain-tnt
 SPDX_COPYRIGHT_TEXT
-  Copyright (c) Sandia Corporation, Kitware Inc.
+  Copyright (c) Kitware Inc.
+  Copyright (c) 2009, Gabriel Peyre
+  Copyright (c) 2013 Karthik Krishnan
+LICENSE_FILES
+  FmmMesh/License.txt
+  FmmMesh/Copyright.txt
+  FmmMesh/gw_maths/tnt/LICENSE
+SPDX_CUSTOM_LICENSE_FILE
+  FmmMesh/gw_maths/tnt/LICENSE
+SPDX_CUSTOM_LICENSE_NAME
+  PublicDomain-tnt
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS

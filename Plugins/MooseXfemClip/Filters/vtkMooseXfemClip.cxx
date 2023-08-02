@@ -1,18 +1,7 @@
-/*=========================================================================
-
-  Module:    vtkMooseXfemClip.cxx
-  Copyright (c) 2017 Battelle Energy Alliance, LLC
-
-  Based on Visualization Toolkit
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+// SPDX-FileCopyrightText: Copyright (c) 2017 Battelle Energy Alliance, LLC
+// SPDX-License-Identifier: BSD-3-Clause
 #include "vtkMooseXfemClip.h"
 
 #include "vtkCellArray.h"

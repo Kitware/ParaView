@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: NONE
+// SPDX-License-Identifier: LicenseRef-PublicDomain-nifti 
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
