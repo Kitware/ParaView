@@ -1163,6 +1163,7 @@ found and the point will be rejected.</Documentation>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="field_arrays" attribute_type="field" />
         <FixedTypeDomain name="fixed_type" />
