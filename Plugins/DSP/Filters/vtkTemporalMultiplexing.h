@@ -8,8 +8,6 @@
  * Each point/cell array of the input is converted to a 3D array defined by
  * (index, tuple, component), corresponding to (point/cell, timestep, component).
  * The arrays are vtkMultiDimensionalArray objects.
- *
- * Note: the filter currently does not support composite datasets.
  */
 
 #ifndef vtkTemporalMultiplexing_h
@@ -23,6 +21,9 @@
 #include <set>    // for std::set
 #include <string> // for std::string
 
+class vtkCompositeDataSet;
+class vtkDataObject;
+class vtkDataSet;
 class vtkDataSetAttributes;
 class vtkTable;
 
@@ -42,7 +43,7 @@ public:
   vtkGetMacro(FieldAssociation, int);
   ///@}
 
-  //@{
+  ///@{
   /**
    * Handle attribute arrays listing.
    */
@@ -66,18 +67,29 @@ private:
   void operator=(const vtkTemporalMultiplexing&) = delete;
 
   /**
+   * Retrieve a valid point or cell data as well as the total number of points
+   * or cells from the input depending on the current field association.
+   */
+  void GetArraysInformation(
+    vtkDataObject* input, vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType& nbArrays);
+
+  /**
    * Create and allocate vectors of arrays based on the given point or cell data.
    * Each vector has a number of elements matching the number of points or cells.
    * Each array in a vector has a number of tuples equal to the number of input
    * timesteps.
    */
-  void PrepareVectorsOfArrays(vtkDataSetAttributes* attributes, vtkIdType nbArrays);
+  void PrepareVectorsOfArrays(
+    vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbArrays);
 
+  ///@{
   /**
    * Retrieve the values for each array at the current timestep and store them in
    * the corresponding vectors of arrays.
    */
-  void FillArraysForCurrentTimestep(vtkDataSetAttributes* attributes);
+  void FillArraysForCurrentTimestep(vtkDataSet* inputDS);
+  void FillArraysForCurrentTimestep(vtkCompositeDataSet* inputCDS);
+  ///@}
 
   /**
    * Create multi dimensional arrays once all timesteps have been processed.

@@ -7,6 +7,8 @@
 #include "vtkArrayDispatchArrayList.h"
 #include "vtkCellData.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataSetRange.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
@@ -135,6 +137,7 @@ void vtkTemporalMultiplexing::ClearAttributeArrays()
 int vtkTemporalMultiplexing::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
@@ -182,12 +185,18 @@ int vtkTemporalMultiplexing::RequestUpdateExtent(vtkInformation* vtkNotUsed(requ
 int vtkTemporalMultiplexing::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkDataSet* input = vtkDataSet::GetData(inputVector[0]);
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkTable* output = vtkTable::GetData(outputVector, 0);
 
-  if (!output)
+  if (!input || !output)
   {
-    vtkErrorMacro("Missing valid output.");
+    vtkErrorMacro("Missing valid input or output.");
+    return 0;
+  }
+
+  if (!vtkCompositeDataSet::SafeDownCast(input) && !vtkDataSet::SafeDownCast(input))
+  {
+    vtkErrorMacro("Input should be a vtkDataSet or vtkCompositeDataSet.");
     return 0;
   }
 
@@ -205,26 +214,12 @@ int vtkTemporalMultiplexing::RequestData(
     return 0;
   }
 
-  // Retrieve data set attributes (point or cell data)
-  vtkDataSetAttributes* dataAttributes = nullptr;
-  vtkIdType nbArrays = 0;
-
-  if (this->FieldAssociation == vtkDataObject::POINT)
-  {
-    dataAttributes = input->GetPointData();
-    nbArrays = input->GetNumberOfPoints();
-  }
-  else if (this->FieldAssociation == vtkDataObject::CELL)
-  {
-    dataAttributes = input->GetCellData();
-    nbArrays = input->GetNumberOfCells();
-  }
-  else
+  if (this->FieldAssociation != vtkDataObject::POINT &&
+    this->FieldAssociation != vtkDataObject::CELL)
   {
     vtkWarningMacro("Invalid field association. Only point and cell associations are supported. "
                     "Defaulting to point association.");
-    dataAttributes = input->GetPointData();
-    nbArrays = input->GetNumberOfPoints();
+    this->FieldAssociation = vtkDataObject::POINT;
   }
 
   // For the first request, let the pipeline know it should loop and setup arrays
@@ -232,12 +227,27 @@ int vtkTemporalMultiplexing::RequestData(
   {
     request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
     this->Internals->Arrays.clear();
-    this->PrepareVectorsOfArrays(dataAttributes, nbArrays);
+    vtkSmartPointer<vtkDataSetAttributes> attributes;
+    vtkIdType nbArrays = 0;
+    this->GetArraysInformation(input, attributes, nbArrays);
+    this->PrepareVectorsOfArrays(attributes, nbArrays);
   }
 
   // Retrieve each data array then add it to the vector
   // of arrays for the current timestep
-  this->FillArraysForCurrentTimestep(dataAttributes);
+  if (auto inputCDS = vtkCompositeDataSet::SafeDownCast(input))
+  {
+    this->FillArraysForCurrentTimestep(inputCDS);
+  }
+  else if (auto inputDS = vtkDataSet::SafeDownCast(input))
+  {
+    this->FillArraysForCurrentTimestep(inputDS);
+  }
+  else
+  {
+    vtkErrorMacro("Input should be vtkDataSet or vtkCompositeDataSet.");
+    return 0;
+  }
 
   // Stop looping when the last timestep has been processed and prepare output
   this->CurrentTimeIndex++;
@@ -253,8 +263,55 @@ int vtkTemporalMultiplexing::RequestData(
 }
 
 //------------------------------------------------------------------------------
+void vtkTemporalMultiplexing::GetArraysInformation(
+  vtkDataObject* input, vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType& nbArrays)
+{
+  if (auto inputCDS = vtkCompositeDataSet::SafeDownCast(input))
+  {
+    // For array initialization, retrieving one object is enough
+    for (auto node : vtk::Range(inputCDS))
+    {
+      vtkDataSet* inputObj = vtkDataSet::SafeDownCast(node);
+
+      if (inputObj)
+      {
+        if (this->FieldAssociation == vtkDataObject::POINT)
+        {
+          nbArrays = inputCDS->GetNumberOfPoints();
+          attributes = inputObj->GetPointData();
+        }
+        else
+        {
+          nbArrays = inputCDS->GetNumberOfCells();
+          attributes = inputObj->GetCellData();
+        }
+
+        break;
+      }
+    }
+  }
+  else if (auto inputDS = vtkDataSet::SafeDownCast(input))
+  {
+    if (this->FieldAssociation == vtkDataObject::POINT)
+    {
+      nbArrays = inputDS->GetNumberOfPoints();
+      attributes = inputDS->GetPointData();
+    }
+    else
+    {
+      nbArrays = inputDS->GetNumberOfCells();
+      attributes = inputDS->GetCellData();
+    }
+  }
+  else
+  {
+    vtkWarningMacro("Input should be vtkDataSet or vtkCompositeDataSet.");
+  }
+}
+
+//------------------------------------------------------------------------------
 void vtkTemporalMultiplexing::PrepareVectorsOfArrays(
-  vtkDataSetAttributes* attributes, vtkIdType nbArrays)
+  vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbArrays)
 {
   using SupportedArrays = vtkArrayDispatch::Arrays;
   using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
@@ -296,9 +353,19 @@ void vtkTemporalMultiplexing::PrepareVectorsOfArrays(
 }
 
 //------------------------------------------------------------------------------
-void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSetAttributes* attributes)
+void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSet* inputDS)
 {
   vtkIdType nbArrays = this->Internals->Arrays.begin()->second.size();
+  vtkDataSetAttributes* attributes = nullptr;
+
+  if (this->FieldAssociation == vtkDataObject::POINT)
+  {
+    attributes = inputDS->GetPointData();
+  }
+  else if (this->FieldAssociation == vtkDataObject::CELL)
+  {
+    attributes = inputDS->GetCellData();
+  }
 
   for (auto arrayVec : this->Internals->Arrays)
   {
@@ -321,6 +388,52 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSetAttributes*
         }
       }
     });
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkCompositeDataSet* inputCDS)
+{
+  for (auto arrayVec : this->Internals->Arrays)
+  {
+    vtkIdType offset = 0;
+
+    // Iterate over datasets
+    for (auto node : vtk::Range(inputCDS))
+    {
+      vtkDataSet* dataset = vtkDataSet::SafeDownCast(node);
+
+      if (!dataset)
+      {
+        continue;
+      }
+
+      vtkDataSetAttributes* attributes = (this->FieldAssociation == vtkDataObject::POINT)
+        ? vtkDataSetAttributes::SafeDownCast(dataset->GetPointData())
+        : vtkDataSetAttributes::SafeDownCast(dataset->GetCellData());
+      vtkDataArray* array = attributes->GetArray(arrayVec.first.c_str());
+
+      if (!array)
+      {
+        break;
+      }
+
+      vtkIdType nbValues = array->GetNumberOfTuples();
+      vtkIdType nbComp = array->GetNumberOfComponents();
+
+      vtkSMPTools::For(offset, offset + nbValues, [&](vtkIdType begin, vtkIdType end) {
+        for (vtkIdType idx = begin; idx < end; idx++)
+        {
+          for (vtkIdType comp = 0; comp < nbComp; comp++)
+          {
+            arrayVec.second[idx]->SetComponent(
+              this->CurrentTimeIndex, comp, array->GetComponent(idx - offset, comp));
+          }
+        }
+      });
+
+      offset += nbValues;
+    }
   }
 }
 
