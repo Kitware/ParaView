@@ -53,15 +53,18 @@ struct ConstructMDArray
     const std::vector<vtkSmartPointer<vtkDataArray>>& arrayVector, vtkTable* output)
   {
     // Downcast each vtkDataArray into vtkAOSDataArrayTemplate for the backend
-    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> aosVector;
-    aosVector.reserve(arrayVector.size());
+    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> aosVector(arrayVector.size());
 
     vtkSMPTools::For(0, arrayVector.size(), [&](vtkIdType begin, vtkIdType end) {
       for (vtkIdType idx = begin; idx < end; idx++)
       {
         vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>> aosArray =
           vtkAOSDataArrayTemplate<ValueType>::FastDownCast(arrayVector[idx]);
-        aosVector.emplace_back(aosArray);
+        if (!aosArray)
+        {
+          vtkErrorWithObjectMacro(nullptr, "One of arrays could not be down casted to AOS.");
+        }
+        aosVector[idx] = aosArray;
       }
     });
 
@@ -82,15 +85,18 @@ struct ConstructVTKIdTypeMDArray
     const std::vector<vtkSmartPointer<vtkDataArray>>& arrayVector, vtkTable* output)
   {
     // Downcast each vtkDataArray into vtkAOSDataArrayTemplate for the backend
-    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<vtkIdType>>> aosVector;
-    aosVector.reserve(arrayVector.size());
+    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<vtkIdType>>> aosVector(arrayVector.size());
 
     vtkSMPTools::For(0, arrayVector.size(), [&](vtkIdType begin, vtkIdType end) {
       for (vtkIdType idx = begin; idx < end; idx++)
       {
         vtkSmartPointer<vtkAOSDataArrayTemplate<vtkIdType>> aosArray =
           vtkAOSDataArrayTemplate<vtkIdType>::FastDownCast(arrayVector[idx]);
-        aosVector.emplace_back(aosArray);
+        if (!aosArray)
+        {
+          vtkErrorWithObjectMacro(nullptr, "One of IdType arrays could not be down casted to AOS.");
+        }
+        aosVector[idx] = aosArray;
       }
     });
 
