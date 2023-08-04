@@ -79,6 +79,12 @@ Q_SIGNALS:
   void uiModified();
 
 protected Q_SLOTS:
+  /**
+   * Triggered when the field association attribute changed.
+   * Enabled/disable buttons that apply only to a given attribute.
+   */
+  void onCurrentAttributeChange(int);
+
   void currentIndexChanged(pqOutputPort*);
   void showing(pqDataRepresentation*);
   void displayPrecisionChanged(int);
