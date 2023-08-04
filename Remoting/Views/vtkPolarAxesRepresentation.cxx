@@ -14,6 +14,7 @@
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkFloatArray.h"
+#include "vtkHyperTreeGrid.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -265,6 +266,7 @@ int vtkPolarAxesRepresentation::FillInputPortInformation(int vtkNotUsed(port), v
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
@@ -335,6 +337,7 @@ void vtkPolarAxesRepresentation::InitializeDataBoundsFromData(vtkDataObject* dat
   vtkMath::UninitializeBounds(this->DataBounds);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(data);
+  vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(data);
   if (ds)
   {
     ds->GetBounds(this->DataBounds);
@@ -358,6 +361,10 @@ void vtkPolarAxesRepresentation::InitializeDataBoundsFromData(vtkDataObject* dat
     }
     iter->Delete();
     bbox.GetBounds(this->DataBounds);
+  }
+  else if (htg)
+  {
+    htg->GetBounds(this->DataBounds);
   }
   this->DataBoundsTime.Modified();
 }

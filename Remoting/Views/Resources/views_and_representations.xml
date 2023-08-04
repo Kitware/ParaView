@@ -11524,6 +11524,7 @@
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>

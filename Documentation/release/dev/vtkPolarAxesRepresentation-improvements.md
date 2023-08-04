@@ -1,6 +1,6 @@
 ## Improvements of vtkPolarAxesRepresentation
 
-This lists every changes made to this representation, sorted by their category in the ParaView panel.
+This lists every changes made to this representation, sorted by their category in the ParaView panel. Also, the representation is now applicable to vtkHyperTreeGrid.
 
 ### Custom Bounds and Range
 
