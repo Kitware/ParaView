@@ -481,7 +481,6 @@
 
   <!-- =================================================================== -->
   <ProxyGroup name="generic_point_interpolation_kernels">
-    <Proxy group="point_interpolation_kernels" name="VoronoiKernel" />
     <Proxy group="point_interpolation_kernels" name="EllipsoidalGaussianKernel" />
     <Proxy group="point_interpolation_kernels" name="GaussianKernel" />
     <Proxy group="point_interpolation_kernels" name="LinearKernel" />
