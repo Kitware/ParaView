@@ -68,7 +68,7 @@ public:
     VTK_STANDARD_NEW_BODY(vtkMultiDimensionalArray<ValueType>);
   }
 
-  vtkTemplateTypeMacro(SelfType, SuperType);
+  vtkImplicitArrayTypeMacro(SelfType, SuperType);
 
   /**
    * Setter for Backend.
