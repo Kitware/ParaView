@@ -10,15 +10,15 @@ args = parser.parse_args(sys.argv[1:])
 expected_columns = [
     "Block Name",
     "Point ID",
-    "ID",
+    "FieldData: ID",
     "Points_0",
     "Points_1",
     "Points_2",
     "Points_Magnitude",
     "RTData",
-    "STRUCTURED_DIMENSIONS:0",
-    "STRUCTURED_DIMENSIONS:1",
-    "STRUCTURED_DIMENSIONS:2"
+    "FieldData: STRUCTURED_DIMENSIONS:0",
+    "FieldData: STRUCTURED_DIMENSIONS:1",
+    "FieldData: STRUCTURED_DIMENSIONS:2"
 ]
 
 # Open CSV file written by the XML test and verify the column names.
