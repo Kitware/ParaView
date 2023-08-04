@@ -137,6 +137,7 @@ void pqXRInterfaceDockPanel::constructor()
     "OpenXR", QVariant(pqXRInterfaceDockPanel::XR_BACKEND_OPENXR));
 
 #if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+  this->Internals->Ui.useOpenxrRemoting->setVisible(true);
   QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged,
     [&](int state) { this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked); });
   QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged, [&](int state) {
@@ -145,6 +146,8 @@ void pqXRInterfaceDockPanel::constructor()
   });
   QObject::connect(this->Internals->Ui.remoteAddress, &QLineEdit::textChanged,
     [&](QString text) { this->Internals->Helper->SetRemotingAddress(text.toStdString()); });
+#else
+  this->Internals->Ui.useOpenxrRemoting->setVisible(false);
 #endif
 
 #endif

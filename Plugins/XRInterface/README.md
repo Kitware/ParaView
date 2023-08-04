@@ -24,6 +24,20 @@ Alternatively, compile it yourself, but make sure to turn on `BUILD_SHARED` in t
 
 git clone, configure, build and install [OpenXR](https://github.com/KhronosGroup/OpenXR-SDK) somewhere.
 
+#### OpenXRRemoting
+
+The new OpenXRRemoting module allows to connect the current active render window to a remote XR device.
+For now, this feature is experimental and Windows only as it is for the Hololens2.
+
+For remoting, the SDK cannot be used directly as the `DYNAMIC_LOADER` option is missing. You will need to
+compile from source [OpenXR](https://github.com/KhronosGroup/OpenXR-SDK-Source/blob/main/BUILDING.md#windows-32-bit).
+
+Then you need an additional NuGet package named `Microsoft.Holographic.Remoting.OpenXr` available
+[here](https://www.nuget.org/packages/Microsoft.Holographic.Remoting.OpenXr/2.8.1). Note that you will
+need the exact same version of this package between the one used to build this plugin and for the player
+application in your remote device. For more details about that check the documentation about the OpenXRRemoting
+module in vtk [here](../../VTK/Rendering/OpenXRRemoting/README.md).
+
 ### Building ParaView with the XRInterface plugin
 
 During the ParaView configuration, enable `PARAVIEW_PLUGIN_ENABLE_XRInterface`,
@@ -41,6 +55,22 @@ Then make sure to point to the right location for the backends includes and libs
  - `OpenXR_LIBRARY` may point to `path/to/openxr_install/lib|bin/openxr_loader.so|lib`
 
 You should then be able to configure and build ParaView with the plugin and start using it in ParaView.
+
+#### Building ParaView with the OpenXRRemoting module
+
+Since the module depends on OpenXR, the CMake option `PARAVIEW_XRInterface_OpenXR_Support` needs to be enabled first.
+Then specify include directory and library like above.
+
+For the remoting, enable `PARAVIEW_XRInterface_OpenXRRemoting_Support`.
+
+CMake may then complain about missing VTK modules, you will probably need to set
+`VTK_MODULE_ENABLE_VTK_RenderingOpenXRRemoting` to `WANT`.
+
+Then make sure to point to the right includes and bin:
+- `OpenXRRemoting_INCLUDE_DIR` may point to `path/to/Microsoft.Holographic.Remoting.OpenXr/build/native/include/openxr`.
+- `OpenXRRemoting_BIN_DIR` may point to `path/to/Microsoft.Holographic.Remoting.OpenXr/build/native/bin/x64/Desktop`.
+
+Note that you will also need to add these paths to the environment variable `PATH`.
 
 ### Other options
 

@@ -15,7 +15,7 @@
 #include "vtkOpenXRRenderer.h"
 #endif
 
-#if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
 #include "vtkOpenXRRemotingRenderWindow.h"
 #include "vtkWin32OpenGLDXRenderWindow.h"
 #endif
@@ -296,14 +296,14 @@ void vtkPVXRInterfaceHelper::SetUseOpenXR(bool useOpenXr)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXRInterfaceHelper::SetUseOpenXRRemoting(bool useOpenXRREmoting)
+void vtkPVXRInterfaceHelper::SetUseOpenXRRemoting(bool useOpenXRRemoting)
 {
-#if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
-  this->UseOpenXRRemoting = useOpenXRREmoting;
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+  this->UseOpenXRRemoting = useOpenXRRemoting;
 #else
-  if (this->UseOpenXRRemoting)
+  if (useOpenXRRemoting)
   {
-    vtkWarningMacro("Attempted to enable UseOpenXRREmoting without OpenXRRemoting support");
+    vtkWarningMacro("Attempted to enable UseOpenXRRemoting without OpenXRRemoting support");
   }
 #endif
 }
@@ -1618,10 +1618,19 @@ void vtkPVXRInterfaceHelper::RenderXRView()
   {
     vtkRenderer* ren = this->Internals->RenderWindow->GetRenderers()->GetFirstRenderer();
 
-    vtkWin32OpenGLDXRenderWindow* hw = vtkWin32OpenGLDXRenderWindow::SafeDownCast(
-      vtkOpenXRRemotingRenderWindow::SafeDownCast(this->Internals->RenderWindow)
-        ->GetHelperWindow());
-    hw->Lock();
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+    vtkSmartPointer<vtkWin32OpenGLDXRenderWindow> hw = nullptr;
+    if (this->UseOpenXR && this->UseOpenXRRemoting)
+    {
+      hw = vtkWin32OpenGLDXRenderWindow::SafeDownCast(
+        vtkOpenXRRemotingRenderWindow::SafeDownCast(this->Internals->RenderWindow)
+          ->GetHelperWindow());
+      if (hw)
+      {
+        hw->Lock();
+      }
+    }
+#endif
 
     vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->Internals->RenderWindow);
 
@@ -1718,7 +1727,13 @@ void vtkPVXRInterfaceHelper::RenderXRView()
     // do a FSQ render
     this->Internals->ObserverWidget->renderWindow()->Render();
     this->Internals->RenderWindow->MakeCurrent();
-    hw->Unlock();
+
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+    if (this->UseOpenXR && this->UseOpenXRRemoting && hw)
+    {
+      hw->Unlock();
+    }
+#endif
   }
 }
 
@@ -1906,14 +1921,14 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 #if XRINTERFACE_HAS_OPENXR_SUPPORT
   if (this->UseOpenXR)
   {
+
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
     if (this->UseOpenXRRemoting)
     {
-      vtkWarningMacro("Enable OpenXRRemoting scene");
       renWin = vtkSmartPointer<vtkOpenXRRemotingRenderWindow>::New();
       auto* renWinRemote = dynamic_cast<vtkOpenXRRemotingRenderWindow*>(renWin.Get());
       if (renWinRemote)
       {
-        vtkWarningMacro("Set IP: " << this->RemotingAddress);
         renWinRemote->SetRemotingIPAddress(this->RemotingAddress.c_str());
       }
       vtkNew<vtkWin32OpenGLDXRenderWindow> dxw;
@@ -1921,6 +1936,7 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
       renWin->SetHelperWindow(dxw);
     }
     else
+#endif
     {
       renWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
       renWin->MakeCurrent();
@@ -2132,8 +2148,8 @@ void vtkPVXRInterfaceHelper::SendToXR(vtkSMViewProxy* smview)
 
     // As the OpenXRRemoting is only for the Hololens2 which is for AR application only,
     // we force to not display the floor for such context as it's not relevant
-#if XRINTERFACE_HAS_OPENXR_SUPPORT && XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
-    if (this->UseOpenXRRemoting)
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+    if (this->UseOpenXR && this->UseOpenXRRemoting)
     {
       shouldShowTheFloor = false;
     }

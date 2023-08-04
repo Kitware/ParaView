@@ -87,7 +87,7 @@
       <item>
        <widget class="QCheckBox" name="useOpenxrRemoting">
         <property name="text">
-         <string>Use OpenXR Remoting</string>
+         <string>Use OpenXR Remoting (experimental)</string>
         </property>
        </widget>
       </item>
@@ -121,7 +121,7 @@
            <string extracomment="Specify the IP address used to connect ParaView to the remote XR device, e.g. Hololens2"/>
           </property>
           <property name="placeholderText">
-           <string>XX.XX.XX.XX</string>
+           <string>127.0.0.1</string>
           </property>
          </widget>
         </item>

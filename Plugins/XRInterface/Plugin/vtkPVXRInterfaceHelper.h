@@ -310,7 +310,10 @@ public:
    * Set/get whether to use OpenXR Remoting for Hololens2.
    * Default is false.
    *
-   * Note that UseOpenXR needs to be set to true.
+   * @note as the remoting depends on OpenXR, this feature do nothing if the
+   * UseOpenXR isn't enabled.
+   *
+   * @warning This feature is currently experimental.
    */
   void SetUseOpenXRRemoting(bool useOpenXrRemoting);
   vtkGetMacro(UseOpenXRRemoting, bool);
@@ -417,7 +420,7 @@ private:
   bool NeedStillRender = false;
   bool UseOpenXR = false;
   bool UseOpenXRRemoting = false;
-  std::string RemotingAddress = "";
+  std::string RemotingAddress = "127.0.0.1";
   RightTriggerAction RightTriggerMode = vtkPVXRInterfaceHelper::PICK;
 
   vtkSMViewProxy* SMView = nullptr;
