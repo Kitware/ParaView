@@ -64,5 +64,17 @@ if (USE_CATALYST)
         PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
         SKIP_REGULAR_EXPRESSION "Python support not enabled"
         SKIP_RETURN_CODE 125)
+    
+    add_test(
+      NAME CxxFullExampleV2::SimplePipeline-WithRendering
+      COMMAND CxxFullExampleV2
+              ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline_with_rendering.py)
+
+    set_tests_properties("CxxFullExampleV2::SimplePipeline-WithRendering"
+      PROPERTIES
+        FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
+        PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
+        SKIP_REGULAR_EXPRESSION "Python support not enabled|Failed to create requested view"
+        SKIP_RETURN_CODE 125)
   endif()
 endif()
