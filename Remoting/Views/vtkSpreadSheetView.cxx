@@ -349,29 +349,33 @@ public:
 
   bool OrderByNames(vtkAbstractArray* a1, vtkAbstractArray* a2)
   {
-    std::vector<std::string> order = { "vtkBlockNameIndices", "vtkOriginalProcessIds",
+    std::vector<std::string> firstOrder = { "vtkBlockNameIndices", "vtkOriginalProcessIds",
       "vtkCompositeIndexArray", "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds",
       "vtkOriginalRowIds", "Structured Coordinates" };
+    std::vector<std::string> lastOrder = { "FieldData: " };
 
     if (this->OrderColumnsByList && !this->OrderedColumnList.empty())
     {
-      order.insert(order.end(), this->OrderedColumnList.begin(), this->OrderedColumnList.end());
+      firstOrder.insert(
+        firstOrder.end(), this->OrderedColumnList.begin(), this->OrderedColumnList.end());
     }
 
     std::string a1Name = a1->GetName() ? a1->GetName() : "";
     std::string a2Name = a2->GetName() ? a2->GetName() : "";
-    int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
-    for (int i = 0; i < order.size(); i++)
-    {
-      if (a1Index == VTK_INT_MAX && a1Name == order[i])
+    unsigned int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
+
+    auto findFirstOrderOccurance = [&firstOrder](const std::string& name, unsigned int& index) {
+      for (unsigned int i = 0; i < firstOrder.size(); i++)
       {
-        a1Index = i;
+        if (index == VTK_INT_MAX && name == firstOrder[i])
+        {
+          index = i;
+          break;
+        }
       }
-      if (a2Index == VTK_INT_MAX && a2Name == order[i])
-      {
-        a2Index = i;
-      }
-    }
+    };
+    findFirstOrderOccurance(a1Name, a1Index);
+    findFirstOrderOccurance(a2Name, a2Index);
     if (a1Index < a2Index)
     {
       return true;
@@ -385,9 +389,26 @@ public:
     // set or they are the same (which does happen, see BUG #9808).
     assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
 
-    std::transform(a1Name.begin(), a1Name.end(), a1Name.begin(), ::tolower);
-    std::transform(a2Name.begin(), a2Name.end(), a2Name.begin(), ::tolower);
-    return (a1Name < a2Name);
+    auto findLastOrderOccurance = [&lastOrder](const std::string& name, unsigned int& index) {
+      for (unsigned int i = 0; i < lastOrder.size(); i++)
+      {
+        if (name.find(lastOrder[i], 0) != std::string::npos)
+        {
+          index = i;
+          break;
+        }
+      }
+    };
+    findLastOrderOccurance(a1Name, a1Index);
+    findLastOrderOccurance(a2Name, a2Index);
+
+    if (a1Index == a2Index)
+    {
+      std::transform(a1Name.begin(), a1Name.end(), a1Name.begin(), ::tolower);
+      std::transform(a2Name.begin(), a2Name.end(), a2Name.begin(), ::tolower);
+      return (a1Name < a2Name);
+    }
+    return a1Index > a2Index;
   }
 
   vtkTable* AddToCache(vtkIdType blockId, vtkTable* data, vtkIdType max)

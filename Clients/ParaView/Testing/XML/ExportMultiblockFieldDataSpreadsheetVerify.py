@@ -10,12 +10,12 @@ args = parser.parse_args(sys.argv[1:])
 expected_columns = [
     "Block Name",
     "Point ID",
-    "FieldData: ID",
     "Points_0",
     "Points_1",
     "Points_2",
     "Points_Magnitude",
     "RTData",
+    "FieldData: ID",
     "FieldData: STRUCTURED_DIMENSIONS:0",
     "FieldData: STRUCTURED_DIMENSIONS:1",
     "FieldData: STRUCTURED_DIMENSIONS:2"
