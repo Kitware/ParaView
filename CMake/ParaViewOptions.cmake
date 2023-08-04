@@ -370,6 +370,11 @@ paraview_require_module(
             VTK::mpi
   EXCLUSIVE)
 
+paraview_require_module(
+  CONDITION PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_RENDERING
+  MODULES   VTK::RenderingParallelLIC
+  EXCLUSIVE)
+
 # ensures VTK::Python module is rejected when Python is not enabled.
 paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON
