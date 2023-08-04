@@ -98,7 +98,8 @@ add_example(CustomApplications/Spreadsheet)
 add_example(Catalyst
   TEST_TIMEOUT 600)
 
-if (TARGET VTK::IOCatalystConduit)
+
+  if (TARGET VTK::IOCatalystConduit)
   add_example(Catalyst2/CFullExample)
   add_example(Catalyst2/CxxFullExample)
   add_example(Catalyst2/CxxImageDataExample)
@@ -106,6 +107,9 @@ if (TARGET VTK::IOCatalystConduit)
   add_example(Catalyst2/CxxPolyhedra)
   add_example(Catalyst2/CxxMultimesh)
   add_example(Catalyst2/CxxSteeringExample)
+  if (Python3_EXECUTABLE)
+    add_example(Catalyst2/PythonFullExample)
+  endif ()
 endif ()
 
 add_custom_target(paraview-examples
