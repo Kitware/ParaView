@@ -44,6 +44,11 @@ public:
 
     for (auto array : arrays)
     {
+      if (!array)
+      {
+        vtkErrorWithObjectMacro(nullptr, "One of the arrays passed to the constructor is nullptr");
+        return;
+      }
       if (array->GetNumberOfComponents() != nbOfComp)
       {
         vtkErrorWithObjectMacro(nullptr, "Number of components of all the arrays are not equal");
