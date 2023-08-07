@@ -141,7 +141,7 @@ Use 'X'/'Y'/'Z'/'L' to constrain the movement to the X / Y / Z / Line axis respe
      </property>
      <property name="font">
       <font>
-       <weight>600</weight>
+       <weight>63</weight>
       </font>
      </property>
     </widget>
