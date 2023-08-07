@@ -1511,18 +1511,9 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
       vtkErrorMacro("Failed to generate hierarchy for input partitioned data set collection.");
       return;
     }
-    // we need to convert the assembly selectors to hierarchy selectors, because the composite
-    // ids of the input might not be the same as the composite ids of the output, because the
-    // the output is a vtkMultiBlockDataSet.
-
-    // compute the composite ids for the assembly selectors.
-    auto assemblySelectorsCids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
+    // we need to convert assembly selectors to composite ids.
+    cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
       blockVisibilitySelectors, outputPDC->GetDataAssembly(), outputPDC);
-    // compute the hierarchy selectors for the composite ids.
-    auto hierarchySelectors =
-      vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(assemblySelectorsCids, pdcHierarchy);
-    // compute the composite ids for the hierarchy selectors.
-    cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(hierarchySelectors, hierarchy);
 
     for (auto& selector : blockColorsAndOpacitiesSelectors)
     {
