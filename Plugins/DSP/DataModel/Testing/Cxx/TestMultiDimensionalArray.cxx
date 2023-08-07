@@ -127,5 +127,15 @@ int TestMultiDimensionalArray(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
     }
   }
 
+  // Check new instance
+  vtkSmartPointer<vtkDataArray> mdNewInstance;
+  mdNewInstance.TakeReference(mdArray->NewInstance());
+  if (!vtkAOSDataArrayTemplate<int>::SafeDownCast(mdNewInstance))
+  {
+    std::cerr << "Multi-dimensional array failed to provide correct AOS array on NewInstance call."
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 };
