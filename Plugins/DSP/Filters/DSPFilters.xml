@@ -793,11 +793,10 @@
         </Documentation>
       </StringVectorProperty>
 
-      <!-- Prevent automatic display to avoid crash in Spreadsheet View
-          due to multidimensional arrays -->
       <Hints>
-        <View type="None" />
+        <View type="SpreadSheetView" port="0" />
       </Hints>
+
 
     </SourceProxy>
   </ProxyGroup>
