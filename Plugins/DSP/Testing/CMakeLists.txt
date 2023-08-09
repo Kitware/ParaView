@@ -26,6 +26,14 @@ paraview_add_client_tests(
   TEST_DATA_TARGET ParaViewData
   TEST_SCRIPTS "${tests_with_baselines}")
 
+set (tests_without_baselines
+  "${CMAKE_CURRENT_SOURCE_DIR}/TemporalMultiplexing.xml")
+
+paraview_add_client_tests(
+  LOAD_PLUGIN "DigitalSignalProcessing"
+  TEST_DATA_TARGET ParaViewData
+  TEST_SCRIPTS "${tests_without_baselines}")
+
 # server tests are disabled for now until the MPI version are
 # implemented for the following filters :
 # - SoundQuantities
