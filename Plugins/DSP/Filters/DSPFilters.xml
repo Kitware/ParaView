@@ -161,8 +161,9 @@
         Could be improved by adding more conversions.
 
         This filter has 2 inputs:
-        - port 0 is the input geometry for cell connectivity.
-        - port 1 is a multi-block dataset representing the data through time. Block flat index
+
+- port 0 is the input geometry for cell connectivity.
+- port 1 is a multi-block dataset representing the data through time. Block flat index
           corresponds to the index of the point in the input mesh. This kind of dataset
           can be obtained e.g. by first applying the filter Plot Data Over Time with the
           option "Only Report Selection Statistics" turned off.
@@ -172,7 +173,8 @@
       </Documentation>
 
       <InputProperty command="SetInputConnection"
-                     name="Input" >
+                     name="Input"
+                     label="Geometry" >
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -180,10 +182,14 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <Documentation>
+          Geometry for cell connectivity.
+        </Documentation>
       </InputProperty>
 
       <InputProperty command="SetSourceConnection"
-                     name="Source">
+                     name="Source"
+                     label="Temporal Data">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
