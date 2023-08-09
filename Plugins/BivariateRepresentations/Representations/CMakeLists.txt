@@ -1,7 +1,8 @@
 set(classes
   vtkBivariateNoiseMapper
-  vtkOpenGLBivariateNoiseMapperDelegator
-  vtkBivariateNoiseRepresentation)
+  vtkBivariateNoiseRepresentation
+  vtkBivariateTextureRepresentation
+  vtkOpenGLBivariateNoiseMapperDelegator)
 
 vtk_module_add_module(BivariateRepresentations::vtkBivariateRepresentations
   FORCE_STATIC

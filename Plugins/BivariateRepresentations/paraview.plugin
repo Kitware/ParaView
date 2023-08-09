@@ -4,5 +4,6 @@ DESCRIPTION
   Representations to visualize bivariate data
 REQUIRES_MODULES
   ParaView::RemotingViews
+  ParaView::VTKExtensionsFiltersRendering
   VTK::CommonCore
   VTK::RenderingOpenGL2
