@@ -717,11 +717,9 @@ void hookupActiveSelection(
       // make active selection.
       auto producerPort = vtkSMPropertyHelper(repr, "Input").GetAsOutputPort();
       selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", true);
-      std::string assemblyName = "Hierarchy";
-      if (repr && repr->GetProperty("Assembly"))
-      {
-        assemblyName = vtkSMPropertyHelper(repr, "Assembly").GetAsString();
-      }
+      const std::string assemblyName = repr && repr->GetProperty("Assembly")
+        ? vtkSMPropertyHelper(repr, "Assembly").GetAsString()
+        : "Hierarchy";
       selectBlocks(producerPort, assemblyName, selectors);
       selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
     });

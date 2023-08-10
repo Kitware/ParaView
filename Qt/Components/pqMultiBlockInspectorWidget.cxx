@@ -48,7 +48,6 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
   };
 
   void update();
-  void representationAdded(pqOutputPort*, pqDataRepresentation*) { this->update(); }
 
   static bool hasAppearanceProperties(pqDataRepresentation* repr)
   {
@@ -125,14 +124,13 @@ public:
       helperProxy->GetProperty("BlockSelectors") ? helperProxy->GetProperty("BlockSelectors")
                                                  : helperProxy->GetProperty("Selectors"));
     Q_ASSERT(selectorsProperty != nullptr);
-    std::vector<std::string> selectors(selectorsProperty->GetUncheckedElements());
+    const std::vector<std::string> selectors(selectorsProperty->GetUncheckedElements());
     // get assembly
     const auto repr = this->representation();
-    std::string assemblyName = "Hierarchy";
-    if (repr && repr->getProxy() && repr->getProxy()->GetProperty("Assembly"))
-    {
-      assemblyName = vtkSMPropertyHelper(repr->getProxy(), "Assembly").GetAsString();
-    }
+    const std::string assemblyName =
+      repr && repr->getProxy() && repr->getProxy()->GetProperty("Assembly")
+      ? vtkSMPropertyHelper(repr->getProxy(), "Assembly").GetAsString()
+      : "Hierarchy";
     // create extract block filter
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
     auto extractBlockFilter = builder->createFilter(
@@ -172,6 +170,9 @@ void pqMultiBlockInspectorWidget::pqInternals::update()
 
   if (pqInternals::hasAppearanceProperties(repr))
   {
+    // Here we create a widget using the representation proxy and only expose the properties/groups
+    // that have the panel visibility set to "multiblock_inspector". This way we instantiate a
+    // pqDataAssemblyPropertyWidget which we later add to the container.
     this->HelperProxyWidget = new pqProxyWidget(repr->getProxy(), { "multiblock_inspector" }, {});
     QObject::connect(this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished,
       [repr]() { repr->renderViewEventually(); });
