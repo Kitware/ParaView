@@ -1455,12 +1455,159 @@ void vtkGeometryRepresentation::RemoveAllBlockOpacities()
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockInterpolateScalarsBeforeMapping(
+  const char* selector, bool interpolate)
+{
+  if (selector != nullptr)
+  {
+    auto iter = this->BlockInterpolateScalarsBeforeMapping.find(selector);
+    if (iter == this->BlockInterpolateScalarsBeforeMapping.end())
+    {
+      this->BlockInterpolateScalarsBeforeMapping.insert(std::make_pair(selector, interpolate));
+      this->BlockAttrChanged = true;
+    }
+    else if (iter->second != interpolate)
+    {
+      iter->second = interpolate;
+      this->BlockAttrChanged = true;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveAllBlockInterpolateScalarsBeforeMappings()
+{
+  if (!this->BlockInterpolateScalarsBeforeMapping.empty())
+  {
+    this->BlockInterpolateScalarsBeforeMapping.clear();
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockMapScalars(const char* selector, int val)
+{
+  if (val < 0 || val > 1)
+  {
+    vtkWarningMacro(<< "Invalid parameter for vtkGeometryRepresentation::SetBlockMapScalars: "
+                    << val);
+    val = 0;
+  }
+  static const int mapToColorMode[] = { VTK_COLOR_MODE_DIRECT_SCALARS, VTK_COLOR_MODE_MAP_SCALARS };
+  const int colorMode = mapToColorMode[val];
+  if (selector != nullptr)
+  {
+    auto iter = this->BlockColorModes.find(selector);
+    if (iter == this->BlockColorModes.end())
+    {
+      this->BlockColorModes.insert(std::make_pair(selector, colorMode));
+      this->BlockAttrChanged = true;
+    }
+    else if (iter->second != colorMode)
+    {
+      iter->second = colorMode;
+      this->BlockAttrChanged = true;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveAllBlockMapScalars()
+{
+  if (!this->BlockColorModes.empty())
+  {
+    this->BlockColorModes.clear();
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockArrayName(
+  const char* selector, int assoc, const char* colorArray)
+{
+  if (selector != nullptr && colorArray != nullptr)
+  {
+    auto iter = this->BlockArrayNames.find(selector);
+    if (iter == this->BlockArrayNames.end())
+    {
+      this->BlockArrayNames.insert(std::make_pair(selector, std::make_pair(assoc, colorArray)));
+      this->BlockAttrChanged = true;
+    }
+    else if (iter->second.first != assoc && iter->second.second != colorArray)
+    {
+      iter->second = std::make_pair(assoc, colorArray);
+      this->BlockAttrChanged = true;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveAllBlockArrayNames()
+{
+  if (!this->BlockArrayNames.empty())
+  {
+    this->BlockArrayNames.clear();
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockLookupTableSelector(const char* selector)
+{
+  if (selector != nullptr)
+  {
+    this->BlockLookupTableSelectors.push_back(selector);
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveAllBlockLookupTableSelectors()
+{
+  if (!this->BlockLookupTableSelectors.empty())
+  {
+    this->BlockLookupTableSelectors.clear();
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockLookupTable(vtkScalarsToColors* lut)
+{
+  if (lut != nullptr)
+  {
+    this->BlockLookupTables.push_back(lut);
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveAllBlockLookupTables()
+{
+  if (!this->BlockLookupTables.empty())
+  {
+    this->BlockLookupTables.clear();
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::PopulateBlockAttributes(
   vtkCompositeDataDisplayAttributes* attrs, vtkDataObject* outputData)
 {
+  // exposed properties
   attrs->RemoveBlockVisibilities();
   attrs->RemoveBlockOpacities();
   attrs->RemoveBlockColors();
+  attrs->RemoveBlockInterpolateScalarsBeforeMappings();
+  attrs->RemoveBlockColorModes();
+  attrs->RemoveBlockScalarModes();
+  attrs->RemoveBlockArrayNames();
+  attrs->RemoveBlockLookupTables();
+  // internal properties
+  attrs->RemoveBlockScalarVisibilities();
+  attrs->RemoveBlockUseLookupTableScalarRanges();
+  attrs->RemoveBlockFieldDataTupleIds();
 
   auto dtree = vtkDataObjectTree::SafeDownCast(outputData);
   if (dtree == nullptr ||
@@ -1495,6 +1642,22 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   for (const auto& item : this->BlockOpacities)
   {
     blockPropertiesSelectorsSet.emplace(item.first);
+  }
+  for (const auto& item : this->BlockInterpolateScalarsBeforeMapping)
+  {
+    blockPropertiesSelectorsSet.emplace(item.first);
+  }
+  for (const auto& item : this->BlockColorModes)
+  {
+    blockPropertiesSelectorsSet.emplace(item.first);
+  }
+  for (const auto& item : this->BlockArrayNames)
+  {
+    blockPropertiesSelectorsSet.emplace(item.first);
+  }
+  for (const auto& item : this->BlockLookupTableSelectors)
+  {
+    blockPropertiesSelectorsSet.emplace(item);
   }
   // create a vector of selectors for block properties
   const std::vector<std::string> blockPropertiesSelectors(
@@ -1578,6 +1741,7 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
       if (iter != cid_to_dobj.end())
       {
         attrs->SetBlockColor(iter->second, item.second.GetData());
+        attrs->SetBlockScalarVisibility(iter->second, false);
       }
     }
   }
@@ -1592,6 +1756,84 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
       if (iter != cid_to_dobj.end())
       {
         attrs->SetBlockOpacity(iter->second, item.second);
+      }
+    }
+  }
+
+  // Handle InterpolateScalarsBeforeMapping.
+  for (const auto& item : this->BlockInterpolateScalarsBeforeMapping)
+  {
+    const auto& ids = selectorsCids[item.first];
+    for (const auto& id : ids)
+    {
+      auto iter = cid_to_dobj.find(id);
+      if (iter != cid_to_dobj.end())
+      {
+        attrs->SetBlockInterpolateScalarsBeforeMapping(iter->second, item.second);
+      }
+    }
+  }
+
+  // Handle color mode.
+  for (const auto& item : this->BlockColorModes)
+  {
+    const auto& ids = selectorsCids[item.first];
+    for (const auto& id : ids)
+    {
+      auto iter = cid_to_dobj.find(id);
+      if (iter != cid_to_dobj.end())
+      {
+        attrs->SetBlockColorMode(iter->second, item.second);
+      }
+    }
+  }
+
+  // Handle array names.
+  for (const auto& item : this->BlockArrayNames)
+  {
+    const auto& ids = selectorsCids[item.first];
+    for (const auto& id : ids)
+    {
+      auto iter = cid_to_dobj.find(id);
+      if (iter != cid_to_dobj.end())
+      {
+        switch (/*assoc*/ item.second.first)
+        {
+          case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+            attrs->SetBlockScalarMode(iter->second, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+            break;
+
+          case vtkDataObject::FIELD_ASSOCIATION_NONE:
+            attrs->SetBlockScalarMode(iter->second, VTK_SCALAR_MODE_USE_FIELD_DATA);
+            // Color entire block by zeroth tuple in the field data
+            attrs->SetBlockFieldDataTupleId(iter->second, 0);
+            break;
+
+          case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+          default:
+            attrs->SetBlockScalarMode(iter->second, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+            break;
+        }
+        attrs->SetBlockArrayName(iter->second, item.second.second);
+        attrs->SetBlockScalarVisibility(iter->second, true);
+        attrs->SetBlockUseLookupTableScalarRange(iter->second, true);
+      }
+    }
+  }
+
+  // Handle lookup tables
+  if (this->BlockLookupTables.size() == this->BlockLookupTableSelectors.size())
+  {
+    for (size_t i = 0, numLUTs = this->BlockLookupTables.size(); i < numLUTs; ++i)
+    {
+      const auto& ids = selectorsCids[this->BlockLookupTableSelectors[i]];
+      for (const auto& id : ids)
+      {
+        auto iter = cid_to_dobj.find(id);
+        if (iter != cid_to_dobj.end())
+        {
+          attrs->SetBlockLookupTable(iter->second, this->BlockLookupTables[i]);
+        }
       }
     }
   }
