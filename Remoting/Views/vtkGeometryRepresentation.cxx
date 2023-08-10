@@ -1473,12 +1473,6 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
     return;
   }
 
-  vtkNew<vtkDataAssembly> hierarchy;
-  if (!vtkDataAssemblyUtilities::GenerateHierarchy(dtree, hierarchy))
-  {
-    return;
-  }
-
   std::unordered_map<unsigned int, vtkDataObject*> cid_to_dobj;
   cid_to_dobj[0u] = dtree;
   for (const auto& ref : vtk::Range(dtree,
@@ -1492,69 +1486,79 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   // create a vector of selectors for block visibilities
   const std::vector<std::string> blockVisibilitySelectors(
     this->BlockSelectors.begin(), this->BlockSelectors.end());
-  // get the selectors for block colors and opacities
-  std::set<std::string> blockColorsAndOpacitiesSelectorsSet;
+  // get the selectors for block properties
+  std::set<std::string> blockPropertiesSelectorsSet;
   for (const auto& item : this->BlockColors)
   {
-    blockColorsAndOpacitiesSelectorsSet.emplace(item.first);
+    blockPropertiesSelectorsSet.emplace(item.first);
   }
   for (const auto& item : this->BlockOpacities)
   {
-    blockColorsAndOpacitiesSelectorsSet.emplace(item.first);
+    blockPropertiesSelectorsSet.emplace(item.first);
   }
-  // create a vector of selectors for block colors and opacities
-  const std::vector<std::string> blockColorsAndOpacitiesSelectors(
-    blockColorsAndOpacitiesSelectorsSet.begin(), blockColorsAndOpacitiesSelectorsSet.end());
-
+  // create a vector of selectors for block properties
+  const std::vector<std::string> blockPropertiesSelectors(
+    blockPropertiesSelectorsSet.begin(), blockPropertiesSelectorsSet.end());
   std::vector<unsigned int> cids;
-  std::map<std::string, std::vector<std::string>> selectorsMap;
+  std::unordered_map<std::string, std::vector<unsigned int>> selectorsCids;
   const bool isAssembly =
     this->ActiveAssembly != nullptr && strcmp(this->ActiveAssembly, "Assembly") == 0;
   // TODO, in the future, when vtkPVGeometryFilter produces PDC, we won't need to read the
   // vtkDataAssembly from the output data's field data and convert the output to a PDC.
-  if (isAssembly && outputData->GetFieldData()->HasArray("vtkDataAssembly"))
+  const bool mbWithAssembly = outputData->IsA("vtkMultiBlockDataSet") &&
+    outputData->GetFieldData()->HasArray("vtkDataAssembly");
+  const bool pdcWithAssembly = outputData->IsA("vtkPartitionedDataSetCollection") &&
+    vtkPartitionedDataSetCollection::SafeDownCast(outputData)->GetDataAssembly();
+  if (isAssembly && (mbWithAssembly || pdcWithAssembly))
   {
-    const auto dataAssemblyArray = outputData->GetFieldData()->GetAbstractArray("vtkDataAssembly");
-    const auto dataAssemblyString = dataAssemblyArray->GetVariantValue(0).ToString();
-    vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
-    converter->SetInputDataObject(outputData);
-    converter->Update();
-    auto outputPDC =
-      vtkPartitionedDataSetCollection::SafeDownCast(converter->GetOutputDataObject(0));
-    vtkNew<vtkDataAssembly> dataAssembly;
-    dataAssembly->InitializeFromXML(dataAssemblyString.c_str());
-    outputPDC->SetDataAssembly(dataAssembly);
-    // construct a hierarchy for the input partitioned data set collection.
-    vtkNew<vtkDataAssembly> pdcHierarchy;
-    if (!vtkDataAssemblyUtilities::GenerateHierarchy(outputPDC, pdcHierarchy))
+    vtkSmartPointer<vtkPartitionedDataSetCollection> outputPDC;
+    if (mbWithAssembly)
     {
-      vtkErrorMacro("Failed to generate hierarchy for input partitioned data set collection.");
-      return;
+      const auto dataAssemblyArray =
+        outputData->GetFieldData()->GetAbstractArray("vtkDataAssembly");
+      const auto dataAssemblyString = dataAssemblyArray->GetVariantValue(0).ToString();
+      vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
+      converter->SetInputDataObject(outputData);
+      converter->Update();
+      outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(converter->GetOutputDataObject(0));
+      vtkNew<vtkDataAssembly> dataAssembly;
+      dataAssembly->InitializeFromXML(dataAssemblyString.c_str());
+      outputPDC->SetDataAssembly(dataAssembly);
+    }
+    else // pdcWithAssembly
+    {
+      outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(outputData);
     }
     // we need to convert assembly selectors to composite ids.
     cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
       blockVisibilitySelectors, outputPDC->GetDataAssembly(), outputPDC);
 
-    for (auto& selector : blockColorsAndOpacitiesSelectors)
+    // create a composite ids map for the assembly selectors.
+    for (const auto& selector : blockPropertiesSelectors)
     {
-      // compute the composite ids for the assembly selectors.
-      auto selectorCids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
+      const auto selectorCIds = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
         { selector }, outputPDC->GetDataAssembly(), outputPDC);
-      // compute the hierarchy selectors for the composite ids.
-      selectorsMap[selector] =
-        vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(selectorCids, pdcHierarchy);
+      selectorsCids[selector] = selectorCIds;
     }
   }
   else
   {
+    vtkNew<vtkDataAssembly> hierarchy;
+    if (!vtkDataAssemblyUtilities::GenerateHierarchy(dtree, hierarchy))
+    {
+      return;
+    }
     // compute the composite ids for the hierarchy selectors
     cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(blockVisibilitySelectors, hierarchy);
-    // set selectors map
-    for (const auto& selector : blockColorsAndOpacitiesSelectors)
+    // create a composite ids map for the hierarchy selectors.
+    for (const auto& selector : blockPropertiesSelectors)
     {
-      selectorsMap[selector] = { selector };
+      const auto selectorCIds =
+        vtkDataAssemblyUtilities::GetSelectedCompositeIds({ selector }, hierarchy);
+      selectorsCids[selector] = selectorCIds;
     }
   }
+  // Handle visibility.
   for (const auto& id : cids)
   {
     auto iter = cid_to_dobj.find(id);
@@ -1567,8 +1571,7 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   // Handle color.
   for (const auto& item : this->BlockColors)
   {
-    const auto ids =
-      vtkDataAssemblyUtilities::GetSelectedCompositeIds(selectorsMap[item.first], hierarchy);
+    const auto& ids = selectorsCids[item.first];
     for (const auto& id : ids)
     {
       auto iter = cid_to_dobj.find(id);
@@ -1579,10 +1582,10 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
     }
   }
 
+  // Handle opacity.
   for (const auto& item : this->BlockOpacities)
   {
-    const auto ids =
-      vtkDataAssemblyUtilities::GetSelectedCompositeIds(selectorsMap[item.first], hierarchy);
+    const auto& ids = selectorsCids[item.first];
     for (const auto& id : ids)
     {
       auto iter = cid_to_dobj.find(id);
