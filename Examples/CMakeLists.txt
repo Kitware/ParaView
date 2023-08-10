@@ -107,6 +107,7 @@ add_example(Catalyst
   add_example(Catalyst2/CxxPolyhedra)
   add_example(Catalyst2/CxxMultimesh)
   add_example(Catalyst2/CxxSteeringExample)
+  add_example(Catalyst2/Fortran90FullExample)
   if (Python3_EXECUTABLE)
     add_example(Catalyst2/PythonFullExample)
   endif ()
