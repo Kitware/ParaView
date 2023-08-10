@@ -53,8 +53,13 @@ void vtkNetworkImageSource::UpdateImage()
     return;
   }
 
-  vtkPVSession* session =
-    vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
+  auto processModule = vtkProcessModule::GetProcessModule();
+  if (!processModule)
+  {
+    vtkErrorMacro("The process module should be initialized.");
+    return;
+  }
+  vtkPVSession* session = vtkPVSession::SafeDownCast(processModule->GetActiveSession());
   if (!session)
   {
     vtkErrorMacro("Active session must be a vtkPVSession.");
@@ -110,7 +115,7 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
   {
     reader.TakeReference(vtkBMPReader::New());
   }
-  else if (ext == ".jpg")
+  else if (ext == ".jpg" || ext == ".jpeg")
   {
     reader.TakeReference(vtkJPEGReader::New());
   }
