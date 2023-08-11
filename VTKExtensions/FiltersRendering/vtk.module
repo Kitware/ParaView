@@ -47,5 +47,7 @@ TEST_DEPENDS
   VTK::IOImage
   VTK::TestingCore
   VTK::TestingRendering
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
 TEST_LABELS
   ParaView
