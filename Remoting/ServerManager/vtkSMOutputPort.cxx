@@ -122,6 +122,55 @@ vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(
 }
 
 //----------------------------------------------------------------------------
+vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalSubsetDataInformation(
+  const char* selector, const char* assemblyName)
+{
+  auto dinfo = this->GetDataInformation();
+  auto assembly = dinfo->GetDataAssembly(assemblyName);
+  if (assembly == nullptr || selector == nullptr || selector[0] == '\0')
+  {
+    return nullptr;
+  }
+
+  const auto nodes = assembly->SelectNodes({ selector });
+  if (nodes.empty())
+  {
+    return nullptr;
+  }
+  if (nodes.size() > 1)
+  {
+    vtkWarningMacro(
+      "GetTemporalSubsetDataInformation selector matched multiple nodes. Only first one is used.");
+  }
+
+  const std::string key(assemblyName ? assemblyName : "");
+
+  auto iter1 = this->TemporalSubsetDataInformations.find(key);
+  if (iter1 != this->TemporalSubsetDataInformations.end())
+  {
+    auto iter2 = iter1->second.find(nodes.front());
+    if (iter2 != iter1->second.end())
+    {
+      return iter2->second;
+    }
+  }
+
+  this->SourceProxy->GetSession()->PrepareProgress();
+
+  vtkNew<vtkPVTemporalDataInformation> temporalSubsetInfo;
+  temporalSubsetInfo->Initialize();
+  temporalSubsetInfo->SetPortNumber(this->PortIndex);
+  temporalSubsetInfo->SetSubsetSelector(selector);
+  temporalSubsetInfo->SetSubsetAssemblyName(assemblyName);
+  this->SourceProxy->GatherInformation(temporalSubsetInfo);
+  temporalSubsetInfo->Modified();
+
+  this->TemporalSubsetDataInformations[key][nodes.front()] = temporalSubsetInfo;
+  this->SourceProxy->GetSession()->CleanupPendingProgress();
+  return temporalSubsetInfo;
+}
+
+//----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(unsigned int compositeIndex)
 {
   auto dinfo = this->GetDataInformation();

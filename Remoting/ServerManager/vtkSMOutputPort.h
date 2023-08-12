@@ -63,7 +63,7 @@ public:
    *
    * @arg \c selector the selector expression
    * @arg \c assemblyName name of the assembly to use to apply the selector
-   *         to to determine the subset. If none specified, hierarchy is assumed.
+   *         to determine the subset. If none specified, hierarchy is assumed.
    */
   vtkPVDataInformation* GetSubsetDataInformation(
     const char* selector, const char* assemblyName = nullptr);
@@ -81,6 +81,18 @@ public:
    * the pipeline and hence can be slow. Use with caution.
    */
   virtual vtkPVTemporalDataInformation* GetTemporalDataInformation();
+
+  ///@{
+  /**
+   * Get Temporal data information for a specific selector.
+   *
+   * @arg \c selector the selector expression
+   * @arg \c assemblyName name of the assembly to use to apply the selector
+   *         to determine the subset. If none specified, hierarchy is assumed.
+   */
+  vtkPVTemporalDataInformation* GetTemporalSubsetDataInformation(
+    const char* selector, const char* assemblyName = nullptr);
+  ///@}
 
   /**
    * Returns the classname of the data object on this output port.
@@ -166,6 +178,8 @@ protected:
 
   std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation>>>
     SubsetDataInformations;
+  std::map<std::string, std::map<int, vtkSmartPointer<vtkPVTemporalDataInformation>>>
+    TemporalSubsetDataInformations;
   std::map<int, vtkSmartPointer<vtkPVDataInformation>> RankDataInformations;
 
 private:
