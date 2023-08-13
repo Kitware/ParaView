@@ -11,6 +11,7 @@
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMSession.h"
@@ -46,6 +47,11 @@ vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
 {
   this->RepresentedDataInformation->Delete();
   this->ProminentValuesInformation->Delete();
+  for (auto& prominentValuesInformation : this->BlockProminentValuesInformation)
+  {
+    prominentValuesInformation.second->Delete();
+  }
+  this->BlockProminentValuesInformation.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -298,6 +304,10 @@ void vtkSMRepresentationProxy::InvalidateDataInformation()
   this->Superclass::InvalidateDataInformation();
   this->RepresentedDataInformationValid = false;
   this->ProminentValuesInformationValid = false;
+  for (auto& prominentValuesInformation : this->BlockProminentValuesInformationValid)
+  {
+    prominentValuesInformation.second = false;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -320,14 +330,15 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   std::string name, int fieldAssoc, int numComponents, double uncertaintyAllowed, double fraction,
   bool force)
 {
-  bool differentAttribute =
+  const bool differentAttribute =
     this->ProminentValuesInformation->GetNumberOfComponents() != numComponents ||
     this->ProminentValuesInformation->GetFieldName() != name ||
     strcmp(this->ProminentValuesInformation->GetFieldAssociation(),
       vtkDataObject::GetAssociationTypeAsString(fieldAssoc)) != 0;
-  bool invalid = this->ProminentValuesFraction < 0. || this->ProminentValuesUncertainty < 0. ||
-    this->ProminentValuesFraction > 1. || this->ProminentValuesUncertainty > 1.;
-  bool largerFractionOrLessCertain = this->ProminentValuesFraction < fraction ||
+  const bool invalid = this->ProminentValuesFraction < 0. ||
+    this->ProminentValuesUncertainty < 0. || this->ProminentValuesFraction > 1. ||
+    this->ProminentValuesUncertainty > 1.;
+  const bool largerFractionOrLessCertain = this->ProminentValuesFraction < fraction ||
     this->ProminentValuesUncertainty > uncertaintyAllowed;
   if (!this->ProminentValuesInformationValid || differentAttribute || invalid ||
     largerFractionOrLessCertain || this->ProminentValuesInformation->GetForce() != force)
@@ -370,6 +381,81 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   }
 
   return this->ProminentValuesInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetBlockProminentValuesInformation(
+  std::string blockSelector, std::string assemblyName, std::string name, int fieldAssoc,
+  int numComponents, double uncertaintyAllowed, double fraction, bool force)
+{
+  const auto foundBlock = this->BlockProminentValuesInformation.count(blockSelector) > 0;
+  if (!foundBlock)
+  {
+    this->BlockProminentValuesInformation[blockSelector] = vtkPVProminentValuesInformation::New();
+    this->BlockProminentValuesInformationValid[blockSelector] = false;
+    this->BlockProminentValuesFraction[blockSelector] = -1;
+    this->BlockProminentValuesUncertainty[blockSelector] = -1;
+  }
+  auto& blockProminentValuesInformation = this->BlockProminentValuesInformation[blockSelector];
+  auto& blockProminentValuesInformationValid =
+    this->BlockProminentValuesInformationValid[blockSelector];
+  auto& blockProminentValuesFraction = this->BlockProminentValuesFraction[blockSelector];
+  auto& blockProminentValuesUncertainty = this->BlockProminentValuesUncertainty[blockSelector];
+
+  const bool differentAttribute =
+    blockProminentValuesInformation->GetNumberOfComponents() != numComponents ||
+    blockProminentValuesInformation->GetFieldName() != name ||
+    strcmp(blockProminentValuesInformation->GetFieldAssociation(),
+      vtkDataObject::GetAssociationTypeAsString(fieldAssoc)) != 0;
+  const bool invalid = blockProminentValuesFraction < 0. || blockProminentValuesUncertainty < 0. ||
+    blockProminentValuesFraction > 1. || blockProminentValuesUncertainty > 1.;
+  const bool largerFractionOrLessCertain =
+    blockProminentValuesFraction < fraction || blockProminentValuesUncertainty > uncertaintyAllowed;
+  if (!blockProminentValuesInformationValid || differentAttribute || invalid ||
+    largerFractionOrLessCertain || blockProminentValuesInformation->GetForce() != force)
+  {
+    vtkTimerLog::MarkStartEvent("vtkSMRepresentationProxy::GetProminentValues");
+    this->CreateVTKObjects();
+
+    // Initialize parameters with specified values:
+    blockProminentValuesInformation->Initialize();
+    blockProminentValuesInformation->SetFieldAssociation(
+      vtkDataObject::GetAssociationTypeAsString(fieldAssoc));
+    blockProminentValuesInformation->SetSubsetAssemblyName(assemblyName.c_str());
+    blockProminentValuesInformation->SetSubsetSelector(blockSelector.c_str());
+    blockProminentValuesInformation->SetFieldName(name.c_str());
+    blockProminentValuesInformation->SetNumberOfComponents(numComponents);
+    blockProminentValuesInformation->SetUncertainty(uncertaintyAllowed);
+    blockProminentValuesInformation->SetFraction(fraction);
+    blockProminentValuesInformation->SetForce(force);
+
+    // Ask the server to fill out the rest of the information:
+
+    // Now, we need to check if the array of interest is on the input or
+    // produced as an artifact by the representation.
+    vtkSMPropertyHelper inputHelper(this, "Input");
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+    const unsigned int port = inputHelper.GetOutputPort();
+    if (input &&
+      input->GetOutputPort(port)
+          ->GetSubsetDataInformation(blockSelector.c_str(), assemblyName.c_str())
+          ->GetArrayInformation(name.c_str(), fieldAssoc) != nullptr)
+    {
+      blockProminentValuesInformation->SetPortNumber(port);
+      input->GatherInformation(blockProminentValuesInformation);
+    }
+    else
+    {
+      this->GatherInformation(blockProminentValuesInformation);
+    }
+
+    vtkTimerLog::MarkEndEvent("vtkSMRepresentationProxy::GetProminentValues");
+    blockProminentValuesFraction = fraction;
+    blockProminentValuesUncertainty = uncertaintyAllowed;
+    blockProminentValuesInformationValid = true;
+  }
+
+  return blockProminentValuesInformation;
 }
 
 //----------------------------------------------------------------------------

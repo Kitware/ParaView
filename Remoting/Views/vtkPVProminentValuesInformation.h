@@ -46,6 +46,22 @@ public:
 
   ///@{
   /**
+   * Set/get subset assembly's name
+   */
+  vtkSetStringMacro(SubsetAssemblyName);
+  vtkGetStringMacro(SubsetAssemblyName);
+  ///@}
+
+  ///@{
+  /**
+   * Set/get subset selector's name
+   */
+  vtkSetStringMacro(SubsetSelector);
+  vtkGetStringMacro(SubsetSelector);
+  ///@}
+
+  ///@{
+  /**
    * Set/get array's association
    */
   vtkSetStringMacro(FieldAssociation);
@@ -194,6 +210,8 @@ protected:
   /// Information parameters
   ///@{
   int PortNumber;
+  char* SubsetAssemblyName;
+  char* SubsetSelector;
   int NumberOfComponents;
   char* FieldName;
   char* FieldAssociation;
