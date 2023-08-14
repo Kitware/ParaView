@@ -65,6 +65,20 @@ vtkSMProxy* vtkSMPVRepresentationProxy::GetLastLUTProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::SetLastBlockLUTProxy(
+  vtkSMProxy* proxy, const std::string& blockSelector)
+{
+  this->LastBlockLUTProxies[blockSelector] = proxy;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMPVRepresentationProxy::GetLastBlockLUTProxy(const std::string& blockSelector)
+{
+  const auto& iter = this->LastBlockLUTProxies.find(blockSelector);
+  return iter != this->LastBlockLUTProxies.end() ? iter->second : nullptr;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)

@@ -28,6 +28,9 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSmartPointer.h" // For LastLUTProxy
 
+#include <set>           // needed for std::set
+#include <unordered_map> // needed for std::unordered_map
+
 class vtkPVArrayInformation;
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMPVRepresentationProxy : public vtkSMRepresentationProxy
@@ -44,6 +47,8 @@ public:
    */
   void SetLastLUTProxy(vtkSMProxy* proxy);
   vtkSMProxy* GetLastLUTProxy();
+  void SetLastBlockLUTProxy(vtkSMProxy* proxy, const std::string& blockSelector);
+  vtkSMProxy* GetLastBlockLUTProxy(const std::string& blockSelector);
   ///@}
 
   /**
@@ -446,6 +451,7 @@ protected:
    * turning off the coloring for this representation.
    */
   vtkSmartPointer<vtkSMProxy> LastLUTProxy;
+  std::unordered_map<std::string, vtkSmartPointer<vtkSMProxy>> LastBlockLUTProxies;
 
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) = delete;
