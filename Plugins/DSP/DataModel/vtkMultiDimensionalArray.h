@@ -101,6 +101,24 @@ public:
    */
   vtkIdType GetNumberOfArrays() { return this->Backend->GetNumberOfArrays(); }
 
+  /**
+   * Specific ShallowCopy
+   *
+   * We cannot call the method `ShallowCopy` since that conflicts with the virtual function of
+   * the same name that cannot be templated.
+   */
+  template <typename OtherValue>
+  void ImplicitShallowCopy(vtkMultiDimensionalArray<OtherValue>* other)
+  {
+    static_assert(std::is_same<OtherValue, ValueType>::value,
+      "Cannot copy multidimensional array from another underlying type");
+    this->SetName(other->GetName());
+    this->SetNumberOfComponents(other->GetNumberOfComponents());
+    this->SetNumberOfTuples(other->GetNumberOfTuples());
+    auto backend = other->GetBackend();
+    this->ConstructBackend(backend->GetArrays());
+  }
+
 protected:
   vtkMultiDimensionalArray() = default;
   ~vtkMultiDimensionalArray() override = default;

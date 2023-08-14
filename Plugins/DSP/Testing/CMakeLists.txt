@@ -27,6 +27,7 @@ paraview_add_client_tests(
   TEST_SCRIPTS "${tests_with_baselines}")
 
 set (tests_without_baselines
+  "${CMAKE_CURRENT_SOURCE_DIR}/DimensionBrowser.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/TemporalMultiplexing.xml")
 
 paraview_add_client_tests(

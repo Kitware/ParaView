@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create a temporal source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="FastUniformGrid" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Temporal" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Temporal" command="activate" arguments="GenerateTimeSteps" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/TimeStepValuesToGenerate/ScalarValueList/AddRange" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/TimeStepValuesToGenerate/ScalarValueList/SeriesGeneratorDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- TemporalMultiplexing will create a multidimensional array -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="TableFFT" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="TemporalMultiplexing" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+
+  <!-- check multiplexer output values -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelRowCount" arguments="3" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.0,DistanceSquared" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,Swirl" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.0,X" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.2,[300, 300]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[-10, -10], [-10, -10], [-10, -10]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[-10, -10]" />
+
+  <!-- create MultiDimensionBrowser -->
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="MultiDimensionBrowser" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- check MultiDimensionBrowser default output -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Index/IntRangeWidget/LineEdit" property="text" arguments="0" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelRowCount" arguments="3" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.0,DistanceSquared" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,Swirl" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.0,X" />
+
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.2,[300, 300]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[-10, -10], [-10, -10], [-10, -10]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[-10, -10]" />
+
+  <!-- set some Index: 1337 -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Index/IntRangeWidget/LineEdit" command="set_string" arguments="1337" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.2,[165, 165]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[-10, -10], [-7, -7], [4, 4]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[4, 4]" />
+
+  <!-- set Index to max (9260) -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Index/IntRangeWidget/LineEdit" command="set_string" arguments="9260" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.2,[300, 300]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[10, 10], [10, 10], [10, 10]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[10, 10]" />
+
+</pqevents>
