@@ -73,8 +73,8 @@ function (_vtk_module_wrap_client_server_sources module sources classes)
         "guarantee intended behavior.")
     endif ()
   endif ()
-  file(GENERATE OUTPUT "compile_definitions_${_vtk_client_server_target_name}" CONTENT ${_vtk_client_server_genex_compile_definitions_all})
-  file(GENERATE OUTPUT "include_directories_${_vtk_client_server_target_name}" CONTENT ${_vtk_client_server_genex_include_directories_all})
+  file(GENERATE OUTPUT "compile_definitions_${_vtk_client_server_target_name}" CONTENT "${_vtk_client_server_genex_compile_definitions_all}")
+  file(GENERATE OUTPUT "include_directories_${_vtk_client_server_target_name}" CONTENT "${_vtk_client_server_genex_include_directories_all}")
   file(GENERATE
     OUTPUT  "${_vtk_client_server_args_file}"
     CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions_all}>:\n-D\'$<JOIN:${_vtk_client_server_genex_compile_definitions_all},\'\n-D\'>\'>\n
