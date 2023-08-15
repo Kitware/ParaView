@@ -326,13 +326,13 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsigned int mode)
 {
-  typedef std::set<vtkSMProxy*> proxysettype;
-  proxysettype currently_shown_scalar_bars;
-  proxysettype luts;
+  std::set<vtkSMProxy*> currently_shown_scalar_bars;
+  std::set<vtkSMProxy*> luts;
 
   // colored_reprs are only those reprs that are uniquely colored with a LUT.
   // i.e. if two repr have the same lut, we only add the first one to this set.
-  proxysettype colored_reprs;
+  std::set<vtkSMProxy*> colored_reprs;
+  std::set<std::pair<vtkSMProxy*, std::string>> colored_reprs_blocks;
 
   // build a list of all transfer functions used for scalar coloring in this
   // view and build a list of scalar bars currently shown in this view.
@@ -346,13 +346,27 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
       currently_shown_scalar_bars.insert(proxy);
     }
     else if (vtkSMPropertyHelper(proxy, "Visibility", true).GetAsInt() == 1 &&
-      vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
+      (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy) ||
+        vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(proxy)))
+
     {
       vtkSMProxy* lut = vtkSMPropertyHelper(proxy, "LookupTable", true).GetAsProxy();
       if (lut && luts.find(lut) == luts.end())
       {
         colored_reprs.insert(proxy);
         luts.insert(lut);
+      }
+      const vtkSMPropertyHelper blockLookupTableSelectors(proxy, "BlockLookupTableSelectors", true);
+      const vtkSMPropertyHelper blockLookUpTables(proxy, "BlockLookupTables", true);
+      for (unsigned int i = 0; i < blockLookupTableSelectors.GetNumberOfElements(); ++i)
+      {
+        vtkSMProxy* blockLut = blockLookUpTables.GetAsProxy(i);
+        if (blockLut && luts.find(blockLut) == luts.end())
+        {
+          colored_reprs_blocks.insert(
+            std::make_pair(proxy, blockLookupTableSelectors.GetAsString(i)));
+          luts.insert(blockLut);
+        }
       }
     }
   }
@@ -362,10 +376,8 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
   if ((mode & HIDE_UNUSED_SCALAR_BARS) == HIDE_UNUSED_SCALAR_BARS)
   {
     // hide scalar-bars that point to lookup tables not in the luts set.
-    for (proxysettype::const_iterator iter = currently_shown_scalar_bars.begin();
-         iter != currently_shown_scalar_bars.end(); ++iter)
+    for (auto& sbProxy : currently_shown_scalar_bars)
     {
-      vtkSMProxy* sbProxy = (*iter);
       if (sbProxy &&
         (luts.find(vtkSMPropertyHelper(sbProxy, "LookupTable").GetAsProxy()) == luts.end()))
       {
@@ -385,10 +397,15 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
     // create and show scalar-bar for LUTs if they don't already exist.
     // To do that, we iterate over reprs and turn on scalar bar. This is needed
     // to ensure that a new scalar bar is created, it gets the right title.
-    for (proxysettype::const_iterator iter = colored_reprs.begin(); iter != colored_reprs.end();
-         ++iter)
+    for (auto& reprProxy : colored_reprs)
     {
-      vtkSMColorMapEditorHelper::SetScalarBarVisibility(*iter, viewProxy, true);
+      vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, true);
+      modified = true; // not really truthful here.
+    }
+    for (auto& reprBlockProxy : colored_reprs_blocks)
+    {
+      vtkSMColorMapEditorHelper::SetBlockScalarBarVisibility(
+        reprBlockProxy.first, viewProxy, reprBlockProxy.second, true);
       modified = true; // not really truthful here.
     }
   }
@@ -403,8 +420,25 @@ bool vtkSMTransferFunctionManager::UpdateScalarBarsComponentTitle(
     return false;
   }
 
-  bool ret = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
-    lutProxy, vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(representation));
+  bool ret = false;
+  if (auto result = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
+        lutProxy, vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(representation)))
+  {
+    ret |= result;
+  }
+  if (representation->GetProperty("BlockLookupTableSelectors"))
+  {
+    vtkSMPropertyHelper blockLookUpTableSelectors(representation, "BlockLookupTableSelectors");
+    for (unsigned int i = 0; i < blockLookUpTableSelectors.GetNumberOfElements(); ++i)
+    {
+      if (auto result = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(lutProxy,
+            vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(
+              representation, blockLookUpTableSelectors.GetAsString(i))))
+      {
+        ret |= result;
+      }
+    }
+  }
   SM_SCOPED_TRACE(CallFunction)
     .arg("UpdateScalarBarsComponentTitle")
     .arg(lutProxy)
@@ -434,7 +468,7 @@ bool vtkSMTransferFunctionManager::HideScalarBarIfNotNeeded(vtkSMProxy* lutProxy
     return false;
   }
 
-  vtkSMPropertyHelper visibilityHelper(sbProxy, "Visibility");
+  const vtkSMPropertyHelper visibilityHelper(sbProxy, "Visibility");
   if (visibilityHelper.GetAsInt() == 0)
   {
     // sb hidden.
@@ -443,18 +477,29 @@ bool vtkSMTransferFunctionManager::HideScalarBarIfNotNeeded(vtkSMProxy* lutProxy
 
   // build a list of all transfer functions used for scalar coloring in this
   // view and build a list of scalar bars currently shown in this view.
-  vtkSMPropertyHelper reprHelper(view, "Representations");
+  const vtkSMPropertyHelper reprHelper(view, "Representations");
   for (unsigned int cc = 0, max = reprHelper.GetNumberOfElements(); cc < max; ++cc)
   {
     vtkSMProxy* proxy = reprHelper.GetAsProxy(cc);
     if (vtkSMPropertyHelper(proxy, "Visibility", true).GetAsInt() == 1 &&
-      vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
+      (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy) ||
+        vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(proxy)))
     {
       vtkSMProxy* lut = vtkSMPropertyHelper(proxy, "LookupTable", true).GetAsProxy();
       if (lut == lutProxy)
       {
         // lut is being used. Don't hide the scalar bar.
         return false;
+      }
+      // check for the block related lookup tables
+      const vtkSMPropertyHelper blockLookUpTables(proxy, "BlockLookupTables", true);
+      for (unsigned int i = 0; i < blockLookUpTables.GetNumberOfElements(); ++i)
+      {
+        if (blockLookUpTables.GetAsProxy(i) == lutProxy)
+        {
+          // lut is being used. Don't hide the scalar bar.
+          return false;
+        }
       }
     }
   }
