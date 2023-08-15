@@ -223,7 +223,7 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
 
   if (path.empty())
   {
-    vtkLogF(WARNING, "Empty file for script specified.");
+    vtkLogF(WARNING, "Empty filename provided for script.");
     return nullptr;
   }
   std::string tmp = path;
@@ -234,10 +234,18 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
     {
       std::string pythonPath;
       vtksys::SystemTools::GetEnv("PYTHONPATH", pythonPath);
+#if defined(_WIN32) && !defined(__MINGW32__)
+      std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, ';');
+#else
       std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, ':');
+#endif
       for (auto& p : paths)
       {
+#if defined(_WIN32) && !defined(__MINGW32__)
+        std::string testPath = p + "\\" + path;
+#else
         std::string testPath = p + "/" + path;
+#endif
         if (vtkPSystemTools::FileExists(testPath.c_str()))
         {
           tmp = testPath;
