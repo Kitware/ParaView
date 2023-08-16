@@ -1,4 +1,5 @@
 set(MODULE_HEADERS
+  vtkArrayDispatchDSPArrayList.h
   vtkMultiDimensionalArray.h
   vtkMultiDimensionalImplicitBackend.h
 )
