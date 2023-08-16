@@ -551,6 +551,10 @@ void pqSelectionQueryPropertyWidget::pqQueryWidget::populateOperators(int termTy
       this->addOperator("is <=", ValueWidget::SINGLE_VALUE, "{term} <= {value}");
       this->addOperator("is min", ValueWidget::NO_VALUE, "{term} == min({term})");
       this->addOperator("is max", ValueWidget::NO_VALUE, "{term} == max({term})");
+      this->addOperator(
+        "is min per block", ValueWidget::NO_VALUE, "{term} == min_per_block({term})");
+      this->addOperator(
+        "is max per block", ValueWidget::NO_VALUE, "{term} == max_per_block({term})");
       this->addOperator("is NaN", ValueWidget::NO_VALUE, "isnan({term})");
       this->addOperator("is <= mean", ValueWidget::NO_VALUE, "{term} <= mean({term})");
       this->addOperator("is >= mean", ValueWidget::NO_VALUE, "{term} >= mean({term})");
