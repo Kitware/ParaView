@@ -58,19 +58,25 @@ public:
   }
   ///@}
 
+  ///@{
   /**
    * Add range to current scalar bar for a given representation proxy.
    * This allows to display the combined range
    * of multiple data sets that hold the same array.
    */
   void AddRange(vtkSMRepresentationProxy* proxy);
+  void AddBlockRange(vtkSMRepresentationProxy* proxy, const std::string& blockSelector);
+  ///@}
 
+  ///@{
   /**
    * Remove range to current scalar bar for a given representation proxy.
    * This allows to display the combined range
    * of multiple data sets that hold the same array.
    */
   void RemoveRange(vtkSMRepresentationProxy* proxy);
+  void RemoveBlockRange(vtkSMRepresentationProxy* proxy, const std::string& blockSelector);
+  ///@}
 
   /**
    * Get the current range of the scalar bar.
@@ -110,6 +116,9 @@ protected:
    * `nullptr` and would invalidate the container is used as key.
    */
   std::unordered_map<vtkSMRepresentationProxy*, vtkWeakPointer<vtkSMRepresentationProxy>> Proxies;
+  std::map<std::pair<vtkSMRepresentationProxy*, std::string>,
+    vtkWeakPointer<vtkSMRepresentationProxy>>
+    BlockProxies;
   ///@}
 
 private:
