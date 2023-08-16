@@ -235,10 +235,11 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
       std::string pythonPath;
       vtksys::SystemTools::GetEnv("PYTHONPATH", pythonPath);
 #if defined(_WIN32) && !defined(__MINGW32__)
-      std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, ';');
+      char splitChar = ';';
 #else
-      std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, ':');
+      char splitChar = ':';
 #endif
+      std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, splitChar);
       for (auto& p : paths)
       {
 #if defined(_WIN32) && !defined(__MINGW32__)
