@@ -7,6 +7,29 @@
 #include <catalyst_conduit_blueprint.hpp>
 #include <cinttypes>
 
+namespace
+{
+void format_error(const conduit_cpp::Node& n)
+{
+  if (n.has_child("valid") && n["valid"].as_string() == "false")
+  {
+    vtkLogScopeF(ERROR, "%s", n.name().c_str());
+    for (size_t i = 0; i < n.number_of_children(); i++)
+    {
+      format_error(n.child(i));
+    }
+    if (n.has_child("errors"))
+    {
+      vtkLogF(ERROR, "Errors: %zu", n["errors"].number_of_children());
+      for (size_t i = 0; i < n["errors"].number_of_children(); i++)
+      {
+        vtkLogF(ERROR, "Error %zu : %s", i, n["errors"][i].as_string().c_str());
+      }
+    }
+  }
+}
+}
+
 namespace initialize
 {
 namespace scripts
@@ -318,6 +341,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
             "Validation of mesh state field '%s' failed. Expected types are: string, MCArrays or "
             "numeric values.",
             child.name().c_str());
+          format_error(info);
           return false;
         }
       }
@@ -372,7 +396,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
     else
     {
       vtkLogF(ERROR, "Conduit Mesh blueprint validate failed!");
-      /* vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json()); */
+      format_error(info);
       return false;
     }
 
@@ -400,7 +424,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       else
       {
         vtkLogF(ERROR, "%s: Conduit Mesh blueprint validate failed!", child.name().c_str());
-        /* vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json()); */
+        format_error(info);
         return false;
       }
 
