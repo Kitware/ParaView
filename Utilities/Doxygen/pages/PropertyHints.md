@@ -24,11 +24,26 @@ In that case, use this property hint as follows.
       </Hints>
     </IntVectorProperty>
 
-ComponentLabels
+ShowLabel
 -----------------
-Show vector component labels for double or string vector properties.
+Show vector label for double, int or string vector properties.
 
-A multi-component double vector property may represent several different types
+A repeatable vector property won't show the label of the property by default,
+as the table can have component labels and takes more space. This hint forces
+the label to show up in this case.
+
+    <DoubleVectorProperty ...>
+      ...
+      <Hints>
+        <ShowLabel />
+      </Hints>
+    </DoubleVectorProperty>
+
+ShowComponentLabels
+-----------------
+Show vector component labels for double, int or string vector properties.
+
+A multi-component vector property may represent several different types
 of coordinates.  It may be useful to provide labels for each component's input
 to designate which type of vector is being represented. Labels may also be
 provided for multi-component string vector properties.
@@ -37,7 +52,7 @@ provided for multi-component string vector properties.
       ...
       <Hints>
         <ShowComponentLabels>
-          <ComponentLabel component="0" label="X:"/>
+          <ComponentLabel component="0" label="X"/>
           ...
         </ShowComponentLabels>
       </Hints>
