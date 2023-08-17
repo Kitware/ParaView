@@ -66,11 +66,13 @@ if (USE_CATALYST)
     # to be in PYTHONPATH.
     add_test(
       NAME CFullExampleV2::UsePYTHONPATH
-      COMMAND CFullExampleV2 catalyst_pipeline.py)
+      COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}:$ENV{PYTHONPATH}"
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CFullExampleV2 catalyst_pipeline.py)
 
     set_tests_properties("CFullExampleV2::UsePYTHONPATH"
       PROPERTIES
-        ENVIRONMENT_MODIFICATION "PYTHONPATH=path_list_prepend:${CMAKE_CURRENT_SOURCE_DIR}"
+        # XXX(cmake-3.25): use ENVIRONMENT_MODIFICATION instead of env "PYTHONPATH=...".
+        #ENVIRONMENT_MODIFICATION "PYTHONPATH=path_list_prepend:${CMAKE_CURRENT_SOURCE_DIR}"
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
         SKIP_REGULAR_EXPRESSION "Python support not enabled"
