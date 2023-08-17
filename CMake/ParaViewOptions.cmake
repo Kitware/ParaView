@@ -196,6 +196,8 @@ cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" "${parav
 # NvPipe requires an NVIDIA GPU.
 option(PARAVIEW_ENABLE_NVPIPE "Build ParaView with NvPipe remoting. Requires CUDA and an NVIDIA GPU" OFF)
 
+option(PARAVIEW_ENABLE_ALEMBIC "Enable Alembic support." OFF)
+
 option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
 
 option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
@@ -404,6 +406,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_NVPIPE
   MODULES   ParaView::nvpipe
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_ALEMBIC
+  MODULES   VTK::IOAlembic
   EXCLUSIVE)
 
 paraview_require_module(
@@ -647,6 +654,7 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   endfunction ()
 
   _paraview_io_option_conflict(PARAVIEW_ENABLE_ADIOS2 "ADIOS 2.x")
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_ALEMBIC Alembic)
   _paraview_io_option_conflict(PARAVIEW_ENABLE_FFMPEG FFmpeg)
   _paraview_io_option_conflict(PARAVIEW_ENABLE_FIDES Fides)
   _paraview_io_option_conflict(PARAVIEW_ENABLE_GDAL GDAL)
