@@ -70,7 +70,7 @@ Build ParaView following the [guide](Documentation/dev/build.md#) and fix any bu
 
 ### Bringing in VTK changes
 
-If you are working on a change that is accross both VTK and ParaView, you can work directly on the VTK that is
+If you are working on a change that is across both VTK and ParaView, you can work directly on the VTK that is
 inside your repository of ParaView. Just follow the steps in the [VTK develop guide](https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/dev/git/develop.md#initial-setup)
 starting at the usage of `SetupForDevelopment.sh` script.
 
@@ -229,7 +229,7 @@ You then need to wait for CI to run, it can take a while, up to a full day.
 
 A successful CI should be fully green. If that is so, then your MR is ready !
 
-If not, you need to analyse the issues and fix them. Recover the failure information this way:
+If not, you need to analyze the issues and fix them. Recover the failure information this way:
 
 Click on the pipelines tab, then on the last status badge, then on the `cdash-commit` job.
 It will take you to the related CDash report where you will find all information.
@@ -350,7 +350,7 @@ cases, being your topic name with the issue number.
 4. Update a submodule if needed
 
     If you need to update a submodule (eg: VTK) in order to access a specific bugfix or features, first make sure
-    that the needed developements have been merged into the main branch of the submodule. You can then use the command:
+    that the needed developments have been merged into the main branch of the submodule. You can then use the command:
 
         $ git bump my-submodule my-hash-or-branch
 
@@ -483,6 +483,11 @@ Follow these steps:
 7.  Use the "**Submit merge request**" button to create the merge request
     and visit its page.
 
+Guidelines
+----------
+For guidelines with respect to licensing, naming conventions, code formatting,
+documentation and further, please check [guidelines](guidelines.md)
+
 Review a Merge Request
 ----------------------
 
@@ -509,8 +514,27 @@ label.
 
 ### Human Reviews ###
 
-Reviewers may add comments providing feedback or to acknowledge their
-approval.  Lines of specific forms will be extracted during
+Reviewers may add comments providing feedback or to acknowledge their approval.
+
+If a reviewer raises an issue via a thread, the contributor may resolve the thread if the
+solution is indisputable. In case of cited lines within the issue, the
+corresponding changes of the commit prior to a comment are shown. So it
+is better to first push the change and then comment/resolve. When code is cited, the
+last line is usually the line of interest, the above lines just provide the context.
+Providing a comment just saying 'done' is unnecessary as GitLab
+will indicate that the relevant code has changed.
+
+It shall be a common goal for reviewers and contributors to limit the amount of generated emails.
+Therefore reviewers are encouraged to comment systematic issues (e.g. missing `this->`)
+only once but to indicate the general application. Contributors do not need to comment on trivial
+fixes (e.g. typos in comments) but may simply solved the threads after fixing.
+
+To raise the attention of individuals, e.g. a reviewer for another round of review, this person
+can be pinged by addressing via `@` in a comment.
+
+#### Special Comments #####
+
+Lines of specific forms will be extracted during
 [merging](#merge-a-topic) and included as trailing lines of the
 generated merge commit message:
 
@@ -568,16 +592,20 @@ There are a few options for checking out the changes in a work tree:
 
 ### Robot Reviews ###
 
-The "Kitware Robot" automatically performs basic checks on the commits
+The "Kitware Robot" automatically performs basic checks including clang-format on the commits
 and adds a comment acknowledging or rejecting the topic.  This will be
 repeated automatically whenever the topic is pushed to your fork again.
-A re-check may be explicitly requested by adding a comment with a single
-[*trailing* line](#trailing-lines):
+
+Automatic formatting can be triggered  by adding a comment with a single line.
+
+    Do: reformat
+
+A re-check may be explicitly requested by
 
     Do: check
 
 A topic cannot be [merged](#merge-a-topic) until the automatic review
-succeeds.
+succeeds. It is necessary to correct the specific commit via rebase.
 
 ### Continuous Integration ###
 
