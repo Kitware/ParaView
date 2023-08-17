@@ -3,6 +3,7 @@
 #include "vtkSMObject.h"
 
 #include "vtkObjectFactory.h"
+#include <cctype>
 
 vtkStandardNewMacro(vtkSMObject);
 //---------------------------------------------------------------------------
