@@ -247,6 +247,8 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
 #else
         std::string testPath = p + "/" + path;
 #endif
+        vtkLogF(WARNING, "Looking in: '%s'.",
+          testPath.c_str()); // debugging to see what python paths are included in the dashboards
         if (vtkPSystemTools::FileExists(testPath.c_str()))
         {
           tmp = testPath;
