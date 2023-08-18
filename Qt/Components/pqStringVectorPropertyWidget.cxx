@@ -82,7 +82,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   bool wrap_text = false;
   bool python = false;
   bool showLabel = false;
-  vtkPVXMLElement* showLabelHints = nullptr;
+  vtkPVXMLElement* showComponentLabels = nullptr;
   QString placeholderText;
   if (hints)
   {
@@ -108,7 +108,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       placeholderText = placeholderText.trimmed();
     }
     showLabel = (hints->FindNestedElementByName("ShowLabel") != nullptr);
-    showLabelHints = hints->FindNestedElementByName("ShowComponentLabels");
+    showComponentLabels = hints->FindNestedElementByName("ShowComponentLabels");
   }
 
   // find the domain(s)
@@ -380,11 +380,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
         new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
       widget->setObjectName("ScalarValueList");
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
-      widget->setShowLabels(showLabelHints);
-      if (showLabelHints)
+      widget->setShowLabels(showComponentLabels);
+      if (showComponentLabels)
       {
         const int elementCount = svp->GetNumberOfElements();
-        widget->setLabels(pqPropertyWidget::parseComponentLabels(showLabelHints, elementCount));
+        widget->setLabels(
+          pqPropertyWidget::parseComponentLabels(showComponentLabels, elementCount));
       }
       this->setChangeAvailableAsChangeFinished(true);
       vbox->addWidget(widget);
