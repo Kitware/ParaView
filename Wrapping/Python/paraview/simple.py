@@ -833,6 +833,67 @@ def ColorBy(rep=None, value=None, separate=False):
       rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association), component)
     rep.RescaleTransferFunctionToDataRange()
 
+
+# -----------------------------------------------------------------------------
+def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
+    """Set block scalar color. This will automatically setup the color maps and others
+    necessary state for the representations. 'rep' must be the display
+    properties proxy i.e. the value returned by GetDisplayProperties() function.
+    If none is provided the display properties for the active source will be
+    used, if possible. Set separate to True in order to use a separate color
+    map for this representation"""
+    rep = rep if rep else GetDisplayProperties()
+    if not rep:
+        raise ValueError("No display properties can be determined.")
+    if selector is None:
+        raise ValueError("No selector can be determined.")
+
+    rep.SetBlockUseSeparateColorMap(selector, separate)
+    associationInt = rep.GetBlockColorArrayAssociation(selector)
+    association = servermanager.GetAssociationAsString(associationInt) if associationInt != -1 else None
+    arrayname = rep.GetBlockColorArrayName(selector)
+    component = None
+    if value is None:
+        if association is not None:
+            rep.SetBlockScalarColoring(selector, None, servermanager.GetAssociationFromString(association))
+        else:
+            rep.SetBlockScalarColoring(selector, None, 0)
+        return
+    if not isinstance(value, tuple) and not isinstance(value, list):
+        value = (value,)
+    if len(value) == 1:
+        arrayname = value[0]
+    elif len(value) >= 2:
+        association = value[0]
+        arrayname = value[1]
+    if len(value) == 3:
+        # component name provided
+        componentName = value[2]
+        if componentName == "Magnitude":
+            component = -1
+        else:
+            if association == "POINTS":
+                array = rep.Input.PointData.GetArray(arrayname)
+            if association == "CELLS":
+                array = rep.Input.CellData.GetArray(arrayname)
+            if array:
+                # looking for corresponding component name
+                for i in range(0, array.GetNumberOfComponents()):
+                    if componentName == array.GetComponentName(i):
+                        component = i
+                        break
+                    # none have been found, try to use the name as an int
+                    if i == array.GetNumberOfComponents() - 1:
+                        try:
+                            component = int(componentName)
+                        except ValueError:
+                            pass
+    if component is None:
+        rep.SetBlockScalarColoring(selector, arrayname, servermanager.GetAssociationFromString(association))
+    else:
+        rep.SetBlockScalarColoring(selector, arrayname, servermanager.GetAssociationFromString(association), component)
+    rep.RescaleBlockTransferFunctionToDataRange(selector)
+
 # -----------------------------------------------------------------------------
 def _DisableFirstRenderCameraReset():
     """Disable the first render camera reset.  Normally a ResetCamera is called
@@ -1756,7 +1817,7 @@ def GetColorTransferFunction(arrayname, representation=None, separate=False, **p
     This may create a new color transfer function if none exists, or return an existing one"""
     if representation:
       if separate or representation.UseSeparateColorMap:
-        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
+        arrayname = ("%s_%s_%s" % ("Separate", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
         raise RuntimeError ("Missing active session")
     session = servermanager.ActiveConnection.Session
@@ -1766,6 +1827,28 @@ def GetColorTransferFunction(arrayname, representation=None, separate=False, **p
     SetProperties(lut, **params)
     return lut
 
+def GetBlockColorTransferFunction(selector, arrayname, representation=None, separate=False, **params):
+    """Get the color transfer function used to mapping a block data array with the
+    given name to colors. Representation is used to modify the array name
+    when using a separate color transfer function. separate can be used to recover
+    the separate color transfer function even if it is not used currently by the representation.
+    This may create a new color transfer function if none exists, or return an existing one"""
+    if representation:
+        if representation.GetBlockUseSeparateColorMap(selector):
+            arrayname =\
+                ("%s_%s_%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), selector, arrayname))
+        elif separate or representation.UseSeparateColorMap:
+            arrayname = ("%s_%s_%s" % ("Separate", representation.SMProxy.GetGlobalIDAsString(), arrayname))
+    if not servermanager.ActiveConnection:
+        raise RuntimeError("Missing active session")
+    session = servermanager.ActiveConnection.Session
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    lut = servermanager._getPyProxy( \
+        tfmgr.GetColorTransferFunction(arrayname, session.GetSessionProxyManager()))
+    SetProperties(lut, **params)
+    return lut
+
+# -----------------------------------------------------------------------------
 def GetOpacityTransferFunction(arrayname, representation=None, separate=False, **params):
     """Get the opacity transfer function used to mapping a data array with the
     given name to opacity. Representation is used to modify the array name
