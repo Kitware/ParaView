@@ -1544,18 +1544,15 @@ void pqFileDialog::updateButtonStates()
       impl.Ui.OK->setEnabled(true);
       break;
     default:
-      // Check that the files match the selected filter
-      bool filesMatching = std::all_of(
+      // Check that the files match the selected filter (without existence checks)
+      const bool filesMatching = std::all_of(
         impl.FileNames.begin(), impl.FileNames.end(), [&](QString const& fileOrGroupName) {
           // Get all the files of the group if fileName is a group, else just get {fileName}
-          QStringList const fileNames = buildFileGroup(fileOrGroupName);
+          const QStringList fileNames = buildFileGroup(fileOrGroupName);
           return std::all_of(fileNames.begin(), fileNames.end(), [&](QString const& fileName) {
-            QString fileNameWithoutPath =
-              QFileInfo(impl.Model->absoluteFilePath(fileName)).fileName();
-            QString unusedString;
-            return impl.FileFilter.getWildcards().exactMatch(fileNameWithoutPath) &&
-              (impl.Model->fileExists(fileName, unusedString) ||
-                impl.Model->dirExists(fileName, unusedString));
+            const QString fileNameWithoutPath =
+              vtksys::SystemTools::GetFilenameName(fileName.toStdString()).c_str();
+            return impl.FileFilter.getWildcards().exactMatch(fileNameWithoutPath);
           });
         });
       impl.Ui.OK->setEnabled(filesMatching);

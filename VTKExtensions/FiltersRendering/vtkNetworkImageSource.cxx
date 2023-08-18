@@ -122,7 +122,7 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
   {
     reader.TakeReference(vtkBMPReader::New());
   }
-  else if (ext == ".jpg")
+  else if (ext == ".jpg" || ext == ".jpeg")
   {
     reader.TakeReference(vtkJPEGReader::New());
   }

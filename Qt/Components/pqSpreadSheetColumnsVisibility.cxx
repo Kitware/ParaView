@@ -81,6 +81,10 @@ void pqSpreadSheetColumnsVisibility::updateAllCheckState(
 void pqSpreadSheetColumnsVisibility::populateMenu(
   vtkSMViewProxy* proxy, pqSpreadSheetViewModel* model, QMenu* menu)
 {
+  if (!model || !proxy)
+  {
+    return;
+  }
   menu->clear();
 
   std::vector<std::pair<std::string, bool>> columnLabels;
