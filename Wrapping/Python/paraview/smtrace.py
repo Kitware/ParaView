@@ -369,6 +369,8 @@ class Trace(object):
         m = re.match("^[0-9.]*(.+)\\.%s$" % proxy.GetXMLName(), regname)
         if m:
             arrayName = m.group(1)
+            # TODO: when block coloring properties have a GUI which calls pqProxyWidget::onChangeFinished()
+            # Add GetBlockColorTransferFunction tracing
             if proxy.GetXMLGroup() == "lookup_tables":
               arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
               if rep:
@@ -1257,6 +1259,68 @@ class SetScalarColoring(RenderingMixin, TraceItem):
         # only for "Fully Trace Supplemental Proxies" support
         if self.Lut:
           Trace.get_accessor(self.Lut)
+
+
+class SetBlockScalarColoring(RenderingMixin, TraceItem):
+    """Trace vtkSMPVRepresentationProxy.SetBlockScalarColoring"""
+    def __init__(self, display, block_selector, arrayname, attribute_type, component=None, separate=False, lut=None):
+        TraceItem.__init__(self)
+
+        self.Display = sm._getPyProxy(display)
+        self.BlockSelector = block_selector
+        self.ArrayName = arrayname
+        self.AttributeType = attribute_type
+        self.Component = component
+        self.Lut = sm._getPyProxy(lut)
+        self.Separate = separate
+
+    def finalize(self):
+        TraceItem.finalize(self)
+
+        if self.BlockSelector:
+            if self.ArrayName:
+                if self.Component is None:
+                    if self.Separate:
+                        Trace.Output.append_separated([ \
+                            "# set block scalar coloring using an separate color/opacity maps",
+                            "ColorBlockBy(%s, %s, ('%s', '%s'), %s)" % ( \
+                                str(Trace.get_accessor(self.Display)),
+                                self.BlockSelector,
+                                sm.GetAssociationAsString(self.AttributeType),
+                                self.ArrayName, self.Separate)])
+                    else:
+                        Trace.Output.append_separated([ \
+                            "# set block scalar coloring",
+                            "ColorBlockBy(%s, %s, ('%s', '%s'))" % ( \
+                                str(Trace.get_accessor(self.Display)),
+                                self.BlockSelector,
+                                sm.GetAssociationAsString(self.AttributeType),
+                                self.ArrayName)])
+                else:
+                    if self.Separate:
+                        Trace.Output.append_separated([ \
+                            "# set block scalar coloring using an separate color/opacity maps",
+                            "ColorBlockBy(%s, %s, ('%s', '%s', '%s'), %s)" % ( \
+                                str(Trace.get_accessor(self.Display)),
+                                self.BlockSelector,
+                                sm.GetAssociationAsString(self.AttributeType),
+                                self.ArrayName, self.Component, self.Separate)])
+                    else:
+                        Trace.Output.append_separated([ \
+                            "# set block scalar coloring",
+                            "ColorBlockBy(%s, %s, ('%s', '%s', '%s'))" % ( \
+                                str(Trace.get_accessor(self.Display)),
+                                self.BlockSelector,
+                                sm.GetAssociationAsString(self.AttributeType),
+                                self.ArrayName, self.Component)])
+            else:
+                Trace.Output.append_separated([ \
+                    "# turn off block scalar coloring",
+                    "ColorBlockBy(%s, %s, None)" % (str(Trace.get_accessor(self.Display)), self.BlockSelector)])
+
+            # only for "Fully Trace Supplemental Proxies" support
+            if self.Lut:
+                Trace.get_accessor(self.Lut)
 
 class RegisterViewProxy(RenderingMixin, TraceItem):
     """Traces creation of a new view (vtkSMParaViewPipelineController::RegisterViewProxy)."""
