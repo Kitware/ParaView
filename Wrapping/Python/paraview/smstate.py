@@ -285,6 +285,13 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                             "%s.UseSeparateColorMap = True" % (\
                                 smtrace.Trace.get_accessor(rep))])
 
+                    if rep.BlockUseSeparateColorMaps:
+                        selectorsAndUseSeparateColorMap = rep.BlockUseSeparateColorMaps.GetData()
+                        if len(selectorsAndUseSeparateColorMap) % 2 == 0 and len(selectorsAndUseSeparateColorMap) > 0:
+                            trace.append_separated([ \
+                                "# set separate color map for blocks",
+                                "%s.BlockUseSeparateColorMaps = %s" % (\
+                                    smtrace.Trace.get_accessor(rep), ", ".join(selectorsAndUseSeparateColorMap))])
                 except AttributeError: pass
             # save the scalar bar properties themselves.
             if view_scalarbars:
@@ -310,6 +317,17 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                                 smtrace.Trace.get_accessor(rep),
                                 smtrace.Trace.get_accessor(view))])
 
+                    if rep.BlockLookupTableSelectors:
+                        selectors = rep.BlockLookupTableSelectors.GetData()
+                        for selector in selectors:
+                            if rep.IsBlockScalarBarVisible(view, selector):
+                                trace.append_separated([\
+                                    "# set color map for block %s" % selector,
+                                    "%s.SetBlockScalarBarVisibility(%s, %s, True)" % (\
+                                        smtrace.Trace.get_accessor(rep),
+                                        selector,
+                                        smtrace.Trace.get_accessor(view))])
+
                     if not rep.Visibility:
                       traceitem = smtrace.Hide(producer, port, view)
                       traceitem.finalize()
@@ -320,8 +338,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
     #--------------------------------------------------------------------------
     # Now, trace the transfer functions (color maps and opacity maps) used.
-    ctfs = set([x for x in proxies_of_interest \
-        if smtrace.Trace.get_registered_name(x, "lookup_tables")])
+    ctfs = set([x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "lookup_tables")])
     if not skipRenderingComponents and ctfs:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
