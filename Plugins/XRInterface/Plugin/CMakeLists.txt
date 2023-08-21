@@ -32,6 +32,20 @@ if (NOT (PARAVIEW_XRInterface_OpenXR_Support OR PARAVIEW_XRInterface_OpenVR_Supp
   message(STATUS "XRInterface plugin is enabled but neither OpenVR or OpenXR support are enabled, the plugin may not be usable")
 endif ()
 
+option(PARAVIEW_XRInterface_OpenXRRemoting_Support  "Turn on support for OpenXR in XRInterface plugin for the Hololens2" OFF)
+if (PARAVIEW_XRInterface_OpenXRRemoting_Support)
+  if (TARGET VTK::RenderingOpenXRRemoting)
+    list(APPEND required_modules
+      VTK::RenderingOpenXRRemoting
+    )
+    set(openxrremoting_support TRUE)
+  else ()
+    message(FATAL_ERROR
+      "PARAVIEW_XRInterface_OpenXRRemoting_Support is ON but VTK::RenderingOpenXRRemoting is not,
+      please enable VTK::RenderingOpenXRRemoting for Hololens2 support")
+  endif ()
+endif ()
+
 set(interfaces)
 set(sources
   pqXRInterfaceControls.cxx
@@ -108,7 +122,8 @@ set_property(
   pqXRInterfaceDockPanel.cxx
   vtkPVXRInterfaceHelper.cxx
   APPEND PROPERTY
-    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>")
+    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>"
+    COMPILE_DEFINITIONS "XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT=$<BOOL:${openxrremoting_support}>")
 
 set_property(
   SOURCE
@@ -124,6 +139,12 @@ if (openxr_support)
     pv_openxr_binding_knuckles.json
     pv_openxr_binding_vive_controller.json
     pv_openxr_binding_oculus_touch_controller.json
+  )
+endif()
+
+if (openxrremoting_support)
+  list(APPEND xr_input_files
+    pv_openxr_binding_microsoft_hand_interaction.json
   )
 endif()
 

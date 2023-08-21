@@ -83,6 +83,10 @@
       "controller_type": "knuckles"
     },
     {
+      "binding_url": "pv_openxr_binding_microsoft_hand_interaction.json",
+      "controller_type": "microsoft_hand_interaction"
+    },
+    {
       "binding_url": "pv_openxr_binding_vive_controller.json",
       "controller_type": "vive_controller"
     }

@@ -135,6 +135,21 @@ void pqXRInterfaceDockPanel::constructor()
   // No need for tr()
   this->Internals->Ui.chooseBackendCombo->addItem(
     "OpenXR", QVariant(pqXRInterfaceDockPanel::XR_BACKEND_OPENXR));
+
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+  this->Internals->Ui.useOpenxrRemoting->setVisible(true);
+  QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged,
+    [&](int state) { this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked); });
+  QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged, [&](int state) {
+    this->Internals->Ui.remotingAddress->setVisible(state);
+    this->Internals->Ui.remoteAddress->setVisible(state);
+  });
+  QObject::connect(this->Internals->Ui.remoteAddress, &QLineEdit::textChanged,
+    [&](QString text) { this->Internals->Helper->SetRemotingAddress(text.toStdString()); });
+#else
+  this->Internals->Ui.useOpenxrRemoting->setVisible(false);
+#endif
+
 #endif
 
   if (this->Internals->Ui.chooseBackendCombo->count() == 0)

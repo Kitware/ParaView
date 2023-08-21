@@ -85,6 +85,49 @@
        </layout>
       </item>
       <item>
+       <widget class="QCheckBox" name="useOpenxrRemoting">
+        <property name="text">
+         <string>Use OpenXR Remoting (experimental)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayoutXRRemoting">
+        <item>
+         <widget class="QLabel" name="remotingAddress">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="visible">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Remote address</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="remoteAddress">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="visible">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string extracomment="Specify the IP address used to connect ParaView to the remote XR device, e.g. Hololens2"/>
+          </property>
+          <property name="placeholderText">
+           <string>127.0.0.1</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QPushButton" name="sendToXRButton">
         <property name="text">
          <string>Send to XR</string>

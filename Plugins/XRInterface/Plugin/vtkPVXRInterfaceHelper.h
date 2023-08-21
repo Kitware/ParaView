@@ -307,6 +307,31 @@ public:
 
   ///@{
   /**
+   * Set/get whether to use OpenXR Remoting for Hololens2.
+   * Default is false.
+   *
+   * @note as the remoting depends on OpenXR, this feature do nothing if the
+   * UseOpenXR isn't enabled.
+   *
+   * @warning This feature is currently experimental.
+   */
+  void SetUseOpenXRRemoting(bool useOpenXrRemoting);
+  vtkGetMacro(UseOpenXRRemoting, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/get port used to link with the correct remote devices.
+   * Default is 127.0.0.1.
+   *
+   * Note that UseOpenXRRemoting needs to be set to true.
+   */
+  vtkSetMacro(RemotingAddress, std::string);
+  vtkGetMacro(RemotingAddress, std::string);
+  ///@}
+
+  ///@{
+  /**
    * Set/get whether to display base stations in the XR View.
    * Default is false.
    */
@@ -394,6 +419,8 @@ private:
   bool BaseStationVisibility = false;
   bool NeedStillRender = false;
   bool UseOpenXR = false;
+  bool UseOpenXRRemoting = false;
+  std::string RemotingAddress = "127.0.0.1";
   RightTriggerAction RightTriggerMode = vtkPVXRInterfaceHelper::PICK;
 
   vtkSMViewProxy* SMView = nullptr;
