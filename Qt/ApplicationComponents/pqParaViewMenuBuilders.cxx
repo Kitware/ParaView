@@ -28,6 +28,7 @@
 #include "pqChangeFileNameReaction.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
+#include "pqConfigureCategoriesReaction.h"
 #include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
 #include "pqCustomViewpointsDefaultController.h"
@@ -330,6 +331,11 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Manage Favorites..."))
     << pqSetName("actionManage_Favorites");
   new pqManageFavoritesReaction(manageFavoritesAction, mgr);
+
+  QAction* configureCategoriesAction =
+    menu.addAction(QCoreApplication::translate("pqToolsMenu", "Configure Categories"))
+    << pqSetName("actionConfigureCategories");
+  new pqConfigureCategoriesReaction(configureCategoriesAction, mgr);
 
   new pqCustomizeShortcutsReaction(
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Customize Shortcuts..."))

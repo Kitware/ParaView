@@ -48,6 +48,8 @@ set(classes
   pqColorToolbar
   pqCommandButtonPropertyWidget
   pqCommandLineOptionsBehavior
+  pqConfigureCategoriesDialog
+  pqConfigureCategoriesReaction
   pqCopyReaction
   pqCrashRecoveryBehavior
   pqCreateCustomFilterReaction
@@ -230,6 +232,7 @@ set(ui_files
   Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorOpacityEditorWidget.ui
   Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqConfigureCategoriesDialog.ui
   Resources/UI/pqCustomResolutionDialog.ui
   Resources/UI/pqCylinderPropertyWidget.ui
   Resources/UI/pqCustomizeShortcutsDialog.ui

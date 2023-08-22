@@ -198,7 +198,7 @@ Q_SIGNALS:
   void menuPopulated();
 
   /**
-   * Updated when categories have changed.
+   * Fired when categories were updated.
    */
   void categoriesUpdated();
 

@@ -620,7 +620,7 @@ QMenu* pqProxyGroupMenuManager::getFavoritesMenu()
 //-----------------------------------------------------------------------------
 QString pqProxyGroupMenuManager::categoryLabel(const QString& category)
 {
-  pqCategoryMap allCategories = this->Internal->ApplicationCategory->getSubCategoriesRecursive();
+  pqCategoryMap allCategories = this->Internal->menuCategory()->getSubCategoriesRecursive();
   if (allCategories.contains(category))
   {
     return allCategories[category]->label();
@@ -863,7 +863,7 @@ QStringList pqProxyGroupMenuManager::getToolbarCategories() const
 {
   QStringList categories_in_toolbar;
 
-  auto categories = this->Internal->ApplicationCategory->getSubCategoriesRecursive();
+  auto categories = this->Internal->menuCategory()->getSubCategoriesRecursive();
   for (auto category : categories)
   {
     if (category->showInToolbar())
@@ -878,7 +878,7 @@ QStringList pqProxyGroupMenuManager::getToolbarCategories() const
 QList<QAction*> pqProxyGroupMenuManager::categoryActions(const QString& categoryName)
 {
   QList<QAction*> category_actions;
-  auto categories = this->Internal->ApplicationCategory->getSubCategoriesRecursive();
+  auto categories = this->Internal->menuCategory()->getSubCategoriesRecursive();
   if (!categories.contains(categoryName))
   {
     return category_actions;
