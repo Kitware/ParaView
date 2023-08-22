@@ -174,7 +174,8 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   {
     if (proxy->IsA("vtkSMRepresentationProxy") && proxy->GetProperty("Input"))
     {
-      if (proxy->IsA("vtkSMPVRepresentationProxy") || xml_type == "ImageSliceRepresentation")
+      if (proxy->IsA("vtkSMPVRepresentationProxy") || proxy->IsA("vtkSMChartRepresentationProxy") ||
+        xml_type == "ImageSliceRepresentation")
       {
         // pqPipelineRepresentation is a design flaw! We need to get rid of it
         // and have helper code that manages the crap in that class

@@ -60,6 +60,7 @@ set(classes
   vtkPVGridAxes3DRepresentation
   vtkPVHardwareSelector
   vtkPVHistogramChartRepresentation
+  vtkPVImageChartRepresentation
   vtkPVImageSliceMapper
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
@@ -113,6 +114,7 @@ set(classes
   vtkSMChartSeriesSelectionDomain
   vtkSMChartUseIndexForAxisDomain
   vtkSMCinemaVolumetricImageExtractWriterProxy
+  vtkSMColorMapEditorHelper
   vtkSMComparativeAnimationCueProxy
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy

@@ -4,8 +4,8 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
@@ -346,7 +346,7 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
       currently_shown_scalar_bars.insert(proxy);
     }
     else if (vtkSMPropertyHelper(proxy, "Visibility", true).GetAsInt() == 1 &&
-      vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+      vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
     {
       vtkSMProxy* lut = vtkSMPropertyHelper(proxy, "LookupTable", true).GetAsProxy();
       if (lut && luts.find(lut) == luts.end())
@@ -388,7 +388,7 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
     for (proxysettype::const_iterator iter = colored_reprs.begin(); iter != colored_reprs.end();
          ++iter)
     {
-      vtkSMPVRepresentationProxy::SetScalarBarVisibility(*iter, viewProxy, true);
+      vtkSMColorMapEditorHelper::SetScalarBarVisibility(*iter, viewProxy, true);
       modified = true; // not really truthful here.
     }
   }
@@ -404,7 +404,7 @@ bool vtkSMTransferFunctionManager::UpdateScalarBarsComponentTitle(
   }
 
   bool ret = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
-    lutProxy, vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(representation));
+    lutProxy, vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(representation));
   SM_SCOPED_TRACE(CallFunction)
     .arg("UpdateScalarBarsComponentTitle")
     .arg(lutProxy)
@@ -448,7 +448,7 @@ bool vtkSMTransferFunctionManager::HideScalarBarIfNotNeeded(vtkSMProxy* lutProxy
   {
     vtkSMProxy* proxy = reprHelper.GetAsProxy(cc);
     if (vtkSMPropertyHelper(proxy, "Visibility", true).GetAsInt() == 1 &&
-      vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+      vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
     {
       vtkSMProxy* lut = vtkSMPropertyHelper(proxy, "LookupTable", true).GetAsProxy();
       if (lut == lutProxy)

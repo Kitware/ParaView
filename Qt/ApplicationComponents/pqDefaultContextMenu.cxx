@@ -21,7 +21,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMArrayListDomain.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -237,7 +237,7 @@ void pqDefaultContextMenu::colorMenuTriggered(QAction* action)
 
     vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
 
-    vtkSMPVRepresentationProxy::SetScalarColoring(
+    vtkSMColorMapEditorHelper::SetScalarColoring(
       reprProxy, array.second.toUtf8().data(), array.first);
 
     vtkNew<vtkSMTransferFunctionManager> tmgr;
@@ -256,7 +256,7 @@ void pqDefaultContextMenu::colorMenuTriggered(QAction* action)
     {
       // we could now respect some application setting to determine if the LUT is
       // to be reset.
-      vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy, true);
+      vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(reprProxy, true);
 
       /// BUG #0011858. Users often do silly things!
       bool reprVisibility =
@@ -267,7 +267,7 @@ void pqDefaultContextMenu::colorMenuTriggered(QAction* action)
         gsettings->GetScalarBarMode() ==
           vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
       {
-        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
+        vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, view, true);
       }
     }
 

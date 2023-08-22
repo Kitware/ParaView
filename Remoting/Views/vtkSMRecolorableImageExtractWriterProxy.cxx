@@ -7,8 +7,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkProcessModule.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSourceProxy.h"
@@ -59,14 +60,14 @@ public:
       return false;
     }
 
-    auto repr = vtkSMPVRepresentationProxy::SafeDownCast(view->FindRepresentation(source, port));
+    vtkSMRepresentationProxy* repr = view->FindRepresentation(source, port);
     if (!repr || vtkSMPropertyHelper(repr, "Visibility").GetAsInt() == 0)
     {
       vtkLogF(ERROR, "'DataSource' is not visible in view!");
       return false;
     }
 
-    if (!repr->GetUsingScalarColoring())
+    if (!vtkSMColorMapEditorHelper::GetUsingScalarColoring(repr))
     {
       vtkLogF(ERROR, "Chosen 'DataSource' is not using scalar coloring.");
       return false;

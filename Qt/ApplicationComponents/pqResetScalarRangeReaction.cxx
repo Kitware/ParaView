@@ -13,7 +13,7 @@
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTimeKeeperProxy.h"
@@ -28,7 +28,7 @@ namespace
 vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
 {
   vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
   {
     return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
   }
@@ -276,7 +276,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
   {
     BEGIN_UNDO_SET(QCoreApplication::translate(
       "pqResetScalarRangeReaction", "Reset transfer function ranges using temporal data range"));
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
+    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
 
     // disable auto-rescale of transfer function since the user has set one
     // explicitly (BUG #14371).
@@ -319,7 +319,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentat
 
   BEGIN_UNDO_SET(QCoreApplication::translate(
     "pqResetScalarRangeReaction", "Reset transfer function ranges to visible data range"));
-  vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
+  vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(
     repr->getProxy(), view->getProxy());
   repr->renderViewEventually();
   END_UNDO_SET();

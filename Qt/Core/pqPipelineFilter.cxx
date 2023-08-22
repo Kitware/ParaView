@@ -14,8 +14,8 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
 // Qt includes.

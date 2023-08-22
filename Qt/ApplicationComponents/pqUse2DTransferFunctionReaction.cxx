@@ -5,9 +5,10 @@
 
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 
 //-----------------------------------------------------------------------------
 pqUse2DTransferFunctionReaction::pqUse2DTransferFunctionReaction(
@@ -82,7 +83,7 @@ void pqUse2DTransferFunctionReaction::setRepresentation(pqDataRepresentation* re
   bool canUseTf2D = usingSepOpacityArray
     ? false
     : (reprProxy && useTf2DProperty && vtkSMRepresentationProxy::IsVolumeRendering(reprProxy) &&
-        vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy));
+        vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy));
   action->setEnabled(canUseTf2D);
   action->setChecked(false);
   if (useTf2DProperty && reprProxy)

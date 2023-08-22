@@ -14,13 +14,16 @@
  *
  * vtkSMPVRepresentationProxy is used for pretty much all of the
  * data-representations (i.e. representations showing input data) in the render
- * views. It provides helper functions for controlling transfer functions,
- * scalar coloring, etc.
+ * views. It provides helper functions redirecting to vtkSMColorMapEditorHelper
+ * for controlling transfer functions, scalar coloring, etc.
+ *
+ * @sa vtkSMColorMapEditorHelper
  */
 
 #ifndef vtkSMPVRepresentationProxy_h
 #define vtkSMPVRepresentationProxy_h
 
+#include "vtkParaViewDeprecation.h" // for deprecation
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSmartPointer.h" // For LastLUTProxy
@@ -33,6 +36,15 @@ public:
   static vtkSMPVRepresentationProxy* New();
   vtkTypeMacro(vtkSMPVRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  ///@{
+  /**
+   * Set/get last LUT proxy.
+   * Used as a memory of what was the last LUT proxy linked to this representation.
+   */
+  void SetLastLUTProxy(vtkSMProxy* proxy);
+  vtkSMProxy* GetLastLUTProxy();
+  ///@}
 
   /**
    * Returns true if scalar coloring is enabled. This checks whether a property
@@ -52,6 +64,7 @@ public:
    * Safely call GetUsingScalarColoring() after casting the proxy to appropriate
    * type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool GetUsingScalarColoring(vtkSMProxy* proxy)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
@@ -63,6 +76,7 @@ public:
    * Given the input registered representation `proxy`, sets up a lookup table associated with the
    * representation if a scalar bar is being used for `proxy`.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static void SetupLookupTable(vtkSMProxy* proxy);
 
   /**
@@ -98,6 +112,7 @@ public:
    * Safely call SetScalarColoring() after casting the proxy to the appropriate
    * type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool SetScalarColoring(vtkSMProxy* proxy, const char* arrayname, int attribute_type)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
@@ -110,6 +125,7 @@ public:
    * Safely call SetScalarColoring() after casting the proxy to the appropriate
    * type, component version
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool SetScalarColoring(
     vtkSMProxy* proxy, const char* arrayname, int attribute_type, int component)
   {
@@ -155,6 +171,7 @@ public:
    * Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
    * appropriate type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool RescaleTransferFunctionToDataRange(
     vtkSMProxy* proxy, bool extend = false, bool force = true)
   {
@@ -168,6 +185,7 @@ public:
    * Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
    * appropriate type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy, const char* arrayname,
     int attribute_type, bool extend = false, bool force = true)
   {
@@ -197,6 +215,7 @@ public:
    * Safely call RescaleTransferFunctionToDataRangeOverTime() after casting the proxy to
    * appropriate type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool RescaleTransferFunctionToDataRangeOverTime(vtkSMProxy* proxy)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
@@ -209,6 +228,7 @@ public:
    * Safely call RescaleTransferFunctionToDataRangeOverTime() after casting the proxy to
    * appropriate type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool RescaleTransferFunctionToDataRangeOverTime(
     vtkSMProxy* proxy, const char* arrayname, int attribute_type)
   {
@@ -233,11 +253,13 @@ public:
    * Safely call RescaleTransferFunctionToVisibleRange() after casting the proxy
    * to the appropriate type.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* proxy, vtkSMProxy* view)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->RescaleTransferFunctionToVisibleRange(view) : false;
   }
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool RescaleTransferFunctionToVisibleRange(
     vtkSMProxy* proxy, vtkSMProxy* view, const char* arrayname, int attribute_type)
   {
@@ -253,6 +275,7 @@ public:
    * Scalar bar is only shown if scalar coloring is indeed being used.
    */
   virtual bool SetScalarBarVisibility(vtkSMProxy* view, bool visible);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool SetScalarBarVisibility(vtkSMProxy* proxy, vtkSMProxy* view, bool visible)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
@@ -269,6 +292,7 @@ public:
    * scalar bar.
    */
   virtual bool HideScalarBarIfNotNeeded(vtkSMProxy* view);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool HideScalarBarIfNotNeeded(vtkSMProxy* repr, vtkSMProxy* view)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(repr);
@@ -282,6 +306,7 @@ public:
    * representation and view is visible, return false otherwise.
    */
   virtual bool IsScalarBarVisible(vtkSMProxy* view);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static bool IsScalarBarVisible(vtkSMProxy* repr, vtkSMProxy* view)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(repr);
@@ -296,6 +321,7 @@ public:
    * If none is found, returns nullptr.
    */
   virtual vtkPVArrayInformation* GetArrayInformationForColorArray(bool checkRepresentedData = true);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static vtkPVArrayInformation* GetArrayInformationForColorArray(
     vtkSMProxy* proxy, bool checkRepresentedData = true)
   {
@@ -311,6 +337,7 @@ public:
    */
   virtual vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
     double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
     vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false)
   {
@@ -325,6 +352,7 @@ public:
    * Get an estimated number of annotation shown on this representation scalar bar
    */
   int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* view);
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use static functions from vtkSMColorMapEditorHelper instead")
   static int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* proxy, vtkSMProxy* view)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
@@ -369,6 +397,8 @@ protected:
   /**
    * Rescales transfer function ranges using the array information provided.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Internal logic should be in vtkSMColorMapEditorHelper, use "
+                                "exposed functions of the helper instead")
   virtual bool RescaleTransferFunctionToDataRange(
     vtkPVArrayInformation* info, bool extend = false, bool force = true);
 
@@ -398,11 +428,15 @@ protected:
    * In case of UseSeparateColorMap enabled, this function prefix the given
    * arrayname with unique identifier, otherwise it acts as a passthrough.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Internal logic should be in vtkSMColorMapEditorHelper, use "
+                                "exposed functions of the helper instead")
   std::string GetDecoratedArrayName(const std::string& arrayname);
 
   /**
    * Internal method to set scalar coloring, do not use directly.
    */
+  PARAVIEW_DEPRECATED_IN_5_12_0("Internal logic should be in vtkSMColorMapEditorHelper, use "
+                                "exposed functions of the helper instead")
   virtual bool SetScalarColoringInternal(
     const char* arrayname, int attribute_type, bool useComponent, int component);
 

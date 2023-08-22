@@ -7,6 +7,7 @@
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
@@ -115,14 +116,14 @@ int TestScalarBarPlacement(int argc, char* argv[])
   // Set representation to surface to visualize it and enable scalar coloring.
   auto waveletRep = vtkSMPVRepresentationProxy::SafeDownCast(controller->Show(wavelet, 0, view));
   waveletRep->SetRepresentationType("Surface");
-  waveletRep->SetScalarColoring("RTData", vtkDataObject::POINT);
-  waveletRep->RescaleTransferFunctionToDataRange();
+  vtkSMColorMapEditorHelper::SetScalarColoring(waveletRep, "RTData", vtkDataObject::POINT);
+  vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(waveletRep);
 
   // Set representation to surface to visualize it and enable scalar coloring.
   auto sphereRep = vtkSMPVRepresentationProxy::SafeDownCast(controller->Show(sphere, 0, view));
   sphereRep->SetRepresentationType("Surface");
-  sphereRep->SetScalarColoring("Normals", vtkDataObject::POINT);
-  sphereRep->RescaleTransferFunctionToDataRange();
+  vtkSMColorMapEditorHelper::SetScalarColoring(sphereRep, "Normals", vtkDataObject::POINT);
+  vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(sphereRep);
 
   // Get the scalar bar for wavelet and set its location and position.
   auto rtDataTf = mgr->GetColorTransferFunction("RTData", pxm);
@@ -131,7 +132,8 @@ int TestScalarBarPlacement(int argc, char* argv[])
     .Set(static_cast<int>(vtkScalarBarRepresentation::AnyLocation));
   double positionWaveletSb[2] = { 0, 0 };
   vtkSMPropertyHelper(waveletSb, "Position").Set(positionWaveletSb, 2);
-  waveletRep->SetScalarBarVisibility(view, true); // calls UpdateVTKObjects on waveletSb
+  vtkSMColorMapEditorHelper::SetScalarBarVisibility(
+    waveletRep, view, true); // calls UpdateVTKObjects on waveletSb
 
   // verify that window location did not change.
   auto waveletSbWidgetRep =
@@ -159,7 +161,8 @@ int TestScalarBarPlacement(int argc, char* argv[])
     .Set(static_cast<int>(vtkScalarBarRepresentation::AnyLocation));
   double positionSphereSb[2] = { 0.5, 0.5 };
   vtkSMPropertyHelper(sphereSb, "Position").Set(positionSphereSb, 2);
-  sphereRep->SetScalarBarVisibility(view, true); // calls UpdateVTKObjects on sphereSb
+  vtkSMColorMapEditorHelper::SetScalarBarVisibility(
+    sphereRep, view, true); // calls UpdateVTKObjects on sphereSb
 
   // verify that window location did not alter.
   auto sphereSbWidgetRep = vtk3DWidgetRepresentation::SafeDownCast(sphereSb->GetClientSideObject());

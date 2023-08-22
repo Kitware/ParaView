@@ -7,9 +7,10 @@
 #include "pqDataRepresentation.h"
 #include "pqDisplayColorWidget.h"
 #include "pqView.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
 
@@ -68,7 +69,7 @@ void pqUseSeparateColorMapReaction::setRepresentation(pqDataRepresentation* repr
   // Set action state
   vtkSMProperty* colorProp = reprProxy ? reprProxy->GetProperty("UseSeparateColorMap") : nullptr;
   bool can_sep =
-    reprProxy && colorProp && vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy);
+    reprProxy && colorProp && vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy);
   parent_action->setEnabled(can_sep);
   parent_action->setChecked(false);
   if (colorProp && reprProxy)
@@ -83,7 +84,7 @@ void pqUseSeparateColorMapReaction::onTriggered()
 {
   // Disable Multi Components Mapping
   pqDataRepresentation* repr = this->CachedRepresentation.data();
-  vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(repr->getProxy());
   vtkSMProperty* mcmProperty = proxy->GetProperty("MultiComponentsMapping");
   if (vtkSMPropertyHelper(mcmProperty).GetAsInt() == 1)
   {
@@ -97,7 +98,7 @@ void pqUseSeparateColorMapReaction::onTriggered()
   pqView* view = pqActiveObjects::instance().activeView();
   vtkSMProxy* viewProxy = view ? view->getProxy() : nullptr;
 
-  if (proxy->GetUsingScalarColoring())
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
   {
     if (vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable"))
     {

@@ -16,9 +16,9 @@
 #include "vtkInformation.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -402,7 +402,7 @@ void copyDescendants(pqObjectBuilder* builder, pqPipelineSource* source, pqPipel
       builder->createDataRepresentation(child->getOutputPort(outputPort), view);
     if (repr)
     {
-      vtkSMPVRepresentationProxy::SetupLookupTable(repr->getProxy());
+      vtkSMColorMapEditorHelper::SetupLookupTable(repr->getProxy());
     }
   }
 

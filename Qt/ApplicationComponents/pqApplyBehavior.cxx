@@ -22,10 +22,11 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMLiveInsituLinkProxy.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -269,20 +270,19 @@ void pqApplyBehavior::applied(pqPropertiesPanel* panel)
 
       // If not scalar coloring, we make an attempt to color using
       // 'vtkBlockColors' array, if present.
-      if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
-        vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false)
+      if (!vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
       {
         auto dataInfo = reprProxy->GetRepresentedDataInformation();
         auto arrayInfo = dataInfo->GetArrayInformation("vtkBlockColors", vtkDataObject::FIELD);
         if (dataInfo->IsCompositeDataSet() && arrayInfo != nullptr &&
           arrayInfo->GetComponentRange(0)[1] > 0)
         {
-          vtkSMPVRepresentationProxy::SetScalarColoring(
+          vtkSMColorMapEditorHelper::SetScalarColoring(
             reprProxy, "vtkBlockColors", vtkDataObject::FIELD);
           if (gsettings->GetScalarBarMode() ==
             vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
           {
-            vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+            vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, true);
           }
         }
       }
@@ -387,9 +387,9 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
     if (gsettings->GetScalarBarMode() ==
       vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
     {
-      if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+      if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
       {
-        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, preferredView, true);
+        vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, preferredView, true);
       }
     }
 

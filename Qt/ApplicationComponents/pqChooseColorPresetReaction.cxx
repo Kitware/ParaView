@@ -8,7 +8,7 @@
 #include "pqDataRepresentation.h"
 #include "pqPresetDialog.h"
 #include "pqUndoStack.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
@@ -22,7 +22,7 @@ namespace pvInternals
 {
 vtkSMProxy* lutProxy(vtkSMProxy* reprProxy)
 {
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
   {
     return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
   }

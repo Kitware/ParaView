@@ -950,6 +950,7 @@ SET(TESTS_WITH_BASELINES
   DataAxesGrid.xml
   EmptyInitialCompositeReader.xml # Issue #21293
   IOSSMergeExodusEntityBlocks.xml
+  ImageChartView.xml
   LogoSource.xml
   MergeVectorComponents.xml
   MissingPartialArraysColoredByNaN.xml

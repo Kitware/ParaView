@@ -21,10 +21,11 @@
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
@@ -407,9 +408,9 @@ void pqDeleteReaction::aboutToDelete(pqProxy* source)
         if (reprProxy &&
           vtkPVGeneralSettings::GetInstance()->GetScalarBarMode() ==
             vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
-          vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+          vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
         {
-          vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+          vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, true);
         }
         view->render();
       }

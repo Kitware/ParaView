@@ -11,11 +11,12 @@
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMNamedPropertyIterator.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
@@ -360,14 +361,15 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
     proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    vtkSMRepresentationProxy* consumer = vtkSMRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
       vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
       // consumer is using scalar coloring.
-      consumer->GetUsingScalarColoring())
+      vtkSMColorMapEditorHelper::GetUsingScalarColoring(consumer))
     {
-      vtkPVArrayInformation* arrayInfo = consumer->GetArrayInformationForColorArray();
+      vtkPVArrayInformation* arrayInfo =
+        vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(consumer);
       if (!arrayInfo || (component >= 0 && arrayInfo->GetNumberOfComponents() <= component))
       {
         // skip if no arrayInfo available of doesn't have enough components.
@@ -424,15 +426,15 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
     proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    vtkSMRepresentationProxy* consumer = vtkSMRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
       vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
       // consumer is using scalar coloring.
-      consumer->GetUsingScalarColoring())
+      vtkSMColorMapEditorHelper::GetUsingScalarColoring(consumer))
     {
       vtkPVProminentValuesInformation* prominentValues =
-        vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(consumer);
+        vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(consumer);
       if (!prominentValues)
       {
         continue;
@@ -499,17 +501,18 @@ vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
     proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    vtkSMRepresentationProxy* consumer = vtkSMRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
       vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
       // consumer is using scalar coloring.
-      consumer->GetUsingScalarColoring() &&
+      vtkSMColorMapEditorHelper::GetUsingScalarColoring(consumer) &&
       // do not count proxy multiples times
       usedProxy.find(consumer) == usedProxy.end())
     {
       // Recover consumer color array
-      vtkPVArrayInformation* tmpArrayInfo = consumer->GetArrayInformationForColorArray(false);
+      vtkPVArrayInformation* tmpArrayInfo =
+        vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(consumer, false);
       if (!tmpArrayInfo)
       {
         continue;

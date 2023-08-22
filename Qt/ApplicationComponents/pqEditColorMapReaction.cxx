@@ -8,7 +8,7 @@
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqUndoStack.h"
-#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMTrace.h"
@@ -64,7 +64,7 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
     }
   }
 
-  if (!vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
+  if (!vtkSMColorMapEditorHelper::GetUsingScalarColoring(repr->getProxy()))
   {
     // Get the color property.
     vtkSMProxy* proxy = repr->getProxy();
