@@ -20,6 +20,7 @@
 #include "vtkRemotingCoreModule.h" //needed for exports
 #include "vtkSmartPointer.h"       // for vtkSmartPointer
 
+#include <set>    // for std::set
 #include <vector> // for std::vector
 
 class vtkCollection;
@@ -372,8 +373,12 @@ public:
    * as part data information for simplicity.
    */
   vtkGetVector2Macro(TimeRange, double);
-  vtkGetMacro(NumberOfTimeSteps, vtkTypeInt64);
   vtkGetMacro(TimeLabel, std::string);
+  const std::set<double>& GetTimeSteps() const { return this->TimeSteps; }
+  vtkTypeInt64 GetNumberOfTimeSteps() const
+  {
+    return static_cast<unsigned int>(this->TimeSteps.size());
+  }
   ///@}
 
   /**
@@ -498,8 +503,8 @@ private:
   bool HasTime = false;
   double Time = 0.0;
   double TimeRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
+  std::set<double> TimeSteps;
   std::string TimeLabel;
-  vtkTypeInt64 NumberOfTimeSteps = 0;
   std::vector<vtkTypeInt64> AMRNumberOfDataSets;
 
   std::vector<int> UniqueBlockTypes;

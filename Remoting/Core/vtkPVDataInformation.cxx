@@ -246,7 +246,13 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeRange: " << this->TimeRange[0] << ", " << this->TimeRange[1] << endl;
   os << indent << "TimeLabel: " << (this->TimeLabel.empty() ? "(none)" : this->TimeLabel.c_str())
      << endl;
-  os << indent << "NumberOfTimeSteps: " << this->NumberOfTimeSteps << endl;
+  os << indent << "NumberOfTimeSteps: " << this->TimeSteps.size() << endl;
+  os << indent << "TimeSteps: ";
+  for (double timeStep : this->TimeSteps)
+  {
+    os << timeStep;
+  }
+  os << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -315,7 +321,7 @@ void vtkPVDataInformation::Initialize()
   this->TimeRange[0] = VTK_DOUBLE_MAX;
   this->TimeRange[1] = -VTK_DOUBLE_MAX;
   this->TimeLabel.clear();
-  this->NumberOfTimeSteps = 0;
+  this->TimeSteps.clear();
   this->AMRNumberOfDataSets.clear();
 
   this->Hierarchy->Initialize();
@@ -492,7 +498,13 @@ void vtkPVDataInformation::CopyFromPipelineInformation(vtkInformation* pinfo)
 
     if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
     {
-      this->NumberOfTimeSteps = pinfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+      vtkTypeInt64 numberOfTimeSteps =
+        pinfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+      double* inTimes = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+      for (int i = 0; i < numberOfTimeSteps; i++)
+      {
+        this->TimeSteps.insert(inTimes[i]);
+      }
     }
 
     if (pinfo->Has(vtkPVInformationKeys::TIME_LABEL_ANNOTATION()))
@@ -622,8 +634,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
     this->TimeLabel = other->TimeLabel;
   }
 
-  // TODO: not sure what's the best way.
-  this->NumberOfTimeSteps = std::max(this->NumberOfTimeSteps, other->NumberOfTimeSteps);
+  this->TimeSteps.insert(other->TimeSteps.begin(), other->TimeSteps.end());
 
   std::set<int> types;
   std::copy(this->UniqueBlockTypes.begin(), this->UniqueBlockTypes.end(),
@@ -686,8 +697,8 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation* other)
   this->HasTime = other->HasTime;
   this->Time = other->Time;
   std::copy(other->TimeRange, other->TimeRange + 2, this->TimeRange);
+  this->TimeSteps = other->TimeSteps;
   this->TimeLabel = other->TimeLabel;
-  this->NumberOfTimeSteps = other->NumberOfTimeSteps;
   this->UniqueBlockTypes = other->UniqueBlockTypes;
   std::copy(other->NumberOfElements,
     other->NumberOfElements + vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES, this->NumberOfElements);
@@ -986,9 +997,16 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6) << this->HasTime << this->Time
        << vtkClientServerStream::InsertArray(this->TimeRange, 2) << this->TimeLabel
-       << this->NumberOfTimeSteps
        << vtkClientServerStream::InsertArray(
             this->NumberOfElements, vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
+
+  *css << static_cast<int>(this->TimeSteps.size());
+  if (!this->TimeSteps.empty())
+  {
+    std::vector<double> vec;
+    std::copy(this->TimeSteps.begin(), this->TimeSteps.end(), std::back_inserter(vec));
+    *css << vtkClientServerStream::InsertArray(&vec.front(), static_cast<int>(vec.size()));
+  }
 
   *css << static_cast<int>(this->UniqueBlockTypes.size());
   if (!this->UniqueBlockTypes.empty())
@@ -1046,7 +1064,6 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     !css->GetArgument(0, argument++, &this->Time) ||
     !css->GetArgument(0, argument++, this->TimeRange, 2) ||
     !css->GetArgument(0, argument++, &this->TimeLabel) ||
-    !css->GetArgument(0, argument++, &this->NumberOfTimeSteps) ||
     !css->GetArgument(
       0, argument++, this->NumberOfElements, vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES))
   {
@@ -1054,6 +1071,24 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing stream.");
     return;
   }
+
+  // read TimeSteps
+  int timeStepsLength;
+  if (!css->GetArgument(0, argument++, &timeStepsLength))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
+    return;
+  }
+  std::vector<double> vec;
+  vec.resize(timeStepsLength);
+  if (timeStepsLength > 0 && !css->GetArgument(0, argument++, &vec[0], timeStepsLength))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
+    return;
+  }
+  this->TimeSteps.insert(vec.begin(), vec.end());
 
   // read UniqueBlockTypes.
   int uniqueBlockTypesLength;
