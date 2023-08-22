@@ -457,17 +457,14 @@ public:
   }
 
   // populate timesteps info.
-  void setTimeSteps(vtkSMProxy* source)
+  void setTimeSteps(vtkPVDataInformation* dinfo)
   {
-    if (auto property = (source ? source->GetProperty("TimestepValues") : nullptr))
+    if (dinfo)
     {
-      vtkSMPropertyHelper helper(property);
-      std::vector<double> timesteps(helper.GetNumberOfElements());
-      if (helper.GetNumberOfElements() > 0)
-      {
-        helper.Get(&timesteps[0], helper.GetNumberOfElements());
-      };
-      this->TimestepValuesModel.setTimeSteps(timesteps);
+      const std::set<double>& timeSteps = dinfo->GetTimeSteps();
+      std::vector<double> vec;
+      std::copy(timeSteps.begin(), timeSteps.end(), std::back_inserter(vec));
+      this->TimestepValuesModel.setTimeSteps(vec);
     }
     else
     {
@@ -710,7 +707,7 @@ void pqProxyInformationWidget::updateUI()
   internals.setFileName(proxy);
   internals.setDataGrouping(
     dinfo ? dinfo->GetHierarchy() : nullptr, dinfo ? dinfo->GetDataAssembly() : nullptr);
-  internals.setTimeSteps(proxy);
+  internals.setTimeSteps(dinfo);
 
   this->updateSubsetUI();
 }
