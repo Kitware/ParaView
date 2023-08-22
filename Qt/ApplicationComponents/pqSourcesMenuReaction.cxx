@@ -50,7 +50,6 @@ void pqSourcesMenuReaction::updateEnableState()
 void pqSourcesMenuReaction::updateEnableState(bool enabled)
 {
   pqProxyGroupMenuManager* mgr = static_cast<pqProxyGroupMenuManager*>(this->parent());
-  mgr->setEnabled(enabled);
   Q_FOREACH (QAction* action, mgr->actions())
   {
     action->setEnabled(enabled);

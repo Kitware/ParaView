@@ -7,6 +7,8 @@
 #include "pqApplicationComponentsModule.h"
 #include <QMenu>
 
+#include "vtkParaViewDeprecation.h" // for deprecation macro
+
 class vtkPVXMLElement;
 class vtkSMProxy;
 
@@ -142,10 +144,8 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void addProxyDefinitionUpdateObservers();
 
-  /**
-   * Enable/disable the menu and the actions.
-   */
-  void setEnabled(bool enable);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
+  void setEnabled(bool){};
 
   /**
    * Forces a re-population of the menu. Any need to call this only after
@@ -184,6 +184,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   QString ResourceTagName;
   vtkPVXMLElement* MenuRoot;
   int RecentlyUsedMenuSize;
+  PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
   bool Enabled;
   bool EnableFavorites;
 

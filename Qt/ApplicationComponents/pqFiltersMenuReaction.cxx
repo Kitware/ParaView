@@ -140,9 +140,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   }
 
   pqProxyGroupMenuManager* mgr = static_cast<pqProxyGroupMenuManager*>(this->parent());
-  mgr->setEnabled(enabled);
 
-  bool some_enabled = false;
   QList<QAction*> actionsList;
   if (updateOnlyToolbars)
   {
@@ -226,7 +224,6 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       {
         action->setEnabled(true);
         action->setVisible(true);
-        some_enabled = true;
         const char* help = prototype->GetDocumentation()->GetShortHelp();
         action->setStatusTip(help ? QCoreApplication::translate("ServerManagerXML", help) : "");
       }
@@ -243,11 +240,6 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       }
       input->RemoveAllUncheckedProxies();
     }
-  }
-
-  if (!some_enabled)
-  {
-    mgr->setEnabled(false);
   }
 
   // Hide unused submenus

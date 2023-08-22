@@ -860,18 +860,6 @@ QList<QAction*> pqProxyGroupMenuManager::actionsInToolbars()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyGroupMenuManager::setEnabled(bool enable)
-{
-  this->Enabled = enable;
-  // on Mac, with Qt 4.8.1, the enabling/disabling of the menu itself causes
-  // issues; the menu never re-enables itself after being disabled (BUG #13184).
-
-  // Furthermore, with the change to recomputing the enabled state when the menu
-  // is shown using the aboutToShow signal, disabling the menu itself causes the
-  // signal not to be sent resulting in the menu never being re-enabled.
-  //  this->menu()->setEnabled(enable);
-}
-//-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::addProxyDefinitionUpdateListener(const QString& proxyGroupName)
 {
   this->Internal->ProxyDefinitionGroupToListen.insert(proxyGroupName);
