@@ -76,6 +76,7 @@ paraview_add_test_pvbatch(
 paraview_add_test_python(
   NO_RT
   ColorBy.py
+  ColorBlockBy.py
   GroupDataSets.py
   PartialArrayIndication.py
   ResetSession.py
