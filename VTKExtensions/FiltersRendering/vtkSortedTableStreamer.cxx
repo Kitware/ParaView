@@ -149,7 +149,19 @@ public:
       for (vtkIdType i_arr = 0; i_arr < otherFieldData->GetNumberOfArrays(); i_arr++)
       {
         otherArray = otherFieldData->GetAbstractArray(i_arr);
-        dstArray = mergedTable->GetColumnByName(otherArray->GetName());
+        std::string arrayName(otherArray->GetName());
+        // Prefix field data columns with `FieldData: `.
+        // Note: some arrays are already prefixed with __vtkValidMask__
+        // which must be kept in front to be hidden in the spreadsheet.
+        if (arrayName.find("__vtkValidMask__") == std::string::npos)
+        {
+          arrayName.insert(0, "FieldData: ");
+        }
+        else
+        {
+          arrayName.insert(std::string("__vtkValidMask__").size(), "FieldData: ");
+        }
+        dstArray = mergedTable->GetColumnByName(arrayName.c_str());
         needNewArray = (dstArray == nullptr);
 
         if (!otherArray || otherArray->GetNumberOfTuples() != 1)
@@ -161,7 +173,7 @@ public:
         {
           dstArray.TakeReference(otherArray->NewInstance());
           dstArray->SetNumberOfComponents(otherArray->GetNumberOfComponents());
-          dstArray->SetName(otherArray->GetName());
+          dstArray->SetName(arrayName.c_str());
           dstArray->SetNumberOfTuples(size);
           if (auto oinfo = otherArray->GetInformation())
           {

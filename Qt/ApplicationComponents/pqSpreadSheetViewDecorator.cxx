@@ -25,6 +25,7 @@
 #include "pqSpreadSheetViewModel.h"
 #include "pqSpreadSheetViewWidget.h"
 #include "pqUndoStack.h"
+#include "vtkDataObject.h"
 #include "vtkNew.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
@@ -118,11 +119,15 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
         enumDomain->GetEntryValue(cc));
     }
   }
+  this->onCurrentAttributeChange(0);
 
   this->connect(internal.Attribute, SIGNAL(currentIndexChanged(int)), SIGNAL(uiModified()));
   this->connect(internal.ToggleCellConnectivity, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
   this->connect(internal.ToggleFieldData, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
   this->connect(internal.SelectionOnly, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
+
+  this->connect(internal.Attribute, SIGNAL(currentIndexChanged(int)), this,
+    SLOT(onCurrentAttributeChange(int)));
 
   internal.Links.setUseUncheckedProperties(true);
   QObject::connect(&internal.Links, &pqPropertyLinks::qtWidgetChanged, [proxy, &internal]() {
@@ -287,6 +292,25 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
       this->Spreadsheet->render();
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::onCurrentAttributeChange(int index)
+{
+  int currentFieldAssociation = this->Internal->Attribute->itemData(index).toInt();
+
+  if (currentFieldAssociation == vtkDataObject::FIELD_ASSOCIATION_NONE)
+  {
+    this->Internal->ToggleFieldData->setEnabled(false);
+    this->Internal->ToggleFieldData->setChecked(false);
+  }
+  else
+  {
+    this->Internal->ToggleFieldData->setEnabled(true);
+  }
+
+  bool enableCellConnectivity = (currentFieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS);
+  this->Internal->ToggleCellConnectivity->setEnabled(enableCellConnectivity);
 }
 
 //-----------------------------------------------------------------------------
