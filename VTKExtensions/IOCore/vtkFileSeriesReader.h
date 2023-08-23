@@ -147,7 +147,7 @@ protected:
     vtkInformationVector* outputVector) override;
   int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override
   {
     return 1;
   };
