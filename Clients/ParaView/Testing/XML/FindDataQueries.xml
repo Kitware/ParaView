@@ -120,4 +120,40 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.V,-19.9491" />
 
+  <!-- reset and open can.ex2 -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionDelete" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="+" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Layout #1" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- testing min per block and max per block -->
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/Input/1QComboBox0" command="activated" arguments="can.ex2" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/ElementType/ComboBox" command="activated" arguments="Cell" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox1" command="activated" arguments="is min per block" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.1.0.1.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.2.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.1.0.0.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.2.0.0.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.0.0.0.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.1.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0.0.0.1.0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="expand" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractSelection" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,61,7,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,61,7,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox1" command="activated" arguments="is max per block" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractSelection" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
+
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/FindDataQueries-Cell-ID-min-max-per-block.png" width="300" height="300" />
+
 </pqevents>

@@ -347,6 +347,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-GlobalElementId-oneof.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-GlobalElementId-range.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-ID-is.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-ID-min-max-per-block.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-ge.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-ge-mean.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-le.png}"
