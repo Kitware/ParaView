@@ -19,6 +19,11 @@
 #include <memory>
 #include <vector>
 
+namespace
+{
+using DataContainerDouble = typename vtkMultiDimensionalImplicitBackend<double>::DataContainerT;
+}
+
 int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
 {
   // Read can.ex2 using ioss reader
@@ -92,14 +97,12 @@ int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
 
   // Now that we have all information needed, prepare the array vector for multi-dimensional
   // implicit array.
-  std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<double>>> arrays;
+  ::DataContainerDouble arrays;
   arrays.reserve(nbOfPoints);
+  const int nbOfValues = nbOfTimesteps * nbOfComponents;
   for (int ptId = 0; ptId < nbOfPoints; ptId++)
   {
-    vtkSmartPointer<vtkAOSDataArrayTemplate<double>> array =
-      vtkSmartPointer<vtkAOSDataArrayTemplate<double>>::New();
-    array->SetNumberOfComponents(nbOfComponents);
-    array->SetNumberOfTuples(nbOfTimesteps);
+    std::vector<double> array(nbOfValues);
     arrays.emplace_back(array);
   }
 
@@ -123,17 +126,19 @@ int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
+    const int valueId = ts * nbOfComponents;
     for (int ptId = 0; ptId < nbOfPoints; ptId++)
     {
       std::vector<double> tuple(nbOfComponents, 0.);
       outArray->GetTypedTuple(ptId, tuple.data());
-      arrays[ptId]->SetTypedTuple(ts, tuple.data());
+      std::copy(tuple.cbegin(), tuple.cend(), arrays[ptId].begin() + valueId);
     }
   }
 
   // Construct the multi-dimensional array
+  auto arraysPtr = std::make_shared<::DataContainerDouble>(arrays);
   vtkNew<vtkMultiDimensionalArray<double>> mdArray;
-  mdArray->ConstructBackend(arrays);
+  mdArray->ConstructBackend(arraysPtr, nbOfTimesteps, nbOfComponents);
 
   // Finally, iterate over timesteps and check equivalence between "VEL" array values and those of
   // the multi-dimensional implicit array.

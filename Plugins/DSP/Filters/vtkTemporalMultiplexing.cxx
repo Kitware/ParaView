@@ -25,88 +25,101 @@
 #include "vtkTable.h"
 
 #include <map>
+#include <memory>
 #include <vector>
-
-struct vtkTemporalMultiplexing::vtkInternals
-{
-  std::map<std::string, std::vector<vtkSmartPointer<vtkDataArray>>> Arrays;
-};
 
 //------------------------------------------------------------------------------
 namespace
 {
-//------------------------------------------------------------------------------
-struct CreateArrayVector
+template <typename ValueType>
+using WorkerDataContainerT = typename vtkMultiDimensionalImplicitBackend<ValueType>::DataContainerT;
+
+class Worker
 {
-  template <typename TArray, typename ValueType = vtk::GetAPIType<TArray>>
-  void operator()(TArray* vtkNotUsed(inArray), vtkSmartPointer<vtkDataArray>& outArray)
-  {
-    outArray.TakeReference(vtkAOSDataArrayTemplate<ValueType>::New());
-  }
+public:
+  virtual void operator()(vtkDataArray* input, vtkIdType currentTimeIndex, vtkIdType offset) = 0;
+  virtual void InitData(vtkIdType nbOfArrays, vtkIdType nbOfTuples, int nbOfComponents,
+    const std::string& arrayName) = 0;
+  virtual vtkSmartPointer<vtkDataArray> ConstructMDArray() = 0;
+  virtual std::string GetArrayName() const = 0;
 };
 
-//------------------------------------------------------------------------------
-struct ConstructMDArray
+template <typename ValueType>
+class TypedWorker : public Worker
 {
-  template <typename TArray, typename ValueType = vtk::GetAPIType<TArray>>
-  void operator()(TArray* vtkNotUsed(dummyArray), const std::string& name,
-    const std::vector<vtkSmartPointer<vtkDataArray>>& arrayVector, vtkTable* output)
+public:
+  void operator()(vtkDataArray* input, vtkIdType currentTimeIndex, vtkIdType arrayOffset) override
   {
-    // Downcast each vtkDataArray into vtkAOSDataArrayTemplate for the backend
-    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> aosVector(arrayVector.size());
+    auto typedInput = vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(input);
+    vtkIdType nbOfArrays = input->GetNumberOfTuples();
 
-    vtkSMPTools::For(0, arrayVector.size(), [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType idx = begin; idx < end; idx++)
+    vtkSMPTools::For(arrayOffset, arrayOffset + nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
+      const vtkIdType valueIdx = currentTimeIndex * this->NbOfComponents;
+      for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
       {
-        vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>> aosArray =
-          vtkAOSDataArrayTemplate<ValueType>::FastDownCast(arrayVector[idx]);
-        if (!aosArray)
+        for (int comp = 0; comp < this->NbOfComponents; ++comp)
         {
-          vtkErrorWithObjectMacro(nullptr, "One of arrays could not be down casted to AOS.");
+          (*this->Data)[arrayIdx][valueIdx + comp] =
+            input->GetComponent(arrayIdx - arrayOffset, comp);
         }
-        aosVector[idx] = aosArray;
       }
     });
+  }
 
+  void InitData(vtkIdType nbOfArrays, vtkIdType nbOfTuples, int nbOfComponents,
+    const std::string& arrayName) override
+  {
+    this->Data =
+      std::make_shared<WorkerDataContainerT<ValueType>>(WorkerDataContainerT<ValueType>());
+    this->Data->resize(nbOfArrays);
+    this->NbOfTuples = nbOfTuples;
+    this->NbOfComponents = nbOfComponents;
+    this->ArrayName = arrayName;
+
+    const vtkIdType nbOfValues = nbOfTuples * nbOfComponents;
+
+    vtkSMPTools::For(0, nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
+      for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
+      {
+        (*this->Data)[arrayIdx].resize(nbOfValues);
+      }
+    });
+  }
+
+  vtkSmartPointer<vtkDataArray> ConstructMDArray() override
+  {
     vtkNew<vtkMultiDimensionalArray<ValueType>> mdArray;
-    mdArray->SetName(name.c_str());
-    mdArray->ConstructBackend(aosVector);
-    output->AddColumn(mdArray);
+    mdArray->ConstructBackend(this->Data, this->NbOfTuples, this->NbOfComponents);
+    mdArray->SetName(this->ArrayName.c_str());
+    return mdArray;
   }
+
+  std::string GetArrayName() const override { return this->ArrayName; }
+
+private:
+  std::shared_ptr<WorkerDataContainerT<ValueType>> Data;
+  vtkIdType NbOfTuples = 0;
+  int NbOfComponents = 0;
+  std::string ArrayName;
 };
 
-//------------------------------------------------------------------------------
-struct ConstructVTKIdTypeMDArray
+struct WorkerCreator
 {
-  // Template specialization of ConstructMDArray is not possible due to vtkIdType
-  // being a typedef
-  template <typename TArray>
-  void operator()(TArray* vtkNotUsed(dummyArray), const std::string& name,
-    const std::vector<vtkSmartPointer<vtkDataArray>>& arrayVector, vtkTable* output)
+  template <typename ArrayT>
+  void operator()(ArrayT* array, std::shared_ptr<Worker>& worker)
   {
-    // Downcast each vtkDataArray into vtkAOSDataArrayTemplate for the backend
-    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<vtkIdType>>> aosVector(arrayVector.size());
-
-    vtkSMPTools::For(0, arrayVector.size(), [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType idx = begin; idx < end; idx++)
-      {
-        vtkSmartPointer<vtkAOSDataArrayTemplate<vtkIdType>> aosArray =
-          vtkAOSDataArrayTemplate<vtkIdType>::FastDownCast(arrayVector[idx]);
-        if (!aosArray)
-        {
-          vtkErrorWithObjectMacro(nullptr, "One of IdType arrays could not be down casted to AOS.");
-        }
-        aosVector[idx] = aosArray;
-      }
-    });
-
-    vtkNew<vtkMultiDimensionalArray<vtkIdType>> mdArray;
-    mdArray->SetName(name.c_str());
-    mdArray->ConstructBackend(aosVector);
-    output->AddColumn(mdArray);
+    worker = std::make_shared<TypedWorker<vtk::GetAPIType<ArrayT>>>();
   }
 };
 }
+
+//------------------------------------------------------------------------------
+struct vtkTemporalMultiplexing::vtkInternals
+{
+  std::vector<std::shared_ptr<::Worker>> Workers;
+  int NumberOfTimeSteps = 0;
+  int CurrentTimeIndex = 0;
+};
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTemporalMultiplexing);
@@ -156,11 +169,12 @@ int vtkTemporalMultiplexing::RequestInformation(vtkInformation* vtkNotUsed(reque
 
   if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
-    this->NumberOfTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    this->Internals->NumberOfTimeSteps =
+      inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   }
   else
   {
-    this->NumberOfTimeSteps = 1;
+    this->Internals->NumberOfTimeSteps = 1;
   }
 
   // Output is not temporal
@@ -180,8 +194,8 @@ int vtkTemporalMultiplexing::RequestUpdateExtent(vtkInformation* vtkNotUsed(requ
 
   if (inTimes)
   {
-    inInfo->Set(
-      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), inTimes[this->CurrentTimeIndex]);
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
+      inTimes[this->Internals->CurrentTimeIndex]);
   }
 
   return 1;
@@ -214,7 +228,7 @@ int vtkTemporalMultiplexing::RequestData(
   }
 
   // Check that dataset is actually temporal
-  if (this->NumberOfTimeSteps <= 0)
+  if (this->Internals->NumberOfTimeSteps <= 0)
   {
     vtkWarningMacro("There should be at least one timestep (non temporal).");
     return 0;
@@ -229,14 +243,13 @@ int vtkTemporalMultiplexing::RequestData(
   }
 
   // For the first request, let the pipeline know it should loop and setup arrays
-  if (this->CurrentTimeIndex == 0)
+  if (this->Internals->CurrentTimeIndex == 0)
   {
     request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
-    this->Internals->Arrays.clear();
     vtkSmartPointer<vtkDataSetAttributes> attributes;
-    vtkIdType nbArrays = 0;
-    this->GetArraysInformation(input, attributes, nbArrays);
-    this->PrepareVectorsOfArrays(attributes, nbArrays);
+    vtkIdType nbOfArrays = 0;
+    this->GetArraysInformation(input, attributes, nbOfArrays);
+    this->PrepareVectorsOfArrays(attributes, nbOfArrays);
   }
 
   // Retrieve each data array then add it to the vector
@@ -256,12 +269,12 @@ int vtkTemporalMultiplexing::RequestData(
   }
 
   // Stop looping when the last timestep has been processed and prepare output
-  this->CurrentTimeIndex++;
+  this->Internals->CurrentTimeIndex++;
 
-  if (this->CurrentTimeIndex == this->NumberOfTimeSteps)
+  if (this->Internals->CurrentTimeIndex == this->Internals->NumberOfTimeSteps)
   {
     request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
-    this->CurrentTimeIndex = 0;
+    this->Internals->CurrentTimeIndex = 0;
     this->CreateMultiDimensionalArrays(output);
   }
 
@@ -270,7 +283,7 @@ int vtkTemporalMultiplexing::RequestData(
 
 //------------------------------------------------------------------------------
 void vtkTemporalMultiplexing::GetArraysInformation(
-  vtkDataObject* input, vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType& nbArrays)
+  vtkDataObject* input, vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType& nbOfArrays)
 {
   if (auto inputCDS = vtkCompositeDataSet::SafeDownCast(input))
   {
@@ -283,12 +296,12 @@ void vtkTemporalMultiplexing::GetArraysInformation(
       {
         if (this->FieldAssociation == vtkDataObject::POINT)
         {
-          nbArrays = inputCDS->GetNumberOfPoints();
+          nbOfArrays = inputCDS->GetNumberOfPoints();
           attributes = inputObj->GetPointData();
         }
         else
         {
-          nbArrays = inputCDS->GetNumberOfCells();
+          nbOfArrays = inputCDS->GetNumberOfCells();
           attributes = inputObj->GetCellData();
         }
 
@@ -300,12 +313,12 @@ void vtkTemporalMultiplexing::GetArraysInformation(
   {
     if (this->FieldAssociation == vtkDataObject::POINT)
     {
-      nbArrays = inputDS->GetNumberOfPoints();
+      nbOfArrays = inputDS->GetNumberOfPoints();
       attributes = inputDS->GetPointData();
     }
     else
     {
-      nbArrays = inputDS->GetNumberOfCells();
+      nbOfArrays = inputDS->GetNumberOfCells();
       attributes = inputDS->GetCellData();
     }
   }
@@ -317,90 +330,57 @@ void vtkTemporalMultiplexing::GetArraysInformation(
 
 //------------------------------------------------------------------------------
 void vtkTemporalMultiplexing::PrepareVectorsOfArrays(
-  vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbArrays)
+  const vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbOfArrays)
 {
   using SupportedArrays = vtkArrayDispatch::Arrays;
   using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
-  CreateArrayVector worker;
+
+  this->Internals->Workers.clear();
+  this->Internals->Workers.reserve(this->SelectedArrays.size());
+
+  ::WorkerCreator workerCreator;
 
   for (const auto& name : this->SelectedArrays)
   {
-    vtkDataArray* array = vtkDataArray::SafeDownCast(attributes->GetAbstractArray(name.c_str()));
-
+    vtkDataArray* array = attributes->GetArray(name.c_str());
     if (!array)
     {
       continue;
     }
 
-    // AOS arrays must be created for multidimensional arrays
-    std::vector<vtkSmartPointer<vtkDataArray>> arrays;
-    arrays.reserve(nbArrays);
-
-    // Create AOS array with correct type
-    vtkSmartPointer<vtkDataArray> refArray;
-
-    if (!Dispatcher::Execute(array, worker, refArray))
+    std::shared_ptr<::Worker> typeErasedWorker;
+    Dispatcher::Execute(array, workerCreator, typeErasedWorker);
+    if (typeErasedWorker)
     {
-      worker(array, refArray);
+      this->Internals->Workers.emplace_back(typeErasedWorker);
+      typeErasedWorker->InitData(
+        nbOfArrays, this->Internals->NumberOfTimeSteps, array->GetNumberOfComponents(), name);
     }
-
-    for (vtkIdType idx = 0; idx < nbArrays; idx++)
-    {
-      vtkSmartPointer<vtkDataArray> newArray;
-      newArray.TakeReference(refArray->NewInstance());
-      newArray->SetNumberOfComponents(array->GetNumberOfComponents());
-      newArray->SetNumberOfTuples(this->NumberOfTimeSteps);
-      newArray->SetName(name.c_str());
-      arrays.emplace_back(newArray);
-    }
-
-    this->Internals->Arrays[name] = arrays;
   }
 }
 
 //------------------------------------------------------------------------------
 void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSet* inputDS)
 {
-  vtkIdType nbArrays = this->Internals->Arrays.begin()->second.size();
-  vtkDataSetAttributes* attributes = nullptr;
+  vtkDataSetAttributes* attributes = inputDS->GetAttributes(this->FieldAssociation);
 
-  if (this->FieldAssociation == vtkDataObject::POINT)
+  for (auto worker : this->Internals->Workers)
   {
-    attributes = inputDS->GetPointData();
-  }
-  else if (this->FieldAssociation == vtkDataObject::CELL)
-  {
-    attributes = inputDS->GetCellData();
-  }
-
-  for (auto arrayVec : this->Internals->Arrays)
-  {
-    vtkDataArray* array = attributes->GetArray(arrayVec.first.c_str());
-
+    vtkDataArray* array = attributes->GetArray(worker->GetArrayName().c_str());
     if (!array)
     {
       continue;
     }
 
-    vtkIdType nbComp = array->GetNumberOfComponents();
-
-    vtkSMPTools::For(0, nbArrays, [&](vtkIdType begin, vtkIdType end) {
-      for (vtkIdType idx = begin; idx < end; idx++)
-      {
-        for (vtkIdType comp = 0; comp < nbComp; comp++)
-        {
-          arrayVec.second[idx]->SetComponent(
-            this->CurrentTimeIndex, comp, array->GetComponent(idx, comp));
-        }
-      }
-    });
+    ::Worker& workerRef = *worker;
+    workerRef(array, this->Internals->CurrentTimeIndex, 0);
   }
 }
 
 //------------------------------------------------------------------------------
 void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkCompositeDataSet* inputCDS)
 {
-  for (auto arrayVec : this->Internals->Arrays)
+  for (auto worker : this->Internals->Workers)
   {
     vtkIdType offset = 0;
 
@@ -408,37 +388,22 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkCompositeDataSet* 
     for (auto node : vtk::Range(inputCDS))
     {
       vtkDataSet* dataset = vtkDataSet::SafeDownCast(node);
-
       if (!dataset)
       {
         continue;
       }
 
-      vtkDataSetAttributes* attributes = (this->FieldAssociation == vtkDataObject::POINT)
-        ? vtkDataSetAttributes::SafeDownCast(dataset->GetPointData())
-        : vtkDataSetAttributes::SafeDownCast(dataset->GetCellData());
-      vtkDataArray* array = attributes->GetArray(arrayVec.first.c_str());
-
+      vtkDataSetAttributes* attributes = dataset->GetAttributes(this->FieldAssociation);
+      vtkDataArray* array = attributes->GetArray(worker->GetArrayName().c_str());
       if (!array)
       {
+        // To avoid partial arrays on composite
         break;
       }
 
-      vtkIdType nbValues = array->GetNumberOfTuples();
-      vtkIdType nbComp = array->GetNumberOfComponents();
-
-      vtkSMPTools::For(offset, offset + nbValues, [&](vtkIdType begin, vtkIdType end) {
-        for (vtkIdType idx = begin; idx < end; idx++)
-        {
-          for (vtkIdType comp = 0; comp < nbComp; comp++)
-          {
-            arrayVec.second[idx]->SetComponent(
-              this->CurrentTimeIndex, comp, array->GetComponent(idx - offset, comp));
-          }
-        }
-      });
-
-      offset += nbValues;
+      ::Worker& workerRef = *worker;
+      workerRef(array, this->Internals->CurrentTimeIndex, offset);
+      offset += array->GetNumberOfTuples();
     }
   }
 }
@@ -447,37 +412,18 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkCompositeDataSet* 
 void vtkTemporalMultiplexing::CreateMultiDimensionalArrays(vtkTable* output)
 {
   // Create multi dimensional arrays from each vector of arrays
-  using SupportedArrays = vtkArrayDispatch::Arrays;
-  using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
-  ConstructMDArray worker;
-  ConstructVTKIdTypeMDArray idTypeWorker;
-
-  for (const auto& arrayInfo : this->Internals->Arrays)
+  for (const auto& worker : this->Internals->Workers)
   {
-    if (vtkAOSDataArrayTemplate<vtkIdType>::FastDownCast(arrayInfo.second[0]))
-    {
-      if (!Dispatcher::Execute(
-            arrayInfo.second[0], idTypeWorker, arrayInfo.first, arrayInfo.second, output))
-      {
-        idTypeWorker(arrayInfo.second[0].Get(), arrayInfo.first, arrayInfo.second, output);
-      }
-    }
-    else
-    {
-      if (!Dispatcher::Execute(
-            arrayInfo.second[0], worker, arrayInfo.first, arrayInfo.second, output))
-      {
-        worker(arrayInfo.second[0].Get(), arrayInfo.first, arrayInfo.second, output);
-      }
-    }
+    vtkSmartPointer<vtkDataArray> mdArray = worker->ConstructMDArray();
+    output->AddColumn(mdArray);
   }
 }
 
 //--------------------------------------- --------------------------------------
 void vtkTemporalMultiplexing::PrintSelf(std::ostream& os, vtkIndent indent)
 {
-  os << indent << "NumberOfTimeSteps: " << this->NumberOfTimeSteps << endl;
-  os << indent << "CurrentTimeIndex: " << this->CurrentTimeIndex << endl;
-  os << indent << "FieldAssociation: " << this->FieldAssociation << endl;
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfTimeSteps: " << this->Internals->NumberOfTimeSteps << endl;
+  os << indent << "CurrentTimeIndex: " << this->Internals->CurrentTimeIndex << endl;
+  os << indent << "FieldAssociation: " << this->FieldAssociation << endl;
 }

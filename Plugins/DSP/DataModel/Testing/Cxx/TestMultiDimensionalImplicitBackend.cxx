@@ -5,28 +5,32 @@
 #include "vtkMultiDimensionalImplicitBackend.h"
 #include "vtkNew.h"
 
+#include <memory>
+
 namespace
 {
+using DataContainerInt = typename vtkMultiDimensionalImplicitBackend<int>::DataContainerT;
+
 /**
- * Generate a list of "nbOfArrays" vtkIntArrays with "nbOfTuples" tuples and "nbOfComponents"
+ * Generate a list of "nbOfArrays" std::vector<int> with "nbOfTuples" tuples and "nbOfComponents"
  * components. Values are incremented along the 3 dimensions: value at (arrayIdx, tupleIdx,
  * componentIdx) equals to nbOfTuples * arrayIdx + nbOfComponents * tupleIdx + componentIdx.
  */
-std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<int>>> generateIntArrayVector(
-  int nbOfArrays, int nbOfTuples, int nbOfComp)
+DataContainerInt generateIntArrayVector(int nbOfArrays, int nbOfTuples, int nbOfComp)
 {
-  std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<int>>> arrays;
+  DataContainerInt arrays;
+  arrays.reserve(nbOfArrays);
+  const int nbOfValues = nbOfTuples * nbOfComp;
   int value = 0;
   for (int arrayIdx = 0; arrayIdx < nbOfArrays; arrayIdx++)
   {
-    vtkNew<vtkAOSDataArrayTemplate<int>> array;
-    array->SetNumberOfComponents(nbOfComp);
-    array->SetNumberOfTuples(nbOfTuples);
+    std::vector<int> array;
+    array.reserve(nbOfValues);
     for (int tupleIdx = 0; tupleIdx < nbOfTuples; tupleIdx++)
     {
       for (int compIdx = 0; compIdx < nbOfComp; compIdx++)
       {
-        array->SetValue(nbOfComp * tupleIdx + compIdx, value++);
+        array.emplace_back(value++);
       }
     }
     arrays.emplace_back(array);
@@ -43,10 +47,11 @@ int TestMultiDimensionalImplicitBackend(int vtkNotUsed(argc), char* vtkNotUsed(a
   constexpr int nbOfComp = 3;
 
   // Construct vector of vtkIntArrays
-  auto arrays = ::generateIntArrayVector(nbOfArrays, nbOfTuples, nbOfComp);
+  auto arrays = std::make_shared<::DataContainerInt>(
+    ::generateIntArrayVector(nbOfArrays, nbOfTuples, nbOfComp));
 
   // Construct backend
-  vtkMultiDimensionalImplicitBackend<int> backend(arrays);
+  vtkMultiDimensionalImplicitBackend<int> backend(arrays, nbOfTuples, nbOfComp);
 
   // Check backend
   int value = 0;

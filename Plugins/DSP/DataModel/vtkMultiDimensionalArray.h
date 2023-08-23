@@ -113,10 +113,9 @@ public:
     static_assert(std::is_same<OtherValue, ValueType>::value,
       "Cannot copy multidimensional array from another underlying type");
     this->SetName(other->GetName());
-    this->SetNumberOfComponents(other->GetNumberOfComponents());
-    this->SetNumberOfTuples(other->GetNumberOfTuples());
     auto backend = other->GetBackend();
-    this->ConstructBackend(backend->GetArrays());
+    this->ConstructBackend(
+      backend->GetData(), backend->GetNumberOfTuples(), backend->GetNumberOfComponents());
   }
 
 protected:
