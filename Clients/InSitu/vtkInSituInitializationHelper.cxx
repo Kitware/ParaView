@@ -28,6 +28,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSteeringDataGenerator.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <algorithm>
 #include <cctype>
@@ -222,18 +223,49 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
 
   if (path.empty())
   {
-    vtkLogF(WARNING, "Empty path specified.");
+    vtkLogF(WARNING, "Empty filename provided for script.");
     return nullptr;
   }
-
+  std::string tmp = path;
   if (!vtkPSystemTools::FileExists(path.c_str()))
   {
-    vtkLogF(WARNING, "File/path does not exist: '%s'. Skipping", path.c_str());
-    return nullptr;
+    tmp.clear();
+    if (vtksys::SystemTools::HasEnv("PYTHONPATH"))
+    {
+      std::string pythonPath;
+      vtksys::SystemTools::GetEnv("PYTHONPATH", pythonPath);
+      vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+        "Looking in PYTHONPATH '%s' for Catalyst script '%s'.", pythonPath.c_str(), path.c_str());
+#if defined(_WIN32) && !defined(__MINGW32__)
+      char splitChar = ';';
+#else
+      char splitChar = ':';
+#endif
+      std::vector<std::string> paths = vtksys::SystemTools::SplitString(pythonPath, splitChar);
+      for (auto& p : paths)
+      {
+#if defined(_WIN32) && !defined(__MINGW32__)
+        std::string testPath = p + "\\" + path;
+#else
+        std::string testPath = p + "/" + path;
+#endif
+        if (vtkPSystemTools::FileExists(testPath.c_str()))
+        {
+          tmp = testPath;
+          break;
+        }
+      }
+    }
+    if (tmp.empty())
+    {
+      vtkLogF(
+        WARNING, "File/path does not exist and not in PYTHONPATH: '%s'. Skipping.", path.c_str());
+      return nullptr;
+    }
   }
 
   vtkNew<vtkInSituPipelinePython> pipeline;
-  pipeline->SetFileName(path.c_str());
+  pipeline->SetFileName(tmp.c_str());
   vtkInSituInitializationHelper::AddPipeline(pipeline);
   return pipeline;
 }

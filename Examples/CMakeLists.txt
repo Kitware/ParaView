@@ -29,6 +29,7 @@ if (ParaView_BINARY_DIR)
               "-Dplatform=${CMAKE_GENERATOR_PLATFORM}"
               "-Dtoolset=${CMAKE_GENERATOR_TOOLSET}"
               "-Dparaview_binary_dir=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+              "-Dcatalyst_DIR=${catalyst_DIR}"
               "-Dparaview_catalyst_dir=${ParaView_BINARY_DIR}/${paraview_catalyst_directory}"
               -P "${CMAKE_CURRENT_LIST_DIR}/RunExample.cmake")
     set_property(TEST "ParaViewExample-${dir}" APPEND
@@ -98,8 +99,7 @@ add_example(CustomApplications/Spreadsheet)
 add_example(Catalyst
   TEST_TIMEOUT 600)
 
-
-  if (TARGET VTK::IOCatalystConduit)
+if (TARGET VTK::IOCatalystConduit)
   add_example(Catalyst2/CFullExample)
   add_example(Catalyst2/CxxFullExample)
   add_example(Catalyst2/CxxImageDataExample)
