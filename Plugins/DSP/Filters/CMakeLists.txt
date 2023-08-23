@@ -13,8 +13,9 @@ set(MODULE_HEADERS
 
 vtk_module_add_module(DigitalSignalProcessing::DSPFiltersPlugin
   FORCE_STATIC  # build static library, to avoid confusion when loading
-  CLASSES       ${MODULE_CLASSES}
-  HEADERS       ${MODULE_HEADERS}
+  CLASSES         ${MODULE_CLASSES}
+  PRIVATE_CLASSES ${MODULE_PRIVATE_CLASSES}
+  HEADERS         ${MODULE_HEADERS}
 )
 
 paraview_add_server_manager_xmls(

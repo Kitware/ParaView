@@ -22,4 +22,12 @@ vtk_add_test_cxx(vtkDigitalSignalProcessingDSPDataModelCxxTests tests
   TestTemporalDataToMultiDimensionalArray.cxx
 )
 
+if (BUILD_SHARED_LIBS)
+  vtk_add_test_cxx(vtkDigitalSignalProcessingDSPDataModelCxxTests tests
+    NO_OUTPUT NO_VALID
+    TestDSPIterator.cxx
+    TestDSPIteratorIntegration.cxx
+  )
+endif()
+
 vtk_test_cxx_executable(vtkDigitalSignalProcessingDSPDataModelCxxTests tests)
