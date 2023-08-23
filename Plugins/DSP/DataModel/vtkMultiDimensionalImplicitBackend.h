@@ -30,10 +30,12 @@ public:
   /**
    * Constructor for vtkMultiDimensionalImplicitBackend.
    * It takes a std::shared_ptr of a list of std::vector<ValueType> as parameter.
-   * Each array should have the same number of tuples and components.
+   * Each array should have the same number of values, so be equal to
+   * nbOfTuples * nbOfComponents. They need to be passed as the arrays are
+   * already flatten.
    */
   vtkMultiDimensionalImplicitBackend(
-    std::shared_ptr<DataContainerT>& arrays, vtkIdType nbOfTuples, int nbOfComponents)
+    std::shared_ptr<DataContainerT> arrays, vtkIdType nbOfTuples, int nbOfComponents)
   {
     if (arrays->empty())
     {
@@ -108,7 +110,7 @@ public:
    * Get the shared_ptr of the data.
    * This allows multiple backend to share the same data without copy.
    */
-  std::shared_ptr<DataContainerT>& GetData() { return this->Arrays; }
+  std::shared_ptr<DataContainerT> GetData() { return this->Arrays; }
 
 private:
   std::shared_ptr<DataContainerT> Arrays;

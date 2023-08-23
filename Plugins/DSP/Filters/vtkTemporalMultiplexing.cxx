@@ -41,26 +41,33 @@ public:
   virtual void InitData(vtkIdType nbOfArrays, vtkIdType nbOfTuples, int nbOfComponents,
     const std::string& arrayName) = 0;
   virtual vtkSmartPointer<vtkDataArray> ConstructMDArray() = 0;
-  virtual std::string GetArrayName() const = 0;
+
+  std::string ArrayName;
 };
 
 template <typename ValueType>
 class TypedWorker : public Worker
 {
 public:
+  /**
+   * Set the data for current time index in each array (ie. for each point/cell).
+   * Note that the array offset is only useful in the context of composite data
+   * sets where the hidden dimension (nb of points/cells) is fragmented in the
+   * input and we have to do a multi-pass here.
+   */
   void operator()(vtkDataArray* input, vtkIdType currentTimeIndex, vtkIdType arrayOffset) override
   {
     auto typedInput = vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(input);
-    vtkIdType nbOfArrays = input->GetNumberOfTuples();
+    vtkIdType nbOfArrays = typedInput->GetNumberOfTuples();
 
-    vtkSMPTools::For(arrayOffset, arrayOffset + nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
+    vtkSMPTools::For(0, nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
       const vtkIdType valueIdx = currentTimeIndex * this->NbOfComponents;
       for (vtkIdType arrayIdx = begin; arrayIdx < end; ++arrayIdx)
       {
         for (int comp = 0; comp < this->NbOfComponents; ++comp)
         {
-          (*this->Data)[arrayIdx][valueIdx + comp] =
-            input->GetComponent(arrayIdx - arrayOffset, comp);
+          (*this->Data)[arrayIdx + arrayOffset][valueIdx + comp] =
+            typedInput->GetComponent(arrayIdx, comp);
         }
       }
     });
@@ -94,19 +101,22 @@ public:
     return mdArray;
   }
 
-  std::string GetArrayName() const override { return this->ArrayName; }
-
 private:
   std::shared_ptr<WorkerDataContainerT<ValueType>> Data;
   vtkIdType NbOfTuples = 0;
   int NbOfComponents = 0;
-  std::string ArrayName;
 };
 
+/**
+ * Worker dedicated to construct the correct type of workers. Instead
+ * of dispatching every time step, this pattern enables us to dispatch
+ * only once in the beginning of the procedure and then use some
+ * polymorphism to "store" the types in the typed workers.
+ */
 struct WorkerCreator
 {
   template <typename ArrayT>
-  void operator()(ArrayT* array, std::shared_ptr<Worker>& worker)
+  void operator()(ArrayT* vtkNotUsed(array), std::shared_ptr<Worker>& worker)
   {
     worker = std::make_shared<TypedWorker<vtk::GetAPIType<ArrayT>>>();
   }
@@ -366,7 +376,7 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkDataSet* inputDS)
 
   for (auto worker : this->Internals->Workers)
   {
-    vtkDataArray* array = attributes->GetArray(worker->GetArrayName().c_str());
+    vtkDataArray* array = attributes->GetArray(worker->ArrayName.c_str());
     if (!array)
     {
       continue;
@@ -394,7 +404,7 @@ void vtkTemporalMultiplexing::FillArraysForCurrentTimestep(vtkCompositeDataSet* 
       }
 
       vtkDataSetAttributes* attributes = dataset->GetAttributes(this->FieldAssociation);
-      vtkDataArray* array = attributes->GetArray(worker->GetArrayName().c_str());
+      vtkDataArray* array = attributes->GetArray(worker->ArrayName.c_str());
       if (!array)
       {
         // To avoid partial arrays on composite
@@ -423,7 +433,9 @@ void vtkTemporalMultiplexing::CreateMultiDimensionalArrays(vtkTable* output)
 void vtkTemporalMultiplexing::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "NumberOfTimeSteps: " << this->Internals->NumberOfTimeSteps << endl;
-  os << indent << "CurrentTimeIndex: " << this->Internals->CurrentTimeIndex << endl;
-  os << indent << "FieldAssociation: " << this->FieldAssociation << endl;
+  os << indent << "FieldAssociation: " << this->FieldAssociation << std::endl;
+  os << indent << "Selected Arrays:" << std::endl;
+  vtkIndent nextIndent = indent.GetNextIndent();
+  std::for_each(this->SelectedArrays.cbegin(), this->SelectedArrays.cend(),
+    [&](const std::string& arrayName) { os << nextIndent << arrayName << std::endl; });
 }

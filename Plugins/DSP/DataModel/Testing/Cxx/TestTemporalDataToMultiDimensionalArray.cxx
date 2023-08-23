@@ -97,14 +97,10 @@ int TestTemporalDataToMultiDimensionalArray(int argc, char* argv[])
 
   // Now that we have all information needed, prepare the array vector for multi-dimensional
   // implicit array.
-  ::DataContainerDouble arrays;
-  arrays.reserve(nbOfPoints);
+  ::DataContainerDouble arrays(nbOfPoints);
   const int nbOfValues = nbOfTimesteps * nbOfComponents;
-  for (int ptId = 0; ptId < nbOfPoints; ptId++)
-  {
-    std::vector<double> array(nbOfValues);
-    arrays.emplace_back(array);
-  }
+  std::for_each(arrays.begin(), arrays.end(),
+    [nbOfValues](std::vector<double>& array) { array.resize(nbOfValues); });
 
   // Iterate over timesteps to fill arrays in the vector. At each timestep, we should have the same
   // composite structure and the same number of points in the temporal dataset.

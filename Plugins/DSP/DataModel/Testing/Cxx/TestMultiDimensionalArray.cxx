@@ -10,34 +10,26 @@
 #include "vtkNew.h"
 
 #include <memory>
+#include <numeric>
 
 namespace
 {
 using DataContainerInt = typename vtkMultiDimensionalImplicitBackend<int>::DataContainerT;
 
 /**
- * Generate a list of "nbOfArrays" std::vector<int> with "nbOfTuples" tuples and "nbOfComponents"
- * components. Values are incremented along the 3 dimensions: value at (arrayIdx, tupleIdx,
- * componentIdx) equals to nbOfTuples * arrayIdx + nbOfComponents * tupleIdx + componentIdx.
+ * Generate a list of "nbOfArrays" std::vector<int>. Values are incremented along the
+ * 3 dimensions: value at (arrayIdx, valueIdx) equals to
+ * nbOfTuples * nbOfComp * arrayIdx + valueIdx.
  */
 DataContainerInt generateIntArrayVector(int nbOfArrays, int nbOfTuples, int nbOfComp)
 {
-  DataContainerInt arrays;
-  arrays.reserve(nbOfArrays);
+  DataContainerInt arrays(nbOfArrays);
   const int nbOfValues = nbOfTuples * nbOfComp;
-  int value = 0;
-  for (int arrayIdx = 0; arrayIdx < nbOfArrays; arrayIdx++)
+  for (int arrayIdx = 0; arrayIdx < nbOfArrays; ++arrayIdx)
   {
-    std::vector<int> array;
-    array.reserve(nbOfValues);
-    for (int tupleIdx = 0; tupleIdx < nbOfTuples; tupleIdx++)
-    {
-      for (int compIdx = 0; compIdx < nbOfComp; compIdx++)
-      {
-        array.emplace_back(value++);
-      }
-    }
-    arrays.emplace_back(array);
+    std::vector<int>& array = arrays[arrayIdx];
+    array.resize(nbOfValues);
+    std::iota(array.begin(), array.end(), arrayIdx * nbOfValues);
   }
   return arrays;
 }
@@ -50,13 +42,11 @@ int TestMultiDimensionalArray(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
   constexpr vtkIdType nbOfTuples = 3;
   constexpr int nbOfComp = 3;
 
-  // Construct vector of vtkIntArrays
-  auto arrays = std::make_shared<::DataContainerInt>(
-    ::generateIntArrayVector(nbOfArrays, nbOfTuples, nbOfComp));
-
   // Construct multi-dimensional array
   vtkNew<vtkMultiDimensionalArray<int>> mdArray;
-  mdArray->ConstructBackend(arrays, nbOfTuples, nbOfComp);
+  mdArray->ConstructBackend(std::make_shared<::DataContainerInt>(
+                              ::generateIntArrayVector(nbOfArrays, nbOfTuples, nbOfComp)),
+    nbOfTuples, nbOfComp);
 
   // Check array sizes
   if (!vtkDSPDataModelTestingUtilities::testValue(
