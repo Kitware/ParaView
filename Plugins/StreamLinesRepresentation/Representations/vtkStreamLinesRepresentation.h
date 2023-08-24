@@ -165,7 +165,7 @@ protected:
   virtual vtkPVLODActor* GetRenderedProp() { return this->Actor; };
 
   vtkSmartPointer<vtkDataObject> Cache;
-  vtkAlgorithm* MBMerger;
+  vtkAlgorithm* MergeBlocks;
   vtkStreamLinesMapper* StreamLinesMapper;
   vtkProperty* Property;
   vtkPVLODActor* Actor;
