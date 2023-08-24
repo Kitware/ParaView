@@ -802,8 +802,56 @@
       <Hints>
         <View type="SpreadSheetView" port="0" />
       </Hints>
+    </SourceProxy>
 
+    <SourceProxy class="vtkMultiDimensionBrowser"
+                 label="Multi Dimension Browser"
+                 name="MultiDimensionBrowser">
+      <Documentation long_help="Select index (dimension) for multidimensionnal array."
+        short_help="Browse multidimensionnal array dimension">
+        Select a dimension to use for all multidimensionnal arrays.
+        This shallow copies the arrays to avoid side effects on upstream pipeline.
+      </Documentation>
 
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array" >
+        </InputArrayDomain>
+      </InputProperty>
+
+      <IntVectorProperty command="GetIndexRange"
+                         name="IndexRangeInfo"
+                         information_only="1"
+                         number_of_elements="2"
+                         panel_visibility="never"
+                         default_values="0 1">
+        <Documentation>
+          Range to use for Index property.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetIndex"
+                         name="Index"
+                         label="Index"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain default_mode="min" min="0" max="1" name="range">
+          <RequiredProperties>
+            <Property name="IndexRangeInfo" function="RangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>
+          Index to use for hidden dimension of multidimensionnal array.
+        </Documentation>
+      </IntVectorProperty>
     </SourceProxy>
   </ProxyGroup>
 
@@ -818,6 +866,7 @@
       <Proxy group="filters" name="EqualizerFilter"/>
       <Proxy group="filters" name="BandFiltering"/>
       <Proxy group="filters" name="TemporalMultiplexing" />
+      <Proxy group="filters" name="MultiDimensionBrowser" />
     </Category>
   </ParaViewFilters>
 </ServerManagerConfiguration>

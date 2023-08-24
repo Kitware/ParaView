@@ -1,6 +1,7 @@
 set(MODULE_CLASSES
   vtkMeanPowerSpectralDensity
   vtkMergeReduceTableBlocks
+  vtkMultiDimensionBrowser
   vtkProjectSpectrumMagnitude
   vtkSoundQuantitiesCalculator
   vtkSpectrogramFilter

@@ -110,6 +110,11 @@ public:
     return this->CurrentArray->GetTypedComponent(tupleIdx, compIdx);
   }
 
+  std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> GetArrays()
+  {
+    return this->Arrays;
+  }
+
 private:
   std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> Arrays;
   vtkAOSDataArrayTemplate<ValueType>* CurrentArray = nullptr;
