@@ -80,7 +80,7 @@ private:
    * timesteps.
    */
   void PrepareVectorsOfArrays(
-    vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbArrays);
+    const vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbArrays);
 
   ///@{
   /**
@@ -99,10 +99,8 @@ private:
 
   struct vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
-  int NumberOfTimeSteps = 0;
-  int CurrentTimeIndex = 0;
-  int FieldAssociation = 0;
   std::set<std::string> SelectedArrays;
+  int FieldAssociation = 0;
 };
 
 #endif // vtkTemporalMultiplexing_h

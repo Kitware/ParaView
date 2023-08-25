@@ -5,31 +5,28 @@
 #include "vtkMultiDimensionalImplicitBackend.h"
 #include "vtkNew.h"
 
+#include <memory>
+#include <numeric>
+
 namespace
 {
+using DataContainerInt = typename vtkMultiDimensionalImplicitBackend<int>::DataContainerT;
+
 /**
- * Generate a list of "nbOfArrays" vtkIntArrays with "nbOfTuples" tuples and "nbOfComponents"
- * components. Values are incremented along the 3 dimensions: value at (arrayIdx, tupleIdx,
- * componentIdx) equals to nbOfTuples * arrayIdx + nbOfComponents * tupleIdx + componentIdx.
+ * Generate a list of "nbOfArrays" std::vector<int>. Values are incremented along the
+ * 3 dimensions: value at (arrayIdx, valueIdx) equals to
+ * nbOfTuples * nbOfComp * arrayIdx + valueIdx.
  */
-std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<int>>> generateIntArrayVector(
-  int nbOfArrays, int nbOfTuples, int nbOfComp)
+DataContainerInt generateIntArrayVector(int nbOfArrays, int nbOfTuples, int nbOfComp)
 {
-  std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<int>>> arrays;
+  DataContainerInt arrays(nbOfArrays);
+  const int nbOfValues = nbOfTuples * nbOfComp;
   int value = 0;
-  for (int arrayIdx = 0; arrayIdx < nbOfArrays; arrayIdx++)
+  for (int arrayIdx = 0; arrayIdx < nbOfArrays; ++arrayIdx)
   {
-    vtkNew<vtkAOSDataArrayTemplate<int>> array;
-    array->SetNumberOfComponents(nbOfComp);
-    array->SetNumberOfTuples(nbOfTuples);
-    for (int tupleIdx = 0; tupleIdx < nbOfTuples; tupleIdx++)
-    {
-      for (int compIdx = 0; compIdx < nbOfComp; compIdx++)
-      {
-        array->SetValue(nbOfComp * tupleIdx + compIdx, value++);
-      }
-    }
-    arrays.emplace_back(array);
+    std::vector<int>& array = arrays[arrayIdx];
+    array.resize(nbOfValues);
+    std::iota(array.begin(), array.end(), arrayIdx * nbOfValues);
   }
   return arrays;
 }
@@ -42,11 +39,11 @@ int TestMultiDimensionalImplicitBackend(int vtkNotUsed(argc), char* vtkNotUsed(a
   constexpr vtkIdType nbOfTuples = 3;
   constexpr int nbOfComp = 3;
 
-  // Construct vector of vtkIntArrays
-  auto arrays = ::generateIntArrayVector(nbOfArrays, nbOfTuples, nbOfComp);
-
   // Construct backend
-  vtkMultiDimensionalImplicitBackend<int> backend(arrays);
+  vtkMultiDimensionalImplicitBackend<int> backend(
+    std::make_shared<::DataContainerInt>(
+      ::generateIntArrayVector(nbOfArrays, nbOfTuples, nbOfComp)),
+    nbOfTuples, nbOfComp);
 
   // Check backend
   int value = 0;

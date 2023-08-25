@@ -7,8 +7,8 @@
 #include "vtkAOSDataArrayTemplate.h"
 #include "vtkSmartPointer.h" // For vtkSmartPointer
 
-#include <algorithm> // For std::swap
-#include <vector>    // For std::vector
+#include <memory> // For std::shared_ptr
+#include <vector> // For std::vector
 
 /**
  * @class vtkMultiDimensionalImplicitBackend
@@ -25,54 +25,45 @@ template <typename ValueType>
 class vtkMultiDimensionalImplicitBackend final
 {
 public:
+  using DataContainerT = std::vector<std::vector<ValueType>>;
+
   /**
    * Constructor for vtkMultiDimensionalImplicitBackend.
-   * It takes a list of vtkAOSDataArrayTemplate<ValueType> as parameter.
-   * Each array should have the same number of tuples and components.
-   * @warning The input vector of arrays will not be preserved upon construction.
+   * It takes a std::shared_ptr of a list of std::vector<ValueType> as parameter.
+   * Each array should have the same number of values, so be equal to
+   * nbOfTuples * nbOfComponents. They need to be passed as the arrays are
+   * already flatten.
    */
   vtkMultiDimensionalImplicitBackend(
-    std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> arrays)
+    std::shared_ptr<DataContainerT> arrays, vtkIdType nbOfTuples, int nbOfComponents)
   {
-    if (arrays.empty())
+    if (arrays->empty())
     {
       return;
     }
 
-    int nbOfComp = arrays[0]->GetNumberOfComponents();
-    vtkIdType nbOfTuples = arrays[0]->GetNumberOfTuples();
-
-    for (auto array : arrays)
+    const std::size_t nbOfValues = static_cast<std::size_t>(nbOfTuples * nbOfComponents);
+    for (auto array : *arrays)
     {
-      if (!array)
+      if (array.size() != nbOfValues)
       {
-        vtkErrorWithObjectMacro(nullptr, "One of the arrays passed to the constructor is nullptr");
-        return;
-      }
-      if (array->GetNumberOfComponents() != nbOfComp)
-      {
-        vtkErrorWithObjectMacro(nullptr, "Number of components of all the arrays are not equal");
-        return;
-      }
-      if (array->GetNumberOfTuples() != nbOfTuples)
-      {
-        vtkErrorWithObjectMacro(nullptr, "Number of tuples of all the arrays are not equal");
+        vtkErrorWithObjectMacro(nullptr, "Number of values of all the arrays are not equal");
         return;
       }
     }
 
-    std::swap(this->Arrays, arrays);
-
-    this->CurrentArray = this->Arrays[0];
-    this->NumberOfComponents = nbOfComp;
+    this->Arrays = arrays;
+    this->CurrentArray = &(*this->Arrays)[0];
+    this->NumberOfComponents = nbOfComponents;
     this->NumberOfTuples = nbOfTuples;
-    this->NumberOfArrays = this->Arrays.size();
+    this->NumberOfArrays = static_cast<vtkIdType>(this->Arrays->size());
   }
 
   /**
    * Set the index to fix the "first" dimension of the 3D array.
+   * @warning No index checking is performed.
    */
-  void SetIndex(vtkIdType idx) { this->CurrentArray = this->Arrays[idx]; }
+  void SetIndex(vtkIdType idx) { this->CurrentArray = &(*this->Arrays)[idx]; }
 
   /**
    * Get the number of components of stored arrays (equal for all arrays).
@@ -91,34 +82,40 @@ public:
 
   /**
    * The main call method for the backend.
+   * @warning No index checking is performed.
    */
-  ValueType operator()(int idx) const { return this->CurrentArray->GetValue(idx); }
+  ValueType operator()(vtkIdType idx) const { return (*this->CurrentArray)[idx]; }
 
   /**
    * Used to implement GetTypedTuple on vtkMultiDimensionalArray.
    */
-  void mapTuple(int tupleidx, ValueType* tuple) const
+  void mapTuple(vtkIdType tupleIdx, ValueType* tuple) const
   {
-    return this->CurrentArray->GetTypedTuple(tupleidx, tuple);
+    const vtkIdType valueIdx = tupleIdx * this->NumberOfComponents;
+    std::copy(this->CurrentArray->cbegin() + valueIdx,
+      this->CurrentArray->cbegin() + valueIdx + this->NumberOfComponents, tuple);
   }
 
   /**
    * Used to implement GetTypedComponent on vtkMultiDimensionalArray.
+   * @warning No index checking is performed.
    */
   ValueType mapComponent(vtkIdType tupleIdx, int compIdx) const
   {
-    return this->CurrentArray->GetTypedComponent(tupleIdx, compIdx);
+    const vtkIdType idx = tupleIdx * this->NumberOfComponents + compIdx;
+    return (*this->CurrentArray)[idx];
   }
 
-  std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> GetArrays()
-  {
-    return this->Arrays;
-  }
+  /**
+   * Get the shared_ptr of the data.
+   * This allows multiple backend to share the same data without copy.
+   */
+  std::shared_ptr<DataContainerT> GetData() { return this->Arrays; }
 
 private:
-  std::vector<vtkSmartPointer<vtkAOSDataArrayTemplate<ValueType>>> Arrays;
-  vtkAOSDataArrayTemplate<ValueType>* CurrentArray = nullptr;
-  int NumberOfComponents = 1;
+  std::shared_ptr<DataContainerT> Arrays;
+  std::vector<ValueType>* CurrentArray = nullptr;
+  int NumberOfComponents = 0;
   vtkIdType NumberOfTuples = 0;
   vtkIdType NumberOfArrays = 0;
 };
