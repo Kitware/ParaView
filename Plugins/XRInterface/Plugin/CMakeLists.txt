@@ -139,11 +139,6 @@ if (openxr_support)
     pv_openxr_binding_knuckles.json
     pv_openxr_binding_vive_controller.json
     pv_openxr_binding_oculus_touch_controller.json
-  )
-endif()
-
-if (openxrremoting_support)
-  list(APPEND xr_input_files
     pv_openxr_binding_microsoft_hand_interaction.json
   )
 endif()
