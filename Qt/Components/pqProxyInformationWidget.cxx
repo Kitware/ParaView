@@ -480,7 +480,37 @@ public:
     auto& ui = this->Ui;
     ui.dataType->setEnabled(dinfo && !dinfo->IsNull());
     ui.labelDataType->setEnabled(dinfo && !dinfo->IsNull());
-    ui.dataType->setText(dinfo ? dinfo->GetPrettyDataTypeString() : QString("(%1)").arg(tr("n/a")));
+
+    if (!dinfo)
+    {
+      ui.dataType->setText(QString("(%1)").arg(tr("n/a")));
+    }
+    else
+    {
+      if (dinfo->GetCompositeDataSetType() != -1)
+      {
+        std::vector<int> uniqueTypes = dinfo->GetUniqueBlockTypes();
+        std::string dataTypeText = dinfo->GetPrettyDataTypeString();
+        dataTypeText += " (";
+
+        if (uniqueTypes.size() >= 2)
+        {
+          dataTypeText += "Mixed Data Types";
+        }
+        else
+        {
+          dataTypeText += dinfo->GetPrettyDataTypeString(dinfo->GetDataSetType());
+        }
+
+        dataTypeText += ")";
+        ui.dataType->setText(dataTypeText.c_str());
+      }
+      else
+      {
+        ui.dataType->setText(dinfo->GetPrettyDataTypeString());
+      }
+    }
+
     ui.labelDataStatistics->setText((dinfo && dinfo->GetNumberOfDataSets() > 1)
         ? tr("Data Statistics (# of datasets: %1)").arg(l.toString(dinfo->GetNumberOfDataSets()))
         : tr("Data Statistics"));
