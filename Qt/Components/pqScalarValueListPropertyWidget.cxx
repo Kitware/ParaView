@@ -491,7 +491,7 @@ void pqScalarValueListPropertyWidget::addRange()
       if (!this->getRange(rangeMin, rangeMax))
       {
         rangeMin = 0.0;
-        rangeMax = 10.0;
+        rangeMax = 9.0;
       }
 
       if (!this->Internals->GeneratorDialog)
