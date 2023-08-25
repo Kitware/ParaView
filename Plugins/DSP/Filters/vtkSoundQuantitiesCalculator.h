@@ -7,14 +7,12 @@
  * from a sound pressure (Pa) array. Could be improved by adding more conversions.
  *
  * This filter has 2 inputs:
- * - port 0 is the input geometry for cell connectivity.
- * - port 1 is a multi-block dataset representing the data through time. Block flat index
- *   corresponds to the index of the point in the input mesh. This kind of dataset
- *   can be obtained e.g. by applying the filter Plot Data Over Time (vtkExtractDataArraysOverTime)
- *   with the option "Only Report Selection Statistics" turned off.
+ * - port 0 is a multiblock dataset or multidimensional table representing the data through time.
+ * - port 1 is the input geometry for cell connectivity.
  *
  * The output is the input geometry with the computed sound quantities attached to
  * it i.e. the mean pressure, the RMS pressure and the acoustic power.
+ * Input geometry arrays are copied except for the pressure array.
  */
 
 #ifndef vtkSoundQuantitiesCalculator_h
@@ -23,8 +21,6 @@
 #include "vtkDSPFiltersPluginModule.h"
 #include "vtkDataSetAlgorithm.h"
 
-class vtkMultiBlockDataSet;
-
 class VTKDSPFILTERSPLUGIN_EXPORT vtkSoundQuantitiesCalculator : public vtkDataSetAlgorithm
 {
 public:
@@ -32,23 +28,16 @@ public:
   vtkTypeMacro(vtkSoundQuantitiesCalculator, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  ///@{
   /**
-   * Specify the source object containing the temporal data for each point.
-   * The source is a vtkMultiBlockDataSet where each block is a vtkTable
-   * holding temporal data for one point.
+   * Set the source object corresponding to the destination mesh.
    * Note that this method does not connect the pipeline. The algorithm will
    * work on the input data as it is without updating the producer of the data.
    * See SetSourceConnection for connecting the pipeline.
    */
-  void SetSourceData(vtkMultiBlockDataSet* source);
-  vtkMultiBlockDataSet* GetSource();
-  ///@}
+  void SetSourceData(vtkDataSet* source);
 
   /**
-   * Specify the source object containing the temporal data for each point.
-   * The source is a vtkMultiBlockDataSet where each block is a vtkTable
-   * holding temporal data for one point.
+   * Set the source object corresponding to the destination mesh.
    * This method connects to the pipeline.
    */
   void SetSourceConnection(vtkAlgorithmOutput* algOutput);
@@ -114,6 +103,8 @@ protected:
   ~vtkSoundQuantitiesCalculator() override = default;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
@@ -131,7 +122,7 @@ private:
    * The input is internally triangulated to be able to compute the
    * acoustic power (if needed).
    */
-  int ProcessData(vtkDataSet* inputMesh, vtkMultiBlockDataSet* inputTables, vtkDataSet* output);
+  int ProcessData(vtkDataSet* inputMesh, vtkDataObject* inputTables, vtkDataSet* output);
 
   vtkSoundQuantitiesCalculator(const vtkSoundQuantitiesCalculator&) = delete;
   void operator=(const vtkSoundQuantitiesCalculator&) = delete;
