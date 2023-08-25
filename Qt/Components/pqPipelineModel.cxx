@@ -11,6 +11,7 @@
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPlotMatrixView.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerManagerModel.h"
@@ -67,6 +68,7 @@ static const QString HISTOGRAMCHART = pqXYHistogramChartView::XYHistogramChartVi
 static const QString LINECHART = pqXYChartView::XYChartViewType();
 static const QString PLOTMATRIX = pqPlotMatrixView::viewType();
 static const QString TABLE = pqSpreadSheetView::spreadsheetViewType();
+static const QString RENDER_VIEW = pqRenderView::renderViewType();
 static const QString INDETERMINATE = "INDETERMINATE";
 static const QString NONE = "None";
 static const QString EYEBALL = "EYEBALL";
@@ -461,6 +463,7 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqSecureServer16.png");
   this->PixmapMap[PipelineModelIconType::LINK].load(":/pqWidgets/Icons/pqLinkBack16.png");
   this->PixmapMap[PipelineModelIconType::GEOMETRY].load(":/pqWidgets/Icons/pq3DView16.png");
+  this->PixmapMap[PipelineModelIconType::RENDER_VIEW].load(":/pqWidgets/Icons/pq3DView16.png");
   this->PixmapMap[PipelineModelIconType::BARCHART].load(":/pqWidgets/Icons/pqHistogram16.png");
   this->PixmapMap[PipelineModelIconType::BOXCHART].load(":/pqWidgets/Icons/pqBoxChart16.png");
   this->PixmapMap[PipelineModelIconType::HISTOGRAMCHART].load(
