@@ -404,7 +404,8 @@
                  label="Project Spectrum Magnitude">
       <Documentation short_help="Project spectrum magnitude on mesh.">
         This filter computes the magnitudes of complex data values from a multi block
-        of tables (input) and places them on the points of a given mesh (source) for
+        of tables or multidimensional table (input) and
+        places them on the points of a given mesh (source) for
         a specified frequency range.
       </Documentation>
 
@@ -417,6 +418,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
         <InputArrayDomain name="row_arrays1"
                           attribute_type="row"
@@ -426,7 +428,7 @@
                           attribute_type="row"
                           optional="1" />
         <Documentation>
-          Multiblock dataset containing the temporal data. Each block corresponds to one point.
+          Multiblock dataset or multidimensional table containing the temporal data. Each block/table corresponds to one point.
         </Documentation>
       </InputProperty>
 
@@ -635,6 +637,10 @@
           Upper bound of the frequency range.
         </Documentation>
       </DoubleVectorProperty>
+
+      <Hints>
+        <View type="RenderView" port="0" />
+      </Hints>
 
     </SourceProxy>
     <!-- ================================================================== -->

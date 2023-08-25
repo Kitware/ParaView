@@ -4,7 +4,7 @@
 #include "vtkProjectSpectrumMagnitude.h"
 
 #include "vtkCommand.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkDSPIterator.h"
 #include "vtkDataArray.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDataSet.h"
@@ -53,6 +53,7 @@ int vtkProjectSpectrumMagnitude::FillInputPortInformation(int port, vtkInformati
   if (port == 0)
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
     return 1;
   }
   else if (port == 1)
@@ -105,31 +106,32 @@ int vtkProjectSpectrumMagnitude::RequestInformation(vtkInformation* vtkNotUsed(r
 int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkMultiBlockDataSet* tables = vtkMultiBlockDataSet::GetData(inputVector[0]);
-  if (!tables)
+  auto dspIterator = vtkDSPIterator::GetInstance(vtkDataObject::GetData(inputVector[0]));
+  if (!dspIterator)
   {
-    vtkErrorMacro("Missing valid input");
+    vtkErrorMacro("Unable to generate iterator!");
     return 0;
   }
 
-  vtkDataSet* input = vtkDataSet::GetData(inputVector[1]);
-  vtkDataSet* output = vtkDataSet::GetData(outputVector);
-
-  const vtkIdType nbBlocks = tables->GetNumberOfBlocks();
-  if (nbBlocks == 0)
+  dspIterator->GoToFirstItem();
+  if (dspIterator->IsDoneWithTraversal())
   {
+    // Silent return with empty input
     return 1;
   }
 
-  if (input->GetNumberOfPoints() != nbBlocks)
+  vtkDataSet* input = vtkDataSet::GetData(inputVector[1]);
+  if (input->GetNumberOfPoints() == 0)
   {
-    vtkErrorMacro("Number of mesh points does not match number of table blocks!");
-    return 0;
+    // Silent return with empty input
+    return 1;
   }
+
+  vtkDataSet* output = vtkDataSet::GetData(outputVector);
 
   // Retrieve table information in order to
   // find row indices for the requested frequency range
-  vtkTable* firstTable = vtkTable::SafeDownCast(tables->GetBlock(0));
+  vtkTable* firstTable = dspIterator->GetCurrentTable();
   if (firstTable == nullptr)
   {
     vtkErrorMacro("Invalid block type");
@@ -167,7 +169,7 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
     return std::array<vtkIdType, 2>{ begin, end };
   }();
 
-  // Configure the output
+  // Copy the structure and arrays of the input
   output->CopyStructure(input);
   output->CopyAttributes(input);
 
@@ -191,7 +193,7 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
     }
     auto outArray = vtk::TakeSmartPointer(modelArray->NewInstance());
     outArray->SetNumberOfComponents(modelArray->GetNumberOfComponents());
-    outArray->SetNumberOfTuples(nbBlocks);
+    outArray->SetNumberOfTuples(input->GetNumberOfPoints());
     outArray->SetName((colName).c_str());
     outArray->Fill(0.0);
     auto outRange = vtk::DataArrayTupleRange(outArray);
@@ -199,15 +201,14 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
     const double componentFactor = 1.0 / firstTable->GetNumberOfRows();
 
     // Fill output array
-    auto iter = vtk::TakeSmartPointer(tables->NewIterator());
-    iter->SkipEmptyNodesOn();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), outIterator++)
+    for (dspIterator->GoToFirstItem();
+         !dspIterator->IsDoneWithTraversal() && outIterator != outRange.end();
+         dspIterator->GoToNextItem(), outIterator++)
     {
-      vtkTable* table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
-      if (table == nullptr)
+      vtkTable* table = dspIterator->GetCurrentTable();
+      if (!table)
       {
-        vtkErrorMacro("Invalid block type");
-        return 0;
+        continue;
       }
       vtkDataArray* inArray = vtkDataArray::SafeDownCast(table->GetColumnByName(colName.c_str()));
       if (!inArray)
@@ -228,6 +229,12 @@ int vtkProjectSpectrumMagnitude::RequestData(vtkInformation* vtkNotUsed(request)
           outComponent++;
         }
       }
+    }
+
+    if (!dspIterator->IsDoneWithTraversal() || outIterator != outRange.end())
+    {
+      vtkWarningMacro("Iteration over the two inputs has not completed because of a dimensional "
+                      "issue, result may be incorrect");
     }
 
     output->GetPointData()->AddArray(outArray);
