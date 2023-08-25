@@ -1429,6 +1429,58 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkSpatioTemporalHarmonicsAttribute"
+                 name="GenerateSpatioTemporalHarmonics">
+      <Documentation short_help="Add a spatio-temporal harmonics array.">
+                     The Spatio Temporal Harmonics Attribute filter adds an
+                     array for point data. The values are computed for each
+                     point with the harmonics defined in the filter. Harmonics
+                     are defined by their amplitude, temporal frequency, wave
+                     vector, and phase.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty name="Harmonics"
+                            command="AddHarmonic"
+                            clean_command="ClearHarmonics"
+                            default_values="1.0 1.0 0.6283 0.6283 0.6283 0.0 3.0 1.0 0.6283 0.0 0.0 1.5708 2.0 2.0 0.0 0.6283 0.0 3.1416 1.0 3.0 0.0 0.0 0.6283 4.7124"
+                            number_of_elements="24"
+                            number_of_elements_per_command="6"
+                            repeat_command="1">
+        <Documentation>
+          This property defines the harmonics that will be computed
+          and summed on each point.
+          Default values are only example values, that would make sense
+          for a dataset of geometrical bounds [-10,10,-10,10,-10,10] and
+          time values ranging from [0;2*Pi[.
+        </Documentation>
+        <Hints>
+          <AllowRestoreDefaults />
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Amplitude"/>
+            <ComponentLabel component="1" label="Temporal Frequency"/>
+            <ComponentLabel component="2" label="X Wave Vector"/>
+            <ComponentLabel component="3" label="Y Wave Vector"/>
+            <ComponentLabel component="4" label="Z Wave Vector"/>
+            <ComponentLabel component="5" label="Phase"/>
+          </ShowComponentLabels>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Harmonics Settings">
+        <Property name="Harmonics" />
+      </PropertyGroup>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkMergeTimeFilter"
                  label="Merge Time"
                  name="MergeTime">

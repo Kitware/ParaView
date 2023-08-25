@@ -787,6 +787,8 @@ SET (TESTS_WITHOUT_BASELINES
   SearchBox.xml
   ServerConnectDialog.xml
   SliceBackwardsCompatibility.xml
+  SpatioTemporalHarmonicsAttribute.xml
+  SpatioTemporalHarmonicsSource.xml
   SpreadSheetFieldData.xml
   SpreadSheetSelectedCellConnectivity.xml
   StringInLineChartView.xml
