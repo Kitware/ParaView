@@ -5,14 +5,12 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkCellData.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkCommand.h"
-#include "vtkExtentTranslator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkMergeBlocks.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLODActor.h"
@@ -28,7 +26,6 @@
 #include "vtkUnsignedCharArray.h"
 
 #include <algorithm>
-#include <map>
 #include <string>
 
 namespace
@@ -104,7 +101,7 @@ vtkStreamLinesRepresentation::vtkStreamLinesRepresentation()
   this->Actor->SetProperty(this->Property);
   this->Actor->SetEnableLOD(0);
 
-  this->MBMerger = vtkMergeBlocks::New();
+  this->MergeBlocks = vtkMergeBlocks::New();
 
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
@@ -116,7 +113,7 @@ vtkStreamLinesRepresentation::~vtkStreamLinesRepresentation()
   this->StreamLinesMapper->Delete();
   this->Property->Delete();
   this->Actor->Delete();
-  this->MBMerger->Delete();
+  this->MergeBlocks->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -124,6 +121,7 @@ int vtkStreamLinesRepresentation::FillInputPortInformation(int, vtkInformation* 
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSetCollection");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
@@ -177,7 +175,7 @@ int vtkStreamLinesRepresentation::RequestData(
     vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
     vtkDataSet* inputDS = vtkDataSet::SafeDownCast(inputDO);
     vtkImageData* inputImage = vtkImageData::SafeDownCast(inputDS);
-    vtkMultiBlockDataSet* inputMB = vtkMultiBlockDataSet::SafeDownCast(inputDO);
+    vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(inputDO);
     if (inputImage)
     {
       vtkImageData* clone = inputImage->NewInstance();
@@ -199,12 +197,13 @@ int vtkStreamLinesRepresentation::RequestData(
       this->Cache.TakeReference(inputDS->NewInstance());
       this->Cache->ShallowCopy(inputDS);
     }
-    else if (inputMB)
+    else if (inputCD &&
+      (inputCD->IsA("vtkMultiBlockDataSet") || inputCD->IsA("vtkPartitionedDataSetCollection")))
     {
-      this->MBMerger->SetInputDataObject(inputMB);
-      this->MBMerger->Update();
-      this->Cache.TakeReference(this->MBMerger->GetOutputDataObject(0)->NewInstance());
-      this->Cache->ShallowCopy(this->MBMerger->GetOutputDataObject(0));
+      this->MergeBlocks->SetInputDataObject(inputCD);
+      this->MergeBlocks->Update();
+      this->Cache.TakeReference(this->MergeBlocks->GetOutputDataObject(0)->NewInstance());
+      this->Cache->ShallowCopy(this->MergeBlocks->GetOutputDataObject(0));
     }
     this->DataSize = this->Cache->GetActualMemorySize();
   }
