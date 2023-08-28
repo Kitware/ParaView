@@ -1,8 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
     <SourceProxy class="vtkFDSReader" label="FDS Reader" name="FDSReader">
-      <Documentation short_help="">
-        TODO
+      <Documentation short_help="Reads .smv files outputed from the FDS code.">
+        A reader relying on `.smv` files to read outputs from the Fire Dynamics Simulator (FDS) code.
       </Documentation>
 
       <StringVectorProperty animateable="0"
@@ -15,6 +15,13 @@
           This property specifies the file name for the VTKFDS reader.
         </Documentation>
       </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="AssemblyTag"
                          command="GetAssemblyTag"
@@ -52,11 +59,6 @@
                                    inverse="1" />
         </Hints>
       </StringVectorProperty>
-
-      <!-- <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
-        <Property name="Assembly" function="ActiveAssembly"/>
-        <Property name="Selectors" function="Selectors"/>
-      </PropertyGroup> -->
 
       <Hints>
         <ReaderFactory extensions="smv"
