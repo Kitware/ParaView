@@ -184,6 +184,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/squareBend/100/,RECURSE:,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
   "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
+  "DATA{${paraview_test_data_directory_input}/Data/test_transient_poly_data.vtkhdf}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol.vtpc}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds/,REGEX:.*}"
@@ -522,6 +523,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFFileSeries2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadFLUENTCFFFormat.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutB.png}"
@@ -901,6 +905,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ReadPartitionedCGNS.xml
   ReadCGNSBCDataset.xml
   ReadIOHDFFileSeries.xml
+  ReadIOHDFWithCache.xml
   ReadFLUENTCFFFormat.xml
   RearrangeLayout.xml
   RectilinearFractal.xml
