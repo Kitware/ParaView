@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Open File -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/test_transient_poly_data.vtkhdf" />
+
+  <!-- Activate UseCache and deactivate MergeParts-->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/MergeParts/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/UseCache/CheckBox" command="set_boolean" arguments="true" />
+
+  <!-- Look at Warping -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Warping" />
+
+  <!-- Move time steps and take first baseline -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadIOHDFWithCache0.png" threshold="5" />
+
+  <!-- Move time steps and take second baseline -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadIOHDFWithCache1.png" threshold="5" />
+
+  <!-- Reorient, move time steps and take third baseline -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.491762,0.743386,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.693916,0.542328,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.693916,0.542328,1,0,0)" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.7" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.8" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.9" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadIOHDFWithCache2.png" threshold="5" />
+</pqevents>
