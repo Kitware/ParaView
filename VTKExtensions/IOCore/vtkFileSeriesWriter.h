@@ -71,6 +71,16 @@ public:
 
   ///@{
   /**
+   * If true, write a .series json meta file when writing all time steps.
+   * Default is false.
+   */
+  vtkGetMacro(WriteJsonMetaFile, bool);
+  vtkSetMacro(WriteJsonMetaFile, bool);
+  vtkBooleanMacro(WriteJsonMetaFile, bool);
+  ///@}
+
+  ///@{
+  /**
    * Provides an option to pad the time step when writing out time series data.
    * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
    * or may not exist and d must exist and d must be the last character
@@ -139,23 +149,26 @@ private:
 
   void SetWriterFileName(const char* fname);
   bool WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
+  bool WriteJsonFile(vtkInformation* inInfo);
   void WriteInternal();
+  bool AppendFileNameForTimeStep(std::ostringstream& fname, int timeIndex, bool appendPath = true);
 
-  vtkAlgorithm* Writer;
-  char* FileNameMethod;
+  vtkAlgorithm* Writer = nullptr;
+  char* FileNameMethod = nullptr;
 
-  int WriteAllTimeSteps;
-  char* FileNameSuffix;
-  int NumberOfTimeSteps;
-  int CurrentTimeIndex;
-  int MinTimeStep;
-  int MaxTimeStep;
-  int TimeStepStride;
+  int WriteAllTimeSteps = 0;
+  bool WriteJsonMetaFile = false;
+  char* FileNameSuffix = nullptr;
+  int NumberOfTimeSteps = 1;
+  int CurrentTimeIndex = 0;
+  int MinTimeStep = 0;
+  int MaxTimeStep = -1;
+  int TimeStepStride = 1;
 
   // The name of the output file.
-  char* FileName;
+  char* FileName = nullptr;
 
-  vtkClientServerInterpreter* Interpreter;
+  vtkClientServerInterpreter* Interpreter = nullptr;
 };
 
 #endif
