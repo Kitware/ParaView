@@ -11,49 +11,45 @@ if (NOT PARAVIEW_USE_PYTHON OR NOT numpy_found)
   return()
 endif()
 
-set (tests_with_baselines
-  "${CMAKE_CURRENT_SOURCE_DIR}/BandFiltering.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/MeanPowerSpectralDensity.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/MergeReduceTableBlocks.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/ProjectSpectrumMagnitude.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/SoundQuantities.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Spectrogram.xml")
-set (SoundQuantities_FORCE_SERIAL TRUE)
+# PODT based and spectrogram tests do not support distributed computing 
+set (tests_with_baselines_no_cs
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPBandFiltering.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPMeanPowerSpectralDensity.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPMergeReduceTableBlocks.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPProjectSpectrumMagnitude.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPSoundQuantities.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPSpectrogram.xml")
 
 paraview_add_client_tests(
   LOAD_PLUGIN "DigitalSignalProcessing"
   BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
   TEST_DATA_TARGET ParaViewData
-  TEST_SCRIPTS "${tests_with_baselines}")
+  TEST_SCRIPTS "${tests_with_baselines_no_cs}")
+set (DSPSoundQuantities_FORCE_SERIAL TRUE)
 
-set (tests_without_baselines
-  "${CMAKE_CURRENT_SOURCE_DIR}/DimensionBrowser.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/TemporalMultiplexing.xml")
+# DimensionBrowser does not support distributed data
+# TemporalMultiplexing is checking actual values in the spreadsheet, which is not resilient with distributed
+set (tests_without_baselines_no_cs
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPDimensionBrowser.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPTemporalMultiplexing.xml")
 
 paraview_add_client_tests(
   LOAD_PLUGIN "DigitalSignalProcessing"
   TEST_DATA_TARGET ParaViewData
-  TEST_SCRIPTS "${tests_without_baselines}")
-
-# server tests are disabled for now until the MPI version are
-# implemented for the following filters :
-# - SoundQuantities
-# - MergeReduceTableBlocks
-# - ProjectSpectrumMagnitude
-# - MeanPowerSpectralDensity
+  TEST_SCRIPTS "${tests_without_baselines_no_cs}")
 
 # add test dependant to Qt
 if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player AND numpy_found AND mpi4py_found)
   paraview_add_client_tests(
     LOAD_PLUGIN "DigitalSignalProcessing"
     TEST_DATA_TARGET ParaViewData
-    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/AudioPlayer.xml")
+    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/DSPAudioPlayer.xml")
   paraview_add_client_server_tests(
     LOAD_PLUGIN "DigitalSignalProcessing"
     TEST_DATA_TARGET ParaViewData
-    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/AudioPlayer.xml")
+    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/DSPAudioPlayer.xml")
   paraview_add_client_server_render_tests(
     LOAD_PLUGIN "DigitalSignalProcessing"
     TEST_DATA_TARGET ParaViewData
-    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/AudioPlayer.xml")
+    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/DSPAudioPlayer.xml")
 endif()
