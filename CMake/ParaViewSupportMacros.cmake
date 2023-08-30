@@ -1,4 +1,4 @@
-macro (vtk_set_with_default var value)
+macro (paraview_set_with_default var value)
   if (NOT ${var})
     set(${var} "${value}")
   endif ()

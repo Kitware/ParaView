@@ -29,7 +29,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel" AND
 endif ()
 
 # Make sure we have C++11 enabled.
-if(NOT VTK_IGNORE_CMAKE_CXX11_CHECKS)
+if(NOT PARAVIEW_IGNORE_CMAKE_CXX11_CHECKS)
   # Needed to make sure libraries and executables not built by the
   # vtkModuleMacros still have the C++11 compiler flags enabled
   # Wrap this in an escape hatch for unknown compilers

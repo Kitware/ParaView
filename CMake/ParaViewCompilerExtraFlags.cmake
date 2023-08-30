@@ -3,7 +3,21 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   include(CheckCXXCompilerFlag)
 
   # Additional warnings for GCC
-  set(CMAKE_CXX_FLAGS_WARN "-Wnon-virtual-dtor -Wno-long-long -ansi -Wcast-align -Wchar-subscripts -Wall -Wextra -Wpointer-arith -Wformat-security -Woverloaded-virtual -Wshadow -Wunused-parameter -fno-check-new -fno-common -Werror=undef")
+  set(CMAKE_CXX_FLAGS_WARN "")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wnon-virtual-dtor")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wno-long-long")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -ansi")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wcast-align")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wchar-subscripts")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wall")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wextra")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wpointer-arith")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wformat-security")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Woverloaded-virtual")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wshadow")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Wunused-parameter")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -fno-check-new")
+  set(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -Werror=undef")
 
   # This flag is useful as not returning from a non-void function is an error
   # with MSVC, but it is not supported on all GCC compiler versions
@@ -13,24 +27,23 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   # If we are compiling on Linux then set some extra linker flags too
-  if(CMAKE_SYSTEM_NAME MATCHES Linux)
-    option(VTK_LINKER_FATAL_WARNINGS "Specify if linker warnings must be considered as errors." OFF)
-    mark_as_advanced(VTK_LINKER_FATAL_WARNINGS)
-    if(VTK_LINKER_FATAL_WARNINGS)
-      set(VTK_EXTRA_SHARED_LINKER_FLAGS "-Wl,--fatal-warnings")
+  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    option(PARAVIEW_LINKER_FATAL_WARNINGS "Specify if linker warnings must be considered as errors." OFF)
+    mark_as_advanced(PARAVIEW_LINKER_FATAL_WARNINGS)
+    if(PARAVIEW_LINKER_FATAL_WARNINGS)
+      set(PARAVIEW_EXTRA_SHARED_LINKER_FLAGS "--fatal-warnings")
     endif()
-    set(CMAKE_SHARED_LINKER_FLAGS
-      "${VTK_EXTRA_SHARED_LINKER_FLAGS} -Wl,-lc ${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS
-      "${VTK_EXTRA_SHARED_LINKER_FLAGS} -Wl,-lc ${CMAKE_SHARED_LINKER_FLAGS}")
-    set (CMAKE_EXE_LINKER_FLAGS
-      "${VTK_EXTRA_SHARED_LINKER_FLAGS} -Wl,-lc ${CMAKE_SHARED_LINKER_FLAGS}")
+    if (TARGET paraviewbuild)
+      target_link_options(paraviewbuild
+        INTERFACE
+        "LINKER:SHELL:${PARAVIEW_EXTRA_SHARED_LINKER_FLAGS} -lc ${CMAKE_SHARED_LINKER_FLAGS}")
+    endif()
   endif()
 
   # Set up the debug CXX_FLAGS for extra warnings
-  option(VTK_EXTRA_COMPILER_WARNINGS
+  option(PARAVIEW_EXTRA_COMPILER_WARNINGS
     "Add compiler flags to do stricter checking when building debug." OFF)
-  if(VTK_EXTRA_COMPILER_WARNINGS)
+  if(PARAVIEW_EXTRA_COMPILER_WARNINGS)
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
       "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${CMAKE_CXX_FLAGS_WARN}")
     set(CMAKE_CXX_FLAGS_DEBUG
@@ -55,8 +68,8 @@ foreach (lang IN ITEMS C CXX Fortran)
     "$<AND:${is_lang},${is_intelllvm},${is_intelllvm_fastmath_assuming_version}>")
 endforeach ()
 string(REPLACE ";" "," intel_oneapi_compiler_detections "${intel_oneapi_compiler_detections}")
-if (TARGET vtkbuild)
-  target_compile_options(vtkbuild
+if (TARGET paraviewbuild)
+  target_compile_options(paraviewbuild
     INTERFACE
       "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
 endif ()

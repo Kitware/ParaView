@@ -30,8 +30,14 @@ if (NOT CMAKE_BUILD_TYPE AND NOT generator_is_multi_config)
       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
+
+
 # Set up our directory structure for output libraries and binaries
 include(GNUInstallDirs)
+# Used to pass common compiler flags to all modules
+add_library(paraviewbuild INTERFACE)
+add_library(ParaView::paraviewbuild ALIAS paraviewbuild)
+
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 endif ()
@@ -62,6 +68,8 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
       "External VTK not found but ParaView requires VTK to function")
   endif ()
   get_filename_component(vtk_cmake_dir "${VTK_CONFIG}" DIRECTORY)
+  # set by vtk-config.cmake. Unsetting this avoids a warning when setting
+  # PARAVIEW_BUILD_LEGACY_REMOVE
   unset(VTK_LEGACY_REMOVE)
 else()
   set(vtk_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
@@ -731,6 +739,7 @@ else ()
     BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
     USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
     ENABLE_WRAPPING     ON
+    UTILITY_TARGET      "ParaView::paraviewbuild"
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
     TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing"
     TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
@@ -788,6 +797,7 @@ vtk_module_build(
   TEST_DATA_TARGET    ParaViewData
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
+  UTILITY_TARGET      "ParaView::paraviewbuild"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
   TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
@@ -812,6 +822,7 @@ vtk_module_build(
   TEST_DATA_TARGET    ParaViewData
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
+  UTILITY_TARGET      "ParaView::paraviewbuild"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
   TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
