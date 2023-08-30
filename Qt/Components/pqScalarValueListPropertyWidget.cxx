@@ -22,6 +22,7 @@
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMProperty.h"
+#include "vtkSMTimeStepsDomain.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkWeakPointer.h"
 
@@ -308,7 +309,8 @@ public:
   enum ValueMode
   {
     MODE_INT,
-    MODE_DOUBLE
+    MODE_DOUBLE,
+    MODE_TIMESTEPS
   };
   Ui::ScalarValueListPropertyWidget Ui;
   vtkNew<vtkEventQtSlotConnect> VTKRangeConnector;
@@ -480,74 +482,82 @@ void pqScalarValueListPropertyWidget::removeAll()
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::addRange()
 {
-  if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
+  switch (this->Internals->Mode)
   {
-    double rangeMin, rangeMax;
-    if (!this->getRange(rangeMin, rangeMax))
+    case pqInternals::MODE_DOUBLE:
+    case pqInternals::MODE_TIMESTEPS:
     {
-      rangeMin = 0.0;
-      rangeMax = 10.0;
-    }
-
-    if (!this->Internals->GeneratorDialog)
-    {
-      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(rangeMin, rangeMax, this);
-    }
-    else
-    {
-      this->Internals->GeneratorDialog->setDataRange(rangeMin, rangeMax);
-    }
-
-    if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
-    {
-      return;
-    }
-
-    QVariantList value = this->Internals->Model.value().toList();
-    for (const auto& newvalue : this->Internals->GeneratorDialog->series())
-    {
-      value.push_back(QVariant(newvalue));
-    }
-    this->Internals->Model.setValue(value);
-    Q_EMIT this->scalarsChanged();
-  }
-  else if (this->Internals->Mode == pqInternals::MODE_INT)
-  {
-    int rangeMin, rangeMax;
-    if (!this->getRange(rangeMin, rangeMax))
-    {
-      rangeMin = 0;
-      rangeMax = 10;
-    }
-
-    if (!this->Internals->GeneratorDialog)
-    {
-      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(rangeMin, rangeMax, this);
-    }
-    else
-    {
-      this->Internals->GeneratorDialog->setDataRange(rangeMin, rangeMax);
-    }
-
-    if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
-    {
-      return;
-    }
-
-    QVariantList intRange;
-    for (const auto& newvalue : this->Internals->GeneratorDialog->series())
-    {
-      const int ival = static_cast<int>(std::floor(newvalue + 0.5));
-      if (intRange.empty() || (intRange.back().toInt() != ival))
+      double rangeMin, rangeMax;
+      if (!this->getRange(rangeMin, rangeMax))
       {
-        intRange.push_back(ival);
+        rangeMin = 0.0;
+        rangeMax = 9.0;
       }
-    }
 
-    QVariantList value = this->Internals->Model.value().toList();
-    value += intRange;
-    this->Internals->Model.setValue(value);
-    Q_EMIT this->scalarsChanged();
+      if (!this->Internals->GeneratorDialog)
+      {
+        this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(rangeMin, rangeMax, this);
+      }
+      else
+      {
+        this->Internals->GeneratorDialog->setDataRange(rangeMin, rangeMax);
+      }
+
+      if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
+      {
+        return;
+      }
+
+      QVariantList value = this->Internals->Model.value().toList();
+      for (const auto& newvalue : this->Internals->GeneratorDialog->series())
+      {
+        value.push_back(QVariant(newvalue));
+      }
+      this->Internals->Model.setValue(value);
+      Q_EMIT this->scalarsChanged();
+    }
+    break;
+    case pqInternals::MODE_INT:
+    {
+      int rangeMin, rangeMax;
+      if (!this->getRange(rangeMin, rangeMax))
+      {
+        rangeMin = 0;
+        rangeMax = 10;
+      }
+
+      if (!this->Internals->GeneratorDialog)
+      {
+        this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(rangeMin, rangeMax, this);
+      }
+      else
+      {
+        this->Internals->GeneratorDialog->setDataRange(rangeMin, rangeMax);
+      }
+
+      if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
+      {
+        return;
+      }
+
+      QVariantList intRange;
+      for (const auto& newvalue : this->Internals->GeneratorDialog->series())
+      {
+        const int ival = static_cast<int>(std::floor(newvalue + 0.5));
+        if (intRange.empty() || (intRange.back().toInt() != ival))
+        {
+          intRange.push_back(ival);
+        }
+      }
+
+      QVariantList value = this->Internals->Model.value().toList();
+      value += intRange;
+      this->Internals->Model.setValue(value);
+      Q_EMIT this->scalarsChanged();
+    }
+    break;
+    default:
+      break;
   }
 }
 
@@ -572,6 +582,7 @@ void pqScalarValueListPropertyWidget::setRangeDomain(vtkSMDoubleRangeDomain* smR
     this->Internals->Ui.AddRange->hide();
   }
 }
+
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::setRangeDomain(vtkSMIntRangeDomain* smRangeDomain)
 {
@@ -595,48 +606,97 @@ void pqScalarValueListPropertyWidget::setRangeDomain(vtkSMIntRangeDomain* smRang
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarValueListPropertyWidget::setRangeDomain(vtkSMTimeStepsDomain* tsDomain)
+{
+  this->Internals->VTKRangeConnector->Disconnect();
+  this->Internals->RangeDomain = tsDomain;
+  this->Internals->Mode = pqInternals::MODE_TIMESTEPS;
+  this->Internals->Model.setAllowIntegerValuesOnly(false);
+  if (tsDomain)
+  {
+    this->Internals->VTKRangeConnector->Connect(
+      tsDomain, vtkCommand::DomainModifiedEvent, this, SLOT(smRangeModified()));
+    this->Internals->Ui.ScalarRangeLabel->show();
+    this->Internals->Ui.AddRange->show();
+    this->smRangeModified();
+  }
+  else
+  {
+    this->Internals->Ui.ScalarRangeLabel->hide();
+    this->Internals->Ui.AddRange->hide();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::smRangeModified()
 {
-  if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
+  switch (this->Internals->Mode)
   {
-    double rangeMin, rangeMax;
-    if (this->getRange(rangeMin, rangeMax))
+    case pqInternals::MODE_DOUBLE:
+    case pqInternals::MODE_TIMESTEPS:
     {
-      this->Internals->setScalarRangeLabel(rangeMin, rangeMax);
+      double rangeMin, rangeMax;
+      if (this->getRange(rangeMin, rangeMax))
+      {
+        this->Internals->setScalarRangeLabel(rangeMin, rangeMax);
+      }
+      else
+      {
+        this->Internals->clearScalarRangeLabel();
+      }
     }
-    else
+    break;
+    case pqInternals::MODE_INT:
     {
-      this->Internals->clearScalarRangeLabel();
+      int rangeMin, rangeMax;
+      if (this->getRange(rangeMin, rangeMax))
+      {
+        this->Internals->setScalarRangeLabel(rangeMin, rangeMax);
+      }
+      else
+      {
+        this->Internals->clearScalarRangeLabel();
+      }
     }
-  }
-  else if (this->Internals->Mode == pqInternals::MODE_INT)
-  {
-    int rangeMin, rangeMax;
-    if (this->getRange(rangeMin, rangeMax))
-    {
-      this->Internals->setScalarRangeLabel(rangeMin, rangeMax);
-    }
-    else
-    {
-      this->Internals->clearScalarRangeLabel();
-    }
+    break;
+    default:
+      break;
   }
 }
 
 //-----------------------------------------------------------------------------
 bool pqScalarValueListPropertyWidget::getRange(double& rangeMin, double& rangeMax)
 {
-  assert(this->Internals->Mode == pqInternals::MODE_DOUBLE);
   // Return the range of values in the input (if available)
   if (this->Internals->RangeDomain)
   {
-    int min_exists = 0, max_exists = 0;
-    vtkSMDoubleRangeDomain* doubleRange =
-      vtkSMDoubleRangeDomain::SafeDownCast(this->Internals->RangeDomain);
-    assert(doubleRange != nullptr);
-    rangeMin = doubleRange->GetMinimum(0, min_exists);
-    rangeMax = doubleRange->GetMaximum(0, max_exists);
-    return (min_exists && max_exists);
+    if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
+    {
+      int min_exists = 0, max_exists = 0;
+      vtkSMDoubleRangeDomain* doubleRange =
+        vtkSMDoubleRangeDomain::SafeDownCast(this->Internals->RangeDomain);
+      assert(doubleRange != nullptr);
+      rangeMin = doubleRange->GetMinimum(0, min_exists);
+      rangeMax = doubleRange->GetMaximum(0, max_exists);
+      return (min_exists && max_exists);
+    }
+    else // this->Internals->Mode == pqInternals::MODE_TIMESTEPS
+    {
+      // Timesteps are sorted in vtkSMTimeStepsDomain
+      vtkSMTimeStepsDomain* tsDomain =
+        vtkSMTimeStepsDomain::SafeDownCast(this->Internals->RangeDomain);
+      auto values = tsDomain->GetValues();
+      if (values.size() >= 2)
+      {
+        rangeMin = values.front();
+        rangeMax = values.back();
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
   }
   return false;
 }

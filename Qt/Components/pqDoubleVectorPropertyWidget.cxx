@@ -32,6 +32,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMTimeStepsDomain.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSmartPointer.h"
 
@@ -94,6 +95,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     : std::vector<std::string>{};
 
   vtkSMDoubleRangeDomain* range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
+  vtkSMTimeStepsDomain* tsDomain = vtkSMTimeStepsDomain::SafeDownCast(domain);
   if (this->property()->GetRepeatable())
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
@@ -102,8 +104,22 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     pqScalarValueListPropertyWidget* widget =
       new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
     widget->setObjectName("ScalarValueList");
-    widget->setRangeDomain(range);
     this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+    if (range)
+    {
+      widget->setRangeDomain(range);
+    }
+    else if (tsDomain)
+    {
+      widget->setRangeDomain(tsDomain);
+      auto tsValues = tsDomain->GetValues();
+
+      // Initialize the scalar value list using the timesteps of the domain
+      QList<QVariant> tsList;
+      tsList.reserve(static_cast<int>(tsValues.size()));
+      std::copy(tsValues.begin(), tsValues.end(), std::back_inserter(tsList));
+      widget->setScalars(tsList);
+    }
     widget->setShowLabels(showComponentLabels);
     if (showComponentLabels)
     {

@@ -146,6 +146,7 @@ set(classes
   vtkSMTimeKeeper
   vtkSMTimeKeeperProxy
   vtkSMTimeStepIndexDomain
+  vtkSMTimeStepsDomain
   vtkSMTrace
   vtkSMUncheckedPropertyHelper
   vtkSMUndoElement

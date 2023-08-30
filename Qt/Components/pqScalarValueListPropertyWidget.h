@@ -16,6 +16,7 @@ class QListWidgetItem;
 class vtkPVXMLElement;
 class vtkSMDoubleRangeDomain;
 class vtkSMIntRangeDomain;
+class vtkSMTimeStepsDomain;
 
 /**
  * pqScalarValueListPropertyWidget provides a table widget to which users are
@@ -39,11 +40,15 @@ public:
   void setScalars(const QVariantList& scalars);
   QVariantList scalars() const;
 
+  ///@{
   /**
    * Sets range domain that will be used to initialize the scalar range.
+   * vtkSMTimeStepsDomain does have a concept of min and max that can be used as a range.
    */
   void setRangeDomain(vtkSMDoubleRangeDomain* smRangeDomain);
   void setRangeDomain(vtkSMIntRangeDomain* smRangeDomain);
+  void setRangeDomain(vtkSMTimeStepsDomain* timestepsDomain);
+  ///@}
 
   void setShowLabels(bool);
   void setLabels(const std::vector<std::string>& labels);

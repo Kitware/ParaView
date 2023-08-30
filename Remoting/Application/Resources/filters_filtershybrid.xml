@@ -366,8 +366,11 @@
                          number_of_elements="0"
                          number_of_elements_per_command="1"
                          repeat_command="1">
-        <!-- Using a range domain will add the "Generate Values" button to the widget -->
-        <DoubleRangeDomain name="range" min="0" max="9"/>
+        <TimeStepsDomain name="timesteps">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </TimeStepsDomain>
         <Documentation>
           This property specifies the timestep values to generate.
         </Documentation>
