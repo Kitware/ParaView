@@ -38,6 +38,26 @@ paraview_add_client_tests(
   TEST_DATA_TARGET ParaViewData
   TEST_SCRIPTS "${tests_without_baselines_no_cs}")
 
+set (tests_with_baselines
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPSoundQuantitiesMultiplex.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPProjectSpectrumMagnitudeMultiplex.xml")
+
+paraview_add_client_tests(
+  LOAD_PLUGIN "DigitalSignalProcessing"
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+  TEST_DATA_TARGET ParaViewData
+  TEST_SCRIPTS "${tests_with_baselines}")
+paraview_add_client_server_tests(
+  LOAD_PLUGIN "DigitalSignalProcessing"
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+  TEST_DATA_TARGET ParaViewData
+  TEST_SCRIPTS "${tests_with_baselines}")
+paraview_add_client_server_render_tests(
+  LOAD_PLUGIN "DigitalSignalProcessing"
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+  TEST_DATA_TARGET ParaViewData
+  TEST_SCRIPTS "${tests_with_baselines}")
+
 # add test dependant to Qt
 if (PARAVIEW_USE_QT AND PARAVIEW_PLUGIN_dsp_enable_audio_player AND numpy_found AND mpi4py_found)
   paraview_add_client_tests(
