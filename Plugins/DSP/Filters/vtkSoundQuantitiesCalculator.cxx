@@ -5,11 +5,11 @@
 #include "vtkAccousticUtilities.h"
 #include "vtkCell.h"
 #include "vtkCellArray.h"
+#include "vtkDSPIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
@@ -71,9 +71,9 @@ vtkSoundQuantitiesCalculator::vtkSoundQuantitiesCalculator()
 }
 
 //------------------------------------------------------------------------------
-void vtkSoundQuantitiesCalculator::SetSourceData(vtkMultiBlockDataSet* input)
+void vtkSoundQuantitiesCalculator::SetSourceData(vtkDataSet* source)
 {
-  this->SetInputData(1, input);
+  this->SetInputData(1, source);
 }
 
 //------------------------------------------------------------------------------
@@ -83,60 +83,87 @@ void vtkSoundQuantitiesCalculator::SetSourceConnection(vtkAlgorithmOutput* algOu
 }
 
 //------------------------------------------------------------------------------
-vtkMultiBlockDataSet* vtkSoundQuantitiesCalculator::GetSource()
+int vtkSoundQuantitiesCalculator::FillInputPortInformation(int port, vtkInformation* info)
 {
-  if (this->GetNumberOfInputConnections(1) < 1)
+  if (port == 0)
   {
-    return nullptr;
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
+    return 1;
   }
-  return vtkMultiBlockDataSet::SafeDownCast(this->GetExecutive()->GetInputData(1, 0));
+  else if (port == 1)
+  {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    return 1;
+  }
+
+  return 0;
 }
 
 //------------------------------------------------------------------------------
-int vtkSoundQuantitiesCalculator::FillInputPortInformation(int port, vtkInformation* info)
+int vtkSoundQuantitiesCalculator::RequestDataObject(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  switch (port)
+  vtkDataSet* input = vtkDataSet::GetData(inputVector[1]);
+
+  if (!input)
   {
-    case 0:
-      info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-      return 1;
-    case 1:
-      info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
-      return 1;
-    default:
-      return 0;
+    vtkErrorMacro("Missing input!");
+    return 0;
   }
+
+  vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkDataSet* output = vtkDataSet::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (!output || !output->IsA(input->GetClassName()))
+  {
+    vtkSmartPointer<vtkDataSet> newOutput = vtk::TakeSmartPointer(input->NewInstance());
+    info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkSoundQuantitiesCalculator::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
+{
+  // Output is not temporal
+  auto outInfo = outputVector->GetInformationObject(0);
+  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+
+  return 1;
 }
 
 //------------------------------------------------------------------------------
 int vtkSoundQuantitiesCalculator::RequestData(vtkInformation* /*request*/,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Retrieve inputs
-  vtkDataSet* inputMesh = vtkDataSet::GetData(inputVector[0]);
-  vtkMultiBlockDataSet* mbInput = vtkMultiBlockDataSet::GetData(inputVector[1]);
-
-  if (!inputMesh || !mbInput)
+  vtkDataObject* inputTables = vtkDataObject::GetData(inputVector[0]);
+  vtkDataSet* inputMesh = vtkDataSet::GetData(inputVector[1]);
+  if (!inputMesh || !inputTables)
   {
-    vtkErrorMacro("At least one of the two inputs was not found.");
+    vtkErrorMacro("Missing Input or source");
     return 0;
   }
 
   // Check pressure array name
-  if (this->PressureArrayName.empty() || this->PressureArrayName == "None")
+  if (this->PressureArrayName.empty())
   {
     vtkErrorMacro("Pressure array must be specified.");
     return 0;
   }
 
-  // Copy input geometry to output (do not copy data because the output is not temporal anymore)
+  // Copy input geometry and arrays to output
   vtkDataSet* output = vtkDataSet::GetData(outputVector, 0);
   output->CopyStructure(inputMesh);
+  output->CopyAttributes(inputMesh);
 
   // Compute every quantity we want and add them to the output
   if (this->ComputeMeanPressure)
   {
-    if (!this->ProcessData(inputMesh, mbInput, output))
+    if (!this->ProcessData(inputMesh, inputTables, output))
     {
       vtkErrorMacro("Data processing failed.");
       return 0;
@@ -148,19 +175,27 @@ int vtkSoundQuantitiesCalculator::RequestData(vtkInformation* /*request*/,
 
 //-----------------------------------------------------------------------------
 int vtkSoundQuantitiesCalculator::ProcessData(
-  vtkDataSet* inputMesh, vtkMultiBlockDataSet* inputTables, vtkDataSet* output)
+  vtkDataSet* inputMesh, vtkDataObject* inputTables, vtkDataSet* output)
 {
-  // Retrieve number of timesteps from first block
-  vtkTable* table = vtkTable::SafeDownCast(inputTables->GetBlock(0));
 
-  if (!table)
+  auto dspIterator = vtkDSPIterator::GetInstance(inputTables);
+  if (!dspIterator)
   {
-    vtkErrorMacro("Source blocks should be of type vtkTable.");
+    vtkErrorMacro("Unable to generate iterator!");
     return 0;
   }
 
-  // Retrieve number of blocks (equal to the number of points)
-  const vtkIdType numOfBlocks = inputTables->GetNumberOfBlocks();
+  vtkIdType nPoints = inputMesh->GetNumberOfPoints();
+  dspIterator->GoToFirstItem();
+  if (dspIterator->IsDoneWithTraversal() || nPoints == 0)
+  {
+    // Silent return with both empty input, warn if not both
+    if (!(dspIterator->IsDoneWithTraversal() && nPoints == 0))
+    {
+      vtkWarningMacro("Unexpected incoherent partially empty inputs, results may be incorrect");
+    }
+    return 1;
+  }
 
   // Define output arrays
   constexpr const char* pMeanName = "Mean Pressure (Pa)";
@@ -169,25 +204,31 @@ int vtkSoundQuantitiesCalculator::ProcessData(
   constexpr const char* powerName = "Acoustic Power (dB)";
 
   vtkNew<vtkDoubleArray> pMeanArray;
-  pMeanArray->SetNumberOfValues(numOfBlocks);
+  pMeanArray->SetNumberOfValues(nPoints);
   pMeanArray->SetName(pMeanName);
 
   vtkNew<vtkDoubleArray> pRmsPaArray;
-  pRmsPaArray->SetNumberOfValues(numOfBlocks);
-  pRmsPaArray->SetName(pRmsNamePa);
-
   vtkNew<vtkDoubleArray> pRmsDbArray;
-  pRmsDbArray->SetNumberOfValues(numOfBlocks);
-  pRmsDbArray->SetName(pRmsNameDb);
 
-  for (vtkIdType i = 0; i < numOfBlocks; ++i)
+  if (this->ComputeRMSPressure)
   {
-    table = vtkTable::SafeDownCast(inputTables->GetBlock(i));
+    pRmsPaArray->SetNumberOfValues(nPoints);
+    pRmsPaArray->SetName(pRmsNamePa);
+    pRmsDbArray->SetNumberOfValues(nPoints);
+    pRmsDbArray->SetName(pRmsNameDb);
+  }
+
+  vtkIdType cnt = 0;
+  for (dspIterator->GoToFirstItem(); !dspIterator->IsDoneWithTraversal();
+       dspIterator->GoToNextItem())
+  {
+    vtkTable* table = dspIterator->GetCurrentTable();
     if (!table)
     {
-      vtkErrorMacro("Source blocks should be of type vtkTable.");
-      return 0;
+      continue;
     }
+
+    cnt++;
 
     vtkDataArray* pressureArray =
       vtkDataArray::SafeDownCast(table->GetColumnByName(this->PressureArrayName.c_str()));
@@ -201,7 +242,7 @@ int vtkSoundQuantitiesCalculator::ProcessData(
     const auto pressureRange = vtk::DataArrayValueRange(pressureArray);
     const double mean =
       std::accumulate(pressureRange.cbegin(), pressureRange.cend(), 0.0) / pressureRange.size();
-    pMeanArray->SetValue(i, mean);
+    pMeanArray->SetValue(cnt, mean);
 
     // Compute additional derived quantities
     if (this->ComputeRMSPressure)
@@ -214,10 +255,19 @@ int vtkSoundQuantitiesCalculator::ProcessData(
       }
       rms = std::sqrt(rms / pressureRange.size());
 
-      pRmsPaArray->SetValue(i, rms);
-      pRmsDbArray->SetValue(i, 20.0 * std::log10(rms / vtkAccousticUtilities::REF_PRESSURE));
+      pRmsPaArray->SetValue(cnt, rms);
+      pRmsDbArray->SetValue(cnt, 20.0 * std::log10(rms / vtkAccousticUtilities::REF_PRESSURE));
     }
   }
+
+  if (cnt != nPoints)
+  {
+    vtkWarningMacro("Iteration over the two inputs has not completed because of a dimensional "
+                    "issue, result may be incorrect");
+  }
+
+  // Remove temporal pressure array if present
+  output->GetPointData()->RemoveArray(this->PressureArrayName.c_str());
 
   // Add mean pressure to output
   output->GetPointData()->AddArray(pMeanArray);

@@ -158,23 +158,34 @@
                  name="SoundQuantitiesCalculator">
       <Documentation short_help="Compute intensity from sound pressure level.">
         Compute the pressure RMS value (Pa and dB) as well as the acoustic power from a sound pressure (Pa) array.
-        Could be improved by adding more conversions.
 
-        This filter has 2 inputs:
-
-- port 0 is the input geometry for cell connectivity.
-- port 1 is a multi-block dataset representing the data through time. Block flat index
-          corresponds to the index of the point in the input mesh. This kind of dataset
-          can be obtained e.g. by first applying the filter Plot Data Over Time with the
-          option "Only Report Selection Statistics" turned off.
-
-        The output is the input geometry with the computed sound quantities attached to
+        The output is the destination mesh with the computed sound quantities attached to
         it i.e. the mean pressure, the RMS pressure and the acoustic power.
       </Documentation>
 
       <InputProperty command="SetInputConnection"
                      name="Input"
-                     label="Geometry" >
+                     label="Table Data" >
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays1"
+                          attribute_type="row"
+                          number_of_components="1"
+                          optional="1" />
+        <Documentation>
+          Multiblock dataset or multidimensional table containing the temporal data. Each block/point table corresponds to one point.
+        </Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSourceConnection"
+                     name="Source"
+                     label="Destination Mesh">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -183,23 +194,7 @@
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <Documentation>
-          Geometry for cell connectivity.
-        </Documentation>
-      </InputProperty>
-
-      <InputProperty command="SetSourceConnection"
-                     name="Source"
-                     label="Temporal Data">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkMultiBlockDataSet"/>
-        </DataTypeDomain>
-        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
-        <Documentation>
-          Multiblock dataset containing the temporal data. Each block corresponds to one point.
+          Mesh on which to display point values.
         </Documentation>
       </InputProperty>
 
@@ -210,8 +205,7 @@
                             number_of_elements="1">
         <ArrayListDomain attribute_type="Scalars"
                          name="array_list"
-                         none_string="None"
-                         input_domain_name="row_arrays">
+                         input_domain_name="row_arrays1">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -296,6 +290,10 @@
           This is a single value that will be stored in the field data.
         </Documentation>
       </IntVectorProperty>
+
+      <Hints>
+        <View type="RenderView" port="0" />
+      </Hints>
 
     </SourceProxy>
     <!-- ================================================================== -->
@@ -404,7 +402,8 @@
                  label="Project Spectrum Magnitude">
       <Documentation short_help="Project spectrum magnitude on mesh.">
         This filter computes the magnitudes of complex data values from a multi block
-        of tables (input) and places them on the points of a given mesh (source) for
+        of tables or multidimensional table (input) and
+        places them on the points of a given mesh (source) for
         a specified frequency range.
       </Documentation>
 
@@ -417,6 +416,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
         <InputArrayDomain name="row_arrays1"
                           attribute_type="row"
@@ -426,7 +426,7 @@
                           attribute_type="row"
                           optional="1" />
         <Documentation>
-          Multiblock dataset containing the temporal data. Each block corresponds to one point.
+          Multiblock dataset or multidimensional table containing the temporal data. Each block/table corresponds to one point.
         </Documentation>
       </InputProperty>
 
@@ -635,6 +635,10 @@
           Upper bound of the frequency range.
         </Documentation>
       </DoubleVectorProperty>
+
+      <Hints>
+        <View type="RenderView" port="0" />
+      </Hints>
 
     </SourceProxy>
     <!-- ================================================================== -->

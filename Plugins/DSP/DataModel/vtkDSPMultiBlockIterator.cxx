@@ -55,9 +55,10 @@ bool vtkDSPMultiBlockIterator::IsDoneWithTraversal()
 //-----------------------------------------------------------------------------
 vtkTable* vtkDSPMultiBlockIterator::GetCurrentTable()
 {
-  vtkTable* table = vtkTable::SafeDownCast(this->Internals->Iterator->GetCurrentDataObject());
+  vtkDataObject* object = this->Internals->Iterator->GetCurrentDataObject();
+  vtkTable* table = vtkTable::SafeDownCast(object);
 
-  if (!table)
+  if (object && !table)
   {
     vtkErrorMacro("Current block (flat index = " << this->Internals->Iterator->GetCurrentFlatIndex()
                                                  << ") is not a vtkTable!");
