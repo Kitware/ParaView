@@ -1,4 +1,5 @@
 set(MODULE_CLASSES
+  vtkBandFiltering
   vtkMeanPowerSpectralDensity
   vtkMergeReduceTableBlocks
   vtkMultiDimensionBrowser
