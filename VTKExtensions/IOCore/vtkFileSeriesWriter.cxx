@@ -6,6 +6,7 @@
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataSet.h"
+#include "vtkFileSeriesUtilities.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -19,11 +20,6 @@
 
 #include <sstream>
 #include <string>
-
-namespace
-{
-const std::string FILE_SERIES_VERSION = "1.0";
-}
 
 vtkStandardNewMacro(vtkFileSeriesWriter);
 vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
@@ -261,7 +257,7 @@ bool vtkFileSeriesWriter::WriteJsonFile(vtkInformation* inInfo)
   vtksys::ofstream jsonFile(jsonFilename.c_str(), ios::out);
 
   Json::Value root;
-  root["file-series-version"] = ::FILE_SERIES_VERSION;
+  root["file-series-version"] = vtkFileSeriesUtilities::FILE_SERIES_VERSION;
 
   Json::Value files;
   double* inTimes = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());

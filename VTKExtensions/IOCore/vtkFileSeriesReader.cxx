@@ -7,6 +7,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
+#include "vtkFileSeriesUtilities.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
@@ -18,7 +19,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTypeTraits.h"
-
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
@@ -803,9 +803,17 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
     bool parsingSuccessful = parseFromStream(builder, metafile, &root, nullptr);
     if (parsingSuccessful)
     {
-      if (!root.isMember("file-series-version"))
+      if (!root.isMember("file-series-version") || !root["file-series-version"].isString())
       {
-        vtkErrorMacro("Syntax error in meta-file. A list of file names is required.");
+        vtkErrorMacro("Syntax error in meta-file. A file-series-version string is required.");
+        return 0;
+      }
+      if (!vtkFileSeriesUtilities::CheckVersion(root["file-series-version"].asString()))
+      {
+        vtkErrorMacro(
+          "File-series-version in meta file is not supported by this reader. Version in file: "
+          << root["file-series-version"].asString() << " , Version supported by this reader: "
+          << vtkFileSeriesUtilities::FILE_SERIES_VERSION);
         return 0;
       }
       if (!root.isMember("files"))
