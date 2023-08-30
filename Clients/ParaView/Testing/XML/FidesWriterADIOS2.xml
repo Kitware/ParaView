@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- this test should be used when ADIOS2 readers are built. In this case, when opening a bp file,
+       the select reader dialog box will appear. If other ADIOS2 readers are not built, use FidesWriter.xml -->
+  <!-- create a wavelet -->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="Wavelet" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- add time with programmable filter -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ProgrammableFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/InformationScript/InformationScript" command="set_string" arguments="def setOutputTimesteps(algorithm, timesteps):&#xA;    executive = algorithm.GetExecutive()&#xA;    outInfo = executive.GetOutputInformation(0)&#xA;    outInfo.Remove(executive.TIME_STEPS())&#xA;    for timestep in timesteps:&#xA;        outInfo.Append(executive.TIME_STEPS(), timestep)&#xA;    outInfo.Remove(executive.TIME_RANGE())&#xA;    outInfo.Append(executive.TIME_RANGE(), timesteps[0])&#xA;    outInfo.Append(executive.TIME_RANGE(), timesteps[-1])&#xA;setOutputTimesteps(self, (0, 1, 2, 3, 4, 5))" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CopyArrays/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />
+
+  <!-- delete the bp file (which is actually a directory) in case it already exists -->
+  <pqevent object="pqClientMainWindow" command="remove_directory" arguments="$PARAVIEW_TEST_ROOT/test-fides-writer.bp" />
+  <!-- write data to ADIOS2 BP file using Fides -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionSaveData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test-fides-writer.bp" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/TimeStepRange/LineEdit0" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/TimeStepRange/LineEdit1" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/TimeStepStride/IntRangeWidget/LineEdit" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- open the file with Fides Reader to check it's correct -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test-fides-writer.bp" />
+  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="FidesReader" />
+  <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Representation/displayRepresentationWidget/comboBox" command="set_string" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/DisplayColorWidget/Variables" command="set_string" arguments="RTData" />
+
+  <!-- only show what fides read in -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,18,10,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,18,10,/0:0/0:0/0:1" />
+
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
+    baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/FidesWriter.png" width="400" height="400" />
+</pqevents>
