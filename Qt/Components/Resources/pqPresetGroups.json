@@ -135,6 +135,7 @@
   {
     "groupName": "Rainbow",
     "presets": [
+      "Fast",
       "Rainbow Desaturated",
       "Rainbow Uniform",
       "Turbo",
