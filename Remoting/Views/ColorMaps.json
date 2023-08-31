@@ -2525,7 +2525,6 @@
   {
     "ColorSpace": "Lab",
     "Name": "Gray and Red",
-    "DefaultMap": true,
     "RGBPoints": [
       -1,
       0.101961,
