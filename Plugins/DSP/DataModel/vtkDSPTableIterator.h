@@ -7,6 +7,9 @@
  *
  * Iterate over implicit/hidden indices of vtkMultiDimensionalArrays
  * contained in a vtkTable.
+ *
+ * @sa
+ * vtkDSPIterator vtkDSPMultiBlockIterator
  */
 
 #ifndef vtkDSPTableIterator_h
@@ -43,6 +46,12 @@ public:
    * Get the current item as a table.
    */
   virtual vtkTable* GetCurrentTable() override;
+
+  /**
+   * Get the number of iterations needed to traverse the current item.
+   * This is equivalent to the number of hidden indices for the multidimensional arrays.
+   */
+  virtual vtkIdType GetNumberOfIterations() override;
 
 protected:
   vtkDSPTableIterator();

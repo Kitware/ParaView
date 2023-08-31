@@ -9,6 +9,9 @@
  * vtkMultiDimensionalArrays or over vtkMultiBlockDataSets.
  * Use the GetInstance method to instantiate the appropriate type of iterator depending
  * on the type of the input.
+ *
+ * @sa
+ * vtkDSPMultiBlockIterator vtkDSPTableIterator
  */
 
 #ifndef vtkDSPIterator_h
@@ -67,6 +70,15 @@ public:
    * Implemented by subclasses.
    */
   virtual vtkTable* GetCurrentTable() = 0;
+
+  /**
+   * Get the total number of iterations.
+   *
+   * @return The number of iterations needed to traverse the underlying item.
+   *
+   * Implemented by subclasses.
+   */
+  virtual vtkIdType GetNumberOfIterations() = 0;
 
 protected:
   vtkDSPIterator() = default;

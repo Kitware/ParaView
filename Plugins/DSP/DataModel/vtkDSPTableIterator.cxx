@@ -43,16 +43,16 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-struct LastIndexIdentifier
+struct NbIterationsIdentifier
 {
-  vtkIdType LastIndex = 0;
+  vtkIdType NbIterations = 0;
 
   template <typename ArrayT>
   void operator()(ArrayT* array)
   {
     vtkIdType nbArrays = array->GetNumberOfArrays();
-    this->LastIndex =
-      ((nbArrays < this->LastIndex || this->LastIndex == 0) ? nbArrays : this->LastIndex);
+    this->NbIterations =
+      ((nbArrays < this->NbIterations || this->NbIterations == 0) ? nbArrays : this->NbIterations);
   }
 };
 
@@ -80,8 +80,8 @@ struct ImplicitShallowCopier
 struct WorkerCreator
 {
   template <typename ArrayT>
-  void operator()(ArrayT* array, std::shared_ptr<Worker>& worker, LastIndexIdentifier& identifier,
-    ImplicitShallowCopier& copier)
+  void operator()(ArrayT* array, std::shared_ptr<Worker>& worker,
+    NbIterationsIdentifier& identifier, ImplicitShallowCopier& copier)
   {
     auto copiedArray = copier(array);
     worker = std::make_shared<TypedWorker<ArrayT>>(copiedArray.Get());
@@ -98,7 +98,7 @@ DispatchInitialize(vtkTable* table)
 
   std::vector<std::shared_ptr<Worker>> workers;
   WorkerCreator workerCreator;
-  LastIndexIdentifier lastIndexID;
+  NbIterationsIdentifier nbIterationsID;
   auto internalTable = vtkSmartPointer<vtkTable>::New();
   ImplicitShallowCopier copier(internalTable);
 
@@ -111,7 +111,7 @@ DispatchInitialize(vtkTable* table)
     }
 
     std::shared_ptr<Worker> typeErasedWorker;
-    if (!MDDispatcher::Execute(array, workerCreator, typeErasedWorker, lastIndexID, copier))
+    if (!MDDispatcher::Execute(array, workerCreator, typeErasedWorker, nbIterationsID, copier))
     {
       internalTable->GetRowData()->AddArray(array);
     }
@@ -121,7 +121,7 @@ DispatchInitialize(vtkTable* table)
     }
   }
 
-  return std::make_tuple(lastIndexID.LastIndex, workers, internalTable);
+  return std::make_tuple(nbIterationsID.NbIterations, workers, internalTable);
 }
 }
 
@@ -131,7 +131,7 @@ struct vtkDSPTableIterator::vtkInternals
   // Needed since there is no GetIndex method
   // on vtkMultiDimensionalArray
   vtkIdType CurrentIdx = 0;
-  vtkIdType LastIdx = 0;
+  vtkIdType NbIterations = 0;
   vtkSmartPointer<vtkTable> Table;
   std::vector<std::shared_ptr<Worker>> Workers;
 };
@@ -144,7 +144,7 @@ vtkDSPTableIterator* vtkDSPTableIterator::New(vtkTable* table)
 {
   auto result = vtkDSPTableIterator::New();
   auto dispatchedRes = ::DispatchInitialize(table);
-  result->Internals->LastIdx = std::get<0>(dispatchedRes);
+  result->Internals->NbIterations = std::get<0>(dispatchedRes);
   result->Internals->Workers = std::get<1>(dispatchedRes);
   result->Internals->Table = std::get<2>(dispatchedRes);
 
@@ -176,11 +176,17 @@ void vtkDSPTableIterator::GoToNextItem()
 //-----------------------------------------------------------------------------
 bool vtkDSPTableIterator::IsDoneWithTraversal()
 {
-  return this->Internals->CurrentIdx >= this->Internals->LastIdx;
+  return this->Internals->CurrentIdx >= this->Internals->NbIterations;
 }
 
 //-----------------------------------------------------------------------------
 vtkTable* vtkDSPTableIterator::GetCurrentTable()
 {
   return this->Internals->Table;
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkDSPTableIterator::GetNumberOfIterations()
+{
+  return this->Internals->NbIterations;
 }
