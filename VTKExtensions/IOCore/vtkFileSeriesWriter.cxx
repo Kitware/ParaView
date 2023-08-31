@@ -6,16 +6,19 @@
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataSet.h"
+#include "vtkFileSeriesUtilities.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
+
+#include "vtk_jsoncpp.h"
 
 #include <sstream>
-#include <vtksys/SystemTools.hxx>
-
 #include <string>
 
 vtkStandardNewMacro(vtkFileSeriesWriter);
@@ -25,21 +28,6 @@ vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
 vtkFileSeriesWriter::vtkFileSeriesWriter()
 {
   this->SetNumberOfOutputPorts(0);
-
-  this->Writer = nullptr;
-
-  this->FileNameMethod = nullptr;
-  this->FileName = nullptr;
-  this->FileNameSuffix = nullptr;
-
-  this->WriteAllTimeSteps = 0;
-  this->MinTimeStep = 0;
-  this->MaxTimeStep = -1;
-  this->TimeStepStride = 1;
-
-  this->NumberOfTimeSteps = 1;
-  this->CurrentTimeIndex = 0;
-  this->Interpreter = nullptr;
   this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
 }
 
@@ -177,35 +165,52 @@ int vtkFileSeriesWriter::RequestData(vtkInformation* request, vtkInformationVect
       // Tell the pipeline to stop looping.
       request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
       this->CurrentTimeIndex = 0;
+
+      if (this->WriteJsonMetaFile)
+      {
+        this->WriteJsonFile(inInfo);
+      }
     }
   }
 
   return 1;
 }
+
+//----------------------------------------------------------------------------
+bool vtkFileSeriesWriter::AppendFileNameForTimeStep(
+  std::ostringstream& fname, int timeIndex, bool appendPath)
+{
+  std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+  std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
+  std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+  if (this->FileNameSuffix && vtkFileSeriesWriter::SuffixValidation(this->FileNameSuffix))
+  {
+    // timeIndex to a string using this->FileNameSuffix as format
+    char suffix[100];
+    snprintf(suffix, 100, this->FileNameSuffix, timeIndex);
+    if (appendPath && !path.empty())
+    {
+      fname << path << "/";
+    }
+    fname << fnamenoext << suffix << ext;
+  }
+  else
+  {
+    vtkErrorMacro("Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
+                                         << ". Expected valid % format specifiers!");
+    return false;
+  }
+  return true;
+}
+
 //----------------------------------------------------------------------------
 bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* inInfo)
 {
   std::ostringstream fname;
   if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
   {
-    std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
-    std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-    if (this->FileNameSuffix && vtkFileSeriesWriter::SuffixValidation(this->FileNameSuffix))
+    if (!this->AppendFileNameForTimeStep(fname, this->CurrentTimeIndex))
     {
-      // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
-      char suffix[100];
-      snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
-      if (!path.empty())
-      {
-        fname << path << "/";
-      }
-      fname << fnamenoext << suffix << ext;
-    }
-    else
-    {
-      vtkErrorMacro("Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
-                                           << ". Expected valid % format specifiers!");
       return false;
     }
   }
@@ -242,6 +247,40 @@ bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
   this->WriteInternal();
   this->Writer->SetInputConnection(nullptr);
 
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkFileSeriesWriter::WriteJsonFile(vtkInformation* inInfo)
+{
+  std::string jsonFilename = std::string(this->FileName) + ".series";
+  vtksys::ofstream jsonFile(jsonFilename.c_str(), ios::out);
+
+  Json::Value root;
+  root["file-series-version"] = vtkFileSeriesUtilities::FILE_SERIES_VERSION;
+
+  Json::Value files;
+  double* inTimes = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  for (int i = 0; i < this->NumberOfTimeSteps; i++)
+  {
+    std::ostringstream fname;
+    if (!this->AppendFileNameForTimeStep(fname, i, false))
+    {
+      return false;
+    }
+
+    Json::Value file;
+    file["name"] = fname.str();
+    file["time"] = inTimes[i];
+    files.append(file);
+  }
+  root["files"] = files;
+
+  Json::StreamWriterBuilder builder;
+  builder["commentStyle"] = "None";
+  builder["indentation"] = "   ";
+  std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+  writer->write(root, &jsonFile);
   return true;
 }
 

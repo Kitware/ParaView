@@ -391,6 +391,20 @@
         <Documentation>When WriteTimeSteps is turned ON, the writer is
         executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetWriteJsonMetaFile"
+                         default_values="0"
+                         name="WriteSeriesMetaFile"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When writing timesteps, write a supplementary .series json meta file.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
       <SubProxy>
         <!-- No harm if use vtkCompleteArrays even in serial mode so, we are
              letting it be -->
@@ -460,6 +474,7 @@
 
       <PropertyGroup label="File Series">
         <Property name="WriteTimeSteps" />
+        <Property name="WriteSeriesMetaFile" />
         <Property name="FileNameSuffix" />
         <Property name="MinTimeStep" />
         <Property name="MaxTimeStep" />

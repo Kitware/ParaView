@@ -1298,6 +1298,7 @@ list(APPEND TESTS_WITH_BASELINES
   # SaveAnimationGeometry.xml # see #20236
   SaveColorMap.xml
   SaveCSV.xml
+  SaveFileSeries.xml
   SaveMultiBlockCSV.xml
   SaveOBJ.xml
   SaveTSV.xml
