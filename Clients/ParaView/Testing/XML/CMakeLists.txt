@@ -500,6 +500,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteGradientBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteLightGrayBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteNeutralGrayBackground.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteWarmGrayBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteDarkGrayBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteWhiteBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"

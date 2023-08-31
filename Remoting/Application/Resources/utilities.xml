@@ -1125,6 +1125,31 @@
     </Proxy>
 
     <!-- ================================================================= -->
+    <Proxy label="Warm Gray Background" name="WarmGrayBackground">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.384313725 0.364705882 0.352941176"
+                            name="BackgroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="SurfaceColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            name="SelectionColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================= -->
     <Proxy label="Dark Gray Background" name="DarkGrayBackground">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
