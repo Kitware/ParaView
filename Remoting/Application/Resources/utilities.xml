@@ -1125,7 +1125,7 @@
     </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy label="Warm Gray Background" name="WarmGrayBackground">
+    <Proxy label="Dark Gray Background" name="DarkGrayBackground">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>

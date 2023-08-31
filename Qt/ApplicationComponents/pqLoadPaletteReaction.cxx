@@ -67,7 +67,7 @@ void pqLoadPaletteReaction::populateMenu()
   assert(pdmgr);
 
   // Palette ordering / ban list can be found in issue #20707
-  std::array<std::string, 7> mainPalettes = { "BlueGrayBackground", "WarmGrayBackground",
+  std::array<std::string, 7> mainPalettes = { "BlueGrayBackground", "DarkGrayBackground",
     "NeutralGrayBackground", "LightGrayBackground", "WhiteBackground", "BlackBackground",
     "GradientBackground" };
 

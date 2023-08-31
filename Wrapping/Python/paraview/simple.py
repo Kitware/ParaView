@@ -952,6 +952,9 @@ def LoadPalette(paletteName):
             name = "BlueGrayBackground"
         elif paletteName == "PrintBackground":
             name = "WhiteBackground"
+    if paraview.compatibility.GetVersion() <= (5, 11):
+        if paletteName == "WarmGrayBackground":
+            name = "DarkGrayBackground"
 
     pxm = servermanager.ProxyManager()
     palette = pxm.GetProxy("settings", "ColorPalette")
