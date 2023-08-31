@@ -1517,6 +1517,16 @@ if (PARAVIEW_USE_MPI)
     TEST_SCRIPTS GhostCellsGenerator.xml
     )
 
+  # GhostCellGeneratorSynchronize is only tested in non-built-in mode.
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostCellsGeneratorSynchronize.xml
+  )
+  paraview_add_client_server_render_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostCellsGeneratorSynchronize.xml
+  )
+
   paraview_add_client_server_tests(
 #    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS GhostFeatureEdgesAndWireframe.xml
