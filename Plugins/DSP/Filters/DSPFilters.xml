@@ -67,12 +67,19 @@
 
     </SourceProxy>
     <!-- ================================================================== -->
-    <SourceProxy class="vtkMergeReduceTableBlocks"
-                 label="Merge Reduce Table Blocks"
-                 name="MergeReduceTableBlocks">
-      <Documentation short_help="Reduce a multiblock of tables with operations such as mean or sum.">
-        This filter performs reduction operations such as the mean or the sum over columns
-        across all blocks of a multiblock of vtkTables.
+    <SourceProxy class="vtkMergeReduceTables"
+                 label="Merge Reduce Tables"
+                 name="MergeReduceTables">
+      <Documentation short_help="Reduce table arrays over points/cells with operations such as mean or sum.">
+        This filter performs reduction operations such as the mean or the sum
+        over columns across vtkTables. Each table typically corresponds to a
+        point/cell. These tables can be obtained after applying a Temporal
+        Multiplexing or Plot Data Over Time filter.
+
+        Make sure that ghost points are marked as such when using the filter
+        in distributed mode to prevent duplicates. This can be done by applying a
+        Ghost Cells Generator on the geometry prior to transforming it into tables
+        in the previous steps.
       </Documentation>
 
       <InputProperty command="SetInputConnection"
@@ -83,6 +90,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
         <InputArrayDomain name="row_arrays"
                           attribute_type="row"
@@ -122,7 +130,7 @@
           </ArrayListDomain>
           <Documentation>
             Select the row data arrays to copy from input to output.
-            Arrays are copied from the first block.
+            Arrays are copied from the first table.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="row"/>
@@ -863,7 +871,7 @@
     <Category name="Digital Signal Processing" menu_label="DSP" show_in_toolbar="0">
       <Proxy group="filters" name="SoundQuantitiesCalculator" />
       <Proxy group="filters" name="MeanPowerSpectralDensity" />
-      <Proxy group="filters" name="MergeReduceTableBlocks" />
+      <Proxy group="filters" name="MergeReduceTables" />
       <Proxy group="filters" name="Spectrogram" />
       <Proxy group="filters" name="ProjectSpectrumMagnitude" />
       <Proxy group="filters" name="TableFFT" />
