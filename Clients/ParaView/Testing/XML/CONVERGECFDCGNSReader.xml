@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Load file with CONVERGECFD CGNS Reader -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/EngineSector.cgns" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCheckState" arguments="1.0,0" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Check information in each partitioned dataset -->
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/cellCount" property="text" arguments="8,166" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/pointCount" property="text" arguments="15,127 (double)" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="0.0,RADIUS (partial)" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,TEMP (partial)" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.0,VELOCITY (partial)" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="7.0,HIROY_SOOT (partial)" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/cellCount" property="text" arguments="1,956" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/pointCount" property="text" arguments="7,556 (double)" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.1.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/cellCount" property="text" arguments="6,209" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/pointCount" property="text" arguments="7,556 (double)" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.2.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/cellCount" property="text" arguments="1" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/pointCount" property="text" arguments="15 (float)" />
+
+  <!-- Open Multiblock Inspector and deselect mesh and boundaries -->
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0.0.0.0.0.0.0,0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0.0.0.0.0.1.0,0" />
+
+  <!-- Display TEMP array -->
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="TEMP (partial)" />
+</pqevents>
