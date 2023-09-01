@@ -225,10 +225,9 @@ int vtkSoundQuantitiesCalculator::ProcessData(
     vtkTable* table = dspIterator->GetCurrentTable();
     if (!table)
     {
+      // An empty table should correspond to an *absent* point, do not increase counter
       continue;
     }
-
-    cnt++;
 
     vtkDataArray* pressureArray =
       vtkDataArray::SafeDownCast(table->GetColumnByName(this->PressureArrayName.c_str()));
@@ -258,6 +257,7 @@ int vtkSoundQuantitiesCalculator::ProcessData(
       pRmsPaArray->SetValue(cnt, rms);
       pRmsDbArray->SetValue(cnt, 20.0 * std::log10(rms / vtkAccousticUtilities::REF_PRESSURE));
     }
+    cnt++;
   }
 
   if (cnt != nPoints)
