@@ -70,12 +70,13 @@
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
 
+#include <QLibraryInfo>
+#include <QProcessEnvironment>
+
 #include <cassert>
 
 #ifdef PARAVIEW_USE_QTHELP
 #include <QHelpEngine>
-#include <QLibraryInfo>
-#include <QProcessEnvironment>
 #endif
 
 //-----------------------------------------------------------------------------
