@@ -17,17 +17,20 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Multiplex -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="TemporalMultiplexing" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/GenerateTimeColumn/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- FFT -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="DSPTableFFT" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Browser -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="MultiDimensionBrowser" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />

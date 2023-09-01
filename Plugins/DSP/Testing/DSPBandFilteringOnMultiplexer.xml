@@ -1,11 +1,13 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- create a Spatio Temporal source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SpatioTemporalHarmonicsSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Multiplex -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="TemporalMultiplexing" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -21,6 +23,7 @@
   <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="4.5,0.0696457" />
 
   <!-- Browser : select the 5th hidden dimension -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="DSP" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Digital Signal Processing" command="activate" arguments="MultiDimensionBrowser" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Index/IntRangeWidget/LineEdit" command="set_string" arguments="5" />
