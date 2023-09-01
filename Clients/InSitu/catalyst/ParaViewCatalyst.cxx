@@ -39,8 +39,8 @@
 #include "catalyst_impl_paraview.h"
 
 static bool update_producer_mesh_blueprint(const std::string& channel_name,
-  const conduit_node* node, const conduit_node* global_fields, bool multimesh, bool amrmesh,
-  const conduit_node* assemblyNode, bool multiblock)
+  const conduit_node* node, const conduit_node* global_fields, bool multimesh,
+  const conduit_node* assemblyNode, bool multiblock, bool amr)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
@@ -60,9 +60,9 @@ static bool update_producer_mesh_blueprint(const std::string& channel_name,
   algo->SetNode(node);
   algo->SetGlobalFieldsNode(global_fields);
   algo->SetUseMultiMeshProtocol(multimesh);
-  algo->SetUseAMRMeshProtocol(amrmesh);
   algo->SetOutputMultiBlock(multiblock);
   algo->SetAssemblyNode(assemblyNode);
+  algo->SetUseAMRMeshProtocol(amr);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
 }
@@ -388,7 +388,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
             channel_name.c_str());
         }
       }
-      else if (type == "multimesh" || type == "amrmesh")
+      else if (type == "multimesh")
       {
         for (conduit_index_t didx = 0, dmax = data_node.number_of_children();
              didx < dmax && is_valid; ++didx)
@@ -435,6 +435,13 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
         vtkLogF(ERROR, "Fides mesh is not supported by this build. Rebuild with Fides enabled.");
 #endif
       }
+      else if (type == "amrmesh")
+      {
+        is_valid = true;
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+          "amrmesh mesh detected for channel (%s); validation will be skipped for now",
+          channel_name.c_str());
+      }
       else
       {
         is_valid = false;
@@ -462,8 +469,8 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
           assembly = conduit_cpp::c_node(&anode);
         }
         update_producer_mesh_blueprint(channel_name, conduit_cpp::c_node(&data_node),
-          conduit_cpp::c_node(&fields), type == "multimesh", type == "amrmesh", assembly,
-          channel_output_multiblock != 0);
+          conduit_cpp::c_node(&fields), type == "multimesh", assembly,
+          channel_output_multiblock != 0, type == "amrmesh");
       }
       else if (type == "ioss")
       {
