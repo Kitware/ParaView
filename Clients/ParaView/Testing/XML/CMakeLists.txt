@@ -104,6 +104,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/dualSphereAnimation/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/dualSphereAnimation4.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/elements.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/EngineSector.cgns}"
   "DATA{${paraview_test_data_directory_input}/Data/ensemble-wavelet/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/Fides/cartesian-attr.bp}"
   "DATA{${paraview_test_data_directory_input}/Data/Fides/cartesian-attr.bp.dir/,REGEX:.*}"
@@ -303,6 +304,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourRange_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourRange_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourCellData.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDCGNSReader.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDReaderMesh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDReaderParcels.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConvertToMoleculeBonds.png}"
@@ -955,6 +957,7 @@ SET(TESTS_WITH_BASELINES
   CameraOrientationWidget.xml
   ChartsClearSelection.xml
   CleanToGridRemovePoints.xml
+  CONVERGECFDCGNSReader.xml
   DataAxesGrid.xml
   EmptyInitialCompositeReader.xml # Issue #21293
   IOSSMergeExodusEntityBlocks.xml
@@ -2016,6 +2019,8 @@ IF (PARAVIEW_USE_MPI)
   # CGNS BC patches not supported in parallel
   set(ReadCGNSBCDataset_DISABLE_CS TRUE)
   set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
+  set(CONVERGECFDCGNSReader_DISABLE_CS TRUE)
+  set(CONVERGECFDCGNSReader_DISABLE_CRS TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but builtin

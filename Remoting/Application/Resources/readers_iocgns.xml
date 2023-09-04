@@ -1,5 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="internal_sources">
+    <!-- ==================================================================== -->
     <!-- CGNSReader -->
     <SourceProxy name="CGNSReader"
                  class="vtkCGNSReader"
@@ -302,9 +303,101 @@
 
       <!-- End CGNSReader -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy name="CONVERGECFDCGNSReaderCore"
+                 class="vtkCONVERGECFDCGNSReader"
+                 label="CONVERGECFD CGNS Reader">
+      <Documentation short_help="Reads CONVERGECFD CGNS post files.">
+        This reader reads CONVERGECFD post files using the CGNS standard (.cgns extension).
+        Meshes, surfaces, and parcels are read.
+        Parcels are defined inside "PARCEL_DATA" UserDefinedData_t nodes.
+      </Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          CONVERGECFD CGNS file name.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayInfo"
+                            command="GetPointDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointArrayStatus"
+                            command="GetPointDataArraySelection"
+                            information_property="PointArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Available mesh point variables.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayInfo"
+                            command="GetCellDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellArrayStatus"
+                            command="GetCellDataArraySelection"
+                            information_property="CellArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Available cell variables.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ParcelArrayInfo"
+                            command="GetParcelDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="ParcelArrayStatus"
+                            command="GetParcelDataArraySelection"
+                            information_property="ParcelArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+            <Property name="ParcelArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Available parcel variables.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
   </ProxyGroup>
 
   <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
     <!-- Begin CGNSSeriesReader -->
     <SourceProxy name="CGNSSeriesReader"
                  class="vtkCGNSFileSeriesReader"
@@ -322,8 +415,8 @@
       <StringVectorProperty name="FileNameInfo"
                             command="GetCurrentFileName"
                             information_only="1" >
-      <SimpleStringInformationHelper />
-    </StringVectorProperty>
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
 
       <StringVectorProperty name="FileNames"
                             clean_command="RemoveAllFileNames"
@@ -399,5 +492,63 @@
 
       <!-- End of CGNSSeriesReader -->
     </SourceProxy>
+    <!-- ================================================================== -->
+    <SourceProxy name="CONVERGECFDCGNSReader"
+                 label="CONVERGECFD CGNS Reader"
+                 class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation short_help="Reads CONVERGECFD CGNS post files.">
+        This reader reads CONVERGECFD post files using the CGNS standard (.cgns extension).
+        Meshes, surfaces, and parcels are read.
+        Parcels are defined inside "PARCEL_DATA" UserDefinedData_t nodes.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="CONVERGECFDCGNSReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+          <Property name="ParcelArrayInfo" />
+          <Property name="ParcelArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to read. If more than one file is specified,
+          the reader will switch to file series mode in which it will pretend
+          that it can support time and provide one file per time step.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="cgns"
+                       file_description="CONVERGE CGNS Files" />
+      </Hints>
+    </SourceProxy>
+    <!-- ==================================================================== -->
   </ProxyGroup>
 </ServerManagerConfiguration>
