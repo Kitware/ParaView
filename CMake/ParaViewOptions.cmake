@@ -558,6 +558,7 @@ paraview_require_module(
   MODULES   VTK::IOAMR
             VTK::IOCityGML
             VTK::IOCONVERGECFD
+            VTK::IOFDS
             VTK::IOIOSS
             VTK::IOH5part
             VTK::IOH5Rage
