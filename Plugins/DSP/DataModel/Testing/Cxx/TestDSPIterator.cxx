@@ -14,21 +14,12 @@
 #include "vtkTemporalMultiplexing.h"
 #include "vtkTestUtilities.h"
 
-//-----------------------------------------------------------------------------
-bool CheckDSPIteratorWithObject(vtkDataObject* object)
+namespace
 {
-  auto dspIterator = vtkDSPIterator::GetInstance(object);
 
-  if (!dspIterator)
-  {
-    std::cerr << "Failed to generate iterator!" << std::endl;
-    return false;
-  }
-
-  // Check first item
-  dspIterator->GoToFirstItem();
-  vtkTable* table = dspIterator->GetCurrentTable();
-
+//-----------------------------------------------------------------------------
+bool CheckMDArrayInCorrectState(vtkTable* table)
+{
   if (!table)
   {
     std::cerr << "Unable to retrieve the table corresponding to the first point!" << std::endl;
@@ -49,14 +40,38 @@ bool CheckDSPIteratorWithObject(vtkDataObject* object)
   {
     std::cerr << "'Modulator' multidimensional array should have 10 tuples but has "
               << array->GetNumberOfTuples() << "." << std::endl;
-    return EXIT_FAILURE;
+    return false;
   }
 
   // Check timestep 4 for point 0
   if (!vtkMathUtilities::FuzzyCompare(array->GetComponent(4, 0), 0.951057, 0.0001))
   {
     std::cerr << "Expected 0.951057 but got " << array->GetComponent(4, 0) << "." << std::endl;
-    return EXIT_FAILURE;
+    return false;
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool CheckDSPIteratorWithObject(vtkDataObject* object)
+{
+  auto dspIterator = vtkDSPIterator::GetInstance(object);
+
+  if (!dspIterator)
+  {
+    std::cerr << "Failed to generate iterator!" << std::endl;
+    return false;
+  }
+
+  // Check first item
+  dspIterator->GoToFirstItem();
+  vtkTable* table = dspIterator->GetCurrentTable();
+
+  if (!CheckMDArrayInCorrectState(table))
+  {
+    std::cerr << "MDArray not in correct state at first iteration" << std::endl;
+    return false;
   }
 
   // Check total number of iterations and tables
@@ -83,6 +98,7 @@ bool CheckDSPIteratorWithObject(vtkDataObject* object)
   }
 
   return true;
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +127,7 @@ int TestDSPIterator(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!CheckDSPIteratorWithObject(outputMB))
+  if (!::CheckDSPIteratorWithObject(outputMB))
   {
     std::cerr << "Failed test for multiblock output." << std::endl;
     return EXIT_FAILURE;
@@ -132,9 +148,16 @@ int TestDSPIterator(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!CheckDSPIteratorWithObject(output))
+  if (!::CheckDSPIteratorWithObject(output))
   {
     std::cerr << "Failed test for table output." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // run this check to make sure the iterator didn't break its input
+  if (!::CheckMDArrayInCorrectState(output))
+  {
+    std::cerr << "Failed test after iteration." << std::endl;
     return EXIT_FAILURE;
   }
 
