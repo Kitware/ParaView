@@ -140,6 +140,21 @@
         not set, the writer is called for all time steps available in
         its input.</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetWriteJsonMetaFile"
+                         default_values="0"
+                         name="WriteSeriesMetaFile"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When writing timesteps, write a supplementary .series json meta file.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetMinTimeStep"
                          default_values="0"
                          label="First time step"
@@ -203,6 +218,7 @@
 
       <PropertyGroup label="File Series">
         <Property name="WriteTimeSteps" />
+        <Property name="WriteSeriesMetaFile" />
         <Property name="FileNameSuffix"/>
         <Property name="MinTimeStep" />
         <Property name="MaxTimeStep" />
@@ -274,6 +290,21 @@
         not set, the writer is called for all time steps available in
         its input.</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetWriteJsonMetaFile"
+                         default_values="0"
+                         name="WriteSeriesMetaFile"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When writing timesteps, write a supplementary .series json meta file.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetMinTimeStep"
                          default_values="0"
                          label="First time step"
@@ -337,6 +368,7 @@
 
       <PropertyGroup label="File Series">
         <Property name="WriteTimeSteps" />
+        <Property name="WriteSeriesMetaFile" />
         <Property name="FileNameSuffix"/>
         <Property name="MinTimeStep" />
         <Property name="MaxTimeStep" />
