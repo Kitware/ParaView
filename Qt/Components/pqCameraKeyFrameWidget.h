@@ -24,6 +24,11 @@ public:
   pqCameraKeyFrameWidget(QWidget* parent = nullptr);
   ~pqCameraKeyFrameWidget() override;
 
+  /**
+   * Return 'true' if the CameraKeyFrameWidget is set to 'path' mode,
+   * indicating that the widget's configuration applies to the entire animation
+   * track rather than being defined on a per-keyframe basis.
+   */
   bool usePathBasedMode() const;
 
 Q_SIGNALS:
