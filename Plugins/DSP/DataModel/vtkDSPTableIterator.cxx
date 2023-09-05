@@ -6,6 +6,7 @@
 #include "vtkArrayDispatch.h"
 #include "vtkArrayDispatchDSPArrayList.h"
 #include "vtkDataObject.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkMultiDimensionalArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
@@ -20,6 +21,7 @@ class Worker
 {
 public:
   virtual void SetIndex(vtkIdType index) = 0;
+  virtual ~Worker() = default;
 };
 
 //-----------------------------------------------------------------------------
@@ -31,6 +33,8 @@ public:
     : Array(typedArray)
   {
   }
+
+  ~TypedWorker() override = default;
 
   void SetIndex(vtkIdType index) override { this->Array->SetIndex(index); }
 
@@ -53,18 +57,41 @@ struct LastIndexIdentifier
 };
 
 //-----------------------------------------------------------------------------
-struct WorkerCreator
+struct ImplicitShallowCopier
 {
-  template <typename ArrayT>
-  void operator()(ArrayT* array, std::shared_ptr<Worker>& worker, LastIndexIdentifier& identifier)
+  vtkTable* InternalTable = nullptr;
+
+  ImplicitShallowCopier(vtkTable* table)
+    : InternalTable(table)
   {
-    worker = std::make_shared<TypedWorker<ArrayT>>(array);
-    identifier(array);
+  }
+
+  template <typename ArrayT>
+  vtkSmartPointer<ArrayT> operator()(ArrayT* array)
+  {
+    auto shallowCopied = vtkSmartPointer<ArrayT>::New();
+    shallowCopied->ImplicitShallowCopy(array);
+    this->InternalTable->GetRowData()->AddArray(shallowCopied);
+    return shallowCopied;
   }
 };
 
 //-----------------------------------------------------------------------------
-std::pair<vtkIdType, std::vector<std::shared_ptr<Worker>>> DispatchInitialize(vtkTable* table)
+struct WorkerCreator
+{
+  template <typename ArrayT>
+  void operator()(ArrayT* array, std::shared_ptr<Worker>& worker, LastIndexIdentifier& identifier,
+    ImplicitShallowCopier& copier)
+  {
+    auto copiedArray = copier(array);
+    worker = std::make_shared<TypedWorker<ArrayT>>(copiedArray.Get());
+    identifier(copiedArray.Get());
+  }
+};
+
+//-----------------------------------------------------------------------------
+std::tuple<vtkIdType, std::vector<std::shared_ptr<Worker>>, vtkSmartPointer<vtkTable>>
+DispatchInitialize(vtkTable* table)
 {
   using MDArrayList = vtkArrayDispatch::MultiDimensionalArrays;
   using MDDispatcher = vtkArrayDispatch::DispatchByArray<MDArrayList>;
@@ -72,6 +99,8 @@ std::pair<vtkIdType, std::vector<std::shared_ptr<Worker>>> DispatchInitialize(vt
   std::vector<std::shared_ptr<Worker>> workers;
   WorkerCreator workerCreator;
   LastIndexIdentifier lastIndexID;
+  auto internalTable = vtkSmartPointer<vtkTable>::New();
+  ImplicitShallowCopier copier(internalTable);
 
   for (vtkIdType iArr = 0; iArr < table->GetNumberOfColumns(); ++iArr)
   {
@@ -82,14 +111,17 @@ std::pair<vtkIdType, std::vector<std::shared_ptr<Worker>>> DispatchInitialize(vt
     }
 
     std::shared_ptr<Worker> typeErasedWorker;
-    MDDispatcher::Execute(array, workerCreator, typeErasedWorker, lastIndexID);
-    if (typeErasedWorker)
+    if (!MDDispatcher::Execute(array, workerCreator, typeErasedWorker, lastIndexID, copier))
+    {
+      internalTable->GetRowData()->AddArray(array);
+    }
+    else
     {
       workers.emplace_back(typeErasedWorker);
     }
   }
 
-  return std::make_pair(lastIndexID.LastIndex, workers);
+  return std::make_tuple(lastIndexID.LastIndex, workers, internalTable);
 }
 }
 
@@ -112,9 +144,9 @@ vtkDSPTableIterator* vtkDSPTableIterator::New(vtkTable* table)
 {
   auto result = vtkDSPTableIterator::New();
   auto dispatchedRes = ::DispatchInitialize(table);
-  result->Internals->Table = table;
-  result->Internals->LastIdx = dispatchedRes.first;
-  result->Internals->Workers = dispatchedRes.second;
+  result->Internals->LastIdx = std::get<0>(dispatchedRes);
+  result->Internals->Workers = std::get<1>(dispatchedRes);
+  result->Internals->Table = std::get<2>(dispatchedRes);
 
   return result;
 }
