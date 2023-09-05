@@ -84,6 +84,26 @@
         </property>
        </widget>
       </item>
+      <item>
+        <widget class="QPushButton" name="pbImportKeyFrames">
+          <property name="toolTip">
+            <string>Import key frames from a .pvkfc file.</string>
+          </property>
+          <property name="text">
+            <string>Import</string>
+          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbExportKeyFrames">
+          <property name="toolTip">
+           <string>Export key frames to a .pvkfc file.</string>
+          </property>
+          <property name="text">
+           <string>Export</string>
+          </property>
+        </widget>
+       </item>
      </layout>
     </widget>
    </item>

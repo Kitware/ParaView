@@ -6,6 +6,9 @@
 
 #include "pqComponentsModule.h"
 #include <QWidget>
+
+#include <vtk_jsoncpp_fwd.h> // for forward declarations
+
 class QComboBox;
 
 class PQCOMPONENTS_EXPORT pqKeyFrameTypeWidget : public QWidget
@@ -24,6 +27,16 @@ class PQCOMPONENTS_EXPORT pqKeyFrameTypeWidget : public QWidget
 public:
   pqKeyFrameTypeWidget(QWidget* parent = nullptr);
   ~pqKeyFrameTypeWidget() override;
+
+  /**
+   * Initialize the widget properties using JSON.
+   */
+  void initializeUsingJSON(const Json::Value& json);
+
+  /**
+   * Generate a JSON representing the widget configuration.
+   */
+  Json::Value serializeToJSON() const;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setType(const QString& text);

@@ -4,6 +4,8 @@
 #include "pqKeyFrameTypeWidget.h"
 #include "ui_pqKeyFrameTypeWidget.h"
 
+#include "vtk_jsoncpp.h"
+
 class pqKeyFrameTypeWidget::pqInternal : public Ui::pqKeyFrameTypeWidget
 {
 };
@@ -54,6 +56,69 @@ pqKeyFrameTypeWidget::pqKeyFrameTypeWidget(QWidget* p)
 pqKeyFrameTypeWidget::~pqKeyFrameTypeWidget()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameTypeWidget::initializeUsingJSON(const Json::Value& json)
+{
+  if (json["type"].isString())
+  {
+    this->setType(json["type"].asCString());
+  }
+
+  QString interpolationType = this->type();
+  if (interpolationType == "Exponential")
+  {
+    if (json["base"].isInt())
+    {
+      this->setBase(QString::number(json["base"].asInt()));
+    }
+    if (json["startPower"].isInt())
+    {
+      this->setStartPower(QString::number(json["startPower"].asInt()));
+    }
+    if (json["endPower"].isInt())
+    {
+      this->setEndPower(QString::number(json["endPower"].asInt()));
+    }
+  }
+  else if (interpolationType == "Sinusoid")
+  {
+    if (json["phase"].isDouble())
+    {
+      this->setPhase(json["phase"].asDouble());
+    }
+    if (json["frequency"].isInt())
+    {
+      this->setFrequency(QString::number(json["frequency"].asInt()));
+    }
+    if (json["offset"].isInt())
+    {
+      this->setOffset(QString::number(json["offset"].asInt()));
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+Json::Value pqKeyFrameTypeWidget::serializeToJSON() const
+{
+  Json::Value keyFrame;
+
+  QString interpolationType = this->type();
+  keyFrame["type"] = interpolationType.toStdString();
+  if (interpolationType == "Exponential")
+  {
+    keyFrame["base"] = this->base().toInt();
+    keyFrame["startPower"] = this->startPower().toInt();
+    keyFrame["endPower"] = this->endPower().toInt();
+  }
+  else if (interpolationType == "Sinusoid")
+  {
+    keyFrame["phase"] = this->phase();
+    keyFrame["frequency"] = this->frequency().toInt();
+    keyFrame["offset"] = this->offset().toInt();
+  }
+  return keyFrame;
 }
 
 void pqKeyFrameTypeWidget::setType(const QString& text)

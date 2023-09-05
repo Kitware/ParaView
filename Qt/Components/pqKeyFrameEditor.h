@@ -63,6 +63,8 @@ private Q_SLOTS:
   void updateCurrentCamera(QStandardItem* item);
   void updateCurrentCameraWithSelected();
   void createOrbitalKeyFrame();
+  void importTrajectory();
+  void exportTrajectory();
   void updateSplineMode();
 
 private: // NOLINT(readability-redundant-access-specifiers)

@@ -11,13 +11,13 @@
 #include "pqServer.h"
 #include "vtkCamera.h"
 #include "vtkPVSession.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
+#include "vtk_jsoncpp.h"
 
 #include <QDebug>
 #include <QDoubleValidator>
@@ -201,6 +201,109 @@ void pqCameraKeyFrameWidget::setUsePathBasedMode(bool use_paths)
 bool pqCameraKeyFrameWidget::usePathBasedMode() const
 {
   return (this->Internal->stackedWidgetMode->currentIndex() == 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraKeyFrameWidget::initializeUsingJSON(const Json::Value& json)
+{
+  std::vector<double> value;
+  auto parseJSONVector = [&json, &value](const char* name, unsigned int size) -> bool {
+    value.resize(size);
+    for (unsigned int idx = 0; idx < size; idx++)
+    {
+      if (json[name][idx].isDouble())
+      {
+        value[idx] = json[name][idx].asDouble();
+      }
+      else
+      {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  if (json["viewUp"].size() == 3 && parseJSONVector("viewUp", 3))
+  {
+    this->Internal->setViewUp(value.data());
+  }
+  if (this->usePathBasedMode())
+  {
+    unsigned int size = json["positions"].size();
+    if (size >= 3 && size % 3 == 0 && parseJSONVector("positions", size))
+    {
+      vtkSMPropertyHelper(this->Internal->PSplineProxy, "Points").Set(value.data(), size);
+    }
+    size = json["focalPoints"].size();
+    if (size >= 3 && size % 3 == 0 && parseJSONVector("focalPoints", size))
+    {
+      vtkSMPropertyHelper(this->Internal->FSplineProxy, "Points").Set(value.data(), size);
+    }
+    if (json["positionPathClosed"].isInt())
+    {
+      vtkSMPropertyHelper(this->Internal->PSplineProxy, "Closed")
+        .Set(json["positionPathClosed"].asInt());
+    }
+    if (json["focalPointPathClosed"].isInt())
+    {
+      vtkSMPropertyHelper(this->Internal->FSplineProxy, "Closed")
+        .Set(json["focalPointPathClosed"].asInt());
+    }
+  }
+  else
+  {
+    if (json["position"].size() == 3 && parseJSONVector("position", 3))
+    {
+      this->Internal->setPosition(value.data());
+    }
+    if (json["focalPoint"].size() == 3 && parseJSONVector("focalPoint", 3))
+    {
+      this->Internal->setFocalPoint(value.data());
+    }
+    if (json["viewAngle"].isDouble())
+    {
+      this->Internal->setViewAngle(json["viewAngle"].asDouble());
+    }
+    if (json["parallelScale"].isDouble())
+    {
+      this->Internal->setParallelScale(json["parallelScale"].asDouble());
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+Json::Value pqCameraKeyFrameWidget::serializeToJSON() const
+{
+  Json::Value keyFrame;
+
+  auto addJSONVector = [&keyFrame](const char* name, const double* value, size_t size) {
+    for (unsigned int idx = 0; idx < size; idx++)
+    {
+      keyFrame[name].insert(idx, value[idx]);
+    }
+  };
+
+  if (this->usePathBasedMode())
+  {
+    auto positions = vtkSMPropertyHelper(this->Internal->PSplineProxy, "Points").GetDoubleArray();
+    addJSONVector("positions", positions.data(), positions.size());
+    keyFrame["positionPathClosed"] =
+      vtkSMPropertyHelper(this->Internal->PSplineProxy, "Closed").GetAsInt();
+    auto focalPoints = vtkSMPropertyHelper(this->Internal->FSplineProxy, "Points").GetDoubleArray();
+    addJSONVector("focalPoints", focalPoints.data(), focalPoints.size());
+    keyFrame["focalPointPathClosed"] =
+      vtkSMPropertyHelper(this->Internal->FSplineProxy, "Closed").GetAsInt();
+    addJSONVector("viewUp", this->Internal->viewUp_Path(), 3);
+  }
+  else
+  {
+    keyFrame["parallelScale"] = this->Internal->getParallelScale();
+    keyFrame["viewAngle"] = this->Internal->getViewAngle();
+    addJSONVector("viewUp", this->Internal->viewUp_NonPath(), 3);
+    addJSONVector("position", this->Internal->position(), 3);
+    addJSONVector("focalPoint", this->Internal->focalPoint(), 3);
+  }
+  return keyFrame;
 }
 
 //-----------------------------------------------------------------------------
