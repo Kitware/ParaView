@@ -39,9 +39,9 @@
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 
   <!-- add new key frame, with orbit. Position spline has 7 control points -->
-  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pbNew" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/widget/pbNew" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="0.1,Path ..." />
-  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pbCreateOrbit" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pbCameraModeStackedWidget/pbPathModePage/pbCreateOrbit" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/OrbitCreatorDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.1" />
   <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.1" />

@@ -406,12 +406,8 @@ pqKeyFrameEditor::pqKeyFrameEditor(
   this->readKeyFrameData();
 
   bool pathBased = this->Internal->cameraPathCue();
-  // path mode
-  this->Internal->Ui.pbCreateOrbit->setVisible(this->Internal->cameraCue() && pathBased);
-  // cameras mode
-  this->Internal->Ui.pbUseCurrentCamera->setVisible(this->Internal->cameraCue() && !pathBased);
-  this->Internal->Ui.pbApplyToCamera->setVisible(this->Internal->cameraCue() && !pathBased);
-  this->Internal->Ui.pbUseSpline->setVisible(this->Internal->cameraCue() && !pathBased);
+  this->Internal->Ui.pbCameraModeStackedWidget->setVisible(this->Internal->cameraCue());
+  this->Internal->Ui.pbCameraModeStackedWidget->setCurrentIndex(pathBased ? 1 : 0);
 
   this->updateButtons();
 

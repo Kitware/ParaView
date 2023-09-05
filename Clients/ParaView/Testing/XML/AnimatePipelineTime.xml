@@ -15,7 +15,7 @@
   <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.0.0" />
 
   <pqevent object="pqPipelineTimeKeyFrameEditor/variableRadio" command="set_boolean" arguments="true" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/pbNew" command="activate" arguments="" />
+  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/widget/pbNew" command="activate" arguments="" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,52,19,/1:2" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mouseRelease" arguments="1,0,0,52,19,/1:2" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="6,48,536870912,0,0,1" />
