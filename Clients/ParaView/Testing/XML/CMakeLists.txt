@@ -38,6 +38,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/CubeStringArray.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/EnSight/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/ExRestarts/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/FDSExample/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FileSeries/,REGEX:.*}"
@@ -647,6 +648,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCompositedGeometryCulling.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestGeometryBoundsClobber.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_2.png}"
@@ -929,6 +933,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   SteeringDataGenerator.xml
   TestCleanGridPointDataStrategies.xml
   TestColorMapModificationRendersAllViews.xml
+  TestFDSReader.xml
   TestHTGSelection.xml
   TestIsoVolume.xml
   TextSourceBorder.xml

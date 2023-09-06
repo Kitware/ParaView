@@ -1,0 +1,69 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkFDSReader" label="FDS Reader" name="FDSReader">
+      <Documentation short_help="Reads .smv files outputed from the FDS code.">
+        A reader relying on `.smv` files to read outputs from the Fire Dynamics Simulator (FDS) code.
+      </Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the file name for the VTKFDS reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="AssemblyTag"
+                         command="GetAssemblyTag"
+                         information_only="1">
+        <Documentation>
+          This is simply an int that changes whenever a new assembly is built
+          by the reader. This can be used to determine if the assembly should be fetched from
+          the reader whenever the reader is updated.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="AssemblySelectors"
+                            command="AddSelector"
+                            clean_command="ClearSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            panel_widget="data_assembly_editor" >
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Tag"
+                      name="AssemblyTag" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to extract from the input dataset.
+        </Documentation>
+        <Hints>
+          <!-- AssemblyTag == 0 implies there's no assembly in the file,
+          in which case, we want to hide this widget entirely -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AssemblyTag"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="smv"
+                       file_description="SmokeView Files"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

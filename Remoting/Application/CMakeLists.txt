@@ -412,6 +412,11 @@ if (TARGET VTK::IOCatalystConduit)
     Resources/proxies_conduit.xml)
 endif()
 
+if (TARGET VTK::IOFDS)
+  list(APPEND xml_files
+    Resources/readers_iofds.xml)
+endif()
+
 if (PARAVIEW_USE_PYTHON)
   list(APPEND xml_files
     Resources/readers_openpmd.xml
