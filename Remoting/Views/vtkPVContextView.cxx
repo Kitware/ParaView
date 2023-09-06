@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVContextView.h"
 
+#include "vtkAbstractChartExporter.h"
 #include "vtkAnnotationLink.h"
-#include "vtkCSVExporter.h"
 #include "vtkCamera.h"
 #include "vtkChart.h"
 #include "vtkChartRepresentation.h"
@@ -166,9 +166,9 @@ bool vtkPVContextView::MapSelectionToInput(vtkSelection* sel)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVContextView::Export(vtkCSVExporter* exporter)
+bool vtkPVContextView::Export(vtkAbstractChartExporter* exporter)
 {
-  exporter->Open(vtkCSVExporter::STREAM_COLUMNS);
+  exporter->Open(vtkAbstractChartExporter::STREAM_COLUMNS);
   for (int cc = 0, max = this->GetNumberOfRepresentations(); cc < max; cc++)
   {
     vtkChartRepresentation* repr =

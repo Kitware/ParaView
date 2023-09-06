@@ -387,7 +387,7 @@ void vtkXYChartRepresentation::PrepareForRendering()
 }
 
 //----------------------------------------------------------------------------
-bool vtkXYChartRepresentation::Export(vtkCSVExporter* exporter)
+bool vtkXYChartRepresentation::Export(vtkAbstractChartExporter* exporter)
 {
   assert(this->GetVisibility() == true);
   return this->Internals->Export(this, exporter);

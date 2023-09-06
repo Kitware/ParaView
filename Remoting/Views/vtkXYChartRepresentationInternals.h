@@ -388,7 +388,7 @@ public:
   /**
    * Export visible plots to a CSV file.
    */
-  virtual bool Export(vtkXYChartRepresentation* self, vtkCSVExporter* exporter)
+  virtual bool Export(vtkXYChartRepresentation* self, vtkAbstractChartExporter* exporter)
   {
     for (PlotsMap::iterator iter1 = this->SeriesPlots.begin(); iter1 != this->SeriesPlots.end();
          ++iter1)

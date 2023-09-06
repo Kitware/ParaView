@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVParallelCoordinatesRepresentation.h"
 
-#include "vtkCSVExporter.h"
+#include "vtkAbstractChartExporter.h"
 #include "vtkChartParallelCoordinates.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
@@ -184,7 +184,7 @@ void vtkPVParallelCoordinatesRepresentation::PrepareForRendering()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVParallelCoordinatesRepresentation::Export(vtkCSVExporter* exporter)
+bool vtkPVParallelCoordinatesRepresentation::Export(vtkAbstractChartExporter* exporter)
 {
   vtkChartParallelCoordinates* chart = this->GetChart();
   vtkTable* plotInput = this->GetLocalOutput();
