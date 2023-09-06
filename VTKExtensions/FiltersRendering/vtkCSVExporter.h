@@ -37,7 +37,7 @@
 #ifndef vtkCSVExporter_h
 #define vtkCSVExporter_h
 
-#include "vtkObject.h"
+#include "vtkAbstractChartExporter.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
 
 #include <string> // needed for std::string
@@ -46,11 +46,11 @@ class vtkAbstractArray;
 class vtkDataArray;
 class vtkFieldData;
 
-class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkCSVExporter : public vtkObject
+class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkCSVExporter : public vtkAbstractChartExporter
 {
 public:
   static vtkCSVExporter* New();
-  vtkTypeMacro(vtkCSVExporter, vtkObject);
+  vtkTypeMacro(vtkCSVExporter, vtkAbstractChartExporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -68,12 +68,6 @@ public:
   vtkSetStringMacro(FieldDelimiter);
   vtkGetStringMacro(FieldDelimiter);
   ///@}
-
-  enum ExporterModes
-  {
-    STREAM_ROWS,
-    STREAM_COLUMNS
-  };
 
   ///@{
   /**
@@ -110,19 +104,19 @@ public:
   /**
    * Open the file and set mode in which the exporter is operating.
    */
-  bool Open(ExporterModes mode = STREAM_ROWS);
+  bool Open(ExporterModes mode = STREAM_ROWS) override;
 
   /**
    * Closes the file cleanly. Call this at the end to close the file and dump
    * out any cached data.
    */
-  void Close();
+  void Close() override;
 
   /**
    * Same as Close except deletes the file, if created. This is useful to
    * interrupt the exporting on failure.
    */
-  void Abort();
+  void Abort() override;
 
   ///@{
   /**
@@ -130,8 +124,8 @@ public:
    * WriteHeader and then use WriteData as many times as needed to write out
    * rows.
    */
-  void WriteHeader(vtkFieldData*);
-  void WriteData(vtkFieldData*);
+  void WriteHeader(vtkFieldData*) override;
+  void WriteData(vtkFieldData*) override;
   ///@}
 
   /**
@@ -141,8 +135,8 @@ public:
    * makes it possible to add multiple columns with varying number of samples.
    * The final output will have empty cells for missing values.
    */
-  void AddColumn(
-    vtkAbstractArray* yarray, const char* yarrayname = nullptr, vtkDataArray* xarray = nullptr);
+  void AddColumn(vtkAbstractArray* yarray, const char* yarrayname = nullptr,
+    vtkDataArray* xarray = nullptr) override;
 
   ///@{
   /**
