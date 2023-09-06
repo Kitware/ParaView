@@ -119,6 +119,11 @@ public:
   const std::string& GetTimeoutCommand() const { return this->TimeoutCommand; }
 
   /**
+   * On server processes, the interval in seconds between consecutive calls of `TimeoutCommand`.
+   */
+  vtkGetMacro(TimeoutCommandInterval, int);
+
+  /**
    * On client processes, this returns the server connection url to use to
    * connect to the server process(es) on startup, if any.
    *
@@ -304,6 +309,7 @@ private:
   std::string ServerResourceName;
   int Timeout = 0;
   std::string TimeoutCommand;
+  int TimeoutCommandInterval = 60;
   bool UseStereoRendering = false;
   int StereoType = 0;
   double EyeSeparation = 0.06;

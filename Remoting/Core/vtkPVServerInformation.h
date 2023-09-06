@@ -98,6 +98,14 @@ public:
   const std::string& GetTimeoutCommand() const { return this->TimeoutCommand; }
   ///@}
 
+  ///@{
+  /**
+   * Get the time interval in seconds between consecutive calls of TimeoutCommand.
+   * Defaults to 60.
+   */
+  vtkGetMacro(TimeoutCommandInterval, int);
+  ///@}
+
   /**
    * When in tile display mode, returns the tile dimensions.
    */
@@ -170,6 +178,7 @@ protected:
   int RemoteRendering;
   int Timeout;
   std::string TimeoutCommand;
+  int TimeoutCommandInterval;
   int UseIceT;
   int MultiClientsEnable;
   int ClientId;
