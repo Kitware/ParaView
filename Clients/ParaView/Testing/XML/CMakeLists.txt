@@ -1111,6 +1111,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRContour.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
+  AnimationCameraExportImport.xml
   AnimationFollowPath.xml
   AnimationSetTimeCursor.xml
   AnimationUseCamera.xml
