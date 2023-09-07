@@ -7,9 +7,10 @@ Created with the Valve Index controller, some adaptations may be needed for othe
  - Create a “Wavelet”, Apply
  - Set “Surface With Edges” representation
  - Set “RTData” as coloring array
- - Open “Time Manager” (View -> Time Manager)
  - Create a “Slice” on the Wavelet, Apply
    - This will hide the Wavelet, set it back to visible using the Pipeline Browser
+ - Open “Time Manager” (View -> Time Manager)
+ - In “Time Manager”, change the source from "Wavelet1" to "Slice1" in the first combo box
  - In “Time Manager”, click the “+” button to add a default animation for the Slice
  - Create a “Poly Line Source”, Apply
  - Load the “XRInterface” plugin
@@ -19,7 +20,6 @@ Created with the Valve Index controller, some adaptations may be needed for othe
  - Check “Base Station Visibility” (only if HMD uses base stations)
  - Choose “OpenVR” or “OpenXR” as runtime depending on what you are testing
  - Click “Send to XR”
- - Output message may appear, close it.
  - Press “Show XR View” and check VR scene is visible in a desktop window
 
 ## After entering XR:
@@ -50,12 +50,6 @@ Created with the Valve Index controller, some adaptations may be needed for othe
    - Check “Flying” movement style (only left joystick, follows controller orientation/direction)
    - Check “Grounded” movement style (left joystick for horizontal movement, right joystick for vertical movement)
  - Move “Movement speed” slider and check movement speed change (with joystick)
-
-## In the XR menu, in “Environment” tab
-
- - Change “View Up” and check orientation change
- - Press one of “Scene Scale” buttons and check scaling change (recommended to test the smaller ones)
- - Toggle “Show Floor” (floor should disappear)
  - Press “Reset Camera” (actors must come back to center of the room)
  - Save camera poses:
    - Click “Save Pose” (a new button should appear in the toolbar)
@@ -64,10 +58,18 @@ Created with the Valve Index controller, some adaptations may be needed for othe
    - Move away from your current position (with joystick or by moving physically)
    - Press the left trigger to load the saved position (camera should be moved at the saved position again)
    - Press “Clear” (all save poses should be removed)
+   - Click “Save Pose” (to test state file later)
+
+## In the XR menu, in “Environment” tab
+
+ - Change “View Up” and check orientation change
+ - Press one of “Scene Scale” buttons and check scaling change (recommended to test the smaller ones)
+ - Toggle “Show Floor” (floor should disappear)
 
 ## In the XR menu, in “Widgets” tab
 
  - Press “Ruler”
+ - Check that white cross marker is displayed at the tip of the right controller
  - Place two points with right trigger (should place distance info)
  - Press “Ruler” again
  - Toggle “Navigation Panel” (should appear above the left controller)
@@ -84,10 +86,10 @@ Created with the Valve Index controller, some adaptations may be needed for othe
 
 ## In the XR menu:
 
-  - Hide the wavelet from the XR menu pipeline browser, so you can see the slice:
-   - Play slice animation from XR menu, test all buttons (goto begin/end, single step, play, loop)
-   - Let the animation loop, and check that the animation is also played in Paraview Desktop view.
-   - Check that the loop button is synced between Paraview Desktop and the XR menu
+ - Hide the wavelet from the XR menu pipeline browser, so you can see the slice
+ - Play slice animation from XR menu, test all buttons (goto begin/end, single step, play, loop)
+ - Let the animation loop, and check that the animation is also played in Paraview Desktop view
+ - Check that the loop button is synced between Paraview Desktop and the XR menu
  - Press “Exit XR” button and confirm XR is closed
 
 ## After exiting XR:
