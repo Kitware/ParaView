@@ -60,6 +60,11 @@ public:
   void RemoveMeasurement();
 
   /**
+   * Return whether the distance widget is enabled or not.
+   */
+  bool IsMeasurementEnabled() const;
+
+  /**
    * Show a billboard with the provided text and texture file.
    * Its position is updated depending on the HMD position if necessary.
    * Only one billboard can be displayed at a time.

@@ -184,12 +184,14 @@ void vtkPVXRInterfaceHelper::TakeMeasurement()
 {
   this->ToggleShowControls();
   this->Widgets->TakeMeasurement(this->Internals->RenderWindow);
+  this->SetShowRightControllerMarker(true);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::RemoveMeasurement()
 {
   this->Widgets->RemoveMeasurement();
+  this->SetShowRightControllerMarker(false);
 }
 
 //----------------------------------------------------------------------------
@@ -740,6 +742,28 @@ void vtkPVXRInterfaceHelper::SetHoverPick(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::SetShowRightControllerMarker(bool visibility)
+{
+  vtkVRRenderer* ren = vtkVRRenderer::SafeDownCast(this->Renderer);
+
+  if (!ren)
+  {
+    return;
+  }
+
+  // Check that the marker is not used anywhere before removing it
+  if (!visibility &&
+    (this->RightTriggerMode == vtkPVXRInterfaceHelper::ADD_POINT_TO_SOURCE ||
+      this->RightTriggerMode == vtkPVXRInterfaceHelper::GRAB ||
+      this->Widgets->IsMeasurementEnabled()))
+  {
+    return;
+  }
+
+  ren->SetShowRightMarker(visibility);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
 {
   this->HideBillboard();
@@ -770,17 +794,26 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
 
     switch (this->RightTriggerMode)
     {
+      case vtkPVXRInterfaceHelper::ADD_POINT_TO_SOURCE:
+      {
+        this->SetShowRightControllerMarker(true);
+        break;
+      }
       case vtkPVXRInterfaceHelper::GRAB:
+        this->SetShowRightControllerMarker(true);
         style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
         break;
       case vtkPVXRInterfaceHelper::PICK:
+        this->SetShowRightControllerMarker(false);
         style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
         style->GrabWithRayOn();
         break;
       case vtkPVXRInterfaceHelper::INTERACTIVE_CROP:
+        this->SetShowRightControllerMarker(false);
         style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_CLIP);
         break;
       case vtkPVXRInterfaceHelper::PROBE:
+        this->SetShowRightControllerMarker(false);
         style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
         break;
       default:
