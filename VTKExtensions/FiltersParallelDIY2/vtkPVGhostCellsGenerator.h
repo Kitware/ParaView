@@ -53,7 +53,28 @@ public:
    */
   void SetNumberOfGhostLayers(int nbGhostLayers);
 
-  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  /**
+   * Specify if the filter should try to synchronize ghost data
+   * without recomputing ghost cells localization.
+   * If On, it assumes the number of ghost layer should not change.
+   * If On, but conditions are not met (ghosts, gids and pids), it
+   * will fallback on the default behavior: generating ghosts.
+   * Does not apply to Hyper Tree Grid.
+   * Pass the call to the internal vtkGhostCellGenerator.
+   */
+  void SetSynchronizeOnly(bool sync);
+
+  /**
+   * Specify if the filter should generate GlobalsIds.
+   * Default is false.
+   */
+  void SetGenerateGlobalIds(bool set);
+
+  /**
+   * Specify if the filter should generate ProcessIds.
+   * Default is false.
+   */
+  void SetGenerateProcessIds(bool set);
 
 protected:
   vtkPVGhostCellsGenerator();
@@ -62,6 +83,8 @@ protected:
 private:
   vtkPVGhostCellsGenerator(const vtkPVGhostCellsGenerator&) = delete;
   void operator=(const vtkPVGhostCellsGenerator&) = delete;
+
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

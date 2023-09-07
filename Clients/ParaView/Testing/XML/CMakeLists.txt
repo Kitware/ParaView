@@ -1475,6 +1475,17 @@ if (PARAVIEW_USE_MPI)
     TEST_SCRIPTS DistributePoints.xml
   )
 
+  # GenerateProcessIds is only tested in non-built-in mode.
+  # There is no baseline because of TODO
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GenerateProcessIds.xml
+  )
+  paraview_add_client_server_render_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GenerateProcessIds.xml
+  )
+
   # Volume rendering seems to work better in serial
   set (UseDataPartitions_FORCE_SERIAL TRUE)
   # This test requires a parallel partition to make sense so we
@@ -1505,6 +1516,16 @@ if (PARAVIEW_USE_MPI)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS GhostCellsGenerator.xml
     )
+
+  # GhostCellGeneratorSynchronize is only tested in non-built-in mode.
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostCellsGeneratorSynchronize.xml
+  )
+  paraview_add_client_server_render_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostCellsGeneratorSynchronize.xml
+  )
 
   paraview_add_client_server_tests(
 #    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}

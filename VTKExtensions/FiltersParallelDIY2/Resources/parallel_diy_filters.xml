@@ -25,6 +25,57 @@
         </DataTypeDomain>
         <Documentation>This property specifies the input.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetSynchronizeOnly"
+                         default_values="0"
+                         name="SynchronizeOnly"
+                        number_of_elements="1">
+        <Documentation>
+          Specify if the filter should only try to synchronize ghost data.
+          If On, it assumes the number of ghost layer should not change.
+          If On, but conditions are not met (ghosts, gids and pids), it
+          will fallback on the default behavior: generating ghosts.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetGenerateGlobalIds"
+                         default_values="0"
+                         name="GenerateGlobalIds"
+                         number_of_elements="1">
+        <Documentation>
+          Specify if the filter should generate global ids when generating ghost cells.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   property="SynchronizeOnly"
+                                   value="0"
+                                   mode="enabled_state" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetGenerateProcessIds"
+                         default_values="0"
+                         name="GenerateProcessIds"
+                         number_of_elements="1">
+        <Documentation>
+          Specify if the filter should generate process ids when generating ghost cells.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   property="SynchronizeOnly"
+                                   value="0"
+                                   mode="enabled_state" />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetBuildIfRequired"
                          default_values="0"
                          name="BuildIfRequired"
@@ -40,6 +91,10 @@
                                    name="vtkHyperTreeGrid"
                                    exclude="1"
                                    mode="visibility"/>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="SynchronizeOnly"
+                                   value="0"/>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfGhostLayers"
@@ -58,10 +113,11 @@
                                    name="vtkHyperTreeGrid"
                                    exclude="1"
                                    mode="visibility"/>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="enabled_state"
-                                   property="BuildIfRequired"
-                                   value="0">
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="BuildIfRequired" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SynchronizeOnly" value="0" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>

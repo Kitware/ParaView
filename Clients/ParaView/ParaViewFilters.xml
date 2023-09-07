@@ -253,6 +253,7 @@
   <Proxy group="filters" name="ForceTime" />
   <Proxy group="filters" name="GaussianSplatter" />
   <Proxy group="filters" name="GenerateGlobalIds" />
+  <Proxy group="filters" name="GenerateProcessIds" />
   <Proxy group="filters" name="GenerateIdScalars" />
   <Proxy group="filters" name="GenerateSpatioTemporalHarmonics" />
   <Proxy group="filters" name="GenerateTimeSteps" />

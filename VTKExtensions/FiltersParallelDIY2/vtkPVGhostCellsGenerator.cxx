@@ -49,22 +49,61 @@ void vtkPVGhostCellsGenerator::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVGhostCellsGenerator::SetController(vtkMultiProcessController* controller)
 {
-  this->Internals->Generator->SetController(controller);
-  this->Modified();
+  if (controller != this->Internals->Generator->GetController())
+  {
+    this->Internals->Generator->SetController(controller);
+    this->Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGhostCellsGenerator::SetBuildIfRequired(bool enable)
 {
-  this->Internals->Generator->SetBuildIfRequired(enable);
-  this->Modified();
+  if (enable != this->Internals->Generator->GetBuildIfRequired())
+  {
+    this->Internals->Generator->SetBuildIfRequired(enable);
+    this->Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGhostCellsGenerator::SetNumberOfGhostLayers(int nbGhostLayers)
 {
-  this->Internals->Generator->SetNumberOfGhostLayers(nbGhostLayers);
-  this->Modified();
+  if (nbGhostLayers != this->Internals->Generator->GetNumberOfGhostLayers())
+  {
+    this->Internals->Generator->SetNumberOfGhostLayers(nbGhostLayers);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGhostCellsGenerator::SetSynchronizeOnly(bool sync)
+{
+  if (sync != this->Internals->Generator->GetSynchronizeOnly())
+  {
+    this->Internals->Generator->SetSynchronizeOnly(sync);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGhostCellsGenerator::SetGenerateGlobalIds(bool set)
+{
+  if (set != this->Internals->Generator->GetGenerateGlobalIds())
+  {
+    this->Internals->Generator->SetGenerateGlobalIds(set);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGhostCellsGenerator::SetGenerateProcessIds(bool set)
+{
+  if (set != this->Internals->Generator->GetGenerateProcessIds())
+  {
+    this->Internals->Generator->SetGenerateProcessIds(set);
+    this->Modified();
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -79,8 +118,7 @@ int vtkPVGhostCellsGenerator::RequestDataObject(vtkInformation* vtkNotUsed(reque
 
   if (!input)
   {
-    vtkErrorMacro("Missing input!");
-    return 0;
+    return 1;
   }
 
   int filterIndex = vtkHyperTreeGrid::SafeDownCast(input) == nullptr ? 0 : 1;
