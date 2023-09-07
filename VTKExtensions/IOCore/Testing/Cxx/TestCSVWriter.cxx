@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Menno Deij - van Rijswijk, MARIN, The Netherlands
 // SPDX-License-Identifier: BSD-3-Clause
+#include "vtkConstantArray.h"
 #include <vtkCSVWriter.h>
 #include <vtkDelimitedTextReader.h>
 #include <vtkDoubleArray.h>
@@ -33,6 +34,12 @@ bool WriteCSV(const std::string& fname, int rank)
   col3->SetName("Column3-Partial");
   col3->SetNumberOfTuples(10);
 
+  vtkNew<vtkConstantArray<int>> col4;
+  col4->SetName("Column4-implicit");
+  col4->SetNumberOfTuples(10);
+  col4->SetNumberOfComponents(1);
+  col4->SetBackend(std::make_shared<vtkConstantImplicitBackend<int>>(42));
+
   for (int cc = 0; cc < 10; ++cc)
   {
     const auto row = cc + rank * 10;
@@ -46,9 +53,11 @@ bool WriteCSV(const std::string& fname, int rank)
     table->AddColumn(col1);
     table->AddColumn(col3);
     table->AddColumn(col2);
+    table->AddColumn(col4);
   }
   else
   {
+    table->AddColumn(col4);
     table->AddColumn(col2);
     table->AddColumn(col1);
   }
@@ -64,7 +73,7 @@ bool WriteCSV(const std::string& fname, int rank)
   if ((x) != (y))                                                                                  \
   {                                                                                                \
     std::cerr << "ERROR: " << (txt) << endl                                                        \
-              << "expected (" << (x) << "), got (" << (y) << ")" << endl;                          \
+              << "expected (" << (y) << "), got (" << (x) << ")" << endl;                          \
     return false;                                                                                  \
   }
 
@@ -83,7 +92,7 @@ bool ReadAndVerifyCSV(const std::string& fname, int rank, int numRanks)
 
   auto table = reader->GetOutput();
   VERITFY_EQ(table->GetNumberOfRows(), 10 * numRanks, "incorrect row count");
-  VERITFY_EQ(table->GetNumberOfColumns(), 2, "incorrect column count");
+  VERITFY_EQ(table->GetNumberOfColumns(), 3, "incorrect column count");
 
   for (int irank = 0; irank < numRanks; ++irank)
   {
@@ -92,10 +101,13 @@ bool ReadAndVerifyCSV(const std::string& fname, int rank, int numRanks)
       const auto row = cc + irank * 10;
       auto value1 = table->GetValueByName(row, "Column1");
       auto value2 = table->GetValueByName(row, "Column2");
+      auto value3 = table->GetValueByName(row, "Column4-implicit");
       VERITFY_EQ(value1.ToDouble(), row + 1.5,
         std::string("incorrect column1  values at row ") + std::to_string(row));
       VERITFY_EQ(value2.ToInt(), row * 100,
         std::string("incorrect column2  values at row ") + std::to_string(row));
+      VERITFY_EQ(
+        value3.ToInt(), 42, std::string("incorrect column4  values at row ") + std::to_string(row));
     }
   }
   return true;

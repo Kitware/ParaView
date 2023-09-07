@@ -3,10 +3,14 @@
 #include "vtkCSVWriter.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkArrayDispatch.h"
+#include "vtkArrayDispatchArrayList.h"
 #include "vtkArrayIteratorIncludes.h"
 #include "vtkAttributeDataToTableFilter.h"
 #include "vtkCellData.h"
+#include "vtkCharArray.h"
 #include "vtkDataArray.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDoubleArray.h"
 #include "vtkErrorCode.h"
 #include "vtkInformation.h"
@@ -19,7 +23,9 @@
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
 #include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
@@ -186,97 +192,125 @@ int vtkCSVWriter::ProcessRequest(
 
 namespace
 {
-//-----------------------------------------------------------------------------
-template <class iterT>
-void vtkCSVWriterGetDataString(
-  iterT* iter, vtkIdType tupleIndex, ostream& stream, vtkCSVWriter* writer, bool& first)
+/**
+ * Worker interface, so we can store pointers of concrete subclasses in a generic container.
+ * The operator() should write the array value at given index into the stream.
+ */
+struct AbstractStreamWorker
 {
-  int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex * numComps;
-  for (int cc = 0; cc < numComps; cc++)
+  AbstractStreamWorker(vtkAbstractArray* arr)
+    : NumberOfComponents(arr->GetNumberOfComponents())
   {
-    if (!first)
-    {
-      stream << writer->GetFieldDelimiter();
-    }
-    first = false;
-    if ((index + cc) < iter->GetNumberOfValues())
-    {
-      stream << iter->GetValue(index + cc);
-    }
   }
-}
 
-//-----------------------------------------------------------------------------
-template <>
-void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
-  ostream& stream, vtkCSVWriter* writer, bool& first)
-{
-  int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex * numComps;
-  for (int cc = 0; cc < numComps; cc++)
-  {
-    if (!first)
-    {
-      stream << writer->GetFieldDelimiter();
-    }
-    first = false;
-    if ((index + cc) < iter->GetNumberOfValues())
-    {
-      stream << writer->GetString(iter->GetValue(index + cc));
-    }
-  }
-}
+  virtual void operator()(ostream& stream, vtkCSVWriter* writer, vtkIdType index) = 0;
+  vtkIdType NumberOfComponents;
+};
 
-//-----------------------------------------------------------------------------
-template <>
-void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
-  ostream& stream, vtkCSVWriter* writer, bool& first)
+/**
+ * Generic implementation using DataArrayValueRange.
+ */
+template <typename ArrayT>
+struct DataToStreamWorker : public AbstractStreamWorker
 {
-  int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex * numComps;
-  for (int cc = 0; cc < numComps; cc++)
+  DataToStreamWorker(ArrayT* array)
+    : AbstractStreamWorker(array)
   {
-    if (!first)
-    {
-      stream << writer->GetFieldDelimiter();
-    }
-    first = false;
-    if ((index + cc) < iter->GetNumberOfValues())
-    {
-      stream << static_cast<int>(iter->GetValue(index + cc));
-    }
+    this->Range = vtk::DataArrayValueRange(array);
   }
-}
 
-//-----------------------------------------------------------------------------
-template <>
-void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
-  ostream& stream, vtkCSVWriter* writer, bool& first)
-{
-  int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex * numComps;
-  for (int cc = 0; cc < numComps; cc++)
+  void operator()(ostream& stream, vtkCSVWriter* vtkNotUsed(writer), vtkIdType index) override
   {
-    if ((index + cc) < iter->GetNumberOfValues())
-    {
-      if (!first)
-      {
-        stream << writer->GetFieldDelimiter();
-      }
-      first = false;
-      stream << static_cast<int>(iter->GetValue(index + cc));
-    }
-    else
-    {
-      if (!first)
-      {
-        stream << writer->GetFieldDelimiter();
-      }
-      first = false;
-    }
+    stream << this->Range[index];
   }
-}
+
+private:
+  using RangeType =
+    typename vtk::detail::SelectValueRange<ArrayT, vtk::detail::DynamicTupleSize>::type;
+  RangeType Range;
+};
+
+/**
+ * vtkStringArray specialization to support string delimiters.
+ */
+template <>
+struct DataToStreamWorker<vtkStringArray> : public AbstractStreamWorker
+{
+  DataToStreamWorker(vtkStringArray* array)
+    : AbstractStreamWorker(array)
+    , Array(array)
+  {
+  }
+
+  void operator()(ostream& stream, vtkCSVWriter* writer, vtkIdType index) override
+  {
+    stream << writer->GetString(this->Array->GetValue(index));
+  }
+
+  vtkStringArray* Array;
+};
+
+/**
+ * vtkCharArray specialization to enforce numeric values.
+ */
+template <>
+struct DataToStreamWorker<vtkCharArray> : public AbstractStreamWorker
+{
+  DataToStreamWorker(vtkCharArray* array)
+    : AbstractStreamWorker(array)
+  {
+    this->Range = vtk::DataArrayValueRange(array);
+  }
+
+  void operator()(ostream& stream, vtkCSVWriter* vtkNotUsed(writer), vtkIdType index) override
+  {
+    stream << static_cast<int>(this->Range[index]);
+  }
+
+private:
+  using RangeType =
+    typename vtk::detail::SelectValueRange<vtkCharArray, vtk::detail::DynamicTupleSize>::type;
+  RangeType Range;
+};
+
+/**
+ * vtkUnsignedCharArray specialization to enforce numeric values.
+ */
+template <>
+struct DataToStreamWorker<vtkUnsignedCharArray> : public AbstractStreamWorker
+{
+  DataToStreamWorker(vtkUnsignedCharArray* array)
+    : AbstractStreamWorker(array)
+  {
+    this->Range = vtk::DataArrayValueRange(array);
+  }
+
+  void operator()(ostream& stream, vtkCSVWriter* vtkNotUsed(writer), vtkIdType index) override
+  {
+    stream << static_cast<int>(this->Range[index]);
+  }
+
+private:
+  using RangeType = typename vtk::detail::SelectValueRange<vtkUnsignedCharArray,
+    vtk::detail::DynamicTupleSize>::type;
+  RangeType Range;
+};
+
+/**
+ * Worker dedicated to construct the correct type of workers. Instead
+ * of dispatching every row, this pattern enables us to dispatch
+ * only once in the beginning of the procedure and then use some
+ * polymorphism to "store" the types in the typed workers.
+ */
+struct WorkerCreator
+{
+  template <typename ArrayT>
+  void operator()(ArrayT* array, std::shared_ptr<AbstractStreamWorker>& worker)
+  {
+    auto typed_worker = std::make_shared<DataToStreamWorker<ArrayT>>(array);
+    worker = typed_worker;
+  }
+};
 
 } // end anonymous namespace
 
@@ -286,6 +320,7 @@ class vtkCSVWriter::CSVFile
   std::vector<std::pair<std::string, int>> ColumnInfo;
   int TimeStep = -1;
   double Time = vtkMath::Nan();
+  std::vector<std::shared_ptr<::AbstractStreamWorker>> ColumnsWorkers;
 
 public:
   CSVFile(int timeStep, double time)
@@ -394,14 +429,14 @@ public:
     this->Stream << std::setprecision(self->GetPrecision());
   }
 
-  void WriteData(vtkTable* table, vtkCSVWriter* self)
+  void InitializeStreamWorkers(vtkDataSetAttributes* dsa, vtkCSVWriter* self)
   {
-    this->WriteData(table->GetRowData(), self);
-  }
+    this->ColumnsWorkers.clear();
 
-  void WriteData(vtkDataSetAttributes* dsa, vtkCSVWriter* self)
-  {
-    std::vector<vtkSmartPointer<vtkArrayIterator>> columnsIters;
+    using SupportedArrays = vtkArrayDispatch::AllArrays;
+    using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
+    ::WorkerCreator creator;
+
     for (const auto& cinfo : this->ColumnInfo)
     {
       auto array = dsa->GetAbstractArray(cinfo.first.c_str());
@@ -409,37 +444,73 @@ public:
       {
         vtkErrorWithObjectMacro(self, "Mismatched components for '" << array->GetName() << "'!");
       }
-      vtkArrayIterator* iter = array->NewIterator();
-      columnsIters.push_back(iter);
-      iter->FastDelete();
-    }
 
-    const auto num_tuples = dsa->GetNumberOfTuples();
-    for (vtkIdType cc = 0; cc < num_tuples; ++cc)
+      if (auto stringArray = vtkStringArray::SafeDownCast(array))
+      {
+        auto stringWorker = std::make_shared<DataToStreamWorker<vtkStringArray>>(stringArray);
+        this->ColumnsWorkers.push_back(stringWorker);
+        continue;
+      }
+
+      auto dataArray = vtkDataArray::SafeDownCast(array);
+      if (dataArray)
+      {
+        std::shared_ptr<::AbstractStreamWorker> streamWorker;
+        if (!Dispatcher::Execute(dataArray, creator, streamWorker))
+        {
+          creator(dataArray, streamWorker);
+        }
+        this->ColumnsWorkers.push_back(streamWorker);
+        continue;
+      }
+
+      vtkWarningWithObjectMacro(self, "Column not supported by writer: " << array->GetName());
+    }
+  }
+
+  void WriteData(vtkTable* table, vtkCSVWriter* self)
+  {
+    this->InitializeStreamWorkers(table->GetRowData(), self);
+    this->WriteData(table->GetRowData(), self);
+  }
+
+  void WriteData(vtkDataSetAttributes* dsa, vtkCSVWriter* self)
+  {
+    const auto numTuples = dsa->GetNumberOfTuples();
+    for (vtkIdType tupleIndex = 0; tupleIndex < numTuples; ++tupleIndex)
     {
-      bool first_column = true;
+      bool firstColumn = true;
       if (this->TimeStep >= 0)
       {
         this->Stream << this->TimeStep;
-        first_column = false;
+        firstColumn = false;
       }
       if (!vtkMath::IsNan(this->Time))
       {
-        if (!first_column)
+        if (!firstColumn)
         {
           this->Stream << self->GetFieldDelimiter();
         }
         // add a time column.
         this->Stream << this->Time;
-        first_column = false;
+        firstColumn = false;
       }
 
-      for (auto& iter : columnsIters)
+      for (auto& columnWorker : this->ColumnsWorkers)
       {
-        switch (iter->GetDataType())
+        int numComps = columnWorker->NumberOfComponents;
+        vtkIdType index = tupleIndex * numComps;
+        for (int component = 0; component < numComps; component++)
         {
-          vtkArrayIteratorTemplateMacro(vtkCSVWriterGetDataString(
-            static_cast<VTK_TT*>(iter.GetPointer()), cc, this->Stream, self, first_column));
+          if (!firstColumn)
+          {
+            this->Stream << self->GetFieldDelimiter();
+          }
+          firstColumn = false;
+          if ((index + component) < numComps * numTuples)
+          {
+            (*columnWorker)(this->Stream, self, index + component);
+          }
         }
       }
       this->Stream << "\n";
