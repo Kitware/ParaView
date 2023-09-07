@@ -4819,6 +4819,298 @@
                   panel_visibility="advanced" />
       </PropertyGroup>
     </PVRepresentationProxy>
+
+    <!-- A proxy for composite datasets holding cell grids -->
+    <PVRepresentationProxy class="vtkPVCompositeRepresentation"
+                           name="PVCellGridRepresentationBase"
+                           processes="client|renderserver|dataserver">
+      <Documentation>ParaView's default representation for showing any type of
+      dataset in the render view.</Documentation>
+      <InputProperty command="SetSelectionConnection"
+                     name="Selection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection" />
+        </DataTypeDomain>
+        <Documentation>Set the selection.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for this
+        representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSelectionVisibility"
+                         default_values="1"
+                         name="SelectionVisibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for the selection, if
+        any.</Documentation>
+      </IntVectorProperty>
+      <RepresentationType subproxy="OutlineRepresentation"
+                          text="Outline" />
+      <RepresentationType subproxy="CellGridSurfaceRepresentation"
+                          subtype="Surface"
+                          text="Surface" />
+      <StringVectorProperty command="GetRepresentationTypes"
+                            information_only="1"
+                            name="RepresentationTypesInfo"
+                            si_class="vtkSIDataArrayProperty">
+        <Documentation>Property that lists the available representation types.
+        This is used by the domain for "Representation" to setup the list of
+        types available correctly.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetActiveRepresentation"
+                            default_values="Surface"
+                            name="Representation"
+                            number_of_elements="1"
+                            panel_visibility="default"
+                            panel_widget="display_representation_selector" >
+        <Documentation>Choose the type for the representation.</Documentation>
+        <RepresentationTypeDomain name="list">
+          <RequiredProperties>
+            <Property function="StringList"
+                      name="RepresentationTypesInfo" />
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </RepresentationTypeDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellFieldDataArrayName"
+                            default_values="vtkOriginalCellIds"
+                            name="SelectionCellFieldDataArrayName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <ArrayListDomain input_domain_name="input_array_cell"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointFieldDataArrayName"
+                            default_values="vtkOriginalPointIds"
+                            name="SelectionPointFieldDataArrayName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <ArrayListDomain input_domain_name="input_array_point"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="CellGridSurfaceRepresentation"
+               proxygroup="representations"
+               proxyname="CellGridSurfaceRepresentation"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup panel_visibility="default"
+                         panel_widget="ColorEditor"
+                         label="Coloring" >
+            <Property name="AmbientColor" />
+            <Property name="ColorArrayName" />
+            <Property name="DiffuseColor" />
+            <Property name="LookupTable" />
+            <Property name="UseSeparateColorMap" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Scalar Coloring">
+            <Property name="MapScalars"
+                      panel_visibility="advanced" />
+            <Property name="MultiComponentsMapping"
+                      panel_visibility="advanced" />
+            <Property name="InterpolateScalarsBeforeMapping"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Styling">
+            <Property name="Opacity"
+                      panel_visibility="default" />
+            <Property name="PointSize"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points" />
+            <Property name="LineWidth"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="wireframe" />
+            <Property name="RenderLinesAsTubes"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="wireframe"/>
+            <Property name="RenderPointsAsSpheres"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Lighting">
+            <Property name="Interpolation"
+                      panel_visibility="advanced" />
+            <Property name="Specular"
+                      panel_visibility="default" />
+            <Property name="SpecularColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced" />
+            <Property name="InteractiveSelectionColor"
+                      panel_visibility="never" />
+            <Property name="SpecularPower"
+                      panel_visibility="advanced" />
+            <Property name="Luminosity"
+                      panel_visibility="advanced" />
+            <Property name="Ambient" panel_visibility="advanced"/>
+            <Property name="Diffuse" panel_visibility="advanced"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Edge Styling">
+            <Property name="EdgeColor"
+                      panel_widget="color_selector_with_palette"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="Surface With Edges" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Transforming">
+            <Property name="Position"
+                      panel_visibility="advanced" />
+            <Property name="Scale"
+                      panel_visibility="advanced" />
+            <Property name="Orientation"
+                      panel_visibility="advanced" />
+            <Property name="Origin"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Miscellaneous">
+            <Property name="Pickable"
+                      panel_visibility="advanced" />
+            <Property name="StaticMode"
+                      panel_visibility="never" />
+            <Property name="SuppressLOD"
+                      panel_visibility="never" />
+            <Property name="UserTransform"
+                      panel_visibility="never" />
+            <Property name="BlockColorsDistinctValues"
+                      panel_visibility="advanced" />
+            <Property name="UseDataPartitions"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Blocks"
+                         panel_widget="DataAssemblyEditor"
+                         panel_visibility="multiblock_inspector">
+            <!--
+               place holder for future work
+               <Property name="Assembly"       function="ActiveAssembly" />
+            -->
+            <Property name="BlockSelectors" function="Selectors" />
+            <Property name="BlockColors"    function="Colors" />
+            <Property name="BlockOpacities" function="Opacities" />
+            <Hints>
+              <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
+            </Hints>
+          </PropertyGroup>
+
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="OutlineRepresentation"
+               proxygroup="representations"
+               proxyname="OutlineRepresentation"></Proxy>
+        <ShareProperties subproxy="CellGridSurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+      <ProxyProperty name="DataAxesGrid"
+                     command="SetGridAxesRepresentation"
+                     panel_widget="proxy_editor" >
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="representations" name="GridAxesRepresentation" />
+        </ProxyListDomain>
+        <Hints>
+          <!-- tell pqProxyEditorPropertyWidget that use the "GridAxesVisibility"
+               property on the GridAxes3DRepr for a checkbox on the UI -->
+          <ProxyEditorPropertyWidget property="GridAxesVisibility" />
+        </Hints>
+      </ProxyProperty>
+      <SubProxy command="SetSelectionRepresentation">
+        <Proxy name="SelectionRepresentation"
+               proxygroup="representations"
+               proxyname="SelectionRepresentation" />
+        <ShareProperties subproxy="CellGridSurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+          <Exception name="Color" />
+          <Exception name="LineWidth" />
+          <Exception name="Opacity" />
+          <Exception name="PointSize" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property exposed_name="SelectionColor" name="Color" panel_visibility="never" />
+          <Property exposed_name="SelectionOpacity" name="Opacity" panel_visibility="never" />
+          <Property exposed_name="SelectionUseOutline" name="UseOutline" panel_visibility="never" />
+          <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never" />
+          <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never" />
+          <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never" />
+          <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" panel_visibility="never"/>
+          <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
+            <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionCellLabelFontFile" name="CellLabelFontFile" function="File"/>
+            <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" function="Justification"/>
+            <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
+          </PropertyGroup>
+          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" panel_visibility="never"/>
+          <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
+          <Property exposed_name="SelectionMaximumNumberOfLabels" name="MaximumNumberOfLabels" panel_visibility="never"/>
+          <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
+            <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionPointLabelFontFile" name="PointLabelFontFile" function="File"/>
+            <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification" function="Justification"/>
+            <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
+          </PropertyGroup>
+          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat" panel_visibility="never"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of PVCellGridRepresentationBase -->
+    </PVRepresentationProxy>
   </ProxyGroup>
 
   <!-- ==================================================================== -->
@@ -4936,6 +5228,37 @@
         <NoSolidColor representation="Volume" />
       </Hints>
       <!-- End of UnstructuredGridRepresentation -->
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PVCellGridRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="CellGridRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>This representation is used to show cell grids as
+      Surface/Surface+Edges/Wireframe</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkCellGrid" />
+
+          <!-- for MB, we want to match if any of the leaf nodes is of the following type -->
+          <DataType value="vtkDataObjectTree" child_match="all">
+            <DataType value="vtkCellGrid" />
+          </DataType>
+
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1"></InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1"></InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <!-- End of CellGridRepresentation -->
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
@@ -7771,6 +8094,542 @@
                            name="range" />
       </DoubleVectorProperty>
     <!-- End of ImageSliceRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkCellGridRepresentation"
+                         name="CellGridSurfaceRepresentation"
+                         processes="client|renderserver|dataserver">
+      <Documentation>Representation to show a cell-grid in a 3D render view.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array_any" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell_1"
+                          number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_1"
+                          number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_2"
+                          number_of_components="2"
+                          optional="1" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell_3"
+                          number_of_components="3"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_3"
+                          number_of_components="3"
+                          optional="1" />
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Get/Set the visibility of the
+        representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetRepresentation"
+                            default_values="Surface"
+                            name="Representation"
+                            panel_widget="display_representation_selector"
+                            number_of_elements="1">
+        <StringListDomain name="string_list">
+          <String value="Points" />
+          <String value="Wireframe" />
+          <String value="Surface" />
+          <String value="Surface With Edges" />
+          <String value="Outline" />
+        </StringListDomain>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetAmbient"
+                            default_values="0.0"
+                            name="Ambient"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDiffuse"
+                            default_values="1.0"
+                            name="Diffuse"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSpecular"
+                            default_values="0.0"
+                            name="Specular"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSuppressLOD"
+                         default_values="0"
+                         name="SuppressLOD"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetAmbientColor"
+                            default_values="1.0 1.0 1.0"
+                            name="AmbientColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDiffuseColor"
+                            default_values="1.0 1.0 1.0"
+                            name="DiffuseColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSpecularColor"
+                            default_values="1.0 1.0 1.0"
+                            name="SpecularColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLineWidth"
+                            default_values="1.0"
+                            name="LineWidth"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPointSize"
+                            default_values="2.0"
+                            name="PointSize"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRenderLinesAsTubes"
+                         default_values="0"
+                         name="RenderLinesAsTubes"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, all lines are rendered as 3D tubes, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRenderPointsAsSpheres"
+                         default_values="0"
+                         name="RenderPointsAsSpheres"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, all points are rendered as 3D spheres, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolation"
+                         default_values="1"
+                         name="Interpolation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Flat"
+                 value="0" />
+          <Entry text="Gouraud"
+                 value="1" />
+          <Entry text="PBR"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSpecularPower"
+                            default_values="100.0"
+                            name="SpecularPower"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLuminosity"
+                            default_values="0.0"
+                            name="Luminosity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100.0"
+                           min="0"
+                           name="range" />
+        <Documentation>Makes the object emit light.
+        Only takes effect with OSPRay's path traced renderer.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEdgeColor"
+                            default_values="0 0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3">
+        <Documentation>Set the edge color. This color is used to draw the edge
+        for the polygonal data when EdgeVisibility is on.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetInteractiveSelectionColor"
+                            default_values="0.5 0.0 1.0"
+                            name="InteractiveSelectionColor"
+                            number_of_elements="3">
+        <Documentation>Set the preselection color. This color is used to draw the edge
+        of the current preselection.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveSelectionColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            label="Translation"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetUserTransform"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="UserTransform"
+                            number_of_elements="16">
+        <Documentation>
+          In addition to the instance variables such as position and
+          orientation, you can add an additional transformation for your own
+          use. This transformation is concatenated with the actor's internal
+          transformation, which you implicitly create through the use of
+          Position, Origin, Orientation. The value is 4x4 matrix for the linear
+          transform to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetPickable"
+                         default_values="1"
+                         name="Pickable"
+                         number_of_elements="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable" >
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty default_values="0"
+                         name="UseSeparateColorMap"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>By default, ParaView shares a single color map among all datasets colored
+        by arrays that have the same name. When this option is enabled, the active dataset will
+        be assigned a separate color map not shared by other datasets.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMapScalars"
+                         default_values="1"
+                         name="MapScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When enabled, LookupTable will always be
+        used for scalar mapping. Otherwise, when up to 4 component
+        scalars are present, the components are clamped to a valid
+        color interval (0-255 for an integral type and 0.0-1.0 for a
+        floating point type) and then directly used as
+        color.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="MultiComponentsMapping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable multi components mapping. For a two-components array,
+        the first component is mapped to the color, the second component is mapped to the
+        opacity. For a four-components array, the first, second and third components are used as
+        RGB values and the fourth component is mapped to the opacity. Only available
+        when MapScalars is ON. This feature forces "Separate Color Map" and scales the color and
+        the opacity range with the correct component.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Representation"
+                                   value="Volume" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MapScalars"
+                                   value="1" />
+          <PropertyWidgetDecorator type="MultiComponentsDecorator"
+                                   components="2 4" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolateScalarsBeforeMapping"
+                         default_values="1"
+                         name="InterpolateScalarsBeforeMapping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true (default), texture coordinates
+        are sent to and interpolated by the graphics card. This is
+        equivalent with interpolating scalars and then mapping them to
+        obtain colors between points. Otherwise, colors are sent to
+        and interpolated by the graphics card.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStatic"
+                         default_values="0"
+                         name="StaticMode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssembly"
+        number_of_elements="1"
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockSelectors"
+        command="AddBlockSelector"
+        clean_command="RemoveAllBlockSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        number_of_elements="1"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockColors"
+                            command="SetBlockColor"
+                            clean_command="RemoveAllBlockColors"
+                            element_types="2 1 1 1"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+         <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify colors associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockOpacities"
+                            command="SetBlockOpacity"
+                            clean_command="RemoveAllBlockOpacities"
+                            element_types="2 1"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+         <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify opacities associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks"
+                     panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly"       function="ActiveAssembly" />
+        <Property name="BlockSelectors" function="Selectors" />
+        <Property name="BlockColors"    function="Colors" />
+        <Property name="BlockOpacities" function="Opacities" />
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1"  link_active_selection="1"/>
+        </Hints>
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetBlockColorsDistinctValues"
+                         default_values="7"
+                         name="BlockColorsDistinctValues"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>
+          Determines the number of distinct values in
+          vtkBlockColors. This array is added to each block if
+          the dataset is a composite dataset. The array has one value
+          set to (blockIndex % BlockColorsDistinctValues)
+        </Documentation>
+        <IntRangeDomain min="2" name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="GeneralSettings"
+                        property="BlockColorsDistinctValues"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseDataPartitions"
+                         default_values="0"
+                         name="UseDataPartitions"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to redistribute the data when actor is translucent.
+        Default is false.</Documentation>
+      </IntVectorProperty>
+    <!-- End of CellGridSurfaceRepresentation -->
     </RepresentationProxy>
 
     <!-- ================================================================== -->

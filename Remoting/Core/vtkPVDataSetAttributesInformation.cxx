@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVDataSetAttributesInformation.h"
 
+#include "vtkCellAttribute.h"
+#include "vtkCellGrid.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
@@ -138,6 +140,28 @@ void vtkPVDataSetAttributesInformation::CopyFromDataObject(vtkDataObject* dobj)
 
   if (!dobj)
   {
+    return;
+  }
+
+  // Handle vtkCellGrid cell-data specially.
+  auto* cg = vtkCellGrid::SafeDownCast(dobj);
+  if (cg)
+  {
+    if (this->FieldAssociation == vtkDataObject::CELL)
+    {
+      for (const auto& attId : cg->GetCellAttributeIds())
+      {
+        auto* cellAtt = cg->GetCellAttributeById(attId);
+        if (!cellAtt)
+        {
+          continue; // TODO: Warn?
+        }
+        auto ainfo = vtkPVArrayInformation::New();
+        ainfo->CopyFromCellAttribute(cg, cellAtt);
+        internals.ArrayInformation[cellAtt->GetName().Data()].TakeReference(ainfo);
+      }
+    }
+    internals.ValuesPopulated = true;
     return;
   }
 

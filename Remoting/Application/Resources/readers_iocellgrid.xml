@@ -1,0 +1,70 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkCompositeCellGridReader" label="Composite CellGrid Reader" name="CompositeCellGridReader">
+      <Documentation short_help="Reader for discontinuous Galerkin and other cell-grid data">
+        Reader for discontinuous Galerkin and other data in cell-grid format.
+        This is a distributed reader.
+      </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The path to a file containing cell-grid JSON data.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellTypeInfo"
+        command="GetCellTypeSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellTypes"
+        command="GetCellTypeSelection"
+        information_property="CellTypeInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellTypeInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the cell types to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellAttributeInfo"
+        command="GetCellAttributeSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellAttributes"
+        command="GetCellAttributeSelection"
+        information_property="CellAttributeInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellAttributeInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+        <Documentation>Select the cell attributes to read.</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="dg"
+          file_description="CellGrid Files"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

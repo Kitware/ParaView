@@ -23,6 +23,7 @@
 #include <set>    // for std::set
 #include <vector> // for std::vector
 
+class vtkCellGrid;
 class vtkCollection;
 class vtkCompositeDataSet;
 class vtkDataAssembly;

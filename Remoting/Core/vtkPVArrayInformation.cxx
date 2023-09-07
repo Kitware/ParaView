@@ -3,6 +3,8 @@
 #include "vtkPVArrayInformation.h"
 
 #include "vtkAbstractArray.h"
+#include "vtkCellAttribute.h"
+#include "vtkCellGrid.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
 #include "vtkFieldData.h"
@@ -319,6 +321,28 @@ void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData*
         std::make_pair<std::string, std::string>(key->GetLocation(), key->GetName()));
     }
     it->Delete();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttribute* attribute)
+{
+  assert(!!attribute);
+  const int numComponents = attribute->GetNumberOfComponents();
+  assert(numComponents > 0);
+
+  this->Name = attribute->GetName().Data();
+  this->DataType = VTK_DOUBLE; // TODO: vtkCellAttribute doesn't force this.
+  // this->NumberOfTuples = 0; // TODO: Should we even try to answer this?
+
+  this->Components.resize(numComponents + 1);
+  for (int comp = -1; comp < numComponents; ++comp)
+  {
+    auto& compInfo = this->Components.at(comp + 1);
+    grid->GetCellAttributeRange(attribute, comp < 0 ? -2 : comp, compInfo.Range.GetData(), false);
+    grid->GetCellAttributeRange(
+      attribute, comp < 0 ? -2 : comp, compInfo.FiniteRange.GetData(), true);
+    compInfo.DefaultName = vtkPVPostFilter::DefaultComponentName(comp, numComponents);
   }
 }
 

@@ -10,6 +10,7 @@
 #include "vtkCellArray.h"
 #include "vtkCellArrayIterator.h"
 #include "vtkCellData.h"
+#include "vtkCellGrid.h"
 #include "vtkCellTypes.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
@@ -479,6 +480,10 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
   else if (auto genericDataSet = vtkGenericDataSet::SafeDownCast(input))
   {
     this->GenericDataSetExecute(genericDataSet, output, doCommunicate);
+  }
+  else if (auto cellGrid = vtkCellGrid::SafeDownCast(input))
+  {
+    this->CellGridExecute(cellGrid, output, doCommunicate);
   }
 }
 
@@ -1263,6 +1268,21 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeometryFilter::CellGridExecute(
+  vtkCellGrid* input, vtkPolyData* output, int vtkNotUsed(doCommunicate))
+{
+  double bounds[6];
+  input->GetBounds(bounds);
+  vtkNew<vtkOutlineSource> outline;
+  outline->SetBounds(bounds);
+  outline->Update();
+
+  output->SetPoints(outline->GetOutput()->GetPoints());
+  output->SetLines(outline->GetOutput()->GetLines());
+  output->SetPolys(outline->GetOutput()->GetPolys());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ImageDataExecute(
   vtkImageData* input, vtkPolyData* output, int doCommunicate, int updatePiece, const int* ext)
 {
@@ -1724,6 +1744,7 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port, vtkInformation* info
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGenericDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCellGrid");
   return 1;
 }
 

@@ -8,6 +8,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkByteSwap.h"
 #include "vtkCellData.h"
+#include "vtkCellGrid.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerStreamInstantiator.h"
 #include "vtkCollection.h"
@@ -584,6 +585,11 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
 
     htg->GetBounds(this->Bounds);
     htg->GetExtent(this->Extent);
+  }
+  else if (auto cg = vtkCellGrid::SafeDownCast(dobj))
+  {
+    cg->GetBounds(this->Bounds);
+    // this->AttributeInformations[cc]->CopyFromDataObject(dobj);
   }
 }
 
@@ -1211,6 +1217,7 @@ int vtkPVDataInformation::GetExtentType(int type)
     case VTK_PARTITIONED_DATA_SET:
     case VTK_PARTITIONED_DATA_SET_COLLECTION:
     case VTK_UNIFORM_HYPER_TREE_GRID:
+    case VTK_CELL_GRID:
       return VTK_PIECES_EXTENT;
 
     default:

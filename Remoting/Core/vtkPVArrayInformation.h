@@ -21,8 +21,10 @@
 #include <vector> // for std::vector
 
 class vtkAbstractArray;
-class vtkFieldData;
+class vtkCellAttribute;
+class vtkCellGrid;
 class vtkClientServerStream;
+class vtkFieldData;
 class vtkGenericAttribute;
 
 class VTKREMOTINGCORE_EXPORT vtkPVArrayInformation : public vtkObject
@@ -133,6 +135,7 @@ public:
   ///@}
 
   void CopyFromArray(vtkAbstractArray* array, vtkFieldData* fd = nullptr);
+  void CopyFromCellAttribute(vtkCellGrid* grid, vtkCellAttribute* attribute);
   void CopyFromGenericAttribute(vtkGenericAttribute* array);
   void CopyToStream(vtkClientServerStream*) const;
   bool CopyFromStream(const vtkClientServerStream*);
