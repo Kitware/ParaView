@@ -830,6 +830,20 @@ void vtkStreamLinesMapper::Render(vtkRenderer* ren, vtkActor* actor)
     return;
   }
 
+  double magRange[2];
+  inVectors->GetRange(magRange, -1);
+  const double& minSpeed = magRange[0];
+  const double& maxSpeed = magRange[1];
+  const bool velocityIsNotValid = (minSpeed == 0. && maxSpeed == 0.) ||
+    (vtkMath::IsInf(minSpeed) && vtkMath::IsInf(maxSpeed)) ||
+    (vtkMath::IsNan(minSpeed) && vtkMath::IsNan(maxSpeed));
+
+  if (velocityIsNotValid)
+  {
+    vtkDebugMacro(<< "Speed field vector is zero or not valid!");
+    return;
+  }
+
   // Set processing dataset and arrays
   this->Internal->SetData(inData, inVectors, inScalars);
 
