@@ -47,23 +47,17 @@ vtkStandardNewMacro(vtkPVServerInformation);
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
 {
-  this->MultiClientsEnable = 0;
-  this->ClientId = 0;
-  this->IdTypeSize = 0;
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   this->NumberOfProcesses = controller ? controller->GetNumberOfProcesses() : 1;
   this->MPIInitialized = controller ? controller->IsA("vtkMPIController") != 0 : false;
   this->RootOnly = 1;
-  this->RemoteRendering = 1;
-  this->Timeout = 0;
-  this->TimeoutCommandInterval = 60;
+
 #if VTK_MODULE_ENABLE_ParaView_icet
   this->UseIceT = 1;
 #else
   this->UseIceT = 0;
 #endif
 
-  this->AVISupport = 0;
 #if defined(_WIN32)
   this->AVISupport = 1;
 #else
@@ -72,20 +66,12 @@ vtkPVServerInformation::vtkPVServerInformation()
 #endif
 #endif
 
-  this->NVPipeSupport = false;
 #if VTK_MODULE_ENABLE_ParaView_nvpipe
   if (NVPipeAvailable())
   {
     this->NVPipeSupport = true;
   }
 #endif
-
-  // Refer to note at the top of this file abount OGVSupport.
-  this->OGVSupport = 1;
-
-  this->IsInTileDisplay = false;
-  this->IsInCave = false;
-  this->TileDimensions[0] = this->TileDimensions[1] = 0;
 
   this->SMPBackendName = vtkSMPTools::GetBackend() ? vtkSMPTools::GetBackend() : "";
   this->SMPMaxNumberOfThreads = vtkSMPTools::GetEstimatedNumberOfThreads();
