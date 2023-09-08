@@ -39,7 +39,7 @@
 #include "catalyst_impl_paraview.h"
 
 static bool update_producer_mesh_blueprint(const std::string& channel_name,
-  const conduit_node* node, const conduit_node* global_fields, bool multimesh,
+  const conduit_node* node, const conduit_node* global_fields, bool multimesh, bool amrmesh,
   const conduit_node* assemblyNode, bool multiblock)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
@@ -60,6 +60,7 @@ static bool update_producer_mesh_blueprint(const std::string& channel_name,
   algo->SetNode(node);
   algo->SetGlobalFieldsNode(global_fields);
   algo->SetUseMultiMeshProtocol(multimesh);
+  algo->SetUseAMRMeshProtocol(amrmesh);
   algo->SetOutputMultiBlock(multiblock);
   algo->SetAssemblyNode(assemblyNode);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
@@ -387,7 +388,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
             channel_name.c_str());
         }
       }
-      else if (type == "multimesh")
+      else if (type == "multimesh" || type == "amrmesh")
       {
         for (conduit_index_t didx = 0, dmax = data_node.number_of_children();
              didx < dmax && is_valid; ++didx)
@@ -452,7 +453,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       fields["timestep"].set(channel_timestep);
       fields["cycle"].set(channel_timestep);
       fields["channel"].set(channel_name);
-      if (type == "mesh" || type == "multimesh")
+      if (type == "mesh" || type == "multimesh" || type == "amrmesh")
       {
         conduit_node* assembly = nullptr;
         if (channel_node.has_path("assembly"))
@@ -461,7 +462,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
           assembly = conduit_cpp::c_node(&anode);
         }
         update_producer_mesh_blueprint(channel_name, conduit_cpp::c_node(&data_node),
-          conduit_cpp::c_node(&fields), type == "multimesh", assembly,
+          conduit_cpp::c_node(&fields), type == "multimesh", type == "amrmesh", assembly,
           channel_output_multiblock != 0);
       }
       else if (type == "ioss")

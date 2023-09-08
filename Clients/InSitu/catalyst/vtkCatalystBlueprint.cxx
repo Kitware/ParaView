@@ -408,7 +408,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       }
     }
   }
-  else if (type == "multimesh")
+  else if (type == "multimesh" || type == "amrmesh")
   {
     const auto data = n["data"];
     const conduit_index_t nchildren = data.number_of_children();
