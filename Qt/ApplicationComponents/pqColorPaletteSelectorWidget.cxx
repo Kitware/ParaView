@@ -37,9 +37,9 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
   cbbox->setObjectName("ComboBox");
 
   // Palette ordering / ban list can be found in issue #20707
-  std::array<std::string, 7> mainPalettes = { "BlueGrayBackground", "WarmGrayBackground",
-    "NeutralGrayBackground", "LightGrayBackground", "WhiteBackground", "BlackBackground",
-    "GradientBackground" };
+  std::array<std::string, 8> mainPalettes = { "BlueGrayBackground", "WarmGrayBackground",
+    "DarkGrayBackground", "NeutralGrayBackground", "LightGrayBackground", "WhiteBackground",
+    "BlackBackground", "GradientBackground" };
 
   for (const std::string& str : mainPalettes)
   {

@@ -2,6 +2,8 @@
   {
     "groupName": "Default",
     "presets": [
+      "Fast",
+      "Turbo",
       "Cool to Warm",
       "Cool to Warm (Extended)",
       "Black-Body Radiation",
@@ -10,14 +12,12 @@
       "Black, Blue and White",
       "Blue Orange (divergent)",
       "Viridis (matplotlib)",
-      "Gray and Red",
-      "Linear Green (Gr4L)",
       "Cold and Hot",
-      "Blue - Green - Orange",
+      "Linear Green (Gr4L)",
       "Rainbow Desaturated",
-      "Yellow - Gray - Blue",
+      "Blue - Green - Orange",
       "Rainbow Uniform",
-      "Turbo"
+      "Yellow - Gray - Blue"
     ]
   },
   {
@@ -135,6 +135,7 @@
   {
     "groupName": "Rainbow",
     "presets": [
+      "Fast",
       "Rainbow Desaturated",
       "Rainbow Uniform",
       "Turbo",
