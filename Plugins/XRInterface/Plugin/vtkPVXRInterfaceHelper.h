@@ -252,6 +252,11 @@ public:
   void SetShowNavigationPanel(bool);
 
   /**
+   * Set whether to display a white cross marker at the tip of the right controller.
+   */
+  void SetShowRightControllerMarker(bool visibility);
+
+  /**
    * Set the right trigger action.
    */
   void SetRightTriggerMode(int index);

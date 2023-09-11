@@ -393,6 +393,12 @@ void vtkPVXRInterfaceWidgets::RemoveMeasurement()
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVXRInterfaceWidgets::IsMeasurementEnabled() const
+{
+  return (this->Internals->DistanceWidget->GetEnabled() == 1);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXRInterfaceWidgets::AddACropPlane(double* origin, double* normal)
 {
   size_t i = this->CropPlanes.size();

@@ -61,6 +61,14 @@
         {
           "inputs": {
             "click": {
+              "output": "nextcamerapose"
+            }
+          },
+          "path": "/user/hand/left/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
               "output": "triggeraction"
             }
           },
