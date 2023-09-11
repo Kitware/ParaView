@@ -47,22 +47,17 @@ vtkStandardNewMacro(vtkPVServerInformation);
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
 {
-  this->MultiClientsEnable = 0;
-  this->ClientId = 0;
-  this->IdTypeSize = 0;
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   this->NumberOfProcesses = controller ? controller->GetNumberOfProcesses() : 1;
   this->MPIInitialized = controller ? controller->IsA("vtkMPIController") != 0 : false;
   this->RootOnly = 1;
-  this->RemoteRendering = 1;
-  this->Timeout = 0;
+
 #if VTK_MODULE_ENABLE_ParaView_icet
   this->UseIceT = 1;
 #else
   this->UseIceT = 0;
 #endif
 
-  this->AVISupport = 0;
 #if defined(_WIN32)
   this->AVISupport = 1;
 #else
@@ -71,20 +66,12 @@ vtkPVServerInformation::vtkPVServerInformation()
 #endif
 #endif
 
-  this->NVPipeSupport = false;
 #if VTK_MODULE_ENABLE_ParaView_nvpipe
   if (NVPipeAvailable())
   {
     this->NVPipeSupport = true;
   }
 #endif
-
-  // Refer to note at the top of this file abount OGVSupport.
-  this->OGVSupport = 1;
-
-  this->IsInTileDisplay = false;
-  this->IsInCave = false;
-  this->TileDimensions[0] = this->TileDimensions[1] = 0;
 
   this->SMPBackendName = vtkSMPTools::GetBackend() ? vtkSMPTools::GetBackend() : "";
   this->SMPMaxNumberOfThreads = vtkSMPTools::GetEstimatedNumberOfThreads();
@@ -136,6 +123,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   this->UseIceT = info->GetUseIceT();
   this->Timeout = info->GetTimeout();
   this->TimeoutCommand = info->GetTimeoutCommand();
+  this->TimeoutCommandInterval = info->GetTimeoutCommandInterval();
   this->NumberOfProcesses = info->NumberOfProcesses;
   this->MPIInitialized = info->MPIInitialized;
   this->NVPipeSupport = info->NVPipeSupport;
@@ -160,6 +148,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   auto config = vtkRemotingCoreConfiguration::GetInstance();
   this->Timeout = config->GetTimeout();
   this->TimeoutCommand = config->GetTimeoutCommand();
+  this->TimeoutCommandInterval = config->GetTimeoutCommandInterval();
   this->IsInCave = config->GetIsInCave();
   this->IsInTileDisplay = config->GetIsInTileDisplay();
   this->MultiClientsEnable = config->GetMultiClientMode();
@@ -201,6 +190,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     }
 
     this->TimeoutCommand = serverInfo->GetTimeoutCommand();
+    this->TimeoutCommandInterval = serverInfo->GetTimeoutCommandInterval();
 
     this->IsInTileDisplay |= serverInfo->GetIsInTileDisplay();
     this->IsInTileDisplay |= serverInfo->GetIsInCave();
@@ -246,6 +236,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->RemoteRendering;
   *css << this->Timeout;
   *css << this->TimeoutCommand;
+  *css << this->TimeoutCommandInterval;
   *css << this->UseIceT;
   *css << this->OGVSupport;
   *css << this->AVISupport;
@@ -282,6 +273,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!css->GetArgument(0, idx++, &this->TimeoutCommand))
   {
     vtkErrorMacro("Error parsing TimeoutCommand from message.");
+    return;
+  }
+  if (!css->GetArgument(0, idx++, &this->TimeoutCommandInterval))
+  {
+    vtkErrorMacro("Error parsing TimeoutCommandInterval from message.");
     return;
   }
   if (!css->GetArgument(0, idx++, &this->UseIceT))

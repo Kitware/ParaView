@@ -98,6 +98,14 @@ public:
   const std::string& GetTimeoutCommand() const { return this->TimeoutCommand; }
   ///@}
 
+  ///@{
+  /**
+   * Get the time interval in seconds between consecutive calls of TimeoutCommand.
+   * Defaults to 60.
+   */
+  vtkGetMacro(TimeoutCommandInterval, int);
+  ///@}
+
   /**
    * When in tile display mode, returns the tile dimensions.
    */
@@ -164,19 +172,20 @@ protected:
 
   int NumberOfProcesses;
   bool MPIInitialized;
-  int OGVSupport;
-  int AVISupport;
-  bool NVPipeSupport;
-  int RemoteRendering;
-  int Timeout;
+  int OGVSupport = 1;
+  int AVISupport = 0;
+  bool NVPipeSupport = false;
+  int RemoteRendering = 1;
+  int Timeout = 0;
   std::string TimeoutCommand;
+  int TimeoutCommandInterval = 60;
   int UseIceT;
-  int MultiClientsEnable;
-  int ClientId;
-  int IdTypeSize;
-  bool IsInTileDisplay;
-  bool IsInCave;
-  int TileDimensions[2];
+  int MultiClientsEnable = 0;
+  int ClientId = 0;
+  int IdTypeSize = 0;
+  bool IsInTileDisplay = false;
+  bool IsInCave = false;
+  int TileDimensions[2] = { 0, 0 };
   std::string SMPBackendName;
   int SMPMaxNumberOfThreads;
   bool AcceleratedFiltersOverrideAvailable;

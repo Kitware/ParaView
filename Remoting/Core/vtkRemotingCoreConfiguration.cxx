@@ -354,7 +354,15 @@ bool vtkRemotingCoreConfiguration::PopulateConnectionOptions(
       ->default_val(0);
 
     groupConnection->add_option("--timeout-command", this->TimeoutCommand,
-      "Timeout command allowing server to regularly check remaining time available.");
+      "Timeout command allowing server to regularly check remaining time available. When executed, "
+      "the command should write an integer value to stdout, corresponding to the remaining "
+      "connection time, in minutes.");
+
+    groupConnection
+      ->add_option("--timeout-command-interval", this->TimeoutCommandInterval,
+        "Interval in seconds between consecutive calls to the timeout command. Only applies if "
+        "--timeout-command is set.")
+      ->default_val(60);
   }
   else if (ptype == vtkProcessModule::PROCESS_CLIENT)
   {
@@ -541,6 +549,7 @@ void vtkRemotingCoreConfiguration::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ServerResourceName: " << this->ServerResourceName.c_str() << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
   os << indent << "TimeoutCommand: " << this->TimeoutCommand << endl;
+  os << indent << "TimeoutCommandInterval: " << this->TimeoutCommandInterval << endl;
   os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
   os << indent << "StereoType: " << this->StereoType << endl;
   os << indent << "EyeSeparation: " << this->GetEyeSeparation() << endl;

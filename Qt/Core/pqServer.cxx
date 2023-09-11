@@ -51,8 +51,9 @@ public:
   // remaining time in minutes
   int RemainingLifeTime{ -1 };
 
-  // Server side timeout command
+  // Server side timeout command and time interval between command invocations in seconds
   std::string TimeoutCommand;
+  int TimeoutCommandInterval{ 60 };
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
@@ -75,6 +76,7 @@ pqServer::pqServer(vtkIdType connectionID, QObject* _parent)
   if (this->isRemote() && serverInfo)
   {
     this->Internals->TimeoutCommand = serverInfo->GetTimeoutCommand();
+    this->Internals->TimeoutCommandInterval = serverInfo->GetTimeoutCommandInterval();
     int val = serverInfo->GetTimeout();
     this->Internals->RemainingLifeTime = val > 0 ? val : -1;
   }
@@ -98,7 +100,7 @@ pqServer::pqServer(vtkIdType connectionID, QObject* _parent)
   QObject::connect(&this->Internals->ServerLifeTimeTimer, &QTimer::timeout, this,
     &pqServer::updateRemainingLifeTime);
 
-  this->Internals->ServerLifeTimeTimer.setInterval(60000);
+  this->Internals->ServerLifeTimeTimer.setInterval(1000 * this->Internals->TimeoutCommandInterval);
   this->Internals->ServerLifeTimeTimer.start();
 
   QObject::connect(&this->Internals->HeartbeatTimer, SIGNAL(timeout()), this, SLOT(heartBeat()));
