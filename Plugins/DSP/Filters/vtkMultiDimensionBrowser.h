@@ -24,6 +24,9 @@ class vtkTable;
  * vtkMultiDimensionalArrays are typically created by the vtkTemporalMultiplexing filter.
  * In that case, the first dimension correspond to point index of the multiplexing input.
  * So changing Index means browsing points of this dataset.
+ *
+ * In a distributed context, it can use a `GlobalIds` array, which is supposed to be continuous
+ * between 0 and NumberOfElements.
  */
 class VTKDSPFILTERSPLUGIN_EXPORT vtkMultiDimensionBrowser : public vtkTableAlgorithm
 {
@@ -35,9 +38,20 @@ public:
   ///@{
   /**
    * Set/Get the choosen index for the selected vtkMultiDimensionnalArray
+   * Default is 0.
    */
   vtkSetMacro(Index, int);
   vtkGetMacro(Index, int);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the use of GlobalIds to select index in hidden dimension.
+   * Default is off.
+   */
+  vtkSetMacro(UseGlobalIds, bool);
+  vtkGetMacro(UseGlobalIds, bool);
+  vtkBooleanMacro(UseGlobalIds, bool);
   ///@}
 
   /**
@@ -69,20 +83,31 @@ protected:
    */
   bool CreateOutputArray(vtkDataArray* sourceArray, vtkTable* output);
 
+private:
+  vtkMultiDimensionBrowser(const vtkMultiDimensionBrowser&) = delete;
+  void operator=(const vtkMultiDimensionBrowser&) = delete;
+
+  /**
+   * Get the maximum value available for index.
+   */
+  ///@{
+  /// Compute the maximum significant value for Index.
+  vtkIdType ComputeIndexMax();
+  /// Compute size of hidden dimension. Use each input array and keep the min for robusteness.
+  vtkIdType ComputeLocalSize();
+  /// Find max value of the GlobalId array.
+  vtkIdType ComputeLocalGlobalIdMax();
+  ///@}
+
   /**
    * Index range check.
    */
   ///@{
   /**
-   * Get the maximum value available for index.
-   * Parse all input arrays to get their maximum. Return the minimal value for safety.
-   */
-  int ComputeIndexMax();
-  /**
    * Compute the IndexRange.
    * This is [0, ComputeIndexMax()].
    */
-  void UpdateIndexRange();
+  void UpdateGlobalIndexRange();
   /**
    * Return true if Index is in IndexRange. Be sure range is up to date before calling this.
    * @sa UpdateIndexRange, ComputeIndexMax
@@ -90,12 +115,23 @@ protected:
   bool IsIndexInRange();
   ///@}
 
-private:
-  vtkMultiDimensionBrowser(const vtkMultiDimensionBrowser&) = delete;
-  void operator=(const vtkMultiDimensionBrowser&) = delete;
+  /**
+   * Update LocalIndex.
+   * Return true if LocalIndex is valid.
+   */
+  ///@{
+  /// Update LocalIndex from Index.
+  bool UpdateLocalIndex();
+  /// Maps Index to a local index, using an offset per rank. Useful in distributed environment.
+  bool MapToLocalIndex();
+  /// Maps Index to its position in a GlobalIds local array.
+  bool MapToLocalGlobalId();
+  ///@}
 
   int Index = 0;
+  int LocalIndex = 0;
   int IndexRange[2] = { 0, 0 };
+  bool UseGlobalIds = false;
 };
 
 #endif

@@ -856,6 +856,43 @@
           Index to use for hidden dimension of multidimensionnal array.
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty  name="UseGlobalIds"
+                          label="Use Global Ids"
+                          command="SetUseGlobalIds"
+                          number_of_elements="1"
+                          animateable="0"
+                          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If enabled, use global ids array to get Index.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="GlobalIds"
+                            label="Global Ids"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator  type="GenericDecorator"
+                                    mode="visibility"
+                                    property="UseGlobalIds"
+                                    value="1" />
+        </Hints>
+        <Documentation>
+          Name of the global ids array.
+        </Documentation>
+      </StringVectorProperty>
+
     </SourceProxy>
   </ProxyGroup>
 
