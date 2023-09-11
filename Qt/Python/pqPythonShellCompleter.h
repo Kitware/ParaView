@@ -4,30 +4,24 @@
 #ifndef pqPythonShellCompleter_h
 #define pqPythonShellCompleter_h
 
-#include "pqConsoleWidget.h"
-
+#include "pqPythonCompleter.h"
 #include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
-
 #include "vtkWeakPointer.h" // for weak pointer
 
 class vtkPythonInteractiveInterpreter;
 
-class PQPYTHON_EXPORT pqPythonShellCompleter : public pqConsoleWidgetCompleter
+/**
+ * Completer class for Python shell, using interactive shell context to provide line completions.
+ */
+class PQPYTHON_EXPORT pqPythonShellCompleter : public pqPythonCompleter
 {
 public:
-  pqPythonShellCompleter(QWidget* p, vtkPythonInteractiveInterpreter* interp);
-
-  /**
-   * Update the completion model given a string. The given string is the current entered text.
-   */
-  void updateCompletionModel(const QString& rootText) override;
+  pqPythonShellCompleter(QWidget* parent, vtkPythonInteractiveInterpreter* interp)
+    : pqPythonCompleter(parent)
+    , Interpreter(interp){};
 
 protected:
-  /**
-   * Given a python variable name, look up its attributes and return them in a
-   * string list.
-   */
-  QStringList getPythonAttributes(const QString& pythonObjectName);
+  virtual QStringList getPythonCompletions(const QString& pythonObjectName) override;
 
 private:
   vtkWeakPointer<vtkPythonInteractiveInterpreter> Interpreter;

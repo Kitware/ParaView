@@ -365,7 +365,7 @@ public:
     this->Parent.internalExecuteCommand(command);
   }
 
-  void setCompleter(pqConsoleWidgetCompleter* completer)
+  void setCompleter(pqWidgetCompleter* completer)
   {
     if (this->Completer)
     {
@@ -386,7 +386,7 @@ public:
   pqConsoleWidget& Parent;
 
   /// A custom completer
-  QPointer<pqConsoleWidgetCompleter> Completer;
+  QPointer<pqWidgetCompleter> Completer;
 
   /** Stores the beginning of the area of interactive input, outside which
   changes can't be made to the text edit contents */
@@ -454,7 +454,7 @@ void pqConsoleWidget::setFontSize(int size)
 }
 
 //-----------------------------------------------------------------------------
-void pqConsoleWidget::setCompleter(pqConsoleWidgetCompleter* completer)
+void pqConsoleWidget::setCompleter(pqWidgetCompleter* completer)
 {
   this->Implementation->setCompleter(completer);
 }

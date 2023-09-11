@@ -400,6 +400,7 @@ but text wrapping is enabled for reading purpose. This also enable the integrati
 Expression Manager, to easily save and reuse entered property text.
 
 **Attribute `syntax`**
+
 Set it to `python` to ask for syntax highlighting when `type` is set to `multi_line` (`pygments` python module should be found).
 With `one_liner_wrapped`, the tools button for Expression Manager are configured for `Python` expression type.
 
@@ -413,3 +414,6 @@ With `one_liner_wrapped`, the tools button for Expression Manager are configured
   </Hints>
 </StringVectorProperty>
 ```
+**Attribute `autocomplete`**
+
+Set it to `python_calc` to enable Python Calculator style autocomplete on the text field. Completes many Numpy functions, fields and names from the paraview module.

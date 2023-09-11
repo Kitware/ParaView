@@ -389,7 +389,8 @@ using the ( and ) buttons.
   in parentheses.
 - +: Add two scalars or two vectors. The operands for this function are not
   required to be enclosed in parentheses.
-- sin: Compute the sine of a scalar. cos: Compute the cosine of a scalar.
+- sin: Compute the sine of a scalar.
+- cos: Compute the cosine of a scalar.
 - tan: Compute the tangent of a scalar.
 - asin: Compute the arcsine of a scalar.
 - acos: Compute the arccosine of a scalar.

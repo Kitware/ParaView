@@ -1,11 +1,13 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
+
 #include "pqOneLinerTextEdit.h"
 
-// Server Manager Includes.
+#include "pqWidgetCompleter.h"
 
 // Qt Includes.
+#include <QAbstractItemView>
 #include <QKeyEvent>
 #include <QMimeData>
 
@@ -49,7 +51,8 @@ void pqOneLinerTextEdit::keyPressEvent(QKeyEvent* event)
 {
   if (event)
   {
-    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    if ((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) &&
+      !(this->getCompleter() && this->getCompleter()->popup()->isVisible()))
     {
       return;
     }
