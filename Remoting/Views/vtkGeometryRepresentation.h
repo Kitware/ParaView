@@ -164,6 +164,7 @@ public:
   virtual void SetUseOutline(int);
   void SetTriangulate(int);
   void SetNonlinearSubdivisionLevel(int);
+  void SetMatchBoundariesIgnoringCellOrder(int);
   virtual void SetGenerateFeatureEdges(bool);
 
   //***************************************************************************

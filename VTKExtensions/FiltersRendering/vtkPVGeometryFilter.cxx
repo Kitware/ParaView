@@ -1425,6 +1425,9 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->UnstructuredGridGeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
       this->UnstructuredGridGeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
+      this->UnstructuredGridGeometryFilter->SetMatchBoundariesIgnoringCellOrder(
+        this->MatchBoundariesIgnoringCellOrder);
+
       // Turn off ghost cell clipping. This ensures that ghost cells are retained
       // and handed to the GeometryFilter to ensure only valid faces are
       // generated. If this weren't here, then the GeometryFilter would
@@ -1488,6 +1491,9 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->GeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
       this->GeometryFilter->SetOriginalCellIdsName(nullptr);
       this->GeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
+
+      this->GeometryFilter->SetMatchBoundariesIgnoringCellOrder(
+        this->MatchBoundariesIgnoringCellOrder);
 
       // Now use vtkRecoverGeometryWireframe to create an edge flag attribute
       // that will cause the wireframe to be rendered correctly.
@@ -1744,6 +1750,8 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals ? "on" : "off") << endl;
   os << indent << "Triangulate: " << (this->Triangulate ? "on" : "off") << endl;
   os << indent << "NonlinearSubdivisionLevel: " << this->NonlinearSubdivisionLevel << endl;
+  os << indent << "MatchBoundariesIgnoringCellOrder: " << this->MatchBoundariesIgnoringCellOrder
+     << endl;
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "PassThroughCellIds: " << (this->PassThroughCellIds ? "on" : "off") << endl;
   os << indent << "PassThroughPointIds: " << (this->PassThroughPointIds ? "on" : "off") << endl;
@@ -1787,6 +1795,23 @@ void vtkPVGeometryFilter::SetNonlinearSubdivisionLevel(int newvalue)
     if (this->GeometryFilter)
     {
       this->GeometryFilter->SetNonlinearSubdivisionLevel(this->NonlinearSubdivisionLevel);
+    }
+
+    this->Modified();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetMatchBoundariesIgnoringCellOrder(int newvalue)
+{
+  if (this->MatchBoundariesIgnoringCellOrder != newvalue)
+  {
+    this->MatchBoundariesIgnoringCellOrder = newvalue;
+
+    if (this->GeometryFilter)
+    {
+      this->GeometryFilter->SetMatchBoundariesIgnoringCellOrder(
+        this->MatchBoundariesIgnoringCellOrder);
     }
 
     this->Modified();
