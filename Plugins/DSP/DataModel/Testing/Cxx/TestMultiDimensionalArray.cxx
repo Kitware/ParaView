@@ -130,5 +130,27 @@ int TestMultiDimensionalArray(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
     return EXIT_FAILURE;
   }
 
+  // Check memory size
+  vtkNew<vtkMultiDimensionalArray<int>> mdArrayLarge;
+  mdArrayLarge->ConstructBackend(
+    std::make_shared<::DataContainerInt>(::generateIntArrayVector(1024, 50, 4)), 50, 4);
+  vtkDataArray* mdDataArray = mdArrayLarge;
+
+  if (mdArrayLarge->GetActualMemorySize() != 50 * 4 * sizeof(int) ||
+    mdDataArray->GetActualMemorySize() != mdArrayLarge->GetActualMemorySize())
+  {
+    std::cerr << "Large multi-dimensional array failed to return correct size measurement, "
+              << mdArrayLarge->GetActualMemorySize() << "KiB instead of expected "
+              << 50 * 4 * sizeof(int) << "KiB." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (mdArray->GetActualMemorySize() != 1)
+  {
+    std::cerr << "Multi-dimensional array failed to return correct size measurement, "
+              << mdArray->GetActualMemorySize() << "KiB instead of expected 1KiB." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 };
