@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Composite (of 2 HTG) -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="RandomHyperTreeGridSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="RandomHyperTreeGridSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="keyEvent" arguments="6,16777249,67108864,,0,1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,67108864,70,7,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,67108864,70,7,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="keyEvent" arguments="7,16777249,0,,0,1" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/GroupDataSets" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- add some field data at the block level ("block id") -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ProgrammableFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CopyArrays/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" command="set_string" arguments="coeff = 1&#xA;for block in output:&#xA;  arr = numpy.ones(1) * coeff&#xA;  block.FieldData.append(arr, &apos;blockId&apos;)&#xA;  coeff += 1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,blockId" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[1, 2]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[1, 1]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.1.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[2, 2]" />
+
+  <!-- add python calculator -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PythonCalculator" />
+  <!-- work only on field data -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayAssociation/ComboBox" command="activated" arguments="Field Data" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="blockId + 2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.0,result" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.1,double" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[3, 4]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[1, 1]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[3, 3]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.1.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[2, 2]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[4, 4]" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="result" />
+
+  <!-- use field data to create cell data -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayAssociation/ComboBox" command="activated" arguments="Cell Data" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="Depth + inputs[0].FieldData['blockId']" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.0,result" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[1, 7]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[1, 6]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.1.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="1.2,[2, 7]" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="result" />
+
+  <!-- use cell data to create FieldData -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayAssociation/ComboBox" command="activated" arguments="Field Data" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="blockId + inputs[0].CellData['Depth']" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.0,result" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[1, 7]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[1, 6]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.1.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[2, 7]" />
+
+  <!-- FieldData with multiple tuples is not available for coloration -->
+  <pqcheck object="pqClientMainWindow/variableToolbar/displayColor/Variables" property="currentText" arguments="result (?)" />
+
+  <!-- reverse expression order -->
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Properties" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayAssociation/ComboBox" command="activated" arguments="Field Data" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/ExpressionWidget/OneLiner" command="set_string" arguments="inputs[0].CellData['Depth'] + blockId" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.0,result" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[1, 7]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[1, 6]" />
+  <pqevent object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataGroupingTab/qt_tabwidget_stackedwidget/hierarchyTab/compositeTree" command="setCurrent" arguments="0.0.1.0" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="2.2,[2, 7]" />
+
+</pqevents>
