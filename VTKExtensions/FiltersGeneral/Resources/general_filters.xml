@@ -2902,6 +2902,30 @@ Every Nth Point.
           the output are included.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="MemoryStrategy"
+                         command="SetMemoryStrategy"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility" />
+        </Hints>
+        <EnumerationDomain name="enum">
+          <Entry text="Mask Input" value="0" />
+          <Entry text="Regenerate Trees And Index Fields" value="1" />
+          <Entry text="New HyperTreeGrid" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Select how to construct the result in memory:
+           - MaskInput (default): shallow copy the input and mask all cells being thresholded
+          - Regenerate Trees And Index Fields: generate a new tree structure but use indexed arrays on the
+          input for cell data
+          - New HyperTreeGrid: construct a new HyperTreeGrid from scratch representing the minimal
+          threshold of the input
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
         <WarnOnCreate>
