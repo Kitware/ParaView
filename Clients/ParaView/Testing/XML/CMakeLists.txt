@@ -387,6 +387,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe8.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe9.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe10.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesNonlinearCells.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GlyphWithEmptyCells_A.png}"
@@ -1201,6 +1202,7 @@ list(APPEND TESTS_WITH_BASELINES
   ExtractTimeSteps.xml
   EyeDomeLighting.xml
   FeatureEdges.xml
+  FeatureEdgesNonlinearCells.xml
   FFTOverTime.xml
   FieldDataBlocks.xml
   FileDialogOpenFile.xml

@@ -1482,7 +1482,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       output->ShallowCopy(triangleFilter->GetOutput());
     }
 
-    if (handleSubdivision)
+    if (handleSubdivision && !this->GenerateFeatureEdges)
     {
       // Restore state of GeometryFilter.
       this->GeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
