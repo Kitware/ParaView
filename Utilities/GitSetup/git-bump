@@ -90,6 +90,9 @@ fi
 submodule_xref="$( echo "$url" | sed -e 's,https://[^/]*/\(.*\),\1,;s/\.git$//' )"
 readonly submodule_xref
 
+# ensure commit is reachable localy
+git -C "$submodule_path" fetch origin "$target_commit"
+
 # construct resulting log
 fphistory="$( git \
   -C "$submodule_path" \
@@ -112,14 +115,14 @@ EOF
 )"
 readonly template
 
-# Save template in file
-tmp_file="$( mktemp "$root_path"/.git/bump.XXXXXX )"
+# Save template in file. Get the actual git dir, whenever using worktrees
+readonly git_dir_path="$( git rev-parse --path-format=absolute --git-common-dir )"
+tmp_file="$( mktemp "$git_dir_path"/bump.XXXXXX )"
 readonly tmp_file
 trap 'rm -f -- "$tmp_file"' EXIT
 echo "$template" > "$tmp_file"
 
 # try committing
-git -C "$submodule_path" fetch --all
 git -C "$submodule_path" checkout "$target_commit"
 git -C "$submodule_path" submodule update --recursive
 git add "$submodule_path"
