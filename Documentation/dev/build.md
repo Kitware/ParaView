@@ -26,6 +26,7 @@ for your operating system. It will be built with the Python wrapping, MPI capabi
 
  * If you are using a Linux distribution, please see [the Linux part](#linux),
  * If you are using Microsoft Windows, please see [the Windows part](#windows),
+ * For macOS, please see [the macOS part](#macos)
  * If you are using another OS, feel free to provide compilation steps.
 
 ### Linux
@@ -86,6 +87,48 @@ Double click on the paraview executable in the `/bin` directory or run in the pr
 
 ```sh
 ./bin/paraview
+```
+
+### macOS
+These instructions have worked on a mid 2023 MacMini with an M2 chipset on macOS Ventura.
+
+#### Install Homebrew
+Please run the command in a terminal to install the following dependencies on your Mac via [Homebrew](https://brew.sh/) and add the relevant environment variables for brew.
+```zsh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+##### Install dependencies (largely following the Ubuntu steps for Linux)
+`brew install open-mpi cmake mesa tbb ninja gdal qt5`
+
+##### Set build environment
+```sh
+echo 'export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"' >> ~/.zshrc
+echo 'export LDFLAGS="-L/opt/homebrew/opt/qt@5/lib"' >> ~/.zshrc
+echo 'export CPPFLAGS="-I/opt/homebrew/opt/qt@5/include"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### Build
+
+To build a specific ParaView version, eg: v5.11.1, please run the following commands in a terminal
+```sh
+git clone https://gitlab.kitware.com/paraview/paraview.git
+mkdir paraview_build
+cd paraview
+git checkout v5.11.1
+git submodule update --init --recursive
+cd ../paraview_build
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_GDAL=ON ../paraview
+ninja
+```
+
+#### Run
+Double click on the paraview executable in the `/bin` directory or run in the previous terminal
+
+```sh
+./bin/paraview.app/Contents/MacOS/paraview
 ```
 
 ### Windows
