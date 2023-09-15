@@ -31,7 +31,8 @@ set (DSPSoundQuantities_FORCE_SERIAL TRUE)
 # TemporalMultiplexing is checking actual values in the spreadsheet, which is not resilient with distributed
 set (tests_without_baselines_no_cs
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPDimensionBrowser.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/DSPTemporalMultiplexing.xml")
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPTemporalMultiplexing.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPTableFFT.xml")
 
 paraview_add_client_tests(
   LOAD_PLUGIN "DigitalSignalProcessing"
@@ -59,7 +60,8 @@ paraview_add_client_server_render_tests(
   TEST_SCRIPTS "${tests_with_baselines}")
 
 set (tests_without_baselines
-  "${CMAKE_CURRENT_SOURCE_DIR}/DSPDistributedDimensionBrowser.xml")
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPDistributedDimensionBrowser.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DistributedDSPTableFFT.xml")
 
 paraview_add_client_server_tests(
   LOAD_PLUGIN "DigitalSignalProcessing"
