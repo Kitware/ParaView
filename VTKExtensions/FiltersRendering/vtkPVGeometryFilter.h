@@ -150,6 +150,17 @@ public:
 
   ///@{
   /**
+   * When two volumetric cells of different order are connected by their corners (for instance, a
+   * quadratic hexahedron next to a linear hexahedron ), the internal face is rendered and is not
+   * considered as a ghost cell. To remove these faces, switch MatchBoundariesIgnoringCellOrder to 1
+   * (default is 0).
+   */
+  virtual void SetMatchBoundariesIgnoringCellOrder(int);
+  vtkGetMacro(MatchBoundariesIgnoringCellOrder, int);
+  ///@}
+
+  ///@{
+  /**
    * Set and get the controller.
    */
   virtual void SetController(vtkMultiProcessController*);
@@ -296,6 +307,7 @@ protected:
   int GenerateCellNormals;
   int Triangulate;
   int NonlinearSubdivisionLevel;
+  int MatchBoundariesIgnoringCellOrder = 0;
 
   vtkMultiProcessController* Controller;
   vtkOutlineSource* OutlineSource;

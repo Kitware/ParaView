@@ -301,6 +301,7 @@ void vtkGeometryRepresentation::SetupDefaults()
     geomFilter->SetUseOutline(0);
     geomFilter->SetTriangulate(0);
     geomFilter->SetNonlinearSubdivisionLevel(1);
+    geomFilter->SetMatchBoundariesIgnoringCellOrder(0);
     geomFilter->SetPassThroughCellIds(1);
     geomFilter->SetPassThroughPointIds(1);
   }
@@ -1337,6 +1338,20 @@ void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
   if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
   {
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(val);
+  }
+
+  // since geometry filter needs to execute, we need to mark the representation
+  // modified.
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMatchBoundariesIgnoringCellOrder(int val)
+{
+  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  {
+    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)
+      ->SetMatchBoundariesIgnoringCellOrder(val);
   }
 
   // since geometry filter needs to execute, we need to mark the representation
