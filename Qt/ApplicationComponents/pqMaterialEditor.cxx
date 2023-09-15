@@ -643,6 +643,10 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* vtkNotUse
               observer->Editor = this;
               this->Internals->MaterialLibrary->AddObserver(vtkCommand::UpdateDataEvent, observer);
               this->updateMaterialList();
+
+              // we also need to instantiate the renderer of the shaderball
+              vtkOSPRayRendererNode::SetMaterialLibrary(
+                this->Internals->MaterialLibrary, this->Internals->getRenderer());
             }
           }
         }
