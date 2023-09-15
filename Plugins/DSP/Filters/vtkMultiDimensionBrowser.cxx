@@ -5,14 +5,23 @@
 
 #include "vtkArrayDispatch.h"
 #include "vtkArrayDispatchDSPArrayList.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkMultiDimensionalArray.h"
+#include "vtkMultiProcessController.h"
 #include "vtkTable.h"
 
 #include <limits>
 
 namespace
 {
+using AllMDArrays = vtkArrayDispatch::MultiDimensionalArrays;
+
+using IdsArrays = vtkTypeList::Unique<vtkTypeList::Create<vtkMultiDimensionalArray<vtkIdType>,
+  vtkMultiDimensionalArray<int>, vtkMultiDimensionalArray<long>,
+  vtkMultiDimensionalArray<long long>, vtkMultiDimensionalArray<unsigned int>,
+  vtkMultiDimensionalArray<unsigned long>, vtkMultiDimensionalArray<unsigned long long>>>::Result;
+
 //------------------------------------------------------------------------------
 /**
  * Construct a vtkMultiDimensionalArray
@@ -30,7 +39,10 @@ struct PrepareMDArrayCopy
   {
     vtkNew<TArray> outputArray;
     outputArray->ImplicitShallowCopy(inputArray);
-    outputArray->SetIndex(index);
+    if (index >= 0 && index < inputArray->GetBackend()->GetNumberOfArrays())
+    {
+      outputArray->SetIndex(index);
+    }
     output->AddColumn(outputArray);
   }
 };
@@ -41,13 +53,63 @@ struct PrepareMDArrayCopy
  */
 struct MDArrayInfo
 {
-  int DimensionMax = 0;
+  vtkIdType LocalSize = 0;
 
   template <typename TArray>
   void operator()(TArray* inputArray)
   {
     auto backend = inputArray->GetBackend();
-    this->DimensionMax = backend->GetNumberOfArrays() - 1;
+    this->LocalSize = backend->GetNumberOfArrays();
+  }
+};
+
+/**
+ * Find a value in the given array.
+ */
+struct MDFindMax
+{
+  vtkIdType Max = 0;
+
+  template <typename TArray>
+  void operator()(TArray* array)
+  {
+    // use a dummy array to avoid modification on the actual array.
+    vtkNew<TArray> dummyArray;
+    dummyArray->ImplicitShallowCopy(array);
+    auto range = vtk::DataArrayValueRange(dummyArray);
+    for (vtkIdType index = 0; index < dummyArray->GetBackend()->GetNumberOfArrays(); index++)
+    {
+      dummyArray->SetIndex(index);
+      this->Max = std::max(this->Max, static_cast<vtkIdType>(range[0]));
+    }
+  }
+};
+
+/**
+ * Find a value in the given array.
+ */
+struct MDFindValue
+{
+  vtkIdType IndexOfValue = 0;
+  bool ValueFound = false;
+
+  template <typename TArray>
+  void operator()(TArray* array, vtkIdType target)
+  {
+    // use a dummy array to avoid modification on the actual array.
+    vtkNew<TArray> dummyArray;
+    dummyArray->ImplicitShallowCopy(array);
+    auto range = vtk::DataArrayValueRange(dummyArray);
+    for (vtkIdType index = 0; index < dummyArray->GetBackend()->GetNumberOfArrays(); index++)
+    {
+      dummyArray->SetIndex(index);
+      if (target == static_cast<vtkIdType>(range[0]))
+      {
+        this->IndexOfValue = index;
+        this->ValueFound = true;
+        break;
+      }
+    }
   }
 };
 
@@ -57,29 +119,70 @@ struct MDArrayInfo
 vtkStandardNewMacro(vtkMultiDimensionBrowser);
 
 //------------------------------------------------------------------------------
-int vtkMultiDimensionBrowser::ComputeIndexMax()
+vtkIdType vtkMultiDimensionBrowser::ComputeLocalGlobalIdMax()
 {
-  using SupportedArrays = vtkArrayDispatch::MultiDimensionalArrays;
-  using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
+  using Dispatcher = vtkArrayDispatch::DispatchByArray<IdsArrays>;
+  ::MDFindMax maxWorker;
+
+  auto inputData = this->GetInputDataObject(0, 0);
+  vtkDataArray* inputArray = this->GetInputArrayToProcess(0, inputData);
+  vtkIdType localMax = 0;
+  if (Dispatcher::Execute(inputArray, maxWorker))
+  {
+    localMax = maxWorker.Max;
+  }
+
+  return localMax;
+}
+
+//------------------------------------------------------------------------------
+vtkIdType vtkMultiDimensionBrowser::ComputeLocalSize()
+{
+  using Dispatcher = vtkArrayDispatch::DispatchByArray<AllMDArrays>;
   ::MDArrayInfo infoWorker;
 
   auto table = vtkTable::SafeDownCast(this->GetInputDataObject(0, 0));
   auto rowData = table->GetRowData();
 
-  int indexMax = std::numeric_limits<int>::max();
+  vtkIdType nbOfIndexes = std::numeric_limits<vtkIdType>::max();
   for (int arrayIdx = 0; arrayIdx < rowData->GetNumberOfArrays(); arrayIdx++)
   {
     if (Dispatcher::Execute(rowData->GetArray(arrayIdx), infoWorker))
     {
-      indexMax = std::min(indexMax, infoWorker.DimensionMax);
+      nbOfIndexes = std::min(nbOfIndexes, infoWorker.LocalSize);
     }
   }
 
-  return indexMax;
+  return nbOfIndexes;
 }
 
 //------------------------------------------------------------------------------
-void vtkMultiDimensionBrowser::UpdateIndexRange()
+vtkIdType vtkMultiDimensionBrowser::ComputeIndexMax()
+{
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  if (this->UseGlobalIds)
+  {
+    const auto localMax = this->ComputeLocalGlobalIdMax();
+    vtkIdType globalMax = localMax;
+    if (controller->GetNumberOfProcesses() > 1)
+    {
+      controller->AllReduce(&localMax, &globalMax, 1, vtkCommunicator::MAX_OP);
+    }
+    return globalMax;
+  }
+
+  const auto localSize = this->ComputeLocalSize();
+  vtkIdType globalSize = localSize;
+  if (controller->GetNumberOfProcesses() > 1)
+  {
+    controller->AllReduce(&localSize, &globalSize, 1, vtkCommunicator::SUM_OP);
+  }
+
+  return globalSize - 1;
+}
+
+//------------------------------------------------------------------------------
+void vtkMultiDimensionBrowser::UpdateGlobalIndexRange()
 {
   this->IndexRange[0] = 0;
   this->IndexRange[1] = this->ComputeIndexMax();
@@ -92,12 +195,69 @@ bool vtkMultiDimensionBrowser::IsIndexInRange()
 }
 
 //------------------------------------------------------------------------------
+bool vtkMultiDimensionBrowser::UpdateLocalIndex()
+{
+  if (this->UseGlobalIds)
+  {
+    return this->MapToLocalGlobalId();
+  }
+
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  if (controller->GetNumberOfProcesses() > 1)
+  {
+    return this->MapToLocalIndex();
+  }
+
+  this->LocalIndex = this->Index;
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool vtkMultiDimensionBrowser::MapToLocalGlobalId()
+{
+  auto inputData = this->GetInputDataObject(0, 0);
+  vtkDataArray* inputArray = this->GetInputArrayToProcess(0, inputData);
+  using Dispatcher = vtkArrayDispatch::DispatchByArray<IdsArrays>;
+  ::MDFindValue findWorker;
+
+  if (Dispatcher::Execute(inputArray, findWorker, this->Index))
+  {
+    if (findWorker.ValueFound)
+    {
+      this->LocalIndex = findWorker.IndexOfValue;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+//------------------------------------------------------------------------------
+bool vtkMultiDimensionBrowser::MapToLocalIndex()
+{
+  auto controller = vtkMultiProcessController::GetGlobalController();
+
+  const auto localSize = this->ComputeLocalSize();
+  std::vector<vtkIdType> processesSize;
+  processesSize.reserve(controller->GetNumberOfProcesses());
+  controller->AllGather(&localSize, processesSize.data(), 1);
+  vtkIdType offset = 0;
+  for (vtkIdType rank = 0; rank < controller->GetLocalProcessId(); rank++)
+  {
+    offset += processesSize[rank];
+  }
+
+  this->LocalIndex = this->Index - offset;
+
+  return this->LocalIndex < localSize && this->LocalIndex >= 0;
+}
+
+//------------------------------------------------------------------------------
 bool vtkMultiDimensionBrowser::CreateOutputArray(vtkDataArray* sourceArray, vtkTable* output)
 {
-  using SupportedArrays = vtkArrayDispatch::MultiDimensionalArrays;
-  using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
+  using Dispatcher = vtkArrayDispatch::DispatchByArray<AllMDArrays>;
   ::PrepareMDArrayCopy worker;
-  if (Dispatcher::Execute(sourceArray, worker, output, this->Index))
+  if (Dispatcher::Execute(sourceArray, worker, output, this->LocalIndex))
   {
     vtkDebugMacro("Index set on new multidimensional array " << sourceArray->GetName());
     return true;
@@ -111,7 +271,7 @@ bool vtkMultiDimensionBrowser::CreateOutputArray(vtkDataArray* sourceArray, vtkT
 int vtkMultiDimensionBrowser::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* vtkNotUsed(outputVector))
 {
-  this->UpdateIndexRange();
+  this->UpdateGlobalIndexRange();
   return 1;
 }
 
@@ -136,7 +296,7 @@ int vtkMultiDimensionBrowser::RequestData(vtkInformation* vtkNotUsed(request),
 
   output->ShallowCopy(input);
 
-  this->UpdateIndexRange();
+  this->UpdateGlobalIndexRange();
   if (!this->IsIndexInRange())
   {
     vtkWarningMacro("Index " << this->Index << " is out of range [" << this->IndexRange[0] << ", "
@@ -145,9 +305,14 @@ int vtkMultiDimensionBrowser::RequestData(vtkInformation* vtkNotUsed(request),
   else
   {
     auto rowData = input->GetRowData();
+    auto hasLocalIndex = this->UpdateLocalIndex();
     for (int arrayIdx = 0; arrayIdx < rowData->GetNumberOfArrays(); arrayIdx++)
     {
       this->CreateOutputArray(rowData->GetArray(arrayIdx), output);
+    }
+    if (!hasLocalIndex)
+    {
+      output->SetNumberOfRows(0);
     }
   }
 
