@@ -26,7 +26,7 @@ for your operating system. It will be built with the Python wrapping, MPI capabi
 
  * If you are using a Linux distribution, please see [the Linux part](#linux),
  * If you are using Microsoft Windows, please see [the Windows part](#windows),
- * For macOS, please see [the macOS part](#macos)
+ * If you are using macOS, please see [the macOS part](#macos),
  * If you are using another OS, feel free to provide compilation steps.
 
 ### Linux
