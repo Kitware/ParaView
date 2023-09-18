@@ -138,11 +138,12 @@ void pqXRInterfaceDockPanel::constructor()
 
 #if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
   this->Internals->Ui.useOpenxrRemoting->setVisible(true);
-  QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged,
-    [&](int state) { this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked); });
   QObject::connect(this->Internals->Ui.useOpenxrRemoting, &QCheckBox::stateChanged, [&](int state) {
+    this->Internals->Helper->SetUseOpenXRRemoting(state == Qt::Checked);
     this->Internals->Ui.remotingAddress->setVisible(state);
     this->Internals->Ui.remoteAddress->setVisible(state);
+    this->Internals->Ui.runtimeVersionLabel->setText(
+      this->Internals->Helper->GetOpenXRRuntimeVersionString().c_str());
   });
   QObject::connect(this->Internals->Ui.remoteAddress, &QLineEdit::textChanged,
     [&](QString text) { this->Internals->Helper->SetRemotingAddress(text.toStdString()); });
@@ -589,13 +590,18 @@ void pqXRInterfaceDockPanel::xrBackendChanged(int index)
   switch (this->Internals->Ui.chooseBackendCombo->itemData(index).toInt())
   {
     case pqXRInterfaceDockPanel::XR_BACKEND_OPENVR:
+      this->Internals->Ui.runtimeVersionLabel->hide();
       this->Internals->Helper->SetUseOpenXR(false);
       break;
     case pqXRInterfaceDockPanel::XR_BACKEND_OPENXR:
       this->Internals->Helper->SetUseOpenXR(true);
+      this->Internals->Ui.runtimeVersionLabel->setText(
+        this->Internals->Helper->GetOpenXRRuntimeVersionString().c_str());
+      this->Internals->Ui.runtimeVersionLabel->show();
       break;
     case pqXRInterfaceDockPanel::XR_BACKEND_NONE:
     default:
+      this->Internals->Ui.runtimeVersionLabel->hide();
       break;
   }
 }

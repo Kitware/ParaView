@@ -85,6 +85,13 @@
        </layout>
       </item>
       <item>
+       <widget class="QLabel" name="runtimeVersionLabel">
+        <property name="text">
+         <string>Runtime version:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="useOpenxrRemoting">
         <property name="text">
          <string>Use OpenXR Remoting (experimental)</string>

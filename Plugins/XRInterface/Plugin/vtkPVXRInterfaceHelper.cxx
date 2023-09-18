@@ -16,6 +16,7 @@
 #endif
 
 #if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+#include "vtkOpenXRManagerRemoteConnection.h"
 #include "vtkOpenXRRemotingRenderWindow.h"
 #include "vtkWin32OpenGLDXRenderWindow.h"
 #endif
@@ -1913,6 +1914,47 @@ void vtkPVXRInterfaceHelper::AttachToCurrentView(vtkSMViewProxy* smview)
   this->Renderer = nullptr;
   this->Internals->Interactor = nullptr;
   this->Internals->RenderWindow = nullptr;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVXRInterfaceHelper::GetOpenXRRuntimeVersionString() const
+{
+  std::string output;
+
+#if XRINTERFACE_HAS_OPENXR_SUPPORT
+  vtkSmartPointer<vtkOpenXRManagerConnection> cs;
+
+  if (this->UseOpenXR)
+  {
+#if XRINTERFACE_HAS_OPENXRREMOTING_SUPPORT
+    if (this->UseOpenXRRemoting)
+    {
+      cs = vtkSmartPointer<vtkOpenXRManagerRemoteConnection>::New();
+      output = "OpenXR Remoting runtime version: ";
+    }
+    else
+#endif
+    {
+      cs = vtkSmartPointer<vtkOpenXRManagerConnection>::New();
+      output = "OpenXR runtime version: ";
+    }
+  }
+
+  const auto version = vtkOpenXRManager::QueryInstanceVersion(cs);
+
+  if (version.Major == 0 && version.Minor == 0 && version.Patch == 0)
+  {
+    output += "unknown";
+  }
+  else
+  {
+    output += std::to_string(version.Major) += '.';
+    output += std::to_string(version.Minor) += '.';
+    output += std::to_string(version.Patch);
+  }
+#endif
+
+  return output;
 }
 
 //----------------------------------------------------------------------------

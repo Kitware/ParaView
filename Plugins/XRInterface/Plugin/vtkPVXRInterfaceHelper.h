@@ -87,6 +87,14 @@ public:
   };
 
   /**
+   * Get OpenXR Runtime version.
+   * This function is affected by `UseOpenXR` and `UseOpenXRRemoting`
+   * If `UseOpenXR` is `false`, this function return an empty string.
+   * `UseOpenXRRemoting` is used to determine OpenXR connection strategy.
+   */
+  std::string GetOpenXRRuntimeVersionString() const;
+
+  /**
    * Create an XR View (e.g. displayed in an HMD) with the actors
    * present in the current Render View.
    */
