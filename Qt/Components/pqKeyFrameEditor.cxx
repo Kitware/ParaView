@@ -850,6 +850,34 @@ void pqKeyFrameEditor::importTrajectory()
 
   int keyFrameNumber = keyFramesConfiguration["keyFrames"].size();
 
+  if (keyFrameNumber < 1)
+  {
+    qWarning() << "This .pvkfc file seems to be empty - a `keyFrames` array object is expected.";
+    return;
+  }
+
+  const Json::Value& firstFrame = keyFramesConfiguration["keyFrames"][0];
+  if (this->Internal->cameraCue())
+  {
+    if (!firstFrame["camera"].isObject())
+    {
+      qWarning() << "This .pvkfc file does not contain a `camera` object, even though a camera "
+                    "animation has been selected.";
+      return;
+    }
+    else if (this->Internal->cameraPathCue() ^ firstFrame["camera"]["positions"].isArray())
+    {
+      qWarning() << "This .pvkfc file is incompatible with the current camera animation mode.";
+      return;
+    }
+  }
+  else if (!firstFrame["interpolation"].isObject())
+  {
+    qWarning() << "This .pvkfc file does not contain an `interpolation` object, even though an "
+                  "interpolation animation has been selected.";
+    return;
+  }
+
   this->deleteAllKeyFrames();
   for (int frameIdx = 0; frameIdx < keyFrameNumber - 1; frameIdx++)
   {
