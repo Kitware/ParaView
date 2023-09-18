@@ -28,6 +28,19 @@
             panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty
+            name="CreateSharedPoints"
+            command="SetCreateSharedPoints"
+            label="Create shared points"
+            number_of_elements="1"
+            default_values="1"
+            panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property allows Fides to close gaps between blocks
+          of structured grids by utilizing shared points.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty
             name="DataSourceEngine"
             animateable="0"
@@ -168,6 +181,19 @@
             default_values="0"
             panel_visibility="never">
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+            name="CreateSharedPoints"
+            command="SetCreateSharedPoints"
+            label="Create shared points"
+            number_of_elements="1"
+            default_values="1"
+            panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property allows Fides to close gaps between blocks
+          of structured grids by utilizing shared points.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty
             name="DataSourceIO"
