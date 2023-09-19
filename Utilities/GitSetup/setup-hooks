@@ -55,7 +55,7 @@ fi &&
 # Populate ".git/hooks".
 echo 'Setting up git hooks...' &&
 hooks_dir=$(git rev-parse --git-path hooks) &&
-mkdir -p "hooks_dir" &&
+mkdir -p "$hooks_dir" &&
 cd "$hooks_dir" &&
 if ! test -e .git; then
 	git init -q || die 'Could not run git init for hooks.'
