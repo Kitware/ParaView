@@ -164,7 +164,7 @@ vtkIdType vtkMultiDimensionBrowser::ComputeIndexMax()
   {
     const auto localMax = this->ComputeLocalGlobalIdMax();
     vtkIdType globalMax = localMax;
-    if (controller->GetNumberOfProcesses() > 1)
+    if (controller && controller->GetNumberOfProcesses() > 1)
     {
       controller->AllReduce(&localMax, &globalMax, 1, vtkCommunicator::MAX_OP);
     }
@@ -173,7 +173,7 @@ vtkIdType vtkMultiDimensionBrowser::ComputeIndexMax()
 
   const auto localSize = this->ComputeLocalSize();
   vtkIdType globalSize = localSize;
-  if (controller->GetNumberOfProcesses() > 1)
+  if (controller && controller->GetNumberOfProcesses() > 1)
   {
     controller->AllReduce(&localSize, &globalSize, 1, vtkCommunicator::SUM_OP);
   }
@@ -203,7 +203,7 @@ bool vtkMultiDimensionBrowser::UpdateLocalIndex()
   }
 
   auto controller = vtkMultiProcessController::GetGlobalController();
-  if (controller->GetNumberOfProcesses() > 1)
+  if (controller && controller->GetNumberOfProcesses() > 1)
   {
     return this->MapToLocalIndex();
   }
@@ -238,6 +238,11 @@ bool vtkMultiDimensionBrowser::MapToLocalIndex()
   auto controller = vtkMultiProcessController::GetGlobalController();
 
   const auto localSize = this->ComputeLocalSize();
+  if (!controller)
+  {
+    this->LocalIndex = this->Index;
+    return this->LocalIndex < localSize && this->LocalIndex >= 0;
+  }
   std::vector<vtkIdType> processesSize;
   processesSize.reserve(controller->GetNumberOfProcesses());
   controller->AllGather(&localSize, processesSize.data(), 1);

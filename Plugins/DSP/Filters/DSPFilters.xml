@@ -894,6 +894,20 @@
       </StringVectorProperty>
 
     </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkDSPTableFFT"
+                 label="DSP Table FFT"
+                 name="DSPTableFFT"
+                 base_proxygroup="filters"
+                 base_proxyname="TableFFT">
+      <Documentation short_help="Run an FFT on output from Temporal Multiplexing.">
+        This filter replaces the Table FFT filter when outputting data from the
+        Temporal Multiplexing filter. It will iterate over the hidden spatial
+        dimension and output mutliplexed FFT data.
+      </Documentation>
+    </SourceProxy>
+
   </ProxyGroup>
 
   <ParaViewFilters>
@@ -908,6 +922,7 @@
       <Proxy group="filters" name="BandFiltering"/>
       <Proxy group="filters" name="TemporalMultiplexing" />
       <Proxy group="filters" name="MultiDimensionBrowser" />
+      <Proxy group="filters" name="DSPTableFFT" />
     </Category>
   </ParaViewFilters>
 </ServerManagerConfiguration>
