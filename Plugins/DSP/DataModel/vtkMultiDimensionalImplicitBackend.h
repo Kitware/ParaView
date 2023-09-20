@@ -107,6 +107,18 @@ public:
   }
 
   /**
+   * Used to implement GetActualMemorySize on vtkMultiDimensionalArray.
+   * The function makes the assumption that all arrays have the same number of components and
+   * tuples.
+   */
+  unsigned long getMemorySize()
+  {
+    unsigned long bytes = static_cast<unsigned long>(sizeof(ValueType)) *
+      this->GetNumberOfArrays() * this->GetNumberOfTuples() * this->GetNumberOfComponents();
+    return std::ceil(bytes / 1024.0);
+  }
+
+  /**
    * Get the shared_ptr of the data.
    * This allows multiple backend to share the same data without copy.
    */
