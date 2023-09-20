@@ -2,7 +2,7 @@ set(MODULE_CLASSES
   vtkBandFiltering
   vtkDSPTableFFT
   vtkMeanPowerSpectralDensity
-  vtkMergeReduceTableBlocks
+  vtkMergeReduceTables
   vtkMultiDimensionBrowser
   vtkProjectSpectrumMagnitude
   vtkSoundQuantitiesCalculator

@@ -11,11 +11,11 @@ if (NOT PARAVIEW_USE_PYTHON OR NOT numpy_found)
   return()
 endif()
 
-# PODT based and spectrogram tests do not support distributed computing 
+# PODT based and spectrogram tests do not support distributed computing
 set (tests_with_baselines_no_cs
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPBandFiltering.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPMeanPowerSpectralDensity.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/DSPMergeReduceTableBlocks.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPMergeReduceTables.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPProjectSpectrumMagnitude.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPSoundQuantities.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPSpectrogram.xml")
@@ -40,8 +40,9 @@ paraview_add_client_tests(
   TEST_SCRIPTS "${tests_without_baselines_no_cs}")
 
 set (tests_with_baselines
-  "${CMAKE_CURRENT_SOURCE_DIR}/DSPSoundQuantitiesMultiplex.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/DSPProjectSpectrumMagnitudeMultiplex.xml")
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPMergeReduceTablesMultiplex.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPProjectSpectrumMagnitudeMultiplex.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPSoundQuantitiesMultiplex.xml")
 
 paraview_add_client_tests(
   LOAD_PLUGIN "DigitalSignalProcessing"

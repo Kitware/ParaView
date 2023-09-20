@@ -5,8 +5,10 @@
 
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTreeRange.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkRange.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 
@@ -14,6 +16,7 @@
 struct vtkDSPMultiBlockIterator::vtkInternals
 {
   vtkSmartPointer<vtkCompositeDataIterator> Iterator;
+  vtkIdType NbIterations = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -25,6 +28,10 @@ vtkDSPMultiBlockIterator* vtkDSPMultiBlockIterator::New(vtkMultiBlockDataSet* mb
   auto result = vtkDSPMultiBlockIterator::New();
   result->Internals->Iterator.TakeReference(mb->NewIterator());
   result->Internals->Iterator->SkipEmptyNodesOn();
+  result->Internals->NbIterations = vtk::Range(mb,
+    vtk::DataObjectTreeOptions::VisitOnlyLeaves | vtk::DataObjectTreeOptions::TraverseSubTree |
+      vtk::DataObjectTreeOptions::SkipEmptyNodes)
+                                      .size();
   return result;
 }
 
@@ -65,4 +72,10 @@ vtkTable* vtkDSPMultiBlockIterator::GetCurrentTable()
   }
 
   return table;
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkDSPMultiBlockIterator::GetNumberOfIterations()
+{
+  return this->Internals->NbIterations;
 }

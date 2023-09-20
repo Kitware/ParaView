@@ -7,6 +7,12 @@
  *
  * Iterates over a vtkMultiBlockDataSet.
  * Simple wrapper over a vtkCompositeDataIterator.
+ *
+ * @warning
+ * Traverses the whole structure on creation.
+ *
+ * @sa
+ * vtkDSPIterator vtkDSPTableIterator
  */
 
 #ifndef vtkDSPMultiBlockIterator_h
@@ -44,6 +50,12 @@ public:
    * Get the current item as a table.
    */
   virtual vtkTable* GetCurrentTable() override;
+
+  /**
+   * Get the number of iterations needed to traverse the current item.
+   * This is equivalent to the number of non-empty leaf blocks.
+   */
+  virtual vtkIdType GetNumberOfIterations() override;
 
 protected:
   vtkDSPMultiBlockIterator();
