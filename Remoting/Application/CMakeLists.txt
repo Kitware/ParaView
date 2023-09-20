@@ -248,6 +248,12 @@ if (TARGET VTK::IOCityGML)
     Resources/proxies_citygml.xml)
 endif ()
 
+if (TARGET VTK::IOCesium3DTiles)
+  list(APPEND xml_files
+    Resources/proxies_cesium3dtiles.xml)
+endif ()
+
+
 if (TARGET VTK::IOHDF)
   list(APPEND xml_files
     Resources/readers_iohdf.xml)
