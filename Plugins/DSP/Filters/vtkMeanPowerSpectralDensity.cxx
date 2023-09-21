@@ -5,7 +5,9 @@
 
 #include "vtkAccousticUtilities.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkDSPIterator.h"
 #include "vtkDataArrayRange.h"
+#include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -23,7 +25,8 @@ vtkStandardNewMacro(vtkMeanPowerSpectralDensity);
 int vtkMeanPowerSpectralDensity::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
   return 1;
 }
 
@@ -31,10 +34,12 @@ int vtkMeanPowerSpectralDensity::FillInputPortInformation(
 int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkMultiBlockDataSet* input = vtkMultiBlockDataSet::GetData(inputVector[0]);
-  if (!input)
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
+  vtkTable* output = vtkTable::GetData(outputVector);
+
+  if (!input || !output)
   {
-    vtkErrorMacro("Missing valid input");
+    vtkErrorMacro("Missing valid input or output.");
     return 0;
   }
   if (this->FFTArrayName.empty())
@@ -43,12 +48,19 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
     return 0;
   }
 
-  // Search for the FFT array
-  vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(input->NewIterator());
-  iter->SkipEmptyNodesOn();
+  // Create DSP iterator according to input type
+  auto iter = vtkDSPIterator::GetInstance(input);
+
+  if (!iter)
+  {
+    vtkErrorMacro("Unable to generate iterator for the given input.");
+    return 0;
+  }
+
   iter->GoToFirstItem();
-  vtkTable* node = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
+  vtkTable* node = iter->GetCurrentTable();
+
+  // Search for the FFT array
   vtkDataArray* fftArray =
     vtkDataArray::SafeDownCast(node->GetColumnByName(this->FFTArrayName.c_str()));
 
@@ -78,16 +90,37 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
     return 0;
   }
 
+  // Copy frequency column if available
+  vtkDataArray* freqArray = this->FrequencyArrayName.empty()
+    ? nullptr
+    : vtkDataArray::SafeDownCast(node->GetColumnByName(this->FrequencyArrayName.c_str()));
+  if (freqArray)
+  {
+    vtkNew<vtkDoubleArray> freq;
+    freq->SetName(this->FrequencyArrayName.c_str());
+    freq->SetNumberOfValues(res->GetNumberOfValues());
+
+    auto freqValueRange = vtk::DataArrayValueRange(freqArray).GetSubRange(1);
+    auto outFreqRange = vtk::DataArrayValueRange(freq);
+
+    assert(freqValueRange.size() == outFreqRange.size() && "FrequencyArray size is not coherent");
+
+    using FreqType = decltype(freqValueRange)::ValueType;
+    vtkSMPTools::Transform(freqValueRange.cbegin(), freqValueRange.cend(), outFreqRange.begin(),
+      [](FreqType value) { return static_cast<double>(value); });
+
+    output->AddColumn(freq);
+  }
+
   // Compute sum of all FFTs over all microphones
   for (; !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
-    node = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
+    node = iter->GetCurrentTable();
     fftArray = vtkDataArray::SafeDownCast(node->GetColumnByName(this->FFTArrayName.c_str()));
 
     if (!fftArray)
     {
-      vtkErrorMacro("Could not find FFT array named " << this->FFTArrayName << " in block "
-                                                      << iter->GetCurrentFlatIndex());
+      vtkErrorMacro("Could not find FFT array named " << this->FFTArrayName << ".");
       return 0;
     }
 
@@ -126,31 +159,8 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
           (vtkAccousticUtilities::REF_PRESSURE * vtkAccousticUtilities::REF_PRESSURE));
     });
 
-  // Construct output
-  vtkTable* output = vtkTable::GetData(outputVector);
+  // Add array to output
   output->AddColumn(res);
-
-  // Add frequency column if available
-  vtkDataArray* freqArray = this->FrequencyArrayName.empty()
-    ? nullptr
-    : vtkDataArray::SafeDownCast(node->GetColumnByName(this->FrequencyArrayName.c_str()));
-  if (freqArray)
-  {
-    vtkNew<vtkDoubleArray> freq;
-    freq->SetName(this->FrequencyArrayName.c_str());
-    freq->SetNumberOfValues(res->GetNumberOfValues());
-
-    auto freqValueRange = vtk::DataArrayValueRange(freqArray).GetSubRange(1);
-    auto outFreqRange = vtk::DataArrayValueRange(freq);
-
-    assert(freqValueRange.size() == outFreqRange.size() && "FrequencyArray size is not coherent");
-
-    using FreqType = decltype(freqValueRange)::ValueType;
-    vtkSMPTools::Transform(freqValueRange.cbegin(), freqValueRange.cend(), outFreqRange.begin(),
-      [](FreqType value) { return static_cast<double>(value); });
-
-    output->AddColumn(freq);
-  }
 
   return 1;
 }
