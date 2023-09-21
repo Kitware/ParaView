@@ -89,6 +89,10 @@ public:
    */
   QStringList getToolbarCategories() const;
   /**
+   * Return a name for the toolbar. This is based on category name and proxy group.
+   */
+  QString getToolbarName(pqProxyCategory* category);
+  /**
    * Given a category name, return the category label.
    */
   QString categoryLabel(const QString& category);

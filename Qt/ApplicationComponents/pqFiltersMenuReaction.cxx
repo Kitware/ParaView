@@ -62,6 +62,8 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(pqApplicationCore::instance(), SIGNAL(updateMasterEnableState(bool)), this,
     SLOT(setEnableStateDirty()));
 
+  QObject::connect(menuManager, SIGNAL(categoriesUpdated()), this, SLOT(setEnableStateDirty()));
+
   // force the state to compute the first time
   this->IsDirty = true;
   this->updateEnableState(false);

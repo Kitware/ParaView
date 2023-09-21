@@ -856,6 +856,8 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
   }
 #endif
+
+  mainWindow.addToolBarBreak();
 }
 
 //-----------------------------------------------------------------------------

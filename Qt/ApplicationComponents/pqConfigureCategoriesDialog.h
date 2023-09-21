@@ -74,7 +74,12 @@ protected Q_SLOTS:
    */
   void onItemChanged(QTreeWidgetItem*, int);
 
-protected: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * Update category toolbar property from checkbox state.
+   */
+  void updateToolbarState();
+
+private:
   /**
    * Update trees.
    */
@@ -115,6 +120,10 @@ protected: // NOLINT(readability-redundant-access-specifiers)
    * Return true if at least on item is selected in the custom tree.
    */
   bool customTreeHasSelection();
+  /**
+   * Return true if at least on item is selected in the application tree.
+   */
+  bool applicationTreeHasSelection();
   /**
    * Return the first selected item in the custom tree.
    * If no selection, return the invisibleRootItem.

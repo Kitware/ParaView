@@ -114,7 +114,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../Widgets/Resources/pqComponents.qrc">
+         <iconset>
           <normaloff>:/pqWidgets/Icons/pqNavForward.svg</normaloff>:/pqWidgets/Icons/pqNavForward.svg</iconset>
         </property>
        </widget>
@@ -144,6 +144,22 @@
         <property name="icon">
          <iconset>
           <normaloff>:/pqWidgets/Icons/pqSubElement.svg</normaloff>:/pqWidgets/Icons/pqSubElement.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QCheckBox" name="useAsToolbar">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Toolbar</string>
+        </property>
+        <property name="toolTip">
+          <string>Add a toolbar for this category</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -226,19 +242,6 @@
          </property>
         </column>
        </widget>
-      </item>
-      <item row="0" column="3">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>

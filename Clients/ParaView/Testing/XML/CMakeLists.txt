@@ -856,6 +856,7 @@ SET (TESTS_WITHOUT_BASELINES
   ProxyCategoriesDialog.xml
   ProxyCategoriesConfiguration.xml
   ProxyCategoriesMenusDefault.xml
+  ProxyCategoriesToolbar.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
   ReloadCGNSFile.xml

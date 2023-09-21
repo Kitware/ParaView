@@ -859,6 +859,26 @@ vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
 }
 
 //-----------------------------------------------------------------------------
+QString pqProxyGroupMenuManager::getToolbarName(pqProxyCategory* category)
+{
+  // get group from proxies, but default to ResourceTagName
+  QString groupName = this->ResourceTagName;
+  auto proxies = category->getRootProxies();
+  if (!proxies.empty())
+  {
+    auto someProxy = proxies[0];
+    if (someProxy)
+    {
+      groupName = someProxy->group();
+    }
+  }
+
+  auto toolbarName = QString("%1.%2").arg(groupName).arg(category->name());
+
+  return toolbarName;
+}
+
+//-----------------------------------------------------------------------------
 QStringList pqProxyGroupMenuManager::getToolbarCategories() const
 {
   QStringList categories_in_toolbar;

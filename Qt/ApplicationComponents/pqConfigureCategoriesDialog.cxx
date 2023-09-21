@@ -198,6 +198,8 @@ pqConfigureCategoriesDialog::pqConfigureCategoriesDialog(
 
   QObject::connect(this->Internal->Ui->searchBox, &pqSearchBox::textChanged, this,
     &pqConfigureCategoriesDialog::onSearchTextChanged);
+  QObject::connect(this->Internal->Ui->useAsToolbar, &QCheckBox::clicked, this,
+    &pqConfigureCategoriesDialog::updateToolbarState);
 
   this->connect(this, &QDialog::accepted, this, &pqConfigureCategoriesDialog::onAccepted);
 
@@ -273,6 +275,16 @@ bool pqConfigureCategoriesDialog::eventFilter(QObject* object, QEvent* event)
     }
 
     return true;
+  }
+
+  if (event->type() == QEvent::MouseButtonRelease)
+  {
+    auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+    auto itemClicked = this->Internal->Ui->customCategoriesTree->indexAt(mouseEvent->pos());
+    if (!itemClicked.isValid())
+    {
+      this->Internal->Ui->customCategoriesTree->clearSelection();
+    }
   }
 
   return QDialog::eventFilter(object, event);
@@ -378,6 +390,12 @@ void pqConfigureCategoriesDialog::onItemChanged(QTreeWidgetItem* item, int)
 bool pqConfigureCategoriesDialog::customTreeHasSelection()
 {
   return !this->Internal->Ui->customCategoriesTree->selectedItems().isEmpty();
+}
+
+//----------------------------------------------------------------------------
+bool pqConfigureCategoriesDialog::applicationTreeHasSelection()
+{
+  return !this->Internal->Ui->defaultCategoriesTree->selectedItems().isEmpty();
 }
 
 //----------------------------------------------------------------------------
@@ -521,6 +539,17 @@ void pqConfigureCategoriesDialog::onRemovePressed()
 }
 
 //----------------------------------------------------------------------------
+void pqConfigureCategoriesDialog::updateToolbarState()
+{
+  QTreeWidgetItem* categoryItem = this->getSelectedItem();
+  if (::isCategory(categoryItem))
+  {
+    auto category = ::getCategory(categoryItem);
+    category->setShowInToolbar(this->Internal->Ui->useAsToolbar->isChecked());
+  }
+}
+
+//----------------------------------------------------------------------------
 bool pqConfigureCategoriesDialog::insertCategoryFromItem(
   QTreeWidgetItem* sourceItem, QTreeWidgetItem* parentCategoryItem, QTreeWidgetItem* precedingItem)
 {
@@ -654,11 +683,17 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::createItem(
 //----------------------------------------------------------------------------
 void pqConfigureCategoriesDialog::updateUIState()
 {
-  bool hasCustomItemSelection = !this->Ui->customCategoriesTree->selectedItems().empty();
-  bool hasApplicationItemSelection = !this->Ui->defaultCategoriesTree->selectedItems().empty();
-  this->Ui->addFilter->setEnabled(hasApplicationItemSelection && hasCustomItemSelection);
-  this->Ui->addSubCategory->setEnabled(hasCustomItemSelection);
-  this->Ui->remove->setEnabled(hasCustomItemSelection);
+  bool hasCustomItemSelection = this->customTreeHasSelection();
+  bool hasApplicationItemSelection = this->applicationTreeHasSelection();
+  this->Internal->Ui->addFilter->setEnabled(hasApplicationItemSelection && hasCustomItemSelection);
+  this->Internal->Ui->addSubCategory->setEnabled(hasCustomItemSelection);
+  this->Internal->Ui->remove->setEnabled(hasCustomItemSelection);
+
+  auto selectedItem = this->getSelectedItem();
+  auto category = ::getCategory(selectedItem);
+  this->Internal->Ui->useAsToolbar->setEnabled(
+    hasCustomItemSelection && ::isCategory(selectedItem) && category);
+  this->Internal->Ui->useAsToolbar->setChecked(category && category->showInToolbar());
 }
 
 //----------------------------------------------------------------------------
