@@ -3,136 +3,171 @@
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 <ui version="4.0" >
  <class>pqKeyFrameEditor</class>
- <widget class="QWidget" name="pqKeyFrameEditor" >
-  <property name="geometry" >
+ <widget class="QWidget" name="pqKeyFrameEditor">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>270</height>
+    <width>836</width>
+    <height>583</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="leftMargin" >
+  <layout class="QGridLayout">
+   <property name="leftMargin">
     <number>0</number>
    </property>
-   <property name="topMargin" >
+   <property name="topMargin">
     <number>0</number>
    </property>
-   <property name="rightMargin" >
+   <property name="rightMargin">
     <number>0</number>
    </property>
-   <property name="bottomMargin" >
+   <property name="bottomMargin">
     <number>0</number>
    </property>
-   <property name="horizontalSpacing" >
+   <property name="horizontalSpacing">
     <number>6</number>
    </property>
-   <property name="verticalSpacing" >
+   <property name="verticalSpacing">
     <number>7</number>
    </property>
-   <item row="0" column="0" colspan="2" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Label</string>
-     </property>
-    </widget>
-   </item>
-   <item rowspan="7" row="1" column="0" >
-    <widget class="QTableView" name="tableView" >
-     <property name="selectionMode" >
+   <item row="1" column="0" rowspan="8">
+    <widget class="QTableView" name="tableView">
+     <property name="selectionMode">
       <enum>QAbstractItemView::SingleSelection</enum>
      </property>
-     <property name="selectionBehavior" >
+     <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" >
-    <widget class="QPushButton" name="pbNew" >
-     <property name="text" >
-      <string>New</string>
-     </property>
-     <property name="toolTip" >
-      <string>Add a new keyframe before selected</string>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Label</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" >
-    <widget class="QPushButton" name="pbDelete" >
-     <property name="text" >
-      <string>Delete</string>
-     </property>
-     <property name="toolTip" >
-      <string>Delete selected keyframe</string>
-     </property>
+   <item row="3" column="1">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QPushButton" name="pbNew">
+        <property name="toolTip">
+         <string>Add a new keyframe before selected</string>
+        </property>
+        <property name="text">
+         <string>New</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbDelete">
+        <property name="toolTip">
+         <string>Delete selected keyframe</string>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbDeleteAll">
+        <property name="toolTip">
+         <string>Delete all keyframe</string>
+        </property>
+        <property name="text">
+         <string>Delete All</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+        <widget class="QPushButton" name="pbImportKeyFrames">
+          <property name="toolTip">
+            <string>Import key frames from a .pvkfc file.</string>
+          </property>
+          <property name="text">
+            <string>Import</string>
+          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbExportKeyFrames">
+          <property name="toolTip">
+           <string>Export key frames to a .pvkfc file.</string>
+          </property>
+          <property name="text">
+           <string>Export</string>
+          </property>
+        </widget>
+       </item>
+     </layout>
     </widget>
    </item>
-   <item row="3" column="1" >
-    <widget class="QPushButton" name="pbDeleteAll" >
-     <property name="text" >
-      <string>Delete All</string>
+   <item row="4" column="1">
+    <widget class="QStackedWidget" name="pbCameraModeStackedWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="toolTip" >
-      <string>Delete all keyframe</string>
-     </property>
+     <widget class="QWidget" name="pbCameraModePage">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="pbApplyToCamera">
+         <property name="toolTip">
+          <string>Apply selected keyframe configuration to the current view camera</string>
+         </property>
+         <property name="text">
+          <string>Apply to Camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbUseCurrentCamera">
+         <property name="toolTip">
+          <string>Use current camera for selected keyframe</string>
+         </property>
+         <property name="text">
+          <string>Use current Camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="pbUseSpline">
+         <property name="toolTip">
+          <string>Use spline interpolation for this cue</string>
+         </property>
+         <property name="text">
+          <string>Spline Interpolation</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pbPathModePage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="pbCreateOrbit">
+         <property name="toolTip">
+          <string>Create an orbit path for selected keyframe, starting with current camera.</string>
+         </property>
+         <property name="text">
+          <string>Create Orbit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
-   </item>
-   <item rowspan="4" row="4" column="1" >
-    <widget class="QPushButton" name="pbCreateOrbit" >
-     <property name="text" >
-      <string>Create Orbit</string>
-     </property>
-     <property name="toolTip" >
-      <string>Create an orbit path for selected keyframe, starting with current camera.</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1" >
-    <widget class="QPushButton" name="pbApplyToCamera" >
-     <property name="text" >
-      <string>Apply to Camera</string>
-     </property>
-     <property name="toolTip" >
-      <string>Apply selected keyframe configuration to the current view camera</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1" >
-    <widget class="QPushButton" name="pbUseCurrentCamera" >
-     <property name="text" >
-      <string>Use current Camera</string>
-     </property>
-     <property name="toolTip" >
-      <string>Use current camera for selected keyframe</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1" >
-    <widget class="QCheckBox" name="pbUseSpline" >
-     <property name="text" >
-      <string>Spline Interpolation</string>
-     </property>
-     <property name="toolTip" >
-      <string>Use spline interpolation for this cue</string>
-     </property>
-    </widget>
-    </item>
-   <item row="7" column="1" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

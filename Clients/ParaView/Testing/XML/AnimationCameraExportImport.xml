@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create cone -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ConeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- open time manager -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Time Manager" />
+
+  <!-- add track interpolate cameras -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/proxiesBox" command="activated" arguments="Camera" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/propertiesBox" command="activated" arguments="Interpolate cameras" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />
+
+  <!-- open interpolate cameras dialog -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCurrent" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCheckState" arguments="1.0.1.0,2" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="edit" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="activate" arguments="1.0.1.0" />
+
+  <!-- add 2 key frames -->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.1" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pbCameraModeStackedWidget/pbCameraModePage/pbUseCurrentCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/widget/pbNew" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="2.1" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/pbCameraModeStackedWidget/pbCameraModePage/pbUseCurrentCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton2" command="activate" arguments="" />
+
+  <!-- save key frames state -->
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/widget/pbExportKeyFrames" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/animation-camera-export.pvkfc" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+
+  <!-- delete track and change point of view -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/removeCameraAnimationCue1Button" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+
+  <!-- add new track and open it -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0/qt_scrollarea_viewport/addTrackWidget/addButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCurrent" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="setCheckState" arguments="1.0.1.0,2" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="doubleClick" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="edit" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" command="activate" arguments="1.0.1.0" />
+
+  <!-- import key frames state -->
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/widget/pbImportKeyFrames" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/pqKeyFrameEditor/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/animation-camera-export.pvkfc" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+
+  <!-- play VCR -->
+  <pqevent object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeProperties/vcrBar/actionVCRPlay" command="activate" arguments="" />
+</pqevents>

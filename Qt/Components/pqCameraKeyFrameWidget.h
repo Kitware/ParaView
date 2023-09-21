@@ -7,6 +7,8 @@
 #include "pqComponentsModule.h"
 #include <QWidget>
 
+#include <vtk_jsoncpp_fwd.h> // for forward declarations
+
 class vtkSMProxy;
 class vtkCamera;
 
@@ -24,7 +26,24 @@ public:
   pqCameraKeyFrameWidget(QWidget* parent = nullptr);
   ~pqCameraKeyFrameWidget() override;
 
+  /**
+   * Return 'true' if the CameraKeyFrameWidget is set to 'path' mode,
+   * indicating that the widget's configuration applies to the entire animation
+   * track rather than being defined on a per-keyframe basis.
+   */
   bool usePathBasedMode() const;
+
+  /**
+   * Initialize the widget properties using JSON.
+   * Does not work in 'path' mode.
+   */
+  void initializeUsingJSON(const Json::Value& json);
+
+  /**
+   * Generate a JSON representing the widget configuration.
+   * Does not work in 'path' mode.
+   */
+  Json::Value serializeToJSON() const;
 
 Q_SIGNALS:
   /**

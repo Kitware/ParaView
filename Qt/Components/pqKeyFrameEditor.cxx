@@ -20,12 +20,15 @@
 #include <vtkCamera.h>
 #include <vtkSMRenderViewProxy.h>
 #include <vtkSMTrace.h>
+#include <vtk_jsoncpp.h>
+#include <vtksys/FStream.hxx>
 
 #include "pqActiveObjects.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCameraKeyFrameWidget.h"
+#include "pqFileDialog.h"
 #include "pqKeyFrameTypeWidget.h"
 #include "pqOrbitCreatorDialog.h"
 #include "pqPropertyLinks.h"
@@ -385,6 +388,10 @@ pqKeyFrameEditor::pqKeyFrameEditor(
   connect(this->Internal->Ui.pbDeleteAll, SIGNAL(clicked(bool)), this, SLOT(deleteAllKeyFrames()));
   connect(
     this->Internal->Ui.pbCreateOrbit, SIGNAL(clicked(bool)), this, SLOT(createOrbitalKeyFrame()));
+  connect(
+    this->Internal->Ui.pbImportKeyFrames, SIGNAL(clicked(bool)), this, SLOT(importTrajectory()));
+  connect(
+    this->Internal->Ui.pbExportKeyFrames, SIGNAL(clicked(bool)), this, SLOT(exportTrajectory()));
   connect(this->Internal->Ui.pbUseCurrentCamera, SIGNAL(clicked(bool)), this,
     SLOT(useCurrentCameraForSelected()));
   connect(this->Internal->Ui.pbApplyToCamera, SIGNAL(clicked(bool)), this,
@@ -406,12 +413,8 @@ pqKeyFrameEditor::pqKeyFrameEditor(
   this->readKeyFrameData();
 
   bool pathBased = this->Internal->cameraPathCue();
-  // path mode
-  this->Internal->Ui.pbCreateOrbit->setVisible(this->Internal->cameraCue() && pathBased);
-  // cameras mode
-  this->Internal->Ui.pbUseCurrentCamera->setVisible(this->Internal->cameraCue() && !pathBased);
-  this->Internal->Ui.pbApplyToCamera->setVisible(this->Internal->cameraCue() && !pathBased);
-  this->Internal->Ui.pbUseSpline->setVisible(this->Internal->cameraCue() && !pathBased);
+  this->Internal->Ui.pbCameraModeStackedWidget->setVisible(this->Internal->cameraCue());
+  this->Internal->Ui.pbCameraModeStackedWidget->setCurrentIndex(pathBased ? 1 : 0);
 
   this->updateButtons();
 
@@ -810,6 +813,167 @@ void pqKeyFrameEditor::createOrbitalKeyFrame()
 
   this->Internal->Cue->triggerKeyFramesModified();
   this->Internal->Cue->getProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::importTrajectory()
+{
+  QString filters =
+    QString("ParaView keyframes configuration (*.pvkfc);;") + "All Files" + " (*.*)";
+
+  pqFileDialog dialog(nullptr, this, tr("Load Custom KeyFrames Configuration"), "", filters, false);
+  dialog.setFileMode(pqFileDialog::ExistingFile);
+
+  if (dialog.exec() != QDialog::Accepted)
+  {
+    return;
+  }
+
+  QString filename = dialog.getSelectedFiles()[0];
+  vtksys::ifstream inputFile(filename.toStdString().c_str());
+  Json::Value keyFramesConfiguration;
+  Json::CharReaderBuilder builder;
+  std::string errs;
+  bool validJson = Json::parseFromStream(builder, inputFile, &keyFramesConfiguration, &errs);
+
+  if (!validJson)
+  {
+    qWarning() << "Could not read:" << filename << "\n" << errs.c_str();
+    return;
+  }
+
+  if (!keyFramesConfiguration["keyFrames"].isArray())
+  {
+    qWarning() << "The .pvkfc reader expect a `keyFrames` array containing all key frames.";
+    return;
+  }
+
+  int keyFrameNumber = keyFramesConfiguration["keyFrames"].size();
+
+  if (keyFrameNumber < 1)
+  {
+    qWarning() << "This .pvkfc file seems to be empty - a `keyFrames` array object is expected.";
+    return;
+  }
+
+  const Json::Value& firstFrame = keyFramesConfiguration["keyFrames"][0];
+  if (this->Internal->cameraCue())
+  {
+    if (!firstFrame["camera"].isObject())
+    {
+      qWarning() << "This .pvkfc file does not contain a `camera` object, even though a camera "
+                    "animation has been selected.";
+      return;
+    }
+    else if (this->Internal->cameraPathCue() ^ firstFrame["camera"]["positions"].isArray())
+    {
+      qWarning() << "This .pvkfc file is incompatible with the current camera animation mode.";
+      return;
+    }
+  }
+  else if (!firstFrame["interpolation"].isObject())
+  {
+    qWarning() << "This .pvkfc file does not contain an `interpolation` object, even though an "
+                  "interpolation animation has been selected.";
+    return;
+  }
+
+  this->deleteAllKeyFrames();
+  for (int frameIdx = 0; frameIdx < keyFrameNumber - 1; frameIdx++)
+  {
+    this->newKeyFrame();
+  }
+
+  for (int frameIdx = 0; frameIdx < keyFrameNumber; frameIdx++)
+  {
+    const Json::Value& keyFrame = keyFramesConfiguration["keyFrames"][frameIdx];
+    if (keyFrame["time"].isDouble())
+    {
+      QModelIndex idx = this->Internal->Model.index(frameIdx, 0);
+      double realKeyTime = this->Internal->realTime(keyFrame["time"].asDouble());
+      this->Internal->Model.setData(idx, realKeyTime, Qt::DisplayRole);
+    }
+
+    if (this->Internal->cameraCue())
+    {
+      pqCameraKeyFrameItem* item =
+        dynamic_cast<pqCameraKeyFrameItem*>(this->Internal->Model.item(frameIdx, 1));
+      if (item)
+      {
+        item->CamWidget.initializeUsingJSON(keyFrame["camera"]);
+      }
+    }
+    else
+    {
+      pqKeyFrameInterpolationItem* item =
+        static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(frameIdx, 1));
+      if (item && keyFrame["interpolation"].isObject())
+      {
+        item->Widget.initializeUsingJSON(keyFrame["interpolation"]);
+      }
+      if (keyFrame["value"].isDouble())
+      {
+        QModelIndex idx = this->Internal->Model.index(frameIdx, 2);
+        this->Internal->Model.setData(idx, keyFrame["value"].asDouble(), Qt::DisplayRole);
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::exportTrajectory()
+{
+  QString filters =
+    QString("ParaView keyframes configuration (*.pvkfc);;") + "All Files" + " (*.*)";
+
+  pqFileDialog dialog(
+    nullptr, this, tr("Save Current KeyFrames Configuration"), "", filters, false);
+  dialog.setFileMode(pqFileDialog::AnyFile);
+
+  if (dialog.exec() != QDialog::Accepted)
+  {
+    return;
+  }
+  Json::Value keyFramesConfiguration;
+
+  for (int frameIdx = 0; frameIdx < this->Internal->Model.rowCount(); frameIdx++)
+  {
+    Json::Value keyFrame;
+    QModelIndex idx = this->Internal->Model.index(frameIdx, 0);
+    QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
+    keyFrame["time"] = this->Internal->normalizedTime(newData.toDouble());
+
+    if (this->Internal->cameraCue())
+    {
+      pqCameraKeyFrameItem* item =
+        dynamic_cast<pqCameraKeyFrameItem*>(this->Internal->Model.item(frameIdx, 1));
+      if (item)
+      {
+        keyFrame["camera"] = item->CamWidget.serializeToJSON();
+      }
+    }
+    else
+    {
+      pqKeyFrameInterpolationItem* item =
+        static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(frameIdx, 1));
+      if (item)
+      {
+        keyFrame["interpolation"] = item->Widget.serializeToJSON();
+      }
+      idx = this->Internal->Model.index(frameIdx, 2);
+      newData = this->Internal->Model.data(idx, Qt::DisplayRole);
+      keyFrame["value"] = newData.toDouble();
+    }
+    keyFramesConfiguration["keyFrames"].append(keyFrame);
+  }
+
+  QString filename = dialog.getSelectedFiles()[0];
+  Json::StreamWriterBuilder builder;
+  builder["commentStyle"] = "None";
+  builder["indentation"] = "  ";
+  std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+  vtksys::ofstream outputFile(filename.toStdString().c_str());
+  writer->write(keyFramesConfiguration, &outputFile);
 }
 
 //-----------------------------------------------------------------------------
