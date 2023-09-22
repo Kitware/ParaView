@@ -34,6 +34,10 @@ for your operating system. It will be built with the Python wrapping, MPI capabi
 #### Dependencies
 Please run the command in a terminal to install the following dependencies depending of your linux distribution.
 
+##### Ubuntu 22.04 LTS / Debian 12
+
+`sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools libqt5svg5-dev python3-dev python3-numpy libopenmpi-dev libtbb-dev ninja-build qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools`
+
 ##### Ubuntu 18.04 LTS / Debian 10
 `sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools libqt5svg5-dev python3-dev python3-numpy libopenmpi-dev libtbb-dev ninja-build`
 
