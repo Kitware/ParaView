@@ -64,8 +64,7 @@ set(classes
   pqVectorWidget
   pqWaitCursor
   pqWidgetCompleter
-  pqWidgetsInit
-  )
+  pqWidgetsInit)
 
 set(headers)
 

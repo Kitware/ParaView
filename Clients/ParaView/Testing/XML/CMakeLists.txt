@@ -835,7 +835,6 @@ if (PARAVIEW_USE_PYTHON)
     TestPythonConsole.xml
     #TestPopOutWidget.xml
     MultipleNumberOfComponents.xml
-    PythonCalculatorAutocomplete.xml
     SpreadSheetNullArrayName.xml # needs programmable filter
   )
 
@@ -1681,6 +1680,7 @@ if(PARAVIEW_USE_PYTHON)
       FieldDataDomainDefault.xml
       PythonCalculator.xml
       PythonCalculatorArrayAssociation.xml
+      PythonCalculatorAutocomplete.xml
       PythonCalculatorCrossComposite.xml
       PythonCalculatorFieldData.xml
       PythonCalculatorInput.xml
