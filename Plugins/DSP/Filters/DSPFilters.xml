@@ -12,6 +12,11 @@
         Temporal Multiplexing -> DSP Table FFT -> Mean Power Spectral Density
         while this one is also supported:
         Plot Data Over Time -> Table FFT -> Mean Power Spectral Density
+
+        Make sure that ghost points are marked as such when using the filter
+        in distributed mode to prevent duplicates. This can be done by applying a
+        Ghost Cells Generator on the geometry prior to transforming it into tables
+        in the previous steps.
       </Documentation>
 
       <InputProperty

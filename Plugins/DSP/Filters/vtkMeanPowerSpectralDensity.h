@@ -14,6 +14,11 @@
  *
  * while this one is also supported:
  * vtkPExtractDataArraysOverTime (Plot Data Over Time) -> vtkTableFFT -> vtkMeanPowerSpectralDensity
+ *
+ * @warning Make sure that ghost points are marked as such when using the filter
+ * in distributed mode to prevent duplicates. This can be done by applying a
+ * vtkGhostCellsGenerator on the geometry prior to transforming it into tables
+ * in the previous steps.
  */
 
 #ifndef vtkMeanPowerSpectralDensity_h

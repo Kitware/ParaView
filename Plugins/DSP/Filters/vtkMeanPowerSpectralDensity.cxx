@@ -8,15 +8,19 @@
 #include "vtkDSPIterator.h"
 #include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMPTools.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
+
+#include <numeric>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMeanPowerSpectralDensity);
@@ -58,6 +62,14 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
   }
 
   iter->GoToFirstItem();
+
+  // Check if input is empty
+  if (iter->IsDoneWithTraversal())
+  {
+    return 1;
+  }
+
+  vtkIdType nbIterations = iter->GetNumberOfIterations();
   vtkTable* node = iter->GetCurrentTable();
 
   // Search for the FFT array
@@ -70,14 +82,18 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
     return 0;
   }
 
+  // Retrieve optional ghost array
+  vtkDataArray* ghostArray =
+    vtkArrayDownCast<vtkDataArray>(node->GetColumnByName(vtkDataSetAttributes::GhostArrayName()));
+  bool hasGhost = (ghostArray != nullptr);
+
   // Set number of values to (size - 1) because the first value is ignored
   // (DC frequency, not relevant for computing the PSD)
   vtkNew<vtkDoubleArray> res;
   res->SetNumberOfValues(fftArray->GetNumberOfTuples() - 1);
-  auto resValueRange = vtk::DataArrayValueRange(res);
+  auto resValueRange = vtk::DataArrayValueRange<1>(res);
   vtkSMPTools::Fill(resValueRange.begin(), resValueRange.end(), 0.0);
 
-  int N = 0;
   bool isComplex = false;
 
   if (fftArray->GetNumberOfComponents() == 2)
@@ -100,8 +116,8 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
     freq->SetName(this->FrequencyArrayName.c_str());
     freq->SetNumberOfValues(res->GetNumberOfValues());
 
-    auto freqValueRange = vtk::DataArrayValueRange(freqArray).GetSubRange(1);
-    auto outFreqRange = vtk::DataArrayValueRange(freq);
+    auto freqValueRange = vtk::DataArrayValueRange<1>(freqArray).GetSubRange(1);
+    auto outFreqRange = vtk::DataArrayValueRange<1>(freq);
 
     assert(freqValueRange.size() == outFreqRange.size() && "FrequencyArray size is not coherent");
 
@@ -116,6 +132,20 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
   for (; !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     node = iter->GetCurrentTable();
+
+    // Skip ghost points to avoid duplicates
+    if (hasGhost)
+    {
+      ghostArray = vtkArrayDownCast<vtkDataArray>(
+        node->GetColumnByName(vtkDataSetAttributes::GhostArrayName()));
+
+      if (ghostArray && ghostArray->GetNumberOfTuples() > 0 && ghostArray->GetComponent(0, 0) != 0)
+      {
+        nbIterations--;
+        continue;
+      }
+    }
+
     fftArray = vtkDataArray::SafeDownCast(node->GetColumnByName(this->FFTArrayName.c_str()));
 
     if (!fftArray)
@@ -139,28 +169,67 @@ int vtkMeanPowerSpectralDensity::RequestData(vtkInformation* vtkNotUsed(request)
     }
     else
     {
-      auto fftValueRange = vtk::DataArrayValueRange(fftArray).GetSubRange(1);
+      auto fftValueRange = vtk::DataArrayValueRange<1>(fftArray).GetSubRange(1);
       using FFTType = decltype(fftValueRange)::ValueType;
       vtkSMPTools::Transform(fftValueRange.cbegin(), fftValueRange.cend(), resValueRange.cbegin(),
         resValueRange.begin(),
         [](FFTType fft, double value) { return value + static_cast<double>(std::abs(fft)); });
     }
-
-    ++N;
   }
 
-  // Compute mean PSD
-  res->SetName("Mean PSD (dB)");
-
-  vtkSMPTools::Transform(
-    resValueRange.cbegin(), resValueRange.cend(), resValueRange.begin(), [N](double value) {
-      return 10.0 *
-        std::log10((value / N) /
-          (vtkAccousticUtilities::REF_PRESSURE * vtkAccousticUtilities::REF_PRESSURE));
-    });
-
   // Add array to output
+  res->SetName("Mean PSD (dB)");
   output->AddColumn(res);
+  vtkSmartPointer<vtkTable> localTable = output;
+
+  // Retrieve controller for distributed context
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  const vtkIdType nbProcesses = controller->GetNumberOfProcesses();
+
+  // Gather all tables onto process 0
+  std::vector<vtkSmartPointer<vtkDataObject>> allRanksTables(nbProcesses);
+  std::vector<vtkIdType> allRanksNbIterations(nbProcesses, 0);
+  controller->Gather(localTable, allRanksTables, 0);
+  controller->Gather(&nbIterations, allRanksNbIterations.data(), 1, 0);
+
+  // Reduce results on process 0
+  if (controller->GetLocalProcessId() == 0)
+  {
+    // Compute total number of iterations for the mean PSD
+    vtkIdType totalNbIterations = std::accumulate(
+      allRanksNbIterations.begin(), allRanksNbIterations.end(), static_cast<vtkIdType>(0));
+
+    // Start from first table
+    vtkTable* reducedTable = vtkTable::SafeDownCast(allRanksTables[0]);
+    vtkDoubleArray* firstPSDArray =
+      vtkDoubleArray::SafeDownCast(reducedTable->GetColumnByName("Mean PSD (dB)"));
+    auto firstRange = vtk::DataArrayValueRange<1>(firstPSDArray);
+
+    // Compute sum of magnitudes across all processes
+    for (vtkIdType idx = 1; idx < nbProcesses; idx++)
+    {
+      vtkTable* procTable = vtkTable::SafeDownCast(allRanksTables[idx]);
+      vtkDoubleArray* psdArray =
+        vtkDoubleArray::SafeDownCast(procTable->GetColumnByName("Mean PSD (dB)"));
+      auto arrayRange = vtk::DataArrayValueRange<1>(psdArray);
+
+      vtkSMPTools::Transform(arrayRange.cbegin(), arrayRange.cend(), firstRange.cbegin(),
+        firstRange.begin(), [&](double x, double y) { return x + y; });
+    }
+
+    vtkSMPTools::Transform(
+      firstRange.cbegin(), firstRange.cend(), firstRange.begin(), [&](double value) {
+        return 10.0 *
+          std::log10((value / totalNbIterations) /
+            (vtkAccousticUtilities::REF_PRESSURE * vtkAccousticUtilities::REF_PRESSURE));
+      });
+
+    output->ShallowCopy(reducedTable);
+  }
+  else
+  {
+    output->Initialize();
+  }
 
   return 1;
 }
