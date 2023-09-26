@@ -180,6 +180,12 @@ def execute(self, expression):
     Called by vtkPythonCalculator in its RequestData(...) method. This is not
     intended for use externally except from within
     vtkPythonCalculator::RequestData(...).
+
+    Note: by default, the output attribute respect `self.GetArrayAssociation()`.
+    As some exposed methods (defined by the VTK numpy wrapping) can change the shape,
+    they can also override the output attribute.
+    For instance, `volume()` will target CellData attribute.
+    FieldData cannot be overridden, as it always can handle any shape of arrays.
     """
 
     # Add inputs.
@@ -222,9 +228,16 @@ def execute(self, expression):
                 # we can also get a scalar, convert to single element array of correct type
                 vtkRet = numpy.asarray(retVal, get_numpy_array_type(self.GetResultArrayType()))
 
-        if hasattr(retVal, "Association") and retVal.Association is not None:
-            output.GetAttributes(retVal.Association).append(vtkRet, self.GetArrayName())
-        else:
-            # if somehow the association was removed we
-            # fall back to the input array association
-            output.GetAttributes(self.GetArrayAssociation()).append(vtkRet, self.GetArrayName())
+        # by default, use filter ArrayAssociation for output attribute.
+        outputAttribute = output.GetAttributes(self.GetArrayAssociation())
+        outputToFieldData = self.GetArrayAssociation() == dsa.ArrayAssociation.FIELD
+
+        # if the computation changes this association for anything other than FIELD, use it instead.
+        # this is useful for some custom methods, like `volume` that apply only for some Array Association (CELL in the example)
+        if not outputToFieldData \
+           and hasattr(retVal, "Association") \
+           and retVal.Association not in [None, dsa.ArrayAssociation.FIELD]:
+
+            outputAttribute = output.GetAttributes(retVal.Association)
+
+        outputAttribute.append(vtkRet, self.GetArrayName())

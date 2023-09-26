@@ -1679,8 +1679,10 @@ if(PARAVIEW_USE_PYTHON)
       ExpressionClear.xml
       FieldDataDomainDefault.xml
       PythonCalculator.xml
-      PythonCalculatorInput.xml
+      PythonCalculatorArrayAssociation.xml
       PythonCalculatorCrossComposite.xml
+      PythonCalculatorFieldData.xml
+      PythonCalculatorInput.xml
       )
 
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)

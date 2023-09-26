@@ -54,14 +54,17 @@
                          default_values="0"
                          name="ArrayAssociation"
                          number_of_elements="1">
-        <FieldDataDomain name="enum">
+        <FieldDataDomain name="enum" enable_field_data="1">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </FieldDataDomain>
-        <Documentation>This property controls the association of the output
-        array as well as which arrays are defined as variables.</Documentation>
+        <Documentation>
+        This property controls which input arrays are defined as variables.
+        This is also the default for output association.
+        Depending on the operation, output association may vary.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetArrayName"
                             default_values="result"
