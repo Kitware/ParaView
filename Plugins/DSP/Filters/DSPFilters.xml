@@ -777,6 +777,16 @@
         </DataTypeDomain>
       </InputProperty>
 
+      <IntVectorProperty name="GenerateTimeColumn"
+                         command="SetGenerateTimeColumn"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Generate a time column, as a data array containing time steps values.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="FieldAssociation"
                          command="SetFieldAssociation"
                          default_values="0"

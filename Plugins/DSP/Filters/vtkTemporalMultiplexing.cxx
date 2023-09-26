@@ -13,6 +13,7 @@
 #include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
+#include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiDimensionalArray.h"
@@ -31,6 +32,8 @@
 //------------------------------------------------------------------------------
 namespace
 {
+const char* TIME_ARRAY_NAME = "Time";
+
 template <typename ValueType>
 using WorkerDataContainerT = typename vtkMultiDimensionalImplicitBackend<ValueType>::DataContainerT;
 
@@ -286,6 +289,11 @@ int vtkTemporalMultiplexing::RequestData(
     request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
     this->Internals->CurrentTimeIndex = 0;
     this->CreateMultiDimensionalArrays(output);
+
+    if (this->GenerateTimeColumn)
+    {
+      this->CreateTimeArray(inputVector, output);
+    }
   }
 
   return 1;
@@ -427,6 +435,22 @@ void vtkTemporalMultiplexing::CreateMultiDimensionalArrays(vtkTable* output)
     vtkSmartPointer<vtkDataArray> mdArray = worker->ConstructMDArray();
     output->AddColumn(mdArray);
   }
+}
+
+//------------------------------------------------------------------------------
+void vtkTemporalMultiplexing::CreateTimeArray(vtkInformationVector** inputVector, vtkTable* output)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (!inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    return;
+  }
+
+  double* inTimes = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  vtkNew<vtkDoubleArray> timeArray;
+  timeArray->SetName(::TIME_ARRAY_NAME);
+  timeArray->SetArray(inTimes, this->Internals->NumberOfTimeSteps, 1);
+  output->AddColumn(timeArray);
 }
 
 //--------------------------------------- --------------------------------------
