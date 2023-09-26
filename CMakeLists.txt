@@ -804,6 +804,7 @@ vtk_module_build(
   GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
   SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
   SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
+install(TARGETS paraviewbuild EXPORT "ParaView")
 
 vtk_module_build(
   MODULES             ${paraview_client_modules}
