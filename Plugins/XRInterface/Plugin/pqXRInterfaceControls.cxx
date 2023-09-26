@@ -125,6 +125,8 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   this->Internals->Ui.rightTrigger->addItem(
     tr("Interactive Crop"), QVariant(vtkPVXRInterfaceHelper::INTERACTIVE_CROP));
   this->Internals->Ui.rightTrigger->addItem(tr("Probe"), QVariant(vtkPVXRInterfaceHelper::PROBE));
+  this->Internals->Ui.rightTrigger->addItem(
+    tr("Teleportation"), QVariant(vtkPVXRInterfaceHelper::TELEPORTATION));
 
   QObject::connect(this->Internals->Ui.rightTrigger,
     QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
