@@ -34,8 +34,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
       set(PARAVIEW_EXTRA_SHARED_LINKER_FLAGS "--fatal-warnings")
     endif()
     if (TARGET paraviewbuild)
-      target_link_options(paraviewbuild
-        INTERFACE
+      set_target_properties(paraviewbuild
+        PROPERTIES
+        INTERFACE_LINK_OPTIONS
         "LINKER:SHELL:${PARAVIEW_EXTRA_SHARED_LINKER_FLAGS} -lc ${CMAKE_SHARED_LINKER_FLAGS}")
     endif()
   endif()
@@ -69,7 +70,8 @@ foreach (lang IN ITEMS C CXX Fortran)
 endforeach ()
 string(REPLACE ";" "," intel_oneapi_compiler_detections "${intel_oneapi_compiler_detections}")
 if (TARGET paraviewbuild)
-  target_compile_options(paraviewbuild
-    INTERFACE
-      "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
+  set_target_properties(paraviewbuild
+    PROPERTIES
+    INTERFACE_COMPILE_OPTIONS
+    "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
 endif ()
