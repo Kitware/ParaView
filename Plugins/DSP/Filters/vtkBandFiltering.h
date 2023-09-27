@@ -150,6 +150,16 @@ protected:
   static vtkSmartPointer<vtkTable> ApplyFFTInternal(
     vtkTable* input, int window, double defaultSampleRate);
 
+  /**
+   * Perform a band filtering on the input vtkTable. This vtkTable needs to have a frequency column
+   * and at least one specific quantity column.
+   *
+   * To be able to use the vtkDSPIterator, we pass all parameter from the RequestData to this
+   * method.
+   */
+  int ExecuteBandFilteringOnTable(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+
 private:
   vtkBandFiltering(const vtkBandFiltering&) = delete;
   void operator=(const vtkBandFiltering&) = delete;
