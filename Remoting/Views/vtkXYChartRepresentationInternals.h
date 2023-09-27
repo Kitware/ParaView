@@ -410,7 +410,9 @@ public:
         vtkAbstractArray* yarray = table->GetColumnByName(columnName.c_str());
         if (yarray != nullptr)
         {
-          exporter->AddColumn(yarray, plot->GetLabel().c_str(), xarray);
+          const std::string plotName = plot->GetLabel();
+          exporter->AddColumn(yarray, plotName.c_str(), xarray);
+          exporter->AddStyle(plot, plotName.c_str());
         }
       }
     }

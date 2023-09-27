@@ -17,6 +17,7 @@
 class vtkAbstractArray;
 class vtkDataArray;
 class vtkFieldData;
+class vtkPlot;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkAbstractChartExporter : public vtkObject
 {
@@ -67,6 +68,8 @@ public:
    */
   virtual void AddColumn(
     vtkAbstractArray* yarray, const char* yarrayname = nullptr, vtkDataArray* xarray = nullptr) = 0;
+
+  virtual void AddStyle(vtkPlot* plot, const char* plotName) = 0;
 
 protected:
   vtkAbstractChartExporter();
