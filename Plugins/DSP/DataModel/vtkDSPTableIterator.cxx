@@ -144,7 +144,8 @@ vtkDSPTableIterator* vtkDSPTableIterator::New(vtkTable* table)
 {
   auto result = vtkDSPTableIterator::New();
   auto dispatchedRes = ::DispatchInitialize(table);
-  result->Internals->NbIterations = std::get<0>(dispatchedRes);
+  vtkIdType dispatchedNbIterations = std::get<0>(dispatchedRes);
+  result->Internals->NbIterations = dispatchedNbIterations != 0 ? dispatchedNbIterations : 1;
   result->Internals->Workers = std::get<1>(dispatchedRes);
   result->Internals->Table = std::get<2>(dispatchedRes);
 
