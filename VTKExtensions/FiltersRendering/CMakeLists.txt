@@ -17,6 +17,7 @@ set(classes
   vtkMPIMoveData
   vtkNetworkImageSource
   vtkOrderedCompositeDistributor
+  vtkPlotlyJsonExporter
   vtkPVGeometryFilter
   vtkRedistributePolyData
   vtkResampledAMRImageSource

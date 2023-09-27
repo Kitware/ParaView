@@ -39,6 +39,8 @@ PRIVATE_DEPENDS
   VTK::ParallelCore
   VTK::RenderingVolume
   VTK::zlib
+  VTK::nlohmannjson
+  VTK::ChartsCore
 OPTIONAL_DEPENDS
   VTK::FiltersParallelMPI
   VTK::IOImage
