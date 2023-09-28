@@ -228,7 +228,7 @@ if (PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # our `find_python_module` checks to determine which tests to add or exclude
   # will fail. We find it here.
   find_package(Python3 3.3 QUIET COMPONENTS Interpreter)
-  include(FindPythonModules)
+  include(ParaViewFindPythonModules)
 endif()
 
 set(paraview_features_needing_remote_modules

@@ -64,7 +64,7 @@ set(PY_TESTS
   VRMLSource.py,NO_VALID
   )
 
-include(FindPythonModules)
+include(ParaViewFindPythonModules)
 find_python_module(numpy numpy_found)
 if (numpy_found)
   list(APPEND PY_TESTS PythonSelection.py PythonSMTraceTest3.py)

@@ -1797,7 +1797,7 @@ if(PARAVIEW_USE_PYTHON)
   )
 
   # Check that matplotlib is available
-  include(FindPythonModules)
+  include(ParaViewFindPythonModules)
   find_python_module(matplotlib matplotlib_found)
   if (matplotlib_found)
     list(APPEND TESTS_WITH_BASELINES TestPythonView.xml)

@@ -281,7 +281,7 @@ unset(filedriver_tests)
 #    baselines.
 #---------------------------------------------------------------------
 if (TARGET ParaView::paraview OR paraview_will_be_built)
-  include(FindPythonModules)
+  include(ParaViewFindPythonModules)
   find_python_module(pandas pandas_found)
 
   set(catalyst_tests

@@ -3,7 +3,7 @@ if (Python3_VERSION VERSION_LESS "3.7")
   return ()
 endif ()
 
-include(FindPythonModules)
+include(ParaViewFindPythonModules)
 find_python_module(wslink wslink_found)
 
 # Make sure we can start the DataProber server
