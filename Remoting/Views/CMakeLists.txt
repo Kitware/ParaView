@@ -137,6 +137,7 @@ set(classes
   vtkSMPVRepresentationProxy
   vtkSMParaViewPipelineControllerWithRendering
   vtkSMPlotMatrixViewProxy
+  vtkSMPlotlyJsonExtractWriterProxy
   vtkSMRangedTransferFunctionDomain
   vtkSMRecolorableImageExtractWriterProxy
   vtkSMRenderViewProxy
@@ -238,6 +239,7 @@ paraview_add_server_manager_xmls(
   XMLS Resources/2dwidgets_remotingviews.xml
        Resources/3dwidgets_remotingviews.xml
        Resources/extractors_remotingviews.xml
+       Resources/extractors_json.xml
        Resources/rendering.xml
        Resources/sources_remotingviews.xml
        Resources/utilities_remotingviews.xml
