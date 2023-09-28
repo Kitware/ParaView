@@ -2,29 +2,46 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "vtkPlotlyJsonExporter.h"
+
+#include "vtkAxis.h"
+#include "vtkChart.h"
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkGenericDataArray.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkPlotPoints.h" // for vtkPlotPoints
+#include "vtkTextProperty.h"
+#include "vtksys/FStream.hxx"
+
 #include "vtk_nlohmannjson.h"
 // clang-format off
 #include VTK_NLOHMANN_JSON(json.hpp) // for json
 // clang-format on
 
+#include <sstream>
+
 using vtkNJson = nlohmann::json;
 
 namespace
 {
-void AddArray(vtkNJson& parent, const std::string& key, vtkAbstractArray* array, const char* name)
+void AddArray(vtkNJson& parent, const std::string& key, vtkAbstractArray* array)
 {
   if (auto* dpArray = vtkDoubleArray::SafeDownCast(array))
   {
     std::vector<double> vec(dpArray->Begin(), dpArray->End());
-    parent["name"] = name;
+    parent[key] = std::move(vec);
+  }
+  else if (auto* dArray = vtkDataArray::SafeDownCast(array))
+  {
+    std::vector<double> vec(dArray->GetNumberOfValues());
+    for (vtkIdType i = 0; i < dArray->GetNumberOfValues(); i++)
+    {
+      vec[i] = dArray->GetTuple1(i);
+    }
     parent[key] = std::move(vec);
   }
   else
@@ -33,14 +50,36 @@ void AddArray(vtkNJson& parent, const std::string& key, vtkAbstractArray* array,
       array->GetArrayTypeAsString());
   }
 }
+
+std::string GetColorAsString(double rgb[3])
+{
+  return "rgb(" + std::to_string(rgb[0]) + "," + std::to_string(rgb[1]) + "," +
+    std::to_string(rgb[2]) + ")";
+}
+
+void SetFontProperties(vtkNJson& font, vtkTextProperty* textProperty)
+{
+  const std::map<int, std::string> VTK_FONT_TO_PLOTLY = {
+    { VTK_ARIAL, "Arial" },
+    { VTK_TIMES, "Times New Roman" },
+    { VTK_COURIER, "Courier New" },
+    { VTK_FONT_FILE, "Arial" },
+    { VTK_UNKNOWN_FONT, "Arial" },
+  };
+
+  double rgb[3];
+  textProperty->GetColor(rgb);
+  font["color"] = GetColorAsString(rgb);
+  font["size"] = textProperty->GetFontSize();
+  font["family"] = VTK_FONT_TO_PLOTLY.at(textProperty->GetFontFamily());
+}
 }
 
 class vtkPlotlyJsonExporter::vtkInternals
 {
 public:
-  vtkNJson Data;
-
-  std::fstream File;
+  vtkNJson Data = vtkNJson::object();
+  vtksys::ofstream File;
 };
 
 //----------------------------------------------------------------------------
@@ -56,6 +95,7 @@ vtkPlotlyJsonExporter::vtkPlotlyJsonExporter()
 //----------------------------------------------------------------------------
 vtkPlotlyJsonExporter::~vtkPlotlyJsonExporter()
 {
+  this->Close();
   delete this->Internals;
   this->SetFileName(nullptr);
 }
@@ -70,12 +110,15 @@ void vtkPlotlyJsonExporter::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkPlotlyJsonExporter::Open(ExporterModes mode)
 {
   auto& internals = *(this->Internals);
-  // setup basic stricture
+  // setup basic structure
   internals.Data["data"] = vtkNJson::array();
   internals.Data["layout"] = vtkNJson::object();
   if (mode == ExporterModes::STREAM_COLUMNS)
   {
-    internals.File.open(this->GetFileName());
+    if (!this->WriteToOutputString)
+    {
+      internals.File.open(this->FileName);
+    }
     return true;
   }
   else
@@ -90,16 +133,28 @@ bool vtkPlotlyJsonExporter::Open(ExporterModes mode)
 void vtkPlotlyJsonExporter::Close()
 {
   auto& internals = *(this->Internals);
-  internals.File << internals.Data;
-  internals.File.close();
+  if (this->WriteToOutputString)
+  {
+    return;
+  }
+  if (internals.File.is_open())
+  {
+    internals.File << internals.Data;
+    internals.File.close();
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPlotlyJsonExporter::Abort()
 {
+  if (this->WriteToOutputString)
+  {
+    return;
+  }
   auto& internals = *(this->Internals);
   this->Close();
   vtksys::SystemTools::RemoveFile(this->FileName);
+  internals.Data = vtkNJson::object();
 }
 
 //----------------------------------------------------------------------------
@@ -119,10 +174,11 @@ void vtkPlotlyJsonExporter::AddColumn(
 {
   auto& internals = *(this->Internals);
   auto dataField = vtkNJson::object();
-  AddArray(dataField, "y", yarray, yarrayname);
+  dataField["name"] = yarrayname;
+  AddArray(dataField, "y", yarray);
   if (xarray)
   {
-    AddArray(dataField, "x", xarray, xarray->GetName());
+    AddArray(dataField, "x", xarray);
   }
   else
   {
@@ -155,7 +211,7 @@ void vtkPlotlyJsonExporter::AddStyle(vtkPlot* plot, const char* plotName)
   auto& internals = *(this->Internals);
   auto& data = internals.Data["data"];
   auto iter = std::find_if(data.begin(), data.end(), [&plotName](const vtkNJson& object) {
-    auto iter = object.find(plotName);
+    auto iter = object.find("name");
     return iter != object.end() && iter.value() == std::string(plotName);
   });
 
@@ -170,19 +226,62 @@ void vtkPlotlyJsonExporter::AddStyle(vtkPlot* plot, const char* plotName)
   auto& line = node["line"];
   double rgb[3];
   plot->GetColorF(rgb);
-  line["color"] = "rgb(" + std::to_string(rgb[0]) + "," + std::to_string(rgb[1]) + "," +
-    std::to_string(rgb[2]) + ")";
+  line["color"] = GetColorAsString(rgb);
   line["dash"] = VTK_LINE_STYLES_TO_PLOTLY.at(plot->GetPen()->GetLineType());
+
+  // default style
+  node["mode"] = "lines";
+
   // marker style if any
   if (vtkPlotPoints* plotPoints = vtkPlotPoints::SafeDownCast(plot))
   {
     auto& marker = node["marker"];
-    marker["symbol"] = VTK_MARKER_STYLES_TO_PLOTLY.at(plotPoints->GetMarkerStyle());
-    marker["size"] = plotPoints->GetMarkerSize();
-    node["mode"] = "lines+markers"; // FIXME how to do markers only ?
+    if (plotPoints->GetMarkerStyle() != VTK_MARKER_NONE)
+    {
+      marker["symbol"] = VTK_MARKER_STYLES_TO_PLOTLY.at(plotPoints->GetMarkerStyle());
+      marker["size"] = plotPoints->GetMarkerSize();
+      node["mode"] = "lines+markers"; // FIXME how to do markers only ?
+    }
   }
-  else
-  {
-    node["mode"] = "lines";
-  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPlotlyJsonExporter::SetGlobalStyle(vtkChart* chart)
+{
+  auto& internals = *(this->Internals);
+  auto& layout = internals.Data["layout"];
+
+  // see https://plotly.com/javascript/reference/layout/
+
+  // Graph Title
+  auto p = vtkNJson::json_pointer("/title/text");
+  layout[p] = chart->GetTitle();
+
+  vtkTextProperty* titleProperties = chart->GetTitleProperties();
+
+  p = vtkNJson::json_pointer("/title/font");
+  auto& tfont = layout[p];
+  SetFontProperties(tfont, titleProperties);
+
+  // Xaxis
+  p = vtkNJson::json_pointer("/xaxis/title/text");
+  layout[p] = chart->GetAxis(0)->GetTitle();
+  titleProperties = chart->GetAxis(0)->GetTitleProperties();
+  p = vtkNJson::json_pointer("/xaxis/title/font");
+  auto& xfont = layout[p];
+  SetFontProperties(xfont, titleProperties);
+
+  // Yaxis
+  p = vtkNJson::json_pointer("/yaxis/title/text");
+  layout[p] = chart->GetAxis(1)->GetTitle();
+  titleProperties = chart->GetAxis(1)->GetTitleProperties();
+  p = vtkNJson::json_pointer("/yaxis/title/font");
+  auto& yfont = layout[p];
+  SetFontProperties(yfont, titleProperties);
+}
+//----------------------------------------------------------------------------
+std::string vtkPlotlyJsonExporter::GetOutputString() const
+{
+  auto& internals = *(this->Internals);
+  return internals.Data.dump();
 }

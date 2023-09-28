@@ -68,7 +68,23 @@ public:
    *
    */
   void AddStyle(vtkPlot* plot, const char* plotName) override;
-  void SetGlobalStyle(vtkChart* chart) override{};
+
+  /**
+   * @brief
+   */
+  void SetGlobalStyle(vtkChart* chart) override;
+
+  ///@{
+  /**
+   * Whether to output to a string instead of to a file which is the default.
+   */
+  vtkSetMacro(WriteToOutputString, bool);
+  vtkGetMacro(WriteToOutputString, bool);
+  vtkBooleanMacro(WriteToOutputString, bool);
+  ///@}
+
+  // When WriteToOutputString is set this can be used to retrieve the string respresentation.
+  std::string GetOutputString() const;
 
 protected:
   vtkPlotlyJsonExporter();
@@ -80,6 +96,7 @@ private:
 
   char* FileName = nullptr;
   class vtkInternals;
+  bool WriteToOutputString = false;
   vtkInternals* Internals;
 };
 
