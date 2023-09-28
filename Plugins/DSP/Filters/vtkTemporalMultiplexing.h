@@ -8,6 +8,13 @@
  * Each point/cell array of the input is converted to a 3D array defined by
  * (index, tuple, component), corresponding to (point/cell, timestep, component).
  * The arrays are vtkMultiDimensionalArray objects.
+ *
+ * Optionally, another array can be added to the table, representing time values.
+ * This one, named "Time", is a vtkDoubleArray, as it remains the same for each
+ * point/cell.  So, using the dimension browser, i.e. updating the point/cell
+ * browsed, won't affect this array.
+ *
+ * @sa vtkMultiDimensionBrowser
  */
 
 #ifndef vtkTemporalMultiplexing_h
@@ -41,6 +48,17 @@ public:
    */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
+  ///@}
+
+  ///@{
+  /**
+   * Set/get whether a time column should be added to the output.
+   * The data array added is named "Time".
+   * Default is true.
+   */
+  vtkSetMacro(GenerateTimeColumn, bool);
+  vtkGetMacro(GenerateTimeColumn, bool);
+  vtkBooleanMacro(GenerateTimeColumn, bool);
   ///@}
 
   ///@{
@@ -97,10 +115,17 @@ private:
    */
   void CreateMultiDimensionalArrays(vtkTable* output);
 
+  /**
+   * Create time array once all timesteps have been processed.
+   * Should run after the last call to RequestData().
+   */
+  void CreateTimeArray(vtkInformationVector** inputVector, vtkTable* output);
+
   struct vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
   std::set<std::string> SelectedArrays;
   int FieldAssociation = 0;
+  bool GenerateTimeColumn = true;
 };
 
 #endif // vtkTemporalMultiplexing_h
