@@ -32,6 +32,10 @@ public:
 
 private:
   Q_DISABLE_COPY(pqStringVectorPropertyWidget);
+
+  bool widgetHintHasAttributeEqualTo(const std::string& attribute, const std::string& value);
+
+  vtkPVXMLElement* WidgetHint = nullptr;
 };
 
 #endif // pqStringVectorPropertyWidget_h

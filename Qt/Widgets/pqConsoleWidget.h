@@ -5,13 +5,11 @@
 #ifndef pqConsoleWidget_h
 #define pqConsoleWidget_h
 
+#include "pqWidgetCompleter.h"
 #include "pqWidgetsModule.h"
 
-#include <QCompleter>
 #include <QTextCharFormat>
 #include <QWidget>
-
-class pqConsoleWidgetCompleter;
 
 /**
   Qt widget that provides an interactive console - you can send text to the
@@ -40,7 +38,7 @@ public:
   /**
    * Set a completer for this console widget
    */
-  void setCompleter(pqConsoleWidgetCompleter* completer);
+  void setCompleter(pqWidgetCompleter* completer);
 
   QPoint getCursorPosition();
 
@@ -123,15 +121,4 @@ private:
   void printAndExecuteCommand(const QString& text);
 };
 
-class PQWIDGETS_EXPORT pqConsoleWidgetCompleter : public QCompleter
-{
-public:
-  /**
-   * Update the completion model given a string.  The given string
-   * is the current console text between the cursor and the start of
-   * the line.
-   */
-  virtual void updateCompletionModel(const QString& str) = 0;
-};
-
-#endif // !pqConsoleWidget_h
+#endif // pqConsoleWidget_h

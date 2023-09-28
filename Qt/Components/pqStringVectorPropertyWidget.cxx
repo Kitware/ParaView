@@ -47,6 +47,7 @@
 #include "pqTreeWidget.h"
 
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QLabel>
 #include <QPushButton>
@@ -55,11 +56,10 @@
 #include <QTextEdit>
 #include <QTreeWidget>
 #include <QVBoxLayout>
-
-#include <QCoreApplication>
 #include <cassert>
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
+#include "pqPythonCalculatorCompleter.h"
 #include "pqPythonScriptEditor.h"
 #include "pqPythonSyntaxHighlighter.h"
 #endif
@@ -76,40 +76,26 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     return;
   }
 
+  // parse <Hint> element
   vtkPVXMLElement* hints = svp->GetHints();
-
-  bool multiline_text = false;
-  bool wrap_text = false;
-  bool python = false;
-  bool showLabel = false;
   vtkPVXMLElement* showComponentLabels = nullptr;
   QString placeholderText;
   if (hints)
   {
-    vtkPVXMLElement* widgetHint = hints->FindNestedElementByName("Widget");
-    if (widgetHint && widgetHint->GetAttribute("type") &&
-      strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
-    {
-      multiline_text = true;
-    }
-    else if (widgetHint && widgetHint->GetAttribute("type") &&
-      strcmp(widgetHint->GetAttribute("type"), "one_liner_wrapped") == 0)
-    {
-      wrap_text = true;
-    }
-    if (widgetHint && widgetHint->GetAttribute("syntax") &&
-      strcmp(widgetHint->GetAttribute("syntax"), "python") == 0)
-    {
-      python = true;
-    }
+    this->WidgetHint = hints->FindNestedElementByName("Widget");
     if (vtkPVXMLElement* phtElement = hints->FindNestedElementByName("PlaceholderText"))
     {
       placeholderText = phtElement->GetCharacterData();
       placeholderText = placeholderText.trimmed();
     }
-    showLabel = (hints->FindNestedElementByName("ShowLabel") != nullptr);
+
     showComponentLabels = hints->FindNestedElementByName("ShowComponentLabels");
   }
+  bool multilineText = widgetHintHasAttributeEqualTo("type", "multi_line");
+  bool wrapText = widgetHintHasAttributeEqualTo("type", "one_liner_wrapped");
+  bool usePython = widgetHintHasAttributeEqualTo("syntax", "python");
+  bool autocompletePython = widgetHintHasAttributeEqualTo("autocomplete", "python_calc");
+  bool showLabel = (hints && hints->FindNestedElementByName("ShowLabel") != nullptr);
 
   // find the domain(s)
   vtkSMEnumerationDomain* enumerationDomain = nullptr;
@@ -138,6 +124,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vbox->setContentsMargins(0, 0, 0, 0);
   vbox->setSpacing(0);
 
+  // create the right widget depending on the domain
   if (fileListDomain)
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqFileChooserWidget`.");
@@ -287,7 +274,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     vbox->addWidget(comboBox);
   }
-  else if (multiline_text)
+  else if (multilineText)
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqTextEdit`.");
 
@@ -317,7 +304,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     w->setLayout(hbox);
     vbox->addWidget(w);
-    if (python)
+    if (usePython)
     {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "supports Python syntax highlighter.");
@@ -394,17 +381,18 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     else
     {
       // add a single line edit.
-      if (wrap_text)
+      if (wrapText)
       {
         vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqOneLinerTextEdit`.");
 
-        QString group = python ? pqExpressionsManager::PYTHON_EXPRESSION_GROUP()
-                               : pqExpressionsManager::EXPRESSION_GROUP();
+        QString group = usePython ? pqExpressionsManager::PYTHON_EXPRESSION_GROUP()
+                                  : pqExpressionsManager::EXPRESSION_GROUP();
         auto expressionsWidget = new pqExpressionsWidget(this, group);
         expressionsWidget->setObjectName("ExpressionWidget");
         vbox->addWidget(expressionsWidget);
 
         pqOneLinerTextEdit* lineEdit = expressionsWidget->lineEdit();
+
         if (!placeholderText.isEmpty())
         {
           lineEdit->setPlaceholderText(placeholderText);
@@ -413,11 +401,29 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
         this->addPropertyLink(lineEdit, "plainText", SIGNAL(textChanged()), smProperty);
         this->connect(
           lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+
+        if (autocompletePython)
+        {
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+          vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use Python calculator autocomplete.");
+
+          vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
+            vtkSMPropertyHelper(this->proxy(), "Input").GetAsProxy(0));
+
+          pqPythonCalculatorCompleter* completer = new pqPythonCalculatorCompleter(this, input);
+          completer->setCompletionMode(QCompleter::PopupCompletion);
+          lineEdit->setCompleter(completer);
+#else
+          vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+            "Python not enabled, no Python autocomplete support.");
+#endif
+        }
       }
       else
       {
         vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqLineEdit`.");
         pqLineEdit* lineEdit = new pqLineEdit(this);
+
         if (!placeholderText.isEmpty())
         {
           lineEdit->setPlaceholderText(placeholderText);
@@ -493,4 +499,12 @@ void pqStringVectorPropertyWidget::processFileChooserHints(vtkPVXMLElement* hint
       supportedExtensions.join(", ").toUtf8().data());
     filter = supportedExtensions.join(";;");
   }
+}
+
+//-----------------------------------------------------------------------------
+bool pqStringVectorPropertyWidget::widgetHintHasAttributeEqualTo(
+  const std::string& attribute, const std::string& value)
+{
+  return (this->WidgetHint && this->WidgetHint->GetAttribute(attribute.c_str()) &&
+    strcmp(this->WidgetHint->GetAttribute(attribute.c_str()), value.c_str()) == 0);
 }
