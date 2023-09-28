@@ -6,8 +6,17 @@
                 name="MeanPowerSpectralDensity">
       <Documentation short_help="Compute mean power spectral density (PSD).">
         This filter computes the mean power spectral density (PSD) of temporal signals.
-        The input should be a multiblock dataset of vtkTables where each block
-        represents a point. Each row of the tables corresponds to a timestep.
+        The input should contain tables of data arrays where each table typically
+        corresponds to a point or cell.
+        The recommended sequence of filters applied to a vtkDataSet is:
+        Temporal Multiplexing -> DSP Table FFT -> Mean Power Spectral Density
+        while this one is also supported:
+        Plot Data Over Time -> Table FFT -> Mean Power Spectral Density
+
+        Make sure that ghost points are marked as such when using the filter
+        in distributed mode to prevent duplicates. This can be done by applying a
+        Ghost Cells Generator on the geometry prior to transforming it into tables
+        in the previous steps.
       </Documentation>
 
       <InputProperty
@@ -19,6 +28,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
         <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
       </InputProperty>
@@ -815,7 +825,7 @@
         <View type="SpreadSheetView" port="0" />
       </Hints>
     </SourceProxy>
-
+    <!-- ================================================================== -->
     <SourceProxy class="vtkMultiDimensionBrowser"
                  label="Multi Dimension Browser"
                  name="MultiDimensionBrowser">
@@ -902,7 +912,6 @@
       </StringVectorProperty>
 
     </SourceProxy>
-
     <!-- ================================================================== -->
     <SourceProxy class="vtkDSPTableFFT"
                  label="DSP Table FFT"

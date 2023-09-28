@@ -40,6 +40,7 @@ paraview_add_client_tests(
   TEST_SCRIPTS "${tests_without_baselines_no_cs}")
 
 set (tests_with_baselines
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPMeanPowerSpectralDensityMultiplex.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPMergeReduceTablesMultiplex.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPProjectSpectrumMagnitudeMultiplex.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPSoundQuantitiesMultiplex.xml")

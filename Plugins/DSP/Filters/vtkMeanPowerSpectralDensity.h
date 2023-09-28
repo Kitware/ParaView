@@ -3,10 +3,22 @@
 
 /**
  * @class   vtkMeanPowerSpectralDensity
+ * @brief   Computes the mean power spectral density (PSD) of temporal signals.
  *
  * This filter computes the mean power spectral density (PSD) of temporal signals.
- * The input should be a multiblock dataset of vtkTables where each block
- * represents a point. Each row of the tables corresponds to a timestep.
+ * The input should contain tables of data arrays where each table typically
+ * corresponds to a point/cell.
+ *
+ * The recommended sequence of filters applied to a vtkDataSet is:
+ * vtkTemporalMultiplexing -> vtkDSPTableFFT -> vtkMeanPowerSpectralDensity
+ *
+ * while this one is also supported:
+ * vtkPExtractDataArraysOverTime (Plot Data Over Time) -> vtkTableFFT -> vtkMeanPowerSpectralDensity
+ *
+ * @warning Make sure that ghost points are marked as such when using the filter
+ * in distributed mode to prevent duplicates. This can be done by applying a
+ * vtkGhostCellsGenerator on the geometry prior to transforming it into tables
+ * in the previous steps.
  */
 
 #ifndef vtkMeanPowerSpectralDensity_h
