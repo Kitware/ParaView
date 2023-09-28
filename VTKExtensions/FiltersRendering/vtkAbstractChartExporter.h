@@ -18,6 +18,7 @@ class vtkAbstractArray;
 class vtkDataArray;
 class vtkFieldData;
 class vtkPlot;
+class vtkChart;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkAbstractChartExporter : public vtkObject
 {
@@ -69,7 +70,18 @@ public:
   virtual void AddColumn(
     vtkAbstractArray* yarray, const char* yarrayname = nullptr, vtkDataArray* xarray = nullptr) = 0;
 
+  /**
+   * Attach information about the style of the plot (color,line type, marker
+   * type etc. To the plot accosiated with plotName. plotName should match the
+   * yarrayname used when adding the data via Add Column.
+   * AddColumn needs to be called before adding the style.
+   */
   virtual void AddStyle(vtkPlot* plot, const char* plotName) = 0;
+
+  /** Set Global style elements like graph and axis titles. Each implementation
+   * is expected to get what it can support from the public vtkChart API.
+   */
+  virtual void SetGlobalStyle(vtkChart* chart) = 0;
 
 protected:
   vtkAbstractChartExporter();

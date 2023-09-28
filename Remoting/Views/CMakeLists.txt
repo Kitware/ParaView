@@ -108,6 +108,7 @@ set(classes
   vtkSIPVRepresentationProxy
   vtkSIUnstructuredGridVolumeRepresentationProxy
   vtkSMBoxRepresentationProxy
+  vtkSMPlotlyJsonExtractWriterProxy
   vtkSMCameraLink
   vtkSMCameraProxy
   vtkSMChartRepresentationProxy

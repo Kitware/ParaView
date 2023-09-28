@@ -141,6 +141,9 @@ public:
   // CVS writer does not support adding the style yet;
   void AddStyle(vtkPlot* vtkNotUsed(plot), const char* vtkNotUsed(plotName)) override{};
 
+  void SetGlobalStyle(vtkChart* vtkNotUsed(chart)) override{};
+  ///@}
+
   ///@{
   /**
    * Whether to output to a string instead of to a file, which is the default.

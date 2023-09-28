@@ -68,6 +68,7 @@ public:
    *
    */
   void AddStyle(vtkPlot* plot, const char* plotName) override;
+  void SetGlobalStyle(vtkChart* chart) override{};
 
 protected:
   vtkPlotlyJsonExporter();

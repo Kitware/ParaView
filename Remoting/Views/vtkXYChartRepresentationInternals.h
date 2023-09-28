@@ -416,6 +416,9 @@ public:
         }
       }
     }
+
+    vtkChartXY* chartXY = self->GetChart();
+    exporter->SetGlobalStyle(chartXY);
     return true;
   }
 
