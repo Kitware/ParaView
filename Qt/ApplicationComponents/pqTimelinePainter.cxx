@@ -277,7 +277,6 @@ bool pqTimelinePainter::paintTick(QPainter* painter, const QStyleOptionViewItem&
 void pqTimelinePainter::paintTimeline(QPainter* painter, const QStyleOptionViewItem& option,
   QStandardItem* item, bool paintLabels, const QStyleOptionViewItem& labelsOption)
 {
-  painter->save();
   std::vector<double> times = this->getTimes(item);
 
   // if not enough timesteps
@@ -286,7 +285,6 @@ void pqTimelinePainter::paintTimeline(QPainter* painter, const QStyleOptionViewI
     // we always want to have at least 2 rects in the list.
     this->Internals->LabelRects << QRect();
     this->Internals->LabelRects << QRect();
-    painter->restore();
     return;
   }
 
