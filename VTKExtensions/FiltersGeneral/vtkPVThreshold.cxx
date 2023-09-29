@@ -90,6 +90,7 @@ int vtkPVThreshold::RequestData(
   {
     // Match behavior from vtkThreshold
     vtkNew<vtkHyperTreeGridThreshold> thresholdFilter;
+    thresholdFilter->SetMemoryStrategy(this->MemoryStrategy);
     if (this->ThresholdFunction == &vtkThreshold::Lower)
     {
       thresholdFilter->ThresholdBetween(

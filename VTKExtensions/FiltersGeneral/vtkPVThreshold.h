@@ -23,6 +23,16 @@ public:
 
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
+  ///@{
+  /**
+   * Property specific to `vtkHyperTreeGridThreshold`. See class doc for more info.
+   *
+   * default is vtkHyperTreeGridThreshold::MaskInput
+   */
+  vtkGetMacro(MemoryStrategy, int);
+  vtkSetMacro(MemoryStrategy, int);
+  ///@}
+
 protected:
   vtkPVThreshold() = default;
   ~vtkPVThreshold() override = default;
@@ -39,6 +49,8 @@ protected:
 private:
   vtkPVThreshold(const vtkPVThreshold&) = delete;
   void operator=(const vtkPVThreshold&) = delete;
+
+  int MemoryStrategy = 0;
 };
 
 #endif
