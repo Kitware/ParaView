@@ -1,4 +1,4 @@
-ParaView 5.11.1 Release Notes
+ParaView 5.11.2 Release Notes
 ============================
 
 Bug fixes made since ParaView 5.11.1 are listed in this document.
