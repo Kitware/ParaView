@@ -82,7 +82,8 @@ public:
     GRAB,
     PICK,
     INTERACTIVE_CROP,
-    PROBE
+    PROBE,
+    TELEPORTATION
   };
 
   /**

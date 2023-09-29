@@ -39,6 +39,7 @@ Created with the Valve Index controller, some adaptations may be needed for othe
    - Check “Probe” (pick a cell)
    - Check “Interactive Crop” (keep trigger pressed)
    - Check “Add Point to Source” (will automatically add to the poly line source, make sure it is selected in the pipeline view)
+   - Check “Teleportation” (teleport with the ray, make sure that the ray intersect with the prop you want to teleport to)
    - Back to “Pick” action
  - Outside of the menu, use picking or grabbing to move the wavelet
  - Press “Reset Actors Position“ (actors should come back to their position before picking)

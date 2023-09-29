@@ -816,6 +816,11 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(int index)
         this->SetShowRightControllerMarker(false);
         style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
         break;
+      case vtkPVXRInterfaceHelper::TELEPORTATION:
+        this->SetShowRightControllerMarker(false);
+        style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_TELEPORTATION);
+        style->GrabWithRayOn();
+        break;
       default:
         break;
     }
