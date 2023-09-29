@@ -246,7 +246,7 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
   menu.setStyle(style);
 
   pqProxyGroupMenuManager* mgr =
-    new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
+    new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable, true);
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
   pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
@@ -321,8 +321,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Manage Plugins..."))
     << pqSetName("actionManage_Plugins"));
 
-  QMenu* dummyMenu = new QMenu();
-  pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false);
+  QMenu* dummyMenu = new QMenu(&menu);
+  pqProxyGroupMenuManager* mgr =
+    new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false, true);
   mgr->addProxyDefinitionUpdateListener("filters");
 
   QAction* configureCategoriesAction =

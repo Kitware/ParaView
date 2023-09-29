@@ -124,8 +124,11 @@ public:
    * Contained proxies.
    */
   ///@{
-  /// Return child proxy from name.
-  pqProxyInfo* getProxy(const QString& name);
+  /// Return true if a direct child exists with the given name.
+  bool hasProxy(const QString& name);
+  /// Return child proxy from name. If recursive is true, forward request to subcategories until
+  /// finding a matching proxy.
+  pqProxyInfo* findProxy(const QString& name, bool recursive = false);
   /// Return direct child proxies.
   QList<pqProxyInfo*> getRootProxies();
   /// Return proxies including subcategories proxies.
@@ -138,6 +141,8 @@ public:
    * Contained categories.
    */
   ///@{
+  /// Return contained category by name. If not found, return an empty one.
+  pqProxyCategory* findSubCategory(const QString& name);
   /// Return contained categories.
   QMap<QString, pqProxyCategory*> getSubCategories();
   /// Return contained categories recursively.

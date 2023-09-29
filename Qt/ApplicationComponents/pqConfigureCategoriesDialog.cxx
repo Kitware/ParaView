@@ -111,6 +111,8 @@ struct pqConfigureCategoriesDialog::pqInternal
   {
   }
 
+  bool isFavorites(pqProxyCategory* category) { return this->MenuManager->isFavorites(category); }
+
   //----------------------------------------------------------------------------
   /**
    * Set a unique name from current item text.
@@ -151,7 +153,6 @@ struct pqConfigureCategoriesDialog::pqInternal
   }
 
   bool BlockEdition = false;
-
   pqProxyGroupMenuManager* MenuManager;
   QScopedPointer<Ui::pqConfigureCategoriesDialog> Ui;
   std::unique_ptr<pqProxyCategory> SettingsCategory;
@@ -687,13 +688,15 @@ void pqConfigureCategoriesDialog::updateUIState()
   bool hasApplicationItemSelection = this->applicationTreeHasSelection();
   this->Internal->Ui->addFilter->setEnabled(hasApplicationItemSelection && hasCustomItemSelection);
   this->Internal->Ui->addSubCategory->setEnabled(hasCustomItemSelection);
-  this->Internal->Ui->remove->setEnabled(hasCustomItemSelection);
 
   auto selectedItem = this->getSelectedItem();
   auto category = ::getCategory(selectedItem);
   this->Internal->Ui->useAsToolbar->setEnabled(
     hasCustomItemSelection && ::isCategory(selectedItem) && category);
   this->Internal->Ui->useAsToolbar->setChecked(category && category->showInToolbar());
+
+  bool isFavorites = this->Internal->isFavorites(category);
+  this->Internal->Ui->remove->setEnabled(hasCustomItemSelection && !isFavorites);
 }
 
 //----------------------------------------------------------------------------

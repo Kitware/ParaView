@@ -23,6 +23,14 @@
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="3.0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0.3.0" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0.3.0,Slice" />
+  <!-- categories can be removed and nested -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="true" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
+  <!-- but favorites cannot be removed -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="7.0,&amp;Favorites" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="7.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
 
   <!-- Test adding/removing categories. -->
   <!-- add a new category -->

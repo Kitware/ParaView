@@ -392,7 +392,13 @@ QList<pqProxyInfo*> pqProxyCategory::getProxiesRecursive()
 }
 
 //-----------------------------------------------------------------------------
-pqProxyInfo* pqProxyCategory::getProxy(const QString& name)
+bool pqProxyCategory::hasProxy(const QString& name)
+{
+  return this->Proxies.contains(name);
+}
+
+//-----------------------------------------------------------------------------
+pqProxyInfo* pqProxyCategory::findProxy(const QString& name, bool recursive)
 {
   if (this->Proxies.contains(name))
   {
@@ -462,6 +468,17 @@ QMap<QString, pqProxyCategory*> pqProxyCategory::getSubCategoriesRecursive()
   }
 
   return categories;
+}
+
+//-----------------------------------------------------------------------------
+pqProxyCategory* pqProxyCategory::findSubCategory(const QString& name)
+{
+  if (this->SubCategories.contains(name))
+  {
+    return this->SubCategories[name];
+  }
+
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

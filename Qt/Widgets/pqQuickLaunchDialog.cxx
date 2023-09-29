@@ -231,6 +231,7 @@ void pqQuickLaunchDialog::updateSearch()
         currentRow = i;
       }
     }
+    item->setFont(this->Internal->Actions[actionName]->font());
     this->Internal->options->addItem(item);
     i++;
   }

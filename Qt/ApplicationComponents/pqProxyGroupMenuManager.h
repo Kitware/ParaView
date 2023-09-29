@@ -36,8 +36,8 @@ public:
    * \c supportsQuickLaunch, set to false if quick-launch is not to be supported
    *    for this menu.
    */
-  pqProxyGroupMenuManager(
-    QMenu* menu, const QString& resourceTagName, bool supportsQuickLaunch = true);
+  pqProxyGroupMenuManager(QMenu* menu, const QString& resourceTagName,
+    bool supportsQuickLaunch = true, bool enableFavorites = false);
   ~pqProxyGroupMenuManager() override;
 
   /**
@@ -143,6 +143,10 @@ public:
   void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
 
   /**
+   * Specific-meaning categories.
+   */
+  ///@{
+  /**
    * Returns the invisible root category containing all
    * categories to display, as defined by the application.
    */
@@ -152,6 +156,16 @@ public:
    * categories to display. Use settings if existing.
    */
   pqProxyCategory* getMenuCategory();
+  /**
+   * Returns the Favorites category.
+   */
+  pqProxyCategory* getFavoritesCategory();
+  /**
+   * Returns true if the given category is a favorites.
+   * Based on name.
+   */
+  bool isFavorites(pqProxyCategory* category);
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -192,6 +206,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   virtual void populateMenu();
 
+  /**
+   * Write categories to settings.
+   */
+  void writeCategoryToSettings();
+
 Q_SIGNALS:
   void triggered(const QString& group, const QString& name);
 
@@ -211,6 +230,7 @@ protected Q_SLOTS:
   void quickLaunch();
   void switchActiveServer();
   void updateMenuStyle();
+  void updateActionsStyle();
 
   /// Fill recently used submenu
   void populateRecentlyUsedMenu();
@@ -222,11 +242,6 @@ protected Q_SLOTS:
   PARAVIEW_DEPRECATED_IN_5_13_0(
     "Favorites are now a specific category, configurable as the others.")
   void populateFavoritesMenu();
-
-  /**
-   * Write categories to settings.
-   */
-  void writeCategoryToSettings();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   QString ResourceTagName;
@@ -246,7 +261,9 @@ protected: // NOLINT(readability-redundant-access-specifiers)
     "Favorites are now a specific category, configurable as the others.")
   void loadFavoritesItems();
 
-  QAction* getAddToCategoryAction(const QString& path);
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "Favorites are now a specific category, configurable as the others.")
+  QAction* getAddToFavoritesAction(const QString& path);
 
   /**
    * Return the action for a given proxy.
@@ -277,16 +294,12 @@ private: // NOLINT(readability-redundant-access-specifiers)
   QAction* createAction(pqProxyInfo* proxy);
 
   /**
-   * Update action icon from proxy info.
-   * For CustomFilters, fallback to a default icon.
+   * Create the action and the reaction to add to favorites under given category.
    */
-  void updateActionIcon(QAction* action, pqProxyInfo* proxy);
+  QAction* createAddToFavoritesAction();
+
   /**
-   * Update action "omit from toolbar" property from proxy info.
-   */
-  void updateActionOmitFromToolbar(QAction* action, pqProxyInfo* proxy);
-  /**
-   * Update action shortcut from settings.
+   * Updating menus content.
    */
   ///@{
   /// Clear main menu.

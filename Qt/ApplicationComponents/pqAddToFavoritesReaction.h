@@ -6,6 +6,13 @@
 
 #include "pqReaction.h"
 
+#include "vtkParaViewDeprecation.h" // for deprecation macro
+
+#include <memory>
+
+class pqProxyCategory;
+class pqProxyGroupMenuManager;
+
 /**
  * @ingroup Reactions
  * Reaction to add selected filter in favorites
@@ -16,7 +23,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAddToFavoritesReaction : public pqReactio
   typedef pqReaction Superclass;
 
 public:
+  PARAVIEW_DEPRECATED_IN_5_13_0("Favorites are integrated into the categories. Please initialize "
+                                "from a pqProxyCategory instead.")
   pqAddToFavoritesReaction(QAction* parent, QVector<QString>& filters);
+
+  pqAddToFavoritesReaction(QAction* parent, pqProxyGroupMenuManager* manager);
+
+  ~pqAddToFavoritesReaction() override;
 
   /**
    * Add filter in favorites.
@@ -34,12 +47,15 @@ protected:
   /**
    * Called when the action is triggered.
    */
-  void onTriggered() override { pqAddToFavoritesReaction::addToFavorites(this->parentAction()); }
+  void onTriggered() override { this->addActiveSourceToFavorites(); }
 
 private:
   Q_DISABLE_COPY(pqAddToFavoritesReaction)
 
-  QVector<QString> Filters;
+  void addActiveSourceToFavorites();
+
+  struct pqInternal;
+  std::unique_ptr<pqInternal> Internal;
 };
 
 #endif
