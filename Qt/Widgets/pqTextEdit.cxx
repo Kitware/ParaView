@@ -144,8 +144,17 @@ void pqTextEdit::keyPressEvent(QKeyEvent* e)
   {
     case Qt::Key_Tab: // Display completer or accept
       e->accept();
-      this->updateCompleter();
-      this->selectCompletion();
+      if (!this->Completer->getCompleteEmptyPrompts() &&
+        this->textUnderCursor().trimmed().isEmpty())
+      {
+        this->Superclass::keyPressEvent(
+          e); // Input a tab and don't complete when the line is empty.
+      }
+      else
+      {
+        this->updateCompleter();
+        this->selectCompletion();
+      }
       break;
     default:
       e->accept();

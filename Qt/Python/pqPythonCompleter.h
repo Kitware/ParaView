@@ -18,15 +18,6 @@ public:
   pqPythonCompleter(QWidget* parent)
     : pqWidgetCompleter(parent){};
 
-  ///@{
-  /**
-   * get/set CompleteEmptyPrompts, indicating whether or not the completer should show anything
-   * if an empty prompt is given.
-   */
-  bool getCompleteEmptyPrompts() { return this->CompleteEmptyPrompts; };
-  void setCompleteEmptyPrompts(bool newValue) { this->CompleteEmptyPrompts = newValue; };
-  ///@}
-
 protected:
   virtual QStringList getCompletions(const QString& prompt) override;
   virtual QString getCompletionPrefix(const QString& prompt) override;
@@ -55,8 +46,5 @@ protected:
    * This method must be implemented in concrete classes.
    */
   virtual QStringList getPythonCompletions(const QString& pythonObjectName) = 0;
-
-private:
-  bool CompleteEmptyPrompts = false;
 };
 #endif

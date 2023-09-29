@@ -17,6 +17,7 @@ from paraview.vtk import vtkDataObject, vtkDoubleArray, vtkSelectionNode, vtkSel
 from paraview.modules import vtkPVVTKExtensionsFiltersPython
 from paraview.vtk.util.numpy_support import get_numpy_array_type
 import sys
+import textwrap
 
 if sys.version_info >= (3,):
     xrange = range
@@ -134,7 +135,7 @@ def cellContainsPoint(inputs, locations):
     return output.CellData.GetArray('vtkInsidedness')
 
 
-def compute(inputs, expression, ns=None):
+def compute(inputs, expression, ns=None, multiline=False):
     #  build the locals environment used to eval the expression.
     mylocals = dict()
     if ns:
@@ -145,16 +146,30 @@ def compute(inputs, expression, ns=None):
     except AttributeError:
         pass
 
-    finalRet = None
-    for subEx in expression.split(' and '):
-        retVal = eval(subEx, globals(), mylocals)
-        if finalRet is None:
-            finalRet = retVal
-        else:
-            finalRet = dsa.VTKArray([a & b for a, b in zip(finalRet, retVal)])
+    if multiline:
+        # Wrap multiline expressions returning a value in a function, and evaluate it.
+        if "return" not in expression:
+            raise ValueError(
+                "Multiline expression does not contain a return statement.")
 
-    return finalRet
+        multilineFunction = f'def func():\n' \
+                    f'{textwrap.indent(expression, " "*4)}\n' \
+                    f'result = func()\n'
+        returnValueDict = {}
 
+        # `mylocals` need to be in the global `exec` scope, otherwise it would not be accessible inside the `func` scope
+        exec(multilineFunction, dict(globals(), **mylocals), returnValueDict)
+
+        return returnValueDict['result']
+    else:
+        finalRet = None
+        for subEx in expression.split(' and '): # Used in 'extract_selection' to find data matching multiple criteria
+            retVal = eval(subEx, globals(), mylocals)
+            if finalRet is None:
+                finalRet = retVal
+            else:
+                finalRet = dsa.VTKArray([a & b for a, b in zip(finalRet, retVal)])
+        return finalRet
 
 def get_data_time(self, do, ininfo):
     dinfo = do.GetInformation()
@@ -174,7 +189,7 @@ def get_data_time(self, do, ininfo):
     return (t, t_index)
 
 
-def execute(self, expression):
+def execute(self, expression, multiline=False):
     """
     **Internal Method**
     Called by vtkPythonCalculator in its RequestData(...) method. This is not
@@ -215,7 +230,7 @@ def execute(self, expression):
                       "t_value": inputs[0].t_value,
                       "time_index": inputs[0].time_index,
                       "t_index": inputs[0].t_index})
-    retVal = compute(inputs, expression, ns=variables)
+    retVal = compute(inputs, expression, ns=variables, multiline=multiline)
 
     if retVal is not None:
         vtkRet = retVal

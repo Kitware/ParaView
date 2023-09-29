@@ -24,6 +24,15 @@ public:
    */
   virtual void updateCompletionModel(const QString& prompt);
 
+  ///@{
+  /**
+   * get/set CompleteEmptyPrompts, indicating whether or not the completer should show anything
+   * if an empty prompt is given.
+   */
+  bool getCompleteEmptyPrompts() { return this->CompleteEmptyPrompts; };
+  void setCompleteEmptyPrompts(bool newValue) { this->CompleteEmptyPrompts = newValue; };
+  ///@}
+
 protected:
   /**
    * Return a list of strings that could match the given prompt
@@ -34,5 +43,8 @@ protected:
    * Return the part of the prompt that can be completed.
    */
   virtual QString getCompletionPrefix(const QString& prompt) = 0;
+
+private:
+  bool CompleteEmptyPrompts = false;
 };
 #endif

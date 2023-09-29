@@ -1712,6 +1712,7 @@ if(PARAVIEW_USE_PYTHON)
       PythonCalculatorCrossComposite.xml
       PythonCalculatorFieldData.xml
       PythonCalculatorInput.xml
+      PythonCalculatorMultiline.xml
       )
 
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
