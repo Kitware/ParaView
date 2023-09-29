@@ -174,7 +174,7 @@ option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray and/or OptiX ray-t
 
 set(paraview_web_default ON)
 if (PARAVIEW_USE_PYTHON AND WIN32)
-  include(ParaViewFindPythonModules.cmake)
+  include(ParaViewFindPythonModules)
   find_python_module(win32api have_pywin32)
   set(paraview_web_default "${have_pywin32}")
 endif ()
