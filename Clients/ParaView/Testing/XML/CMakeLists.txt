@@ -765,6 +765,17 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToEmptyData.png}"
 )
 
+# Some tests can take a long time; increase their timeout.
+set(UndoRedo1_TIMEOUT 300)
+set(RearrangeLayout_TIMEOUT 150)
+set(Ensemble_TIMEOUT 150)
+set(ScalarBarRange_TIMEOUT 150)
+set(PropertyContextMenu_TIMEOUT 150)
+set(HelpWindowHistory_TIMEOUT 150)
+set(SplitViewTrace_TIMEOUT 150)
+set(ColorOpacityTableEditorHistogram_TIMEOUT 150)
+set(TraceExportAndSaveData_TIMEOUT 150)
+
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   AddFieldArrays.xml
@@ -2387,6 +2398,3 @@ if (PARAVIEW_PLUGIN_ENABLE_ArrowGlyph)
     FORCE_SERIAL
     TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectPluginLoad.xml)
 endif ()
-
-# Some tests can take a long time, increasing their timeout
-set_property(TEST pvcrs.UndoRedo1 PROPERTY TIMEOUT 300)

@@ -8,6 +8,9 @@ set(GMV_READER_TESTS
   GMVReaderInvalidFiles${suffix}.xml
 )
 
+# Increase timeout for BasicRead as the data can take some time to read
+set("GMVReaderBasicRead${suffix}_TIMEOUT" 300)
+
 set(_paraview_add_tests_default_test_data_target ParaViewData)
 ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/GMV/,REGEX:.*}"
@@ -27,12 +30,6 @@ if (TEST "pv.GMVReaderInvalidFiles${suffix}")
       PASS_REGULAR_EXPRESSION "client0 process exited with code 0")
 endif ()
 
-# Increase timeout for BasicRead as the data can take some time to read
-if (TEST "pv.GMVReaderBasicRead${suffix}")
-  set_property(TEST "pv.GMVReaderBasicRead${suffix}"
-    PROPERTY TIMEOUT 300)
-endif ()
-
   paraview_add_client_server_tests(
   BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline"
   TEST_SCRIPTS ${GMV_READER_TESTS}
@@ -43,10 +40,4 @@ if (TEST "pvcs.GMVReaderInvalidFiles${suffix}")
   set_property(TEST "pvcs.GMVReaderInvalidFiles${suffix}"
     PROPERTY
       PASS_REGULAR_EXPRESSION "server process exited with code 0")
-endif ()
-
-# Increase timeout for BasicRead as the data can take some time to read
-if (TEST "pvcs.GMVReaderBasicRead${suffix}")
-  set_property(TEST "pvcs.GMVReaderBasicRead${suffix}"
-    PROPERTY TIMEOUT 300)
 endif ()
