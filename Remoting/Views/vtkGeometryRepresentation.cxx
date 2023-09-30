@@ -7,6 +7,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
+#include "vtkCompositeCellGridMapper.h"
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositePolyDataMapper.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
@@ -41,6 +42,7 @@
 #include "vtkShader.h"
 #include "vtkShaderProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringToken.h"
 #include "vtkTexture.h"
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
@@ -264,7 +266,10 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->SetActiveAssembly(nullptr);
   this->GeometryFilter->Delete();
   this->MultiBlockMaker->Delete();
-  this->Decimator->Delete();
+  if (this->Decimator)
+  {
+    this->Decimator->Delete();
+  }
   this->LODOutlineFilter->Delete();
   this->Mapper->Delete();
   this->LODMapper->Delete();
@@ -1777,7 +1782,16 @@ void vtkGeometryRepresentation::UpdateShaderReplacements()
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetArrayIdNames(const char* pointArray, const char* cellArray)
 {
-  vtkCompositePolyDataMapper* mapper = vtkCompositePolyDataMapper::SafeDownCast(this->Mapper);
-  mapper->SetPointIdArrayName(pointArray ? pointArray : "vtkOriginalPointIds");
-  mapper->SetCellIdArrayName(cellArray ? cellArray : "vtkOriginalCellIds");
+  using namespace vtk::literals;
+
+  if (auto* cpmapper = vtkCompositePolyDataMapper::SafeDownCast(this->Mapper))
+  {
+    cpmapper->SetPointIdArrayName(pointArray ? pointArray : "vtkOriginalPointIds");
+    cpmapper->SetCellIdArrayName(cellArray ? cellArray : "vtkOriginalCellIds");
+  }
+  else if (auto* cgmapper = vtkCompositeCellGridMapper::SafeDownCast(this->Mapper))
+  {
+    cgmapper->SetPointIdAttributeName(pointArray ? pointArray : "vtkOriginalPointIds"_token);
+    cgmapper->SetCellIdAttributeName(cellArray ? cellArray : "vtkOriginalCellIds"_token);
+  }
 }

@@ -108,6 +108,10 @@ vtkGlyph3DRepresentation::~vtkGlyph3DRepresentation()
 void vtkGlyph3DRepresentation::SetupDefaults()
 {
   this->Superclass::SetupDefaults();
+  if (!vtkCompositePolyDataMapper::SafeDownCast(this->Mapper))
+  {
+    return;
+  }
 
   if (auto compositeAttributes =
         vtkCompositePolyDataMapper::SafeDownCast(this->Mapper)->GetCompositeDataDisplayAttributes())

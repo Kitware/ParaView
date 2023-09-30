@@ -42,6 +42,12 @@ if (TARGET VTK::FiltersAMR)
     Resources/sources_filtersamr.xml)
 endif ()
 
+if (TARGET VTK::FiltersCellGrid)
+  list(APPEND xml_files
+    Resources/filters_filterscellgrid.xml
+  )
+endif()
+
 if (TARGET VTK::FiltersCore)
   list(APPEND xml_files
     Resources/filters_filterscore.xml
@@ -184,6 +190,12 @@ if (TARGET VTK::FiltersVerdict)
   list(APPEND xml_files
     Resources/filters_filtersverdict.xml)
 endif ()
+
+if (TARGET VTK::IOCellGrid)
+  list(APPEND xml_files
+    Resources/readers_iocellgrid.xml
+  )
+endif()
 
 if (TARGET VTK::IOXML AND TARGET VTK::IOParallelXML)
   list(APPEND xml_files

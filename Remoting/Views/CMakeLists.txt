@@ -10,6 +10,7 @@ set(classes
   vtkAMRStreamingVolumeRepresentation
   vtkBoundingRectContextDevice2D
   vtkCaveSynchronizedRenderers
+  vtkCellGridRepresentation
   vtkChartRepresentation
   vtkChartSelectionRepresentation
   vtkChartTextRepresentation

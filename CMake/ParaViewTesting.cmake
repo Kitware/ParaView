@@ -39,7 +39,7 @@ function (_paraview_add_tests function)
   # It is kept here to avoid filtering it out from ARGN in the caller.
   # If it were not present here, nor filtered out in the caller, then it would be considered
   # as part of "TEST_SCRIPTS" multivalue argument.
-  
+
   if (_paraview_add_tests_UNPARSED_ARGUMENTS)
     message(FATAL_ERROR
       "Unparsed arguments for ${function}: "
@@ -242,6 +242,12 @@ function (_paraview_add_tests function)
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
         ENVIRONMENT "${_paraview_add_tests_ENVIRONMENT}")
+    if (DEFINED "${_paraview_add_tests_name}_TIMEOUT")
+      set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+        PROPERTY
+          TIMEOUT ${${_paraview_add_tests_name}_TIMEOUT}
+      )
+    endif()
     if (DEFINED _paraview_add_tests_NUMPROCS)
       set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
         PROPERTY

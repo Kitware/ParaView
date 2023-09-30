@@ -1,0 +1,69 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <SourceProxy
+      class="vtkCellGridComputeSurface"
+      label="Compute Surface Sides"
+      name="ComputeCellGridSurface">
+      <Documentation
+        long_help="Compute external-facing sides of conforming cells."
+        short_help="Compute external-facing sides of conforming cells.">
+        This filter adds arrays (if not already present) holding tuples of
+        (cell ID, side ID) pairs which identify the sides of all the cells
+        which do not share a boundary with a neighbor (i.e., any external
+        surfaces as well as non-conforming internal surfaces). These arrays
+        are grouped by the type of cells whose sides they refer to as well
+        as the shape of the side. (For example, a group of wedge cells will
+        have one array listing quadrilateral sides and another array listing
+        triangular sides.) These arrays can be used to render the cell-grid
+        efficiently.</Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <!-- End of ComputeCellGridSurface -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkUnstructuredGridToCellGrid"
+      label="Convert To Cell Grid"
+      name="ConvertToCellGrid">
+      <Documentation
+        long_help="Convert unstructured grids into cell grids."
+        short_help="Convert unstructured grids into cell grids.">
+        This filter turns an unstructured grid or partitioned dataset collection whose
+        leaf nodes are unstructured grids with linear cells into a partitioned dataset
+        collection of cell-grids.
+
+        Additionally, it uses annotations added to the field data by the IOSS reader to
+        promote certain cell-data arrays into spatially-varying discontinuous Galerkin
+        attributes.
+
+        Note that even unstructured grids with no annotations are converted into cell
+        grids so that the entire dataset can be rendered using the composite cell-grid
+        representation.</Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1" name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+          <!-- for MB, we want to match if any of the leaf nodes is of the following type -->
+          <DataType value="vtkDataObjectTree" child_match="any">
+            <DataType value="vtkUnstructuredGrid" />
+          </DataType>
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <!-- End of ConvertToCellGrid -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

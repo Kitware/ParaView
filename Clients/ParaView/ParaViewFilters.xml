@@ -196,12 +196,14 @@
   <Proxy group="filters" name="CleanUnstructuredGridCells" />
   <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg" />
   <Proxy group="filters" name="ClipClosedSurface" />
+  <Proxy group="filters" name="ComputeCellGridSurface" />
   <Proxy group="filters" name="ComputeConnectedSurfaceProperties" />
   <Proxy group="filters" name="ComputeMoleculeBonds" />
   <Proxy group="filters" name="ComputeMoments" />
   <Proxy group="filters" name="ComputeQuartiles" icon=":/pqWidgets/Icons/pqBoxChart16.png" />
   <Proxy group="filters" name="ContingencyStatistics" />
   <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg" />
+  <Proxy group="filters" name="ConvertToCellGrid" />
   <Proxy group="filters" name="ConvertPolyhedra" />
   <Proxy group="filters" name="ConvertToMultiBlock" />
   <Proxy group="filters" name="ConvertToPartitionedDataSetCollection" />

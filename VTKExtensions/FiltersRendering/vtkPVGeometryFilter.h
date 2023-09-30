@@ -16,6 +16,7 @@
 #include "vtkParaViewDeprecation.h"                   // for PARAVIEW_DEPRECATED_IN_5_11_0
 
 class vtkCallbackCommand;
+class vtkCellGrid;
 class vtkDataSet;
 class vtkExplicitStructuredGrid;
 class vtkFeatureEdges;
@@ -292,6 +293,8 @@ protected:
 
   void ExplicitStructuredGridExecute(
     vtkExplicitStructuredGrid* input, vtkPolyData* out, int doCommunicate, const int* wholeExtent);
+
+  void CellGridExecute(vtkCellGrid* input, vtkPolyData* output, int doCommunicate);
 
   /**
    * Cleans up the output polydata. If doCommunicate is true the method is free

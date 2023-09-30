@@ -29,6 +29,7 @@ DEPENDS
   VTK::RenderingAnnotation
   VTK::RenderingContext2D
   VTK::RenderingCore
+  VTK::RenderingCellGrid
   VTK::RenderingParallel
   VTK::ViewsContext2D
   VTK::ViewsCore
@@ -41,6 +42,7 @@ PRIVATE_DEPENDS
   VTK::CommonColor
   VTK::CommonSystem
   VTK::DomainsChemistryOpenGL2
+  VTK::FiltersCellGrid
   VTK::FiltersModeling
   VTK::FiltersParallel
   VTK::FiltersParallelDIY2
