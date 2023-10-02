@@ -9,6 +9,7 @@
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMStringListDomain.h"
+#include "vtkSMTimeStepsDomain.h"
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
@@ -43,7 +44,8 @@ pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
   while (!iter->IsAtEnd() && !this->Internal->Domain)
   {
     vtkSMDomain* d = iter->GetDomain();
-    if (vtkSMEnumerationDomain::SafeDownCast(d) || vtkSMStringListDomain::SafeDownCast(d))
+    if (vtkSMEnumerationDomain::SafeDownCast(d) || vtkSMStringListDomain::SafeDownCast(d) ||
+      vtkSMTimeStepsDomain::SafeDownCast(d))
     {
       this->Internal->Domain = d;
     }
