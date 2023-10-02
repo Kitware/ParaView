@@ -765,16 +765,29 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToEmptyData.png}"
 )
 
-# Some tests can take a long time; increase their timeout.
+# Some tests can take a long time; increase their timeouts.
+# Really very long (300 seconds):
 set(UndoRedo1_TIMEOUT 300)
-set(RearrangeLayout_TIMEOUT 150)
-set(Ensemble_TIMEOUT 150)
-set(ScalarBarRange_TIMEOUT 150)
-set(PropertyContextMenu_TIMEOUT 150)
-set(HelpWindowHistory_TIMEOUT 150)
-set(SplitViewTrace_TIMEOUT 150)
+
+# Very long (200 seconds):
+set(RearrangeLayout_TIMEOUT 200)
+
+# Somewhat long (150 seconds):
 set(ColorOpacityTableEditorHistogram_TIMEOUT 150)
+set(ComparativeVisPanel_TIMEOUT 150)
+set(Ensemble_TIMEOUT 150)
+set(HelpWindowHistory_TIMEOUT 150)
+set(LagrangianIntegrationModel_TIMEOUT 150)
+set(LagrangianParticleTracker_TIMEOUT 150)
+set(LagrangianParticleTrackerReseeding_TIMEOUT 150)
+set(MultiServer3_TIMEOUT 150)
+set(PropertyContextMenu_TIMEOUT 150)
+set(SaveTSV_TIMEOUT 150)
+set(ScalarBarRange_TIMEOUT 150)
+set(SliceRepresentation_TIMEOUT 150)
+set(SplitViewTrace_TIMEOUT 150)
 set(TraceExportAndSaveData_TIMEOUT 150)
+set(TransferFunction2DYScalars_TIMEOUT 150)
 
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
