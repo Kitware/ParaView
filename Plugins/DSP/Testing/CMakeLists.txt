@@ -30,6 +30,7 @@ set (DSPSoundQuantities_FORCE_SERIAL TRUE)
 # DimensionBrowser does not support distributed data
 # TemporalMultiplexing is checking actual values in the spreadsheet, which is not resilient with distributed
 set (tests_without_baselines_no_cs
+  "${CMAKE_CURRENT_SOURCE_DIR}/DSPBandFilteringOnMultiplexer.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPDimensionBrowser.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPTemporalMultiplexing.xml"
   "${CMAKE_CURRENT_SOURCE_DIR}/DSPTableFFT.xml")
