@@ -787,7 +787,6 @@ void pqSMAdaptor::setSelectionProperty(
   if (StringListDomain || StringDomain)
   {
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(Property);
-    assert(svp);
     if (Type == CHECKED)
     {
       svp->SetElements(smValueStrings.GetPointer());
@@ -800,7 +799,6 @@ void pqSMAdaptor::setSelectionProperty(
   else if (EnumerationDomain)
   {
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
-    assert(ivp);
     smValueInts.push_back(0); // avoids need to check for size==0.
     if (Type == CHECKED)
     {
