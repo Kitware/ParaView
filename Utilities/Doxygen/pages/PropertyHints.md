@@ -24,6 +24,23 @@ In that case, use this property hint as follows.
       </Hints>
     </IntVectorProperty>
 
+IsSelectable
+------------
+Add a checkbox for each element of the list and remove list update abilities.
+
+A repeatable vector property is displayed as a table that you update by adding
+or removing values by default. This hints changes its representation into a
+checkable but non-editable table.
+For now, can be used only with the timesteps domain that fills a double vector
+property values.
+
+    <DoubleVectorProperty ...>
+      ...
+      <Hints>
+        <IsSelectable />
+      </Hints>
+    </DoubleVectorProperty>
+
 ShowLabel
 -----------------
 Show vector label for double, int or string vector properties.
