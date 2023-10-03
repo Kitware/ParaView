@@ -796,7 +796,6 @@ void vtkSMParaViewPipelineControllerWithRendering::DoMaterialSetup(vtkSMProxy* p
 {
   vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
   mlp->LoadDefaultMaterials();
-  mlp->Synchronize();
 }
 
 //----------------------------------------------------------------------------
