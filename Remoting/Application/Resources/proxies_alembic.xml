@@ -1,0 +1,19 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="exporters">
+    <RenderViewExporterProxy class="vtkAlembicExporter"
+                             name="AlembicExporter">
+      <Documentation>Exporter to export a single render view to Alembic scene format.
+      </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="abc" />
+      </Hints>
+    </RenderViewExporterProxy>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

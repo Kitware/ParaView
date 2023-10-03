@@ -203,6 +203,11 @@ if (TARGET VTK::IOXML AND TARGET VTK::IOParallelXML)
     Resources/writers_ioxml.xml)
 endif ()
 
+if (TARGET VTK::IOAlembic)
+  list(APPEND xml_files
+    Resources/proxies_alembic.xml)
+endif ()
+
 if (TARGET VTK::IONetCDF)
   list(APPEND xml_files
     Resources/readers_ionetcdf.xml)
