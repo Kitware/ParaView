@@ -6,6 +6,22 @@ for a *Property* element in Server-Manager configuration XMLs.
 
 [TOC]
 
+AllowRestoreDefaults
+----------
+Add a button to restore the property to default values.
+
+Any repeatable vector property is displayed as a table that you update by adding
+or removing values by default. However, you may want to restore default values,
+so adding a button makes it easier than using the context menu.
+In that case, use this property hint as follows.
+
+    <IntVectorProperty ...>
+      ...
+      <Hints>
+        <AllowRestoreDefaults />
+      </Hints>
+    </IntVectorProperty>
+
 NoDefault
 ----------
 Skip setting run-time defaults during initialization.
@@ -367,37 +383,6 @@ The snippet below shows these hints in use.
         check_tcoords="1"/>
     </Hints>
   </ProxyProperty>
-```
-
-ScalarValueListPropertyWidget
------------------------------
-
-The ScalarValueListProperty widget is a widget shown for repeatable int and string vector property widget.
-It shows as a simple table containing all the entries of the properties.
-
-Customize the `pqScalarValueListPropertyWidget` with the `ShowLabel` and `AllowRestoreDefaults` hints.
-
-* `ShowLabel` - With this hint, the label of the property is shown on top of the table.
-* `AllowRestoreDefaults` - With this hint, a button is added to restore the property to default values.
-
-```xml
-<StringVectorProperty command="SetChartsDefaultXAxis"
-                      name="ChartsDefaultXAxis"
-                      number_of_elements_per_command="1"
-                      repeat_command="1"
-                      default_values_delimiter=";"
-                      default_values="in_extents;Time;time;arc_length;XArray;x_array;Frequency"
-                      number_of_elements="7"
-                      set_number_command="SetNumberOfChartsDefaultXAxis"
-                      use_index="1">
-<Documentation>
-  List of array names to use as X axis when displaying it in charts.
-</Documentation>
-<Hints>
-  <ShowLabel />
-  <AllowRestoreDefaults />
-</Hints>
-</StringVectorProperty>
 ```
 
 Widget
