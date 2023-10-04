@@ -34,6 +34,16 @@ public:
    */
   const std::vector<double>& GetValues() { return this->Values; };
 
+  /**
+   * Returns the value at index from the timesteps after Update.
+   */
+  double GetValue(unsigned int i) { return this->Values[i]; };
+
+  /**
+   * Returns the number of values containing the timesteps after Update.
+   */
+  unsigned int GetNumberOfValues() { return static_cast<unsigned int>(this->Values.size()); };
+
 protected:
   vtkSMTimeStepsDomain() = default;
   ~vtkSMTimeStepsDomain() override = default;

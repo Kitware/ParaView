@@ -15,8 +15,12 @@
 #include "pqPropertiesPanel.h"
 #include "pqScalarValueListPropertyWidget.h"
 #include "pqScaleByButton.h"
+#include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
+#include "pqTreeWidget.h"
+#include "pqTreeWidgetSelectionHelper.h"
 #include "pqWidgetRangeDomain.h"
+
 #include "vtkBoundingBox.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
@@ -36,12 +40,14 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSmartPointer.h"
 
+#include <QCoreApplication>
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QMainWindow>
 #include <QMenu>
 #include <QStyle>
 #include <QToolButton>
+#include <QTreeWidgetItem>
 
 //-----------------------------------------------------------------------------
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
@@ -82,10 +88,12 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
   // Fill Layout
   vtkPVXMLElement* hints = dvp->GetHints();
+  bool isSelectable = false;
   bool showLabel = false;
   vtkPVXMLElement* showComponentLabels = nullptr;
   if (hints != nullptr)
   {
+    isSelectable = (hints->FindNestedElementByName("IsSelectable") != nullptr);
     showLabel = (hints->FindNestedElementByName("ShowLabel") != nullptr);
     showComponentLabels = hints->FindNestedElementByName("ShowComponentLabels");
   }
@@ -98,36 +106,66 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   vtkSMTimeStepsDomain* tsDomain = vtkSMTimeStepsDomain::SafeDownCast(domain);
   if (this->property()->GetRepeatable())
   {
-    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-      "use `pqScalarValueListPropertyWidget` since property is repeatable");
-
-    pqScalarValueListPropertyWidget* widget =
-      new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
-    widget->setObjectName("ScalarValueList");
-    this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
-    if (range)
+    if (isSelectable)
     {
-      widget->setRangeDomain(range);
-    }
-    else if (tsDomain)
-    {
-      widget->setRangeDomain(tsDomain);
-      auto tsValues = tsDomain->GetValues();
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "use a multi-select value list (in a `pqTreeWidget`)");
+      pqTreeWidget* treeWidget = new pqTreeWidget(this);
+      treeWidget->setObjectName("TreeWidget");
+      treeWidget->setColumnCount(1);
+      treeWidget->setRootIsDecorated(false);
+      treeWidget->setMaximumRowCountBeforeScrolling(smProperty);
 
-      // Initialize the scalar value list using the timesteps of the domain
-      QList<QVariant> tsList;
-      tsList.reserve(static_cast<int>(tsValues.size()));
-      std::copy(tsValues.begin(), tsValues.end(), std::back_inserter(tsList));
-      widget->setScalars(tsList);
-    }
-    widget->setShowLabels(showComponentLabels);
-    if (showComponentLabels)
-    {
-      widget->setLabels(componentLabels);
-    }
+      QTreeWidgetItem* header = new QTreeWidgetItem();
+      header->setData(0, Qt::DisplayRole,
+        QCoreApplication::translate("ServerManagerXML", smProperty->GetXMLLabel()));
+      treeWidget->setHeaderItem(header);
 
+      // helper makes it easier to select multiple entries.
+      pqTreeWidgetSelectionHelper* helper = new pqTreeWidgetSelectionHelper(treeWidget);
+      helper->setObjectName("TreeWidgetSelectionHelper");
+
+      // adaptor makes it possible to link with the smproperty.
+      pqSignalAdaptorSelectionTreeWidget* adaptor =
+        new pqSignalAdaptorSelectionTreeWidget(treeWidget, smProperty);
+      adaptor->setObjectName("SelectionTreeWidgetAdaptor");
+      this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()), smProperty);
+
+      layoutLocal->addWidget(treeWidget);
+    }
+    else
+    {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "use `pqScalarValueListPropertyWidget` since property is repeatable");
+
+      pqScalarValueListPropertyWidget* widget =
+        new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
+      widget->setObjectName("ScalarValueList");
+      this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+      if (range)
+      {
+        widget->setRangeDomain(range);
+      }
+      else if (tsDomain)
+      {
+        widget->setRangeDomain(tsDomain);
+        auto tsValues = tsDomain->GetValues();
+
+        // Initialize the scalar value list using the timesteps of the domain
+        QList<QVariant> tsList;
+        tsList.reserve(static_cast<int>(tsValues.size()));
+        std::copy(tsValues.begin(), tsValues.end(), std::back_inserter(tsList));
+        widget->setScalars(tsList);
+      }
+      widget->setShowLabels(showComponentLabels);
+      if (showComponentLabels)
+      {
+        widget->setLabels(componentLabels);
+      }
+
+      layoutLocal->addWidget(widget);
+    }
     this->setChangeAvailableAsChangeFinished(true);
-    layoutLocal->addWidget(widget);
     this->setShowLabel(showLabel);
   }
   else if (range)
