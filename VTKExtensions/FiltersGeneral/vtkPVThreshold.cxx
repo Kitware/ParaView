@@ -88,6 +88,15 @@ int vtkPVThreshold::RequestData(
 
   if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
   {
+    vtkDataArray* inScalars = this->GetInputArrayToProcess(0, inputVector);
+    if (inScalars && inScalars->GetNumberOfComponents() > 1)
+    {
+      outDataObj->ShallowCopy(inDataObj);
+      vtkWarningMacro(
+        << "Hyper Tree Grid does not support multi-components arrays: copying input.");
+      return 1;
+    }
+
     // Match behavior from vtkThreshold
     vtkNew<vtkHyperTreeGridThreshold> thresholdFilter;
     thresholdFilter->SetMemoryStrategy(this->MemoryStrategy);

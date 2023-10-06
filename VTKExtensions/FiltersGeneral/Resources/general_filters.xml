@@ -2743,7 +2743,12 @@ Every Nth Point.
                      data. It operates on any type of dataset and produces
                      unstructured grid output.
                      The scalar array from which to threshold the data can be selected
-                     in the 'Scalars' menu.
+                     in the 'Scalars' menu. For a multi-components array, 'Selected
+                     Component' menu allows you to select a specific component or
+                     magnitude if using the 'Selected' component mode. You can also
+                     choose 'All' or 'Any' that will keep data if either all components
+                     or at least one satisfies the threshold. Note that multi-components
+                     arrays are not available with Hyper Tree Grid inputs.
                      The 'Lower Threshold' and 'Upper Threshold' sliders determine
                      the range of the scalars to retain in the output.
                      The threshold method can be selected from the 'Threshold Method' menu.
@@ -2763,9 +2768,7 @@ Every Nth Point.
           <DataType value="vtkDataSet" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <InputArrayDomain name="input_array"
-                          number_of_components="1">
-        </InputArrayDomain>
+        <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the input to the Threshold
         filter.</Documentation>
       </InputProperty>
@@ -2774,16 +2777,63 @@ Every Nth Point.
                             label="Scalars"
                             name="SelectInputScalars"
                             number_of_elements="5">
-        <ArrayListDomain attribute_type="Scalars"
-                         name="array_list">
+        <ArrayListDomain name="array_list" input_domain_name="input_array">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>The value of this property contains the name of the
-        scalar array from which to perform thresholding.</Documentation>
+        array from which to perform thresholding. Be aware that HTG does not
+        support multi-component arrays.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetComponentMode"
+                         name="ComponentMode"
+                         default_values="0"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Selected"
+                 value="0" />
+          <Entry text="All"
+                 value="1" />
+          <Entry text="Any"
+                 value="2" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>This property specifies how multi-component arrays are handled.
+                       'Selected' will use the 'Selected Component' property.
+                       'All' will pass if all components satisfy the rule.
+                       'Any' will pass if any component satisfies the rule.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSelectedComponent"
+                         name="SelectedComponent"
+                         default_values="0"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility"/>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="ComponentMode" value="0" />
+        </Hints>
+        <Documentation>This property specifies which component of the array needs to satisfy
+                       the rule.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetLowerThreshold"
                             default_values="0"
                             name="LowerThreshold"
@@ -2795,6 +2845,8 @@ Every Nth Point.
                       name="Input" />
             <Property function="ArraySelection"
                       name="SelectInputScalars" />
+            <Property function="ComponentSelection"
+                      name="SelectedComponent" />
           </RequiredProperties>
         </ArrayRangeDomain>
         <Hints>
@@ -2821,6 +2873,8 @@ Every Nth Point.
                       name="Input" />
             <Property function="ArraySelection"
                       name="SelectInputScalars" />
+            <Property function="ComponentSelection"
+                      name="SelectedComponent" />
           </RequiredProperties>
         </ArrayRangeDomain>
         <Hints>
@@ -2858,7 +2912,7 @@ Every Nth Point.
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
                                          name="vtkHyperTreeGrid"
                                          exclude="1"
-                                         mode="enabled_state" />
+                                         mode="visibility" />
         </Hints>
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is 1, then a cell is only
@@ -2874,7 +2928,7 @@ Every Nth Point.
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
                                    name="vtkHyperTreeGrid"
                                    exclude="1"
-                                   mode="enabled_state" />
+                                   mode="visibility" />
         </Hints>
         <BooleanDomain name="bool" />
         <Documentation>
@@ -2895,7 +2949,7 @@ Every Nth Point.
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
                                    name="vtkHyperTreeGrid"
                                    exclude="1"
-                                   mode="enabled_state"/>
+                                   mode="visibility"/>
         </Hints>
         <BooleanDomain name="bool" />
         <Documentation>Invert the threshold results. That is, cells that would have been in the
