@@ -83,6 +83,13 @@ list(APPEND interfaces
 list(APPEND sources
   ${dock_sources})
 
+set(xml_files
+  CAVEInteraction_SM.xml)
+if (PARAVIEW_USE_PYTHON)
+  list(APPEND xml_files
+    CAVEInteraction_SM_Python.xml)
+endif ()
+
 paraview_add_plugin(CAVEInteraction
   REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
@@ -90,6 +97,7 @@ paraview_add_plugin(CAVEInteraction
   UI_INTERFACES ${interfaces}
   UI_FILES ${ui_files}
   SOURCES ${sources}
+  SERVER_MANAGER_XML ${xml_files}
   MODULES CAVEInteraction::Styles
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Interactions/vtk.module"
   XML_DOCUMENTATION OFF)
