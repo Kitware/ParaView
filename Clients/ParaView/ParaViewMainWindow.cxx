@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #if PARAVIEW_USE_PYTHON
+#include "pvincubatorpythonmodules.h"
 #include "pvpythonmodules.h"
 #endif
 
@@ -84,6 +85,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 
 #if PARAVIEW_USE_PYTHON
   pvpythonmodules_load();
+  pvincubatorpythonmodules_load();
 #endif
 
 #if PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION

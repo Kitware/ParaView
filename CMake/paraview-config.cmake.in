@@ -80,6 +80,7 @@ set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
 if (PARAVIEW_USE_PYTHON)
   set(PARAVIEW_PYTHONPATH "@PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX@")
   include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPython-targets.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPythonIncubator-targets.cmake")
   # Unset this for now; these targets will be defined later.
   unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
   unset("${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE")
@@ -90,6 +91,22 @@ include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-propert
 
 include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-packages.cmake")
+
+if ("INCUBATOR" IN_LIST "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
+  list(REMOVE_ITEM "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS"
+    INCUBATOR)
+  # This component is always found.
+  set("${CMAKE_FIND_PACKAGE_NAME}_INCUBATOR_FOUND" 1)
+
+  include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Incubator-targets.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Incubator-vtk-module-properties.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Incubator-vtk-module-find-packages.cmake")
+else ()
+  include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Incubator-targets.cmake")
+
+  set("${CMAKE_FIND_PACKAGE_NAME}_INCUBATOR_FOUND" 0)
+  set("${CMAKE_FIND_PACKAGE_NAME}_INCUBATOR_NOT_FOUND_MESSAGE" "the `INCUBATOR` component was not requested")
+endif ()
 
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Plugins-paraview_plugins-targets-depends.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Plugins-targets.cmake")
@@ -195,6 +212,10 @@ endif ()
 
 if (@PARAVIEW_USE_PYTHON@) # PARAVIEW_USE_PYTHON
   include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
+
+  if(${CMAKE_FIND_PACKAGE_NAME}_INCUBATOR_FOUND)
+    include("${CMAKE_CURRENT_LIST_DIR}/paraview.incubator-vtk-python-module-properties.cmake")
+  endif ()
 endif ()
 
 if (@PARAVIEW_USE_QT@) # PARAVIEW_USE_QT

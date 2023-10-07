@@ -119,6 +119,7 @@ if (PARAVIEW_USE_PYTHON)
   target_link_libraries(paraview
     PRIVATE
       ParaView::pvpythonmodules
+      ParaView::pvincubatorpythonmodules
       ParaView::pqPython
       ParaView::PythonInitializer)
 endif ()
