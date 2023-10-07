@@ -4,8 +4,8 @@
 #ifndef vtkSMVRSkeletonStyleProxy_h
 #define vtkSMVRSkeletonStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkCamera;
@@ -15,7 +15,8 @@ class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRSkeletonStyleProxy : public vtkSMVRInteractorStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRSkeletonStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
   static vtkSMVRSkeletonStyleProxy* New();

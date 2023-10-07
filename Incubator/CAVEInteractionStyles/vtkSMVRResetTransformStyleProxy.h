@@ -4,8 +4,8 @@
 #ifndef vtkSMVRResetTransformStyleProxy_h
 #define vtkSMVRResetTransformStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRTrackStyleProxy.h"
 
 class vtkCamera;
@@ -15,7 +15,8 @@ class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRResetTransformStyleProxy : public vtkSMVRTrackStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRResetTransformStyleProxy
+  : public vtkSMVRTrackStyleProxy
 {
 public:
   static vtkSMVRResetTransformStyleProxy* New();

@@ -1,4 +1,4 @@
-set(style_classes
+set(classes
   vtkSMVRGrabTransformStyleProxy
   vtkSMVRControlSlicePositionStyleProxy
   vtkSMVRResetTransformStyleProxy
@@ -14,9 +14,10 @@ set(style_classes
   vtkSMVRInteractorStyleProxy
   vtkSMVRTrackStyleProxy)
 
-if (PARAVIEW_USE_PYTHON)
-  list(APPEND style_classes vtkSMVRPythonInteractorStyleProxy)
+if (TARGET VTK::WrappingPythonCore)
+  list(APPEND classes
+    vtkSMVRPythonInteractorStyleProxy)
 endif ()
 
-vtk_module_add_module(CAVEInteraction::Styles
-  CLASSES ${style_classes})
+vtk_module_add_module(ParaViewIncubator::CAVEInteractionStyles
+  CLASSES ${classes})

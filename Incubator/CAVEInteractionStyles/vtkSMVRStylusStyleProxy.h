@@ -13,12 +13,13 @@
 #ifndef vtkSMVRStylusStyleProxy_h
 #define vtkSMVRStylusStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRTrackStyleProxy.h"
 
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRStylusStyleProxy : public vtkSMVRTrackStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRStylusStyleProxy
+  : public vtkSMVRTrackStyleProxy
 {
 public:
   static vtkSMVRStylusStyleProxy* New();

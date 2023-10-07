@@ -11,12 +11,13 @@
 #ifndef vtkSMVRMovePointStyleProxy_h
 #define vtkSMVRMovePointStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRTrackStyleProxy.h"
 
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRMovePointStyleProxy : public vtkSMVRTrackStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRMovePointStyleProxy
+  : public vtkSMVRTrackStyleProxy
 {
 public:
   static vtkSMVRMovePointStyleProxy* New();
