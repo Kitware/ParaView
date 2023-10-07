@@ -6,6 +6,7 @@ set(classes
   vtkSMVRGrabWorldStyleProxy
   vtkSMVRInteractorStyleProxy
   vtkSMVRMovePointStyleProxy
+  vtkSMVRPythonInteractorStyleProxy
   vtkSMVRResetTransformStyleProxy
   vtkSMVRSkeletonStyleProxy
   vtkSMVRSpaceNavigatorGrabWorldStyleProxy
@@ -13,11 +14,6 @@ set(classes
   vtkSMVRTrackStyleProxy
   vtkSMVRVirtualHandStyleProxy
   vtkVRQueue)
-
-if (TARGET VTK::WrappingPythonCore)
-  list(APPEND classes
-    vtkSMVRPythonInteractorStyleProxy)
-endif ()
 
 vtk_module_add_module(ParaViewIncubator::CAVEInteractionStyles
   CLASSES ${classes})
