@@ -411,9 +411,13 @@ endif ()
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
   if (paraview_required_modules OR paraview_unrecognized_modules)
+    set(required_modules
+      ${paraview_required_modules}
+      ${paraview_unrecognized_modules})
+    string(REPLACE ";" ", " required_modules "${required_modules}")
     message(FATAL_ERROR
       "The following modules were requested or required, but not found: "
-      "${paraview_required_modules};${paraview_unrecognized_modules}.")
+      "${required_modules}.")
   endif ()
 
   if (PARAVIEW_USE_PYTHON)
