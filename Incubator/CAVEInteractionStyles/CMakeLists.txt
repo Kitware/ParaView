@@ -1,18 +1,18 @@
 set(classes
-  vtkSMVRGrabTransformStyleProxy
-  vtkSMVRControlSlicePositionStyleProxy
-  vtkSMVRResetTransformStyleProxy
-  vtkSMVRMovePointStyleProxy
-  vtkSMVRSkeletonStyleProxy
   vtkSMVRControlSliceOrientationStyleProxy
+  vtkSMVRControlSlicePositionStyleProxy
   vtkSMVRGrabPointStyleProxy
+  vtkSMVRGrabTransformStyleProxy
+  vtkSMVRGrabWorldStyleProxy
+  vtkSMVRInteractorStyleProxy
+  vtkSMVRMovePointStyleProxy
+  vtkSMVRResetTransformStyleProxy
+  vtkSMVRSkeletonStyleProxy
   vtkSMVRSpaceNavigatorGrabWorldStyleProxy
   vtkSMVRStylusStyleProxy
+  vtkSMVRTrackStyleProxy
   vtkSMVRVirtualHandStyleProxy
-  vtkSMVRGrabWorldStyleProxy
-  vtkVRQueue
-  vtkSMVRInteractorStyleProxy
-  vtkSMVRTrackStyleProxy)
+  vtkVRQueue)
 
 if (TARGET VTK::WrappingPythonCore)
   list(APPEND classes
