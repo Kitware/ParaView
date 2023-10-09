@@ -337,7 +337,6 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     {
       this->InitializeProxy(materialLib);
       materialLib->UpdateVTKObjects();
-      this->DoMaterialSetup(materialLib.Get());
       pxm->RegisterProxy("materiallibrary", materialLib);
     }
 #endif

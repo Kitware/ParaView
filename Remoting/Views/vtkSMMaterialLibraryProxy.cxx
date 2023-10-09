@@ -5,6 +5,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVSession.h"
 #include "vtkPVTrivialProducer.h"
@@ -47,11 +48,20 @@ void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)
 void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  if (this->DefaultMaterialsLoaded)
+  {
+    return;
+  }
+
+  vtkLogF(WARNING, "Loading default OSPRay materials. This operation can take a few seconds.");
+  this->DefaultMaterialsLoaded = true;
+
   // todo: this should be relative to binary or in prefs/settings, see pq
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadRelativeFile"
          << "ospray_mats.json" << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER_ROOT);
+  this->Synchronize();
 #endif
 }
 

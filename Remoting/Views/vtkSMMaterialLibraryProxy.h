@@ -51,6 +51,7 @@ protected:
 private:
   vtkSMMaterialLibraryProxy(const vtkSMMaterialLibraryProxy&) = delete;
   void operator=(const vtkSMMaterialLibraryProxy&) = delete;
+  bool DefaultMaterialsLoaded = false;
 };
 
 #endif

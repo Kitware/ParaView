@@ -15,6 +15,7 @@
 #include "vtkNew.h"                 // needed for vtkInteractorObserver.
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
+
 class vtkCamera;
 class vtkCollection;
 class vtkFloatArray;
@@ -148,6 +149,14 @@ public:
    * Returns the client-side renderer (composited or 3D).
    */
   vtkRenderer* GetRenderer();
+
+  /**
+   * Filter changes to the OSPRay rendering method, to transfer the pathtracing materials from
+   * client to server only when they are acutally needed.
+   * Use this method instead of `UpdateProperty` when changing the OSPRay back-end for the default
+   * materials to load properly.
+   */
+  void UpdateVTKObjects() override;
 
   enum class CameraAdjustmentType : int
   {

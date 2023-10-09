@@ -34,13 +34,17 @@
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyInternals.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMViewProxyInteractorHelper.h"
@@ -969,6 +973,36 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
 
   // return selected representation
   return repr;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::UpdateVTKObjects()
+{
+  // Load default OSPRay materials lazily when the path tracing algorithm is used
+  vtkSMProxyInternals::PropertyInfoMap::iterator it =
+    this->Internals->Properties.find("OSPRayRendererType");
+
+  if (it->second.ModifiedFlag)
+  {
+    vtkSMStringVectorProperty* svp =
+      vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("OSPRayRendererType"));
+    const char* rendererType = svp ? svp->GetElement(0) : nullptr;
+
+    if (!(strcmp(rendererType, "OSPRay raycaster") == 0))
+    {
+      vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+      vtkSMSessionProxyManager* sessionProxyManager = proxyManager->GetActiveSessionProxyManager();
+
+      vtkSmartPointer<vtkSMProxy> materialLibProxy = sessionProxyManager
+        ? sessionProxyManager->FindProxy("materiallibrary", "materials", "MaterialLibrary")
+        : nullptr;
+      vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(materialLibProxy);
+
+      mlp->LoadDefaultMaterials();
+    }
+  }
+
+  this->Superclass::UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
