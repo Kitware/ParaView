@@ -67,6 +67,11 @@ public:
   static QString macroNameFromFileName(const QString& filename);
 
   // Description:
+  // Get an icon name from the fileName
+  // If no corresponding icon, return an empty string
+  static QString iconNameFromFileName(const QString& filename);
+
+  // Description:
   // Get a list a "*.py" files from macro directories.
   static QStringList getMacrosFilePaths();
 

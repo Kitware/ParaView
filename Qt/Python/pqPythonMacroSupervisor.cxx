@@ -268,15 +268,10 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   runAction->setData(fileName);
   runAction->setEnabled(enable);
 
-  for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+  QString iconName = pqPythonMacroSupervisor::iconNameFromFileName(fileName);
+  if (!iconName.isEmpty())
   {
-    QString iconFile = QFileInfo(fileName).absoluteFilePath().replace(".py", extension);
-
-    if (QFileInfo::exists(iconFile))
-    {
-      runAction->setIcon(QIcon(iconFile));
-      break;
-    }
+    runAction->setIcon(QIcon(iconName));
   }
 
   this->Internal->RunActionMap.insert(fileName, runAction);
@@ -395,6 +390,7 @@ void pqPythonMacroSupervisor::onEditMacroTriggered()
     }
   }
 }
+
 //----------------------------------------------------------------------------
 QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& filename)
 {
@@ -404,6 +400,21 @@ QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& filename)
     name = "Unnamed macro";
   }
   return name;
+}
+
+//----------------------------------------------------------------------------
+QString pqPythonMacroSupervisor::iconNameFromFileName(const QString& filename)
+{
+  for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+  {
+    QString iconName = QFileInfo(filename).absoluteFilePath().replace(".py", extension);
+    if (QFileInfo::exists(iconName))
+    {
+      return iconName;
+    }
+  }
+
+  return QString();
 }
 
 //----------------------------------------------------------------------------
