@@ -36,11 +36,25 @@
         </DataTypeDomain>
         <Documentation>Set the input of the filter.</Documentation>
       </InputProperty>
+
+      <IntVectorProperty animateable="0"
+                         command="SetUseMultilineExpression"
+                         default_values="0"
+                         name="UseMultilineExpression"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to true, the expression is a multiline script that
+        returns the output array.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty command="SetExpression"
                             name="Expression"
                             number_of_elements="1">
         <Hints>
           <Widget type="one_liner_wrapped" syntax="python" autocomplete="python_calc"/>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseMultilineExpression"
+                                   value="0" />
         </Hints>
         <Documentation>The Python expression evaluated during
         execution. Set of potentially available variables [inputs, points, t_value,
@@ -50,6 +64,23 @@
         are always available, and their default values are 0, and 0 respectively.
         </Documentation>
       </StringVectorProperty>
+      <StringVectorProperty command="SetMultilineExpression"
+                            name="MultilineExpression"
+                            number_of_elements="1"
+                            default_values="outputArray=numpy.ones(1)&#xA;return outputArray">
+        <Hints>
+          <Widget type="multi_line" syntax="python" autocomplete="python_calc"/>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseMultilineExpression"
+                                   value="1" />
+        </Hints>
+        <Documentation>The multiline Python expression executed, that should return the output array
+          using the Python "return" keyword. The variables that can be used here are the exact same as the ones available in the
+          single-line expression editor.
+        </Documentation>
+      </StringVectorProperty>
+
       <IntVectorProperty command="SetArrayAssociation"
                          default_values="0"
                          name="ArrayAssociation"

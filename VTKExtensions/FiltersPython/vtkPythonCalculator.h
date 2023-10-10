@@ -22,6 +22,7 @@
 #ifndef vtkPythonCalculator_h
 #define vtkPythonCalculator_h
 
+#include "vtkDataObject.h"                         // for FIELD_ASSOCIATION_POINTS
 #include "vtkPVVTKExtensionsFiltersPythonModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"
 
@@ -48,8 +49,17 @@ public:
    * must return a scalar value (which is converted to an array) or a
    * numpy array.
    */
-  vtkSetStringMacro(Expression);
-  vtkGetStringMacro(Expression);
+  vtkSetMacro(Expression, std::string);
+  vtkGetMacro(Expression, std::string);
+  ///@}
+
+  ///@{
+  /**
+   * Set the text of the python multiline expression. The expression must use an explicit return
+   * statement for the result scalar value or numpy array.
+   */
+  vtkSetMacro(MultilineExpression, std::string);
+  vtkGetMacro(MultilineExpression, std::string);
   ///@}
 
   ///@{
@@ -69,6 +79,16 @@ public:
   vtkSetMacro(ResultArrayType, int);
   ///@}
 
+  ///@{
+  /**
+   * If true, executes `MultilineExpression`, which is a multiline string representing a Python
+   * script, ending by a return statement. Otherwise, evaluates `Expression`, a python expression.
+   * Initial value is false.
+   */
+  vtkGetMacro(UseMultilineExpression, bool);
+  vtkSetMacro(UseMultilineExpression, bool);
+  ///@}
+
   /**
    * For internal use only.
    */
@@ -81,7 +101,7 @@ protected:
   /**
    * For internal use only.
    */
-  void Exec(const char*);
+  void Exec(const std::string&);
 
   int FillOutputPortInformation(int port, vtkInformation* info) override;
 
@@ -96,10 +116,13 @@ protected:
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  char* Expression;
-  char* ArrayName;
-  int ArrayAssociation;
-  int ResultArrayType;
+  std::string Expression;
+  std::string MultilineExpression;
+  bool UseMultilineExpression = false;
+
+  char* ArrayName = nullptr;
+  int ArrayAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+  int ResultArrayType = VTK_DOUBLE;
 
 private:
   vtkPythonCalculator(const vtkPythonCalculator&) = delete;

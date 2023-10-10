@@ -111,12 +111,22 @@ bool pqPythonSyntaxHighlighter::eventFilter(QObject* obj, QEvent* ev)
   {
     return false;
   }
+
   if (ev->type() == QEvent::KeyPress)
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
     if (keyEvent->modifiers() == Qt::NoModifier && keyEvent->key() == Qt::Key_Tab)
     {
-      this->TextEdit.textCursor().insertText(globals::kFourSpaces);
+      QTextCursor tc = this->TextEdit.textCursor();
+      tc.select(QTextCursor::LineUnderCursor);
+
+      // Don't replace tabs if we're not at the start of the line
+      if (!tc.selectedText().trimmed().isEmpty())
+      {
+        return false;
+      }
+
+      tc.insertText(globals::kFourSpaces);
       return true;
     }
   }

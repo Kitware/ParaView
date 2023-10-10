@@ -5,7 +5,6 @@
 
 #include "vtkPythonCalculator.h"
 
-#include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -15,8 +14,8 @@
 #include "vtkSmartPyObject.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <regex>
 #include <string>
-#include <vtksys/SystemTools.hxx>
 
 namespace
 {
@@ -37,18 +36,13 @@ vtkStandardNewMacro(vtkPythonCalculator);
 //----------------------------------------------------------------------------
 vtkPythonCalculator::vtkPythonCalculator()
 {
-  this->Expression = nullptr;
-  this->ArrayName = nullptr;
   this->SetArrayName("result");
   this->SetExecuteMethod(vtkPythonCalculator::ExecuteScript, this);
-  this->ArrayAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-  this->ResultArrayType = VTK_DOUBLE;
 }
 
 //----------------------------------------------------------------------------
 vtkPythonCalculator::~vtkPythonCalculator()
 {
-  this->SetExpression(nullptr);
   this->SetArrayName(nullptr);
 }
 
@@ -95,23 +89,34 @@ int vtkPythonCalculator::RequestData(
     }
   }
 
+  std::string formattableExpression =
+    this->UseMultilineExpression ? this->MultilineExpression : this->Expression;
+
   // define calculator scope
   PV_STRING_FORMATTER_NAMED_SCOPE(
     "CALCULATOR", fmt::arg("timevalue", dataTime), fmt::arg("timeindex", timeIndex));
 
-  char* cachedExpression = vtksys::SystemTools::DuplicateString(this->Expression);
-
-  std::string formattableExpression = this->Expression ? this->Expression : std::string();
-  delete[] this->Expression;
-  this->Expression = vtksys::SystemTools::DuplicateString(
-    vtkPVStringFormatter::Format(formattableExpression).c_str());
+  if (this->UseMultilineExpression)
+  {
+    this->MultilineExpression = vtkPVStringFormatter::Format(formattableExpression);
+  }
+  else
+  {
+    this->Expression = vtkPVStringFormatter::Format(formattableExpression);
+  }
 
   // call superclass
   this->Superclass::RequestData(request, inputVector, outputVector);
 
   // restore cached expression
-  delete[] this->Expression;
-  this->Expression = vtksys::SystemTools::DuplicateString(cachedExpression);
+  if (this->UseMultilineExpression)
+  {
+    this->MultilineExpression = formattableExpression;
+  }
+  else
+  {
+    this->Expression = formattableExpression;
+  }
 
   return 1;
 }
@@ -155,23 +160,23 @@ void vtkPythonCalculator::ExecuteScript(void* arg)
   vtkPythonCalculator* self = static_cast<vtkPythonCalculator*>(arg);
   if (self)
   {
-    self->Exec(self->GetExpression());
+    self->Exec(
+      self->UseMultilineExpression ? self->GetMultilineExpression() : self->GetExpression());
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonCalculator::Exec(const char* expression)
+void vtkPythonCalculator::Exec(const std::string& expression)
 {
-  // Do not execute if expression is nullptr or empty.
-  if (!expression || expression[0] == '\0')
+  // Do not execute if expression is empty.
+  if (expression.empty())
   {
     return;
   }
 
   // Replace tabs with two spaces
   std::string orgscript;
-  size_t len = strlen(expression);
-  for (size_t i = 0; i < len; i++)
+  for (size_t i = 0; i < expression.size(); i++)
   {
     if (expression[i] == '\t')
     {
@@ -202,8 +207,9 @@ void vtkPythonCalculator::Exec(const char* expression)
   // call `paraview.detail.calculator.execute(self)`
   // calculator.py references ArrayName, ArrayAssociation and ResultArrayType to create the output
   // array.
-  vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
-    modCalculator, fname.GetPointer(), self.GetPointer(), pyexpression.GetPointer(), nullptr));
+  vtkSmartPyObject retVal(
+    PyObject_CallMethodObjArgs(modCalculator, fname.GetPointer(), self.GetPointer(),
+      pyexpression.GetPointer(), (this->UseMultilineExpression ? Py_True : Py_False), nullptr));
 
   CheckAndFlushPythonErrors();
 
@@ -242,4 +248,9 @@ int vtkPythonCalculator::FillInputPortInformation(int port, vtkInformation* info
 void vtkPythonCalculator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Expression: " << this->Expression << endl;
+  os << indent << "MultilineExpression: " << this->MultilineExpression << endl;
+  os << indent << "UseMultilineExpression: " << this->UseMultilineExpression << endl;
+  os << indent << "ArrayName: " << this->ArrayName << endl;
 }

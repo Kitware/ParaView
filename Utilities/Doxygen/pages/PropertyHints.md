@@ -418,4 +418,4 @@ With `one_liner_wrapped`, the tools button for Expression Manager are configured
 ```
 **Attribute `autocomplete`**
 
-Set it to `python_calc` to enable Python Calculator style autocomplete on the text field. Completes many Numpy functions, fields and names from the paraview module.
+Set it to `python_calc` to enable Python Calculator style autocomplete on the text field. Completes many Numpy functions, fields and names from the paraview module. It can be used for widget with `type` attribute set to `one_liner_wrapped` or `multi_line`.

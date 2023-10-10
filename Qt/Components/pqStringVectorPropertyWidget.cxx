@@ -91,10 +91,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     showComponentLabels = hints->FindNestedElementByName("ShowComponentLabels");
   }
-  bool multilineText = widgetHintHasAttributeEqualTo("type", "multi_line");
-  bool wrapText = widgetHintHasAttributeEqualTo("type", "one_liner_wrapped");
-  bool usePython = widgetHintHasAttributeEqualTo("syntax", "python");
-  bool autocompletePython = widgetHintHasAttributeEqualTo("autocomplete", "python_calc");
+  bool multilineText = this->widgetHintHasAttributeEqualTo("type", "multi_line");
+  bool wrapText = this->widgetHintHasAttributeEqualTo("type", "one_liner_wrapped");
+  bool usePython = this->widgetHintHasAttributeEqualTo("syntax", "python");
+  bool autocompletePython = this->widgetHintHasAttributeEqualTo("autocomplete", "python_calc");
   bool showLabel = (hints && hints->FindNestedElementByName("ShowLabel") != nullptr);
 
   // find the domain(s)
@@ -274,6 +274,25 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     vbox->addWidget(comboBox);
   }
+  else if (enumerationDomain)
+  {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqComboBoxDomain`.");
+    QComboBox* comboBox = new QComboBox(this);
+    comboBox->setObjectName("ComboBox");
+
+    pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
+
+    this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), svp);
+    this->setChangeAvailableAsChangeFinished(true);
+
+    for (unsigned int i = 0; i < enumerationDomain->GetNumberOfEntries(); i++)
+    {
+      comboBox->addItem(
+        QCoreApplication::translate("ServerManagerXML", enumerationDomain->GetEntryText(i)));
+    }
+
+    vbox->addWidget(comboBox);
+  }
   else if (multilineText)
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqTextEdit`.");
@@ -304,6 +323,25 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     w->setLayout(hbox);
     vbox->addWidget(w);
+
+    if (autocompletePython)
+    {
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use Python calculator autocomplete.");
+
+      vtkSMSourceProxy* input =
+        vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(this->proxy(), "Input").GetAsProxy(0));
+
+      pqPythonCalculatorCompleter* completer = new pqPythonCalculatorCompleter(this, input);
+      completer->setCompletionMode(QCompleter::PopupCompletion);
+      completer->setCompleteEmptyPrompts(false);
+      textEdit->setCompleter(completer);
+#else
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "Python not enabled, no Python autocomplete support.");
+#endif
+    }
+
     if (usePython)
     {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
@@ -339,26 +377,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
     this->setShowLabel(showLabel);
   }
-  else if (enumerationDomain)
-  {
-    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqComboBoxDomain`.");
-    QComboBox* comboBox = new QComboBox(this);
-    comboBox->setObjectName("ComboBox");
 
-    pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
-
-    this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), svp);
-    this->setChangeAvailableAsChangeFinished(true);
-
-    for (unsigned int i = 0; i < enumerationDomain->GetNumberOfEntries(); i++)
-    {
-      comboBox->addItem(
-        QCoreApplication::translate("ServerManagerXML", enumerationDomain->GetEntryText(i)));
-    }
-
-    vbox->addWidget(comboBox);
-  }
-  else
+  else // No domain specified
   {
     if (smProperty->GetRepeatable())
     {

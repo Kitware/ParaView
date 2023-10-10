@@ -17,6 +17,10 @@ QStringList pqPythonCalculatorCompleter::getPythonCompletions(const QString& pyt
 
   // `object` contains all locals available in the `calculator.py` script
   PyObject* calc_module = PyImport_ImportModule("paraview.detail.calculator");
+  if (calc_module == nullptr)
+  {
+    return QStringList{};
+  }
   PyObject* object = PyModule_GetDict(calc_module);
   Py_INCREF(object);
 
