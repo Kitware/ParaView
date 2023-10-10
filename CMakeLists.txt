@@ -746,6 +746,7 @@ else ()
     GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
     SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
     SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/vtk/vtk/-/tree/master")
+  install(TARGETS paraviewbuild EXPORT "VTK")
 
   if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
     set(CMAKE_C_CLANG_TIDY "${CMAKE_C_CLANG_TIDY_save}")
@@ -804,7 +805,9 @@ vtk_module_build(
   GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
   SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
   SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
-install(TARGETS paraviewbuild EXPORT "ParaView")
+if (PARAVIEW_USE_EXTERNAL_VTK)
+  install(TARGETS paraviewbuild EXPORT "ParaView")
+endif()
 
 vtk_module_build(
   MODULES             ${paraview_client_modules}
