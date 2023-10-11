@@ -348,6 +348,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "supports Python syntax highlighter.");
       auto highlighter = new pqPythonSyntaxHighlighter(textEdit, *textEdit);
       highlighter->ConnectHighligter();
+      Q_EMIT textEdit->textChanged();
 
       QPushButton* pushButton = new QPushButton(this);
       pushButton->setIcon(this->style()->standardIcon(QStyle::SP_TitleBarMaxButton));
