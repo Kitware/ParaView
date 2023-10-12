@@ -17,6 +17,7 @@ PRIVATE_DEPENDS
   ParaView::RemotingCore
   ParaView::RemotingSettings
   VTK::vtksys
+  VTK::GeovisCore
 OPTIONAL_DEPENDS
   ParaView::RemotingViews
   # These correspond to the optional XML files included when enabling certain

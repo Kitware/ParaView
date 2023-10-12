@@ -202,8 +202,6 @@ option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
 
 option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
 
-option(PARAVIEW_ENABLE_GEOVIS "Enable GeoVis support." OFF)
-
 option(PARAVIEW_ENABLE_OPENTURNS "Enable OpenTURNS support." OFF)
 
 option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
@@ -421,11 +419,6 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_LAS
   MODULES   VTK::IOLAS
-  EXCLUSIVE)
-
-paraview_require_module(
-  CONDITION PARAVIEW_ENABLE_GEOVIS
-  MODULES   VTK::GeovisCore
   EXCLUSIVE)
 
 paraview_require_module(

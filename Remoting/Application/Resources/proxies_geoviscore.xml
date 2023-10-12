@@ -1,0 +1,30 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="transforms">
+    <!-- ==================================================================== -->
+    <Proxy class="vtkGeoTransform"
+                 label="GeoTransform"
+                 name="GeoTransform">
+      <StringVectorProperty animateable="0"
+                            command="SetSourceProjection"
+                            name="SourceProjection"
+                            number_of_elements="1">
+        <Documentation>Set the source PROJ string</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetDestinationProjection"
+                            name="DestinationProjection"
+                            number_of_elements="1">
+        <Documentation>Set the destination PROJ string</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="TransformZCoordinate"
+                         command="SetTransformZCoordinate"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If set, we transform (x, y, z) otherwise
+        we transform (x, y) and leave z unchanged.</Documentation>
+      </IntVectorProperty>
+      <!-- End TransformFilter -->
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
