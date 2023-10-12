@@ -26,6 +26,7 @@
 #include "vtkGenericGeometryFilter.h"
 #include "vtkGeometryFilter.h"
 #include "vtkHyperTreeGrid.h"
+#include "vtkHyperTreeGridFeatureEdges.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -467,7 +468,12 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
   }
   else if (auto hyperTreeGrid = vtkHyperTreeGrid::SafeDownCast(input))
   {
-    this->HyperTreeGridExecute(hyperTreeGrid, output, doCommunicate);
+    // If feature edges are requested, vtkHyperTreeGridFeatureEdges will generate them,
+    // so no need to compute the HTG geometry.
+    if (!this->GenerateFeatureEdges)
+    {
+      this->HyperTreeGridExecute(hyperTreeGrid, output, doCommunicate);
+    }
   }
   else if (auto explicitStructuredGrid = vtkExplicitStructuredGrid::SafeDownCast(input))
   {
@@ -524,9 +530,61 @@ int vtkPVGeometryFilter::RequestData(
   }
   int* wholeExtent =
     vtkStreamingDemandDrivenPipeline::GetWholeExtent(inputVector[0]->GetInformationObject(0));
-  this->ExecuteBlock(input, output, 1, procid, numProcs, 0, wholeExtent);
-  this->CleanupOutputData(output, 1);
+
+  vtkHyperTreeGrid* inputHTG = vtkHyperTreeGrid::SafeDownCast(input);
+  if (this->GenerateFeatureEdges && inputHTG)
+  {
+    this->GenerateFeatureEdgesHTG(inputHTG, output);
+  }
+  else
+  {
+    this->ExecuteBlock(input, output, 1, procid, numProcs, 0, wholeExtent);
+    this->CleanupOutputData(output, 1);
+  }
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::GenerateFeatureEdgesHTG(vtkHyperTreeGrid* input, vtkPolyData* output)
+{
+  vtkNew<vtkHyperTreeGridFeatureEdges> featureEdgesFilter;
+  vtkNew<vtkHyperTreeGrid> htgCopy;
+  htgCopy->ShallowCopy(input);
+  featureEdgesFilter->SetInputData(htgCopy);
+  featureEdgesFilter->Update();
+  output->ShallowCopy(featureEdgesFilter->GetOutput());
+  output->RemoveGhostCells();
+  if (this->GenerateProcessIds)
+  {
+    this->GenerateProcessIdsArrays(output);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
+{
+  unsigned int procId =
+    this->Controller ? static_cast<unsigned int>(this->Controller->GetLocalProcessId()) : 0;
+
+  vtkIdType numPoints = output->GetNumberOfPoints();
+  if (numPoints > 0)
+  {
+    vtkNew<vtkUnsignedIntArray> array;
+    array->SetNumberOfTuples(numPoints);
+    array->FillTypedComponent(0, procId);
+    array->SetName("vtkProcessId");
+    output->GetPointData()->AddArray(array);
+  }
+
+  vtkIdType numCells = output->GetNumberOfCells();
+  if (numCells > 0)
+  {
+    vtkNew<vtkUnsignedIntArray> cellArray;
+    cellArray->SetNumberOfTuples(numCells);
+    cellArray->FillTypedComponent(0, procId);
+    cellArray->SetName("vtkProcessId");
+    output->GetCellData()->AddArray(cellArray);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -542,29 +600,7 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
   output->RemoveGhostCells();
   if (this->GenerateProcessIds && output)
   {
-    // add process ids array.
-    unsigned int procId =
-      this->Controller ? static_cast<unsigned int>(this->Controller->GetLocalProcessId()) : 0;
-
-    vtkIdType numPoints = output->GetNumberOfPoints();
-    if (numPoints > 0)
-    {
-      vtkNew<vtkUnsignedIntArray> array;
-      array->SetNumberOfTuples(numPoints);
-      array->FillTypedComponent(0, procId);
-      array->SetName("vtkProcessId");
-      output->GetPointData()->AddArray(array);
-    }
-
-    vtkIdType numCells = output->GetNumberOfCells();
-    if (numCells > 0)
-    {
-      vtkNew<vtkUnsignedIntArray> cellArray;
-      cellArray->SetNumberOfTuples(numCells);
-      cellArray->FillTypedComponent(0, procId);
-      cellArray->SetName("vtkProcessId");
-      output->GetCellData()->AddArray(cellArray);
-    }
+    this->GenerateProcessIdsArrays(output);
   }
 }
 
@@ -921,8 +957,16 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     }
 
     vtkNew<vtkPolyData> tmpOut;
-    this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
-    this->CleanupOutputData(tmpOut, 0);
+    vtkHyperTreeGrid* inputHTG = vtkHyperTreeGrid::SafeDownCast(input);
+    if (this->GenerateFeatureEdges && inputHTG)
+    {
+      this->GenerateFeatureEdgesHTG(inputHTG, tmpOut);
+    }
+    else
+    {
+      this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
+      this->CleanupOutputData(tmpOut, 0);
+    }
     // skip empty nodes.
     if (tmpOut->GetNumberOfPoints() > 0)
     {
