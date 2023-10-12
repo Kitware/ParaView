@@ -51,3 +51,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkBivariateNoiseRepresentation.h

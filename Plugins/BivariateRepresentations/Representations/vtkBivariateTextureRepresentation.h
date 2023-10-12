@@ -112,3 +112,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkBivariateTextureRepresentation.h
