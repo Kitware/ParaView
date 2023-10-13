@@ -85,7 +85,12 @@ Q_SIGNALS:
 
   // Description:
   // Emitted when a macro has been triggered.
-  void executeScriptRequested(const QString& filename);
+  void executeScriptRequested(const QString& fileName);
+
+  /**
+   * Emitted when a macro has been added.
+   */
+  void onAddedMacro();
 
   // Description:
   // Emitted when a macro has to be edited

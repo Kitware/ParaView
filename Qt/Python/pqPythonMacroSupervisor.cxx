@@ -243,8 +243,7 @@ void pqPythonMacroSupervisor::resetActions()
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addMacro(const QString& fileName)
 {
-  pqPythonMacroSupervisor::addMacro(
-    pqPythonMacroSupervisor::macroNameFromFileName(fileName), fileName);
+  this->addMacro(pqPythonMacroSupervisor::macroNameFromFileName(fileName), fileName);
 }
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& fileName)
@@ -295,6 +294,8 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   addActionToWidgets(runAction, this->Internal->RunWidgetContainers);
   addActionToWidgets(editAction, this->Internal->EditWidgetContainers);
   addActionToWidgets(deleteAction, this->Internal->DeleteWidgetContainers);
+
+  Q_EMIT this->onAddedMacro();
 }
 
 //----------------------------------------------------------------------------
@@ -373,7 +374,7 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
       pqPythonMacroSupervisor::hideFile(file.absoluteFilePath());
     }
 
-    pqPythonMacroSupervisor::removeMacro(filename);
+    this->removeMacro(filename);
   }
 }
 //----------------------------------------------------------------------------
