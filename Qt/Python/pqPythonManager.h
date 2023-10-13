@@ -12,6 +12,7 @@
 
 class QWidget;
 class QToolBar;
+class pqPythonMacroSupervisor;
 class pqServer;
 
 /**
@@ -31,6 +32,11 @@ class PQPYTHON_EXPORT pqPythonManager : public QObject
 public:
   pqPythonManager(QObject* parent = nullptr);
   ~pqPythonManager() override;
+
+  /**
+   * Provides access to the macro supervisor.
+   */
+  pqPythonMacroSupervisor* macroSupervisor() const;
 
   /**
    * Convienience method to call `vtkPythonInterpreter::Initialize()`.
