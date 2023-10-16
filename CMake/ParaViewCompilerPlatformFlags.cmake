@@ -1,22 +1,6 @@
 set(VTK_REQUIRED_C_FLAGS)
 set(VTK_REQUIRED_CXX_FLAGS)
 
-# make sure Crun is linked in with the native compiler, it is
-# not used by default for shared libraries and is required for
-# things like java to work.
-if(CMAKE_SYSTEM MATCHES "SunOS.*")
-  if(NOT CMAKE_COMPILER_IS_GNUCXX)
-    find_library(VTK_SUNCC_CRUN_LIBRARY Crun /opt/SUNWspro/lib)
-    if(VTK_SUNCC_CRUN_LIBRARY)
-      link_libraries(${VTK_SUNCC_CRUN_LIBRARY})
-    endif()
-    find_library(VTK_SUNCC_CSTD_LIBRARY Cstd /opt/SUNWspro/lib)
-    if(VTK_SUNCC_CSTD_LIBRARY)
-      link_libraries(${VTK_SUNCC_CSTD_LIBRARY})
-    endif()
-  endif()
-endif()
-
 # A GCC compiler.
 if(CMAKE_COMPILER_IS_GNUCXX)
   if(VTK_USE_X)
@@ -28,13 +12,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     link_libraries(-lgdi32)
   endif()
   if(MINGW)
-  endif()
-  if(CMAKE_SYSTEM MATCHES "SunOS.*")
-    # Disable warnings that occur in X11 headers.
-    if(DART_ROOT AND BUILD_TESTING)
-      set(VTK_REQUIRED_CXX_FLAGS "${VTK_REQUIRED_CXX_FLAGS} -Wno-unknown-pragmas")
-      set(VTK_REQUIRED_C_FLAGS "${VTK_REQUIRED_C_FLAGS} -Wno-unknown-pragmas")
-    endif()
     string(APPEND VTK_REQUIRED_CXX_FLAGS " -mthreads")
     string(APPEND VTK_REQUIRED_C_FLAGS " -mthreads")
     string(APPEND VTK_REQUIRED_EXE_LINKER_FLAGS " -mthreads")
@@ -43,24 +20,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 else()
   if(CMAKE_ANSI_CFLAGS)
-  endif()
-  if(CMAKE_SYSTEM MATCHES "OSF1-V.*")
-     set(VTK_REQUIRED_CXX_FLAGS
-         "${VTK_REQUIRED_CXX_FLAGS} -timplicit_local -no_implicit_include")
-  endif()
-  if(CMAKE_SYSTEM MATCHES "AIX.*")
-    # allow t-ypeid and d-ynamic_cast usage (normally off by default on xlC)
-    set(VTK_REQUIRED_CXX_FLAGS "${VTK_REQUIRED_CXX_FLAGS} -qrtti=all")
-    # silence duplicate symbol warnings on AIX
-    set(VTK_REQUIRED_EXE_LINKER_FLAGS "${VTK_REQUIRED_EXE_LINKER_FLAGS} -bhalt:5")
-    set(VTK_REQUIRED_SHARED_LINKER_FLAGS "${VTK_REQUIRED_SHARED_LINKER_FLAGS} -bhalt:5")
-    set(VTK_REQUIRED_MODULE_LINKER_FLAGS "${VTK_REQUIRED_MODULE_LINKER_FLAGS} -bhalt:5")
-  endif()
-  if(CMAKE_SYSTEM MATCHES "HP-UX.*")
-     set(VTK_REQUIRED_C_FLAGS
-         "${VTK_REQUIRED_C_FLAGS} +W2111 +W2236 +W4276")
-     set(VTK_REQUIRED_CXX_FLAGS
-         "${VTK_REQUIRED_CXX_FLAGS} +W2111 +W2236 +W4276")
     string(APPEND VTK_REQUIRED_C_FLAGS " ${CMAKE_ANSI_CFLAGS}")
   endif()
 endif()
@@ -88,16 +47,6 @@ if(_MAY_BE_INTEL_COMPILER)
   else()
     set(VTK_REQUIRED_CXX_FLAGS "${VTK_REQUIRED_CXX_FLAGS} -i_dynamic")
   endif()
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "PGI")
-  # --diag_suppress=236 is for constant value asserts used for error handling
-  # This can be restricted to the implementation and doesn't need to propagate
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --diag_suppress=236")
-
-  # --diag_suppress=381 is for redundant semi-colons used in macros
-  # This needs to propagate to anything that includes VTK headers
-  set(VTK_REQUIRED_CXX_FLAGS "${VTK_REQUIRED_CXX_FLAGS} --diag_suppress=381")
 endif()
 
 if(MSVC)
