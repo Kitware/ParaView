@@ -67,6 +67,10 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     message(FATAL_ERROR
       "External VTK not found but ParaView requires VTK to function")
   endif ()
+  if (NOT PARAVIEW_BUILD_SHARED_LIBS)
+    message(FATAL_ERROR
+      "Static build with external VTK does not currently work.")
+  endif()
   get_filename_component(vtk_cmake_dir "${VTK_CONFIG}" DIRECTORY)
   # set by vtk-config.cmake. Unsetting this avoids a warning when setting
   # PARAVIEW_BUILD_LEGACY_REMOVE
@@ -544,8 +548,6 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     endmacro()
     search_dependent_targets(${vtk_modules})
   endif ()
-
-
   if (PARAVIEW_USE_PYTHON)
     find_package(Python3 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
