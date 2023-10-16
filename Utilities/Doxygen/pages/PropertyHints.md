@@ -419,3 +419,19 @@ With `one_liner_wrapped`, the tools button for Expression Manager are configured
 **Attribute `autocomplete`**
 
 Set it to `python_calc` to enable Python Calculator style autocomplete on the text field. Completes many Numpy functions, fields and names from the paraview module. It can be used for widget with `type` attribute set to `one_liner_wrapped` or `multi_line`.
+
+WarnOnPropertyChange
+------
+
+Display a warning message box when the *string* property has been changed. Set the `onlyonce` attribute to only show the message on the first property change.
+The `Text` tag specifies the message box title and body text.
+
+```xml
+<Hints>
+  <WarnOnPropertyChange onlyonce="true">
+    <Text title="Message box title">
+Message box message
+  </Text>
+  </WarnOnPropertyChange>
+</Hints>
+```
