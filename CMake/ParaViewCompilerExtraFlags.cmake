@@ -45,10 +45,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   option(PARAVIEW_EXTRA_COMPILER_WARNINGS
     "Add compiler flags to do stricter checking when building debug." OFF)
   if(PARAVIEW_EXTRA_COMPILER_WARNINGS)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
-      "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${CMAKE_CXX_FLAGS_WARN}")
-    set(CMAKE_CXX_FLAGS_DEBUG
-      "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_WARN} ${CMAKE_CXX_FLAGS_ERROR}")
+    string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " ${CMAKE_CXX_FLAGS_WARN}")
+    string(APPEND CMAKE_CXX_FLAGS_DEBUG
+      " ${CMAKE_CXX_FLAGS_WARN} ${CMAKE_CXX_FLAGS_ERROR}")
   endif()
 endif()
 
@@ -70,8 +69,7 @@ foreach (lang IN ITEMS C CXX Fortran)
 endforeach ()
 string(REPLACE ";" "," intel_oneapi_compiler_detections "${intel_oneapi_compiler_detections}")
 if (TARGET paraviewbuild)
-  set_target_properties(paraviewbuild
-    PROPERTIES
-    INTERFACE_COMPILE_OPTIONS
+  target_compile_options(paraviewbuild
+    INTERFACE
     "$<BUILD_INTERFACE:$<$<OR:${intel_oneapi_compiler_detections}>:-fp-model=precise>>")
 endif ()
