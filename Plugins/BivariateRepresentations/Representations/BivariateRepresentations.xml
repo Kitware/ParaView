@@ -190,5 +190,166 @@
       </SubProxy>
     <!-- End of UniformGridRepresentation Extension -->
     </Extension>
+
+    <RepresentationProxy name="BivariateTextureRepresentation"
+      class="vtkBivariateTextureRepresentation"
+      processes="client|renderserver|dataserver"
+      base_proxygroup="representations"
+      base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        This representation generates 2D texture coordinates from 2 choosen point data arrays
+        and provide default textures to visualize bi-variate data.
+      </Documentation>
+      <StringVectorProperty name="FirstArray"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            default_values="1 0 0 0 0">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="input_array_point_1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the first point data array used to compute texture
+          coordinates (first component).
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="SecondArray"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            default_values="2 0 0 0 0">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="input_array_point_1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the second point data array used to compute texture
+          coordinates (second component).
+        </Documentation>
+      </StringVectorProperty>
+
+      <SubProxy command="SetLogoSourceRepresentation">
+        <Proxy name="LogoSourceRepresentation"
+               proxygroup="representations"
+               proxyname="LogoSourceRepresentation">
+        </Proxy>
+      </SubProxy>
+    <!-- End of BivariateTextureRepresentation -->
+    </RepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding BivariateTextureRepresentation
+        as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BivariateTextureRepresentation"
+                          text="Bivariate Texture Surface"
+                          subtype="Surface" />
+
+      <SubProxy>
+        <Proxy name="BivariateTextureRepresentation"
+               proxygroup="representations"
+               proxyname="BivariateTextureRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Bivariate representation">
+            <Property name="FirstArray"/>
+            <Property name="SecondArray"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bivariate Texture Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of GeometryRepresentation Extension -->
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <Documentation>
+        Extends standard UnstructuredGridRepresentation by adding BivariateTextureRepresentation
+        as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BivariateTextureRepresentation"
+                          text="Bivariate Texture Surface"
+                          subtype="Surface" />
+
+      <SubProxy>
+        <Proxy name="BivariateTextureRepresentation"
+               proxygroup="representations"
+               proxyname="BivariateTextureRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Bivariate representation">
+            <Property name="FirstArray"/>
+            <Property name="SecondArray"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bivariate Texture Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of UnstructuredGridRepresentation Extension -->
+    </Extension>
+
+    <Extension name="UniformGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding BivariateTextureRepresentation
+        as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BivariateTextureRepresentation"
+                          text="Bivariate Texture Surface"
+                          subtype="Surface" />
+
+      <SubProxy>
+        <Proxy name="BivariateTextureRepresentation"
+               proxygroup="representations"
+               proxyname="BivariateTextureRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Bivariate representation">
+            <Property name="FirstArray"/>
+            <Property name="SecondArray"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bivariate Texture Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    <!-- End of UniformGridRepresentation Extension -->
+    </Extension>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -265,7 +265,6 @@ set(paraview_default_plugins
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
   BagPlotViewsAndFilters
-  BivariateRepresentations
   CFSReader
   ContourLabelPlugin
   Datamine
@@ -304,6 +303,12 @@ set(paraview_default_plugins
 
 if (PARAVIEW_BUILD_TRANSLATIONS)
   list(APPEND paraview_default_plugins TranslationsTesting)
+endif()
+
+if (PARAVIEW_BUILD_SHARED_LIBS)
+  # Disabled by default in case of static build, because of restricted features
+  # in that case (default textures will not be found)
+  list(APPEND paraview_default_plugins BivariateRepresentations)
 endif()
 
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)

@@ -118,3 +118,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkBivariateNoiseMapper.h

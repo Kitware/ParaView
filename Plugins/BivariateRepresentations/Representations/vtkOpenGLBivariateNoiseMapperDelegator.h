@@ -15,8 +15,6 @@
 
 #include "vtkBivariateRepresentationsModule.h" // for export macro
 
-VTK_ABI_NAMESPACE_BEGIN
-
 class VTKBIVARIATEREPRESENTATIONS_EXPORT vtkOpenGLBivariateNoiseMapperDelegator
   : public vtkOpenGLCompositePolyDataMapperDelegator
 {
@@ -39,5 +37,6 @@ private:
   void operator=(const vtkOpenGLBivariateNoiseMapperDelegator&) = delete;
 };
 
-VTK_ABI_NAMESPACE_END
 #endif
+
+// VTK-HeaderTest-Exclude: vtkOpenGLBivariateNoiseMapperDelegator.h
