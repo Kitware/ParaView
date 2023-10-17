@@ -139,8 +139,15 @@ void vtkPlotlyJsonExporter::Close()
   }
   if (internals.File.is_open())
   {
-    internals.File << internals.Data;
-    internals.File.close();
+    try
+    {
+      internals.File << internals.Data;
+      internals.File.close();
+    }
+    catch (...)
+    {
+      vtkLogF(ERROR, "Failed writing json to file");
+    }
   }
 }
 
