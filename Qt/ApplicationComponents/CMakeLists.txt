@@ -217,16 +217,6 @@ set(headers
   pqCatalystContinueReaction.h
   )
 
-if (TARGET ParaView::pqPython)
-  list(APPEND classes
-    pqMacroReaction
-    pqTraceReaction
-  )
-  list(APPEND headers
-    pqPythonScriptEditorReaction.h
-  )
-endif ()
-
 set(ui_files
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqBackgroundEditorWidget.ui
@@ -290,6 +280,21 @@ set(qt_components
 if(PARAVIEW_QT_MAJOR_VERSION GREATER "5")
   list(APPEND qt_components
     Core5Compat)
+endif ()
+
+
+if (TARGET ParaView::pqPython)
+  list(APPEND classes
+    pqEditMacrosDialog
+    pqEditMacrosReaction
+    pqMacroReaction
+    pqTraceReaction
+  )
+  list(APPEND headers
+    pqPythonScriptEditorReaction.h
+  )
+  list(APPEND ui_files
+    Resources/UI/pqEditMacrosDialog.ui)
 endif ()
 
 if (paraview_use_materialeditor)

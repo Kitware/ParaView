@@ -110,6 +110,12 @@ pqPythonManager::~pqPythonManager()
 }
 
 //-----------------------------------------------------------------------------
+pqPythonMacroSupervisor* pqPythonManager::macroSupervisor() const
+{
+  return this->Internal->MacroSupervisor;
+}
+
+//-----------------------------------------------------------------------------
 bool pqPythonManager::initializeInterpreter()
 {
   return vtkPythonInterpreter::Initialize();

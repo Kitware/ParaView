@@ -1664,11 +1664,17 @@ if(PARAVIEW_USE_PYTHON)
 
   list(APPEND TESTS_WITHOUT_BASELINES
     PythonEditorTab.xml
-    PythonResetSessionMacro.xml
     ProgrammableSourcePythonEditorLink.xml
     TraceIntegrateVariables.xml
     FullNotation.xml
   )
+
+  # The macros are not reset on MacOS, see #21706.
+  if(NOT APPLE)
+    list(APPEND TESTS_WITHOUT_BASELINES
+      PythonResetSessionMacro.xml
+    )
+  endif()
 
   # Check that matplotlib is available
   include(FindPythonModules)

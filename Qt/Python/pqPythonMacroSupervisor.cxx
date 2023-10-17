@@ -176,15 +176,15 @@ QMap<QString, QString> pqPythonMacroSupervisor::getStoredMacros()
 }
 
 //----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::removeStoredMacro(const QString& filename)
+void pqPythonMacroSupervisor::removeStoredMacro(const QString& fileName)
 {
-  pqPythonMacroSupervisor::hideFile(filename);
+  pqPythonMacroSupervisor::hideFile(fileName);
 }
 
 //----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::hideFile(const QString& filename)
+void pqPythonMacroSupervisor::hideFile(const QString& fileName)
 {
-  QFileInfo file = QFileInfo(filename);
+  QFileInfo file = QFileInfo(fileName);
   QDir dir = file.absoluteDir();
   QString baseName = file.baseName();
   QString suffix = file.completeSuffix();
@@ -198,7 +198,7 @@ void pqPythonMacroSupervisor::hideFile(const QString& filename)
     index++;
   }
   QString newFilePath = dir.absolutePath() + QDir::separator() + newName;
-  QFile::rename(filename, newFilePath);
+  QFile::rename(fileName, newFilePath);
 }
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::updateMacroList()
@@ -243,8 +243,7 @@ void pqPythonMacroSupervisor::resetActions()
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addMacro(const QString& fileName)
 {
-  pqPythonMacroSupervisor::addMacro(
-    pqPythonMacroSupervisor::macroNameFromFileName(fileName), fileName);
+  this->addMacro(pqPythonMacroSupervisor::macroNameFromFileName(fileName), fileName);
 }
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& fileName)
@@ -268,15 +267,10 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   runAction->setData(fileName);
   runAction->setEnabled(enable);
 
-  for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+  QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(fileName);
+  if (!iconPath.isEmpty())
   {
-    QString iconFile = QFileInfo(fileName).absoluteFilePath().replace(".py", extension);
-
-    if (QFileInfo::exists(iconFile))
-    {
-      runAction->setIcon(QIcon(iconFile));
-      break;
-    }
+    runAction->setIcon(QIcon(iconPath));
   }
 
   this->Internal->RunActionMap.insert(fileName, runAction);
@@ -300,6 +294,8 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   addActionToWidgets(runAction, this->Internal->RunWidgetContainers);
   addActionToWidgets(editAction, this->Internal->EditWidgetContainers);
   addActionToWidgets(deleteAction, this->Internal->DeleteWidgetContainers);
+
+  Q_EMIT this->onAddedMacro();
 }
 
 //----------------------------------------------------------------------------
@@ -378,7 +374,7 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
       pqPythonMacroSupervisor::hideFile(file.absoluteFilePath());
     }
 
-    pqPythonMacroSupervisor::removeMacro(filename);
+    this->removeMacro(filename);
   }
 }
 //----------------------------------------------------------------------------
@@ -395,15 +391,31 @@ void pqPythonMacroSupervisor::onEditMacroTriggered()
     }
   }
 }
+
 //----------------------------------------------------------------------------
-QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& filename)
+QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& fileName)
 {
-  QString name = QFileInfo(filename).fileName().replace(".py", "");
+  QString name = QFileInfo(fileName).fileName().replace(".py", "");
   if (!name.length())
   {
     name = "Unnamed macro";
   }
   return name;
+}
+
+//----------------------------------------------------------------------------
+QString pqPythonMacroSupervisor::iconPathFromFileName(const QString& fileName)
+{
+  for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+  {
+    QString iconPath = QFileInfo(fileName).absoluteFilePath().replace(".py", extension);
+    if (QFileInfo::exists(iconPath))
+    {
+      return iconPath;
+    }
+  }
+
+  return QString();
 }
 
 //----------------------------------------------------------------------------

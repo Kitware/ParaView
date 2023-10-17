@@ -86,13 +86,13 @@
 #include "pqViewMenuManager.h"
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
+#include "pqEditMacrosReaction.h"
 #include "pqMacroReaction.h"
+#include "pqPythonMacroSupervisor.h"
+#include "pqPythonManager.h"
+#include "pqPythonScriptEditorReaction.h"
+#include "pqPythonTabWidget.h"
 #include "pqTraceReaction.h"
-
-#include <pqPythonMacroSupervisor.h>
-#include <pqPythonManager.h>
-#include <pqPythonScriptEditorReaction.h>
-#include <pqPythonTabWidget.h>
 #endif
 
 #include <QApplication>
@@ -638,34 +638,13 @@ void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
     new pqMacroReaction(
       menu.addAction(QCoreApplication::translate("pqMacrosMenu", "Import new macro..."))
       << pqSetName("actionMacroCreate"));
-    QMenu* editMenu = menu.addMenu(QCoreApplication::translate("pqMacrosMenu", "Edit..."))
-      << pqSetName("menuMacroEdit");
-    QMenu* deleteMenu = menu.addMenu(QCoreApplication::translate("pqMacrosMenu", "Delete..."))
-      << pqSetName("menuMacroDelete");
-    QAction* deleteAllAction =
-      menu.addAction(QCoreApplication::translate("pqMacrosMenu", "Delete All"));
-    QObject::connect(deleteAllAction, &QAction::triggered, []() {
-      QMessageBox::StandardButton ret = QMessageBox::question(pqCoreUtilities::mainWidget(),
-        QCoreApplication::translate("pqMacrosMenu", "Delete All"),
-        QCoreApplication::translate("pqMacrosMenu", "All macros will be deleted. Are you sure?"));
-      if (ret == QMessageBox::StandardButton::Yes)
-      {
-        // The script editor shows macros about to be deleted. remove those tabs.
-        pqPythonTabWidget* const tWidget =
-          pqPythonScriptEditor::getUniqueInstance()->findChild<pqPythonTabWidget*>();
-        for (int i = tWidget->count() - 1; i >= 0; --i)
-        {
-          Q_EMIT tWidget->tabCloseRequested(i);
-        }
-        // remove user Macros dir
-        pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getMacrosDir());
-        pqPVApplicationCore::instance()->pythonManager()->updateMacroList();
-      }
-    });
+
+    new pqEditMacrosReaction(
+      menu.addAction(QCoreApplication::translate("pqMacrosMenu", "Edit Macros"))
+      << pqSetName("actionMacroEdit"));
+
     menu.addSeparator();
     manager->addWidgetForRunMacros(&menu);
-    manager->addWidgetForEditMacros(editMenu);
-    manager->addWidgetForDeleteMacros(deleteMenu);
   }
 
 #endif
