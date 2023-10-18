@@ -3,9 +3,6 @@ set(VTK_REQUIRED_CXX_FLAGS)
 
 # A GCC compiler.
 if(CMAKE_COMPILER_IS_GNUCXX)
-  if(VTK_USE_X)
-    unset(WIN32)
-  endif()
   if(CYGWIN)
     string(APPEND VTK_REQUIRED_CXX_FLAGS " -mwin32")
     string(APPEND VTK_REQUIRED_C_FLAGS " -mwin32")
