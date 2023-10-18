@@ -171,6 +171,34 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridFeatureEdges"
+                 name="HyperTreeGridFeatureEdges"
+                 label="HyperTreeGrid Feature Edges Filter">
+      <Documentation short_help="Generate feature edges of an HTG.">
+        Generate a vtkPolyData representing the feature edges of an HTG.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetMergePoints"
+                         default_values="0"
+                         name="MergePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Select whether to merge duplicated points.</Documentation>
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridFeatureEdges -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridToDualGrid"
                  name="HyperTreeGridToDualGrid"
                  label="HyperTreeGrid To Dual Grid">
