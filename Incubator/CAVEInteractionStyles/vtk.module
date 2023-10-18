@@ -1,7 +1,7 @@
 NAME
-  CAVEInteraction::Styles
+  ParaViewIncubator::CAVEInteractionStyles
 LIBRARY_NAME
-  vtkInteractionStyles
+  vtkPVIncubatorCAVEInteractionStyles
 SPDX_LICENSE_IDENTIFIER
   BSD-3-Clause
 SPDX_COPYRIGHT_TEXT
@@ -16,7 +16,6 @@ DEPENDS
   ParaView::RemotingViews
   ParaView::pqApplicationComponents
 OPTIONAL_DEPENDS
-  VTK::Python
   VTK::PythonInterpreter
   VTK::WrappingPythonCore
 PRIVATE_DEPENDS

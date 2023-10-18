@@ -1,0 +1,8 @@
+r"""
+This is the package for paraview's extension modules.
+"""
+
+#------------------------------------------------------------------------------
+# list the contents
+__all__ = [
+@_paraview_incubator_python_modules_all@]

@@ -26,5 +26,5 @@ paraview_add_plugin(AddPQProxy
   SOURCES ${sources})
 
 target_link_libraries(AddPQProxy
-    PRIVATE
-      ParaView::RemotingViews)
+  PRIVATE
+    ParaView::RemotingViews)

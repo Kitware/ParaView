@@ -4,9 +4,9 @@
 #ifndef vtkVRQueue_h
 #define vtkVRQueue_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
 #include "vtkObject.h"
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 
 #include <condition_variable>
 #include <mutex>
@@ -50,7 +50,7 @@ struct vtkVREvent
   unsigned int timeStamp;
 };
 
-class VTKINTERACTIONSTYLES_EXPORT vtkVRQueue : public vtkObject
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkVRQueue : public vtkObject
 {
 public:
   static vtkVRQueue* New();

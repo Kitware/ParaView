@@ -3,7 +3,7 @@
 #ifndef vtkSMVRPythonInteractorStyleProxy_h
 #define vtkSMVRPythonInteractorStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
 #include <string>
@@ -17,7 +17,7 @@ class vtkSMRenderViewProxy;
 class vtkTransform;
 class vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRPythonInteractorStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRPythonInteractorStyleProxy
   : public vtkSMVRInteractorStyleProxy
 {
 public:

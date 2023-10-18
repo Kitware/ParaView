@@ -4,14 +4,14 @@
 #ifndef vtkSMVRControlSlicePositionStyleProxy_h
 #define vtkSMVRControlSlicePositionStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkTransform;
 class vtkMatrix4x4;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRControlSlicePositionStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRControlSlicePositionStyleProxy
   : public vtkSMVRInteractorStyleProxy
 {
 public:

@@ -4,8 +4,8 @@
 #ifndef vtkSMVRGrabPointStyleProxy_h
 #define vtkSMVRGrabPointStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkCamera;
@@ -15,7 +15,8 @@ class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRGrabPointStyleProxy : public vtkSMVRInteractorStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRGrabPointStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
   static vtkSMVRGrabPointStyleProxy* New();

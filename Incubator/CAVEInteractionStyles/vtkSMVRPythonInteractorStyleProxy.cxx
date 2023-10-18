@@ -12,26 +12,35 @@
 /*        property that will be connected to the head tracker.            */
 /*                                                                        */
 /**************************************************************************/
+#define vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON                                              \
+  (VTK_MODULE_ENABLE_VTK_WrappingPythonCore && VTK_MODULE_ENABLE_VTK_PythonInterpreter)
+
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
 #include "vtkPython.h" // must be first
+#endif
 
 #include "vtkSMVRPythonInteractorStyleProxy.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPythonInterpreter.h"
-#include "vtkPythonUtil.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSmartPyObject.h"
 #include "vtkVRQueue.h"
+
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
+#include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
+#endif
 
 #include "vtksys/FStream.hxx"
 
 #include <algorithm>
 #include <sstream>
 
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
 namespace
 {
 bool CheckAndFlushPythonErrors()
@@ -45,13 +54,16 @@ bool CheckAndFlushPythonErrors()
   return false;
 }
 }
+#endif
 
 class vtkSMVRPythonInteractorStyleProxy::Internal
 {
 public:
   const char* ModuleName = "paraview.detail";
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   vtkSmartPyObject Module;
   vtkSmartPyObject PythonObject;
+#endif
 };
 
 // ----------------------------------------------------------------------------
@@ -59,9 +71,8 @@ vtkStandardNewMacro(vtkSMVRPythonInteractorStyleProxy);
 
 // ----------------------------------------------------------------------------
 vtkSMVRPythonInteractorStyleProxy::vtkSMVRPythonInteractorStyleProxy()
-  : Superclass()
 {
-  this->Internals = new Internal();
+  this->Internals = new Internal;
   this->FileName = nullptr;
 }
 
@@ -101,6 +112,7 @@ void vtkSMVRPythonInteractorStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkSMVRPythonInteractorStyleProxy::SetPythonObject(void* obj)
 {
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   vtkPythonScopeGilEnsurer gilEnsurer;
 
   this->Internals->PythonObject = static_cast<PyObject*>(obj);
@@ -112,8 +124,9 @@ void vtkSMVRPythonInteractorStyleProxy::SetPythonObject(void* obj)
     PyObject_CallMethodObjArgs(this->Internals->PythonObject.GetPointer(), fname.GetPointer(),
       vtkself.GetPointer(), nullptr);
     CheckAndFlushPythonErrors();
-    this->InvokeEvent(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE);
+    this->InvokeEvent(Superclass::INTERACTOR_STYLE_REQUEST_CONFIGURE);
   }
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -136,6 +149,7 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
     vtkWarningMacro(<< "Unable to open " << this->FileName << " for reading");
   }
 
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   // Initialize Python is not already initialized.
   vtkPythonInterpreter::Initialize();
 
@@ -166,6 +180,9 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
   CheckAndFlushPythonErrors();
 
   this->SetPythonObject(styleObject);
+#else
+  vtkWarningMacro(<< "Python not enabled");
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -185,6 +202,7 @@ void vtkSMVRPythonInteractorStyleProxy::UpdateVTKObjects()
 // ----------------------------------------------------------------------------
 void vtkSMVRPythonInteractorStyleProxy::InvokeHandler(const char* mname, const vtkVREvent& event)
 {
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   vtkPythonScopeGilEnsurer gilEnsurer;
 
   if (!this->Internals->PythonObject)
@@ -252,30 +270,43 @@ void vtkSMVRPythonInteractorStyleProxy::InvokeHandler(const char* mname, const v
   }
 
   CheckAndFlushPythonErrors();
+#endif
 }
 
 // ----------------------------------------------------------------------------
 void vtkSMVRPythonInteractorStyleProxy::HandleTracker(const vtkVREvent& event)
 {
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   this->InvokeHandler("HandleTracker", event);
+#else
+  this->Superclass::HandleTracker(event);
+#endif
 }
 
 // ----------------------------------------------------------------------------
 void vtkSMVRPythonInteractorStyleProxy::HandleAnalog(const vtkVREvent& event)
 {
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   this->InvokeHandler("HandleAnalog", event);
+#else
+  this->Superclass::HandleAnalog(event);
+#endif
 }
 
 // ----------------------------------------------------------------------------
 void vtkSMVRPythonInteractorStyleProxy::HandleButton(const vtkVREvent& event)
 {
+#if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
   this->InvokeHandler("HandleButton", event);
+#else
+  this->Superclass::HandleButton(event);
+#endif
 }
 
 // ----------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMVRPythonInteractorStyleProxy::SaveConfiguration()
 {
-  vtkPVXMLElement* elt = vtkSMVRInteractorStyleProxy::SaveConfiguration();
+  vtkPVXMLElement* elt = Superclass::SaveConfiguration();
 
   vtkSMStringVectorProperty* svp;
 
@@ -323,7 +354,7 @@ bool vtkSMVRPythonInteractorStyleProxy::Configure(
   if (result)
   {
     this->UpdateVTKObjects();
-    result = vtkSMVRInteractorStyleProxy::Configure(child, locator);
+    result = Superclass::Configure(child, locator);
   }
 
   return result;

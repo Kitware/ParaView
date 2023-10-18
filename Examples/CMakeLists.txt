@@ -114,6 +114,9 @@ if (TARGET VTK::IOCatalystConduit)
   endif ()
 endif ()
 
+add_example(UseParaView/Incubator)
+add_example(UseParaView/NoIncubator)
+
 add_custom_target(paraview-examples
   COMMAND
     "${CMAKE_CTEST_COMMAND}"

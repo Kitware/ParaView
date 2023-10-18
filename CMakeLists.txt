@@ -252,6 +252,8 @@ set_property(GLOBAL
   PROPERTY
     "_vtk_module_autoinit_include" "\"vtkAutoInit.h\"")
 
+set(paraview_incubator_requested_modules)
+
 # Note that the way that this flag gets used, it only has an effect on the
 # initial configuration.
 set(_paraview_plugins_default OFF)
@@ -321,7 +323,51 @@ paraview_plugin_find_plugins(paraview_plugin_files ${paraview_plugin_directories
 paraview_plugin_scan(
   PLUGIN_FILES      ${paraview_plugin_files}
   PROVIDES_PLUGINS  paraview_plugins
-  REQUIRES_MODULES  paraview_plugin_required_modules)
+  REQUIRES_MODULES  paraview_plugin_required_modules_all)
+
+set(paraview_plugin_required_modules)
+foreach (paraview_module IN LISTS paraview_plugin_required_modules_all)
+  if (paraview_module MATCHES "ParaViewIncubator::")
+    list(APPEND paraview_incubator_requested_modules
+      "${paraview_module}")
+  elseif (paraview_module MATCHES "ParaView::")
+    list(APPEND paraview_plugin_required_modules
+      "${paraview_module}")
+  elseif (paraview_module MATCHES "VTK::")
+    list(APPEND vtk_plugin_required_modules
+      "${paraview_module}")
+  endif ()
+endforeach ()
+
+set(all_incubator_modules)
+vtk_module_find_modules(paraview_incubator_module_files
+  "${CMAKE_CURRENT_SOURCE_DIR}/Incubator")
+vtk_module_scan(
+  MODULE_FILES            ${paraview_incubator_module_files}
+  REQUEST_MODULES         ParaViewIncubator::Core
+                          ${paraview_incubator_requested_modules}
+  PROVIDES_MODULES        paraview_incubator_modules
+  REQUIRES_MODULES        paraview_incubator_required_modules_all
+  UNRECOGNIZED_MODULES    paraview_incubator_unrecognized_modules
+  WANT_BY_DEFAULT         OFF
+  HIDE_MODULES_FROM_CACHE ON
+  ENABLE_TESTS            "${PARAVIEW_BUILD_TESTING}")
+
+set(paraview_incubator_required_modules)
+foreach (paraview_module IN LISTS paraview_incubator_required_modules_all)
+  if (NOT paraview_module MATCHES "ParaView::")
+    list(APPEND paraview_plugin_required_modules
+      "${paraview_module}")
+  endif ()
+endforeach ()
+
+set(paraview_unrecognized_paraview_modules)
+foreach (paraview_module IN LISTS paraview_incubator_unrecognized_modules)
+  if (paraview_module MATCHES "ParaView::")
+    list(APPEND paraview_unrecognized_paraview_modules
+      "${paraview_module}")
+  endif ()
+endforeach ()
 
 set(paraview_client_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
@@ -355,6 +401,7 @@ vtk_module_scan(
   KIT_FILES           ${paraview_kit_files}
   REQUEST_MODULES     ${paraview_requested_modules}
                       ${paraview_plugin_required_modules}
+                      ${paraview_incubator_required_modules}
                       ${paraview_client_required_modules}
   REJECT_MODULES      ${paraview_rejected_modules}
   PROVIDES_MODULES    paraview_modules
@@ -416,9 +463,13 @@ endif ()
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
   if (paraview_required_modules OR paraview_unrecognized_modules)
+    set(required_modules
+      ${paraview_required_modules}
+      ${paraview_unrecognized_modules})
+    string(REPLACE ";" ", " required_modules "${required_modules}")
     message(FATAL_ERROR
       "The following modules were requested or required, but not found: "
-      "${paraview_required_modules};${paraview_unrecognized_modules}.")
+      "${required_modules}.")
   endif ()
 
   if (PARAVIEW_USE_PYTHON)
@@ -433,7 +484,8 @@ else ()
   set(vtk_requested_modules)
   foreach (vtk_module IN LISTS
                 paraview_requested_modules
-                paraview_plugin_required_modules
+                vtk_plugin_required_modules
+                paraview_incubator_required_modules
                 paraview_client_required_modules)
     if (vtk_module MATCHES "ParaView::")
       continue ()
@@ -530,6 +582,7 @@ else ()
     KIT_FILES           ${vtk_kit_files}
     REQUEST_MODULES     ${vtk_requested_modules}
                         ${paraview_required_modules}
+                        ${paraview_incubator_required_modules}
     REJECT_MODULES      ${vtk_rejected_modules}
     PROVIDES_MODULES    vtk_modules
     PROVIDES_KITS       vtk_kits
@@ -542,9 +595,13 @@ else ()
     list(REMOVE_ITEM vtk_unrecognized_modules ${vtk_rejected_modules})
   endif()
   if (vtk_required_modules OR vtk_unrecognized_modules)
+    set(required_modules
+      ${vtk_required_modules}
+      ${vtk_unrecognized_modules})
+    string(REPLACE ";" ", " required_modules "${required_modules}")
     message(FATAL_ERROR
       "The following modules were requested or required, but not found: "
-      "${vtk_required_modules};${vtk_unrecognized_modules}.")
+      "${required_modules}.")
   endif ()
 
   # Handle the requirement of `sqlitebin` for `proj`.
@@ -683,6 +740,26 @@ vtk_module_build(
   TEST_DATA_TARGET    ParaViewData
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
+  TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
+  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
+  GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
+  SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
+  SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
+
+vtk_module_build(
+  MODULES             ${paraview_incubator_modules}
+  PACKAGE             ParaViewIncubator
+  INSTALL_EXPORT      ParaViewIncubator
+  INSTALL_HEADERS     "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+  HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/Incubator"
+  CMAKE_DESTINATION   "${paraview_cmake_destination}"
+  LICENSE_DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
+  HIERARCHY_DESTINATION "${CMAKE_INSTALL_LIBDIR}/vtk/hierarchy/${CMAKE_PROJECT_NAME}"
+  LIBRARY_NAME_SUFFIX "${PARAVIEW_CUSTOM_LIBRARY_SUFFIX}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1"
+  TEST_DATA_TARGET    ParaViewData
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
   TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
@@ -844,6 +921,20 @@ if (PARAVIEW_USE_PYTHON)
     TARGET          ParaView::pvpythonmodules
     DEPENDS         VTK::vtkpythonmodules)
 
+  vtk_module_wrap_python(
+    MODULES         ${paraview_incubator_modules}
+    INSTALL_EXPORT  ParaViewPythonIncubator
+    INSTALL_HEADERS "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+    PYTHON_PACKAGE  "paraview.incubator"
+    MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
+    CMAKE_DESTINATION   "${paraview_cmake_destination}"
+    LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
+    HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/pvincubatorpythonmodules"
+    WRAPPED_MODULES paraview_incubator_python_wrapped_modules
+    TARGET          ParaView::pvincubatorpythonmodules
+    DEPENDS         VTK::vtkpythonmodules)
+
   if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     export(
       EXPORT    ParaViewPython
@@ -853,6 +944,17 @@ if (PARAVIEW_USE_PYTHON)
       EXPORT      ParaViewPython
       NAMESPACE   ParaView::
       FILE        ParaViewPython-targets.cmake
+      DESTINATION "${paraview_cmake_destination}"
+      COMPONENT   "development")
+
+    export(
+      EXPORT    ParaViewPythonIncubator
+      NAMESPACE ParaView::
+      FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewPythonIncubator-targets.cmake")
+    install(
+      EXPORT      ParaViewPythonIncubator
+      NAMESPACE   ParaView::
+      FILE        ParaViewPythonIncubator-targets.cmake
       DESTINATION "${paraview_cmake_destination}"
       COMPONENT   "development")
   endif ()

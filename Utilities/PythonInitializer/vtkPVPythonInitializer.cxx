@@ -4,6 +4,7 @@
 // Windows debug builds.
 #include "vtkPython.h"
 
+#include "pvincubatorpythonmodules.h"
 #include "pvpythonmodules.h"
 #include "vtkUtilitiesPythonInitializerModule.h"
 #include "vtkpythonmodules.h"
@@ -15,5 +16,6 @@ extern "C"
   {
     vtkpythonmodules_load();
     pvpythonmodules_load();
+    pvincubatorpythonmodules_load();
   }
 }

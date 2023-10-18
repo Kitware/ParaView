@@ -83,6 +83,13 @@ list(APPEND interfaces
 list(APPEND sources
   ${dock_sources})
 
+set(xml_files
+  CAVEInteraction_SM.xml)
+if (PARAVIEW_USE_PYTHON)
+  list(APPEND xml_files
+    CAVEInteraction_SM_Python.xml)
+endif ()
+
 paraview_add_plugin(CAVEInteraction
   REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
@@ -90,22 +97,9 @@ paraview_add_plugin(CAVEInteraction
   UI_INTERFACES ${interfaces}
   UI_FILES ${ui_files}
   SOURCES ${sources}
-  MODULES CAVEInteraction::Styles
-  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Interactions/vtk.module"
+  SERVER_MANAGER_XML ${xml_files}
+  MODULES ParaViewIncubator::CAVEInteractionStyles
   XML_DOCUMENTATION OFF)
-
-if (PARAVIEW_USE_PYTHON)
-  vtk_module_wrap_python(
-    MODULES         CAVEInteraction::Styles
-    INSTALL_EXPORT  CAVEInteractionPython
-    PYTHON_PACKAGE  "paraview.caveinteractormodules"
-    MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
-    CMAKE_DESTINATION   "${CMAKE_INSTALL_LIBDIR}/cmake/CAVEInteraction"
-    LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
-    WRAPPED_MODULES cave_python_wrapped_modules
-    TARGET          ParaView::cavepythonmodules)
-endif ()
 
 target_include_directories(CAVEInteraction
   PRIVATE

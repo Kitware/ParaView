@@ -1,0 +1,10 @@
+NAME
+  ParaViewIncubator::Core
+LIBRARY_NAME
+  vtkPVIncubatorCore
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Kitware Inc.
+DEPENDS
+  VTK::CommonCore

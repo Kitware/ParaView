@@ -46,6 +46,7 @@ set(python_files
   paraview/detail/pythonalgorithm.py
   paraview/detail/python_selector.py
   paraview/detail/catalyst_export.py
+  paraview/incubator/__init__.py.in
   paraview/inspect.py
   paraview/live.py
   paraview/lookuptable.py
@@ -73,6 +74,16 @@ set(python_files
   paraview/variant.py
   paraview/vtkConstants.py
   paraview/vtk.py)
+
+# build the "__all__ = [...]" list for paraview/incubator/__init__.py
+set(_paraview_incubator)
+foreach (_paraview_python_module IN LISTS paraview_incubator_python_wrapped_modules)
+  get_property(_paraview_python_library_name
+    TARGET    "${_paraview_python_module}"
+    PROPERTY  "INTERFACE_vtk_module_library_name")
+  string(APPEND _paraview_incubator_python_modules_all
+    "    \'${_paraview_python_library_name}\',\n")
+endforeach ()
 
 # build the "__all__ = [...]" list for paraview/modules/__init__.py
 set(_paraview_python_modules_all)
@@ -122,7 +133,7 @@ if (NOT BUILD_SHARED_LIBS)
   # provide/generate.
   set(_paraview_python_files)
   set(_paraview_python_modules)
-  foreach (_paraview_module IN LISTS paraview_modules paraview_client_modules)
+  foreach (_paraview_module IN LISTS paraview_modules paraview_client_modules paraview_incubator_modules)
     _vtk_module_get_module_property("${_paraview_module}"
       PROPERTY "python_modules"
       VARIABLE _paraview_module_python_files)

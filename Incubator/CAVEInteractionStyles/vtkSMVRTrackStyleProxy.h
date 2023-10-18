@@ -4,7 +4,7 @@
 #ifndef vtkSMVRTrackStyleProxy_h
 #define vtkSMVRTrackStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkSMDoubleVectorProperty;
@@ -15,7 +15,8 @@ class vtkTransform;
 
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRTrackStyleProxy : public vtkSMVRInteractorStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRTrackStyleProxy
+  : public vtkSMVRInteractorStyleProxy
 {
 public:
   static vtkSMVRTrackStyleProxy* New();

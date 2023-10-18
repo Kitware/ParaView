@@ -4,8 +4,8 @@
 #ifndef vtkSMVRVirtualHandStyleProxy_h
 #define vtkSMVRVirtualHandStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
 #include "vtkNew.h"
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRTrackStyleProxy.h"
 
 class vtkCamera;
@@ -15,7 +15,8 @@ class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRVirtualHandStyleProxy : public vtkSMVRTrackStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRVirtualHandStyleProxy
+  : public vtkSMVRTrackStyleProxy
 {
 public:
   static vtkSMVRVirtualHandStyleProxy* New();

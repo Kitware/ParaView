@@ -4,7 +4,7 @@
 #ifndef vtkSMVRSpaceNavigatorGrabWorldStyleProxy_h
 #define vtkSMVRSpaceNavigatorGrabWorldStyleProxy_h
 
-#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include "vtkSMVRInteractorStyleProxy.h"
 
 class vtkSMDoubleVectorProperty;
@@ -15,7 +15,7 @@ class vtkTransform;
 
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRSpaceNavigatorGrabWorldStyleProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRSpaceNavigatorGrabWorldStyleProxy
   : public vtkSMVRInteractorStyleProxy
 {
 public:

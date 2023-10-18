@@ -9,6 +9,7 @@ REQUIRES_MODULES
   ParaView::RemotingServerManager
   ParaView::RemotingViews
   ParaView::pqApplicationComponents
+  ParaViewIncubator::CAVEInteractionStyles
   VTK::CommonCore
   VTK::CommonMath
   VTK::CommonTransforms

@@ -155,6 +155,11 @@ vtk_module_export_find_packages(
   FILE_NAME         "ParaView-vtk-module-find-packages.cmake"
   MODULES           ${paraview_modules})
 
+vtk_module_export_find_packages(
+  CMAKE_DESTINATION "${paraview_cmake_destination}"
+  FILE_NAME         "ParaViewIncubator-vtk-module-find-packages.cmake"
+  MODULES           ${paraview_incubator_modules})
+
 if (PARAVIEW_USE_QT)
   get_property(paraview_client_xml_files GLOBAL
     PROPERTY paraview_client_xml_files)

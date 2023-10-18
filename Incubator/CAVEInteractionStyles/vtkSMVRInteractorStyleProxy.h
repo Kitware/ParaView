@@ -4,8 +4,8 @@
 #ifndef vtkSMVRInteractorStyleProxy_h
 #define vtkSMVRInteractorStyleProxy_h
 
-#include "vtkCommand.h"                 // For UserEvent
-#include "vtkInteractionStylesModule.h" // for export macro
+#include "vtkCommand.h"                                // For UserEvent
+#include "vtkPVIncubatorCAVEInteractionStylesModule.h" // for export macro
 #include <vtkSMProxy.h>
 
 #include <map>
@@ -19,7 +19,7 @@ class vtkSMDoubleVectorProperty;
 class vtkStringList;
 struct vtkVREvent;
 
-class VTKINTERACTIONSTYLES_EXPORT vtkSMVRInteractorStyleProxy : public vtkSMProxy
+class VTKPVINCUBATORCAVEINTERACTIONSTYLES_EXPORT vtkSMVRInteractorStyleProxy : public vtkSMProxy
 {
 public:
   static vtkSMVRInteractorStyleProxy* New();
