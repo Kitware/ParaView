@@ -1642,6 +1642,7 @@ if(PARAVIEW_USE_PYTHON)
     PythonShellRunScript.xml
     PythonEditorRun.xml
     SaveLoadStatePython.xml
+    SaveLoadStateSelectionPython.xml
     TraceExodus.xml
     TraceExportAndSaveData.xml
     TraceSaveGeometry.xml
@@ -1650,6 +1651,9 @@ if(PARAVIEW_USE_PYTHON)
     TraceTimeControls.xml
     TraceWithoutRenderingComponents.xml
   )
+  # Surface selection unstable on CRS mode
+  set(SaveLoadStateSelectionPython_DISABLE_CRS TRUE)
+
   list(APPEND TESTS_WITH_INLINE_COMPARES
     RestoreArrayDefaultTransferFunction.xml
     RestoreDefaultTransferFunction.xml
