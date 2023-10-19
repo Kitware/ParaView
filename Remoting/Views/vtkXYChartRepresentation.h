@@ -134,7 +134,7 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  bool Export(vtkCSVExporter* exporter) override;
+  bool Export(vtkAbstractChartExporter* exporter) override;
 
 protected:
   vtkXYChartRepresentation();

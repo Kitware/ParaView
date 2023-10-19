@@ -17,6 +17,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0000/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/plotly_json_line_chart.json}"
+
 
   # baselines
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewMatplotlibScript.png}"
@@ -44,6 +46,7 @@ if (numpy_found)
     NO_VALID NO_RT
     AppendAttributes.py
     FileSeriesWriterSubTimeSteps.py
+    TestPlotlyJsonExtractor.py
     TestPythonAnnotationFilterNoMerge.py
     TestPythonAnnotationFilter.py
     UnstructuredCellTypePythonCalculator.py

@@ -96,7 +96,7 @@ public:
 
   //---------------------------------------------------------------------------
   // Export visible plots to a CSV file.
-  bool Export(vtkXYChartRepresentation* self, vtkCSVExporter* exporter) override
+  bool Export(vtkXYChartRepresentation* self, vtkAbstractChartExporter* exporter) override
   {
     // used to avoid adding duplicate columns.
     std::set<std::string> added_column_names;

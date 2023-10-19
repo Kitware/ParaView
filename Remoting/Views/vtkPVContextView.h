@@ -20,7 +20,7 @@ class vtkChart;
 class vtkChartRepresentation;
 class vtkPVContextInteractorStyle;
 class vtkContextView;
-class vtkCSVExporter;
+class vtkAbstractChartExporter;
 class vtkInformationIntegerKey;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
@@ -90,7 +90,7 @@ public:
    * This is expected to called only on the client side after a render/update.
    * Thus all data is expected to available on the local process.
    */
-  virtual bool Export(vtkCSVExporter* exporter);
+  virtual bool Export(vtkAbstractChartExporter* exporter);
 
   ///@{
   /**

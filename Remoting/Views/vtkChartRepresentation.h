@@ -24,7 +24,7 @@
 #include <set> //needed for ivars
 
 class vtkChartSelectionRepresentation;
-class vtkCSVExporter;
+class vtkAbstractChartExporter;
 class vtkMultiBlockDataSet;
 class vtkPVContextView;
 class vtkSelectionDeliveryFilter;
@@ -140,7 +140,7 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  virtual bool Export(vtkCSVExporter* vtkNotUsed(exporter)) { return false; }
+  virtual bool Export(vtkAbstractChartExporter* vtkNotUsed(exporter)) { return false; }
 
 protected:
   vtkChartRepresentation();

@@ -1,0 +1,17 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="extract_writers">
+    <!-- =================================================================== -->
+    <PlotlyJsonExtractWriterProxy name="PlotlyJson">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="{prefix}_{timestep:06d}.json">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <ProxyProperty name="View" panel_visibility="never" />
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
+    </PlotlyJsonExtractWriterProxy>
+    <!-- =================================================================== -->
+    </ProxyGroup>
+</ServerManagerConfiguration>

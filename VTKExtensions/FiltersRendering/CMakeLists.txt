@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
+  vtkAbstractChartExporter
   vtkAllToNRedistributeCompositePolyData
   vtkAllToNRedistributePolyData
   vtkBalancedRedistributePolyData
@@ -16,6 +17,7 @@ set(classes
   vtkMPIMoveData
   vtkNetworkImageSource
   vtkOrderedCompositeDistributor
+  vtkPlotlyJsonExporter
   vtkPVGeometryFilter
   vtkRedistributePolyData
   vtkResampledAMRImageSource
