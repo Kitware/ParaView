@@ -16,6 +16,10 @@ function (paraview_add_executable name)
   target_sources("${name}"
     PRIVATE
       ${ARGN})
+  # Add a dummy file set to optimize dependencies. See CMP0154.
+  _vtk_module_add_file_set("${name}"
+    BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}"
+    NAME      dummy)
   add_executable("ParaView::${name}" ALIAS "${name}")
 
   target_link_libraries("${name}"

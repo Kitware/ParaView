@@ -212,6 +212,10 @@ ${_vtk_client_server_calls}}\n")
     PRIVATE
       ${_vtk_client_server_library_sources}
       "${_vtk_client_server_init_file}")
+  # Add a dummy file set to optimize dependencies. See CMP0154.
+  _vtk_module_add_file_set("${name}"
+    BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}"
+    NAME      dummy)
   if (BUILD_SHARED_LIBS)
     set_property(TARGET "${name}"
       PROPERTY

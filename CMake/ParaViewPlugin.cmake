@@ -1519,12 +1519,17 @@ function (paraview_add_plugin name)
   add_library("${_paraview_build_plugin}" "${_paraview_build_plugin_type}")
   target_sources("${_paraview_build_plugin}"
     PRIVATE
-      ${_paraview_add_plugin_header}
       ${_paraview_add_plugin_source}
       ${_paraview_add_plugin_eula_sources}
-      ${_paraview_add_plugin_binary_headers}
       ${_paraview_add_plugin_ui_sources}
-      ${_paraview_add_plugin_python_sources})
+      ${_paraview_add_plugin_python_sources}
+      ${_paraview_add_plugin_SOURCES})
+  _vtk_module_add_file_set("${_paraview_build_plugin}"
+    NAME  paraview_plugin_headers
+    VIS   PRIVATE
+    BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}"
+    FILES ${_paraview_add_plugin_header}
+          ${_paraview_add_plugin_binary_headers})
   if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
     target_compile_definitions("${_paraview_build_plugin}"
       PRIVATE
