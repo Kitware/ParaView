@@ -207,9 +207,11 @@ ${_vtk_client_server_calls}}\n")
     PROPERTY
       GENERATED 1)
 
-  add_library("${name}" STATIC
-    ${_vtk_client_server_library_sources}
-    "${_vtk_client_server_init_file}")
+  add_library("${name}" STATIC)
+  target_sources("${name}"
+    PRIVATE
+      ${_vtk_client_server_library_sources}
+      "${_vtk_client_server_init_file}")
   if (BUILD_SHARED_LIBS)
     set_property(TARGET "${name}"
       PROPERTY

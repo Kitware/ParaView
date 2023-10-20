@@ -12,7 +12,10 @@ function (paraview_add_executable name)
       "${_paraview_client_origin_rpath}")
   endif()
 
-  add_executable("${name}" ${ARGN})
+  add_executable("${name}")
+  target_sources("${name}"
+    PRIVATE
+      ${ARGN})
   add_executable("ParaView::${name}" ALIAS "${name}")
 
   target_link_libraries("${name}"
