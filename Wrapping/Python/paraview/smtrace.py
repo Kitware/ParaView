@@ -197,7 +197,7 @@ class Trace(object):
 
         if isinstance(obj, sm.SourceProxy):
             # handle pipeline source/filter proxy.
-            pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("sources", obj.SMProxy)
+            pname = cls.get_registered_name(obj, "sources")
             if pname:
                 if obj == simple.GetActiveSource():
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
@@ -830,8 +830,15 @@ class ExodusIIReaderFilter(PipelineProxyFilter):
             "FilePrefix", "XMLFileName", "FilePattern", "FileRange"]
 
 class ExtractSelectionFilter(PipelineProxyFilter):
+    def __init__(self, trace_all_in_ctor=False, save_selection=False):
+        super().__init__(trace_all_in_ctor)
+        self.save_selection = save_selection
+
     def should_never_trace(self, prop):
         if PipelineProxyFilter.should_never_trace(self, prop): return True
+
+        # When saving state, Selection property should not be ignored
+        if self.save_selection: return False
 
         # Selections are not registered with the proxy manager, so we will not try to trace them.
         return prop.get_property_name() in ["Selection"]
@@ -979,9 +986,10 @@ class RegisterPipelineProxy(TraceItem):
     """This traces the creation of a Pipeline Proxy such as
     sources/filters/readers etc."""
 
-    def __init__(self, proxy):
+    def __init__(self, proxy, saving_state=False):
         TraceItem.__init__(self)
         self.Proxy = sm._getPyProxy(proxy)
+        self.saving_state = saving_state
 
     def finalize(self):
         pname = Trace.get_registered_name(self.Proxy, "sources")
@@ -993,12 +1001,34 @@ class RegisterPipelineProxy(TraceItem):
         trace.append("# create a new '%s'" % self.Proxy.GetXMLLabel())
         if isinstance(self.Proxy, sm.ExodusIIReaderProxy):
             filter_type = ExodusIIReaderFilter()
-        elif self.Proxy.GetXMLLabel() == "Extract Selection":
-            filter_type = ExtractSelectionFilter()
+        elif self.Proxy.GetXMLName() == "ExtractSelection":
+            filter_type = ExtractSelectionFilter(save_selection=self.saving_state)
         else:
             filter_type = PipelineProxyFilter()
         ctor_args = "registrationName='%s'" % pname
         trace.append(accessor.trace_ctor(ctor, filter_type, ctor_args=ctor_args))
+        Trace.Output.append_separated(trace.raw_data())
+        TraceItem.finalize(self)
+
+class RegisterSelectionProxy(TraceItem):
+    """This traces the creation of a Proxy for selection.
+    This is used only when saving state for now."""
+
+    def __init__(self, proxy):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+
+    def finalize(self):
+        pname = Trace.get_registered_name(self.Proxy, "selection_sources")
+        varname = Trace.get_varname(pname)
+        accessor = ProxyAccessor(varname, self.Proxy)
+
+        xmlname = self.Proxy.GetXMLName()
+        trace = TraceOutput()
+        trace.append("# create a new '%s'" % self.Proxy.GetXMLLabel())
+        filter_type = ProxyFilter(trace_all_in_ctor=True)
+        ctor_args = "proxyname='%s', registrationname='%s'" % (xmlname, pname)
+        trace.append(accessor.trace_ctor("CreateSelection", filter_type, ctor_args=ctor_args))
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 

@@ -219,8 +219,23 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             "# ----------------------------------------------------------------"])
 
     #--------------------------------------------------------------------------
-    # Next, trace data processing pipelines.
+    # Next, trace selections.
     sorted_proxies_of_interest = __toposort(proxies_of_interest)
+    sorted_selections = [x for x in sorted_proxies_of_interest \
+        if smtrace.Trace.get_registered_name(x, "selection_sources")]
+    if sorted_selections:
+        trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# setup the selections",
+            "# ----------------------------------------------------------------"])
+        for selection in sorted_selections:
+            traceitem = smtrace.RegisterSelectionProxy(selection)
+            traceitem.finalize()
+            del traceitem
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
+    #--------------------------------------------------------------------------
+    # Next, trace data processing pipelines.
     sorted_sources = [x for x in sorted_proxies_of_interest \
         if smtrace.Trace.get_registered_name(x, "sources")]
     if sorted_sources:
@@ -229,7 +244,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             "# setup the data processing pipelines",
             "# ----------------------------------------------------------------"])
         for source in sorted_sources:
-            traceitem = smtrace.RegisterPipelineProxy(source)
+            traceitem = smtrace.RegisterPipelineProxy(source, saving_state=True)
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
