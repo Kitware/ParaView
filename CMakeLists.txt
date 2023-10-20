@@ -346,6 +346,21 @@ foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
   set("_paraview_plugin_default_${paraview_default_plugin}" "${PARAVIEW_PLUGINS_DEFAULT}")
 endforeach ()
 
+# move modules from ${from} list to ${to} list if they match VTK::
+function (move_modules from to)
+  set(modules ${${to}})
+  set(from_new_value)
+  foreach(mod IN LISTS ${from})
+    if(${mod} MATCHES "^VTK::")
+      list(APPEND modules ${mod})
+    else()
+      list(APPEND from_new_value ${mod})
+    endif()
+  endforeach()
+  set(${to} ${modules} PARENT_SCOPE)
+  set(${from} ${from_new_value} PARENT_SCOPE)
+endfunction()
+
 set(paraview_plugin_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
 paraview_plugin_find_plugins(paraview_plugin_files ${paraview_plugin_directories})
@@ -397,7 +412,10 @@ foreach (paraview_module IN LISTS paraview_incubator_unrecognized_modules)
       "${paraview_module}")
   endif ()
 endforeach ()
+set(vtk_modules)
+move_modules(paraview_plugin_required_modules vtk_modules)
 
+move_modules(paraview_client_requested_modules vtk_modules)
 set(paraview_client_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
   "${CMAKE_CURRENT_SOURCE_DIR}/Adaptors")
@@ -414,7 +432,9 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_client_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
+move_modules(paraview_client_required_modules vtk_modules)
 
+move_modules(paraview_requested_modules vtk_modules)
 set(paraview_source_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
@@ -439,6 +459,7 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
+move_modules(paraview_required_modules vtk_modules)
 
 set(paraview_unrecognized_paraview_modules)
 foreach (paraview_module IN LISTS paraview_unrecognized_modules)
@@ -491,63 +512,19 @@ elseif (UNIX)
 endif ()
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
-  if (paraview_required_modules OR paraview_unrecognized_modules)
-    foreach(mod IN LISTS paraview_required_modules)
-        if(NOT TARGET "${mod}")
-            list(APPEND modules_notarget ${mod})
-        endif()
-        if(${mod} MATCHES "^VTK::") # For better debugging
-            list(APPEND vtk_modules ${mod})
-        endif()
-    endforeach()
-    foreach(mod ${paraview_unrecognized_modules})
-        if(NOT TARGET ${mod})
-            if (${mod} IN_LIST paraview_rejected_modules)
-                list(APPEND _to_remove ${mod})
-            endif()
-        else()
-            list(APPEND _to_remove ${mod})
-            #list(APPEND vtk_modules ${mod}) #probably do not need to add unrecognized_modules to the wrapper
-        endif()
-    endforeach()
-    list(REMOVE_ITEM paraview_unrecognized_modules ${_to_remove})
-    list(REMOVE_DUPLICATES paraview_unrecognized_modules)
-    set(_unnecessary_modules ${paraview_modules})
-    list(REMOVE_ITEM _unnecessary_modules ${paraview_required_modules})
-    if(modules_notarget)
-        message(FATAL_ERROR
-          "The following modules were requested or required, but not found: "
-          "${modules_notarget}")
+  list(REMOVE_DUPLICATES vtk_modules)
+  foreach(mod IN LISTS vtk_modules)
+    if(NOT TARGET "${mod}")
+      list(APPEND modules_notarget ${mod})
     endif()
-    list(REMOVE_DUPLICATES vtk_modules)
-    list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
-    find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}")
-    macro(search_dependent_targets)
-        set(vtk_mod_dep_list)
-        foreach(vtk_targ ${ARGN})
-            get_target_property(vtk_mod_dep ${vtk_targ} "INTERFACE_vtk_module_depends")
-            if(vtk_mod_dep)
-                list(APPEND vtk_mod_dep_list ${vtk_mod_dep})
-            endif()
-            get_target_property(vtk_mod_pdep ${vtk_targ} "INTERFACE_vtk_module_private_depends")
-            if(vtk_mod_pdep)
-                list(APPEND vtk_mod_dep_list ${vtk_mod_pdep})
-            endif()
-            get_target_property(vtk_mod_odep ${vtk_targ} "INTERFACE_vtk_module_optional_depends")
-            if(vtk_mod_odep)
-                list(APPEND vtk_mod_dep_list ${vtk_mod_odep})
-            endif()
-            if(vtk_mod_dep_list)
-                list(REMOVE_ITEM vtk_mod_dep_list ${vtk_modules})
-                if(vtk_mod_dep_list)
-                    list(APPEND vtk_modules ${vtk_mod_dep_list})
-                    search_dependent_targets(${vtk_mod_dep_list})
-                endif()
-            endif()
-        endforeach()
-    endmacro()
-    search_dependent_targets(${vtk_modules})
-  endif ()
+  endforeach()
+  if(modules_notarget)
+    message(FATAL_ERROR
+      "The following modules are required, but not found: "
+      "${modules_notarget}")
+  endif()
+  list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
+  find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}")
   if (PARAVIEW_USE_PYTHON)
     find_package(Python3 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
@@ -657,7 +634,7 @@ else ()
     MODULE_FILES        ${vtk_module_files}
     KIT_FILES           ${vtk_kit_files}
     REQUEST_MODULES     ${vtk_requested_modules}
-                        ${paraview_required_modules}
+                        ${vtk_modules}
                         ${paraview_incubator_required_modules}
     REJECT_MODULES      ${vtk_rejected_modules}
     PROVIDES_MODULES    vtk_modules
@@ -722,7 +699,6 @@ else ()
     set(CMAKE_C_CLANG_TIDY "")
     set(CMAKE_CXX_CLANG_TIDY "")
   endif ()
-
   vtk_module_build(
     MODULES             ${vtk_modules}
     KITS                ${vtk_kits}
