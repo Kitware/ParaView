@@ -1,14 +1,16 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- WARNING: This test impacts user's Macros directory (add and remove on it)! -->
-  <!-- TODO: Uncomment sensible part when this is not the case anymore (#21706)-->
+  <!-- TODO: When this is not the case anymore (see #21706),-->
+  <!-- * uncomment sensible part (remove all clearing macros directory)-->
+  <!-- * uncomment checks for number of macros -->
 
   <!-- Create a new macro from a script that calls `ResetSession` -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
   <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroEdit" />
   <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/add" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/Udirectory/resetSession.py" />
-  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="1" />
+  <!-- <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="1" /> -->
 
   <!-- Edit the macro (button) -->
   <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
@@ -34,7 +36,7 @@
 
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
   <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroEdit" />
-  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="2" />
+  <!-- <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="2" /> -->
 
   <!-- Edit a macro (double click) -->
   <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="1.0" />
@@ -44,7 +46,7 @@
   <!-- Might hide your personal macros, see Macros directory to get it back -->
   <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/remove" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="1" />
+  <!-- <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="1" /> -->
 
   <!-- Delete all macros -->
   <!-- Not tested as RemoveAll actually remove the user Macros directory -->
