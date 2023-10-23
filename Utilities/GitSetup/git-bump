@@ -55,6 +55,29 @@ shift
 readonly target_commit="$1"
 shift
 
+git_version_check () {
+  local version="$1"
+  readonly version
+  shift
+
+  local reason="$1"
+  readonly reason
+  shift
+
+  local lower_version
+  lower_version="$( (
+    echo "$version"
+    git --version | sed -e 's/git version //'
+  ) | sort -V | head -n1 )"
+  readonly lower_version
+
+  if [ "$lower_version" != "$version" ]; then
+    die "Git version $version needed for $reason"
+  fi
+}
+
+git_version_check "2.31.0" "rev-parse --path-format="
+
 # go to root path
 root_path="$( git rev-parse --show-superproject-working-tree )"
 if [[ -z "$root_path" ]]; then
@@ -64,20 +87,26 @@ readonly root_path
 cd "$root_path"
 
 # Find informations about the submodule
-config="$( git config --local --get-regexp "submodule\..*$submodule.*\.url" )"
-readonly config
-n_match="$( echo  "$config" | wc -l )"
-readonly n_match
-if [[ "$n_match" != "1" ]]; then
-  die "Submodule name ambiguous, aborting"
+if git config --local "submodule.$submodule.url" >/dev/null 2>/dev/null; then
+  submodule_name="$submodule"
+  url="$( git config --local --get "submodule.$submodule.url" )"
+else
+  config="$( git config --local --get-regexp "submodule\..*$submodule.*\.url" )"
+  readonly config
+  # Extract out the submodule name and URL from the configuration line.
+  submodule_name="${config//.url */}"
+  submodule_name="${submodule_name//submodule./}"
+  url="${config//* /}"
+  n_match="$( echo  "$config" | wc -l | tr -d ' ' )"
+  readonly n_match
+  if [[ "$n_match" != "1" ]]; then
+    die "Submodule name ambiguous, aborting"
+  fi
 fi
+readonly submodule_name
+readonly url
 
-# Extract out the submodule name and URL from the configuration line.
-submodule_name="${config//.url */}"
-readonly submodule_name="${submodule_name//submodule./}"
-readonly url="${config//* /}"
-
-if [[ -z "$config" ]] || [[ -z "$submodule_name" ]] || [[ -z "$url" ]]; then
+if [[ -z "$submodule_name" ]] || [[ -z "$url" ]]; then
   die "Submodule not found\nUsage: git bump <submodule-name> <target-commit>"
 fi
 
@@ -116,7 +145,8 @@ EOF
 readonly template
 
 # Save template in file. Get the actual git dir, whenever using worktrees
-readonly git_dir_path="$( git rev-parse --path-format=absolute --git-common-dir )"
+git_dir_path="$( git rev-parse --path-format=absolute --git-common-dir )"
+readonly git_dir_path
 tmp_file="$( mktemp "$git_dir_path"/bump.XXXXXX )"
 readonly tmp_file
 trap 'rm -f -- "$tmp_file"' EXIT

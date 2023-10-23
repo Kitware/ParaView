@@ -55,14 +55,13 @@ gitlab_configured='' &&
 config="${BASH_SOURCE%/*}/config" &&
 protocol=$(git config -f "$config" --get gitlab.protocol ||
 	   echo "https") &&
+userpart=$(test "$protocol" = "ssh" && echo "git@" || echo '') &&
 host=$(git config -f "$config" --get gitlab.host) &&
 site=$(git config -f "$config" --get gitlab.site ||
-       echo "$protocol://$host") &&
+       echo "$protocol://$userpart$host") &&
 group_path=$(git config -f "$config" --get gitlab.group-path) &&
 project_path=$(git config -f "$config" --get gitlab.project-path) &&
 gitlab_upstream="$site/$group_path/$project_path.git" &&
-gitlab_pushurl=$(git config --get remote.gitlab.pushurl ||
-		 git config --get remote.gitlab.url) &&
 gitlab_configured=1
 
 data_report_and_remove() {
