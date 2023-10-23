@@ -28,7 +28,7 @@ protected:
   ~vtkSMVRSkeletonStyleProxy();
 
   void HandleButton(const vtkVREvent& event) override;
-  void HandleAnalog(const vtkVREvent& event) override;
+  void HandleValuator(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
   bool EnableReport;

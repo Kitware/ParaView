@@ -116,7 +116,7 @@
       <widget class="QComboBox" name="inputType">
        <item>
         <property name="text">
-         <string>Analog</string>
+         <string>Valuator</string>
         </property>
        </item>
        <item>

@@ -283,7 +283,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState* state)
     readSize = read(this->Socket, reinterpret_cast<char*>(&value), sizeof(value));
 #endif
     if (readSize < sizeof(value))
-      qDebug() << "analog : " << count << readSize;
+      qDebug() << "valuator : " << count << readSize;
     (*valuators)[count] = value;
   }
 }

@@ -249,7 +249,7 @@ pqVRUIConnection::pqVRUIConnection(QObject* parentObject)
   this->Name = "";
   this->Type = "VRUI";
   this->TrackerPresent = false;
-  this->AnalogPresent = false;
+  this->ValuatorPresent = false;
   this->ButtonPresent = false;
   this->TrackerTransformPresent = false;
   this->Transformation = vtkMatrix4x4::New();
@@ -278,12 +278,12 @@ void pqVRUIConnection::addButton(std::string id, std::string name)
 }
 
 // ----------------------------------------------------------------------------
-void pqVRUIConnection::addAnalog(std::string id, std::string name)
+void pqVRUIConnection::addValuator(std::string id, std::string name)
 {
   std::stringstream returnStr;
-  returnStr << "analog." << id;
-  this->AnalogMapping[returnStr.str()] = name;
-  this->AnalogPresent = true;
+  returnStr << "valuator." << id;
+  this->ValuatorMapping[returnStr.str()] = name;
+  this->ValuatorPresent = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -366,10 +366,10 @@ std::string pqVRUIConnection::name(int eventType, int id)
     returnStr << this->Address << ".";
   switch (eventType)
   {
-    case ANALOG_EVENT:
-      e << "analog." << id;
-      if (this->AnalogMapping.find(e.str()) != this->AnalogMapping.end())
-        returnStr << this->AnalogMapping[e.str()];
+    case VALUATOR_EVENT:
+      e << "valuator." << id;
+      if (this->ValuatorMapping.find(e.str()) != this->ValuatorMapping.end())
+        returnStr << this->ValuatorMapping[e.str()];
       else
         returnStr << e.str();
       break;
@@ -423,9 +423,9 @@ bool pqVRUIConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
         {
           this->addButton(id, name);
         }
-        else if (strcmp(e->GetName(), "Analog") == 0)
+        else if (strcmp(e->GetName(), "Valuator") == 0)
         {
-          this->addAnalog(id, name);
+          this->addValuator(id, name);
         }
         else if (strcmp(e->GetName(), "Tracker") == 0)
         {
@@ -466,7 +466,7 @@ vtkPVXMLElement* pqVRUIConnection::saveConfiguration() const
   child->AddAttribute("address", this->Address.c_str());
   child->AddAttribute("port", this->Port.c_str());
   saveButtonEventConfig(child);
-  saveAnalogEventConfig(child);
+  saveValuatorEventConfig(child);
   saveTrackerEventConfig(child);
   saveTrackerTransformationConfig(child);
   return child;
@@ -505,12 +505,12 @@ void pqVRUIConnection::saveButtonEventConfig(vtkPVXMLElement* child) const
 }
 
 // ----------------------------------------------------------------------------
-void pqVRUIConnection::saveAnalogEventConfig(vtkPVXMLElement* child) const
+void pqVRUIConnection::saveValuatorEventConfig(vtkPVXMLElement* child) const
 {
-  if (!this->AnalogPresent)
+  if (!this->ValuatorPresent)
     return;
-  for (std::map<std::string, std::string>::const_iterator it = this->AnalogMapping.begin();
-       it != this->AnalogMapping.end(); ++it)
+  for (std::map<std::string, std::string>::const_iterator it = this->ValuatorMapping.begin();
+       it != this->ValuatorMapping.end(); ++it)
   {
     std::string key = it->first;
     std::string value = it->second;
@@ -525,9 +525,9 @@ void pqVRUIConnection::saveAnalogEventConfig(vtkPVXMLElement* child) const
       token.push_back(word);
     }
     vtkPVXMLElement* e = vtkPVXMLElement::New();
-    if (strcmp(token[0].c_str(), "analog") == 0)
+    if (strcmp(token[0].c_str(), "valuator") == 0)
     {
-      e->SetName("Analog");
+      e->SetName("Valuator");
       e->AddAttribute("id", token[1].c_str());
       e->AddAttribute("name", value.c_str());
     }
@@ -609,7 +609,7 @@ void pqVRUIConnection::callback()
 #endif
     this->Internals->StateMutex->lock();
     this->getAndEnqueueButtonData();
-    this->getAndEnqueueAnalogData();
+    this->getAndEnqueueValuatorData();
     this->getAndEnqueueTrackerData();
     this->Internals->StateMutex->unlock();
 
@@ -659,17 +659,17 @@ void pqVRUIConnection::getNextPacket()
 }
 
 // ----------------------------------------------------------------------------
-void pqVRUIConnection::newAnalogValue(std::vector<float>* data)
+void pqVRUIConnection::newValuatorValue(std::vector<float>* data)
 {
   vtkVREvent temp;
   temp.connId = this->Address;
-  temp.name = name(ANALOG_EVENT);
-  temp.eventType = ANALOG_EVENT;
+  temp.name = name(VALUATOR_EVENT);
+  temp.eventType = VALUATOR_EVENT;
   temp.timeStamp = QDateTime::currentDateTime().toTime_t();
-  temp.data.analog.num_channels = (int)(*data).size();
+  temp.data.valuator.num_channels = (int)(*data).size();
   for (unsigned int i = 0; i < (*data).size(); ++i)
   {
-    temp.data.analog.channel[i] = (*data)[i];
+    temp.data.valuator.channel[i] = (*data)[i];
   }
   this->EventQueue->Enqueue(temp);
 }
@@ -813,10 +813,10 @@ void pqVRUIConnection::getAndEnqueueButtonData()
 }
 
 // ----------------------------------------------------------------------------
-void pqVRUIConnection::getAndEnqueueAnalogData()
+void pqVRUIConnection::getAndEnqueueValuatorData()
 {
-  std::vector<float>* analog = this->Internals->State->GetValuatorStates();
-  newAnalogValue(analog);
+  std::vector<float>* valuator = this->Internals->State->GetValuatorStates();
+  newValuatorValue(valuator);
 }
 
 // ----------------------------------------------------------------------------

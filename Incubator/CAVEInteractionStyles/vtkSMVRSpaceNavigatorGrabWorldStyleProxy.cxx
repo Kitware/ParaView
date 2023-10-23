@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkSMVRSpaceNavigatorGrabWorldStyleProxy);
 vtkSMVRSpaceNavigatorGrabWorldStyleProxy::vtkSMVRSpaceNavigatorGrabWorldStyleProxy()
   : Superclass()
 {
-  this->AddAnalogRole("Move");
+  this->AddValuatorRole("Move");
 }
 
 // ----------------------------------------------------------------------------
@@ -38,16 +38,16 @@ void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::PrintSelf(ostream& os, vtkIndent 
 }
 
 // ----------------------------------------------------------------------------
-// HandleAnalog() method
-void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleAnalog(const vtkVREvent& event)
+// HandleValuator() method
+void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleValuator(const vtkVREvent& event)
 {
-  std::string role = this->GetAnalogRole(event.name);
+  std::string role = this->GetValuatorRole(event.name);
 
   if (role == "Move")
   {
-    // A Space Navigator will have 6 analog data streams.  Ignore data
+    // A Space Navigator will have 6 valuator data streams.  Ignore data
     //   if this input does not match this parameter of the Space Navigator.
-    if (event.data.analog.num_channels != 6)
+    if (event.data.valuator.num_channels != 6)
     {
       return;
     }
@@ -62,7 +62,7 @@ void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleAnalog(const vtkVREvent& ev
       double up_vector[3];
       double forward_vector[3];
       double orient[3];
-      const double* analog_input = event.data.analog.channel;
+      const double* valuator_input = event.data.valuator.channel;
 
       camera = viewProxy->GetActiveCamera();
 
@@ -75,7 +75,7 @@ void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleAnalog(const vtkVREvent& ev
       // Apply up-down motion
       for (int i = 0; i < 3; i++)
       {
-        double dx = MOVEMENT_FACTOR * analog_input[2] * up_vector[i];
+        double dx = MOVEMENT_FACTOR * valuator_input[2] * up_vector[i];
 
         camera_location[i] += dx;
         focal_point[i] += dx;
@@ -87,7 +87,7 @@ void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleAnalog(const vtkVREvent& ev
 
       for (int i = 0; i < 3; i++)
       {
-        double dx = -MOVEMENT_FACTOR * analog_input[0] * side_vector[i];
+        double dx = -MOVEMENT_FACTOR * valuator_input[0] * side_vector[i];
 
         camera_location[i] += dx;
         focal_point[i] += dx;
@@ -99,10 +99,10 @@ void vtkSMVRSpaceNavigatorGrabWorldStyleProxy::HandleAnalog(const vtkVREvent& ev
 
       // Set all the other camera values
       /* WRS: why the use of pow()?  And why doesn't this use the forward_vector? */
-      camera->Dolly(pow(1.01, analog_input[1]));
-      camera->Elevation(1.0 * analog_input[3]);
-      camera->Azimuth(1.0 * analog_input[5]);
-      camera->Roll(1.0 * analog_input[4]);
+      camera->Dolly(pow(1.01, valuator_input[1]));
+      camera->Elevation(1.0 * valuator_input[3]);
+      camera->Azimuth(1.0 * valuator_input[5]);
+      camera->Roll(1.0 * valuator_input[4]);
     }
   }
 }

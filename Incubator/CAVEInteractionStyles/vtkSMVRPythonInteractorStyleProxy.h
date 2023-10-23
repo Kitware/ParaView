@@ -71,7 +71,7 @@ protected:
   vtkSMVRPythonInteractorStyleProxy();
   ~vtkSMVRPythonInteractorStyleProxy() override;
   void HandleTracker(const vtkVREvent& event) override;
-  void HandleAnalog(const vtkVREvent& event) override;
+  void HandleValuator(const vtkVREvent& event) override;
   void HandleButton(const vtkVREvent& event) override;
   void InvokeHandler(const char* mname, const vtkVREvent& event);
   vtkPVXMLElement* SaveConfiguration() override;

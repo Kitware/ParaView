@@ -54,8 +54,8 @@ public:
   void addButton(std::string id, std::string name);
 
   // Description:
-  // Add Analog device
-  void addAnalog(std::string id, std::string name);
+  // Add Valuator device
+  void addValuator(std::string id, std::string name);
 
   // Description:
   // Add tracking device
@@ -88,13 +88,13 @@ public:
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
 
-  /// Access to analog map
-  std::map<std::string, std::string> analogMap() { return this->AnalogMapping; }
-  /// Access to analog map
-  void setAnalogMap(const std::map<std::string, std::string>& mapping)
+  /// Access to valuator map
+  std::map<std::string, std::string> valuatorMap() { return this->ValuatorMapping; }
+  /// Access to valuator map
+  void setValuatorMap(const std::map<std::string, std::string>& mapping)
   {
-    this->AnalogMapping = mapping;
-    this->AnalogPresent = (this->AnalogMapping.size() > 0);
+    this->ValuatorMapping = mapping;
+    this->ValuatorPresent = (this->ValuatorMapping.size() > 0);
   }
 
   /// Access to button map
@@ -131,7 +131,7 @@ protected:
 
   void configureTransform(vtkPVXMLElement* child);
   void saveButtonEventConfig(vtkPVXMLElement* child) const;
-  void saveAnalogEventConfig(vtkPVXMLElement* child) const;
+  void saveValuatorEventConfig(vtkPVXMLElement* child) const;
   void saveTrackerEventConfig(vtkPVXMLElement* child) const;
   void saveTrackerTranslationConfig(vtkPVXMLElement* child) const;
   void saveTrackerRotationConfig(vtkPVXMLElement* child) const;
@@ -146,10 +146,10 @@ protected:
 
   // std::map<std::string,std::string> Mapping;
   std::map<std::string, std::string> ButtonMapping;
-  std::map<std::string, std::string> AnalogMapping;
+  std::map<std::string, std::string> ValuatorMapping;
   std::map<std::string, std::string> TrackerMapping;
 
-  bool TrackerPresent, ButtonPresent, AnalogPresent, TrackerTransformPresent;
+  bool TrackerPresent, ButtonPresent, ValuatorPresent, TrackerTransformPresent;
   vtkMatrix4x4* Transformation;
 
   bool Initialized;

@@ -34,7 +34,7 @@ public:
 
   enum InputType
   {
-    Analog = 0,
+    Valuator = 0,
     Button,
     Tracker
   };
@@ -49,7 +49,7 @@ public:
   void AddInput(QWidget* parent, InputType type, const std::string& role, const std::string& name);
   QList<InputGui> Inputs;
 
-  QStringList AnalogNames;
+  QStringList ValuatorNames;
   QStringList ButtonNames;
   QStringList TrackerNames;
 };
@@ -65,13 +65,13 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
   // Populate input lists
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
 
-  std::map<std::string, std::string> analogs;
+  std::map<std::string, std::string> valuators;
   std::map<std::string, std::string> buttons;
   std::map<std::string, std::string> trackers;
 
   Q_FOREACH (const QString& connName, mgr->connectionNames())
   {
-    analogs.clear();
+    valuators.clear();
     buttons.clear();
     trackers.clear();
     // Lookup connection
@@ -79,7 +79,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
 #if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
     if (pqVRPNConnection* conn = mgr->GetVRPNConnection(connName))
     {
-      analogs = conn->analogMap();
+      valuators = conn->valuatorMap();
       buttons = conn->buttonMap();
       trackers = conn->trackerMap();
       found = true;
@@ -90,7 +90,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
     {
       if (!found)
       {
-        analogs = conn->analogMap();
+        valuators = conn->valuatorMap();
         buttons = conn->buttonMap();
         trackers = conn->trackerMap();
         found = true;
@@ -105,9 +105,9 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
 
     std::map<std::string, std::string>::const_iterator it;
     std::map<std::string, std::string>::const_iterator it_end;
-    for (it = analogs.begin(), it_end = analogs.end(); it != it_end; ++it)
+    for (it = valuators.begin(), it_end = valuators.end(); it != it_end; ++it)
     {
-      this->Internals->AnalogNames.append(
+      this->Internals->ValuatorNames.append(
         QString("%1.%2").arg(connName).arg(QString::fromStdString(it->second)));
     }
     for (it = buttons.begin(), it_end = buttons.end(); it != it_end; ++it)
@@ -122,7 +122,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
     }
   }
 
-  std::sort(this->Internals->AnalogNames.begin(), this->Internals->AnalogNames.end());
+  std::sort(this->Internals->ValuatorNames.begin(), this->Internals->ValuatorNames.end());
   std::sort(this->Internals->ButtonNames.begin(), this->Internals->ButtonNames.end());
   std::sort(this->Internals->TrackerNames.begin(), this->Internals->TrackerNames.end());
 }
@@ -141,12 +141,12 @@ void pqVRAddStyleDialog::setInteractorStyle(vtkSMVRInteractorStyleProxy* style, 
 
   // Create gui
   vtkNew<vtkStringList> roles;
-  style->GetAnalogRoles(roles.GetPointer());
+  style->GetValuatorRoles(roles.GetPointer());
   for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
   {
     std::string role(roles->GetString(i));
-    std::string analogName(style->GetAnalogName(role));
-    this->Internals->AddInput(this, pqInternals::Analog, role, analogName);
+    std::string valuatorName(style->GetValuatorName(role));
+    this->Internals->AddInput(this, pqInternals::Valuator, role, valuatorName);
   }
   style->GetButtonRoles(roles.GetPointer());
   for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
@@ -180,8 +180,8 @@ void pqVRAddStyleDialog::updateInteractorStyle()
     const std::string& name = gui.combo->currentText().toStdString();
     switch (gui.type)
     {
-      case pqInternals::Analog:
-        this->Internals->Style->SetAnalogName(role, name);
+      case pqInternals::Valuator:
+        this->Internals->Style->SetValuatorName(role, name);
         break;
       case pqInternals::Button:
         this->Internals->Style->SetButtonName(role, name);
@@ -213,8 +213,8 @@ void pqVRAddStyleDialog::pqInternals::AddInput(
   gui.combo = new QComboBox(parent);
   switch (type)
   {
-    case Analog:
-      gui.combo->addItems(this->AnalogNames);
+    case Valuator:
+      gui.combo->addItems(this->ValuatorNames);
       break;
     case Button:
       gui.combo->addItems(this->ButtonNames);

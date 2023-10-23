@@ -28,12 +28,12 @@ class pqVRAddConnectionDialog::pqInternals : public Ui::VRAddConnectionDialog
 public:
   enum InputType
   {
-    Analog = 0,
+    Valuator = 0,
     Button,
     Tracker
   };
 
-  std::map<std::string, std::string> AnalogMapping;
+  std::map<std::string, std::string> ValuatorMapping;
   std::map<std::string, std::string> ButtonMapping;
   std::map<std::string, std::string> TrackerMapping;
 
@@ -161,7 +161,7 @@ void pqVRAddConnectionDialog::setConnection(pqVRPNConnection* conn)
   this->Internals->connectionAddress->setText(QString::fromStdString(conn->address()));
   this->Internals->SetSelectedConnectionType(pqInternals::VRPN);
   this->Internals->connectionType->setEnabled(false);
-  this->Internals->AnalogMapping = conn->analogMap();
+  this->Internals->ValuatorMapping = conn->valuatorMap();
   this->Internals->ButtonMapping = conn->buttonMap();
   this->Internals->TrackerMapping = conn->trackerMap();
   this->Internals->updateUi();
@@ -195,7 +195,7 @@ void pqVRAddConnectionDialog::setConnection(pqVRUIConnection* conn)
   this->Internals->connectionPort->setValue(QString::fromStdString(conn->port()).toInt());
   this->Internals->SetSelectedConnectionType(pqInternals::VRUI);
   this->Internals->connectionType->setEnabled(false);
-  this->Internals->AnalogMapping = conn->analogMap();
+  this->Internals->ValuatorMapping = conn->valuatorMap();
   this->Internals->ButtonMapping = conn->buttonMap();
   this->Internals->TrackerMapping = conn->trackerMap();
   this->Internals->updateUi();
@@ -351,7 +351,7 @@ void pqVRAddConnectionDialog::pqInternals::updateVRPNConnection()
 
   this->VRPNConn->setName(this->connectionName->text().toStdString());
   this->VRPNConn->setAddress(this->connectionAddress->text().toStdString());
-  this->VRPNConn->setAnalogMap(this->AnalogMapping);
+  this->VRPNConn->setValuatorMap(this->ValuatorMapping);
   this->VRPNConn->setButtonMap(this->ButtonMapping);
   this->VRPNConn->setTrackerMap(this->TrackerMapping);
 }
@@ -370,7 +370,7 @@ void pqVRAddConnectionDialog::pqInternals::updateVRUIConnection()
   this->VRUIConn->setName(this->connectionName->text().toStdString());
   this->VRUIConn->setAddress(this->connectionAddress->text().toStdString());
   this->VRUIConn->setPort(QString::number(this->connectionPort->value()).toStdString());
-  this->VRUIConn->setAnalogMap(this->AnalogMapping);
+  this->VRUIConn->setValuatorMap(this->ValuatorMapping);
   this->VRUIConn->setButtonMap(this->ButtonMapping);
   this->VRUIConn->setTrackerMap(this->TrackerMapping);
 }
@@ -382,7 +382,7 @@ void pqVRAddConnectionDialog::pqInternals::updateUi()
   this->listWidget->clear();
   std::map<std::string, std::string>::const_iterator it;
   std::map<std::string, std::string>::const_iterator it_end;
-  for (it = this->AnalogMapping.begin(), it_end = this->AnalogMapping.end(); it != it_end; ++it)
+  for (it = this->ValuatorMapping.begin(), it_end = this->ValuatorMapping.end(); it != it_end; ++it)
   {
     this->listWidget->addItem(QString("%1: %2")
                                 .arg(QString::fromStdString(it->first))
@@ -424,9 +424,9 @@ void pqVRAddConnectionDialog::pqInternals::addInput()
   const char* idPrefix;
   switch (this->inputType->currentIndex())
   {
-    case Analog:
-      targetMap = &this->AnalogMapping;
-      idPrefix = "analog.";
+    case Valuator:
+      targetMap = &this->ValuatorMapping;
+      idPrefix = "valuator.";
       break;
     case Button:
       targetMap = &this->ButtonMapping;
@@ -458,9 +458,9 @@ void pqVRAddConnectionDialog::pqInternals::removeInput()
       continue;
     }
 
-    if (id.startsWith("analog."))
+    if (id.startsWith("valuator."))
     {
-      this->AnalogMapping.erase(id.toStdString());
+      this->ValuatorMapping.erase(id.toStdString());
     }
     else if (id.startsWith("button."))
     {
