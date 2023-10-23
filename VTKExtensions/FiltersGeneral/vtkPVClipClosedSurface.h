@@ -24,15 +24,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVClipClosedSurface* New();
 
-  ///@{
-  /**
-   * Set/Get the InsideOut flag (off by default)
-   */
-  vtkSetMacro(InsideOut, int);
-  vtkGetMacro(InsideOut, int);
-  vtkBooleanMacro(InsideOut, int);
-  ///@}
-
   /**
    * Set the clipping plane.
    */
@@ -45,7 +36,6 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  int InsideOut;
   vtkPlane* ClippingPlane;
 
 private:
