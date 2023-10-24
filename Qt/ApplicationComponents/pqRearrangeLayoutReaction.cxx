@@ -24,13 +24,13 @@ void pqRearrangeLayoutReaction::onTriggered()
   switch (this->ActionOrientation)
   {
     case Orientation::HORIZONTAL:
-      currentLayout->RearrangeViews(vtkSMViewLayoutProxy::HORIZONTAL);
+      currentLayout->EqualizeViews(vtkSMViewLayoutProxy::HORIZONTAL);
       break;
     case Orientation::VERTICAL:
-      currentLayout->RearrangeViews(vtkSMViewLayoutProxy::VERTICAL);
+      currentLayout->EqualizeViews(vtkSMViewLayoutProxy::VERTICAL);
       break;
     case Orientation::BOTH:
-      currentLayout->RearrangeViews();
+      currentLayout->EqualizeViews();
       break;
     default:
       break;

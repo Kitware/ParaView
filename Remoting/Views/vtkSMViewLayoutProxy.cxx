@@ -937,7 +937,7 @@ int vtkSMViewLayoutProxy::GetViewLocation(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::RearrangeViews()
+bool vtkSMViewLayoutProxy::EqualizeViews()
 {
   this->ComputeSteadySplitFraction(0, Direction::HORIZONTAL);
   this->ComputeSteadySplitFraction(0, Direction::VERTICAL);
@@ -946,7 +946,7 @@ bool vtkSMViewLayoutProxy::RearrangeViews()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::RearrangeViews(Direction direction)
+bool vtkSMViewLayoutProxy::EqualizeViews(Direction direction)
 {
   this->ComputeSteadySplitFraction(0, direction);
   this->UpdateState();
