@@ -74,6 +74,7 @@ set(classes
   pqEditColorMapReaction
   pqEditScalarBarReaction
   pqEnableWidgetDecorator
+  pqEqualizeLayoutReaction
   pqEqualizerPropertyWidget
   pqExampleVisualizationsDialog
   pqExampleVisualizationsDialogReaction
@@ -142,7 +143,6 @@ set(classes
   pqPropertyCollectionWidget
   pqProxyGroupMenuManager
   pqReaction
-  pqRearrangeLayoutReaction
   pqReloadFilesReaction
   pqRenameProxyReaction
   pqRenderViewSelectionReaction
