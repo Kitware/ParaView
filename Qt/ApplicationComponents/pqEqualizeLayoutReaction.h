@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
-#ifndef pqRearrangeLayoutReaction_h
-#define pqRearrangeLayoutReaction_h
+#ifndef pqEqualizeLayoutReaction_h
+#define pqEqualizeLayoutReaction_h
 
 #include "pqReaction.h"
 
@@ -11,7 +11,7 @@
  * Reaction for resizing views inside the active layout.
  * Resize can occur only Vertically, Horizontally or both.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqRearrangeLayoutReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqEqualizeLayoutReaction : public pqReaction
 {
   Q_OBJECT
   using Superclass = pqReaction;
@@ -24,8 +24,8 @@ public:
     BOTH
   };
 
-  pqRearrangeLayoutReaction(Orientation orientation, QAction* parent);
-  ~pqRearrangeLayoutReaction() override = default;
+  pqEqualizeLayoutReaction(Orientation orientation, QAction* parent);
+  ~pqEqualizeLayoutReaction() override = default;
 
 protected:
   /**
@@ -34,7 +34,7 @@ protected:
   void onTriggered() override;
 
 private:
-  Q_DISABLE_COPY(pqRearrangeLayoutReaction)
+  Q_DISABLE_COPY(pqEqualizeLayoutReaction)
   const Orientation ActionOrientation = Orientation::BOTH;
 };
 

@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqViewMenuManager.h"
 
+#include "pqEqualizeLayoutReaction.h"
 #include "pqLockPanelsReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqPreviewMenuManager.h"
-#include "pqRearrangeLayoutReaction.h"
 #include "pqSetName.h"
 #include "pqTabbedMultiViewWidget.h"
 
@@ -106,22 +106,22 @@ void pqViewMenuManager::buildMenu()
   equalizeViewsHorizontallyAction->setObjectName("equalizeViewsHorizontallyAction");
   equalizeViewsHorizontallyAction->setToolTip(
     tr("Equalize layout so views are evenly sized horizontally"));
-  new pqRearrangeLayoutReaction(
-    pqRearrangeLayoutReaction::Orientation::HORIZONTAL, equalizeViewsHorizontallyAction);
+  new pqEqualizeLayoutReaction(
+    pqEqualizeLayoutReaction::Orientation::HORIZONTAL, equalizeViewsHorizontallyAction);
 
   QAction* equalizeViewsVerticallyAction = equalizeMenu->addAction(tr("Vertically"));
   equalizeViewsVerticallyAction->setObjectName("equalizeViewsVerticallyAction");
   equalizeViewsVerticallyAction->setToolTip(
     tr("Equalize layout so views are evenly sized vertically"));
-  new pqRearrangeLayoutReaction(
-    pqRearrangeLayoutReaction::Orientation::VERTICAL, equalizeViewsVerticallyAction);
+  new pqEqualizeLayoutReaction(
+    pqEqualizeLayoutReaction::Orientation::VERTICAL, equalizeViewsVerticallyAction);
 
   QAction* equalizeViewsBothAction = equalizeMenu->addAction(tr("Both"));
   equalizeViewsBothAction->setObjectName("equalizeViewsBothAction");
   equalizeViewsBothAction->setToolTip(
     tr("Equalize layout so views are evenly sized horizontally and vertically"));
-  new pqRearrangeLayoutReaction(
-    pqRearrangeLayoutReaction::Orientation::BOTH, equalizeViewsBothAction);
+  new pqEqualizeLayoutReaction(
+    pqEqualizeLayoutReaction::Orientation::BOTH, equalizeViewsBothAction);
 }
 
 //-----------------------------------------------------------------------------

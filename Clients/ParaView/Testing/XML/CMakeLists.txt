@@ -770,7 +770,7 @@ ExternalData_Expand_Arguments(ParaViewData _
 set(UndoRedo1_TIMEOUT 300)
 
 # Very long (200 seconds):
-set(RearrangeLayout_TIMEOUT 200)
+set(EqualizeLayout_TIMEOUT 200)
 
 # Somewhat long (150 seconds):
 set(ColorOpacityTableEditorHistogram_TIMEOUT 150)
