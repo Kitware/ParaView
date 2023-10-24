@@ -12,7 +12,6 @@ vtkStandardNewMacro(vtkPVClipClosedSurface);
 //-----------------------------------------------------------------------------
 vtkPVClipClosedSurface::vtkPVClipClosedSurface()
 {
-  this->InsideOut = 0;
   this->ClippingPlane = nullptr;
   this->ClippingPlanes = nullptr;
 }
