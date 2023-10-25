@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqViewMenuManager.h"
 
+#include "pqEqualizeLayoutReaction.h"
 #include "pqLockPanelsReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqPreviewMenuManager.h"
-#include "pqRearrangeLayoutReaction.h"
 #include "pqSetName.h"
 #include "pqTabbedMultiViewWidget.h"
 
@@ -101,28 +101,27 @@ void pqViewMenuManager::buildMenu()
     cannot be moved"));
   new pqLockPanelsReaction(lockDockWidgetsAction);
 
-  QMenu* reArrangeMenu = this->Menu->addMenu(tr("Rearrange Views"))
-    << pqSetName("rearrangeViewsMenu");
-  QAction* rearrangeViewsHorizontallyAction = reArrangeMenu->addAction(tr("Horizontally"));
-  rearrangeViewsHorizontallyAction->setObjectName("rearrangeViewsHorizontallyAction");
-  rearrangeViewsHorizontallyAction->setToolTip(
-    tr("Rearrange layout so views are evenly sized horizontally"));
-  new pqRearrangeLayoutReaction(
-    pqRearrangeLayoutReaction::Orientation::HORIZONTAL, rearrangeViewsHorizontallyAction);
+  QMenu* equalizeMenu = this->Menu->addMenu(tr("Equalize Views")) << pqSetName("equalizeViewsMenu");
+  QAction* equalizeViewsHorizontallyAction = equalizeMenu->addAction(tr("Horizontally"));
+  equalizeViewsHorizontallyAction->setObjectName("equalizeViewsHorizontallyAction");
+  equalizeViewsHorizontallyAction->setToolTip(
+    tr("Equalize layout so views are evenly sized horizontally"));
+  new pqEqualizeLayoutReaction(
+    pqEqualizeLayoutReaction::Orientation::HORIZONTAL, equalizeViewsHorizontallyAction);
 
-  QAction* rearrangeViewsVerticallyAction = reArrangeMenu->addAction(tr("Vertically"));
-  rearrangeViewsVerticallyAction->setObjectName("rearrangeViewsVerticallyAction");
-  rearrangeViewsVerticallyAction->setToolTip(
-    tr("Rearrange layout so views are evenly sized vertically"));
-  new pqRearrangeLayoutReaction(
-    pqRearrangeLayoutReaction::Orientation::VERTICAL, rearrangeViewsVerticallyAction);
+  QAction* equalizeViewsVerticallyAction = equalizeMenu->addAction(tr("Vertically"));
+  equalizeViewsVerticallyAction->setObjectName("equalizeViewsVerticallyAction");
+  equalizeViewsVerticallyAction->setToolTip(
+    tr("Equalize layout so views are evenly sized vertically"));
+  new pqEqualizeLayoutReaction(
+    pqEqualizeLayoutReaction::Orientation::VERTICAL, equalizeViewsVerticallyAction);
 
-  QAction* rearrangeViewsGridAction = reArrangeMenu->addAction(tr("Grid"));
-  rearrangeViewsGridAction->setObjectName("rearrangeViewsGridAction");
-  rearrangeViewsGridAction->setToolTip(
-    tr("Rearrange layout so views are evenly sized horizontally and vertically"));
-  new pqRearrangeLayoutReaction(
-    pqRearrangeLayoutReaction::Orientation::BOTH, rearrangeViewsGridAction);
+  QAction* equalizeViewsBothAction = equalizeMenu->addAction(tr("Both"));
+  equalizeViewsBothAction->setObjectName("equalizeViewsBothAction");
+  equalizeViewsBothAction->setToolTip(
+    tr("Equalize layout so views are evenly sized horizontally and vertically"));
+  new pqEqualizeLayoutReaction(
+    pqEqualizeLayoutReaction::Orientation::BOTH, equalizeViewsBothAction);
 }
 
 //-----------------------------------------------------------------------------

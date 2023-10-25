@@ -116,14 +116,14 @@ public:
   bool SetSplitFraction(int location, double fraction);
 
   /**
-   * Rearrange views so they appear evenly sized.
+   * Equalize views so they appear evenly sized.
    */
-  bool RearrangeViews();
+  bool EqualizeViews();
 
   /**
-   * Rearrange views so they appear evenly sized along direction.
+   * Equalize views so they appear evenly sized along direction.
    */
-  bool RearrangeViews(Direction direction);
+  bool EqualizeViews(Direction direction);
 
   /**
    * One can maximize a particular (non-split) cell. Note the maximized state is

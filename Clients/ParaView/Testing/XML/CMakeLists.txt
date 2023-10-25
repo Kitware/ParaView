@@ -328,6 +328,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EqualizeLayoutA.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EqualizeLayoutB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExpandSelection_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExpandSelection_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExtractCellsByType.png}"
@@ -534,8 +536,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadIOHDFWithCache2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadFLUENTCFFFormat.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutA.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RearrangeLayoutB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RectilinearVolumeRendering.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadAMReXGrid-AfterReload.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadAMReXGrid-BeforeReload.png}"
@@ -770,7 +770,7 @@ ExternalData_Expand_Arguments(ParaViewData _
 set(UndoRedo1_TIMEOUT 300)
 
 # Very long (200 seconds):
-set(RearrangeLayout_TIMEOUT 200)
+set(EqualizeLayout_TIMEOUT 200)
 
 # Somewhat long (150 seconds):
 set(ColorOpacityTableEditorHistogram_TIMEOUT 150)
@@ -899,6 +899,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   DeleteSubtreePipelineBrowser.xml
   EllipseSource.xml
   Ensemble.xml
+  EqualizeLayout.xml
   ExtractSubsetWithSeed.xml
   FastUniformGridSource.xml
   FileSeries.xml
@@ -944,7 +945,6 @@ SET (TESTS_WITH_INLINE_COMPARES
   ReadIOHDFFileSeries.xml
   ReadIOHDFWithCache.xml
   ReadFLUENTCFFFormat.xml
-  RearrangeLayout.xml
   RectilinearFractal.xml
   ReloadAMReXGrid.xml
   ReloadExodusFile.xml
