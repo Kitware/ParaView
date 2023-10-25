@@ -522,6 +522,8 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel& other, QObject* par
   // Build a pipeline model from the current server manager model.
   QList<pqPipelineSource*> sources;
   QList<pqPipelineSource*>::Iterator source;
+  QList<pqExtractor*> extractors;
+  QList<pqExtractor*>::Iterator extractor;
   QList<pqServer*> servers = other.findItems<pqServer*>();
   QList<pqServer*>::Iterator server = servers.begin();
   for (; server != servers.end(); ++server)
@@ -548,6 +550,13 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel& other, QObject* par
           this->addConnection(*source, (*source)->getConsumer(port, i), port);
         }
       }
+    }
+
+    // Set up extractors
+    extractors = other.findItems<pqExtractor*>(*server);
+    for (extractor = extractors.begin(); extractor != extractors.end(); ++extractor)
+    {
+      this->addExtractor(*extractor);
     }
   }
 }
