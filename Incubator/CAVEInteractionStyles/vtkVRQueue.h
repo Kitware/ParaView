@@ -13,9 +13,9 @@
 #include <queue>
 
 #define BUTTON_EVENT 1
-#define ANALOG_EVENT 2
+#define VALUATOR_EVENT 2
 #define TRACKER_EVENT 3
-#define VTK_ANALOG_CHANNEL_MAX 128
+#define VTK_VALUATOR_CHANNEL_MAX 128
 
 struct vtkTracker
 {
@@ -23,10 +23,10 @@ struct vtkTracker
   double matrix[16]; // The matrix with transformations applied
 };
 
-struct vtkAnalog
+struct vtkValuator
 {
-  int num_channels;                       // how many channels
-  double channel[VTK_ANALOG_CHANNEL_MAX]; // channel diliever analog values
+  int num_channels;                         // how many channels
+  double channel[VTK_VALUATOR_CHANNEL_MAX]; // channel diliever valuator values
 };
 
 struct vtkButton
@@ -37,7 +37,7 @@ struct vtkButton
 
 union vtkVREventCommonData {
   vtkTracker tracker;
-  vtkAnalog analog;
+  vtkValuator valuator;
   vtkButton button;
 };
 

@@ -1,7 +1,7 @@
 from paraview.simple import *
 from vtkmodules.vtkCommonMath import vtkMatrix4x4
 from vtkmodules.vtkCommonTransforms import vtkTransform
-from paraview.caveinteractormodules.vtkInteractionStyles import vtkSMVRPythonInteractorStyleProxy
+from paraview.incubator import vtkPVIncubatorCAVEInteractionStyles
 
 
 #
@@ -11,7 +11,7 @@ def create_interactor_style():
     ParaView depends on this method being present in your module and
     that when it is invoked, it returns an instance of the Python
     object implementing the HandleTracker, HandleButton, and
-    HandleAnalog methods.
+    HandleValuator methods.
 
     Be sure to define in your python module a method called
     "create_interactor_style()" which constructs and returns an
@@ -120,10 +120,10 @@ class CustomInteractorStyle(object):
             rvProxy.SetPropertyWithName("ModelTransformMatrix", m_elts)
             rvProxy.UpdateVTKObjects()
 
-    def HandleAnalog(self, vtkSelf, role, numChannels, channelData):
-        """Handle an analog event.
+    def HandleValuator(self, vtkSelf, role, numChannels, channelData):
+        """Handle an valuator event.
 
-        Given the analog event data in the method parameters, take
+        Given the valuator event data in the method parameters, take
         some action based on that data.
 
         Args:
@@ -134,9 +134,9 @@ class CustomInteractorStyle(object):
                 your interactor style role bindings.  Named roles
                 can be defined for the different event types in your
                 Initialize() method.
-            numChannels: The number of channels of analog data present in
+            numChannels: The number of channels of valuator data present in
                 channelData parameter (i.e. the length of the array)
-            channelData: The array of analog data values.
+            channelData: The array of valuator data values.
 
         """
-        print(f"HandleAnalog() -> number of channels: {numChannels}, role: {role}")
+        print(f"HandleValuator() -> number of channels: {numChannels}, role: {role}")

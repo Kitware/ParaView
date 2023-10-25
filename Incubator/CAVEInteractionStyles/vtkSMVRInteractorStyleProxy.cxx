@@ -56,8 +56,8 @@ void vtkSMVRInteractorStyleProxy::PrintSelf(ostream& os, vtkIndent indent)
   }
 
   vtkIndent nextIndent = indent.GetNextIndent();
-  os << indent << "Analogs:" << endl;
-  for (StringMap::const_iterator iter = this->Analogs.begin(), itEnd = this->Analogs.end();
+  os << indent << "Valuators:" << endl;
+  for (StringMap::const_iterator iter = this->Valuators.begin(), itEnd = this->Valuators.end();
        iter != itEnd; ++iter)
   {
     os << nextIndent << iter->first.c_str() << ": " << iter->second.c_str() << endl;
@@ -107,15 +107,15 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
     vtkPVXMLElement* element = child->GetNestedElement(neCount);
     if (element && element->GetName())
     {
-      if (strcmp(element->GetName(), "Analog") == 0)
+      if (strcmp(element->GetName(), "Valuator") == 0)
       {
         const char* role = element->GetAttributeOrDefault("role", nullptr);
         const char* name = element->GetAttributeOrDefault("name", nullptr);
         if (role && name && *role && *name)
         {
-          if (!this->SetAnalogName(role, name))
+          if (!this->SetValuatorName(role, name))
           {
-            vtkWarningMacro(<< "Invalid analog role: " << role);
+            vtkWarningMacro(<< "Invalid valuator role: " << role);
             result = false;
           }
         }
@@ -150,12 +150,12 @@ bool vtkSMVRInteractorStyleProxy::Configure(vtkPVXMLElement* child, vtkSMProxyLo
   }
 
   // Verify that all defined roles have named buttons:
-  for (StringMap::const_iterator iter = this->Analogs.begin(), itEnd = this->Analogs.end();
+  for (StringMap::const_iterator iter = this->Valuators.begin(), itEnd = this->Valuators.end();
        iter != itEnd; ++iter)
   {
     if (iter->second.empty())
     {
-      vtkWarningMacro(<< "Analog role not defined: " << iter->first.c_str());
+      vtkWarningMacro(<< "Valuator role not defined: " << iter->first.c_str());
       result = false;
     }
   }
@@ -235,15 +235,15 @@ vtkPVXMLElement* vtkSMVRInteractorStyleProxy::SaveConfiguration()
     child->AddAttribute("property", this->ControlledPropertyName);
   }
 
-  for (StringMap::const_iterator iter = this->Analogs.begin(), itEnd = this->Analogs.end();
+  for (StringMap::const_iterator iter = this->Valuators.begin(), itEnd = this->Valuators.end();
        iter != itEnd; ++iter)
   {
-    vtkPVXMLElement* analog = vtkPVXMLElement::New();
-    analog->SetName("Analog");
-    analog->AddAttribute("role", iter->first.c_str());
-    analog->AddAttribute("name", iter->second.c_str());
-    child->AddNestedElement(analog);
-    analog->FastDelete();
+    vtkPVXMLElement* valuator = vtkPVXMLElement::New();
+    valuator->SetName("Valuator");
+    valuator->AddAttribute("role", iter->first.c_str());
+    valuator->AddAttribute("name", iter->second.c_str());
+    child->AddNestedElement(valuator);
+    valuator->FastDelete();
   }
   for (StringMap::const_iterator iter = this->Buttons.begin(), itEnd = this->Buttons.end();
        iter != itEnd; ++iter)
@@ -281,8 +281,8 @@ bool vtkSMVRInteractorStyleProxy::Update()
 void vtkSMVRInteractorStyleProxy::HandleButton(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
-// HandleAnalog() method -- empty in the generic class
-void vtkSMVRInteractorStyleProxy::HandleAnalog(const vtkVREvent& vtkNotUsed(event)) {}
+// HandleValuator() method -- empty in the generic class
+void vtkSMVRInteractorStyleProxy::HandleValuator(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method -- empty in the generic class
@@ -314,9 +314,9 @@ std::vector<std::string> vtkSMVRInteractorStyleProxy::Tokenize(std::string input
 }
 
 // ----------------------------------------------------------------------------
-void vtkSMVRInteractorStyleProxy::AddAnalogRole(const std::string& role)
+void vtkSMVRInteractorStyleProxy::AddValuatorRole(const std::string& role)
 {
-  this->Analogs.insert(StringMap::value_type(role, std::string()));
+  this->Valuators.insert(StringMap::value_type(role, std::string()));
 }
 
 // ----------------------------------------------------------------------------
@@ -334,7 +334,7 @@ void vtkSMVRInteractorStyleProxy::AddTrackerRole(const std::string& role)
 // ----------------------------------------------------------------------------
 void vtkSMVRInteractorStyleProxy::ClearAllRoles()
 {
-  this->Analogs.clear();
+  this->Valuators.clear();
   this->Buttons.clear();
   this->Trackers.clear();
 }
@@ -393,8 +393,8 @@ bool vtkSMVRInteractorStyleProxy::HandleEvent(const vtkVREvent& event)
     case BUTTON_EVENT:
       this->HandleButton(event);
       break;
-    case ANALOG_EVENT:
-      this->HandleAnalog(event);
+    case VALUATOR_EVENT:
+      this->HandleValuator(event);
       break;
     case TRACKER_EVENT:
       this->HandleTracker(event);
@@ -404,9 +404,9 @@ bool vtkSMVRInteractorStyleProxy::HandleEvent(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-void vtkSMVRInteractorStyleProxy::GetAnalogRoles(vtkStringList* roles)
+void vtkSMVRInteractorStyleProxy::GetValuatorRoles(vtkStringList* roles)
 {
-  this->MapKeysToStringList(this->Analogs, roles);
+  this->MapKeysToStringList(this->Valuators, roles);
 }
 
 // ----------------------------------------------------------------------------
@@ -422,9 +422,9 @@ void vtkSMVRInteractorStyleProxy::GetTrackerRoles(vtkStringList* roles)
 }
 
 // ----------------------------------------------------------------------------
-int vtkSMVRInteractorStyleProxy::GetNumberOfAnalogRoles()
+int vtkSMVRInteractorStyleProxy::GetNumberOfValuatorRoles()
 {
-  return static_cast<int>(this->Analogs.size());
+  return static_cast<int>(this->Valuators.size());
 }
 
 // ----------------------------------------------------------------------------
@@ -440,9 +440,9 @@ int vtkSMVRInteractorStyleProxy::GetNumberOfTrackerRoles()
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkSMVRInteractorStyleProxy::GetAnalogRole(const std::string& name)
+std::string vtkSMVRInteractorStyleProxy::GetValuatorRole(const std::string& name)
 {
-  return this->GetKeyInMap(this->Analogs, name);
+  return this->GetKeyInMap(this->Valuators, name);
 }
 
 // ----------------------------------------------------------------------------
@@ -458,15 +458,15 @@ std::string vtkSMVRInteractorStyleProxy::GetTrackerRole(const std::string& name)
 }
 
 // ----------------------------------------------------------------------------
-bool vtkSMVRInteractorStyleProxy::SetAnalogName(const std::string& role, const std::string& name)
+bool vtkSMVRInteractorStyleProxy::SetValuatorName(const std::string& role, const std::string& name)
 {
-  return this->SetValueInMap(this->Analogs, role, name);
+  return this->SetValueInMap(this->Valuators, role, name);
 }
 
 // ----------------------------------------------------------------------------
-std::string vtkSMVRInteractorStyleProxy::GetAnalogName(const std::string& role)
+std::string vtkSMVRInteractorStyleProxy::GetValuatorName(const std::string& role)
 {
-  return this->GetValueInMap(this->Analogs, role);
+  return this->GetValueInMap(this->Valuators, role);
 }
 
 // ----------------------------------------------------------------------------

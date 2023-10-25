@@ -52,26 +52,26 @@ public:
 
   // Description:
   // Get a list of defined roles for each output type.
-  void GetAnalogRoles(vtkStringList*);
+  void GetValuatorRoles(vtkStringList*);
   void GetButtonRoles(vtkStringList*);
   void GetTrackerRoles(vtkStringList*);
 
   // Description:
   // Get the number of roles defined for each output type.
-  int GetNumberOfAnalogRoles();
+  int GetNumberOfValuatorRoles();
   int GetNumberOfButtonRoles();
   int GetNumberOfTrackerRoles();
 
   // Description:
   // Get the role of the input with the given name. If the name is not
   // set or recognized, an empty string is returned.
-  std::string GetAnalogRole(const std::string& name);
+  std::string GetValuatorRole(const std::string& name);
   std::string GetButtonRole(const std::string& name);
   std::string GetTrackerRole(const std::string& name);
 
   // Description:
   // Add a new input role to the interactor style.
-  void AddAnalogRole(const std::string& role);
+  void AddValuatorRole(const std::string& role);
   void AddButtonRole(const std::string& role);
   void AddTrackerRole(const std::string& role);
 
@@ -79,8 +79,8 @@ public:
 
   // Description:
   // Set/Get the name of the input that fulfills the specified role.
-  bool SetAnalogName(const std::string& role, const std::string& name);
-  std::string GetAnalogName(const std::string& role);
+  bool SetValuatorName(const std::string& role, const std::string& name);
+  std::string GetValuatorName(const std::string& role);
   bool SetButtonName(const std::string& role, const std::string& name);
   std::string GetButtonName(const std::string& role);
   bool SetTrackerName(const std::string& role, const std::string& name);
@@ -102,7 +102,7 @@ protected:
   virtual ~vtkSMVRInteractorStyleProxy();
 
   virtual void HandleButton(const vtkVREvent& event);
-  virtual void HandleAnalog(const vtkVREvent& event);
+  virtual void HandleValuator(const vtkVREvent& event);
   virtual void HandleTracker(const vtkVREvent& event);
 
   static std::vector<std::string> Tokenize(std::string input);
@@ -111,7 +111,7 @@ protected:
   char* ControlledPropertyName;
 
   typedef std::map<std::string, std::string> StringMap;
-  StringMap Analogs;
+  StringMap Valuators;
   StringMap Buttons;
   StringMap Trackers;
   void MapKeysToStringList(const StringMap& source, vtkStringList* target);

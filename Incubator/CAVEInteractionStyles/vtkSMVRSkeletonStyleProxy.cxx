@@ -31,7 +31,7 @@ vtkSMVRSkeletonStyleProxy::vtkSMVRSkeletonStyleProxy()
 {
   this->AddButtonRole("Rotate Tracker");
   this->AddButtonRole("Report Self");
-  this->AddAnalogRole("X");
+  this->AddValuatorRole("X");
   this->AddTrackerRole("Tracker");
   this->EnableReport = false;
 
@@ -84,15 +84,15 @@ void vtkSMVRSkeletonStyleProxy::HandleButton(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-// HandleAnalog() method
-void vtkSMVRSkeletonStyleProxy::HandleAnalog(const vtkVREvent& event)
+// HandleValuator() method
+void vtkSMVRSkeletonStyleProxy::HandleValuator(const vtkVREvent& event)
 {
-  std::string role = this->GetAnalogRole(event.name);
+  std::string role = this->GetValuatorRole(event.name);
 
   if (role == "X")
   {
-    cout << "Got a value for 'X' of " << event.data.analog.num_channels << " : "
-         << event.data.analog.channel[0] << " " << event.data.analog.channel[1] << "\n";
+    cout << "Got a value for 'X' of " << event.data.valuator.num_channels << " : "
+         << event.data.valuator.channel[0] << " " << event.data.valuator.channel[1] << "\n";
   }
 }
 

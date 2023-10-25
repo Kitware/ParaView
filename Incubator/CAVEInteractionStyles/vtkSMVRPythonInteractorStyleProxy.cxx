@@ -236,17 +236,17 @@ void vtkSMVRPythonInteractorStyleProxy::InvokeHandler(const char* mname, const v
           vtkself.GetPointer(), pyrole.GetPointer(), pysensor.GetPointer(), pymatrix, nullptr));
     }
     break;
-    case ANALOG_EVENT:
+    case VALUATOR_EVENT:
     {
-      role = this->GetAnalogRole(event.name);
+      role = this->GetValuatorRole(event.name);
       Py_ssize_t i = 0;
-      unsigned int numElements = event.data.analog.num_channels, j = 0;
+      unsigned int numElements = event.data.valuator.num_channels, j = 0;
       vtkSmartPyObject pyrole(PyUnicode_FromString(role.c_str()));
-      vtkSmartPyObject pynumchan(PyLong_FromLong(event.data.analog.num_channels));
+      vtkSmartPyObject pynumchan(PyLong_FromLong(event.data.valuator.num_channels));
       PyObject* pychannels = PyList_New(numElements);
       for (; j < numElements; ++i, ++j)
       {
-        PyList_SetItem(pychannels, i, PyFloat_FromDouble(event.data.analog.channel[j]));
+        PyList_SetItem(pychannels, i, PyFloat_FromDouble(event.data.valuator.channel[j]));
       }
       vtkSmartPyObject retVal(
         PyObject_CallMethodObjArgs(this->Internals->PythonObject.GetPointer(), fname.GetPointer(),
@@ -284,12 +284,12 @@ void vtkSMVRPythonInteractorStyleProxy::HandleTracker(const vtkVREvent& event)
 }
 
 // ----------------------------------------------------------------------------
-void vtkSMVRPythonInteractorStyleProxy::HandleAnalog(const vtkVREvent& event)
+void vtkSMVRPythonInteractorStyleProxy::HandleValuator(const vtkVREvent& event)
 {
 #if vtkSMVRPythonInteractorStyleProxy_WITH_PYTHON
-  this->InvokeHandler("HandleAnalog", event);
+  this->InvokeHandler("HandleValuator", event);
 #else
-  this->Superclass::HandleAnalog(event);
+  this->Superclass::HandleValuator(event);
 #endif
 }
 

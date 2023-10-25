@@ -92,7 +92,7 @@ pqVRPNConnection::pqVRPNConnection(QObject* parentObject)
   this->Name = "";
   this->Type = "VRPN";
   this->TrackerPresent = false;
-  this->AnalogPresent = false;
+  this->ValuatorPresent = false;
   this->ButtonPresent = false;
   this->TrackerTransformPresent = false;
   this->Transformation = vtkMatrix4x4::New();
@@ -115,12 +115,12 @@ void pqVRPNConnection::addButton(std::string id, std::string name)
 }
 
 // ----------------------------------------------------------------------public
-void pqVRPNConnection::addAnalog(std::string id, std::string name)
+void pqVRPNConnection::addValuator(std::string id, std::string name)
 {
   std::stringstream returnStr;
-  returnStr << "analog." << id;
-  this->AnalogMapping[returnStr.str()] = name;
-  this->AnalogPresent = true;
+  returnStr << "valuator." << id;
+  this->ValuatorMapping[returnStr.str()] = name;
+  this->ValuatorPresent = true;
 }
 
 // ----------------------------------------------------------------------public
@@ -211,13 +211,13 @@ void pqVRPNConnection::newAnalogValue(vrpn_ANALOGCB data)
 {
   vtkVREvent event;
   event.connId = this->Address;
-  event.name = name(ANALOG_EVENT);
-  event.eventType = ANALOG_EVENT;
+  event.name = name(VALUATOR_EVENT);
+  event.eventType = VALUATOR_EVENT;
   event.timeStamp = QDateTime::currentDateTime().toTime_t();
-  event.data.analog.num_channels = data.num_channel;
+  event.data.valuator.num_channels = data.num_channel;
   for (int i = 0; i < data.num_channel; ++i)
   {
-    event.data.analog.channel[i] = data.channel[i];
+    event.data.valuator.channel[i] = data.channel[i];
   }
   this->EventQueue->Enqueue(event);
 }
@@ -350,10 +350,10 @@ std::string pqVRPNConnection::name(int eventType, int id)
     returnStr << this->Address << ".";
   switch (eventType)
   {
-    case ANALOG_EVENT:
-      eventStr << "analog." << id;
-      if (this->AnalogMapping.find(eventStr.str()) != this->AnalogMapping.end())
-        returnStr << this->AnalogMapping[eventStr.str()];
+    case VALUATOR_EVENT:
+      eventStr << "valuator." << id;
+      if (this->ValuatorMapping.find(eventStr.str()) != this->ValuatorMapping.end())
+        returnStr << this->ValuatorMapping[eventStr.str()];
       else
         returnStr << eventStr.str();
       break;
@@ -407,9 +407,9 @@ bool pqVRPNConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
         {
           this->addButton(id, name);
         }
-        else if (strcmp(nestedElement->GetName(), "Analog") == 0)
+        else if (strcmp(nestedElement->GetName(), "Valuator") == 0)
         {
-          this->addAnalog(id, name);
+          this->addValuator(id, name);
         }
         else if (strcmp(nestedElement->GetName(), "Tracker") == 0)
         {
@@ -449,7 +449,7 @@ vtkPVXMLElement* pqVRPNConnection::saveConfiguration() const
   child->AddAttribute("name", this->Name.c_str());
   child->AddAttribute("address", this->Address.c_str());
   saveButtonEventConfig(child);
-  saveAnalogEventConfig(child);
+  saveValuatorEventConfig(child);
   saveTrackerEventConfig(child);
   saveTrackerTransformationConfig(child);
   return child;
@@ -488,12 +488,12 @@ void pqVRPNConnection::saveButtonEventConfig(vtkPVXMLElement* child) const
 }
 
 // ----------------------------------------------------------------------public
-void pqVRPNConnection::saveAnalogEventConfig(vtkPVXMLElement* child) const
+void pqVRPNConnection::saveValuatorEventConfig(vtkPVXMLElement* child) const
 {
-  if (!this->AnalogPresent)
+  if (!this->ValuatorPresent)
     return;
-  for (std::map<std::string, std::string>::const_iterator iter = this->AnalogMapping.begin();
-       iter != this->AnalogMapping.end(); ++iter)
+  for (std::map<std::string, std::string>::const_iterator iter = this->ValuatorMapping.begin();
+       iter != this->ValuatorMapping.end(); ++iter)
   {
     std::string key = iter->first;
     std::string value = iter->second;
@@ -508,9 +508,9 @@ void pqVRPNConnection::saveAnalogEventConfig(vtkPVXMLElement* child) const
       token.push_back(word);
     }
     vtkPVXMLElement* element = vtkPVXMLElement::New();
-    if (strcmp(token[0].c_str(), "analog") == 0)
+    if (strcmp(token[0].c_str(), "valuator") == 0)
     {
-      element->SetName("Analog");
+      element->SetName("Valuator");
       element->AddAttribute("id", token[1].c_str());
       element->AddAttribute("name", value.c_str());
     }

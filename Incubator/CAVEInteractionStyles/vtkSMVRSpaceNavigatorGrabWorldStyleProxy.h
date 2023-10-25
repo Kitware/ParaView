@@ -27,7 +27,7 @@ protected:
   vtkSMVRSpaceNavigatorGrabWorldStyleProxy();
   ~vtkSMVRSpaceNavigatorGrabWorldStyleProxy() override;
 
-  void HandleAnalog(const vtkVREvent& event) override;
+  void HandleValuator(const vtkVREvent& event) override;
 
 private:
   vtkSMVRSpaceNavigatorGrabWorldStyleProxy(
