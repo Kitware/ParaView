@@ -42,9 +42,15 @@
                        FLUENTCFFReader creates an unstructured grid dataset. It
                        reads .cas.h5 and .dat.h5 files stored in FLUENT CFF format.
                        </Documentation>
+        <StringVectorProperty command="GetCurrentFileName"
+                              information_only="1"
+                              name="FileNameInfo">
+          <SimpleStringInformationHelper />
+        </StringVectorProperty>
         <StringVectorProperty animateable="0"
                               clean_command="RemoveAllFileNames"
                               command="AddFileName"
+                              information_property="FileNameInfo"
                               name="FileName"
                               number_of_elements="1"
                               panel_visibility="never"
