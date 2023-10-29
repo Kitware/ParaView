@@ -1460,7 +1460,7 @@
           and summed on each point.
           Default values are only example values, that would make sense
           for a dataset of geometrical bounds [-10,10,-10,10,-10,10] and
-          time values ranging from [0;2*Pi[.
+          time values greater than or equal to 0 and less than 2*Pi.
         </Documentation>
         <Hints>
           <AllowRestoreDefaults />
