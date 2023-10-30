@@ -63,6 +63,7 @@ set(classes
   pqFindDataSelectionDisplayFrame
   pqSpreadSheetColumnsVisibility
   pqHighlightItemDelegate
+  pqIconBrowser
   pqImageTip
   pqIndexSelectionWidget
   pqInputSelectorWidget
@@ -195,6 +196,7 @@ set(ui_files
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqHelpWindow.ui
+  Resources/UI/pqIconBrowser.ui
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
