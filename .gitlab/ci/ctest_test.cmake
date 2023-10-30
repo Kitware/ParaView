@@ -22,6 +22,8 @@ set(test_exclusions)
 list(APPEND test_exclusions
   # see paraview/paraview#21440
   "\\.TraceExodus$"
+  # see https://gitlab.kitware.com/paraview/paraview/-/issues/22349
+  "\\.SplitViewTrace$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
