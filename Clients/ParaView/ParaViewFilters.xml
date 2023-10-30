@@ -21,7 +21,7 @@
     <Proxy group="filters" name="MinkowskiFilter" />
     <Proxy group="filters" name="PMergeConnected" />
   </Category>
-  <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1" hide_for_tests="1">
+  <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1">
     <Proxy group="filters" name="Calculator" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLine" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLineCustom" omit_from_toolbar="1" />

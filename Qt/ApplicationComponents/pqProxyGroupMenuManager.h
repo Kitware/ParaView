@@ -92,7 +92,9 @@ public:
   /**
    * Returns whether or not the category's toolbar should be hidden initially.
    */
-  bool hideForTests(const QString& category) const;
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "This was mostly unused. Also it is better to avoid test-dedicated code paths.")
+  bool hideForTests(const QString&) const { return false; };
 
   /**
    * Attach an observer to proxy manager to monitor any proxy definition update

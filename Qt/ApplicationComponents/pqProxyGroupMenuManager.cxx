@@ -752,18 +752,6 @@ QList<QAction*> pqProxyGroupMenuManager::actions() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqProxyGroupMenuManager::hideForTests(const QString& category) const
-{
-  pqInternal::CategoryInfoMap::iterator categoryIter = this->Internal->Categories.find(category);
-  if (categoryIter == this->Internal->Categories.end() ||
-    (categoryIter.value().ShowInToolbar && !categoryIter.value().HideForTests))
-  {
-    return false;
-  }
-  return true;
-}
-
-//-----------------------------------------------------------------------------
 vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
 {
   if (!action)

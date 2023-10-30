@@ -5,9 +5,12 @@
 #define pqCategoryToolbarsBehavior_h
 
 #include "pqApplicationComponentsModule.h"
+
 #include <QList>
 #include <QObject>
 #include <QPointer>
+
+#include "vtkParaViewDeprecation.h" // for deprecation macro
 
 class pqProxyGroupMenuManager;
 class QMainWindow;
@@ -42,7 +45,9 @@ protected Q_SLOTS:
    * can be hidden before each test starts (to prevent small test-image differences
    * due to layout differences between machines).
    */
-  void prepareForTest();
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "This was mostly unused. Also it is better to avoid test-dedicated code paths.")
+  void prepareForTest(){};
 
 private:
   Q_DISABLE_COPY(pqCategoryToolbarsBehavior)

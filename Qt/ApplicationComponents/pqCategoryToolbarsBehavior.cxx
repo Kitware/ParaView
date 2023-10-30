@@ -7,13 +7,11 @@
 #include "pqEventDispatcher.h"
 #include "pqEventTranslator.h"
 #include "pqProxyGroupMenuManager.h"
-#include "pqTestUtility.h"
 
 #include <QMainWindow>
 #include <QToolBar>
 
 #include <cassert>
-#include <iostream>
 
 //-----------------------------------------------------------------------------
 pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
@@ -25,20 +23,6 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
 
   this->MainWindow = mainWindow;
   this->MenuManager = menuManager;
-
-  // When tests start, hide toolbars that have asked to be off by default.
-  // Do the same when starting to record events for a test.
-  pqTestUtility* testUtil = pqApplicationCore::instance()->testUtility();
-  pqEventDispatcher* testPlayer = testUtil ? testUtil->dispatcher() : nullptr;
-  pqEventTranslator* testRecorder = testUtil ? testUtil->eventTranslator() : nullptr;
-  if (testPlayer)
-  {
-    QObject::connect(testPlayer, SIGNAL(restarted()), this, SLOT(prepareForTest()));
-  }
-  if (testRecorder)
-  {
-    QObject::connect(testRecorder, SIGNAL(started()), this, SLOT(prepareForTest()));
-  }
 
   QObject::connect(menuManager, SIGNAL(menuPopulated()), this, SLOT(updateToolbars()));
   this->updateToolbars();
@@ -78,17 +62,6 @@ void pqCategoryToolbarsBehavior::updateToolbars()
         continue;
       }
       toolbar->addAction(toolbarActions[cc]);
-    }
-  }
-}
-
-void pqCategoryToolbarsBehavior::prepareForTest()
-{
-  for (QAction* toolbar : this->ToolbarsToHide)
-  {
-    if (toolbar && toolbar->isChecked())
-    {
-      toolbar->trigger();
     }
   }
 }
