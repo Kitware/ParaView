@@ -1184,7 +1184,7 @@ int classUsesStdString(ClassInfo* data)
 /* print the parsed structures */
 int main(int argc, char* argv[])
 {
-  OptionInfo* options;
+  const OptionInfo* options;
   FileInfo* fileInfo;
   ClassInfo* data;
   NamespaceInfo* ns;
