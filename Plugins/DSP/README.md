@@ -1,30 +1,51 @@
 # Digital Signal Processing for Paraview
 
 This plugin aims to bring basic digital signal processing and audio preview to ParaView.
-It offers a few new filters and a new dock panel.
+It provides a few filters, a view and a new dock panel.
 
 ## General ideas and usage
 
 VTK pipeline and data model do not offer a very efficient way of accessing and processing temporal data on a mesh.
-This is why most of the filters works on a multi-block dataset of several tables. The idea is that for a given mesh
-with `n` points and `t` timesteps we create a multi-block with `n` tables inside, and each of these tables contains
-`t` rows. A column of a table represents a point attribute of the input mesh. It is possible to create such a
-structure in ParaView using the `Plot Data Over Time` filter on a temporal dataset, with the option
-`Only Report Selection Statistics` turned off.
+This plugin introduce a data model to be able to process such data through spatial and temporal dimensions.
 
-**DISCLAIMER** : The current implementation of the filters in this plugin, as described above, does not
-work in with multiple processes. That also means that these filters do not scale well for very large datasets.
-Please use the `Extract Selection` and `Extract Timesteps` filters in order to reduce the range of your
-study when needed, and only use a single `pvserver` MPI process. A rework of the architecture is needed in order
-to improve the scalability of these filters.
+The idea is that for a given mesh with `n` points and `t` timesteps we create a structure of arrays
+with `n` tables inside, and each of these tables contains `t` rows. A column of a table represents a point attribute of the input mesh.
 
-## New filters
+This plugin supports two ways to generate such a structure, either using multidimensional arrays thanks to the `TemporalMultiplexer` filter,
+or using a multiblock of tables using the `PlotDataOverTime` filter.
+
+Multidimensional arrays are the preferred structure as they are efficient and support distributed computing.
+In that case, a single Table is generated and each array correspond to a data on the input mesh, with `t` rows for each timestep and a
+hidden dimension of size `n` for the points.
+Please note some processing require specific care and the spatial dimension is hidden in ParaView. To create such a structure, just use the `TemporalMultiplexer` on a temporal dataset.
+
+Multiblock is the legacy structure, while perfectly integrated in ParaView, it is very inefficient with a high number of points and does not support
+distributed computing. In that case, each table block of the multiblock correspond to the data of a point, then the table simply contains all arrays for the point
+on `t` rows for the timesteps. To create such a structure in ParaView, using the `Plot Data Over Time` filter on a temporal dataset,
+with the option `Only Report Selection Statistics` turned off.
+
+## Filters
+
+### Temporal multiplexer
+
+This filter extract the data arrays on all timesteps and all points, storing it in multidimensional arrays, where
+the points are in the hidden dimension and the timesteps are the rows of the array.
+
+### Multidimensions browser
+
+This filter gives access to the hidden dimension and extracts the table corresponding to a single point.
+
+### Band filtering
+
+This filter performs a band filtering operation in frequency space. It takes as input a table with at least a column for a specific quantity and an optional time array. It’s possible to pick a custom band or choose between octave and third octave band. The output is a table with the mean of this quantity (in the original unit or in decibels) for each frequency defined in the frequency column (in Hz). 
 
 ### Mean Power Spectral Density
 
 This filter computes the mean power spectral density (PSD) of temporal signals.
-The input should be a multiblock dataset of vtkTables where each block
-represents a point. Each row of the tables corresponds to a timestep.
+
+### DSP Table FFT
+
+A Fast Fourier Transform (FFT) filter dedicated to compute FFT on the output of the Temporal multiplexer. It has the same arguments as the usual Table FFT filter. Similarly to the Temporal Multiplexer, it outputs a table of multi dimensional arrays where the hidden dimension is still related to the spatial discretization and the tuple dimension represents the discretization of frequency space.
 
 ### Sound Quantities Calculator
 
@@ -43,7 +64,7 @@ it i.e. the mean pressure, the RMS pressure and the acoustic power.
 
 ### Spectrogram
 
-This filter computes the spectrogram of the input vtkTable column.
+This filter computes the spectrogram of the input.
 The output is a vtkImageData where the X and Y axes correspond to time and
 frequency, respectively.
 The spectrogram is computed by applying a FFT on temporal windows each containing
@@ -52,14 +73,17 @@ time resolution and window type properties, respectively.
 
 ### Project Spectrum Magnitude
 
-This filter computes the magnitudes of a column from a multi block
-of tables (input) and places them on the points of a given mesh (source) for
+This filter computes the spectrum magnitudes of the selected arrays and places them on the points of a given mesh (source) for
 a specified frequency range.
 
 ### Merge Reduce Table Blocks
 
 This filter performs reduction operations such as the mean or the sum over columns
-across all blocks of a multiblock of vtkTables.
+across all blocks of the structure.
+
+## ImageChart View
+
+A new type of view dedicated to displaying 2D image data in a chart context. It can be used with  the Spectrogram filter output. It comes with the same customization options as many other charts, such as axis properties, custom labels, etc. It also allows easier data inspection with axis annotations and tooltips.
 
 ## Audio Player Panel
 
@@ -85,7 +109,7 @@ And a part of the resulting output :
 
 ## Acknowledgement
 
-This work is funded by the CALM-AA European project (cofunded by the European fund for
+This work has been funded by the CALM-AA European project (cofunded by the European fund for
 regional development)
 
 ![Acknowledgement](Documentation/acknowledgement.png "Acknowledgement")
