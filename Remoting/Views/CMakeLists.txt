@@ -233,7 +233,11 @@ vtk_module_add_module(ParaView::RemotingViews
   CLASSES ${classes}
   HEADERS ${headers}
   SOURCES ${vtk_object_factory_source} ${sources}
-  PRIVATE_HEADERS ${vtk_object_factory_header} ${private_headers})
+  PRIVATE_HEADERS ${vtk_object_factory_header} ${private_headers}
+  # This is code generated from ColorMaps.json. Exclude until issue 22351 is fixed.
+  SPDX_SKIP_REGEX "vtkSMTransferFunctionPresetsBuiltin"
+)
+  
 
 paraview_add_server_manager_xmls(
   XMLS Resources/2dwidgets_remotingviews.xml
