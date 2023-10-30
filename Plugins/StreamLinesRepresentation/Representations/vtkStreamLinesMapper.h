@@ -92,7 +92,7 @@ public:
    * on a specific rendering pass.
    */
   bool HasOpaqueGeometry() override { return true; }
-  bool HasTranslucentPolygonalGeometry() override { return false; }
+  bool HasTranslucentPolygonalGeometry() override { return true; }
   ///@}
 
   /**
