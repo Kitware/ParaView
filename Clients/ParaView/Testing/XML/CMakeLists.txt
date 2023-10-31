@@ -1336,6 +1336,7 @@ list(APPEND TESTS_WITH_BASELINES
   ReadPIOWithHTG.xml
   ReadXMLPolyDataFileSeries.xml
   RecentFiles.xml
+  RecentFilesHardFilename.xml
   RectilinearVolumeRendering.xml
   RedistributeDataSetFilter.xml
   RepresentationSelector.xml
@@ -2210,6 +2211,13 @@ set (glTFReaderMultipleScenes_DISABLE_CS TRUE)
 set (glTFReaderMultipleScenes_DISABLE_CRS TRUE)
 set (glTFReaderMultipleAnimations_DISABLE_CS TRUE)
 set (glTFReaderMultipleAnimations_DISABLE_CRS TRUE)
+
+# pvd writer/reader has issues creating directories or filenames with punctuation
+# https://gitlab.kitware.com/paraview/paraview/-/issues/22361
+if (NOT APPLE)
+  set (RecentFilesHardFilename_DISABLE_CS TRUE)
+  set (RecentFilesHardFilename_DISABLE_CRS TRUE)
+endif()
 
 set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml

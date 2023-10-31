@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Geometric Shapes" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Geometric Shapes" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/GeometricShapes" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
+  <!-- Legal punctuation on win32. Should include ";" but testing framework can't handle it -->
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/nametest `~!@ #$%^ (){}[] _-=+ ,. stuff.vtp" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
+
+  <!-- Have to open and delete it to put something in Recent Files. -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/nametest `~!@ #$%^ (){}[] _-=+ ,. stuff.vtp" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
+
+  <!-- down down right down enter to select the last recent files entry -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="keyEvent" arguments="6:16777237:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="keyEvent" arguments="7:16777237:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="keyEvent" arguments="6:16777237:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="keyEvent" arguments="7:16777237:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="keyEvent" arguments="6:16777236:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="keyEvent" arguments="7:16777236:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="6:16777237:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="7:16777237:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="6:16777220:0:1:0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File/menuRecentFiles" command="keyEvent" arguments="7:16777220:0:1:0:1" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+</pqevents>
