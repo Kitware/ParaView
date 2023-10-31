@@ -12,6 +12,11 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     "in parameter the ParaView source directory.")
 endif ()
 
+# Set behavior for ninja DEPFILE usage in VTK
+if (POLICY CMP0116)
+  cmake_policy(SET CMP0116 NEW)
+endif()
+
 #------------------------------------------------------------------------------
 # Set a default build type if none was specified
 get_property(generator_is_multi_config GLOBAL

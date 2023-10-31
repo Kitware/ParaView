@@ -334,7 +334,7 @@ void vtkPointGaussianRepresentation::SetCustomTriangleScale(double scale)
   this->PresetShaderScales[vtkPointGaussianRepresentation::CUSTOM] = scale;
   if (this->SelectedPreset == vtkPointGaussianRepresentation::CUSTOM)
   {
-    this->Mapper->SetTriangleScale(this->PresetShaderScales[this->SelectedPreset]);
+    this->Mapper->SetBoundScale(this->PresetShaderScales[this->SelectedPreset]);
   }
 }
 
@@ -345,7 +345,7 @@ void vtkPointGaussianRepresentation::SelectShaderPreset(int preset)
   {
     this->SelectedPreset = preset;
     this->Mapper->SetSplatShaderCode(this->PresetShaderStrings[preset].c_str());
-    this->Mapper->SetTriangleScale(this->PresetShaderScales[preset]);
+    this->Mapper->SetBoundScale(this->PresetShaderScales[preset]);
   }
 }
 
