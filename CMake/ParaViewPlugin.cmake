@@ -1278,6 +1278,12 @@ function (paraview_add_plugin name)
       PATTERNS          "*.html" "*.css" "*.png" "*.jpg" "*.js"
                         ${_paraview_add_plugin_DOCUMENTATION_ADD_PATTERNS})
 
+    set(_paraview_add_plugin_depends_args)
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+      list(APPEND _paraview_add_plugin_depends_args
+        DEPENDS_EXPLICIT_ONLY)
+    endif ()
+
     list(APPEND _paraview_add_plugin_extra_include_dirs
       "${CMAKE_CURRENT_BINARY_DIR}")
     set(_paraview_add_plugin_qch_output
@@ -1297,7 +1303,8 @@ function (paraview_add_plugin name)
       DEPENDS "${_paraview_build_plugin_qch_path}"
               "${_paraview_build_plugin}_qch"
               "$<TARGET_FILE:ParaView::ProcessXML>"
-      COMMENT "Generating header for ${_paraview_build_plugin} documentation")
+      COMMENT "Generating header for ${_paraview_build_plugin} documentation"
+      ${_paraview_add_plugin_depends_args})
     set_property(SOURCE "${_paraview_add_plugin_qch_output}"
       PROPERTY
         SKIP_AUTOMOC 1)
@@ -1444,6 +1451,13 @@ function (paraview_add_plugin name)
         "WrappedPython_${_paraview_build_plugin}_${_paraview_add_plugin_python_module_mangled}.h")
       set(_paraview_add_plugin_python_header
         "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_add_plugin_python_header_name}")
+
+      set(_paraview_add_plugin_python_depends_args)
+      if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+        list(APPEND _paraview_add_plugin_python_depends_args
+          DEPENDS_EXPLICIT_ONLY)
+      endif ()
+
       add_custom_command(
         OUTPUT  "${_paraview_add_plugin_python_header}"
         COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
@@ -1455,7 +1469,8 @@ function (paraview_add_plugin name)
                 "${_paraview_add_plugin_python_path}"
         DEPENDS "${_paraview_add_plugin_python_path}"
                 "$<TARGET_FILE:ParaView::ProcessXML>"
-        COMMENT "Convert Python module ${_paraview_add_plugin_python_module_name} for ${_paraview_build_plugin}")
+        COMMENT "Convert Python module ${_paraview_add_plugin_python_module_name} for ${_paraview_build_plugin}"
+        ${_paraview_add_plugin_python_depends_args})
 
       list(APPEND _paraview_add_plugin_python_sources
         "${_paraview_add_plugin_python_header}")
