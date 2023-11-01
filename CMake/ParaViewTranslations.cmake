@@ -41,8 +41,8 @@ function(paraview_generate_translation_header)
   endif ()
   find_package(Python3 QUIET REQUIRED COMPONENTS Interpreter)
   add_custom_command(
-    OUTPUT ${_pv_generate_tr_h_RESULT_FILE}
-    DEPENDS "${_pv_generate_tr_h_INPUT_FILES}"
+    OUTPUT  "${_pv_generate_tr_h_RESULT_FILE}"
+    DEPENDS ${_pv_generate_tr_h_INPUT_FILES}
     COMMAND "$<TARGET_FILE:Python3::Interpreter>"
             "${_ParaViewTranslations_cmake_dir}/XML_translations_header_generator.py"
             -o "${_pv_generate_tr_h_RESULT_FILE}"
