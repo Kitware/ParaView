@@ -282,7 +282,7 @@ function (paraview_server_manager_process_files)
             "$<TARGET_FILE:ParaView::ProcessXML>"
             "${_paraview_sm_process_files_response_file}"
     COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-            $<TARGET_FILE:ParaView::ProcessXML>
+            "$<TARGET_FILE:ParaView::ProcessXML>"
             "${_paraview_sm_process_files_output}"
             "${_paraview_sm_process_files_TARGET}"
             "Interface"

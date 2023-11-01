@@ -105,7 +105,8 @@ function(paraview_create_translation)
     "${_pv_create_tr_pro_file}")
   add_custom_command(
     OUTPUT  "${_pv_create_tr_OUTPUT_TS}"
-    COMMAND "$<TARGET_FILE:Qt${PARAVIEW_QT_MAJOR_VERSION}::lupdate>" ${_pv_create_tr_pro_file}
+    COMMAND "$<TARGET_FILE:Qt${PARAVIEW_QT_MAJOR_VERSION}::lupdate>"
+            "${_pv_create_tr_pro_file}"
     DEPENDS ${_pv_create_tr_files})
   add_custom_target("${_pv_create_tr_TARGET}"
     DEPENDS "${_pv_create_tr_OUTPUT_TS}")

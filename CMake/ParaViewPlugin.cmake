@@ -1287,7 +1287,7 @@ function (paraview_add_plugin name)
     add_custom_command(
       OUTPUT "${_paraview_add_plugin_qch_output}"
       COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-              $<TARGET_FILE:ParaView::ProcessXML>
+              "$<TARGET_FILE:ParaView::ProcessXML>"
               -base64
               "${_paraview_add_plugin_qch_output}"
               \"\"
@@ -1447,7 +1447,7 @@ function (paraview_add_plugin name)
       add_custom_command(
         OUTPUT  "${_paraview_add_plugin_python_header}"
         COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-                $<TARGET_FILE:ParaView::ProcessXML>
+                "$<TARGET_FILE:ParaView::ProcessXML>"
                 "${_paraview_add_plugin_python_header}"
                 "module_${_paraview_add_plugin_python_module_mangled}_"
                 "_string"
