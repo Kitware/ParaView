@@ -539,6 +539,19 @@ The **Clean To Grid** filter now supports a new option, **Remove Point Without C
 In case of a hyper tree grid input, the **Contour** filter now exposes the **HTG Strategy 3D** property. It forwards the property to the internal contour filter for hyper tree grids. This property allows better results in the 3D case but is significantly more time consuming.
 
 
+## **Threshold** component modes
+
+You can now apply the **Threshold** filter on multi-component arrays. When doing so, it is possible to change how the components are handled. You can choose one of the supported **Component Mode** values:
+
+* **Selected**: the Selected Component needs to satisfy the threshold
+* **All**: all components need to satisfy the threshold
+* **Any**: any component needs to satisfy the threshold
+
+When using the Selected mode, you can either select a specific component, or even the magnitude of the components.
+
+Note that multi-components arrays options are not available with hyper tree grid inputs.
+
+
 ## Memory strategies for **Threshold** filter with hyper tree grid input
 
 Using memory strategies, you can now choose how to describe the output of the **Threshold** filter when its input is a hyper tree grid. This drop down list of options determines how the output hyper tree grid output is represented in memory:
@@ -1021,9 +1034,21 @@ pythonpath entry: /path/to/some/site-packages
 ```
 
 
-## Python state save animation
+## Python state saving improvements
+
+### Python state save animation
 
 Python state now saves the animation state as well, which includes the current animation time but also all the scene properties and even the different animation tracks and keyframes.
+
+### Python state save extract selection
+
+Python state now contains the **Extract Selection** filter.
+
+You can also generate selections in Python scripts that will not appear in the pipeline. Such selections will appear in the state as in this example:
+
+```py
+idSelection = CreateSelection(proxyname='IDSelectionSource', registrationName='selection_sources.1', IDs=[0, 7628])
+```
 
 
 ## Python Trace default verbosity
@@ -1107,6 +1132,10 @@ Connecting to a Paraview server with raytracing enabled used to be slow because 
 ## osmesa static binaries
 
 The official ParaView binaries built with OSMesa using static binaries no longer contains the TTK plugins. This is due to the size of the TTK plugin against a static ParaView coming in around 1.6GB.
+
+## ADIOS2 VTX reader supports non-MPI builds
+
+The ADIOS2 VTX reader can now be built with or without MPI enabled.
 
 
 # Catalyst
