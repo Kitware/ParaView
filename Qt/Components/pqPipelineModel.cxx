@@ -557,6 +557,11 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel& other, QObject* par
     for (extractor = extractors.begin(); extractor != extractors.end(); ++extractor)
     {
       this->addExtractor(*extractor);
+      auto port = qobject_cast<pqOutputPort*>((*extractor)->producer());
+      if (port && (*extractor)->isDataExtractor())
+      {
+        this->addConnection(port->getSource(), *extractor);
+      }
     }
   }
 }
