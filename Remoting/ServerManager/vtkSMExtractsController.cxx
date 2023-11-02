@@ -426,6 +426,47 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractor(
 }
 
 //----------------------------------------------------------------------------
+vtkSMProxy* vtkSMExtractsController::CreateSteeringExtractor(
+  vtkSMProxy* proxy, const char* registrationName /*=nullptr*/) const
+{
+  if (!proxy)
+  {
+    return nullptr;
+  }
+
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  auto pxm = proxy->GetSessionProxyManager();
+
+  const std::string pname = registrationName ? std::string(registrationName)
+                                             : pxm->GetUniqueProxyName("extractors", "steering");
+  auto extractor =
+    vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("extractors", "SteeringExtractor"));
+
+  SM_SCOPED_TRACE(CreateSteeringExtractor)
+    .arg("producer", proxy)
+    .arg("extractor", extractor)
+    .arg("registrationName", pname.c_str());
+
+  controller->PreInitializeProxy(extractor);
+
+  if (auto port = vtkSMOutputPort::SafeDownCast(proxy))
+  {
+    vtkSMPropertyHelper(extractor, "Producer").Set(port->GetSourceProxy());
+  }
+  else
+  {
+    vtkSMPropertyHelper(extractor, "Producer").Set(proxy);
+  }
+
+  controller->PostInitializeProxy(extractor);
+  extractor->UpdateVTKObjects();
+
+  pxm->RegisterProxy("extractors", pname.c_str(), extractor);
+
+  return extractor;
+}
+
+//----------------------------------------------------------------------------
 const char* vtkSMExtractsController::GetRealExtractsOutputDirectory() const
 {
   return (this->EnvironmentExtractsOutputDirectory ? this->EnvironmentExtractsOutputDirectory

@@ -477,13 +477,21 @@ def CreateExtractor(name, proxy=None, registrationName=None):
         rawProxy = proxy.SMProxy
 
     controller = servermanager.vtkSMExtractsController()
-    rawExtractor = controller.CreateExtractor(rawProxy, name, registrationName)
-    extractor = servermanager._getPyProxy(rawExtractor)
 
+    # Special case of 'steering' extractors : add it to the steerable extractors list
+    # managed by the in situ helper class, not to the extracts controller, because
+    # they are not associated with a writer.
     from .catalyst.detail import IsInsitu, RegisterExtractor
-    if IsInsitu():
-        # tag the extractor to know which pipeline this came from.
-        RegisterExtractor(extractor)
+    if name == "steering" and IsInsitu():
+        rawExtractor = controller.CreateSteeringExtractor(rawProxy, registrationName)
+        extractor = servermanager._getPyProxy(rawExtractor)
+        UpdateSteerableParameters(extractor, registrationName)
+    else:
+        rawExtractor = controller.CreateExtractor(rawProxy, name, registrationName)
+        extractor = servermanager._getPyProxy(rawExtractor)
+        if IsInsitu():
+            # tag the extractor to know which pipeline this came from.
+            RegisterExtractor(extractor)
     return extractor
 
 

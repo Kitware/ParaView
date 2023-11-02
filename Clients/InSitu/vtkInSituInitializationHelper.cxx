@@ -24,6 +24,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
@@ -68,6 +69,7 @@ public:
   std::map<std::string, vtkSmartPointer<vtkSMSourceProxy>> Producers;
   std::vector<PipelineInfo> Pipelines;
   std::map<vtkSMProxy*, std::string> SteerableProxies;
+  std::map<vtkSMProxy*, std::string> SteerableExtracts;
 
   bool InExecutePipelines = false;
   int TimeStep = 0;
@@ -451,18 +453,19 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
 
   for (auto& steerable_proxies : internals.SteerableProxies)
   {
-    auto hints = steerable_proxies.first->GetHints();
+    vtkPVXMLElement* hints = steerable_proxies.first->GetHints();
     if (!hints)
     {
       continue;
     }
-    auto mesh_hint = hints->FindNestedElementByName("CatalystInitializePropertiesWithMesh");
+    vtkPVXMLElement* mesh_hint =
+      hints->FindNestedElementByName("CatalystInitializePropertiesWithMesh");
     if (!mesh_hint)
     {
       continue;
     }
 
-    auto mesh_name = mesh_hint->GetAttribute("mesh");
+    const char* mesh_name = mesh_hint->GetAttribute("mesh");
     if (!mesh_name)
     {
       vtkLog(ERROR, "`CatalystInitializePropertiesWithMesh` missing 'mesh' attribute.");
@@ -658,10 +661,23 @@ void vtkInSituInitializationHelper::GetSteerableProxies(
   if (vtkInSituInitializationHelper::Internals != nullptr)
   {
     auto internals = vtkInSituInitializationHelper::Internals;
-    proxies.reserve(proxies.size() + internals->SteerableProxies.size());
+    proxies.reserve(
+      proxies.size() + internals->SteerableProxies.size() + internals->SteerableExtracts.size());
     for (auto& proxy : internals->SteerableProxies)
     {
       proxies.emplace_back(proxy.second, proxy.first);
+    }
+
+    for (auto& proxy : internals->SteerableExtracts)
+    {
+      // The dataset to be serialized is the input of the extract
+      vtkSMProxy* inputProxy =
+        vtkSMProxyProperty::SafeDownCast(proxy.first->GetProperty("Producer"))->GetProxy(0);
+
+      if (inputProxy)
+      {
+        proxies.emplace_back(proxy.second, inputProxy);
+      }
     }
   }
 }
@@ -679,10 +695,21 @@ void vtkInSituInitializationHelper::UpdateSteerableParameters(
   {
     auto internals = vtkInSituInitializationHelper::Internals;
 
-    auto it = internals->SteerableProxies.lower_bound(steerableProxy);
-    if (it == internals->SteerableProxies.end() || it->first != steerableProxy)
+    if (strcmp(steerableProxy->GetXMLName(), "SteeringExtractor") == 0)
     {
-      internals->SteerableProxies.emplace_hint(it, steerableProxy, steerableSourceName);
+      auto it = internals->SteerableExtracts.lower_bound(steerableProxy);
+      if (it == internals->SteerableExtracts.end() || it->first != steerableProxy)
+      {
+        internals->SteerableExtracts.emplace_hint(it, steerableProxy, steerableSourceName);
+      }
+    }
+    else
+    {
+      auto it = internals->SteerableProxies.lower_bound(steerableProxy);
+      if (it == internals->SteerableProxies.end() || it->first != steerableProxy)
+      {
+        internals->SteerableProxies.emplace_hint(it, steerableProxy, steerableSourceName);
+      }
     }
 
     UpdateSteerableProxies();
