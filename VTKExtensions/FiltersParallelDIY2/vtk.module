@@ -15,9 +15,9 @@ DEPENDS
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
+  VTK::FiltersParallelDIY2
   ParaView::VTKExtensionsFiltersGeneral
 PRIVATE_DEPENDS
   VTK::ParallelCore
-  VTK::FiltersParallelDIY2
 TEST_LABELS
   ParaView
