@@ -39,6 +39,14 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
   )
 endif()
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "vtkmoverride")
+  list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22352
+    "\\.FeatureEdgesFilterHTG$"
+    "\\.FeatureEdgesRepresentationHTG$"
+  )
+endif()
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
   list(APPEND test_exclusions
     # These tests all seem to have some problem with the rendering order of
@@ -114,6 +122,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
     "^pv\\.ExtrusionRepresentationCellData$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22353
+    "\\.FeatureEdgesFilterHTG$"
+    "\\.FeatureEdgesRepresentationHTG$"
     # paraview/paraview/#21397
     "\\.TextSourceBorder$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21462

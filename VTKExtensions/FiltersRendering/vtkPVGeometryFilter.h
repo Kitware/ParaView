@@ -362,6 +362,22 @@ private:
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
   class BoundsReductionOperation;
   ///@}
+
+  /**
+   * Generate feature edges for the input hyper tree grid.
+   * We need this dedicated function because generating feature edges
+   * for an HTG is different than for other data objects: the
+   * vtkHyperTreeGridFeatureEdges filter operates on the input HTG
+   * directly, and not on the output polydata of the internal geometry
+   * filter.
+   */
+  void GenerateFeatureEdgesHTG(vtkHyperTreeGrid* input, vtkPolyData* output);
+
+  /**
+   * Generate the "vtkProcessId" point and cell data arrays on the output
+   * vtkPolydata.
+   */
+  void GenerateProcessIdsArrays(vtkPolyData* output);
 };
 
 #endif
