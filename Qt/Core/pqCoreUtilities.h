@@ -79,6 +79,9 @@ public:
 
   /**
    * Return the path of the root ParaView user specific configuration directory
+   *
+   * In disable registry mode (--dr), return the test directory instead.
+   * If the test directory is empty, fall back to the usual user directory.
    */
   static QString getParaViewUserDirectory();
 
