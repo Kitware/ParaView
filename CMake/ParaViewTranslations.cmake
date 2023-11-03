@@ -40,8 +40,14 @@ function(paraview_generate_translation_header)
       "The `TARGET` argument is required.")
   endif ()
   find_package(Python3 QUIET REQUIRED COMPONENTS Interpreter)
-  add_custom_command(OUTPUT ${_pv_generate_tr_h_RESULT_FILE}
-    COMMAND "$<TARGET_FILE:Python3::Interpreter>" "${_ParaViewTranslations_cmake_dir}/XML_translations_header_generator.py" -o "${_pv_generate_tr_h_RESULT_FILE}" ${_pv_generate_tr_h_INPUT_FILES} -s "${CMAKE_SOURCE_DIR}/")
+  add_custom_command(
+    OUTPUT  "${_pv_generate_tr_h_RESULT_FILE}"
+    DEPENDS ${_pv_generate_tr_h_INPUT_FILES}
+    COMMAND "$<TARGET_FILE:Python3::Interpreter>"
+            "${_ParaViewTranslations_cmake_dir}/XML_translations_header_generator.py"
+            -o "${_pv_generate_tr_h_RESULT_FILE}"
+            ${_pv_generate_tr_h_INPUT_FILES}
+            -s "${CMAKE_SOURCE_DIR}/")
   add_custom_target("${_pv_generate_tr_h_TARGET}"
     DEPENDS "${_pv_generate_tr_h_RESULT_FILE}")
 endfunction()
@@ -105,8 +111,10 @@ function(paraview_create_translation)
     "${_pv_create_tr_pro_file}")
   add_custom_command(
     OUTPUT  "${_pv_create_tr_OUTPUT_TS}"
-    COMMAND "$<TARGET_FILE:Qt${PARAVIEW_QT_MAJOR_VERSION}::lupdate>" ${_pv_create_tr_pro_file}
-    DEPENDS ${_pv_create_tr_files})
+    COMMAND "$<TARGET_FILE:Qt${PARAVIEW_QT_MAJOR_VERSION}::lupdate>"
+            "${_pv_create_tr_pro_file}"
+    DEPENDS ${_pv_create_tr_files}
+            "${_pv_create_tr_pro_file}")
   add_custom_target("${_pv_create_tr_TARGET}"
     DEPENDS "${_pv_create_tr_OUTPUT_TS}")
 endfunction()

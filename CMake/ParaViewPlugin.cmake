@@ -1278,6 +1278,12 @@ function (paraview_add_plugin name)
       PATTERNS          "*.html" "*.css" "*.png" "*.jpg" "*.js"
                         ${_paraview_add_plugin_DOCUMENTATION_ADD_PATTERNS})
 
+    set(_paraview_add_plugin_depends_args)
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+      list(APPEND _paraview_add_plugin_depends_args
+        DEPENDS_EXPLICIT_ONLY)
+    endif ()
+
     list(APPEND _paraview_add_plugin_extra_include_dirs
       "${CMAKE_CURRENT_BINARY_DIR}")
     set(_paraview_add_plugin_qch_output
@@ -1287,7 +1293,7 @@ function (paraview_add_plugin name)
     add_custom_command(
       OUTPUT "${_paraview_add_plugin_qch_output}"
       COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-              $<TARGET_FILE:ParaView::ProcessXML>
+              "$<TARGET_FILE:ParaView::ProcessXML>"
               -base64
               "${_paraview_add_plugin_qch_output}"
               \"\"
@@ -1297,7 +1303,8 @@ function (paraview_add_plugin name)
       DEPENDS "${_paraview_build_plugin_qch_path}"
               "${_paraview_build_plugin}_qch"
               "$<TARGET_FILE:ParaView::ProcessXML>"
-      COMMENT "Generating header for ${_paraview_build_plugin} documentation")
+      COMMENT "Generating header for ${_paraview_build_plugin} documentation"
+      ${_paraview_add_plugin_depends_args})
     set_property(SOURCE "${_paraview_add_plugin_qch_output}"
       PROPERTY
         SKIP_AUTOMOC 1)
@@ -1444,10 +1451,17 @@ function (paraview_add_plugin name)
         "WrappedPython_${_paraview_build_plugin}_${_paraview_add_plugin_python_module_mangled}.h")
       set(_paraview_add_plugin_python_header
         "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_add_plugin_python_header_name}")
+
+      set(_paraview_add_plugin_python_depends_args)
+      if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+        list(APPEND _paraview_add_plugin_python_depends_args
+          DEPENDS_EXPLICIT_ONLY)
+      endif ()
+
       add_custom_command(
         OUTPUT  "${_paraview_add_plugin_python_header}"
         COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-                $<TARGET_FILE:ParaView::ProcessXML>
+                "$<TARGET_FILE:ParaView::ProcessXML>"
                 "${_paraview_add_plugin_python_header}"
                 "module_${_paraview_add_plugin_python_module_mangled}_"
                 "_string"
@@ -1455,7 +1469,8 @@ function (paraview_add_plugin name)
                 "${_paraview_add_plugin_python_path}"
         DEPENDS "${_paraview_add_plugin_python_path}"
                 "$<TARGET_FILE:ParaView::ProcessXML>"
-        COMMENT "Convert Python module ${_paraview_add_plugin_python_module_name} for ${_paraview_build_plugin}")
+        COMMENT "Convert Python module ${_paraview_add_plugin_python_module_name} for ${_paraview_build_plugin}"
+        ${_paraview_add_plugin_python_depends_args})
 
       list(APPEND _paraview_add_plugin_python_sources
         "${_paraview_add_plugin_python_header}")
@@ -1516,14 +1531,20 @@ function (paraview_add_plugin name)
   endif ()
   string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
 
-  add_library("${_paraview_build_plugin}" "${_paraview_build_plugin_type}"
-    ${_paraview_add_plugin_header}
-    ${_paraview_add_plugin_source}
-    ${_paraview_add_plugin_eula_sources}
-    ${_paraview_add_plugin_binary_headers}
-    ${_paraview_add_plugin_ui_sources}
-    ${_paraview_add_plugin_python_sources}
-    ${_paraview_add_plugin_SOURCES})
+  add_library("${_paraview_build_plugin}" "${_paraview_build_plugin_type}")
+  target_sources("${_paraview_build_plugin}"
+    PRIVATE
+      ${_paraview_add_plugin_source}
+      ${_paraview_add_plugin_eula_sources}
+      ${_paraview_add_plugin_ui_sources}
+      ${_paraview_add_plugin_python_sources}
+      ${_paraview_add_plugin_SOURCES})
+  _vtk_module_add_file_set("${_paraview_build_plugin}"
+    NAME  paraview_plugin_headers
+    VIS   PRIVATE
+    BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}"
+    FILES ${_paraview_add_plugin_header}
+          ${_paraview_add_plugin_binary_headers})
   if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
     target_compile_definitions("${_paraview_build_plugin}"
       PRIVATE

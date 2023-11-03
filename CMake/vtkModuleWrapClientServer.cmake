@@ -104,6 +104,8 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
 
     set(_vtk_client_server_source_output
       "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS/${_vtk_client_server_basename}ClientServer.cxx")
+    set(_vtk_client_server_depfile
+      "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS.dir/${_vtk_client_server_basename}ClientServer.cxx.d")
     list(APPEND _vtk_client_server_sources
       "${_vtk_client_server_source_output}")
 
@@ -111,12 +113,12 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
       OUTPUT  "${_vtk_client_server_source_output}"
       COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
               "$<TARGET_FILE:ParaView::WrapClientServer>"
+              -MF "${_vtk_client_server_depfile}"
               "@${_vtk_client_server_args_file}"
               -o "${_vtk_client_server_source_output}"
               "${_vtk_client_server_header}"
               --types "${_vtk_client_server_hierarchy_file}"
-      IMPLICIT_DEPENDS
-              CXX "${_vtk_client_server_header}"
+      DEPFILE "${_vtk_client_server_depfile}"
       COMMENT "Generating client_server wrapper sources for ${_vtk_client_server_basename}"
       DEPENDS
         "$<TARGET_FILE:ParaView::WrapClientServer>"
@@ -207,9 +209,15 @@ ${_vtk_client_server_calls}}\n")
     PROPERTY
       GENERATED 1)
 
-  add_library("${name}" STATIC
-    ${_vtk_client_server_library_sources}
-    "${_vtk_client_server_init_file}")
+  add_library("${name}" STATIC)
+  target_sources("${name}"
+    PRIVATE
+      ${_vtk_client_server_library_sources}
+      "${_vtk_client_server_init_file}")
+  # Add a dummy file set to optimize dependencies. See CMP0154.
+  _vtk_module_add_file_set("${name}"
+    BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}"
+    NAME      dummy)
   if (BUILD_SHARED_LIBS)
     set_property(TARGET "${name}"
       PROPERTY

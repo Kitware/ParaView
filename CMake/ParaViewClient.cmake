@@ -405,11 +405,13 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     endif()
   endif ()
 
-  add_executable("${_paraview_client_NAME}" ${_paraview_client_executable_flags}
-    ${_paraview_client_SOURCES}
-    ${_paraview_client_resource_files}
-    ${_paraview_client_source_files}
-    ${_paraview_client_extra_sources})
+  add_executable("${_paraview_client_NAME}" ${_paraview_client_executable_flags})
+  target_sources("${_paraview_client_NAME}"
+    PRIVATE
+      ${_paraview_client_SOURCES}
+      ${_paraview_client_resource_files}
+      ${_paraview_client_source_files}
+      ${_paraview_client_extra_sources})
   if (DEFINED _paraview_client_NAMESPACE)
     add_executable("${_paraview_client_NAMESPACE}::${_paraview_client_NAME}" ALIAS "${_paraview_client_NAME}")
   endif ()

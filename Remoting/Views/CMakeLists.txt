@@ -209,15 +209,22 @@ if (TARGET ParaView::icet)
 endif()
 
 # Compile ColorMaps.json
+set(_colormaps_depends_args)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+  list(APPEND _colormaps_depends_args
+    DEPENDS_EXPLICIT_ONLY)
+endif ()
+
 add_custom_command(
   OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h"
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json"
-          ParaView::ProcessXML
-  COMMAND ParaView::ProcessXML
+          "$<TARGET_FILE:ParaView::ProcessXML>"
+  COMMAND "$<TARGET_FILE:ParaView::ProcessXML>"
           "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h"
           vtkSMTransferFunctionPresets JSON JSON
           "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json"
-  COMMENT "Processing builtin color maps")
+  COMMENT "Processing builtin color maps"
+  ${_colormaps_depends_args})
 list(APPEND private_headers
   "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h")
 

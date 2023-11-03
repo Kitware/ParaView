@@ -276,19 +276,26 @@ function (paraview_server_manager_process_files)
     OUTPUT  "${_paraview_sm_process_files_response_file}"
     CONTENT "${_paraview_sm_process_files_input_file_content}")
 
+  set(_paraview_sm_process_files_depends_args)
+  if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
+    list(APPEND _paraview_sm_process_files_depends_args
+      DEPENDS_EXPLICIT_ONLY)
+  endif ()
+
   add_custom_command(
     OUTPUT  "${_paraview_sm_process_files_output}"
     DEPENDS ${_paraview_sm_process_files_FILES}
             "$<TARGET_FILE:ParaView::ProcessXML>"
             "${_paraview_sm_process_files_response_file}"
     COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-            $<TARGET_FILE:ParaView::ProcessXML>
+            "$<TARGET_FILE:ParaView::ProcessXML>"
             "${_paraview_sm_process_files_output}"
             "${_paraview_sm_process_files_TARGET}"
             "Interface"
             "GetInterfaces"
             "@${_paraview_sm_process_files_response_file}"
-    COMMENT "Generating server manager headers for ${_paraview_sm_process_files_TARGET}.")
+    COMMENT "Generating server manager headers for ${_paraview_sm_process_files_TARGET}."
+    ${_paraview_sm_process_files_depends_args})
   add_custom_target("${_paraview_sm_process_files_TARGET}_xml_content"
     DEPENDS
       "${_paraview_sm_process_files_output}")
