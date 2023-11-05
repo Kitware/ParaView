@@ -233,7 +233,7 @@ protected:
    * Overridden here where the library has link access to rendering classes.
    */
   PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Material setup is now handled by the RenderView proxy on raytracing back-end update");
+    "Material setup is now handled by the RenderView proxy on raytracing back-end update")
   void DoMaterialSetup(vtkSMProxy* proxy) override;
 
 private:

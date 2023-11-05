@@ -367,7 +367,7 @@ protected:
    * An entry point to load a catalog of OSPRay rendering materials.
    */
   PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Material setup is now handled by the RenderView proxy on raytracing back-end update");
+    "Material setup is now handled by the RenderView proxy on raytracing back-end update")
   virtual void DoMaterialSetup(vtkSMProxy* proxy);
 
 private:
