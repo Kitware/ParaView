@@ -500,7 +500,7 @@
         </ExposedProperties>
       </SubProxy>
       <Hints>
-        <ReaderFactory extensions="cas"
+        <ReaderFactory extensions="cas msh"
                        file_description="Fluent Case Files" />
       </Hints>
       <!-- FLUENTReader -->
