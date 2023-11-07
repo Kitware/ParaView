@@ -16,10 +16,12 @@
 #include <QStringList>
 
 #include "pqApplicationCore.h"
+#include "pqCoreTestUtility.h"
 #include "pqDoubleLineEdit.h"
 #include "pqSettings.h"
 #include "vtkObject.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkWeakPointer.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -63,6 +65,12 @@ QWidget* pqCoreUtilities::findMainWindow()
 //-----------------------------------------------------------------------------
 QString pqCoreUtilities::getParaViewUserDirectory()
 {
+  auto testDir = pqCoreTestUtility::TestDirectory();
+  if (!testDir.isEmpty() && vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry())
+  {
+    return QFileInfo(testDir).absolutePath();
+  }
+
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return QFileInfo(settings->fileName()).path();
 }
