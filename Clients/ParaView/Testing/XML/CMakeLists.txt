@@ -89,6 +89,15 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.1}"
   "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.2}"
   "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.3}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/system/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/constant/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/0/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/0.5/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/1/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/1.5/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/2/,RECURSE:,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cavity/2.5/,RECURSE:,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np01/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np04/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/bc_struct.cgns}"
@@ -1543,6 +1552,11 @@ if (PARAVIEW_USE_MPI)
     TEST_SCRIPTS UseDataPartitions.xml
   )
 
+  # Test a bug (#22337) that could only happen in non built-in mode
+  # This test has no baseline.
+  paraview_add_client_server_tests(
+    TEST_SCRIPTS POpenFoamUpdate.xml
+  )
 
   # Test AppendReduce which can only be tested with non-built-in mode
   paraview_add_client_server_tests(
