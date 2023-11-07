@@ -672,6 +672,10 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
       "Failed to generate HTML output")
   endif ()
 
+  # Escape open/close brackets as HTML entities as they somehow interfere with the foreach loop below.
+  string(REPLACE "[" "&#91;" _paraview_gpd_output "${_paraview_gpd_output}")
+  string(REPLACE "]" "&#93;" _paraview_gpd_output "${_paraview_gpd_output}")
+
   # Escape semicolons.
   _paraview_client_escape_cmake_list(_paraview_gpd_output)
   # Convert into a list of HTML documents.
