@@ -1005,6 +1005,15 @@ public:
   void SetEnableOSPRay(bool);
   bool GetEnableOSPRay();
   ///@}
+
+  ///@{
+  /**
+   * Enable/disable ray tracing with ANARI
+   */
+  void SetEnableANARI(bool);
+  bool GetEnableANARI();
+  ///@}
+
   ///@{
   /**
    * Controls whether OSPRay sends casts shadow rays or not.
