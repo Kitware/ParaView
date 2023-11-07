@@ -133,6 +133,11 @@ protected Q_SLOTS:
    */
   virtual void onMouseStop();
 
+  /**
+   * clears the selection cache.
+   */
+  virtual void clearSelectionCache();
+
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * callback called when the vtkPVRenderView is done with selection.
