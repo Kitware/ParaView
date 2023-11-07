@@ -600,7 +600,7 @@ function (paraview_client_documentation)
             "-Dxmls_file=${_paraview_client_doc_xmls_file}"
             -D_paraview_generate_proxy_documentation_run=ON
             -P "${_ParaViewClient_script_file}"
-    DEPENDS ${_paraview_client_doc_xmls_list}
+    DEPENDS ${_paraview_client_doc_xmls}
             "${_paraview_client_doc_xmls_file}"
             "${_ParaViewClient_script_file}"
             "${_ParaViewClient_cmake_dir}/paraview_servermanager_convert_xml.xsl"
