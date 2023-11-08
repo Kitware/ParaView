@@ -253,6 +253,11 @@ if (TARGET VTK::IOHDF)
     Resources/readers_iohdf.xml)
 endif ()
 
+if (TARGET VTK::IOERF)
+  list(APPEND xml_files
+    Resources/readers_ioerf.xml)
+endif ()
+
 if (TARGET VTK::IOSegY)
   list(APPEND xml_files
     Resources/proxies_segy.xml)

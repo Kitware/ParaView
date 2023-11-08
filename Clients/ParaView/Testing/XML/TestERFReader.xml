@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Load the erf hdf5 file -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/hdf_fpm_simulation.erfh5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Change the timestep -->
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="editTextChanged" arguments="0.008125" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="0.008125" />
+
+  <!-- Pick the pressure point array-->
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="pressure (partial)" />
+</pqevents>

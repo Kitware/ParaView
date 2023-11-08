@@ -1,0 +1,129 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkERFReader"
+                 label="ERF HDF5 data reader"
+                 name="ERFReader">
+      <Documentation short_help="Reads ERF HDF5 data files.">
+        Reads ERF HDF5 serial data files.
+      </Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            information_property="FileNameInfo"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the ERF
+        reader.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FileNameInfo"
+                            command="GetFileName"
+                            information_only="1" >
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="StagesInfo"
+                            command="GetStagesSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Stages"
+                            command="GetStagesSelection"
+                            information_property="StagesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            panel_visibility="default"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="StagesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          List of stages to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlocksInfo"
+                            command="GetBlocksSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Blocks"
+                            command="GetBlocksSelection"
+                            information_property="BlocksInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            panel_visibility="default"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="BlocksInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          List of blocks to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariablesInfo"
+                            command="GetVariablesSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Variables"
+                            command="GetVariablesSelection"
+                            information_property="VariablesInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            panel_visibility="default"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="VariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          List of variables to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- This property is used by the property panel to show the available timesteps in the data. -->
+      <DoubleVectorProperty name="TimestepValues"
+                             repeatable="1"
+                             information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Represent the information property for transient data.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TimeRange" information_only="1">
+        <TimeRangeInformationHelper/>
+        <Documentation>
+           Sends time range information to the animation panel.
+           ParaView uses this information to set the range of time
+           for the animation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="erfh5"
+                       file_description="ERF HDF5 Files" />
+      </Hints>
+
+
+     </SourceProxy>
+    <!-- End ERFReader -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

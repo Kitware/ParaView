@@ -46,6 +46,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/GenericIOReader/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.mhd}"
   "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.raw}"
+  "DATA{${paraview_test_data_directory_input}/Data/hdf_fpm_simulation.erfh5}"
   "DATA{${paraview_test_data_directory_input}/Data/Iron_Xdmf/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadState.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadStateDialog.pvsm}"
@@ -665,6 +666,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCompositedGeometryCulling.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestGeometryBoundsClobber.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestERFReader.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader2.png}"
@@ -984,6 +986,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   SteeringDataGenerator.xml
   TestCleanGridPointDataStrategies.xml
   TestColorMapModificationRendersAllViews.xml
+  TestERFReader.xml
   TestFDSReader.xml
   TestHTGSelection.xml
   TestHTGThreshold.xml
