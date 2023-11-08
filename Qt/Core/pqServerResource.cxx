@@ -88,6 +88,14 @@ public:
       this->Path = this->Path.mid(1);
     }
 
+    if (!this->Path.isEmpty())
+    {
+      // Reverse the ; and # replacement. This means filenames can't have "%3B" or "%23" in them,
+      // but they can have "%", which wouldn't work with the more general
+      // QUrl::fromPercentEncoding()
+      this->Path.replace("%3B", ";").replace("%23", "#");
+    }
+
     if (this->Path.size() > 1 && this->Path[1] == ':')
     {
       this->Path = QDir::toNativeSeparators(this->Path);
@@ -218,6 +226,8 @@ QString pqServerResource::toURI() const
       result += "/";
     }
     result += this->Implementation->Path;
+    // Replace ; and # with percent encodings to avoid characters messing up the parsing later.
+    result.replace(";", "%3B").replace("#", "%23");
   }
 
   if (!this->Implementation->ServerName.isEmpty())
