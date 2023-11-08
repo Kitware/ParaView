@@ -16,18 +16,15 @@ pqEditMacrosReaction::pqEditMacrosReaction(QAction* action)
 //-----------------------------------------------------------------------------
 void pqEditMacrosReaction::configureMacros()
 {
-  if (pqEditMacrosReaction::Dialog)
-  {
-    pqEditMacrosReaction::Dialog->raise();
-    pqEditMacrosReaction::Dialog->activateWindow();
-  }
-  else
+  if (!pqEditMacrosReaction::Dialog)
   {
     pqEditMacrosReaction::Dialog = new pqEditMacrosDialog(pqCoreUtilities::mainWidget());
     pqEditMacrosReaction::Dialog->setObjectName("EditMacrosDialog");
-    pqEditMacrosReaction::Dialog->setAttribute(Qt::WA_DeleteOnClose);
-    pqEditMacrosReaction::Dialog->show();
   }
+
+  pqEditMacrosReaction::Dialog->show();
+  pqEditMacrosReaction::Dialog->raise();
+  pqEditMacrosReaction::Dialog->activateWindow();
 }
 
 //-----------------------------------------------------------------------------

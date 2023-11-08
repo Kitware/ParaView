@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- load a macro -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroEdit" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/Udirectory/resetSession.py" />
+
+  <!-- open browser -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/setIcon" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/filterBox" property="currentText" arguments="All" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/remove" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/importIcon" property="enabled" arguments="true" />
+
+  <!-- clean user defined icons -->
+  <pqevent object="pqClientMainWindow/IconBrowser/removeAll" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/IconBrowser/filterBox" command="activated" arguments="User icons" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelRowCount" arguments="0" />
+
+  <!-- choose icon: use apply  -->
+  <pqevent object="pqClientMainWindow/IconBrowser/filterBox" command="activated" arguments="All" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="8.0" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCheckState" arguments="8.0,0" />
+  <pqevent object="pqClientMainWindow/IconBrowser/buttonBox/ApplyIcon" command="activate" arguments="" />
+
+  <!-- open browser with double click -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="doubleClick" arguments="0.0" />
+  <!-- import new image -->
+  <pqevent object="pqClientMainWindow/IconBrowser/importIcon" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/IconOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/paraview_icon.svg" />
+  <pqevent object="pqClientMainWindow/IconBrowser/searchBox/SearchLineEdit" command="set_string" arguments="paraview" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelRowCount" arguments="1" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelItemData" arguments="0.0,paraview_icon" />
+  <pqevent object="pqClientMainWindow/IconBrowser/searchBox/SearchLineEdit" command="set_string" arguments="" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/filterBox" property="currentText" arguments="All" />
+  <pqevent object="pqClientMainWindow/IconBrowser/filterBox" command="activated" arguments="User icons" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelRowCount" arguments="1" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelItemData" arguments="0.0,paraview_icon" />
+
+  <!-- choose icon: double click to select and close -->
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCheckState" arguments="0.0,0" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="doubleClick" arguments="0.0" />
+
+  <!-- remove user defined icon -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/setIcon" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/IconBrowser/filterBox" command="activated" arguments="User icons" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/remove" property="enabled" arguments="true" />
+  <pqevent object="pqClientMainWindow/IconBrowser/remove" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/listView" property="modelRowCount" arguments="0" />
+
+  <!-- cannot remove application defined icons -->
+  <pqevent object="pqClientMainWindow/IconBrowser/filterBox" command="activated" arguments="Application resources" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/IconBrowser/remove" property="enabled" arguments="false" />
+  <pqevent object="pqClientMainWindow/IconBrowser/buttonBox/CloseDialog" command="activate" arguments="" />
+
+  <!-- remove remaining macro -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/removeAll" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+</pqevents>

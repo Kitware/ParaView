@@ -23,6 +23,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00040.temp/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00050.temp/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00050.temp/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/paraview_icon.svg}"
   "DATA{${paraview_test_data_directory_input}/Data/3GQP.pdb}"
   "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}"
   "DATA{${paraview_test_data_directory_input}/Data/CameraWidgetViewLinkState.pvsm}"
@@ -1699,6 +1700,8 @@ if(PARAVIEW_USE_PYTHON)
   set(SelectPointsTrace_DISABLE_CRS TRUE)
 
   list(APPEND TESTS_WITHOUT_BASELINES
+    MacroEditor.xml
+    IconBrowser.xml
     PythonEditorTab.xml
     PythonResetSessionMacro.xml
     ProgrammableSourcePythonEditorLink.xml

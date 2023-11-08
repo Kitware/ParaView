@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- open editor and ensure empty macro list -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroEdit" />
+
+  <!-- ensure clean state with delete all.
+  As code path requires at least one macro, add one so test will always work -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/Udirectory/resetSession.py" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/removeAll" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="0" />
+
+  <!-- Create a new macro from a script that calls `ResetSession` -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/Udirectory/resetSession.py" />
+  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="1" />
+  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelItemData" arguments="0.1,resetSession" />
+
+  <!-- Edit the macro (button) -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/edit" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Save a duplicated macro -->
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save As &amp;Macro..." />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/resetSession-1.py" />
+
+  <!-- Close tabs -->
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+
+  <!-- Load the duplicated macro with the menu button -->
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroCreate" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/resetSession-1.py" />
+
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Macros" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Macros" command="activate" arguments="actionMacroEdit" />
+  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="2" />
+
+  <!-- Edit a macro (double click) -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="1.1" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="doubleClick" arguments="1.1" />
+  <!-- Close tabs -->
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+
+  <!-- Delete one macro -->
+  <!-- Might hide your personal macros, see Macros directory to get it back -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/remove" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="1" />
+
+  <!-- Delete all macros -->
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/removeAll" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" property="modelRowCount" arguments="0" />
+</pqevents>
