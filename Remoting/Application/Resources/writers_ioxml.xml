@@ -54,7 +54,7 @@
         smallest compressed filesize.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompressionLevel"
-                         default_values="6"
+                         default_values="5"
                          name="CompressionLevel"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -994,7 +994,7 @@
         smallest compressed filesize.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompressionLevel"
-                         default_values="6"
+                         default_values="5"
                          name="CompressionLevel"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
