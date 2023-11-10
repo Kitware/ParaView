@@ -264,7 +264,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     if (indexedLookup)
     {
       vtkPVProminentValuesInformation* prominentValues =
-        vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(this);
+        vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(this);
       vtkSmartPointer<vtkStringList> activeAnnotations = vtkSmartPointer<vtkStringList>::New();
       vtkSmartPointer<vtkDoubleArray> activeIndexedColors = vtkSmartPointer<vtkDoubleArray>::New();
       vtkSmartPointer<vtkAbstractArray> uniqueValues;
@@ -460,7 +460,8 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
   bool haveComponent = useComponent;
   bool separate = (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt() != 0);
   bool useTransfer2D = (vtkSMPropertyHelper(this, "UseTransfer2D", true).GetAsInt() != 0);
-  std::string decoratedArrayName = this->GetDecoratedArrayName(arrayname);
+  std::string decoratedArrayName =
+    vtkSMColorMapEditorHelper::GetDecoratedArrayName(this, arrayname);
   vtkNew<vtkSMTransferFunctionManager> mgr;
   vtkSMProxy* lutProxy = nullptr;
   if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
