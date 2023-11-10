@@ -212,8 +212,9 @@ endif()
 add_custom_command(
   OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h"
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json"
-          ParaView::ProcessXML
-  COMMAND ParaView::ProcessXML
+          "$<TARGET_FILE:ParaView::ProcessXML>"
+  COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
+          "$<TARGET_FILE:ParaView::ProcessXML>"
           "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h"
           vtkSMTransferFunctionPresets JSON JSON
           "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json"
