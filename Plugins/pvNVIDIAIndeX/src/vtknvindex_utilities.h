@@ -34,8 +34,7 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef _WIN32
-#else // _WIN32
+#ifndef _WIN32
 #include <pwd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -54,25 +53,8 @@ namespace util
 typedef mi::math::Vector<mi::Sint32, 3> Vec3i;
 typedef mi::math::Vector<mi::Uint32, 3> Vec3u;
 
-typedef mi::math::Vector_struct<mi::Sint32, 3> Vec3i_struct;
-typedef mi::math::Vector_struct<mi::Uint32, 3> Vec3u_struct;
-
 typedef mi::math::Bbox<mi::Sint32, 3> Bbox3i;
 typedef mi::math::Bbox<mi::Uint32, 3> Bbox3u;
-
-typedef mi::math::Bbox_struct<mi::Sint32, 3> Bbox3i_struct;
-typedef mi::math::Bbox_struct<mi::Uint32, 3> Bbox3u_struct;
-
-//-------------------------------------------------------------------------------------------------
-// Helper macro. Checks whether the expression is true and if not prints a message and exits.
-#define check_success(expr)                                                                        \
-  {                                                                                                \
-    if (!(expr))                                                                                   \
-    {                                                                                              \
-      fprintf(stderr, "Error in file %s, line %d: \"%s\".\n", __FILE__, __LINE__, #expr);          \
-      exit(EXIT_FAILURE);                                                                          \
-    }                                                                                              \
-  }
 
 inline void sleep(mi::Float32 seconds)
 {
@@ -86,57 +68,6 @@ inline void sleep(mi::Float32 seconds)
   useconds_t micros = (useconds_t)(seconds * 1000000);
   ::usleep((useconds_t)micros);
 #endif // _WIN32
-}
-
-//-------------------------------------------------------------------------------------------------
-// Get current time.
-// \return get Float64 epoch time in second.
-inline mi::Float64 get_time()
-{
-#ifdef _WIN32
-  static bool init = false;
-  static mi::Float64 frequency;
-  if (!init)
-  {
-    //_tzset();
-    LARGE_INTEGER freq;
-    QueryPerformanceFrequency(&freq);
-    frequency = (mi::Float64)freq.QuadPart;
-    init = true;
-  }
-  LARGE_INTEGER counter;
-  QueryPerformanceCounter(&counter);
-
-  return (mi::Float64)counter.QuadPart / frequency;
-#else
-  timeval tv;
-  gettimeofday(&tv, nullptr);
-  return static_cast<mi::Float64>(tv.tv_sec) + (static_cast<mi::Float64>(tv.tv_usec) * 1.0e-6);
-#endif
-}
-
-//----------------------------------------------------------------------
-// Retrieves the host name of this machine.
-// \return Returns the host name of this machine.
-inline std::string get_host_name()
-{
-  std::string host_name = "unknown";
-#ifdef LINUX
-  char buf[256];
-  if (gethostname(buf, sizeof(buf)) == 0)
-    host_name = buf;
-#else
-  char* host_name_env = getenv("HOSTNAME");
-  if (host_name_env == nullptr)
-    host_name_env = getenv("HOST");
-
-  if (host_name_env != nullptr)
-    host_name = host_name_env;
-// else
-//    INFO_LOG << "Environment variable 'HOSTNAME' or 'HOST' not set on host.";
-#endif // LINUX
-
-  return host_name;
 }
 
 #ifndef _WIN32
@@ -257,6 +188,7 @@ inline void deserialize(mi::neuraylib::IDeserializer* deserializer, std::string&
     target.clear();
   }
 }
+
 }
 } // vtknvindex::util
 
