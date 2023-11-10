@@ -831,6 +831,7 @@ paraview_plugin_build(
   LIBRARY_SUBDIRECTORY  "paraview${paraview_version_suffix}/plugins"
   CMAKE_DESTINATION     "${paraview_cmake_destination}"
   PLUGINS_FILE_NAME "paraview.plugins.xml"
+  USE_FILE_SETS     ON
   TARGET            ParaView::paraview_plugins
   INSTALL_EXPORT    ParaViewPlugins
   INSTALL_HEADERS   "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
