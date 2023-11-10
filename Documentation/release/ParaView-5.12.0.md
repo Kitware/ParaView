@@ -963,13 +963,13 @@ The _Choose Preset_ dialog no longer gets stuck behind other control panels on m
 In the _Properties_ panel, two icons at the top of each section let you save the current values shown in property widgets as the defaults for the next time this source/filter is created, or reset all values to the application defaults. Now each property widget has a context menu, available by right-clicking on the widget's label, to "Use as Default", or "Reset to Application Default" for just that property. The context menu is not shown if the property cannot take these actions.
 
 
-## Rearrange views in layouts
+## Equalize view size in layouts
 
-ParaView now provides the ability to evenly rearrange the views size inside a layout.
+ParaView now provides the ability to make the size of all views inside a layout the same.
 
-When using multiples views in the same layout, you can create and manually resize views, while keeping a overall rectangle global shape. However, it may get frustrating to create an evenly spaced layout manually.
+When using multiples views in the same layout, you can create and manually resize views, while keeping a overall rectangle global shape. However, it may get frustrating to create an equally sized layout manually.
 
-Now you can use the "Rearrange Views" action from the "Views" menu to independently resize width, height or both (horizontal, vertical or grid mode). This is also available in context menu from the _Layout_ tab.
+Now you can use the "Equalize Views" action from the "Views" menu to resize width, height or both with the "Horizontally", "Vertically", or "Grid" modes). This is also available in context menu from each _Layout_ tab.
 
 > ![Before rearranging](img/5.12.0/rearrange-layout-creation.png)
 >
