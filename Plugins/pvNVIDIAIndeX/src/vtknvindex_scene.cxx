@@ -1305,14 +1305,21 @@ void vtknvindex_scene::update_config_settings(
     const mi::Uint32 rendering_samples = 1;
     config_settings->set_rendering_samples(rendering_samples);
 
-    // A good number for max spans is (no.of physical cpu cores/2).
+    // Enable automatic span control for compositing
+    config_settings->set_automatic_span_control(true);
+
+    // Set an upper limit for the number of spans per host.
+    // A good number is (no. of physical cpu cores / 2).
     vtksys::SystemInformation sys_info;
     sys_info.RunCPUCheck();
     mi::Uint32 nb_physical_cores = sys_info.GetNumberOfPhysicalCPU();
     if (nb_physical_cores == 0)
-      nb_physical_cores = 8; // when information not available, assuming 8 cores.
-    config_settings->set_max_spans_per_machine(nb_physical_cores / 2);
-    config_settings->set_automatic_span_control(true);
+    {
+      nb_physical_cores = 8; // when no information is available, assume 8 CPU cores
+    }
+
+    const mi::Uint32 max_spans = std::max(1u, nb_physical_cores / 2);
+    config_settings->set_max_spans_per_machine(max_spans);
 
     // Data transfer configuration.
     // TODO: performance implications?
