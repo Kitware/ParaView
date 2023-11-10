@@ -10,7 +10,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
