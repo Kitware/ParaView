@@ -124,6 +124,40 @@
       <!-- End CompositeDataSetGhostCellsGenerator -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkStitchImageDataWithGhosts"
+                 name="StitchImageDataWithGhosts">
+      <Documentation short_help="Stitch Image Data With Ghosts.">
+        Stitches images that are separated by one voxel, effectively generating ghost
+        points at the new interfaces between the input images. Setting NumberOfGhosts to n
+        stitches the images and generates n-1 layers of ghost cells.
+        The inputs CANNOT have any cell data, or the filter will not run.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetNumberOfGhostLayers"
+                         default_values="1"
+                         name="NumberOfGhosts"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="10"/>
+      </IntVectorProperty>
+      <!-- End StitchImageDataWithGhosts -->
+    </SourceProxy>
+
     <!-- ================================================================== -->
     <SourceProxy class="vtkPVProbeLineFilter"
                  base_proxygroup="internal_filters"

@@ -374,6 +374,7 @@
   <Proxy group="filters" name="SliceAlongPolyLine" />
   <Proxy group="filters" name="SliceWithPlane" />
   <Proxy group="filters" name="SmoothPolyDataFilter" />
+  <Proxy group="filters" name="StitchImageDataWithGhosts" />
   <Proxy group="filters" name="StreakLine" />
   <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer.svg" />
   <Proxy group="filters" name="Stripper" />
