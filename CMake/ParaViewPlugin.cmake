@@ -288,6 +288,7 @@ paraview_plugin_build(
   [CMAKE_DESTINATION <destination>]
   [TARGET_COMPONENT <component>]
   [INSTALL_HEADERS <ON|OFF>]
+  [USE_FILE_SETS <ON|OFF>]
 
   [HEADERS_DESTINATION <destination>]
   [RUNTIME_DESTINATION <destination>]
@@ -319,6 +320,8 @@ paraview_plugin_build(
   * `TARGET_COMPONENT`: (Defaults to `development`) The component to use for
     `<TARGET>`.
   * `INSTALL_HEADERS`: (Defaults to `ON`) Whether to install headers or not.
+  * `USE_FILE_SETS`: (Defaults to `OFF`) Whether to use `FILE_SET` source
+    specification or not.
   * `HEADERS_DESTINATION`: (Defaults to `${CMAKE_INSTALL_INCLUDEDIR}`) Where to
     install include files.
   * `RUNTIME_DESTINATION`: (Defaults to `${CMAKE_INSTALL_BINDIR}`) Where to
@@ -348,7 +351,7 @@ paraview_plugin_build(
 function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
-    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS;DISABLE_XML_DOCUMENTATION;GENERATE_SPDX;SPDX_DOCUMENT_NAMESPACE;SPDX_DOWNLOAD_LOCATION"
+    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS;DISABLE_XML_DOCUMENTATION;GENERATE_SPDX;SPDX_DOCUMENT_NAMESPACE;SPDX_DOWNLOAD_LOCATION;USE_FILE_SETS"
     "PLUGINS;AUTOLOAD"
     ${ARGN})
 
@@ -395,6 +398,10 @@ function (paraview_plugin_build)
 
   if (NOT DEFINED _paraview_build_INSTALL_HEADERS)
     set(_paraview_build_INSTALL_HEADERS ON)
+  endif ()
+
+  if (NOT DEFINED _paraview_build_USE_FILE_SETS)
+    set(_paraview_build_USE_FILE_SETS OFF)
   endif ()
 
   if (NOT DEFINED _paraview_build_ADD_INSTALL_RPATHS)
@@ -1126,6 +1133,7 @@ function (paraview_add_plugin name)
     vtk_module_build(
       MODULES             ${plugin_modules}
       PACKAGE             "${_paraview_build_plugin}"
+      USE_FILE_SETS       "${_paraview_build_USE_FILE_SETS}"
       ${_paraview_add_plugin_module_install_export_args}
       INSTALL_HEADERS     "${_paraview_build_INSTALL_HEADERS}"
       TARGETS_COMPONENT   "${_paraview_build_PLUGINS_COMPONENT}"
@@ -1539,6 +1547,8 @@ function (paraview_add_plugin name)
       ${_paraview_add_plugin_ui_sources}
       ${_paraview_add_plugin_python_sources}
       ${_paraview_add_plugin_SOURCES})
+  # Forward the file set option internally.
+  set(_vtk_build_USE_FILE_SETS "${_paraview_build_USE_FILE_SETS}")
   _vtk_module_add_file_set("${_paraview_build_plugin}"
     NAME  paraview_plugin_headers
     VIS   PRIVATE
