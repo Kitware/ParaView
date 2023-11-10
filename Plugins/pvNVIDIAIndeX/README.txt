@@ -11,14 +11,19 @@ refer to the User's Guide for detailed instructions.
 
 The NVIDIA IndeX for ParaView Plugin is compatible with:
 
-* All NVIDIA GPUs that support at least CUDA compute capability 3.0, i.e.
-  "Kepler" GPU architecture or newer. To find out the compute capability of a
-  specific GPU, go to: https://developer.nvidia.com/cuda-gpus
+* All NVIDIA GPUs that support at least CUDA compute capability 5.0, i.e.
+  "Maxwell" GPU architecture or newer.
 
-* NVIDIA display driver that supports CUDA 10.2.
+  To find out the compute capability of a specific GPU, go to:
+  https://developer.nvidia.com/cuda-gpus
+
+* NVIDIA display driver that supports CUDA 12.
   Minimum driver version:
-  - Linux:   440.33
-  - Windows: 441.22
+  - Linux:   525.60.13
+  - Windows: 527.41
+  Recommended driver version (CUDA 12.3):
+  - Linux:   545.23.06 or newer
+  - Windows: 545.84 or newer
 
 * Operating systems:
   - Red Hat Enterprise Linux (RHEL) or CentOS version 7 or newer.
@@ -31,12 +36,12 @@ The NVIDIA IndeX for ParaView Plugin is compatible with:
 # Features and Licensing
 #-------------------------------------------------------------------------------
 
-The NVIDIA IndeX for ParaView Plugin comes with a free workstation license that
-enables utilizing the capabilities of a single NVIDIA GPU.
+The NVIDIA IndeX for ParaView Plugin comes with a free evaluation license that
+enables all features for a limited time, including full scalability to run on
+multiple NVIDIA GPUs and on a cluster of GPU hosts. The software will continue
+to run after the evaluation period, but with multi-GPU features disabled.
 
-If you want to use NVIDIA IndeX on a cluster of multiple hosts and/or
-with multiple NVIDIA GPUs, then please contact NVIDIA for the appropriate licensing:
-nvidia-index@nvidia.com.
+For licensing requests, please contact nvidia-index@nvidia.com.
 
 # Features
 ----------
@@ -47,8 +52,8 @@ nvidia-index@nvidia.com.
 * Interactive visualization of time-varying structured volume grids.
 
 * Support for 8-bit and 16-bit signed/unsigned integer, and 32-bit floating
-  point volume data types. 64-bit floating point data is supported via automatic
-  conversion.
+  point volume data types. 64-bit floating point data and 32-bit integer data
+  is supported via an automatic conversion.
 
 * XAC (NVIDIA IndeX Accelerated Computing) visual elements for volume rendering
   with four different configurable presets: Iso-surfaces, depth enhancement,
@@ -69,8 +74,8 @@ nvidia-index@nvidia.com.
   volume rendering.
 
 * Multi-GPU and GPU cluster support for scalable real-time visualization of
-  datasets of arbitrary size. Requires an appropriate license
-  (please contact NVIDIA).
+  datasets of arbitrary size. Requires an appropriate license after the evaluation period
+  (please contact nvidia-index@nvidia.com).
 
 #-------------------------------------------------------------------------------
 # Known Limitations
@@ -117,11 +122,9 @@ Please do not hesitate to contact NVIDIA for further assistance:
 
 Support mailing list: paraview-plugin-support@nvidia.com
 
-NVIDIA IndeX/ParaView forum: https://forums.developer.nvidia.com/c/164
-
 NVIDIA IndeX for ParaView website: https://www.nvidia.com/en-us/data-center/index-paraview-plugin
 
-NVIDIA IndeX website: https://developer.nvidia.com/nvidia-index
+NVIDIA IndeX website: https://developer.nvidia.com/index
 
 
-Copyright 2021 NVIDIA Corporation. All rights reserved.
+Copyright 2023 NVIDIA Corporation. All rights reserved.
