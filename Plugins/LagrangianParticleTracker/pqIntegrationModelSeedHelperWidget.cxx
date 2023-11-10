@@ -102,7 +102,7 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
       for (unsigned int i = 0; i < nArrays; i++)
       {
         const char* arrayName = namesProp->GetElement(i);
-        std::string labelName = vtkSMProperty::CreateNewPrettyLabel(arrayName);
+        std::string labelName = vtkSMObject::CreatePrettyLabel(arrayName);
         int type = typesProp->GetElement(i);
         int nComponents = compsProp->GetElement(i);
 
