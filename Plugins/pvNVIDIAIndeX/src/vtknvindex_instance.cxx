@@ -1454,5 +1454,5 @@ void vtknvindex_instance::init_scene_graph()
 //-------------------------------------------------------------------------------------------------
 const char* vtknvindex_instance::get_version() const
 {
-  return "5.10";
+  return "5.12";
 }
