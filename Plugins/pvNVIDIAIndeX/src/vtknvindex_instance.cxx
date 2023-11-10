@@ -1112,24 +1112,13 @@ bool vtknvindex_instance::setup_nvindex()
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
 
-#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
     // Reduce log output
     idebug_configuration->set_option("debug_configuration_quiet=yes");
     // Set optimized flags
     idebug_configuration->set_option("integration_flags=8");
-#endif
 
-#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 329100 ||                                               \
-  (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR == 329100 && NVIDIA_INDEX_LIBRARY_REVISION_MINOR == 8100 && \
-    NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 3009))
-
-    // Skip when running with the old library version, as that would trigger a runtime warning
-    if (std::string(m_nvindex_interface->get_revision()).find("329100.8100.3009,") != 0)
-    {
-      // Disable features not used by the plugin
-      idebug_configuration->set_option("disable_picking=1");
-    }
-#endif
+    // Disable features not used by the plugin
+    idebug_configuration->set_option("disable_picking=1");
 
     // Don't pre-allocate buffers for rasterizer
     idebug_configuration->set_option("rasterizer_memory_allocation=-1");
