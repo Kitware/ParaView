@@ -1296,6 +1296,11 @@ void vtknvindex_scene::update_config_settings(
     config_settings->set_subdivision_configuration(subdiv_config);
 #endif
 
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+    // Import all data subsets immediately, even when they are initially invisible.
+    config_settings->set_data_import_mode(nv::index::IConfig_settings::DATA_IMPORT_IMMEDIATE);
+#endif
+
     // Super sampling
     const mi::Uint32 rendering_samples = 1;
     config_settings->set_rendering_samples(rendering_samples);
