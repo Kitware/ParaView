@@ -561,6 +561,21 @@ bool vtknvindex_instance::load_nvindex()
   }
 
 #if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+#ifndef _WIN32
+  // Explicitly set the path used by NVIDIA IndeX to load libdice.so. This is necessary in case the
+  // non-transitive RUNPATH is applied to the plugin instead of RPATH.
+  mi::base::Handle<nv::index::IIndex_loader_configuration> loader_config(
+    nv::index::nv_factory<nv::index::IIndex_loader_configuration>(index_lib_symbol));
+  if (loader_config)
+  {
+    loader_config->clear();
+    // First search in the directory containing libnvindex.so
+    loader_config->add_library_search_origin();
+    // Then fall back to the default search path (e.g. LD_LIBRARY_PATH)
+    loader_config->add_library_search_default();
+  }
+#endif // _WIN32
+
   m_nvindex_interface = nv::index::nv_factory<nv::index::IIndex>(index_lib_symbol);
   if (!m_nvindex_interface.is_valid_interface())
   {
