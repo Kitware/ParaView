@@ -130,6 +130,60 @@ std::string get_interface_address(const std::string interface_name, bool ipv6 = 
 }
 #endif // _WIN32
 
+bool is_compatible_revision(const std::string& build_revision_str,
+  const std::string& library_revision_full_str, bool& revision_mismatch)
+{
+  // Extract just the revision, without build date and platform
+  std::string library_revision_str = library_revision_full_str;
+  const std::size_t pos = library_revision_str.find(',');
+  if (pos != std::string::npos)
+  {
+    library_revision_str = library_revision_str.substr(0, pos);
+  }
+
+  revision_mismatch = (library_revision_str != build_revision_str);
+  if (revision_mismatch)
+  {
+    // Split up revision into its components
+    std::vector<std::string> library_revision;
+    std::stringstream str(library_revision_str);
+    while (str.good())
+    {
+      std::string component;
+      std::getline(str, component, '.');
+      library_revision.push_back(component);
+    }
+
+    std::vector<std::string> build_revision = { std::to_string(
+      NVIDIA_INDEX_LIBRARY_REVISION_MAJOR) };
+    if (NVIDIA_INDEX_LIBRARY_REVISION_MINOR > 0)
+    {
+      build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_MINOR));
+      if (NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 0)
+      {
+        build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR));
+      }
+    }
+
+    if (build_revision.size() == 1 || library_revision.size() == 1)
+    {
+      // No branch, meaning development version. Let's assume users know what they're doing.
+      return true;
+    }
+    else if (build_revision.size() != library_revision.size())
+    {
+      return false;
+    }
+    else if (build_revision.size() >= 2)
+    {
+      // It's a release branch, verify that the major revision is the same
+      return (build_revision[0] == library_revision[0]);
+    }
+  }
+
+  return true;
+}
+
 } // namespace
 
 const std::string vtknvindex_instance::s_config_filename = "nvindex_config.xml";
@@ -389,7 +443,11 @@ bool vtknvindex_instance::load_nvindex()
 
   // Load shared libraries.
   const char* lib_name = "libnvindex" MI_BASE_DLL_FILE_EXT;
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+  const char* entry_point_name = "nv_factory";
+#else
   const char* entry_point_name = "nv_index_factory";
+#endif
   void* index_lib_symbol = nullptr;
 
 #ifdef _WIN32
@@ -413,17 +471,59 @@ bool vtknvindex_instance::load_nvindex()
     const std::string error_str = dlerror();
     const std::string path_env = "LD_LIBRARY_PATH";
 #endif
-    ERROR_LOG << "Failed to load the NVIDIA IndeX library: '" << error_str << "'.";
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+    if (m_p_handle)
+    {
+      // Check if the entry point used by older versions of IndeX exists
+      const char* entry_point_name_old = "nv_index_factory";
+#ifdef _WIN32
+      index_lib_symbol = GetProcAddress((HMODULE)m_p_handle, entry_point_name_old);
+#else
+      index_lib_symbol = dlsym(m_p_handle, entry_point_name_old);
+#endif
+      if (index_lib_symbol)
+      {
+        // The library is still using the old entry point, bail out early
+        ERROR_LOG << "The NVIDIA IndeX library '" << lib_name
+                  << "' is not compatible with this plugin version '" << get_version()
+                  << "', which was built against revision '" << NVIDIA_INDEX_LIBRARY_REVISION_STRING
+                  << "' "
+                  << "Please check your ParaView installation or get the matching IndeX libraries "
+                  << "from the ParaView dependencies repository: "
+                  << "https://www.paraview.org/files/dependencies/";
+        return false;
+      }
+    }
+#endif
+
+    ERROR_LOG << "Failed to " << (m_p_handle ? "retrieve the entry point into" : "load")
+              << " the NVIDIA IndeX library '" << lib_name << "': '" << error_str << "'.";
     ERROR_LOG << "Please verify that the environment variable " << path_env
-              << " contains the location of the NVIDIA IndeX libraries.";
+              << " contains the path to the correct NVIDIA IndeX libraries.";
+
     return false;
   }
 
   m_nvindexlib_fname = lib_name;
 
+  std::string library_revision_full_str;
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+  // Only access IVersion here, IIndeX will be retrieved after successful version check
+  {
+    mi::base::Handle<mi::neuraylib::IVersion> version(
+      nv::index::nv_factory<mi::neuraylib::IVersion>(index_lib_symbol));
+    if (!version)
+    {
+      ERROR_LOG << "Failed to retrieve the IVersion interface from the NVIDIA IndeX library.";
+      return false;
+    }
+
+    library_revision_full_str = version->get_build_number();
+  }
+#else
   typedef nv::index::IIndex*(IIndex_factory());
   IIndex_factory* factory = (IIndex_factory*)index_lib_symbol;
-
   m_nvindex_interface = factory();
   if (!m_nvindex_interface.is_valid_interface())
   {
@@ -431,80 +531,43 @@ bool vtknvindex_instance::load_nvindex()
     return false;
   }
 
+  library_revision_full_str = m_nvindex_interface->get_revision();
+#endif
+
   // Check that this IndeX library is compatible with this plugin version
   const std::string build_revision_str = NVIDIA_INDEX_LIBRARY_REVISION_STRING;
-  const std::string library_revision_full_str = m_nvindex_interface->get_revision();
   bool revision_mismatch = false;
+  if (!is_compatible_revision(build_revision_str, library_revision_full_str, revision_mismatch))
   {
-    // Extract just the revision, without build date and platform
-    std::string library_revision_str = library_revision_full_str;
-    const std::size_t pos = library_revision_str.find(',');
-    if (pos != std::string::npos)
+    // Note that this doesn't automatically open the "Output Messages" window if it happens
+    // during ParaView startup. The message will however become visible when another error is
+    // later triggered in Render().
+    ERROR_LOG << "The loaded NVIDIA IndeX library build '" << library_revision_full_str
+              << "' is not compatible with this plugin version '" << get_version()
+              << "', which was built against revision '" << build_revision_str << "' "
+              << "Please check your ParaView installation or get the matching IndeX libraries "
+              << "from the ParaView dependencies repository: "
+              << "https://www.paraview.org/files/dependencies/";
+
+    INFO_LOG << "Shutting down NVIDIA IndeX...";
+    if (m_nvindex_interface)
     {
-      library_revision_str = library_revision_str.substr(0, pos);
+      m_nvindex_interface->shutdown();
+      m_nvindex_interface.reset();
     }
+    unload_nvindex();
 
-    revision_mismatch = (library_revision_str != build_revision_str);
-    if (revision_mismatch)
-    {
-      // Split up revision into its components
-      std::vector<std::string> library_revision;
-      std::stringstream str(library_revision_str);
-      while (str.good())
-      {
-        std::string component;
-        std::getline(str, component, '.');
-        library_revision.push_back(component);
-      }
-
-      std::vector<std::string> build_revision = { std::to_string(
-        NVIDIA_INDEX_LIBRARY_REVISION_MAJOR) };
-      if (NVIDIA_INDEX_LIBRARY_REVISION_MINOR > 0)
-      {
-        build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_MINOR));
-        if (NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 0)
-        {
-          build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR));
-        }
-      }
-
-      bool is_compatible = false;
-      if (build_revision.size() == 1 || library_revision.size() == 1)
-      {
-        // No branch, meaning development version. Let's assume users know what they're doing.
-        is_compatible = true;
-      }
-      else if (build_revision.size() != library_revision.size())
-      {
-        is_compatible = false;
-      }
-      else if (build_revision.size() >= 2)
-      {
-        // It's a release branch, verify that the major revision is the same
-        is_compatible = (build_revision[0] == library_revision[0]);
-      }
-
-      if (!is_compatible)
-      {
-        // Note that this doesn't automatically open the "Output Messages" window if it happens
-        // during ParaView startup. The message will however become visible when another error is
-        // later triggered in Render().
-        ERROR_LOG << "The loaded NVIDIA IndeX library build '" << library_revision_full_str
-                  << "' is not compatible with this plugin version '" << get_version()
-                  << "', which was built against revision '" << build_revision_str << "' "
-                  << "Please check your ParaView installation or get the matching IndeX libraries "
-                  << "from the ParaView dependencies repository: "
-                  << "https://www.paraview.org/files/dependencies/";
-
-        INFO_LOG << "Shutting down NVIDIA IndeX...";
-        m_nvindex_interface->shutdown();
-        m_nvindex_interface.reset();
-        unload_nvindex();
-
-        return false;
-      }
-    }
+    return false;
   }
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+  m_nvindex_interface = nv::index::nv_factory<nv::index::IIndex>(index_lib_symbol);
+  if (!m_nvindex_interface.is_valid_interface())
+  {
+    ERROR_LOG << "Failed to initialize the NVIDIA IndeX library interface.";
+    return false;
+  }
+#endif
 
   // Check for license and authenticate.
   const mi::Sint32 auth_result = authenticate_nvindex();
@@ -1085,6 +1148,8 @@ bool vtknvindex_instance::setup_nvindex()
       idebug_configuration->set_option("use_strict_domain_subdivision=1");
 
 #ifdef VTKNVINDEX_USE_KDTREE
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR <= 348900)
+
     // Enable kd-tree affinity
     idebug_configuration->set_option("use_kdtree_subdivision=1");
 
@@ -1092,11 +1157,16 @@ bool vtknvindex_instance::setup_nvindex()
     idebug_configuration->set_option("subdivision_parts=4");
 
 #if 0
-    // Debug kd-tree
-    idebug_configuration->set_option("debug_kdtree_subdivision=1");
     idebug_configuration->set_option("dump_kdtree_subdivision=1");
 #endif
+
+#endif // (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR <= 348900)
+
+#if 0
+    // Debug kd-tree
+    idebug_configuration->set_option("debug_kdtree_subdivision=1");
 #endif
+#endif // VTKNVINDEX_USE_KDTREE
 
     // Use pinned memory for staging buffer (enabled by default).
     if (use_config_file)

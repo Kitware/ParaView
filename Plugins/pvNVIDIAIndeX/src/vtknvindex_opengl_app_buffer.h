@@ -30,14 +30,23 @@
 #ifndef vtknvindex_opengl_app_buffer_h
 #define vtknvindex_opengl_app_buffer_h
 
+#include <nv/index/version.h>
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+#include <mi/base/interface_implement.h>
+#include <nv/index/iapplication_depth_buffer.h>
+using vtknvindex_opengl_app_buffer_base = nv::index::IApplication_depth_buffer_gl;
+#else
 #include <nv/index/iopengl_application_buffer.h>
+using vtknvindex_opengl_app_buffer_base = nv::index::IOpengl_application_buffer;
+#endif
 
 #include <cassert>
 #include <string>
 
 // The class represents the application's OpenGL frame buffer.
 class vtknvindex_opengl_app_buffer
-  : public mi::base::Interface_implement<nv::index::IOpengl_application_buffer>
+  : public mi::base::Interface_implement<vtknvindex_opengl_app_buffer_base>
 {
 public:
   vtknvindex_opengl_app_buffer();

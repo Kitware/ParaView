@@ -123,8 +123,6 @@ void vtknvindex_performance_values::print_perf_values(
                << NVIDIA_INDEX_LIBRARY_REVISION_STRING << "\n";
     header_str << "NVIDIA IndeX library build version    : " << index->get_version() << ", "
                << index->get_revision() << "\n";
-    header_str << "DiCE library API interface version    : " << index->get_dice_interface_version()
-               << "\n";
     header_str << "DiCE header  API version              : "
                << MI_NEURAYLIB_VERSION_QUALIFIED_STRING << "\n";
     header_str << "DiCE library build version            : " << index->get_dice_version() << "\n";

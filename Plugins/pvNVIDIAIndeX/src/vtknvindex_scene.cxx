@@ -1282,6 +1282,20 @@ void vtknvindex_scene::update_config_settings(
     if (!is_success)
       ERROR_LOG << "Failed to set the subcube configuration.";
 
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 348900)
+    nv::index::IConfig_settings::Subdivision_config subdiv_config =
+      config_settings->get_subdivision_configuration();
+    subdiv_config.subdivision_mode =
+      nv::index::IConfig_settings::Subdivision_config::SUBDIVIDE_USING_KD_TREE;
+    subdiv_config.subdivision_part_count =
+      4; // TODO: Should this be set based on the number of GPUs when no MPI.
+#if 0
+    subdiv_config.save_subdivision = true;
+#endif
+
+    config_settings->set_subdivision_configuration(subdiv_config);
+#endif
+
     // Super sampling
     const mi::Uint32 rendering_samples = 1;
     config_settings->set_rendering_samples(rendering_samples);
