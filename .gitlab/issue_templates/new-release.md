@@ -16,15 +16,8 @@ Please remove this comment.
 
 # Preparatory steps
 
-  - Update ParaView guides
-    - Catalyst Guide
-      - [ ] Rename to ParaViewCatalystGuide-@VERSION@.pdf
-      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-    - Getting Started Guide
-      - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
-      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-    - macOS signing machine
-      - [ ] Check that the macOS signing machine is reachable. If not, request it to be switched on.
+  - macOS signing machine
+    - [ ] Check that the macOS signing machine is reachable. If not, request it to be switched on.
 
 # Update ParaView
 
@@ -43,25 +36,40 @@ Please remove this comment.
       associated milestone are available on the `release` branch.
 
   - Integrate changes.
-    - Make a commit for each of these `release`-only changes on a single topic
+    - Make a commit for each of these `release` changes on a single topic
       (suggested branch name: `update-to-v@VERSION@`):
-      - Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
+      - [ ] Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
       - [ ] Update `version.txt` and tag the commit (tag this commit below)
         ```
         git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
         echo @VERSION@@RC@ > version.txt
         git commit -m 'Update version number to @VERSION@@RC@' version.txt
         ```
+    - Make a commit for each of these `release`-only changes
+<!-- if not RC1 and patch == 0 -->
       - [ ] Update VTK's `paraview/release` branch. The
             [`release-mr`][release-mr]  script should be used to do this. Pass
             `-c .kitware-release-paraview.json` to use the appropriate
             configuration file.
+        - [ ] In VTK repository make a branch for the current paraview VTK
+          ```
+          git fetch origin
+          git checkout -b update-for-v@VERSION@@RC@ @PARAVIEW_VTK_CHECKSUM@
+          ```
+        - [ ] Add your development fork as a remote named `gitlab`
+          ```
+          git remote add gitlab <vtk fork url>
+          ```
+        - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
+              (ask @ben.boeckel if you do not have one)
+        - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
+              `Developer` privileges (so it can open MRs)
+<!-- endif -->
         - [ ] Merge the VTK `paraview/release` update MR
         - [ ] Update kwrobot with the new `paraview/release` branch rules (@ben.boeckel)
       - [ ] `.gitmodules` to track the `paraview/release` branch of VTK
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
             groups
-
     - Create a merge request targeting `release`
       - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
             (ask @ben.boeckel if you do not have one)
@@ -71,12 +79,17 @@ Please remove this comment.
             Merge Request (see script for usage)
         - [ ] Pull the script for each release; it may have been updated since it
           was last used
+        - [ ] Add your development fork as a remote named `gitlab`
         - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
         - [ ] The script outputs the information it will be using to create the
           merge request. Please verify that it is all correct before creating
           the merge request. See usage at the top of the script to provide
           information that is either missing or incorrect (e.g., if its data
           extraction heuristics fail).
+    - [ ] Run the test with `Do: test` and get a green dashboard.
+<!-- if not RC1 and patch == 0 -->
+    - [ ] Remove fixup commit: `git reset --hard @^`
+<!-- endif -->
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] Create tag: `git tag -a -m '@VERSION@@RC@' v@VERSION@@RC@ commit-that-updated-version.txt`
@@ -122,17 +135,17 @@ git submodule update --recursive --init
       - [ ] Commit changes
         - [ ] `git add README.md versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile`
         - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
-      - Make a commit for each of these `release`-only changes
-        - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
-              groups (if `@BASEBRANCH@` is `master`)
-      - Create a commit which will be tagged:
+    - Make a commit for each of these `release`-only changes
+      - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
+            groups (if `@BASEBRANCH@` is `master`)
+      - [ ] Create a commit which will be tagged:
         - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
-      - [ ] Create tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
+        - [ ] Create tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
 <!-- if not RC and patch == 0 -->
       - [ ] Create a commit that changes the paraview _DEFAULT_ source to the git
             url source in the `versions.cmake` file.
 <!-- endif -->
-      - Force `@VERSION@@RC@` in CMakeLists.txt
+      - [ ] Force `@VERSION@@RC@` in CMakeLists.txt
         - [ ] Append to the top of CMakeLists.txt (After project...) The following
             ```
             # Force source selection setting here.
@@ -152,12 +165,13 @@ git submodule update --recursive --init
       - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
 <!-- if not RC and patch == 0-->
       - [ ] Make sure that the backporting directive in the merge-request
-        description skips the last commit such as: `Backport: master:HEAD~`
+            description skips the last commit such as: `Backport: master:HEAD~`
 <!-- endif -->
-  - [ ] Build binaries
+  - Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
           build products. They will be deleted within 24 hours.
+
   - [ ] Remove fixup commit: `git reset --hard @^`
   - [ ] Get positive review
   - [ ] Force push `git push -f gitlab`
@@ -195,10 +209,10 @@ Show(Text(Text="$A^2$"))
   - Getting started guide opens
   - Help lists Readers, Writers, Filters, and Sources properly
   - Examples load and match thumbnails in dialog
-  - Python. Open the Python shell and run
   - Plugins are present and load properly
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
+    - ref. !22372 for current expected results
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representaiton to NVIDIA IndeX)
 
 Binary checklist
@@ -214,7 +228,7 @@ Binary checklist
 # Upload binaries
 
   - [ ] Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`)
-  - [ ] Ask @jonthan.volks (Kitware comm team) to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website from within the directory corresponding to www.paraview.org/files/
+  - [ ] Ask @cory.quammen to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website from within the directory corresponding to www.paraview.org/files/
 
 ```
 buildListing.sh
