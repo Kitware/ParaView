@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file   idistributed_data_subset.h
 /// \brief  Distributed subset interaces for a large-scale distributed datasets.

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component that allows extensions of the \neurayApiName.
@@ -38,9 +38,8 @@ public:
     ///
     /// All user-defined classes to be used with the \neurayApiName must be registered. The only
     /// exception are classes that never cross the API boundary, for example, classes only used
-    /// locally within a plugin. Class registration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
-    /// before \neurayProductName has been started.
+    /// locally within a plugin. Class registration must be done in #mi::neuraylib::IPlugin::init()
+    /// or before \neurayProductName has been started.
     ///
     /// \param class_name   The class name under which the class is to be registered. The class
     ///                     name must consist only of alphanumeric characters or underscores,
@@ -62,9 +61,8 @@ public:
     ///
     /// All user-defined classes to be used with the \neurayApiName must be registered. The only
     /// exception are classes that never cross the API boundary, for example, classes only used
-    /// locally within a plugin. Class registration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
-    /// before \neurayProductName has been started.
+    /// locally within a plugin. Class registration must be done in #mi::neuraylib::IPlugin::init()
+    /// or before \neurayProductName has been started.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It uses the default class factory #mi::neuraylib::User_class_factory
@@ -89,9 +87,8 @@ public:
 
     /// Unregisters a class with the \neurayApiName.
     ///
-    /// Class unregistration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::exit() or \endif
-    /// after \neurayProductName has been shut down.
+    /// Class unregistration must be done in #mi::neuraylib::IPlugin::exit() or after
+    /// \neurayProductName has been shut down.
     ///
     /// \param class_name   The class name under which the class was registered.
     /// \param uuid         The class ID of the class. You can simply pass IID() of your class
@@ -107,9 +104,8 @@ public:
 
     /// Unregisters a class with the \neurayApiName.
     ///
-    /// Class unregistration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::exit() or \endif
-    /// before \neurayProductName has been shut down.
+    /// Class unregistration must be done in #mi::neuraylib::IPlugin::exit() or after
+    /// \neurayProductName has been shut down.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
     /// convenience. It uses the default class factory #mi::neuraylib::User_class_factory
@@ -135,9 +131,8 @@ public:
 
     /// Registers a new importer with the \neurayApiName.
     ///
-    /// Importer registration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
-    /// before \neurayProductName has been started.
+    /// Importer registration must be done in #mi::neuraylib::IPlugin::exit() or before
+    /// \neurayProductName has been started.
     ///
     /// \param importer     The new importer to register.
     /// \return
@@ -148,9 +143,8 @@ public:
 
     /// Registers a new exporter with the \neurayApiName.
     ///
-    /// Exporter registration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
-    /// before \neurayProductName has been started.
+    /// Importer registration must be done in #mi::neuraylib::IPlugin::exit() or before
+    /// \neurayProductName has been started.
     ///
     /// \param exporter     The new exporter to register.
     /// \return
@@ -161,9 +155,8 @@ public:
 
     /// Unregisters an importer registered with the \neurayApiName.
     ///
-    /// Unregistration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::exit() or \endif
-    /// after \neurayProductName has been shut down.
+    /// Unregistration must be done in #mi::neuraylib::IPlugin::exit() or after
+    /// \neurayProductName has been shut down.
     ///
     /// \param importer     The importer to unregister.
     /// \return
@@ -175,9 +168,8 @@ public:
 
     /// Unregisters an exporter registered with the \neurayApiName.
     ///
-    /// Unregistration must be done
-    /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::exit() or \endif
-    /// after \neurayProductName has been shut down.
+    /// Unregistration must be done in #mi::neuraylib::IPlugin::exit() or after
+    /// \neurayProductName has been shut down.
     ///
     /// \param exporter     The exporter to unregister.
     /// \return
@@ -266,7 +258,7 @@ public:
 
 };
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 } // namespace neuraylib
 

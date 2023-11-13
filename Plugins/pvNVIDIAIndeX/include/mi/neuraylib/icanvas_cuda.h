@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for CUDA canvases
@@ -69,7 +69,7 @@ public:
     virtual void* get_data(Uint32 layer = 0) = 0;
 };
 
-/*@}*/ // end group mi_neuray_rendering
+/**@}*/ // end group mi_neuray_rendering
 
 } // namespace neuraylib
 

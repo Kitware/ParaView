@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief A lightweight HTTP server.
@@ -439,7 +439,7 @@ public:
 
     /// Query whether this is a secure (i.e. HTTPS) connection
     /// \return A bool indicating whether this is a secure connection
-    virtual bool is_secure_connection() = 0;    
+    virtual bool is_secure_connection() = 0;
 };
 
 /// A WebSocket state handler that can be installed to a WebSocket connection to handle events of
@@ -610,6 +610,16 @@ public:
 
     /// Returns the HTTP connection associated with this WebSocket connection.
     virtual IConnection* get_http_connection() = 0;
+
+    /// Set the maximum payload that web socket messages can have. Defaults to 2 Gb.
+    ///
+    /// \param bytes The maximum payload in bytes
+    virtual void set_max_payload(Uint64 bytes) = 0;
+
+    /// Get the maximum payoad.
+    ///
+    /// \return The maximum payload.
+    virtual Uint64 get_max_payload() = 0;
 };
 
 mi_static_assert( sizeof( IWeb_socket::State) == sizeof( Uint32));
@@ -735,7 +745,7 @@ public:
     /// Starts the server in SSL mode listening on the given address.
     ///
     /// This method can be called at most once. Additionally, the method #start() can also be called
-    /// for unsecure connections.
+    /// for insecure connections.
     ///
     /// The server will run within a separate thread; all requests will be handled in their own
     /// threads as well.
@@ -884,16 +894,16 @@ public:
     virtual Uint32 get_http_post_body_limit() const = 0;
 
     /// Sets the maximum number of concurrent connections this server will accept. Defaults to 256.
-    /// 
-    /// Further connections will be put on the os backlog and serviced only after the number of 
+    ///
+    /// Further connections will be put on the OS backlog and serviced only after the number of
     /// current connections drops below this value.
-    /// 
-    /// Note that when even the os backlog is full things works a bit differently depending on OS:
-    /// 
-    /// Linux:   Further connections will be ignored by the server, client will time out and 
+    ///
+    /// Note that when even the OS backlog is full things works a bit differently depending on OS:
+    ///
+    /// Linux:   Further connections will be ignored by the server, client will time out and
     //           try again.
     /// Windows: Further connections will be rejected by the server and fail.
-    /// 
+    ///
     /// \param limit The new limit.
     virtual void set_concurrent_connection_limit( Uint32 limit ) = 0;
 
@@ -977,14 +987,14 @@ public:
     ///
     /// \note
     ///   The WebSocket address must have one of the following two formats:
-    ///   - \c "ws://host_address[:host_port]/url" for unsecure connections, or
+    ///   - \c "ws://host_address[:host_port]/url" for insecure connections, or
     ///   - \c "wss://host_address[:host_port]/url" for secure connections.
     ///
     virtual IWeb_socket* create_client_web_socket( const char* web_socket_address,
         Float32 connect_timeout) = 0;
 };
 
-/*@}*/ // end group mi_neuray_http
+/**@}*/ // end group mi_neuray_http
 
 } // namespace http
 

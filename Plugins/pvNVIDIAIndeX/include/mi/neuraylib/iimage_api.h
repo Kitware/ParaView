@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for various image-related functions.
@@ -24,11 +24,6 @@ class ITile;
 /**
 \if MDL_SDK_API
     \defgroup mi_neuray_mdl_sdk_misc Miscellaneous Interfaces
-    \ingroup mi_neuray
-
-    \brief Various utility classes.
-\elseif IRAY_API
-    \defgroup mi_neuray_mdl_sdk_misc Miscellaneous MDL-related Interfaces
     \ingroup mi_neuray
 
     \brief Various utility classes.
@@ -69,7 +64,7 @@ public:
     /// \param width        The desired width.
     /// \param height       The desired height.
     /// \return             The requested tile, or \c NULL in case of invalid pixel type, width, or
-    ///                     height.
+    ///                     height, or memory allocation failures.
     virtual ITile* create_tile(
         const char* pixel_type,
         Uint32 width,
@@ -92,7 +87,7 @@ public:
     /// \param gamma        The desired gamma value. The special value 0.0 represents the default
     ///                     gamma which is 1.0 for HDR pixel types and 2.2 for LDR pixel types.
     /// \return             The requested canvas, or \c NULL in case of invalid pixel type, width,
-    ///                     height, layers, or cubemap flag.
+    ///                     height, layers, or cubemap flag, or memory allocation failures.
     virtual ICanvas* create_canvas(
         const char* pixel_type,
         Uint32 width,
@@ -120,6 +115,11 @@ public:
     ///                     gamma which is 1.0 for HDR pixel types and 2.2 for LDR pixel types.
     /// \return             The requested canvas, or \c NULL in case of invalid parameters or
     ///                     CUDA errors.
+#else // MI_SKIP_WITH_MDL_SDK_DOXYGEN
+    /// Unused.
+    ///
+    /// This method exists only for technical reasons (ABI compatibility). Calling it results in
+    /// unspecified behavior.
 #endif // MI_SKIP_WITH_MDL_SDK_DOXYGEN
     virtual ICanvas_cuda* create_canvas_cuda(
         Sint32 cuda_device_id,
@@ -129,19 +129,31 @@ public:
         Uint32 layers = 1,
         Float32 gamma = 0.0f) const = 0;
 
-    /// Creates mipmaps from the given canvas.
+    /// Creates a mipmap from the given canvas.
     ///
     /// \note The base level (the canvas that is passed in) is not included in the returned
     /// canvas array.
     ///
-    /// \param canvas           The canvas to create the mipmaps from.
+    /// \param canvas           The canvas to create the mipmap from.
     /// \param gamma_override   If this parameter is different from zero, it is used instead of the
     ///                         canvas gamma during mipmap creation.
     /// \return                 An array of type #mi::IPointer containing pointers to
-    ///                         the mipmaps of type #mi::neuraylib::ICanvas.
-    ///                         If no mipmaps could be created, NULL is returned.
-    virtual IArray* create_mipmaps(
+    ///                         the miplevels of type #mi::neuraylib::ICanvas.
+    ///                         If no mipmap could be created, \c NULL is returned.
+    virtual IArray* create_mipmap(
         const ICanvas* canvas, Float32 gamma_override = 0.0f) const = 0;
+
+#ifdef MI_NEURAYLIB_DEPRECATED_14_0
+    inline IArray* create_mipmaps(
+        const ICanvas* canvas, Float32 gamma_override = 0.0f) const
+    { return create_mipmap( canvas, gamma_override); }
+#endif // MI_NEURAYLIB_DEPRECATED_14_0
+
+    /// Creates a copy of the passed tile.
+    virtual ITile* clone_tile( const ITile* tile) const = 0;
+
+    /// Creates a (deep) copy of the passed canvas.
+    virtual ICanvas* clone_canvas( const ICanvas* canvas) const = 0;
 
     //@}
     /// \name Conversion between canvases and raw memory buffers
@@ -256,9 +268,11 @@ public:
     /// \param image_format  The image format of the buffer, e.g., \c "jpg". Note that support for
     ///                      a given image format requires an image plugin capable of handling that
     ///                      format.
+    /// \param selector      The selector, or \c NULL. \ifnot DICE_API See section 2.3.1 in
+    ///                      [\ref MDLLS] for details. \endif
     /// \return              The canvas with the decoded pixel data, or \c NULL in case of failure.
     virtual ICanvas* create_canvas_from_buffer(
-        const IBuffer* buffer, const char* image_format) const = 0;
+        const IBuffer* buffer, const char* image_format, const char* selector = 0) const = 0;
 
     /// Decodes the pixel data from a reader into a canvas.
     ///
@@ -267,9 +281,11 @@ public:
     /// \param image_format  The image format of the buffer, e.g., \c "jpg". Note that support for
     ///                      a given image format requires an image plugin capable of handling that
     ///                      format.
+    /// \param selector      The selector, or \c NULL. \ifnot DICE_API See section 2.3.1 in
+    ///                      [\ref MDLLS] for details. \endif
     /// \return              The canvas with the decoded pixel data, or \c NULL in case of failure.
     virtual ICanvas* create_canvas_from_reader(
-        IReader* reader, const char* image_format) const = 0;
+        IReader* reader, const char* image_format, const char* selector = 0) const = 0;
 
     /// Indicates whether a particular image format is supported for decoding.
     ///
@@ -308,6 +324,23 @@ public:
     /// \name Utility methods for canvases
     //@{
 
+    /// Converts a tile to a different pixel type.
+    ///
+    /// \note This method creates a copy if the passed-in tiles already has the desired pixel type.
+    /// (It cannot return the passed-in tile since this would require a const cast.) If
+    /// performance is critical, you should compare pixel types yourself and skip the method call if
+    /// pixel type conversion is not needed.)
+    ///
+    /// See #convert(const ICanvas*,const char*)const for details of the conversion process.
+    ///
+    /// \param tile         The tile to convert (or to copy).
+    /// \param pixel_type   The desired pixel type. See \ref mi_neuray_types for a list of supported
+    ///                     pixel types. If this pixel type is the same as the pixel type of \p
+    ///                     tile, then a copy of the tile is returned.
+    /// \return             A tile with the requested pixel type, or \c NULL in case of errors
+    ///                     (\p tile is \c NULL, or \p pixel_type is not valid).
+    virtual ITile* convert( const ITile* tile, const char* pixel_type) const = 0;
+
     /// Converts a canvas to a different pixel type.
     ///
     /// \note This method creates a copy if the passed-in canvas already has the desired pixel type.
@@ -344,6 +377,17 @@ public:
     /// \return             A canvas with the requested pixel type, or \c NULL in case of errors
     ///                     (\p canvas is \c NULL, or \p pixel_type is not valid).
     virtual ICanvas* convert( const ICanvas* canvas, const char* pixel_type) const = 0;
+
+    /// Sets the gamma value of a tile and adjusts the pixel data accordingly.
+    ///
+    /// \note Gamma adjustments are always done in pixel type "Color" or "Rgb_fp". If necessary,
+    ///       the pixel data is converted forth and back automatically (which needs temporary
+    ///       buffers).
+    ///
+    /// \param tile             The tile whose pixel data is to be adjusted.
+    /// \param old_gamma        The old gamma value.
+    /// \param new_gamma        The new gamma value.
+    virtual void adjust_gamma( ITile* tile, Float32 old_gamma, Float32 new_gamma) const = 0;
 
     /// Sets the gamma value of a canvas and adjusts the pixel data accordingly.
     ///
@@ -384,6 +428,7 @@ public:
     /// Invalid pixel type/selector combinations are:
     /// - \p pixel_type is not an RGB or RGBA pixel type
     /// - \p selector is not an RGBA channel selector
+    /// - \p selector is \c "A", but \p pixel_type has no alpha channel
     ///
     /// \param pixel_type   The pixel type of the mipmap/canvas/tile.
     /// \param selector     The RGBA channel selector.
@@ -393,7 +438,7 @@ public:
     virtual const char* get_pixel_type_for_channel(
         const char* pixel_type, const char* selector) const = 0;
 
-    /// Extracs an RGBA channel from a canvas.
+    /// Extracts an RGBA channel from a canvas.
     ///
     /// \param canvas           The canvas to extract a channel from.
     /// \param selector         The RGBA channel selector.
@@ -401,7 +446,7 @@ public:
     ///                         channel selector combinations (see #get_pixel_type_for_channel()).
     virtual ICanvas* extract_channel( const ICanvas* canvas, const char* selector) const = 0;
 
-    /// Extracs an RGBA channel from a tile.
+    /// Extracts an RGBA channel from a tile.
     ///
     /// \param tile             The tile to extract a channel from.
     /// \param selector         The RGBA channel selector.
@@ -413,7 +458,7 @@ public:
 
 };
 
-/*@}*/ // end group mi_neuray_rendering / mi_neuray_rtmp
+/**@}*/ // end group mi_neuray_rendering / mi_neuray_rtmp
 
 } // namespace neuraylib
 

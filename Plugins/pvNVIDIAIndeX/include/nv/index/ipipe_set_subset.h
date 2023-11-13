@@ -1,6 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
+/// \brief Pipe set subset.
 
 #ifndef NVIDIA_INDEX_IPIPE_SET_SUBSET_H
 #define NVIDIA_INDEX_IPIPE_SET_SUBSET_H
@@ -70,8 +72,6 @@ public:
     /// \param[in] coordinate_first         Domain-specific property coordinate value of the first vertex.
     /// \param[in] coordinate_last          Domain-specific property coordinate value of the last vertex.
     ///
-    /// \return true on success, or false if one of the arguments is invalid.
-    //
     virtual void set_property_coordinates_range(
         mi::Float32 coordinate_first,
         mi::Float32 coordinate_last) = 0;
@@ -86,8 +86,6 @@ public:
     /// \param[in] value_min  Data value that should be mapped to 0.
     /// \param[in] value_max  Data value that should be mapped to 1.
     ///
-    /// \return true on success, or false if one of the arguments is invalid.
-    //
     virtual void set_property_value_range(
         mi::Float32 value_min,
         mi::Float32 value_max) = 0;

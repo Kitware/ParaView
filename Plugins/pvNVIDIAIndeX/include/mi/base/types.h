@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/types.h
 /// \brief Basic types.
@@ -14,6 +14,14 @@
 #include <cstddef>             // define  size_t, ptrdiff_t
 #include <cstdlib>             // declare abs
 #include <cmath>               // declare abs overloads
+
+#if defined(__has_include)
+#if (!defined(_WIN32) || (defined(_HAS_CXX20) && _HAS_CXX20) || _MSVC_LANG >= 202002L)
+#if __has_include(<bit>)
+#include <bit>
+#endif
+#endif
+#endif
 
 #ifndef MI_BASE_NO_STL
 #include <algorithm>           // define  min, max
@@ -325,6 +333,10 @@ namespace {
 ///     float  fval( 0.0f );
 ///     Uint32 uval( binary_cast<Uint32>(fval) );
 /// \endcode
+#ifdef  __cpp_lib_bit_cast
+template<class T, class S>
+constexpr T binary_cast(const S& src) noexcept { return std::bit_cast<T,S>(src); }
+#else
 template <class Target, class Source>
 inline Target binary_cast(Source const & val)
 {
@@ -333,6 +345,7 @@ inline Target binary_cast(Source const & val)
     val_.source = val;
     return val_.target;
 }
+#endif
 
 /// %Base class for the helper class to deduce properties of numeric types defined in this API.
 ///

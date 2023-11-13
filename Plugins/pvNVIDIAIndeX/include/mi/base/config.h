@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/config.h
 /// \brief Configuration of the Base API.
@@ -20,7 +20,7 @@
  */
 
 // The current copyright year string.
-#define MI_COPYRIGHT_YEARS_STRING "2021"
+#define MI_COPYRIGHT_YEARS_STRING "2023"
 
 // The NVIDIA company name string for copyrights etc.
 #define MI_COPYRIGHT_COMPANY_STRING "NVIDIA Corporation"
@@ -255,13 +255,13 @@
 #define MI_ARCH_LITTLE_ENDIAN
 #endif // !defined(MI_ARCH_LITTLE_ENDIAN)
 
-#elif defined(__aarch64__)
+#elif defined(__aarch64__) || defined(_M_ARM64)
 
 #if !defined(MI_ARCH_ARM_64)
 #define MI_ARCH_ARM_64
 #endif // !defined( MI_ARCH_ARM_64)
 
-#if !defined(__AARCH64EL__)
+#if !defined(__AARCH64EL__) && !defined(_M_ARM64) // windows implies little endian mode for now
 #error Architecture ARM_64 is only supported in little endian mode.
 #endif
 
@@ -271,7 +271,10 @@
 
 #endif
 
-#if defined(MI_ARCH_X86_64) || defined(MI_ARCH_SPARC_64) || defined(MI_ARCH_POWERPC_64) || defined(MI_ARCH_ARM_64)
+#if    defined(MI_ARCH_X86_64) \
+    || defined(MI_ARCH_SPARC_64) \
+    || defined(MI_ARCH_POWERPC_64) \
+    || defined(MI_ARCH_ARM_64)
 #define MI_ARCH_64BIT
 #endif // defined(MI_ARCH_X86_64) ...
 
@@ -312,11 +315,20 @@
 
 #ifdef __CUDACC__
 #define MI_HOST_DEVICE_INLINE __host__ __device__ __forceinline__
+#ifndef MI_DEVICE_INLINE
+#define MI_DEVICE_INLINE __device__ __forceinline__
+#endif
 #else
 #ifdef __cplusplus
 #define MI_HOST_DEVICE_INLINE MI_FORCE_INLINE
+#ifndef MI_DEVICE_INLINE
+#define MI_DEVICE_INLINE MI_FORCE_INLINE
+#endif
 #else
 #define MI_HOST_DEVICE_INLINE
+#ifndef MI_DEVICE_INLINE
+#define MI_DEVICE_INLINE
+#endif
 #endif
 #endif
 
@@ -333,6 +345,6 @@
 #define MI_CXX_FEATURE_RVALUE_REFERENCES
 #endif
 
-/*@}*/ // end group mi_base_config
+/**@}*/ // end group mi_base_config
 
 #endif // MI_BASE_CONFIG_H

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Assertions and compile-time assertions.
@@ -90,7 +90,7 @@ error "Only one of mi_neuray_assert and mi_neuray_assert_msg has been defined. P
 #endif // mi_neuray_assert xor mi_neuray_assert_msg
 
 
-/*@}*/ // end group mi_neuray_assert
+/**@}*/ // end group mi_neuray_assert
 
 } // namespace neuraylib
 } // namespace mi

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief \NeurayApiName for implementing distributed parallel computing algorithms.
@@ -49,9 +49,9 @@
 #define MI_NEURAYLIB_DICE_VERSION_QUALIFIER_EMPTY
 
 /// DiCE product version number in a string representation, such as \c "2016".
-#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2021"
+#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2023"
 
-/*@}*/ // end group mi_neuray_dice
+/**@}*/ // end group mi_neuray_dice
 
 namespace mi {
 
@@ -63,6 +63,7 @@ class IExecution_listener;
 class IFragmented_job;
 class IGpu_description;
 class IJob;
+class IJob_execution_context;
 class IScope;
 class ITransaction;
 class IRDMA_buffer;
@@ -197,7 +198,7 @@ public:
 
 };
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 /** \addtogroup mi_neuray_dice
 @{
@@ -221,17 +222,7 @@ public:
 /// privacy level is, the more private the corresponding scope.
 typedef Uint8 Privacy_level;
 
-/// Provides information about the context in which a job is executed.
-class IJob_execution_context
-{
-public:
-    /// Returns the thread ID.
-    ///
-    /// \return   The ID of thread the job is executed in.
-    virtual Uint64 get_thread_id() const = 0;
-};
-
-/*@}*/ // end group mi_neuray_dice
+/**@}*/ // end group mi_neuray_dice
 
 /** \addtogroup mi_neuray_database_access
 @{
@@ -530,7 +521,7 @@ public:
     ///                        - -5: Invalid privacy level.
     virtual Sint32 localize( Tag_struct tag, Privacy_level privacy_level) = 0;
 
-    /// Removes a \p tag from the database.
+    /// Marks a \p tag for removal from the database.
     ///
     /// Note that the element continues to be stored in the database as long as it is referenced by
     /// other elements (or jobs). If it is no longer referenced, it will be lazily removed by the
@@ -538,7 +529,7 @@ public:
     /// implies that a #remove() call might actually remove an element that was stored later under
     /// the same tag.
     ///
-    /// \param tag            The tag that identifies the database element to be removed.
+    /// \param tag            The tag that identifies the database element to be marked for removal.
     /// \param only_localized If \c true, the element is only removed if it exists in the scope
     ///                       of the transaction; parent scopes are not considered.
     /// \return
@@ -587,7 +578,7 @@ public:
     /// stamp.
     ///
     /// \note \p time_stamp should not stem from another concurrent transaction. Such changes will
-    ///       never be visible in this transaction, but the method might still return \p true
+    ///       never be visible in this transaction, but the method might still return \c true
     ///       depending on the start order of the two transactions.
     ///
     /// \note In case of multiple overlapping transactions the returned answer may not list
@@ -608,7 +599,7 @@ public:
     /// the database since a given time stamp.
     ///
     /// \note \p time_stamp should not stem from another concurrent transaction. Such changes will
-    ///       never be visible in this transaction, but the method might still return \p true
+    ///       never be visible in this transaction, but the method might still return \c true
     ///       depending on the start order of the two transactions.
     ///
     /// \see #get_time_stamp(), #get_time_stamp(mi::neuraylib::Tag_struct)const
@@ -655,8 +646,7 @@ public:
     ///
     /// When storing a database element or database job a new tag is automatically assigned and
     /// returned. Alternatively, one can reserve a tag upfront and pass it later explicitly to the
-    /// various #store() method. For example, this workflow can be used for cyclic references among
-    /// database elements.
+    /// various #store() method.
     ///
     /// \return     The reserved tag.
     virtual Tag_struct reserve_tag() = 0;
@@ -750,7 +740,7 @@ public:
     virtual void invalidate_job_results( Tag_struct tag) = 0;
 };
 
-/*@}*/ // end group mi_neuray_database_access
+/**@}*/ // end group mi_neuray_database_access
 
 /** \addtogroup mi_neuray_dice
 @{
@@ -1107,16 +1097,16 @@ class IFragmented_job : public
 public:
     /// Executes one of many fragments of the fragmented job on the local host.
     ///
-    /// Executes one fragment of the many fragments spawned by the fragmented job. This fragment
-    /// executed on the calling host only and, thus, operates on the original instance of the
-    /// fragmented job class and not on a copy.
+    /// Executes one fragment of the many fragments spawned by the fragmented job. This method is
+    /// used for fragments executed on the calling host only and, thus, operates on the original
+    /// instance of the fragmented job class and not on a copy.
     ///
     /// Note that other fragments operating on the same instance might be executed in parallel.
     /// Therefore all accesses to instance data need to be properly serialized.
     ///
     /// \see #execute_fragment_remote() and #receive_remote_result() are the counterpart of this
     ///      method for remote execution
-    /// \see #execute_fragment_remote_rdma() and #receive_remote_result_rdma() are the counterpart
+    /// \see #execute_fragment_remote_rdma() and #receive_remote_result_rdma() are the counterparts
     ///      of this method for remote execution using RDMA
     ///
     /// \param transaction  The transaction in which the fragmented job is executed. The transaction
@@ -1163,10 +1153,9 @@ public:
     /// \param context      The context in which the fragmented job is executed.
     ///
     /// \see #receive_remote_result() consumes the data produced by this method
-    /// \see #execute_fragment() is the counterpart of this method and #receive_remote_result() for
-    ///      local execution
-    /// \see #execute_fragment_remote_rdma() and #receive_remote_result_rdma() are the counterpart
-    ///      of this method and #receive_remote_result() for remote execution using RDMA
+    /// \see #execute_fragment() is the counterpart of this method for local execution
+    /// \see #execute_fragment_remote_rdma() and #receive_remote_result_rdma() are the counterparts
+    ///      of this method for remote execution using RDMA
     virtual void execute_fragment_remote(
         ISerializer* serializer,
         IDice_transaction* transaction,
@@ -1205,10 +1194,9 @@ public:
     /// \param count        The number of fragments into which the fragmented job is split.
     ///
     /// \see #execute_fragment_remote() produces the data consumed by this method
-    /// \see #execute_fragment() is the counterpart of this method and
-    ///      #execute_fragment_remote() for local execution
-    /// \see #execute_fragment_remote_rdma() and #receive_remote_result_rdma() are the counterpart
-    ///      of this method and #execute_fragment_remote() for remote execution using RDMA
+    /// \see #execute_fragment() is the counterpart of this method for local execution
+    /// \see #execute_fragment_remote_rdma() and #receive_remote_result_rdma() are the counterparts
+    ///      of this method for remote execution using RDMA
     virtual void receive_remote_result(
         IDeserializer* deserializer,
         IDice_transaction* transaction,
@@ -1378,7 +1366,12 @@ public:
         /// #serialize() and #deserialize() as well as for execute_fragment_remote() and
         /// #receive_remote_result() suffice.
         LOCAL = 0,
-        /// The fragments will be spread across all hosts in the cluster.
+        /// The fragments will be spread across all hosts in the cluster. If a fragment fails to
+        /// execute on a given host (for example, due to a host leaving the cluster), it is
+        /// re-assinged to a different host such that fragments are guaranteed to be executed.
+        ///
+        /// \note Although DiCE tries to distribute fragments in a fair manner to the cluster nodes,
+        ///       there is no guarantee that this will be the case.
         CLUSTER = 1,
         /// At most one fragment will be done per remote host. If the specified number of fragments
         /// is larger than zero and less than the number of remote hosts then only some hosts will
@@ -1390,7 +1383,9 @@ public:
         ///       fragment of the job.
         ONCE_PER_HOST = 2,
         /// The job implements an explicit assignment of fragments to hosts and must implement the
-        /// #assign_fragments_to_hosts() function to fill out all slots.
+        /// #assign_fragments_to_hosts() function to fill out all slots. Fragments assigned to hosts
+        /// which are unknown will be skipped. If a host fails during fragment execution, its
+        /// workload will \em not be re-assinged to a different host
         USER_DEFINED = 3,
         SCHEDULING_MODE_FORCE_32_BIT = 0xffffffffU
     };
@@ -1710,7 +1705,7 @@ public:
     /// Returns 0.
     virtual Size get_thread_limit() const { return 0; }
 
-    /// Returns false.
+    /// Returns \c false.
     virtual bool get_allow_non_sequential_chunks() const { return false; }
 
     /// Empty body, i.e., leaves \p slots unaltered.
@@ -1808,7 +1803,7 @@ public:
     virtual void cancel() { }
 };
 
-/*@}*/ // end group mi_neuray_dice
+/**@}*/ // end group mi_neuray_dice
 
 } // namespace neuraylib
 

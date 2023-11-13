@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for tiles
@@ -99,7 +99,7 @@ public:
     virtual void* get_data() = 0;
 };
 
-/*@}*/ // end group mi_neuray_rendering
+/**@}*/ // end group mi_neuray_rendering
 
 } // namespace neuraylib
 

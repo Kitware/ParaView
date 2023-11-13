@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/interface_implement.h
 /// \brief Mixin class template for deriving interface implementations.
@@ -40,6 +40,8 @@ template <class I>
 class Interface_implement : public I
 {
 public:
+    typedef I Interface;
+
     /// Constructor.
     ///
     /// \param initial   The initial reference count (defaults to 1).
@@ -68,6 +70,21 @@ public:
         (void) other;
         return *this;
     }
+
+#if (__cplusplus >= 201103L)
+    /// Move constructor.
+    Interface_implement(Interface_implement&& other)
+        : m_refcnt{other.m_refcnt.swap(0)}
+    {
+    }
+
+    /// Move assignment.
+    Interface_implement& operator=(Interface_implement&& other)
+    {
+        other.m_refcnt = m_refcnt.swap(other.m_refcnt);
+        return *this;
+    }
+#endif
 
     /// Increments the reference count.
     ///

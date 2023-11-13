@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Callback interface for notifications about joining or leaving hosts.
@@ -88,7 +88,7 @@ public:
     virtual void database_status_callback(const char* status) = 0;
 };
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 } // namespace neuraylib
 

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Database transactions.
@@ -31,6 +31,13 @@ class IScope;
 /// Transactions are associated with a scope of the database and can be created with
 /// #mi::neuraylib::IScope::create_transaction().
 ///
+/// Transactions are not thread-safe. If you use a particular transaction from multiple threads,
+/// then you have to serialize all transaction uses. This does not only apply to methods of
+/// #mi::neuraylib::ITransaction, but all methods that implicitly use the transaction. For example,
+/// such a use can happen by methods of DB elements returned from #access() or #edit() calls, or by
+/// objects returned from factories taking the transaction as an \ifnot DICE_API argument, like
+/// #mi::neuraylib::IMdl_factory::create_module_builder(). \else argument. \endif
+///
 /// \par Concurrent accesses to database elements within a transaction
 /// Access to database elements is provided by #access() (read-only) and #edit() (for modification).
 /// The interface pointers returned by these methods must be released when you are done, in
@@ -47,31 +54,28 @@ class IScope;
 /// <li> multiple #access() calls: Since all obtained interface pointers are const there is no
 ///      way to modify the database elements.</li>
 /// <li> #access() call after #edit() calls: The interface pointer returned from #access() reflects
-///      the changes as they are done to the interface pointer returned from the last #edit() call.
+///      the changes as they are done via the interface pointer returned from the last #edit() call.
 ///      \if IRAY_API Note that this use case is not supported for user-defined classes (classes
 ///      derived from #mi::neuraylib::IUser_class).\endif </li>
-/// <li> #edit() call after #access() calls: The changes done to the interface pointer returned from
+/// <li> #edit() call after #access() calls: The changes done via the interface pointer returned from
 ///      #edit() are not observable through any interface pointer returned from the #access() calls.
 ///      </li>
-/// <li> multiple #edit() calls: The changes done to the individual interface pointers are not
-///      observable through the other interface pointers. The changes from the interface pointer
-///      from the last #edit() call survive, independent of the order in which the pointers are
-///      released.</li>
+/// <li> multiple #edit() calls: The changes done via the individual interface pointers are not
+///      observable through the other interface pointers, except for the changes done via the
+///      interface pointer obtained first at the time the second interface pointer is obtained. The
+///      changes from the interface pointer from the last #edit() call survive, independent of the
+///      order in which the pointers are released.</li>
 /// </ul>
 /// \par
 /// Note that these semantics do not only apply to #access() and #edit() calls. They also apply
 /// to other API methods that access other database elements, e.g., #mi::IRef::get_reference(),
 /// which internally calls #access().
 ///
-/// \ifnot MDL_SDK_API
 /// \par Concurrent transactions
 /// If the same database element is edited in multiple overlapping transactions, the changes from
 /// the transaction created last survive, independent of the order in which the transactions are
-/// committed. If needed, the lifetime of transactions can be serialized across hosts (see
-/// #mi::neuraylib::IDatabase::lock() for details).
-/// \else
-/// \note The MDL SDK currently supports only one transaction at a time.
-/// \endif
+/// committed. \ifnot MDL_SDK_API If needed, the lifetime of transactions can be serialized across
+/// hosts (see #mi::neuraylib::IDatabase::lock() for details). \endif
 class ITransaction : public
     mi::base::Interface_declare<0x6ca1f0c2,0xb262,0x4f09,0xa6,0xa5,0x05,0xae,0x14,0x45,0xed,0xfa>
 {
@@ -87,14 +91,10 @@ public:
     ///                     - -3: The transaction is not open.
     virtual Sint32 commit() = 0;
 
-    /// \ifnot MDL_SDK_API
     /// Aborts the transaction.
     ///
     /// Note that an abort() implicitly closes the transaction.
     /// A closed transaction does not allow any future operations and needs to be released.
-    /// \else
-    /// This operation is not supported.
-    /// \endif
     virtual void abort() = 0;
 
     /// Indicates whether the transaction is open.
@@ -111,11 +111,9 @@ public:
     /// \ref mi_neuray_scene_element. \endif Note that most types can also be created via the API
     /// component #mi::neuraylib::IFactory which does not require the context of a transaction.
     ///
-    /// This method can not be used to create MDL definitions, material instances, or
-    /// function calls. To create instances of
-    /// #mi::neuraylib::IMaterial_instance and #mi::neuraylib::IFunction_call, use the
-    /// methods #mi::neuraylib::IMaterial_definition::create_material_instance() or
-    /// #mi::neuraylib::IFunction_definition::create_function_call(), respectively.
+    /// This method can not be used to create MDL modules, definitions, or function calls. To
+    /// create instances of #mi::neuraylib::IFunction_call, use the method
+    /// #mi::neuraylib::IFunction_definition::create_function_call().
     ///
     /// The created object will be initialized in a manner dependent upon the passed type
     /// name. Each class has its own policy on initialization. So, one should not make any
@@ -129,8 +127,8 @@ public:
     ///                     #mi::neuraylib::IImage. \if IRAY_API Names of user-defined classes are
     ///                     also valid arguments. \endif Note that you can not create instances of
     ///                     #mi::neuraylib::IAttribute_set or #mi::neuraylib::IScene_element, only
-    ///                     instances of the derived interfaces \if IRAY_API (see also
-    ///                     #mi::neuraylib::IAttribute_container) \endif .
+    ///                     instances of the derived interfaces. \if IRAY_API (See also
+    ///                     #mi::neuraylib::IAttribute_container). \endif
     /// \param argc         The number of elements in \p argv. Passed to the constructor of factory
     ///                     of the object to create.
     /// \param argv         The array of arguments passed to the constructor. Passed to the
@@ -150,11 +148,9 @@ public:
     /// \ref mi_neuray_scene_element. \endif Note that most types can also be created via the API
     /// component #mi::neuraylib::IFactory which does not require the context of a transaction.
     ///
-    /// This method can not be used to create MDL definitions, material instances, or
-    /// function calls. To create instances of
-    /// #mi::neuraylib::IMaterial_instance and #mi::neuraylib::IFunction_call, use the
-    /// methods #mi::neuraylib::IMaterial_definition::create_material_instance() or
-    /// #mi::neuraylib::IFunction_definition::create_function_call(), respectively.
+    /// This method can not be used to create MDL modules, definitions, or function calls. To
+    /// create instances of #mi::neuraylib::IFunction_call, use the method
+    /// #mi::neuraylib::IFunction_definition::create_function_call().
     ///
     /// The created object will be initialized in a manner dependent upon the passed type name. Each
     /// class has its own policy on initialization. So, one should not make any assumptions on the
@@ -184,8 +180,8 @@ public:
     ///                     #mi::neuraylib::IImage. \if IRAY_API Names of user-defined classes are
     ///                     also valid arguments. \endif Note that you can not create instances of
     ///                     #mi::neuraylib::IAttribute_set or #mi::neuraylib::IScene_element, only
-    ///                     instances of the derived interfaces \if IRAY_API (see also
-    ///                     #mi::neuraylib::IAttribute_container) \endif .
+    ///                     instances of the derived interfaces. \if IRAY_API (See also
+    ///                     #mi::neuraylib::IAttribute_container). \endif
     /// \param argc         The number of elements in \p argv. Passed to the constructor of factory
     ///                     of the object to create.
     /// \param argv         The array of arguments passed to the constructor. Passed to the
@@ -216,11 +212,9 @@ public:
     /// \ref mi_neuray_scene_element. \endif Note that most types can also be created via the API
     /// component #mi::neuraylib::IFactory which does not require the context of a transaction.
     ///
-    /// This method can not be used to create MDL definitions, material instances, or
-    /// function calls. To create instances of
-    /// #mi::neuraylib::IMaterial_instance and #mi::neuraylib::IFunction_call, use the
-    /// methods #mi::neuraylib::IMaterial_definition::create_material_instance() or
-    /// #mi::neuraylib::IFunction_definition::create_function_call(), respectively.
+    /// This method can not be used to create MDL modules, definitions, or function calls. To
+    /// create instances of #mi::neuraylib::IFunction_call, use the method
+    /// #mi::neuraylib::IFunction_definition::create_function_call().
     ///
     /// The created object will be initialized in a manner dependent upon the passed type name. Each
     /// class has its own policy on initialization. So, one should not make any assumptions on the
@@ -276,7 +270,7 @@ public:
     /// \param db_element The #mi::base::IInterface to store.
     /// \param name       The name under which to store \p db_element. If there exists already a DB
     ///                   element with that name then it will be overwritten \if IRAY_API (but see
-    ///                   also return code -9 below) \endif .
+    ///                   also return code -9 below) \endif
     /// \param privacy    The privacy level under which to store \p db_element (in the range from 0
     ///                   to the privacy level of the scope of this transaction). In addition, the
     ///                   constant #LOCAL_SCOPE can be used as a shortcut to indicate the privacy
@@ -298,12 +292,9 @@ public:
     ///
     ///        - -9: There is already an element of name \p name and overwriting elements of that
     ///              type is not supported. This applies to elements of type
-    ///              #mi::neuraylib::IModule, #mi::neuraylib::IMaterial_definition, and
-    ///              #mi::neuraylib::IFunction_definition.
-    ///              It also applies to elements of type #mi::neuraylib::IFunction_call
-    ///              and #mi::neuraylib::IMaterial_instance that are used as defaults
-    ///              in an #mi::neuraylib::IMaterial_definition or
-    ///              #mi::neuraylib::IFunction_definition.
+    ///              #mi::neuraylib::IModule and #mi::neuraylib::IFunction_definition. It also
+    ///              applies to elements of type #mi::neuraylib::IFunction_call that are used as
+    ///              defaults in an #mi::neuraylib::IFunction_definition.
     virtual Sint32 store(
         base::IInterface* db_element, const char* name, Uint8 privacy = LOCAL_SCOPE) = 0;
 
@@ -389,8 +380,8 @@ public:
 
     /// Creates a copy of a database element.
     ///
-    /// Note that DB elements of type #mi::neuraylib::IModule, #mi::neuraylib::IMaterial_definition,
-    /// and #mi::neuraylib::IFunction_definition can not be copied.
+    /// Note that DB elements of type #mi::neuraylib::IModule and
+    /// #mi::neuraylib::IFunction_definition can not be copied.
     ///
     /// \param source    The name of the element to be copied.
     /// \param target    The desired name of the copy.
@@ -408,15 +399,16 @@ public:
     ///                  - -6: DB elements of this type cannot be copied.
     ///                  - -9: There is already an element of name \p name and overwriting elements
     ///                        of that type is not supported. This applies to elements of type
-    ///                        #mi::neuraylib::IModule, #mi::neuraylib::IMaterial_definition, and
-    ///                        #mi::neuraylib::IFunction_definition.
+    ///                        #mi::neuraylib::IModule and #mi::neuraylib::IFunction_definition.
     ///                        It also applies to elements of type #mi::neuraylib::IFunction_call
-    ///                        and #mi::neuraylib::IMaterial_instance that are used as defaults
-    ///                        in an #mi::neuraylib::IMaterial_definition or
-    ///                        #mi::neuraylib::IFunction_definition.
+    ///                        that are used as defaults in an #mi::neuraylib::IFunction_definition.
+#ifdef MI_NEURAYLIB_DEPRECATED_ITRANSACTION_COPY_DEFAULT_PRIVACY_LEVEL_ZERO
     virtual Sint32 copy( const char* source, const char* target, Uint8 privacy = 0) = 0;
+#else
+    virtual Sint32 copy( const char* source, const char* target, Uint8 privacy = LOCAL_SCOPE) = 0;
+#endif
 
-    /// Removes the element with the name \p name from the database.
+    /// Marks the element with the name \p name for removal from the database.
     ///
     /// Note that the element continues to be stored in the database as long as it is referenced by
     /// other elements. If it is no longer referenced, and the last transaction were it was
@@ -429,7 +421,11 @@ public:
     /// committed and before starting the next one to force garbage collection of all possible
     /// elements.
     ///
-    /// \param name           The name of the element in the database to remove.
+    /// \if IRAY_API
+    /// See also \ref mi_neuray_database_reuse_of_names for more details and correct usage patterns.
+    /// \endif
+    ///
+    /// \param name           The name of the element in the database to mark for removal.
     /// \param only_localized \if MDL_SDK_API Unused. \else If \c true, the element is only removed
     ///                       if it exists in the scope of the transaction; parent scopes are not
     ///                       considered. \endif
@@ -487,7 +483,7 @@ public:
     /// stamp.
     ///
     /// \note \p time_stamp should not stem from another concurrent transaction. Such changes will
-    ///       never be visible in this transaction, but the method might still return \p true
+    ///       never be visible in this transaction, but the method might still return \c true
     ///       depending on the start order of the two transactions.
     ///
     /// \note In case of multiple overlapping transactions the returned answer may not list
@@ -560,7 +556,7 @@ public:
     virtual Sint32 get_privacy_level( const char* name) const = 0;
 };
 
-/*@}*/ // end group mi_neuray_database_access
+/**@}*/ // end group mi_neuray_database_access
 
 } // namespace neuraylib
 

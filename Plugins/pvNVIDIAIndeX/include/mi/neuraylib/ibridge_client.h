@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge client
@@ -21,8 +21,6 @@ namespace base { class ILogger; }
 namespace neuraylib {
 class IDeserializer;
 class ITransaction;
-class IScope;
-class IProgress_callback;
 class ITag_set;
 }
 
@@ -758,7 +756,7 @@ public:
     virtual const char* get_bridge_protocol_version() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_bridge_client
+/**@}*/ // end group mi_neuray_bridge_client
 
 } // namespace bridge
 

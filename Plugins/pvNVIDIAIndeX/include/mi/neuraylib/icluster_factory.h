@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to create additional clusters.
@@ -41,7 +41,7 @@ public:
     virtual ICluster* create_cluster() = 0;
 };
 
-/*@}*/ // end group mi_neuray_cluster
+/**@}*/ // end group mi_neuray_cluster
 
 } // namespace neuraylib
 

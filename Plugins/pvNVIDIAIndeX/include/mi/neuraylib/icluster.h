@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Additional clusters.
@@ -136,7 +136,7 @@ public:
     virtual Sint32 set_host_property( const char* key, const char* value) = 0;
 };
 
-/*@}*/ // end group mi_neuray_cluster
+/**@}*/ // end group mi_neuray_cluster
 
 } // namespace neuraylib
 

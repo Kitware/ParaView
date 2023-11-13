@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of VDB datasets.
@@ -29,7 +29,7 @@ class IVDB_subset_device;
 /// \ingroup nv_index_data_subsets
 ///
 class IVDB_subset :
-    public mi::base::Interface_declare<0x4cd248b2,0xb8a3,0x4cbe,0x9c,0x2a,0x9f,0xc8,0x3a,0x82,0x89,0x6e,
+    public mi::base::Interface_declare<0xe0555782,0x2353,0x4d3b,0xaf,0x9d,0xa4,0xbb,0xbc,0x10,0xa9,0xec,
                                        IDistributed_data_subset>
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,25 +43,33 @@ public:
         mi::Uint32 minor;           ///<! Minor of NanoVDB version.
     };
 
+    struct NVDB_grid_storage {
+        mi::Size    size;
+        void*       data;
+    };
+
 public:
     /// Generating a grid storage.
     ///
-    /// \param[in] format               The volume voxel format.
+    /// \param[in] attribute_index      The attribute index to generate the volume storage for.
     /// \param[in] grid_memory_size     The memory size of the grid.
     /// \param[in] nvdb_version         The NanoVDB version.
     /// 
     /// \return                         Returns \c true if the grid generation was successful, otherwise \c false.
     /// 
     virtual bool                    generate_grid_storage(
-                                        Distributed_data_attribute_format   format,
-                                        mi::Size                            grid_memory_size,
-                                        NVDB_version                        nvdb_version) = 0;
+                                        mi::Uint32      attribute_index,
+                                        mi::Size        grid_memory_size,
+                                        NVDB_version    nvdb_version) = 0;
 
     /// Accessing the internal grid storage.
     ///
+    /// \param[in] attribute_index      The attribute index to return the volume storage for.
+    ///
     /// \return     Returns the internal grid data storage.
     /// 
-    virtual void*                   get_grid_storage() const = 0;
+    virtual NVDB_grid_storage       get_grid_storage(
+                                        mi::Uint32      attribute_index) const = 0;
 
     /// Accessing the device VDB subset for direct access to the VDB device resources
     ///
@@ -89,14 +97,19 @@ public:
 public:
     virtual NVDB_version        nvdb_version() const = 0;
 
-    virtual void*               grid_buffer() = 0;
+    virtual void*               grid_buffer(
+                                    mi::Uint32      attribute_index) = 0;
 
-    virtual mi::Size            grid_buffer_size() const = 0;
+    virtual mi::Size            grid_buffer_size(
+                                    mi::Uint32      attribute_index) const = 0;
     virtual bool                grid_buffer_resize(
-                                    const mi::Size new_size) = 0;
+                                    mi::Uint32      attribute_index,
+                                    const mi::Size  new_size) = 0;
 
     // #todo take ownership?
+    // - set grid_data_size to ~0x00000000u for unknown size.
     virtual bool                adopt_grid_buffer(
+                                    mi::Uint32  attribute_index,
                                     void*       grid_data,
                                     mi::Size    grid_data_size) = 0;
 };

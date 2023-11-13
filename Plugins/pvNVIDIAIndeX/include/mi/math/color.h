@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/color.h
 /// \brief Standard RGBA color class with floating point elements and operations.
@@ -53,7 +53,7 @@ struct Spectrum_struct
 
 /// Supported clipping modes
 ///
-/// \sa #mi::Color::clip() function.
+/// \see #mi::Color::clip() function.
 enum Clip_mode {
     CLIP_RGB,   ///< First clip RGB to [0,1], then clip A to [max(R,G,B),1].
     CLIP_ALPHA, ///< First clip A to [0,1], then clip RGB to [0,A].
@@ -646,7 +646,7 @@ inline Color gamma_correction(
     return Color( fast_pow( color.r, f),
                   fast_pow( color.g, f),
                   fast_pow( color.b, f),
-                  color.a);
+                  fast_pow( color.a, f));
 }
 
 /// Compares the two given values elementwise for equality within the given epsilon.

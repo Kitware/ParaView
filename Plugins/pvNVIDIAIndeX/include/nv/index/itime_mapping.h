@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class representing clock pulses and time mapping vor time varying data.

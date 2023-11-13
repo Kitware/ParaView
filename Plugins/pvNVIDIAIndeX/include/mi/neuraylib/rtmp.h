@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief An RTMP server.
@@ -551,7 +551,7 @@ public:
     virtual IServer* create_server() = 0;
 };
 
-/*@}*/ // end group mi_neuray_rtmp
+/**@}*/ // end group mi_neuray_rtmp
 
 } // namespace rtmp
 

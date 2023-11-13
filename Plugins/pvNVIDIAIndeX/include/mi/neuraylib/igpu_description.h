@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Provides information about GPUs.
@@ -50,7 +50,7 @@ public:
 
     /// Returns the CUDA compute capability (minor), or -1 if the GPU is not a CUDA device.
     virtual Sint32 get_cuda_compute_capability_minor() const = 0;
-    
+
     /// Returns the clock rate in kilohertz, or -1 if the GPU is not a CUDA device.
     virtual Sint32 get_clock_rate() const = 0;
 
@@ -68,11 +68,12 @@ public:
     /// Returns \c true if the GPU is attached to a display (Windows only), and \c false otherwise.
     virtual bool is_attached_to_display() const = 0;
 
-    /// Returns \c true if the GPU is part of an Optimus/mixed internal+discrete GPU setup (Windows only), and \c false otherwise.
+    /// Returns \c true if the GPU is part of an Optimus/mixed internal+discrete GPU setup (Windows
+    /// only), and \c false otherwise.
     virtual bool get_optimus_flag() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 } // namespace neuraylib
 

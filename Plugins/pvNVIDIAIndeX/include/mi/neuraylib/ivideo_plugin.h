@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Video plugin API
@@ -25,7 +25,7 @@ class IPlugin_api;
 */
 
 /// Type of video encoder plugins
-#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v28"
+#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v31"
 
 /// A buffer for video data representing a frame.
 class IVideo_data : public
@@ -85,7 +85,7 @@ public:
     /// Returns the value of a parameter for the video stream.
     ///
     /// \param name         The name of the parameter to query.
-    /// \return             The value of the parameter, or NULL if it doesn't exist.
+    /// \return             The value of the parameter, or \c NULL if it doesn't exist.
     virtual const char* get_parameter(const char* name) = 0;
 
     /// Returns the \p index -th supported pixel type. The canvas passed to encode_canvas() must
@@ -158,7 +158,7 @@ public:
     /// Initializes the video decoder. If not enough data is provided then 1 is returned and
     /// this method must be called again with more data. If enough data was present to
     /// decode one or more frames, then those frames will be decoded as part of this call.
-    /// After the call to init(), call decode_canvas() with data set to NULL to get any buffered
+    /// After the call to init(), call decode_canvas() with data set to \c NULL to get any buffered
     /// frames.
     ///
     /// \param data           Video stream data to be decoded.
@@ -286,7 +286,7 @@ public:
     virtual IVideo_decoder* create_video_decoder( const char* codec_name) = 0;
 };
 
-/*@}*/ // end group mi_neuray_plugins
+/**@}*/ // end group mi_neuray_plugins
 
 } // namespace neuraylib
 

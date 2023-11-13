@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for library authentication functionality.
@@ -175,7 +175,7 @@ public:
     virtual bool is_flexnet_license_available() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 namespace detail {
 

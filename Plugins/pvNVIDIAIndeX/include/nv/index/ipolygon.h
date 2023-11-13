@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing object space and image space labels.

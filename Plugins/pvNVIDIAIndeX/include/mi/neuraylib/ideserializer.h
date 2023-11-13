@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief      Deserialization of objects from a byte stream.
@@ -16,7 +16,7 @@ namespace neuraylib {
 
 /** 
 \if IRAY_API \addtogroup mi_neuray_plugins
-\elseif MDL_SOURCE_RELEASE \addtogroup mi_neuray_plugins
+\elseif MDL_SDK_API \addtogroup mi_neuray_plugins
 \else \addtogroup mi_neuray_dice
 \endif
 @{
@@ -145,7 +145,7 @@ public:
     virtual bool read( Tag_struct* value, Size count = 1) = 0;
 };
 
-/*@}*/ // end group mi_neuray_plugins / mi_neuray_dice
+/**@}*/ // end group mi_neuray_plugins / mi_neuray_dice
 
 } // namespace neuraylib
 

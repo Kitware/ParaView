@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for canvases
@@ -8,6 +8,7 @@
 #define MI_NEURAYLIB_ICANVAS_H
 
 #include <mi/base/interface_declare.h>
+#include <mi/neuraylib/vector_typedefs.h>
 
 namespace mi {
 
@@ -99,7 +100,15 @@ public:
     virtual ITile* get_tile( Uint32 layer = 0) = 0;
 };
 
-/*@}*/ // end group mi_neuray_rendering
+
+/// Convenience function which returns a canvas' resolution in a struct.
+inline Uint32_2 get_resolution(const ICanvas_base& canvas)
+{
+    return Uint32_2(canvas.get_resolution_x(),canvas.get_resolution_y());
+}
+
+
+/**@}*/ // end group mi_neuray_rendering
 
 } // namespace neuraylib
 

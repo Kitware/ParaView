@@ -1,6 +1,7 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
 /// \brief Scene attribute controlling particle volume rendering properties.
 
 #ifndef NVIDIA_INDEX_IPARTICLE_VOLUME_RENDERING_PROPERTIES_H
@@ -105,8 +106,16 @@ public:
     /// Returns the override radius applied to a particle volume scene element (\c Iparticle_volume_scene_element).
     virtual mi::Float32                 get_override_fixed_radius() const = 0;
 
+    /// Set the mode to use OptiX native spheres primitives for rendering.
+    ///
+    /// \note This mode may help reduce the memory overhead required for building the internal BVH structures.
+    ///
+    virtual void                        set_use_optix_sphere_primitives(bool use_optix_spheres) = 0;
+    /// Returns whether the mode to use OptiX native spheres primitives for rendering is set.
+    virtual bool                        get_use_optix_sphere_primitives() const = 0;
+
     /// Internal debugging options applied to the visualization.
-    /// \param[in] o    Debug option applied to the visualization.   
+    /// \param[in] o    Debug option applied to the visualization.
     virtual void                        set_debug_visualization_option(mi::Uint32 o) = 0;
     /// Internal debugging options applied to the visualization.
     /// \return         Returns the applied debug option.  

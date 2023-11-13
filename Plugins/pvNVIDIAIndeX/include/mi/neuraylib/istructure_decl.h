@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief structure declarations
@@ -96,7 +96,7 @@ public:
     virtual const char* get_structure_type_name() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_types
+/**@}*/ // end group mi_neuray_types
 
 } // namespace mi
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element representing a sphere higher-level shape.

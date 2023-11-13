@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface class representing NVIDIA IndeX's distributed datasets.
@@ -42,11 +42,7 @@ public:
     ///
     /// \return     Transformation matrix from the local to the global space.
     ///
-    virtual mi::math::Matrix_struct<mi::Float32, 4, 4> get_transform() const
-    {
-        mi::math::Matrix_struct<mi::Float32, 4, 4> mat_struct = mi::math::Matrix<mi::Float32, 4, 4>(1.f);
-        return mat_struct;
-    };
+    virtual mi::math::Matrix_struct<mi::Float32, 4, 4> get_transform() const = 0;
 
     /// A distributed dataset's extent in 3D space that shall be considered for
     /// rendering or computing can be restricted by a clip region.
@@ -57,21 +53,18 @@ public:
     /// in a repartitioning of the spatial subdivision or might trigger
     /// importer calls.
     ///
-    /// \return     The clip region of the dataset defined in its local
-    ///            coordinate system.
+    /// \param[in]clip_region    The clip region of the dataset in its local
+    ///                          coordinate system.
     ///
-    virtual void set_clip_region(const mi::math::Bbox_struct<mi::Float32, 3>&) {};
+    virtual void set_clip_region(const mi::math::Bbox_struct<mi::Float32, 3>& clip_region) = 0;
 
     /// A distributed dataset's extent in 3D space that shall be considered for
     /// rendering or computing can be restricted by a clip region.
     ///
     /// \return     The clip region of the dataset in its local
-    ///            coordinate system.
+    ///             coordinate system.
     ///
-    virtual mi::math::Bbox_struct<mi::Float32, 3> get_clip_region() const
-    {
-        return mi::math::Bbox<mi::Float32, 3>(); // defaults to invalid bbox
-    }
+    virtual mi::math::Bbox_struct<mi::Float32, 3> get_clip_region() const = 0;
 
     /// Each distributed dataset may be pickable, so that the ray cast through the scene can
     /// intersect and query the data. The intersection information will be returned by the

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/version.h
 /// \brief Major and minor version number and an optional qualifier.
@@ -75,6 +75,6 @@
 #endif // MI_BASE_VERSION_QUALIFIER_EMPTY
 
 
-/*@}*/ // end group mi_base_version
+/**@}*/ // end group mi_base_version
 
 #endif // MI_BASE_VERSION_H

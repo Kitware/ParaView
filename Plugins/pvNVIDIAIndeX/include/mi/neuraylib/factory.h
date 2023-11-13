@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Main factory function.
@@ -107,6 +107,8 @@ T* mi_factory( void* symbol)
 }
 
 }
-/*@}*/ // end group mi_neuray_ineuray
+/**
+@}
+*/ // end group mi_neuray_ineuray
 
 #endif // MI_NEURAYLIB_FACTORY_H
