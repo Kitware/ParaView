@@ -1345,12 +1345,6 @@ int main(int argc, char* argv[])
   }
   fprintf(fp, "#include \"vtkClientServerInterpreter.h\"\n");
   fprintf(fp, "#include \"vtkClientServerStream.h\"\n\n");
-#if 0
-  if (!strcmp("vtkObject",data->Name))
-    {
-    fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
-    }
-#endif
   if (!strcmp("vtkObjectBase", data->Name))
   {
     fprintf(fp, "#include <sstream>\n");
@@ -1397,8 +1391,6 @@ int main(int argc, char* argv[])
   }
 
   fprintf(fp, "  (void)arlu;\n");
-
-  /*fprintf(fp,"  vtkClientServerStream resultStream;\n");*/
 
   /* insert function handling code here */
   for (i = 0; i < data->NumberOfFunctions; i++)
