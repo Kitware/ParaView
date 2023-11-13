@@ -1282,6 +1282,7 @@ int main(int argc, char* argv[])
 
   if (!data)
   {
+    vtkWrap_WarnEmpty(options);
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
     if (vtkParse_Finalize())
@@ -1293,6 +1294,7 @@ int main(int argc, char* argv[])
 
   if (data->Template)
   {
+    vtkWrap_WarnEmpty(options);
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
     if (vtkParse_Finalize())
@@ -1317,6 +1319,7 @@ int main(int argc, char* argv[])
         fprintf(fp, "// %c %s\n", i == j ? '!' : ' ', data->SuperClasses[j]);
       }
 
+      vtkWrap_WarnEmpty(options);
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
       if (vtkParse_Finalize())
@@ -1337,6 +1340,7 @@ int main(int argc, char* argv[])
 
     if (!vtkWrap_IsTypeOf(hierarchyInfo, data->Name, "vtkObjectBase"))
     {
+      vtkWrap_WarnEmpty(options);
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
       if (vtkParse_Finalize())
