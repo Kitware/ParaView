@@ -1222,7 +1222,7 @@ int main(int argc, char* argv[])
   if (!fp)
   {
     fprintf(stderr, "Error opening output file %s\n", options->OutputFileName);
-    exit(1);
+    return 1;
   }
 
   data = fileInfo->MainClass;
@@ -1283,14 +1283,14 @@ int main(int argc, char* argv[])
   {
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    exit(0);
+    return 0;
   }
 
   if (data->Template)
   {
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    exit(0);
+    return 0;
   }
 
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
@@ -1310,7 +1310,7 @@ int main(int argc, char* argv[])
 
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
-      exit(0);
+      return 0;
     }
   }
 
@@ -1326,7 +1326,7 @@ int main(int argc, char* argv[])
     {
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
-      exit(0);
+      return 0;
     }
   }
 
