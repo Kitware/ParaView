@@ -1298,7 +1298,7 @@ int main(int argc, char* argv[])
     if (strncmp(data->SuperClasses[i], "vtk", 3) == 0 && strchr(data->SuperClasses[i], '<'))
     {
       fprintf(fp, "// This automatically generated file contains only a stub,\n");
-      fprintf(fp, "// bacause the class %s is based on a templated VTK class.\n", data->Name);
+      fprintf(fp, "// because the class %s is based on a templated VTK class.\n", data->Name);
       fprintf(fp, "// Wrapping such classes is not currently supported.\n");
       fprintf(fp,
         "// Here follows the list of detected superclasses (first offending one marked by !):\n");
