@@ -52,6 +52,12 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   "pqRescaleRange.h:.*: warning: Found ';' while parsing initializer list"
   "vtkRealtimeAnimationPlayer.h:.*: warning: Found ';' while parsing initializer list"
   # end of 5.12 deprecation
+
+  # warnings from moc generated code
+  "_autogen"
+
+  # deprecation notes
+  "note: declared here"
 )
 
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION

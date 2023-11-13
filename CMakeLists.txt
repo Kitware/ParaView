@@ -658,6 +658,7 @@ else ()
     PACKAGE             VTK
     INSTALL_EXPORT      VTK
     INSTALL_HEADERS     "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+    USE_FILE_SETS       ON
     HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
     CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
     LICENSE_DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
@@ -712,6 +713,7 @@ vtk_module_build(
   KITS                ${paraview_kits}
   INSTALL_EXPORT      ParaView
   INSTALL_HEADERS     "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+  USE_FILE_SETS       ON
   HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
   CMAKE_DESTINATION   "${paraview_cmake_destination}"
   LICENSE_DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
@@ -735,6 +737,7 @@ vtk_module_build(
   PACKAGE             ParaViewClients
   INSTALL_EXPORT      ParaViewClients
   INSTALL_HEADERS     "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+  USE_FILE_SETS       ON
   HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
   CMAKE_DESTINATION   "${paraview_cmake_destination}"
   LICENSE_DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
@@ -757,6 +760,7 @@ vtk_module_build(
   PACKAGE             ParaViewIncubator
   INSTALL_EXPORT      ParaViewIncubator
   INSTALL_HEADERS     "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+  USE_FILE_SETS       ON
   HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}/Incubator"
   CMAKE_DESTINATION   "${paraview_cmake_destination}"
   LICENSE_DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
@@ -827,6 +831,7 @@ paraview_plugin_build(
   LIBRARY_SUBDIRECTORY  "paraview${paraview_version_suffix}/plugins"
   CMAKE_DESTINATION     "${paraview_cmake_destination}"
   PLUGINS_FILE_NAME "paraview.plugins.xml"
+  USE_FILE_SETS     ON
   TARGET            ParaView::paraview_plugins
   INSTALL_EXPORT    ParaViewPlugins
   INSTALL_HEADERS   "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
