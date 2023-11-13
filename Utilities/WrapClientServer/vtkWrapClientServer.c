@@ -1222,6 +1222,7 @@ int main(int argc, char* argv[])
   if (!fp)
   {
     fprintf(stderr, "Error opening output file %s\n", options->OutputFileName);
+    vtkParse_Finalize();
     return 1;
   }
 
@@ -1283,6 +1284,10 @@ int main(int argc, char* argv[])
   {
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
+    if (vtkParse_Finalize())
+    {
+      return 1;
+    }
     return 0;
   }
 
@@ -1290,6 +1295,10 @@ int main(int argc, char* argv[])
   {
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
+    if (vtkParse_Finalize())
+    {
+      return 1;
+    }
     return 0;
   }
 
@@ -1310,6 +1319,10 @@ int main(int argc, char* argv[])
 
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
+      if (vtkParse_Finalize())
+      {
+        return 1;
+      }
       return 0;
     }
   }
@@ -1326,6 +1339,10 @@ int main(int argc, char* argv[])
     {
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
+      if (vtkParse_Finalize())
+      {
+        return 1;
+      }
       return 0;
     }
   }
@@ -1468,5 +1485,11 @@ int main(int argc, char* argv[])
 
   vtkParse_Free(fileInfo);
   fclose(fp);
+
+  if (vtkParse_Finalize())
+  {
+    return 1;
+  }
+
   return 0;
 }
