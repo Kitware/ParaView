@@ -110,7 +110,9 @@ function(extract_version_components source_dir version_string var_prefix)
     set(${var_prefix}_VERSION_PATCH ${patch} PARENT_SCOPE)
     set(${var_prefix}_VERSION_PATCH_EXTRA ${patch_extra} PARENT_SCOPE)
     set(${var_prefix}_VERSION_FULL ${full} PARENT_SCOPE)
-    if("${major}.${minor}.${patch}" VERSION_EQUAL "${full}")
+    if("${major}.${minor}.${patch}" VERSION_EQUAL "${full}" AND
+       # Date-based patch versions are never releases.
+       patch LESS "20000101")
       set(${var_prefix}_VERSION_IS_RELEASE TRUE PARENT_SCOPE)
     else()
       set(${var_prefix}_VERSION_IS_RELEASE FALSE PARENT_SCOPE)
