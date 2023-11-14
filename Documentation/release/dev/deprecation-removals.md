@@ -15,3 +15,6 @@
   `pqApplyBehavior` instead.
 * `pqVCRController::playing(bool)` signal has been removed (deprecated in
   5.11). Use the `::playing(bool, bool)` signal instead.
+* In `pqAnimationScene`, the `beginPlay()` and `endPlay()` signals have been
+  removed (deprecated in 5.11). Use the variants with `vtkCallback` APIs
+  instead.

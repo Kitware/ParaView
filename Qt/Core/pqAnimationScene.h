@@ -5,7 +5,6 @@
 #define pqAnimationScene_h
 
 #include "pqProxy.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
 #include <QPair>
 #include <QSet>
 
@@ -126,18 +125,6 @@ Q_SIGNALS:
    * Emitted when the clock time ranges change.
    */
   void clockTimeRangesChanged();
-
-  /**
-   * @deprecated in ParaView 5.11.0
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
-  void beginPlay();
-
-  /**
-   * @deprecated in ParaView 5.11.0
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
-  void endPlay();
 
   /**
    * Emitted when animation starts playing.
