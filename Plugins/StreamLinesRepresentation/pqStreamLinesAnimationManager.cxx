@@ -43,9 +43,9 @@ void pqStreamLinesAnimationManager::onRenderEnded()
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(reprs[i]->getProxy());
     if (repr && repr->GetProperty("Representation"))
     {
-      const char* rs = vtkSMPropertyHelper(repr, "Representation").GetAsString();
+      const char* representation = vtkSMPropertyHelper(repr, "Representation").GetAsString();
       const int visible = vtkSMPropertyHelper(repr, "Visibility").GetAsInt();
-      if (rs && !strcmp(rs, "Stream Lines") && visible)
+      if (representation && (std::string(representation) == "Stream Lines") && visible)
       {
         // This view as a visible StreamLines representation.
         // Let's ask for a new render!

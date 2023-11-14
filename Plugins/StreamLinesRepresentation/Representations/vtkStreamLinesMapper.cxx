@@ -132,7 +132,8 @@ protected:
   ~Private() override;
 
   void InitParticle(int);
-  bool InterpolateSpeedAndColor(double[3], double[3], vtkIdType);
+  bool InterpolateSpeedAndColor(
+    std::array<double, 3>& position, std::array<double, 3>& velocity, vtkIdType particleId);
 
   inline double Rand(double vmin = 0., double vmax = 1.)
   {
@@ -247,7 +248,7 @@ void vtkStreamLinesMapper::Private::SetNumberOfParticles(int nbParticles)
 
 //-----------------------------------------------------------------------------
 bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
-  double pos[3], double outSpeed[3], vtkIdType pid)
+  std::array<double, 3>& position, std::array<double, 3>& velocity, vtkIdType particleId)
 {
   int subId;
   double pcoords[3];
@@ -256,11 +257,12 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
   vtkIdType cellId = 0;
   if (!this->Locator)
   {
-    cellId = this->DataSet->FindCell(pos, nullptr, -1, 1e-10, subId, pcoords, weights);
+    cellId = this->DataSet->FindCell(position.data(), nullptr, -1, 1e-10, subId, pcoords, weights);
   }
   else
   {
-    cellId = this->Locator->FindCell(pos, 0., this->GenericCell.Get(), pcoords, weights);
+    cellId =
+      this->Locator->FindCell(position.data(), 0., this->GenericCell.Get(), pcoords, weights);
   }
 
   if (cellId < 0)
@@ -278,14 +280,14 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
   {
     if (this->AreCellVectors)
     {
-      this->Vectors->GetTuple(cellId, outSpeed);
+      this->Vectors->GetTuple(cellId, velocity.data());
     }
     else
     {
       this->InterpolationArray->InterpolateTuple(0, this->IdList.Get(), this->Vectors, weights);
-      this->InterpolationArray->GetTuple(0, outSpeed);
+      this->InterpolationArray->GetTuple(0, velocity.data());
     }
-    double speed = vtkMath::Norm(outSpeed);
+    double speed = vtkMath::Norm(velocity.data());
     if (speed == 0. || vtkMath::IsInf(speed) || vtkMath::IsNan(speed))
     {
       // Null speed area
@@ -297,12 +299,12 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
   {
     if (this->AreCellScalars)
     {
-      this->InterpolationScalarArray->SetTuple(pid, this->Scalars->GetTuple(cellId));
+      this->InterpolationScalarArray->SetTuple(particleId, this->Scalars->GetTuple(cellId));
     }
     else
     {
       this->InterpolationScalarArray->InterpolateTuple(
-        pid, this->IdList.Get(), this->Scalars, weights);
+        particleId, this->IdList.Get(), this->Scalars, weights);
     }
   }
   return true;
@@ -315,21 +317,21 @@ void vtkStreamLinesMapper::Private::InitParticle(int pid)
   do
   {
     // Sample a new seed location
-    double pos[3];
-    pos[0] = this->Rand(this->Bounds[0], this->Bounds[1]);
-    pos[1] = this->Rand(this->Bounds[2], this->Bounds[3]);
-    pos[2] = this->Rand(this->Bounds[4], this->Bounds[5]);
-    this->Particles->SetPoint(pid * 2 + 0, pos);
-    this->Particles->SetPoint(pid * 2 + 1, pos);
+    std::array<double, 3> position;
+    position[0] = this->Rand(this->Bounds[0], this->Bounds[1]);
+    position[1] = this->Rand(this->Bounds[2], this->Bounds[3]);
+    position[2] = this->Rand(this->Bounds[4], this->Bounds[5]);
+    this->Particles->SetPoint(pid * 2 + 0, position.data());
+    this->Particles->SetPoint(pid * 2 + 1, position.data());
     this->ParticlesTTL[pid] = this->Rand(1, this->Mapper->MaxTimeToLive);
 
     // Check speed at this location
-    double speedVec[9];
-    if (this->InterpolateSpeedAndColor(pos, speedVec, pid * 2))
+    std::array<double, 3> velocity;
+    if (this->InterpolateSpeedAndColor(position, velocity, pid * 2))
     {
       this->InterpolationScalarArray->SetTuple(
         pid * 2 + 1, this->InterpolationScalarArray->GetTuple(pid * 2));
-      double speed = vtkMath::Norm(speedVec);
+      double speed = vtkMath::Norm(velocity.data());
       // Do not sample in no-speed areas
       added = (speed != 0. && !vtkMath::IsInf(speed) && !vtkMath::IsNan(speed));
     }
@@ -348,20 +350,20 @@ void vtkStreamLinesMapper::Private::UpdateParticles()
     this->ParticlesTTL[i]--;
     if (this->ParticlesTTL[i] > 0)
     {
-      double pos[3];
-      this->Particles->GetPoint(i * 2 + 1, pos);
+      std::array<double, 3> position;
+      this->Particles->GetPoint(i * 2 + 1, position.data());
 
-      // Update prevpos with last pos
-      this->Particles->SetPoint(i * 2 + 0, pos);
+      // Advance particle position.
+      this->Particles->SetPoint(i * 2 + 0, position.data());
       this->InterpolationScalarArray->SetTuple(
         i * 2 + 0, this->InterpolationScalarArray->GetTuple(i * 2 + 1));
 
       // Move the particle and fetch its color
-      double speedVec[3];
-      if (this->InterpolateSpeedAndColor(pos, speedVec, i * 2 + 1))
+      std::array<double, 3> velocity;
+      if (this->InterpolateSpeedAndColor(position, velocity, i * 2 + 1))
       {
-        this->Particles->SetPoint(2 * i + 1, pos[0] + dt * speedVec[0], pos[1] + dt * speedVec[1],
-          pos[2] + dt * speedVec[2]);
+        this->Particles->SetPoint(2 * i + 1, position[0] + dt * velocity[0],
+          position[1] + dt * velocity[1], position[2] + dt * velocity[2]);
       }
       else
       {
