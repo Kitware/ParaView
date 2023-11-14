@@ -25,7 +25,7 @@
 #ifndef vtkSMChartSeriesListDomain_h
 #define vtkSMChartSeriesListDomain_h
 
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMStringListDomain.h"
 

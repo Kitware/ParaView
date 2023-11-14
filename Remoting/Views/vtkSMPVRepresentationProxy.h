@@ -23,7 +23,7 @@
 #ifndef vtkSMPVRepresentationProxy_h
 #define vtkSMPVRepresentationProxy_h
 
-#include "vtkParaViewDeprecation.h" // for deprecation
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSmartPointer.h" // For LastLUTProxy

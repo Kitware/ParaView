@@ -7,7 +7,7 @@
 #include "pqComponentsModule.h"
 #include "pqDoubleLineEdit.h" // for pqDoubleLineEdit::RealNumberNotation.
 
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 #include <QList>
 #include <QScopedPointer>

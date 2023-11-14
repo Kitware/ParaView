@@ -6,7 +6,7 @@
 #define pqFileDialogFavoriteModel_h
 
 #include "pqCoreModule.h"
-#include "vtkParaViewDeprecation.h" // for deprecation
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 #include <QAbstractListModel>
 #include <QList>

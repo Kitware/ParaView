@@ -4,7 +4,7 @@
 #ifndef pqHelpWindow_h
 #define pqHelpWindow_h
 
-#include "vtkParaViewDeprecation.h" // For deprecation
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 #include "pqComponentsModule.h" // For export macro
 

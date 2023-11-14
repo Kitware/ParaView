@@ -7,7 +7,7 @@
 #include "pqReaction.h"
 #include "vtkSmartPointer.h"
 
-#include "vtkParaViewDeprecation.h" // for deprecation
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 #include <QPointer>
 

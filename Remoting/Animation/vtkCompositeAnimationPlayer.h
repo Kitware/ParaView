@@ -14,7 +14,7 @@
 #include "vtkAnimationPlayer.h"
 #include "vtkRemotingAnimationModule.h" // needed for export macro
 
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 class vtkSequenceAnimationPlayer;
 class vtkTimestepsAnimationPlayer;
