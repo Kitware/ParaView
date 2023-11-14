@@ -21,3 +21,6 @@
 * In `pqRenderView`, the `selectOnSurface()` method has been removed in favor
   of `selectCellsOnSurface` and `selectFrustum` in favor of
   `selectFrustumCells` (deprecated in 5.11).
+* `pqServerResource::sessionServer()` and `::setSessionServer()` methods have
+  been removed (deprecated in 5.11). Any calls should just be removed and the
+  resource used directly instead.

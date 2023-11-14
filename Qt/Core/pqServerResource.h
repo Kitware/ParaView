@@ -7,8 +7,6 @@
 
 #include "pqCoreModule.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
-
 #include <QString>
 class pqServerConfiguration;
 
@@ -262,18 +260,6 @@ public:
    * scheme, host and port numbers are excluded
    */
   pqServerResource pathServerName() const;
-
-  /**
-   * Deprecated method, just return a copy of this
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the resource directly instead")
-  pqServerResource sessionServer() const { return *this; };
-
-  /**
-   * Deprecated method, noop
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the resource directly instead")
-  void setSessionServer(const pqServerResource&){};
 
   ///@{
   /**
