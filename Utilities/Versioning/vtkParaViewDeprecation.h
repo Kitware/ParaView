@@ -93,10 +93,10 @@
 #endif
 #endif
 
-// APIs deprecated in the next release.
+// APIs deprecated in 5.12.0.
 #if defined(__VTK_WRAP__)
 #define PARAVIEW_DEPRECATED_IN_5_12_0(reason) [[vtk::deprecated(reason, "5.12.0")]]
-#elif PARAVIEW_DEPRECATION_LEVEL >= PARAVIEW_VERSION_CHECK(5, 12, 0)
+#elif PARAVIEW_DEPRECATION_LEVEL >= PARAVIEW_VERSION_CHECK(5, 11, 20230101)
 #define PARAVIEW_DEPRECATED_IN_5_12_0(reason) PARAVIEW_DEPRECATION(reason)
 #else
 #define PARAVIEW_DEPRECATED_IN_5_12_0(reason)
