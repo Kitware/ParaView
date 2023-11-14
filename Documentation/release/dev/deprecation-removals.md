@@ -26,3 +26,6 @@
   resource used directly instead.
 * Remove `pqTimelineScrollbar` (deprecated in 5.11). Use
   `pqTimeInspectorWidget` instead.
+* Remove `vtkPVPluginsInformation::PluginRequirementsSatisfied()` method
+  (deprecated in 5.11). Use `vtkSMProxyManager::SatisfyPluginRequirements()`
+  instead.

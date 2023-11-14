@@ -13,8 +13,7 @@
 #define vtkPVPluginsInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkParaViewDeprecation.h" // needed for deprecation
-#include "vtkRemotingCoreModule.h"  // needed for exports
+#include "vtkRemotingCoreModule.h" // needed for exports
 
 class VTKREMOTINGCORE_EXPORT vtkPVPluginsInformation : public vtkPVInformation
 {
@@ -92,16 +91,6 @@ public:
    */
   vtkGetStringMacro(SearchPaths);
   ///@}
-
-  /**
-   * Method to validate if the plugin requirements are met across processes.
-   * This also updated the "StatusMessage" for all the plugins. If StatusMessage
-   * is empty for a loaded plugin, it implies that everything is fine. If some
-   * requirement is not met, the StatusMessage includes the error message.
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use `vtkSMProxyManager::SatisfyPluginRequirements()` instead")
-  static bool PluginRequirementsSatisfied(
-    vtkPVPluginsInformation* client_plugins, vtkPVPluginsInformation* server_plugins);
 
 protected:
   vtkPVPluginsInformation();
