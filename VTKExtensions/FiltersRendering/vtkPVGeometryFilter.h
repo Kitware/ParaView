@@ -13,7 +13,6 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
-#include "vtkParaViewDeprecation.h"                   // for PARAVIEW_DEPRECATED_IN_5_11_0
 
 class vtkCallbackCommand;
 class vtkCellGrid;
@@ -77,41 +76,6 @@ public:
    */
   vtkSetMacro(BlockColorsDistinctValues, int);
   vtkGetMacro(BlockColorsDistinctValues, int);
-  ///@}
-
-  ///@{
-  /**
-   * When input is structured data, this flag will generate faces with
-   * triangle strips.  This should render faster and use less memory, but no
-   * cell data is copied.  By default, UseStrips is Off.
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  void SetUseStrips(int) {}
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  virtual int GetUseStrips() VTK_FUTURE_CONST { return false; }
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  virtual void UseStripsOn() {}
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  virtual void UseStripsOff() {}
-
-  // Description:
-  // Makes set use strips call modified after it changes the setting.
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  void SetForceUseStrips(int) {}
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  virtual int GetForceUseStrips() VTK_FUTURE_CONST { return false; }
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  virtual void ForceUseStripsOn() {}
-  PARAVIEW_DEPRECATED_IN_5_11_0(
-    "Removed; the backing implementation has done nothing since VTK 9.1.0")
-  virtual void ForceUseStripsOff() {}
   ///@}
 
   ///@{

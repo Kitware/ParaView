@@ -31,3 +31,5 @@
   instead.
 * Remove `vtkPVRenderView` `VolumeAnisotropy` methods (deprecated in 5.11). Use
   `vtkVolumeProperty`'s `ScatteringAnisotropy` methods instead.
+* Remove `vtkPVGeometryFilter` `UseStrips` and `ForceUseStripsOn` methods
+  (deprecated in 5.11).
