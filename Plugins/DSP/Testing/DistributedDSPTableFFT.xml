@@ -32,11 +32,11 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Check value index 0 -->
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="15.15,0.000212288" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="14.14,1.23171e-05" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="9.14,-4.45292e-05" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="9.16,0.00020308" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="6.15,0.00100698" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="15.16,0.000212288" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="14.15,1.23171e-05" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="9.15,-4.45292e-05" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="9.17,0.00020308" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="6.16,0.00100698" />
 
 
   <!-- Set index 1000 -->
@@ -44,9 +44,9 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Check value index 1000 -->
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="5.14,-0.000185805" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="6.15,-0.000819618" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="14.15,0.000819618" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="16.14,-0.000137006" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="19.16,31.6244" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="5.15,-0.000185805" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="6.16,-0.000819618" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="14.16,0.000819618" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="16.15,-0.000137006" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="19.17,31.6244" />
 </pqevents>
