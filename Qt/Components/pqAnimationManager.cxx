@@ -219,18 +219,6 @@ void pqAnimationManager::onTick(int progress)
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationManager::onBeginPlay()
-{
-  this->Internals->AnimationPlaying = true;
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationManager::onEndPlay()
-{
-  this->Internals->AnimationPlaying = false;
-}
-
-//-----------------------------------------------------------------------------
 void pqAnimationManager::onBeginPlay(
   vtkObject* /*caller*/, unsigned long /*event_id*/, void*, void* /*reversed*/)
 {
