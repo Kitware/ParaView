@@ -6,7 +6,6 @@
 #define pqVCRController_h
 
 #include "pqComponentsModule.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
 #include <QObject>
 #include <QPointer>
 
@@ -37,13 +36,6 @@ Q_SIGNALS:
    * Emitted for each tick.
    */
   void timestepChanged();
-
-  /**
-   * @deprecated in 5.11.0.
-   * Use playing(bool, bool) instead.
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use overload with additional reversed argument.")
-  void playing(bool);
 
   /**
    * Emitted as `playing(true, reversed)` when playback begins
