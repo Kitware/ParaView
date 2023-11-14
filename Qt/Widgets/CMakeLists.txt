@@ -52,7 +52,6 @@ set(classes
   pqSpinBox
   pqTableView
   pqTextEdit
-  pqTimelineScrollbar
   pqTreeView
   pqTreeViewExpandState
   pqTreeViewSelectionHelper

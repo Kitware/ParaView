@@ -85,9 +85,6 @@
     </widget>
    </item>
    <item>
-    <widget class="pqTimelineScrollbar" name="TimelineScrollbar" native="true"/>
-   </item>
-   <item>
     <widget class="pqAnimationWidget" name="AnimationWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -116,12 +113,6 @@
    <class>pqVCRToolbar</class>
    <extends>QWidget</extends>
    <header>pqVCRToolbar.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqTimelineScrollbar</class>
-   <extends>QWidget</extends>
-   <header>pqTimelineScrollbar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

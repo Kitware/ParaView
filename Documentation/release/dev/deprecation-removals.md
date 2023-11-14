@@ -24,3 +24,5 @@
 * `pqServerResource::sessionServer()` and `::setSessionServer()` methods have
   been removed (deprecated in 5.11). Any calls should just be removed and the
   resource used directly instead.
+* Remove `pqTimelineScrollbar` (deprecated in 5.11). Use
+  `pqTimeInspectorWidget` instead.

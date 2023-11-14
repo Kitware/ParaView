@@ -45,7 +45,6 @@
 #include "pqSetName.h"
 #include "pqSignalAdaptors.h"
 #include "pqTimeKeeper.h"
-#include "pqTimelineScrollbar.h"
 #include "pqUndoStack.h"
 
 #include "vtkCamera.h"
@@ -392,12 +391,6 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
     &pqAnimationViewWidget::onStrideChanged);
   QObject::connect(this->Internal->Duration, &QLineEdit::editingFinished, this,
     &pqAnimationViewWidget::updateStrideRange);
-
-  pqTimelineScrollbar* timelineScrollbar = new pqTimelineScrollbar(this);
-  timelineScrollbar->linkSpacing(this->Internal->AnimationWidget);
-  timelineScrollbar->setAnimationModel(this->Internal->AnimationWidget->animationModel());
-
-  vboxlayout->addWidget(timelineScrollbar);
 
   vboxlayout->addWidget(this->Internal->AnimationWidget);
 }

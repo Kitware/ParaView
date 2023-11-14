@@ -47,7 +47,6 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   "pqAnimationKeyFrame.h:.*: warning: Found ';' while parsing initializer list"
   "pqAnimationModel.h:.*: warning: Found ';' while parsing initializer list"
   "pqAnimationTrack.h:.*: warning: Found ';' while parsing initializer list"
-  "pqTimelineScrollbar.h:.*: warning: Found ';' while parsing initializer list"
   "pqResetScalarRangeReaction.h:.*: warning: Found ';' while parsing initializer list"
   "pqRescaleRange.h:.*: warning: Found ';' while parsing initializer list"
   "vtkRealtimeAnimationPlayer.h:.*: warning: Found ';' while parsing initializer list"
