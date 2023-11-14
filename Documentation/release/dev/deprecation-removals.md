@@ -33,3 +33,6 @@
   `vtkVolumeProperty`'s `ScatteringAnisotropy` methods instead.
 * Remove `vtkPVGeometryFilter` `UseStrips` and `ForceUseStripsOn` methods
   (deprecated in 5.11).
+* In `paraview.simple`, remove the `Show3DWidgets` and `Hide3DWidgets`
+  functions (deprecated in 5.11). Use `ShowInteractiveWidgets` and
+  `HideInteractiveWidgets` instead.
