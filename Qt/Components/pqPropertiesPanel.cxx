@@ -360,24 +360,6 @@ void pqPropertiesPanel::setPanelMode(int val)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::setAutoApplyDelay(int delay)
-{
-  VTK_LEGACY_REPLACED_BODY(pqPropertiesPanel::setAutoApplyDelay, "ParaView 5.11",
-    vtkPVGeneralSettings::SetAutoApplyDelay());
-  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
-  return generalSettings->SetAutoApplyDelay(delay);
-}
-
-//-----------------------------------------------------------------------------
-int pqPropertiesPanel::autoApplyDelay()
-{
-  VTK_LEGACY_REPLACED_BODY(
-    pqPropertiesPanel::autoApplyDelay, "ParaView 5.11", vtkPVGeneralSettings::GetAutoApplyDelay());
-  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
-  return generalSettings->GetAutoApplyDelay();
-}
-
-//-----------------------------------------------------------------------------
 pqView* pqPropertiesPanel::view() const
 {
   return this->Internals->View;

@@ -5,7 +5,6 @@
 #define pqPropertiesPanel_h
 
 #include "pqComponentsModule.h"
-#include "vtkParaViewDeprecation.h"
 
 #include <QWidget>
 
@@ -39,18 +38,6 @@ class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
 public:
   pqPropertiesPanel(QWidget* parent = nullptr);
   ~pqPropertiesPanel() override;
-
-  /**
-   * Sets the delay for auto-apply to \p delay (in msec).
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use `pqApplyBehavior::setAutoApplyDelay()` instead")
-  static void setAutoApplyDelay(int delay);
-
-  /**
-   * Returns the delay for the auto-apply (in msec).
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use `pqApplyBehavior::autoApplyDelay()` instead")
-  static int autoApplyDelay();
 
   /**
    * Returns the current view, if any.

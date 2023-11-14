@@ -10,3 +10,6 @@
 * In `pqPropertiesPanel`, the `setAutoApply()` and `autoApply()` methods have
   been removed (deprecated in 5.11). Use the methods on `vtkPVGeneralSettings`
   instead.
+* In `pqPropertiesPanel`, the `setAutoApplyDelay()` and `autoApplyDelay()`
+  methods have been removed (deprecated in 5.11). Use the methods on
+  `pqApplyBehavior` instead.
