@@ -96,8 +96,10 @@ public:
     ReleaseVTKGLObject(this->StreamLineColorBlendProgram, renWin);
     ReleaseVTKGLObject(this->CurrentBuffer, renWin);
     ReleaseVTKGLObject(this->CurrentTexture, renWin);
+    ReleaseVTKGLObject(this->CurrentDepthTexture, renWin);
     ReleaseVTKGLObject(this->FrameBuffer, renWin);
     ReleaseVTKGLObject(this->FrameTexture, renWin);
+    ReleaseVTKGLObject(this->FrameDepthTexture, renWin);
     ReleaseVTKGLObject(this->StreamLineSegmentProgram, renWin);
     ReleaseVTKGLObject(this->FinalImageBlendProgram, renWin);
   }
