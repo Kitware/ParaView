@@ -1222,7 +1222,8 @@ int main(int argc, char* argv[])
   if (!fp)
   {
     fprintf(stderr, "Error opening output file %s\n", options->OutputFileName);
-    exit(1);
+    vtkParse_Finalize();
+    return 1;
   }
 
   data = fileInfo->MainClass;
@@ -1281,16 +1282,26 @@ int main(int argc, char* argv[])
 
   if (!data)
   {
+    vtkWrap_WarnEmpty(options);
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    exit(0);
+    if (vtkParse_Finalize())
+    {
+      return 1;
+    }
+    return 0;
   }
 
   if (data->Template)
   {
+    vtkWrap_WarnEmpty(options);
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    exit(0);
+    if (vtkParse_Finalize())
+    {
+      return 1;
+    }
+    return 0;
   }
 
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
@@ -1298,7 +1309,7 @@ int main(int argc, char* argv[])
     if (strncmp(data->SuperClasses[i], "vtk", 3) == 0 && strchr(data->SuperClasses[i], '<'))
     {
       fprintf(fp, "// This automatically generated file contains only a stub,\n");
-      fprintf(fp, "// bacause the class %s is based on a templated VTK class.\n", data->Name);
+      fprintf(fp, "// because the class %s is based on a templated VTK class.\n", data->Name);
       fprintf(fp, "// Wrapping such classes is not currently supported.\n");
       fprintf(fp,
         "// Here follows the list of detected superclasses (first offending one marked by !):\n");
@@ -1308,9 +1319,14 @@ int main(int argc, char* argv[])
         fprintf(fp, "// %c %s\n", i == j ? '!' : ' ', data->SuperClasses[j]);
       }
 
+      vtkWrap_WarnEmpty(options);
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
-      exit(0);
+      if (vtkParse_Finalize())
+      {
+        return 1;
+      }
+      return 0;
     }
   }
 
@@ -1324,9 +1340,14 @@ int main(int argc, char* argv[])
 
     if (!vtkWrap_IsTypeOf(hierarchyInfo, data->Name, "vtkObjectBase"))
     {
+      vtkWrap_WarnEmpty(options);
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
-      exit(0);
+      if (vtkParse_Finalize())
+      {
+        return 1;
+      }
+      return 0;
     }
   }
 
@@ -1345,12 +1366,6 @@ int main(int argc, char* argv[])
   }
   fprintf(fp, "#include \"vtkClientServerInterpreter.h\"\n");
   fprintf(fp, "#include \"vtkClientServerStream.h\"\n\n");
-#if 0
-  if (!strcmp("vtkObject",data->Name))
-    {
-    fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
-    }
-#endif
   if (!strcmp("vtkObjectBase", data->Name))
   {
     fprintf(fp, "#include <sstream>\n");
@@ -1397,8 +1412,6 @@ int main(int argc, char* argv[])
   }
 
   fprintf(fp, "  (void)arlu;\n");
-
-  /*fprintf(fp,"  vtkClientServerStream resultStream;\n");*/
 
   /* insert function handling code here */
   for (i = 0; i < data->NumberOfFunctions; i++)
@@ -1476,5 +1489,11 @@ int main(int argc, char* argv[])
 
   vtkParse_Free(fileInfo);
   fclose(fp);
+
+  if (vtkParse_Finalize())
+  {
+    return 1;
+  }
+
   return 0;
 }

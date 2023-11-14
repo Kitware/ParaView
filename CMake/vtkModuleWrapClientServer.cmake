@@ -117,6 +117,7 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
               "@${_vtk_client_server_args_file}"
               -o "${_vtk_client_server_source_output}"
               "${_vtk_client_server_header}"
+              ${_vtk_client_server_warning_args}
               --types "${_vtk_client_server_hierarchy_file}"
       DEPFILE "${_vtk_client_server_depfile}"
       COMMENT "Generating client_server wrapper sources for ${_vtk_client_server_basename}"
@@ -263,7 +264,10 @@ vtk_module_wrap_client_server(
   [DESTINATION <destination>]
 
   [INSTALL_EXPORT <export>]
-  [COMPONENT <component>])
+  [COMPONENT <component>]
+
+  [WARNINGS <warning>...]
+)
 ```
 
   * `MODULES`: (Required) The list of modules to wrap.
@@ -282,12 +286,13 @@ vtk_module_wrap_client_server(
     libraries and generated interface target to the provided export set.
   * `COMPONENT`: (Defaults to `development`) All install rules created by this
     function will use this installation component.
+  * ``WARNINGS``: Warnings to enable. Supported warnings: ``empty``.
 #]==]
 function (vtk_module_wrap_client_server)
   cmake_parse_arguments(_vtk_client_server
     ""
     "DESTINATION;INSTALL_EXPORT;TARGET;COMPONENT;FUNCTION_NAME;WRAPPED_MODULES"
-    "MODULES"
+    "MODULES;WARNINGS"
     ${ARGN})
 
   if (_vtk_client_server_UNPARSED_ARGUMENTS)
@@ -306,6 +311,18 @@ function (vtk_module_wrap_client_server)
     message(FATAL_ERROR
       "The `TARGET` argument is required.")
   endif ()
+
+  set(_vtk_client_server_known_warnings
+    empty)
+  set(_vtk_client_server_warning_args)
+  foreach (_vtk_client_server_warning IN LISTS _vtk_client_server_WARNINGS)
+    if (NOT _vtk_client_server_warning IN_LIST _vtk_client_server_known_warnings)
+      message(FATAL_ERROR
+        "Unrecognized warning: ${_vtk_client_server_warning}")
+    endif ()
+    list(APPEND _vtk_client_server_warning_args
+      "-W${_vtk_client_server_warning}")
+  endforeach ()
 
   if (NOT DEFINED _vtk_client_server_DESTINATION)
     set(_vtk_client_server_DESTINATION "${CMAKE_INSTALL_LIBDIR}")
