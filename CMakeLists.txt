@@ -413,10 +413,8 @@ foreach (paraview_module IN LISTS paraview_incubator_unrecognized_modules)
   endif ()
 endforeach ()
 set(vtk_modules)
-message("paraview_plugin_required_modules: ${paraview_plugin_required_modules}")
 move_vtk_modules(paraview_plugin_required_modules vtk_modules)
 
-message("paraview_client_requested_modules: ${paraview_client_requested_modules}")
 move_vtk_modules(paraview_client_requested_modules vtk_modules)
 set(paraview_client_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
@@ -434,10 +432,8 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_client_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
-message("paraview_client_required_modules: ${paraview_client_required_modules}")
 move_vtk_modules(paraview_client_required_modules vtk_modules)
 
-message("paraview_requested_modules: ${paraview_requested_modules}")
 move_vtk_modules(paraview_requested_modules vtk_modules)
 set(paraview_source_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
@@ -463,7 +459,6 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
-message("paraview_required_modules: ${paraview_required_modules}")
 move_vtk_modules(paraview_required_modules vtk_modules)
 
 set(paraview_unrecognized_paraview_modules)
@@ -528,7 +523,6 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
       "The following modules are required, but not found: "
       "${modules_notarget}")
   endif()
-  message("VTK no deps: ${vtk_modules}")
   list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
   macro(search_dependent_targets)
     set(vtk_mod_dep_list)
@@ -901,9 +895,6 @@ vtk_module_json(
 list(LENGTH vtk_modules vtk_modules_len)
 list(LENGTH paraview_modules paraview_modules_len)
 list(LENGTH paraview_client_modules paraview_client_modules_len)
-message("VTK: ${vtk_modules}")
-message("ParaView: ${paraview_modules}")
-message("ParaView client: ${paraview_client_modules}")
 message(STATUS "Enabled modules: VTK(${vtk_modules_len}), ParaView(${paraview_modules_len} + ${paraview_client_modules_len})")
 
 set(autoload_plugins)
