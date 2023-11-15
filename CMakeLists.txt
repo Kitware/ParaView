@@ -347,7 +347,7 @@ foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
 endforeach ()
 
 # move modules from ${from} list to ${to} list if they match VTK::
-function (move_modules from to)
+function (move_vtk_modules from to)
   set(modules ${${to}})
   set(from_new_value)
   foreach(mod IN LISTS ${from})
@@ -413,9 +413,11 @@ foreach (paraview_module IN LISTS paraview_incubator_unrecognized_modules)
   endif ()
 endforeach ()
 set(vtk_modules)
-move_modules(paraview_plugin_required_modules vtk_modules)
+message("paraview_plugin_required_modules: ${paraview_plugin_required_modules}")
+move_vtk_modules(paraview_plugin_required_modules vtk_modules)
 
-move_modules(paraview_client_requested_modules vtk_modules)
+message("paraview_client_requested_modules: ${paraview_client_requested_modules}")
+move_vtk_modules(paraview_client_requested_modules vtk_modules)
 set(paraview_client_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
   "${CMAKE_CURRENT_SOURCE_DIR}/Adaptors")
@@ -432,9 +434,11 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_client_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
-move_modules(paraview_client_required_modules vtk_modules)
+message("paraview_client_required_modules: ${paraview_client_required_modules}")
+move_vtk_modules(paraview_client_required_modules vtk_modules)
 
-move_modules(paraview_requested_modules vtk_modules)
+message("paraview_requested_modules: ${paraview_requested_modules}")
+move_vtk_modules(paraview_requested_modules vtk_modules)
 set(paraview_source_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
@@ -459,7 +463,8 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
-move_modules(paraview_required_modules vtk_modules)
+message("paraview_required_modules: ${paraview_required_modules}")
+move_vtk_modules(paraview_required_modules vtk_modules)
 
 set(paraview_unrecognized_paraview_modules)
 foreach (paraview_module IN LISTS paraview_unrecognized_modules)
@@ -523,8 +528,34 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
       "The following modules are required, but not found: "
       "${modules_notarget}")
   endif()
+  message("VTK no deps: ${vtk_modules}")
   list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
-  find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}")
+  macro(search_dependent_targets)
+    set(vtk_mod_dep_list)
+    foreach(vtk_targ ${ARGN})
+      get_target_property(vtk_mod_dep ${vtk_targ} "INTERFACE_vtk_module_depends")
+      if(vtk_mod_dep)
+        list(APPEND vtk_mod_dep_list ${vtk_mod_dep})
+      endif()
+      get_target_property(vtk_mod_pdep ${vtk_targ} "INTERFACE_vtk_module_private_depends")
+      if(vtk_mod_pdep)
+        list(APPEND vtk_mod_dep_list ${vtk_mod_pdep})
+      endif()
+      get_target_property(vtk_mod_odep ${vtk_targ} "INTERFACE_vtk_module_optional_depends")
+      if(vtk_mod_odep)
+        list(APPEND vtk_mod_dep_list ${vtk_mod_odep})
+      endif()
+      if(vtk_mod_dep_list)
+        list(REMOVE_ITEM vtk_mod_dep_list ${vtk_modules})
+        if(vtk_mod_dep_list)
+          list(APPEND vtk_modules ${vtk_mod_dep_list})
+          search_dependent_targets(${vtk_mod_dep_list})
+        endif()
+      endif()
+    endforeach()
+  endmacro()
+  search_dependent_targets(${vtk_modules})
+  find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}")  
   if (PARAVIEW_USE_PYTHON)
     find_package(Python3 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
@@ -870,6 +901,9 @@ vtk_module_json(
 list(LENGTH vtk_modules vtk_modules_len)
 list(LENGTH paraview_modules paraview_modules_len)
 list(LENGTH paraview_client_modules paraview_client_modules_len)
+message("VTK: ${vtk_modules}")
+message("ParaView: ${paraview_modules}")
+message("ParaView client: ${paraview_client_modules}")
 message(STATUS "Enabled modules: VTK(${vtk_modules_len}), ParaView(${paraview_modules_len} + ${paraview_client_modules_len})")
 
 set(autoload_plugins)
