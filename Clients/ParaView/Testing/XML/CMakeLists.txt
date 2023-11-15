@@ -1975,6 +1975,7 @@ set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (ReadPartitionedCGNS_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (RecentFiles_FORCE_SERIAL TRUE) # use key events
+set (RecentFilesHardFilename_FORCE_SERIAL TRUE) # use key events
 set (SPTimeseries_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (SeriesPresetRegexp_FORCE_SERIAL TRUE)  # since this uses popup-menu
