@@ -147,6 +147,12 @@ bool vtkSMExtractsController::Extract(vtkCollection* collection)
 //----------------------------------------------------------------------------
 bool vtkSMExtractsController::Extract(vtkSMProxy* extractor)
 {
+  if (std::string(extractor->GetXMLName()) == "SteeringExtractor")
+  {
+    // Nothing to extract here for steering extractors
+    return false;
+  }
+
   if (!this->IsTriggerActivated(extractor))
   {
     // skipping, nothing to do.

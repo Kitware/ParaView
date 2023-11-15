@@ -6,13 +6,20 @@ print("executing catalyst_pipeline")
 producer = TrivialProducer(registrationName="grid")
 steerable_parameters = CreateSteerableParameters("SteerableParameters")
 
+# We need to filter out the velocity field for the steering extractor, because currently,
+# vtkDataObjectToConduit does not support serializing double fields.
+filterArray = PassArrays(Input=producer)
+filterArray.CellDataArrays = ['pressure']
+steering_extractor = CreateExtractor('steering', filterArray, registrationName='steerchannel')
+
 from paraview import catalyst
 
 options = catalyst.Options()
 options.EnableCatalystLive = 1
 
 def catalyst_execute(info):
-    global producer
+    global producer, filterArray
+    filterArray.UpdatePipeline()
     producer.UpdatePipeline()
     print("-----------------------------------")
     print("executing (cycle={}, time={})".format(info.cycle, info.time))
