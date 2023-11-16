@@ -3610,9 +3610,11 @@ bool vtkPVRenderView::GetEnableSynchronizableActors()
 void vtkPVRenderView::SetEnableANARI(bool v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  vtkRenderer* ren = this->GetRenderer();
   if (v && !this->Internals->AnariPass)
   {
     this->Internals->AnariPass = vtkSmartPointer<vtkAnariPass>::New();
+    vtkAnariRendererNode::SetCompositeOnGL(1, ren);
   }
   // if (!vtkAnariPass::IsSupported())
   // {
@@ -3626,12 +3628,11 @@ void vtkPVRenderView::SetEnableANARI(bool v)
     return;
   }
   this->Internals->IsInAnari = v;
-  vtkRenderer* ren = this->GetRenderer();
   if (v)
   {
     ren->SetUseShadows(this->Internals->OSPRayShadows);
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
-    this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass.GetPointer());
+    this->SynchronizedRenderers->SetRenderPass(this->Internals->AnariPass);
     this->SynchronizedRenderers->SetEnableRayTracing(true);
   }
   else
@@ -3654,6 +3655,43 @@ void vtkPVRenderView::SetEnableANARI(bool v)
 bool vtkPVRenderView::GetEnableANARI()
 {
   return this->Internals->IsInAnari;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetANARILibrary(std::string l)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  vtkRenderer* ren = this->GetRenderer();
+  if (vtkAnariRendererNode::GetLibraryName(ren) != l)
+  {
+    vtkAnariRendererNode::SetLibraryName(l.c_str(), ren);
+    // Need to reset anaripass to re-init with the new library
+    if (this->Internals->AnariPass)
+    {
+      bool isinanari = this->Internals->IsInAnari;
+      if (isinanari)
+      {
+        this->SetEnableANARI(false);
+      }
+      this->Internals->AnariPass = nullptr;
+      if (isinanari)
+      {
+        this->SetEnableANARI(true);
+      }
+    }
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVRenderView::GetANARILibrary()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingAnari
+  vtkRenderer* ren = this->GetRenderer();
+  return vtkAnariRendererNode::GetLibraryName(ren);
+#else
+  return nullptr;
+#endif
 }
 
 //----------------------------------------------------------------------------

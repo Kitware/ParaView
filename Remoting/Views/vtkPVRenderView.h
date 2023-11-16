@@ -1016,6 +1016,14 @@ public:
 
   ///@{
   /**
+   * Set/Get the ANARI library name
+   */
+  void SetANARILibrary(std::string);
+  const char* GetANARILibrary();
+  ///@}
+
+  ///@{
+  /**
    * Controls whether OSPRay sends casts shadow rays or not.
    */
   void SetShadows(bool);
