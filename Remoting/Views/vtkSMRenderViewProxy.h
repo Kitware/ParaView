@@ -262,6 +262,12 @@ public:
    */
   void ComputeVisibleBounds(vtkSMProxy* representation, double* bounds);
 
+  /**
+   * Tries to clear the selection cache (if needed).
+   * Returns a boolean value which indicates whether the cache has been cleared.
+   */
+  bool ClearSelectionCache(bool force = false);
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;
@@ -312,12 +318,6 @@ protected:
   bool IsInSelectionMode();
 
   bool IsSelectionCached;
-
-  /**
-   * Returns true if the cache clear request was sent to vtkPVRenderView. The
-   * return value is primarily intended for debugging/logging purposes.
-   */
-  bool ClearSelectionCache(bool force = false);
 
   // Internal fields for the observer mechanism that is used to invalidate
   // the cache of selection when the current user became master

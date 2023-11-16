@@ -95,6 +95,20 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
       SLOT(setRepresentation(pqDataRepresentation*)));
   }
 
+  switch (this->Mode)
+  {
+    case SELECT_SURFACE_POINTDATA_INTERACTIVELY:
+    case SELECT_SURFACE_CELLDATA_INTERACTIVELY:
+    case SELECT_SURFACE_CELLS_INTERACTIVELY:
+    case SELECT_SURFACE_POINTS_INTERACTIVELY:
+    case SELECT_SURFACE_POINTS_TOOLTIP:
+    case SELECT_SURFACE_CELLS_TOOLTIP:
+      QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::dataUpdated, this,
+        &pqRenderViewSelectionReaction::clearSelectionCache);
+      break;
+    default:
+      break;
+  }
   this->updateEnableState();
 
   this->MouseMovingTimer.setSingleShot(true);
@@ -840,6 +854,15 @@ void pqRenderViewSelectionReaction::onMouseStop()
 {
   this->MouseMoving = false;
   this->UpdateTooltip();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::clearSelectionCache()
+{
+  if (pqRenderViewSelectionReaction::ActiveReaction == this)
+  {
+    this->View->getRenderViewProxy()->ClearSelectionCache(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
