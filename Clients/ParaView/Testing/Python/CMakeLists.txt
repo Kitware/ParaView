@@ -22,6 +22,9 @@ ExternalData_Expand_Arguments(ParaViewData _
 
   # baselines
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewMatplotlibScript.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGContourVoxelsPolyhedron.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTG3DContourPolyhedron.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGContourMonoHT.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewNumpyScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCatalystClient.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FontSize.png}"
@@ -233,3 +236,12 @@ paraview_add_test_python(
 
 set_tests_properties(paraviewPython-TestPV_PLUGIN_PATH
         PROPERTIES ENVIRONMENT "PV_PLUGIN_PATH=${CMAKE_SOURCE_DIR}/Examples/Plugins/PythonAlgorithm/")
+
+#------------------------------------------------------------------------------
+# Add HTG rendering tests
+paraview_add_test_python(
+  NO_DATA NO_RT
+  TestHTGContourVoxelsPolyhedron.py
+  TestHTG3DContourPolyhedron.py
+  TestHTGContourMonoHT.py
+)

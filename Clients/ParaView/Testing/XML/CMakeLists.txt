@@ -359,6 +359,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FastUniformGridSource4.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesFilterHTG.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesHTG.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesHTGNoMask.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesNonlinearCells.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FeatureEdgesRepresentationHTG.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesReader_cartesian.png}"
@@ -432,6 +433,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGeometry.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGradient.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridMultiBlock.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridMultipleClip.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridObliquePlaneCutter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridPlaneCutter.png}"
   #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold.png}"
@@ -925,6 +927,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ExtractSubsetWithSeed.xml
   FastUniformGridSource.xml
   FeatureEdgesHTG.xml
+  FeatureEdgesHTGNoMask.xml
   FileSeries.xml
   FontScalingInScreenshots.xml
   HyperTreeGridAxisClip.xml
@@ -938,6 +941,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   HyperTreeGridGeometry.xml
   HyperTreeGridGradient.xml
   HyperTreeGridMultiBlock.xml
+  HyperTreeGridMultipleClip.xml
   HyperTreeGridObliquePlaneCutter.xml
   HyperTreeGridPlaneCutter.xml
   HyperTreeGridThreshold.xml
