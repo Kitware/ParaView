@@ -3869,9 +3869,10 @@ int vtkPVRenderView::GetSamplesPerPixel()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaxFrames(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing || VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
+  vtkAnariRendererNode::SetAccumulationCount(v, ren);
   static bool warned_once = false;
   if (!warned_once && v > 1 && vtkPVView::GetEnableStreaming() == false)
   {
