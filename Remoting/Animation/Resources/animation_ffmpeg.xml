@@ -6,6 +6,13 @@
         FFMPEG animation writer.
       </Documentation>
 
+      <StringVectorProperty name="FileName" command="SetFileName"
+        number_of_elements="1"
+        default_values=""
+        panel_visibility="never">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+
       <IntVectorProperty name="Compression"
         command="SetCompression"
         number_of_elements="1"
