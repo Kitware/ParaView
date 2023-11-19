@@ -148,6 +148,12 @@ public:
     vtkSMProxy* proxy, bool checkRepresentedData = true);
 
   /**
+   * In case of UseSeparateColorMap enabled, this function prefix the given
+   * arrayname with unique identifier, otherwise it acts as a passthrough.
+   */
+  static std::string GetDecoratedArrayName(vtkSMProxy* proxy, const std::string& arrayname);
+
+  /**
    * Call vtkSMRepresentationProxy::GetProminentValuesInformation() for the
    * array used for scalar color, if any. Otherwise returns nullptr.
    */
@@ -178,12 +184,6 @@ protected:
   // Add proxy parameter?
   static bool RescaleTransferFunctionToDataRange(
     vtkSMProxy* proxy, vtkPVArrayInformation* info, bool extend = false, bool force = true);
-
-  /**
-   * In case of UseSeparateColorMap enabled, this function prefix the given
-   * arrayname with unique identifier, otherwise it acts as a passthrough.
-   */
-  static std::string GetDecoratedArrayName(vtkSMProxy* proxy, const std::string& arrayname);
 
   /**
    * Internal method to set scalar coloring, do not use directly.
