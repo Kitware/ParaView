@@ -3,10 +3,10 @@
 #include "pqEditMacrosDialog.h"
 #include "ui_pqEditMacrosDialog.h"
 
-// pqCore
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqIconBrowser.h"
 #include "pqPVApplicationCore.h"
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonManager.h"
@@ -28,6 +28,22 @@ struct pqEditMacrosDialog::pqInternals
   {
   }
 
+  enum Columns
+  {
+    Icons,
+    Macros,
+    Count
+  };
+
+  // qt item role to store macro path
+  static constexpr int MACRO_PATH_ROLE() { return Qt::UserRole + 1; }
+
+  // get macro file path stored in item user data
+  QString getMacroFilePath(QTreeWidgetItem* item)
+  {
+    return item->data(Macros, this->MACRO_PATH_ROLE()).toString();
+  }
+
   QScopedPointer<Ui::pqEditMacrosDialog> Ui;
 };
 
@@ -40,9 +56,10 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
-  this->Internals->Ui->macrosTree->setAcceptDrops(false);
-  this->Internals->Ui->macrosTree->sortByColumn(0, Qt::AscendingOrder);
-  this->Internals->Ui->macrosTree->setHeaderLabels(QStringList() << tr("Macro Name"));
+  this->Internals->Ui->macrosTree->setColumnCount(pqInternals::Count);
+  this->Internals->Ui->macrosTree->sortByColumn(pqInternals::Macros, Qt::AscendingOrder);
+  this->Internals->Ui->macrosTree->setHeaderLabels(QStringList() << tr("Icons") << tr("Macros"));
+  this->Internals->Ui->macrosTree->resizeColumnToContents(pqInternals::Icons);
 
   QObject::connect(pqPVApplicationCore::instance()->pythonManager()->macroSupervisor(),
     &pqPythonMacroSupervisor::onAddedMacro, this, &pqEditMacrosDialog::populateTree);
@@ -53,7 +70,19 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
   QObject::connect(
     this->Internals->Ui->edit, &QToolButton::released, this, &pqEditMacrosDialog::onEditPressed);
   this->connect(this->Internals->Ui->macrosTree, &QTreeWidget::itemDoubleClicked, this,
-    &pqEditMacrosDialog::onEditPressed);
+    [&](QTreeWidgetItem*, int column) {
+      if (column == pqInternals::Icons)
+      {
+        this->onSetIconPressed();
+      }
+      else if (column == pqInternals::Macros)
+      {
+        this->onEditPressed();
+      }
+    });
+
+  QObject::connect(this->Internals->Ui->setIcon, &QToolButton::released, this,
+    &pqEditMacrosDialog::onSetIconPressed);
 
   QObject::connect(this->Internals->Ui->remove, &QToolButton::released, this,
     &pqEditMacrosDialog::onRemovePressed);
@@ -102,8 +131,34 @@ void pqEditMacrosDialog::onEditPressed()
   {
     // Python Manager can't be nullptr as this dialog is built only when Python is enabled
     pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-    pythonManager->editMacro(item->data(0, Qt::UserRole).toString());
+    pythonManager->editMacro(this->Internals->getMacroFilePath(item));
   }
+}
+
+//----------------------------------------------------------------------------
+void pqEditMacrosDialog::onSetIconPressed()
+{
+  QList<QTreeWidgetItem*> selected = this->Internals->Ui->macrosTree->selectedItems();
+  if (selected.empty())
+  {
+    return;
+  }
+
+  auto item = selected.first();
+  auto macroPath = this->Internals->getMacroFilePath(item);
+  QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(macroPath);
+
+  auto newIconPath = pqIconBrowser::getIconPath(iconPath);
+  if (newIconPath == iconPath)
+  {
+    return;
+  }
+
+  item->setIcon(pqInternals::Icons, QIcon(newIconPath));
+  pqPythonMacroSupervisor::setIconForMacro(macroPath, newIconPath);
+
+  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  pythonManager->updateMacroList();
 }
 
 //----------------------------------------------------------------------------
@@ -162,7 +217,7 @@ void pqEditMacrosDialog::onSearchTextChanged(const QString& pattern)
     }
     else
     {
-      item->setHidden(!item->text(0).contains(pattern, Qt::CaseInsensitive));
+      item->setHidden(!item->text(pqInternals::Macros).contains(pattern, Qt::CaseInsensitive));
     }
   }
 }
@@ -182,14 +237,16 @@ void pqEditMacrosDialog::createItem(QTreeWidgetItem* parent, const QString& file
   }
 
   QTreeWidgetItem* item = new QTreeWidgetItem(parent, preceding);
-  item->setText(0, displayName);
-  item->setData(0, Qt::UserRole, fileName);
+  item->setText(pqInternals::Macros, displayName);
+  item->setData(pqInternals::Macros, this->Internals->MACRO_PATH_ROLE(), fileName);
   item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  item->setToolTip(pqInternals::Icons, tr("Double click to change icon"));
+  item->setToolTip(pqInternals::Macros, tr("Double click to edit macro"));
 
   QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(fileName);
   if (!iconPath.isEmpty())
   {
-    item->setIcon(0, QIcon(iconPath));
+    item->setIcon(pqInternals::Icons, QIcon(iconPath));
   }
 }
 
@@ -207,7 +264,8 @@ void pqEditMacrosDialog::populateTree()
     this->createItem(treeRoot, macrosIter.key(), macrosIter.value());
   }
 
-  this->Internals->Ui->macrosTree->resizeColumnToContents(0);
+  this->Internals->Ui->macrosTree->resizeColumnToContents(pqInternals::Macros);
+  this->Internals->Ui->macrosTree->resizeColumnToContents(pqInternals::Icons);
   this->Internals->Ui->macrosTree->setCurrentItem(nullptr);
   this->updateUIState();
 }
@@ -256,7 +314,7 @@ QTreeWidgetItem* pqEditMacrosDialog::getNearestItem(QTreeWidgetItem* item)
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::deleteItem(QTreeWidgetItem* item)
 {
-  pqPythonMacroSupervisor::hideFile(item->data(0, Qt::UserRole).toString());
+  pqPythonMacroSupervisor::hideFile(this->Internals->getMacroFilePath(item));
   delete item;
 }
 
@@ -283,5 +341,6 @@ void pqEditMacrosDialog::updateUIState()
 
   this->Internals->Ui->edit->setEnabled(hasSelectedItems);
   this->Internals->Ui->remove->setEnabled(hasSelectedItems);
+  this->Internals->Ui->setIcon->setEnabled(hasSelectedItems);
   this->Internals->Ui->removeAll->setEnabled(hasItems);
 }

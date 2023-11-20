@@ -40,6 +40,11 @@ private Q_SLOTS:
   void onEditPressed();
 
   /**
+   * Set an icon for the selected macro.
+   */
+  void onSetIconPressed();
+
+  /**
    * Remove selected item from macros tree.
    */
   void onRemovePressed();

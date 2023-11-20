@@ -80,16 +80,15 @@ public:
    */
   static QString iconPathFromFileName(const QString& fileName);
 
+  static void setIconForMacro(const QString& macroPath, const QString& iconPath);
+
   /**
    * Get a list a "*.py" files from macro directories.
    */
   static QStringList getMacrosFilePaths();
 
-  static QStringList getSupportedIconFormats()
-  {
-    return QStringList() << ".svg"
-                         << ".png";
-  }
+  PARAVIEW_DEPRECATED_IN_5_12_0("User pqIconListModel::getSupportedIconFormats instead.")
+  static QStringList getSupportedIconFormats();
 
 Q_SIGNALS:
 

@@ -35,6 +35,8 @@ set(classes
   pqFlatTreeViewEventPlayer
   pqFlatTreeViewEventTranslator
   pqGraphLayoutStrategyInterface
+  pqIconListModel
+  pqIconSettings
   pqImageUtil
   pqInteractiveViewLink
   pqInterfaceTracker

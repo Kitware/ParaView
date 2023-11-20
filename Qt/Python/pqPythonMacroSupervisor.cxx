@@ -3,9 +3,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqPythonMacroSupervisor.h"
 #include "pqApplicationCore.h"
+#include "pqIconSettings.h"
 #include "pqServer.h"
 
 #include "pqCoreUtilities.h"
+#include "pqIconListModel.h"
 #include "pqPythonManager.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -46,6 +48,39 @@ public:
   QList<QPointer<QWidget>> DeleteWidgetContainers;
   // List of action linked to widget/menuItem used to delete a macro
   QMap<QString, QPointer<QAction>> DeleteActionMap;
+
+  static pqIconSettings IconSettings() { return pqIconSettings("Macros"); }
+
+  /**
+   * Find an icon for given macro, looking under standard macro directories.
+   * Matching icon has same base name than the macro and ends with one of the
+   * supported icon extension.
+   * Return an empty string if no such a file exist.
+   */
+  static QString findMacroIconUnderMacroDir(const QString& macroPath)
+  {
+    // keep looking in macro dir for backward compatibility.
+    QStringList iconDirs = pqCoreUtilities::findParaviewPaths(QString("Macros"), true, true);
+
+    auto fileBaseName = QFileInfo(macroPath).completeBaseName();
+    QStringList filter;
+    for (auto extension : pqIconListModel::getSupportedIconFormats())
+    {
+      filter << fileBaseName + extension;
+    }
+
+    for (const auto& iconDir : iconDirs)
+    {
+      auto directory = QDir(iconDir);
+      auto icons = directory.entryInfoList(filter, QDir::Files);
+      if (!icons.empty())
+      {
+        return icons.first().absoluteFilePath();
+      }
+    }
+
+    return QString();
+  }
 };
 
 //----------------------------------------------------------------------------
@@ -268,9 +303,13 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   runAction->setEnabled(enable);
 
   QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(fileName);
-  if (!iconPath.isEmpty())
+  if (!iconPath.isEmpty() && QFileInfo::exists(iconPath))
   {
     runAction->setIcon(QIcon(iconPath));
+  }
+  else
+  {
+    pqInternal::IconSettings().removeItemFromSettings(fileName);
   }
 
   this->Internal->RunActionMap.insert(fileName, runAction);
@@ -320,6 +359,8 @@ void pqPythonMacroSupervisor::removeMacro(const QString& fileName)
   removeActionFromWidgets(action, this->Internal->DeleteWidgetContainers);
   this->Internal->DeleteActionMap.remove(fileName);
   delete action;
+
+  pqInternal::IconSettings().removeItemFromSettings(fileName);
 }
 
 //----------------------------------------------------------------------------
@@ -363,7 +404,7 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
     QDir dir = QFileInfo(filename).absoluteDir();
     QStringList filter;
     filter << QFileInfo(filename).completeBaseName() + ".py";
-    for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+    for (auto extension : pqIconListModel::getSupportedIconFormats())
     {
       filter << QFileInfo(filename).completeBaseName() + extension;
     }
@@ -404,18 +445,31 @@ QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& fileName)
 }
 
 //----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::setIconForMacro(const QString& macroPath, const QString& iconPath)
+{
+  auto iconSettings = pqInternal::IconSettings();
+  if (iconPath.isEmpty())
+  {
+    iconSettings.removeItemFromSettings(macroPath);
+  }
+  else
+  {
+    iconSettings.setItemIconInSettings(macroPath, iconPath);
+  }
+}
+
+//----------------------------------------------------------------------------
 QString pqPythonMacroSupervisor::iconPathFromFileName(const QString& fileName)
 {
-  for (auto extension : pqPythonMacroSupervisor::getSupportedIconFormats())
+  QString iconPath = pqInternal::IconSettings().getIconFromSettings(fileName);
+  if (!iconPath.isEmpty())
   {
-    QString iconPath = QFileInfo(fileName).absoluteFilePath().replace(".py", extension);
-    if (QFileInfo::exists(iconPath))
-    {
-      return iconPath;
-    }
+    return iconPath;
   }
 
-  return QString();
+  iconPath = pqInternal::findMacroIconUnderMacroDir(fileName);
+
+  return iconPath;
 }
 
 //----------------------------------------------------------------------------
@@ -457,4 +511,10 @@ QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
   }
 
   return macroList;
+}
+
+//----------------------------------------------------------------------------
+QStringList pqPythonMacroSupervisor::getSupportedIconFormats()
+{
+  return pqIconListModel::getSupportedIconFormats();
 }
