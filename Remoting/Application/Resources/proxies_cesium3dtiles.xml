@@ -1,0 +1,35 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkCesium3DTilesReader"
+                 label="Cesium3DTiles Reader"
+                 name="Cesium3DTiles Reader">
+      <Documentation short_help="Reads Cesium3DTiles data files.">
+vtkCesium3DTilesReader is a reader for Cesium3DTiles tilesets. The output is a
+multiblock dataset.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify file name of the Cesium3DTiles tileset to read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="Level"
+                         command="SetLevel"
+                         panel_visibility="default"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Level in the tree we read tiles from.
+        </Documentation>
+      </IntVectorProperty>
+
+
+      <Hints>
+        <ReaderFactory extensions="json"
+                       file_description="Cesium3DTiles tileset" />
+      </Hints>
+    </SourceProxy>
+    <!-- End Cesium3DTilesReader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

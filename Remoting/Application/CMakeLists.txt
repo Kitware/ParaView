@@ -31,6 +31,12 @@ if (TARGET VTK::DomainsChemistry)
     Resources/filters_domainschemistry.xml)
 endif ()
 
+if (TARGET VTK::GeovisCore)
+  list(APPEND xml_files
+    Resources/proxies_geoviscore.xml)
+endif ()
+
+
 if (TARGET VTK::IOChemistry)
   list(APPEND xml_files
     Resources/readers_iochemistry.xml)
@@ -246,6 +252,11 @@ endif ()
 if (TARGET VTK::IOCityGML)
   list(APPEND xml_files
     Resources/proxies_citygml.xml)
+endif ()
+
+if (TARGET VTK::IOCesium3DTiles)
+  list(APPEND xml_files
+    Resources/proxies_cesium3dtiles.xml)
 endif ()
 
 if (TARGET VTK::IOHDF)
