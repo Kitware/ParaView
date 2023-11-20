@@ -3595,28 +3595,6 @@ int vtkPVRenderView::GetSamplesPerPixel()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetVolumeAnisotropy(double v)
-{
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkRenderer* ren = this->GetRenderer();
-  vtkOSPRayRendererNode::SetVolumeAnisotropy(v, ren);
-#else
-  (void)v;
-#endif
-}
-
-//----------------------------------------------------------------------------
-double vtkPVRenderView::GetVolumeAnisotropy()
-{
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkRenderer* ren = this->GetRenderer();
-  return vtkOSPRayRendererNode::GetVolumeAnisotropy(ren);
-#else
-  return 0.0f;
-#endif
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaxFrames(int v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing

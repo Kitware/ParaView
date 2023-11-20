@@ -2476,32 +2476,6 @@ def HideInteractiveWidgets(proxy=None):
         raise ValueError ("No 'proxy' was provided and no active source was found.")
     _InvokeWidgetUserEvent(proxy, "HideWidget")
 
-def Show3DWidgets(proxy=None):
-    """
-    If possible in the current environment, this method will
-    request the application to show the 3D widget(s) for proxy
-
-    PARAVIEW_DEPRECATED_IN_5_11_0
-    Use :func:`ShowInteractiveWidgets` instead.
-    """
-    import warnings
-    warnings.warn("`Show3DWidgets` is deprecated in ParaView 5.11. Use `ShowInteractiveWidgets` instead",
-        DeprecationWarning)
-    ShowInteractiveWidgets(proxy)
-
-def Hide3DWidgets(proxy=None):
-    """
-    If possible in the current environment, this method will
-    request the application to show the 3D widget(s) for proxy
-
-    PARAVIEW_DEPRECATED_IN_5_11_0
-    Use :func:`HideInteractiveWidgets` instead.
-    """
-    import warnings
-    warnings.warn("`Hide3DWidgets` is deprecated in ParaView 5.11. Use `HideInteractiveWidgets` instead",
-        DeprecationWarning)
-    HideInteractiveWidgets(proxy)
-
 def _InvokeWidgetUserEvent(proxy, event):
     """Internal method used by ShowInteractiveWidgets/HideInteractiveWidgets"""
     if proxy:

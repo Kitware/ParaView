@@ -20,7 +20,6 @@
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqTimelineScrollbar.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkCompositeAnimationPlayer.h"
@@ -263,10 +262,6 @@ pqTimeInspectorWidget::pqTimeInspectorWidget(QWidget* parentObject)
 
   this->connect(pqPVApplicationCore::instance()->animationManager(),
     SIGNAL(activeSceneChanged(pqAnimationScene*)), SLOT(setAnimationScene(pqAnimationScene*)));
-
-  pqTimelineScrollbar* timelineScrollbar = this->Internals->Ui.TimelineScrollbar;
-  timelineScrollbar->linkSpacing(this->Internals->Ui.AnimationWidget);
-  timelineScrollbar->setAnimationModel(this->Internals->Ui.AnimationWidget->animationModel());
 }
 
 //-----------------------------------------------------------------------------

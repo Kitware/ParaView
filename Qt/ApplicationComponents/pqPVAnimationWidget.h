@@ -7,7 +7,7 @@
 #include "pqAnimationViewWidget.h"
 #include "pqApplicationComponentsModule.h"
 
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 /**
  * pqPVAnimationWidget is subclass of pqAnimationViewWidget that connects with

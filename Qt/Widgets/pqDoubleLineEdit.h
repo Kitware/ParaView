@@ -12,7 +12,7 @@
 #include "pqLineEdit.h"
 #include "pqWidgetsModule.h"
 
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 /**
  * @class pqDoubleLineEdit

@@ -20,7 +20,7 @@
 #define vtkPVRepresentedArrayListSettings_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h" // deprecation macros
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 

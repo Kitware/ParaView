@@ -12,7 +12,7 @@
 
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h"                 // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkSmartPointer.h"
 
 class vtkImplicitFunction;

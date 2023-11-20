@@ -84,30 +84,6 @@
         <!-- Does this have any data type domain? -->
         <Documentation>Set the input to the Geometry Filter.</Documentation>
       </InputProperty>
-      <!-- PARAVIEW_DEPRECATED_IN_5_11_0 -->
-      <IntVectorProperty animateable="0"
-                         command="SetUseStrips"
-                         default_values="0"
-                         is_internal="1"
-                         name="UseStrips"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Toggle whether to generate faces containing triangle
-        strips. This should render faster and use less memory, but no cell data
-        is copied.</Documentation>
-      </IntVectorProperty>
-      <!-- PARAVIEW_DEPRECATED_IN_5_11_0 -->
-      <IntVectorProperty animateable="0"
-                         command="SetForceUseStrips"
-                         default_values="0"
-                         is_internal="1"
-                         name="ForceStrips"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This makes UseStrips call Modified() after changing its
-        setting to ensure that the filter's output is immediately
-        changed.</Documentation>
-      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetUseOutline"
                          default_values="0"

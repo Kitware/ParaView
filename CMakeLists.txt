@@ -303,7 +303,6 @@ set(paraview_default_plugins
   StereoCursorView
   StreamLinesRepresentation
   StreamingParticles
-  SurfaceLIC
   ThickenLayeredCells
   VTKmFilters
   pvblot)

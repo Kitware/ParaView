@@ -13,7 +13,7 @@
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVRenderView.h"        // needed for renderer enum
-#include "vtkParaViewDeprecation.h" // needed for macro
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkWeakPointer.h"         // needed for vtkWeakPointer.
 
 class vtkPolarAxesActor;

@@ -6,8 +6,7 @@
 
 #include <QObject>
 
-#include "pqComponentsModule.h"     // for exports
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
+#include "pqComponentsModule.h" // for exports
 
 class QSize;
 
@@ -95,18 +94,6 @@ Q_SIGNALS:
   void writeAnimation(const QString& filename, int magnification, double frameRate);
 
   /**
-   * @deprecated in ParaView 5.11.0
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
-  void beginPlay();
-
-  /**
-   * @deprecated in ParaView 5.11.0
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
-  void endPlay();
-
-  /**
    * Emitted when the active animation scene begins playing.
    */
   void beginPlay(vtkObject* caller, unsigned long, void*, void* reversed);
@@ -128,18 +115,6 @@ protected Q_SLOTS:
    * Called on every tick while saving animation.
    */
   void onTick(int);
-
-  /**
-   * @deprecated in ParaView 5.11.0
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
-  void onBeginPlay();
-
-  /**
-   * @deprecated in ParaView 5.11.0
-   */
-  PARAVIEW_DEPRECATED_IN_5_11_0("Use the overload with VTK callback signature.")
-  void onEndPlay();
 
   /**
    * Called to demarcate the start and end of an animation

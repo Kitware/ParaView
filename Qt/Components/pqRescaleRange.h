@@ -10,7 +10,7 @@
 #ifndef pqRescaleRange_h
 #define pqRescaleRange_h
 
-#include "vtkParaViewDeprecation.h" // for deprecation
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 #include "pqComponentsModule.h"
 #include <QDialog>

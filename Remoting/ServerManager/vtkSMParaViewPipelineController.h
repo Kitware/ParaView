@@ -29,7 +29,7 @@
 #ifndef vtkSMParaViewPipelineController_h
 #define vtkSMParaViewPipelineController_h
 
-#include "vtkParaViewDeprecation.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkSMObject.h"
 
 #include <string> // for std::string
