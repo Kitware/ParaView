@@ -602,7 +602,7 @@ function (paraview_client_documentation)
             "-Dxmls_file=${_paraview_client_doc_xmls_file}"
             -D_paraview_generate_proxy_documentation_run=ON
             -P "${_ParaViewClient_script_file}"
-    DEPENDS ${_paraview_client_doc_xmls_list}
+    DEPENDS ${_paraview_client_doc_xmls}
             "${_paraview_client_doc_xmls_file}"
             "${_ParaViewClient_script_file}"
             "${_ParaViewClient_cmake_dir}/paraview_servermanager_convert_xml.xsl"
@@ -674,20 +674,24 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
       "Failed to generate HTML output")
   endif ()
 
+  # Escape open/close brackets as HTML entities as they somehow interfere with the foreach loop below.
+  string(REPLACE "[" "&#91;" _paraview_gpd_output "${_paraview_gpd_output}")
+  string(REPLACE "]" "&#93;" _paraview_gpd_output "${_paraview_gpd_output}")
+
   # Escape semicolons.
   _paraview_client_escape_cmake_list(_paraview_gpd_output)
+
   # Convert into a list of HTML documents.
   string(REPLACE "</html>\n<html>" "</html>\n;<html>"  _paraview_gpd_output "${_paraview_gpd_output}")
 
   foreach (_paraview_gpd_html_doc IN LISTS _paraview_gpd_output)
+    _paraview_client_unescape_cmake_list(_paraview_gpd_html_doc)
     string(REGEX MATCH "<meta name=\"filename\" contents=\"([^\"]*)\"" _ "${_paraview_gpd_html_doc}")
     set(_paraview_gpd_filename "${CMAKE_MATCH_1}")
     if (NOT _paraview_gpd_filename)
       message(FATAL_ERROR
         "No filename for an HTML output?")
     endif ()
-
-    _paraview_client_unescape_cmake_list(_paraview_gpd_html_doc)
 
     # Replace reStructured Text markup.
     string(REGEX REPLACE "\\*\\*([^*]+)\\*\\*" "<b>\\1</b>" _paraview_gpd_html_doc "${_paraview_gpd_html_doc}")
