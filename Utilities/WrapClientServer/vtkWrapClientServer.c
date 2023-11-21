@@ -1222,8 +1222,7 @@ int main(int argc, char* argv[])
   if (!fp)
   {
     fprintf(stderr, "Error opening output file %s\n", options->OutputFileName);
-    vtkParse_Finalize();
-    return 1;
+    return vtkParse_FinalizeMain(1);
   }
 
   data = fileInfo->MainClass;
@@ -1285,11 +1284,7 @@ int main(int argc, char* argv[])
     vtkWrap_WarnEmpty(options);
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    if (vtkParse_Finalize())
-    {
-      return 1;
-    }
-    return 0;
+    return vtkParse_FinalizeMain(0);
   }
 
   if (data->Template)
@@ -1297,11 +1292,7 @@ int main(int argc, char* argv[])
     vtkWrap_WarnEmpty(options);
     output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    if (vtkParse_Finalize())
-    {
-      return 1;
-    }
-    return 0;
+    return vtkParse_FinalizeMain(0);
   }
 
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
@@ -1322,11 +1313,7 @@ int main(int argc, char* argv[])
       vtkWrap_WarnEmpty(options);
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
-      if (vtkParse_Finalize())
-      {
-        return 1;
-      }
-      return 0;
+      return vtkParse_FinalizeMain(0);
     }
   }
 
@@ -1343,11 +1330,7 @@ int main(int argc, char* argv[])
       vtkWrap_WarnEmpty(options);
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
-      if (vtkParse_Finalize())
-      {
-        return 1;
-      }
-      return 0;
+      return vtkParse_FinalizeMain(0);
     }
   }
 
@@ -1490,10 +1473,5 @@ int main(int argc, char* argv[])
   vtkParse_Free(fileInfo);
   fclose(fp);
 
-  if (vtkParse_Finalize())
-  {
-    return 1;
-  }
-
-  return 0;
+  return vtkParse_FinalizeMain(0);
 }

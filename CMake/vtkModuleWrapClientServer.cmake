@@ -109,17 +109,24 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
     list(APPEND _vtk_client_server_sources
       "${_vtk_client_server_source_output}")
 
+    _vtk_module_depfile_args(
+      TOOL_ARGS _vtk_client_server_depfile_flags
+      CUSTOM_COMMAND_ARGS _vtk_client_server_depfile_args
+      SOURCE "${_vtk_client_server_header}"
+      DEPFILE_PATH "${_vtk_client_server_depfile}"
+      TOOL_FLAGS "-MF")
+
     add_custom_command(
       OUTPUT  "${_vtk_client_server_source_output}"
       COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
               "$<TARGET_FILE:ParaView::WrapClientServer>"
-              -MF "${_vtk_client_server_depfile}"
+              ${_vtk_client_server_depfile_flags}
               "@${_vtk_client_server_args_file}"
               -o "${_vtk_client_server_source_output}"
               "${_vtk_client_server_header}"
               ${_vtk_client_server_warning_args}
               --types "${_vtk_client_server_hierarchy_file}"
-      DEPFILE "${_vtk_client_server_depfile}"
+      ${_vtk_client_server_depfile_args}
       COMMENT "Generating client_server wrapper sources for ${_vtk_client_server_basename}"
       DEPENDS
         "$<TARGET_FILE:ParaView::WrapClientServer>"
