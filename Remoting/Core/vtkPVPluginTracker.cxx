@@ -18,7 +18,6 @@
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
-#include "vtkVersion.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/String.hxx"

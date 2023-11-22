@@ -38,7 +38,6 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
-#include "vtkVersion.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/RegularExpression.hxx"
