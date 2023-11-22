@@ -190,4 +190,8 @@ PREDEFINED  = "vtkSetMacro(name,type)= \
                    static int IsTypeOf(const char *type); \
                    virtual int IsA(const char *type); \
                    static thisClass* SafeDownCast(vtkObject *o);" \
+               "PARAVIEW_DEPRECATED_IN_5_10_0(x)=" \
+               "PARAVIEW_DEPRECATED_IN_5_11_0(x)=" \
+               "PARAVIEW_DEPRECATED_IN_5_12_0(x)=" \
+               "PARAVIEW_DEPRECATED_IN_5_13_0(x)=" \
                "VTK_LEGACY(x)= x"
