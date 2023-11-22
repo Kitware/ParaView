@@ -4,7 +4,7 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVVersion.h"
+#include "vtkPVVersionQuick.h"
 #include "vtkProcessModule.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkVersion.h"

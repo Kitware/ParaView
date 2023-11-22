@@ -9,7 +9,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVFileInformationHelper.h"
-#include "vtkPVVersion.h"
+#include "vtkPVVersionQuick.h"
 #include "vtkProcessModule.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkSmartPointer.h"

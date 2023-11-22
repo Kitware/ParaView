@@ -14,7 +14,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVSessionBase.h"
-#include "vtkPVVersion.h"
+#include "vtkPVVersionQuick.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"

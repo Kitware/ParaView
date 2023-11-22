@@ -14,7 +14,7 @@
 #include "vtkPVProgressHandler.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
-#include "vtkPVVersion.h"
+#include "vtkPVVersionQuick.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkReservedRemoteObjectIds.h"
