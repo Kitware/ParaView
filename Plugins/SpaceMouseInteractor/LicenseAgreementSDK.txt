@@ -1,0 +1,34 @@
+
+3DCONNEXION SOFTWARE DEVELOPMENT KIT LICENSE AGREEMENT
+
+IMPORTANT - READ CAREFULLY BEFORE DOWNLOADING, COPYING, INSTALLING, OR USING THE 3DCONNEXION SDK
+
+3DCONNEXION S.A.M. (3DCONNEXION) IS WILLING TO LICENSE THE SOFTWARE DEVELOPMENT KIT (3DCONNEXION SDK) TO YOU ONLY ON THE CONDITION THAT YOU ACCEPT ALL OF THE TERMS CONTAINED IN THIS LICENSE AGREEMENT. This is a legal agreement between you (either an individual or an entity) and 3Dconnexion ("Agreement"). By using this 3DCONNEXION SDK, you are agreeing to be bound by the terms and conditions of this Agreement. If you do not agree to the terms and conditions of this Agreement you must stop using the 3DCONNEXION SDK and destroy any copies of the SOFTWARE DEVELOPMENT KIT, all documentation included, in your possession or control.
+
+1. License Grant
+Subject to the terms and conditions contained in this Agreement, 3Dconnexion grants to you a personal limited non-exclusive, non-transferable, non-sublicensable, world-wide, royalty-free, revocable license to install, use, copy, modify and distribute in object code form the 3DCONNEXION SDK. In addition no license is granted under any patents that may be or later become infringed by your modifications or derivative works in which the 3DCONNEXION SDK may be incorporated. No other rights are granted.
+
+2. Attribution Requirements and Trademark License
+In the format set forth below, you must provide attribution to 3Dconnexion in one of the following locations: (1) the "About" or "Info" box menu items (or equivalent) of your software application, (2) the "Help" file (or equivalent) of your software application:
+
+"3D input device development tools and related technology are provided under license from 3Dconnexion. Copyright 3Dconnexion 1992 - 2020. All rights reserved."
+
+3. Restrictions
+The 3DCONNEXION SDK contains copyrighted material, trade secrets, intellectual property and other proprietary materials of 3Dconnexion. You agree that in order to protect those proprietary materials this license is granted to you only to integrate a hardware or software product to operate and communicate with a hardware product designed and distributed by 3Dconnexion.  You may not use any element of the 3DCONNEXION SDK to create or enhance a product that competes with a product developed and/or distributed by 3Dconnexion.
+
+4. Disclaimer of Warranty and Limitation of Liability
+YOUR USE OF THE 3DCONNEXION SDK IS AT YOUR SOLE RISK. THE 3DCONNEXION SDK AND ALL MATERIALS PROVIDED HEREUNDER BY 3DCONNEXION ARE PROVIDED TO YOU WITHOUT CHARGE AND "AS IS" WITHOUT WARRANTY OF ANY KIND. 3DCONNEXION AND ITS AFFILIATED COMPANIES MAKE NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NONINFRINGEMENT REGARDING THE 3DCONNEXION SDK AND ALL MATERIALS OR ITS USE AND OPERATION ALONE OR IN COMBINATION WITH ANY PRODUCT.
+IN NO EVENT SHALL 3DCONNEXION OR ANY OF ITS AFFILIATED COMPANIES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA OR PROFITS; OR BUSINESS INTERRUPTION) ARISING IN ANY WAY OUT OF USE, REPRODUCTION, MODIFICATON AND/OR DISTRIBUTION, OR THE INABILITY TO USE, ANY PORTION OF THE 3DCONNEXION SDK OR ITS DERIVATIVES OR MODIFICATIONS, INCLUDING THE DEVELOPER FORCE FEEDBACK GAME, AND ANY OF THE MATERIALS PROVIDED HEREUNDER BY 3DCONNEXION, HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE), EVEN IF 3DCONNEXION OR ANY OF ITS AFFILIATED COMPANIES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. Because some states/jurisdictions do not allow the exclusion or limitation of consequential or incidental damages, the above limitation may not apply to you.
+
+5. Confidentiality
+The source code and instructions contained in the 3DCONNEXION SDK are trade secrets of 3Dconnexion and you agree to maintain the confidentiality of such source code and instructions, to use them only as authorized in this License and not to disclose them to any third party.
+
+6. Termination
+This Agreement is effective until terminated. Upon any violation of any of the provisions of this Agreement, in particular, upon any unauthorized transfer of the license, rights to use the 3DCONNEXION SDK shall automatically terminate and the 3DCONNEXION SDK must be returned to 3Dconnexion or all copies of the 3DCONNEXION SDK destroyed. You may also terminate this Agreement at any time by destroying all copies of the 3DCONNEXION SDK in your possession or control. The provisions of paragraphs 3, 4 and 5 will survive any termination of this Agreement.
+
+7. General Terms and Conditions
+This Agreement will be governed by and construed in accordance with the laws of the United States and the State of Massachusetts, without regard to or application of its choice of law rules or principles. If for any reason a court of competent jurisdiction finds any provision of this Agreement, or portion thereof, to be unenforceable, that provision of the Agreement shall be enforced to the maximum extent permissible so as to affect the intent of the parties, and the remainder of this Agreement shall continue in full force and effect. This Agreement constitutes the entire agreement between the parties with respect to the use of the Software and supersedes all prior or contemporaneous understandings, communications or agreements, written or oral, regarding such subject matter. 3Dconnexion may, in its sole discretion, modify portions of this Agreement at any time. 3Dconnexion may notify you of any changes by posting notice of such modifications on 3Dconnexion's web site(s) or sending notice via e-mail, postal mail or other means. Your continued use of the Software following notice of such modifications shall be deemed to be your acceptance of any such modifications to the Agreement. If you do not agree to any such modifications, you must immediately stop using the Software and destroy all copies of the Software in your possession or control.
+
+The 3DCONNEXION SDK is protected by national copyright laws and international treaties. Unauthorized reproduction or distribution of the 3DCONNEXION SDK is subject to civil and criminal penalties.
+
+Revision: 20184A
