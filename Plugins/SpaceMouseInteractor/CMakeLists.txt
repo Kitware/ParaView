@@ -34,6 +34,8 @@ set(CMAKE_CXX_STANDARD 14)
 paraview_add_plugin(SpaceMouseInteractor
   REQUIRED_ON_CLIENT
   VERSION       "1.0"
+  EULA "LicenseAgreementSDK.txt"
+  DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
   UI_INTERFACES ${interfaces}
   SOURCES       ${sources})
 
