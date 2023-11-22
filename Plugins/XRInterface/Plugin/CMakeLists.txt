@@ -85,10 +85,16 @@ list(APPEND interfaces
 list(APPEND sources
   ${dock_sources} ${location_sources})
 
+set(openxrremoting_eula_file "")
+if (openxrremoting_support)
+  set (openxrremoting_eula_file "OpenXRRemoting/EULA.txt")
+endif()
+
 paraview_add_plugin(XRInterface
   REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   VERSION "1.2"
+  EULA ${openxrremoting_eula_file}
   UI_FILES pqXRInterfaceDockPanel.ui pqXRInterfaceControls.ui
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}
