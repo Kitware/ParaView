@@ -61,7 +61,7 @@ public:
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::constructor()
 {
-  this->setWindowTitle("VR Panel");
+  this->setWindowTitle("CAVE Interaction Manager");
   QWidget* container = new QWidget(this);
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
