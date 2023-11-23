@@ -91,7 +91,7 @@ struct pqIconBrowser::pqInternal
     // remove icon
     QObject::connect(this->Ui.remove, &QToolButton::released, [&]() {
       this->updateCurrentIconPath();
-      this->removeIconFromUserDir(this->CurrentIconPath);
+      this->removeIconFromUserDir(QFileInfo(this->CurrentIconPath));
       this->resetIconList();
     });
 
