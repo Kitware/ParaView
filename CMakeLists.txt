@@ -535,10 +535,17 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
       if(vtk_mod_pdep)
         list(APPEND vtk_mod_dep_list ${vtk_mod_pdep})
       endif()
+
+      # Check for optional dependencies and only add them if the target exists
       get_target_property(vtk_mod_odep ${vtk_targ} "INTERFACE_vtk_module_optional_depends")
       if(vtk_mod_odep)
-        list(APPEND vtk_mod_dep_list ${vtk_mod_odep})
+        foreach(opt_dep ${vtk_mod_odep})
+          if(TARGET "${opt_dep}")
+            list(APPEND vtk_mod_dep_list ${opt_dep})
+          endif()
+        endforeach()
       endif()
+
       if(vtk_mod_dep_list)
         list(REMOVE_ITEM vtk_mod_dep_list ${vtk_modules})
         if(vtk_mod_dep_list)
