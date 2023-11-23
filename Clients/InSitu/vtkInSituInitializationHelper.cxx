@@ -33,7 +33,12 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <set>
 #include <string>
+
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+#include <catalyst_conduit.hpp>
+#endif
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
 extern "C"
@@ -212,7 +217,8 @@ void vtkInSituInitializationHelper::Finalize()
 }
 
 //----------------------------------------------------------------------------
-vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string& path)
+vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(
+  const std::string& name, const std::string& path)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
@@ -266,6 +272,7 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
 
   vtkNew<vtkInSituPipelinePython> pipeline;
   pipeline->SetFileName(tmp.c_str());
+  pipeline->SetName(name.c_str());
   vtkInSituInitializationHelper::AddPipeline(pipeline);
   return pipeline;
 }
@@ -369,7 +376,12 @@ void vtkInSituInitializationHelper::MarkProducerModified(vtkSMSourceProxy* produ
 
 //----------------------------------------------------------------------------
 bool vtkInSituInitializationHelper::ExecutePipelines(
-  int timestep, double time, const std::vector<std::string>& parameters)
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+  int timestep, double time, const conduit_node* pipelines,
+  const std::vector<std::string>& parameters)
+#else
+  int timestep, double time, const conduit_node*, const std::vector<std::string>& parameters)
+#endif
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
@@ -392,26 +404,66 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
 
   UpdateSteerableProxies();
 
+  // If there is a pipelines node, it gives up the list of pipelines
+  // to execute. Create a set from the pipelines to be used when
+  // executing them.
+  std::set<std::string> to_execute;
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+  if (pipelines)
+  {
+    const conduit_cpp::Node cpp_pipelines =
+      conduit_cpp::cpp_node(const_cast<conduit_node*>(pipelines));
+
+    const conduit_index_t nchildren = cpp_pipelines.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      try
+      {
+        to_execute.insert(cpp_pipelines.child(i).as_string());
+      }
+      catch (conduit_cpp::Error&)
+      {
+      }
+    }
+  }
+  else
+  {
+    // If there is no pipelines node, insert all pipelines into
+    // the set of pipelines to execute.
+    for (auto& item : internals.Pipelines)
+    {
+      to_execute.insert(item.Pipeline->GetName());
+    }
+  }
+#endif
+
   for (auto& item : internals.Pipelines)
   {
     if (!item.Initialized)
     {
       item.InitializationFailed = !item.Pipeline->Initialize();
+
       item.Initialized = true;
     }
 
     if (!item.InitializationFailed && !item.ExecuteFailed)
     {
-      // set the execute parameters for this pipeline
-      auto pipeline = vtkInSituPipelinePython::SafeDownCast(item.Pipeline);
-      if (pipeline)
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+      // Check the to_execute set to see if the pipeline is to be executed.
+      if (item.Pipeline->GetName() && to_execute.find(item.Pipeline->GetName()) != to_execute.end())
+#endif
       {
-        pipeline->SetParameters(parameters);
+        // set the execute parameters for this pipeline
+        auto pipeline = vtkInSituPipelinePython::SafeDownCast(item.Pipeline);
+        if (pipeline)
+        {
+          pipeline->SetParameters(parameters);
+        }
+        // If `Initialize` failed, don't call `Execute` on the Pipeline.
+        // If Execute fails even once, we no longer call Execute on this pipeline
+        // in subsequent calls to `ExecutePipelines`.
+        item.ExecuteFailed = !item.Pipeline->Execute(timestep, time);
       }
-      // If `Initialize` failed, don't call `Execute` on the Pipeline.
-      // If Execute fails even once, we no longer call Execute on this pipeline
-      // in subsequent calls to `ExecutePipelines`.
-      item.ExecuteFailed = !item.Pipeline->Execute(timestep, time);
     }
   }
 

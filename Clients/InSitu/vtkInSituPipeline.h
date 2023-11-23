@@ -53,9 +53,18 @@ public:
    */
   virtual bool Finalize() { return true; }
 
+  /**
+   * Set/Get the name of the pipeline to be executed.
+   * Each pipeline has to have a name to be valid.
+   */
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
+
 protected:
   vtkInSituPipeline();
   ~vtkInSituPipeline() override;
+
+  char* Name;
 
 private:
   vtkInSituPipeline(const vtkInSituPipeline&) = delete;
