@@ -398,6 +398,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsLoaded.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsSkinned.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostCellsGeneratorImageDistributed.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostCellsGeneratorImageSerial.png}" 
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe3.png}"
@@ -432,6 +434,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDepthLimiter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridEvaluateCoarse.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGeometry.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGhostCellsGenerator.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGradient.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridMultiBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridMultipleClip.png}"
@@ -940,6 +943,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   HyperTreeGridDepthLimiter.xml
   HyperTreeGridEvaluateCoarse.xml
   HyperTreeGridGeometry.xml
+  HyperTreeGridGhostCellsGenerator.xml
   HyperTreeGridGradient.xml
   HyperTreeGridMultiBlock.xml
   HyperTreeGridMultipleClip.xml
@@ -1277,15 +1281,16 @@ list(APPEND TESTS_WITH_BASELINES
   Fractal2D.xml
   GenerateTimeSteps.xml
   GenerateTimeStepsData.xml
-  glTFReaderAnimatedMorphing.xml
-  glTFReaderMultipleAnimations.xml
-  glTFReaderMultipleScenes.xml
-  glTFReaderTriangle.xml
-  glTFReaderToggleDeformation.xml
+  GhostCellsGeneratorImageSerial.xml
   Glyph3DCullingAndLOD.xml
   Glyph3DRepresentation.xml
   GlyphUseCellCenters.xml
   GlyphWithEmptyCells.xml
+  glTFReaderAnimatedMorphing.xml
+  glTFReaderMultipleAnimations.xml
+  glTFReaderMultipleScenes.xml
+  glTFReaderToggleDeformation.xml
+  glTFReaderTriangle.xml
   H5PartReader.xml
   HideAll.xml
   HorizontalColorLegendTitle.xml
@@ -1600,6 +1605,18 @@ if (PARAVIEW_USE_MPI)
     TEST_SCRIPTS GhostCellsGeneratorSynchronize.xml
   )
 
+  # GhostCellsGeneratorImageDistributed needs specifically two servers
+  paraview_add_client_server_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostCellsGeneratorImageDistributed.xml
+    NUMSERVERS 2
+  )
+  paraview_add_client_server_render_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS GhostCellsGeneratorImageDistributed.xml
+    NUMSERVERS 2
+  )
+
   paraview_add_client_server_tests(
 #    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS GhostFeatureEdgesAndWireframe.xml
@@ -1644,6 +1661,10 @@ if (PARAVIEW_USE_MPI)
   set(PointInterpolator_DISABLE_CRS TRUE)
   set(PointInterpolator_DISABLE_CS TRUE)
   set(PointVolumeInterpolator_DISABLE_CS TRUE)
+
+  # Test uses distributed sources
+  set(GhostCellsGeneratorImageSerial_DISABLE_CS TRUE)
+  set(GhostCellsGeneratorImageSerial_DISABLE_CRS TRUE)
 
   # The following tests are only run in client-server mode.
   # They are needed to verify the remote saving/loading of different files, such as states and screenshots, work.
