@@ -363,6 +363,11 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   menu.addSeparator(); // --------------------------------------------------
+
+  new pqEditMacrosReaction(
+    menu.addAction(QCoreApplication::translate("pqMacrosMenu", "Manage Macros"))
+    << pqSetName("actionMacroEdit"));
+
   new pqTraceReaction(menu.addAction(QCoreApplication::translate("pqToolsMenu", "Start Trace"))
       << pqSetName("actionToolsStartStopTrace"),
     QCoreApplication::translate("pqToolsMenu", "Start Trace"),

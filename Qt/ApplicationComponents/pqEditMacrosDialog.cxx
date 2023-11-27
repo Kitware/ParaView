@@ -44,6 +44,32 @@ struct pqEditMacrosDialog::pqInternals
     return item->data(Macros, this->MACRO_PATH_ROLE()).toString();
   }
 
+  /**
+   * Joins macro names into one string, aggregated with given separator.
+   * Joins only the first maxCount macros of the list, adding "..." at
+   * the end when more elements are found.
+   */
+  QString joinMacrosNames(QList<QTreeWidgetItem*> items, QString separator, int maxCount)
+  {
+    QStringList macroNames;
+    int numberOfDisplayedMacros = 0;
+    for (auto item : items)
+    {
+      macroNames << item->text(pqInternals::Macros);
+      numberOfDisplayedMacros++;
+      if (numberOfDisplayedMacros >= maxCount)
+      {
+        const int extraCount = items.size() - maxCount;
+        if (extraCount > 0)
+        {
+          macroNames << tr("... (%1 more)").arg(extraCount);
+        }
+        break;
+      }
+    }
+    return macroNames.join(separator);
+  }
+
   QScopedPointer<Ui::pqEditMacrosDialog> Ui;
 };
 
@@ -170,11 +196,23 @@ void pqEditMacrosDialog::onRemovePressed()
     return;
   }
 
-  this->deleteItems(selected);
+  QString intro = QCoreApplication::translate("pqMacrosMenu", "Selected macros will be deleted: ");
+  static const int maxNumberOfNames = 5;
+  QString displayedNames =
+    this->Internals->joinMacrosNames(selected, QString(", "), maxNumberOfNames);
+  QString question = QCoreApplication::translate("pqMacrosMenu", "Are you sure?");
+  QString fullmessage = QString("%1\n%2\n%3").arg(intro).arg(displayedNames).arg(question);
 
-  // Python Manager can't be nullptr as this dialog is built only when Python is enabled
-  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  pythonManager->updateMacroList();
+  QMessageBox::StandardButton ret = QMessageBox::question(pqCoreUtilities::mainWidget(),
+    QCoreApplication::translate("pqMacrosMenu", "Delete Macro(s)"), fullmessage);
+
+  if (ret == QMessageBox::StandardButton::Yes)
+  {
+    this->deleteItems(selected);
+    // Python Manager can't be nullptr as this dialog is built only when Python is enabled
+    pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
+    pythonManager->updateMacroList();
+  }
 }
 
 //----------------------------------------------------------------------------
