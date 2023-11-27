@@ -533,6 +533,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteWarmGrayBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteDarkGrayBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PaletteWhiteBackground.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PlotOverLine_Boundary.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PlotOverLine_Center.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PlotOverLine_Uniform.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Preview-SingleView.png}"
@@ -975,6 +978,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ParallelCoordinatesView.xml
   PartitionedDataSet.xml
   PartitionedDataSetCollection.xml
+  PlotOverLine_3d.xml
   Preview.xml
   PreviewFontScaling.xml
   PropertyContextMenu.xml
@@ -1768,6 +1772,7 @@ if(PARAVIEW_USE_PYTHON)
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
+      PlotOverLine_surface.xml # needs find data
       ProgrammableAnnotation.xml
       SpreadSheetSelectionTrace.xml
       StructuredGridCellBlanking.xml
@@ -1778,6 +1783,7 @@ if(PARAVIEW_USE_PYTHON)
       ExpressionChooser.xml
       ExpressionClear.xml
       FieldDataDomainDefault.xml
+      PlotOverLine_htg.xml # needs find data
       PythonCalculator.xml
       PythonCalculatorArrayAssociation.xml
       PythonCalculatorAutocomplete.xml
@@ -2284,6 +2290,14 @@ if (NOT APPLE)
   set (RecentFilesHardFilename_DISABLE_CS TRUE)
   set (RecentFilesHardFilename_DISABLE_CRS TRUE)
 endif()
+
+# tests involve pointCount checks, so not reliable in CS modes.
+set (PlotOverLine_3d_DISABLE_CS TRUE)
+set (PlotOverLine_3d_DISABLE_CRS TRUE)
+set (PlotOverLine_htg_DISABLE_CS TRUE)
+set (PlotOverLine_htg_DISABLE_CRS TRUE)
+set (PlotOverLine_surface_DISABLE_CS TRUE)
+set (PlotOverLine_surface_DISABLE_CRS TRUE)
 
 set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml
