@@ -5,8 +5,15 @@
 #define pqProxyGroupMenuManager_h
 
 #include "pqApplicationComponentsModule.h"
+
 #include <QMenu>
 
+#include "vtkParaViewDeprecation.h" // for deprecation macro
+
+#include <memory> // for unique_ptr
+
+class pqProxyCategory;
+class pqProxyInfo;
 class vtkPVXMLElement;
 class vtkSMProxy;
 
@@ -29,8 +36,8 @@ public:
    * \c supportsQuickLaunch, set to false if quick-launch is not to be supported
    *    for this menu.
    */
-  pqProxyGroupMenuManager(
-    QMenu* menu, const QString& resourceTagName, bool supportsQuickLaunch = true);
+  pqProxyGroupMenuManager(QMenu* menu, const QString& resourceTagName,
+    bool supportsQuickLaunch = true, bool enableFavorites = false);
   ~pqProxyGroupMenuManager() override;
 
   /**
@@ -39,22 +46,23 @@ public:
   QMenu* menu() const { return static_cast<QMenu*>(this->parent()); }
 
   /**
+   * returns the widget that hold actions created by this menu manager.
+   */
+  QWidget* widgetActionsHolder() const;
+  QMenu* getFavoritesMenu();
+
+  /**
    * When size>0 a recently used category will be added to the menu.
    * One must call update() or initialize() after changing this value.
    */
   void setRecentlyUsedMenuSize(unsigned int val) { this->RecentlyUsedMenuSize = val; }
-
   unsigned int recentlyUsedMenuSize() const { return this->RecentlyUsedMenuSize; }
-
   /**
-   * returns the widget that hold actions created by this menu manager.
+   * Returns true if the pqProxyGroupMenuManager has been registered with
+   * quick-launch mechanism maintained by pqApplicationCore.
    */
-  QWidget* widgetActionsHolder() const;
-
-  /**
-   * returns the actions holds by the widgetActionsHolder
-   */
-  QList<QAction*> actions() const;
+  bool supportsQuickLaunch() const { return this->SupportsQuickLaunch; }
+  void setEnableFavorites(bool enable) { this->EnableFavorites = enable; }
 
   /**
    * Returns the prototype proxy for the action.
@@ -72,25 +80,56 @@ public:
   void removeProxy(const QString& xmlgroup, const QString& xmlname);
 
   /**
+   * Categories information.
+   */
+  ///@{
+  /**
    * Returns a list of categories that have the "show_in_toolbar" attribute set
    * to 1.
    */
   QStringList getToolbarCategories() const;
+  /**
+   * Return a name for the toolbar. This is based on category name and proxy group.
+   */
+  QString getToolbarName(pqProxyCategory* category);
+  /**
+   * Given a category name, return the category label.
+   */
+  QString categoryLabel(const QString& category);
+  /**
+   * Returns whether or not the category's toolbar should be hidden initially.
+   */
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "This was mostly unused. Also it is better to avoid test-dedicated code paths.")
+  bool hideForTests(const QString&) const { return false; };
+  ///@}
 
   /**
-   * Returns the list of actions in a category.
+   * List actions.
    */
-  QList<QAction*> actions(const QString& category);
-
+  ///@{
+  /**
+   * returns the actions holds by the widgetActionsHolder
+   */
+  QList<QAction*> actions() const;
+  /**
+   * Returns actions from given category. Create actions as needed.
+   * Looks for category in the default categories list.
+   */
+  QList<QAction*> categoryActions(const QString& category);
+  /**
+   * Returns actions from given category. Create actions as needed.
+   */
+  QList<QAction*> categoryActions(pqProxyCategory* category);
   /**
    * Returns this list of actions that appear in toolbars
    */
   QList<QAction*> actionsInToolbars();
-
   /**
-   * Returns whether or not the category's toolbar should be hidden initially.
+   * Return the action for a given proxy.
    */
-  bool hideForTests(const QString& category) const;
+  QAction* getAction(pqProxyInfo* proxy);
+  ///@}
 
   /**
    * Attach an observer to proxy manager to monitor any proxy definition update
@@ -104,21 +143,35 @@ public:
   void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
 
   /**
-   * Returns true if the pqProxyGroupMenuManager has been registered with
-   * quick-launch mechanism maintained by pqApplicationCore.
+   * Specific-meaning categories.
    */
-  bool supportsQuickLaunch() const { return this->SupportsQuickLaunch; }
-
-  void setEnableFavorites(bool enable) { this->EnableFavorites = enable; }
-
-  QMenu* getFavoritesMenu();
-
+  ///@{
   /**
-   * Given a category name, return the category label.
+   * Returns the invisible root category containing all
+   * categories to display, as defined by the application.
    */
-  QString categoryLabel(const QString& category);
+  pqProxyCategory* getApplicationCategory();
+  /**
+   * Returns the invisible root category containing all
+   * categories to display. Use settings if existing.
+   */
+  pqProxyCategory* getMenuCategory();
+  /**
+   * Returns the Favorites category.
+   */
+  pqProxyCategory* getFavoritesCategory();
+  /**
+   * Returns true if the given category is a favorites.
+   * Based on name.
+   */
+  bool isFavorites(pqProxyCategory* category);
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * Update from servermanager.
+   */
+  ///@{
   /**
    * Load a configuration XML. It will find the elements with resourceTagName
    * in the XML and populate the menu accordingly. Applications do not need to
@@ -126,32 +179,37 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * pqApplicationCore::loadXML()
    */
   void loadConfiguration(vtkPVXMLElement*);
-
   /**
    * Look for new proxy definition to add inside the menu
+   * Iter over known proxy definitions to parse Hints tag.
    */
   void lookForNewDefinitions();
-
   /**
    * Remove all ProxyDefinitionUpdate observers to active server
    */
   void removeProxyDefinitionUpdateObservers();
-
   /**
    * Update the list of ProxyDefinitionUpdate observers to  server
    */
   void addProxyDefinitionUpdateObservers();
+  ///@}
+
+  PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
+  void setEnabled(bool){};
 
   /**
-   * Enable/disable the menu and the actions.
-   */
-  void setEnabled(bool enable);
-
-  /**
-   * Forces a re-population of the menu. Any need to call this only after
-   * addProxy() has been used to explicitly add entries.
+   * Forces a re-population of the menu.
+   * Create the main submenu entries. Actions are mostly created on "aboutToShow" signal,
+   * as menu should present the currently available proxies.
+   * See also populateRecentlyUsedMenu, populateAlphabeticalMenu, populateMiscMenu,
+   * populateCategoriesMenus, clearMenu
    */
   virtual void populateMenu();
+
+  /**
+   * Write categories to settings.
+   */
+  void writeCategoryToSettings();
 
 Q_SIGNALS:
   void triggered(const QString& group, const QString& name);
@@ -162,30 +220,36 @@ Q_SIGNALS:
    */
   void menuPopulated();
 
+  /**
+   * Fired when categories were updated.
+   */
+  void categoriesUpdated();
+
 protected Q_SLOTS:
   void triggered();
   void quickLaunch();
   void switchActiveServer();
   void updateMenuStyle();
+  void updateActionsStyle();
 
-  /**
-   * called when "recent" menu is being shown.
-   * updates the menu with actions for the filters in the recent list.
-   */
+  /// Fill recently used submenu
   void populateRecentlyUsedMenu();
 
   /**
    * called when "favorites" menu is being shown.
    * create the menu (and submenu) with actions for the filters in the favorites list.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "Favorites are now a specific category, configurable as the others.")
   void populateFavoritesMenu();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   QString ResourceTagName;
-  vtkPVXMLElement* MenuRoot;
-  int RecentlyUsedMenuSize;
-  bool Enabled;
-  bool EnableFavorites;
+  vtkPVXMLElement* MenuRoot = nullptr;
+  int RecentlyUsedMenuSize = 0;
+  PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
+  bool Enabled = true;
+  bool EnableFavorites = false;
 
   void loadRecentlyUsedItems();
   void saveRecentlyUsedItems();
@@ -193,21 +257,69 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Load the favorites from settings.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "Favorites are now a specific category, configurable as the others.")
   void loadFavoritesItems();
 
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "Favorites are now a specific category, configurable as the others.")
+  QAction* getAddToFavoritesAction(const QString& path);
+
   /**
-   * Returns the action for a given proxy.
+   * Return the action for a given proxy.
    */
   QAction* getAction(const QString& pgroup, const QString& proxyname);
 
-  QAction* getAddToCategoryAction(const QString& path);
+private Q_SLOTS:
+  /**
+   * Populate submenus with current actions.
+   * See also populateMenu
+   */
+  ///@{
+  /// Fill alphabetical submenu
+  void populateAlphabeticalMenu();
+  /// Fill miscellaneous submenu with proxies that are not part of any category.
+  void populateMiscMenu();
+  /// Append categories to the end of the main menu.
+  void populateCategoriesMenus();
+  ///@}
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqProxyGroupMenuManager)
 
-  class pqInternal;
-  pqInternal* Internal;
-  bool SupportsQuickLaunch;
+  /**
+   * Create the action for a given proxy.
+   * Return nullptr if its prototype is not known by the proxy manager.
+   */
+  QAction* createAction(pqProxyInfo* proxy);
+
+  /**
+   * Create the action and the reaction to add to favorites under given category.
+   */
+  QAction* createAddToFavoritesAction();
+
+  /**
+   * Updating menus content.
+   */
+  ///@{
+  /// Clear main menu.
+  void clearMenu();
+  /// Remove all categories menus.
+  void clearCategoriesMenus();
+  /// populate given menu with categories.
+  void populateSubCategoriesMenus(QMenu* parent, pqProxyCategory* category);
+  /// populate category menu with proxies and sub categories.
+  void populateCategoryMenu(QMenu* parent, pqProxyCategory* category);
+  ///@}
+
+  /**
+   * Load categories information from settings.
+   */
+  void loadCategorySettings();
+
+  struct pqInternal;
+  std::unique_ptr<pqInternal> Internal;
+  bool SupportsQuickLaunch = true;
 };
 
 #endif

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-FileCopyrightText: Copyright (c) Kitware Inc. -->
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- PARAVIEW_DEPRECATED_IN_5_13_0 -->
 <ui version="4.0">
  <class>pqFavoritesDialog</class>
  <widget class="QDialog" name="pqFavoritesDialog">

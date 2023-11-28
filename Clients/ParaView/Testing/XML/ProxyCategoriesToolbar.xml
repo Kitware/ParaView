@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create a source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <!-- check toolbars -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/useAsToolbar" property="checked" arguments="true" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/useAsToolbar" command="set_boolean" arguments="false" />
+
+  <!-- make "Annotations" a toolbar -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/useAsToolbar" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <!-- test any property to be sure toolbar and buttons exists -->
+  <pqcheck object="pqClientMainWindow/filters.Annotation" property="visible" arguments="true" />
+  <pqcheck object="pqClientMainWindow/filters.Annotation/0QToolButton0" property="down" arguments="false" />
+  <!-- toolbar is now in "View" menu -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Toolbars" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Toolbars" command="activate" arguments="Annotation" />
+
+  <!-- Create a subcategory, add it as a toolbar -->
+  <!-- load a testing plugin to add "0000MyGlyph" filter, so we are sure to find it in the list -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadLocal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ConfigureCategories.xml" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <!-- Create categories -->
+  <!-- add "SubCat" under "AAA Some Category" categories. Naming ensure first position in category list. -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addCategory" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="AAA Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="key" arguments="16777232" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="editAccepted" arguments="0.0,AAA Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="edit" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="SubCat" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="key" arguments="16777232" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="editAccepted" arguments="0.0.0.0,SubCat" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" command="setCurrent" arguments="0.0" />
+  <!-- Add filter -->
+  <!-- look for "0000MyGlyph" (in filter left panel). As the test uses index in the filter list, we need this filter to be the first, thus its name -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/searchBox/SearchLineEdit" command="set_string" arguments="Glyph" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" property="modelItemData" arguments="0.0,0000 My Glyph" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" command="setCurrent" arguments="0.0" />
+  <!-- add it under "SubCat" -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/useAsToolbar" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Check toolbar exists -->
+  <pqcheck object="pqClientMainWindow/filters.SubCat" property="visible" arguments="true" />
+  <!-- Check existence of any button of this toolbar -->
+  <pqcheck object="pqClientMainWindow/filters.SubCat/0QToolButton0" property="down" arguments="false" />
+  <!-- toolbar is now in "View" menu -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Toolbars" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Toolbars" command="activate" arguments="SubCat" />
+
+  <!-- Remove category should remove toolbar. No way to check the result for now... -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
+
+  <!-- make next cat a toolbar -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/useAsToolbar" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Toolbars" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Toolbars" command="activate" arguments="AM&amp;R" />
+
+</pqevents>

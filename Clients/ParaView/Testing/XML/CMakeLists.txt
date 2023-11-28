@@ -33,6 +33,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/ConfigureCategories.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/convergecfd_post_5016_spray.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/cth.vtr}"
   "DATA{${paraview_test_data_directory_input}/Data/cube_1ts_mod.e}"
@@ -816,6 +817,8 @@ set(SliceRepresentation_TIMEOUT 150)
 set(SplitViewTrace_TIMEOUT 150)
 set(TraceExportAndSaveData_TIMEOUT 150)
 set(TransferFunction2DYScalars_TIMEOUT 150)
+set(ProxyCategoriesDialog_TIMEOUT 150)
+set(ProxyCategoriesConfiguration_TIMEOUT 150)
 
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
@@ -836,7 +839,6 @@ SET (TESTS_WITHOUT_BASELINES
   ExtractParticlesOverTime.xml
   FieldDataToAttribute.xml
   FileDialogOpenInteractClose.xml
-  FavoritesFilters.xml
   GradientBackwardsCompatibility.xml
   ImportCustomPresets.xml
   InformationPanel.xml
@@ -850,6 +852,11 @@ SET (TESTS_WITHOUT_BASELINES
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
   PolarAxesBackwardsCompatibility.xml
+  ProxyCategoriesDialog.xml
+  ProxyCategoriesFavorites.xml
+  ProxyCategoriesConfiguration.xml
+  ProxyCategoriesMenusDefault.xml
+  ProxyCategoriesToolbar.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
   ReloadCGNSFile.xml
@@ -1984,6 +1991,7 @@ set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComputeArrayMagnitudeSetting_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (ConfigurableCategories_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (DefaultReadersSetting_FORCE_SERIAL TRUE)  # since this uses popup-menu
@@ -1993,7 +2001,6 @@ set (ExpressionChooser_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsDialog_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsExporter_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExpressionsSettings_FORCE_SERIAL TRUE) # since this uses combo-box popup-menu
-set (FavoritesFilters_FORCE_SERIAL TRUE)
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window

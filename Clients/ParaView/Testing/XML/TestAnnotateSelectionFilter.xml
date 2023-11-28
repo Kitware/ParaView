@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- Create a sphere-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources"/>
   <pqevent object="pqClientMainWindow/menubar/menuSources/GeometricShapes" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
@@ -13,6 +14,7 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.547486,0.553866,1,0,0)" />
 
   <!-- Create a annotateSelection filter-->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Annotation" command="activate" arguments="AnnotateSelection" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,6,23" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,3,94" />

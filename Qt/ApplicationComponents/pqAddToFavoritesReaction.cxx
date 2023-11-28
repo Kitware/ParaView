@@ -2,27 +2,53 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqAddToFavoritesReaction.h"
-#include "pqQtDeprecated.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
 #include "pqPipelineFilter.h"
-#include "pqSettings.h"
+#include "pqProxyCategory.h"
+#include "pqProxyGroupMenuManager.h"
 
 #include "vtkSMProxy.h"
 
 #include <QDebug>
-//-----------------------------------------------------------------------------
-pqAddToFavoritesReaction::pqAddToFavoritesReaction(QAction* parentObject, QVector<QString>& filters)
-  : Superclass(parentObject)
-{
-  this->Filters.swap(filters);
+#include <QPointer>
 
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
-    SLOT(updateEnableState()));
+struct pqAddToFavoritesReaction::pqInternal
+{
+  pqInternal(pqProxyGroupMenuManager* manager)
+    : Manager(manager)
+  {
+  }
+
+  pqProxyGroupMenuManager* Manager = nullptr;
+};
+
+//-----------------------------------------------------------------------------
+pqAddToFavoritesReaction::pqAddToFavoritesReaction(
+  QAction* parentObject, pqProxyGroupMenuManager* manager)
+  : Superclass(parentObject)
+  , Internal(new pqInternal(manager))
+{
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::sourceChanged, this,
+    &pqAddToFavoritesReaction::updateEnableState);
 
   this->updateEnableState();
 }
+
+//-----------------------------------------------------------------------------
+pqAddToFavoritesReaction::pqAddToFavoritesReaction(QAction* parentObject, QVector<QString>& filters)
+  : Superclass(parentObject)
+  , Internal(new pqInternal(new pqProxyGroupMenuManager(nullptr, QString("ParaViewFilters"))))
+{
+  Q_UNUSED(filters);
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnableState()));
+
+  this->parentAction()->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+pqAddToFavoritesReaction::~pqAddToFavoritesReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqAddToFavoritesReaction::updateEnableState()
@@ -35,11 +61,15 @@ void pqAddToFavoritesReaction::updateEnableState()
     return;
   }
 
-  this->parentAction()->setEnabled(!this->Filters.contains(filter->getProxy()->GetXMLName()));
+  auto favorites = this->Internal->Manager->getFavoritesCategory();
+  const QString& name = filter->getProxy()->GetXMLName();
+  bool exists = favorites->hasProxy(name);
+
+  this->parentAction()->setEnabled(!exists);
 }
 
 //-----------------------------------------------------------------------------
-void pqAddToFavoritesReaction::addToFavorites(QAction* parent)
+void pqAddToFavoritesReaction::addActiveSourceToFavorites()
 {
   pqPipelineFilter* filter =
     qobject_cast<pqPipelineFilter*>(pqActiveObjects::instance().activeSource());
@@ -50,30 +80,15 @@ void pqAddToFavoritesReaction::addToFavorites(QAction* parent)
     return;
   }
 
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString key = QString("favorites.%1/").arg("ParaViewFilters");
-
   vtkSMProxy* proxy = filter->getProxy();
-  QString filterId = QString("%1;%2;%3;%4")
-                       .arg(proxy->GetXMLGroup())
-                       .arg(parent->data().toString())
-                       .arg(proxy->GetXMLLabel())
-                       .arg(proxy->GetXMLName());
+  const QString name = proxy->GetXMLName();
 
-  QString value;
-  if (settings->contains(key))
+  auto appCategory = this->Internal->Manager->getApplicationCategory();
+  auto proxyInfo = appCategory->findProxy(name, true);
+  if (proxyInfo)
   {
-    value = settings->value(key).toString();
+    auto favorites = this->Internal->Manager->getFavoritesCategory();
+    favorites->addProxy(new pqProxyInfo(favorites, proxyInfo));
+    this->Internal->Manager->writeCategoryToSettings();
   }
-  QString settingValue = settings->value(key).toString();
-  QStringList bmList = settingValue.split("|", PV_QT_SKIP_EMPTY_PARTS);
-  for (const QString& bm : bmList)
-  {
-    if (bm == filterId)
-    {
-      return;
-    }
-  }
-  value += (filterId + QString("|"));
-  settings->setValue(key, value);
 }

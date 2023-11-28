@@ -28,6 +28,7 @@
 #include "pqChangeFileNameReaction.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
+#include "pqConfigureCategoriesReaction.h"
 #include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
 #include "pqCustomViewpointsDefaultController.h"
@@ -54,7 +55,6 @@
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageExpressionsReaction.h"
-#include "pqManageFavoritesReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
 #include "pqPVApplicationCore.h"
@@ -246,10 +246,9 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
   menu.setStyle(style);
 
   pqProxyGroupMenuManager* mgr =
-    new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
+    new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable, true);
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  mgr->setEnableFavorites(true);
   pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
 
   // Connect the filters menu about to show and the quick-launch dialog about to show
@@ -322,14 +321,15 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Manage Plugins..."))
     << pqSetName("actionManage_Plugins"));
 
-  QMenu* dummyMenu = new QMenu();
-  pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false);
+  QMenu* dummyMenu = new QMenu(&menu);
+  pqProxyGroupMenuManager* mgr =
+    new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false, true);
   mgr->addProxyDefinitionUpdateListener("filters");
 
-  QAction* manageFavoritesAction =
-    menu.addAction(QCoreApplication::translate("pqToolsMenu", "Manage Favorites..."))
-    << pqSetName("actionManage_Favorites");
-  new pqManageFavoritesReaction(manageFavoritesAction, mgr);
+  QAction* configureCategoriesAction =
+    menu.addAction(QCoreApplication::translate("pqToolsMenu", "Configure Categories"))
+    << pqSetName("actionConfigureCategories");
+  new pqConfigureCategoriesReaction(configureCategoriesAction, mgr);
 
   new pqCustomizeShortcutsReaction(
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Customize Shortcuts..."))
@@ -855,6 +855,8 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
   }
 #endif
+
+  mainWindow.addToolBarBreak();
 }
 
 //-----------------------------------------------------------------------------

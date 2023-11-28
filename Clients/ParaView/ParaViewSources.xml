@@ -1,7 +1,7 @@
 <ParaViewSources>
 
   <!-- This section list all categories/toolbar sources. Sources should be duplicated in the next section -->
-  <Category name="Annotation" menu_label="&amp;Annotation" preserve_order="1"
+  <Category name="Annotation" menu_label="A&amp;nnotation" preserve_order="1"
     show_in_toolbar="0">
     <Proxy group="sources" name="VectorText" />
     <Proxy group="sources" name="TimeToTextConvertorSource" />
@@ -40,7 +40,7 @@
     <Proxy group="sources" name="SplineSource" />
     <Proxy group="sources" name="SuperquadricSource" />
   </Category>
-  <Category name="MeasurementTools" menu_label="&amp;Measurement Tools" preserve_order="1"
+  <Category name="MeasurementTools" menu_label="M&amp;easurement Tools" preserve_order="1"
     show_in_toolbar="1">
     <Proxy group="sources" name="Axes" omit_from_toolbar="1" />
     <Proxy group="sources" name="Ruler" />

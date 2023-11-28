@@ -5,9 +5,12 @@
 #define pqCategoryToolbarsBehavior_h
 
 #include "pqApplicationComponentsModule.h"
-#include <QList>
+
 #include <QObject>
-#include <QPointer>
+
+#include <memory>
+
+#include "vtkParaViewDeprecation.h" // for deprecation macro
 
 class pqProxyGroupMenuManager;
 class QMainWindow;
@@ -30,10 +33,11 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCategoryToolbarsBehavior : public QObject
 
 public:
   pqCategoryToolbarsBehavior(pqProxyGroupMenuManager* menuManager, QMainWindow* mainWindow);
+  ~pqCategoryToolbarsBehavior() override;
 
 protected Q_SLOTS:
   /**
-   * Called when menuManager fires the menuPopulated() signal.
+   * Create, delete toolbars.
    */
   void updateToolbars();
 
@@ -42,14 +46,15 @@ protected Q_SLOTS:
    * can be hidden before each test starts (to prevent small test-image differences
    * due to layout differences between machines).
    */
-  void prepareForTest();
+  PARAVIEW_DEPRECATED_IN_5_13_0(
+    "This was mostly unused. Also it is better to avoid test-dedicated code paths.")
+  void prepareForTest(){};
 
 private:
   Q_DISABLE_COPY(pqCategoryToolbarsBehavior)
 
-  QPointer<QMainWindow> MainWindow;
-  QPointer<pqProxyGroupMenuManager> MenuManager;
-  QList<QAction*> ToolbarsToHide;
+  class pqInternal;
+  std::unique_ptr<pqInternal> Internal;
 };
 
 #endif

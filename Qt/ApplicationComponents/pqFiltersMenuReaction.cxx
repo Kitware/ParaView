@@ -62,6 +62,8 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(pqApplicationCore::instance(), SIGNAL(updateMasterEnableState(bool)), this,
     SLOT(setEnableStateDirty()));
 
+  QObject::connect(menuManager, SIGNAL(categoriesUpdated()), this, SLOT(setEnableStateDirty()));
+
   // force the state to compute the first time
   this->IsDirty = true;
   this->updateEnableState(false);
@@ -140,9 +142,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   }
 
   pqProxyGroupMenuManager* mgr = static_cast<pqProxyGroupMenuManager*>(this->parent());
-  mgr->setEnabled(enabled);
 
-  bool some_enabled = false;
   QList<QAction*> actionsList;
   if (updateOnlyToolbars)
   {
@@ -161,7 +161,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   {
     actionsList = mgr->actions();
   }
-  Q_FOREACH (QAction* action, actionsList)
+  for (QAction* action : actionsList)
   {
     vtkSMProxy* prototype = mgr->getPrototype(action);
     if (!prototype || !enabled)
@@ -226,7 +226,6 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       {
         action->setEnabled(true);
         action->setVisible(true);
-        some_enabled = true;
         const char* help = prototype->GetDocumentation()->GetShortHelp();
         action->setStatusTip(help ? QCoreApplication::translate("ServerManagerXML", help) : "");
       }
@@ -245,41 +244,25 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
     }
   }
 
-  if (!some_enabled)
-  {
-    mgr->setEnabled(false);
-  }
-
   // Hide unused submenus
-  if (this->HideDisabledActions)
+  QMenu* menu = mgr->menu();
+  bool anyMenuShown = false;
+  QList<QAction*> menuActions = menu->actions();
+  for (QAction* menuAction : menuActions)
   {
-    QMenu* menu = mgr->menu();
-    bool anyMenuShown = false;
-    QList<QAction*> menuActions = menu->actions();
-    for (QAction* menuAction : menuActions)
+    if (menuAction->isSeparator() || !menuAction->menu() ||
+      menuAction->menu() == mgr->getFavoritesMenu())
     {
-      if (menuAction->isSeparator() || !menuAction->menu() ||
-        menuAction->menu() == mgr->getFavoritesMenu())
-      {
-        continue;
-      }
-      bool anySubMenuShown = false;
-      QList<QAction*> subMenuActions = menuAction->menu()->actions();
-
-      for (QAction* subMenuAction : subMenuActions)
-      {
-        if (subMenuAction->isVisible())
-        {
-          anySubMenuShown = true;
-          anyMenuShown = true;
-          break;
-        }
-      }
-
-      menuAction->setVisible(anySubMenuShown);
+      continue;
     }
-    menu->setEnabled(anyMenuShown);
+
+    bool visible = (menuAction->menu() && !menuAction->menu()->isEmpty());
+    menuAction->setVisible(visible);
+    anyMenuShown = anyMenuShown || visible;
+
+    QList<QAction*> subMenuActions = menuAction->menu()->actions();
   }
+  menu->setEnabled(anyMenuShown);
 
   // If we updated only the toolbars, then the state of other actions may still
   // be dirty
@@ -343,7 +326,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
     vtkSMPropertyHelper helper(filterProxy, inputPortNames[0]);
     helper.RemoveAllValues();
 
-    Q_FOREACH (pqOutputPort* outputPort, selectedOutputPorts)
+    for (pqOutputPort* outputPort : selectedOutputPorts)
     {
       helper.Add(outputPort->getSource()->getProxy(), outputPort->getPortNumber());
     }

@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- load a testing plugin to add "0000MyGlyph" filter -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadLocal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ConfigureCategories.xml" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Open Dialog -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+
+  <!-- Create categories -->
+  <!-- add "SubCat" under "Some Category" categories -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addCategory" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="key" arguments="16777232" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="editAccepted" arguments="0.0,Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="14.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0,Some Category" />
+
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="edit" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="SubCat" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree/qt_scrollarea_viewport/1QExpandingLineEdit0" command="key" arguments="16777232" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="editAccepted" arguments="0.0.0.0,SubCat" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+
+  <!-- Add filter -->
+  <!-- look for "0000MyGlyph" (in filter left panel). As the test uses index in the filter list, we need this filter to be the first, thus its name -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/searchBox/SearchLineEdit" command="set_string" arguments="Glyph" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" property="modelItemData" arguments="0.0,0000 My Glyph" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" command="setCurrent" arguments="0.0" />
+  <!-- add it under "SubCat" -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+
+  <!-- Save and close dialog -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Test menus -->
+  <!-- create a source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="&amp;Alphabetical" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="FastUniformGrid" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <!-- access filter via custom category -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="Some Category" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Some Category" command="activate" arguments="SubCat" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Some Category/SubCat" command="activate" arguments="0000MyGlyph" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
+
+  <!-- Remove categories containing "0000MyGlyph" -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="14.0,Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="14.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0,Plugins" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="11.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <!-- It is now under "Misc" category -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Miscellaneous" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Miscellaneous" command="activate" arguments="0000MyGlyph" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+</pqevents>

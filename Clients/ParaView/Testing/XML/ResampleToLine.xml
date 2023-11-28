@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources"/>
   <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ResampleToLine" />

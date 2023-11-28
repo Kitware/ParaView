@@ -14,14 +14,14 @@
     <Proxy group="filters" name="GroupDataSets" />
     <Proxy group="filters" name="ExtractBlock" />
   </Category>
-  <Category name="CosmoTools" menu_label="&amp;CosmoTools" show_in_toolbar="0">
+  <Category name="CosmoTools" menu_label="C&amp;osmoTools" show_in_toolbar="0">
     <Proxy group="filters" name="ANLHaloFinder" />
     <Proxy group="filters" name="ANLSubhaloFinder" />
     <Proxy group="filters" name="LANLHaloFinder" />
     <Proxy group="filters" name="MinkowskiFilter" />
     <Proxy group="filters" name="PMergeConnected" />
   </Category>
-  <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1" hide_for_tests="1">
+  <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1">
     <Proxy group="filters" name="Calculator" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLine" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLineCustom" omit_from_toolbar="1" />
@@ -44,7 +44,7 @@
     <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
     <Proxy group="filters" name="ThresholdTable" omit_from_toolbar="1" />
   </Category>
-  <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
+  <Category name="Hyper Tree Grid" menu_label="H&amp;yper Tree Grid">
     <Proxy group="filters" name="Clip" />
     <Proxy group="filters" name="Cut" />
     <Proxy group="filters" name="HyperTreeGridAxisReflection" />
@@ -92,11 +92,11 @@
     <Proxy group="filters" name="TimeStepProgressFilter" />
     <Proxy group="filters" name="TimeToTextConvertor" />
   </Category>
-  <Category name="Material Analysis" menu_label="&amp;Material Analysis">
+  <Category name="Material Analysis" menu_label="Materia&amp;l Analysis">
     <Proxy group="filters" name="MaterialInterfaceFilter" />
     <Proxy group="filters" name="IntersectFragments" />
   </Category>
-  <Category name="CTH" menu_label="&amp;CTH">
+  <Category name="CTH" menu_label="CT&amp;H">
     <Proxy group="filters" name="CTHPart" />
     <Proxy group="filters" name="NonOverlappingLevelIdScalars" />
     <Proxy group="filters" name="MaterialInterfaceFilter" />
@@ -108,7 +108,7 @@
     <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
-  <Category name="AMR" menu_label="&amp;AMR">
+  <Category name="AMR" menu_label="AM&amp;R">
     <Proxy group="filters" name="AMRConnectivity" />
     <Proxy group="filters" name="AMRDualClip" />
     <Proxy group="filters" name="AMRDualContour" />

@@ -3,6 +3,7 @@
 
   <!-- Set up wavelet source and scalar bar font to 40 and bold -->
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources"/>
   <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />

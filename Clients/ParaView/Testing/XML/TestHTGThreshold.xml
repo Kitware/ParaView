@@ -1,10 +1,12 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- Create source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/DataObjects" command="activate" arguments="RandomHyperTreeGridSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Apply threshold -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Common" command="activate" arguments="Threshold" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/LowerThreshold/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="1" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/UpperThreshold/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="3" />

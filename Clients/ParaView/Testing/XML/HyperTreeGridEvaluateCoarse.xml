@@ -11,7 +11,7 @@
 
   <!-- Add filter and set representation: -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Hyper Tree Grid" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="H&amp;yper Tree Grid" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Hyper Tree Grid" command="activate" arguments="HyperTreeGridEvaluateCoarse" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface With Edges" />
