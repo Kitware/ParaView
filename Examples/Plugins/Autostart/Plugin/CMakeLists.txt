@@ -19,3 +19,12 @@ paraview_add_plugin(Autostart
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
+
+target_link_libraries(Autostart
+  PRIVATE
+    ParaView::pqApplicationComponents)
+
+option(BUILD_TESTING "Build Plugin Testing" OFF)
+if (BUILD_TESTING AND BUILD_SHARED_LIBS)
+  add_subdirectory(Testing)
+endif()

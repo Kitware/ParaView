@@ -5,3 +5,4 @@ DESCRIPTION
   called when the plugin is loaded and when the application is shutdown.
 REQUIRES_MODULES
   ParaView::pqComponents
+  ParaView::pqApplicationComponents
