@@ -21,6 +21,9 @@ public:
   // Callback for startup.
   void onStartup();
 
+public Q_SLOTS:
+  void playAnimation();
+
 private:
   Q_DISABLE_COPY(pqMyApplicationStarter)
 };
