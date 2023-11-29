@@ -35,9 +35,9 @@ public:
   pqProxyInfo() = default;
 
   /**
-   * Update label. If empty, create a new one from name.
+   * Set label.
    */
-  void updateLabel(const QString& label = "");
+  void setLabel(const QString& label);
 
   /**
    * Set HideFromMenu.
@@ -74,7 +74,7 @@ public:
    */
   QString name() { return this->Name; }
   QString group() { return this->Group; }
-  /// return the translated label.
+  /// return the translated label, or create one from name if empty.
   QString label();
   QString icon() { return this->Icon; }
   QStringList omitFromToolbar() { return this->OmitFromToolbar; }
