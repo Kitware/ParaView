@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqMyApplicationStarter.h"
 
-// Server Manager Includes.
+#include <pqAnimationManager.h>
+#include <pqAnimationScene.h>
+#include <pqPVApplicationCore.h>
+#include <vtkLogger.h>
 
-// Qt Includes.
-#include <QtDebug>
-// ParaView Includes.
+#include <QTimer>
 
 //-----------------------------------------------------------------------------
 pqMyApplicationStarter::pqMyApplicationStarter(QObject* p /*=0*/)
@@ -21,11 +22,21 @@ pqMyApplicationStarter::~pqMyApplicationStarter() = default;
 //-----------------------------------------------------------------------------
 void pqMyApplicationStarter::onStartup()
 {
-  qWarning() << "Message from pqMyApplicationStarter: Application Started";
+  vtkLog(INFO, "Message from pqMyApplicationStarter: Application Started");
+
+  // Create a single shot timer that will trigger as soon as paraview starts processing events.
+  // Needed because playing the animation at startup is not supported.
+  QTimer::singleShot(1, this, &pqMyApplicationStarter::playAnimation);
 }
 
 //-----------------------------------------------------------------------------
+void pqMyApplicationStarter::playAnimation()
+{
+  vtkLog(INFO, "Message from pqMyApplicationStarter: Playing animation");
+  pqPVApplicationCore::instance()->animationManager()->getActiveScene()->play();
+}
+//-----------------------------------------------------------------------------
 void pqMyApplicationStarter::onShutdown()
 {
-  qWarning() << "Message from pqMyApplicationStarter: Application Shutting down";
+  vtkLog(INFO, "Message from pqMyApplicationStarter: Application Shutting down");
 }
