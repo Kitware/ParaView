@@ -837,6 +837,13 @@ QAction* pqProxyGroupMenuManager::getAction(pqProxyInfo* proxyInfo)
 }
 
 //-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::updateActionIcon(pqProxyInfo* proxy)
+{
+  auto action = this->getAction(proxy);
+  this->Internal->updateActionIcon(action, proxy);
+}
+
+//-----------------------------------------------------------------------------
 QAction* pqProxyGroupMenuManager::createAction(pqProxyInfo* proxyInfo)
 {
   const QString& group = proxyInfo->group();

@@ -16,6 +16,7 @@
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="16" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0,&amp;Common" />
@@ -23,7 +24,11 @@
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="3.0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0.3.0" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0.3.0,Slice" />
-  <!-- categories can be removed and nested -->
+  <!-- filters can have an icon -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="true" />
+  <!-- categories can be removed and nested, but no icons -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="true" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
   <!-- but favorites cannot be removed -->
@@ -96,11 +101,19 @@
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="true" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0.0.0,0000 My Glyph" />
+
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation_0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="1.0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
   <!-- second addition in same category has no effect -->
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+
+  <!-- add an icon to our filter -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/IconBrowser/buttonBox/ApplyIcon" command="activate" arguments="" />
 
   <!-- Close and reopen -->
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />

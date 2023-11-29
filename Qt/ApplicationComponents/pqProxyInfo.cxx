@@ -107,6 +107,12 @@ void pqProxyInfo::setHideFromMenu(bool hide)
 }
 
 //-----------------------------------------------------------------------------
+void pqProxyInfo::setIcon(const QString& iconPath)
+{
+  this->Icon = iconPath;
+}
+
+//-----------------------------------------------------------------------------
 void pqProxyInfo::merge(pqProxyInfo* other)
 {
   if (this->Name.isEmpty())
