@@ -402,7 +402,7 @@ def SelectCompositeDataIDs(IDs=[], FieldType='POINT', ContainingCells=False, Sou
     - Modifier - 'ADD', 'SUBTRACT', 'TOGGLE', or None to define whether and how the selection
         should modify the existing selection.
     """
-    selectIDsHelper('CompositeDataIDSelectionSource', **locals())
+    _selectIDsHelper('CompositeDataIDSelectionSource', **locals())
 
 
 def SelectHierarchicalDataIDs(IDs=[], FieldType='POINT', ContainingCells=False, Source=None, Modifier=None):
