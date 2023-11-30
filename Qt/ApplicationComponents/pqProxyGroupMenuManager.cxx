@@ -217,12 +217,12 @@ struct pqProxyGroupMenuManager::pqInternal
   void updateActionShortcut(QAction* action, pqProxyInfo* proxyInfo)
   {
     const QString group = proxyInfo->group();
-    pqSettings settings;
+    pqSettings* settings = pqApplicationCore::instance()->settings();
 
     if (group == "filters" || group == "sources")
     {
       QString menuName = group == "filters" ? "Filters" : "Sources";
-      auto variant = settings.value(
+      auto variant = settings->value(
         QString("pqCustomShortcuts/%1/Alphabetical/%2").arg(menuName, proxyInfo->label()),
         QVariant());
       if (variant.canConvert<QKeySequence>())

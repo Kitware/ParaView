@@ -5,6 +5,7 @@
 
 #include "ui_pqCustomizeShortcutsDialog.h"
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqSettings.h"
 
@@ -53,8 +54,8 @@ public:
   {
     this->KeySequence = shortcut.toString();
     this->Action->setShortcut(shortcut);
-    pqSettings settings;
-    settings.setValue(settingsKey(), shortcut);
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    settings->setValue(settingsKey(), shortcut);
   }
 
   bool isLeaf() const { return this->IsLeaf; }
@@ -96,7 +97,7 @@ private:
 
 class pqCustomizeShortcutsModel : public QAbstractItemModel
 {
-  static void buildTree(TreeItem* root, const QList<QAction*>& actions, pqSettings& settings)
+  static void buildTree(TreeItem* root, const QList<QAction*>& actions, pqSettings* settings)
   {
     for (QAction* action : actions)
     {
@@ -107,7 +108,7 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
       }
       actionName = actionName.replace("&", "");
       QString localSettingName = actionName.replace(" ", "_");
-      QString settingsKey = QString("%1/%2").arg(settings.group()).arg(localSettingName);
+      QString settingsKey = QString("%1/%2").arg(settings->group()).arg(localSettingName);
       if (action->menu())
       {
         if ((root->name() == "Filters" || root->name() == "Sources") &&
@@ -122,17 +123,17 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
         {
           TreeItem* myItem = new TreeItem(actionName, settingsKey, false, action, root);
           root->appendChild(myItem);
-          settings.beginGroup(localSettingName);
+          settings->beginGroup(localSettingName);
           buildTree(myItem, action->menu()->actions(), settings);
-          settings.endGroup();
+          settings->endGroup();
         }
       }
       else
       {
         QString shortcut;
-        if (settings.contains(localSettingName))
+        if (settings->contains(localSettingName))
         {
-          shortcut = settings.value(localSettingName).toString();
+          shortcut = settings->value(localSettingName).toString();
         }
         TreeItem* myItem = new TreeItem(actionName, settingsKey, true, action, root);
         root->appendChild(myItem);
@@ -144,13 +145,13 @@ public:
   pqCustomizeShortcutsModel(QObject* p)
     : QAbstractItemModel(p)
   {
-    pqSettings settings;
+    pqSettings* settings = pqApplicationCore::instance()->settings();
     auto mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
     auto menuBar = mainWindow->menuBar();
     TreeItem* treeItem = new TreeItem("", "", false, nullptr, nullptr);
-    settings.beginGroup("pqCustomShortcuts");
+    settings->beginGroup("pqCustomShortcuts");
     buildTree(treeItem, menuBar->actions(), settings);
-    settings.endGroup();
+    settings->endGroup();
     this->RootItem = treeItem;
   }
 
