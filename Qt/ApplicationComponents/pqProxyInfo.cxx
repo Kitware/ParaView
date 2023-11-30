@@ -20,7 +20,6 @@ pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, const QString& name, const QSt
   , OmitFromToolbar(omitFromToolbar)
   , HideFromMenu(hide)
 {
-  this->updateLabel();
 }
 
 //-----------------------------------------------------------------------------
@@ -42,8 +41,6 @@ pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, vtkPVXMLElement* xmlElement)
   int hide = 0;
   xmlElement->GetScalarAttribute("hide_from_menu", &hide);
   this->HideFromMenu = hide == 1;
-
-  this->updateLabel();
 }
 
 //-----------------------------------------------------------------------------
@@ -56,7 +53,6 @@ pqProxyInfo::pqProxyInfo(pqProxyCategory* parent, pqProxyInfo* other)
   , OmitFromToolbar(other->OmitFromToolbar)
   , HideFromMenu(other->HideFromMenu)
 {
-  this->updateLabel();
 }
 
 //-----------------------------------------------------------------------------
@@ -85,19 +81,20 @@ void pqProxyInfo::convertToXML(vtkPVXMLElement* root)
 //-----------------------------------------------------------------------------
 QString pqProxyInfo::label()
 {
+  QString label = this->Label;
+  if (label.isEmpty())
+  {
+    label = vtkSMObject::CreatePrettyLabel(this->Name.toStdString()).c_str();
+  }
+
   // we do not store the translation, as we need the original label when writing to xml.
-  return QCoreApplication::translate("ServerManagerXML", this->Label.toStdString().c_str());
+  return QCoreApplication::translate("ServerManagerXML", label.toStdString().c_str());
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyInfo::updateLabel(const QString& newLabel)
+void pqProxyInfo::setLabel(const QString& newLabel)
 {
   this->Label = newLabel;
-
-  if (newLabel.isEmpty())
-  {
-    this->Label = QString(vtkSMObject::CreatePrettyLabel(this->Name.toStdString()).c_str());
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +123,6 @@ void pqProxyInfo::merge(pqProxyInfo* other)
   if (this->Label.isEmpty())
   {
     this->Label = other->Label;
-    this->updateLabel();
   }
   if (this->Icon.isEmpty())
   {

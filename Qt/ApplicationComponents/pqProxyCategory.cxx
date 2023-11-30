@@ -269,7 +269,7 @@ void pqProxyCategory::addProxy(pqProxyInfo* proxyInfo)
   const QString& proxyName = proxyInfo->name();
   const QString& proxyGroup = proxyInfo->group();
 
-  QString label = proxyName;
+  QString label = proxyInfo->label();
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (proxyManager)
@@ -282,7 +282,7 @@ void pqProxyCategory::addProxy(pqProxyInfo* proxyInfo)
     }
   }
 
-  proxyInfo->updateLabel(label);
+  proxyInfo->setLabel(label);
 
   if (this->Proxies.contains(proxyName))
   {

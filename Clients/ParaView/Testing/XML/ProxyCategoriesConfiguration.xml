@@ -60,11 +60,11 @@
   <!-- Remove categories containing "0000MyGlyph" -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="14.0,Some Category" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="14.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="15.0,Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="15.0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0,Plugins" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="11.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="12.0,Plugins" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="12.0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <!-- It is now under "Misc" category -->
