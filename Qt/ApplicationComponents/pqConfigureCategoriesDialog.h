@@ -60,6 +60,11 @@ protected Q_SLOTS:
   void resetToApplicationCategories();
 
   /**
+   * Set an icon for the selected filter.
+   */
+  void onSetIconPressed();
+
+  /**
    * Save current categories tree and exit.
    */
   void onAccepted();
@@ -145,6 +150,10 @@ private:
    * - the selected item itself otherwise
    */
   QTreeWidgetItem* getSelectedCategoryItem();
+  /**
+   * Return the current proxy item or nullptr.
+   */
+  QTreeWidgetItem* getSelectedProxyItem();
   ///@}
 
   /**

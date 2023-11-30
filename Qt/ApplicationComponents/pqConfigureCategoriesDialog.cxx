@@ -14,6 +14,7 @@
 #include <QStringList>
 #include <QTreeWidgetItem>
 
+#include "pqIconBrowser.h"
 #include "pqProxyCategory.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqProxyInfo.h"
@@ -152,6 +153,38 @@ struct pqConfigureCategoriesDialog::pqInternal
     this->BlockEdition = blocked;
   }
 
+  /**
+   * Set an icon to the proxy stored under the given item.
+   */
+  void setIcon(QTreeWidgetItem* item, const QString& iconPath)
+  {
+    auto proxyInfo = ::getProxy(item);
+    if (!proxyInfo)
+    {
+      return;
+    }
+
+    proxyInfo->setIcon(iconPath);
+    this->MenuManager->updateActionIcon(proxyInfo);
+    item->setIcon(0, QIcon(iconPath));
+  }
+
+  /**
+   * Update the icon of the given item, based on its internal proxy info.
+   */
+  void updateIcon(QTreeWidgetItem* item)
+  {
+    auto proxyInfo = ::getProxy(item);
+
+    // use the same icon as the associated menu action.
+    auto action = this->MenuManager->getAction(proxyInfo);
+
+    if (action && !action->icon().isNull())
+    {
+      item->setIcon(0, QIcon(action->icon()));
+    }
+  }
+
   bool BlockEdition = false;
   pqProxyGroupMenuManager* MenuManager;
   QScopedPointer<Ui::pqConfigureCategoriesDialog> Ui;
@@ -185,6 +218,9 @@ pqConfigureCategoriesDialog::pqConfigureCategoriesDialog(
     QTreeWidgetItem* precedingItem = this->getSelectedItem();
     this->createCategory(::DEFAULT_NAME, parentItem, precedingItem);
   });
+
+  QObject::connect(this->Internal->Ui->setIcon, &QToolButton::released, this,
+    &pqConfigureCategoriesDialog::onSetIconPressed);
 
   QObject::connect(this->Internal->Ui->remove, &QToolButton::released, this,
     &pqConfigureCategoriesDialog::onRemovePressed);
@@ -423,6 +459,18 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::getSelectedCategoryItem()
 }
 
 //----------------------------------------------------------------------------
+QTreeWidgetItem* pqConfigureCategoriesDialog::getSelectedProxyItem()
+{
+  auto item = getSelectedItem();
+  if (::isCategory(item))
+  {
+    return nullptr;
+  }
+
+  return item;
+}
+
+//----------------------------------------------------------------------------
 QTreeWidgetItem* pqConfigureCategoriesDialog::getNearestItem(QTreeWidgetItem* item)
 {
   auto above = this->Internal->Ui->customCategoriesTree->itemAbove(item);
@@ -597,6 +645,19 @@ void pqConfigureCategoriesDialog::onAddPressed()
 }
 
 //----------------------------------------------------------------------------
+void pqConfigureCategoriesDialog::onSetIconPressed()
+{
+  auto item = this->getSelectedProxyItem();
+  if (!item)
+  {
+    return;
+  }
+
+  auto newIconPath = pqIconBrowser::getIconPath();
+  this->Internal->setIcon(item, newIconPath);
+}
+
+//----------------------------------------------------------------------------
 void pqConfigureCategoriesDialog::onAccepted()
 {
   this->Internal->SettingsCategory->writeSettings(this->ResourceTag);
@@ -624,12 +685,7 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::createProxyItem(
   auto item = this->createItem(parent, proxyInfo->label(), preceding);
   item->setData(0, ::PROXY_ROLE, QVariant::fromValue(proxyInfo));
 
-  // use the same icon as the associated menu action.
-  auto action = this->Internal->MenuManager->getAction(proxyInfo);
-  if (action && !action->icon().isNull())
-  {
-    item->setIcon(0, QIcon(action->icon()));
-  }
+  this->Internal->updateIcon(item);
 
   return item;
 }
@@ -691,12 +747,14 @@ void pqConfigureCategoriesDialog::updateUIState()
 
   auto selectedItem = this->getSelectedItem();
   auto category = ::getCategory(selectedItem);
-  this->Internal->Ui->useAsToolbar->setEnabled(
-    hasCustomItemSelection && ::isCategory(selectedItem) && category);
+  bool isCategory = ::isCategory(selectedItem);
+  this->Internal->Ui->useAsToolbar->setEnabled(hasCustomItemSelection && isCategory && category);
   this->Internal->Ui->useAsToolbar->setChecked(category && category->showInToolbar());
 
   bool isFavorites = this->Internal->isFavorites(category);
   this->Internal->Ui->remove->setEnabled(hasCustomItemSelection && !isFavorites);
+
+  this->Internal->Ui->setIcon->setEnabled(hasCustomItemSelection && !isCategory);
 }
 
 //----------------------------------------------------------------------------

@@ -45,6 +45,11 @@ public:
   void setHideFromMenu(bool hidden);
 
   /**
+   * Set Icon path.
+   */
+  void setIcon(const QString& iconPath);
+
+  /**
    * Merge pqProxyInfo meta data into self.
    * Append OmitFromToolbar values.
    * For other properties, keep those from self if non empty, else copy other.

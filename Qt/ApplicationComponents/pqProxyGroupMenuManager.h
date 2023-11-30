@@ -129,6 +129,10 @@ public:
    * Return the action for a given proxy.
    */
   QAction* getAction(pqProxyInfo* proxy);
+  /**
+   * Update action icon from proxy info.
+   */
+  void updateActionIcon(pqProxyInfo* proxy);
   ///@}
 
   /**

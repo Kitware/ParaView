@@ -120,6 +120,20 @@
        </widget>
       </item>
       <item row="0" column="1">
+       <widget class="QToolButton" name="setIcon">
+        <property name="toolTip">
+         <string>Set an icon for the current proxy</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/pqWidgets/Icons/pqChooseIcon.svg</normaloff>:/pqWidgets/Icons/pqChooseIcon.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
        <widget class="QToolButton" name="addCategory">
         <property name="toolTip">
          <string>Create a category</string>
@@ -133,7 +147,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="0" column="3">
        <widget class="QToolButton" name="addSubCategory">
         <property name="toolTip">
          <string>Insert a subcategory</string>
@@ -147,7 +161,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="4">
        <widget class="QCheckBox" name="useAsToolbar">
         <property name="enabled">
          <bool>false</bool>
@@ -163,7 +177,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
+      <item row="0" column="5">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -176,7 +190,7 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="5">
+      <item row="0" column="6">
        <widget class="QToolButton" name="remove">
         <property name="toolTip">
          <string>Delete selected entry</string>
@@ -190,7 +204,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="6">
+      <item row="0" column="7">
        <widget class="QToolButton" name="resetAll">
         <property name="toolTip">
          <string>Reset categories</string>
@@ -204,7 +218,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" rowspan="3" colspan="7">
+      <item row="1" column="0" rowspan="3" colspan="8">
        <widget class="pqFavoritesTreeWidget" name="customCategoriesTree">
         <property name="contextMenuPolicy">
          <enum>Qt::NoContextMenu</enum>

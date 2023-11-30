@@ -2027,6 +2027,11 @@ set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (glTFReaderAnimatedMorphing_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (glTFReaderToggleDeformation_FORCE_SERIAL TRUE)  # since this uses popup-menu
 
+# those tests load and remove macros. Serial avoid side effects
+set(MacroEditor_FORCE_SERIAL TRUE)
+set(IconBrowser_FORCE_SERIAL TRUE)
+set(PythonResetSessionMacro_FORCE_SERIAL TRUE)
+
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
 set(LoadSaveStateVolume_DISABLE_CRS TRUE)
