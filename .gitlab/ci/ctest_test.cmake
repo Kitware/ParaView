@@ -98,6 +98,13 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
     "pvcs\\.CDISimpleRead$"
     )
+
+  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
+    list(APPEND test_exclusions
+      # https://gitlab.kitware.com/paraview/paraview/-/issues/22398
+      "^ParaViewExample-Catalyst2/PythonFullExample$")
+  endif ()
+
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
