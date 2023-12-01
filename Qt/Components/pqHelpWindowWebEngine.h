@@ -92,7 +92,7 @@ public:
 
   PARAVIEW_DEPRECATED_IN_5_12_0(
     "This constructor is deprecated, please use the specialized one instead: pqWebView* "
-    "newInstance(QHelpEngine* engine, pqHelpWindow* self)");
+    "newInstance(QHelpEngine* engine, pqHelpWindow* self)")
   static pqWebView* newInstance(QHelpEngine* engine, QWidget* parentObject)
   {
     pqWebView* instance = new pqWebView(parentObject);
