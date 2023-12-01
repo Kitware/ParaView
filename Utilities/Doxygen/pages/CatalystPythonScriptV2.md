@@ -437,6 +437,35 @@ a specific directory. To use it, ensure that all extractor use a relative
 filename. The filename is then evaluated to be relative to the directory
 provided for `options.ExtractsOutputDirectory`
 
+### Steering extractors
+
+Catalyst's steering capability allows simulation parameters to be modified at runtime
+using the `CreateSteerableParameters` Python function in the script, and `catalyst_results` function
+on the simulation side to retrieve parameters associated with a proxy. A special kind of Extractor,
+`'steering'`, allows the Python script to send feedback to the simulation in the form of a dataset.
+This extractor, unlike the others, is not associated to a trigger, but their input dataset is serialized
+in a Conduit node sent to the simulation only when the latter calls `catalyst_results.`
+
+A usual use case is performing a data reduction in the Python script, then sending this result back to the simulation.
+The following script presents an example of this workflow.
+
+```py
+from paraview.simple import *
+
+from paraview import catalyst
+options = catalyst.Options()
+
+producer = TrivialProducer(registrationName="grid")
+
+# Create a slice of the producer
+sliced = Slice(Input=producer, SliceType="Plane")
+sliced.SliceType.Normal = [0.0, 1.0, 0.0]
+
+# Create an extractor taking the output of the slice. This way,
+# the slice will be sent back as a Catalyst results node.
+steering = CreateExtractor('steering', sliced, registrationName='steerchannel')
+```
+
 ### Using Python Package
 
 In previous section, we used a single .py file to demonstrate various

@@ -162,6 +162,12 @@ public:
   ///@}
 
   /**
+   * Creates and initializes a new steering extractor
+   */
+  vtkSMProxy* CreateSteeringExtractor(
+    vtkSMProxy* proxy, const char* registrationName = nullptr) const;
+
+  /**
    * Returns true is the `extractor` is an extractor for the `proxy`.
    */
   static bool IsExtractor(vtkSMProxy* extractor, vtkSMProxy* proxy);

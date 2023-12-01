@@ -22,6 +22,18 @@
       </ProxyProperty>
       <ProxyProperty name="Producer" panel_visibility="never" />
     </Proxy>
+
+    <Proxy name="SteeringExtractor">
+      <ProxyProperty name="Producer" panel_visibility="never">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>
+          This property sets the input of the extractor.
+        </Documentation>
+      </ProxyProperty>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="extract_triggers">

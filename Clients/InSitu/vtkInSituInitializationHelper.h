@@ -136,7 +136,15 @@ public:
    */
   static bool IsPythonSupported();
 
+  /**
+   * Fill the vector with all steerable proxies and extracts associated to the pipeline.
+   */
   static void GetSteerableProxies(std::vector<std::pair<std::string, vtkSMProxy*>>& proxies);
+
+  /**
+   * Update the internal list of steerable proxies or extracts by adding the proxy passed in
+   * parameters.
+   */
   static void UpdateSteerableParameters(
     vtkSMProxy* steerableProxy, const char* steerableSourceName);
 

@@ -17,6 +17,7 @@
 #include "vtkInSituPipelinePython.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPVLogger.h"
+#include "vtkPartitionedDataSet.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
@@ -172,27 +173,47 @@ static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit
   return true;
 }
 
+/**
+ * Fill a conduit node's channel with a specified name with the dataset given by the proxy's
+ * ClientSideObject. Return true if the mesh conversion to conduit was successful if it happened,
+ * even if the channel is empty.
+ */
 static bool convert_to_blueprint_mesh(
   vtkSMProxy* proxy, const std::string& name, conduit_cpp::Node& node)
 {
-  if (proxy != nullptr)
+  if (proxy == nullptr)
   {
-    if (auto steeringDataGenerator = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject()))
+    return true;
+  }
+
+  auto sourceDataset = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject());
+  if (sourceDataset == nullptr)
+  {
+    return true;
+  }
+
+  sourceDataset->Update();
+  vtkDataObject* outputDataObject = sourceDataset->GetOutputDataObject(0);
+  if (outputDataObject == nullptr)
+  {
+    return true;
+  }
+
+  if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
+  {
+    if (auto data_object = multi_block->GetBlock(0))
     {
-      steeringDataGenerator->Update();
-      if (vtkDataObject* outputDataObject = steeringDataGenerator->GetOutputDataObject(0))
-      {
-        if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
-        {
-          if (auto data_object = multi_block->GetBlock(0))
-          {
-            auto channel = node[name];
-            return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
-          }
-        }
-      }
+      conduit_cpp::Node channel = node[name];
+      return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
     }
   }
+  else if (auto partitioned =
+             vtkPartitionedDataSet::SafeDownCast(outputDataObject)->GetPartitionAsDataObject(0))
+  {
+    conduit_cpp::Node channel = node[name];
+    return vtkDataObjectToConduit::FillConduitNode(partitioned, channel);
+  }
+
   return true;
 }
 
