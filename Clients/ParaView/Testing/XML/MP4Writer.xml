@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveAnimation" />
+  <pqevent object="pqClientMainWindow/SaveAnimationFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/tmp.mp4" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,6,251" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,6,251" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FrameWindow/LineEdit1" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/SaveAnimationDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- test for file's presence, but don't open it-->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/tmp.mp4" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/cancelButton" command="activate" arguments="" />
+</pqevents>
