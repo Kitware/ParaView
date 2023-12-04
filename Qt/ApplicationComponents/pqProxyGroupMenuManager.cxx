@@ -1026,15 +1026,9 @@ QList<QAction*> pqProxyGroupMenuManager::categoryActions(pqProxyCategory* catego
   }
 
   auto proxies = category->getRootProxies();
-  auto orderedProxies = category->getOrderedRootProxiesNames();
-  if (!category->preserveOrder())
-  {
-    // alphabetical sort unless the XML overrode the sorting using the "preserve_order"
-    // attribute. (see #8364)
-    std::sort(orderedProxies.begin(), orderedProxies.end());
-  }
+  QStringList proxiesOriginalOrdering = category->getOrderedRootProxiesNames();
 
-  for (auto proxyName : orderedProxies)
+  for (auto proxyName : proxiesOriginalOrdering)
   {
     auto proxy = category->findProxy(proxyName);
     QAction* action = this->getAction(proxy);
@@ -1042,6 +1036,13 @@ QList<QAction*> pqProxyGroupMenuManager::categoryActions(pqProxyCategory* catego
     {
       category_actions.push_back(action);
     }
+  }
+
+  // alphabetical sort unless the XML overrode the sorting using the "preserve_order"
+  // attribute. (see #8364)
+  if (!category->preserveOrder())
+  {
+    std::sort(category_actions.begin(), category_actions.end(), ::actionTextSort);
   }
 
   return category_actions;
