@@ -5,6 +5,11 @@
       <Documentation>
         AVI writer that uses Video-for-Windows API.
       </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
 
       <IntVectorProperty name="Quality"
         command="SetQuality"
@@ -55,6 +60,12 @@
         MP4 writer that uses the Microsoft Media Foundation API to write H.264-encoded
         video files.
       </Documentation>
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
 
       <IntVectorProperty name="BitRate"
         command="SetBitRate"

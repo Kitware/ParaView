@@ -914,6 +914,12 @@ if (PARAVIEW_USE_QTHELP)
     HelpWindowHistory.xml)
 endif()
 
+if (WIN32)
+  list(APPEND TESTS_WITHOUT_BASELINES
+    AVIWriter.xml
+    MP4Writer.xml)
+endif()
+
 SET (TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
   BoundingRuler.xml
