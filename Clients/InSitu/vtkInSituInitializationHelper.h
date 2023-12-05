@@ -38,6 +38,10 @@ class vtkCPCxxHelper;
 class vtkInSituPipeline;
 class vtkSMProxy;
 class vtkSMSourceProxy;
+// forward declare conduit_node and its typedef.
+// it has to be identical to the one in conduit.hpp
+struct conduit_node_impl;
+typedef struct conduit_node_impl conduit_node;
 
 #include <string> // for std::string
 #include <vector> // for std::vector
@@ -116,6 +120,10 @@ public:
   static bool ExecutePipelines(
     int timestep, double time, const std::vector<std::string>& parameters = {});
 
+  // This overload accept the "catalyst/state" node of the ParaView Blueprint.
+  // When using this overload the conduit node will become available also via the catalyst script
+  static bool ExecutePipelines(const conduit_node* catalyst_state);
+
   ///@{
   /**
    * Provides access to current time and timestep during `ExecutePipelines`
@@ -124,6 +132,14 @@ public:
   static int GetTimeStep();
   static double GetTime();
   ///@}
+
+  /**
+   * Provides access to the conduit node that the simulation passed as argument
+   * to "catalyst_execute" for this timestep.  This should be treated as
+   * READ-ONLY since any change could directly modify simulation data.  The
+   * value is not valid outside `ExecutePipelines`.
+   */
+  static conduit_node* GetCatalystParameters();
 
   /**
    * Returns true if vtkInSituInitializationHelper has been initialized; which

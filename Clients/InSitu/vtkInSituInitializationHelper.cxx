@@ -7,6 +7,7 @@
 #include "vtkCallbackCommand.h"
 #if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
 #include "vtkConduitSource.h"
+#include <catalyst_conduit.hpp>
 #endif
 #include "vtkDataArrayAccessor.h"
 #include "vtkFieldData.h"
@@ -74,6 +75,10 @@ public:
   bool InExecutePipelines = false;
   int TimeStep = 0;
   double Time = 0.0;
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+  // pointer arguments of the current catalyst call
+  conduit_node* catalyst_params = nullptr;
+#endif
 };
 
 template <typename PropertyType>
@@ -370,6 +375,41 @@ void vtkInSituInitializationHelper::MarkProducerModified(vtkSMSourceProxy* produ
 }
 
 //----------------------------------------------------------------------------
+bool vtkInSituInitializationHelper::ExecutePipelines(const conduit_node* params)
+{
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+
+  auto& internals = (*vtkInSituInitializationHelper::Internals);
+  // store a pointer to the catalyst_execute parameters. This will be accessible from python.
+  internals.catalyst_params = const_cast<conduit_node*>(params);
+
+  const conduit_cpp::Node& cpp_params = conduit_cpp::cpp_node(const_cast<conduit_node*>(params));
+  const auto& root = cpp_params["catalyst"];
+
+  const int timestep = root.has_path("state/timestep")
+    ? root["state/timestep"].to_int64()
+    : (root.has_path("state/cycle") ? root["state/cycle"].to_int64() : 0);
+  const double time = root.has_path("state/time") ? root["state/time"].to_float64() : 0;
+
+  std::vector<std::string> parameters;
+  if (root.has_path("state/parameters"))
+  {
+    const auto state_parameters = root["state/parameters"];
+    const conduit_index_t nchildren = state_parameters.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      parameters.push_back(state_parameters.child(i).as_string());
+    }
+  }
+
+  return vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
+#else
+  vtkLogF(ERROR, "ParaView is compiled without Conduit support");
+  (void)(params);
+  return false;
+#endif
+}
+
 bool vtkInSituInitializationHelper::ExecutePipelines(
   int timestep, double time, const std::vector<std::string>& parameters)
 {
@@ -636,6 +676,30 @@ double vtkInSituInitializationHelper::GetTime()
   }
 
   return internals.Time;
+}
+
+//----------------------------------------------------------------------------
+conduit_node* vtkInSituInitializationHelper::GetCatalystParameters()
+{
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+  if (vtkInSituInitializationHelper::Internals == nullptr)
+  {
+    vtkLogF(ERROR, "'GetCatalystParameters' cannot be called before 'Initialize'.");
+    return nullptr;
+  }
+
+  auto& internals = (*vtkInSituInitializationHelper::Internals);
+  if (!internals.InExecutePipelines)
+  {
+    vtkLogF(ERROR, "'GetCatalystParameters' cannot be called outside 'ExecutePipelines'.");
+    return nullptr;
+  }
+
+  return internals.catalyst_params;
+#else
+  vtkLogF(ERROR, "ParaView is compiled without Conduit support");
+  return nullptr;
+#endif
 }
 
 //----------------------------------------------------------------------------
