@@ -104,16 +104,20 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
 
     set(_vtk_client_server_source_output
       "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS/${_vtk_client_server_basename}ClientServer.cxx")
-    set(_vtk_client_server_depfile
-      "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS.dir/${_vtk_client_server_basename}ClientServer.cxx.d")
+    set(_vtk_client_server_depfile_genex
+      "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS/${_vtk_client_server_basename}ClientServer.cxx.$<CONFIG>.d")
+    set(_vtk_client_server_depfile_nogenex
+      "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS/${_vtk_client_server_basename}ClientServer.cxx.d")
     list(APPEND _vtk_client_server_sources
       "${_vtk_client_server_source_output}")
 
     _vtk_module_depfile_args(
+      MULTI_CONFIG_NEEDS_GENEX
       TOOL_ARGS _vtk_client_server_depfile_flags
       CUSTOM_COMMAND_ARGS _vtk_client_server_depfile_args
       SOURCE "${_vtk_client_server_header}"
-      DEPFILE_PATH "${_vtk_client_server_depfile}"
+      DEPFILE_PATH "${_vtk_client_server_depfile_genex}"
+      DEPFILE_NO_GENEX_PATH "${_vtk_client_server_depfile_nogenex}"
       TOOL_FLAGS "-MF")
 
     add_custom_command(
