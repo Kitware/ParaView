@@ -1,9 +1,9 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
-/// \brief  [...]
-///
+/// \brief Distributed subsets of height fields.
+
 #ifndef NVIDIA_INDEX_IHEIGHT_FIELD_SUBSET_H
 #define NVIDIA_INDEX_IHEIGHT_FIELD_SUBSET_H
 
@@ -16,11 +16,12 @@ namespace nv
 {
 namespace index
 {
+
 /// Subset-data descriptor for tiled height-field subsets. This interface class is used by the NVIDIA IndeX library
 /// to communicate information about tiled height-field sub-data to an application.
 ///
-/// TODO: describe internal representation
-/// TODO: describe LOD info
+/// \todo Describe internal representation
+/// \todo Describe LOD info
 ///
 /// \ingroup nv_index_data_subsets
 ///
@@ -281,7 +282,7 @@ public:
     ///
     /// \param[in] output_filename  Defines the output file.
     ///
-    /// \note: This API is currently not supported and will change in future releases.
+    /// \note This API is currently not supported and will change in future releases.
     ///
     virtual bool store_internal_data_representation(const char* output_filename) const = 0;
 
@@ -290,7 +291,7 @@ public:
     ///
     /// \param[in] input_filename   Defines the input file.
     ///
-    /// \note: This API is currently not supported and will change in future releases.
+    /// \note This API is currently not supported and will change in future releases.
     ///
     virtual bool load_internal_data_representation(const char*  input_filename) = 0;
 };

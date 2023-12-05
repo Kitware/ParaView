@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Main \NeurayApiName interface.
@@ -40,7 +40,7 @@ namespace neuraylib {
 /// This is an object representing the \neurayLibraryName. Only one object of this type will exist
 /// at a time. It is used for configuration, startup and shutdown of the \neurayLibraryName.
 class INeuray : public
-    mi::base::Interface_declare<0xa43c2343,0x8fdd,0x467d,0x8b,0xc1,0xe3,0x4e,0x2a,0x2f,0x39,0x13>
+    mi::base::Interface_declare<0x34b6a7c3,0xf040,0x43ec,0x9b,0x7c,0xc1,0x36,0x2f,0xe7,0x0a,0xaa>
 {
 public:
     /// Returns the interface version of the \neurayLibraryName.
@@ -85,7 +85,7 @@ public:
     ///                    - -7: No NVIDIA VCA as required by the license in use was found.
     virtual Sint32 start( bool blocking = true) = 0;
 
-    /// The operational status of the library \if DICE_API or additional clusters \endif.
+    /// The operational status of the library \if DICE_API or additional clusters \endif
     ///
     /// \if DICE_API \see #mi::neuraylib::ICluster \endif
     enum Status
@@ -236,7 +236,7 @@ public:
 
 mi_static_assert( sizeof( INeuray::Status) == sizeof( Uint32));
 
-/*@}*/ // end group mi_neuray_ineuray
+/**@}*/ // end group mi_neuray_ineuray
 
 } // namespace neuraylib
 

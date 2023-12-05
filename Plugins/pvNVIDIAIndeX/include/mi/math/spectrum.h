@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/spectrum.h
 /// \brief %Spectrum class with floating point elements and operations.
@@ -106,7 +106,10 @@ public:
 
 #if (__cplusplus >= 201103L)
     /// Default copy constructor.
-    Spectrum( const Spectrum& s ) = default;
+    Spectrum( const Spectrum& s) = default;
+
+    /// Default assignment operator.
+    Spectrum& operator=( const Spectrum& s) = default;
 #endif
 
     /// Constructor from underlying storage type.

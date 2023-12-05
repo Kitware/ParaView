@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file       mi/base/lock.h
 /// \brief      Multithreading locks.
@@ -125,7 +125,7 @@ private:
     pthread_mutex_t m_mutex;
 #else
     // The critical section implementing the lock.
-    CRITICAL_SECTION m_critical_section;
+    SRWLOCK m_srwlock;
     // The flag used to ensure that the lock is non-recursive.
     bool m_locked;
 #endif
@@ -226,15 +226,16 @@ private:
 #ifndef MI_FOR_DOXYGEN_ONLY
 
 inline Lock::Lock()
+#ifdef MI_PLATFORM_WINDOWS
+  : m_srwlock( SRWLOCK_INIT),
+    m_locked( false)
+#endif
 {
 #ifndef MI_PLATFORM_WINDOWS
     pthread_mutexattr_t mutex_attributes;
     pthread_mutexattr_init( &mutex_attributes);
     pthread_mutexattr_settype( &mutex_attributes, PTHREAD_MUTEX_ERRORCHECK);
     pthread_mutex_init( &m_mutex, &mutex_attributes);
-#else
-    InitializeCriticalSection( &m_critical_section);
-    m_locked = false;
 #endif
 }
 
@@ -248,7 +249,6 @@ inline Lock::~Lock()
 #else
     // Avoid assertion here because it might be mapped to an exception.
     // mi_base_assert( !m_locked);
-    DeleteCriticalSection( &m_critical_section);
 #endif
 }
 
@@ -261,7 +261,7 @@ inline void Lock::lock()
         abort();
     }
 #else
-    EnterCriticalSection( &m_critical_section);
+    AcquireSRWLockExclusive( &m_srwlock);
     if( m_locked) {
         mi_base_assert( !"Dead lock");
         abort();
@@ -279,11 +279,11 @@ inline bool Lock::try_lock()
     mi_base_assert( result == 0 || result == EBUSY || result == EDEADLK);
     return result == 0;
 #else
-    BOOL result = TryEnterCriticalSection( &m_critical_section);
-    if( result == 0)
+    BOOL result = TryAcquireSRWLockExclusive( &m_srwlock);
+    if( result == FALSE)
         return false;
     if( m_locked) {
-        LeaveCriticalSection( &m_critical_section);
+        ReleaseSRWLockExclusive( &m_srwlock);
         return false;
     }
     m_locked = true;
@@ -300,7 +300,7 @@ inline void Lock::unlock()
 #else
     mi_base_assert( m_locked);
     m_locked = false;
-    LeaveCriticalSection( &m_critical_section);
+    ReleaseSRWLockExclusive( &m_srwlock);
 #endif
 }
 

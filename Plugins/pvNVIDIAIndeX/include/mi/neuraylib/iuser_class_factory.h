@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for factories for user-defined class.
@@ -90,7 +90,7 @@ public:
     }
 };
 
-/*@}*/ // end group mi_neuray_plugins
+/**@}*/ // end group mi_neuray_plugins
 
 } // namespace neuraylib
 

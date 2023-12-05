@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Distributed cache service.
@@ -118,7 +118,7 @@ public:
     virtual void remove_object( ISerializable* serializable) = 0;
 };
 
-/*@}*/ // end group mi_neuray_dice
+/**@}*/ // end group mi_neuray_dice
 
 } // namespace neuraylib
 

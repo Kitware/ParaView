@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The scene query API of the NVIDIA IndeX library.
@@ -39,6 +39,7 @@ public:
     ///
     /// \return                             Pick results in front-to-back order.
     ///
+    /// \deprecated
     virtual IScene_pick_results* pick(
         const mi::math::Vector_struct<mi::Uint32, 2>&   pixel_location,
         const nv::index::IIndex_canvas*                 pick_canvas,
@@ -58,6 +59,7 @@ public:
     ///
     /// \return                             List with pick results for each viewport.
     ///
+    /// \deprecated
     virtual IScene_pick_results_list* pick(
         const mi::math::Vector_struct<mi::Sint32, 2>& pixel_location,
         const nv::index::IIndex_canvas*               pick_canvas,

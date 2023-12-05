@@ -1,9 +1,9 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
-/// \brief  [...]
-///
+/// \brief Interface for height field scene elements.
+
 #ifndef NVIDIA_INDEX_IHEIGHT_FIELD_SCENE_ELEMENT_H
 #define NVIDIA_INDEX_IHEIGHT_FIELD_SCENE_ELEMENT_H
 
@@ -26,7 +26,6 @@ class IHeight_field_scene_element :
     public mi::base::Interface_declare<0x9c51971c,0xf04e,0x4761,0xbb,0x69,0x34,0xbd,0x7f,0xd5,0x8c,0xd1,
                                        nv::index::IDistributed_data>
 {
-public:
 };
 
 }} // namespace index / nv

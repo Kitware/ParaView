@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for general settings.
@@ -71,7 +71,7 @@ public:
     /// Enables or disables the usage of HTTP proxy for WebSocket. In case of
     /// enabling, this function also sets the HTTP proxy address for WebSocket.
     ///
-    /// \param proxy_address       If proxy_address is NULL, the usage of HTTP
+    /// \param proxy_address       If proxy_address is \c NULL, the usage of HTTP
     ///                            proxy is disabled. Otherwise, this parameter
     ///                            must contain the proxy address and port for
     ///                            WebSocket to use. In this case, the address
@@ -112,7 +112,7 @@ public:
     virtual const char* get_http_proxy_username() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 } // namespace neuraylib
 

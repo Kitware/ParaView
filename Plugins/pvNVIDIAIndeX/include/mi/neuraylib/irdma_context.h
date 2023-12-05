@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Support for remote DMA transfers.
@@ -108,7 +108,7 @@ public:
     ///                 region not completely in the original buffer.
     virtual IRDMA_buffer* duplicate( Size offset, Size size) = 0;
 
-    /// Return True if this is a GPU puffer and GPUDirect registration was successful.
+    /// Returns \c true if this is a GPU puffer and GPUDirect registration was successful.
     virtual bool is_gpudirect() = 0;
 };
 
@@ -167,7 +167,7 @@ public:
     virtual Sint32 flush( IRDMA_buffer* buffer) = 0;
 };
 
-/*@}*/ // end group mi_neuray_dice
+/**@}*/ // end group mi_neuray_dice
 
 } // namespace neuraylib
 

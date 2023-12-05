@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file   idistributed_data_edit.h
 /// \brief  Interfaces for distributed data processing.
@@ -59,11 +59,11 @@ public:
 /// the compute task's compute callback for processing it. Once the compute task finished the  
 /// distributed datatype specific operations, it typically signals 
 /// the NVIDIA IndeX system if modifications have been applied to the subset data. If  
-/// modifications occured then the NVIDIA IndeX system update the internal structures and resources
+/// modifications occurred then the NVIDIA IndeX system update the internal structures and resources
 /// accordingly.
 /// 
 /// The an instance of a \c IData_subset_compute_task_processing implementation is typically
-/// exposed through the \c IDistributed_data_job interface. Implemented distribtued data job run 
+/// exposed through the \c IDistributed_data_job interface. Implemented distributed data job run 
 /// against an distributed dataset that is uploaded to the GPU cluster. The job spans a thread or 
 /// execution for each data subset of the dataset. Here, the subset data is either stored locally
 /// and is then processed by the method \c IDistributed_data_job::execute_subset or stored on a remote 

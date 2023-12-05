@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/function.h
 /// \brief Math functions and function templates on simple types or generic container and vector
@@ -499,61 +499,61 @@ inline Float64 ceil( Float64 s) { return std::ceil(s); }
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline  Uint8 clamp(  Uint8 s,  Uint8 low,  Uint8 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Uint16 clamp( Uint16 s, Uint16 low, Uint16 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Uint32 clamp( Uint32 s, Uint32 low, Uint32 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Uint64 clamp( Uint64 s, Uint64 low, Uint64 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline  Sint8 clamp(  Sint8 s,  Sint8 low,  Sint8 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Sint16 clamp( Sint16 s, Sint16 low, Sint16 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Sint32 clamp( Sint32 s, Sint32 low, Sint32 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Sint64 clamp( Sint64 s, Sint64 low, Sint64 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Float32 clamp( Float32 s, Float32 low, Float32 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 /// Returns the value \p s if it is in the range [\p low, \p high], the
 /// value \p low if \p s < \p low, or the value \p high if \p s > \p high.
 inline Float64 clamp( Float64 s, Float64 low, Float64 high)
 {
-    return ( s < low) ? low : ( s > high) ? high : s;
+    return min(high, max(low, s));
 }
 
 /// Returns the cosine of \p a. The angle \p a is specified in radians.
@@ -668,7 +668,7 @@ inline Uint32 leading_zeros(Uint64 v) {
 #elif defined(MI_COMPILER_ICC) || defined(MI_COMPILER_GCC)
     return (v != 0) ? __builtin_clzll(v) : 64;
 #else
-    // use fallback, e.g. on Solaris
+    // use fallback
     if (v == 0) return 64;
     Uint32 n = 1;
     if ((v >> 32) == 0) { n += 32; v <<= 32; };
@@ -774,9 +774,9 @@ inline Float32 rsqrt( Float32 s) { return 1.0f / std::sqrt(s); }
 inline Float64 rsqrt( Float64 s) { return 1.0  / std::sqrt(s); }
 
 /// Returns the value \p s clamped to the range [0,1].
-inline Float32 saturate( Float32 s) { return (s < 0.f) ? 0.f : (s > 1.f) ? 1.f : s;}
+inline Float32 saturate( Float32 s) { return min(1.f, max(0.f, s)); }
 /// Returns the value \p s clamped to the range [0,1].
-inline Float64 saturate( Float64 s) { return (s < 0.) ? 0.   : (s > 1. ) ? 1.  : s;}
+inline Float64 saturate( Float64 s) { return min(1. , max(0. , s)); }
 
 /// Returns -1 if \c s<0, 0 if \c s==0, and +1 if \c s>0.
 inline Sint8   sign( Sint8   s)
@@ -849,10 +849,10 @@ using std::isnan;
 
 
 #ifndef __CUDA_ARCH__
-inline float uint_as_float(const unsigned v)
+inline float __uint_as_float(const unsigned v)
 { return base::binary_cast<float>(v);}
 
-inline unsigned float_as_uint(const float v)
+inline unsigned __float_as_uint(const float v)
 { return base::binary_cast<unsigned>(v);}
 #endif
 
@@ -1008,8 +1008,8 @@ MI_HOST_DEVICE_INLINE void to_rgbe( const Float32 color[3], Uint32& rgbe)
     else if( m >= 1.7014118346046923173168730371588e+38f) // 2^127
         rgbe = 0xFFFFFFFFu;
     else {
-        const Uint32  e = float_as_uint( m) & 0x7F800000u;
-        const Float32 v = uint_as_float( 0x82800000u - e);
+        const Uint32  e = __float_as_uint( m) & 0x7F800000u;
+        const Float32 v = __uint_as_float( 0x82800000u - e);
 
         rgbe =  Uint32( c[0] * v)
              | (Uint32( c[1] * v) <<  8)
@@ -1034,8 +1034,8 @@ MI_HOST_DEVICE_INLINE void to_rgbe( const Float32 color[3], Uint8 rgbe[4])
     else if( m >= 1.7014118346046923173168730371588e+38f) // 2^127
         rgbe[0] = rgbe[1] = rgbe[2] = rgbe[3] = 255;
     else {
-        const Uint32  e = float_as_uint( m) & 0x7F800000u;
-        const Float32 v = uint_as_float( 0x82800000u - e);
+        const Uint32  e = __float_as_uint( m) & 0x7F800000u;
+        const Float32 v = __uint_as_float( 0x82800000u - e);
 
         rgbe[0] = Uint8( c[0] * v);
         rgbe[1] = Uint8( c[1] * v);
@@ -1053,12 +1053,12 @@ MI_HOST_DEVICE_INLINE void from_rgbe( const Uint8 rgbe[4], Float32 color[3])
     }
 
     const Uint32  e = (static_cast<Uint32>( rgbe[3]) << 23) - 0x800000u;
-    const Float32 v = uint_as_float( e);
+    const Float32 v = __uint_as_float( e);
     const Float32 c = static_cast<Float32>( 1.0 - 0.5/256.0) * v;
 
-    color[0] = uint_as_float( e | (static_cast<Uint32>( rgbe[0]) << 15)) - c;
-    color[1] = uint_as_float( e | (static_cast<Uint32>( rgbe[1]) << 15)) - c;
-    color[2] = uint_as_float( e | (static_cast<Uint32>( rgbe[2]) << 15)) - c;
+    color[0] = __uint_as_float( e | (static_cast<Uint32>( rgbe[0]) << 15)) - c;
+    color[1] = __uint_as_float( e | (static_cast<Uint32>( rgbe[1]) << 15)) - c;
+    color[2] = __uint_as_float( e | (static_cast<Uint32>( rgbe[2]) << 15)) - c;
 }
 
 /// Decodes a color from RGBE representation.
@@ -1071,12 +1071,12 @@ MI_HOST_DEVICE_INLINE void from_rgbe( const Uint32 rgbe, Float32 color[3])
     }
 
     const Uint32  e = (rgbe3 >> 1) - 0x800000u;
-    const Float32 v = uint_as_float( e);
+    const Float32 v = __uint_as_float( e);
     const Float32 c = static_cast<Float32>( 1.0 - 0.5/256.0) * v;
 
-    color[0] = uint_as_float( e | ((rgbe << 15) & 0x7F8000u)) - c;
-    color[1] = uint_as_float( e | ((rgbe <<  7) & 0x7F8000u)) - c;
-    color[2] = uint_as_float( e | ((rgbe >>  1) & 0x7F8000u)) - c;
+    color[0] = __uint_as_float( e | ((rgbe << 15) & 0x7F8000u)) - c;
+    color[1] = __uint_as_float( e | ((rgbe <<  7) & 0x7F8000u)) - c;
+    color[2] = __uint_as_float( e | ((rgbe >>  1) & 0x7F8000u)) - c;
 }
 
 

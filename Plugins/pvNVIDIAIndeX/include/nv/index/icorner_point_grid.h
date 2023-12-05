@@ -1,7 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
-/// Scene element representing corner-point grids.
+/// \file
+/// \brief Scene element representing corner-point grids.
 
 #ifndef NVIDIA_INDEX_ICORNER_POINT_GRID_H
 #define NVIDIA_INDEX_ICORNER_POINT_GRID_H

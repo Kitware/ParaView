@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/handle.h
 /// \brief Smart-pointer handle class for interfaces, const and non-const version.
@@ -10,6 +10,11 @@
 #include <mi/base/assert.h>
 #include <mi/base/config.h> // for MI_CXX_FEATURE_RVALUE_REFERENCES
 #include <mi/base/iinterface.h>
+
+#ifdef __cpp_variadic_templates
+#include <utility>
+#endif
+
 
 namespace mi {
 namespace base {
@@ -88,10 +93,10 @@ static const Dup_interface DUP_INTERFACE = 0;
 ///
 /// Note that this use case often shows up when you store a pointer passed in via a member function
 /// as a class member.
-/// 
-/// \if IRAY_API See also [:ipmlink handle_class %Handle class] for an extended example (and
-/// [:ipmlink reference_counting Reference counting] for the same example without handle class).
-/// \endif
+///
+/// \if IRAY_API See also [:ipmlink overview_of_library_design Handle class] for an extended
+/// example (and [:ipmlink overview_of_library_design Reference counting] for the same example
+/// without handle class). \endif
 /// \if DICE_API See also \ref mi_neuray_handle for an extended example (and \ref
 /// mi_neuray_refcounting for the same example without handle class). \endif
 /// \if MDL_SDK_API See also \ref mi_neuray_handle for an extended example (and \ref
@@ -100,7 +105,7 @@ static const Dup_interface DUP_INTERFACE = 0;
 ///    \par Include File:
 ///    <tt> \#include <mi/base/handle.h></tt>
 ///
-/// \sa
+/// \see
 ///     #make_handle() and #make_handle_dup() for creating a typed handle from a typed
 ///     interface %pointer
 template <class Interface>
@@ -128,6 +133,8 @@ public:
     typedef Interface& reference;
 
 private:
+    template <typename I2> friend class Handle;
+
     // Pointer to underlying interface, can be \c NULL
     Interface* m_iptr;
 
@@ -185,6 +192,14 @@ public:
     {
         other.m_iptr = 0;
     }
+
+    /// Converting move constructor.
+    template <class Interface2>
+    Handle( Handle<Interface2>&& other)
+      : m_iptr( other.m_iptr)
+    {
+        other.m_iptr = 0;
+    }
 #endif
 
     /// Swap two interfaces.
@@ -227,6 +242,18 @@ public:
             m_iptr = other.m_iptr;
             other.m_iptr = 0;
         }
+        return *this;
+    }
+
+    /// Converting move assignment operator, releases old interface.
+    template <class Interface2>
+    Self& operator=( Handle<Interface2>&& other)
+    {
+        if( m_iptr)
+            m_iptr->release();
+        m_iptr = other.m_iptr;
+        other.m_iptr = 0;
+
         return *this;
     }
 #endif
@@ -276,6 +303,28 @@ public:
         return ptr;
     }
 
+#ifdef __cpp_variadic_templates
+    /// Invokes the overload with this handle's interface type.
+    template <typename... T>
+    Self& emplace(T&&... args)
+    {
+        return emplace<Interface>(std::forward<T>(args)...);
+    }
+
+    /// Resets this handle to a new implementation instance.
+    ///
+    /// This function first releases the previous instance (if any) and then
+    /// allocates a new instance of \p Impl by invoking the constructor with
+    /// the provided arguments.
+    template <typename Impl, typename... T>
+    Self& emplace(T&&... args)
+    {
+        reset();
+        m_iptr = new Impl(std::forward<T>(args)...);
+        return *this;
+    }
+#endif
+
     /// The dereference operator accesses the interface.
     ///
     /// \pre is_valid_interface().
@@ -294,8 +343,9 @@ public:
         return m_iptr;
     }
 
-    /// Returns a new handle for a possibly different interface type, which is the equivalent of a
-    /// dynamic cast.
+    /// Returns a new handle for a possibly different interface type, similar to a dynamic cast,
+    /// but not necessarily restricted to derived interfaces, but also for otherwise related
+    /// interfaces.
     ///
     /// Returns a handle with an invalid interface if the requested interface type is not supported
     /// by the underlying interface implementation or if this interface is itself already invalid.
@@ -390,6 +440,20 @@ inline Handle<Interface> make_handle_dup( Interface* iptr)
 {
     return Handle<Interface>( iptr, DUP_INTERFACE);
 }
+
+#ifdef __cpp_variadic_templates
+/// Allocates a new instance of \p Impl and wraps it in a handle.
+///
+/// This function allocates a new instance of \p Impl by invoking its constructor with
+/// the provided arguments. The resulting pointer is wrapped in a handle.
+template <typename Impl, typename... T>
+inline Handle<Impl> construct_handle(T&&... args)
+{
+    return Handle<Impl>{new Impl(std::forward<T>(args)...)};
+}
+
+#endif
+
 
 /*@}*/ // end group mi_base_iinterface
 

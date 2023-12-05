@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cache manager.
@@ -19,8 +19,8 @@ namespace neuraylib {
 ///
 /// You cannot directly interact with the cache manager yourself. The purpose of this interface is
 /// to allow you to start a cache manager such that it can be used by other components, e.g., the
-/// Bridge, see #mi::bridge::IApplication::set_disk_cache() \if IRAY_API , or the Iray Bridge, see
-/// #mi::bridge::IIray_bridge_application::set_disk_cache() \endif .
+/// Bridge. See #mi::bridge::IApplication::set_disk_cache(). \if IRAY_API For the Iray Bridge, see
+/// #mi::bridge::IIray_bridge_application::set_disk_cache(). \endif
 ///
 /// \see #mi::neuraylib::ICache_manager_factory
 class ICache_manager : public
@@ -112,7 +112,7 @@ public:
 
     /// Enables or disables the usage of RDMA InfiniBand. 
     /// 
-    /// The default value is false (disabled).
+    /// The default value is \c false (disabled).
     /// 
     /// \see #get_use_rdma()
     ///

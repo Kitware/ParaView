@@ -1,6 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
+/// \brief User-defined AI/DL inference techniques.
 
 #ifndef NVIDIA_INDEX_IDISTRIBUTED_INFERENCE_TECHNIQUE_H
 #define NVIDIA_INDEX_IDISTRIBUTED_INFERENCE_TECHNIQUE_H
@@ -63,7 +65,7 @@ public:
     /// Returns optional configuration settings that may be used by the library
     /// for the session export mechanism provided by \c ISession::export_session().
     ///
-    /// \see IDistributed_data_import_strategy::get_configuration()
+    /// \see IDistributed_data_import_callback::get_configuration()
     ///
     /// \return             String representation of the configuration settings, the
     ///                     instance of the interface class keeps ownership of the returned pointer.

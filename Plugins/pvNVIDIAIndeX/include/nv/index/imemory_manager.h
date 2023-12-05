@@ -1,6 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
+/// \brief Memory management.
 
 #ifndef NVIDIA_INDEX_IMEMORY_MANAGER_H
 #define NVIDIA_INDEX_IMEMORY_MANAGER_H

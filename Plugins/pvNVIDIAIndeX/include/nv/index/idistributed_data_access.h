@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interfaces for accessing distributed data.
@@ -24,9 +24,9 @@ namespace index
 /// The access functionality facilitates an application to 
 /// operate and make use of the data distributed and uploaded  
 /// by NVIDIA IndeX to GPUs and nodes in the cluster environment. 
-/// User-defined computing algorithms, analyis techniques,
+/// User-defined computing algorithms, analysis techniques,
 /// data export strategies of
-/// todays or future workflows can make use of the distributed data 
+/// today's or future workflows can make use of the distributed data
 /// through the distributed data access interfaces.
 ///
 /// Distributed data can be queried from the
@@ -124,7 +124,7 @@ public:
 ///
 /// The access functionality, for instance, allows implementing
 /// user-defined computing algorithms operating on the distributed
-/// elevation data to facilitate todays and future workflow
+/// elevation data to facilitate today's and future workflow
 /// functionalities.
 ///
 /// The amount of elevation values queried from the

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of sparse volume datasets.
@@ -41,7 +41,8 @@ enum Sparse_volume_voxel_format
     SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_2,               ///< Vector voxel format with 2 components and float32 precision per component
     SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_4,               ///< Vector voxel format with 4 components and float32 precision per component
 
-    SPARSE_VOLUME_VOXEL_FORMAT_COUNT
+    SPARSE_VOLUME_VOXEL_FORMAT_COUNT,
+    SPARSE_VOLUME_VOXEL_FORMAT_INVALID = SPARSE_VOLUME_VOXEL_FORMAT_COUNT
 };
 
 /// Get the size in byte for a given sparse volume voxel data format.
@@ -68,6 +69,9 @@ inline mi::Sint32 get_sizeof(const nv::index::Sparse_volume_voxel_format fmt)
     case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT16:    return     sizeof(mi::Sint16);
     case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT16_2:  return 2 * sizeof(mi::Sint16);
     case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT16_4:  return 4 * sizeof(mi::Sint16);
+    case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT16:   return     sizeof(mi::Sint16);
+    case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT16_2: return 2 * sizeof(mi::Sint16);
+    case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT16_4: return 4 * sizeof(mi::Sint16);
     case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32:   return     sizeof(mi::Float32);
     case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_2: return 2 * sizeof(mi::Float32);
     case nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_4: return 4 * sizeof(mi::Float32);
@@ -179,9 +183,13 @@ public:
     ///  
     struct Data_brick_info
     {
-        mi::math::Vector_struct<mi::Sint32, 3>  brick_position;     ///< Position in volume local space of the
-                                                                    ///< the particular brick (on its level-of-detail).
-        mi::Uint32                              brick_lod_level;    ///< Level-of-detail of the particular brick.
+        mi::math::Vector_struct<mi::Sint32, 3>  brick_position;                 ///< Position in volume local space of the
+                                                                                ///< the particular brick (on its level-of-detail).
+        mi::math::Bbox_struct<mi::Sint32, 3>    brick_bbox_base_level_strict;   ///< Bbox of the brick in local space of the base-lod
+                                                                                ///< level without the coverage of the shared border voxels.
+        mi::math::Bbox_struct<mi::Sint32, 3>    brick_bbox_base_level_extended; ///< Bbox of the brick in local space of the base-lod
+                                                                                ///< level with the coverage of the shared border voxels.
+        mi::Uint32                              brick_lod_level;                ///< Level-of-detail of the particular brick.
     };
 
 public:
@@ -259,6 +267,8 @@ public:
     /// \returns    The subset-local volume-data brick index for the requested data LOD brick.
     ///
     virtual mi::Uint32                              get_lod_subset_data_brick_index(mi::Uint32 lod_brick_index) const = 0;
+
+    virtual mi::math::Matrix_struct<mi::Float32, 4, 4> get_dataset_transform() const = 0;
 };
 
 /// Distributed data storage class for sparse volume subsets.
@@ -477,6 +487,9 @@ public:
                                                 mi::Uint32      brick_attrib_idx,
                                                 const void*     brick_homog_value) = 0;
 
+    virtual const void*                     get_brick_homogeneous_value(
+                                                mi::Uint32      brick_subset_idx,
+                                                mi::Uint32      brick_attrib_idx) const = 0;
     /// Set a background value used in volume areas not covered by voxel or homogeneous brick data. The default
     /// background value is a zero value according to the attributes voxel format.
     /// 
@@ -489,6 +502,9 @@ public:
     virtual bool                            set_background_value(
                                                 mi::Uint32      attrib_idx,
                                                 const void*     background_value) = 0;
+
+    virtual const void*                     get_background_value(
+                                                mi::Uint32      attrib_idx) const = 0;
 
     /// Explicitly set the state of a data-brick in the subset.
     ///
@@ -514,7 +530,7 @@ public:
     /// This method allows to write a compact cache file of successfully loaded subset data to the file system
     /// for more efficient future loading operations.
     ///
-    /// \note: This API is currently not supported and will change in future releases.
+    /// \note This API is currently not supported and will change in future releases.
     ///
     /// \param[in]  output_filename     The file name for the data subset memory dump.
     ///
@@ -523,7 +539,7 @@ public:
     virtual bool store_internal_data_representation(const char* output_filename) const = 0;
     /// This method allows to load a compact cache file of a data subset.
     ///
-    /// \note: This API is currently not supported and will change in future releases.
+    /// \note This API is currently not supported and will change in future releases.
     ///
     /// \param[in]  input_filename      The file name of the cache file to be loaded.
     ///

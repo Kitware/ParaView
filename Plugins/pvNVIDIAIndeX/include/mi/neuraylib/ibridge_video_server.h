@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge video handling
@@ -301,7 +301,7 @@ public:
     virtual void video_context_closed( Sint32 reason) = 0;
 };
 
-/*@}*/ // end group mi_neuray_bridge_server
+/**@}*/ // end group mi_neuray_bridge_server
 
 } // namespace bridge
 

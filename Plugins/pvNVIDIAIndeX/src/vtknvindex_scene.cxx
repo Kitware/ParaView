@@ -1,4 +1,30 @@
-// SPDX-FileCopyrightText: Copyright (c) Copyright 2021 NVIDIA Corporation
+/* Copyright 2023 NVIDIA Corporation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// SPDX-FileCopyrightText: Copyright 2023 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
@@ -35,6 +61,178 @@
 #include "vtknvindex_rtc_kernel_params.h"
 #include "vtknvindex_sparse_volume_importer.h"
 #include "vtknvindex_volume_compute.h"
+
+namespace
+{
+
+unsigned int get_number_of_physical_cpus()
+{
+  vtksys::SystemInformation sys_info;
+  sys_info.RunCPUCheck();
+  unsigned int physical_cpus = sys_info.GetNumberOfPhysicalCPU();
+
+#if defined(MI_PLATFORM_LINUX) && !defined(MI_ARCH_X86_64)
+  if (physical_cpus > 1)
+  {
+    return physical_cpus;
+  }
+
+  // vtksys::SystemInformation::GetNumberOfPhysicalCPU() on Linux running on non-x86 architectures
+  // is unsupported and may always return 1. Hence, determine the number of physical CPU cores by
+  // reading directly from /sys.
+
+  //
+  // Retrieve list of CPUs that are online
+  //
+  const std::string error_prefix = "Could not determine the number of physical CPU cores: ";
+  const std::string sys_cpu_online = "/sys/devices/system/cpu/online";
+  std::string line;
+  {
+    std::ifstream f(sys_cpu_online, ios::in);
+    if (!f)
+    {
+      WARN_LOG << error_prefix << "Failed to open " << sys_cpu_online;
+      return 0;
+    }
+    std::getline(f, line);
+    f.close();
+  }
+
+  if (line.empty())
+  {
+    WARN_LOG << error_prefix << sys_cpu_online << " is empty.";
+    return 0;
+  }
+
+  std::set<int> online_cpus;
+  std::string current_num;
+  int range_start = -1;
+
+  // Process the CPU list that may look like "0,1,5-15"
+  for (char c : line + '\0') // add null to ensure proper processing of last entry
+  {
+    if (std::isdigit(c))
+    {
+      current_num += c;
+    }
+    else if (c == ',' || c == '-' || c == '\0')
+    {
+      if (current_num.empty())
+      {
+        WARN_LOG << error_prefix << "Expected a number "
+                 << (c == '\0' ? std::string("at the end") : std::string("before '") + c + "'")
+                 << " when parsing " << sys_cpu_online << ": '" << line << "'";
+        return 0;
+      }
+
+      const int num = std::stoi(current_num);
+      current_num = "";
+
+      if (c == '-')
+      {
+        if (range_start >= 0)
+        {
+          WARN_LOG << error_prefix << "Expected a number after '-' when parsing " << sys_cpu_online
+                   << ": '" << line << "'";
+          return 0;
+        }
+        range_start = num;
+      }
+      else
+      {
+        const int range_end = num;
+        if (range_start >= 0)
+        {
+          if (range_start > range_end)
+          {
+            // It should be "3-5" not "5-3"
+            WARN_LOG << error_prefix << "Invalid range when parsing " << sys_cpu_online << ": '"
+                     << line << "'";
+            return 0;
+          }
+        }
+        else
+        {
+          range_start = num; // Single value
+        }
+
+        for (int i = range_start; i <= range_end; ++i)
+        {
+          online_cpus.insert(i);
+        }
+
+        range_start = -1;
+      }
+    }
+    else
+    {
+      WARN_LOG << error_prefix << "Unexpected character '" << c << "' when parsing "
+               << sys_cpu_online << ": '" << line << "'";
+      return 0;
+    }
+  }
+
+  if (online_cpus.empty())
+  {
+    WARN_LOG << error_prefix << "Could not get online CPUs from " << sys_cpu_online << ": '" << line
+             << "'";
+    return 0;
+  }
+
+  //
+  // Determine the number of physical CPU cores.
+  // This is equivalent to running:
+  // cat /sys/devices/system/cpu/cpu[0-9]*/topology/{core_cpus,thread_siblings} | sort -u | wc -l
+  //
+  // See also:
+  // https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/ABI/stable/sysfs-devices-system-cpu
+  //
+  std::set<std::string> cpus_within_core;
+  for (int cpu_id : online_cpus)
+  {
+    const std::string dir = "/sys/devices/system/cpu/cpu" + std::to_string(cpu_id) + "/topology/";
+    std::ifstream f;
+
+    // "CPUs within the same core": Try current and deprecated name
+    for (const std::string filename : { "core_cpus", "thread_siblings" })
+    {
+      f.open(dir + filename, ios::in);
+      if (f)
+      {
+        break;
+      }
+    }
+
+    if (f)
+    {
+      std::string s;
+      if (std::getline(f, s) && !s.empty())
+      {
+        cpus_within_core.insert(s);
+      }
+    }
+    else
+    {
+      WARN_LOG << error_prefix << "Could not open " << dir << "{core_cpus,thread_siblings}";
+      return 0;
+    }
+
+    f.close();
+  }
+
+  physical_cpus = cpus_within_core.size();
+  if (physical_cpus == 0)
+  {
+    WARN_LOG << error_prefix << "Could not get core information for  " << sys_cpu_online << ": '"
+             << line << "'";
+  }
+
+#endif
+
+  return physical_cpus;
+}
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params& slice_params,
@@ -1256,18 +1454,42 @@ void vtknvindex_scene::update_config_settings(
     if (!is_success)
       ERROR_LOG << "Failed to set the subcube configuration.";
 
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 348900)
+    nv::index::IConfig_settings::Subdivision_config subdiv_config =
+      config_settings->get_subdivision_configuration();
+    subdiv_config.subdivision_mode =
+      nv::index::IConfig_settings::Subdivision_config::SUBDIVIDE_USING_KD_TREE;
+    subdiv_config.subdivision_part_count =
+      4; // TODO: Should this be set based on the number of GPUs when no MPI.
+#if 0
+    subdiv_config.save_subdivision = true;
+#endif
+
+    config_settings->set_subdivision_configuration(subdiv_config);
+#endif
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR >= 372500)
+    // Import all data subsets immediately, even when they are initially invisible.
+    config_settings->set_data_import_mode(nv::index::IConfig_settings::DATA_IMPORT_IMMEDIATE);
+#endif
+
     // Super sampling
     const mi::Uint32 rendering_samples = 1;
     config_settings->set_rendering_samples(rendering_samples);
 
-    // A good number for max spans is (no.of physical cpu cores/2).
-    vtksys::SystemInformation sys_info;
-    sys_info.RunCPUCheck();
-    mi::Uint32 nb_physical_cores = sys_info.GetNumberOfPhysicalCPU();
-    if (nb_physical_cores == 0)
-      nb_physical_cores = 8; // when information not available, assuming 8 cores.
-    config_settings->set_max_spans_per_machine(nb_physical_cores / 2);
+    // Enable automatic span control for compositing
     config_settings->set_automatic_span_control(true);
+
+    // Set an upper limit for the number of spans per host.
+    // A good number is (no. of physical cpu cores / 2).
+    static mi::Uint32 nb_physical_cores = get_number_of_physical_cpus(); // only run once
+    if (nb_physical_cores == 0)
+    {
+      nb_physical_cores = 8; // when no information is available, assume 8 CPU cores
+    }
+
+    const mi::Uint32 max_spans = std::max(1u, nb_physical_cores / 2);
+    config_settings->set_max_spans_per_machine(max_spans);
 
     // Data transfer configuration.
     // TODO: performance implications?

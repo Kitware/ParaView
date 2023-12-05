@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing object space and image space labels.
@@ -163,7 +163,8 @@ public:
         mi::Float32&                             width) const = 0;
 
     /// Compute the width of the label based on the given font.
-    /// Note: not yet implemented and supported!
+    ///
+    /// \todo Not yet implemented and supported!
     ///
     /// \param[in]      font    The font based on which the label width shall be computed.
     ///
@@ -257,7 +258,8 @@ public:
         mi::Float32&                             width) const = 0;
 
     /// Compute the width of the label based on the given font.
-    /// Note: not yet implemented and supported!
+    ///
+    /// \todo Not yet implemented and supported!
     ///
     /// \param[in]      font    The font based on which the label width shall be computed.
     ///

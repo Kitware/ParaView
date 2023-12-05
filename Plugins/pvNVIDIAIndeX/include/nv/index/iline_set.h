@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element for line geometry.
@@ -47,34 +47,34 @@ public:
     /// Available line styles for the line rendering
     enum Line_style
     {
-        ///
+        /// solid 
         LINE_STYLE_SOLID      = 0,
-        ///        
+        /// dashed  
         LINE_STYLE_DASHED     = 1,
-        ///
+        /// dotted
         LINE_STYLE_DOTTED     = 2,
-        ///
+        /// centered
         LINE_STYLE_CENTER     = 3,
-        ///
+        /// hidden
         LINE_STYLE_HIDDEN     = 4,
-        ///
+        /// phantom
         LINE_STYLE_PHANTOM    = 5,
-        ///
+        /// dashed with dots
         LINE_STYLE_DASHDOT    = 6,
-        ///
+        /// border
         LINE_STYLE_BORDER     = 7,
-        ///
+        /// divide
         LINE_STYLE_DIVIDE     = 8
     };
     
     /// Available cap styles for the line rendering
     enum Cap_style
     {
-        ///
+        /// flat
         CAP_STYLE_FLAT         = 0,
-        ///
+        /// square
         CAP_STYLE_SQUARE       = 1,
-        ///
+        /// round
         CAP_STYLE_ROUND        = 2
     };
 

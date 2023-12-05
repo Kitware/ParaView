@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Multi-view functionality
@@ -8,6 +8,7 @@
 #define NVIDIA_INDEX_IVIEWPORT_H
 
 #include <mi/dice.h>
+#include <nv/index/iindex_canvas.h>
 
 namespace nv {
 namespace index {

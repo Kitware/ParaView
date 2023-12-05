@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge server
@@ -819,7 +819,7 @@ public:
     ///
     /// The following optional exporter options are supported:
     /// - \c "recurse" of type #mi::IBoolean: If \c true, any elements referenced by the elements
-    ///   in the \p elements array are exported as well. Default: true.
+    ///   in the \p elements array are exported as well. Default: \c true.
     ///
     /// \param transaction         The transaction to use for the export.
     /// \param elements            The elements to export. Only supports element names as IString.
@@ -900,7 +900,7 @@ public:
         Size* o_size) = 0;
 };
 
-/*@}*/ // end group mi_neuray_bridge_server
+/**@}*/ // end group mi_neuray_bridge_server
 
 } // namespace bridge
 

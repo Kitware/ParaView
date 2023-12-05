@@ -1,4 +1,30 @@
-// SPDX-FileCopyrightText: Copyright (c) Copyright 2021 NVIDIA Corporation
+/* Copyright 2023 NVIDIA Corporation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// SPDX-FileCopyrightText: Copyright 2023 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
 #ifndef vtknvindex_utilities_h
@@ -8,8 +34,7 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef _WIN32
-#else // _WIN32
+#ifndef _WIN32
 #include <pwd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -28,25 +53,8 @@ namespace util
 typedef mi::math::Vector<mi::Sint32, 3> Vec3i;
 typedef mi::math::Vector<mi::Uint32, 3> Vec3u;
 
-typedef mi::math::Vector_struct<mi::Sint32, 3> Vec3i_struct;
-typedef mi::math::Vector_struct<mi::Uint32, 3> Vec3u_struct;
-
 typedef mi::math::Bbox<mi::Sint32, 3> Bbox3i;
 typedef mi::math::Bbox<mi::Uint32, 3> Bbox3u;
-
-typedef mi::math::Bbox_struct<mi::Sint32, 3> Bbox3i_struct;
-typedef mi::math::Bbox_struct<mi::Uint32, 3> Bbox3u_struct;
-
-//-------------------------------------------------------------------------------------------------
-// Helper macro. Checks whether the expression is true and if not prints a message and exits.
-#define check_success(expr)                                                                        \
-  {                                                                                                \
-    if (!(expr))                                                                                   \
-    {                                                                                              \
-      fprintf(stderr, "Error in file %s, line %d: \"%s\".\n", __FILE__, __LINE__, #expr);          \
-      exit(EXIT_FAILURE);                                                                          \
-    }                                                                                              \
-  }
 
 inline void sleep(mi::Float32 seconds)
 {
@@ -60,57 +68,6 @@ inline void sleep(mi::Float32 seconds)
   useconds_t micros = (useconds_t)(seconds * 1000000);
   ::usleep((useconds_t)micros);
 #endif // _WIN32
-}
-
-//-------------------------------------------------------------------------------------------------
-// Get current time.
-// \return get Float64 epoch time in second.
-inline mi::Float64 get_time()
-{
-#ifdef _WIN32
-  static bool init = false;
-  static mi::Float64 frequency;
-  if (!init)
-  {
-    //_tzset();
-    LARGE_INTEGER freq;
-    QueryPerformanceFrequency(&freq);
-    frequency = (mi::Float64)freq.QuadPart;
-    init = true;
-  }
-  LARGE_INTEGER counter;
-  QueryPerformanceCounter(&counter);
-
-  return (mi::Float64)counter.QuadPart / frequency;
-#else
-  timeval tv;
-  gettimeofday(&tv, nullptr);
-  return static_cast<mi::Float64>(tv.tv_sec) + (static_cast<mi::Float64>(tv.tv_usec) * 1.0e-6);
-#endif
-}
-
-//----------------------------------------------------------------------
-// Retrieves the host name of this machine.
-// \return Returns the host name of this machine.
-inline std::string get_host_name()
-{
-  std::string host_name = "unknown";
-#ifdef LINUX
-  char buf[256];
-  if (gethostname(buf, sizeof(buf)) == 0)
-    host_name = buf;
-#else
-  char* host_name_env = getenv("HOSTNAME");
-  if (host_name_env == nullptr)
-    host_name_env = getenv("HOST");
-
-  if (host_name_env != nullptr)
-    host_name = host_name_env;
-// else
-//    INFO_LOG << "Environment variable 'HOSTNAME' or 'HOST' not set on host.";
-#endif // LINUX
-
-  return host_name;
 }
 
 #ifndef _WIN32
@@ -231,6 +188,7 @@ inline void deserialize(mi::neuraylib::IDeserializer* deserializer, std::string&
     target.clear();
   }
 }
+
 }
 } // vtknvindex::util
 

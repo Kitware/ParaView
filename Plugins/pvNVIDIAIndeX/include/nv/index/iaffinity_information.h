@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Defines the affinity of spatial areas to machines/GPUs in the cluster.
@@ -43,7 +43,8 @@ public:
     /// Flags for setting specific affinity modes.
     enum Affinity_flags
     {
-        ANY_GPU = 0xffffffff ///< The GPU should be assigned automatically.
+        ANY_GPU = 0xffffffffu,  ///< The GPU should be assigned automatically.
+        ANY_HOST = 0u           ///< The host should be assigned automatically.
     };
 
     /// Defines the affinity for a subregion with the given bounding box. The
@@ -145,7 +146,7 @@ class IDomain_specific_subdivision_topology :
                                        nv::index::IDomain_specific_subdivision>
 {
 public:
-    /// Subdivision schemes can rely on different topyologies
+    /// Subdivision schemes can rely on different topologies
     enum Topology_type 
     {
         TOPO_KD_TREE,   ///<! Kd-tree based topology.
