@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/version.h
 /// \brief Major and minor version number and an optional qualifier.
@@ -73,6 +73,8 @@
 #define MI_MATH_VERSION_QUALIFIED_STRING  MI_MATH_VERSION_STRING "-" MI_MATH_VERSION_QUALIFIER
 #endif // MI_MATH_VERSION_QUALIFIER_EMPTY
 
-/*@}*/ // end group mi_math_version
+/**
+@}
+*/ // end group mi_math_version
 
 #endif // MI_MATH_VERSION_H

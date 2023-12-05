@@ -1,4 +1,30 @@
-// SPDX-FileCopyrightText: Copyright (c) Copyright 2021 NVIDIA Corporation
+/* Copyright 2023 NVIDIA Corporation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// SPDX-FileCopyrightText: Copyright 2023 NVIDIA Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <vector>
@@ -57,8 +83,16 @@ void normalize(const mi::math::Vector<mi::Float32, 2>& input_range,
   const mi::math::Vector<mi::Float32, 2>& scale_range,
   mi::math::Vector<mi::Float32, 2>& output_range)
 {
+  // unsigned scalar data: normalize to [0.0, 1.0]
   output_range.x = (input_range.x - scale_range.x) / (scale_range.y - scale_range.x);
   output_range.y = (input_range.y - scale_range.x) / (scale_range.y - scale_range.x);
+
+  if (scale_range.x < 0.f)
+  {
+    // signed scalar data: normalize to [-1.0, 1.0]
+    output_range = (output_range - mi::math::Vector<mi::Float32, 2>(0.5f)) *
+      mi::math::Vector<mi::Float32, 2>(2.f);
+  }
 }
 
 } // namespace
@@ -95,7 +129,6 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   if (scalar_type != "float" && scalar_type != "double" && scalar_type != "int" &&
     scalar_type != "unsigned int")
   {
-    // The scalar type is float or is internally converted to float (e.g. for "int")
     mi::math::Vector<mi::Float32, 2> scalar_range;
     regular_volume_properties->get_scalar_range(scalar_range);
 
@@ -105,6 +138,7 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   }
   else
   {
+    // The scalar type is float or is internally converted to float (e.g. for "int")
     domain_range = mi::math::Vector<mi::Float32, 2>(colormap_range);
   }
 

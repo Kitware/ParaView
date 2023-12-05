@@ -1,123 +1,727 @@
 END USER LICENSE AGREEMENT
-Release Date: June 14th, 2018
+Release Date: June 14th, 2018 (Revised October 10, 2022)
 
 NVIDIA SOFTWARE END-USER LICENSE AGREEMENT
 
-IMPORTANT – READ BEFORE DOWNLOADING, INSTALLING, COPYING OR USING THE LICENSED SOFTWARE
+IMPORTANT - READ BEFORE DOWNLOADING, INSTALLING, COPYING OR USING THE
+LICENSED SOFTWARE
 
-READ CAREFULLY: This Enterprise End User License Agreement ("EULA”), made and entered into as of the time and date of click through action (“Effective Date”), is a legal agreement between you (“You” or “Your”) and the NVIDIA Corporation ("NVIDIA") and governs the use of the NVIDIA computer software installed on Your premises and the documentation made available for use with such NVIDIA software. By downloading, installing, copying, or otherwise using the NVIDIA software and/or documentation, You agree to be bound by the terms of this EULA. If You do not agree to the terms of this EULA, do not download, install, copy or use the NVIDIA software or documentation. IF YOU ARE ENTERING INTO THIS EULA ON BEHALF OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE LEGAL AUTHORITY TO BIND THE ENTITY TO THIS EULA, IN WHICH CASE “YOU” WILL MEAN THE ENTITY YOU REPRESENT. IF YOU DON’T HAVE SUCH AUTHORITY, OR IF YOU DON’T ACCEPT ALL THE TERMS AND CONDITIONS OF THIS EULA, THEN NVIDIA IS UNWILLING TO LICENSE THE SOFTWARE OR DOCUMENTATION TO YOU, AND YOU MAY NOT DOWNLOAD, INSTALL, COPY OR USE THEM. 
+READ CAREFULLY: This Enterprise End User License Agreement ("EULA"), made and entered
+into as of the time and date of click through action ("Effective Date"), is a legal agreement
+between you ("You" or "Your") and the NVIDIA Corporation ("NVIDIA") and governs the use of
+the NVIDIA computer software installed on Your premises and the documentation made
+available for use with such NVIDIA software. By downloading, installing, copying, or otherwise
+using the NVIDIA software and/or documentation, You agree to be bound by the terms of this
+EULA. If You do not agree to the terms of this EULA, do not download, install, copy or use the
+NVIDIA software or documentation. IF YOU ARE ENTERING INTO THIS EULA ON BEHALF
+OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE
+LEGAL AUTHORITY TO BIND THE ENTITY TO THIS EULA, IN WHICH CASE "YOU" WILL
+MEAN THE ENTITY YOU REPRESENT. IF YOU DON'T HAVE SUCH AUTHORITY, OR IF
+YOU DON'T ACCEPT ALL THE TERMS AND CONDITIONS OF THIS EULA, THEN NVIDIA IS
+UNWILLING TO LICENSE THE SOFTWARE OR DOCUMENTATION TO YOU, AND YOU
+MAY NOT DOWNLOAD, INSTALL, COPY OR USE THEM.
 
-1	DEFINITIONS.  Certain capitalized terms, if not otherwise defined elsewhere in the EULA, shall have the meanings set forth below in this Section 1. 
-1.1	“Confidential Information” means the Licensed Software, and any NVIDIA business, marketing, pricing, research and development, know-how, technical, scientific, financial status, proposed new products or other information disclosed by NVIDIA to You which, at the time of disclosure, is designated in writing as confidential or proprietary (or like written designation), or orally identified as confidential or proprietary or is otherwise reasonably identifiable by parties exercising reasonable business judgment, as confidential. Confidential Information does not and will not include information that: (i) is or becomes generally known to the public through no fault of or breach of this EULA by the receiving party; (ii) is rightfully known by the receiving party at the time of disclosure without an obligation of confidentiality; (iii) is independently developed by the receiving party without use of the disclosing party’s Confidential Information; or (iv)is rightfully obtained by the receiving party from a third party without restriction on use or disclosure. 
-1.2	“Documentation” means the NVIDIA documentation made available for use with the Software, including (without limitation) user manuals, operations instructions, installation guides, release notes, utility programs and other materials provided to You under this EULA. 
-1.3	“Enterprise” means You or any company or legal entity for which You accepted the terms of this EULA, and their subsidiaries of which Your company or legal entity owns more than fifty percent (50%) of the issued and outstanding equity. 
-1.4	“Feedback” means any and all suggestions, feature requests, comments or other feedback relating to the Licensed Software, including possible enhancements or modifications thereto. 
-1.5	“Intellectual Property Rights” means all patent, copyright, trademark, trade secret, trade dress, trade names, utility models, mask work, moral rights, rights of attribution or integrity service marks, master recording and music publishing rights, performance rights, author’s rights, database rights, registered design rights and any applications for the protection or registration of these rights, or other intellectual or industrial property rights or proprietary rights, howsoever arising and in whatever media, whether now known or hereafter devised, whether or not registered, (including all claims and causes of action for infringement, misappropriation or violation and all rights in any registrations and renewals), worldwide and whether existing now or in the future. 
-1.6	“License Term” means the fixed term of a Software license granted under this EULA as specified in the Order. 
-1.7	“Licensed Software” means both Software and Documentation. 
-1.8	“MDL Materials” means the definitions and materials using the NVIDIA Material Definition Language (MDL). 
-1.9	“Open Source License” includes, without limitation, a software license that requires as a condition of use, modification, and/or distribution of such software that the Software be (i) disclosed or distributed in source code form; (ii) be licensed for the purpose of making derivative works; or (iii) be redistributable at no charge. 
-1.10	“Order” means a purchase order issued by You, a signed purchase agreement with You, or other ordering document issued by You to NVIDIA or an NVIDIA authorized reseller (including any on-line acceptance process) that references and incorporates this EULA and is accepted by NVIDIA. 
-1.11	“Services” has the meaning assigned to it in Exhibit A. 
-1.12	“Software” means the NVIDIA software programs licensed to You under this EULA. Software includes the MDL Materials. 
-2	LICENSE. 
-2.1	License Grant. Conditional on payment of the appropriate fee for the license to the Licensed Software (as may be set out in an Order), NVIDIA hereby grants You a non-exclusive, non-transferable license, without the right to sublicense (except as expressly set forth in this Section), during the License Term (subject to the termination rights described below): 
-(i)	to install and have a single user within Your Enterprise use the Software (other than MDL Materials) on one computer owned or controlled by You and at one location at any one time in accordance with the Documentation and make copies of the Software (other than MDL Materials) solely for backup or archival purposes; 
-(ii)	to use the Documentation in connection with Your use of the Software; 
-(iii)	to install and have any number of users within Your Enterprise, as permitted under the license purchased, use, modify, translate, adapt, arrange, or create derivative works of the MDL Materials on any number of computers owned or controlled by You in accordance with the Documentation and make copies of the MDL Materials for backup or archival and for distribution purposes (but only so long as you do not remove any of the contents of the MDL Materials); and 
-(iv)	to sub-license and distribute the MDL Materials (unmodified, or as so modified) in connection with Your use of other Software licensed hereunder, and authorize others to use and distribute the MDL Materials (unmodified, or as so modified) in connection with their use of material of Yours that You distribute to them, provided all such distributions are consistent with the terms under which You are permitted to distribute MDL Materials and provided further that such use by others (and distribution) is solely for the purposes only of enabling such others to render images based on material as modified by You.
-In connection with Your distribution of MDL Materials, You must enter into enforceable agreements that pass down terms that are consistent with the terms set forth in this EULA for use of such MDL Materials, including (without limitation) terms relating to the license grant and license restrictions, confidentiality and protection of NVIDIA’s Intellectual Property Rights in and to the MDL Materials. You are liable for the distribution of MDL Materials provided under this EULA in violation of Your distribution rights. 
-Notwithstanding the foregoing, NVIDIA is not obligated to provide you any source code of the MDL Materials beyond that made generally available by NVIDIA to its licensees. You acknowledge that this EULA does not grant You any right or license under or relating to any patent and that the Licensed Software may be subject to patent rights held by unaffiliated third-parties. No Orders are binding on NVIDIA until accepted by NVIDIA. Your Orders are subject to this EULA. 
-2.1.1	Evaluation License. With respect to any license to a Licensed Software provided to You under this EULA and indicated to be a license for evaluation purposes only, You may only exercise the rights granted under Section 2.1 as modified by this section and Section 2.1.4 for internal evaluation and demonstration purposes only and such licenses expire 90 days from the date of commencement. 
-2.1.2	Educational/Academic License. With respect to any license to a Licensed Software provided to You under this EULA and indicated to be an Educational/Academic License, You may only exercise the rights granted under Section 2.1 as modified by this section and Section 2.1.4 for internal educational purposes only and all users must be enrolled or employed by an academic institution. If you do not meet this qualification, you have no rights under this license. 
-2.1.3	Research & Development License. With respect to any license to a Licensed Software provided to You under this EULA and indicated to be a Research & Development License, You may only exercise the rights granted under Section 2.1 as modified by this section and Section 2.1.4 for internal research and development purposes only. 
-2.1.4	The following terms apply to licenses granted under Sections 2.1.1, 2.1.2 and 2.1.3 These licenses (a) do not include any right or license to use the Licensed Software or its output in any way in any public release, however limited, and/or in any manner that provides third parties with use of or access to any output from the Licensed Software, except that sub-license and distribution of MDL Materials are permitted as provided in Section 2.1; (c) NVIDIA does not provide any Services, if applicable, (notwithstanding that the license may be a time based license); and (d) notwithstanding any contrary terms in Section 6 below, NVIDIA HAS NO LIABILITY TO YOU UNDER THIS EULA FOR ANY DIRECT DAMAGES ARISING FROM OR RELATING TO THE USE OF A LICENSED SOFTWARE. 
-2.1.5	Authorization Code: If the Licensed Software requires an authorization code, you must register Your purchase of this Licensed Software with NVIDIA before an authorization code shall be issued to You, and NVIDIA shall maintain Your registration details in conformance with its privacy policy. 
-2.2	Enterprise Usage. You are responsible for the compliance with the terms and conditions of this EULA by Your Enterprise. Any act or omission that if committed by You would constitute a breach of this EULA shall be deemed to constitute a breach of this EULA if committed by another party to Your Enterprise. 
-2.3	Support Services.  If Your Order includes Services for the Licensed Software, then the supply of such Services shall be governed by the terms of Exhibit A and the NVIDIA Software Service Supplemental Terms (as further described in Exhibit A). In the event that You have an agreement with a NVIDIA reseller for the same Services described in Exhibit A for a Licensed Software, the Exhibit A does not apply and such Services are delivered to You pursuant to the terms of Your agreement with the NVIDIA reseller. 
-2.4	Limited Rights. Your rights in the Licensed Software are limited to those expressly granted in Section 2.1 and no other licenses are granted whether by implication, estoppel or otherwise. NVIDIA reserves all other rights, title and interest in and to the Licensed Software not expressly granted to You under this EULA. 
-2.5	License Restrictions. Except as expressly authorized above in relation to the MDL Materials, You agree that You will not (nor allow third parties to): (i) reverse engineer, decompile, disassemble (except to the extent applicable laws specifically requires that such activities be permitted) or attempt to derive the source code, underlying ideas, algorithm or structure of Software provided to You in object code form; (ii) sell, distribute, rent, loan, lease, sub-license or otherwise make available the Licensed Software to third parties; (iii) make its functionality available to third parties (a) as an application services provider or service bureau; (b) by operating hosted/virtual system environments; (c) by hosting, time sharing or providing any other type of services; or (d) otherwise by means of the internet (iii) modify, translate or otherwise create any derivative works of any of the Licensed Software; (iv) remove, alter, cover or obscure any proprietary notice that appears on or with the Licensed Software or any copies thereof; (v) use the Licensed Software, or allow its use, transfer, transmission or export in violation of any export control laws or regulations administered by the United States government; (vi) distribute, permit access to, or sublicense the Licensed Software as a stand-alone product; (vii) sell, transfer, sublicense or assign the Licensed Software to any third party; (viii) use the Licensed Software for the purpose of developing competing products or technologies or assisting a third party in such activities; (ix) utilize any equipment, device, software, or other means designed to circumvent or remove any form of copy protection used by NVIDIA in connection with the Licensed Software, or use the Licensed Software together with any authorization code, serial number, or other copy protection device not supplied by NVIDIA directly or through an authorized reseller; (x) use the Licensed Software in any manner that would cause the Licensed Software to become subject to an Open Source License; or (xi) distribute any modified MDL definition supplied to You under or by reference to the same name as used by NVIDIA. Nothing in this EULA shall be construed to give You a right to use, or otherwise obtain access to, any source code from which the Software or any portion thereof is compiled or interpreted. 
-2.6	Critical Applications. You will not use the Licensed Software in any application where the use or failure of the Software could cause a life-threatening event or result in catastrophic damages, including (but not limited to) medical, nuclear, aviation, navigation, or military applications, and You agree to defend, indemnify, and hold NVIDIA harmless against any loss, liability, cost or damage of any kind that NVIDIA incurs as a result of a breach of the foregoing covenant. 
-2.7	Third Party License Obligations.  You acknowledge and agree that the Licensed Software may include or incorporate third party technology (collectively “Third Party Components”), which are provided for use in or with the Software and not otherwise used separately. If the Licensed Software includes or incorporates Third Party Components, then the third-party pass-through terms and conditions (“Third Party Terms”) for the particular Third Party Component contained in or included with the Licensed Software shall be incorporated by reference into this EULA. In the event of any conflict between the terms in this EULA and the Third Party Terms, the Third Party Terms shall govern. Copyright to Third Party Components are held by the copyright holders indicated in the copyright notices indicated in the corresponding Documentation. More specifically, certain of the Third Party Materials are governed by open-source software license agreements, including the GNU Lesser General Public License. 
-3	CONFIDENTIALITY. 
-3.1	Each party will not use the other party’s Confidential Information, except as necessary for the performance of this EULA, and will not disclose such Confidential Information to any third party, except to those of its employees, employees of its Enterprise and Contractors that have a need to know such Confidential Information for the performance of this EULA, provided that each such employee and Contractor is subject to a written agreement that includes confidentiality obligations consistent with those set forth herein. Each party will use all reasonable efforts to maintain the confidentiality of all of the other party’s Confidential Information in its possession or control, but in no event less than the efforts that it ordinarily uses with respect to its own Confidential Information of similar nature and importance. The foregoing obligations will not restrict either party from disclosing the other party’s Confidential Information or the terms and conditions of this EULA as required under applicable securities regulations or pursuant to the order or requirement of a court, administrative agency, or other governmental body, provided that the party required to make such a disclosure (i) gives reasonable notice to the other party to enable it to contest such order or requirement prior to its disclosure (whether through protective orders or otherwise), (ii) uses reasonable effort to obtain confidential treatment or similar protection to the fullest extent possible to avoid public disclosure of the terms of this EULA, and (iii) discloses only the minimum amount of information necessary to comply with such requirements. 
-4	OWNERSHIP AND FEEDBACK. 
-4.1	Ownership. You are not obligated to disclose to NVIDIA any modifications You make to MDL Materials. The Licensed Software, all modifications to Licensed Software and all the Intellectual Property Rights therein are and will remain the sole and exclusive property of NVIDIA and its licensors, whether the Software or Documentation are separate from or combined with any other products or materials. All Your modifications to MDL Materials are licensed to You subject to the terms of this EULA. You shall not knowingly engage in any act or omission that would impair NVIDIA’s and/or its licensors’ Intellectual Property Rights in the Licensed Software or any other materials, information, processes or subject matter proprietary to NVIDIA. NVIDIA’s licensors are intended third party beneficiaries with the right to enforce provisions of this EULA with respect to their Confidential Information and/or Intellectual Property Rights. You will reproduce on each copy You make of the Software and Documentation, and not alter, remove or obscure, the Intellectual Property Rights notices of NVIDIA and its licensors that may appear on the Software and Documentation. 
-4.2	Feedback. You have no obligation to give NVIDIA any Feedback. However, NVIDIA may use and include any Feedback that You voluntarily provide to improve the Licensed Software or other related NVIDIA products, technologies or materials. Accordingly, if You provide Feedback, You agree that NVIDIA and its licensees may freely use, reproduce, license, distribute, and otherwise commercialize the Feedback in the Licensed Software or other related technologies without the payment of any royalties or fees to You. Further, NVIDIA is entitled to use any information provided by You in connection with Feedback for any purpose, including in any NVIDIA products. All Feedback becomes the sole property of NVIDIA and may be used in any manner NVIDIA sees fit, and You hereby assign to NVIDIA all of Your right, title and interest in and to any Feedback. NVIDIA has no obligation to respond to Feedback or to incorporate Feedback into the Licensed Software. 
-5	NO WARRANTIES. 
-5.1	THE LICENSED SOFTWARE, AND ANY OTHER SOFTWARE, MATERIALS, CONFIDENTIAL INFORMATION AND/OR SERVICES PROVIDED BY NVIDIA ARE PROVIDED “AS IS” AND “WITH ALL FAULTS,” AND NVIDIA EXPRESSLY DISCLAIMS ALL OTHER WARRANTIES OF ANY KIND OR NATURE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES OF OPERABILITY, CONDITION, VALUE, ACCURACY OF DATA, OR QUALITY, AS WELL AS ANY WARRANTIES OF MERCHANTABILITY, SYSTEM INTEGRATION, WORKMANSHIP, SUITABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR THE ABSENCE OF ANY DEFECTS THEREIN, WHETHER LATENT OR PATENT. NO WARRANTY IS MADE BY NVIDIA ON THE BASIS OF TRADE USAGE, COURSE OF DEALING OR COURSE OF TRADE. NVIDIA DOES NOT WARRANT THAT THE LICENSED SOFTWARE OR ANY OTHER SOFTWARE, MATERIALS, CONFIDENTIAL INFORMATION AND/OR SERVICES PROVIDED UNDER THIS EULA WILL MEET YOUR REQUIREMENTS OR THAT THE OPERATION THEREOF WILL BE UNINTERRUPTED OR ERROR-FREE, OR THAT ALL ERRORS WILL BE CORRECTED. YOU ACKNOWLEDGE THAT NVIDIA’S OBLIGATIONS UNDER THIS EULA ARE FOR THE BENEFIT OF YOU ONLY. 
-6	LIMITATION OF LIABILITY. 
-6.1	Limitation of Liability.  TO THE MAXIMUM EXTENT PERMITTED BY LAW, NVIDIA SHALL NOT BE LIABLE FOR ANY SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES (INCLUDING, WITHOUT LIMITATION, LOST PROFITS, LOSS OF USE, LOSS OF DATA OR LOSS OF GOODWILL), OR THE COSTS OF PROCURING SUBSTITUTE PRODUCTS, ARISING OUT OF OR IN CONNECTION WITH THIS EULA OR THE USE OR PERFORMANCE OF THE LICENSED SOFTWARE, AND ANY OTHER SOFTWARE, MATERIALS, CONFIDENTIAL INFORMATION AND/OR SERVICES PROVIDED BY NVIDIA HEREUNDER, WHETHER SUCH LIABILITY ARISES FROM ANY CLAIM BASED UPON BREACH OF CONTRACT, BREACH OF WARRANTY, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR ANY OTHER CAUSE OF ACTION OR THEORY OF LIABILITY AND WHETHER OR NOT NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO EVENT WILL NVIDIA’S TOTAL CUMULATIVE LIABILITY UNDER OR ARISING OUT OF THIS EULA EXCEED THE NET AMOUNTS RECEIVED BY NVIDIA FOR YOUR USE OF THE PARTICULAR LICENSED SOFTWARE DURING THE TWELVE (12) MONTHS BEFORE THE LIABILITY AROSE. THE NATURE OF THE LIABILITY, THE NUMBER OF CLAIMS OR SUITS OR THE NUMBER OF PARTIES WITHIN YOUR ENTERPRISE THAT ACCEPTED THE TERMS OF THIS EULA SHALL NOT ENLARGE OR EXTEND THIS LIMIT. THE FOREGOING LIMITATIONS SHALL APPLY REGARDLESS OF WHETHER NVIDIA OR ITS LICENSORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF WHETHER ANY REMEDY FAILS ITS ESSENTIAL PURPOSE. 
-6.2	Further Limitations. NVIDIA’s licensors shall have no liability of any kind under this EULA. The disclaimers, exclusions and limitations of liability set forth in this EULA form an essential basis of the bargain between the parties, and, absent any of such disclaimers, exclusions or limitations of liability, the provisions of this EULA, including, without limitation, the economic terms, would be substantially different. You may not bring a claim under this EULA more than eighteen (18) months after the cause of action arises. 
-7	TERM AND TERMINATION. 
-7.1	EULA, Licenses and Services. This EULA shall become effective upon the Effective Date and shall continue until Your last access or use of the Licensed Software and/or Services hereunder, unless earlier terminated by the parties as provided in this Section 7. Each Licensed Software license commences upon delivery and ends at the earlier of (a) the expiration of the applicable License Term, or (b) termination of such license or this EULA. Services for the Licensed Software shall co-term with the associated license and no credit or refund will be provided upon the expiration or termination of the associated license for any Service fees paid. 
-7.2	Termination.  Either party may terminate this EULA, Licensed Software licenses and/or Services at any time: (i) in the event that the other party breaches any material term of this EULA and fails to cure such breach within thirty (30) days following notice thereof from the non-breaching party, or within ten (10) days following notice thereof in the event You breach any payment-related obligation; or (ii) upon written notice if the other party becomes the subject of a voluntary or involuntary petition in bankruptcy or any proceeding relating to insolvency, receivership, liquidation or composition for the benefit of creditors, if that petition or proceeding is not dismissed with prejudice within sixty (60) days after filing, or ceases to do business. Termination of this EULA, a license or a Service hereunder shall not release the parties from any liability which, at the time of termination, has already accrued or which thereafter may accrue with respect to any act or omission before termination, or from any obligation which is expressly stated in this EULA to survive termination. Notwithstanding the foregoing, the party terminating this EULA, a license or a Service as permitted by any provision in this Section 7 shall incur no additional liability merely by virtue of such termination. Termination of this EULA, a license or a Service regardless of cause or nature, shall be without prejudice to any other rights or remedies of the parties and shall be without liability for any loss or damage occasioned thereby. 
-7.3	Effect of Expiration or Termination.  Upon any expiration or termination of this EULA, a license or a Service provided hereunder, (i) You must promptly discontinue use of the affected Licensed Software and/or Service, and (ii) in the case of a license expiration or termination, You must promptly destroy or return to NVIDIA all copies of the affected Licensed Software and all portions thereof, and each party will promptly destroy or return to the other all of the other party’s Confidential Information within its possession or control. Upon written request, You will certify in writing that You have complied with your obligations under this section. Sections 1, 2.4 through 2.7, 3, 4, 5, 6, 7, and 8 will survive the expiration or termination of this EULA for any reason. 
-8	GENERAL PROVISIONS. 
-8.1	Assignment.  This EULA and the rights and obligations hereunder may not be assigned, delegated or transferred by You, in whole or in part, including by merger, consolidation, dissolution, operation of law, or any other manner, without written consent of NVIDIA, and any purported assignment in violation of this provision shall be void and of no effect. Subject to the foregoing, this Agreement will bind and inure to the benefit of each party's permitted successors and assigns. 
-8.2	Audit. During the term of this EULA and for a period of three (3) years thereafter, You will maintain complete and accurate books and records regarding use of the Licensed Software and Your performance and administration of this EULA.  During such period, NVIDIA or its authorized third party auditors will have the right to inspect and audit Your Enterprise books and records for the purpose of confirming Your compliance with the terms of this EULA. Any such inspection and audit will be conducted during regular business hours and in a manner that minimizes interference with Your normal business activities. If such an inspection and audit reveals an underpayment of any amounts payable to NVIDIA, then You will promptly remit the full amount of such underpayment to NVIDIA, including interest that will accrue (without the requirement of a notice) at the lower of 1.5% per month or the highest rate permissible by law. If the underpaid amount exceeds five percent (5%) of the amounts payable to NVIDIA for the period audited and/or such an inspection and audit reveals a material non-conformance with the terms of this EULA, then You will also pay NVIDIA’s reasonable costs of conducting the inspection and audit. Further, You agree that the party delivering the Licensed Software to You may collect and disclose to NVIDIA (subject to confidentiality obligations) information for NVIDIA to verify Your compliance with the terms of this EULA including (without limitation) information regarding Your usage of the Licensed Software. 
-8.3	Governing Law; Jurisdictions.  This EULA will be governed by and construed in accordance with the laws of the State of Delaware and the United States without regard to the conflicts of law provisions thereof. The parties expressly agree that the United Nations Convention on Contracts for the International Sale of Goods will not apply.  Any legal action or proceeding arising under this EULA will be brought exclusively in the federal courts located in the Northern District of California or the state courts located in Santa Clara County and the parties hereby irrevocably consent to the personal jurisdiction and venue therein. The prevailing party in any action to enforce this EULA shall be entitled to recover costs and expenses including, without limitation, reasonable attorney’s fees. 
-8.4	Nonexclusive Remedy.  Except as expressly set forth in this EULA, the exercise by either party of any of its remedies under this EULA will be without prejudice to its other remedies under this EULA or otherwise. 
-8.5	Injunctive Relief. The parties agree that a material breach of any of the promises or agreements contained in this EULA adversely affecting NVIDIA’s Intellectual Property Rights in the Licensed Software may result in irreparable and continuing injury to NVIDIA for which monetary damages would not be an adequate remedy and NVIDIA is therefore entitled to seek injunctive relief as well as such other and further relief as may be appropriate. 
-8.6	Conflicts; Order of Precedence.  Any printed or other terms and conditions on an Order or similar order document conflicting and/or in addition with the terms and conditions of this EULA or its exhibits and addenda shall be of no force or effect. In the event of a conflict or inconsistency between any exhibit and this EULA, the conflict or inconsistency shall be resolved in favor of this EULA. 
-8.7	Waiver.  The failure by either party to enforce its rights under this EULA at any time for any period will not constitute a waiver of future enforcement of that right or any other right. Any waiver will be effective only if in writing and signed by duly authorized representatives of each party. 
-8.8	Severability. If for any reason a court of competent jurisdiction finds any provision of this EULA invalid or unenforceable, that provision of the EULA will be enforced to the maximum extent permissible so as to effect the intent of the parties, and the other provisions of this EULA will remain in full force and effect. 
-8.9	U.S. Government Legend. You agree and certify that You will comply with all laws, regulations, rules, and other requirements applicable to transaction(s) with any government(s) occurring pursuant to this EULA and all related matters (“Government Transaction(s)”). You shall defend, indemnify and hold harmless NVIDIA, its subsidiaries, their directors, officers, employees and agents from and against all actions, causes of action, liabilities, claims, suits, judgments, liens, awards and damages, of any kind and nature whatsoever, arising from or related to Your failure to comply with the obligations under this section and for any expenses, costs of litigation and attorney's fees related thereto or incident to establishing the right of indemnification. The Licensed Software has been developed entirely at private expense and is commercial computer software provided with RESTRICTED RIGHTS. Use, duplication or disclosure by the U.S. Government or a U.S. Government subcontractor is subject to the restrictions set forth in the agreement under which Licensed Software was obtained pursuant to DFARS 227.7202-3(a) or as set forth in subparagraphs (c)(1) and (2) of the Commercial Computer Software - Restricted Rights clause at FAR 52.227-19, as applicable. Contractor/manufacturer is NVIDIA, 2701 San Tomas Expressway, Santa Clara, CA 95050. 
-8.10	Force Majeure.  Neither party will be responsible for any failure or delay in its performance under this EULA (except for any payment obligations) to the extent due to causes beyond its reasonable control, including, but not limited to, acts of God, fire, flood, war, earthquake, environmental conditions, governmental action, acts of civil or military authority, riots, wars, sabotage, strikes, compliance with laws or regulations, strikes, lockouts or other serious labor disputes, or shortage of or inability to obtain material or equipment for so long as such event of force majeure continues in effect. 
-8.11	Relationship of Parties. Each party acknowledges and agrees that the other is an independent contractor in the performance of this EULA, and each is solely responsible for all of its employees, agents, contractors, and labor costs and expenses arising in connection therewith.  The parties are not partners, joint ventures or otherwise affiliated, and neither has any authority to make any statements, representations or commitments of any kind to bind the other without the prior written consent of the other party. 
-8.12	Export Control. You acknowledge that the Licensed Software, technology and related documentation described under this EULA are subject to the U.S. Export Administration Regulations (EAR) and economic sanctions regulations administered by the U.S. Department of Treasury’s Office of Foreign Assets Control (OFAC).  You agree to comply with the EAR and OFAC regulations and all applicable international and national export and import laws.  You agree not to export or re-export the Licensed Software, technology and related documentation to any destination requiring an export license or other approval under the EAR or OFAC regulations otherwise without first obtaining such export license or approval and NVIDIA’s permission. You will not, without prior governmental authorization, export or re-export NVIDIA Licensed Software, technology and related documentation, directly or indirectly, (i) to any end-user whom You know or have reason to know will utilize them in the design, development or production of nuclear, chemical or biological weapons, or rocket systems, space launch vehicles, and sounding rockets, or unmanned air vehicle systems; (ii) to any end-user who has been prohibited from participating in U.S. export transactions by any federal agency of the U.S. government; or (iii) to any countries that are subject to U.S. export restrictions (currently including, but not necessarily limited to, Cuba, Iran, North Korea, Sudan, and Syria and the Region of Crimea).  You shall defend NVIDIA, its employees and its affiliates against any and all threatened or actual claims, suits, fines, sanctions, actions, or proceedings, and indemnify and hold each and all of them harmless against any costs incurred (including pre-suit investigations, expert fees, attorney's fees) and any and all sums paid or awarded with respect thereto as penalties, damages, fines, restitutions, or otherwise resulting from any violation by You, Your agents, affiliates or related entities of the export laws with respect to any such NVIDIA Licensed Software, technology or related documentation. 
-8.13	Entire Agreement. This EULA, including the terms of Exhibit A, the NVIDIA Software Services Supplemental Terms and  Orders constitute the entire agreement with respect to the subject matter hereof and supersedes all proposals, oral or written, all negotiations, conversations, or discussions between or among parties relating to the subject matter of this EULA and all past dealing or industry custom. Any notice delivered by NVIDIA to You under this EULA will be delivered via mail, email or fax. Any additional and/or conflicting terms and conditions on purchase order(s) or any other documents are null, void, and invalid. 
+1     DEFINITIONS. Certain capitalized terms, if not otherwise defined elsewhere in the
+EULA, shall have the meanings set forth below in this Section 1.
+
+1.1      "Confidential Information" means the Licensed Software, and any NVIDIA business,
+marketing, pricing, research and development, know-how, technical, scientific, financial status,
+proposed new products or other information disclosed by NVIDIA to You which, at the time of
+disclosure, is designated in writing as confidential or proprietary (or like written designation), or
+orally identified as confidential or proprietary or is otherwise reasonably identifiable by parties
+exercising reasonable business judgment, as confidential. Confidential Information does not and
+will not include information that: (i) is or becomes generally known to the public through no fault
+of or breach of this EULA by the receiving party; (ii) is rightfully known by the receiving party at
+the time of disclosure without an obligation of confidentiality; (iii) is independently developed by
+the receiving party without use of the disclosing party's Confidential Information; or (iv)is
+rightfully obtained by the receiving party from a third party without restriction on use or
+disclosure.
+
+1.2    "Documentation" means the NVIDIA documentation made available for use with the
+Software, including (without limitation) user manuals, operations instructions, installation guides,
+release notes, utility programs and other materials provided to You under this EULA.
+
+1.3      "Enterprise" means You or any company or legal entity for which You accepted the
+terms of this EULA, and their subsidiaries of which Your company or legal entity owns more
+than fifty percent (50%) of the issued and outstanding equity.
+
+1.4     "Feedback" means any and all suggestions, feature requests, comments or other
+feedback relating to the Licensed Software, including possible enhancements or modifications
+thereto.
+
+1.5     "Intellectual Property Rights" means all patent, copyright, trademark, trade secret, trade
+dress, trade names, utility models, mask work, moral rights, rights of attribution or integrity
+service marks, master recording and music publishing rights, performance rights, author's
+rights, database rights, registered design rights and any applications for the protection or
+registration of these rights, or other intellectual or industrial property rights or proprietary rights,
+howsoever arising and in whatever media, whether now known or hereafter devised, whether or
+not registered, (including all claims and causes of action for infringement, misappropriation or
+violation and all rights in any registrations and renewals), worldwide and whether existing now
+or in the future.
+
+1.6     "License Term" means the fixed term of a Software license granted under this EULA as
+specified in the Order.
+
+1.7     "Licensed Software" means both Software and Documentation.
+
+1.8     "MDL Materials" means the definitions and materials using the NVIDIA Material
+Definition Language (MDL).
+
+1.9     "Open Source License" includes, without limitation, a software license that requires as a
+condition of use, modification, and/or distribution of such software that the Software be (i)
+disclosed or distributed in source code form; (ii) be licensed for the purpose of making derivative
+works; or (iii) be redistributable at no charge.
+
+1.10 "Order" means a purchase order issued by You, a signed purchase agreement with You,
+or other ordering document issued by You to NVIDIA (including any online acceptance process)
+or an NVIDIA authorized reseller (including any on-line acceptance process) that references and
+incorporates this EULA and is accepted by NVIDIA.
+
+1.11    "Services" has the meaning assigned to it in Exhibit A.
+
+1.12 "Software" means the NVIDIA software programs licensed to You under this EULA.
+Software includes the MDL Materials.
+
+2      LICENSE.
+
+2.1    License Grant. Conditional on payment of the appropriate fee for the license to the
+Licensed Software (as may be set out in an Order), NVIDIA hereby grants You a non-exclusive,
+non-transferable license, without the right to sublicense (except as expressly set forth in this
+Section), during the License Term (subject to the termination rights described below):
+
+(i)     to install and have a single user within Your Enterprise use the Software (other than
+MDL Materials) on one computer owned or controlled by You and at one location at any one
+time in accordance with the Documentation and make copies of the Software (other than MDL
+Materials) solely for backup or archival purposes;
+
+(ii)   to use the Documentation in connection with Your use of the Software;
+
+(iii)   to install and have any number of users within Your Enterprise, as permitted under the
+license purchased, use, modify, translate, adapt, arrange, or create derivative works of the MDL
+Materials on any number of computers owned or controlled by You in accordance with the
+Documentation and make copies of the MDL Materials for backup or archival and for distribution
+purposes (but only so long as you do not remove any of the contents of the MDL Materials); and
+
+(iv)    to distribute images rendered with the Licensed Software and to sub-license and
+distribute the MDL Materials (unmodified, or as so modified) in connection with Your use of
+other Software licensed hereunder, and authorize others to use and distribute the MDL
+Materials (unmodified, or as so modified) in connection with their use of material of Yours that
+You distribute to them, provided all such distributions are consistent with the terms under which
+You are permitted to distribute the same and provided further that such use by others (and
+distribution) is solely for the purposes only of enabling such others to render images based on
+material as modified by You.
+
+In connection with Your distribution of MDL Materials, You must enter into enforceable
+agreements that pass down terms that are consistent with the terms set forth in this EULA for
+use of such MDL Materials, including (without limitation) terms relating to the license grant and
+license restrictions, confidentiality and protection of NVIDIA's Intellectual Property Rights in and
+to the MDL Materials. You are liable for the distribution of MDL Materials provided under this
+EULA in violation of Your distribution rights.
+
+Notwithstanding the foregoing, NVIDIA is not obligated to provide you any source code of the
+MDL Materials beyond that made generally available by NVIDIA to its licensees. You
+acknowledge that this EULA does not grant You any right or license under or relating to any
+patent and that the Licensed Software may be subject to patent rights held by unaffiliated third-
+parties. No Orders are binding on NVIDIA until accepted by NVIDIA. Your Orders are subject to
+this EULA.
+
+2.1.1 Evaluation License. With respect to any license to a Licensed Software provided to You
+under this EULA and indicated to be a license for evaluation purposes only, You may only
+exercise the rights granted under Section 2.1 as modified by this section and Section 2.1.4 for
+internal evaluation and demonstration purposes only and such licenses expire 90 days from the
+date of commencement.
+
+2.1.2 Educational/Academic License. With respect to any license to a Licensed Software
+provided to You under this EULA and indicated to be an Educational/Academic License, You
+may only exercise the rights granted under Section 2.1 as modified by this section and Section
+2.1.4 for internal educational purposes only and all users must be enrolled or employed by an
+academic institution. If you do not meet this qualification, you have no rights under this license.
+
+2.1.3 Research & Development License. With respect to any license to a Licensed Software
+provided to You under this EULA and indicated to be a Research & Development License, You
+may only exercise the rights granted under Section 2.1 as modified by this section and Section
+2.1.4 for internal research and development purposes only.
+
+2.1.4 The following terms apply to licenses granted under Sections 2.1.1, 2.1.2 and 2.1.3.
+Except for the distribution of images rendered with the Licensed Software, these licenses (a) do
+not include any right or license to use the Licensed Software or its output in any way in any
+public release, however limited, and/or in any manner that provides third parties with use of or
+access to any output from the Licensed Software, except that sub-license and distribution of
+MDL Materials are permitted as provided in Section 2.1; (c) NVIDIA does not provide any
+Services, if applicable, (notwithstanding that the license may be a time based license); and (d)
+notwithstanding any contrary terms in Section 6 below, NVIDIA HAS NO LIABILITY TO YOU
+UNDER THIS EULA FOR ANY DIRECT DAMAGES ARISING FROM OR RELATING TO THE
+USE OF A LICENSED SOFTWARE.
+
+2.1.5 Authorization Code: If the Licensed Software requires an authorization code, you must
+register Your purchase of this Licensed Software with NVIDIA before an authorization code shall
+be issued to You, and NVIDIA shall maintain Your registration details in conformance with its
+privacy policy.
+
+2.2     Enterprise Usage. You are responsible for the compliance with the terms and conditions
+of this EULA by Your Enterprise. Any act or omission that if committed by You would constitute
+a breach of this EULA shall be deemed to constitute a breach of this EULA if committed by
+another party to Your Enterprise.
+
+2.3    Support Services. If Your Order includes Services for the Licensed Software, then the
+supply of such Services shall be governed by the terms of Exhibit A and the NVIDIA Software
+Service Supplemental Terms (as further described in Exhibit A). In the event that You have an
+agreement with a NVIDIA reseller for the same Services described in Exhibit A for a Licensed
+Software, the Exhibit A does not apply and such Services are delivered to You pursuant to the
+terms of Your agreement with the NVIDIA reseller.
+
+2.4    Limited Rights. Your rights in the Licensed Software are limited to those expressly
+granted in Section 2.1 and no other licenses are granted whether by implication, estoppel or
+otherwise. NVIDIA reserves all other rights, title and interest in and to the Licensed Software not
+expressly granted to You under this EULA.
+
+2.5      License Restrictions. Except as expressly authorized above in relation to the MDL
+Materials, You agree that You will not (nor allow third parties to): (i) reverse engineer,
+decompile, disassemble (except to the extent applicable laws specifically requires that such
+activities be permitted) or attempt to derive the source code, underlying ideas, algorithm or
+structure of Software provided to You in object code form; (ii) sell, distribute, rent, loan, lease,
+sub-license or otherwise make available the Licensed Software to third parties; (iii) make its
+functionality available to third parties (a) as an application services provider or service bureau;
+(b) by operating hosted/virtual system environments; (c) by hosting, time sharing or providing
+any other type of services; or (d) otherwise by means of the internet (iii) modify, translate or
+otherwise create any derivative works of any of the Licensed Software; (iv) remove, alter, cover
+or obscure any proprietary notice that appears on or with the Licensed Software or any copies
+thereof; (v) use the Licensed Software, or allow its use, transfer, transmission or export in
+violation of any export control laws or regulations administered by the United States
+government; (vi) distribute, permit access to, or sublicense the Licensed Software as a stand-
+alone product; (vii) sell, transfer, sublicense or assign the Licensed Software to any third party;
+(viii) use the Licensed Software for the purpose of developing competing products or
+technologies or assisting a third party in such activities; (ix) utilize any equipment, device,
+software, or other means designed to circumvent or remove any form of copy protection used by
+NVIDIA in connection with the Licensed Software, or use the Licensed Software together with
+any authorization code, serial number, or other copy protection device not supplied by NVIDIA
+directly or through an authorized reseller; (x) use the Licensed Software in any manner that
+would cause the Licensed Software to become subject to an Open Source License; or (xi)
+distribute any modified MDL definition supplied to You under or by reference to the same name
+as used by NVIDIA. Nothing in this EULA shall be construed to give You a right to use, or
+otherwise obtain access to, any source code from which the Software or any portion thereof is
+compiled or interpreted.
+
+2.6       Critical Applications. You will not use the Licensed Software in any application where the
+use or failure of the Software could cause a life-threatening event or result in catastrophic
+damages, including (but not limited to) medical, nuclear, aviation, navigation, or military
+applications, and You agree to defend, indemnify, and hold NVIDIA harmless against any loss,
+liability, cost or damage of any kind that NVIDIA incurs as a result of a breach of the foregoing
+covenant.
+
+2.7     Third Party License Obligations. You acknowledge and agree that the Licensed
+Software may include or incorporate third party technology (collectively "Third Party
+Components"), which are provided for use in or with the Software and not otherwise used
+separately. If the Licensed Software includes or incorporates Third Party Components, then the
+third-party pass-through terms and conditions ("Third Party Terms") for the particular Third Party
+Component contained in or included with the Licensed Software shall be incorporated by
+reference into this EULA. In the event of any conflict between the terms in this EULA and the
+Third Party Terms, the Third Party Terms shall govern. Copyright to Third Party Components
+are held by the copyright holders indicated in the copyright notices indicated in the
+corresponding Documentation. More specifically, certain of the Third Party Materials are
+governed by open-source software license agreements, including the GNU Lesser General
+Public License.
+
+3      CONFIDENTIALITY.
+
+3.1     Each party will not use the other party's Confidential Information, except as necessary
+for the performance of this EULA, and will not disclose such Confidential Information to any third
+party, except to those of its employees, employees of its Enterprise and Contractors that have a
+need to know such Confidential Information for the performance of this EULA, provided that
+each such employee and Contractor is subject to a written agreement that includes
+confidentiality obligations consistent with those set forth herein. Each party will use all
+reasonable efforts to maintain the confidentiality of all of the other party's Confidential
+Information in its possession or control, but in no event less than the efforts that it ordinarily
+uses with respect to its own Confidential Information of similar nature and importance. The
+foregoing obligations will not restrict either party from disclosing the other party's Confidential
+Information or the terms and conditions of this EULA as required under applicable securities
+regulations or pursuant to the order or requirement of a court, administrative agency, or other
+governmental body, provided that the party required to make such a disclosure (i) gives
+reasonable notice to the other party to enable it to contest such order or requirement prior to its
+disclosure (whether through protective orders or otherwise), (ii) uses reasonable effort to obtain
+confidential treatment or similar protection to the fullest extent possible to avoid public
+disclosure of the terms of this EULA, and (iii) discloses only the minimum amount of information
+necessary to comply with such requirements.
+
+4      OWNERSHIP AND FEEDBACK.
+
+4.1      Ownership. You are not obligated to disclose to NVIDIA any modifications You make to
+MDL Materials. The Licensed Software, all modifications to Licensed Software and all the
+Intellectual Property Rights therein are and will remain the sole and exclusive property of
+NVIDIA and its licensors, whether the Software or Documentation are separate from or
+combined with any other products or materials. All Your modifications to MDL Materials are
+licensed to You subject to the terms of this EULA. You shall not knowingly engage in any act or
+omission that would impair NVIDIA's and/or its licensors' Intellectual Property Rights in the
+Licensed Software or any other materials, information, processes or subject matter proprietary
+to NVIDIA. NVIDIA's licensors are intended third party beneficiaries with the right to enforce
+provisions of this EULA with respect to their Confidential Information and/or Intellectual Property
+Rights. You will reproduce on each copy You make of the Software and Documentation, and not
+alter, remove or obscure, the Intellectual Property Rights notices of NVIDIA and its licensors
+that may appear on the Software and Documentation.
+
+4.2     Feedback. You have no obligation to give NVIDIA any Feedback. However, NVIDIA may
+use and include any Feedback that You voluntarily provide to improve the Licensed Software or
+other related NVIDIA products, technologies or materials. Accordingly, if You provide Feedback,
+You agree that NVIDIA and its licensees may freely use, reproduce, license, distribute, and
+otherwise commercialize the Feedback in the Licensed Software or other related technologies
+without the payment of any royalties or fees to You. Further, NVIDIA is entitled to use any
+information provided by You in connection with Feedback for any purpose, including in any
+NVIDIA products. All Feedback becomes the sole property of NVIDIA and may be used in any
+manner NVIDIA sees fit, and You hereby assign to NVIDIA all of Your right, title and interest in
+and to any Feedback. NVIDIA has no obligation to respond to Feedback or to incorporate
+Feedback into the Licensed Software.
+
+5      NO WARRANTIES.
+
+5.1   THE LICENSED SOFTWARE, AND ANY OTHER SOFTWARE, MATERIALS,
+CONFIDENTIAL INFORMATION AND/OR SERVICES PROVIDED BY NVIDIA ARE
+PROVIDED "AS IS" AND "WITH ALL FAULTS," AND NVIDIA EXPRESSLY DISCLAIMS ALL
+OTHER WARRANTIES OF ANY KIND OR NATURE, WHETHER EXPRESS, IMPLIED OR
+STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES OF OPERABILITY,
+CONDITION, VALUE, ACCURACY OF DATA, OR QUALITY, AS WELL AS ANY
+WARRANTIES OF MERCHANTABILITY, SYSTEM INTEGRATION, WORKMANSHIP,
+SUITABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR THE ABSENCE OF ANY
+DEFECTS THEREIN, WHETHER LATENT OR PATENT. NO WARRANTY IS MADE BY
+NVIDIA ON THE BASIS OF TRADE USAGE, COURSE OF DEALING OR COURSE OF
+TRADE. NVIDIA DOES NOT WARRANT THAT THE LICENSED SOFTWARE OR ANY OTHER
+SOFTWARE, MATERIALS, CONFIDENTIAL INFORMATION AND/OR SERVICES PROVIDED
+UNDER THIS EULA WILL MEET YOUR REQUIREMENTS OR THAT THE OPERATION
+THEREOF WILL BE UNINTERRUPTED OR ERROR-FREE, OR THAT ALL ERRORS WILL BE
+CORRECTED. YOU ACKNOWLEDGE THAT NVIDIA'S OBLIGATIONS UNDER THIS EULA
+ARE FOR THE BENEFIT OF YOU ONLY.
+
+6      LIMITATION OF LIABILITY.
+
+6.1  Limitation of Liability. TO THE MAXIMUM EXTENT PERMITTED BY LAW, NVIDIA
+SHALL NOT BE LIABLE FOR ANY SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES (INCLUDING, WITHOUT LIMITATION, LOST PROFITS, LOSS OF USE, LOSS OF
+DATA OR LOSS OF GOODWILL), OR THE COSTS OF PROCURING SUBSTITUTE
+PRODUCTS, ARISING OUT OF OR IN CONNECTION WITH THIS EULA OR THE USE OR
+PERFORMANCE OF THE LICENSED SOFTWARE, AND ANY OTHER SOFTWARE,
+MATERIALS, CONFIDENTIAL INFORMATION AND/OR SERVICES PROVIDED BY NVIDIA
+HEREUNDER, WHETHER SUCH LIABILITY ARISES FROM ANY CLAIM BASED UPON
+BREACH OF CONTRACT, BREACH OF WARRANTY, TORT (INCLUDING NEGLIGENCE),
+PRODUCT LIABILITY OR ANY OTHER CAUSE OF ACTION OR THEORY OF LIABILITY AND
+WHETHER OR NOT NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES. IN NO EVENT WILL NVIDIA'S TOTAL CUMULATIVE LIABILITY UNDER OR
+ARISING OUT OF THIS EULA EXCEED THE NET AMOUNTS RECEIVED BY NVIDIA FOR
+YOUR USE OF THE PARTICULAR LICENSED SOFTWARE DURING THE TWELVE (12)
+MONTHS BEFORE THE LIABILITY AROSE. THE NATURE OF THE LIABILITY, THE NUMBER
+OF CLAIMS OR SUITS OR THE NUMBER OF PARTIES WITHIN YOUR ENTERPRISE THAT
+ACCEPTED THE TERMS OF THIS EULA SHALL NOT ENLARGE OR EXTEND THIS LIMIT.
+THE FOREGOING LIMITATIONS SHALL APPLY REGARDLESS OF WHETHER NVIDIA OR
+ITS LICENSORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND
+REGARDLESS OF WHETHER ANY REMEDY FAILS ITS ESSENTIAL PURPOSE.
+
+6.2    Further Limitations. NVIDIA's licensors shall have no liability of any kind under this
+EULA. The disclaimers, exclusions and limitations of liability set forth in this EULA form an
+essential basis of the bargain between the parties, and, absent any of such disclaimers,
+exclusions or limitations of liability, the provisions of this EULA, including, without limitation, the
+economic terms, would be substantially different. You may not bring a claim under this EULA
+more than eighteen (18) months after the cause of action arises.
+
+7       TERM AND TERMINATION.
+
+7.1    EULA, Licenses and Services. This EULA shall become effective upon the Effective
+Date and shall continue until Your last access or use of the Licensed Software and/or Services
+hereunder, unless earlier terminated by the parties as provided in this Section 7. Each Licensed
+Software license commences upon delivery and ends at the earlier of (a) the expiration of the
+applicable License Term, or (b) termination of such license or this EULA. Services for the
+Licensed Software shall co-term with the associated license and no credit or refund will be
+provided upon the expiration or termination of the associated license for any Service fees paid.
+
+7.2     Termination. Either party may terminate this EULA, Licensed Software licenses and/or
+Services at any time: (i) in the event that the other party breaches any material term of this
+EULA and fails to cure such breach within thirty (30) days following notice thereof from the non-
+breaching party, or within ten (10) days following notice thereof in the event You breach any
+payment-related obligation; or (ii) upon written notice if the other party becomes the subject of a
+voluntary or involuntary petition in bankruptcy or any proceeding relating to insolvency,
+receivership, liquidation or composition for the benefit of creditors, if that petition or proceeding
+is not dismissed with prejudice within sixty (60) days after filing, or ceases to do business.
+Termination of this EULA, a license or a Service hereunder shall not release the parties from
+any liability which, at the time of termination, has already accrued or which thereafter may
+accrue with respect to any act or omission before termination, or from any obligation which is
+expressly stated in this EULA to survive termination. Notwithstanding the foregoing, the party
+terminating this EULA, a license or a Service as permitted by any provision in this Section 7
+shall incur no additional liability merely by virtue of such termination. Termination of this EULA,
+a license or a Service regardless of cause or nature, shall be without prejudice to any other
+rights or remedies of the parties and shall be without liability for any loss or damage occasioned
+thereby.
+
+7.3      Effect of Expiration or Termination. Upon any expiration or termination of this EULA, a
+license or a Service provided hereunder, (i) You must promptly discontinue use of the affected
+Licensed Software and/or Service, and (ii) in the case of a license expiration or termination, You
+must promptly destroy or return to NVIDIA all copies of the affected Licensed Software and all
+portions thereof, and each party will promptly destroy or return to the other all of the other
+party's Confidential Information within its possession or control. Upon written request, You will
+certify in writing that You have complied with your obligations under this section. Sections 1, 2.4
+through 2.7, 3, 4, 5, 6, 7, and 8 will survive the expiration or termination of this EULA for any
+reason.
+
+8      GENERAL PROVISIONS.
+
+8.1     Assignment. This EULA and the rights and obligations hereunder may not be assigned,
+delegated or transferred by You, in whole or in part, including by merger, consolidation,
+dissolution, operation of law, or any other manner, without written consent of NVIDIA, and any
+purported assignment in violation of this provision shall be void and of no effect. Subject to the
+foregoing, this Agreement will bind and inure to the benefit of each party's permitted successors
+and assigns.
+
+8.2      Audit. During the term of this EULA and for a period of three (3) years thereafter, You
+will maintain complete and accurate books and records regarding use of the Licensed Software
+and Your performance and administration of this EULA. During such period, NVIDIA or its
+authorized third party auditors will have the right to inspect and audit Your Enterprise books and
+records for the purpose of confirming Your compliance with the terms of this EULA. Any such
+inspection and audit will be conducted during regular business hours and in a manner that
+minimizes interference with Your normal business activities. If such an inspection and audit
+reveals an underpayment of any amounts payable to NVIDIA, then You will promptly remit the
+full amount of such underpayment to NVIDIA, including interest that will accrue (without the
+requirement of a notice) at the lower of 1.5% per month or the highest rate permissible by law. If
+the underpaid amount exceeds five percent (5%) of the amounts payable to NVIDIA for the
+period audited and/or such an inspection and audit reveals a material non-conformance with the
+terms of this EULA, then You will also pay NVIDIA's reasonable costs of conducting the
+inspection and audit. Further, You agree that the party delivering the Licensed Software to You
+may collect and disclose to NVIDIA (subject to confidentiality obligations) information for NVIDIA
+to verify Your compliance with the terms of this EULA including (without limitation) information
+regarding Your usage of the Licensed Software.
+
+8.3     Governing Law; Jurisdictions. This EULA will be governed by and construed in
+accordance with the laws of the State of Delaware and the United States without regard to the
+conflicts of law provisions thereof. The parties expressly agree that the United Nations
+Convention on Contracts for the International Sale of Goods will not apply. Any legal action or
+proceeding arising under this EULA will be brought exclusively in the federal courts located in
+the Northern District of California or the state courts located in Santa Clara County and the
+parties hereby irrevocably consent to the personal jurisdiction and venue therein. The prevailing
+party in any action to enforce this EULA shall be entitled to recover costs and expenses
+including, without limitation, reasonable attorney's fees.
+
+8.4     Nonexclusive Remedy. Except as expressly set forth in this EULA, the exercise by
+either party of any of its remedies under this EULA will be without prejudice to its other remedies
+under this EULA or otherwise.
+
+8.5     Injunctive Relief. The parties agree that a material breach of any of the promises or
+agreements contained in this EULA adversely affecting NVIDIA's Intellectual Property Rights in
+the Licensed Software may result in irreparable and continuing injury to NVIDIA for which
+monetary damages would not be an adequate remedy and NVIDIA is therefore entitled to seek
+injunctive relief as well as such other and further relief as may be appropriate.
+
+8.6     Conflicts; Order of Precedence. Any printed or other terms and conditions on an Order
+or similar order document conflicting and/or in addition with the terms and conditions of this
+EULA or its exhibits and addenda shall be of no force or effect. In the event of a conflict or
+inconsistency between any exhibit and this EULA, the conflict or inconsistency shall be resolved
+in favor of this EULA.
+
+8.7    Waiver. The failure by either party to enforce its rights under this EULA at any time for
+any period will not constitute a waiver of future enforcement of that right or any other right. Any
+waiver will be effective only if in writing and signed by duly authorized representatives of each
+party.
+
+8.8     Severability. If for any reason a court of competent jurisdiction finds any provision of this
+EULA invalid or unenforceable, that provision of the EULA will be enforced to the maximum
+extent permissible so as to effect the intent of the parties, and the other provisions of this EULA
+will remain in full force and effect.
+
+8.9      U.S. Government Legend. You agree and certify that You will comply with all laws,
+regulations, rules, and other requirements applicable to transaction(s) with any government(s)
+occurring pursuant to this EULA and all related matters ("Government Transaction(s)"). You
+shall defend, indemnify and hold harmless NVIDIA, its subsidiaries, their directors, officers,
+employees and agents from and against all actions, causes of action, liabilities, claims, suits,
+judgments, liens, awards and damages, of any kind and nature whatsoever, arising from or
+related to Your failure to comply with the obligations under this section and for any expenses,
+costs of litigation and attorney's fees related thereto or incident to establishing the right of
+indemnification. The Licensed Software has been developed entirely at private expense and is
+commercial computer software provided with RESTRICTED RIGHTS. Use, duplication or
+disclosure by the U.S. Government or a U.S. Government subcontractor is subject to the
+restrictions set forth in the agreement under which Licensed Software was obtained pursuant to
+DFARS 227.7202-3(a) or as set forth in subparagraphs (c)(1) and (2) of the Commercial
+Computer Software - Restricted Rights clause at FAR 52.227-19, as applicable.
+Contractor/manufacturer is NVIDIA, 2701 San Tomas Expressway, Santa Clara, CA 95050.
+
+8.10 Force Majeure. Neither party will be responsible for any failure or delay in its
+performance under this EULA (except for any payment obligations) to the extent due to causes
+beyond its reasonable control, including, but not limited to, acts of God, fire, flood, war,
+earthquake, environmental conditions, governmental action, acts of civil or military authority,
+riots, wars, sabotage, strikes, compliance with laws or regulations, strikes, lockouts or other
+serious labor disputes, or shortage of or inability to obtain material or equipment for so long as
+such event of force majeure continues in effect.
+
+8.11 Relationship of Parties. Each party acknowledges and agrees that the other is an
+independent contractor in the performance of this EULA, and each is solely responsible for all of
+its employees, agents, contractors, and labor costs and expenses arising in connection
+therewith. The parties are not partners, joint ventures or otherwise affiliated, and neither has
+any authority to make any statements, representations or commitments of any kind to bind the
+other without the prior written consent of the other party.
+
+8.12 Export Control. You acknowledge that the Licensed Software, technology and related
+documentation described under this EULA are subject to the U.S. Export Administration
+Regulations (EAR) and economic sanctions regulations administered by the U.S. Department of
+Treasury's Office of Foreign Assets Control (OFAC). You agree to comply with the EAR and
+OFAC regulations and all applicable international and national export and import laws. You
+agree not to export or re-export the Licensed Software, technology and related documentation
+to any destination requiring an export license or other approval under the EAR or OFAC
+regulations otherwise without first obtaining such export license or approval and NVIDIA's
+permission. You will not, without prior governmental authorization, export or re-export NVIDIA
+Licensed Software, technology and related documentation, directly or indirectly, (i) to any end-
+user whom You know or have reason to know will utilize them in the design, development or
+production of nuclear, chemical or biological weapons, or rocket systems, space launch
+vehicles, and sounding rockets, or unmanned air vehicle systems; (ii) to any end-user who has
+been prohibited from participating in U.S. export transactions by any federal agency of the U.S.
+government; or (iii) to any countries that are subject to U.S. export restrictions (currently
+including, but not necessarily limited to, Cuba, Iran, North Korea, Sudan, and Syria and the
+Region of Crimea). You shall defend NVIDIA, its employees and its affiliates against any and all
+threatened or actual claims, suits, fines, sanctions, actions, or proceedings, and indemnify and
+hold each and all of them harmless against any costs incurred (including pre-suit investigations,
+expert fees, attorney's fees) and any and all sums paid or awarded with respect thereto as
+penalties, damages, fines, restitutions, or otherwise resulting from any violation by You, Your
+agents, affiliates or related entities of the export laws with respect to any such NVIDIA Licensed
+Software, technology or related documentation.
+
+8.13 Entire Agreement. This EULA, including the terms of Exhibit A, the NVIDIA Software
+Services Supplemental Terms and Orders constitute the entire agreement with respect to the
+subject matter hereof and supersedes all proposals, oral or written, all negotiations,
+conversations, or discussions between or among parties relating to the subject matter of this
+EULA and all past dealing or industry custom. Any notice delivered by NVIDIA to You under this
+EULA will be delivered via mail, email or fax. Any additional and/or conflicting terms and
+conditions on purchase order(s) or any other documents are null, void, and invalid.
 
 Exhibit A
+
 NVIDIA Software Service Terms and Conditions
-1	SCOPE. If Your Order indicates that NVIDIA will directly provide Services for the Supported Software You purchased, then NVIDIA agrees to provide the Services to the Supported Software based on the Service Subscription purchased and during the applicable Service Term solely on Certified System(s) operating the Supported Software, and solely for the Supported OSs. 
-The Services are provided by NVIDIA to You in accordance with the terms and conditions of the EULA, this Exhibit A and the NVIDIA Iray Service Supplemental Terms made available by NVIDIA at www.nvidia.com (the “Supplemental Terms”), which Supplemental Terms are incorporated into the EULA by this reference. NVIDIA may update the Supplemental Terms by providing You with a copy of, or written notice of availability of, new Supplemental Terms and any modifications are binding on You, provided that such modification apply to customers generally and do not single You out. 
-2	SERVICES. 
-2.1	Technical Support. If Your Service Subscription for a Supported Software includes Technical Support, subject to payment of applicable Service Fees NVIDIA will make available to You Technical Support for such Supported Software during the Service Term. Technical Support plans available for purchase and associated terms are further described in the Supplemental Terms. 
-You will be permitted to designate in writing to NVIDIA Designated Users for purposes of obtaining Technical Support from NVIDIA, which list of Designated Users may be updated by You at any time by written notice to NVIDIA (which may include notice by email or other electronic transmission). NVIDIA will provide Technical Support to such Designated Users via a dedicated support portal that allows the Designated User(s) to make Support Issue requests for the Supported Software through the dedicated support portal. Notwithstanding NVIDIA’s confidentiality obligations in Section 3 of the EULA, You hereby grant NVIDIA permission to discuss Your Support Issues with the third party from which the system was purchased for the purpose of resolving the Support Issue, including sharing with such third party any relevant information (including, for the avoidance of doubt, Confidential Information) that would be useful in assisting with such resolution. 
-2.2	Maintenance. If Your Service Subscription for a Supported Software includes Maintenance, subject to payment of applicable Service Fees NVIDIA will make available to You the Maintenance releases associated with such Supported Software during the Service Term. 
-2.3	Updates. If Your Service Subscription for a Supported Software includes Updates, subject to payment of applicable Service Fees NVIDIA will make available to You the Update releases associated with such Supported Software during the Service Term. 
-2.4	Upgrades. If Your Service Subscription for a Supported Software includes Upgrade, subject to payment of applicable Service Fees NVIDIA will make available to You the Upgrade releases associated with such Supported Software during the Service Term. 
-2.5	Service Subscription Reinstatement. If You elect not to renew certain Services and later You desire to re-enroll to receive such Services, You must pay with respect to the Services being reinstated at the then-current rates: (a) Service Fees for the period between the last expiration of the Services and until commencement of the new Services Subscription, (b) Service Fees for the new Services Subscription, for the Service Term and (c) a twenty percent (20%) reinstatement fee on the sum of Service Fees under (a) and (b). Service Subscription re-enrollment is subject to availability of the Services at the time of ordering and software version restrictions. 
-2.6	Purchase Requirements. You shall (a) purchase initial Services for a Supported Software only for the most current generally available version of the Supported Software, and (b) initially purchase and renew Subscription Services for all of Your licenses of a Supported Software. 
-2.7	Service Availability. The Supplemental Terms and/or the product descriptions will indicate the types of Services that are available for Supported Software during the General Support Period and the Extended Support Period. NVIDIA may, at its sole discretion, decide that a Supported Software version has reached the end of the Extended Support Period. NVIDIA is not obligated to provide any Services for a Supported Software version after the end of the Extended Support Period. 
-3	EXCLUSIONS.  You shall not request, and NVIDIA shall not provide Services for Supported Software under the EULA related to: 
-(a)	errors in Your own or Your licensors’ products that are not due to Errors in the Supported Software;
-(b)	service necessary due to accident, catastrophe, or negligence of Your users, or due to operator error, improper use of the Supported Software or attempted support by unauthorized persons;
-(c)	causes external to the Supported Software, including weather conditions, air conditioning and humidity control, faulty electrical power, hardware failure, misuse, neglect, damage or use of the Supported Software with hardware or software not supplied or recommended by NVIDIA
-(d)	Your failure to implement Maintenance, Updates or Upgrades supplied by NVIDIA which would correct the Error and were previously made available by NVIDIA;
-(e)	modifications to the Supported Software made by You or on Your behalf, or any modifications made by any third party without NVIDIA’s authorization;
-(f)	use of the Supported Software that deviates from the operating procedures, indicated supported operating systems and any other specifications indicated in the Documentation;
-(g)	Your combination of the Supported Software with other products or technologies not provided by NVIDIA; or
-(h)	Licensed Software or Services provided free of charge.
-Further, Services do not include any enhancement(s) or addition(s) to the Supported Software other than Maintenance, Updates and Upgrades which NVIDIA does not make available to its commercial customers as part of the standard Services for the Supported Software but rather is only provided subject to a payment of a separate fee, and will not be provided in consideration of the Service Fees paid by You under the EULA. 
-4	YOUR SERVICE RESPONSIBILITIES. In order for NVIDIA to deliver the Services to You hereunder, You agree that: 
-(a)	You are responsible for procuring, installing and maintaining all equipment and obtaining all consents for other software and other hardware necessary to operate the Supported Software;
-(b)	Your failure to deploy a Maintenance release, Update release or Upgrade release available to You as promptly as possible may render the applicable Supported Software non-operable or non-conforming to the documentation or specifications provided by NVIDIA and You assume all risks and liability arising therefrom;
-(c)	You shall further provide through Designated Users such information, and/or access to Your resources as NVIDIA may reasonably require in order to provide Services, including, without limitation, access via the internet or via direct modem or VPN connection to relevant servers, minimally intrusive access to Your facilities, and/or access to, and assistance of, Your personnel who possess information required by NVIDIA for purposes of performing its obligations hereunder. As examples, as reasonably requested by NVIDIA You shall (i) identify the correct version(s) of Supported Software to which a potential Support Issue relates, (ii) provide the documentation and assistance necessary to demonstrate and diagnose each potential Support Issue, including providing necessary test cases that NVIDIA can reproduce on a Certified System, (iii) provide remote system access for NVIDIA to replicate potential Errors, and (iv) provide embedded diagnostic information associated with the Supported Software;
-(d)	When You use a Maintenance release, Update release or Upgrade release, access to a new product version does not change the number of authorized licenses You have for the Supported Software and You shall discontinue use of the prior version as necessary to maintain Your authorized number of licenses;
-(e)	You will appoint as Designated Users only those of Your employees who have reasonably appropriate technical backgrounds and skills. You may remove or replace any of the Designated Users at any time during a Service Term upon written notice to NVIDIA; and
-(f)	You will appoint, at NVIDIA’s request, designated Service and engineering contacts for Service issue escalations.
-NVIDIA shall be excused from any non-performance of its obligations hereunder to the extent any such non-performance is attributable to Your failure to perform Your obligations under this section.  
-5	SERVICE FEES; PAYMENT TERMS. When You purchase Services directly from NVIDIA the following applies: Service Fees for the Service Subscriptions are set forth in the associated Order and are payable pursuant to the terms of such Order. Unless otherwise expressly indicated in an Order, Service Fees will be invoiced upon Your purchase and are payable net thirty (30) days of the invoice date. All Service Fees are non-refundable. All payments will be made in U.S. Dollars. The Service Fees do not include any taxes, duties or similar charges. If NVIDIA is required to pay sales, use, property, value-added or other taxes based on the payments provided in the EULA and if NVIDIA is required to collect and remit such taxes, then such taxes shall be billed to and paid by You or Your reseller, unless NVIDIA receives a valid exemption or resale certificate. If You are not billed the applicable tax under the Order, then it is Your responsibility to properly remit the tax directly to the applicable tax jurisdiction. Further, You acknowledge that the payments to NVIDIA under the EULA shall be made in full without reduction for withholding taxes, if applicable. This section shall not apply to taxes based on NVIDIA’s net income or payroll taxes. All amounts not paid when due will accrue interest (without the requirement of a notice) at the lower of 1.5% per month or the highest rate permissible by law until the unpaid amounts are paid in full.  If payment of any Service Fee is overdue, NVIDIA reserves the right to suspend or terminate Services, in addition to any other remedies it may have, until the payment delinquency is corrected. Payment obligations survive any expiration or termination of the EULA and upon expiration or termination of the EULA any amounts owed to NVIDIA will be due and payable immediately on the effective date of expiration or termination, even if longer terms had been provided previously.  
-6	DEFINITIONS. 
-6.1	“Certified Systems” means Supported OS platforms, corresponding hardware platforms, third party software and configuration details appearing on a list maintained by NVIDIA and made available to You, or as otherwise approved by NVIDIA.
-6.2	“Day(s)” (only when capitalized) means 8:00 AM - 5:00 PM, Pacific Time, Monday through Friday, excluding U.S. public holidays.  All other usage of "day" or "days" means calendar days.
-6.3	“Designated User” means the individual(s) designated by You as the technical contact(s) who may file and engage with NVIDIA on Technical Support.
-6.4	“Error(s)” means a reproducible defect, problem, logical error or bug in the Supported Software that constitutes a failure to comply substantially with the applicable NVIDIA documentation or specification and is reported using standard NVIDIA procedures.
-6.5	“Error Correction(s)” means adapting, re-configuring, or reprogramming the Supported Software to correct the Error(s).
-6.6	“Extended Support Period” means the period of time starting upon general availability of the next Upgrade version of a Supported Software product, and until the product reaches the product cycle milestone when Services are no longer made generally available for customers of the product (also referred to as the “end of life” milestone), which milestone is at NVIDIA’s sole discretion.
-6.7	“General Support Period” means the period of time between general availability of one Upgrade version of a Supported Software product, and until the immediately following general availability of the next Upgrade version of the same product.
-6.8	“Maintenance” means security patch(es), Error Correction(s) and Workaround(s) to the Supported Software made available by NVIDIA in its sole discretion and on a “when and if generally made available” basis to its other commercial customers of the Supported Software, including those customers that do not have Updates or Upgrades as part of their current  Service Subscription.
-6.9	“Response” means NVIDIA’s initial acknowledgment of a Technical Support request filed by a Designated User.
-6.10	“Services” means, as the context requires, each or all of the following: (i) Technical Support, (ii) Maintenance, (iii) Update, and (iv) Upgrade services to the Supported Software provided by NVIDIA hereunder based on the Service Subscription You purchased. 
-6.11	“Service Fee(s)” means the fees for the purchased Service Subscriptions, as applicable for each Order.
-6.12	“Service Subscriptions” means the particular Services You purchased from NVIDIA or an NVIDIA-approved reseller.
-6.13	“Support Issue(s)” means the Technical Support requests filed by Designated Users hereunder that relate to the Supported Software.
-6.14	“Supported OS” means the supported operating system(s) listed in conjunction with a particular Certified System on the list maintained by NVIDIA and made available to You.
-6.15	“Supported Software” means the Software installed on Your premises that are under a current and valid license and for which You purchased Services, and does not include any modifications made by You or a third party on Your behalf, any modifications to the Supported Software made by NVIDIA pursuant to a consulting services agreement or any portion of the Supported Software not developed by NVIDIA.
-6.16	“Service Term” means the duration of the Service Subscriptions purchased as set forth in an Order. 
-6.17	“Technical Support” means the provision of telephone or web-based technical assistance by qualified NVIDIA personnel to questions from Designated Users related to the installation, use and operation of the Supported Software, including basic instruction or assistance related to functional Errors in the Supported Software.
-6.18	“Updates” means those modifications to the Supported Software other than Maintenance deliverables made available by NVIDIA in its sole discretion and on a “when and if generally made available” basis to its other commercial customers of the Supported Software who have the same Supported Software version under a Services contract coverage with NVIDIA that specifically includes “Updates” and that is indicated by NVIDIA as being an update by means of a change in the digit to right of first decimal point (e.g., version 5.0 to version 5.1). Updates may include revisions to Documentation.
-6.19	“Upgrades” means those modifications to the Supported Software other than Maintenance releases made available by NVIDIA in its sole discretion and on a “when and if generally made available” basis to its other commercial customers of the Supported Software who have the same Supported Software version under a Services contract coverage with NVIDIA that specifically includes “Updates” and that is indicated by NVIDIA as being an upgrade by means of a change in the digit to left of first decimal point (e.g., version 5.0 to version 6.0). Upgrades may include revisions to Documentation.
-6.20	“Workarounds” means procedures and routines, for use by You, which, when employed in the regular operation of, or access to, the Supported Software, will avoid or substantially diminish the practical adverse effects of the relevant Error. 
+
+1      SCOPE. If Your Order indicates that NVIDIA will directly provide Services for the
+Supported Software You purchased, then NVIDIA agrees to provide the Services to the
+Supported Software based on the Service Subscription purchased and during the applicable
+Service Term solely on Certified System(s) operating the Supported Software, and solely for the
+Supported OSs.
+
+The Services are provided by NVIDIA to You in accordance with the terms and conditions of the
+EULA, this Exhibit A and the NVIDIA Iray Service Supplemental Terms made available by
+NVIDIA at www.nvidia.com (the "Supplemental Terms"), which Supplemental Terms are
+incorporated into the EULA by this reference. NVIDIA may update the Supplemental Terms by
+providing You with a copy of, or written notice of availability of, new Supplemental Terms and
+any modifications are binding on You, provided that such modification apply to customers
+generally and do not single You out.
+
+2      SERVICES.
+
+2.1    Technical Support. If Your Service Subscription for a Supported Software includes
+Technical Support, subject to payment of applicable Service Fees NVIDIA will make available to
+You Technical Support for such Supported Software during the Service Term. Technical
+Support plans available for purchase and associated terms are further described in the
+Supplemental Terms.
+
+You will be permitted to designate in writing to NVIDIA Designated Users for purposes of
+obtaining Technical Support from NVIDIA, which list of Designated Users may be updated by
+You at any time by written notice to NVIDIA (which may include notice by email or other
+electronic transmission). NVIDIA will provide Technical Support to such Designated Users via a
+dedicated support portal that allows the Designated User(s) to make Support Issue requests for
+the Supported Software through the dedicated support portal. Notwithstanding NVIDIA's
+confidentiality obligations in Section 3 of the EULA, You hereby grant NVIDIA permission to
+discuss Your Support Issues with the third party from which the system was purchased for the
+purpose of resolving the Support Issue, including sharing with such third party any relevant
+information (including, for the avoidance of doubt, Confidential Information) that would be useful
+in assisting with such resolution.
+
+2.2    Maintenance. If Your Service Subscription for a Supported Software includes
+Maintenance, subject to payment of applicable Service Fees NVIDIA will make available to You
+the Maintenance releases associated with such Supported Software during the Service Term.
+
+2.3    Updates. If Your Service Subscription for a Supported Software includes Updates,
+subject to payment of applicable Service Fees NVIDIA will make available to You the Update
+releases associated with such Supported Software during the Service Term.
+
+2.4    Upgrades. If Your Service Subscription for a Supported Software includes Upgrade,
+subject to payment of applicable Service Fees NVIDIA will make available to You the Upgrade
+releases associated with such Supported Software during the Service Term.
+
+2.5      Service Subscription Reinstatement. If You elect not to renew certain Services and later
+You desire to re-enroll to receive such Services, You must pay with respect to the Services
+being reinstated at the then-current rates: (a) Service Fees for the period between the last
+expiration of the Services and until commencement of the new Services Subscription, (b)
+Service Fees for the new Services Subscription, for the Service Term and (c) a twenty percent
+(20%) reinstatement fee on the sum of Service Fees under (a) and (b). Service Subscription re-
+enrollment is subject to availability of the Services at the time of ordering and software version
+restrictions.
+
+2.6      Purchase Requirements. You shall (a) purchase initial Services for a Supported
+Software only for the most current generally available version of the Supported Software, and
+(b) initially purchase and renew Subscription Services for all of Your licenses of a Supported
+Software.
+
+2.7     Service Availability. The Supplemental Terms and/or the product descriptions will
+indicate the types of Services that are available for Supported Software during the General
+Support Period and the Extended Support Period. NVIDIA may, at its sole discretion, decide
+that a Supported Software version has reached the end of the Extended Support Period.
+NVIDIA is not obligated to provide any Services for a Supported Software version after the end
+of the Extended Support Period.
+
+3     EXCLUSIONS. You shall not request, and NVIDIA shall not provide Services for
+Supported Software under the EULA related to:
+
+(a)     errors in Your own or Your licensors' products that are not due to Errors in the
+Supported Software;
+(b)     service necessary due to accident, catastrophe, or negligence of Your users, or due to
+operator error, improper use of the Supported Software or attempted support by unauthorized
+persons;
+(c)     causes external to the Supported Software, including weather conditions, air
+conditioning and humidity control, faulty electrical power, hardware failure, misuse, neglect,
+damage or use of the Supported Software with hardware or software not supplied or
+recommended by NVIDIA
+(d)     Your failure to implement Maintenance, Updates or Upgrades supplied by NVIDIA which
+would correct the Error and were previously made available by NVIDIA;
+(e)     modifications to the Supported Software made by You or on Your behalf, or any
+modifications made by any third party without NVIDIA's authorization;
+(f)     use of the Supported Software that deviates from the operating procedures, indicated
+supported operating systems and any other specifications indicated in the Documentation;
+(g)     Your combination of the Supported Software with other products or technologies not
+provided by NVIDIA; or
+(h)     Licensed Software or Services provided free of charge.
+Further, Services do not include any enhancement(s) or addition(s) to the Supported Software
+other than Maintenance, Updates and Upgrades which NVIDIA does not make available to its
+commercial customers as part of the standard Services for the Supported Software but rather is
+only provided subject to a payment of a separate fee, and will not be provided in consideration
+of the Service Fees paid by You under the EULA.
+
+4     YOUR SERVICE RESPONSIBILITIES. In order for NVIDIA to deliver the Services to
+You hereunder, You agree that:
+
+(a)     You are responsible for procuring, installing and maintaining all equipment and obtaining
+all consents for other software and other hardware necessary to operate the Supported
+Software;
+(b)     Your failure to deploy a Maintenance release, Update release or Upgrade release
+available to You as promptly as possible may render the applicable Supported Software non-
+operable or non-conforming to the documentation or specifications provided by NVIDIA and You
+assume all risks and liability arising therefrom;
+(c)     You shall further provide through Designated Users such information, and/or access to
+Your resources as NVIDIA may reasonably require in order to provide Services, including,
+without limitation, access via the internet or via direct modem or VPN connection to relevant
+servers, minimally intrusive access to Your facilities, and/or access to, and assistance of, Your
+personnel who possess information required by NVIDIA for purposes of performing its
+obligations hereunder. As examples, as reasonably requested by NVIDIA You shall (i) identify
+the correct version(s) of Supported Software to which a potential Support Issue relates, (ii)
+provide the documentation and assistance necessary to demonstrate and diagnose each
+potential Support Issue, including providing necessary test cases that NVIDIA can reproduce on
+a Certified System, (iii) provide remote system access for NVIDIA to replicate potential Errors,
+and (iv) provide embedded diagnostic information associated with the Supported Software;
+(d)     When You use a Maintenance release, Update release or Upgrade release, access to a
+new product version does not change the number of authorized licenses You have for the
+Supported Software and You shall discontinue use of the prior version as necessary to maintain
+Your authorized number of licenses;
+(e)     You will appoint as Designated Users only those of Your employees who have
+reasonably appropriate technical backgrounds and skills. You may remove or replace any of the
+Designated Users at any time during a Service Term upon written notice to NVIDIA; and
+(f)     You will appoint, at NVIDIA's request, designated Service and engineering contacts for
+Service issue escalations.
+NVIDIA shall be excused from any non-performance of its obligations hereunder to the extent
+any such non-performance is attributable to Your failure to perform Your obligations under this
+section.
+
+5        SERVICE FEES; PAYMENT TERMS. When You purchase Services directly from
+NVIDIA the following applies: Service Fees for the Service Subscriptions are set forth in the
+associated Order and are payable pursuant to the terms of such Order. Unless otherwise
+expressly indicated in an Order, Service Fees will be invoiced upon Your purchase and are
+payable net thirty (30) days of the invoice date. All Service Fees are non-refundable. All
+payments will be made in U.S. Dollars. The Service Fees do not include any taxes, duties or
+similar charges. If NVIDIA is required to pay sales, use, property, value-added or other taxes
+based on the payments provided in the EULA and if NVIDIA is required to collect and remit such
+taxes, then such taxes shall be billed to and paid by You or Your reseller, unless NVIDIA
+receives a valid exemption or resale certificate. If You are not billed the applicable tax under the
+Order, then it is Your responsibility to properly remit the tax directly to the applicable tax
+jurisdiction. Further, You acknowledge that the payments to NVIDIA under the EULA shall be
+made in full without reduction for withholding taxes, if applicable. This section shall not apply to
+taxes based on NVIDIA's net income or payroll taxes. All amounts not paid when due will accrue
+interest (without the requirement of a notice) at the lower of 1.5% per month or the highest rate
+permissible by law until the unpaid amounts are paid in full. If payment of any Service Fee is
+overdue, NVIDIA reserves the right to suspend or terminate Services, in addition to any other
+remedies it may have, until the payment delinquency is corrected. Payment obligations survive
+any expiration or termination of the EULA and upon expiration or termination of the EULA any
+amounts owed to NVIDIA will be due and payable immediately on the effective date of
+expiration or termination, even if longer terms had been provided previously.
+
+6      DEFINITIONS.
+
+6.1     "Certified Systems" means Supported OS platforms, corresponding hardware platforms,
+third party software and configuration details appearing on a list maintained by NVIDIA and
+made available to You, or as otherwise approved by NVIDIA.
+
+6.2    "Day(s)" (only when capitalized) means 8:00 AM - 5:00 PM, Pacific Time, Monday
+through Friday, excluding U.S. public holidays. All other usage of "day" or "days" means
+calendar days.
+
+6.3   "Designated User" means the individual(s) designated by You as the technical contact(s)
+who may file and engage with NVIDIA on Technical Support.
+
+6.4    "Error(s)" means a reproducible defect, problem, logical error or bug in the Supported
+Software that constitutes a failure to comply substantially with the applicable NVIDIA
+documentation or specification and is reported using standard NVIDIA procedures.
+6.5    "Error Correction(s)" means adapting, re-configuring, or reprogramming the Supported
+Software to correct the Error(s).
+
+6.6     "Extended Support Period" means the period of time starting upon general availability of
+the next Upgrade version of a Supported Software product, and until the product reaches the
+product cycle milestone when Services are no longer made generally available for customers of
+the product (also referred to as the "end of life" milestone), which milestone is at NVIDIA's sole
+discretion.
+
+6.7     "General Support Period" means the period of time between general availability of one
+Upgrade version of a Supported Software product, and until the immediately following general
+availability of the next Upgrade version of the same product.
+
+6.8     "Maintenance" means security patch(es), Error Correction(s) and Workaround(s) to the
+Supported Software made available by NVIDIA in its sole discretion and on a "when and if
+generally made available" basis to its other commercial customers of the Supported Software,
+including those customers that do not have Updates or Upgrades as part of their current
+Service Subscription.
+
+6.9    "Response" means NVIDIA's initial acknowledgment of a Technical Support request filed
+by a Designated User.
+
+6.10 "Services" means, as the context requires, each or all of the following: (i) Technical
+Support, (ii) Maintenance, (iii) Update, and (iv) Upgrade services to the Supported Software
+provided by NVIDIA hereunder based on the Service Subscription You purchased.
+
+6.11 "Service Fee(s)" means the fees for the purchased Service Subscriptions, as applicable
+for each Order.
+
+6.12 "Service Subscriptions" means the particular Services You purchased from NVIDIA or an
+NVIDIA-approved reseller.
+
+6.13 "Support Issue(s)" means the Technical Support requests filed by Designated Users
+hereunder that relate to the Supported Software.
+
+6.14 "Supported OS" means the supported operating system(s) listed in conjunction with a
+particular Certified System on the list maintained by NVIDIA and made available to You.
+
+6.15 "Supported Software" means the Software installed on Your premises that are under a
+current and valid license and for which You purchased Services, and does not include any
+modifications made by You or a third party on Your behalf, any modifications to the Supported
+Software made by NVIDIA pursuant to a consulting services agreement or any portion of the
+Supported Software not developed by NVIDIA.
+
+6.16 "Service Term" means the duration of the Service Subscriptions purchased as set forth
+in an Order.
+
+6.17 "Technical Support" means the provision of telephone or web-based technical
+assistance by qualified NVIDIA personnel to questions from Designated Users related to the
+installation, use and operation of the Supported Software, including basic instruction or
+assistance related to functional Errors in the Supported Software.
+
+6.18 "Updates" means those modifications to the Supported Software other than Maintenance
+deliverables made available by NVIDIA in its sole discretion and on a "when and if generally
+made available" basis to its other commercial customers of the Supported Software who have
+the same Supported Software version under a Services contract coverage with NVIDIA that
+specifically includes "Updates" and that is indicated by NVIDIA as being an update by means of
+a change in the digit to right of first decimal point (e.g., version 5.0 to version 5.1). Updates may
+include revisions to Documentation.
+
+6.19 "Upgrades" means those modifications to the Supported Software other than
+Maintenance releases made available by NVIDIA in its sole discretion and on a "when and if
+generally made available" basis to its other commercial customers of the Supported Software
+who have the same Supported Software version under a Services contract coverage with
+NVIDIA that specifically includes "Updates" and that is indicated by NVIDIA as being an upgrade
+by means of a change in the digit to left of first decimal point (e.g., version 5.0 to version 6.0).
+Upgrades may include revisions to Documentation.
+
+6.20 "Workarounds" means procedures and routines, for use by You, which, when employed
+in the regular operation of, or access to, the Supported Software, will avoid or substantially
+diminish the practical adverse effects of the relevant Error.

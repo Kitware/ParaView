@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief  Interface for accessing the monitored performance values.
@@ -139,11 +139,11 @@ public:
     /// - frames_per_second: Rendered frames per second (corresponding
     ///   to time_complete_frame).
     /// - nb_horizontal_spans: Number of horizontal spans used.
-    /// - size_zbuffer_transfer: Size of the z-buffer used for OpenGL
-    ///   integration.
-    /// - size_zbuffer_transfer_compressed: Size of the compressed z-buffer
+    /// - size_zbuffer_transfer: Size of the depth buffer used for application
+    ///   rendering integration.
+    /// - size_zbuffer_transfer_compressed: Size of the compressed depth buffer
     ///   that is transferred over the network.
-    /// - time_zbuffer_serialize: Time taken for processing the z-buffer,
+    /// - time_zbuffer_serialize: Time taken for processing the depth buffer,
     ///   e.g. compression.
     ///
     /// The types that have names starting with "time_" as well as the type "frames_per_second" are

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for implementing progress callbacks.
@@ -16,13 +16,12 @@ namespace nv
 namespace index
 {
 
-/// The interface class allows implementing user-defined progress callbacks
-/// used for querying the progress of the distributed rendering or
-/// computing task. The progress of a tasks, e.g., the uploading and
-/// rendering of the data, is measured in percent in the
-/// range from 0 to 100.
+/// User-defined progress callback for querying the progress of the
+/// distributed rendering or computing task. The progress of a tasks,
+/// e.g., the uploading and rendering of the data, is measured in
+/// percent in the range from 0 to 100.
 ///
-/// The index library's render call provides means to register a progress
+/// \c IIndex_rendering::render()  provides means to register a progress
 /// callback that monitors the progress for uploading and rendering the 
 /// data in the cluster.
 ///

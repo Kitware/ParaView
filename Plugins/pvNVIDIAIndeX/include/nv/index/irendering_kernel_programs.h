@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute representing user programmable rendering kernel
@@ -251,7 +251,7 @@ public:
 /// It is important to note that the contents of the buffer data input through this interface must conform to certain
 /// rules to ensure data consistency between the host and device data. Especially, data alignment of buffer contents
 /// must be regarded. For example, certain vector data types require alignment to special boundaries inside structures:
-/// http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#vector-types__alignment-requirements-in-device-code
+/// https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses
 ///
 /// Example for misaligned data between host and device:
 ///
@@ -264,13 +264,13 @@ public:
 /// \endcode
 ///
 /// In this example the 'color' entry of the structure is not correctly aligned to the struct. A \c float4 variable requires
-/// a 4 byte alignment. Such cases can be corrected by manually adding padding data:
+/// a 16 byte alignment. Such cases can be corrected by manually adding padding data:
 ///
 /// \code
 /// struct correct_alignment
 /// {
 ///     float3  normal;
-///     char    padding_data[4]; // align the next entry to a 4 byte boundary
+///     char    padding_data[4]; // align the next entry to a 16 byte boundary
 ///     float4  color;
 /// };
 /// \endcode

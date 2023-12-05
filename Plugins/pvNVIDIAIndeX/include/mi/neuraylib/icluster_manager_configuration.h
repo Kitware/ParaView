@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cluster manager
@@ -49,7 +49,7 @@ public:
 
     /// This callback will be called when the cluster is fully started and connected.
     ///
-    /// \param is_ready   True, if the cluster is up and ready to be connected
+    /// \param is_ready   \c True, if the cluster is up and ready to be connected
     virtual void cluster_ready_callback(bool is_ready) = 0;
 };
 
@@ -365,12 +365,12 @@ public:
     /// any reserved cluster will be released by the VCA manager when the connection is closed from
     /// its point of view. The default is that auto-release is not enabled.
     ///
-    /// \param auto_release_enabled True, if auto-release should be enabled, false otherwise.
+    /// \param auto_release_enabled \c True, if auto-release should be enabled, \c false otherwise.
     virtual void set_auto_release_cluster( bool auto_release_enabled) = 0;
 
     /// Return if auto-release is enabled or not.
     ///
-    /// \return                     True, if auto-release is enabled, false otherwise.
+    /// \return                     \c True, if auto-release is enabled, \c false otherwise.
     virtual bool get_auto_release_cluster() = 0;
 
     /// Get the name of the VCA to which this connections connects to.
@@ -405,7 +405,7 @@ public:
         const char* address, const char* user_name, const char* password, Sint32* errors = 0) = 0;
 };
 
-/*@}*/ // end group mi_neuray_cluster_manager
+/**@}*/ // end group mi_neuray_cluster_manager
 
 } // namespace neuraylib
 

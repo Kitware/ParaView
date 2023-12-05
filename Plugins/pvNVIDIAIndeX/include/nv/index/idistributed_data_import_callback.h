@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The interface class for implementing import callbacks used for distributed large-scale data chunk loading.
@@ -58,9 +58,9 @@ public:
 /// contained in subregions.
 ///
 /// Derived classes typically declare additional member variables. 
-/// For instance, importer that read the data from a file server
+/// For instance, importers that read the data from a file server
 /// require the file and directory names where a dataset is
-/// stored for uploading.
+/// stored.
 ///
 /// Consequently, a derived class has to implement the methods of the
 /// (\c mi::neuraylib::ISerializable) interface class properly, i.e.,
@@ -70,9 +70,9 @@ public:
 ///
 /// Whenever the subregion that contains part of the entire data is processed by
 /// the distributed rendering and computing solution, the NVIDIA IndeX library
-/// calls the interface method \c create() and passes a bounding box, The bounding
+/// calls \c create() and passes a bounding box. The bounding
 /// box is given in the dataset's local space and defines the 3D area for which 
-/// the data of the dataset subset need to be imported.
+/// the data of the dataset subset needs to be imported.
 ///
 /// \ingroup nv_index_data_import
 ///

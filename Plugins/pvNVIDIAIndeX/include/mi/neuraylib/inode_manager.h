@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Node manager API
@@ -39,14 +39,14 @@ namespace neuraylib {
 /// in order to add a cluster of worker nodes to a running application or to join an already running
 /// cluster.
 ///
-/// The application running on the client nodes has full control over which cluster to join or which
-/// worker nodes to select for the formation of a cluster. This can be achieved by writing a custom
-/// filter class to which DiCE offers eligible clusters respectively worker nodes along with their
-/// properties which have been set by the node manager process running on the worker nodes. Such a
-/// filter can then return either true or false. True is returned if the cluster respectively worker
-/// node in question should be chosen, or false, otherwise. In addition a client application can
-/// specify a minimum and maximum amount of worker nodes which need to be in the cluster for the
-/// cluster creation to be successful.
+/// The application running on the client nodes has full control over which cluster to join or
+/// which worker nodes to select for the formation of a cluster. This can be achieved by writing a
+/// custom filter class to which DiCE offers eligible clusters respectively worker nodes along with
+/// their properties which have been set by the node manager process running on the worker nodes.
+/// Such a filter can then return either \c true or \c false. \c True is returned if the cluster
+/// respectively worker node in question should be chosen, or \c false, otherwise. In addition a
+/// client application can specify a minimum and maximum amount of worker nodes which need to be in
+/// the cluster for the cluster creation to be successful.
 ///
 /// Each cluster created using the node manager API is associated with a multicast address which is
 /// automatically chosen and which can be passed to DiCE for forming a DiCE cluster. In addition to
@@ -1096,7 +1096,7 @@ public:
     virtual INode_manager_worker* create_worker() = 0;
 };
 
-/*@}*/ // end group mi_neuray_node_manager
+/**@}*/ // end group mi_neuray_node_manager
 
 } // namespace neuraylib
 

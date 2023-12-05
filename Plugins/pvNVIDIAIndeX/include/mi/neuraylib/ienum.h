@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Numeric types.
@@ -79,7 +79,7 @@ public:
     virtual const IEnum_decl* get_enum_decl() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_simple_types
+/**@}*/ // end group mi_neuray_simple_types
 
 } // namespace mi
 

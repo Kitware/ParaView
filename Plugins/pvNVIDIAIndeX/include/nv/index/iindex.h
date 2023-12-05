@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Main API of the NVIDIA IndeX library.
@@ -12,13 +12,13 @@
 #include <mi/dice.h>
 
 #include <nv/index/iaffinity_information.h>
+#include <nv/index/iapplication_depth_buffer.h>
 #include <nv/index/ibalancing_operations.h>
 #include <nv/index/icluster_change_callback.h>
 #include <nv/index/idistributed_data_locality.h>
 #include <nv/index/ierror.h>
 #include <nv/index/iindex_canvas.h>
 #include <nv/index/iindex_scene_query.h>
-#include <nv/index/iopengl_application_buffer.h>
 #include <nv/index/iperformance_values.h>
 #include <nv/index/iprogress_callback.h>
 #include <nv/index/iscene_query_results.h>
@@ -220,7 +220,7 @@
 /// \defgroup nv_index_rendering Distributed Rendering
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 // ----------------------------------------------------------------------------------
@@ -228,25 +228,25 @@
 /// \defgroup nv_index_computing Distributed Computing
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 /// \defgroup nv_index_data_access Distributed Data Access
 /// \ingroup nv_index_computing
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 /// \defgroup nv_index_data_edit Distributed Compute Jobs
 /// \ingroup nv_index_computing
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 /// \defgroup nv_index_data_computing Distributed Rendering and Computing
 /// \ingroup nv_index_computing
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 // ----------------------------------------------------------------------------------
@@ -254,7 +254,7 @@
 /// \defgroup xac NVIDIA IndeX Accelerated Computing Technology
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 /// The NVIDIA IndeX Accelerated Computing (XAC) interfaces enable application-side
 /// programming of CUDA programs that are compiled and linked with the NVIDIA IndeX 
@@ -269,7 +269,7 @@
 /// \defgroup xac_scene Sampling and Scene Information for XAC programs
 /// \ingroup xac
 ///
-/// \brief \todo mn
+/// \brief
 ///
 /// The NVIDIA IndeX XAC programs For each rendered frame, NVIDIA IndeX performs a front-to-back ray
 /// casting procedure in a scene defined by an XAC class.
@@ -277,7 +277,7 @@
 /// \defgroup xac_obj XAC elements
 /// \ingroup xac
 ///
-/// \brief \todo mn
+/// \brief
 ///
 /// Scene elements for XAC programs.
 /// Predefined elements that are part of the XAC interface can provide information
@@ -287,7 +287,7 @@
 /// \defgroup xac_lib XAC functions
 /// \ingroup xac
 ///
-/// \brief \todo mn
+/// \brief
 ///
 /// Functions and macros for XAC programs.
 /// The XAC interface also provides a set of convenience macros and functions for
@@ -297,7 +297,7 @@
 /// \defgroup xac_compute XAC compute
 /// \ingroup xac
 ///
-/// \brief \todo mn
+/// \brief
 ///
 /// NVIDIA IndeX Accelerated Compute (XAC) facilities for gpu accelerated computing of data.
 
@@ -306,7 +306,7 @@
 /// \defgroup nv_scene_queries Built-in Picking Operation
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 // ----------------------------------------------------------------------------------
@@ -324,7 +324,7 @@
 /// \defgroup nv_index_utilities Utilities
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 // ----------------------------------------------------------------------------------
@@ -332,7 +332,7 @@
 /// \defgroup nv_index_performance_measurement Performance measurement
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 // ----------------------------------------------------------------------------------
@@ -340,7 +340,7 @@
 /// \defgroup nv_index_error Errors
 /// \ingroup nv_index
 ///
-/// \brief \todo mn
+/// \brief
 ///
 
 
@@ -473,21 +473,25 @@ class IIndex_session :
     public mi::base::Interface_declare<0x8ba1e5c7,0xaeb9,0x45ee,0xbb,0xf1,0xd6,0x25,0x91,0x70,0xce,0xaa>
 {
 public:
-    /// Create an instance that represents the \c ISession that manages the
+    /// Creates an instance that represents the \c ISession.
+    ///
+    /// An instance of the \c ISession interface class that manages the
     /// general operations applied to the system. A session, for instance, contains
     /// the configuration (\c IConfig_settings) and a scene
     /// (\c IScene), but also exposes factory functionalities for creating
     /// scene elements or the virtual camera.
     ///
+    /// The session can be assigned a name to be able to retrieve it later without knowing the tag
+    /// using \c get_session(). Such a name must be unique in the DiCE database. This functionality
+    /// can be used to enable failing viewer machines to continue rendering, or joining viewer
+    /// machines to implement multi-viewer/multi-scene scenarios for interactive collaborations on
+    /// shared large scale datasets.
+    ///
     /// \param[in] dice_transaction         The DiCE database transaction
     ///                                     used for creating a session.
     ///
-    /// \param[in] session_name             The session may have a certain name to retrieve
-    ///                                     the session by name without knowing the tag.
-    ///                                     Enables failing viewer machines to continue
-    ///                                     rendering or joining viewer machines to implement
-    ///                                     multi-viewer/multi-scene scenarios for interactive
-    ///                                     collaborations on shared large scale datasets.
+    /// \param[in] session_name             An optional name used to identify the session database
+    ///                                     element in the DiCE database.
     ///
     /// \return                             Returns the created \c ISession tag
     ///                                     on success. The caller takes ownership of the session
@@ -496,6 +500,26 @@ public:
     ///                                     it is not needed anymore.
     ///
     virtual mi::neuraylib::Tag_struct create_session(
+        mi::neuraylib::IDice_transaction*   dice_transaction,
+        const char*                         session_name = 0) = 0;
+
+    /// Returns a previously created \c ISession instance.
+    /// 
+    /// An instance of \c ISession that manages the general operations applied to the system. Such a
+    /// session contains, for instance, the configuration (\c IConfig_settings) and a scene (\c
+    /// IScene), but also exposes factory functionalities for creating scene elements or the virtual
+    /// camera.
+    ///
+    /// \param[in] dice_transaction         The DiCE transaction used for retrieving the selected
+    ///                                     session.
+    ///
+    /// \param[in] session_name             When querying for a session, the name stored 
+    ///                                     with the session when creating the session using 
+    ///                                     \c create_session() needs to be specified.
+    ///
+    /// \return                             Returns the tag of the \c ISession.
+    ///
+    virtual mi::neuraylib::Tag_struct get_session(
         mi::neuraylib::IDice_transaction*   dice_transaction,
         const char*                         session_name = 0) = 0;
 
@@ -537,7 +561,7 @@ public:
     virtual IClock_pulse_generator* get_clock() const = 0;
 };
 
-typedef mi::Uint32  IFrame_identifier; ///< A frame's unique identifier.
+typedef mi::Uint64  IFrame_identifier; ///< A frame's unique identifier.
 
 /// The frame results store information gathered during the rendering process. Such information
 /// include error information and the performance values.
@@ -570,6 +594,14 @@ public:
     ///                 of the rendering process.
     ///
     virtual IError_set* get_error_set() const = 0;
+
+    /// The frame id uniquely identifies the rendered frame.
+    /// The if of the rendered frame can be identified uniquely. This allows to assign frame rendering
+    /// results in a distinct way, e.g., to certain performance values.
+    /// 
+    /// \return         Returns a unique frame id.
+    ///
+    virtual IFrame_identifier get_frame_id() const = 0;
 };
 
 /// List of rendering results for multi-view rendering. Each list
@@ -788,9 +820,9 @@ public:
     ///                                         about the frames rendered, can
     ///                                         be set to 0.
     /// \param[in] composite_immediately        Deprecated, should be set to \c true.
-    /// \param[in] opengl_app_buffer            OpenGL application buffer, which
-    ///                                         contains RGBA and depth information.
-    ///                                         Set to 0 if OpenGL integration is not required.
+    /// \param[in] application_depth_buffer     Depth buffer of the application, with which the
+    ///                                         NVIDIA IndeX rendering should be integrated.
+    ///                                         Set to 0 if depth buffer integration is not required.
     ///
     /// \return                                 Returns a frame results interface containing
     ///                                         information gathered during the
@@ -804,7 +836,7 @@ public:
         IProgress_callback*                      progress = 0,
         IFrame_info_callbacks*                   frame_info = 0,
         bool                                     composite_immediately = true,
-        IOpengl_application_buffer*              opengl_app_buffer = 0) = 0;
+        IApplication_depth_buffer*               application_depth_buffer = 0) = 0;
 
     /// Renders a frame of the scene and writes the resulting image
     /// tiles into the user-defined or a built-in \c IIndex_canvas. Each element
@@ -889,7 +921,7 @@ public:
 /// \ingroup nv_index
 ///
 class IIndex :
-    public mi::base::Interface_declare<0x0342c227,0x65f1,0x4465,0xb2,0x79,0x74,0x6a,0x04,0xfa,0x28,0x4b>
+    public mi::base::Interface_declare<0x3beb46c0,0xb77d,0x4c90,0xbc,0xc3,0x1d,0xb1,0xa5,0xd5,0xb8,0xd5>
 {
 public:
     /// Authenticates the NVIDIA IndeX library.
@@ -947,6 +979,7 @@ public:
     ///   - \c ICluster_configuration.
     ///        The API component for configuring and querying the NVIDIA IndeX cluster setup.
     ///   - \c IIndex_scene_query
+    ///   - \c IMemory_allocator_configuration
     ///
     /// \param interface_id      The unique id of the interface to be queried.
     ///
@@ -1070,20 +1103,6 @@ public:
     ///
     virtual mi::Sint32 get_cuda_runtime_version() const = 0;
 
-    /// The NVIDIA IndeX library may come with different API to support various
-    /// domain specific interfaces for compute and rendering of large-scale data.
-    /// The interface version of the NVIDIA IndeX library indicates the API.
-    ///
-    /// \return     Returns the NVIDIA IndeX API version.
-    ///
-    virtual mi::Uint32 get_interface_version() const = 0;
-
-    /// Returns the interface version of the DiCE library.
-    ///
-    /// \return     Returns the DiCE API version.
-    ///
-    virtual mi::Uint32 get_dice_interface_version() const = 0;
-
     /// Returns the product version of the DiCE library.
     ///
     /// \return     Returns the DiCE product version.
@@ -1110,6 +1129,48 @@ public:
     /// \return         Exposes the DiCE interface.
     ///
     virtual mi::neuraylib::INeuray* get_dice_interface() = 0;
+};
+
+/// Optional configuration for how the NVIDIA IndeX library loads its dependeny shared libraries,
+/// such as DiCE.
+///
+/// An instance of this interface can only be retrieved from \c nv_factory() and configured before
+/// \c IIndex is first accessed.
+///
+/// By default the system's standard shared library search mechanism will be used, which may be
+/// affected by environment variables such as \c LD_LIBRARY_PATH or \c PATH. Alternatively, a fixed
+/// path can be specified, which may also be relative to the position of the NVIDIA IndeX shared
+/// library file. When multiple search paths/mechanism (e.g. fixed path and default) are added, then
+/// they will be tried in order.
+///
+/// \ingroup nv_index
+///
+class IIndex_loader_configuration :
+    public mi::base::Interface_declare<0x48c60a29,0x6c27,0x4d2c,0x86,0x90,0xfa,0x47,0x17,0xc2,0xa7,0xd8>
+{
+public:
+    /// Resets the loader configuration to the defaults.
+    virtual void clear() = 0;
+
+    /// Adds a directory to the library search list.
+    ///
+    /// \param[in]  directory  Path of a directory, ignored if null or empty string.
+    ///
+    virtual void add_library_search_path(const char* directory) = 0;
+
+    /// Adds a path relative to the location of the NVIDIA IndeX shared library file to the library
+    /// search list.
+    ///
+    /// \param[in]  path       Path relative to the directory containing the NVIDIA IndeX shared
+    ///                        library. If null or empty string, the directory itself will be used.
+    ///
+    virtual void add_library_search_origin(const char* path = 0) = 0;
+
+    /// Adds the system's standard library search mechanism to the library search list. This will
+    /// include default library search paths as well as additional paths defined, for example, by
+    /// environment variables such as \c LD_LIBRARY_PATH or \c PATH.
+    ///
+    virtual void add_library_search_default() = 0;
 };
 
 } // namespace index
@@ -1144,7 +1205,8 @@ nv::index::IIndex* nv_index_factory();
 /// - an instance of the main #nv::index::IIndex interface, which is used to configure,
 /// to start up, to operate and to shut down NVIDIA IndeX. This interface can be requested
 /// only once.
-/// - an instance of the mi::neuraylib::IVersion class.
+/// - an instance of #nv::index::IIndex_loader_configuration.
+/// - an instance of mi::neuraylib::IVersion.
 ///
 /// \ingroup nv_index
 ///
@@ -1180,8 +1242,8 @@ T* nv_factory(void* symbol, void* arg = 0)
         return 0;
     }
 
-    typedef mi::base::IInterface* INeuray_factory(const mi::base::Uuid& iid, void* arg);
-    INeuray_factory* factory = reinterpret_cast<INeuray_factory*>(symbol);
+    typedef mi::base::IInterface* IIndex_factory(const mi::base::Uuid& iid, void* arg);
+    IIndex_factory* factory = reinterpret_cast<IIndex_factory*>(symbol);
     mi::base::Handle<mi::base::IInterface> iinterface(factory(typename T::IID(), arg));
     if (iinterface)
     {

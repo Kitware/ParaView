@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for networking related settings.
@@ -154,7 +154,7 @@ public:
 
     /// Sets the interface to be used for outgoing packets.
     ///
-    /// If not set, it will be the any address. The string may end with : and a port number to
+    /// If not set, it will be the "any" address. The string may end with : and a port number to
     /// select which port to listen to for UDP and TCP unicast. If no port is set and unicast only
     /// mode is set, port 10000 will be used.
     ///
@@ -165,12 +165,14 @@ public:
     /// address as 192.168.0.0/16:10000 would make the host bind to the 192.168.1.1 address on
     /// port 10000.
     ///
-    /// IPv6 addresses need to be surrounded by brackets but can otherwise be used just like its
-    /// IPv4 counterparts mentioned above. The address [::] means the ``any IPv6 interface''
+    /// IPv6 addresses need to be surrounded by brackets but can otherwise be used just like their
+    /// IPv4 counterparts mentioned above. The address [::] means the "any IPv6 interface"
     /// address.
     ///
-    /// It is also possible to specify an interface name instead of an address. DiCE will
-    /// then take the address from the interface.
+    /// It is also possible to specify an interface name instead of an address. The name must
+    /// be prefixed by the string \c "if://". \NeurayProductName will then take the address
+    /// from the interface. A single "*" wildcard may be used at the end of the requested name,
+    /// in which case the first matching interface will be selected.
     ///
     /// This can only be configured before \NeurayProductName has been started.
     ///
@@ -360,7 +362,7 @@ public:
 
     /// Enables or disables the usage of RDMA InfiniBand. 
     /// 
-    /// The default value is false (disabled).
+    /// The default value is \c false (disabled).
     /// 
     /// \see #get_use_rdma()
     ///
@@ -401,7 +403,7 @@ public:
 mi_static_assert( sizeof( INetwork_configuration::Status) == sizeof( Uint32));
 mi_static_assert( sizeof( INetwork_configuration::Mode) == sizeof( Uint32));
 
-/*@}*/ // end group mi_neuray_configuration
+/**@}*/ // end group mi_neuray_configuration
 
 } // namespace neuraylib
 

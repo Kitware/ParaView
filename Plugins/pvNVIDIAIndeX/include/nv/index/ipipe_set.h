@@ -1,6 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
+/// \brief Pipe set scene element.
 
 #ifndef NVIDIA_INDEX_IPIPE_SET_H
 #define NVIDIA_INDEX_IPIPE_SET_H

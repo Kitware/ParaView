@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief UUID type.
@@ -30,7 +30,7 @@ public:
     virtual base::Uuid get_uuid() const = 0;
 };
 
-/*@}*/ // end group mi_neuray_simple_types
+/**@}*/ // end group mi_neuray_simple_types
 
 } // namespace mi
 

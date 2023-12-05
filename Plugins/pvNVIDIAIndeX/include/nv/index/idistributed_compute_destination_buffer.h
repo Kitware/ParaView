@@ -1,5 +1,5 @@
  /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous texture generation for use with shapes.
@@ -13,6 +13,7 @@
 #include <nv/index/idistributed_data_subset.h>
 
 #include <nv/index/iirregular_volume_subset.h>
+#include <nv/index/iparticle_volume_subset.h>
 #include <nv/index/isparse_volume_subset.h>
 #include <nv/index/isparse_volume_subset.h>
 #include <nv/index/ivdb_subset.h>
@@ -81,6 +82,15 @@ public:
     ///
     virtual Compute_frame_id                        get_compute_frame_id() const = 0;
 
+    /// Notity IndeX about the completion of the compute operation performed on an instance
+    /// of \c IDistributed_compute_destination_buffer.
+    /// 
+    /// This notification will let IndeX perform follow-up operations and schedule the computed
+    /// data for use or rendering. This notification is sent implicitly on returning from a
+    /// \c IDistributed_compute_technique::launch_compute call for all provided destination-
+    /// buffer instances.
+    /// 
+    virtual void                                    notify_compute_completion() const = 0;
 };
 
 /// Compute-destination buffer for 3D sparse-volume generation techniques.
@@ -206,13 +216,45 @@ public:
     virtual IVDB_subset*                            get_distributed_data_subset() = 0;
 };
 
-/// The interface class exposes intersections points that can be used, for
+/// Compute-destination buffer for particle volumes (point sets).
+///
+/// Upon applying an \c IDistributed_compute_technique attribute to a \c IParticle_volume_scene_element scene element
+/// a \c IDistributed_compute_destination_buffer_VDB is passed to the \c IDistributed_compute_technique::launch_compute()
+/// method.
+///
+/// \ingroup nv_index_data_computing
+///
+class IDistributed_compute_destination_buffer_particle_volume :
+    public mi::base::Interface_declare<0x131bc471, 0xb557, 0x4e80, 0x8e, 0x71, 0xa1, 0x3a, 0x58, 0xd5, 0xa5, 0x1f,
+                                       nv::index::IDistributed_compute_destination_buffer>
+{
+public:
+    /// Returns the bounding box of the volume subset for which the compute technique
+    /// is required to generate values.
+    ///
+    /// The rendering system computes and initializes the bounding box of the volume subset.
+    ///
+    /// \return     The bounding box of the volume subset, defined in non-normalized
+    ///             volume coordinates.
+    ///
+    virtual mi::math::Bbox_struct<mi::Float32, 3>   get_volume_subset_data_bbox() const = 0;
+
+    /// Returns the particle volume data-subset for which the compute technique is required to
+    /// generate data values.
+    ///
+    /// \return     An interface pointer to an instance of \c IParticle_volume_subset.
+    ///
+    virtual IParticle_volume_subset*                get_distributed_data_subset() = 0;
+};
+
+
+/// The interface class exposes intersection points that can be used, for
 /// instance, to texture or shade the surface of geometry.
 ///
 /// The IndeX library implements the serializable interface, which enables
 /// user-defined classes to distribute an instance of the class to different
 /// hosts in the cluster environment using DiCE's serialization and
-/// deserialization mechanism.  Furthermore, the interface class exposes the
+/// deserialization mechanism. Furthermore, the interface class exposes the
 /// intersections points through the interface method
 /// generate_intersection_points(). The internal implementation of this method
 /// creates the intersection points on the fly whenever the method is
@@ -645,6 +687,14 @@ public:
     ///         area is defined in the object's local coordinate system.
     ///
     virtual mi::math::Bbox_struct<mi::Float32, 2> get_surface_area() const = 0;
+};
+
+class IDistributed_compute_destination_buffer_container :
+    public mi::base::Interface_declare<0xdb6a75e3,0x86c0,0x494a,0xac,0xd9,0x4a,0xd9,0x68,0x56,0xb7,0x3c>
+{
+public:
+    virtual mi::Uint32                                  get_nb_destination_buffers() const = 0;
+    virtual IDistributed_compute_destination_buffer*    get_destination_buffer(mi::Uint32 buffer_idx) const = 0;
 };
 
 } // namespace index

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for creation, assignment, and cloning of instances of types.
@@ -373,7 +373,7 @@ public:
 mi_static_assert( sizeof( IFactory::Assign_result) == sizeof( Uint32));
 mi_static_assert( sizeof( IFactory::Assign_clone_options) == sizeof( Uint32));
 
-/*@}*/ // end group mi_neuray_types
+/**@}*/ // end group mi_neuray_types
 
 } // namespace neuraylib
 

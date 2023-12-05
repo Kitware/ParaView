@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous, distributed data generation techniques.
@@ -25,12 +25,12 @@ namespace index {
 /// of the scene primitive (defined by the renderer), the compute technique is
 /// called and an instance of an \c IDistributed_compute_destination_buffer is passed. The
 /// compute technique fills this buffer for the required subregions of the
-/// distributed dataset. The renderer then maps either uses the generated data
+/// distributed dataset. The renderer then maps either the generated data
 /// directly (\c ISparse_volume_scene_element) or uses it as a texture mapped onto the defined
 /// 2D area (c IPlane and \c IRegular_heightfield).
 ///
 /// Typical use cases for the compute technique are to visualize data that result
-/// from complex, possibly distributed, computing processes process either as 2D
+/// from complex, possibly distributed, computing processes either as 2D
 /// textures or 3D volumes.
 ///
 /// \ingroup nv_index_data_computing
@@ -40,28 +40,34 @@ class IDistributed_compute_technique :
                                        nv::index::IAttribute>
 {
 public:
+    enum Invocation_mode
+    {
+        INDIVIDUAL,             ///< The launch_compute() callback will be invoked for each data-subset individually
+        GROUPED_PER_DEVICE,     ///< The launch_compute() callback will be invoked with a list of all data-subsets grouped per device
+        GROUPED_PER_HOST        ///< The launch_compute() callback will be invoked with a list of all data-subsets grouped per host
+    };
+
+public:
     /// Launches the user-defined compute technique. This method is called by the
-    /// rendering system in a separate thread to trigger the computation of the buffer
+    /// rendering system in a separate thread to trigger the computation of the buffers
     /// data asynchronously and in parallel to the rendering of subregion data.
     ///
-    /// \note This method must only return upon finishing the compute tasks.
+    /// \note This method must only return upon finishing the all compute tasks.
     ///
-    /// \param[in]     dice_transaction  The current DiCE transaction.
-    ///
-    /// \param[in,out] dst_buffer
-    ///                An instance of a \c IDistributed_compute_destination_buffer representing
-    ///                either a \c IDistributed_compute_destination_buffer_2d_texture for generating
-    ///                2D texture data or a specialization of \c IDistributed_compute_destination_buffer_3d_volume
-    ///                for generating 3D volume data. Part of destination buffers
-    ///                attributes are set by the rendering system. These include,
-    ///                for instance, the bounding box of the subregion or the 2D
-    ///                screen space area covered by the subregion. The destination
-    ///                buffers are created by and will be cached inside the rendering
-    ///                system.
+    /// \param[in,out] dst_buffer_container A set of instances of a \c IDistributed_compute_destination_buffer representing
+    ///                                     either a \c IDistributed_compute_destination_buffer_2d_texture for generating
+    ///                                     2D texture data or a specialization of \c IDistributed_compute_destination_buffer_3d_volume
+    ///                                     for generating 3D volume data. Part of destination buffers
+    ///                                     attributes are set by the rendering system. These include,
+    ///                                     for instance, the bounding box of the subregion or the 2D
+    ///                                     screen space area covered by the subregion. The destination
+    ///                                     buffers are created by and will be cached inside the rendering
+    ///                                     system.
+    /// \param[in]     dice_transaction     The current DiCE transaction.
     ///
     virtual void launch_compute(
-        mi::neuraylib::IDice_transaction*        dice_transaction,
-        IDistributed_compute_destination_buffer* dst_buffer) const = 0;
+        IDistributed_compute_destination_buffer_container*  dst_buffer_container,
+        mi::neuraylib::IDice_transaction*                   dice_transaction) const = 0;
 
     /// Return whether the compute technique will work on the potentially exposed device data directly.
     /// 
@@ -70,14 +76,25 @@ public:
     /// communicates to IndeX if the device data is accessed or manipulated in order to change the internal
     /// data residency scheduling during the NVIDIA IndeX rendering operation when the compute task is invoked.
     /// 
-    /// \returns Whether the compute technique will work on the potentially exposed device data directly
+    /// \returns    Returns \c true if the compute technique will operate on the potentially exposed device data directly.
     /// 
     virtual bool is_gpu_operation() const = 0;
+
+    // Returns the expected invocation mode for the compute technique
+    ///
+    /// This mode controls how IndeX is providing the destination buffers for multiple 
+    /// data subsets to an instance of the compute technique implementation. The application
+    /// can control whether to receive all jobs individually and in parallel, or grouped per
+    /// device or host.
+    /// 
+    /// \returns The expected invocation mode for the compute technique.
+    /// 
+    virtual Invocation_mode get_invocation_mode() const = 0;
 
     /// Returns optional configuration settings that may be used by the library
     /// for the session export mechanism provided by \c ISession::export_session().
     ///
-    /// \see IDistributed_data_import_strategy::get_configuration()
+    /// \see IDistributed_data_import_callback::get_configuration()
     ///
     /// \return             String representation of the configuration settings, the
     ///                     instance of the interface class keeps ownership of the returned pointer.
@@ -185,6 +202,29 @@ public:
         return false;
     }
 
+    // Per default we want individual invocations
+    virtual IDistributed_compute_technique::Invocation_mode get_invocation_mode() const
+    {
+        return IDistributed_compute_technique::INDIVIDUAL;
+    }
+
+    // Keep compatibility with the old launch_compute() interface
+    virtual void launch_compute(
+        mi::neuraylib::IDice_transaction*         dice_transaction,
+        IDistributed_compute_destination_buffer*  dst_buffer) const
+    {
+        (void) dice_transaction;
+        (void) dst_buffer;
+    }
+
+    virtual void launch_compute(
+        IDistributed_compute_destination_buffer_container*  dst_buffer_container,
+        mi::neuraylib::IDice_transaction*                   dice_transaction) const
+    {
+        if (dst_buffer_container && dst_buffer_container->get_nb_destination_buffers() > 0u) {
+            return launch_compute(dice_transaction, dst_buffer_container->get_destination_buffer(0u));
+        }
+    }
 };
 
 

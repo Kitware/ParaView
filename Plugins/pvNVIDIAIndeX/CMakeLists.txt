@@ -1,11 +1,11 @@
 #/******************************************************************************
-# * Copyright 2021 NVIDIA Corporation. All rights reserved.
+# * Copyright 2023 NVIDIA Corporation. All rights reserved.
 # *****************************************************************************/
 
 paraview_add_plugin(pvNVIDIAIndeX
   REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
-  VERSION "5.11"
+  VERSION "5.12"
   EULA "EULA.txt"
   MODULES pvNVIDIAIndeX::IndeXRepresentations
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/vtk.module"

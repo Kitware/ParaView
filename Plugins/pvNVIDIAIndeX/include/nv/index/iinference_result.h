@@ -1,6 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
+/// \brief AI/DL inference results
 
 #ifndef NVIDIA_INDEX_IINFERENCE_RESULT_H
 #define NVIDIA_INDEX_IINFERENCE_RESULT_H
@@ -57,6 +59,10 @@ public:
         mi::neuraylib::Tag_struct           xac_program,
         mi::Uint32                          slot_id,
         nv::index::ICuda_memory_buffer*     inference_results) = 0;
+
+    virtual void invalidate(
+        mi::neuraylib::Tag_struct           xac_program,
+        mi::Uint32                          slot_id) = 0;
 };
 
 } // namespace index

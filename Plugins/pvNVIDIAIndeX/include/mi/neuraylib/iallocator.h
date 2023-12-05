@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for allocators.
@@ -76,7 +76,7 @@ public:
     virtual Size get_used_extra_memory() = 0;
 };
 
-/*@}*/ // end group mi_neuray_ineuray
+/**@}*/ // end group mi_neuray_ineuray
 
 } // namespace neuraylib
 

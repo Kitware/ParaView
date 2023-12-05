@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Color type.
@@ -71,7 +71,7 @@ public:
     using ICompound::set_value;
 };
 
-/*@}*/ // end group mi_neuray_compounds
+/**@}*/ // end group mi_neuray_compounds
 
 } // namespace mi
 

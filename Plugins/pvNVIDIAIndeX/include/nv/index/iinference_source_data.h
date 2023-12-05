@@ -1,6 +1,8 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
+/// \file
+/// \brief Interface for source data that an inference technique can operate on.
 
 #ifndef NVIDIA_INDEX_IINFERENCE_SOURCE_DATA_H
 #define NVIDIA_INDEX_IINFERENCE_SOURCE_DATA_H

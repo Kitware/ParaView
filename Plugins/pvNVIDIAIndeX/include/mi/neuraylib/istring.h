@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief String type.
@@ -33,7 +33,7 @@ public:
     virtual void set_c_str( const char* str) = 0;
 };
 
-/*@}*/ // end group mi_neuray_simple_types
+/**@}*/ // end group mi_neuray_simple_types
 
 } // namespace mi
 

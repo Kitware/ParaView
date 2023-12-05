@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2021 NVIDIA Corporation. All rights reserved.
+ * Copyright 2023 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for regular heightfield scene elements
@@ -216,7 +216,6 @@ public:
     /// Returns the tag of the import strategy that is used for
     /// loading the dataset.
     ///
-    /// \return tag of the IDistributed_data_import_strategy
     virtual mi::neuraylib::Tag_struct get_import_strategy() const = 0;
 
     ///////////////////////////////////////////////////////////////////////////////////
