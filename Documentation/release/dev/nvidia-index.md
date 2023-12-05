@@ -40,3 +40,13 @@ The POWER9 architecture (ppc64le) is no longer supported by the NVIDIA IndeX plu
 
 - Data that is outside the camera's view frustum will now be imported immediately by the NVIDIA IndeX plugin.
   Previously, data import could get delayed until the camera was moved, which would temporarily interrupt user interaction.
+
+- The color map for (signed) `char` and `short` data is now applied to the full value range, for consistency with other
+  ParaView representations.
+
+- `signed char` (`VTK_SIGNED_CHAR`) data is supported in addition to `char` (`VTK_CHAR`) and `unsigned char`
+  (`VTK_UNSIGNED_CHAR`) for structured volumes.
+
+- Platform dependent `char` data, which is used by the legacy VTK data format (.vtk) and when loading raw binary data
+  (.raw), is now correctly interpreted as `unsigned char` on aarch64, while it is `signed char` on x86-64. A warning
+  message will be given, recommending to use one of the explicit data types instead of `char`.

@@ -83,8 +83,16 @@ void normalize(const mi::math::Vector<mi::Float32, 2>& input_range,
   const mi::math::Vector<mi::Float32, 2>& scale_range,
   mi::math::Vector<mi::Float32, 2>& output_range)
 {
+  // unsigned scalar data: normalize to [0.0, 1.0]
   output_range.x = (input_range.x - scale_range.x) / (scale_range.y - scale_range.x);
   output_range.y = (input_range.y - scale_range.x) / (scale_range.y - scale_range.x);
+
+  if (scale_range.x < 0.f)
+  {
+    // signed scalar data: normalize to [-1.0, 1.0]
+    output_range = (output_range - mi::math::Vector<mi::Float32, 2>(0.5f)) *
+      mi::math::Vector<mi::Float32, 2>(2.f);
+  }
 }
 
 } // namespace
@@ -121,7 +129,6 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   if (scalar_type != "float" && scalar_type != "double" && scalar_type != "int" &&
     scalar_type != "unsigned int")
   {
-    // The scalar type is float or is internally converted to float (e.g. for "int")
     mi::math::Vector<mi::Float32, 2> scalar_range;
     regular_volume_properties->get_scalar_range(scalar_range);
 
@@ -131,6 +138,7 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   }
   else
   {
+    // The scalar type is float or is internally converted to float (e.g. for "int")
     domain_range = mi::math::Vector<mi::Float32, 2>(colormap_range);
   }
 

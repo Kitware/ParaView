@@ -281,6 +281,16 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
       m_data_array_warning_printed.emplace(this->ArrayName);
     }
   }
+  else if (scalar_type == "char")
+  {
+    if (m_data_array_warning_printed.find(this->ArrayName) == m_data_array_warning_printed.end())
+    {
+      WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
+               << "in '" << scalar_type << "' format which is platform dependent. "
+               << "Use 'signed char' or 'unsigned char' instead.";
+      m_data_array_warning_printed.emplace(this->ArrayName);
+    }
+  }
 
   if (!is_data_supported)
   {

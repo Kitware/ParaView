@@ -43,6 +43,15 @@ inline nv::index::Sparse_volume_voxel_format match_volume_format(const std::stri
 {
   if (fmt_string == "char")
   {
+    // "char" is platform dependent
+#if VTK_TYPE_CHAR_IS_SIGNED
+    return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT8;
+#else
+    return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_UINT8;
+#endif
+  }
+  else if (fmt_string == "signed char")
+  {
     return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT8;
   }
   else if (fmt_string == "unsigned char")
