@@ -11,7 +11,7 @@
 #                        (This should be CMAKE_INSTALL_PREFIX set for ParaView)
 # PARAVIEW_SOURCE_DIR : ParaView source dir (For source location of Examples)
 # PARAVIEW_TEST_DIR : Temporary directory for location of Examples build tree
-# PARAVIEW_VERSION : ParaView version string used when creating the installtree
+# PARAVIEW_VERSION : ParaView version string used when creating the install tree
 
 message (STATUS "Building Examples against ParaView install tree")
 message("CTEST_FULL_OUTPUT") # Don't truncate test output.

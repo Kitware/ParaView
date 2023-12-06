@@ -6,7 +6,7 @@
 #include "pqEventDispatcher.h" // For blocking test events during configuration download
 
 #include "vtkNew.h"
-#include "vtkPVVersion.h"
+#include "vtkPVVersionQuick.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 

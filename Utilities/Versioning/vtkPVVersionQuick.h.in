@@ -1,0 +1,17 @@
+// SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
+// SPDX-License-Identifier: BSD-3-Clause
+
+#ifndef vtkPVVersionQuick_h
+#define vtkPVVersionQuick_h
+
+#define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
+#define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@
+#define PARAVIEW_VERSION_EPOCH @PARAVIEW_VERSION_EPOCH@
+#define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
+
+#define PARAVIEW_VERSION_CHECK(major, minor, build)                                                     \
+  (10000000000ULL * major + 100000000ULL * minor + build)
+#define PARAVIEW_VERSION_NUMBER_QUICK                                                                   \
+  PARAVIEW_VERSION_CHECK(PARAVIEW_VERSION_MAJOR, PARAVIEW_VERSION_MINOR, PARAVIEW_VERSION_EPOCH)
+
+#endif

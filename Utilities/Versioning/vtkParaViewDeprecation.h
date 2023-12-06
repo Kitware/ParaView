@@ -5,7 +5,7 @@
 #ifndef vtkParaViewDeprecation_h
 #define vtkParaViewDeprecation_h
 
-#include "vtkPVVersion.h"
+#include "vtkPVVersionQuick.h"
 
 //----------------------------------------------------------------------------
 // These macros may be used to deprecate APIs in ParaView. They act as
@@ -50,7 +50,11 @@
 // The level at which warnings should be made.
 #ifndef PARAVIEW_DEPRECATION_LEVEL
 // ParaView defaults to deprecation of its current version.
+#ifdef PARAVIEW_VERSION_NUMBER
 #define PARAVIEW_DEPRECATION_LEVEL PARAVIEW_VERSION_NUMBER
+#else
+#define PARAVIEW_DEPRECATION_LEVEL PARAVIEW_VERSION_NUMBER_QUICK
+#endif
 #endif
 
 // API deprecated before 5.11.0 have already been removed.

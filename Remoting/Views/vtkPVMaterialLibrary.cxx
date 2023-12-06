@@ -4,10 +4,13 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVVersion.h"
 #include "vtkProcessModule.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkVersion.h"
+
+#if !defined(_WIN32) && !defined(__APPLE__)
+#include "vtkPVVersionQuick.h"
+#endif
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"

@@ -9,11 +9,14 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVFileInformationHelper.h"
-#include "vtkPVVersion.h"
 #include "vtkProcessModule.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkSmartPointer.h"
 #include "vtkVersion.h"
+
+#if !defined(_WIN32) && !defined(__APPLE__)
+#include "vtkPVVersionQuick.h"
+#endif
 
 #if defined(_WIN32)
 #include <direct.h>  // _getcwd
