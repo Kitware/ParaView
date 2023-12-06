@@ -69,7 +69,8 @@ vtk_module_add_module(pvNVIDIAIndeX::IndeXRepresentations
   CLASSES ${classes}
   SOURCES ${sources}
   PRIVATE_CLASSES ${private_classes}
-  PRIVATE_HEADERS ${private_headers})
+  PRIVATE_HEADERS ${private_headers}
+  SPDX_SKIP_REGEX "^vtknvindex_")
 vtk_module_include(pvNVIDIAIndeX::IndeXRepresentations
   PUBLIC
     $<BUILD_INTERFACE:${NVINDEX_INCLUDE_DIRS}>)
