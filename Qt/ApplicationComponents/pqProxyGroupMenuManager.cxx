@@ -840,7 +840,10 @@ QAction* pqProxyGroupMenuManager::getAction(pqProxyInfo* proxyInfo)
 void pqProxyGroupMenuManager::updateActionIcon(pqProxyInfo* proxy)
 {
   auto action = this->getAction(proxy);
-  this->Internal->updateActionIcon(action, proxy);
+  if (action)
+  {
+    this->Internal->updateActionIcon(action, proxy);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -66,7 +66,7 @@
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation_0" />
 
   <!-- ================================================== -->
-  <!-- add filter -->
+  <!-- add filters -->
   <!-- if no selection, add button is disabled -->
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="false" />
   <!-- look for "0000MyGlyph" (in filter left panel). As the test uses index in the filter list, we need this filter to be the first, thus its name -->
@@ -91,6 +91,18 @@
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/IconBrowser/buttonBox/ApplyIcon" command="activate" arguments="" />
+
+  <!-- manipulate proxy of an inexisting filter (not built, or from an not-loaded plugin but still in settings) -->
+  <!-- look for "0001 My Undefined Filter" (in filter left panel). As the test uses index in the filter list, we need this filter to be the second, thus its name -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/searchBox/SearchLineEdit" command="set_string" arguments="My Undefined Filter" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" property="modelItemData" arguments="1.0,0001 My Undefined Filter" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" command="setCurrent" arguments="1.0" />
+  <!-- add it under "Some Category" -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0,Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="true" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0.0.0,0001 My Undefined Filter" />
 
   <!-- ================================================== -->
   <!-- remove filter from "Some Category" -->
