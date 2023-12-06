@@ -2,9 +2,9 @@
 
 set -e
 
-readonly version="5.10.20210901"
+readonly version="5.12.0.20231121"
 readonly tarball="nvidia-index-libs-${version}-linux.tar.bz2"
-readonly sha256sum="fbf47297e39b0ac2a51e98ce5064d99f29628413c53498b06884e60f01d04482"
+readonly sha256sum="f82a859482f774f5639be9ddb1c45d1f117a661cab303e8edae93d357729afbe"
 
 readonly index_root="$HOME/index"
 
