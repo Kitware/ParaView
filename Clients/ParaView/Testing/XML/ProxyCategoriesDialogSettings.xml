@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- load a testing plugin to add "0000MyGlyph" filter -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadLocal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ConfigureCategories.xml" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <!-- Open Dialog -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+
+  <!-- ================================================== -->
+  <!-- add a new category -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addCategory" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0,New Category" />
+  <!-- add filter -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" property="modelItemData" arguments="0.0,0000 My Glyph" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0,New Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0.0.0,0000 My Glyph" />
+
+  <!-- ================================================== -->
+  <!-- Close and reopen -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+  <!-- check that settings where correctly saved and reload -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="18" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0,New Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="11.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="11.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="11.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="11.0.0.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0.0.0,0000 My Glyph" />
+
+  <!-- ================================================== -->
+  <!-- reset to app default -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="18" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/resetAll" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="17" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0,Plugin Hint" />
+
+  <!-- ================================================== -->
+  <!-- close dialog -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+</pqevents>
