@@ -112,7 +112,15 @@ struct pqConfigureCategoriesDialog::pqInternal
   {
   }
 
+  //----------------------------------------------------------------------------
   bool isFavorites(pqProxyCategory* category) { return this->MenuManager->isFavorites(category); }
+
+  //----------------------------------------------------------------------------
+  bool isAvailable(pqProxyInfo* proxyInfo)
+  {
+    auto action = this->MenuManager->getAction(proxyInfo);
+    return action != nullptr;
+  }
 
   //----------------------------------------------------------------------------
   /**
@@ -171,14 +179,25 @@ struct pqConfigureCategoriesDialog::pqInternal
 
   /**
    * Update the icon of the given item, based on its internal proxy info.
+   * Also make it grey if there is no associated action.
+   *
+   * This means that the underlying filter is not available in the proxy manager.
+   * This is usually the case for not-yet-loaded plugins.
    */
-  void updateIcon(QTreeWidgetItem* item)
+  void updateItemDisplay(QTreeWidgetItem* item)
   {
     auto proxyInfo = ::getProxy(item);
 
+    if (!this->isAvailable(proxyInfo))
+    {
+      auto font = item->font(0);
+      item->setForeground(0, QBrush(QColor(200, 200, 200)));
+      item->setToolTip(
+        0, tr("Filter is not available.\nIt may be part of a plugin that is not loaded."));
+    }
+
     // use the same icon as the associated menu action.
     auto action = this->MenuManager->getAction(proxyInfo);
-
     if (action && !action->icon().isNull())
     {
       item->setIcon(0, QIcon(action->icon()));
@@ -685,7 +704,7 @@ QTreeWidgetItem* pqConfigureCategoriesDialog::createProxyItem(
   auto item = this->createItem(parent, proxyInfo->label(), preceding);
   item->setData(0, ::PROXY_ROLE, QVariant::fromValue(proxyInfo));
 
-  this->Internal->updateIcon(item);
+  this->Internal->updateItemDisplay(item);
 
   return item;
 }
@@ -751,10 +770,12 @@ void pqConfigureCategoriesDialog::updateUIState()
   this->Internal->Ui->useAsToolbar->setEnabled(hasCustomItemSelection && isCategory && category);
   this->Internal->Ui->useAsToolbar->setChecked(category && category->showInToolbar());
 
-  bool isFavorites = this->Internal->isFavorites(category);
-  this->Internal->Ui->remove->setEnabled(hasCustomItemSelection && !isFavorites);
+  bool isFavoritesMainCategory = this->Internal->isFavorites(category);
+  this->Internal->Ui->remove->setEnabled(hasCustomItemSelection && !isFavoritesMainCategory);
 
-  this->Internal->Ui->setIcon->setEnabled(hasCustomItemSelection && !isCategory);
+  auto proxyInfo = ::getProxy(selectedItem);
+  bool isAvailable = proxyInfo && this->Internal->isAvailable(proxyInfo);
+  this->Internal->Ui->setIcon->setEnabled(hasCustomItemSelection && isAvailable);
 }
 
 //----------------------------------------------------------------------------

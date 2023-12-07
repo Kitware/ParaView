@@ -855,9 +855,11 @@ SET (TESTS_WITHOUT_BASELINES
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
   PolarAxesBackwardsCompatibility.xml
-  ProxyCategoriesDialog.xml
-  ProxyCategoriesFavorites.xml
   ProxyCategoriesConfiguration.xml
+  ProxyCategoriesDialog.xml
+  ProxyCategoriesDialogDefault.xml
+  ProxyCategoriesDialogSettings.xml
+  ProxyCategoriesFavorites.xml
   ProxyCategoriesMenusDefault.xml
   ProxyCategoriesToolbar.xml
   ReadIOHDFAMRMaxLevels.xml

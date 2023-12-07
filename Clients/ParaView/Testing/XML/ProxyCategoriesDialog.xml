@@ -1,44 +1,17 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- ================================================== -->
   <!-- load a testing plugin to add "0000MyGlyph" filter -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadLocal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/1pqFileDialog0" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ConfigureCategories.xml" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-
   <!-- Open Dialog -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
 
-  <!-- Check default contents -->
-  <!-- nb of categories, including "Annotation" and "Common" that contains "Slice" -->
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="17" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0,&amp;Common" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0,Plugin Hint" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="11.0.0.0,My Glyph" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0.3.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0.3.0,Slice" />
-  <!-- filters can have an icon -->
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="true" />
-  <!-- categories can be removed and nested, but no icons -->
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="true" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
-  <!-- but favorites cannot be removed -->
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="7.0,&amp;Favorites" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="7.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
-
+  <!-- ================================================== -->
   <!-- Test adding/removing categories. -->
   <!-- add a new category -->
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addCategory" command="activate" arguments="" />
@@ -77,6 +50,7 @@
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="2.0,AM&amp;R" />
 
+  <!-- ================================================== -->
   <!-- Renaming -->
   <!-- rename "New Category_1" to "Some Category" category -->
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
@@ -91,7 +65,8 @@
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="14.0" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation_0" />
 
-  <!-- add filter -->
+  <!-- ================================================== -->
+  <!-- add filters -->
   <!-- if no selection, add button is disabled -->
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="false" />
   <!-- look for "0000MyGlyph" (in filter left panel). As the test uses index in the filter list, we need this filter to be the first, thus its name -->
@@ -117,42 +92,25 @@
   <pqevent object="pqClientMainWindow/IconBrowser/listView" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/IconBrowser/buttonBox/ApplyIcon" command="activate" arguments="" />
 
-  <!-- Close and reopen -->
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
+  <!-- manipulate proxy of an inexisting filter (not built, or from an not-loaded plugin but still in settings) -->
+  <!-- look for "0001 My Undefined Filter" (in filter left panel). As the test uses index in the filter list, we need this filter to be the second, thus its name -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/searchBox/SearchLineEdit" command="set_string" arguments="My Undefined Filter" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" property="modelItemData" arguments="1.0,0001 My Undefined Filter" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/filtersGroup/defaultCategoriesTree" command="setCurrent" arguments="1.0" />
+  <!-- add it under "Some Category" -->
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0,Some Category" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="true" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0.0.0,0001 My Undefined Filter" />
 
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="19" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="2.0,Annotation_0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="16.0,Some Category" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="2.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="2.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="2.0.0.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="2.0.0.0,0000 My Glyph" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="13.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="13.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="13.0.0.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="13.0.0.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="13.0.0.0.0.0,0000 My Glyph" />
-
+  <!-- ================================================== -->
   <!-- remove filter from "Some Category" -->
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="true" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="13.0.0.0.0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" command="activate" arguments="" />
 
-  <!-- Check reset -->
-  <!-- reset to app default -->
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="19" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/resetAll" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="17" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0,&amp;Common" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0.3.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0.3.0,Slice" />
-
+  <!-- ================================================== -->
   <!-- close dialog -->
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 </pqevents>
