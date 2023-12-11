@@ -657,11 +657,11 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
       QStringList data_list;
       data_list << pgroup << pname;
       action << pqSetName(name) << pqSetData(data_list);
-      pqSettings settings;
+      pqSettings* settings = pqApplicationCore::instance()->settings();
       if (pgroup == "filters" || pgroup == "sources")
       {
         QString menuName = pgroup == "filters" ? "Filters" : "Sources";
-        auto variant = settings.value(
+        auto variant = settings->value(
           QString("pqCustomShortcuts/%1/Alphabetical/%2").arg(menuName, label), QVariant());
         if (variant.canConvert<QKeySequence>())
         {
