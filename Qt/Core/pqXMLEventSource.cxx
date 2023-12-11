@@ -267,6 +267,7 @@ int pqXMLEventSource::getNextEvent(
     object = elem->GetAttribute("object");
     command = elem->GetAttribute("property");
     arguments = elem->GetAttribute("arguments");
+    arguments = pqCoreTestUtility::fixPath(arguments);
     return SUCCESS;
   }
 
