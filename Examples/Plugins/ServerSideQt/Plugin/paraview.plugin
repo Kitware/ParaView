@@ -1,0 +1,8 @@
+NAME
+  ServerSideQt
+DESCRIPTION
+  This illustrates how to find and configure Qt for server side use,
+  even if paraview was built without the Qt support.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::FiltersCore
