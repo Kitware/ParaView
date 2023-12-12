@@ -4,6 +4,7 @@
 #include "pqCustomShortcutBehavior.h"
 
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqCustomizeShortcutsDialog.h"
 #include "pqKeySequences.h"
 #include "pqModalShortcut.h"
@@ -29,7 +30,7 @@ pqCustomShortcutBehavior::pqCustomShortcutBehavior(QMainWindow* parentObject)
 namespace
 {
 
-void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
+void loadShortcuts(const QList<QAction*>& actions, pqSettings* settings)
 {
   for (QAction* action : actions)
   {
@@ -39,9 +40,9 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
     if (action->menu())
     {
       auto menu = action->menu();
-      settings.beginGroup(actionName);
+      settings->beginGroup(actionName);
       loadShortcuts(menu->actions(), settings);
-      settings.endGroup();
+      settings->endGroup();
     }
     else if (!actionName.isEmpty())
     {
@@ -49,7 +50,7 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
       // user specified one in the settings.
       QKeySequence defaultShortcut = action->shortcut();
       action->setProperty("ParaViewDefaultKeySequence", defaultShortcut);
-      auto variant = settings.value(actionName, QVariant());
+      auto variant = settings->value(actionName, QVariant());
       if (variant.canConvert<QKeySequence>())
       {
         pqKeySequences::instance().addModalShortcut(
@@ -70,9 +71,9 @@ void pqCustomShortcutBehavior::loadMenuItemShortcuts()
   }
 
   auto menuBar = mainWindow->menuBar();
-  pqSettings settings;
+  pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  settings.beginGroup("pqCustomShortcuts");
+  settings->beginGroup("pqCustomShortcuts");
   loadShortcuts(menuBar->actions(), settings);
-  settings.endGroup();
+  settings->endGroup();
 }
