@@ -79,7 +79,7 @@ public:
    * can point to a Python script, a directory containing a Python package or a
    * zip-file which containing a Python package.
    */
-  static vtkInSituPipeline* AddPipeline(const std::string& path);
+  static vtkInSituPipeline* AddPipeline(const std::string& pipeline_name, const std::string& path);
 
   /**
    * Add a vtkInSituPipeline instance.
@@ -117,8 +117,9 @@ public:
   /**
    * Executes pipelines.
    */
-  static bool ExecutePipelines(
-    int timestep, double time, const std::vector<std::string>& parameters = {});
+  static bool ExecutePipelines(int timestep, double time,
+    const std::vector<std::string>& pipelines = {},
+    const std::vector<std::string>& parameters = {});
 
   // This overload accept the "catalyst/state" node of the ParaView Blueprint.
   // When using this overload the conduit node will become available also via the catalyst script

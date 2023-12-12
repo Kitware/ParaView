@@ -34,7 +34,7 @@ if (USE_CATALYST)
       NAME PythonFullExampleV2::SimplePipeline
       COMMAND  ${CMAKE_COMMAND} -E env "PYTHONPATH=${CATALYST_PYTHONPATH}:$ENV{PYTHONPATH}" "CATALYST_IMPLEMENTATION_PATHS=${ParaView_CATALYST_DIR}"
                ${mpi_prefix}
-               ${Python3_EXECUTABLE} ${python_driver} "${CMAKE_CURRENT_SOURCE_DIR}/../SampleScripts/gridwriter.py"
+               ${Python3_EXECUTABLE} ${python_driver} "${CMAKE_CURRENT_SOURCE_DIR}/../SampleScripts/gridwriter.py" "${CMAKE_CURRENT_SOURCE_DIR}/second.py"
     )
 
   endif()

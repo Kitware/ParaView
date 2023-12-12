@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <set>
 #include <string>
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
@@ -221,7 +222,8 @@ void vtkInSituInitializationHelper::Finalize()
 }
 
 //----------------------------------------------------------------------------
-vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string& path)
+vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(
+  const std::string& name, const std::string& path)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
@@ -275,6 +277,7 @@ vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string&
 
   vtkNew<vtkInSituPipelinePython> pipeline;
   pipeline->SetFileName(tmp.c_str());
+  pipeline->SetName(name.c_str());
   vtkInSituInitializationHelper::AddPipeline(pipeline);
   return pipeline;
 }
@@ -394,6 +397,27 @@ bool vtkInSituInitializationHelper::ExecutePipelines(const conduit_node* params)
     : (root.has_path("state/cycle") ? root["state/cycle"].to_int64() : 0);
   const double time = root.has_path("state/time") ? root["state/time"].to_float64() : 0;
 
+  std::vector<std::string> pipelines;
+  if (root.has_path("state/pipelines"))
+  {
+    const auto state_pipelines = root["state/pipelines"];
+    const conduit_index_t nchildren = state_pipelines.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      pipelines.push_back(state_pipelines.child(i).as_string());
+    }
+  }
+  else
+  {
+    for (auto& item : internals.Pipelines)
+    {
+      if (item.Pipeline->GetName())
+      {
+        pipelines.push_back(item.Pipeline->GetName());
+      }
+    }
+  }
+
   std::vector<std::string> parameters;
   if (root.has_path("state/parameters"))
   {
@@ -405,7 +429,7 @@ bool vtkInSituInitializationHelper::ExecutePipelines(const conduit_node* params)
     }
   }
 
-  return vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
+  return vtkInSituInitializationHelper::ExecutePipelines(timestep, time, pipelines, parameters);
 #else
   vtkLogF(ERROR, "ParaView is compiled without Conduit support");
   (void)(params);
@@ -413,8 +437,8 @@ bool vtkInSituInitializationHelper::ExecutePipelines(const conduit_node* params)
 #endif
 }
 
-bool vtkInSituInitializationHelper::ExecutePipelines(
-  int timestep, double time, const std::vector<std::string>& parameters)
+bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time,
+  const std::vector<std::string>& pipelines, const std::vector<std::string>& parameters)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
@@ -437,8 +461,19 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
 
   UpdateSteerableProxies();
 
+  std::set<std::string> toExecute;
+  for (auto& p : pipelines)
+  {
+    toExecute.insert(p);
+  }
+
   for (auto& item : internals.Pipelines)
   {
+    if (item.Pipeline->GetName() && toExecute.find(item.Pipeline->GetName()) == toExecute.end())
+    {
+      continue;
+    }
+
     if (!item.Initialized)
     {
       item.InitializationFailed = !item.Pipeline->Initialize();
