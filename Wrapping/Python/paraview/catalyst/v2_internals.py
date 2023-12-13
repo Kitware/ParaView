@@ -59,7 +59,9 @@ class CatalystV1Information:
 class CatalystV2Information:
     def __init__(self):
         from paraview.modules.vtkPVInSitu import vtkInSituInitializationHelper
+        from paraview.modules.vtkPVInSitu import vtkInSituPythonConduitHelper
         self.helper = vtkInSituInitializationHelper
+        self.helperConduitNode = vtkInSituPythonConduitHelper
 
     @property
     def time(self):
@@ -75,6 +77,20 @@ class CatalystV2Information:
     def cycle(self):
         """returns the current simulation cycle or timestep index"""
         return self.helper.GetTimeStep()
+
+    @property
+    def catalyst_params(self):
+        """ returns a reference to the arguments (as a conduit node) passed in
+        `catalyst_execute` for this timestep.  This reference should be treated
+        as a READ-ONLY since any change will affect the data passed by the
+        simulation.
+
+        Note: This call will import the catalyst_conduit python package tha
+        ships with catalyst. So make sure that your PYTHONPATH includes it.
+        The path is available in the cmake variable CATALYST_PYTHONPATH during
+        configuration.
+        """
+        return self.helperConduitNode.GetCatalystParameters()
 
 def import_and_validate(modulename):
     import importlib
