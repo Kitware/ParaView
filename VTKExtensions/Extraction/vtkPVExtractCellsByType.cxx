@@ -22,6 +22,7 @@ static const std::map<std::string, unsigned int> SupportedCellTypes = { { "Verte
   { "Polygon", VTK_POLYGON }, { "Pixel", VTK_PIXEL }, { "Quadrilateral", VTK_QUAD },
   { "Tetrahedron", VTK_TETRA }, { "Voxel", VTK_VOXEL }, { "Hexahedron", VTK_HEXAHEDRON },
   { "Wedge", VTK_WEDGE }, { "Pyramid", VTK_PYRAMID }, { "Pentagonal Prism", VTK_PENTAGONAL_PRISM },
+  { "Hexagonal Prism", VTK_HEXAGONAL_PRISM }, { "Polyhedron", VTK_POLYHEDRON },
   { "Quadratic Edge", VTK_QUADRATIC_EDGE }, { "Quadratic Triangle", VTK_QUADRATIC_TRIANGLE },
   { "Quadratic Quadrilateral", VTK_QUADRATIC_QUAD }, { "Quadratic Polygon", VTK_QUADRATIC_POLYGON },
   { "Quadratic Tetrahedron", VTK_QUADRATIC_TETRA },
