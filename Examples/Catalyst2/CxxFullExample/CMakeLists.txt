@@ -44,9 +44,11 @@ if (USE_CATALYST)
 
   include(CTest)
   if (BUILD_TESTING)
+    # once we update to cmake >= 3.25 we should use --modify PYTHONPATH=path_list_prepend:${CATALYST_PYTHONPATH}
     add_test(
       NAME CxxFullExampleV2::SimplePipeline
-      COMMAND CxxFullExampleV2
+      COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CATALYST_PYTHONPATH}:$ENV{PYTHONPATH}" 
+              $<TARGET_FILE:CxxFullExampleV2>
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
 
     set(_vtk_fail_regex
