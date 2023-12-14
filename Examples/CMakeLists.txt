@@ -112,6 +112,7 @@ if (TARGET VTK::IOCatalystConduit)
   add_example(Catalyst2/Fortran90FullExample)
   if (Python3_EXECUTABLE)
     add_example(Catalyst2/PythonFullExample)
+    add_example(Catalyst2/PythonSteeringExample)
   endif ()
 endif ()
 
