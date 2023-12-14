@@ -575,5 +575,7 @@ enum catalyst_status catalyst_results_paraview(conduit_node* params)
     is_success &= convert_to_blueprint_mesh(proxy.second, proxy.first, catalyst_node);
   }
 
+  vtkInSituInitializationHelper::GetResultsFromPipelines(params);
+
   return is_success ? catalyst_status_ok : pvcatalyst_err(results);
 }

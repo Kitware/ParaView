@@ -95,6 +95,16 @@ bool vtkInSituPipelinePython::Execute(int timestep, double time)
 }
 
 //----------------------------------------------------------------------------
+bool vtkInSituPipelinePython::Results()
+{
+#if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+  return this->Helper->CatalystResults();
+#else
+  return false;
+#endif
+}
+
+//----------------------------------------------------------------------------
 bool vtkInSituPipelinePython::Finalize()
 {
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst

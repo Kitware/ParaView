@@ -48,6 +48,11 @@ public:
    */
   virtual bool Execute(int timestep, double time) = 0;
 
+  /*
+   * Called optionally after Execute.
+   */
+  virtual bool Results() { return true; }
+
   /**
    * Called once before the in situ analysis is finalized.
    */

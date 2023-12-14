@@ -124,6 +124,11 @@ public:
   // When using this overload the conduit node will become available also via the catalyst script
   static bool ExecutePipelines(const conduit_node* catalyst_state);
 
+  /**
+   * Call Results() on all pipelines.
+   */
+  static bool GetResultsFromPipelines(conduit_node* catalyst_params);
+
   ///@{
   /**
    * Provides access to current time and timestep during `ExecutePipelines`

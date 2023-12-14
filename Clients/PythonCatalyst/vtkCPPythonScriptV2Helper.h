@@ -67,6 +67,11 @@ public:
    */
   bool CatalystExecute(int timestep, double time, const std::vector<std::string>& params = {});
 
+  /**
+   * Calls `catalyst_results`.
+   */
+  bool CatalystResults();
+
   ///@{
   /**
    * There are overloads intended for vtkCPPythonScriptV2Pipeline i.e. legacy

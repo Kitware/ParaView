@@ -58,6 +58,7 @@ public:
    */
   bool Initialize() override;
   bool Execute(int, double) override;
+  bool Results() override;
   bool Finalize() override;
   ///@}
 
