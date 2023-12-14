@@ -100,9 +100,9 @@
                        file_description="ADIOS2 BP3 File (CoreImage)" />
         <ReaderFactory filename_patterns="md.idx"
                        file_description="ADIOS2 BP4 Metadata File (CoreImage)" />
-        <ReaderFactory extensions="bp"
+        <ReaderFactory extensions="bp bp4 bp5"
                        is_directory="1"
-                       file_description="ADIOS2 BP4 Directory (CoreImage)" />
+            file_description="ADIOS2 BP (4/5) Directory (CoreImage)" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>
