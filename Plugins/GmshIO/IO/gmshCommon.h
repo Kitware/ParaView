@@ -4,7 +4,7 @@
 #include <typeindex>
 
 //-----------------------------------------------------------------------------
-enum class GmshPrimitive : char
+enum class GmshPrimitive : signed char
 {
   Unsupported = -1,
   POINT = 15,
@@ -22,7 +22,10 @@ namespace std
 template <>
 struct hash<GmshPrimitive>
 {
-  size_t operator()(GmshPrimitive x) const { return hash<char>()(static_cast<char>(x)); }
+  size_t operator()(GmshPrimitive x) const
+  {
+    return hash<signed char>()(static_cast<signed char>(x));
+  }
 };
 }
 
