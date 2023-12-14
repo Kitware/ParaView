@@ -896,6 +896,26 @@ points in the input. Defaults to ***Single***.
           but can take significantly more time to complete.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseImplicitArraysHTG"
+                         name="UseImplicitArraysHTG"
+                         label="Reduce Output Memory Usage"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility" />
+        </Hints>
+        <Documentation>
+          If checked, the filter will optimize the space allocated to store the contour values.
+          This option can lower the memory consumption, especially if the output contour
+          contains a lot of points and is generated with few contour values, at the cost of some
+          extra computation. Note that this option will do nothing if there are more than 256
+          contour values.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Isosurfaces"
@@ -957,6 +977,7 @@ points in the input. Defaults to ***Single***.
 
       <PropertyGroup label="Hyper Tree Grid Contour">
         <Property name="HTGStrategy3D" />
+        <Property name="UseImplicitArraysHTG" />
       </PropertyGroup>
       <PropertyGroup label="Isosurfaces">
         <Property name="ContourValues" />

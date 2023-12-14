@@ -88,6 +88,7 @@ int vtkPVContourFilter::RequestData(
     contourFilter->SetInputData(0, inDataObj);
     contourFilter->SetInputArrayToProcess(0, inArrayInfo);
     contourFilter->SetStrategy3D(this->HTGStrategy3D);
+    contourFilter->SetUseImplicitArrays(this->UseImplicitArraysHTG);
     for (vtkIdType i = 0; i < this->GetNumberOfContours(); ++i)
     {
       contourFilter->SetValue(i, this->GetValue(i));

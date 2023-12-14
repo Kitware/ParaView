@@ -48,10 +48,27 @@ public:
    * only). It takes advantage of the vtkPolyhedronUtilities::Decompose method to generate better
    * contours. The dowside is that this method is much slower than
    * vtkHyperTreeGridContour::USE_VOXELS.
+   *
+   * @attention This option only concerns HTG inputs.
    */
   vtkGetMacro(HTGStrategy3D, int);
   vtkSetClampMacro(HTGStrategy3D, int, vtkHyperTreeGridContour::USE_VOXELS,
     vtkHyperTreeGridContour::USE_DECOMPOSED_POLYHEDRA);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get wether or not the filter should use implicit arrays to store the
+   * output contour values (stored as point data of the output contour).
+   * Since these values are the same fo each isosurface, some memory can be saved
+   * by storing each value only once unsing an indexed array.
+   *
+   * @attention This option only concerns HTG inputs.
+   * @attention This option have no effect if there is more than 256 contour values.
+   */
+  vtkSetMacro(UseImplicitArraysHTG, bool);
+  vtkGetMacro(UseImplicitArraysHTG, bool);
+  vtkBooleanMacro(UseImplicitArraysHTG, bool);
   ///@}
 
 protected:
@@ -86,6 +103,9 @@ private:
 
   // Strategy used to represent HTG dual cells in 3D
   int HTGStrategy3D = vtkHyperTreeGridContour::USE_VOXELS;
+
+  // Use implicit arrays to store contour values in case of HTG input
+  bool UseImplicitArraysHTG = false;
 };
 
 #endif // vtkPVContourFilter_h
