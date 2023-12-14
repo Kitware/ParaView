@@ -481,6 +481,7 @@ bool vtkInSituInitializationHelper::GetResultsFromPipelines(conduit_node* cataly
   }
 
   internals.InResultsPipelines = true;
+
   // store a pointer to the catalyst_results parameters. This will be accessible from python.
   internals.catalyst_params = catalyst_params;
 
