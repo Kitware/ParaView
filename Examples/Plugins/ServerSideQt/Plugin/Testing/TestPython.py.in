@@ -1,0 +1,24 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+from vtkmodules.vtkCommonCore import vtkLogger
+
+# Load the plugin
+LoadPlugin("$<TARGET_FILE:ServerSideQt>", ns=globals())
+
+filePath = "@TEST_ROOT@/test.log"
+vtkLogger.LogToFile(filePath, vtkLogger.TRUNCATE, vtkLogger.VERBOSITY_INFO)
+
+sphere = MySphere()
+
+def checkLog(logFilePath):
+    with open(logFilePath, 'r') as logFile:
+        lines = logFile.readlines()
+        for line in lines:
+            if "INFO" in line and "This was included as a Qt Resource File!" in line:
+                return
+
+    from paraview import print_error
+    print_error("Log does not contains expected line")
+
+
+checkLog(filePath)

@@ -1,0 +1,7 @@
+NAME
+  SphereSource
+DEPENDS
+  VTK::FiltersSources
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  ParaView::VTKExtensionsCore

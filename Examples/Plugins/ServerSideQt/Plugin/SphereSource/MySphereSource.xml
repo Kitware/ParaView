@@ -1,0 +1,12 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+   <SourceProxy name="MySphere" class="vtkMySphereSource" label="MySphere">
+     <Documentation
+        long_help="Create a sphere."
+       short_help="Create a sphere.">
+       Simply create a sphere, but print message from a Qt resource when created on server side.
+     </Documentation>
+   <!-- End MySphere -->
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
