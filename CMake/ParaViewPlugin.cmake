@@ -1063,6 +1063,12 @@ function (paraview_add_plugin name)
     endif ()
   endif ()
 
+  if (_paraview_add_plugin_UI_INTERFACES OR _paraview_add_plugin_UI_FILES OR _paraview_add_plugin_UI_RESOURCES)
+    if (NOT PARAVIEW_USE_QT)
+      message(FATAL_ERROR "UI_INTERFACES, UI_FILES and UI_RESOURCES require ParaView to be built with Qt enabled.")
+    endif()
+  endif()
+
   if (DEFINED _paraview_build_INSTALL_EXPORT AND
       NOT DEFINED _paraview_add_plugin_MODULE_INSTALL_EXPORT)
     set(_paraview_add_plugin_MODULE_INSTALL_EXPORT
