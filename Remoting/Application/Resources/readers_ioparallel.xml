@@ -292,16 +292,6 @@
         changes.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
-                         command="SetDecomposePolyhedra"
-                         default_values="0"
-                         label="Decompose polyhedra"
-                         name="DecomposePolyhedra"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>Decompose polyhedra into tets/pyramids (deprecated)</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty animateable="0"
                          command="SetSizeAverageCellToPoint"
                          default_values="0"
                          name="WeightPointDataByCellSize"
