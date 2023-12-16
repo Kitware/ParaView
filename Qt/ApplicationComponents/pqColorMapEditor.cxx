@@ -359,7 +359,7 @@ void pqColorMapEditor::renderViews()
   for (auto& view : source->getViews())
   {
     const auto representation = source->getRepresentation(view);
-    if (representation->isVisible())
+    if (representation && representation->isVisible())
     {
       representation->renderViewEventually();
     }
