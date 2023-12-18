@@ -83,6 +83,7 @@ add_example(Plugins/Representation)
 #add_example(Plugins/RepresentationBehavior)
 add_example(Plugins/SMParametricSource)
 add_example(Plugins/SMMyProxy)
+add_example(Plugins/ServerSideQt)
 add_example(Plugins/SourceToolbar)
 # add_example(Plugins/VisItReader)
 
