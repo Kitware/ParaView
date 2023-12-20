@@ -214,7 +214,7 @@ protected:
     {
       for (int cc = 0; cc < 2; ++cc)
       {
-        if (auto remoteWriterHelper = this->RemoteWriterHelpers[1])
+        if (auto remoteWriterHelper = this->RemoteWriterHelpers[cc])
         {
           vtkSMPropertyHelper(remoteWriterHelper, "State").Set(vtkRemoteWriterHelper::END);
           remoteWriterHelper->UpdateVTKObjects();
