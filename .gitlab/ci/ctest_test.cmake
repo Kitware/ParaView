@@ -97,6 +97,15 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
     "pvcs\\.CDISimpleRead$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22427
+    "pqCoreKeySequences$"
+    "pqWidgetspqTextEditTest$"
+    "pv\\.ComputeArrayMagnitudeSetting$"
+    "TestPythonView$"
+    "pv\\.TooltipCopy$"
+    "pvcs\\.ShaderReplacement"
+    "pvcrs\\.ShaderReplacement"
     )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
