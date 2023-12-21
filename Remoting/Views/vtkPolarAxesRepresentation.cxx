@@ -425,7 +425,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
 
   this->PolarAxesActor->SetBounds(bds);
 
-  double pole[3] = { 0.0 };
+  double pole[3] = { 0.0, 0.0, 0.0 };
   double center[2] = { (bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5 };
   double maxRadius = 0.0;
   double minRadius = EnableCustomRadius ? this->MinRadius : 0.0;
@@ -440,6 +440,11 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   }
   else
   {
+    for (std::size_t ind{ 0 }; ind < 3; ++ind)
+    {
+      pole[ind] = position[ind];
+    }
+
     this->PolarAxesActor->SetPole(pole);
 
     // Compute the max length between pole and bounds for maximum radius

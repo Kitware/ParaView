@@ -81,3 +81,8 @@ paraview_add_test_python(
   JUST_VALID
   ${PY_TESTS}
   )
+
+paraview_add_test_python(
+  NO_RT
+  PolarAxesAutoPoleOffTranslation.py
+)
