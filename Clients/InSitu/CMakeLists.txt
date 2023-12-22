@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
   vtkInSituInitializationHelper
+  vtkInSituPythonConduitHelper
   vtkInSituPipeline
   vtkInSituPipelineIO
   vtkInSituPipelinePython

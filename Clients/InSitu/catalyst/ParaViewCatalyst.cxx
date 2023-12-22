@@ -517,18 +517,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       "No 'catalyst/channels' found. No meshes will be processed.");
   }
 
-  // check for optional 'parameters'
-  std::vector<std::string> parameters;
-  if (root.has_path("state/parameters"))
-  {
-    const auto state_parameters = root["state/parameters"];
-    const conduit_index_t nchildren = state_parameters.number_of_children();
-    for (conduit_index_t i = 0; i < nchildren; ++i)
-    {
-      parameters.push_back(state_parameters.child(i).as_string());
-    }
-  }
-  vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
+  vtkInSituInitializationHelper::ExecutePipelines(params);
 
   return catalyst_status_ok;
 }

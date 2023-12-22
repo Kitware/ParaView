@@ -2,8 +2,8 @@
 set -x
 
 readonly catalyst_repo="https://gitlab.kitware.com/paraview/catalyst"
-# we are pre-release, use the most recent commit (Aug 8, 2023)
-readonly catalyst_commit="4143e3ca09b568e425f34aa8c3f1b3bd21433a5a"
+# we are pre-release, use the most recent commit (Dec 19, 2023)
+readonly catalyst_commit="63665051edd818e8a7874444dae5f1dff3c9f48b"
 
 readonly catalyst_root="$HOME/catalyst"
 readonly catalyst_src="$catalyst_root/src"
