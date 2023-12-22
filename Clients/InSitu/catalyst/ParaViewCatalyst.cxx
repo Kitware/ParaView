@@ -255,7 +255,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 
         vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Analysis script: '%s'", fname.c_str());
 
-        auto pipeline = vtkInSituInitializationHelper::AddPipeline(fname);
+        auto pipeline = vtkInSituInitializationHelper::AddPipeline(script.name(), fname);
 
         // check for optional 'args'
         if (script.has_path("args"))
@@ -301,6 +301,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
     {
       if (auto p = create_precompiled_pipeline(pipelines.child(i)))
       {
+        p->SetName(pipelines.child(i).name().c_str());
         vtkInSituInitializationHelper::AddPipeline(p);
       }
     }
@@ -507,7 +508,17 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
       parameters.push_back(state_parameters.child(i).as_string());
     }
   }
-  vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
+
+  if (root.has_path("state/pipelines"))
+  {
+    const auto state_pipelines = root["state/pipelines"];
+    vtkInSituInitializationHelper::ExecutePipelines(
+      timestep, time, conduit_cpp::c_node(&state_pipelines), parameters);
+  }
+  else
+  {
+    vtkInSituInitializationHelper::ExecutePipelines(timestep, time, nullptr, parameters);
+  }
 
   return catalyst_status_ok;
 }

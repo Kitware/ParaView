@@ -39,6 +39,11 @@ class vtkInSituPipeline;
 class vtkSMProxy;
 class vtkSMSourceProxy;
 
+// forward declare conduit_node and its typedef.
+// it has to be identical to the one in conduit.hpp
+struct conduit_node_impl;
+typedef struct conduit_node_impl conduit_node;
+
 #include <string> // for std::string
 #include <vector> // for std::vector
 
@@ -75,7 +80,7 @@ public:
    * can point to a Python script, a directory containing a Python package or a
    * zip-file which containing a Python package.
    */
-  static vtkInSituPipeline* AddPipeline(const std::string& path);
+  static vtkInSituPipeline* AddPipeline(const std::string& name, const std::string& path);
 
   /**
    * Add a vtkInSituPipeline instance.
@@ -113,8 +118,8 @@ public:
   /**
    * Executes pipelines.
    */
-  static bool ExecutePipelines(
-    int timestep, double time, const std::vector<std::string>& parameters = {});
+  static bool ExecutePipelines(int timestep, double time, const conduit_node* pipelines,
+    const std::vector<std::string>& parameters = {});
 
   ///@{
   /**

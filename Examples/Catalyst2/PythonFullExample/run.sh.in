@@ -8,4 +8,4 @@ export CATALYST_IMPLEMENTATION_NAME=paraview
 # we need to pass in the full path to the Python script we want to use since it's not picked up by looking
 # in PYTHONPATH
 
-"@Python3_EXECUTABLE@" "@CMAKE_CURRENT_SOURCE_DIR@/fedriver.py" "@CMAKE_CURRENT_SOURCE_DIR@/../SampleScripts/gridwriter.py"
+"@Python3_EXECUTABLE@" "@CMAKE_CURRENT_SOURCE_DIR@/fedriver.py" "@CMAKE_CURRENT_SOURCE_DIR@/../SampleScripts/gridwriter.py" "@CMAKE_CURRENT_SOURCE_DIR@/second.py"
