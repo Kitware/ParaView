@@ -125,6 +125,15 @@ def do_catalyst_finalize(module):
         log(log_level(), "calling '%s.%s'", module.__name__, "catalyst_finalize")
         module.catalyst_finalize()
 
+def do_catalyst_results(module):
+    log(log_level(), "called do_catalyst_results %r", module)
+
+    # call 'catalyst_results' on module if exits
+    if hasattr(module, "catalyst_results"):
+        log(log_level(), "calling '%s.%s'", module.__name__, "catalyst_results")
+        info = CatalystV2Information()
+        module.catalyst_results(info)
+
 def do_catalyst_execute(module):
     log(log_level(), "called do_catalyst_execute %r", module)
 

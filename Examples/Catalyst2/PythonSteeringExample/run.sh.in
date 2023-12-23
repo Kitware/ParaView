@@ -1,0 +1,11 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH="@ParaView_CATALYST_DIR@/../":$LD_LIBRARY_PATH
+export PYTHONPATH="@CATALYST_PYTHONPATH@":"@CMAKE_CURRENT_SOURCE_DIR@":$PYTHONPATH
+export CATALYST_IMPLEMENTATION_PATHS="@ParaView_CATALYST_DIR@"
+export CATALYST_IMPLEMENTATION_NAME=paraview
+
+# we need to pass in the full path to the Python script we want to use since it's not picked up by looking
+# in PYTHONPATH
+
+"@Python3_EXECUTABLE@" "@CMAKE_CURRENT_SOURCE_DIR@/fedriver.py" "@CMAKE_CURRENT_SOURCE_DIR@/catalyst_pipeline.py"

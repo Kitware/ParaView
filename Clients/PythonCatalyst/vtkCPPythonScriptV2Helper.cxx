@@ -421,6 +421,31 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(
 }
 
 //----------------------------------------------------------------------------
+bool vtkCPPythonScriptV2Helper::CatalystResults()
+{
+  vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
+
+  if (!this->IsImported())
+  {
+    return false;
+  }
+
+  auto& internals = (*this->Internals);
+
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject method(PyUnicode_FromString("do_catalyst_results"));
+  vtkSmartPyObject result(PyObject_CallMethodObjArgs(
+    internals.APIModule, method, internals.Package.GetPointer(), nullptr));
+  if (!result)
+  {
+    vtkInternals::FlushErrors();
+    return false;
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkCPPythonScriptV2Helper::CatalystExecute(vtkCPDataDescription* dataDesc)
 {
   assert(dataDesc != nullptr);

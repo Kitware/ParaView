@@ -61,6 +61,7 @@ public:
     bool Initialized;
     bool InitializationFailed;
     bool ExecuteFailed;
+    bool ResultsFailed;
   };
 
   vtkSmartPointer<vtkCPCxxHelper> CPCxxHelper;
@@ -73,6 +74,7 @@ public:
   std::map<vtkSMProxy*, std::string> SteerableExtracts;
 
   bool InExecutePipelines = false;
+  bool InResultsPipelines = false;
   int TimeStep = 0;
   double Time = 0.0;
 #if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
@@ -283,7 +285,8 @@ void vtkInSituInitializationHelper::AddPipeline(vtkInSituPipeline* pipeline)
   if (pipeline)
   {
     auto& internals = (*vtkInSituInitializationHelper::Internals);
-    internals.Pipelines.push_back(vtkInternals::PipelineInfo{ pipeline, false, false, false });
+    internals.Pipelines.push_back(
+      vtkInternals::PipelineInfo{ pipeline, false, false, false, false });
   }
 }
 
@@ -459,6 +462,68 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
 
   internals.InExecutePipelines = false;
   return true;
+}
+
+bool vtkInSituInitializationHelper::GetResultsFromPipelines(conduit_node* catalyst_params)
+{
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
+  auto& internals = (*vtkInSituInitializationHelper::Internals);
+  if (internals.InExecutePipelines)
+  {
+    vtkLogF(ERROR, "Calling ExecutePipelines during GetResultsFromPipelines is not supported!");
+    return false;
+  }
+
+  if (internals.InResultsPipelines)
+  {
+    vtkLogF(ERROR, "Recursive call to 'GetResultsFromPipelines' not supported!");
+    return false;
+  }
+
+  internals.InResultsPipelines = true;
+
+  // store a pointer to the catalyst_results parameters. This will be accessible from python.
+  internals.catalyst_params = catalyst_params;
+
+  // By default we use the time & timestep information from the previous catalyst_execute run.
+  // However, a user may override it using the "catalyst/state/time" and "catalyst/state/timestep"
+  // paths
+  const conduit_cpp::Node& cpp_params = conduit_cpp::cpp_node(catalyst_params);
+  if (cpp_params.has_path("catalyst"))
+  {
+    const auto& root = cpp_params["catalyst"];
+
+    if (root.has_path("state/timestep"))
+    {
+      internals.TimeStep = root["state/timestep"].to_int64();
+    }
+    else if (root.has_path("state/cycle"))
+    {
+      internals.TimeStep = root["state/cycle"].to_int64();
+    }
+
+    if (root.has_path("state/time"))
+    {
+      internals.Time = root["state/time"].to_float64();
+    }
+  }
+
+  for (auto& item : internals.Pipelines)
+  {
+    if (!item.InitializationFailed && !item.ExecuteFailed && !item.ResultsFailed)
+    {
+      item.ResultsFailed = !item.Pipeline->Results();
+    }
+  }
+
+  internals.InResultsPipelines = false;
+
+  return true;
+#else
+  vtkLogF(ERROR, "ParaView is compiled without Conduit support");
+  (void)(catalyst_params);
+  return false;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -650,9 +715,10 @@ int vtkInSituInitializationHelper::GetTimeStep()
   }
 
   auto& internals = (*vtkInSituInitializationHelper::Internals);
-  if (!internals.InExecutePipelines)
+  if (!internals.InExecutePipelines && !internals.InResultsPipelines)
   {
-    vtkLogF(ERROR, "'GetTimeStep' cannot be called outside 'ExecutePipelines'.");
+    vtkLogF(ERROR,
+      "'GetTimeStep' cannot be called outside 'ExecutePipelines' or 'GetResultsFromPipelines'.");
     return 0;
   }
 
@@ -669,9 +735,10 @@ double vtkInSituInitializationHelper::GetTime()
   }
 
   auto& internals = (*vtkInSituInitializationHelper::Internals);
-  if (!internals.InExecutePipelines)
+  if (!internals.InExecutePipelines && !internals.InResultsPipelines)
   {
-    vtkLogF(ERROR, "'GetTime' cannot be called outside 'ExecutePipelines'.");
+    vtkLogF(
+      ERROR, "'GetTime' cannot be called outside 'ExecutePipelines' or 'GetResultsFromPipelines'.");
     return 0;
   }
 
@@ -689,9 +756,11 @@ conduit_node* vtkInSituInitializationHelper::GetCatalystParameters()
   }
 
   auto& internals = (*vtkInSituInitializationHelper::Internals);
-  if (!internals.InExecutePipelines)
+  if (!internals.InExecutePipelines && !internals.InResultsPipelines)
   {
-    vtkLogF(ERROR, "'GetCatalystParameters' cannot be called outside 'ExecutePipelines'.");
+    vtkLogF(ERROR,
+      "'GetCatalystParameters' cannot be called outside 'ExecutePipelines' or "
+      "'GetCatalystParameters'.");
     return nullptr;
   }
 
