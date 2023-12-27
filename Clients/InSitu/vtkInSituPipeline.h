@@ -58,9 +58,17 @@ public:
    */
   virtual bool Finalize() { return true; }
 
+  /**
+   * Name is used to identify individual pipelines.
+   */
+  vtkGetStringMacro(Name);
+  vtkSetStringMacro(Name);
+
 protected:
   vtkInSituPipeline();
   ~vtkInSituPipeline() override;
+
+  char* Name;
 
 private:
   vtkInSituPipeline(const vtkInSituPipeline&) = delete;

@@ -37,6 +37,8 @@ def coprocess(time, timeStep, grid, attributes):
     node['catalyst/state/timestep'] = timeStep
     node['catalyst/state/time'] = time
 
+    node['catalyst/state/pipelines/0'] = 'script0'
+
     # the Catalyst channel is "input"
     node['catalyst/channels/input/type'] = 'mesh'
 

@@ -5,10 +5,16 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkInSituPipeline::vtkInSituPipeline() = default;
+vtkInSituPipeline::vtkInSituPipeline()
+{
+  this->Name = nullptr;
+}
 
 //----------------------------------------------------------------------------
-vtkInSituPipeline::~vtkInSituPipeline() = default;
+vtkInSituPipeline::~vtkInSituPipeline()
+{
+  delete[] this->Name;
+}
 
 //----------------------------------------------------------------------------
 void vtkInSituPipeline::PrintSelf(ostream& os, vtkIndent indent)

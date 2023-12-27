@@ -276,7 +276,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 
         vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Analysis script: '%s'", fname.c_str());
 
-        auto pipeline = vtkInSituInitializationHelper::AddPipeline(fname);
+        auto pipeline = vtkInSituInitializationHelper::AddPipeline(script.name(), fname);
 
         // check for optional 'args'
         if (script.has_path("args"))
@@ -322,6 +322,7 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
     {
       if (auto p = create_precompiled_pipeline(pipelines.child(i)))
       {
+        p->SetName(pipelines.child(i).name().c_str());
         vtkInSituInitializationHelper::AddPipeline(p);
       }
     }
