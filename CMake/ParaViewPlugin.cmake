@@ -1257,65 +1257,74 @@ function (paraview_add_plugin name)
 
   if ((_paraview_add_plugin_module_xmls OR _paraview_add_plugin_xmls) AND
       PARAVIEW_USE_QT AND _paraview_add_plugin_XML_DOCUMENTATION)
-    set(_paraview_build_plugin_docdir
-      "${CMAKE_CURRENT_BINARY_DIR}/paraview_help")
 
-    paraview_client_documentation(
-      TARGET      "${_paraview_build_plugin}_doc"
-      OUTPUT_DIR  "${_paraview_build_plugin_docdir}"
-      XMLS        ${_paraview_add_plugin_module_xmls}
-                  ${_paraview_add_plugin_xmls})
+    if (PARAVIEW_QT_MAJOR_VERSION VERSION_GREATER "5")
+      # see https://gitlab.kitware.com/paraview/paraview/-/issues/19742
+      if (NOT DEFINED ENV{CI})
+        message(AUTHOR_WARNING "Building the plugin documentation with Qt6 is not supported")
+      endif ()
+    else ()
 
-    set(_paraview_build_plugin_doc_source_args)
-    if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR)
-      list(APPEND _paraview_build_plugin_doc_source_args
-        SOURCE_DIR "${_paraview_add_plugin_DOCUMENTATION_DIR}")
+      set(_paraview_build_plugin_docdir
+        "${CMAKE_CURRENT_BINARY_DIR}/paraview_help")
+
+      paraview_client_documentation(
+        TARGET      "${_paraview_build_plugin}_doc"
+        OUTPUT_DIR  "${_paraview_build_plugin_docdir}"
+        XMLS        ${_paraview_add_plugin_module_xmls}
+                    ${_paraview_add_plugin_xmls})
+
+      set(_paraview_build_plugin_doc_source_args)
+      if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR)
+        list(APPEND _paraview_build_plugin_doc_source_args
+          SOURCE_DIR "${_paraview_add_plugin_DOCUMENTATION_DIR}")
+      endif ()
+
+      paraview_client_generate_help(
+        NAME              "${_paraview_build_plugin}"
+        OUTPUT_PATH        _paraview_build_plugin_qch_path
+        OUTPUT_DIR        "${_paraview_build_plugin_docdir}"
+        TARGET            "${_paraview_build_plugin}_qch"
+                          ${_paraview_build_plugin_doc_source_args}
+        TABLE_OF_CONTENTS "${_paraview_add_plugin_DOCUMENTATION_TOC}"
+        DEPENDS           "${_paraview_build_plugin}_doc"
+                          "${_paraview_add_plugin_DOCUMENTATION_DEPENDENCIES}"
+        PATTERNS          "*.html" "*.css" "*.png" "*.jpg" "*.js"
+                          ${_paraview_add_plugin_DOCUMENTATION_ADD_PATTERNS})
+
+      list(APPEND _paraview_add_plugin_extra_include_dirs
+        "${CMAKE_CURRENT_BINARY_DIR}")
+      set(_paraview_add_plugin_qch_output
+        "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}_qch.h")
+      list(APPEND _paraview_add_plugin_binary_headers
+        "${_paraview_add_plugin_qch_output}")
+      add_custom_command(
+        OUTPUT "${_paraview_add_plugin_qch_output}"
+        COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
+                $<TARGET_FILE:ParaView::ProcessXML>
+                -base64
+                "${_paraview_add_plugin_qch_output}"
+                \"\"
+                "_qch"
+                "_qch"
+                "${_paraview_build_plugin_qch_path}"
+        DEPENDS "${_paraview_build_plugin_qch_path}"
+                "${_paraview_build_plugin}_qch"
+                "$<TARGET_FILE:ParaView::ProcessXML>"
+        COMMENT "Generating header for ${_paraview_build_plugin} documentation")
+      set_property(SOURCE "${_paraview_add_plugin_qch_output}"
+        PROPERTY
+          SKIP_AUTOMOC 1)
+
+      string(APPEND _paraview_add_plugin_includes
+        "#include \"${_paraview_build_plugin}_qch.h\"\n")
+      string(APPEND _paraview_add_plugin_binary_resources
+        "  {
+      const char *text = ${_paraview_build_plugin}_qch();
+      resources.emplace_back(text);
+      delete [] text;
+    }\n")
     endif ()
-
-    paraview_client_generate_help(
-      NAME              "${_paraview_build_plugin}"
-      OUTPUT_PATH        _paraview_build_plugin_qch_path
-      OUTPUT_DIR        "${_paraview_build_plugin_docdir}"
-      TARGET            "${_paraview_build_plugin}_qch"
-                        ${_paraview_build_plugin_doc_source_args}
-      TABLE_OF_CONTENTS "${_paraview_add_plugin_DOCUMENTATION_TOC}"
-      DEPENDS           "${_paraview_build_plugin}_doc"
-                        "${_paraview_add_plugin_DOCUMENTATION_DEPENDENCIES}"
-      PATTERNS          "*.html" "*.css" "*.png" "*.jpg" "*.js"
-                        ${_paraview_add_plugin_DOCUMENTATION_ADD_PATTERNS})
-
-    list(APPEND _paraview_add_plugin_extra_include_dirs
-      "${CMAKE_CURRENT_BINARY_DIR}")
-    set(_paraview_add_plugin_qch_output
-      "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}_qch.h")
-    list(APPEND _paraview_add_plugin_binary_headers
-      "${_paraview_add_plugin_qch_output}")
-    add_custom_command(
-      OUTPUT "${_paraview_add_plugin_qch_output}"
-      COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
-              $<TARGET_FILE:ParaView::ProcessXML>
-              -base64
-              "${_paraview_add_plugin_qch_output}"
-              \"\"
-              "_qch"
-              "_qch"
-              "${_paraview_build_plugin_qch_path}"
-      DEPENDS "${_paraview_build_plugin_qch_path}"
-              "${_paraview_build_plugin}_qch"
-              "$<TARGET_FILE:ParaView::ProcessXML>"
-      COMMENT "Generating header for ${_paraview_build_plugin} documentation")
-    set_property(SOURCE "${_paraview_add_plugin_qch_output}"
-      PROPERTY
-        SKIP_AUTOMOC 1)
-
-    string(APPEND _paraview_add_plugin_includes
-      "#include \"${_paraview_build_plugin}_qch.h\"\n")
-    string(APPEND _paraview_add_plugin_binary_resources
-      "  {
-    const char *text = ${_paraview_build_plugin}_qch();
-    resources.emplace_back(text);
-    delete [] text;
-  }\n")
   endif ()
 
   set(_paraview_add_plugin_eula_sources)
