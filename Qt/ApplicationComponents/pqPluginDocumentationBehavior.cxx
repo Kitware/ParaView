@@ -25,18 +25,13 @@
 #define QT_ENDL Qt::endl
 #endif
 
+constexpr int INDEX_TIMEOUT_MSEC = 100;
+
 //-----------------------------------------------------------------------------
 class pqPluginDocumentationBehavior::pqInternals
 {
 public:
   QSet<QString> RegisteredPlugins;
-  QTimer Timer;
-
-  pqInternals()
-  {
-    this->Timer.setInterval(100);
-    this->Timer.setSingleShot(true);
-  }
 };
 
 //-----------------------------------------------------------------------------
@@ -46,7 +41,7 @@ pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(QHelpEngine* parent
 {
   assert(parentObject != nullptr);
 
-  QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(refreshHelpEngine()));
+  QTimer::singleShot(INDEX_TIMEOUT_MSEC, this, SLOT(refreshHelpEngine()));
 
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   pqCoreUtilities::connect(tracker, vtkCommand::RegisterEvent, this, SLOT(updatePlugins()));
@@ -111,9 +106,9 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
 
     delete[] decoded_stream;
     decoded_stream = nullptr;
-
-    this->Internals->Timer.start();
   }
+
+  QTimer::singleShot(INDEX_TIMEOUT_MSEC, this, SLOT(refreshHelpEngine()));
 }
 
 //-----------------------------------------------------------------------------
