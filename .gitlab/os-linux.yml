@@ -163,6 +163,7 @@
 
     script:
         - *before_script_linux
+        - .gitlab/ci/clang-tidy-cache.sh
         - sccache --start-server
         - sccache --show-stats
         - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
