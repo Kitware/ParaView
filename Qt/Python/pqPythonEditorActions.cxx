@@ -127,7 +127,7 @@ pqPythonEditorActions::pqPythonEditorActions()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonEditorActions::updateScriptsList(pqPythonManager* const python_mgr)
+void pqPythonEditorActions::updateScriptsList(pqPythonManager* python_mgr)
 {
   auto scripts = details::ListFiles(pqPythonScriptEditor::getScriptsDir());
 

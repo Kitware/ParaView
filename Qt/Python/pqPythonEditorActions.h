@@ -156,7 +156,7 @@ struct pqPythonEditorActions
    * the files contained into the default Script dir
    * @param python_mgr: instance of the python manager
    */
-  void updateScriptsList(pqPythonManager* const python_mgr);
+  void updateScriptsList(pqPythonManager* python_mgr);
 
   /**
    * @brief Fill the input menus with the current actions
