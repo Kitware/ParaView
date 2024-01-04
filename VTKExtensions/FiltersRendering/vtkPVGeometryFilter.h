@@ -16,9 +16,13 @@
 #include "vtkParaViewDeprecation.h"                   // For PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkSmartPointer.h"                          // needed for vtkSmartPointer
 
+#include "vtkNew.h" // for vtkNew
+
 class vtkCallbackCommand;
 class vtkCellGrid;
 class vtkDataSet;
+class vtkDataObjectMeshCache;
+class vtkDataObjectTree;
 class vtkExplicitStructuredGrid;
 class vtkFeatureEdges;
 class vtkGenericDataSet;
@@ -340,6 +344,19 @@ private:
    * vtkPolydata.
    */
   void GenerateProcessIdsArrays(vtkPolyData* output);
+
+  /**
+   * Use cache to fill output from input if possible.
+   * Return true on success.
+   */
+  bool UseCacheIfPossible(vtkDataObject* input, vtkDataObject* output);
+
+  /**
+   * Update cache content with given data object.
+   */
+  void UpdateCache(vtkDataObject* output);
+
+  vtkNew<vtkDataObjectMeshCache> MeshCache;
 };
 
 #endif
