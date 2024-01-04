@@ -47,7 +47,7 @@ struct PQPYTHON_EXPORT pqLinkedObjectPythonTextArea : public pqLinkedObjectQText
    * Constructs a new instance of \ref pqLinkedObjectPythonTextArea using the default copy
    * constructor of this class
    */
-  std::unique_ptr<pqLinkedObjectInterface> clone() const noexcept override
+  std::unique_ptr<pqLinkedObjectInterface> clone() const override
   {
     return std::unique_ptr<pqLinkedObjectPythonTextArea>(new pqLinkedObjectPythonTextArea(*this));
   }
