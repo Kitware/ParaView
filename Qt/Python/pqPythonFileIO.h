@@ -162,7 +162,7 @@ private:
     QTextEdit* Text = nullptr;
   } File;
 
-  bool saveBuffer(const QString& file, const vtkTypeUInt32 location);
+  bool saveBuffer(const QString& file, vtkTypeUInt32 location);
 
   QTextEdit& TextEdit;
 
