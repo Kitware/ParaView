@@ -83,12 +83,14 @@ inline int Run(int processType, int argc, char* argv[])
   // empty when BUILD_SHARED_LIBS is ON.
   vtkPVInitializePythonModules();
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
   // Setup python options
   std::vector<char*> pythonArgs;
   ProcessArgsForPython(pythonArgs, options->GetExtraArguments(), argc, argv);
   pythonArgs.push_back(nullptr);
   vtkPythonInterpreter::InitializeWithArgs(
-    1, static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front());
+    1, static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front(), pm->GetProgramPath().c_str());
 
   // Do the rest of the initialization
   status = vtkInitializationHelper::InitializeMiscellaneous(processType);
@@ -102,8 +104,6 @@ inline int Run(int processType, int argc, char* argv[])
     vtkLogF(ERROR, "No script specified. Please specify a batch script or use 'pvpython'.");
     return EXIT_FAILURE;
   }
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   // register static plugins
   ParaView_paraview_plugins_initialize();
