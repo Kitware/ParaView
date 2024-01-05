@@ -1411,6 +1411,7 @@ struct Process_5_9_to_5_10
   }
 };
 
+//===========================================================================
 struct Process_5_10_to_5_11
 {
   bool operator()(xml_document& document) { return HandleDataSetSurfaceFilter(document); }
@@ -1437,6 +1438,7 @@ struct Process_5_10_to_5_11
   }
 };
 
+//===========================================================================
 struct Process_5_11_to_5_12
 {
   bool operator()(xml_document& document)
@@ -1684,6 +1686,35 @@ struct Process_5_11_to_5_12
   }
 };
 
+//===========================================================================
+struct Process_5_12_to_5_13
+{
+  bool operator()(xml_document& document) { return HandleSetDecomposePolyhedra(document); }
+
+  static bool HandleSetDecomposePolyhedra(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='OpenFOAMReader']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      for (auto child : node.children())
+      {
+        if (std::string(child.attribute("name").as_string()) == "DecomposePolyhedra")
+        {
+          vtkGenericWarningMacro(
+            "The state file uses the OpenFOAMReader DecomposePolyhedra property, which has been "
+            "removed in ParaView version 5.13. This property will be ignored.");
+          node.remove_child(child);
+        }
+      }
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -1803,6 +1834,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_11_to_5_12 converter;
     status = converter(document);
     version = vtkSMVersion(5, 12, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 13, 0)))
+  {
+    Process_5_12_to_5_13 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 13, 0);
   }
 
   if (status)

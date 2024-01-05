@@ -981,6 +981,16 @@ def getattr(proxy, pname):
         if pname == "PlayMode" and proxy.GetProperty(pname).GetData() == "Real Time":
             raise NotSupportedException("'Real Time' is an obsolete value for 'PlayMode'. Use 'Sequence' instead.")
 
+    # 5.12 -> 5.13 breaking change on vtkOpenFoamReader
+    # DecomposePolyhedra property has been removed
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "OpenFOAMReader":
+        if pname == "DecomposePolyhedra":
+            if compatibility_version < (5, 13):
+                paraview.print_warning("'%s' is no longer supported and will have no effect. " % pname)
+                raise Continue()
+            else:
+                raise NotSupportedException("'DecomposePolyhedra' property has been removed in ParaView 5.13")
+
     raise Continue()
 
 
