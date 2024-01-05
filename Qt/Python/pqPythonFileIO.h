@@ -77,7 +77,7 @@ public:
   /**
    * @brief Returns the location of the file that the editor acts on
    */
-  const vtkTypeUInt32 getLocation() const { return this->File.Location; }
+  vtkTypeUInt32 getLocation() const { return this->File.Location; }
 
   /**
    * @brief Returns true if the buffer content has been saved on the disk
