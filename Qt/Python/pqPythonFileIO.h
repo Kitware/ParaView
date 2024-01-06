@@ -77,7 +77,7 @@ public:
   /**
    * @brief Returns the location of the file that the editor acts on
    */
-  const vtkTypeUInt32 getLocation() const { return this->File.Location; }
+  vtkTypeUInt32 getLocation() const { return this->File.Location; }
 
   /**
    * @brief Returns true if the buffer content has been saved on the disk
@@ -162,7 +162,7 @@ private:
     QTextEdit* Text = nullptr;
   } File;
 
-  bool saveBuffer(const QString& file, const vtkTypeUInt32 location);
+  bool saveBuffer(const QString& file, vtkTypeUInt32 location);
 
   QTextEdit& TextEdit;
 

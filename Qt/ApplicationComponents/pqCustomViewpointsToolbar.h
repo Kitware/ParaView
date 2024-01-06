@@ -48,7 +48,6 @@ public:
   }
   ~pqCustomViewpointsToolbar() override = default;
 
-public:
   /**
    * Clear and recreate all custom viewpoint actions
    * based on current settings

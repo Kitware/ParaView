@@ -18,7 +18,7 @@ typedef vtkSmartPointer<vtkSMProxy> pqSMProxy;
 /**
  * declare pqSMProxy for use with QVariant
  */
-Q_DECLARE_METATYPE(pqSMProxy)
+Q_DECLARE_METATYPE(pqSMProxy) // NOLINT(performance-no-int-to-ptr)
 
 // use Schwartz counter idiom to correctly
 // call qRegisterMetaType<> even on static builds when pqSMProxy

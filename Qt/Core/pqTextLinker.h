@@ -43,7 +43,7 @@ struct PQCORE_EXPORT pqTextLinker
    * @brief Copy assignement operators performs a deep
    * copy of the underlying data (only if they exist)
    */
-  pqTextLinker& operator=(const pqTextLinker& other) noexcept
+  pqTextLinker& operator=(const pqTextLinker& other)
   {
     for (decltype(other.Objs)::size_type i = 0; i < other.Objs.size(); ++i)
     {
