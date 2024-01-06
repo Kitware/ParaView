@@ -38,7 +38,7 @@ struct PQCORE_EXPORT pqLinkedObjectInterface
   /**
    * Pure virtual cloning this widget.
    */
-  virtual std::unique_ptr<pqLinkedObjectInterface> clone() const noexcept = 0;
+  virtual std::unique_ptr<pqLinkedObjectInterface> clone() const = 0;
 
   /**
    * Link this object to the other. The expected behavior should be that when this object is

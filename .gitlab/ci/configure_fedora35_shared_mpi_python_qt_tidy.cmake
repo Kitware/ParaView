@@ -1,4 +1,5 @@
-set(CMAKE_C_CLANG_TIDY "/usr/bin/clang-tidy" CACHE FILEPATH "")
-set(CMAKE_CXX_CLANG_TIDY "/usr/bin/clang-tidy" CACHE FILEPATH "")
+set(CMAKE_C_CLANG_TIDY "clang-tidy-cache" "--header-filter=$ENV{CI_PROJECT_DIR}/([A-SW-Z]|Testing|Utilities/[A-UW-Z]|Utilities/Versioning|VTKExtensions)" CACHE FILEPATH "")
+set(CMAKE_CXX_CLANG_TIDY "clang-tidy-cache" "--header-filter=$ENV{CI_PROJECT_DIR}/([A-SW-Z]|Testing|Utilities/[A-UW-Z]|Utilities/Versioning|VTKExtensions)" CACHE FILEPATH "")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "")
 
 include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora35_shared_mpi_python_qt.cmake")

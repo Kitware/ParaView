@@ -112,7 +112,7 @@ public:
 
 protected:
   pqCoreConfiguration();
-  ~pqCoreConfiguration();
+  ~pqCoreConfiguration() override;
 
   ///@{
   // not entirely sure why this is being done, but I'll let it be fore now.

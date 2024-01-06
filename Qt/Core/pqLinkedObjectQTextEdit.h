@@ -50,7 +50,7 @@ struct PQCORE_EXPORT pqLinkedObjectQTextEdit : public pqLinkedObjectInterface
    * Constructs a new instance of \ref pqLinkedObjectQTextEdit using the default copy constructor of
    * this class
    */
-  std::unique_ptr<pqLinkedObjectInterface> clone() const noexcept override
+  std::unique_ptr<pqLinkedObjectInterface> clone() const override
   {
     return std::unique_ptr<pqLinkedObjectQTextEdit>(new pqLinkedObjectQTextEdit(*this));
   }
