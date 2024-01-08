@@ -920,7 +920,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
 void pqRenderView::selectFrustumCells(int rect[4], int selectionModifier)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
-  std::string modifier = GetSelectionModifierAsString(selectionModifier);
+  const std::string modifier = GetSelectionModifierAsString(selectionModifier);
 
   vtkNew<vtkCollection> selectedRepresentations;
   vtkNew<vtkCollection> selectionSources;
@@ -935,11 +935,7 @@ void pqRenderView::selectFrustumCells(int rect[4], int selectionModifier)
     return;
   }
 
-  std::vector<int> rectVector(4);
-  for (size_t i = 0; i < 4; ++i)
-  {
-    rectVector[i] = rect[i];
-  }
+  const std::vector<int> rectVector(rect, rect + 4);
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("SelectCellsThrough")
@@ -960,7 +956,7 @@ void pqRenderView::selectFrustumCells(int rect[4], int selectionModifier)
 void pqRenderView::selectFrustumPoints(int rect[4], int selectionModifier)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
-  std::string modifier = GetSelectionModifierAsString(selectionModifier);
+  const std::string modifier = GetSelectionModifierAsString(selectionModifier);
 
   vtkNew<vtkCollection> selectedRepresentations;
   vtkNew<vtkCollection> selectionSources;
@@ -975,7 +971,7 @@ void pqRenderView::selectFrustumPoints(int rect[4], int selectionModifier)
     return;
   }
 
-  std::vector<int> rectVector(rect, rect + 4);
+  const std::vector<int> rectVector(rect, rect + 4);
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("SelectPointsThrough")
@@ -987,6 +983,34 @@ void pqRenderView::selectFrustumPoints(int rect[4], int selectionModifier)
 
   this->collectSelectionPorts(
     selectedRepresentations, selectionSources, output_ports, selectionModifier, false);
+
+  // Fire selection event to let the world know that this view selected something.
+  this->emitSelectionSignal(output_ports, selectionModifier);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectFrustumBlocks(int rect[4], int selectionModifier)
+{
+  vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
+  const std::string modifier = GetSelectionModifierAsString(selectionModifier);
+
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
+  QList<pqOutputPort*> output_ports;
+
+  BEGIN_UNDO_EXCLUDE();
+  if (!renderModuleP->SelectFrustumCells(
+        rect, selectedRepresentations, selectionSources, this->UseMultipleRepresentationSelection))
+  {
+    END_UNDO_EXCLUDE();
+    this->emitSelectionSignal(output_ports, selectionModifier);
+    return;
+  }
+
+  END_UNDO_EXCLUDE();
+
+  this->collectSelectionPorts(
+    selectedRepresentations, selectionSources, output_ports, selectionModifier, true);
 
   // Fire selection event to let the world know that this view selected something.
   this->emitSelectionSignal(output_ports, selectionModifier);
