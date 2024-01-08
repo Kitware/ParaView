@@ -40,7 +40,7 @@ one of them installed in order to build and use this filter.
 
 ## Example
 User can refer to this page
-https://www.dkrz.de/up/services/analysis/visualization/sw/paraview/tutorial/adding-date-and-time
+https://docs.dkrz.de/doc/visualization/sw/paraview/Filters/time-annotation/index.html
 
 ## Thanks
 The filter class was written by Joachim Pouderoux, Kitware 2018.
