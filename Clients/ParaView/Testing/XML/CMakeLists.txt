@@ -1069,6 +1069,7 @@ SET(TESTS_WITH_BASELINES
   ResampleToLine.xml
   ReverseSense.xml
   SaveLoadScreenShotWithEmbedState.xml
+  SelectionBlocksThrough.xml
   SelectionByArray.xml
   SeriesPreset.xml
   SeriesPresetRegexp.xml
