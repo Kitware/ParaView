@@ -36,9 +36,9 @@ def CheckSelection(numPoints=None, numCells=None):
     es.UpdatePipeline()
     info = es.GetDataInformation()
     print("Points and cells:", info.GetNumberOfPoints(), info.GetNumberOfCells())
-    if numPoints:
+    if numPoints is not None:
         assert numPoints == info.GetNumberOfPoints()
-    if numCells:
+    if numCells is not None:
         assert numCells == info.GetNumberOfCells()
     del es
 
@@ -83,6 +83,34 @@ Show(g)
 Render()
 SelectSurfaceBlocks(Rectangle=[100, 100, 200, 200])
 CheckSelection(numPoints=61, numCells=107)
+
+# Composite data ids selection
+Hide(s)
+SetActiveSource(g)
+Show(g)
+Render()
+
+# Should make selection within the whole dataset (0 is the root block id)
+SelectCompositeDataIDs(IDs=[0, 0, 0], FieldType="POINT")
+CheckSelection(numPoints=2, numCells=2)
+
+Hide(s)
+SetActiveSource(g)
+Show(g)
+Render()
+
+# Should make selection within the first subblock
+SelectCompositeDataIDs(IDs=[1, 0, 0], FieldType="POINT")
+CheckSelection(numPoints=1, numCells=1)
+
+Hide(s)
+SetActiveSource(g)
+Show(g)
+Render()
+
+# Should make selection within the second subblock
+SelectCompositeDataIDs(IDs=[2, 0, 0], FieldType="POINT")
+CheckSelection(numPoints=1, numCells=1)
 
 try:
     SelectSurfacePoints(Rectangle=[0, 0], Polygon=[0, 0])
