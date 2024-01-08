@@ -764,13 +764,30 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelectionSource(int outputType,
   }
   else if ((outputType == vtkSelectionNode::BLOCKS ||
              outputType == vtkSelectionNode::BLOCK_SELECTORS) &&
-    selectionSourceProxy &&
-    (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
-      strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0 ||
-      strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0))
+    selectionSourceProxy)
   {
-    return vtkSMSelectionHelper::ConvertInternal(
-      selectionSourceProxy, dataSource, dataPort, outputType);
+    if (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
+      strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0 ||
+      strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0)
+    {
+      return vtkSMSelectionHelper::ConvertInternal(
+        selectionSourceProxy, dataSource, dataPort, outputType);
+    }
+    else if (strcmp(inproxyname, "FrustumSelectionSource") == 0)
+    {
+      // convert to indices first
+      auto indicesSelectionSource =
+        vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertInternal(
+          selectionSourceProxy, dataSource, dataPort, vtkSelectionNode::INDICES));
+      if (indicesSelectionSource)
+      {
+        // convert to blocks
+        vtkSMProxy* blocksSelectionSource = vtkSMSelectionHelper::ConvertInternal(
+          indicesSelectionSource, dataSource, dataPort, outputType);
+        indicesSelectionSource->Delete();
+        return blocksSelectionSource;
+      }
+    }
   }
 
   // Conversion not possible, so simply create a new proxy of the requested
