@@ -3013,6 +3013,11 @@
                                    mode="visibility"
                                    property="EnableOSPRay"
                                    values="1" />
+          <WarnOnPropertyChange onlyonce="true">
+            <Text title="Warning: Potentially slow operation">
+OSPRay pathtracer may need to transfer default materials from client to server. This operation can take a few seconds in client-server mode.
+            </Text>
+          </WarnOnPropertyChange>
         </Hints>
       </StringVectorProperty>
       <IntVectorProperty

@@ -53,7 +53,6 @@ void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
     return;
   }
 
-  vtkLogF(WARNING, "Loading default OSPRay materials. This operation can take a few seconds.");
   this->DefaultMaterialsLoaded = true;
 
   // todo: this should be relative to binary or in prefs/settings, see pq

@@ -90,6 +90,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
 
     showComponentLabels = hints->FindNestedElementByName("ShowComponentLabels");
+
+    this->WarnOnChangeHint = hints->FindNestedElementByName("WarnOnPropertyChange");
+    if (this->WarnOnChangeHint)
+    {
+      this->connect(this, SIGNAL(changeFinished()), this, SLOT(showWarningOnChange()));
+    }
   }
   bool multilineText = this->widgetHintHasAttributeEqualTo("type", "multi_line");
   bool wrapText = this->widgetHintHasAttributeEqualTo("type", "one_liner_wrapped");
@@ -465,6 +471,24 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
 //-----------------------------------------------------------------------------
 pqStringVectorPropertyWidget::~pqStringVectorPropertyWidget() = default;
+
+//-----------------------------------------------------------------------------
+void pqStringVectorPropertyWidget::showWarningOnChange()
+{
+  if (this->WarnOnChangeHint->GetAttribute("onlyonce") == std::string("true") &&
+    this->WarningTriggered)
+  {
+    return; // The warning should only be triggerred once
+  }
+  vtkPVXMLElement* warningText = this->WarnOnChangeHint->FindNestedElementByName("Text");
+  QMessageBox* mBox = new QMessageBox(QMessageBox::Information,
+    QCoreApplication::translate("ServerManagerXML", warningText->GetAttribute("title")),
+    QString(QCoreApplication::translate("ServerManagerXML", warningText->GetCharacterData())),
+    QMessageBox::Ok, pqCoreUtilities::mainWidget());
+  mBox->exec(); // Hang until the user dismisses the dialog.
+
+  this->WarningTriggered = true; // Memorize that it has been triggered
+}
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqStringVectorPropertyWidget::createWidget(
