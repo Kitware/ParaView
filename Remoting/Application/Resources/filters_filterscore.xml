@@ -1623,6 +1623,23 @@ found and the point will be rejected.</Documentation>
         </Documentation>
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseImplicitArrays"
+                         default_values="0"
+                         name="UseImplicitArrays"
+                         label="Reduce Output Memory Usage"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        **IMPORTANT:** this option only concerns Hyper Tree Grids sources (including composite
+        source containing HTGs). If checked, the filter will optimize the space allocated
+        to store the output probed values. This option will lower the memory consumption,
+        especially if the probed source contains a lot of data arrays, at the cost of an increased
+        computation time.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- cell locator begin -->
       <ProxyProperty command="SetCellLocatorPrototype"
                      label="Cell Locator"
@@ -1635,6 +1652,28 @@ found and the point will be rejected.</Documentation>
         </Documentation>
       </ProxyProperty>
       <!-- cell locator end -->
+
+      <PropertyGroup label="General Properties">
+        <Property name="CategoricalData" />
+        <Property name="ComputeTolerance" />
+        <Property name="Tolerance" />
+        <Property name="MarkBlankPointsAndCells" />
+      </PropertyGroup>
+      <PropertyGroup label="Pass arrays">
+        <Property name="PassCellArrays" />
+        <Property name="PassPointArrays" />
+        <Property name="PassFieldArrays" />
+        <Property name="PassPartialArrays" />
+      </PropertyGroup>
+      <PropertyGroup label="Point Set Resample">
+        <Property name="SnapToCellWithClosestPoint" />
+      </PropertyGroup>
+      <PropertyGroup label="Hyper Tree Grid Resample">
+        <Property name="UseImplicitArrays" />
+      </PropertyGroup>
+      <PropertyGroup label="Locator">
+        <Property name="CellLocator" />
+      </PropertyGroup>
 
       <!-- End vtkResampleToImage -->
     </SourceProxy>
