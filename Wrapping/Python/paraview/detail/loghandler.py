@@ -1,5 +1,6 @@
 import logging
 
+
 class VTKHandler(logging.Handler):
     def __init__(self, *args, **kwargs):
         super(VTKHandler, self).__init__(*args, **kwargs)
@@ -9,11 +10,11 @@ class VTKHandler(logging.Handler):
             from vtkmodules.vtkCommonCore import vtkLogger
             msg = self.format(record)
             lvl = self.get_vtk_level(record.levelno)
-            vtkLogger.Log(\
-                    lvl,
-                    record.filename,
-                    record.lineno,
-                    msg)
+            vtkLogger.Log( \
+                lvl,
+                record.filename,
+                record.lineno,
+                msg)
 
             from vtkmodules.vtkCommonCore import vtkOutputWindow as win
             outputWindow = win.GetInstance()

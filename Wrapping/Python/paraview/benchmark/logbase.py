@@ -17,6 +17,7 @@ import paraview
 start_frame = 0
 default_log_threshold = dict()
 
+
 def component_to_string(comp):
     session = servermanager.ProxyManager().GetSessionProxyManager().GetSession()
     if comp == session.NONE: return 'None'
@@ -29,7 +30,8 @@ def component_to_string(comp):
     if comp == session.CLIENT_AND_SERVERS: return 'ClientAndServers'
     return None
 
-class OneLog :
+
+class OneLog:
     def __init__(self, runmode='batch', servertype='unified', component=0, rank=0):
         self.runmode = runmode
         self.servertype = servertype
@@ -38,24 +40,27 @@ class OneLog :
         self.lines = []
 
     def print_log(self, showlines=False):
-        print ("#RunMode:", self.runmode, end="")
-        print ("ServerType:", self.servertype, end="")
-        print ("Component:", self.component, end="")
-        print ("processor#:", self.rank)
+        print("#RunMode:", self.runmode, end="")
+        print("ServerType:", self.servertype, end="")
+        print("Component:", self.component, end="")
+        print("processor#:", self.rank)
         if showlines:
             for i in self.lines:
-                print (i)
+                print(i)
 
     def toString(self, showlines=False):
-        result = "#RunMode: " + self.runmode + " ServerType: " + self.servertype + " processor#: " + str(self.rank) + "\n"
+        result = "#RunMode: " + self.runmode + " ServerType: " + self.servertype + " processor#: " + str(
+            self.rank) + "\n"
         if showlines:
             for i in self.lines:
                 result += i + "\n"
         return result
 
+
 logs = []
 
-def maximize_logs () :
+
+def maximize_logs():
     """
     Convenience method to ask paraview to produce logs with lots of space and
     highest resolution.
@@ -66,8 +71,8 @@ def maximize_logs () :
 
     ss = paraview.servermanager.vtkSMSession
     for ptype in [ss.CLIENT_AND_SERVERS, ss.CLIENT, ss.SERVERS,
-                 ss.RENDER_SERVER, ss.DATA_SERVER]:
-      default_log_threshold[str(ptype)] = 0.0
+                  ss.RENDER_SERVER, ss.DATA_SERVER]:
+        default_log_threshold[str(ptype)] = 0.0
 
     pxm = paraview.servermanager.ProxyManager()
     tl = pxm.NewProxy("misc", "TimerLog")
@@ -75,7 +80,8 @@ def maximize_logs () :
     prop.SetElements1(1000000)
     tl.UpdateVTKObjects()
 
-def get_memuse() :
+
+def get_memuse():
     pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
     session = servermanager.ProxyManager().GetSessionProxyManager().GetSession()
 
@@ -91,14 +97,15 @@ def get_memuse() :
     for comp_label, comp_type in components.items():
         infos = servermanager.vtkPVMemoryUseInformation()
         session.GatherInformation(comp_type, infos, 0)
-        for i in range(0,infos.GetSize()):
+        for i in range(0, infos.GetSize()):
             retval.append('%(l)s[%(r)d] %(pu)d / %(hu)d' %
                           {'l': comp_label, 'r': infos.GetRank(i),
                            'pu': infos.GetProcMemoryUse(i),
                            'hu': infos.GetHostMemoryUse(i)})
     return retval
 
-def dump_logs( filename ) :
+
+def dump_logs(filename):
     """
     This saves off the logs we've gathered.
     Ot allows you to run a benchmark somewhere, save off all of the details in
@@ -114,7 +121,8 @@ def dump_logs( filename ) :
     pickle.dump(logs, f)
     f.close()
 
-def import_logs( filename ) :
+
+def import_logs(filename):
     """
     This is for bringing in a saved log files and parse it after the fact.
     TODO: add an option to load in raw paraview logs in text format
@@ -129,7 +137,8 @@ def import_logs( filename ) :
     logs = pickle.load(f)
     f.close()
 
-def get_logs() :
+
+def get_logs():
     """
     This is for bringing in logs at run time to parse while running.
     """
@@ -169,7 +178,7 @@ def get_logs() :
     for component in components:
         timerInfo = paraview.servermanager.vtkPVTimerInformation()
         if len(default_log_threshold) != 0:
-           timerInfo.SetLogThreshold(default_log_threshold[str(component)])
+            timerInfo.SetLogThreshold(default_log_threshold[str(component)])
         session.GatherInformation(component, timerInfo, 0)
 
         for i in range(timerInfo.GetNumberOfLogs()):
@@ -184,7 +193,8 @@ def get_logs() :
             alog.lines = timerInfo.GetLog(i).split('\n');
             logs.append(alog)
 
-def print_logs() :
+
+def print_logs():
     """
     Print logs on the root node by gathering logs across all the nodes
     regardless if the process was started in symmetric mode or not.
@@ -217,7 +227,7 @@ def print_logs() :
                 logSize = int(logSize)
                 logTxt = " " * logSize
                 ctrl.Receive(logTxt, logSize, otherProc, 987456)
-                print (logTxt)
+                print(logTxt)
         else:
             # Extract logs text
             logTxt = ""
@@ -245,6 +255,7 @@ def test_module():
     v = Render()
 
     print_logs()
+
 
 if __name__ == "__main__":
     test_module()

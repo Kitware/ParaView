@@ -13,10 +13,12 @@ This is useful for generating tests or states that can be used with the miniapp.
 
 from paraview.demos.wavelet_miniapp import parser, create_dataset
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # If this module is loaded as a Plugin in ParaView, we create a source
 # that acts similar to the miniapp.This is useful for testing.
 from paraview.util.vtkAlgorithm import *
+
+
 @smproxy.source(name="WaveletMiniApp",
                 label="Wavelet Mini-App")
 class WaveletMiniApp(VTKPythonAlgorithmBase):
@@ -24,7 +26,7 @@ class WaveletMiniApp(VTKPythonAlgorithmBase):
         VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkImageData')
 
         global parser
-        self._args = parser.parse_args(["-s","not-used"])
+        self._args = parser.parse_args(["-s", "not-used"])
 
     def _get_update_time(self, outInfo):
         executive = self.GetExecutive()
@@ -36,10 +38,10 @@ class WaveletMiniApp(VTKPythonAlgorithmBase):
             utime = outInfo.Get(executive.UPDATE_TIME_STEP())
             i = bisect.bisect_right(timesteps, utime)
             if i:
-                return timesteps[i-1]
+                return timesteps[i - 1]
             return timesteps[0]
         else:
-            assert(len(timesteps) > 0)
+            assert (len(timesteps) > 0)
             return timesteps[0]
 
     def _get_update_piece(self, outInfo):
@@ -64,7 +66,7 @@ class WaveletMiniApp(VTKPythonAlgorithmBase):
 
     @smproperty.doublevector(name="TimestepValues", information_only="1", si_class="vtkSITimeStepsProperty")
     def GetTimestepValues(self):
-        return [step/float(self._args.timesteps) for step in range(self._args.timesteps)]
+        return [step / float(self._args.timesteps) for step in range(self._args.timesteps)]
 
     def RequestInformation(self, request, inInfoVec, outInfoVec):
         executive = self.GetExecutive()

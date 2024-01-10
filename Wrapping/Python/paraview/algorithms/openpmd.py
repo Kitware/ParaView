@@ -653,8 +653,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             ]
 
             # 1D and 2D data: remove extra dimensions for load
-            del chunk_offset[len(shp) :]
-            del chunk_extent[len(shp) :]
+            del chunk_offset[len(shp):]
+            del chunk_extent[len(shp):]
 
             data = []
             for name, var in arrays:
@@ -683,7 +683,6 @@ class openPMDReader(VTKPythonAlgorithmBase):
             output.SetPartition(0, img)
             for name, array in data:
                 imgw.PointData.append(array, name)
-
 
     def _RequestParticleData(self, executive, poutput, outInfo, timeInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa

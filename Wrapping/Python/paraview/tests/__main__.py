@@ -19,17 +19,17 @@ This root package can be used to launch all the tests one after another.
             --baseline_directory /tmp/baselines
 """
 
-
 import argparse, textwrap, os, os.path
 from .. import print_info as log
 
 parser = argparse.ArgumentParser(
-        prog="paraview.tests",
-        description=textwrap.dedent(greeting),
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+    prog="paraview.tests",
+    description=textwrap.dedent(greeting),
+    formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument("-i", "--interactive", help="enable interaction", action="store_true")
 parser.add_argument("-o", "--output_directory", help="output directory", type=str)
 parser.add_argument("-v", "--baseline_directory", help="baseline directory (for comparison)", type=str)
+
 
 def single_yes_or_no_question(question, default_no=True):
     choices = ' [y/N]: ' if default_no else ' [Y/n]: '
@@ -42,9 +42,10 @@ def single_yes_or_no_question(question, default_no=True):
     else:
         return False if default_no else True
 
+
 def main(opts):
     import importlib
-    tests = [ "verify_eyedomelighting", "basic_rendering" ]
+    tests = ["verify_eyedomelighting", "basic_rendering"]
 
     if opts.output_directory:
         os.makedirs(opts.output_directory, exist_ok=True)
@@ -68,6 +69,7 @@ def main(opts):
         log(textwrap.wrap(tmodule.__doc__, width=30))
         tmodule.main(targs)
         log("done '%s'" % tname)
+
 
 args = parser.parse_args()
 main(args)

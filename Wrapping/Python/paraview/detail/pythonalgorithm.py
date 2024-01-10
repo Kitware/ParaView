@@ -7,6 +7,7 @@ from inspect import signature
 
 import sys
 
+
 def _count(values):
     """internal: returns the `number-of-elements` for the argument.
        if argument is a list or type, it returns its `len`, else returns 0 for None
@@ -18,6 +19,7 @@ def _count(values):
     else:
         return 1
 
+
 def _stringify(values):
     """internal method: used to convert values to a string suitable for an xml attribute"""
     if type(values) == list or type(values) == tuple:
@@ -26,6 +28,7 @@ def _stringify(values):
         return "1" if values else "0"
     else:
         return str(values)
+
 
 def _generate_xml(attrs, nested_xmls=[]):
     """internal: used to generate an XML string from the arguments.
@@ -38,8 +41,8 @@ def _generate_xml(attrs, nested_xmls=[]):
     d = {}
     d["type"] = attrs.pop("type")
 
-    attr_items = filter(lambda item : item[1] is not None, attrs.items())
-    d["attrs"] = "\n".join(["%s=\"%s\"" % (x, _stringify(y)) for x,y in attr_items])
+    attr_items = filter(lambda item: item[1] is not None, attrs.items())
+    d["attrs"] = "\n".join(["%s=\"%s\"" % (x, _stringify(y)) for x, y in attr_items])
     d["nested_xmls"] = "\n".join(nested_xmls)
     xml = """<{type} {attrs}> {nested_xmls} </{type}>"""
     return xml.format(**d)
@@ -52,6 +55,7 @@ def _undecorate(func):
     if hasattr(func, "_pv_original_func"):
         return _undecorate(func._pv_original_func)
     return func
+
 
 def _create_decorator(kwargs={}, update_func=None, generate_xml_func=None):
     """internal: used to create decorator for class or function objects.
@@ -70,6 +74,7 @@ def _create_decorator(kwargs={}, update_func=None, generate_xml_func=None):
                    The callback typically adds an attribute on the decoratedobj for further processing later.
     """
     attrs = kwargs.copy()
+
     def decorator(func):
         original_func = _undecorate(func)
         if update_func is not None:
@@ -77,11 +82,14 @@ def _create_decorator(kwargs={}, update_func=None, generate_xml_func=None):
         else:
             updated_attrs = attrs
         generate_xml_func(original_func, updated_attrs)
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
+
         setattr(wrapper, "_pv_original_func", original_func)
         return wrapper
+
     return decorator
 
 
@@ -92,6 +100,7 @@ class smproperty(object):
     using one of the available decorators will be exposed be accessible to ParaView
     UI or client-side Python scripting API.
     """
+
     @staticmethod
     def _append_xml(func, xml):
         pxmls = []
@@ -111,7 +120,7 @@ class smproperty(object):
             hints = []
             for h in func._pvsm_hints_xmls:
                 hints.append(h)
-            nested_xmls.append(_generate_xml({"type":"Hints"}, hints))
+            nested_xmls.append(_generate_xml({"type": "Hints"}, hints))
             delattr(func, "_pvsm_hints_xmls")
 
         pxml = _generate_xml(attrs, nested_xmls)
@@ -147,7 +156,7 @@ class smproperty(object):
         # if not set.
         if attrs.get("repeat_command", None) is not None and \
                 attrs.get("number_of_elements_per_command", None) is None:
-                    attrs["number_of_elements_per_command"] = len(signature(func).parameters) - 1
+            attrs["number_of_elements_per_command"] = len(signature(func).parameters) - 1
         return attrs
 
     @staticmethod
@@ -157,53 +166,55 @@ class smproperty(object):
     @staticmethod
     def xml(xmlstr):
         """Decorator that be used to directly add a ServerManager property XML for a method."""
+
         def generate(func, attrs):
             smproperty._append_xml(func, xmlstr)
+
         return _create_decorator(generate_xml_func=generate)
 
     @staticmethod
     def intvector(**kwargs):
-        attrs = { "type" : "IntVectorProperty"}
+        attrs = {"type": "IntVectorProperty"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproperty._update_vectorproperty_defaults,
-                generate_xml_func=smproperty._generate_xml)
+                                 update_func=smproperty._update_vectorproperty_defaults,
+                                 generate_xml_func=smproperty._generate_xml)
 
     @staticmethod
     def doublevector(**kwargs):
-        attrs = { "type" : "DoubleVectorProperty"}
+        attrs = {"type": "DoubleVectorProperty"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproperty._update_vectorproperty_defaults,
-                generate_xml_func=smproperty._generate_xml)
+                                 update_func=smproperty._update_vectorproperty_defaults,
+                                 generate_xml_func=smproperty._generate_xml)
 
     @staticmethod
     def idtypevector(**kwargs):
-        attrs = { "type" : "IdTypeVectorProperty"}
+        attrs = {"type": "IdTypeVectorProperty"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproperty._update_vectorproperty_defaults,
-                generate_xml_func=smproperty._generate_xml)
+                                 update_func=smproperty._update_vectorproperty_defaults,
+                                 generate_xml_func=smproperty._generate_xml)
 
     @staticmethod
     def stringvector(**kwargs):
-        attrs = { "type" : "StringVectorProperty" }
+        attrs = {"type": "StringVectorProperty"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproperty._update_vectorproperty_defaults,
-                generate_xml_func=smproperty._generate_xml)
+                                 update_func=smproperty._update_vectorproperty_defaults,
+                                 generate_xml_func=smproperty._generate_xml)
 
     @staticmethod
     def proxy(**kwargs):
-        attrs = { "type" : "ProxyProperty" }
+        attrs = {"type": "ProxyProperty"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproperty._update_proxyproperty_attrs,
-                generate_xml_func=smproperty._generate_xml)
+                                 update_func=smproperty._update_proxyproperty_attrs,
+                                 generate_xml_func=smproperty._generate_xml)
 
     @staticmethod
     def input(**kwargs):
-        attrs = { "type" : "InputProperty" }
+        attrs = {"type": "InputProperty"}
         if kwargs.get("multiple_input", False) or kwargs.get("repeat_command", False):
             attrs["command"] = "AddInputConnection"
             # FIXME: input property doesn't support cleaning port connections alone :(
@@ -214,13 +225,13 @@ class smproperty(object):
         # todo: handle inputType
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproperty._update_property_defaults,
-                generate_xml_func=smproperty._generate_xml)
+                                 update_func=smproperty._update_property_defaults,
+                                 generate_xml_func=smproperty._generate_xml)
 
     @staticmethod
     def dataarrayselection(name=None):
         def generate(func, attrs):
-            xml="""<StringVectorProperty name="{name}Info"
+            xml = """<StringVectorProperty name="{name}Info"
                                          command="{command}"
                                          number_of_elements_per_command="2"
                                          information_only="1"
@@ -240,15 +251,17 @@ class smproperty(object):
                    </StringVectorProperty>
             """.format(**attrs)
             smproperty._append_xml(func, xml)
-        return _create_decorator({"name" : name},
-                update_func=smproperty._update_property_defaults,
-                generate_xml_func=generate)
+
+        return _create_decorator({"name": name},
+                                 update_func=smproperty._update_property_defaults,
+                                 generate_xml_func=generate)
 
 
 class smdomain(object):
     """
     Provides decorators that add domains to properties.
     """
+
     @staticmethod
     def _append_xml(func, xml):
         domains = []
@@ -267,45 +280,47 @@ class smdomain(object):
             smdomain._append_xml(func, xmlstr)
 
         return _create_decorator({},
-                generate_xml_func=generate)
+                                 generate_xml_func=generate)
 
     @staticmethod
     def doublerange(**kwargs):
-        attrs = { "type" : "DoubleRangeDomain" , "name" : "range" }
+        attrs = {"type": "DoubleRangeDomain", "name": "range"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                generate_xml_func=smdomain._generate_xml)
+                                 generate_xml_func=smdomain._generate_xml)
 
     @staticmethod
     def intrange(**kwargs):
-        attrs = { "type" : "IntRangeDomain" , "name" : "range" }
+        attrs = {"type": "IntRangeDomain", "name": "range"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                generate_xml_func=smdomain._generate_xml)
+                                 generate_xml_func=smdomain._generate_xml)
 
     @staticmethod
     def filelist(**kwargs):
-        attrs = { "type" : "FileListDomain", "name" : "files" }
+        attrs = {"type": "FileListDomain", "name": "files"}
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                generate_xml_func=smdomain._generate_xml)
+                                 generate_xml_func=smdomain._generate_xml)
 
     @staticmethod
     def datatype(dataTypes, **kwargs):
-        attrs = {"type" : "DataTypeDomain", "name": "input_type"}
+        attrs = {"type": "DataTypeDomain", "name": "input_type"}
         attrs.update(kwargs)
+
         def generate(func, attrs):
             type_xmls = []
             for atype in dataTypes:
-                type_xmls.append(_generate_xml({"type" : "DataType", "value" : atype}, []))
+                type_xmls.append(_generate_xml({"type": "DataType", "value": atype}, []))
             smdomain._append_xml(func, _generate_xml(attrs, type_xmls))
 
         return _create_decorator(attrs,
-                generate_xml_func=generate)
+                                 generate_xml_func=generate)
 
 
 class smhint(object):
     """Provides decorators that add hints to proxies and properties."""
+
     @staticmethod
     def _generate_xml(func, attrs):
         lhints = []
@@ -322,8 +337,9 @@ class smhint(object):
                 lhints = func._pvsm_hints_xmls
             lhints.append(xmlstr)
             setattr(func, "_pvsm_hints_xmls", lhints)
+
         return _create_decorator({},
-                generate_xml_func=generate)
+                                 generate_xml_func=generate)
 
     @staticmethod
     def filechooser(extensions, file_description):
@@ -332,7 +348,8 @@ class smhint(object):
         attrs["extensions"] = extensions
         attrs["file_description"] = file_description
         return _create_decorator(attrs,
-                generate_xml_func=smhint._generate_xml)
+                                 generate_xml_func=smhint._generate_xml)
+
 
 def get_qualified_classname(classobj):
     if classobj.__module__ == "__main__":
@@ -340,11 +357,13 @@ def get_qualified_classname(classobj):
     else:
         return "%s.%s" % (classobj.__module__, classobj.__name__)
 
+
 class smproxy(object):
     """
     Provides decorators for class objects that should be exposed to
     ParaView.
     """
+
     @staticmethod
     def _update_proxy_defaults(classobj, attrs):
         if attrs.get("name", None) is None:
@@ -373,10 +392,9 @@ class smproxy(object):
             if callable(val) and hasattr(val, "_pvsm_property_xmls"):
                 pxmls = getattr(val, "_pvsm_property_xmls")
                 if len(pxmls) > 1:
-                    raise RuntimeError("Multiple property definitions on the same"\
-                            "method are not supported.")
+                    raise RuntimeError("Multiple property definitions on the same" \
+                                       "method are not supported.")
                 prop_xmls_dict[pname] = pxmls[0]
-
 
         # since the order of the properties keeps on changing between invocations,
         # let's sort them by the name for consistency. In future, we may put in
@@ -390,13 +408,13 @@ class smproxy(object):
                 </Property>""")
 
         if hasattr(classobj, "_pvsm_hints_xmls"):
-            hints = [h  for h in classobj._pvsm_hints_xmls]
-            nested_xmls.append(_generate_xml({"type":"Hints"}, hints))
+            hints = [h for h in classobj._pvsm_hints_xmls]
+            nested_xmls.append(_generate_xml({"type": "Hints"}, hints))
 
         proxyxml = _generate_xml(attrs, nested_xmls)
-        groupxml = _generate_xml({"type":"ProxyGroup", "name":attrs.get("group")},
-                                [proxyxml])
-        smconfig = _generate_xml({"type":"ServerManagerConfiguration"}, [groupxml])
+        groupxml = _generate_xml({"type": "ProxyGroup", "name": attrs.get("group")},
+                                 [proxyxml])
+        smconfig = _generate_xml({"type": "ServerManagerConfiguration"}, [groupxml])
         setattr(classobj, "_pvsm_proxy_xml", smconfig)
 
     @staticmethod
@@ -407,12 +425,12 @@ class smproxy(object):
         attrs["si_class"] = "vtkSIPythonSourceProxy"
         attrs.update(kwargs)
         return _create_decorator(attrs,
-                update_func=smproxy._update_proxy_defaults,
-                generate_xml_func=smproxy._generate_xml)
+                                 update_func=smproxy._update_proxy_defaults,
+                                 generate_xml_func=smproxy._generate_xml)
 
     @staticmethod
     def filter(**kwargs):
-        attrs = { "group" : "filters" }
+        attrs = {"group": "filters"}
         attrs.update(kwargs)
         return smproxy.source(**attrs)
 
@@ -425,15 +443,17 @@ class smproxy(object):
         if extensions is None and filename_patterns is None:
             raise RuntimeError("Either `filename_patterns` or `extensions` must be provided for a reader.")
 
-        attrs = { "type" : "ReaderFactory" }
+        attrs = {"type": "ReaderFactory"}
         attrs["file_description"] = file_description
         attrs["extensions"] = extensions
         attrs["filename_patterns"] = filename_patterns
         attrs["is_directory"] = "1" if is_directory else None
         _xml = _generate_xml(attrs, [])
+
         def decorator(func):
             f = smhint.xml(_xml)(func)
             return smproxy.source(**kwargs)(f)
+
         return decorator
 
     @staticmethod
@@ -443,13 +463,15 @@ class smproxy(object):
         """
         assert file_description is not None and extensions is not None
 
-        attrs = { "type" : "WriterFactory" }
+        attrs = {"type": "WriterFactory"}
         attrs["file_description"] = file_description
         attrs["extensions"] = extensions
         _xml = _generate_xml(attrs, [])
+
         def decorator(func):
             f = smhint.xml(_xml)(func)
             return smproxy.source(group="writers", type="WriterProxy", **kwargs)(f)
+
         return decorator
 
 
@@ -466,11 +488,12 @@ def get_plugin_xmls(module_or_package):
         items = module_or_package.items()
 
     xmls = []
-    for (k,v) in items:
+    for (k, v) in items:
         v = _undecorate(v)
         if hasattr(v, "_pvsm_proxy_xml"):
             xmls.append(getattr(v, "_pvsm_proxy_xml"))
     return xmls
+
 
 def get_plugin_name(module_or_package):
     """helper function called by vtkPVPythonAlgorithmPlugin to discover
@@ -481,6 +504,7 @@ def get_plugin_name(module_or_package):
     else:
         return module_or_package.__name__
 
+
 def get_plugin_version(module_or_package):
     """helper function called by vtkPVPythonAlgorithmPlugin to discover
     ParaView plugin version, if any."""
@@ -489,6 +513,7 @@ def get_plugin_version(module_or_package):
         return str(getattr(module_or_package, "paraview_plugin_version"))
     else:
         return "(unknown)"
+
 
 def load_plugin(filepath, default_modulename=None):
     """helper function called by vtkPVPythonAlgorithmPlugin to load
@@ -515,6 +540,7 @@ def load_plugin(filepath, default_modulename=None):
     import sys
     sys.modules[modulename] = module
     return module
+
 
 def reload_plugin_module(module):
     """helper function to reload a plugin module previously loaded via

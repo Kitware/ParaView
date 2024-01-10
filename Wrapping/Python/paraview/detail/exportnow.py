@@ -2,15 +2,18 @@ r"""This module is used to export catalyst defined data products directly
 within the ParaView GUI."""
 
 from paraview.simple import *
+
 haveCinemaC = True
 try:
-  import paraview.tpl.cinema_python.adaptors.paraview.pv_introspect as pvi
+    import paraview.tpl.cinema_python.adaptors.paraview.pv_introspect as pvi
 except:
-  haveCinemaC = False
+    haveCinemaC = False
 import os
+
 
 class CinemaDHelper(object):
     """ A helper that we funnel file save commands through so that we can build up a CinemaD table for them. """
+
     def __init__(self, mcd, rd):
         self.__EnableCinemaDTable = mcd
         self.__RootDirectory = rd
@@ -43,7 +46,7 @@ class CinemaDHelper(object):
         self.Keys.add("timestep")
         self.Keys.add("producer")
         self.Keys.add("FILE")
-        self.Contents.append({'timestep':time,'producer':producer,'FILE':datafilename})
+        self.Contents.append({'timestep': time, 'producer': producer, 'FILE': datafilename})
 
     def AppendCViewToCinemaDTable(self, time, producer, filelist):
         """ keep a record of every new file that cinema image writes along with the keys that produced them so that we can list them all later """
@@ -52,20 +55,20 @@ class CinemaDHelper(object):
         self.Keys.add("timestep")
         self.Keys.add("producer")
         self.Keys.add("FILE")
-        #unroll the contents into key lists and filenames
+        # unroll the contents into key lists and filenames
         for viewname in filelist:
-           for entry in filelist[viewname]:
-               keylist = entry[0]
-               # avoid redundancy from name change
-               if 'time' in keylist:
-                   time = keylist['time']
-                   del keylist['time']
-               for k in keylist:
-                   self.Keys.add(k)
-               keylist['timestep']=time
-               keylist['producer']=producer
-               keylist['FILE']=self.__StripRootDir(entry[1])
-               self.Contents.append(keylist)
+            for entry in filelist[viewname]:
+                keylist = entry[0]
+                # avoid redundancy from name change
+                if 'time' in keylist:
+                    time = keylist['time']
+                    del keylist['time']
+                for k in keylist:
+                    self.Keys.add(k)
+                keylist['timestep'] = time
+                keylist['producer'] = producer
+                keylist['FILE'] = self.__StripRootDir(entry[1])
+                self.Contents.append(keylist)
 
     def Finalize(self):
         """ Finish off the table and write it to a file """
@@ -81,19 +84,19 @@ class CinemaDHelper(object):
         f.write("producer,")
         for k in self.Keys:
             if k != 'timestep' and k != 'producer' and k != 'FILE':
-                f.write("%s,"%k)
+                f.write("%s," % k)
         f.write("FILE\n")
         # write all of the contents
         for l in self.Contents:
-            f.write("%s,"%l['timestep'])
-            f.write("%s,"%l['producer'])
+            f.write("%s," % l['timestep'])
+            f.write("%s," % l['producer'])
             for k in self.Keys:
                 if k != 'timestep' and k != 'producer' and k != 'FILE':
                     v = ''
                     if k in l:
                         v = l[k]
-                    f.write("%s,"%v)
-            f.write("%s\n"%self.__StripRootDir(l['FILE']))
+                    f.write("%s," % v)
+            f.write("%s\n" % self.__StripRootDir(l['FILE']))
         f.close()
 
     def WriteNow(self):
@@ -106,41 +109,41 @@ class CinemaDHelper(object):
             # phew nothing new, we can just append a record
             f = open(indexfilename, "a+")
             for l in self.Contents:
-                f.write("%s,"%l['timestep'])
-                f.write("%s,"%l['producer'])
+                f.write("%s," % l['timestep'])
+                f.write("%s," % l['producer'])
                 for k in self.Keys:
                     if k != 'timestep' and k != 'producer' and k != 'FILE':
                         v = ''
                         if k in l:
                             v = l[k]
-                        f.write("%s,"%v)
-                f.write("%s\n"%self.__StripRootDir(l['FILE']))
+                        f.write("%s," % v)
+                f.write("%s\n" % self.__StripRootDir(l['FILE']))
             f.close()
             self.Contents = []
             return
-        #dang, whatever we wrote recently had a new variable
-        #we may have to extend and rewrite the old output file
+        # dang, whatever we wrote recently had a new variable
+        # we may have to extend and rewrite the old output file
         readKeys = None
         readContents = []
         if os.path.exists(indexfilename):
-            #yep we have to do it
-            #parse the old file
+            # yep we have to do it
+            # parse the old file
             f = open(indexfilename, "r")
             for line in f:
-                read = line[0:-1].split(",") #-1 to skip trailing\n
+                read = line[0:-1].split(",")  # -1 to skip trailing\n
                 if readKeys is None:
                     readKeys = read
                 else:
                     entry = {}
-                    for idx in range(0,len(read)):
-                        entry.update({readKeys[idx]:read[idx]})
+                    for idx in range(0, len(read)):
+                        entry.update({readKeys[idx]: read[idx]})
                     readContents.append(entry)
-        #combine contents
+        # combine contents
         if readKeys is not None:
-           self.Keys = self.Keys.union(readKeys)
-           readContents.extend(self.Contents)
-           self.Contents = readContents
-        #finally, write
+            self.Keys = self.Keys.union(readKeys)
+            readContents.extend(self.Contents)
+            self.Contents = readContents
+        # finally, write
         self.Finalize()
         self.KeysWritten = self.Keys.copy()
         self.Contents = []
@@ -148,6 +151,7 @@ class CinemaDHelper(object):
 
 class __CinemaACHelper(object):
     """ Another helper that connects up to cinema_python's export function. """
+
     def __init__(self, rd, vsel, tsel, asel):
         self.__RootDirectory = rd
         self.__ViewSelection = vsel
@@ -156,16 +160,17 @@ class __CinemaACHelper(object):
         self.NewFiles = None
 
     if haveCinemaC:
-      def ExportNow(self, time):
-          r = pvi.export_scene(baseDirName=self.__RootDirectory,
-                           viewSelection=dict(self.__ViewSelection),
-                           trackSelection=dict(self.__TrackSelection),
-                           arraySelection=dict(self.__ArraySelection),
-                           forcetime=time)
-          self.NewFiles = r
+        def ExportNow(self, time):
+            r = pvi.export_scene(baseDirName=self.__RootDirectory,
+                                 viewSelection=dict(self.__ViewSelection),
+                                 trackSelection=dict(self.__TrackSelection),
+                                 arraySelection=dict(self.__ArraySelection),
+                                 forcetime=time)
+            self.NewFiles = r
     else:
-      def ExportNow(self, time):
-          pass
+        def ExportNow(self, time):
+            pass
+
 
 def _fixup_and_makedir_if_needed(rootdir):
     if rootdir and not rootdir.endswith("/"):
@@ -173,6 +178,7 @@ def _fixup_and_makedir_if_needed(rootdir):
     if rootdir and not os.path.exists(rootdir):
         os.makedirs(rootdir)
     return rootdir
+
 
 def ExportNow(image_root_directory,
               data_root_directory,
@@ -215,8 +221,8 @@ def ExportNow(image_root_directory,
         writercnt = 0
         while wp:
             freq = wp.GetProperty("WriteFrequency").GetElement(0)
-            if ((tstep % freq==0) and
-                (not (wp.GetXMLName() == "Cinema image options"))):
+            if ((tstep % freq == 0) and
+                    (not (wp.GetXMLName() == "Cinema image options"))):
                 # this isn't pretty. I couldn't find a way to write
                 # directly with the writer proxy. So what I do here
                 # is find the input and filename and make a new writer
@@ -239,14 +245,14 @@ def ExportNow(image_root_directory,
                         cell_arrays = [' ']
                     # create a temporary array culling filter
                     pass_arrays = PassArrays(Input=inputproxy, \
-                        PointDataArrays=point_arrays, CellDataArrays=cell_arrays)
+                                             PointDataArrays=point_arrays, CellDataArrays=cell_arrays)
                     inputproxy = pass_arrays
                     helpers.append(inputproxy)
                 fname = wp.GetProperty("CatalystFilePattern").GetElement(0)
                 if wp.GetXMLName() == "ExodusIIWriter":
-                    fnamefilled = data_root_directory+fname+padded_tstep
+                    fnamefilled = data_root_directory + fname + padded_tstep
                 else:
-                    fnamefilled = data_root_directory+fname.replace("%t", padded_tstep)
+                    fnamefilled = data_root_directory + fname.replace("%t", padded_tstep)
 
                 kwargs = {}
                 DataMode = wp.GetProperty("DataMode")
@@ -278,26 +284,26 @@ def ExportNow(image_root_directory,
         viewcnt = 0
         while ssp:
             if not ssp.HasAnnotation("enabled") or not (ssp.GetAnnotation("enabled") == '1'):
-                ssp= ed.GetNextScreenshotProxy()
+                ssp = ed.GetNextScreenshotProxy()
                 continue
             freq = ssp.GetProperty("WriteFrequency").GetElement(0)
-            if tstep % freq==0:
+            if tstep % freq == 0:
                 fname = ssp.GetProperty("CatalystFilePattern").GetElement(0)
                 if fname.endswith("cdb"):
                     CINAC = __CinemaACHelper(image_root_directory,
-                              rendering_info,
-                              cinema_tracks,
-                              cinema_arrays)
+                                             rendering_info,
+                                             cinema_tracks,
+                                             cinema_arrays)
                     # special treatment for cinema image data bases
                     CINAC.ExportNow(tnow)
                     # don't forget to tell cinema D about it
-                    CIND.AppendCViewToCinemaDTable(tnow, "cview_%s"%viewcnt, CINAC.NewFiles)
+                    CIND.AppendCViewToCinemaDTable(tnow, "cview_%s" % viewcnt, CINAC.NewFiles)
                 else:
-                    fnamefilled = image_root_directory+fname.replace("%t", padded_tstep)
+                    fnamefilled = image_root_directory + fname.replace("%t", padded_tstep)
                     # save the screenshot
                     ssp.WriteImage(fnamefilled)
                     # don't forget to tell cinema D about it
-                    CIND.AppendToCinemaDTable(tnow, "view_%s"%viewcnt, fnamefilled)
+                    CIND.AppendToCinemaDTable(tnow, "view_%s" % viewcnt, fnamefilled)
             ssp = ed.GetNextScreenshotProxy()
             viewcnt = viewcnt + 1
         tstep = tstep + 1
@@ -306,7 +312,7 @@ def ExportNow(image_root_directory,
 
         # destroy array culling filters
         for x in helpers:
-          Delete(x)
+            Delete(x)
 
     # defer actual cinema D output until the end because we only know now what the full set of cinema D columns actually are
     CIND.Finalize()

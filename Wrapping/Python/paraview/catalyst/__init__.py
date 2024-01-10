@@ -5,6 +5,7 @@ scripts continue to work as ParaView code keeps evolving. Hence, we limit the
 API exposed here to bare minimum.
 """
 
+
 def Options():
     """Creates and returns an options object which is used to configure Catalyst
     specific options such as output directories, live support, etc."""
@@ -13,6 +14,7 @@ def Options():
     pxm = servermanager.ProxyManager()
     proxy = pxm.NewProxy("coprocessing", "CatalystOptions")
     return servermanager._getPyProxy(proxy)
+
 
 def log_level():
     """Returns the Python logging level to use to log informative messages
@@ -34,6 +36,7 @@ def get_args():
     from . import v2_internals
     return v2_internals._get_active_arguments()
 
+
 def get_execute_params():
     """For the active pipeline script, returns "parameters", if any, specified
     during the execute phase in the Catalyst adaptor.
@@ -45,6 +48,7 @@ def get_execute_params():
     """
     from . import v2_internals
     return v2_internals._get_execute_parameters()
+
 
 def get_script_filename():
     """For the active pipeline script, returns its filename. This is provided in

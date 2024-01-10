@@ -13,6 +13,7 @@ from paraview.detail import exportnow
 # to False.
 createDirectoriesIfNeeded = True
 
+
 # -----------------------------------------------------------------------------
 
 class CoProcessor(object):
@@ -58,8 +59,8 @@ class CoProcessor(object):
         self.__CinemaTracks = {}
         self.__InitialFrequencies = {}
         self.__PrintEnsightFormatString = False
-        self.__TimeStepToStartOutputAt=0
-        self.__ForceOutputAtFirstCall=False
+        self.__TimeStepToStartOutputAt = 0
+        self.__ForceOutputAtFirstCall = False
         self.__FirstTimeStepIndex = None
         # a list of arrays requested for each channel, e.g. {'input': ["a point data array name", 0], ["a cell data array name", 1]}
         self.__RequestedArrays = None
@@ -81,8 +82,8 @@ class CoProcessor(object):
            input, and value is a list of frequencies.
            """
         if type(frequencies) != dict:
-           raise RuntimeError (
-                 "Incorrect argument type: %s, must be a dict" % type(frequencies))
+            raise RuntimeError(
+                "Incorrect argument type: %s, must be a dict" % type(frequencies))
         self.__InitialFrequencies = frequencies
 
     def SetRequestedArrays(self, channelname, requestedarrays):
@@ -100,10 +101,10 @@ class CoProcessor(object):
            input, and value is a list of frequencies.
            """
 
-        self.__TimeStepToStartOutputAt=timeStepToStartOutputAt
-        self.__ForceOutputAtFirstCall=forceOutputAtFirstCall
+        self.__TimeStepToStartOutputAt = timeStepToStartOutputAt
+        self.__ForceOutputAtFirstCall = forceOutputAtFirstCall
 
-    def EnableLiveVisualization(self, enable, frequency = 1):
+    def EnableLiveVisualization(self, enable, frequency=1):
         """Call this method to enable live-visualization. When enabled,
         DoLiveVisualization() will communicate with ParaView server if possible
         for live visualization. Frequency specifies how often the
@@ -114,7 +115,7 @@ class CoProcessor(object):
     def CreatePipeline(self, datadescription):
         """This methods must be overridden by subclasses to create the
            visualization pipeline."""
-        raise RuntimeError ("Subclasses must override this method.")
+        raise RuntimeError("Subclasses must override this method.")
 
     def LoadRequestedData(self, datadescription):
         """Call this method in RequestDataDescription co-processing pass to mark
@@ -133,7 +134,7 @@ class CoProcessor(object):
         # generating the script then only those arrays will be provided to the Live connection.
         # note that we want the pipeline built before we do the actual first live connection.
         if self.__EnableLiveVisualization and self.NeedToOutput(datadescription, self.__LiveVisualizationFrequency) \
-           and self.__LiveVisualizationLink:
+                and self.__LiveVisualizationLink:
             if self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
                 if self.__RequestedArrays:
                     for key in self.__RequestedArrays:
@@ -198,7 +199,7 @@ class CoProcessor(object):
 
             for view in self.__ViewsList:
                 if (view.cpFrequency and self.NeedToOutput(datadescription, view.cpFrequency)) or \
-                   datadescription.GetForceOutput() == True:
+                        datadescription.GetForceOutput() == True:
                     viewinputs = cpstate.locate_simulation_inputs_for_view(view)
                     for viewinput in viewinputs:
                         if self.__RequestedArrays:
@@ -209,19 +210,18 @@ class CoProcessor(object):
                             datadescription.GetInputDescriptionByName(viewinput).AllFieldsOn()
                             datadescription.GetInputDescriptionByName(viewinput).GenerateMeshOn()
 
-
     def UpdateProducers(self, datadescription):
         """This method will update the producers in the pipeline. If the
            pipeline is not created, it will be created using
            self.CreatePipeline().
         """
         if not self.__PipelineCreated:
-           self.CreatePipeline(datadescription)
-           self.__PipelineCreated = True
-           if self.__EnableLiveVisualization:
-               # we don't want to use __InitialFrequencies any more with live viz
-               self.__InitialFrequencies = None
-           self.__FixupWriters()
+            self.CreatePipeline(datadescription)
+            self.__PipelineCreated = True
+            if self.__EnableLiveVisualization:
+                # we don't want to use __InitialFrequencies any more with live viz
+                self.__InitialFrequencies = None
+            self.__FixupWriters()
 
         else:
             simtime = datadescription.GetTime()
@@ -229,7 +229,6 @@ class CoProcessor(object):
                 producer.GetClientSideObject().SetOutput(
                     datadescription.GetInputDescriptionByName(name).GetGrid(),
                     simtime)
-
 
     def WriteData(self, datadescription):
         """This method will update all writes present in the pipeline, as
@@ -244,7 +243,7 @@ class CoProcessor(object):
                 paddingamount = writer.parameters.GetProperty("PaddingAmount").GetElement(0)
                 helperName = writer.GetXMLName()
                 if helperName == "ExodusIIWriter":
-                    ts = "."+str(timestep).rjust(paddingamount, '0')
+                    ts = "." + str(timestep).rjust(paddingamount, '0')
                     writer.FileName = fileName + ts
                 else:
                     ts = str(timestep).rjust(paddingamount, '0')
@@ -260,7 +259,7 @@ class CoProcessor(object):
                             os.makedirs(newDir)
                         except OSError:
                             if not os.path.isdir(newDir):
-                                print ("ERROR: Cannot make directory for", writer.FileName, ". No data will be written.")
+                                print("ERROR: Cannot make directory for", writer.FileName, ". No data will be written.")
                                 oktowrite[0] = 0.
                     comm.Broadcast(oktowrite, 1, 0)
                     if oktowrite[0] == 0:
@@ -269,7 +268,6 @@ class CoProcessor(object):
                 writer.UpdatePipeline(datadescription.GetTime())
                 self.__AppendToCinemaDTable(timestep, "writer_%s" % self.__WritersList.index(writer), writer.FileName)
         self.__FinalizeCinemaDTable()
-
 
     def WriteImages(self, datadescription, rescale_lookuptable=False,
                     image_quality=None, padding_amount=0):
@@ -307,7 +305,7 @@ class CoProcessor(object):
         cinema_dirs = []
         for view in self.__ViewsList:
             if (view.cpFrequency and self.NeedToOutput(datadescription, view.cpFrequency)) or \
-               datadescription.GetForceOutput() == True:
+                    datadescription.GetForceOutput() == True:
                 fname = view.cpFileName
                 ts = str(timestep).rjust(padding_amount, '0')
                 fname = fname.replace("%t", ts)
@@ -318,7 +316,7 @@ class CoProcessor(object):
                     elif view.IsA("vtkSMContextViewProxy") == True:
                         view.ResetDisplay()
                     else:
-                        print (' do not know what to do with a ', view.GetClassName())
+                        print(' do not know what to do with a ', view.GetClassName())
                 view.ViewTime = datadescription.GetTime()
                 if rescale_lookuptable:
                     self.RescaleDataRange(view, datadescription.GetTime())
@@ -326,10 +324,10 @@ class CoProcessor(object):
                 if cinemaOptions and 'camera' in cinemaOptions:
                     if 'composite' in view.cpCinemaOptions and view.cpCinemaOptions['composite'] == True:
                         dirname, filelist = self.UpdateCinema(view, datadescription,
-                                                    specLevel="B")
+                                                              specLevel="B")
                     else:
                         dirname, filelist = self.UpdateCinema(view, datadescription,
-                                                    specLevel="A")
+                                                              specLevel="A")
                     if dirname:
                         self.__AppendCViewToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), filelist)
                         cinema_dirs.append(dirname)
@@ -345,7 +343,7 @@ class CoProcessor(object):
                                 os.makedirs(newDir)
                             except OSError:
                                 if not os.path.isdir(newDir):
-                                    print ("ERROR: Cannot make directory for", fname, ". No image will be output.")
+                                    print("ERROR: Cannot make directory for", fname, ". No image will be output.")
                                     oktowrite[0] = 0.
                         comm.Broadcast(oktowrite, 1, 0)
                         if oktowrite[0] == 0:
@@ -362,7 +360,7 @@ class CoProcessor(object):
                         # let simple.SaveScreenshot pick a default.
                         quality = None
 
-                    if fname.endswith('png') and view.cpCompression is not None and view.cpCompression != -1 :
+                    if fname.endswith('png') and view.cpCompression is not None and view.cpCompression != -1:
                         simple.SaveScreenshot(fname, view,
                                               CompressionLevel=view.cpCompression,
                                               ImageResolution=view.ViewSize)
@@ -377,7 +375,6 @@ class CoProcessor(object):
             pv_introspect.make_workspace_file("cinema\\", cinema_dirs)
 
         self.__FinalizeCinemaDTable()
-
 
     def DoLiveVisualization(self, datadescription, hostname, port):
         """This method execute the code-stub needed to communicate with ParaView
@@ -399,9 +396,9 @@ class CoProcessor(object):
             # Initialize the "link"
             self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
 
-
         if self.__EnableLiveVisualization and self.NeedToOutput(datadescription, self.__LiveVisualizationFrequency):
-            if not self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
+            if not self.__LiveVisualizationLink.Initialize(
+                    servermanager.ActiveConnection.Session.GetSessionProxyManager()):
                 return
 
         time = datadescription.GetTime()
@@ -438,7 +435,7 @@ class CoProcessor(object):
         # Check that the producer name for the input given is valid for the
         # current setup.
         if not datadescription.GetInputDescriptionByName(inputname):
-            raise RuntimeError ("Simulation input name '%s' does not exist" % inputname)
+            raise RuntimeError("Simulation input name '%s' does not exist" % inputname)
 
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
         if not grid:
@@ -462,7 +459,7 @@ class CoProcessor(object):
                 grid.IsA("vtkStructuredGrid") == True or \
                 grid.IsA("vtkRectilinearGrid") == True:
             extent = datadescription.GetInputDescriptionByName(inputname).GetWholeExtent()
-            producer.WholeExtent= [ extent[0], extent[1], extent[2], extent[3], extent[4], extent[5] ]
+            producer.WholeExtent = [extent[0], extent[1], extent[2], extent[3], extent[4], extent[5]]
 
         # Save the producer for easy access in UpdateProducers() call.
         self.__ProducersMap[inputname] = producer
@@ -474,13 +471,13 @@ class CoProcessor(object):
         one simulation product. Much like CreateProducer, only this ends up with
         a temporal cache filter instead of a PVTrivialProducer."""
         if not datadescription.GetInputDescriptionByName(inputname):
-            raise RuntimeError ("Simulation input name '%s' does not exist" % inputname)
+            raise RuntimeError("Simulation input name '%s' does not exist" % inputname)
 
         idd = datadescription.GetInputDescriptionByName(inputname)
 
         cache = idd.GetTemporalCache()
         if not cache:
-            raise RuntimeError ("I see no cache for '%s'" % inputname)
+            raise RuntimeError("I see no cache for '%s'" % inputname)
             return
 
         return servermanager._getPyProxy(cache)
@@ -501,8 +498,8 @@ class CoProcessor(object):
                 if nump == 1:
                     print("Ensight 'Set string' input is '", writer.FileName, ".*'", sep="")
                 else:
-                    print("Ensight 'Set string' input is '", writer.FileName, ".*."+str(nump)+ \
-                          ".<"+str(nump)+":%0."+str(len(str(nump-1)))+"d>'", sep="")
+                    print("Ensight 'Set string' input is '", writer.FileName, ".*." + str(nump) + \
+                          ".<" + str(nump) + ":%0." + str(len(str(nump - 1))) + "d>'", sep="")
 
     def RegisterWriter(self, writer, filename, freq, paddingamount=0, **params):
         """Registers a writer proxy. This method is generally used in
@@ -520,7 +517,6 @@ class CoProcessor(object):
             if writer.GetProperty(p) is not None:
                 wp = writer.GetProperty(p)
                 wp.SetData(v)
-
 
         self.__WritersList.append(writer)
 
@@ -573,8 +569,8 @@ class CoProcessor(object):
         Register a point of control (filter's property) that will be varied over in a cinema export.
         """
         if not isinstance(proxy, servermanager.Proxy):
-            raise RuntimeError ("Invalid 'proxy' argument passed to RegisterCinemaTrack.")
-        self.__CinemaTracksList.append({"name":name, "proxy":proxy, "smproperty":smproperty, "valrange":valrange})
+            raise RuntimeError("Invalid 'proxy' argument passed to RegisterCinemaTrack.")
+        self.__CinemaTracksList.append({"name": name, "proxy": proxy, "smproperty": smproperty, "valrange": valrange})
         proxyDefinitions = self.__CinemaTracks[proxy] if (proxy in self.__CinemaTracks) else {}
         proxyDefinitions[smproperty] = valrange
         self.__CinemaTracks[proxy] = proxyDefinitions
@@ -583,7 +579,7 @@ class CoProcessor(object):
     def AddArraysToCinemaTrack(self, proxy, propertyName, arrayNames):
         ''' Register user-defined target arrays by name. '''
         if not isinstance(proxy, servermanager.Proxy):
-            raise RuntimeError ("Invalid 'proxy' argument passed to AddArraysToCinemaTrack.")
+            raise RuntimeError("Invalid 'proxy' argument passed to AddArraysToCinemaTrack.")
 
         proxyDefinitions = self.__CinemaTracks[proxy] if (proxy in self.__CinemaTracks) else {}
         proxyDefinitions[propertyName] = arrayNames
@@ -595,14 +591,14 @@ class CoProcessor(object):
         """Register a view for image capture with extra meta-data such
         as magnification, size and frequency."""
         if not isinstance(view, servermanager.Proxy):
-            raise RuntimeError ("Invalid 'view' argument passed to RegisterView.")
+            raise RuntimeError("Invalid 'view' argument passed to RegisterView.")
         view.add_attribute("cpFileName", filename)
         view.add_attribute("cpFrequency", freq)
         view.add_attribute("cpFitToScreen", fittoscreen)
         view.add_attribute("cpMagnification", magnification)
         view.add_attribute("cpCinemaOptions", cinema)
         view.add_attribute("cpCompression", compression)
-        view.ViewSize = [ width, height ]
+        view.ViewSize = [width, height]
         self.__ViewsList.append(view)
         return view
 
@@ -615,7 +611,8 @@ class CoProcessor(object):
         write the output files appropriately in WriteData() is called.
         """
         import warnings
-        warnings.warn("'CoProcessor.CreateWriter' is deprecated, use CoProcessor.RegisterWriter instead", DeprecationWarning)
+        warnings.warn("'CoProcessor.CreateWriter' is deprecated, use CoProcessor.RegisterWriter instead",
+                      DeprecationWarning)
 
         writer = proxy_ctor()
         return self.RegisterWriter(writer, filename, freq)
@@ -628,7 +625,8 @@ class CoProcessor(object):
         such as magnification, size and frequency.
         """
         import warnings
-        warnings.warn("'CoProcessor.CreateView' is deprecated, use 'CoProcessor.RegisterView' instead", DeprecationWarning)
+        warnings.warn("'CoProcessor.CreateView' is deprecated, use 'CoProcessor.RegisterView' instead",
+                      DeprecationWarning)
 
         view = proxy_ctor()
         return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height, None)
@@ -647,15 +645,15 @@ class CoProcessor(object):
         reps = view.Representations
         for rep in reps:
             if not hasattr(rep, 'Visibility') or \
-                not rep.Visibility or \
-                not hasattr(rep, 'MapScalars') or \
-                not rep.MapScalars or \
-                not rep.LookupTable:
+                    not rep.Visibility or \
+                    not hasattr(rep, 'MapScalars') or \
+                    not rep.MapScalars or \
+                    not rep.LookupTable:
                 # rep is either not visible or not mapping scalars using a LUT.
                 continue;
 
             input = rep.Input
-            input.UpdatePipeline(time) #make sure range is up-to-date
+            input.UpdatePipeline(time)  # make sure range is up-to-date
             lut = rep.LookupTable
 
             colorArrayInfo = rep.GetArrayInformationForColorArray()
@@ -664,7 +662,7 @@ class CoProcessor(object):
                 datarange = [sys.float_info.max, -sys.float_info.max]
             else:
                 if lut.VectorMode != 'Magnitude' or \
-                   colorArrayInfo.GetNumberOfComponents() == 1:
+                        colorArrayInfo.GetNumberOfComponents() == 1:
                     datarange = colorArrayInfo.GetComponentRange(lut.VectorComponent)
                 else:
                     # -1 corresponds to the magnitude.
@@ -676,33 +674,35 @@ class CoProcessor(object):
             globalController = pm.GetGlobalController()
             localarray = vtkDoubleArray()
             localarray.SetNumberOfTuples(2)
-            localarray.SetValue(0, -datarange[0]) # negate so that MPI_MAX gets min instead of doing a MPI_MIN and MPI_MAX
+            localarray.SetValue(0,
+                                -datarange[0])  # negate so that MPI_MAX gets min instead of doing a MPI_MIN and MPI_MAX
             localarray.SetValue(1, datarange[1])
             globalarray = vtkDoubleArray()
             globalarray.SetNumberOfTuples(2)
             globalController.AllReduce(localarray, globalarray, 0)
             globaldatarange = [-globalarray.GetValue(0), globalarray.GetValue(1)]
             rgbpoints = lut.RGBPoints.GetData()
-            numpts = len(rgbpoints)//4
-            if globaldatarange[0] != rgbpoints[0] or globaldatarange[1] != rgbpoints[(numpts-1)*4]:
+            numpts = len(rgbpoints) // 4
+            if globaldatarange[0] != rgbpoints[0] or globaldatarange[1] != rgbpoints[(numpts - 1) * 4]:
                 # rescale all of the points
-                oldrange = rgbpoints[(numpts-1)*4] - rgbpoints[0]
+                oldrange = rgbpoints[(numpts - 1) * 4] - rgbpoints[0]
                 newrange = globaldatarange[1] - globaldatarange[0]
                 # only readjust if the new range isn't zero.
                 if newrange != 0:
-                   newrgbpoints = list(rgbpoints)
-                   # if the old range isn't 0 then we use that ranges distribution
-                   if oldrange != 0:
-                      for v in range(numpts-1):
-                         newrgbpoints[v*4] = globaldatarange[0]+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
+                    newrgbpoints = list(rgbpoints)
+                    # if the old range isn't 0 then we use that ranges distribution
+                    if oldrange != 0:
+                        for v in range(numpts - 1):
+                            newrgbpoints[v * 4] = globaldatarange[0] + (
+                                        rgbpoints[v * 4] - rgbpoints[0]) * newrange / oldrange
 
-                      # avoid numerical round-off, at least with the last point
-                      newrgbpoints[(numpts-1)*4] = globaldatarange[1]
-                   else: # the old range is 0 so the best we can do is to space the new points evenly
-                      for v in range(numpts+1):
-                         newrgbpoints[v*4] = globaldatarange[0]+v*newrange/(1.0*numpts)
+                        # avoid numerical round-off, at least with the last point
+                        newrgbpoints[(numpts - 1) * 4] = globaldatarange[1]
+                    else:  # the old range is 0 so the best we can do is to space the new points evenly
+                        for v in range(numpts + 1):
+                            newrgbpoints[v * 4] = globaldatarange[0] + v * newrange / (1.0 * numpts)
 
-                   lut.RGBPoints.SetData(newrgbpoints)
+                    lut.RGBPoints.SetData(newrgbpoints)
 
     def UpdateCinema(self, view, datadescription, specLevel):
         """ called from catalyst at each timestep to add to the cinema database """
@@ -719,29 +719,29 @@ class CoProcessor(object):
             paraview.print_error(e)
             return
 
-        #figure out where to put this store
+        # figure out where to put this store
         import os.path
         vfname = view.cpFileName
         extension = os.path.splitext(vfname)[1]
-        vfname = vfname[0:vfname.rfind("_")] #strip _num.ext
+        vfname = vfname[0:vfname.rfind("_")]  # strip _num.ext
         fname = os.path.join(os.path.dirname(vfname),
                              "cinema",
                              os.path.basename(vfname),
                              "info.json")
 
         def float_limiter(x):
-            #a shame, but needed to make sure python, javascript and (directory/file)name agree
+            # a shame, but needed to make sure python, javascript and (directory/file)name agree
             if isinstance(x, (float)):
-                return '%.6e' % x #arbitrarily chose 6 significant digits
+                return '%.6e' % x  # arbitrarily chose 6 significant digits
             else:
                 return x
 
-        #what time?
+        # what time?
         time = datadescription.GetTime()
         view.ViewTime = time
         formatted_time = float_limiter(time)
 
-        #ensure that cinema operates on the specified view
+        # ensure that cinema operates on the specified view
         simple.SetActiveView(view)
 
         # Include camera information in the user defined parameters.
@@ -759,51 +759,51 @@ class CoProcessor(object):
         if "tracking" in co:
             tracking_def = co['tracking']
 
-        #figure out what we show now
-        pxystate= pv_introspect.record_visibility()
+        # figure out what we show now
+        pxystate = pv_introspect.record_visibility()
         # a conservative global bounds for consistent z scaling
-        minbds, maxbds  = pv_introspect.max_bounds()
+        minbds, maxbds = pv_introspect.max_bounds()
 
-        #make sure depth rasters are consistent
+        # make sure depth rasters are consistent
         view.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
         view.LockBounds = 1
 
         disableValues = False if 'noValues' not in co else co['noValues']
 
-        if specLevel=="B":
+        if specLevel == "B":
             p = pv_introspect.inspect(skip_invisible=True)
         else:
             p = pv_introspect.inspect(skip_invisible=False)
         fs = pv_introspect.make_cinema_store(p, fname, view,
-                                             forcetime = formatted_time,
-                                             userDefined = self.__CinemaTracks,
-                                             specLevel = specLevel,
-                                             camType = camType,
-                                             extension = extension,
-                                             disableValues = disableValues)
+                                             forcetime=formatted_time,
+                                             userDefined=self.__CinemaTracks,
+                                             specLevel=specLevel,
+                                             camType=camType,
+                                             extension=extension,
+                                             disableValues=disableValues)
 
-        #all nodes participate, but only root can writes out the files
+        # all nodes participate, but only root can writes out the files
         pm = servermanager.vtkProcessModule.GetProcessModule()
         pid = pm.GetPartitionId()
 
         enableFloatVal = False if 'floatValues' not in co else co['floatValues']
 
         new_files = {}
-        ret = pv_introspect.explore(fs, p, iSave = (pid == 0),
-                              currentTime = {'time':formatted_time},
-                              userDefined = self.__CinemaTracks,
-                              specLevel = specLevel,
-                              camType = camType,
-                              tracking = tracking_def,
-                              floatValues = enableFloatVal,
-                              disableValues = disableValues)
+        ret = pv_introspect.explore(fs, p, iSave=(pid == 0),
+                                    currentTime={'time': formatted_time},
+                                    userDefined=self.__CinemaTracks,
+                                    specLevel=specLevel,
+                                    camType=camType,
+                                    tracking=tracking_def,
+                                    floatValues=enableFloatVal,
+                                    disableValues=disableValues)
         if pid == 0:
             fs.save()
         new_files[vfname] = ret;
 
         view.LockBounds = 0
 
-        #restore what we showed
+        # restore what we showed
         pv_introspect.restore_visibility(pxystate)
         return os.path.basename(vfname), new_files
 
@@ -829,7 +829,6 @@ class CoProcessor(object):
 
         return False
 
-
     def NeedToOutput(self, datadescription, frequency):
         """
         Return True if we need to output based on the input timestep, frequency and forceOutput. Checks based
@@ -846,17 +845,15 @@ class CoProcessor(object):
         if self.__ForceOutputAtFirstCall and self.__FirstTimeStepIndex == timestep:
             return True
 
-        if self.__TimeStepToStartOutputAt <= timestep and (timestep-self.__TimeStepToStartOutputAt) % frequency == 0:
+        if self.__TimeStepToStartOutputAt <= timestep and (timestep - self.__TimeStepToStartOutputAt) % frequency == 0:
             return True
 
         return False
 
-
     def EnableCinemaDTable(self):
         """ Enable the normally disabled cinema D table export feature """
         self.__CinemaDHelper = exportnow.CinemaDHelper(True,
-                self.__ImageRootDirectory)
-
+                                                       self.__ImageRootDirectory)
 
     def __AppendCViewToCinemaDTable(self, time, producer, filelist):
         """
@@ -870,7 +867,6 @@ class CoProcessor(object):
         comm = vtk.vtkMultiProcessController.GetGlobalController()
         if comm.GetLocalProcessId() == 0:
             self.__CinemaDHelper.AppendCViewToCinemaDTable(time, producer, filelist)
-
 
     def __AppendToCinemaDTable(self, time, producer, filename):
         """

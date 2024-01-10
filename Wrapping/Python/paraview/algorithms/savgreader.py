@@ -32,9 +32,9 @@ def get_coords_from_line(line):
     if len(values) == 6:
         pt_n = [float(values[3]), float(values[4]), float(values[5])]
     else:
-        if len(values) >= 7:    # Otherwise the next 4 are colors
+        if len(values) >= 7:  # Otherwise the next 4 are colors
             pt_col = [float(values[3]), float(values[4]), float(values[5]), float(values[6])]
-        if len(values) >= 10:   # And if there are more, those are the normals
+        if len(values) >= 10:  # And if there are more, those are the normals
             pt_n = [float(values[7]), float(values[8]), float(values[9])]
 
     return pt, pt_col, pt_n
@@ -42,18 +42,19 @@ def get_coords_from_line(line):
 
 def not_supported(line):
     return (
-        line.startswith('tri') or
-        line.startswith('pixel') or
-        line.startswith('text') or
-        line.startswith('program') or
-        line.startswith('attribute') or
-        line.startswith('nooptimizations')
+            line.startswith('tri') or
+            line.startswith('pixel') or
+            line.startswith('text') or
+            line.startswith('program') or
+            line.startswith('attribute') or
+            line.startswith('nooptimizations')
     )
 
 
 class SAVGReader(VTKPythonAlgorithmBase):
     def __init__(self):
-        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType="vtkPartitionedDataSetCollection")
+        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1,
+                                        outputType="vtkPartitionedDataSetCollection")
         self._filename = None
         self._ndata = None
         self._timesteps = None

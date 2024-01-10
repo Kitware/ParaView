@@ -1,4 +1,3 @@
-
 # These functions were present in a util.py module.
 # Keeping them around for backwards compatibility
 def SetOutputWholeExtent(algorithm, extent):
@@ -16,7 +15,9 @@ def SetOutputWholeExtent(algorithm, extent):
     if len(extent) != 6:
         raise "Expected a sequence of length 6"
     from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline
-    algorithm.GetExecutive().GetOutputInformation(0).Set(vtkStreamingDemandDrivenPipeline.WHOLE_EXTENT(), extent[0], extent[1], extent[2],extent[3], extent[4], extent[5])
+    algorithm.GetExecutive().GetOutputInformation(0).Set(vtkStreamingDemandDrivenPipeline.WHOLE_EXTENT(), extent[0],
+                                                         extent[1], extent[2], extent[3], extent[4], extent[5])
+
 
 def IntegrateCell(dataset, cellId):
     """
@@ -37,13 +38,16 @@ def ReplaceDollarVariablesWithEnvironment(text):
     """
     import os, re
     r = re.compile(r"\$ENV\{([^}]+)\}")
+
     def repl(m):
         if m.group(1) in os.environ:
             return os.environ[m.group(1)]
         raise KeyError("'%s' is not defined in the process environment" % m.group(1))
+
     return re.sub(r, repl, text)
 
-def Glob(path, rootDir = None):
+
+def Glob(path, rootDir=None):
     """Given a path, this function performs globbing on the file names inside the input
     directory. rootDir is an optional parameter that can set a relative root directory from which
     path is defined. This function returns the list of files matching the globbing pattern (the

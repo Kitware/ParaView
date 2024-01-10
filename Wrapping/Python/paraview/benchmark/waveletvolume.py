@@ -2,11 +2,13 @@ import datetime as dt
 from paraview import servermanager
 from paraview.simple import *
 from paraview.benchmark import *
-#import logbase, logparser
+
+# import logbase, logparser
 
 logbase.maximize_logs()
 records = []
 n0 = dt.datetime.now()
+
 
 def get_render_view(size):
     '''Similar to GetRenderView except if a new view is created, it's
@@ -82,7 +84,6 @@ def memtime_stamp():
 
 def run(output_basename='log', dimension=100, view_size=(1920, 1080),
         num_frames=10, save_logs=True, ospray=False):
-
     from vtkmodules.vtkParallelCore import vtkMultiProcessController
     from vtkmodules.vtkCommonSystem import vtkTimerLog
 
@@ -94,7 +95,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
 
     print('Generating wavelet')
     wavelet = Wavelet()
-    d2 = dimension//2
+    d2 = dimension // 2
     wavelet.WholeExtent = [-d2, d2, -d2, d2, -d2, d2]
     wavelet.Maximum = 100.0
     waveletDisplay = Show()
@@ -143,7 +144,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
                     'dimension': dimension,
                     'view_size': view_size,
                     'num_frames': num_frames,
-                    'ospray' : ospray,
+                    'ospray': ospray,
                     'save_logs': save_logs}))
 
             # Save the memory statistics collected
@@ -151,7 +152,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
                 ofile.write('\n'.join([str(x) for x in records]))
 
         # Process frame timing statistics
-        logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
+        logparser.summarize_results(num_frames, (fpsT1 - fpsT0).total_seconds(),
                                     num_voxels, 'Voxels', save_logs,
                                     output_basename)
 
@@ -187,6 +188,8 @@ def main(argv):
     run(output_basename=args.output_basename, dimension=args.dimension,
         view_size=args.view_size, num_frames=args.frames, ospray=args.ospray)
 
+
 if __name__ == "__main__":
     import sys
+
     main(sys.argv[1:])

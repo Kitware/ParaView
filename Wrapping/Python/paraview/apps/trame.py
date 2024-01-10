@@ -1,4 +1,4 @@
-import paraview.web.venv # noqa
+import paraview.web.venv  # noqa
 import importlib
 import os
 import sys
@@ -14,6 +14,7 @@ if "--trame-app" in sys.argv:
 else:
     TRAME_APP = os.environ.get("TRAME_APP", None)
 
+
 def main():
     if TRAME_APP is None:
         print("Could not find environment variable TRAME_APP or --trame-app arg")
@@ -21,6 +22,7 @@ def main():
 
     module = importlib.import_module(TRAME_APP)
     module.main()
+
 
 if __name__ == "__main__":
     main()

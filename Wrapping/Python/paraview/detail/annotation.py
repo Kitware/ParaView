@@ -4,11 +4,12 @@ r"""
 This module is used by vtkPythonAnnotationFilter.
 """
 from __future__ import absolute_import, print_function
+
 try:
     import numpy as np
 except ImportError:
-    raise RuntimeError("'numpy' module is not found. numpy is needed for "\
-            "this functionality to work. Please install numpy and try again.")
+    raise RuntimeError("'numpy' module is not found. numpy is needed for " \
+                       "this functionality to work. Please install numpy and try again.")
 
 from . import calculator
 from vtkmodules.vtkCommonDataModel import vtkDataObject
@@ -18,9 +19,11 @@ from vtkmodules.numpy_interface import dataset_adapter as dsa
 # is registered.
 import paraview.modules.vtkPVVTKExtensionsFiltersPython
 
-import sys # also for sys.stderr
+import sys  # also for sys.stderr
+
 if sys.version_info >= (3,):
     xrange = range
+
 
 def _get_ns(self, do, association):
     if association == vtkDataObject.FIELD:
@@ -62,7 +65,8 @@ def _get_ns(self, do, association):
         try:
             ns["time_index"] = ns["time_steps"].index(ns["time_value"])
             ns["t_index"] = ns["time_index"]
-        except ValueError: pass
+        except ValueError:
+            pass
     ns.update(arrays)
     return ns
 
@@ -82,14 +86,15 @@ def execute(self):
     try:
         result = calculator.compute(inputs, expression, ns=ns)
     except:
-        print("Failed to evaluate expression '%s'. "\
-            "The following exception stack should provide additional "\
-            "developer specific information. This typically implies a malformed "\
-            "expression. Verify that the expression is valid.\n\n" \
-            "Variables in current scope are %s \n" % (expression, list(ns)), file=sys.stderr)
+        print("Failed to evaluate expression '%s'. " \
+              "The following exception stack should provide additional " \
+              "developer specific information. This typically implies a malformed " \
+              "expression. Verify that the expression is valid.\n\n" \
+              "Variables in current scope are %s \n" % (expression, list(ns)), file=sys.stderr)
         raise
     self.SetComputedAnnotationValue("%s" % result)
     return True
+
 
 def execute_on_attribute_data(self, evaluate_locally):
     """Called by vtkAnnotateAttributeDataFilter."""

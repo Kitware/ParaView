@@ -13,23 +13,24 @@ Example usage:
 
 import argparse, time, os.path, glob
 
-parser = argparse.ArgumentParser(\
-        description="File-based MiniApp for Catalyst testing")
+parser = argparse.ArgumentParser( \
+    description="File-based MiniApp for Catalyst testing")
 
 parser.add_argument("-s", "--script", type=str, action="append",
-    help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
-    ".py file or a Python package zip or directory",
-    required=True)
+                    help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
+                         ".py file or a Python package zip or directory",
+                    required=True)
 parser.add_argument("--script-version", type=int,
-    help="choose Catalyst analysis script version explicitly, otherwise it "
-    "will be determined automatically. When specifying multiple scripts, this "
-    "setting applies to all scripts.", default=0)
+                    help="choose Catalyst analysis script version explicitly, otherwise it "
+                         "will be determined automatically. When specifying multiple scripts, this "
+                         "setting applies to all scripts.", default=0)
 parser.add_argument("-d", "--delay", type=float,
-    help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
+                    help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
 parser.add_argument("-c", "--channel", type=str,
-    help="Catalyst channel name (default: input)", default="input")
+                    help="Catalyst channel name (default: input)", default="input")
 parser.add_argument("-g", "--glob", type=str,
-    help="Pattern to use to locate input filenames.", required=True)
+                    help="Pattern to use to locate input filenames.", required=True)
+
 
 def create_reader(files):
     from paraview import simple
@@ -37,6 +38,7 @@ def create_reader(files):
     if not reader:
         raise RuntimeError("Failed to create a suitable reader for files: %s", str(files))
     return reader
+
 
 def read_dataset(reader, time, rank, num_ranks):
     reader.UpdatePipeline(time)
@@ -49,6 +51,7 @@ def read_dataset(reader, time, rank, num_ranks):
         return (ds, whole_extent)
     else:
         return (ds, None)
+
 
 def main(args):
     """The main loop"""
@@ -94,7 +97,7 @@ def main(args):
             time.sleep(args.delay)
 
         if rank == 0:
-            print_info("timestep: {0} of {1}".format((step+1), numsteps))
+            print_info("timestep: {0} of {1}".format((step + 1), numsteps))
 
         dataset, wholeExtent = read_dataset(reader, time, rank, num_ranks)
 
@@ -108,6 +111,7 @@ def main(args):
 
     # finalize Catalyst
     bridge.finalize()
+
 
 if __name__ == "__main__":
     args = parser.parse_args()

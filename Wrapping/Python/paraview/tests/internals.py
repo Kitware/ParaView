@@ -1,5 +1,6 @@
 r"""private module with utilities to be used by modules in this package alone"""
 
+
 def compare(test_image, baseline_image):
     from vtkmodules.vtkTestingRendering import vtkTesting
     testing = vtkTesting()

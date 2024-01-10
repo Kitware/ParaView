@@ -6,8 +6,8 @@ import paraview
 
 
 def __render(ss, v, title, nframes):
-    print ('============================================================')
-    print (title)
+    print('============================================================')
+    print(title)
     res = []
     res.append(title)
     for phires in (500, 1000):
@@ -23,11 +23,11 @@ def __render(ss, v, title, nframes):
             Render()
         tpr = (dt.datetime.now() - c1).total_seconds() / nframes
         ncells = ss.GetDataInformation().GetNumberOfCells()
-        print (tpr, " secs/frame")
-        print (ncells, " polys")
-        print (ncells/tpr, " polys/sec")
+        print(tpr, " secs/frame")
+        print(ncells, " polys")
+        print(ncells / tpr, " polys/sec")
 
-        res.append((ncells, ncells/tpr))
+        res.append((ncells, ncells / tpr))
     return res
 
 
@@ -68,9 +68,9 @@ def run(filename=None, nframes=60):
         f = open(filename, "w")
     else:
         f = sys.stdout
-    print ('configuration, %d, %d' % (results[0][1][0], results[0][2][0]), file=f)
+    print('configuration, %d, %d' % (results[0][1][0], results[0][2][0]), file=f)
     for i in results:
-        print ('"%s", %g, %g' % (i[0], i[1][1], i[2][1]), file=f)
+        print('"%s", %g, %g' % (i[0], i[1][1], i[2][1]), file=f)
 
 
 def test_module():
@@ -83,6 +83,7 @@ def test_module():
     v = Render()
 
     print_logs()
+
 
 if __name__ == "__main__":
     if "--test" in sys.argv:

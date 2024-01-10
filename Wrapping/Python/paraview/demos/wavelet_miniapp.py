@@ -12,31 +12,31 @@ in the code to see how.
 
 import math, argparse, time, os.path
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # parse command line arguments
-parser = argparse.ArgumentParser(\
+parser = argparse.ArgumentParser( \
     description="Wavelet MiniApp for Catalyst testing")
 parser.add_argument("-t", "--timesteps", type=int,
-    help="number of timesteps to run the miniapp for (default: 100)", default=100)
-parser.add_argument("--size",  type=int,
-    help="number of samples in each coordinate direction (default: 101)", default=101)
+                    help="number of timesteps to run the miniapp for (default: 100)", default=100)
+parser.add_argument("--size", type=int,
+                    help="number of samples in each coordinate direction (default: 101)", default=101)
 parser.add_argument("-s", "--script", type=str, action="append",
-    help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
-    ".py file or a Python package zip or directory",
-    required=True)
+                    help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
+                         ".py file or a Python package zip or directory",
+                    required=True)
 parser.add_argument("--script-version", type=int,
-    help="choose Catalyst analysis script version explicitly, otherwise it "
-    "will be determined automatically. When specifying multiple scripts, this "
-    "setting applies to all scripts.", default=0)
+                    help="choose Catalyst analysis script version explicitly, otherwise it "
+                         "will be determined automatically. When specifying multiple scripts, this "
+                         "setting applies to all scripts.", default=0)
 parser.add_argument("-d", "--delay", type=float,
-    help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
+                    help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
 parser.add_argument("-c", "--channel", type=str,
-    help="Catalyst channel name (default: input)", default="input")
+                    help="Catalyst channel name (default: input)", default="input")
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # A helper function that creates a VTK dataset per timestep/per rank.
 def create_dataset(timestep, args, piece, npieces):
-
     # We'll use vtkRTAnalyticSource to generate our dataset
     # to keep things simple.
     from vtkmodules.vtkImagingCore import vtkRTAnalyticSource
@@ -46,7 +46,7 @@ def create_dataset(timestep, args, piece, npieces):
     wholeExtent = wavelet.GetWholeExtent()
 
     # put in some variation in the point data that changes with timestep
-    wavelet.SetMaximum(255+200*math.sin(timestep))
+    wavelet.SetMaximum(255 + 200 * math.sin(timestep))
 
     # using 'UpdatePiece' lets us generate a subextent based on the
     # 'piece' and 'npieces'; thus works seamlessly in distributed and
@@ -61,7 +61,8 @@ def create_dataset(timestep, args, piece, npieces):
 
     return (dataset, wholeExtent)
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # Here's our simulation main loop
 def main(args):
     """The main loop"""
@@ -93,11 +94,10 @@ def main(args):
             time.sleep(args.delay)
 
         # assume simulation time starts at 0
-        timevalue = step/float(numsteps)
+        timevalue = step / float(numsteps)
 
         if rank == 0:
-            print_info("timestep: {0}/{1}; timevalue: {2}".format(step+1, numsteps, timevalue))
-
+            print_info("timestep: {0}/{1}; timevalue: {2}".format(step + 1, numsteps, timevalue))
 
         dataset, wholeExtent = create_dataset(step, args, rank, num_ranks)
 
@@ -110,6 +110,7 @@ def main(args):
 
     # finalize Catalyst
     bridge.finalize()
+
 
 if __name__ == "__main__":
     args = parser.parse_args()

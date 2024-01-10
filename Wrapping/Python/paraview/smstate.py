@@ -21,16 +21,20 @@ if sys.version_info >= (3,):
 RECORD_MODIFIED_PROPERTIES = sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES
 RECORD_ALL_PROPERTIES = sm.vtkSMTrace.RECORD_ALL_PROPERTIES
 
+
 class supported_proxies(object):
     """filter object used to hide proxies that are currently not supported by
     the state saving mechanism or those that are generally skipped in state.
     There is none currently but keeping the method for backward compatibility
     and future proofing."""
+
     def __call__(self, proxy):
         return proxy
 
+
 class visible_representations(object):
     """filter object to skip hidden representations from being saved in state file"""
+
     def __call__(self, proxy):
         if not supported_proxies()(proxy): return False
         try:
@@ -38,6 +42,7 @@ class visible_representations(object):
         except AttributeError:
             pass
         return True
+
 
 def __toposort(input_set):
     """implementation of Tarjan topological sort to sort proxies using consumer
@@ -50,13 +55,14 @@ def __toposort(input_set):
     result.reverse()
     return result
 
+
 def __toposort_visit(result, proxy, input_set, marked_set, t_marked_set=None):
     if t_marked_set is None:
         temporarily_marked_set = set()
     else:
         temporarily_marked_set = t_marked_set
     if proxy in temporarily_marked_set:
-        raise RuntimeError ("Cycle detected in pipeline! %r" % proxy)
+        raise RuntimeError("Cycle detected in pipeline! %r" % proxy)
     if not proxy in marked_set:
         temporarily_marked_set.add(proxy)
         consumers = set()
@@ -66,6 +72,7 @@ def __toposort_visit(result, proxy, input_set, marked_set, t_marked_set=None):
         marked_set.add(proxy)
         temporarily_marked_set.discard(proxy)
         result.append(proxy)
+
 
 def get_consumers(proxy, filter, consumer_set, recursive=True):
     """Returns the consumers for a proxy iteratively. If filter is non-None,
@@ -79,6 +86,7 @@ def get_consumers(proxy, filter, consumer_set, recursive=True):
         if filter(consumer):
             consumer_set.add(consumer)
             if recursive: get_consumers(consumer, filter, consumer_set)
+
 
 def get_producers(proxy, filter, producer_set):
     """Returns the producers for a proxy iteratively. If filter is non-None,
@@ -97,15 +105,18 @@ def get_producers(proxy, filter, producer_set):
         if proxy.LookupTable and filter(proxy.LookupTable):
             producer_set.add(proxy.LookupTable)
             get_producers(proxy.LookupTable, filter, producer_set)
-    except AttributeError: pass
+    except AttributeError:
+        pass
     try:
         if proxy.ScalarOpacityFunction and filter(proxy.ScalarOpacityFunction):
             producer_set.add(proxy.ScalarOpacityFunction)
             get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
-    except AttributeError: pass
+    except AttributeError:
+        pass
+
 
 def get_state(options=None, source_set=[], filter=None, raw=False,
-        preamble=None, postamble=None):
+              preamble=None, postamble=None):
     """Returns the state string"""
     if options:
         options = sm._getPyProxy(options)
@@ -124,7 +135,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     gc.collect()
 
     if sm.vtkSMTrace.GetActiveTracer():
-        raise RuntimeError ("Cannot generate Python state when tracing is active.")
+        raise RuntimeError("Cannot generate Python state when tracing is active.")
 
     if filter is None:
         filter = visible_representations() if skipHiddenRepresentations else supported_proxies()
@@ -149,7 +160,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
     # proxies_of_interest is set of all proxies that we should trace.
     proxies_of_interest = producers.union(consumers)
-    #print ("proxies_of_interest", proxies_of_interest)
+    # print ("proxies_of_interest", proxies_of_interest)
 
     trace_config = smtrace.start_trace(preamble="")
     # this ensures that lookup tables/scalar bars etc. are fully traced.
@@ -166,7 +177,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
         trace.append(preamble)
     trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # We trace the views and layouts, if any.
     if skipRenderingComponents:
         views = []
@@ -175,9 +186,9 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
     if views:
         # sort views by their names, so the state has some structure to it.
-        views = sorted(views, key=lambda x:\
-                smtrace.Trace.get_registered_name(x, "views"))
-        trace.append_separated([\
+        views = sorted(views, key=lambda x: \
+            smtrace.Trace.get_registered_name(x, "views"))
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup views used in the visualization",
             "# ----------------------------------------------------------------"])
@@ -198,9 +209,9 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
     # trace create of layouts
     if layouts:
-        layouts = sorted(layouts, key=lambda x:\
-                  smtrace.Trace.get_registered_name(x, "layouts"))
-        trace.append_separated([\
+        layouts = sorted(layouts, key=lambda x: \
+            smtrace.Trace.get_registered_name(x, "layouts"))
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup view layouts",
             "# ----------------------------------------------------------------"])
@@ -212,19 +223,19 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
     if views:
         # restore the active view after the layouts have been created.
-        trace.append_separated([\
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# restore active view",
             "SetActiveView(%s)" % smtrace.Trace.get_accessor(simple.GetActiveView()),
             "# ----------------------------------------------------------------"])
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Next, trace selections.
     sorted_proxies_of_interest = __toposort(proxies_of_interest)
     sorted_selections = [x for x in sorted_proxies_of_interest \
-        if smtrace.Trace.get_registered_name(x, "selection_sources")]
+                         if smtrace.Trace.get_registered_name(x, "selection_sources")]
     if sorted_selections:
-        trace.append_separated([\
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup the selections",
             "# ----------------------------------------------------------------"])
@@ -234,12 +245,12 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Next, trace data processing pipelines.
     sorted_sources = [x for x in sorted_proxies_of_interest \
-        if smtrace.Trace.get_registered_name(x, "sources")]
+                      if smtrace.Trace.get_registered_name(x, "sources")]
     if sorted_sources:
-        trace.append_separated([\
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup the data processing pipelines",
             "# ----------------------------------------------------------------"])
@@ -249,15 +260,15 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Can't decide if the representations should be saved with the pipeline
     # objects or afterwards, opting for afterwards for now since the topological
     # sort doesn't guarantee that the representations will follow their sources
     # anyways.
     sorted_representations = [x for x in sorted_proxies_of_interest \
-        if smtrace.Trace.get_registered_name(x, "representations")]
-    scalarbar_representations = [x for x in sorted_proxies_of_interest\
-        if smtrace.Trace.get_registered_name(x, "scalar_bars")]
+                              if smtrace.Trace.get_registered_name(x, "representations")]
+    scalarbar_representations = [x for x in sorted_proxies_of_interest \
+                                 if smtrace.Trace.get_registered_name(x, "scalar_bars")]
     # print ("sorted_representations", sorted_representations)
     # print ("scalarbar_representations", scalarbar_representations)
     if not skipRenderingComponents and (sorted_representations or scalarbar_representations):
@@ -265,7 +276,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
             view_representations = [x for x in view.Representations if x in sorted_representations]
             view_scalarbars = [x for x in view.Representations if x in scalarbar_representations]
             if view_representations or view_scalarbars:
-                trace.append_separated([\
+                trace.append_separated([ \
                     "# ----------------------------------------------------------------",
                     "# setup the visualization in view '%s'" % smtrace.Trace.get_accessor(view),
                     "# ----------------------------------------------------------------"])
@@ -274,15 +285,15 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                     producer = rep.Input
                     port = rep.Input.Port
                     traceitem = smtrace.Show(producer, port, view, rep,
-                        comment="show data from %s" % smtrace.Trace.get_accessor(producer))
+                                             comment="show data from %s" % smtrace.Trace.get_accessor(producer))
                     traceitem.finalize()
                     del traceitem
                     trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
                     if rep.UseSeparateColorMap:
-                        trace.append_separated([\
+                        trace.append_separated([ \
                             "# set separate color map",
-                            "%s.UseSeparateColorMap = True" % (\
+                            "%s.UseSeparateColorMap = True" % ( \
                                 smtrace.Trace.get_accessor(rep))])
 
                     if rep.BlockUseSeparateColorMaps:
@@ -290,18 +301,19 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                         if len(selectorsAndUseSeparateColorMap) % 2 == 0 and len(selectorsAndUseSeparateColorMap) > 0:
                             trace.append_separated([ \
                                 "# set separate color map for blocks",
-                                "%s.BlockUseSeparateColorMaps = %s" % (\
+                                "%s.BlockUseSeparateColorMaps = %s" % ( \
                                     smtrace.Trace.get_accessor(rep), ", ".join(selectorsAndUseSeparateColorMap))])
-                except AttributeError: pass
+                except AttributeError:
+                    pass
             # save the scalar bar properties themselves.
             if view_scalarbars:
                 trace.append_separated("# setup the color legend parameters for each legend in this view")
                 for rep in view_scalarbars:
                     smtrace.Trace.get_accessor(rep)
                     trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
-                    trace.append_separated([\
-                      "# set color bar visibility", "%s.Visibility = %s" % (\
-                    smtrace.Trace.get_accessor(rep), rep.Visibility)])
+                    trace.append_separated([ \
+                        "# set color bar visibility", "%s.Visibility = %s" % ( \
+                            smtrace.Trace.get_accessor(rep), rep.Visibility)])
 
             for rep in view_representations:
                 try:
@@ -311,9 +323,9 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                     if rep.IsScalarBarVisible(view):
                         # FIXME: this will save this multiple times, right now,
                         # if two representations use the same LUT.
-                        trace.append_separated([\
+                        trace.append_separated([ \
                             "# show color legend",
-                            "%s.SetScalarBarVisibility(%s, True)" % (\
+                            "%s.SetScalarBarVisibility(%s, True)" % ( \
                                 smtrace.Trace.get_accessor(rep),
                                 smtrace.Trace.get_accessor(view))])
 
@@ -321,26 +333,27 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                         selectors = rep.BlockLookupTableSelectors.GetData()
                         for selector in selectors:
                             if rep.IsBlockScalarBarVisible(view, selector):
-                                trace.append_separated([\
+                                trace.append_separated([ \
                                     "# set color map for block %s" % selector,
-                                    "%s.SetBlockScalarBarVisibility(%s, %s, True)" % (\
+                                    "%s.SetBlockScalarBarVisibility(%s, %s, True)" % ( \
                                         smtrace.Trace.get_accessor(rep),
                                         selector,
                                         smtrace.Trace.get_accessor(view))])
 
                     if not rep.Visibility:
-                      traceitem = smtrace.Hide(producer, port, view)
-                      traceitem.finalize()
-                      del traceitem
-                      trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+                        traceitem = smtrace.Hide(producer, port, view)
+                        traceitem.finalize()
+                        del traceitem
+                        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-                except AttributeError: pass
+                except AttributeError:
+                    pass
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Now, trace the transfer functions (color maps and opacity maps) used.
     ctfs = set([x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "lookup_tables")])
     if not skipRenderingComponents and ctfs:
-        trace.append_separated([\
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup color maps and opacity maps used in the visualization",
             "# note: the Get..() functions create a new object, if needed",
@@ -351,39 +364,39 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                 smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Now, trace the animation scenes
     # There should be only one but keep the code generic
     anims = set([x for x in proxies_of_interest \
-        if smtrace.Trace.get_registered_name(x, "animation")])
+                 if smtrace.Trace.get_registered_name(x, "animation")])
     if not skipRenderingComponents and anims:
-        trace.append_separated([\
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup animation scene, tracks and keyframes",
             "# note: the Get..() functions create a new object, if needed",
             "# ----------------------------------------------------------------"])
         for anim in anims:
-           traceitem = smtrace.TraceAnimationProxy(anim)
-           traceitem.finalize()
-           del traceitem
+            traceitem = smtrace.TraceAnimationProxy(anim)
+            traceitem.finalize()
+            del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     # Trace extractors.
     exgens = set([x for x in proxies_of_interest \
-            if smtrace.Trace.get_registered_name(x, "extractors")])
+                  if smtrace.Trace.get_registered_name(x, "extractors")])
     if exgens:
-        trace.append_separated([\
+        trace.append_separated([ \
             "# ----------------------------------------------------------------",
             "# setup extractors",
             "# ----------------------------------------------------------------"])
         for exgen in exgens:
             # FIXME: this currently doesn't handle multiple output ports
             # correctly.
-            traceitem = smtrace.CreateExtractor(\
-                    xmlname=exgen.Writer.GetXMLName(),
-                    producer=exgen.Producer,
-                    extractor=exgen,
-                    registrationName=smtrace.Trace.get_registered_name(exgen, "extractors"))
+            traceitem = smtrace.CreateExtractor( \
+                xmlname=exgen.Writer.GetXMLName(),
+                producer=exgen.Producer,
+                extractor=exgen,
+                registrationName=smtrace.Trace.get_registered_name(exgen, "extractors"))
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
@@ -391,11 +404,11 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     # restore the active source since the order in which the pipeline is created
     # in the state file can end up changing the active source to be different
     # than what it was when the state is being saved.
-    trace.append_separated([\
-            "# ----------------------------------------------------------------",
-            "# restore active source",
-            "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
-            "# ----------------------------------------------------------------"])
+    trace.append_separated([ \
+        "# ----------------------------------------------------------------",
+        "# restore active source",
+        "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
+        "# ----------------------------------------------------------------"])
 
     if postamble is None:
         trace.append_separated(smtrace._get_standard_postamble_comment())
@@ -404,24 +417,25 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
 
     del trace_config
     smtrace.stop_trace()
-    #print (trace)
+    # print (trace)
     return str(trace) if not raw else trace.raw_data()
 
+
 if __name__ == "__main__":
-    print ( "Running test")
+    print("Running test")
     simple.Mandelbrot()
     simple.Show()
     simple.Hide()
-    simple.Shrink().ShrinkFactor  = 0.4
+    simple.Shrink().ShrinkFactor = 0.4
     simple.UpdatePipeline()
     simple.Clip().ClipType.Normal[1] = 1
 
     rep = simple.Show()
     view = simple.Render()
-    view.ViewSize=[500, 500]
+    view.ViewSize = [500, 500]
     rep.SetScalarBarVisibility(view, True)
     simple.Render()
-#    rep.SetScalarBarVisibility(view, False)
+    #    rep.SetScalarBarVisibility(view, False)
 
-    print ("====================================================================")
-    print (get_state())
+    print("====================================================================")
+    print(get_state())

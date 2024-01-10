@@ -1,6 +1,7 @@
 from vtkmodules.vtkCommonMisc import vtkResourceFileLocator
 import os.path, sys, platform
 
+
 def find_webapp(appname):
     """Returns the path to the  is web app with given name is found in the package."""
 
@@ -8,7 +9,7 @@ def find_webapp(appname):
         root = "Resources/"
     else:
         from paraview.servermanager import vtkSMProxyManager
-        pv_version= "%d.%d" % (vtkSMProxyManager.GetVersionMajor(), vtkSMProxyManager.GetVersionMinor())
+        pv_version = "%d.%d" % (vtkSMProxyManager.GetVersionMajor(), vtkSMProxyManager.GetVersionMinor())
         root = "share/paraview-%s/" % pv_version
 
     filename = root + "web/%s/server/pvw-%s.py" % (appname, appname)
@@ -18,6 +19,7 @@ def find_webapp(appname):
         return os.path.join(result, filename)
     return None
 
+
 def find_webappcontents(appname):
     path = find_webapp(appname)
     if not path:
@@ -25,6 +27,7 @@ def find_webappcontents(appname):
 
     root = os.path.dirname(os.path.dirname(path))
     return os.path.join(root, "www")
+
 
 def load_webapp(appname):
     path = find_webapp(appname)
@@ -37,12 +40,14 @@ def load_webapp(appname):
     packagename = os.path.splitext(os.path.basename(path))[0]
     return __import__(packagename)
 
+
 def get_commandline_args(appname):
     clargs = sys.argv[1:]
     if not "-c" in clargs and not "--content" in clargs:
         clargs.append("-c")
         clargs.append(find_webappcontents(appname))
     return clargs
+
 
 def start_server(appname, description, module, protocol):
     import argparse

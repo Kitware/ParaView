@@ -10,7 +10,8 @@ Modules in this package have no backwards compatibility assurances and will
 change without notice.
 '''
 
-def module_from_string(script, name = "custom_module"):
+
+def module_from_string(script, name="custom_module"):
     import importlib
     import importlib.util
 

@@ -1,5 +1,6 @@
 import argparse, json, os, os.path, sys
 
+
 def splitall(path):
     allparts = []
     while 1:
@@ -7,7 +8,7 @@ def splitall(path):
         if parts[0] == path:  # sentinel for absolute paths
             allparts.insert(0, parts[0])
             break
-        elif parts[1] == path: # sentinel for relative paths
+        elif parts[1] == path:  # sentinel for relative paths
             allparts.insert(0, parts[1])
             break
         else:
@@ -23,6 +24,7 @@ def find_subdirectory(subdir, node):
             return item
     raise RuntimeError("Missing subdir '%s'" % subdir)
 
+
 def find_directory(subdir, node):
     if subdir == '.' or subdir == None:
         return node
@@ -30,27 +32,29 @@ def find_directory(subdir, node):
         node = find_subdirectory(part, node)
     return node
 
+
 def get_baseline(tname, path, image, root):
     import re
     filename = os.path.join(path, image)
     relpath = os.path.relpath(filename, root)
     return tname + "_" + re.sub('[^0-9a-zA-Z.]+', '_', relpath)
 
-parser = argparse.ArgumentParser(\
-        description="Validate Extrats generated in tests")
+
+parser = argparse.ArgumentParser( \
+    description="Validate Extrats generated in tests")
 
 parser.add_argument("--name", type=str, required=True,
-    help="name of the test being validated")
+                    help="name of the test being validated")
 parser.add_argument("--subdir", type=str, default=None,
-    help="sub directory to validate")
+                    help="sub directory to validate")
 parser.add_argument("--root", type=str, required=True,
-    help ="root directory with results")
+                    help="root directory with results")
 parser.add_argument("--json", type=str, required=True,
-    help="validation json file")
+                    help="validation json file")
 parser.add_argument("--baseline-dir", type=str, default=None,
-    help="directory for baselines for regression tests, if any")
+                    help="directory for baselines for regression tests, if any")
 parser.add_argument("--temp-dir", type=str, default="/tmp",
-    help="directory for results for regression test failures, if any")
+                    help="directory for results for regression test failures, if any")
 
 args = parser.parse_args()
 
@@ -98,21 +102,22 @@ for dirpath, dirs, files in os.walk(test_dir):
     if expected_dirs != dirs:
         missing = expected_dirs - dirs
         unexpected = dirs - expected_dirs
-        raise RuntimeError(\
-            "Mismatched directories under '%s' found.\n"\
+        raise RuntimeError( \
+            "Mismatched directories under '%s' found.\n" \
             "Missing : %s\n" \
             "Unexpected: %s" % (dirpath, missing, unexpected))
 
     if expected_files != files:
         missing = expected_files - files
         unexpected = files - expected_files
-        raise RuntimeError(\
-            "Mismatched files under '%s' found.\n"\
+        raise RuntimeError( \
+            "Mismatched files under '%s' found.\n" \
             "Missing : %s\n" \
             "Unexpected: %s" % (dirpath, missing, unexpected))
 
     if regression_test:
         from vtkmodules.vtkTestingRendering import vtkTesting
+
         t = vtkTesting()
         for image in regression_test:
             t.CleanArguments()

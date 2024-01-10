@@ -73,6 +73,7 @@ try:
 except ImportError:
     pass
 
+
 def _wrap_property(proxy, smproperty):
     """ Internal function.
     Given a server manager property and its domains, returns the
@@ -80,7 +81,7 @@ def _wrap_property(proxy, smproperty):
     """
     property = None
     if paraview.compatibility.GetVersion() >= (3, 5) and \
-      smproperty.IsA("vtkSMStringVectorProperty"):
+            smproperty.IsA("vtkSMStringVectorProperty"):
         arraySelectionDomain = smproperty.FindDomain("vtkSMArraySelectionDomain")
         chartSeriesSelectionDomain = smproperty.FindDomain("vtkSMChartSeriesSelectionDomain")
         arrayListDomain = smproperty.FindDomain("vtkSMArrayListDomain")
@@ -89,7 +90,7 @@ def _wrap_property(proxy, smproperty):
         if arraySelectionDomain and smproperty.GetRepeatable():
             property = ArrayListProperty(proxy, smproperty)
         elif chartSeriesSelectionDomain and smproperty.GetRepeatable() and \
-          chartSeriesSelectionDomain.GetDefaultMode() == 1:
+                chartSeriesSelectionDomain.GetDefaultMode() == 1:
             property = ArrayListProperty(proxy, smproperty)
         elif arrayListDomain and smproperty.GetRepeatable():
             # if it is repeatable, then it is not a single array selection... and if it happens
@@ -107,7 +108,7 @@ def _wrap_property(proxy, smproperty):
             property = VectorProperty(proxy, smproperty)
     elif smproperty.IsA("vtkSMVectorProperty"):
         if smproperty.IsA("vtkSMIntVectorProperty") and \
-          smproperty.FindDomain("vtkSMEnumerationDomain"):
+                smproperty.FindDomain("vtkSMEnumerationDomain"):
             property = EnumerationProperty(proxy, smproperty)
         else:
             property = VectorProperty(proxy, smproperty)
@@ -121,10 +122,12 @@ def _wrap_property(proxy, smproperty):
         property = Property(proxy, smproperty)
     return property
 
+
 class ParaViewPipelineController(object):
     """ParaViewPipelineController wraps vtkSMParaViewPipelineController class
     to manage conversion of arguments passed around from Python Proxy objects to
     vtkSMProxy instances are vice-versa."""
+
     def __init__(self):
         """Constructor. Creates a new instance of
         vtkSMParaViewPipelineController."""
@@ -159,6 +162,7 @@ class ParaViewPipelineController(object):
         except:
             pass
         return getattr(self.SMController, name)
+
 
 class Proxy(object):
     """Proxy for a server side object. A proxy manages the lifetime of
@@ -340,7 +344,7 @@ class Proxy(object):
         """Generic method for setting the value of a property."""
         prop = self.GetProperty(pname)
         if prop is None:
-            raise RuntimeError ("Property %s does not exist. Please check the property name for typos." % pname)
+            raise RuntimeError("Property %s does not exist. Please check the property name for typos." % pname)
         prop.SetData(arg)
 
     def GetPropertyValue(self, name):
@@ -351,9 +355,9 @@ class Proxy(object):
             # Return ColorArrayName as just the array name for backwards compatibility.
             return p[1]
         if isinstance(p, EnumerationProperty) or \
-          isinstance(p, ArraySelectionProperty) or \
-          isinstance(p, StringListProperty) or \
-          isinstance(p, ArrayListProperty):
+                isinstance(p, ArraySelectionProperty) or \
+                isinstance(p, StringListProperty) or \
+                isinstance(p, ArrayListProperty):
             # with domain based property, return the property to provide access to Available method
             return p
         elif isinstance(p, VectorProperty):
@@ -443,6 +447,7 @@ class Proxy(object):
                 if proxy():
                     proxy().SynchronizeCameraProperties()
                 return result
+
             return newfunc
 
         # Camera eventually inherit from Object
@@ -476,9 +481,9 @@ class Proxy(object):
                     pass
                 else:
                     raise AttributeError("Attribute %s does not exist. " % name +
-                        " This class does not allow addition of new attributes to avoid " +
-                        "mistakes due to typos. Use add_attribute() if you really want " +
-                        "to add this attribute.")
+                                         " This class does not allow addition of new attributes to avoid " +
+                                         "mistakes due to typos. Use add_attribute() if you really want " +
+                                         "to add this attribute.")
         else:
             paraview.print_debug_info("Setting '%s' as '%s'", name, value)
             try:
@@ -504,7 +509,7 @@ class Proxy(object):
             return None
         # Handle GetActiveCamera specially.
         if name == "GetActiveCamera" and \
-           hasattr(self.SMProxy, "GetActiveCamera"):
+                hasattr(self.SMProxy, "GetActiveCamera"):
             return self.__GetActiveCamera
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
@@ -522,6 +527,7 @@ class Proxy(object):
             pass
         return getattr(self.SMProxy, name)
 
+
 class SourceProxy(Proxy):
     """Proxy for a source object. This class adds a few methods to Proxy
     that are specific to sources. It also provides access to the output
@@ -530,6 +536,7 @@ class SourceProxy(Proxy):
     or
     > op = source['some name'].
     """
+
     def UpdatePipeline(self, time=None):
         """This method updates the server-side VTK pipeline and the associated
         data information. Make sure to update a source to validate the output
@@ -597,6 +604,7 @@ class SourceProxy(Proxy):
     CellData = property(GetCellDataInformation, None, None, "Returns cell data information")
     FieldData = property(GetFieldDataInformation, None, None, "Returns field data information")
 
+
 class ExodusIIReaderProxy(SourceProxy):
     """Special class to define convenience functions for array
     selection."""
@@ -610,16 +618,17 @@ class ExodusIIReaderProxy(SourceProxy):
         def SelectAllVariables(self):
             "Select all available variables for reading."
             for prop in ('PointVariables', 'EdgeVariables', 'FaceVariables',
-                'ElementVariables', 'GlobalVariables'):
+                         'ElementVariables', 'GlobalVariables'):
                 f = getattr(self, prop)
                 f.SelectAll()
 
         def DeselectAllVariables(self):
             "Deselects all variables."
             for prop in ('PointVariables', 'EdgeVariables', 'FaceVariables',
-                'ElementVariables', 'GlobalVariables'):
+                         'ElementVariables', 'GlobalVariables'):
                 f = getattr(self, prop)
                 f.DeselectAll()
+
 
 class MultiplexerSourceProxy(SourceProxy):
     def UpdateDynamicProperties(self):
@@ -630,6 +639,7 @@ class MultiplexerSourceProxy(SourceProxy):
         cdict = _createClassProperties(self, exclude)
         for key, val in cdict.items():
             self.add_attribute(key, val)
+
 
 class ViewLayoutProxy(Proxy):
     """Special class to define convenience methods for View Layout"""
@@ -642,9 +652,9 @@ class ViewLayoutProxy(Proxy):
         Return -1 on failure."""
         location = self.GetViewLocation(view)
         if location == -1:
-            raise RuntimeError ("View is not present in this layout.")
+            raise RuntimeError("View is not present in this layout.")
         if fraction < 0.0 or fraction > 1.0:
-            raise RuntimeError ("'fraction' must be in the range [0.0, 1.0]")
+            raise RuntimeError("'fraction' must be in the range [0.0, 1.0]")
         return self.SMProxy.SplitHorizontal(location, fraction)
 
     def SplitViewVertical(self, view=None, fraction=0.5):
@@ -656,9 +666,9 @@ class ViewLayoutProxy(Proxy):
         Return -1 on failure."""
         location = self.GetViewLocation(view)
         if location == -1:
-            raise RuntimeError ("View is not present in this layout.")
+            raise RuntimeError("View is not present in this layout.")
         if fraction < 0.0 or fraction > 1.0:
-            raise RuntimeError ("'fraction' must be in the range [0.0, 1.0]")
+            raise RuntimeError("'fraction' must be in the range [0.0, 1.0]")
         return self.SMProxy.SplitVertical(location, fraction)
 
     def AssignView(self, location, view):
@@ -673,6 +683,7 @@ class ViewLayoutProxy(Proxy):
         if isinstance(view, Proxy):
             view = view.SMProxy
         return self.SMProxy.GetViewLocation(view)
+
 
 class Property(object):
     """Generic property object that provides access to one of the properties of
@@ -696,6 +707,7 @@ class Property(object):
     see also dir(proxy.SMProperty). See also the doxygen based documentation
     of the vtkSMProperty C++ class.
     """
+
     def __init__(self, proxy, smproperty):
         """Default constructor. Stores a reference to the proxy."""
         import weakref
@@ -736,7 +748,7 @@ class Property(object):
         if type(self) is Property:
             self.Proxy.SMProxy.InvokeCommand(self._FindPropertyName())
         else:
-            raise RuntimeError ("Cannot invoke this property")
+            raise RuntimeError("Cannot invoke this property")
 
     def _FindPropertyName(self):
         "Returns the name of this property."
@@ -758,7 +770,8 @@ class Property(object):
         return getattr(self.SMProperty, name)
 
     Name = property(_FindPropertyName, None, None,
-           "Returns the name for the property")
+                    "Returns the name for the property")
+
 
 class GenericIterator(object):
     """Iterator for container type objects"""
@@ -778,6 +791,7 @@ class GenericIterator(object):
         self.index += 1
         return self.Object[idx]
 
+
 class VectorProperty(Property):
     """A VectorProperty provides access to one or more values. You can use
     a slice to get one or more property values:
@@ -789,6 +803,7 @@ class VectorProperty(Property):
     or
     > property[1:3] = (1,2)
     """
+
     def ConvertValue(self, value):
         return value
 
@@ -824,7 +839,7 @@ class VectorProperty(Property):
             indices = idx.indices(ls)
             retVal = []
             for i in range(*indices):
-               retVal.append(self.GetElement(i))
+                retVal.append(self.GetElement(i))
             return retVal
         elif idx >= ls:
             raise IndexError
@@ -839,7 +854,7 @@ class VectorProperty(Property):
         "Returns all elements as either a list or a single value."
         property = self.SMProperty
         if property.GetRepeatable() or \
-           property.GetNumberOfElements() > 1:
+                property.GetNumberOfElements() > 1:
             return self[0:len(self)]
         elif property.GetNumberOfElements() == 1:
             return self.GetElement(0)
@@ -848,7 +863,7 @@ class VectorProperty(Property):
         """Allows setting of all values at once. Requires a single value or
         a iterable object."""
         if self.SMProperty.GetInformationOnly() != 0:
-          raise RuntimeError("Cannot set an InformationOnly property!")
+            raise RuntimeError("Cannot set an InformationOnly property!")
         # Python3: str now has attr "__iter__", test separately
         if (not hasattr(values, "__iter__")) or (type(values) == type("")):
             values = (values,)
@@ -858,19 +873,19 @@ class VectorProperty(Property):
         # map returns an iterable, must be converted to list.
         convertedValues = list(map(self.ConvertValue, values))
         if self.GetRepeatable():
-          # Clean up first
-          self.SMProperty.SetNumberOfElements(len(convertedValues))
+            # Clean up first
+            self.SMProperty.SetNumberOfElements(len(convertedValues))
 
         try:
-          # SetElements() isn't available for all VectorProperty values.
-          # Try to use it so that the proxies are updated only once.
-          # Otherwise, call SetElement() for each element.
-          self.SMProperty.SetElements(convertedValues)
+            # SetElements() isn't available for all VectorProperty values.
+            # Try to use it so that the proxies are updated only once.
+            # Otherwise, call SetElement() for each element.
+            self.SMProperty.SetElements(convertedValues)
         except TypeError as e:
-          idx = 0
-          for val in convertedValues:
-            self.SMProperty.SetElement(idx, val)
-            idx += 1
+            idx = 0
+            for val in convertedValues:
+                self.SMProperty.SetElement(idx, val)
+                idx += 1
 
         self._UpdateProperty()
 
@@ -878,6 +893,7 @@ class VectorProperty(Property):
         "Removes all elements."
         self.SMProperty().SetNumberOfElements(0)
         self._UpdateProperty()
+
 
 class DoubleMapProperty(Property):
     """A DoubleMapProperty provides access to a map of double vector values."""
@@ -936,7 +952,7 @@ class DoubleMapProperty(Property):
     def SetData(self, elements):
         """Sets all the elements at once."""
         if self.SMProperty.GetInformationOnly() != 0:
-          raise RuntimeError("Cannot set an InformationOnly property!")
+            raise RuntimeError("Cannot set an InformationOnly property!")
         # first clear existing data
         self.Clear()
 
@@ -950,6 +966,7 @@ class DoubleMapProperty(Property):
         """Removes all elements."""
         self.SMProperty.ClearElements()
         self._UpdateProperty()
+
 
 class EnumerationProperty(VectorProperty):
     """Subclass of VectorProperty that is applicable for enumeration type
@@ -987,7 +1004,8 @@ class EnumerationProperty(VectorProperty):
         return retVal
 
     Available = property(GetAvailable, None, None, \
-        "This read-only property contains the list of values that can be applied to this property.")
+                         "This read-only property contains the list of values that can be applied to this property.")
+
 
 class FileNameProperty(VectorProperty):
     """Property to set/get one or more file names.
@@ -1001,6 +1019,7 @@ class FileNameProperty(VectorProperty):
             self.Proxy.FileNameChanged()
         except AttributeError:
             pass
+
 
 class ArraySelectionProperty(VectorProperty):
     "Property to select an array to be processed by a filter."
@@ -1019,7 +1038,7 @@ class ArraySelectionProperty(VectorProperty):
         return 2
 
     def __setitem__(self, idx, value):
-        raise RuntimeError ("This property cannot be accessed using __setitem__")
+        raise RuntimeError("This property cannot be accessed using __setitem__")
 
     def __getitem__(self, idx):
         """Returns attribute type for index 0, array name for index 1"""
@@ -1046,7 +1065,7 @@ class ArraySelectionProperty(VectorProperty):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
         if self.SMProperty.GetInformationOnly() != 0:
-          raise RuntimeError("Cannot set an InformationOnly property!")
+            raise RuntimeError("Cannot set an InformationOnly property!")
         if not values:
             # if values is None or empty list, we are resetting the selection.
             self.SMProperty.SetElement(4, "")
@@ -1054,7 +1073,7 @@ class ArraySelectionProperty(VectorProperty):
             return
 
         if not isinstance(values, tuple) and \
-           not isinstance(values, list):
+                not isinstance(values, list):
             values = (values,)
         if len(values) == 1:
             self.SMProperty.SetElement(4, values[0])
@@ -1065,10 +1084,10 @@ class ArraySelectionProperty(VectorProperty):
                 # In case user didn't specify valid association,
                 # just pick POINTS.
                 val = GetAssociationFromString("POINTS")
-            self.SMProperty.SetElement(3,  str(val))
+            self.SMProperty.SetElement(3, str(val))
             self.SMProperty.SetElement(4, values[1])
         else:
-            raise RuntimeError ("Expected 1 or 2 values.")
+            raise RuntimeError("Expected 1 or 2 values.")
         self._UpdateProperty()
 
     def UpdateDefault(self):
@@ -1076,13 +1095,14 @@ class ArraySelectionProperty(VectorProperty):
         if self.SMProperty.GetNumberOfElements() != 5:
             return
         if self.GetElement(4) != '' or \
-            self.GetElement(3) != '':
+                self.GetElement(3) != '':
             return
 
-        for i in range(0,3):
+        for i in range(0, 3):
             if self.GetElement(i) == '':
                 self.SMProperty.SetElement(i, '0')
         self.SMProperty.ResetToDomainDefaults(False)
+
 
 class StringListProperty(VectorProperty):
     """Property to set/get the a string with a string list domain.
@@ -1098,7 +1118,8 @@ class StringListProperty(VectorProperty):
         return retVal
 
     Available = property(GetAvailable, None, None, \
-        "This read-only property contains the list of values that can be applied to this property.")
+                         "This read-only property contains the list of values that can be applied to this property.")
+
 
 class ArrayListProperty(VectorProperty):
     """This property provides a simpler interface for selecting arrays.
@@ -1121,7 +1142,7 @@ class ArrayListProperty(VectorProperty):
         return retVal
 
     Available = property(GetAvailable, None, None, \
-        "This read-only property contains the list of items that can be read by a reader.")
+                         "This read-only property contains the list of items that can be read by a reader.")
 
     def SelectAll(self):
         "Selects all arrays."
@@ -1140,45 +1161,45 @@ class ArrayListProperty(VectorProperty):
         return len(self.GetData())
 
     def __setitem__(self, idx, value):
-      """Given a list or tuple of values, sets a slice of values [min, max)"""
-      self.GetData()
-      if isinstance(idx, slice):
-          indices = idx.indices(len(self))
-          for i, j in zip(range(*indices), value):
-              self.__arrays[i] = j
-          self.SetData(self.__arrays)
-      elif idx >= len(self) or idx < 0:
-          raise IndexError
-      else:
-          self.__arrays[idx] = self.ConvertValue(value)
-          self.SetData(self.__arrays)
+        """Given a list or tuple of values, sets a slice of values [min, max)"""
+        self.GetData()
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            for i, j in zip(range(*indices), value):
+                self.__arrays[i] = j
+            self.SetData(self.__arrays)
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        else:
+            self.__arrays[idx] = self.ConvertValue(value)
+            self.SetData(self.__arrays)
 
     def __getitem__(self, idx):
-      """Returns the range [min, max) of elements. Raises an IndexError
-      exception if an argument is out of bounds."""
-      self.GetData()
-      if isinstance(idx, slice):
-          indices = idx.indices(len(self))
-          retVal = []
-          for i in range(*indices):
-              retVal.append(self.__arrays[i])
-          return retVal
-      elif idx >= len(self) or idx < 0:
-          raise IndexError
-      return self.__arrays[idx]
+        """Returns the range [min, max) of elements. Raises an IndexError
+        exception if an argument is out of bounds."""
+        self.GetData()
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            retVal = []
+            for i in range(*indices):
+                retVal.append(self.__arrays[i])
+            return retVal
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        return self.__arrays[idx]
 
     def SetData(self, values):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
         if self.SMProperty.GetInformationOnly() != 0:
-          raise RuntimeError("Cannot set an InformationOnly property!")
+            raise RuntimeError("Cannot set an InformationOnly property!")
         # Clean up first
         iup = self.SMProperty.GetImmediateUpdate()
         self.SMProperty.SetImmediateUpdate(False)
         # Clean up first
         self.SMProperty.SetNumberOfElements(0)
         if not isinstance(values, tuple) and \
-           not isinstance(values, list):
+                not isinstance(values, list):
             values = (values,)
         fullvalues = []
 
@@ -1211,13 +1232,15 @@ class ArrayListProperty(VectorProperty):
         "Returns all elements as a list."
         property = self.SMProperty
         nElems = property.GetNumberOfElements()
-        if nElems%2 != 0:
-            raise ValueError ("The SMProperty with XML label '%s' has a size that is not a multiple of 2." % property.GetXMLLabel())
+        if nElems % 2 != 0:
+            raise ValueError(
+                "The SMProperty with XML label '%s' has a size that is not a multiple of 2." % property.GetXMLLabel())
         self.__arrays = []
         for i in range(0, nElems, 2):
-            if self.GetElement(i+1) != '0':
+            if self.GetElement(i + 1) != '0':
                 self.__arrays.append(self.GetElement(i))
         return list(self.__arrays)
+
 
 class ProxyProperty(Property):
     """A ProxyProperty provides access to one or more proxies. You can use
@@ -1239,6 +1262,7 @@ class ProxyProperty(Property):
     Note that some properties expect only 1 proxy and will complain if
     you set the number of values to be something else.
     """
+
     def __init__(self, proxy, smproperty):
         """Default constructor.  Stores a reference to the proxy.  Also looks
         at domains to find valid values."""
@@ -1288,49 +1312,49 @@ class ProxyProperty(Property):
         self._UpdateProperty()
 
     def __setitem__(self, idx, value):
-      """Given a list or tuple of values, sets a slice of values [min, max)"""
-      if isinstance(idx, slice):
-        indices = idx.indices(len(self))
-        for i, j in zip(range(*indices), value):
-          self.SMProperty.SetProxy(i, j.SMProxy)
-        self._UpdateProperty()
-      elif idx >= len(self) or idx < 0:
-        raise IndexError
-      else:
-        self.SMProperty.SetProxy(idx, value.SMProxy)
-        self._UpdateProperty()
+        """Given a list or tuple of values, sets a slice of values [min, max)"""
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            for i, j in zip(range(*indices), value):
+                self.SMProperty.SetProxy(i, j.SMProxy)
+            self._UpdateProperty()
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        else:
+            self.SMProperty.SetProxy(idx, value.SMProxy)
+            self._UpdateProperty()
 
-    def __delitem__(self,idx):
-      """Removes the element idx"""
-      if isinstance(idx, slice):
-        indices = idx.indices(len(self))
-        # Collect the elements to delete to a new list first.
-        # Otherwise indices are screwed up during the actual
-        # remove loop.
-        toremove = []
-        for i in range(*indices):
-          toremove.append(self[i])
-        for i in toremove:
-          self.SMProperty.RemoveProxy(i.SMProxy)
-        self._UpdateProperty()
-      elif idx >= len(self) or idx < 0:
-        raise IndexError
-      else:
-        self.SMProperty.RemoveProxy(self[idx].SMProxy)
-        self._UpdateProperty()
+    def __delitem__(self, idx):
+        """Removes the element idx"""
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            # Collect the elements to delete to a new list first.
+            # Otherwise indices are screwed up during the actual
+            # remove loop.
+            toremove = []
+            for i in range(*indices):
+                toremove.append(self[i])
+            for i in toremove:
+                self.SMProperty.RemoveProxy(i.SMProxy)
+            self._UpdateProperty()
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        else:
+            self.SMProperty.RemoveProxy(self[idx].SMProxy)
+            self._UpdateProperty()
 
     def __getitem__(self, idx):
-      """Returns the range [min, max) of elements. Raises an IndexError
-      exception if an argument is out of bounds."""
-      if isinstance(idx, slice):
-        indices = idx.indices(len(self))
-        retVal = []
-        for i in range(*indices):
-          retVal.append(_getPyProxy(self.SMProperty.GetProxy(i)))
-        return retVal
-      elif idx >= len(self) or idx < 0:
-        raise IndexError
-      return _getPyProxy(self.SMProperty.GetProxy(idx))
+        """Returns the range [min, max) of elements. Raises an IndexError
+        exception if an argument is out of bounds."""
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            retVal = []
+            for i in range(*indices):
+                retVal.append(_getPyProxy(self.SMProperty.GetProxy(i)))
+            return retVal
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        return _getPyProxy(self.SMProperty.GetProxy(idx))
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -1363,18 +1387,18 @@ class ProxyProperty(Property):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
         if self.SMProperty.GetInformationOnly() != 0:
-          raise RuntimeError("Cannot set an InformationOnly property!")
+            raise RuntimeError("Cannot set an InformationOnly property!")
         if isinstance(values, str):
             position = -1
             try:
                 position = self.Available.index(values)
             except:
-                raise ValueError (values + " is not a valid object in the domain.")
+                raise ValueError(values + " is not a valid object in the domain.")
             listdomain = self.SMProperty.FindDomain("vtkSMProxyListDomain")
             if listdomain:
                 values = listdomain.GetProxy(position)
         if not isinstance(values, tuple) and \
-           not isinstance(values, list):
+                not isinstance(values, list):
             values = (values,)
         self.SMProperty.RemoveAllProxies()
         for value in values:
@@ -1390,6 +1414,7 @@ class ProxyProperty(Property):
         self.SMProperty.RemoveAllProxies()
         self._UpdateProperty()
 
+
 class InputProperty(ProxyProperty):
     """An InputProperty allows making pipeline connections. You can set either
     a source proxy or an OutputProperty to an input property:
@@ -1402,37 +1427,38 @@ class InputProperty(ProxyProperty):
     or
     > property.append(OutputPort(proxy, 0))
     """
+
     def __setitem__(self, idx, value):
-      """Given a list or tuple of values, sets a slice of values [min, max)"""
-      if isinstance(idx, slice):
-        indices = idx.indices(len(self))
-        for i, j in zip(range(*indices), value):
-          op = value[i-min]
-          self.SMProperty.SetInputConnection(i, op.SMProxy, op.Port)
-        self._UpdateProperty()
-      elif idx >= len(self) or idx < 0:
-        raise IndexError
-      else:
-        self.SMProperty.SetInputConnection(idx, value.SMProxy, value.Port)
-        self._UpdateProperty()
+        """Given a list or tuple of values, sets a slice of values [min, max)"""
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            for i, j in zip(range(*indices), value):
+                op = value[i - min]
+                self.SMProperty.SetInputConnection(i, op.SMProxy, op.Port)
+            self._UpdateProperty()
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        else:
+            self.SMProperty.SetInputConnection(idx, value.SMProxy, value.Port)
+            self._UpdateProperty()
 
     def __getitem__(self, idx):
-      """Returns the range [min, max) of elements. Raises an IndexError
-      exception if an argument is out of bounds."""
-      if isinstance(idx, slice):
-        indices = idx.indices(len(self))
-        retVal = []
-        for i in range(*indices):
-            port = None
-            if self.SMProperty.GetProxy(i):
-                port = OutputPort(_getPyProxy(self.SMProperty.GetProxy(i)),\
-                                  self.SMProperty.GetOutputPortForConnection(i))
-            retVal.append(port)
-        return retVal
-      elif idx >= len(self) or idx < 0:
-        raise IndexError
-      return OutputPort(_getPyProxy(self.SMProperty.GetProxy(idx)),\
-                        self.SMProperty.GetOutputPortForConnection(idx))
+        """Returns the range [min, max) of elements. Raises an IndexError
+        exception if an argument is out of bounds."""
+        if isinstance(idx, slice):
+            indices = idx.indices(len(self))
+            retVal = []
+            for i in range(*indices):
+                port = None
+                if self.SMProperty.GetProxy(i):
+                    port = OutputPort(_getPyProxy(self.SMProperty.GetProxy(i)), \
+                                      self.SMProperty.GetOutputPortForConnection(i))
+                retVal.append(port)
+            return retVal
+        elif idx >= len(self) or idx < 0:
+            raise IndexError
+        return OutputPort(_getPyProxy(self.SMProperty.GetProxy(idx)), \
+                          self.SMProperty.GetOutputPortForConnection(idx))
 
     def append(self, value):
         """Appends the given proxy to the property values.
@@ -1448,7 +1474,7 @@ class InputProperty(ProxyProperty):
             return self[0:len(self)]
         else:
             if property.GetNumberOfProxies() > 0:
-                return OutputPort(_getPyProxy(property.GetProxy(0)),\
+                return OutputPort(_getPyProxy(property.GetProxy(0)), \
                                   self.SMProperty.GetOutputPortForConnection(0))
         return None
 
@@ -1459,7 +1485,7 @@ class InputProperty(ProxyProperty):
             ProxyProperty.SetData(self, values)
             return
         if not isinstance(values, tuple) and \
-           not isinstance(values, list):
+                not isinstance(values, list):
             values = (values,)
         self.SMProperty.RemoveAllProxies()
         for value in values:
@@ -1474,6 +1500,7 @@ class InputProperty(ProxyProperty):
         for prop in iter:
             if isinstance(prop, ArraySelectionProperty):
                 prop.UpdateDefault()
+
 
 class DataInformation(object):
     """DataInformation is a contained for meta-data associated with an
@@ -1490,6 +1517,7 @@ class DataInformation(object):
     See also the doxygen based documentation of the vtkPVDataInformation C++
     class.
     """
+
     def __init__(self, dataInformation, proxy, idx):
         """Default constructor. Requires a vtkPVDataInformation, a source proxy
         and an output port id."""
@@ -1516,7 +1544,7 @@ class DataInformation(object):
         """Returns the dataset type as defined in vtkDataObjectTypes."""
         self.Update()
         if not self.DataInformation:
-            raise RuntimeError ("No data information is available")
+            raise RuntimeError("No data information is available")
         if self.DataInformation.GetCompositeDataSetType() > -1:
             return self.DataInformation.GetCompositeDataSetType()
         return self.DataInformation.GetDataSetType()
@@ -1535,6 +1563,7 @@ class DataInformation(object):
         self.Update()
         return getattr(self.DataInformation, name)
 
+
 class ArrayInformation(object):
     """Meta-information associated with an array. Use the Name
     attribute to get the array name.
@@ -1545,6 +1574,7 @@ class ArrayInformation(object):
     See the doxygen based documentation of the vtkPVArrayInformation C++
     class for a full list.
     """
+
     def __init__(self, proxy, field, name):
         self.Proxy = proxy
         self.FieldData = field
@@ -1578,8 +1608,9 @@ class ArrayInformation(object):
         return not self.__eq__(other)
 
     if paraview.compatibility.GetVersion() <= (3, 4):
-       def Range(self, component=0):
-           return self.GetRange(component)
+        def Range(self, component=0):
+            return self.GetRange(component)
+
 
 class FieldDataInformationIterator(object):
     """Iterator for FieldDataInformation"""
@@ -1597,11 +1628,12 @@ class FieldDataInformationIterator(object):
             raise StopIteration
 
         self.index += 1
-        ai = self.FieldDataInformation[self.index-1]
+        ai = self.FieldDataInformation[self.index - 1]
         if self.items:
             return (ai.GetName(), ai)
         else:
             return ai
+
 
 class FieldDataInformation(object):
     """Meta-data for a field of an output object (point data, cell data etc...).
@@ -1620,6 +1652,7 @@ class FieldDataInformation(object):
     The number of arrays can also be accessed using the NumberOfArrays
     property.
     """
+
     def __init__(self, proxy, idx, field):
         self.Proxy = proxy
         self.OutputPort = idx
@@ -1716,6 +1749,7 @@ class FieldDataInformation(object):
 
     NumberOfArrays = property(GetNumberOfArrays, None, None, "Returns the number of arrays.")
 
+
 def OutputPort(proxy, outputPort=0):
     if not Proxy:
         return None
@@ -1729,6 +1763,7 @@ def OutputPort(proxy, outputPort=0):
     newinstance.Port = outputPort
     newinstance._Proxy__Properties = proxy._Proxy__Properties
     return newinstance
+
 
 class ProxyManager(object):
     """When running scripts from the python shell in the ParaView application,
@@ -1817,7 +1852,7 @@ class ProxyManager(object):
         """Unregisters a proxy."""
         if not self.SMProxyManager:
             return
-        if aProxy != None and isinstance(aProxy,Proxy):
+        if aProxy != None and isinstance(aProxy, Proxy):
             aProxy = aProxy.SMProxy
         if aProxy:
             self.SMProxyManager.UnRegisterProxy(groupname, proxyname, aProxy)
@@ -1862,25 +1897,25 @@ class ProxyManager(object):
            can create."""
         iter = None
         if groupname != None:
-            iter = ProxyDefinitionIterator(self.GetProxyDefinitionManager().NewSingleGroupIterator(groupname,0))
+            iter = ProxyDefinitionIterator(self.GetProxyDefinitionManager().NewSingleGroupIterator(groupname, 0))
         else:
             iter = ProxyDefinitionIterator(self.GetProxyDefinitionManager().NewIterator(0))
 
         return iter
 
     def __ConvertArgumentsAndCall(self, *args):
-      newArgs = []
-      for arg in args:
-          if issubclass(type(arg), Proxy) or isinstance(arg, Proxy):
-              newArgs.append(arg.SMProxy)
-          else:
-              newArgs.append(arg)
-      func = getattr(self.SMProxyManager, self.__LastAttrName)
-      retVal = func(*newArgs)
-      if isinstance(retVal, vtkSMProxy):
-          return _getPyProxy(retVal)
-      else:
-          return retVal
+        newArgs = []
+        for arg in args:
+            if issubclass(type(arg), Proxy) or isinstance(arg, Proxy):
+                newArgs.append(arg.SMProxy)
+            else:
+                newArgs.append(arg)
+        func = getattr(self.SMProxyManager, self.__LastAttrName)
+        retVal = func(*newArgs)
+        if isinstance(retVal, vtkSMProxy):
+            return _getPyProxy(retVal)
+        else:
+            return retVal
 
     def __getattr__(self, name):
         """Returns attribute from the ProxyManager"""
@@ -1892,11 +1927,12 @@ class ProxyManager(object):
             pass
         return getattr(self.SMProxyManager, name)
 
-    def LoadState(self, filename, loader = None, location=vtkPVSession.CLIENT):
+    def LoadState(self, filename, loader=None, location=vtkPVSession.CLIENT):
         self.SMProxyManager.LoadXMLState(filename, loader, location)
 
     def SaveState(self, filename, location=vtkPVSession.CLIENT):
         self.SMProxyManager.SaveXMLState(filename, location)
+
 
 class PropertyIterator(object):
     """Wrapper for a vtkSMPropertyIterator class to satisfy
@@ -1949,11 +1985,13 @@ class PropertyIterator(object):
         """returns attributes from the vtkSMPropertyIterator."""
         return getattr(self.SMIterator, name)
 
+
 class ProxyDefinitionIterator(object):
     """Wrapper for a vtkPVProxyDefinitionIterator class to satisfy
        the python iterator protocol.
        See the doxygen documentation of the vtkPVProxyDefinitionIterator
        C++ class for more information."""
+
     def __init__(self, iter):
         self.SMIterator = iter
         if self.SMIterator:
@@ -1975,7 +2013,7 @@ class ProxyDefinitionIterator(object):
         self.Key = self.SMIterator.GetProxyName()
         self.XML = self.SMIterator.GetProxyDefinition()
         self.SMIterator.GoToNextItem()
-        return {"group" : self.Group, "key" : self.Key, "xml" : self.XML}
+        return {"group": self.Group, "key": self.Key, "xml": self.XML}
 
     def GetProxyName(self):
         """Returns the key for the proxy definition last returned by the call
@@ -1995,12 +2033,14 @@ class ProxyDefinitionIterator(object):
         """returns attributes from the vtkPVProxyDefinitionIterator."""
         return getattr(self.SMIterator, name)
 
+
 class ProxyIterator(object):
     """Wrapper for a vtkSMProxyIterator class to satisfy the
      python iterator protocol.
      See the doxygen documentation of vtkSMProxyIterator C++ class for
      more information.
      """
+
     def __init__(self):
         self.SMIterator = vtkSMProxyIterator()
         self.SMIterator.SetSession(ActiveConnection.Session)
@@ -2043,12 +2083,14 @@ class ProxyIterator(object):
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
 
+
 # Caution: Observers must be global methods otherwise we run into memory
 #          leak when the interpreter get reset from the C++ layer.
 class Connection(object):
     """
       This is a python representation for a session/connection.
     """
+
     def __init__(self, connectionId, session):
         """Default constructor. Creates a Connection with the given
         ID, all other data members initialized to None."""
@@ -2066,11 +2108,11 @@ class Connection(object):
         self.ProxiesNS = ConnectionProxyNamespaces(self.Session)
 
         ActiveConnection = None
-        #SetActiveConnection(self)
+        # SetActiveConnection(self)
 
     def __eq__(self, other):
         "Returns true if the connection ids are the same."
-        #Python3 - this is now called when self is None
+        # Python3 - this is now called when self is None
         return ((self is None and other is None) or
                 ((self is not None and other is not None) and (self.ID == other.ID)))
 
@@ -2104,7 +2146,8 @@ class Connection(object):
 
     def __del__(self):
         if self.Alive:
-           self.close()
+            self.close()
+
 
 def SaveState(filename, location=vtkPVSession.CLIENT):
     """Given a state filename, saves the state of objects registered
@@ -2112,13 +2155,14 @@ def SaveState(filename, location=vtkPVSession.CLIENT):
     pm = ProxyManager()
     pm.SaveState(filename, location)
 
+
 def LoadState(filename, connection=None, location=vtkPVSession.CLIENT):
     """Given a state filename and an optional connection, loads the server
     manager state."""
     if not connection:
         connection = ActiveConnection
     if not connection:
-        raise RuntimeError ("Cannot load state without a connection")
+        raise RuntimeError("Cannot load state without a connection")
     pm = ProxyManager()
     pm.LoadState(filename, None, location)
     views = GetRenderViews()
@@ -2129,6 +2173,7 @@ def LoadState(filename, connection=None, location=vtkPVSession.CLIENT):
         if view.GetClassName() == "vtkSMIceTDesktopRenderViewProxy":
             view.GetRenderWindow().SetSize(view.ViewSize[0], \
                                            view.ViewSize[1])
+
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221, timeout=60):
     """
@@ -2162,15 +2207,16 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221, timeout=60
         session = vtkSMSessionClient()
         ret = session.Connect("cdsrs://%s:%d/%s:%d" % (ds_host, ds_port, rs_host, rs_port), timeout)
     if ret:
-      id = vtkProcessModule.GetProcessModule().RegisterSession(session)
-      connection = GetConnectionFromId(id)
+        id = vtkProcessModule.GetProcessModule().RegisterSession(session)
+        connection = GetConnectionFromId(id)
 
-      # This shouldn't be needed. However, it's needed for old Python scripts that
-      # directly import servermanager.py without simple.py
-      SetActiveConnection(connection)
-      return connection
+        # This shouldn't be needed. However, it's needed for old Python scripts that
+        # directly import servermanager.py without simple.py
+        SetActiveConnection(connection)
+        return connection
     else:
-      return None
+        return None
+
 
 def ConnectToCatalyst(ds_host='localhost', ds_port=22222):
     """
@@ -2190,6 +2236,7 @@ def ConnectToCatalyst(ds_host='localhost', ds_port=22222):
     insituLink.SetInsituProxyManager(connection.Session.GetSessionProxyManager())
 
     return insituLink
+
 
 def ReverseConnect(port=11111):
     """
@@ -2212,6 +2259,7 @@ def ReverseConnect(port=11111):
     SetActiveConnection(connection)
     return connection
 
+
 def Disconnect(connection=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
@@ -2221,6 +2269,7 @@ def Disconnect(connection=None):
 
     if connection:
         vtkSMSession.Disconnect(connection.ID)
+
 
 def CreateProxy(xml_group, xml_name, session=None):
     """Creates a proxy. If session is set, the proxy's session is
@@ -2232,9 +2281,10 @@ def CreateProxy(xml_group, xml_name, session=None):
     if not session:
         session = ActiveConnection.Session
     if not session:
-        raise RuntimeError ("Cannot create objects without a session.")
+        raise RuntimeError("Cannot create objects without a session.")
     pxm = ProxyManager(session)
     return pxm.NewProxy(xml_group, xml_name)
+
 
 def GetRenderView(connection=None):
     """Return the render view in use.  If more than one render view is in
@@ -2247,6 +2297,7 @@ def GetRenderView(connection=None):
             break
     return render_module
 
+
 def GetRenderViews(connection=None):
     """Returns the set of all render views."""
     render_modules = []
@@ -2255,6 +2306,7 @@ def GetRenderViews(connection=None):
             render_modules.append(aProxy)
     return render_modules
 
+
 def GetContextViews(connection=None):
     """Returns the set of all context views."""
     context_modules = []
@@ -2262,6 +2314,7 @@ def GetContextViews(connection=None):
         if aProxy.IsA("vtkSMContextViewProxy"):
             context_modules.append(aProxy)
     return context_modules
+
 
 def CreateRenderView(session=None, **extraArgs):
     """Creates a render window on the particular session. If session
@@ -2274,6 +2327,7 @@ def CreateRenderView(session=None, **extraArgs):
     manager."""
     return _create_view("RenderView", session, **extraArgs)
 
+
 def _create_view(view_xml_name, session=None, **extraArgs):
     """Creates a view on the particular session. If session
     is not specified, then the active session is used, if available.
@@ -2282,7 +2336,7 @@ def _create_view(view_xml_name, session=None, **extraArgs):
     if not session:
         session = ActiveConnection.Session
     if not session:
-        raise RuntimeError ("Cannot create view without session.")
+        raise RuntimeError("Cannot create view without session.")
     pxm = ProxyManager()
     view_module = None
     if view_xml_name:
@@ -2291,10 +2345,12 @@ def _create_view(view_xml_name, session=None, **extraArgs):
         return None
     return _getPyProxy(view_module)
 
+
 def GetRepresentation(aProxy, view):
     if view:
-      return view.FindRepresentation(aProxy.SMProxy, aProxy.Port)
+        return view.FindRepresentation(aProxy.SMProxy, aProxy.Port)
     return None
+
 
 def CreateRepresentation(aProxy, view, **extraArgs):
     """Creates a representation for the proxy and adds it to the render
@@ -2312,16 +2368,16 @@ def CreateRepresentation(aProxy, view, **extraArgs):
 
     global rendering
     if not aProxy:
-        raise RuntimeError ("proxy argument cannot be None.")
+        raise RuntimeError("proxy argument cannot be None.")
     if not view:
-        raise RuntimeError ("view argument cannot be None.")
+        raise RuntimeError("view argument cannot be None.")
     if "proxyName" in extraArgs:
-      display = CreateProxy("representations", extraArgs['proxyName'], None)
-      del extraArgs['proxyName']
+        display = CreateProxy("representations", extraArgs['proxyName'], None)
+        del extraArgs['proxyName']
     else:
-      display = view.SMProxy.CreateDefaultRepresentation(aProxy.SMProxy, 0)
-      if display:
-        display.UnRegister(None)
+        display = view.SMProxy.CreateDefaultRepresentation(aProxy.SMProxy, 0)
+        if display:
+            display.UnRegister(None)
     if not display:
         return None
     proxy = _getPyProxy(display)
@@ -2332,7 +2388,10 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     view.Representations.append(proxy)
     return proxy
 
+
 import importlib, importlib.abc
+
+
 class ParaViewMetaPathFinder(importlib.abc.MetaPathFinder):
     def __init__(self):
         self._loader = ParaViewLoader()
@@ -2346,6 +2405,7 @@ class ParaViewMetaPathFinder(importlib.abc.MetaPathFinder):
             return importlib.machinery.ModuleSpec(fullname, self._loader, is_package=package)
         return None
 
+
 class ParaViewLoader(importlib.abc.InspectLoader):
     def _info(self, fullname):
         return vtkPVPythonModule.GetModule(fullname)
@@ -2356,13 +2416,15 @@ class ParaViewLoader(importlib.abc.InspectLoader):
     def get_source(self, fullname):
         return self._info(fullname).GetSource()
 
+
 def LoadXML(xmlstring):
     """
     PARAVIEW_DEPRECATED_IN_5_12_0 Use LoadPlugin(...) instead
     """
-    raise RuntimeError ("Deprecated. Use LoadPlugin(...) instead.")
+    raise RuntimeError("Deprecated. Use LoadPlugin(...) instead.")
 
-def LoadPlugin(filename,  remote=True, connection=None):
+
+def LoadPlugin(filename, remote=True, connection=None):
     """ Given a filename and a session (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
     filters and rendering modules.
@@ -2373,7 +2435,7 @@ def LoadPlugin(filename,  remote=True, connection=None):
     if not connection:
         connection = ActiveConnection
     if not connection:
-        raise RuntimeError ("Cannot load a plugin without a connection.")
+        raise RuntimeError("Cannot load a plugin without a connection.")
     plm = vtkSMProxyManager.GetProxyManager().GetPluginManager()
 
     if remote and connection.IsRemote():
@@ -2383,7 +2445,8 @@ def LoadPlugin(filename,  remote=True, connection=None):
 
     # shouldn't the extension check happen before attempting to load the plugin?
     if not status:
-        raise RuntimeError ("Problem loading plugin %s" % (filename))
+        raise RuntimeError("Problem loading plugin %s" % (filename))
+
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """
@@ -2423,9 +2486,9 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     else:
         integer_types = (int,)
 
-    reducer = filters.ReductionFilter(Input=OutputPort(input,idx))
+    reducer = filters.ReductionFilter(Input=OutputPort(input, idx))
 
-    #create the pipeline that reduces and transmits the data
+    # create the pipeline that reduces and transmits the data
     if arg1 == None:
         dinfo = input.GetDataInformation(idx)
         if dinfo.IsCompositeDataSet():
@@ -2456,12 +2519,12 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     dataInfo = reducer.GetDataInformation(0)
     dataType = dataInfo.GetDataSetType()
     if dataInfo.GetCompositeDataSetType() > 0:
-      dataType = dataInfo.GetCompositeDataSetType()
+        dataType = dataInfo.GetCompositeDataSetType()
 
     fetcher = filters.ClientServerMoveData(Input=reducer)
     fetcher.OutputDataType = dataType
     fetcher.WholeExtent = dataInfo.GetExtent()[:]
-    #fetch
+    # fetch
     fetcher.UpdatePipeline()
 
     op = fetcher.GetClientSideObject().GetOutputDataObject(0)
@@ -2469,6 +2532,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     opc.ShallowCopy(op)
     opc.UnRegister(None)
     return opc
+
 
 def AnimateReader(reader, view):
     """This is a utility function that, given a reader and a view
@@ -2479,9 +2543,9 @@ def AnimateReader(reader, view):
     existing scene and cue to maintain time consistency in the
     application."""
     if not reader:
-        raise RuntimeError ("No reader was specified, cannot animate.")
+        raise RuntimeError("No reader was specified, cannot animate.")
     if not view:
-        raise RuntimeError ("No view was specified, cannot animate.")
+        raise RuntimeError("No view was specified, cannot animate.")
     # Create an animation scene
     # This is why it is not recommended to use this method from the GUI. See #18984
     scene = animation.AnimationScene()
@@ -2509,7 +2573,7 @@ def AnimateReader(reader, view):
     scene.EndTime = reader.TimestepValues.GetData()[-1]
 
     # Each frame will correspond to a time step
-    scene.PlayMode = 2 #Snap To Timesteps
+    scene.PlayMode = 2  # Snap To Timesteps
 
     # Create a special animation cue for time.
     cue = animation.TimeAnimationCue()
@@ -2519,8 +2583,10 @@ def AnimateReader(reader, view):
     scene.Play()
     return scene
 
+
 def GetProgressPrintingIsEnabled():
     return progressObserverTag is not None
+
 
 def SetProgressPrintingEnabled(value):
     """Turn on/off printing of progress (by default, it is on). You can
@@ -2543,9 +2609,11 @@ def SetProgressPrintingEnabled(value):
             ActiveConnection.Session.GetProgressHandler().RemoveObserver(progressObserverTag)
             progressObserverTag = None
 
+
 def ToggleProgressPrinting():
     """Turn on/off printing of progress.  See SetProgressPrintingEnabled."""
     SetProgressPrintingEnabled(not GetProgressPrintingIsEnabled())
+
 
 def Finalize():
     """Although not required, this can be called at exit to cleanup."""
@@ -2554,6 +2622,7 @@ def Finalize():
     if progressObserverTag:
         ToggleProgressPrinting()
     vtkInitializationHelper.Finalize()
+
 
 # Internal methods
 
@@ -2580,42 +2649,51 @@ def _getPyProxy(smproxy, outputPort=0):
     classForProxy = ActiveConnection.ProxiesNS.getClass(smproxy)
     if not classForProxy:
         raise RuntimeError("Failed to locate proxy class for proxy (%s, %s)" % \
-                (smproxy.GetXMLGroup(), smproxy.GetXMLName()))
+                           (smproxy.GetXMLGroup(), smproxy.GetXMLName()))
 
     return classForProxy(proxy=smproxy, port=outputPort)
+
 
 def _createInitialize(group, name):
     """Internal method to create an Initialize() method for the sub-classes
     of Proxy"""
     pgroup = group
     pname = name
+
     def aInitialize(self, connection=None, update=True):
         if not connection:
             connection = ActiveConnection
         if not connection:
-            raise RuntimeError ('Cannot create a proxy without a session.')
+            raise RuntimeError('Cannot create a proxy without a session.')
         if not connection.Session.GetProxyDefinitionManager().HasDefinition(pgroup, pname):
             error_msg = "The connection does not provide any definition for %s." % pname
-            raise RuntimeError (error_msg)
-        self.InitializeFromProxy(\
+            raise RuntimeError(error_msg)
+        self.InitializeFromProxy( \
             CreateProxy(pgroup, pname, connection.Session), update)
+
     return aInitialize
+
 
 def _createGetProperty(pName):
     """Internal method to create a GetXXX() method where XXX == pName."""
     propName = pName
+
     def getProperty(self):
         if paraview.compatibility.GetVersion() >= (3, 5):
             return self.GetPropertyValue(propName)
         else:
             return self.GetProperty(propName)
+
     return getProperty
+
 
 def _createSetProperty(pName):
     """Internal method to create a SetXXX() method where XXX == pName."""
     propName = pName
+
     def setProperty(self, value):
         return self.SetPropertyWithName(propName, value)
+
     return setProperty
 
 
@@ -2633,25 +2711,27 @@ def _printProgress(caller, event):
                 import sys
                 sys.stdout.write(".")
                 currentProgress += 1
-            print ("]")
+            print("]")
             currentProgress = 0
-        print (alg, ": [ ", end="")
+        print(alg, ": [ ", end="")
         currentAlgorithm = alg
     while currentProgress <= progress:
         import sys
         sys.stdout.write(".")
-        #sys.stdout.write("%d " % pm.GetLastProgress())
+        # sys.stdout.write("%d " % pm.GetLastProgress())
         currentProgress += 1
     if progress == 10:
-        print ("]")
+        print("]")
         currentAlgorithm = None
         currentProgress = 0
+
 
 def updateModules(m=None):
     """PARAVIEW_DEPRECATED_IN_5_12_0. Not needed since 5.10."""
     import warnings
     warnings.warn("'servermanager.updateModules' is no longer necessary and thus deprecated.", DeprecationWarning)
     pass
+
 
 class ProxyNamespace:
     """
@@ -2664,6 +2744,7 @@ class ProxyNamespace:
     using `dir()` call on this instance. This avoids having to define classes
     for all proxy types during initialization, thus speeding up initialization.
     """
+
     def __init__(self, xmlGroups, session):
         self.xmlGroups = set(xmlGroups) if xmlGroups else set()
         self.session = session
@@ -2726,7 +2807,7 @@ class ProxyNamespace:
         ptype = self._findProxy(name=name)
         if not ptype:
             raise AttributeError("No Proxy type named '%s' found." % name)
-        cls = _createClass(ptype["group"], ptype["key"], apxm = self.session.GetSessionProxyManager())
+        cls = _createClass(ptype["group"], ptype["key"], apxm=self.session.GetSessionProxyManager())
         # store class definition to avoid creating new type for each proxy.
         setattr(self, name, cls)
         return cls
@@ -2738,7 +2819,6 @@ class ProxyNamespace:
         xml = ptype["xml"]
         doc = xml.FindNestedElementByName("Documentation")
         return doc.GetCharacterData() if doc and doc.GetCharacterData() else ""
-
 
     def findClass(self, smproxy):
         """Given a vtkSMProxy, returns the class type to use for this proxy
@@ -2755,6 +2835,7 @@ class ProxyNamespace:
         # now, attempt to access it.
         return getattr(self, pname) if pname else None
 
+
 class ConnectionProxyNamespaces(object):
     """
     This class stores class types for all known proxies on a particular session.
@@ -2768,7 +2849,7 @@ class ConnectionProxyNamespaces(object):
 
     def _get_proxy_types(self, name, xmlGroups=None):
         if name not in self._namespaces:
-            groups = xmlGroups if xmlGroups else [ name ]
+            groups = xmlGroups if xmlGroups else [name]
             self._namespaces[name] = ProxyNamespace(groups, self._session)
         return self._namespaces[name]
 
@@ -2802,7 +2883,7 @@ class ConnectionProxyNamespaces(object):
         cls = self.__class__
         assert not hasattr(cls, nsname)
         setattr(cls, nsname, property(lambda self: self._get_proxy_types(nsname),
-            doc = "%s proxies" % nsname))
+                                      doc="%s proxies" % nsname))
         ns = getattr(self, nsname)
         return ns.findClass(smproxy)
 
@@ -2814,22 +2895,26 @@ class ConnectionProxyNamespaces(object):
     filters = property(lambda self: self._get_proxy_types("filters"), doc="filter proxies")
     writers = property(lambda self: self._get_proxy_types("writers"), doc="writers proxies")
     rendering = property(lambda self: self._get_proxy_types("rendering",
-        ["annotations", "cameramanipulators", "lookup_tables", "representations", "textures", "views"]),
-        doc="rendering proxies")
+                                                            ["annotations", "cameramanipulators", "lookup_tables",
+                                                             "representations", "textures", "views"]),
+                         doc="rendering proxies")
     animation = property(lambda self: self._get_proxy_types("animation",
-        ["animation", "animation_keyframes"]), doc="animation proxies")
+                                                            ["animation", "animation_keyframes"]),
+                         doc="animation proxies")
     implicit_functions = property(lambda self: self._get_proxy_types("implicit_functions"),
-            doc="implicit function proxies")
+                                  doc="implicit function proxies")
     piecewise_functions = property(lambda self: self._get_proxy_types("piecewise_functions"),
-            doc = "piece-wise functions")
+                                   doc="piece-wise functions")
     extended_sources = property(lambda self: self._get_proxy_types("extended_sources"),
-            doc = "extented sources")
+                                doc="extented sources")
     misc = property(lambda self: self._get_proxy_types("misc",
-        ["misc", "incremental_point_locators", "point_locators"]),
-        doc = "miscellaneous proxies")
+                                                       ["misc", "incremental_point_locators", "point_locators"]),
+                    doc="miscellaneous proxies")
+
 
 def _make_name_valid(name):
     return paraview.make_name_valid(name)
+
 
 def _createClassProperties(proto, excludeset=frozenset()):
     """Builds a dict of properties for all SMProperties on the `proto` proxy.
@@ -2842,7 +2927,7 @@ def _createClassProperties(proto, excludeset=frozenset()):
         propName = iter.GetKey()
         if paraview.compatibility.GetVersion() >= (3, 5):
             if (prop.GetInformationOnly() and propName != "TimestepValues" \
-              and prop.GetPanelVisibility() == "never") or prop.GetIsInternal():
+                and prop.GetPanelVisibility() == "never") or prop.GetIsInternal():
                 continue
         names = [propName]
         if paraview.compatibility.GetVersion() >= (3, 5):
@@ -2860,6 +2945,7 @@ def _createClassProperties(proto, excludeset=frozenset()):
                                        propDoc)
     return cdict
 
+
 def _createClass(groupName, proxyName, apxm=None, prototype=None):
     """Defines a new class type for the proxy."""
     if prototype is None:
@@ -2868,8 +2954,8 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
     else:
         proto = prototype
     if not proto:
-       paraview.print_error("Error while loading %s %s"%(groupName, proxyName))
-       return None
+        paraview.print_error("Error while loading %s %s" % (groupName, proxyName))
+        return None
     pname = proxyName
     if paraview.compatibility.GetVersion() >= (3, 5) and proto.GetXMLLabel():
         pname = proto.GetXMLLabel()
@@ -2883,7 +2969,7 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
 
     # Add the documentation as the class __doc__
     if proto.GetDocumentation() and \
-       proto.GetDocumentation().GetDescription():
+            proto.GetDocumentation().GetDescription():
         doc = proto.GetDocumentation().GetDescription()
     else:
         doc = Proxy.__doc__
@@ -2902,6 +2988,7 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
 
     cobj = type(pname, superclasses, cdict)
     return cobj
+
 
 def __determineGroup(proxy):
     """Internal method"""
@@ -2935,6 +3022,7 @@ def __determineGroup(proxy):
         return "animation"
     return xmlgroup
 
+
 def ResetSession():
     """Reset the session in the active connection to its initial state."""
     global ActiveConnection
@@ -2951,6 +3039,7 @@ def ResetSession():
     connection = GetConnectionFromId(id)
     return connection
 
+
 def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
     it to the client using Fetch. It returns a tuple of (data, render
@@ -2959,12 +3048,12 @@ def demo1():
         Connect()
     if paraview.compatibility.GetVersion() <= (3, 4):
         ss = sources.SphereSource(Radius=2, ThetaResolution=32)
-        shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
+        shr = filters.ShrinkFilter(Input=OutputPort(ss, 0))
         cs = sources.ConeSource()
         app = filters.Append()
     else:
         ss = sources.Sphere(Radius=2, ThetaResolution=32)
-        shr = filters.Shrink(Input=OutputPort(ss,0))
+        shr = filters.Shrink(Input=OutputPort(ss, 0))
         cs = sources.Cone()
         app = filters.AppendDatasets()
     app.Input = [shr, cs]
@@ -2975,6 +3064,7 @@ def demo1():
     data = Fetch(ss)
 
     return (data, rv)
+
 
 def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     """This method demonstrates the user of a reader, representation and
@@ -2991,7 +3081,7 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
         arraySelection = reader.PointResultArrayStatus
     else:
         arraySelection = reader.PointVariables
-    print (arraySelection.Available)
+    print(arraySelection.Available)
     # Select all arrays
     arraySelection.SetData(arraySelection.Available)
 
@@ -2999,7 +3089,7 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     rv = CreateRenderView()
     # Create the matching representation
     rep = CreateRepresentation(reader, rv)
-    rep.Representation = 1 # Wireframe
+    rep.Representation = 1  # Wireframe
     # Black background is not pretty
     rv.Background = [0.4, 0.4, 0.6]
     rv.StillRender()
@@ -3016,18 +3106,18 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     pdi = reader[0].PointData
     # This prints a list of all read point data arrays as well as their
     # value ranges.
-    print ('Number of point arrays:', len(pdi))
+    print('Number of point arrays:', len(pdi))
     for i in range(len(pdi)):
         ai = pdi[i]
-        print ("----------------")
-        print ("Array:", i, ai.Name, ":")
+        print("----------------")
+        print("Array:", i, ai.Name, ":")
         numComps = ai.GetNumberOfComponents()
-        print ("Number of components:", numComps)
+        print("Number of components:", numComps)
         for j in range(numComps):
             if paraview.compatibility.GetVersion() <= (3, 4):
-                print ("Range:", ai.Range(j))
+                print("Range:", ai.Range(j))
             else:
-                print ("Range:", ai.GetRange(j))
+                print("Range:", ai.GetRange(j))
     # White is boring. Let's color the geometry using a variable.
     # First create a lookup table. This object controls how scalar
     # values are mapped to colors. See VTK documentation for
@@ -3041,9 +3131,10 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     # the scalar values, the other 3 the RGB values. This list has
     # 2 points: Pres: 0.00678, color: blue, Pres: 0.0288, color: red
     lt.RGBPoints = [0.00678, 0, 0, 1, 0.0288, 1, 0, 0]
-    lt.ColorSpace = 1 # HSV
+    lt.ColorSpace = 1  # HSV
     rv.StillRender()
     return rv
+
 
 def demo3():
     """This method demonstrates the use of servermanager with numpy as
@@ -3066,21 +3157,21 @@ def demo3():
     source.UpdatePipeline()
 
     di = source.GetDataInformation()
-    print ("Data type:", di.GetPrettyDataTypeString())
-    print ("Extent:", di.GetExtent())
-    print ("Array name:", \
-              source[0].PointData[0].Name)
+    print("Data type:", di.GetPrettyDataTypeString())
+    print("Extent:", di.GetExtent())
+    print("Array name:", \
+          source[0].PointData[0].Name)
 
     rv = CreateRenderView()
 
     rep1 = CreateRepresentation(source, rv)
-    rep1.Representation = 3 # outline
+    rep1.Representation = 3  # outline
 
     # Let's apply a contour filter
     cf = filters.Contour(Input=source, ContourValues=[200])
 
     # Select the array to contour by
-    #cf.SelectInputScalars = 'RTData'
+    # cf.SelectInputScalars = 'RTData'
 
     rep2 = CreateRepresentation(cf, rv)
 
@@ -3101,7 +3192,7 @@ def demo3():
         line = sources.Line(Resolution=60)
     # that spans the dataset
     bounds = di.GetBounds()
-    print ("Bounds: ", bounds)
+    print("Bounds: ", bounds)
     line.Point1 = bounds[0:6:2]
     line.Point2 = bounds[1:6:2]
 
@@ -3115,12 +3206,13 @@ def demo3():
     data = Fetch(probe)
     # Convert it to a numpy array
     data = numpy_support.vtk_to_numpy(
-      data.GetPointData().GetArray("RTData"))
+        data.GetPointData().GetArray("RTData"))
     # Plot it using matplotlib
     pylab.plot(data)
     pylab.show()
 
     return (data, rv, probe)
+
 
 def demo4(fname="/Users/berk/Work/ParaViewData/Data/can.ex2"):
     """This method demonstrates the user of AnimateReader for
@@ -3136,6 +3228,7 @@ def demo4(fname="/Users/berk/Work/ParaViewData/Data/can.ex2"):
     c = view.GetActiveCamera()
     c.Elevation(95)
     return AnimateReader(reader, view)
+
 
 def demo5():
     """ Simple sphere animation"""
@@ -3166,15 +3259,15 @@ def demo5():
 
     # Create 2 keyframes for the StartTheta track
     keyf0 = animation.CompositeKeyFrame()
-    keyf0.Type = 2 # Set keyframe interpolation type to Ramp.
+    keyf0.Type = 2  # Set keyframe interpolation type to Ramp.
     # At time = 0, value = 0
     keyf0.KeyTime = 0
-    keyf0.KeyValues= [0]
+    keyf0.KeyValues = [0]
 
     keyf1 = animation.CompositeKeyFrame()
     # At time = 1.0, value = 200
     keyf1.KeyTime = 1.0
-    keyf1.KeyValues= [200]
+    keyf1.KeyValues = [200]
 
     # Add keyframes.
     cue.KeyFrames = [keyf0, keyf1]
@@ -3182,18 +3275,21 @@ def demo5():
     scene.Play()
     return scene
 
-ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'FIELD' : 2, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
-_LEGACY_ASSOCIATIONS = { 'POINT_DATA' : 0, 'CELL_DATA' : 1 }
+
+ASSOCIATIONS = {'POINTS': 0, 'CELLS': 1, 'FIELD': 2, 'VERTICES': 4, 'EDGES': 5, 'ROWS': 6}
+_LEGACY_ASSOCIATIONS = {'POINT_DATA': 0, 'CELL_DATA': 1}
+
 
 def GetAssociationAsString(val):
     """Returns array association string from its integer value"""
     global ASSOCIATIONS
     if not type(val) == int:
-        raise ValueError ("argument must be of type 'int'")
+        raise ValueError("argument must be of type 'int'")
     for k in ASSOCIATIONS:
         if ASSOCIATIONS[k] == val:
             return k
-    raise RuntimeError ("invalid association type '%d'" % val)
+    raise RuntimeError("invalid association type '%d'" % val)
+
 
 def GetAssociationFromString(val):
     """Returns array association integer value from its string representation"""
@@ -3205,7 +3301,8 @@ def GetAssociationFromString(val):
         try:
             return _LEGACY_ASSOCIATIONS[val]
         except KeyError:
-            raise RuntimeError ("invalid association string '%s'" % val)
+            raise RuntimeError("invalid association string '%s'" % val)
+
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.
@@ -3217,13 +3314,14 @@ ActiveConnection = None
 most."""
 Connections = []
 
+
 def SetActiveConnection(connection=None):
     """Set the active connection. If the process was run without multi-server
        enabled and this method is called with a non-None argument while an
        ActiveConnection is present, it will raise a RuntimeError."""
     global ActiveConnection
 
-    #supports_simutaneous_connections =\
+    # supports_simutaneous_connections =\
     #    vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport()
 
     # print ("updating active connection", connection)
@@ -3243,6 +3341,7 @@ def SetActiveConnection(connection=None):
     pxm = vtkSMProxyManager.GetProxyManager()
     pxm.SetActiveSession(session)
     return ActiveConnection
+
 
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI. If running in parallel this will
@@ -3279,6 +3378,7 @@ if not vtkProcessModule.GetProcessModule():
 
     # since we initialized paraview, lets ensure that we finalize it too
     import atexit
+
     atexit.register(Finalize)
 
 # Initialize progress printing. Can be turned off by calling
@@ -3295,6 +3395,7 @@ _pyproxies = {}
 finder = ParaViewMetaPathFinder()
 sys.meta_path.append(finder)
 
+
 def __exposeActiveModules__():
     """Update servermanager submodules to point to the current
     ActiveConnection.Modules.*"""
@@ -3309,6 +3410,7 @@ def __exposeActiveModules__():
     # group is registered, it gets registered for all ConnectionProxyNamespaces
     # instances.
 
+
 def GetConnectionFromId(id):
     """Returns the Connection object corresponding a connection identified by
        the id."""
@@ -3317,6 +3419,7 @@ def GetConnectionFromId(id):
         if connection.ID == id:
             return connection
     return None
+
 
 def GetConnectionFromSession(session):
     """Returns the Connection object corresponding to a vtkSMSession instance."""
@@ -3335,6 +3438,7 @@ def GetConnectionFromSession(session):
         return c
     return None
 
+
 def __connectionCreatedCallback(obj, string):
     """Callback called when a new session is created."""
     global Connections
@@ -3342,6 +3446,7 @@ def __connectionCreatedCallback(obj, string):
     sid = pm.GetEventCallDataSessionId()
     # this creates the Connection object if needed.
     GetConnectionFromSession(pm.GetSession(sid))
+
 
 def __connectionClosedCallback(obg, string):
     """Callback called when a new session is closed."""
@@ -3359,6 +3464,7 @@ def __connectionClosedCallback(obg, string):
             del c
     import gc
     gc.collect()
+
 
 def __initialize():
     """Does initialization of the module, ensuring that the module's state
@@ -3381,9 +3487,10 @@ def __initialize():
         iter.GoToNextItem()
 
     # Update active session.
-    activeConnection = GetConnectionFromSession(\
+    activeConnection = GetConnectionFromSession( \
         vtkSMProxyManager.GetProxyManager().GetActiveSession())
     SetActiveConnection(activeConnection)
+
 
 __initialize()
 

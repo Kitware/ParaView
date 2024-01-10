@@ -4,6 +4,7 @@ r"""This is a module to perform live visualization in the context of Catalyst.
 from paraview.simple import *
 from paraview import servermanager
 
+
 # -----------------------------------------------------------------------------
 def ConnectToCatalyst(ds_host='localhost', ds_port=22222):
     """Creates a connection to a catalyst simulation. Example usage:
@@ -20,6 +21,7 @@ def ConnectToCatalyst(ds_host='localhost', ds_port=22222):
     SetActiveConnection(servermanager.GetConnectionFromSession(displaySession))
     return insituLink
 
+
 # -----------------------------------------------------------------------------
 def ExtractCatalystData(link, name):
     ''' Extract data called "name" from simulation managed by the LiveInsituLink link.
@@ -31,8 +33,9 @@ def ExtractCatalystData(link, name):
     data = FindSource(name)
     return data
 
+
 # -----------------------------------------------------------------------------
-def PauseCatalyst(link, pause = True):
+def PauseCatalyst(link, pause=True):
     ''' Pause / Unpause the Catalyst simulation managed by the LiveInsituLink link.
     '''
     currentState = link.GetProperty('SimulationPaused').GetElement(0) == 1
@@ -43,6 +46,7 @@ def PauseCatalyst(link, pause = True):
     link.UpdateVTKObjects()
     if not pause:
         link.InvokeCommand('LiveChanged')
+
 
 # -----------------------------------------------------------------------------
 def ProcessServerNotifications():

@@ -1,8 +1,9 @@
 r"""Module used by vtkCDBWriter"""
 from ..tpl import cinemasci
 
+
 def write(fname, vtktable):
-    cdb = cinemasci.new("cdb", { "path" : fname})
+    cdb = cinemasci.new("cdb", {"path": fname})
     if not cdb.initialize(dirExistCheck=False):
         raise RuntimeError("Failed to initialize dbase")
     for row in range(vtktable.GetNumberOfRows()):

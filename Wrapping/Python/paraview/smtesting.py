@@ -12,13 +12,15 @@ from paraview.modules.vtkRemotingMisc import *
 # as we do in any module that is importing this
 SMModuleName = 'paraview.servermanager'
 if 'paraview.simple' in sys.modules:
-  SMModuleName = 'paraview.simple'
+    SMModuleName = 'paraview.simple'
 
 sm = __import__(SMModuleName)
 servermanager = sm.servermanager
 
+
 class TestError(Exception):
-  pass
+    pass
+
 
 __ProcessedCommandLineArguments__ = False
 DataDir = ""
@@ -29,104 +31,108 @@ SMStatesDir = ""
 StateXMLFileName = ""
 UseSavedStateForRegressionTests = False
 
+
 def Error(message):
-  print ("ERROR: %s" % message)
-  return False
+    print("ERROR: %s" % message)
+    return False
+
 
 def ProcessCommandLineArguments():
-  """Processes the command line areguments."""
-  global DataDir
-  global TempDir
-  global BaselineImage
-  global Threshold
-  global StateXMLFileName
-  global UseSavedStateForRegressionTests
-  global SMStatesDir
-  global __ProcessedCommandLineArguments__
-  if __ProcessedCommandLineArguments__:
+    """Processes the command line areguments."""
+    global DataDir
+    global TempDir
+    global BaselineImage
+    global Threshold
+    global StateXMLFileName
+    global UseSavedStateForRegressionTests
+    global SMStatesDir
+    global __ProcessedCommandLineArguments__
+    if __ProcessedCommandLineArguments__:
+        return
+    __ProcessedCommandLineArguments__ = True
+    length = len(sys.argv)
+    index = 1
+    while index < length:
+        key = sys.argv[index - 1]
+        value = sys.argv[index]
+        index += 2
+        if key == "-D":
+            DataDir = value
+        elif key == "-V":
+            BaselineImage = value
+        elif key == "-T":
+            TempDir = value
+        elif key == "-S":
+            SMStatesDir = value
+        elif key == "--threshold":
+            Threshold = float(value)
+        elif key == "--state":
+            StateXMLFileName = value
+        elif key == "--use_saved_state":
+            UseSavedStateForRegressionTests = True
+            index -= 1
+        else:
+            index -= 1
     return
-  __ProcessedCommandLineArguments__ = True
-  length = len(sys.argv)
-  index = 1
-  while index < length:
-    key = sys.argv[index-1]
-    value = sys.argv[index]
-    index += 2
-    if key == "-D":
-      DataDir = value
-    elif key == "-V":
-      BaselineImage = value
-    elif key == "-T":
-      TempDir = value
-    elif key == "-S":
-      SMStatesDir = value
-    elif key == "--threshold":
-      Threshold = float(value)
-    elif key == "--state":
-      StateXMLFileName = value
-    elif key == "--use_saved_state":
-      UseSavedStateForRegressionTests = True
-      index -= 1
-    else:
-      index -=1
-  return
+
 
 def LoadServerManagerState(filename):
-  """This function loads the servermanager state xml/pvsm.
-  Returns the status of the load."""
-  global DataDir
-  ProcessCommandLineArguments()
-  parser = servermanager.vtkPVXMLParser()
+    """This function loads the servermanager state xml/pvsm.
+    Returns the status of the load."""
+    global DataDir
+    ProcessCommandLineArguments()
+    parser = servermanager.vtkPVXMLParser()
 
-  try:
-    fp = open(filename, "r")
-    data = fp.read()
-    fp.close()
-  except:
-    return Error("Failed to open state file %s" % filename)
+    try:
+        fp = open(filename, "r")
+        data = fp.read()
+        fp.close()
+    except:
+        return Error("Failed to open state file %s" % filename)
 
-  regExp = re.compile("\${DataDir}")
-  data = regExp.sub(DataDir, data)
-  if not parser.Parse(data):
-    return Error("Failed to parse")
-  loader = servermanager.vtkSMStateLoader()
-  loader.SetSession(servermanager.ActiveConnection.Session)
-  root = parser.GetRootElement()
-  if loader.LoadState(root):
-    pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
-    pxm.UpdateRegisteredProxiesInOrder(0);
-    pxm.UpdateRegisteredProxies(0)
-    return True
-  return Error("Failed to load state file %s" % filename)
+    regExp = re.compile("\${DataDir}")
+    data = regExp.sub(DataDir, data)
+    if not parser.Parse(data):
+        return Error("Failed to parse")
+    loader = servermanager.vtkSMStateLoader()
+    loader.SetSession(servermanager.ActiveConnection.Session)
+    root = parser.GetRootElement()
+    if loader.LoadState(root):
+        pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
+        pxm.UpdateRegisteredProxiesInOrder(0);
+        pxm.UpdateRegisteredProxies(0)
+        return True
+    return Error("Failed to load state file %s" % filename)
+
 
 def DoRegressionTesting(rmProxy=None):
-  """Perform regression testing."""
-  global TempDir
-  global BaselineImage
-  global Threshold
-  ProcessCommandLineArguments()
+    """Perform regression testing."""
+    global TempDir
+    global BaselineImage
+    global Threshold
+    ProcessCommandLineArguments()
 
-  testing = vtkSMTesting()
-  testing.AddArgument("-T")
-  testing.AddArgument(TempDir)
-  testing.AddArgument("-V")
-  testing.AddArgument(BaselineImage)
+    testing = vtkSMTesting()
+    testing.AddArgument("-T")
+    testing.AddArgument(TempDir)
+    testing.AddArgument("-V")
+    testing.AddArgument(BaselineImage)
 
-  if not rmProxy:
-    rmProxy = servermanager.GetRenderView()
-    if rmProxy:
-      rmProxy = rmProxy.SMProxy
-  if not rmProxy:
-    raise "Failed to locate view to perform regression testing."
-  #pyProxy(rmProxy).SetRenderWindowSize(300, 300);
-  #rmProxy.GetProperty("RenderWindowSize").SetElement(0, 300)
-  #rmProxy.GetProperty("RenderWindowSize").SetElement(1, 300)
-  #rmProxy.UpdateVTKObjects()
-  rmProxy.StillRender()
-  testing.SetRenderViewProxy(rmProxy)
-  if testing.RegressionTest(Threshold) == 1:
-    return True
-  return Error("Regression Test Failed!")
+    if not rmProxy:
+        rmProxy = servermanager.GetRenderView()
+        if rmProxy:
+            rmProxy = rmProxy.SMProxy
+    if not rmProxy:
+        raise "Failed to locate view to perform regression testing."
+    # pyProxy(rmProxy).SetRenderWindowSize(300, 300);
+    # rmProxy.GetProperty("RenderWindowSize").SetElement(0, 300)
+    # rmProxy.GetProperty("RenderWindowSize").SetElement(1, 300)
+    # rmProxy.UpdateVTKObjects()
+    rmProxy.StillRender()
+    testing.SetRenderViewProxy(rmProxy)
+    if testing.RegressionTest(Threshold) == 1:
+        return True
+    return Error("Regression Test Failed!")
 
 
 def GetUniqueTempDirectory(prefix):
@@ -148,7 +154,7 @@ def GetUniqueTempDirectory(prefix):
         pid = os.getpid()
 
     import os.path
-    tempdir = os.path.join(TempDir, "%s%d" % (prefix,pid))
+    tempdir = os.path.join(TempDir, "%s%d" % (prefix, pid))
     if pm.GetPartitionId() == 0:
         try:
             os.makedirs(tempdir)
@@ -160,30 +166,31 @@ def GetUniqueTempDirectory(prefix):
         comm.Barrier()
     return tempdir
 
+
 if __name__ == "__main__":
-  # This script loads the state, saves out a temp state and loads the saved state.
-  # This saved state is used for testing -- this will ensure load/save SM state
-  # is working fine.
-  servermanager.Connect()
-  ProcessCommandLineArguments()
-  ret = 1
-  if StateXMLFileName:
-    if LoadServerManagerState(StateXMLFileName):
-      pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
-      if UseSavedStateForRegressionTests:
-        saved_state = os.path.join(TempDir, "temp.pvsm")
-        pxm.SaveState(saved_state)
-        pxm.UnRegisterProxies();
-        LoadServerManagerState(saved_state)
-        try:
-          os.remove(saved_state)
-        except:
-          pass
-      if DoRegressionTesting():
-        ret = 0
-  else:
-    Error("No ServerManager state file specified")
-  if ret:
-    # This leads to vtkDebugLeaks reporting leaks, hence we do this
-    # only when the tests failed.
-    sys.exit(ret)
+    # This script loads the state, saves out a temp state and loads the saved state.
+    # This saved state is used for testing -- this will ensure load/save SM state
+    # is working fine.
+    servermanager.Connect()
+    ProcessCommandLineArguments()
+    ret = 1
+    if StateXMLFileName:
+        if LoadServerManagerState(StateXMLFileName):
+            pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
+            if UseSavedStateForRegressionTests:
+                saved_state = os.path.join(TempDir, "temp.pvsm")
+                pxm.SaveState(saved_state)
+                pxm.UnRegisterProxies();
+                LoadServerManagerState(saved_state)
+                try:
+                    os.remove(saved_state)
+                except:
+                    pass
+            if DoRegressionTesting():
+                ret = 0
+    else:
+        Error("No ServerManager state file specified")
+    if ret:
+        # This leads to vtkDebugLeaks reporting leaks, hence we do this
+        # only when the tests failed.
+        sys.exit(ret)
