@@ -1446,7 +1446,7 @@ class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
                 helperAccessor.trace_ctor(\
                 "SaveScreenshot" if mode_screenshot else "SaveAnimation",
                     ScreenShotHelperProxyFilter(),
-                    ctor_args="'%s', %s, %s" % (filename, ctor_args_1, location),
+                    ctor_args="filename='%s', viewOrLayout=%s, location=%s" % (filename, ctor_args_1, location),
                     ctor_extra_args=format_txt,
                     skip_assignment=True))
         helperAccessor.finalize()
