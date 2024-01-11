@@ -141,6 +141,7 @@
 
 .before_script_linux: &before_script_linux
     - .gitlab/ci/cmake.sh
+    - .gitlab/ci/cmake.sh mindeps
     - .gitlab/ci/ninja.sh
     - .gitlab/ci/doxygen.sh
     - .gitlab/ci/sccache.sh
