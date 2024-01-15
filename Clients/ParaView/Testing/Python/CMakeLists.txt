@@ -110,6 +110,7 @@ paraview_add_test_python(
   SaveDataWithArrayAndBlockSelection.py
   ReadTimeArray.py
   ReplaceReaderFileName.py
+  ReplaceReaderFileNameNoExtensions.py
 )
 
 # These tests could run safely in serial and parallel.
