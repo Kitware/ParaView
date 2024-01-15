@@ -157,8 +157,9 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
 
   // Import Module --------------------------------------------------------
   vtkSmartPyObject importedModule(PyImport_ImportModule(this->Internals->ModuleName));
-  if (!importedModule || CheckAndFlushPythonErrors())
+  if (CheckAndFlushPythonErrors() || !importedModule)
   {
+    vtkErrorMacro("'Python' failed to import module " << this->Internals->ModuleName);
     return;
   }
 
@@ -167,7 +168,7 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
   this->Internals->Module.TakeReference(PyObject_CallMethodObjArgs(
     importedModule, load_method, PyUnicode_FromString(fileContents.c_str()), nullptr));
 
-  if (!this->Internals->Module || CheckAndFlushPythonErrors())
+  if (CheckAndFlushPythonErrors() || !this->Internals->Module)
   {
     vtkErrorMacro("'Python' module_from_string failed to load");
     return;
@@ -177,7 +178,11 @@ void vtkSMVRPythonInteractorStyleProxy::ReloadPythonFile()
   vtkSmartPyObject create_method(PyUnicode_FromString("create_interactor_style"));
   vtkSmartPyObject styleObject(
     PyObject_CallMethodObjArgs(this->Internals->Module, create_method, nullptr, nullptr));
-  CheckAndFlushPythonErrors();
+  if (CheckAndFlushPythonErrors() || !styleObject)
+  {
+    vtkErrorMacro("'Python' unable to construct interactor style");
+    return;
+  }
 
   this->SetPythonObject(styleObject);
 #else
