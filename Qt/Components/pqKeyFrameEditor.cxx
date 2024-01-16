@@ -51,7 +51,7 @@ pqKeyFrameEditorDialog::pqKeyFrameEditorDialog(QWidget* p, QWidget* child)
   this->setAttribute(Qt::WA_DeleteOnClose);
   this->setWindowModality(Qt::WindowModal);
   this->setWindowTitle(tr("Key Frame Interpolation"));
-  this->setModal(true);
+  this->setModal(false);
   QVBoxLayout* l = new QVBoxLayout(this);
   l->addWidget(this->Child, 0);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
