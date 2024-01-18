@@ -128,7 +128,7 @@ vtkTransferFunctionBoxItem::~vtkTransferFunctionBoxItem()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionBoxItem::DragBox(const double deltaX, const double deltaY)
+void vtkTransferFunctionBoxItem::DragBox(double deltaX, double deltaY)
 {
   this->StartChanges();
 
@@ -146,7 +146,7 @@ void vtkTransferFunctionBoxItem::DragBox(const double deltaX, const double delta
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtkTransferFunctionBoxItem::BoxIsWithinBounds(const double deltaX, const double deltaY)
+bool vtkTransferFunctionBoxItem::BoxIsWithinBounds(double deltaX, double deltaY)
 {
   double bounds[4];
   this->GetValidBounds(bounds);
@@ -165,8 +165,7 @@ bool vtkTransferFunctionBoxItem::BoxIsWithinBounds(const double deltaX, const do
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionBoxItem::MovePoint(
-  vtkIdType pointId, const double deltaX, const double deltaY)
+void vtkTransferFunctionBoxItem::MovePoint(vtkIdType pointId, double deltaX, double deltaY)
 {
   double pos[2];
   this->Internals->BoxPoints->GetPoint(pointId, pos);
@@ -208,7 +207,7 @@ void vtkTransferFunctionBoxItem::MovePoint(
 }
 
 //-------------------------------------------------------------------------------------------------
-vtkIdType vtkTransferFunctionBoxItem::AddPoint(const double x, const double y)
+vtkIdType vtkTransferFunctionBoxItem::AddPoint(double x, double y)
 {
   double pos[2] = { x, y };
   return this->AddPoint(pos);
@@ -233,7 +232,7 @@ vtkIdType vtkTransferFunctionBoxItem::AddPoint(double* pos)
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionBoxItem::DragCorner(const vtkIdType cornerId, const double* delta)
+void vtkTransferFunctionBoxItem::DragCorner(vtkIdType cornerId, const double* delta)
 {
   if (cornerId < 0 || cornerId > 3)
   {
@@ -287,7 +286,7 @@ void vtkTransferFunctionBoxItem::DragCorner(const vtkIdType cornerId, const doub
 
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::ArePointsCrossing(
-  const vtkIdType pointA, const double* deltaA, const vtkIdType pointB)
+  vtkIdType pointA, const double* deltaA, vtkIdType pointB)
 {
   double posA[2];
   this->Internals->BoxPoints->GetPoint(pointA, posA);
@@ -539,8 +538,7 @@ const vtkRectd& vtkTransferFunctionBoxItem::GetBox()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionBoxItem::SetBox(
-  const double x, const double y, const double width, const double height)
+void vtkTransferFunctionBoxItem::SetBox(double x, double y, double width, double height)
 {
   vtkRectd tfBox = this->Internals->TransferFunctionBox->GetBox();
   if (tfBox.GetX() == x && tfBox.GetY() == y && tfBox.GetWidth() == width &&

@@ -105,7 +105,7 @@ public:
 
 protected:
   vtkSelectArraysExtractBlocks();
-  ~vtkSelectArraysExtractBlocks();
+  ~vtkSelectArraysExtractBlocks() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

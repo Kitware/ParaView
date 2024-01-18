@@ -405,7 +405,7 @@ public:
 
 protected:
   vtkPVXRInterfaceHelper();
-  ~vtkPVXRInterfaceHelper();
+  ~vtkPVXRInterfaceHelper() override;
 
   void ApplyState();
   bool InteractorEventCallback(vtkObject* object, unsigned long event, void* calldata);

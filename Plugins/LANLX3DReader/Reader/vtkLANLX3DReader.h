@@ -41,7 +41,7 @@ protected:
   vtkLANLX3DReader();
   ~vtkLANLX3DReader() override;
 
-  char* FileName = 0;
+  char* FileName = nullptr;
   bool ReadAllPieces = true;
 
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

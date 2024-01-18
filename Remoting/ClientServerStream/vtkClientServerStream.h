@@ -466,7 +466,7 @@ public:
   // Constructor checks the argument type and length, allocates
   // memory, and extracts the data from the message.
   vtkClientServerStreamDataArg(const vtkClientServerStream& msg, int message, int argument)
-    : Data(0)
+    : Data(nullptr)
   {
     // Check the argument length.
     vtkTypeUInt32 length = 0;
@@ -486,7 +486,7 @@ public:
     if (this->Data && !msg.GetArgument(message, argument, this->Data, length))
     {
       delete[] this->Data;
-      this->Data = 0;
+      this->Data = nullptr;
     }
   }
 

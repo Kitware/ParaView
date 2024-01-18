@@ -25,7 +25,7 @@ public:
 
 protected:
   vtkPVLinearExtrusionFilter();
-  ~vtkPVLinearExtrusionFilter() override{};
+  ~vtkPVLinearExtrusionFilter() override = default;
 
 private:
   vtkPVLinearExtrusionFilter(const vtkPVLinearExtrusionFilter&) = delete;

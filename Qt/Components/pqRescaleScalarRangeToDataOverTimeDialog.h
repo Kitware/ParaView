@@ -45,7 +45,7 @@ protected Q_SLOTS:
    */
   void rescale();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   std::unique_ptr<pqRescaleScalarRangeToDataOverTimeDialogForm> Form;
 };
 

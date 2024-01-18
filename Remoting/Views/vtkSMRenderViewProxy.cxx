@@ -721,8 +721,7 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ZoomTo(
-  vtkSMProxy* representation, bool closest, const double offsetRatio)
+void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest, double offsetRatio)
 {
   double bounds[6] = { 0.0 };
   this->ComputeVisibleBounds(representation, bounds);
@@ -776,7 +775,7 @@ void vtkSMRenderViewProxy::SynchronizeGeometryBounds()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera(bool closest, const double offsetRatio)
+void vtkSMRenderViewProxy::ResetCamera(bool closest, double offsetRatio)
 {
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
@@ -803,14 +802,14 @@ void vtkSMRenderViewProxy::ResetCamera(bool closest, const double offsetRatio)
 
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera(double xmin, double xmax, double ymin, double ymax,
-  double zmin, double zmax, bool closest, const double offsetRatio)
+  double zmin, double zmax, bool closest, double offsetRatio)
 {
   double bds[6] = { xmin, xmax, ymin, ymax, zmin, zmax };
   this->ResetCamera(bds, closest, offsetRatio);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest, const double offsetRatio)
+void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest, double offsetRatio)
 {
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)

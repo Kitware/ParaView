@@ -203,7 +203,7 @@ public:
 
 protected:
   vtkPVXRInterfaceWidgets();
-  ~vtkPVXRInterfaceWidgets();
+  ~vtkPVXRInterfaceWidgets() override;
 
   bool HasCellImage(vtkStringArray* sa, vtkIdType currCell);
   bool FindCellImage(vtkDataSetAttributes* celld, vtkIdType currCell, std::string& image);

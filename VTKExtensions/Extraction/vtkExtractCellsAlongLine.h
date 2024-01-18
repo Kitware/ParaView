@@ -41,7 +41,7 @@ public:
 
 protected:
   vtkExtractCellsAlongLine();
-  ~vtkExtractCellsAlongLine() = default;
+  ~vtkExtractCellsAlongLine() override = default;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;

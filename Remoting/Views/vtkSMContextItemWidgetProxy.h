@@ -27,7 +27,7 @@ public:
 
 protected:
   vtkSMContextItemWidgetProxy() = default;
-  ~vtkSMContextItemWidgetProxy() = default;
+  ~vtkSMContextItemWidgetProxy() override = default;
 
   /**
    * Overriden so it can call modified on the server-side widget on each

@@ -106,7 +106,7 @@ public:
    */
   bool supportsDashboardMode() override { return true; };
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * put/unset the DASHBOARD_TEST_FROM_CTEST env var
    * to control if ParaView should behave in dashboard mode

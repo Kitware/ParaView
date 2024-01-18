@@ -109,10 +109,10 @@ public:
    *
    * OffsetRatio can be used to add a zoom offset (only applicable when closest is true).
    */
-  void ResetCamera(bool closest = false, const double offsetRatio = 0.9);
-  void ResetCamera(double bounds[6], bool closest = false, const double offsetRatio = 0.9);
+  void ResetCamera(bool closest = false, double offsetRatio = 0.9);
+  void ResetCamera(double bounds[6], bool closest = false, double offsetRatio = 0.9);
   void ResetCamera(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax,
-    bool closest = false, const double offsetRatio = 0.9);
+    bool closest = false, double offsetRatio = 0.9);
   ///@}
 
   /**
@@ -120,8 +120,7 @@ public:
    *
    * OffsetRatio can be used to add a zoom offset (only applicable when closest is true).
    */
-  virtual void ZoomTo(
-    vtkSMProxy* representation, bool closest = false, const double offsetRatio = 0.9);
+  virtual void ZoomTo(vtkSMProxy* representation, bool closest = false, double offsetRatio = 0.9);
 
   ///@{
   /**
