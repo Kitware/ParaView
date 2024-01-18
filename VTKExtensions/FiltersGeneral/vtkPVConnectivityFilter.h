@@ -26,7 +26,7 @@ public:
 
 protected:
   vtkPVConnectivityFilter();
-  ~vtkPVConnectivityFilter() override{};
+  ~vtkPVConnectivityFilter() override = default;
 
 private:
   vtkPVConnectivityFilter(const vtkPVConnectivityFilter&) = delete;

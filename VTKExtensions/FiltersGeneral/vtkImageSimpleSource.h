@@ -56,7 +56,7 @@ public:
 
 protected:
   vtkImageSimpleSource();
-  ~vtkImageSimpleSource() override {}
+  ~vtkImageSimpleSource() override = default;
 
   bool EnableDistanceSquaredData;
   bool EnableSwirlData;
