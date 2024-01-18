@@ -39,7 +39,7 @@ vtkSMAnimationScene* vtkAnimationPlayer::GetAnimationScene()
 }
 
 //----------------------------------------------------------------------------
-void vtkAnimationPlayer::Play(const int dir /*=1*/)
+void vtkAnimationPlayer::Play(int dir /*=1*/)
 {
   bool reverse = (dir == static_cast<int>(vtkAnimationCue::PlayDirection::BACKWARD));
   if (!this->AnimationScene)

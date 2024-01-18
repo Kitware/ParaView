@@ -35,7 +35,7 @@ public:
    * If dir = 0, play the animation in reverse back to the beginning,
    * else play it in the forward direction.
    */
-  void Play(const int dir = 1);
+  void Play(int dir = 1);
 
   /**
    * Stop playing the animation.

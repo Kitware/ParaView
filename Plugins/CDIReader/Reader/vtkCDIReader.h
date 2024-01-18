@@ -189,7 +189,7 @@ protected:
   int LoadPointVarData(int variable, double dTime);
   int LoadCellVarData(int variable, double dTime);
   int LoadDomainVarData(int variable);
-  int ReplaceFillWithNan(const int varID, vtkDataArray* dataArray);
+  int ReplaceFillWithNan(int varID, vtkDataArray* dataArray);
   int RegenerateGeometry();
   int ConstructGridGeometry();
   void GuessGridFile();

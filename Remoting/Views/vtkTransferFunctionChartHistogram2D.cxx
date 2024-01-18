@@ -195,7 +195,7 @@ vtkPVTransferFunction2D* vtkTransferFunctionChartHistogram2D::GetTransferFunctio
 
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionChartHistogram2D::UpdateItemsBounds(
-  const double xMin, const double xMax, const double yMin, const double yMax)
+  double xMin, double xMax, double yMin, double yMax)
 {
   // Set the new bounds to its current box items (plots).
   const vtkIdType numPlots = this->GetNumberOfPlots();
