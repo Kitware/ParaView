@@ -33,7 +33,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCoordinateFramePropertyWidget
 
 public:
   pqCoordinateFramePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqCoordinateFramePropertyWidget() override;
 
   /**

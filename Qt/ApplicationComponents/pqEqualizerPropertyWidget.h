@@ -26,7 +26,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEqualizerPropertyWidget
 
 public:
   explicit pqEqualizerPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqEqualizerPropertyWidget() override;
 
 protected Q_SLOTS:

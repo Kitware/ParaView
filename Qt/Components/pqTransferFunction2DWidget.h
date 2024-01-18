@@ -26,7 +26,7 @@ class PQCOMPONENTS_EXPORT pqTransferFunction2DWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqTransferFunction2DWidget(QWidget* parent = 0);
+  pqTransferFunction2DWidget(QWidget* parent = nullptr);
   ~pqTransferFunction2DWidget() override;
 
   ///@{

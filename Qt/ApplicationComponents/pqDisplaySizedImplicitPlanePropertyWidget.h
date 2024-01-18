@@ -28,7 +28,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDisplaySizedImplicitPlanePropertyWidget
 
 public:
   pqDisplaySizedImplicitPlanePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqDisplaySizedImplicitPlanePropertyWidget() override;
 
   /**

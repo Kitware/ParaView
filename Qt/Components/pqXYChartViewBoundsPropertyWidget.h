@@ -28,7 +28,7 @@ class PQCOMPONENTS_EXPORT pqXYChartViewBoundsPropertyWidget : public pqPropertyW
 
 public:
   explicit pqXYChartViewBoundsPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqXYChartViewBoundsPropertyWidget() override;
 
   ///@{

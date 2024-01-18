@@ -130,7 +130,7 @@ protected:
 
   void SetControlPoint(vtkIdType index, double* point) override;
 
-  void emitEvent(unsigned long event, void* params = 0) override;
+  void emitEvent(unsigned long event, void* params = nullptr) override;
 
   void MovePoint(vtkIdType pointId, double deltaX, double deltaY);
 

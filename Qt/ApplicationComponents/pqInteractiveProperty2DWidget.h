@@ -36,7 +36,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractiveProperty2DWidget
 
 public:
   pqInteractiveProperty2DWidget(const char* widget_smgroup, const char* widget_smname,
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqInteractiveProperty2DWidget() override;
 
   /**
