@@ -32,6 +32,11 @@ public:
    * Set buttons up for "groupName" expressions group.
    */
   void setupButtons(const QString& groupName);
+
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * Clear the expression from the line edit.
+   */
   void clear();
 
 private:
