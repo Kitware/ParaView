@@ -127,7 +127,7 @@ public:
 
 protected:
   vtkPVProbeLineFilter();
-  ~vtkPVProbeLineFilter() = default;
+  ~vtkPVProbeLineFilter() override = default;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;

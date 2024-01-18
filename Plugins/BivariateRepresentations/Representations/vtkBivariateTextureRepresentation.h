@@ -76,7 +76,7 @@ public:
 
 protected:
   vtkBivariateTextureRepresentation();
-  ~vtkBivariateTextureRepresentation();
+  ~vtkBivariateTextureRepresentation() override;
 
   /**
    * Adds the representation to the view.

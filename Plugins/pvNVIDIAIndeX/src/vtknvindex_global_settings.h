@@ -46,7 +46,7 @@ class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_global_settings : public vtkObje
 public:
   static vtknvindex_global_settings* New();
   vtkTypeMacro(vtknvindex_global_settings, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtknvindex_global_settings* GetInstance();
   static void InitializeSettings(vtkObject*, unsigned long, void* clientdata, void*);
@@ -134,7 +134,7 @@ public:
 
 protected:
   vtknvindex_global_settings();
-  ~vtknvindex_global_settings();
+  ~vtknvindex_global_settings() override;
 
   int LogLevel = LOG_WARNING;
   int LogLevelStandardOutput = LOG_INFO;

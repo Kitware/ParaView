@@ -20,7 +20,7 @@ Q_SIGNALS:
   void handleEvent(QObject* obj, QEvent* event);
 
 protected:
-  bool eventFilter(QObject* obj, QEvent* event)
+  bool eventFilter(QObject* obj, QEvent* event) override
   {
     Q_EMIT this->handleEvent(obj, event);
     return this->EventHandlerResult;

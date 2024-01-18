@@ -11,7 +11,7 @@ class pqPythonQtPlugin : public QObject
   Q_OBJECT
 public:
   pqPythonQtPlugin(QWidget* p = 0);
-  virtual ~pqPythonQtPlugin();
+  ~pqPythonQtPlugin() override;
 
   virtual void startup();
   virtual void shutdown();
