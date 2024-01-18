@@ -86,7 +86,7 @@ public:
    */
   const pqServerConfiguration* configuration(const char* configuration_name) const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Remove all user configurations. This deletes the user servers.pvsc file.
    */

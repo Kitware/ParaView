@@ -33,7 +33,7 @@ public:
 
   bool isEnabled() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called to force all shortcuts for the attached property widget to enable/disable.
    *
@@ -66,7 +66,7 @@ protected Q_SLOTS:
    */
   virtual void onShortcutDisabled();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * The parent property widget (returned as a pqPropertyWidget, not QWidget).
    */

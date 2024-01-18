@@ -33,7 +33,7 @@ public:
 private Q_SLOTS:
   void readerListChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqReaderSelectionPropertyWidget);
   class pqInternals;
   friend class pqInternals;

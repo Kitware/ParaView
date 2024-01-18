@@ -26,7 +26,7 @@ public:
 private Q_SLOTS:
   void updateColumn(vtkObject*);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqArrayStatusPropertyWidget);
   class pqInternals;
   friend class pqInternals;

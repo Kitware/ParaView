@@ -55,7 +55,7 @@ public:
    */
   vtkPVTransferFunction2D* transferFunction() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * re-renders the transfer function view. This doesn't render immediately,
    * schedules a render.
@@ -69,7 +69,6 @@ Q_SIGNALS:
    */
   void transferFunctionModified();
 
-protected:
 protected Q_SLOTS:
   /**
    * Show usage info in the application status bar.

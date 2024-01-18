@@ -19,7 +19,7 @@ public Q_SLOTS:
   /** \brief Overrides QDoubleSpinBox::setValue() */
   void setValue(double val);
 
-public:
+public: // NOLINT(readability-redundant-access-specifiers)
   /** \brief Constructor */
   explicit pqScaledSpinBox(QWidget* parent = nullptr);
   /** \brief Copy constructor */
@@ -36,7 +36,7 @@ protected:
   /** \brief Overrides QDoubleSpinBox::keyPressEvent() */
   void keyPressEvent(QKeyEvent* event);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onValueChanged(double newValue);
 
 private:

@@ -42,7 +42,7 @@ public:
   int getLockedAxis() const;
   void setLockedAxis(int lockedAxis);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the widget normal to be along the X axis.
    */

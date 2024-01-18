@@ -41,7 +41,7 @@ private Q_SLOTS:
   void loadEqualizer();
   void resetEqualizer();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqEqualizerPropertyWidget)
 
   pqPropertyLinks WidgetLinks;
