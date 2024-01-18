@@ -104,8 +104,7 @@ protected:
   /**
    * Update individual item bounds based on the chart range.
    */
-  void UpdateItemsBounds(
-    const double xMin, const double xMax, const double yMin, const double yMax);
+  void UpdateItemsBounds(double xMin, double xMax, double yMin, double yMax);
 
   /**
    * Generate the 2D transfer function from the box items.

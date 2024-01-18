@@ -73,7 +73,7 @@ protected Q_SLOTS:
    */
   virtual void removeModalShortcut();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqKeySequences(QObject* parent);
   ~pqKeySequences() override = default;
 

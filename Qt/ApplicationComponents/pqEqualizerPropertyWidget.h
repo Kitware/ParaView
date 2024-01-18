@@ -26,8 +26,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEqualizerPropertyWidget
 
 public:
   explicit pqEqualizerPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  ~pqEqualizerPropertyWidget();
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
+  ~pqEqualizerPropertyWidget() override;
 
 protected Q_SLOTS:
   /**
@@ -41,7 +41,7 @@ private Q_SLOTS:
   void loadEqualizer();
   void resetEqualizer();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqEqualizerPropertyWidget)
 
   pqPropertyLinks WidgetLinks;

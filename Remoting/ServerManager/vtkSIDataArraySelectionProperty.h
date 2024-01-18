@@ -92,7 +92,7 @@ public:
 
 protected:
   vtkSIDataArraySelectionProperty();
-  ~vtkSIDataArraySelectionProperty();
+  ~vtkSIDataArraySelectionProperty() override;
 
   bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) override;
   bool Push(vtkSMMessage*, int) override;

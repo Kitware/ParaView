@@ -33,7 +33,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCoordinateFramePropertyWidget
 
 public:
   pqCoordinateFramePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqCoordinateFramePropertyWidget() override;
 
   /**
@@ -42,7 +42,7 @@ public:
   int getLockedAxis() const;
   void setLockedAxis(int lockedAxis);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the widget normal to be along the X axis.
    */

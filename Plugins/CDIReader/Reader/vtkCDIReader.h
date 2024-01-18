@@ -189,7 +189,7 @@ protected:
   int LoadPointVarData(int variable, double dTime);
   int LoadCellVarData(int variable, double dTime);
   int LoadDomainVarData(int variable);
-  int ReplaceFillWithNan(const int varID, vtkDataArray* dataArray);
+  int ReplaceFillWithNan(int varID, vtkDataArray* dataArray);
   int RegenerateGeometry();
   int ConstructGridGeometry();
   void GuessGridFile();
@@ -249,9 +249,9 @@ protected:
   std::vector<unsigned int> CellMap;  // maps from added cell to original cell #
   std::vector<unsigned int> PointMap; // maps from added point to original point #
 
-  std::string FileName = "";
-  std::string FileSeriesFirstName = "";
-  std::string MaskingVarname = "";
+  std::string FileName;
+  std::string FileSeriesFirstName;
+  std::string MaskingVarname;
   int NumberOfTimeSteps = 0;
   int NumberOfAllTimeSteps = 0;
   std::vector<int> TimeSeriesTimeSteps;
@@ -292,7 +292,7 @@ protected:
   double Layer0Offset = 1e-30;
   double Layer0OffsetRange[2] = { -50, 51 };
 
-  std::string DimensionSelection = "";
+  std::string DimensionSelection;
   bool InvertZAxis = false;
   bool AddCoordinateVars = false;
   projection::Projection ProjectionMode = projection::SPHERICAL;
@@ -339,8 +339,8 @@ protected:
   int ZAxisID = -1;
   std::unordered_set<int> SurfIDs;
 
-  std::string TimeUnits = "";
-  std::string Calendar = "";
+  std::string TimeUnits;
+  std::string Calendar;
   vtkNew<vtkDoubleArray> ClonArray;
   vtkNew<vtkDoubleArray> ClatArray;
   vtkNew<vtkUnstructuredGrid> Output;

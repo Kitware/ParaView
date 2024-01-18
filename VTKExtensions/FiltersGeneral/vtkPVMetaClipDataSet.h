@@ -96,7 +96,7 @@ public:
   int ProcessRequest(
     vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo) override;
 
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
 protected:

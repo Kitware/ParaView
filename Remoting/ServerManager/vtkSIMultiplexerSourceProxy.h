@@ -29,7 +29,7 @@ public:
 
 protected:
   vtkSIMultiplexerSourceProxy();
-  ~vtkSIMultiplexerSourceProxy();
+  ~vtkSIMultiplexerSourceProxy() override;
 
 private:
   vtkSIMultiplexerSourceProxy(const vtkSIMultiplexerSourceProxy&) = delete;

@@ -36,8 +36,8 @@ public:
     std::vector<vtkPVXRInterfaceHelperLocation>& locations);
 
 protected:
-  vtkPVXRInterfaceExporter(){};
-  ~vtkPVXRInterfaceExporter(){};
+  vtkPVXRInterfaceExporter() = default;
+  ~vtkPVXRInterfaceExporter() override = default;
 
 private:
   vtkPVXRInterfaceExporter(const vtkPVXRInterfaceExporter&) = delete;

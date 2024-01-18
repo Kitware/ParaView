@@ -40,7 +40,7 @@ protected:
     XR_BACKEND_OPENXR = 1
   };
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   void exportLocationsAsSkyboxes();
   void exportLocationsAsView();

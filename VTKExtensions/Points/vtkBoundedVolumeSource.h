@@ -87,8 +87,7 @@ public:
    */
   static bool SetImageParameters(
     vtkImageData* image, const vtkBoundingBox& bbox, const vtkVector3i& resolution);
-  static bool SetImageParameters(
-    vtkImageData* image, const vtkBoundingBox& bbox, const double cellSize);
+  static bool SetImageParameters(vtkImageData* image, const vtkBoundingBox& bbox, double cellSize);
   ///@}
 
 protected:

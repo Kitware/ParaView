@@ -9,8 +9,8 @@
 class pqPythonQtWrapperFactory : public PythonQtForeignWrapperFactory
 {
 public:
-  virtual PyObject* wrap(const QByteArray& classname, void* ptr);
-  virtual void* unwrap(const QByteArray& classname, PyObject* object);
+  PyObject* wrap(const QByteArray& classname, void* ptr) override;
+  void* unwrap(const QByteArray& classname, PyObject* object) override;
 };
 
 #endif

@@ -42,7 +42,7 @@ public:
   /**
    * Set position and width with respect to corner 0 (BOTTOM_LEFT).
    */
-  void SetBox(const double x, const double y, const double width, const double height);
+  void SetBox(double x, double y, double width, double height);
 
   /**
    * Get access to the texture of this box item
@@ -52,7 +52,7 @@ public:
   /*
    * Override to rescale box corners when the valid bounds have changed.
    */
-  virtual void SetValidBounds(double x0, double x1, double y0, double y1) override;
+  void SetValidBounds(double x0, double x1, double y0, double y1) override;
 
   ///@{
   /**
@@ -95,7 +95,7 @@ protected:
   vtkTransferFunctionBoxItem();
   ~vtkTransferFunctionBoxItem() override;
 
-  vtkIdType AddPoint(const double x, const double y);
+  vtkIdType AddPoint(double x, double y);
   vtkIdType AddPoint(double* pos) override;
 
   /**
@@ -130,13 +130,13 @@ protected:
 
   void SetControlPoint(vtkIdType index, double* point) override;
 
-  void emitEvent(unsigned long event, void* params = 0) override;
+  void emitEvent(unsigned long event, void* params = nullptr) override;
 
-  void MovePoint(const vtkIdType pointId, const double deltaX, const double deltaY);
+  void MovePoint(vtkIdType pointId, double deltaX, double deltaY);
 
-  void DragBox(const double deltaX, const double deltaY);
+  void DragBox(double deltaX, double deltaY);
 
-  void DragCorner(const vtkIdType cornerId, const double* delta);
+  void DragCorner(vtkIdType cornerId, const double* delta);
 
   bool Paint(vtkContext2D* painter) override;
 
@@ -188,14 +188,14 @@ private:
    * Predicate to check whether pointA crosses pointB in either axis after
    * displacing pontA by deltaA.
    */
-  bool ArePointsCrossing(const vtkIdType pointA, const double* deltaA, const vtkIdType pointB);
+  bool ArePointsCrossing(vtkIdType pointA, const double* deltaA, vtkIdType pointB);
 
   /**
    * Points move independently. In order to keep the box rigid when dragging it
    * outside of the chart edges it is first checked whether it stays within
    * bounds.
    */
-  bool BoxIsWithinBounds(const double deltaX, const double deltaY);
+  bool BoxIsWithinBounds(double deltaX, double deltaY);
 
   /**
    * Customized vtkControlPointsItem::FindPoint implementation for this Item.

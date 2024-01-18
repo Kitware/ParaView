@@ -19,13 +19,13 @@ public Q_SLOTS:
   /** \brief Overrides QDoubleSpinBox::setValue() */
   void setValue(double val);
 
-public:
+public: // NOLINT(readability-redundant-access-specifiers)
   /** \brief Constructor */
   explicit pqScaledSpinBox(QWidget* parent = nullptr);
   /** \brief Copy constructor */
   explicit pqScaledSpinBox(QDoubleSpinBox* other);
   /** \brief Destructor */
-  ~pqScaledSpinBox();
+  ~pqScaledSpinBox() override;
 
   /** \brief Sets the Scale Factor used to increase / decrease the widget value.
    *           When scaling up, the value is multiplied by the Scale Factor.
@@ -34,9 +34,9 @@ public:
 
 protected:
   /** \brief Overrides QDoubleSpinBox::keyPressEvent() */
-  void keyPressEvent(QKeyEvent* event);
+  void keyPressEvent(QKeyEvent* event) override;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onValueChanged(double newValue);
 
 private:

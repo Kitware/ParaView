@@ -76,7 +76,7 @@ public:
 
 protected:
   vtkPVXRInterfaceCollaborationClient();
-  ~vtkPVXRInterfaceCollaborationClient();
+  ~vtkPVXRInterfaceCollaborationClient() override;
 
 private:
   vtkPVXRInterfaceCollaborationClient(const vtkPVXRInterfaceCollaborationClient&) = delete;

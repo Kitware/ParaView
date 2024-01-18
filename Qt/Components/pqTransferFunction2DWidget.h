@@ -26,7 +26,7 @@ class PQCOMPONENTS_EXPORT pqTransferFunction2DWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqTransferFunction2DWidget(QWidget* parent = 0);
+  pqTransferFunction2DWidget(QWidget* parent = nullptr);
   ~pqTransferFunction2DWidget() override;
 
   ///@{
@@ -55,7 +55,7 @@ public:
    */
   vtkPVTransferFunction2D* transferFunction() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * re-renders the transfer function view. This doesn't render immediately,
    * schedules a render.
@@ -69,7 +69,6 @@ Q_SIGNALS:
    */
   void transferFunctionModified();
 
-protected:
 protected Q_SLOTS:
   /**
    * Show usage info in the application status bar.
