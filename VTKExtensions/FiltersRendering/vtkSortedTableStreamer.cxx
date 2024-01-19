@@ -26,10 +26,10 @@
 #include "vtkUnsignedIntArray.h"
 
 #include <algorithm>
-#include <map>
-#include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using std::ostringstream;
@@ -1504,15 +1504,11 @@ vtkSmartPointer<vtkUnsignedIntArray> vtkSortedTableStreamer::GenerateCompositeIn
 }
 
 //----------------------------------------------------------------------------
-std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray>>
-vtkSortedTableStreamer::GenerateBlockNameArray(vtkPartitionedDataSet* ptd, vtkIdType maxSize)
+vtkSmartPointer<vtkStringArray> vtkSortedTableStreamer::GenerateBlockNameArray(
+  vtkPartitionedDataSet* ptd)
 {
-  vtkNew<vtkIdTypeArray> nameIndices;
-  nameIndices->Allocate(maxSize);
-  nameIndices->SetName("vtkBlockNameIndices");
-
-  std::map<std::string, vtkIdType> nameMap;
-
+  // collect all local block names
+  std::unordered_set<std::string> blockNamesSet;
   for (unsigned int cc = 0, max = ptd->GetNumberOfPartitions(); cc < max; ++cc)
   {
     std::string name("invalid");
@@ -1520,41 +1516,98 @@ vtkSortedTableStreamer::GenerateBlockNameArray(vtkPartitionedDataSet* ptd, vtkId
     {
       name = ptd->GetMetaData(cc)->Get(vtkCompositeDataSet::NAME());
     }
+    blockNamesSet.insert(name);
+  }
+  auto localBlockNames = vtkSmartPointer<vtkStringArray>::New();
+  localBlockNames->SetName("vtkBlockNames");
+  localBlockNames->Allocate(static_cast<vtkIdType>(blockNamesSet.size()));
+  for (const auto& name : blockNamesSet)
+  {
+    localBlockNames->InsertNextValue(name);
+  }
+  // if more than one process, we need to make sure that all processes have the same block names
+  // field data array so that the indices can be synchronized, and when the tables are merged, the
+  // indices are still valid.
+  vtkSmartPointer<vtkStringArray> globalBlockNames;
+  if (!this->Controller || this->Controller->GetNumberOfProcesses() == 1)
+  {
+    globalBlockNames = localBlockNames;
+  }
+  else
+  {
+    globalBlockNames = vtkSmartPointer<vtkStringArray>::New();
+    // gather all block names from all ranks.
+    vtkNew<vtkTable> send;
+    send->GetRowData()->AddArray(localBlockNames);
+    // now gather all field data from all ranks.
+    std::vector<vtkSmartPointer<vtkDataObject>> globalRecv;
+    this->Controller->AllGather(send, globalRecv);
+    // now create a union of all block names.
+    std::set<std::string> globalBlockNamesSet;
+    for (size_t i = 0; i < globalRecv.size(); ++i)
+    {
+      if (auto table = vtkTable::SafeDownCast(globalRecv[i]))
+      {
+        const auto recvLocalBlockNames =
+          vtkStringArray::SafeDownCast(table->GetColumnByName("vtkBlockNames"));
+        if (recvLocalBlockNames)
+        {
+          const vtkIdType numberOfElements = recvLocalBlockNames->GetNumberOfValues();
+          for (vtkIdType j = 0; j < numberOfElements; ++j)
+          {
+            globalBlockNamesSet.insert(recvLocalBlockNames->GetValue(j));
+          }
+        }
+      }
+    }
+    globalBlockNames->SetName("vtkBlockNames");
+    globalBlockNames->Allocate(static_cast<vtkIdType>(globalBlockNamesSet.size()));
+    for (const auto& name : globalBlockNamesSet)
+    {
+      globalBlockNames->InsertNextValue(name);
+    }
+  }
+  return globalBlockNames;
+}
 
-    vtkIdType index = 0;
-    auto iter = nameMap.find(name);
-    if (iter == nameMap.end())
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkIdTypeArray> vtkSortedTableStreamer::GenerateBlockIndicesArray(
+  vtkPartitionedDataSet* ptd, vtkStringArray* blockNames, vtkIdType maxSize)
+{
+  // now create a map of block names to indices.
+  std::unordered_map<std::string, vtkIdType> nameMap;
+  vtkIdType counter = 0;
+  for (vtkIdType i = 0; i < blockNames->GetNumberOfValues(); ++i)
+  {
+    const auto name = blockNames->GetValue(i);
+    nameMap[name] = counter++;
+  }
+
+  auto blockIndices = vtkSmartPointer<vtkIdTypeArray>::New();
+  blockIndices->Allocate(maxSize);
+  blockIndices->SetName("vtkBlockNameIndices");
+  for (unsigned int cc = 0, max = ptd->GetNumberOfPartitions(); cc < max; ++cc)
+  {
+    std::string name("invalid");
+    if (ptd->HasMetaData(cc) && ptd->GetMetaData(cc)->Has(vtkCompositeDataSet::NAME()))
     {
-      index = static_cast<vtkIdType>(nameMap.size());
-      nameMap[name] = index;
+      name = ptd->GetMetaData(cc)->Get(vtkCompositeDataSet::NAME());
     }
-    else
-    {
-      index = iter->second;
-    }
+    const auto index = nameMap[name];
 
     if (auto partition = vtkTable::SafeDownCast(ptd->GetPartitionAsDataObject(cc)))
     {
       const auto count = partition->GetNumberOfRows();
       for (vtkIdType jj = 0; jj < count; ++jj)
       {
-        nameIndices->InsertNextValue(index);
+        blockIndices->InsertNextValue(index);
       }
     }
   }
 
-  assert(nameIndices->GetNumberOfTuples() == maxSize);
+  assert(blockIndices->GetNumberOfTuples() == maxSize);
 
-  vtkNew<vtkStringArray> names;
-  names->SetName("vtkBlockNames");
-  names->SetNumberOfTuples(static_cast<vtkIdType>(nameMap.size()));
-  for (const auto& pair : nameMap)
-  {
-    names->SetValue(pair.second, pair.first);
-  }
-
-  return std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray>>{ names,
-    nameIndices };
+  return blockIndices;
 }
 
 //----------------------------------------------------------------------------
@@ -1569,22 +1622,41 @@ int vtkSortedTableStreamer::RequestData(vtkInformation* vtkNotUsed(request),
   {
     this->PopulateFieldDataArrays(inputPTD, input);
   }
-  if (vtkDataTabulator::HasInputCompositeIds(inputPTD))
+  int hasCompositeIds = vtkDataTabulator::HasInputCompositeIds(inputPTD);
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+  {
+    int globalHasCompositeIds;
+    this->Controller->AllReduce(
+      &hasCompositeIds, &globalHasCompositeIds, 1, vtkCommunicator::MAX_OP);
+    hasCompositeIds = globalHasCompositeIds;
+  }
+  if (hasCompositeIds)
   {
     if (input->GetColumnByName("vtkCompositeIndexArray") == nullptr)
     {
       auto array = this->GenerateCompositeIndexArray(inputPTD, input->GetNumberOfRows());
       input->GetRowData()->AddArray(array);
     }
-    if (input->GetColumnByName("vtkBlockNameIndices") == nullptr)
+    int hasBlockNames = input->GetFieldData()->GetAbstractArray("vtkBlockNames") != nullptr;
+    if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+    {
+      int globalHasBlockNames;
+      this->Controller->AllReduce(&hasBlockNames, &globalHasBlockNames, 1, vtkCommunicator::MIN_OP);
+      hasBlockNames = globalHasBlockNames;
+    }
+    if (!hasBlockNames)
     {
       // add name array.
-      auto array_pair = this->GenerateBlockNameArray(inputPTD, input->GetNumberOfRows());
-      if (array_pair.first && array_pair.second)
-      {
-        input->GetRowData()->AddArray(array_pair.second);
-        input->GetFieldData()->AddArray(array_pair.first);
-      }
+      auto blockNamesArray = this->GenerateBlockNameArray(inputPTD);
+      input->GetFieldData()->AddArray(blockNamesArray);
+    }
+    if (!input->GetColumnByName("vtkBlockNameIndices"))
+    {
+      // add name indices array.
+      auto blockIndicesArray = this->GenerateBlockIndicesArray(inputPTD,
+        vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("vtkBlockNames")),
+        input->GetNumberOfRows());
+      input->GetRowData()->AddArray(blockIndicesArray);
     }
   }
 

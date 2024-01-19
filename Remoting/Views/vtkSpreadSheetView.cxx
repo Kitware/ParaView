@@ -132,8 +132,7 @@ const char* get_userfriendly_name(
 }
 
 /**
- * A subclass of vtkPVMergeTables to handle reduction for "vtkBlockNameIndices"
- * and "vtkBlockNames" arrays correctly.
+ * A subclass of vtkPVMergeTables to handle reduction for "vtkBlockNames" correctly.
  */
 class SpreadSheetViewMergeTables : public vtkPVMergeTables
 {
@@ -158,66 +157,10 @@ protected:
       return this->Superclass::RequestData(req, inputVector, outputVector);
     }
 
-    // Reduce vtkBlockNameIndices array correctly.
-    // vtkSortedTableStreamer adds a Row array named "vtkBlockNameIndices" which
-    // is the index for "vtkBlockNames" field array which is the name of the
-    // block. This indirection is used to avoid duplicating strings for all
-    // elements since they don't change for the entire block. However, with MBs
-    // block names are rarely consistent across ranks. So we do this reduction
-    // to build a reduced `vtkBlockNames` array and update the
-    // `vtkBlockNameIndices` accordingly.
-    std::map<std::string, vtkIdType> nameMap;
-    std::vector<vtkTable*> new_inputs(inputs.size(), nullptr);
-    std::transform(inputs.begin(), inputs.end(), new_inputs.begin(), [&nameMap](vtkTable* input) {
-      vtkTable* xformed = vtkTable::New();
-      xformed->ShallowCopy(input);
+    vtkPVMergeTables::MergeTables(output, inputs);
 
-      auto inIndices = vtkIdTypeArray::SafeDownCast(input->GetColumnByName("vtkBlockNameIndices"));
-      auto inNames =
-        vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("vtkBlockNames"));
-      if (!inIndices || !inNames)
-      {
-        return xformed;
-      }
-
-      // insert names in map, if not already present.
-      for (vtkIdType cc = 0, max = inNames->GetNumberOfTuples(); cc < max; ++cc)
-      {
-        nameMap.insert(
-          std::make_pair(inNames->GetValue(cc), static_cast<vtkIdType>(nameMap.size())));
-      }
-
-      vtkNew<vtkIdTypeArray> outIndices;
-      outIndices->SetName("vtkBlockNameIndices");
-      outIndices->SetNumberOfTuples(inIndices->GetNumberOfTuples());
-      auto irange = vtk::DataArrayValueRange<1>(inIndices);
-      auto orange = vtk::DataArrayValueRange<1>(outIndices);
-      std::transform(
-        irange.begin(), irange.end(), orange.begin(), [&nameMap, inNames](const vtkIdType& index) {
-          return nameMap.at(inNames->GetValue(index));
-        });
-
-      xformed->RemoveColumnByName("vtkBlockNameIndices");
-      xformed->AddColumn(outIndices);
-      return xformed;
-    });
-
-    vtkPVMergeTables::MergeTables(output, new_inputs);
-    for (auto input : new_inputs)
-    {
-      input->Delete();
-    }
-    new_inputs.clear();
-
-    vtkNew<vtkStringArray> outNames;
-    outNames->SetName("vtkBlockNames");
-    outNames->SetNumberOfTuples(static_cast<vtkIdType>(nameMap.size()));
-    for (const auto& pair : nameMap)
-    {
-      outNames->SetValue(pair.second, pair.first);
-    }
     output->GetFieldData()->RemoveArray("vtkBlockNames");
-    output->GetFieldData()->AddArray(outNames);
+    output->GetFieldData()->AddArray(inputs[0]->GetFieldData()->GetAbstractArray("vtkBlockNames"));
     return 1;
   }
 
