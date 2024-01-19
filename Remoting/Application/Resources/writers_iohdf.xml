@@ -6,7 +6,7 @@
                   class="vtkHDFWriter">
       <Documentation short_help="Write a dataset in VTKHDF format."
                     long_help="Write files stored in VTKHDF format.">
-        The VTKHDF Writer writer writes files in VTKHDF format,
+        The VTKHDF Writer writes files in VTKHDF format,
         using extension .vtkhdf, a format derived from HDF5.
         Currently, it supports writing Unstructured Grid
         and PolyData datasets, possibly transient,
@@ -56,7 +56,7 @@
         </Documentation>
       </IntVectorProperty>
 
-      <PropertyGroup label="VTKHDF Writer parameters">
+      <PropertyGroup label="VTKHDF Writer transient parameters">
         <Property name="WriteAllTimeSteps"/>
         <Property name="ChunkSize"/>
       </PropertyGroup>
