@@ -4,50 +4,34 @@
 #include "vtkSortedTableStreamer.h"
 
 #include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkCommand.h"
+#include "vtkCommunicator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkDataTabulator.h"
-#include "vtkEdgeListIterator.h"
-#include "vtkEventForwarderCommand.h"
+#include "vtkDoubleArray.h"
 #include "vtkExtractSelection.h"
-#include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkObjectFactory.h"
-#include "vtkPartitionedDataSet.h"
-#include "vtkPartitionedDataSetCollection.h"
-#include "vtkPointData.h"
-#include "vtkPoints.h"
-#include "vtkSignedCharArray.h"
-#include "vtkSmartPointer.h"
-#include "vtkStringArray.h"
-#include "vtkTable.h"
-#include "vtkTree.h"
-#include "vtkVertexListIterator.h"
-
-#include "vtkCommunicator.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkDoubleArray.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkMinimalStandardRandomSequence.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
+#include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
 
 #include <algorithm>
 #include <map>
-#include <numeric>
 #include <set>
-#include <vector>
-
-#include <cfloat>
-
 #include <sstream>
 #include <string>
+#include <vector>
+
 using std::ostringstream;
 
 //****************************************************************************
