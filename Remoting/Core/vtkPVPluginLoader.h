@@ -46,6 +46,14 @@ public:
   bool LoadPluginSilently(const char* filename) { return this->LoadPluginInternal(filename, true); }
 
   /**
+   * Load a delayed load plugin with provided name, XMLs and an actual plugin filename
+   * The actual loading will take place the first time a VTK object for a XML proxy needs to be
+   * created.
+   */
+  bool LoadDelayedLoadPlugin(
+    const std::string& name, const std::vector<std::string>& xmls, const std::string& filename);
+
+  /**
    * Simply forwards the call to
    * vtkPVPluginLoader::LoadPluginConfigurationXMLFromString to load
    * configuration xml.
@@ -153,6 +161,12 @@ protected:
    * plugin.
    */
   bool LoadPluginInternal(vtkPVPlugin* plugin);
+
+  /**
+   * Return true if a plugin pointing provided filename is already loaded, return false otherwise.
+   * Delayed load plugin are considered not loaded until they actually are as standard plugins.
+   */
+  bool IsLoaded(const char* filename);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);
