@@ -857,6 +857,11 @@ protected:
   bool WarnIfDeprecated();
 
   /**
+   * If a proxy need to ensure a plugin is loaded, make sure it is
+   */
+  bool LoadPluginIfEnsured();
+
+  /**
    * This method simply iterates over subproxies and calls
    * UpdatePipelineInformation() on them. vtkSMSourceProxy overrides this method
    * (makes it public) and updates the pipeline information.
@@ -983,6 +988,7 @@ protected:
 
   void SetHints(vtkPVXMLElement* hints);
   void SetDeprecated(vtkPVXMLElement* deprecated);
+  void SetEnsurePlugin(vtkPVXMLElement* ensurePlugin);
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
@@ -990,6 +996,7 @@ protected:
   vtkSMDocumentation* Documentation;
   vtkPVXMLElement* Hints;
   vtkPVXMLElement* Deprecated;
+  vtkPVXMLElement* EnsurePlugin = nullptr;
 
   // Cached version of State
   vtkSMMessage* State;

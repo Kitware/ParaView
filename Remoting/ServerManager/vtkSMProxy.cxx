@@ -13,6 +13,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
 #include "vtkPVLogger.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSIProxy.h"
@@ -79,6 +80,7 @@ vtkStandardNewMacro(vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Deprecated, vtkPVXMLElement);
+vtkCxxSetObjectMacro(vtkSMProxy, EnsurePlugin, vtkPVXMLElement);
 
 //---------------------------------------------------------------------------
 vtkSMProxy::vtkSMProxy()
@@ -141,6 +143,7 @@ vtkSMProxy::~vtkSMProxy()
   this->Documentation->Delete();
   this->SetHints(nullptr);
   this->SetDeprecated(nullptr);
+  this->SetEnsurePlugin(nullptr);
   this->SetSIClassName(nullptr);
 
   if (this->State)
@@ -792,6 +795,9 @@ void vtkSMProxy::CreateVTKObjects()
     return;
   }
 
+  // Ensure needed plugin is loaded
+  this->LoadPluginIfEnsured();
+
   // Push the state
   this->PushState(&message);
 
@@ -886,6 +892,18 @@ bool vtkSMProxy::WarnIfDeprecated()
       << this->Deprecated->GetAttribute("to_remove_in") << ". "
       << (this->Deprecated->GetCharacterData() ? this->Deprecated->GetCharacterData() : ""));
     return true;
+  }
+  return false;
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxy::LoadPluginIfEnsured()
+{
+  if (this->EnsurePlugin)
+  {
+    const char* pluginName = this->EnsurePlugin->GetAttributeOrEmpty("name");
+    vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+    return loader->LoadPluginByName(pluginName);
   }
   return false;
 }
@@ -1578,6 +1596,10 @@ int vtkSMProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement*
     else if (strcmp(subElem->GetName(), "Deprecated") == 0)
     {
       this->SetDeprecated(subElem);
+    }
+    else if (strcmp(subElem->GetName(), "EnsurePlugin") == 0)
+    {
+      this->SetEnsurePlugin(subElem);
     }
   }
 
