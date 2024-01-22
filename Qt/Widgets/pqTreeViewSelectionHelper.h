@@ -57,7 +57,7 @@ protected:
   virtual void buildupMenu(QMenu& menu, int section, const QPoint& pos);
   QAbstractItemView* TreeView;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void showContextMenu(int section, const QPoint&);
 
 private:
