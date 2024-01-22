@@ -125,6 +125,8 @@
  * all properties in the group to consistently use vtkSMDataAssemblyDomain or
  * vtkSMCompositeTreeDomain and mixing is not allowed.
  *
+ * TODO: Remove the usage of vvtkSMCompositeTreeDomain.
+ *
  * @section Hints Hints
  *
  * This widget supports hints that can be added to the group (or property). For

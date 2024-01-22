@@ -19,6 +19,7 @@ def _get_active_data_description():
     helper = _get_active_helper()
     return helper.GetDataDescription()
 
+
 def _transform_registration_name(name):
     from . import get_args
     import re, argparse
@@ -36,6 +37,7 @@ def _transform_registration_name(name):
     val = getattr(result, argname)
     return val if val else name
 
+
 def IsInsitu():
     """Returns True if executing in an insitu environment, else false"""
     helper = _get_active_helper()
@@ -48,13 +50,16 @@ def IsLegacyCatalystAdaptor():
     instead of the Conduit-based in situ API"""
     return _get_active_data_description() is not None
 
+
 if IsInsitu() and not IsLegacyCatalystAdaptor():
     from ..modules.vtkPVInSitu import vtkInSituInitializationHelper
+
 
 def IsCatalystInSituAPI():
     """Returns True if the active execution environment is from within
     an implementation of the Conduit-based Catalyst In Situ API."""
     return IsInsitu() and not IsLegacyCatalystAdaptor() and vtkInSituInitializationHelper.IsInitialized()
+
 
 def IsInsituInput(name):
     if not name or not IsInsitu():
@@ -102,7 +107,7 @@ def CreateProducer(name):
     originalname = name
     name = _transform_registration_name(name)
     log(log_level(), "creating producer for simulation input named '%s' (original-name=%s)" \
-            % (name, originalname))
+        % (name, originalname))
     if IsCatalystInSituAPI():
         # Catalyst 2.0
         from paraview import servermanager
@@ -149,6 +154,7 @@ def InitializePythonEnvironment():
     log(log_level(), "import paraview.modules.vtkPVCatalyst")
     from paraview.modules import vtkPVCatalyst
 
+
 def RegisterPackageFromZip(zipfilename, packagename=None):
     from . import importers
     zipfilename = _mpi_exchange_if_needed(zipfilename)
@@ -169,6 +175,8 @@ def RegisterModuleFromFile(filename):
 
 
 _temp_directory = None
+
+
 def _mpi_exchange_if_needed(filename):
     global _temp_directory
 

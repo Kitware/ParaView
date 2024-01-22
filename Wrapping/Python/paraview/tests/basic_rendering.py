@@ -4,6 +4,7 @@ from . import internals
 from ..simple import *
 from .. import print_info as log
 
+
 def Execute(opts):
     log("initialize pipeline")
     view = CreateView('RenderView')

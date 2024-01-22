@@ -153,8 +153,8 @@ def compute(inputs, expression, ns=None, multiline=False):
                 "Multiline expression does not contain a return statement.")
 
         multilineFunction = f'def func():\n' \
-                    f'{textwrap.indent(expression, " "*4)}\n' \
-                    f'result = func()\n'
+                            f'{textwrap.indent(expression, " " * 4)}\n' \
+                            f'result = func()\n'
         returnValueDict = {}
 
         # `mylocals` need to be in the global `exec` scope, otherwise it would not be accessible inside the `func` scope
@@ -163,13 +163,14 @@ def compute(inputs, expression, ns=None, multiline=False):
         return returnValueDict['result']
     else:
         finalRet = None
-        for subEx in expression.split(' and '): # Used in 'extract_selection' to find data matching multiple criteria
+        for subEx in expression.split(' and '):  # Used in 'extract_selection' to find data matching multiple criteria
             retVal = eval(subEx, globals(), mylocals)
             if finalRet is None:
                 finalRet = retVal
             else:
                 finalRet = dsa.VTKArray([a & b for a, b in zip(finalRet, retVal)])
         return finalRet
+
 
 def get_data_time(self, do, ininfo):
     dinfo = do.GetInformation()
@@ -250,9 +251,8 @@ def execute(self, expression, multiline=False):
         # if the computation changes this association for anything other than FIELD, use it instead.
         # this is useful for some custom methods, like `volume` that apply only for some Array Association (CELL in the example)
         if not outputToFieldData \
-           and hasattr(retVal, "Association") \
-           and retVal.Association not in [None, dsa.ArrayAssociation.FIELD]:
-
+                and hasattr(retVal, "Association") \
+                and retVal.Association not in [None, dsa.ArrayAssociation.FIELD]:
             outputAttribute = output.GetAttributes(retVal.Association)
 
         outputAttribute.append(vtkRet, self.GetArrayName())

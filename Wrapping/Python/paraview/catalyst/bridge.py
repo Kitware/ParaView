@@ -7,17 +7,20 @@ code that such apps need to incorporate into their code to use Catalyst.
 # since we don't want to initialize ParaView yet.
 import paraview
 from paraview.modules.vtkPVCatalyst import vtkCPProcessor, vtkCPDataDescription
-from paraview.modules.vtkPVPythonCatalyst import vtkCPPythonScriptV2Pipeline, vtkCPPythonScriptPipeline, vtkCPPythonPipeline
+from paraview.modules.vtkPVPythonCatalyst import vtkCPPythonScriptV2Pipeline, vtkCPPythonScriptPipeline, \
+    vtkCPPythonPipeline
 from paraview.modules.vtkRemotingCore import vtkProcessModule
 
 
 def _sanity_check():
     pm = vtkProcessModule.GetProcessModule()
     if pm and pm.GetPartitionId() == 0:
-        paraview.print_warning(\
+        paraview.print_warning( \
             "Warning: ParaView has been initialized before `initialize` is called")
 
+
 coprocessor = None
+
 
 def initialize():
     # if ParaView is already initialized, some of the options we set here don't
@@ -40,6 +43,7 @@ def initialize():
     if not coprocessor.Initialize():
         raise RuntimeError("Failed to initialize Catalyst")
 
+
 def add_pipeline_legacy(scriptname):
     global coprocessor
     assert coprocessor is not None
@@ -49,6 +53,7 @@ def add_pipeline_legacy(scriptname):
         raise RuntimeError("Initialization failed!")
 
     coprocessor.AddPipeline(pipeline)
+
 
 def add_pipeline_v2(path):
     import os.path
@@ -60,6 +65,7 @@ def add_pipeline_v2(path):
     if not pipeline.Initialize(path):
         raise RuntimeError("Initialization failed!")
     coprocessor.AddPipeline(pipeline)
+
 
 def add_pipeline(filename, version=0):
     import os.path
@@ -82,6 +88,7 @@ def add_pipeline(filename, version=0):
     else:
         raise RuntimeError("Invalid version '%d'" % version)
 
+
 def coprocess(time, timestep, dataset, name="input", wholeExtent=None):
     global coprocessor
 
@@ -97,6 +104,7 @@ def coprocess(time, timestep, dataset, name="input", wholeExtent=None):
         return False
     idd.SetGrid(dataset)
     coprocessor.CoProcess(dataDesc)
+
 
 def finalize():
     global coprocessor

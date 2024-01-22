@@ -12,12 +12,15 @@ import numbers
 
 _cpstate_globals = None
 
+
 def reset_globals():
     global _cpstate_globals
     _cpstate_globals = None
 
+
 def initialize_globals():
     global _cpstate_globals
+
     class _state(object):
         def __init__(self):
             self.write_frequencies = {}
@@ -31,8 +34,10 @@ def initialize_globals():
             self.enable_live_viz = False
             self.live_viz_frequency = 0
             self.variable_to_name_map = {}
+
     _cpstate_globals = _state()
     return _cpstate_globals
+
 
 def get_globals():
     global _cpstate_globals
@@ -40,12 +45,13 @@ def get_globals():
         raise RuntimeError("get_globals called before initialize_globals!")
     return _cpstate_globals
 
+
 # -----------------------------------------------------------------------------
 def locate_simulation_inputs(proxy):
     """Given any sink/filter proxy, returns a list of upstream proxies that have
        been flagged as 'simulation input' in the state exporting wizard."""
     if hasattr(proxy, "cpSimulationInput"):
-        return [ proxy.cpSimulationInput ]
+        return [proxy.cpSimulationInput]
 
     input_proxies = []
     for property in servermanager.PropertyIterator(proxy):
@@ -62,6 +68,7 @@ def locate_simulation_inputs(proxy):
                     simulation_inputs.append(cur)
     return simulation_inputs
 
+
 # -----------------------------------------------------------------------------
 def locate_simulation_inputs_for_view(view_proxy):
     """Given a view proxy, returns a list of source proxies that have been
@@ -74,6 +81,7 @@ def locate_simulation_inputs_for_view(view_proxy):
         all_sim_inputs = all_sim_inputs + sim_inputs
     return all_sim_inputs
 
+
 # -----------------------------------------------------------------------------
 class ProducerAccessor(smtrace.RealProxyAccessor):
     """This accessor is created instead of the standard one for proxies that
@@ -81,6 +89,7 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
     trace_ctor() method to trace the constructor as the CreateProducer() call,
     since the proxy is a dummy, in this case.
     """
+
     def __init__(self, varname, proxy, simname):
         self.SimulationInputName = simname
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
@@ -92,7 +101,7 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
         trace = smtrace.TraceOutput()
         trace.append("# create a producer from a simulation input")
         trace.append("%s = coprocessor.CreateProducer(datadescription, '%s')" % \
-            (self, self.SimulationInputName))
+                     (self, self.SimulationInputName))
 
         # self.varname has .'s and *'s stripped. Knowing this, the key in cpstate_globals.cinema_arrays
         # should also be stripped of .'s and *'s. Refers to /Qt/ApplicationComponents/pqExportCatalystScript.cxx
@@ -104,18 +113,20 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
             trace.append_separator()
         return trace.raw_data()
 
+
 # -----------------------------------------------------------------------------
 class SliceAccessor(smtrace.RealProxyAccessor):
     """
     augments traces of slice filters with information to explore the
     parameter space for cinema playback (if enabled)
     """
+
     def __init__(self, varname, proxy):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         self.varname = varname
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
-        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+        original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
         cpstate_globals = get_globals()
@@ -131,18 +142,20 @@ class SliceAccessor(smtrace.RealProxyAccessor):
             trace.append_separator()
         return trace.raw_data()
 
+
 # -----------------------------------------------------------------------------
 class ContourAccessor(smtrace.RealProxyAccessor):
     """
     augments traces of contour filters with information to explore the
     parameter space for cinema playback (if enabled)
     """
+
     def __init__(self, varname, proxy):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         self.varname = varname
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
-        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+        original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
         if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
@@ -157,22 +170,24 @@ class ContourAccessor(smtrace.RealProxyAccessor):
             trace.append_separator()
         return trace.raw_data()
 
+
 # -----------------------------------------------------------------------------
 class ClipAccessor(smtrace.RealProxyAccessor):
     """
     augments traces of clip filters with information to explore the
     parameter space for cinema playback (if enabled)
     """
+
     def __init__(self, varname, proxy):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         self.varname = varname
 
-    def trace_ctor(self, ctor, filter, ctor_args = None, skip_assignment = False):
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
         original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
         cpstate_globals = get_globals()
-        if cpstate_globals.cinema_tracks and self.varname  in cpstate_globals.cinema_tracks:
+        if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
             valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
             trace.append(["coprocessor.RegisterCinemaTrack('clip', %s, 'OffsetValues', %s)" % (self, valrange)])
@@ -184,16 +199,18 @@ class ClipAccessor(smtrace.RealProxyAccessor):
             trace.append_separator()
         return trace.raw_data()
 
+
 # TODO: Make Slice, Contour & Clip Accessors to share an interface to reduce code
 # duplication. ArrayAccessor could be used as this interface.
 # -----------------------------------------------------------------------------
 class ArrayAccessor(smtrace.RealProxyAccessor):
     ''' Augments traces of filters by defining names of arrays to be explored.'''
+
     def __init__(self, varname, proxy):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         self.varname = varname
 
-    def trace_ctor(self, ctor, filter, ctor_args = None, skip_assignment = False):
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
         original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
 
@@ -206,34 +223,37 @@ class ArrayAccessor(smtrace.RealProxyAccessor):
             trace.append_separator()
         return trace.raw_data()
 
+
 # -----------------------------------------------------------------------------
 class ViewAccessor(smtrace.RealProxyAccessor):
     """Accessor for views. Overrides trace_ctor() to trace registering of the
     view with the coprocessor. (I wonder if this registering should be moved to
     the end of the state for better readability of the generated state files.
     """
+
     def __init__(self, varname, proxy, proxyname):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         self.ProxyName = proxyname
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
-        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+        original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
         cpstate_globals = get_globals()
         if self.ProxyName in cpstate_globals.screenshot_info:
-           trace.append_separated(["# register the view with coprocessor",
-          "# and provide it with information such as the filename to use,",
-          "# how frequently to write the images, etc."])
-           params = cpstate_globals.screenshot_info[self.ProxyName]
-           assert len(params) == 8
-           trace.append([
-              "coprocessor.RegisterView(%s," % self,
-               "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s, compression=%s)" %\
-                  (params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]),
-              "%s.ViewTime = datadescription.GetTime()" % self])
-           trace.append_separator()
+            trace.append_separated(["# register the view with coprocessor",
+                                    "# and provide it with information such as the filename to use,",
+                                    "# how frequently to write the images, etc."])
+            params = cpstate_globals.screenshot_info[self.ProxyName]
+            assert len(params) == 8
+            trace.append([
+                "coprocessor.RegisterView(%s," % self,
+                "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s, compression=%s)" % \
+                (params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]),
+                "%s.ViewTime = datadescription.GetTime()" % self])
+            trace.append_separator()
         return trace.raw_data()
+
 
 # -----------------------------------------------------------------------------
 class WriterFilter(smtrace.PipelineProxyFilter):
@@ -244,6 +264,7 @@ class WriterFilter(smtrace.PipelineProxyFilter):
             return True
         return super(WriterFilter, self).should_never_trace(prop)
 
+
 # -----------------------------------------------------------------------------
 class WriterAccessor(smtrace.RealProxyAccessor):
     """Accessor for writers. Overrides trace_ctor() to use the actual writer
@@ -251,6 +272,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
     write_frequencies maintained in cpstate_globals with the write frequencies
     for the writer.
     """
+
     def __init__(self, varname, proxy):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         write_frequency = proxy.GetProperty("WriteFrequency").GetElement(0)
@@ -275,9 +297,9 @@ class WriterAccessor(smtrace.RealProxyAccessor):
             # writer that's not available in this build but is available
             # with the build used by the simulation code (probably through a plugin)
             # this stub must have the proper name in the coprocessing hints
-            print ("WARNING: Could not find", xmlname, "writer in", xmlgroup, \
-                   "XML group. This is not a problem as long as the writer is available with " \
-                   "the ParaView build used by the simulation code.")
+            print("WARNING: Could not find", xmlname, "writer in", xmlgroup, \
+                  "XML group. This is not a problem as long as the writer is available with " \
+                  "the ParaView build used by the simulation code.")
             ctor = servermanager._make_name_valid(xmlname)
         else:
             ctor = servermanager._make_name_valid(prototype.GetXMLLabel())
@@ -294,18 +316,19 @@ class WriterAccessor(smtrace.RealProxyAccessor):
         filename = self.get_object().GetProperty("FileName").GetElement(0)
         padding_amount = self.get_object().GetProperty("PaddingAmount").GetElement(0)
         ctor = self.get_proxy_label(xmlgroup, xmlname)
-        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+        original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, WriterFilter(), ctor_args, skip_assignment)
 
         trace = smtrace.TraceOutput(original_trace)
         trace.append_separated(["# register the writer with coprocessor",
-          "# and provide it with information such as the filename to use,",
-          "# how frequently to write the data, etc."])
+                                "# and provide it with information such as the filename to use,",
+                                "# how frequently to write the data, etc."])
         trace.append("coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s)" % \
                      (self, filename, write_frequency, padding_amount))
 
         trace.append_separator()
         return trace.raw_data()
+
 
 # -----------------------------------------------------------------------------
 def cp_hook(varname, proxy):
@@ -319,10 +342,10 @@ def cp_hook(varname, proxy):
         elif proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
             return WriterAccessor(varname, proxy)
         elif ("servermanager.Slice" in proxy.__class__().__str__() and
-            "Plane object" in proxy.__getattribute__("SliceType").__str__()):
+              "Plane object" in proxy.__getattribute__("SliceType").__str__()):
             return SliceAccessor(varname, proxy)
         elif ("servermanager.Clip" in proxy.__class__().__str__() and
-            "Plane object" in proxy.__getattribute__("ClipType").__str__()):
+              "Plane object" in proxy.__getattribute__("ClipType").__str__()):
             return ClipAccessor(varname, proxy)
         elif "servermanager.Contour" in proxy.__class__().__str__():
             return ContourAccessor(varname, proxy)
@@ -330,16 +353,19 @@ def cp_hook(varname, proxy):
             return ArrayAccessor(varname, proxy)
     raise NotImplementedError
 
+
 # -----------------------------------------------------------------------------
 class cpstate_filter_proxies_to_serialize(object):
     """filter used to skip views and representations a when export_rendering is
     disabled."""
+
     def __call__(self, proxy):
         cpstate_globals = get_globals()
         if not smstate.visible_representations()(proxy): return False
         if (not cpstate_globals.export_rendering) and \
-            (proxy.GetXMLGroup() in ["views", "representations"]): return False
+                (proxy.GetXMLGroup() in ["views", "representations"]): return False
         return True
+
 
 # -----------------------------------------------------------------------------
 class NewStyleWriters(object):
@@ -356,7 +382,7 @@ class NewStyleWriters(object):
         This may not be necessary because we register everything we make immediately
         so var names can probably conflict.
         """
-        ret = smtrace.Trace.get_varname(name)+str(self.__cnt)
+        ret = smtrace.Trace.get_varname(name) + str(self.__cnt)
         self.__cnt = self.__cnt + 1
         return ret
 
@@ -369,7 +395,7 @@ class NewStyleWriters(object):
         res.append("# Now any catalyst writers")
         pxm = servermanager.ProxyManager()
         globalepxy = pxm.GetProxy("export_global", "catalyst")
-        exports = pxm.GetProxiesInGroup("export_writers") #todo should use ExportDepot
+        exports = pxm.GetProxiesInGroup("export_writers")  # todo should use ExportDepot
         for x in exports:
             xs = x[0]
             pxy = pxm.GetProxy('export_writers', xs)
@@ -435,7 +461,7 @@ class NewStyleWriters(object):
             # point, cell and field arrays should already be set
             notNeededProperties = ['CatalystFilePattern', 'CellDataArrays', 'ChooseArraysToWrite', 'EdgeDataArrays',
                                    'FieldDataArrays', 'FileName', 'FileNameSuffix', 'Filenamesuffix', 'Input',
-                                   'PointDataArrays', 'WriteFrequency',]
+                                   'PointDataArrays', 'WriteFrequency', ]
             for p in pxy.ListProperties():
                 if p not in notNeededProperties and len(pxy.GetProperty(p)):
                     if isinstance(pxy.GetProperty(p).GetData(), servermanager.Proxy):
@@ -448,7 +474,7 @@ class NewStyleWriters(object):
                         value = pxy.GetProperty(p).GetElement(0)
                         if isinstance(value, numbers.Number):
                             f = "%s.%s = %s" % (varname, p, value)
-                        elif  isinstance(value, str):
+                        elif isinstance(value, str):
                             f = "%s.%s = '%s'" % (varname, p, value)
                         else:
                             f = "%s.%s = %s" % (varname, p, str(value))
@@ -463,8 +489,9 @@ class NewStyleWriters(object):
             res.append(f)
             res.append("")
         if len(res) == 2:
-            return [] # don't clutter output if there are no writers
+            return []  # don't clutter output if there are no writers
         return res
+
 
 # -----------------------------------------------------------------------------
 def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
@@ -585,7 +612,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     for original_line in state:
         for line in original_line.split("\n"):
             if line.find("import *") != -1 or \
-                line.find("#### import the simple") != -1:
+                    line.find("#### import the simple") != -1:
                 continue
             if line:
                 pipelineClassDef += "      " + line + "\n"
@@ -622,7 +649,8 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     reset_globals()
     return pipelineClassDef
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def run(filename=None):
     """Create a dummy pipeline and save the coprocessing state in the filename
         specified, if any, else dumps it out on stdout."""
@@ -637,18 +665,19 @@ def run(filename=None):
 
     viewname = servermanager.ProxyManager().GetProxyName("views", view.SMProxy)
     script = DumpPipeline(export_rendering=True,
-        simulation_input_map={"Wavelet1" : "input"},
-        screenshot_info={viewname : [ 'image.png', '1', '1', '2', '400', '400']},
-        cinema_tracks = {},
-        cinema_arrays = {})
+                          simulation_input_map={"Wavelet1": "input"},
+                          screenshot_info={viewname: ['image.png', '1', '1', '2', '400', '400']},
+                          cinema_tracks={},
+                          cinema_arrays={})
     if filename:
         f = open(filename, "w")
         f.write(script)
         f.close()
     else:
-        print ("# *** Generated Script Begin ***")
-        print (script)
-        print ("# *** Generated Script End ***")
+        print("# *** Generated Script Begin ***")
+        print(script)
+        print("# *** Generated Script End ***")
+
 
 if __name__ == "__main__":
     run()

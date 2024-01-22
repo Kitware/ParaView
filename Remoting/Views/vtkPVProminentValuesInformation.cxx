@@ -8,10 +8,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataArray.h"
+#include "vtkDataAssembly.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkExecutive.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkGraph.h"
 #include "vtkInformation.h"
 #include "vtkInformationIterator.h"
@@ -20,7 +23,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVPostFilter.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
@@ -31,8 +34,6 @@
 #include <set>
 #include <sstream>
 #include <vector>
-
-#define VTK_MAX_CATEGORICAL_VALS (32)
 
 namespace
 {
@@ -50,6 +51,8 @@ vtkStandardNewMacro(vtkPVProminentValuesInformation);
 vtkPVProminentValuesInformation::vtkPVProminentValuesInformation()
 {
   this->PortNumber = 0;
+  this->SubsetAssemblyName = nullptr;
+  this->SubsetSelector = nullptr;
   this->FieldName = nullptr;
   this->FieldAssociation = nullptr;
   this->DistinctValues = nullptr;
@@ -70,6 +73,8 @@ vtkPVProminentValuesInformation::~vtkPVProminentValuesInformation()
 void vtkPVProminentValuesInformation::InitializeParameters()
 {
   this->PortNumber = 0;
+  this->SetSubsetAssemblyName(nullptr);
+  this->SetSubsetSelector(nullptr);
   this->SetFieldName(nullptr);
   this->SetFieldAssociation(nullptr);
   this->NumberOfComponents = -2;
@@ -95,6 +100,14 @@ void vtkPVProminentValuesInformation::PrintSelf(ostream& os, vtkIndent indent)
 
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PortNumber: " << this->PortNumber << endl;
+  if (this->SubsetAssemblyName)
+  {
+    os << indent << "SubsetAssemblyName: " << this->SubsetAssemblyName << endl;
+  }
+  if (this->SubsetSelector)
+  {
+    os << indent << "SubsetSelector: " << this->SubsetSelector << endl;
+  }
   if (this->FieldName)
   {
     os << indent << "FieldName: " << this->FieldName << endl;
@@ -107,15 +120,13 @@ void vtkPVProminentValuesInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DistinctValues :" << endl;
   if (this->DistinctValues)
   {
-    for (vtkInternalDistinctValues::iterator cit = this->DistinctValues->begin();
-         cit != this->DistinctValues->end(); ++cit)
+    for (auto cit = this->DistinctValues->begin(); cit != this->DistinctValues->end(); ++cit)
     {
       os << i2 << "Component " << cit->first << " (" << cit->second.size() << " values )" << endl;
-      for (vtkInternalDistinctValues::mapped_type::iterator eit = cit->second.begin();
-           eit != cit->second.end(); ++eit)
+      for (auto eit = cit->second.begin(); eit != cit->second.end(); ++eit)
       {
         os << i3;
-        for (std::vector<vtkVariant>::const_iterator vit = eit->begin(); vit != eit->end(); ++vit)
+        for (auto vit = eit->begin(); vit != eit->end(); ++vit)
         {
           os << " " << vit->ToString();
         }
@@ -182,6 +193,16 @@ int vtkPVProminentValuesInformation::Compare(vtkPVProminentValuesInformation* in
     strcmp(info->GetFieldAssociation(), this->FieldAssociation) == 0 &&
     info->GetNumberOfComponents() == this->NumberOfComponents)
   {
+    if (this->SubsetAssemblyName && info->SubsetAssemblyName &&
+      strcmp(this->SubsetAssemblyName, info->SubsetAssemblyName) != 0)
+    {
+      return 0;
+    }
+    if (this->SubsetSelector && info->SubsetSelector &&
+      strcmp(this->SubsetSelector, info->SubsetSelector) != 0)
+    {
+      return 0;
+    }
     return 1;
   }
   return 0;
@@ -231,6 +252,8 @@ void vtkPVProminentValuesInformation::CopyFromObject(vtkObject* obj)
 //----------------------------------------------------------------------------
 void vtkPVProminentValuesInformation::DeepCopyParameters(vtkPVProminentValuesInformation* other)
 {
+  this->SetSubsetAssemblyName(other->GetSubsetAssemblyName());
+  this->SetSubsetSelector(other->GetSubsetSelector());
   this->SetFieldName(other->GetFieldName());
   this->SetFieldAssociation(other->GetFieldAssociation());
   this->SetNumberOfComponents(other->GetNumberOfComponents());
@@ -248,7 +271,46 @@ void vtkPVProminentValuesInformation::CopyFromCompositeDataSet(vtkCompositeDataS
     return;
   }
 
-  vtkCompositeDataIterator* iter = cds->NewIterator();
+  vtkSmartPointer<vtkCompositeDataSet> cdsToProcess = nullptr;
+  if (cds->IsA("vtkDataObjectTree") && this->SubsetAssemblyName && this->SubsetAssemblyName[0] &&
+    this->SubsetSelector && this->SubsetSelector[0])
+  {
+    // TODO, in the future, when vtkPVGeometryFilter produces PDC, we won't need to read the
+    // vtkDataAssembly from the output data's field data and convert the output to a PDC.
+    const bool mbWithAssembly =
+      cds->IsA("vtkMultiBlockDataSet") && cds->GetFieldData()->HasArray("vtkDataAssembly");
+    vtkSmartPointer<vtkDataObjectTree> cdsToExtract = nullptr;
+    if (mbWithAssembly)
+    {
+      const auto dataAssemblyArray = cds->GetFieldData()->GetAbstractArray("vtkDataAssembly");
+      const auto dataAssemblyString = dataAssemblyArray->GetVariantValue(0).ToString();
+      vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
+      converter->SetInputDataObject(cds);
+      converter->Update();
+      auto pdc = vtkPartitionedDataSetCollection::SafeDownCast(converter->GetOutputDataObject(0));
+      vtkNew<vtkDataAssembly> dataAssembly;
+      dataAssembly->InitializeFromXML(dataAssemblyString.c_str());
+      pdc->SetDataAssembly(dataAssembly);
+      cdsToExtract = vtk::MakeSmartPointer(pdc);
+    }
+    else
+    {
+      cdsToExtract = vtk::MakeSmartPointer(vtkDataObjectTree::SafeDownCast(cds));
+    }
+
+    vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
+    extractor->SetInputData(cdsToExtract);
+    extractor->SetAssemblyName(this->SubsetAssemblyName);
+    extractor->SetSelector(this->SubsetSelector);
+    extractor->Update();
+    cdsToProcess = vtk::MakeSmartPointer(extractor->GetOutput());
+  }
+  else
+  {
+    cdsToProcess = vtk::MakeSmartPointer(cds);
+  }
+
+  auto iter = vtk::TakeSmartPointer(cdsToProcess->NewIterator());
   if (!iter)
   {
     vtkErrorMacro("Could not create iterator.");
@@ -269,7 +331,6 @@ void vtkPVProminentValuesInformation::CopyFromCompositeDataSet(vtkCompositeDataS
     other->CopyFromLeafDataObject(node);
     this->AddInformation(other.GetPointer());
   }
-  iter->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -435,8 +496,7 @@ void vtkPVProminentValuesInformation::CopyToStream(vtkClientServerStream* css)
 void vtkPVProminentValuesInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   int pos = 0;
-  std::string fieldAssoc;
-  std::string fieldName;
+  std::string fieldAssoc, fieldName;
   if (!css->GetArgument(0, pos++, &this->PortNumber))
   {
     vtkErrorMacro("Error parsing dataset port number from message.");
@@ -546,10 +606,13 @@ void vtkPVProminentValuesInformation::CopyFromStream(const vtkClientServerStream
 void vtkPVProminentValuesInformation::CopyParametersToStream(vtkMultiProcessStream& mps)
 {
   this->Superclass::CopyParametersToStream(mps);
-  vtkTypeUInt32 magic_number = VTK_PROMINENT_MAGIC_NUMBER;
-  mps << magic_number << this->PortNumber << std::string(this->FieldAssociation)
-      << std::string(this->FieldName) << this->NumberOfComponents << this->Fraction
-      << this->Uncertainty << this->Force << this->Valid;
+  static constexpr vtkTypeUInt32 magic_number = VTK_PROMINENT_MAGIC_NUMBER;
+  mps << magic_number << this->PortNumber
+      << std::string(this->SubsetAssemblyName ? this->SubsetAssemblyName : "")
+      << std::string(this->SubsetSelector ? SubsetSelector : "")
+      << std::string(this->FieldAssociation) << std::string(this->FieldName)
+      << this->NumberOfComponents << this->Fraction << this->Uncertainty << this->Force
+      << this->Valid;
 }
 
 //-----------------------------------------------------------------------------
@@ -557,14 +620,15 @@ void vtkPVProminentValuesInformation::CopyParametersFromStream(vtkMultiProcessSt
 {
   this->Superclass::CopyParametersFromStream(mps);
   vtkTypeUInt32 magic_number;
-  std::string fieldAssoc;
-  std::string fieldName;
-  mps >> magic_number >> this->PortNumber >> fieldAssoc >> fieldName >> this->NumberOfComponents >>
-    this->Fraction >> this->Uncertainty >> this->Force >> this->Valid;
+  std::string assemblyName, selector, fieldAssoc, fieldName;
+  mps >> magic_number >> this->PortNumber >> assemblyName >> selector >> fieldAssoc >> fieldName >>
+    this->NumberOfComponents >> this->Fraction >> this->Uncertainty >> this->Force >> this->Valid;
   if (magic_number != VTK_PROMINENT_MAGIC_NUMBER)
   {
     vtkErrorMacro("Magic number mismatch.");
   }
+  this->SetSubsetAssemblyName(assemblyName.empty() ? nullptr : assemblyName.c_str());
+  this->SetSubsetSelector(selector.c_str() ? nullptr : selector.c_str());
   this->SetFieldAssociation(fieldAssoc.c_str());
   this->SetFieldName(fieldName.c_str());
 }

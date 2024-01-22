@@ -5,11 +5,12 @@ the query expression. Once the mask array is obtained, this module will
 mark those elements as requested.
 """
 from __future__ import absolute_import, print_function
+
 try:
-  import numpy as np
+    import numpy as np
 except ImportError:
-  raise RuntimeError ("'numpy' module is not found. numpy is needed for "\
-    "this functionality to work. Please install numpy and try again.")
+    raise RuntimeError("'numpy' module is not found. numpy is needed for " \
+                       "this functionality to work. Please install numpy and try again.")
 
 import re
 import vtkmodules.numpy_interface.dataset_adapter as dsa
@@ -22,16 +23,19 @@ from . import calculator
 from paraview.modules import vtkPVVTKExtensionsExtractionPython
 
 import sys
+
 if sys.hexversion < 0x03000000:
     import itertools
+
     izip = itertools.izip
 else:
     izip = zip
 
+
 def _create_id_array(dataobject, attributeType):
     """Returns a VTKArray or VTKCompositeDataArray for the ids"""
     if not dataobject:
-        raise RuntimeError ("dataobject cannot be None")
+        raise RuntimeError("dataobject cannot be None")
     if dataobject.IsA("vtkCompositeDataSet"):
         ids = []
         for ds in dataobject:
@@ -41,6 +45,7 @@ def _create_id_array(dataobject, attributeType):
         numElems = dataobject.GetNumberOfElements(attributeType)
         return dsa.VTKArray(np.arange(numElems)) if numElems > 0 else dsa.NoneArray
 
+
 def maskarray_is_valid(maskArray):
     """Validates that the maskArray is either a VTKArray,
     VTKCompositeDataArray, ndarray or a NoneArray other returns false."""
@@ -48,6 +53,7 @@ def maskarray_is_valid(maskArray):
         isinstance(maskArray, dsa.VTKArray) or \
         isinstance(maskArray, dsa.VTKCompositeDataArray) or \
         isinstance(maskArray, np.ndarray)
+
 
 def execute(inputDO, selectionNode, insidednessArrayName, outputDO):
     field_type = selectionNode.GetFieldType()
@@ -58,7 +64,7 @@ def execute(inputDO, selectionNode, insidednessArrayName, outputDO):
     elif field_type == selectionNode.ROW:
         attributeType = vtkDataObject.ROW
     else:
-        raise RuntimeError ("Unsupported field attributeType %r" % field_type)
+        raise RuntimeError("Unsupported field attributeType %r" % field_type)
     # Evaluate expression on the inputDO.
     # This is equivalent to executing the Python Calculator on the input dataset
     # to produce a mask array.
@@ -80,16 +86,16 @@ def execute(inputDO, selectionNode, insidednessArrayName, outputDO):
         maskArray = calculator.compute(inputs, query, ns=elocals)
     except:
         from sys import stderr
-        print ("Error: Failed to evaluate Expression '%s'. "\
-            "The following exception stack should provide additional developer "\
-            "specific information. This typically implies a malformed "\
-            "expression. Verify that the expression is valid.\n" % query, file=stderr)
+        print("Error: Failed to evaluate Expression '%s'. " \
+              "The following exception stack should provide additional developer " \
+              "specific information. This typically implies a malformed " \
+              "expression. Verify that the expression is valid.\n" % query, file=stderr)
         raise
 
     if not maskarray_is_valid(maskArray):
         raise RuntimeError(
-            "Expression '%s' did not produce a valid mask array. The value "\
-            "produced is of the type '%s'. This typically implies a malformed "\
+            "Expression '%s' did not produce a valid mask array. The value " \
+            "produced is of the type '%s'. This typically implies a malformed " \
             "expression. Verify that the expression is valid." % \
             (query, type(maskArray)))
 

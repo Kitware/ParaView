@@ -2,11 +2,13 @@ import datetime as dt
 from paraview import servermanager
 from paraview.simple import *
 from paraview.benchmark import *
-#import logbase, logparser
+
+# import logbase, logparser
 
 logbase.maximize_logs()
 records = []
 n0 = dt.datetime.now()
+
 
 def get_render_view(size):
     '''Similar to GetRenderView except if a new view is created, it's
@@ -203,7 +205,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
     num_polys = 0
     num_points = 0
     for r in view.Representations:
-        num_polys  += r.GetRepresentedDataInformation().GetNumberOfCells()
+        num_polys += r.GetRepresentedDataInformation().GetNumberOfCells()
         num_points += r.GetRepresentedDataInformation().GetNumberOfPoints()
     vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
@@ -237,7 +239,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
                 ofile.write('\n'.join([str(x) for x in records]))
 
         # Process frame timing statistics
-        logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
+        logparser.summarize_results(num_frames, (fpsT1 - fpsT0).total_seconds(),
                                     num_polys, 'Polys', save_logs,
                                     output_basename)
         print('Points / Frame: %d' % (num_points))
@@ -282,6 +284,8 @@ def main(argv):
         view_size=args.view_size, num_frames=args.frames,
         transparency=args.transparency, ospray=args.ospray)
 
+
 if __name__ == "__main__":
     import sys
+
     main(sys.argv[1:])

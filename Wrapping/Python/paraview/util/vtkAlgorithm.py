@@ -291,11 +291,10 @@ several of the decorators described here may be used.
 from __future__ import absolute_import, print_function
 
 from ..detail.pythonalgorithm import \
-        smproxy, \
-        smproperty, \
-        smdomain, \
-        smhint
-
+    smproxy, \
+    smproperty, \
+    smdomain, \
+    smhint
 
 # import VTKPythonAlgorithmBase from vtkmodules, just to make it easier for
 # importers of this module.

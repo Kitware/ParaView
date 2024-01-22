@@ -24,6 +24,7 @@
 #include <set>           // needed for std::set
 #include <string>        // needed for std::string
 #include <unordered_map> // needed for std::unordered_map
+#include <vector>        // needed for std::vector
 
 class vtkCompositeDataDisplayAttributes;
 class vtkMapper;
@@ -270,24 +271,63 @@ public:
   /**
    * Update list of selectors that determine the selected blocks.
    */
-  void AddBlockSelector(const char*);
+  void AddBlockSelector(const char* selector);
   void RemoveAllBlockSelectors();
   ///@}
 
   ///@{
   /**
-   * Set/get the color for a single block.
+   * Set the color for a single block.
    */
-  void SetBlockColor(const char*, double, double, double);
+  void SetBlockColor(const char* selector, double r, double g, double b);
   void RemoveAllBlockColors();
   ///@}
 
   ///@{
   /**
-   * Set/get the opacityfor a single block.
+   * Set the opacity for a single block.
    */
-  void SetBlockOpacity(const char*, double);
+  void SetBlockOpacity(const char* selector, double opacity);
   void RemoveAllBlockOpacities();
+  ///@}
+
+  ///@{
+  /**
+   * Set if to interpolate scalars before mapping for a single block.
+   */
+  void SetBlockInterpolateScalarsBeforeMapping(const char* selector, bool interpolate);
+  void RemoveAllBlockInterpolateScalarsBeforeMappings();
+  ///@}
+
+  ///@{
+  /**
+   * Set the block to map scalars for a single block.
+   *
+   * Note: Similar to SetMapScalars, but for blocks.
+   */
+  void SetBlockMapScalars(const char* selector, int val);
+  void RemoveAllBlockMapScalars();
+  ///@}
+
+  ///@{
+  /**
+   * Set the color array for a single block.
+   */
+  void SetBlockArrayName(const char* selector, int assoc, const char* arrayName);
+  void RemoveAllBlockArrayNames();
+  ///@}
+
+  ///@{
+  /**
+   * Set the look up table for a single block.
+   *
+   * Note: we need two methods because we can't wrap a string and a vtkObject using either
+   * vtkSMStringVectorProperty or vtkSMProxyProperty.
+   */
+  void SetBlockLookupTableSelector(const char* selector);
+  void RemoveAllBlockLookupTableSelectors();
+  void SetBlockLookupTable(vtkScalarsToColors* lut);
+  void RemoveAllBlockLookupTables();
   ///@}
 
   /**
@@ -482,10 +522,30 @@ protected:
   vtkTimeStamp BlockAttributeTime;
   bool UpdateBlockAttrLOD = false;
 
-  std::set<std::string> BlockSelectors;
-  std::unordered_map<std::string, double> BlockOpacities;
-  std::unordered_map<std::string, vtkVector3d> BlockColors;
+  // These block variables are similar to the ones in vtkCompositeDataDisplayAttributes
+  // Some of them are exposed and some others are not because, as of now, they are not needed.
 
+  ///@{
+  /**
+   * Configurable through vtkGeometryRepresentation API
+   */
+  std::set<std::string> BlockSelectors;
+  std::unordered_map<std::string, vtkVector3d> BlockColors;
+  std::unordered_map<std::string, double> BlockOpacities;
+  std::unordered_map<std::string, bool> BlockInterpolateScalarsBeforeMapping;
+  std::unordered_map<std::string, int> BlockColorModes;
+  std::unordered_map<std::string, std::pair<int /*assoc*/, std::string>> BlockArrayNames;
+  std::vector<std::string> BlockLookupTableSelectors;
+  std::vector<vtkScalarsToColors*> BlockLookupTables;
+  ///@}
+  ///@{
+  /**
+   * Configured internally in vtkGeometryRepresentation
+   */
+  std::unordered_map<std::string, bool> BlockScalarVisibilities;
+  std::unordered_map<std::string, bool> BlockUseLookupTableScalarRanges;
+  std::unordered_map<vtkDataObject*, vtkIdType> BlockFieldDataTupleIds;
+  ///@}
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&) = delete;
   void operator=(const vtkGeometryRepresentation&) = delete;

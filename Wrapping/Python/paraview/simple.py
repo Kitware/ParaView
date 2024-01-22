@@ -43,25 +43,29 @@ import warnings
 if sys.version_info >= (3,):
     xrange = range
 
+
 def GetParaViewVersion():
     """Returns the version of the ParaView build"""
     return paraview._version(servermanager.vtkSMProxyManager.GetVersionMajor(),
                              servermanager.vtkSMProxyManager.GetVersionMinor())
+
+
 def GetParaViewSourceVersion():
     """Returns the paraview source version string e.g.
     'paraview version x.x.x, Date: YYYY-MM-DD'."""
     return servermanager.vtkSMProxyManager.GetParaViewSourceVersion()
 
-#==============================================================================
+
+# ==============================================================================
 # Client/Server Connection methods
-#==============================================================================
+# ==============================================================================
 
 def Disconnect(ns=None, force=True):
     """Free the current active session"""
     if not ns:
         ns = globals()
 
-    supports_simutaneous_connections =\
+    supports_simutaneous_connections = \
         servermanager.vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport()
     if not force and supports_simutaneous_connections:
         # This is an internal Disconnect request that doesn't need to happen in
@@ -73,9 +77,10 @@ def Disconnect(ns=None, force=True):
         import gc
         gc.collect()
 
+
 # -----------------------------------------------------------------------------
 
-def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111, timeout = 60):
+def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111, timeout=60):
     """Creates a connection to a server. Example usage::
 
     > Connect("amber") # Connect to a single server at default port
@@ -87,9 +92,10 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111, timeout = 
     Disconnect(globals(), False)
     connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port, timeout)
     if not (connection is None):
-      _initializeSession(connection)
-      _add_functions(globals())
+        _initializeSession(connection)
+        _add_functions(globals())
     return connection
+
 
 # -----------------------------------------------------------------------------
 
@@ -102,6 +108,7 @@ def ReverseConnect(port=11111):
     _add_functions(globals())
     return connection
 
+
 # -----------------------------------------------------------------------------
 
 def ResetSession():
@@ -111,9 +118,10 @@ def ResetSession():
     _add_functions(globals())
     return connection
 
-#==============================================================================
+
+# ==============================================================================
 # Multi-servers
-#==============================================================================
+# ==============================================================================
 
 def SetActiveConnection(connection=None, ns=None):
     """Set the active connection. If the process was run without multi-server
@@ -126,16 +134,17 @@ def SetActiveConnection(connection=None, ns=None):
         servermanager.SetActiveConnection(connection)
         _add_functions(ns)
 
-#==============================================================================
+
+# ==============================================================================
 # Views and Layout methods
-#==============================================================================
+# ==============================================================================
 def CreateView(view_xml_name, **params):
     """Creates and returns the specified proxy view based on its name/label.
     Also set params keywords arguments as view properties.
     """
     view = servermanager._create_view(view_xml_name)
     if not view:
-        raise RuntimeError ("Failed to create requested view", view_xml_name)
+        raise RuntimeError("Failed to create requested view", view_xml_name)
 
     try:
         registrationName = params["registrationName"]
@@ -173,12 +182,14 @@ def CreateView(view_xml_name, **params):
         RegisterView(view)
     return view
 
+
 # -----------------------------------------------------------------------------
 
 def CreateRenderView(**params):
     """Create standard 3D render view.
     See CreateView for arguments documentation"""
     return CreateView("RenderView", **params)
+
 
 # -----------------------------------------------------------------------------
 
@@ -187,12 +198,14 @@ def CreateXYPlotView(**params):
     See CreateView for arguments documentation"""
     return CreateView("XYChartView", **params)
 
+
 # -----------------------------------------------------------------------------
 
 def CreateXYPointPlotView(**params):
     """Create XY plot point Chart view.
     See CreateView for arguments documentation"""
     return CreateView("XYPointChartView", **params)
+
 
 # -----------------------------------------------------------------------------
 
@@ -202,12 +215,14 @@ def CreateBarChartView(**params):
     See CreateView for arguments documentation"""
     return CreateView("XYBarChartView", **params)
 
+
 # -----------------------------------------------------------------------------
 
 def CreateComparativeRenderView(**params):
     """Create Comparative view.
     See CreateView for arguments documentation"""
     return CreateView("ComparativeRenderView", **params)
+
 
 # -----------------------------------------------------------------------------
 
@@ -216,12 +231,14 @@ def CreateComparativeXYPlotView(**params):
     See CreateView for arguments documentation"""
     return CreateView("ComparativeXYPlotView", **params)
 
+
 # -----------------------------------------------------------------------------
 
 def CreateComparativeBarChartView(**params):
     """Create comparative Bar Chart view.
     See CreateView for arguments documentation"""
     return CreateView("ComparativeBarChartView", **params)
+
 
 # -----------------------------------------------------------------------------
 
@@ -230,12 +247,14 @@ def CreateParallelCoordinatesChartView(**params):
     See CreateView for arguments documentation"""
     return CreateView("ParallelCoordinatesChartView", **params)
 
+
 # -----------------------------------------------------------------------------
 
 def Create2DRenderView(**params):
     """Create the standard 3D render view with the 2D interaction mode turned ON.
     See CreateView for arguments documentation"""
     return CreateView("2DRenderView", **params)
+
 
 # -----------------------------------------------------------------------------
 
@@ -250,11 +269,13 @@ def GetRenderView():
         view = CreateRenderView()
     return view
 
+
 # -----------------------------------------------------------------------------
 
 def GetRenderViews():
     "Returns all render views as a list."
     return servermanager.GetRenderViews()
+
 
 def GetViews(viewtype=None):
     """Returns all views. If viewtype is specified, only the views of the
@@ -262,9 +283,10 @@ def GetViews(viewtype=None):
     val = []
     for aProxy in servermanager.ProxyManager().GetProxiesInGroup("views").values():
         if aProxy.IsA("vtkSMViewProxy") and \
-            (viewtype is None or aProxy.GetXMLName() == viewtype):
+                (viewtype is None or aProxy.GetXMLName() == viewtype):
             val.append(aProxy)
     return val
+
 
 # -----------------------------------------------------------------------------
 
@@ -279,6 +301,7 @@ def SetViewProperties(view=None, **params):
         view = active_objects.view
     SetProperties(view, **params)
 
+
 # -----------------------------------------------------------------------------
 
 def Render(view=None):
@@ -286,7 +309,7 @@ def Render(view=None):
     if not view:
         view = active_objects.view
     if not view:
-        raise AttributeError ("view cannot be None")
+        raise AttributeError("view cannot be None")
     # setup an interactor if current process support interaction if an
     # interactor hasn't already been set. This overcomes the problem where VTK
     # segfaults if the interactor is created after the window was created.
@@ -297,14 +320,17 @@ def Render(view=None):
         try:
             view.ResetCamera()
             view.StillRender()
-        except AttributeError: pass
+        except AttributeError:
+            pass
         _funcs_internals.first_render = False
     return view
+
 
 # -----------------------------------------------------------------------------
 def RenderAllViews():
     """Render all views"""
     for view in GetViews(): Render(view)
+
 
 # -----------------------------------------------------------------------------
 def Interact(view=None):
@@ -314,9 +340,9 @@ def Interact(view=None):
     if not view:
         view = active_objects.view
     if not view:
-        raise ValueError ("view argument cannot be None")
+        raise ValueError("view argument cannot be None")
     if not view.MakeRenderWindowInteractor(False):
-        raise RuntimeError ("Configuration doesn't support interaction.")
+        raise RuntimeError("Configuration doesn't support interaction.")
     paraview.print_debug_info("Staring interaction. Use 'q' to quit.")
 
     # Views like ComparativeRenderView require that Render() is called before
@@ -325,6 +351,7 @@ def Interact(view=None):
     # and thus the interaction will be begun on stale datasets.
     Render(view)
     view.GetInteractor().Start()
+
 
 # -----------------------------------------------------------------------------
 
@@ -339,6 +366,7 @@ def ResetCamera(view=None):
     if hasattr(view, "ResetDisplay"):
         view.ResetDisplay()
     Render(view)
+
 
 # -----------------------------------------------------------------------------
 
@@ -355,6 +383,7 @@ def ResetCameraToDirection(position, direction, up=None, view=None):
         view.CameraViewUp = up
     ResetCamera(view)
 
+
 # -----------------------------------------------------------------------------
 
 def CreateLayout(name=None):
@@ -363,6 +392,7 @@ def CreateLayout(name=None):
     if name:
         RenameLayout(name, layout)
     return layout
+
 
 # -----------------------------------------------------------------------------
 
@@ -377,7 +407,8 @@ def RemoveLayout(proxy=None):
     name = pxm.GetProxyName('layouts', proxy)
     pxm.UnRegisterProxy('layouts', name, proxy)
     if len(GetLayouts()) == 0:
-      CreateLayout(name)
+        CreateLayout(name)
+
 
 # -----------------------------------------------------------------------------
 
@@ -385,6 +416,7 @@ def GetLayouts():
     """Returns the layout proxies on the active session.
     Layout proxies are used to place views in a grid."""
     return servermanager.ProxyManager().GetProxiesInGroup("layouts")
+
 
 # -----------------------------------------------------------------------------
 
@@ -395,26 +427,29 @@ def GetLayout(view=None):
     if not view:
         view = GetActiveView()
     if not view:
-        raise RuntimeError ("No active view was found.")
+        raise RuntimeError("No active view was found.")
     lproxy = servermanager.vtkSMViewLayoutProxy.FindLayout(view.SMProxy)
     return servermanager._getPyProxy(lproxy)
+
 
 def GetLayoutByName(name):
     """Return the first layout with the given name, if any."""
     layouts = GetLayouts()
     for key in layouts.keys():
-      if key[0] == name:
-        return layouts.get(key)
+        if key[0] == name:
+            return layouts.get(key)
     return None
+
 
 def GetViewsInLayout(layout=None):
     """Returns a list of views in the given layout. If not layout is specified,
     the layout for the active view is used, if possible."""
     layout = layout if layout else GetLayout()
     if not layout:
-        raise RuntimeError ("Layout couldn't be determined. Please specify a valid layout.")
+        raise RuntimeError("Layout couldn't be determined. Please specify a valid layout.")
     views = GetViews()
     return [x for x in views if layout.GetViewLocation(x) != -1]
+
 
 def AssignViewToLayout(view=None, layout=None, hint=0):
     """Assigns the view provided (or active view if None) to the
@@ -432,6 +467,7 @@ def AssignViewToLayout(view=None, layout=None, hint=0):
     controller = servermanager.ParaViewPipelineController()
     return controller.AssignViewToLayout(view, layout, hint)
 
+
 # -----------------------------------------------------------------------------
 
 def RemoveViewsAndLayouts():
@@ -446,9 +482,10 @@ def RemoveViewsAndLayouts():
         proxy = layouts[(name, id)]
         pxm.UnRegisterProxy('layouts', name, layouts[(name, id)])
 
-#==============================================================================
+
+# ==============================================================================
 # Extracts and Extractors
-#==============================================================================
+# ==============================================================================
 def CreateExtractor(name, proxy=None, registrationName=None):
     """
     Creates a new extractor and returns it.
@@ -515,6 +552,7 @@ def GetExtractors(proxy=None):
     else:
         return [g for g in extractors if controller.IsExtractor(g.SMProxy, proxy.SMProxy)]
 
+
 def FindExtractor(registrationName):
     """
     Returns an extractor with a specific registrationName.
@@ -528,14 +566,16 @@ def FindExtractor(registrationName):
     pxm = servermanager.ProxyManager()
     return pxm.GetProxy("extractors", registrationName)
 
+
 def SaveExtractsUsingCatalystOptions(options):
     """
     Generates extracts using a CatalystOptions object. This is intended for use
     when a Catalyst analysis script is being run in batch.
     """
     # handle the case where options is CatalystOptions
-    return SaveExtracts(ExtractsOutputDirectory = options.ExtractsOutputDirectory,
-                        GenerateCinemaSpecification = options.GenerateCinemaSpecification)
+    return SaveExtracts(ExtractsOutputDirectory=options.ExtractsOutputDirectory,
+                        GenerateCinemaSpecification=options.GenerateCinemaSpecification)
+
 
 def SaveExtracts(**kwargs):
     """
@@ -584,12 +624,13 @@ def UpdateSteerableParameters(steerable_proxy, steerable_source_name):
     helper.UpdateSteerableParameters(steerable_proxy.SMProxy,
                                      steerable_source_name)
 
-#==============================================================================
-# XML State management
-#==============================================================================
 
-def LoadState(statefile, data_directory = None, restrict_to_data_directory = False,
-        filenames = None, location=vtkPVSession.CLIENT, *args, **kwargs):
+# ==============================================================================
+# XML State management
+# ==============================================================================
+
+def LoadState(statefile, data_directory=None, restrict_to_data_directory=False,
+              filenames=None, location=vtkPVSession.CLIENT, *args, **kwargs):
     """
     Load PVSM state file.
 
@@ -658,6 +699,7 @@ def LoadState(statefile, data_directory = None, restrict_to_data_directory = Fal
     if len(GetRenderViews()) > 0:
         SetActiveView(GetRenderViews()[0])
 
+
 def _LoadStateLegacy(filename, connection=None, **extraArgs):
     """Python scripts from version < 5.9 used a different signature. This
     function supports that.
@@ -683,14 +725,16 @@ def _LoadStateLegacy(filename, connection=None, **extraArgs):
     if len(GetRenderViews()) > 0:
         SetActiveView(GetRenderViews()[0])
 
+
 # -----------------------------------------------------------------------------
 
 def SaveState(filename, location=vtkPVSession.CLIENT):
     servermanager.SaveState(filename, location)
 
-#==============================================================================
+
+# ==============================================================================
 # Representation methods
-#==============================================================================
+# ==============================================================================
 
 def GetRepresentation(proxy=None, view=None):
     """Given a pipeline object and view, returns the corresponding representation object.
@@ -698,22 +742,24 @@ def GetRepresentation(proxy=None, view=None):
     if not view:
         view = active_objects.view
     if not view:
-        raise ValueError ("view argument cannot be None.")
+        raise ValueError("view argument cannot be None.")
     if not proxy:
         proxy = active_objects.source
     if not proxy:
-        raise ValueError ("proxy argument cannot be None.")
+        raise ValueError("proxy argument cannot be None.")
     rep = servermanager.GetRepresentation(proxy, view)
     if not rep:
         controller = servermanager.ParaViewPipelineController()
         return controller.Show(proxy, proxy.Port, view)
     return rep
 
+
 # -----------------------------------------------------------------------------
 def GetDisplayProperties(proxy=None, view=None):
     """Given a pipeline object and view, returns the corresponding representation object.
     If pipeline object and/or view are not specified, active objects are used."""
     return GetRepresentation(proxy, view)
+
 
 # -----------------------------------------------------------------------------
 def Show(proxy=None, view=None, representationType=None, **params):
@@ -724,7 +770,7 @@ def Show(proxy=None, view=None, representationType=None, **params):
     if not hasattr(proxy, "GetNumberOfOutputPorts") or proxy.GetNumberOfOutputPorts() == 0:
         raise RuntimeError('Cannot show a sink i.e. algorithm with no output.')
     if proxy == None:
-        raise RuntimeError ("Show() needs a proxy argument or that an active source is set.")
+        raise RuntimeError("Show() needs a proxy argument or that an active source is set.")
     if not view:
         # If there's no active view, controller.Show() will create a new preferred view.
         # if possible.
@@ -732,10 +778,11 @@ def Show(proxy=None, view=None, representationType=None, **params):
     controller = servermanager.ParaViewPipelineController()
     rep = controller.Show(proxy, proxy.Port, view, representationType)
     if rep == None:
-        raise RuntimeError ("Could not create a representation object for proxy %s" % proxy.GetXMLLabel())
+        raise RuntimeError("Could not create a representation object for proxy %s" % proxy.GetXMLLabel())
     for param in params.keys():
         setattr(rep, param, params[param])
     return rep
+
 
 # -----------------------------------------------------------------------------
 def ShowAll(view=None):
@@ -746,18 +793,20 @@ def ShowAll(view=None):
     controller = servermanager.ParaViewPipelineController()
     controller.ShowAll(view)
 
+
 # -----------------------------------------------------------------------------
 def Hide(proxy=None, view=None):
     """Turns the visibility of a given pipeline object off in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
     if not proxy:
-      proxy = active_objects.source
+        proxy = active_objects.source
     if not view:
         view = active_objects.view
     if not proxy:
-        raise ValueError ("proxy argument cannot be None when no active source is present.")
+        raise ValueError("proxy argument cannot be None when no active source is present.")
     controller = servermanager.ParaViewPipelineController()
     controller.Hide(proxy, proxy.Port, view)
+
 
 # -----------------------------------------------------------------------------
 def HideAll(view=None):
@@ -767,6 +816,7 @@ def HideAll(view=None):
         view = active_objects.view
     controller = servermanager.ParaViewPipelineController()
     controller.HideAll(view)
+
 
 # -----------------------------------------------------------------------------
 def SetDisplayProperties(proxy=None, view=None, **params):
@@ -779,6 +829,7 @@ def SetDisplayProperties(proxy=None, view=None, **params):
     rep = GetDisplayProperties(proxy, view)
     SetProperties(rep, **params)
 
+
 # -----------------------------------------------------------------------------
 def ColorBy(rep=None, value=None, separate=False):
     """Set scalar color. This will automatically setup the color maps and others
@@ -789,7 +840,7 @@ def ColorBy(rep=None, value=None, separate=False):
     map for this representation"""
     rep = rep if rep else GetDisplayProperties()
     if not rep:
-        raise ValueError ("No display properties can be determined.")
+        raise ValueError("No display properties can be determined.")
 
     rep.UseSeparateColorMap = separate
     association = rep.ColorArrayName.GetAssociation()
@@ -809,29 +860,91 @@ def ColorBy(rep=None, value=None, separate=False):
         # component name provided
         componentName = value[2]
         if componentName == "Magnitude":
-          component = -1
+            component = -1
         else:
-          if association == "POINTS":
-            array = rep.Input.PointData.GetArray(arrayname)
-          if association == "CELLS":
-            array = rep.Input.CellData.GetArray(arrayname)
-          if array:
-            # looking for corresponding component name
-            for i in range(0, array.GetNumberOfComponents()):
-              if componentName == array.GetComponentName(i):
-                component = i
-                break
-              # none have been found, try to use the name as an int
-              if i ==  array.GetNumberOfComponents() - 1:
-                try:
-                  component = int(componentName)
-                except ValueError:
-                  pass
+            if association == "POINTS":
+                array = rep.Input.PointData.GetArray(arrayname)
+            if association == "CELLS":
+                array = rep.Input.CellData.GetArray(arrayname)
+            if array:
+                # looking for corresponding component name
+                for i in range(0, array.GetNumberOfComponents()):
+                    if componentName == array.GetComponentName(i):
+                        component = i
+                        break
+                    # none have been found, try to use the name as an int
+                    if i == array.GetNumberOfComponents() - 1:
+                        try:
+                            component = int(componentName)
+                        except ValueError:
+                            pass
     if component is None:
-      rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association))
+        rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association))
     else:
-      rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association), component)
+        rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association), component)
     rep.RescaleTransferFunctionToDataRange()
+
+
+# -----------------------------------------------------------------------------
+def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
+    """Set block scalar color. This will automatically setup the color maps and others
+    necessary state for the representations. 'rep' must be the display
+    properties proxy i.e. the value returned by GetDisplayProperties() function.
+    If none is provided the display properties for the active source will be
+    used, if possible. Set separate to True in order to use a separate color
+    map for this representation"""
+    rep = rep if rep else GetDisplayProperties()
+    if not rep:
+        raise ValueError("No display properties can be determined.")
+    if selector is None:
+        raise ValueError("No selector can be determined.")
+
+    rep.SetBlockUseSeparateColorMap(selector, separate)
+    associationInt = rep.GetBlockColorArrayAssociation(selector)
+    association = servermanager.GetAssociationAsString(associationInt) if associationInt != -1 else None
+    arrayname = rep.GetBlockColorArrayName(selector)
+    component = None
+    if value is None:
+        if association is not None:
+            rep.SetBlockScalarColoring(selector, None, servermanager.GetAssociationFromString(association))
+        else:
+            rep.SetBlockScalarColoring(selector, None, 0)
+        return
+    if not isinstance(value, tuple) and not isinstance(value, list):
+        value = (value,)
+    if len(value) == 1:
+        arrayname = value[0]
+    elif len(value) >= 2:
+        association = value[0]
+        arrayname = value[1]
+    if len(value) == 3:
+        # component name provided
+        componentName = value[2]
+        if componentName == "Magnitude":
+            component = -1
+        else:
+            if association == "POINTS":
+                array = rep.Input.PointData.GetArray(arrayname)
+            if association == "CELLS":
+                array = rep.Input.CellData.GetArray(arrayname)
+            if array:
+                # looking for corresponding component name
+                for i in range(0, array.GetNumberOfComponents()):
+                    if componentName == array.GetComponentName(i):
+                        component = i
+                        break
+                    # none have been found, try to use the name as an int
+                    if i == array.GetNumberOfComponents() - 1:
+                        try:
+                            component = int(componentName)
+                        except ValueError:
+                            pass
+    if component is None:
+        rep.SetBlockScalarColoring(selector, arrayname, servermanager.GetAssociationFromString(association))
+    else:
+        rep.SetBlockScalarColoring(selector, arrayname, servermanager.GetAssociationFromString(association), component)
+    rep.RescaleBlockTransferFunctionToDataRange(selector)
+
 
 # -----------------------------------------------------------------------------
 def _DisableFirstRenderCameraReset():
@@ -840,9 +953,10 @@ def _DisableFirstRenderCameraReset():
     this module."""
     _funcs_internals.first_render = False
 
-#==============================================================================
+
+# ==============================================================================
 # Proxy handling methods
-#==============================================================================
+# ==============================================================================
 
 def SetProperties(proxy=None, **params):
     """Sets one or more properties of the given pipeline object. If an argument
@@ -857,6 +971,7 @@ def SetProperties(proxy=None, **params):
     for param in params.keys():
         pyproxy = servermanager._getPyProxy(proxy)
         pyproxy.__setattr__(param, params[param])
+
 
 # -----------------------------------------------------------------------------
 
@@ -889,16 +1004,18 @@ def GetProperty(*arguments, **keywords):
             name = keywords[key]
         if key == "proxy":
             proxy = keywords[key]
-    if len(arguments) == 1 :
+    if len(arguments) == 1:
         name = arguments[0]
-    if len(arguments) == 2 :
+    if len(arguments) == 2:
         proxy = arguments[0]
-        name  = arguments[1]
+        name = arguments[1]
     if not name:
-        raise RuntimeError ("Expecting at least a property name as input. Otherwise keyword could be used to set 'proxy' and property 'name'")
+        raise RuntimeError(
+            "Expecting at least a property name as input. Otherwise keyword could be used to set 'proxy' and property 'name'")
     if not proxy:
         proxy = active_objects.source
     return proxy.GetProperty(name)
+
 
 # -----------------------------------------------------------------------------
 def GetDisplayProperty(*arguments, **keywords):
@@ -911,14 +1028,15 @@ def GetDisplayProperty(*arguments, **keywords):
             name = keywords[key]
         if key == "proxy":
             proxy = keywords[key]
-    if len(arguments) == 1 :
+    if len(arguments) == 1:
         name = arguments[0]
-    if len(arguments) == 2 :
+    if len(arguments) == 2:
         proxy = arguments[0]
-        name  = arguments[1]
+        name = arguments[1]
     if not proxy:
         proxy = GetDisplayProperties()
     return GetProperty(proxy, name)
+
 
 # -----------------------------------------------------------------------------
 def GetViewProperty(*arguments, **keywords):
@@ -931,20 +1049,22 @@ def GetViewProperty(*arguments, **keywords):
             name = keywords[key]
         if key == "proxy":
             proxy = keywords[key]
-    if len(arguments) == 1 :
+    if len(arguments) == 1:
         name = arguments[0]
-    if len(arguments) == 2 :
+    if len(arguments) == 2:
         proxy = arguments[0]
-        name  = arguments[1]
+        name = arguments[1]
     if not proxy:
         proxy = GetViewProperties()
     return GetProperty(proxy, name)
+
 
 # -----------------------------------------------------------------------------
 def GetViewProperties(view=None):
     """Same as GetActiveView(), this API is provided just for consistency with
     GetDisplayProperties()."""
     return GetActiveView()
+
 
 # -----------------------------------------------------------------------------
 def LoadPalette(paletteName):
@@ -974,17 +1094,19 @@ def LoadPalette(paletteName):
     palette.Copy(prototype)
     palette.UpdateVTKObjects()
 
-#==============================================================================
+
+# ==============================================================================
 # ServerManager methods
-#==============================================================================
+# ==============================================================================
 
 def RenameProxy(proxy, group, newName):
     """Renames the given proxy."""
     pxm = servermanager.ProxyManager()
     oldName = pxm.GetProxyName(group, proxy)
     if oldName and newName != oldName:
-      pxm.RegisterProxy(group, newName, proxy)
-      pxm.UnRegisterProxy(group, oldName, proxy)
+        pxm.RegisterProxy(group, newName, proxy)
+        pxm.UnRegisterProxy(group, oldName, proxy)
+
 
 def RenameSource(newName, proxy=None):
     """Renames the given source.  If the given proxy is not registered
@@ -994,6 +1116,7 @@ def RenameSource(newName, proxy=None):
         proxy = GetActiveSource()
     RenameProxy(proxy, "sources", newName)
 
+
 def RenameView(newName, proxy=None):
     """Renames the given view.  If the given proxy is not registered
     in the views group this method will have no effect.  If no view is
@@ -1002,6 +1125,7 @@ def RenameView(newName, proxy=None):
         proxy = GetActiveView()
     RenameProxy(proxy, "views", newName)
 
+
 def RenameLayout(newName, proxy=None):
     """Renames the given layout.  If the given proxy is not registered
     in the layout group this method will have no effect.  If no layout is
@@ -1009,6 +1133,7 @@ def RenameLayout(newName, proxy=None):
     if not proxy:
         proxy = GetLayout()
     RenameProxy(proxy, "layouts", newName)
+
 
 # -----------------------------------------------------------------------------
 
@@ -1025,6 +1150,7 @@ def FindSource(name):
     """
     return servermanager.ProxyManager().GetProxy("sources", name)
 
+
 def FindView(name):
     """
     Return a view proxy on the name that was used to register it
@@ -1035,6 +1161,7 @@ def FindView(name):
        myView = FindSource('RenderView1')
     """
     return servermanager.ProxyManager().GetProxy("views", name)
+
 
 def GetActiveViewOrCreate(viewtype):
     """
@@ -1051,8 +1178,9 @@ def GetActiveViewOrCreate(viewtype):
             # sense to assign it to a layout during playback.
             AssignViewToLayout(view)
     if not view:
-        raise RuntimeError ("Failed to create/locate the specified view")
+        raise RuntimeError("Failed to create/locate the specified view")
     return view
+
 
 def FindViewOrCreate(name, viewtype):
     """
@@ -1069,8 +1197,9 @@ def FindViewOrCreate(name, viewtype):
             # sense to assign it to a layout during playback.
             AssignViewToLayout(view)
     if not view:
-        raise RuntimeError ("Failed to create/locate the specified view")
+        raise RuntimeError("Failed to create/locate the specified view")
     return view
+
 
 def LocateView(displayProperties=None):
     """
@@ -1080,7 +1209,7 @@ def LocateView(displayProperties=None):
     if displayProperties is None:
         displayProperties = GetDisplayProperties()
     if displayProperties is None:
-        raise ValueError ("'displayProperties' must be set")
+        raise ValueError("'displayProperties' must be set")
     for view in GetViews():
         try:
             if displayProperties in view.Representations: return view
@@ -1088,13 +1217,15 @@ def LocateView(displayProperties=None):
             pass
     return None
 
+
 def GetSettingsProxy(type):
     """
     Given a type as name returns the Proxy for those settings.
     For example for type=GeneralSettings"""
     pxm = servermanager.ProxyManager()
-    proxy =  pxm.GetProxy("settings", type)
+    proxy = pxm.GetProxy("settings", type)
     return proxy
+
 
 def GetAllSettings():
     """
@@ -1111,17 +1242,20 @@ def GetAllSettings():
         iter.GoToNextItem()
     return settingsList
 
+
 # -----------------------------------------------------------------------------
 
 def GetSources():
     """Given the name of a source, return its Python object."""
     return servermanager.ProxyManager().GetProxiesInGroup("sources")
 
+
 # -----------------------------------------------------------------------------
 
 def GetRepresentations():
     """Returns all representations (display properties)."""
     return servermanager.ProxyManager().GetProxiesInGroup("representations")
+
 
 # -----------------------------------------------------------------------------
 
@@ -1136,6 +1270,7 @@ def UpdatePipeline(time=None, proxy=None):
     else:
         proxy.UpdatePipeline()
 
+
 # -----------------------------------------------------------------------------
 
 def Delete(proxy=None):
@@ -1144,17 +1279,19 @@ def Delete(proxy=None):
     if not proxy:
         proxy = active_objects.source
     if not proxy:
-        raise RuntimeError ("Could not locate proxy to 'Delete'")
+        raise RuntimeError("Could not locate proxy to 'Delete'")
     controller = servermanager.ParaViewPipelineController()
     controller.UnRegisterProxy(proxy)
 
-#==============================================================================
+
+# ==============================================================================
 # Active Source / View / Camera / AnimationScene
-#==============================================================================
+# ==============================================================================
 
 def GetActiveView():
     """Returns the active view."""
     return active_objects.view
+
 
 # -----------------------------------------------------------------------------
 
@@ -1162,17 +1299,20 @@ def SetActiveView(view):
     """Sets the active view."""
     active_objects.view = view
 
+
 # -----------------------------------------------------------------------------
 
 def GetActiveSource():
     """Returns the active source."""
     return active_objects.source
 
+
 # -----------------------------------------------------------------------------
 
 def SetActiveSource(source):
     """Sets the active source."""
     active_objects.source = source
+
 
 # -----------------------------------------------------------------------------
 
@@ -1181,9 +1321,10 @@ def GetActiveCamera():
     is an instance of vtkCamera."""
     return GetActiveView().GetActiveCamera()
 
-#==============================================================================
+
+# ==============================================================================
 # I/O methods
-#==============================================================================
+# ==============================================================================
 
 def OpenDataFile(filename, **extraArgs):
     """Creates a reader to read the give file, if possible.
@@ -1198,12 +1339,12 @@ def OpenDataFile(filename, **extraArgs):
         first_file = filename[0]
     if not reader_factor.TestFileReadability(first_file, session):
         msg = "File not readable: %s " % first_file
-        raise RuntimeError (msg)
+        raise RuntimeError(msg)
     if not reader_factor.CanReadFile(first_file, session):
         msg = "File not readable. No reader found for '%s' " % first_file
-        raise RuntimeError (msg)
+        raise RuntimeError(msg)
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
-      reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
+        reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
     reader_func = _create_func(xml_name, servermanager.sources)
     pname = servermanager.vtkSMCoreUtilities.GetFileNameProperty(prototype)
@@ -1211,6 +1352,7 @@ def OpenDataFile(filename, **extraArgs):
         extraArgs[pname] = filename
         reader = reader_func(**extraArgs)
     return reader
+
 
 # -----------------------------------------------------------------------------
 def ReloadFiles(proxy=None):
@@ -1221,6 +1363,7 @@ def ReloadFiles(proxy=None):
     helper = servermanager.vtkSMReaderReloadHelper()
     return helper.ReloadFiles(proxy.SMProxy)
 
+
 def ExtendFileSeries(proxy=None):
     """For a reader `proxy` that supports reading files series, detect any new files
     added to the series and update the reader's filename property.
@@ -1230,11 +1373,13 @@ def ExtendFileSeries(proxy=None):
     helper = servermanager.vtkSMReaderReloadHelper()
     return helper.ExtendFileSeries(proxy.SMProxy)
 
+
 # -----------------------------------------------------------------------------
 def ReplaceReaderFileName(readerProxy, files, propName):
     """Replaces the readerProxy by a new one given a list of files. PropName
     should be "FileNames" or "FileName" depending on the property name in the reader."""
     servermanager.vtkSMCoreUtilities.ReplaceReaderFileName(readerProxy.SMProxy, files, propName)
+
 
 # -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):
@@ -1243,7 +1388,7 @@ def CreateWriter(filename, proxy=None, **extraArgs):
        provided, then the active source is used. This doesn't actually write the
        data, it simply creates the writer and returns it."""
     if not filename:
-       raise RuntimeError ("filename must be specified")
+        raise RuntimeError("filename must be specified")
     session = servermanager.ActiveConnection.Session
     writer_factory = servermanager.vtkSMProxyManager.GetProxyManager().GetWriterFactory()
     if writer_factory.GetNumberOfRegisteredPrototypes() == 0:
@@ -1251,13 +1396,14 @@ def CreateWriter(filename, proxy=None, **extraArgs):
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:
-        raise RuntimeError ("Could not locate source to write")
+        raise RuntimeError("Could not locate source to write")
     writer_proxy = writer_factory.CreateWriter(filename, proxy.SMProxy, proxy.Port)
     writer_proxy.UnRegister(None)
     pyproxy = servermanager._getPyProxy(writer_proxy)
     if pyproxy and extraArgs:
         SetProperties(pyproxy, **extraArgs)
     return pyproxy
+
 
 def SaveData(filename, proxy=None, **extraArgs):
     """Save data produced by 'proxy' in a file. If no proxy is specified the
@@ -1269,21 +1415,22 @@ def SaveData(filename, proxy=None, **extraArgs):
     """
     writer = CreateWriter(filename, proxy, **extraArgs)
     if not writer:
-        raise RuntimeError ("Could not create writer for specified file or data type")
+        raise RuntimeError("Could not create writer for specified file or data type")
     writer.UpdateVTKObjects()
     writer.UpdatePipeline()
     del writer
 
+
 # -----------------------------------------------------------------------------
 def _SaveScreenshotLegacy(filename,
-    view=None, layout=None, magnification=None, quality=None, **params):
+                          view=None, layout=None, magnification=None, quality=None, **params):
     if view is not None and layout is not None:
-        raise ValueError ("both view and layout cannot be specified")
+        raise ValueError("both view and layout cannot be specified")
 
     viewOrLayout = view if view else layout
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
     if not viewOrLayout:
-        raise ValueError ("view or layout needs to be specified")
+        raise ValueError("view or layout needs to be specified")
     try:
         magnification = int(magnification) if int(magnification) > 0 else 1
     except TypeError:
@@ -1297,29 +1444,30 @@ def _SaveScreenshotLegacy(filename,
     if viewOrLayout.IsA("vtkSMViewProxy"):
         size = viewOrLayout.ViewSize
     else:
-        assert(viewOrLayout.IsA("vtkSMViewLayoutProxy"))
+        assert (viewOrLayout.IsA("vtkSMViewLayoutProxy"))
         exts = [0] * 4
         viewOrLayout.GetLayoutExtent(exts)
-        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
+        size = [exts[1] - exts[0] + 1, exts[3] - exts[2] + 1]
 
-    imageResolution = (size[0]*magnification, size[1]*magnification)
+    imageResolution = (size[0] * magnification, size[1] * magnification)
 
     import os.path
     _, extension = os.path.splitext(filename)
     if (extension == '.jpg'):
         return SaveScreenshot(filename, viewOrLayout,
-            ImageResolution=imageResolution,
-            Quality=quality)
+                              ImageResolution=imageResolution,
+                              Quality=quality)
     elif (extension == '.png'):
         compression = int(((quality * 0.01) - 1.0) * -9.0)
         return SaveScreenshot(filename, viewOrLayout,
-            ImageResolution=imageResolution,
-            CompressionLevel=compression)
+                              ImageResolution=imageResolution,
+                              CompressionLevel=compression)
     else:
         return SaveScreenshot(filename, viewOrLayout,
-            ImageResolution=imageResolution)
+                              ImageResolution=imageResolution)
 
-def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, location=vtkPVSession.CLIENT, **params):
+
+def SaveScreenshot(filename, viewOrLayout=None, saveInBackground=False, location=vtkPVSession.CLIENT, **params):
     """Save screenshot for a view or layout (collection of views) to an image.
 
     `SaveScreenshot` is used to save the rendering results to an image.
@@ -1471,6 +1619,7 @@ def SaveScreenshot(filename, viewOrLayout=None, saveInBackground = False, locati
     SetProperties(options, **params)
     return options.WriteImage(filename, location)
 
+
 # -----------------------------------------------------------------------------
 def SetNumberOfCallbackThreads(n):
     """Sets the number of threads used by the threaded callback queue that can be used for saving
@@ -1478,15 +1627,18 @@ def SetNumberOfCallbackThreads(n):
     """
     paraview.modules.vtkRemotingSetting.GetInstance().SetNumberOfCallbackThreads(n)
 
-# -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     """Gets the number of threads used by the threaded callback queue that can be used for saving
     screenshots.
     """
+
+
 def GetNumberOfCallbackThreads(n):
     paraview.modules.vtkRemotingSetting.GetInstance().GetNumberOfCallbackThreads()
 
+
 # -----------------------------------------------------------------------------
-def WaitForScreenshot(filename = None):
+def WaitForScreenshot(filename=None):
     """Pause this thread until screenshot named filename has terminated.
     If no filename is provided, then this thread pauses until all screenshot have been saved.
     """
@@ -1494,6 +1646,7 @@ def WaitForScreenshot(filename = None):
         paraview.servermanager.vtkRemoteWriterHelper.Wait()
     else:
         paraview.servermanager.vtkRemoteWriterHelper.Wait(filename)
+
 
 # -----------------------------------------------------------------------------
 def SaveAnimation(filename, viewOrLayout=None, scene=None, location=vtkPVSession.CLIENT, **params):
@@ -1615,19 +1768,21 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, location=vtkPVSession
     SetProperties(options, **params)
     return options.WriteAnimation(filename, location)
 
+
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
     The animation geometry is written out as a PVD file. If no view is
     specified, the active view will be used of possible."""
     view = view if view else GetActiveView()
     if not view:
-        raise ValueError ("Please specify the view to use")
+        raise ValueError("Please specify the view to use")
     scene = GetAnimationScene()
     writer = servermanager.vtkSMAnimationSceneGeometryWriter()
     writer.SetFileName(filename)
     writer.SetAnimationScene(scene.SMProxy)
     writer.SetViewModule(view.SMProxy)
     writer.Save()
+
 
 def FetchData(proxy=None, **kwargs):
     """Fetches data from the specified data producer for processing locally. Use this
@@ -1685,9 +1840,10 @@ def FetchData(proxy=None, **kwargs):
     del dataMover
     return result
 
-#==============================================================================
+
+# ==============================================================================
 # Lookup Table / Scalarbar methods
-#==============================================================================
+# ==============================================================================
 # -----------------------------------------------------------------------------
 def HideUnusedScalarBars(view=None):
     """Hides all unused scalar bars from the view. A scalar bar is used if some
@@ -1696,18 +1852,20 @@ def HideUnusedScalarBars(view=None):
     if not view:
         view = active_objects.view
     if not view:
-        raise ValueError ("'view' argument cannot be None with no active is present.")
+        raise ValueError("'view' argument cannot be None with no active is present.")
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS)
+
 
 def HideScalarBarIfNotNeeded(lut, view=None):
     """Hides the given scalar bar if it is not used by any of the displayed data."""
     if not view:
         view = active_objects.view
     if not view:
-        raise ValueError ("'view' argument cannot be None with no active present.")
+        raise ValueError("'view' argument cannot be None with no active present.")
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.HideScalarBarIfNotNeeded(lut.SMProxy, view.SMProxy)
+
 
 def UpdateScalarBars(view=None):
     """Hides all unused scalar bar and shows used scalar bars. A scalar bar is used
@@ -1716,9 +1874,10 @@ def UpdateScalarBars(view=None):
     if not view:
         view = active_objects.view
     if not view:
-        raise ValueError ("'view' argument cannot be None with no active is present.")
+        raise ValueError("'view' argument cannot be None with no active is present.")
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS | tfmgr.SHOW_USED_SCALAR_BARS)
+
 
 def UpdateScalarBarsComponentTitle(ctf, representation=None):
     """Update all scalar bars using the provided lookup table. The representation is used to recover
@@ -1728,12 +1887,13 @@ def UpdateScalarBarsComponentTitle(ctf, representation=None):
         view = active_objects.view
         proxy = active_objects.source
         if not view:
-            raise ValueError ("'representation' argument cannot be None with no active view.")
+            raise ValueError("'representation' argument cannot be None with no active view.")
         if not proxy:
-            raise ValueError ("'representation' argument cannot be None with no active source.")
+            raise ValueError("'representation' argument cannot be None with no active source.")
         representation = GetRepresentation(view, proxy)
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.UpdateScalarBarsComponentTitle(ctf.SMProxy, representation.SMProxy)
+
 
 def GetScalarBar(ctf, view=None):
     """Returns the scalar bar for color transfer function in the given view.
@@ -1741,11 +1901,12 @@ def GetScalarBar(ctf, view=None):
     This will either return an existing scalar bar or create a new one."""
     view = view if view else active_objects.view
     if not view:
-        raise ValueError ("'view' argument cannot be None when no active view is present")
+        raise ValueError("'view' argument cannot be None when no active view is present")
     tfmgr = servermanager.vtkSMTransferFunctionManager()
-    sb = servermanager._getPyProxy(\
+    sb = servermanager._getPyProxy( \
         tfmgr.GetScalarBarRepresentation(ctf.SMProxy, view.SMProxy))
     return sb
+
 
 # -----------------------------------------------------------------------------
 def GetColorTransferFunction(arrayname, representation=None, separate=False, **params):
@@ -1755,17 +1916,41 @@ def GetColorTransferFunction(arrayname, representation=None, separate=False, **p
     the separate color transfer function even if it is not used currently by the representation.
     This may create a new color transfer function if none exists, or return an existing one"""
     if representation:
-      if separate or representation.UseSeparateColorMap:
-        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
+        if separate or representation.UseSeparateColorMap:
+            arrayname = ("%s_%s_%s" % ("Separate", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Missing active session")
+        raise RuntimeError("Missing active session")
     session = servermanager.ActiveConnection.Session
     tfmgr = servermanager.vtkSMTransferFunctionManager()
-    lut = servermanager._getPyProxy(\
-            tfmgr.GetColorTransferFunction(arrayname, session.GetSessionProxyManager()))
+    lut = servermanager._getPyProxy( \
+        tfmgr.GetColorTransferFunction(arrayname, session.GetSessionProxyManager()))
     SetProperties(lut, **params)
     return lut
 
+
+def GetBlockColorTransferFunction(selector, arrayname, representation=None, separate=False, **params):
+    """Get the color transfer function used to mapping a block data array with the
+    given name to colors. Representation is used to modify the array name
+    when using a separate color transfer function. separate can be used to recover
+    the separate color transfer function even if it is not used currently by the representation.
+    This may create a new color transfer function if none exists, or return an existing one"""
+    if representation:
+        if representation.GetBlockUseSeparateColorMap(selector):
+            arrayname = \
+                ("%s_%s_%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), selector, arrayname))
+        elif separate or representation.UseSeparateColorMap:
+            arrayname = ("%s_%s_%s" % ("Separate", representation.SMProxy.GetGlobalIDAsString(), arrayname))
+    if not servermanager.ActiveConnection:
+        raise RuntimeError("Missing active session")
+    session = servermanager.ActiveConnection.Session
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    lut = servermanager._getPyProxy( \
+        tfmgr.GetColorTransferFunction(arrayname, session.GetSessionProxyManager()))
+    SetProperties(lut, **params)
+    return lut
+
+
+# -----------------------------------------------------------------------------
 def GetOpacityTransferFunction(arrayname, representation=None, separate=False, **params):
     """Get the opacity transfer function used to mapping a data array with the
     given name to opacity. Representation is used to modify the array name
@@ -1773,19 +1958,20 @@ def GetOpacityTransferFunction(arrayname, representation=None, separate=False, *
     the separate opacity transfer function even if it is not used currently by the representation.
     This may create a new opacity transfer function if none exists, or return an existing one"""
     if representation:
-      if separate or representation.UseSeparateColorMap:
-        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
+        if separate or representation.UseSeparateColorMap:
+            arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Missing active session")
+        raise RuntimeError("Missing active session")
     session = servermanager.ActiveConnection.Session
     tfmgr = servermanager.vtkSMTransferFunctionManager()
-    otf = servermanager._getPyProxy(\
-            tfmgr.GetOpacityTransferFunction(arrayname, session.GetSessionProxyManager()))
+    otf = servermanager._getPyProxy( \
+        tfmgr.GetOpacityTransferFunction(arrayname, session.GetSessionProxyManager()))
     SetProperties(otf, **params)
     return otf
 
+
 def GetTransferFunction2D(arrayname, array2name=None, representation=None, separate=False,
-        **params):
+                          **params):
     """Get the 2D transfer function used to map either two data arrays or a data array against its
     gradient to color and opacity. Representation is used to modify the array name when using a
     separate color transfer function. separate can be used to recover the separate transfer function
@@ -1793,17 +1979,18 @@ def GetTransferFunction2D(arrayname, array2name=None, representation=None, separ
     exists, or return an existing one"""
     array2name = "" if array2name is None else ("_%s" % array2name)
     if representation:
-      if separate or representation.UseSeparateColorMap:
-        arrayname = ("%s%s_%s%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(),
-            arrayname, array2name))
+        if separate or representation.UseSeparateColorMap:
+            arrayname = ("%s%s_%s%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(),
+                                        arrayname, array2name))
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Missing active session")
+        raise RuntimeError("Missing active session")
     session = servermanager.ActiveConnection.Session
     tfmgr = servermanager.vtkSMTransferFunctionManager()
-    tf2d = servermanager._getPyProxy(\
-            tfmgr.GetTransferFunction2D(arrayname, session.GetSessionProxyManager()))
+    tf2d = servermanager._getPyProxy( \
+        tfmgr.GetTransferFunction2D(arrayname, session.GetSessionProxyManager()))
     SetProperties(tf2d, **params)
     return tf2d
+
 
 # -----------------------------------------------------------------------------
 def ImportPresets(filename, location=vtkPVSession.CLIENT):
@@ -1812,6 +1999,7 @@ def ImportPresets(filename, location=vtkPVSession.CLIENT):
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return presets.ImportPresets(filename, location)
 
+
 # -----------------------------------------------------------------------------
 def ExportTransferFunction(colortransferfunction, opacitytransferfunction, tfname, filename,
                            location=vtkPVSession.CLIENT):
@@ -1819,8 +2007,9 @@ def ExportTransferFunction(colortransferfunction, opacitytransferfunction, tfnam
     Note that opacitytransferfunction can be None. The tfname is the name that will be
     given to the transfer function preset when imported back into ParaView.
     Returns True on success."""
-    return servermanager.vtkSMTransferFunctionProxy.ExportTransferFunction(\
-             colortransferfunction.SMProxy, opacitytransferfunction.SMProxy, tfname, filename, location)
+    return servermanager.vtkSMTransferFunctionProxy.ExportTransferFunction( \
+        colortransferfunction.SMProxy, opacitytransferfunction.SMProxy, tfname, filename, location)
+
 
 # -----------------------------------------------------------------------------
 def CreateLookupTable(**params):
@@ -1833,6 +2022,7 @@ def CreateLookupTable(**params):
     SetProperties(lt, **params)
     controller.RegisterColorTransferFunctionProxy(lt)
     return lt
+
 
 # -----------------------------------------------------------------------------
 
@@ -1847,6 +2037,7 @@ def CreatePiecewiseFunction(**params):
     controller.RegisterOpacityTransferFunction(pfunc)
     return pfunc
 
+
 # -----------------------------------------------------------------------------
 def GetLookupTableForArray(arrayname, num_components, **params):
     """Used to get an existing lookuptable for a array or to create one if none
@@ -1857,6 +2048,7 @@ def GetLookupTableForArray(arrayname, num_components, **params):
     warnings.warn("'GetLookupTableForArray' is deprecated, use GetColorTransferFunction instead", DeprecationWarning)
 
     return GetColorTransferFunction(arrayname, **params)
+
 
 # -----------------------------------------------------------------------------
 def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
@@ -1903,12 +2095,14 @@ def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
 
     return True
 
+
 # -----------------------------------------------------------------------------
 def GetLookupTableNames():
     """Returns a list containing the currently available transfer function
     presets."""
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return [presets.GetPresetName(index) for index in range(presets.GetNumberOfPresets())]
+
 
 # -----------------------------------------------------------------------------
 
@@ -1920,6 +2114,7 @@ def LoadLookupTable(fileName):
     """
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return presets.ImportPresets(fileName)
+
 
 # -----------------------------------------------------------------------------
 
@@ -1935,9 +2130,10 @@ def MakeBlueToRedLT(min, max):
     rgbPoints = [min, 0, 0, 1, max, 1, 0, 0]
     return CreateLookupTable(RGBPoints=rgbPoints, ColorSpace="HSV")
 
-#==============================================================================
+
+# ==============================================================================
 # General puprpose links methods
-#==============================================================================
+# ==============================================================================
 
 def RemoveLink(linkName):
     """Remove a link with the given name."""
@@ -1970,9 +2166,10 @@ def AddProxyLink(proxy1, proxy2, linkName='', link=None):
     pm.RegisterLink(linkName, link)
     return linkName
 
-#==============================================================================
+
+# ==============================================================================
 # ViewLink methods
-#==============================================================================
+# ==============================================================================
 
 def AddViewLink(viewProxy, viewProxyOther, linkName=''):
     """Create a view link between two view proxies.
@@ -1989,7 +2186,8 @@ def AddViewLink(viewProxy, viewProxyOther, linkName=''):
     link = servermanager.vtkSMViewLink()
     return AddProxyLink(viewProxy, viewProxyOther, linkName, link)
 
-def AddRenderViewLink(viewProxy, viewProxyOther, linkName = '', linkCameras=False):
+
+def AddRenderViewLink(viewProxy, viewProxyOther, linkName='', linkCameras=False):
     """Create a view link between two render view proxies.
 
     It also creates links for the AxesGrid proxy property.
@@ -2006,11 +2204,12 @@ def AddRenderViewLink(viewProxy, viewProxyOther, linkName = '', linkCameras=Fals
     link.LinkProxyPropertyProxies(viewProxy.SMProxy, viewProxyOther.SMProxy, "AxesGrid")
     return linkName
 
-#==============================================================================
-# CameraLink methods
-#==============================================================================
 
-def AddCameraLink(viewProxy, viewProxyOther, linkName = ''):
+# ==============================================================================
+# CameraLink methods
+# ==============================================================================
+
+def AddCameraLink(viewProxy, viewProxyOther, linkName=''):
     """Create a camera link between two view proxies.  A name must be given
     so that the link can be referred to by name.  If a link with the given
     name already exists it will be removed first.
@@ -2027,17 +2226,19 @@ def AddCameraLink(viewProxy, viewProxyOther, linkName = ''):
 
     return AddProxyLink(viewProxy, viewProxyOther, linkName, link)
 
+
 # -----------------------------------------------------------------------------
 
 def RemoveCameraLink(linkName):
     """Remove a camera link with the given name."""
     RemoveLink(linkName)
 
-#==============================================================================
-# SelectionLink methods
-#==============================================================================
 
-def AddSelectionLink(objProxy, objProxyOther, linkName, convertToIndices = True):
+# ==============================================================================
+# SelectionLink methods
+# ==============================================================================
+
+def AddSelectionLink(objProxy, objProxyOther, linkName, convertToIndices=True):
     """Create a selection link between two filters proxies.
     A name must be given so that the link can be referred to by name.
     If a link with the given name already exists it will be removed first."""
@@ -2053,24 +2254,27 @@ def AddSelectionLink(objProxy, objProxyOther, linkName, convertToIndices = True)
     servermanager.ProxyManager().RegisterLink(linkName, link)
     return link
 
+
 # -----------------------------------------------------------------------------
 
 def RemoveSelectionLink(linkName):
     """Remove a selection link with the given name."""
     RemoveLink(linkName)
 
-#==============================================================================
+
+# ==============================================================================
 # Animation methods
-#==============================================================================
+# ==============================================================================
 
 def GetTimeKeeper():
     """Returns the time-keeper for the active session. Timekeeper is often used
     to manage time step information known to the ParaView application."""
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Missing active session")
+        raise RuntimeError("Missing active session")
     session = servermanager.ActiveConnection.Session
     controller = servermanager.ParaViewPipelineController()
     return controller.FindTimeKeeper(session)
+
 
 def GetAnimationScene():
     """Returns the application-wide animation scene. ParaView has only one
@@ -2078,10 +2282,11 @@ def GetAnimationScene():
     free to create additional animation scenes directly, but those scenes
     won't be shown in the ParaView GUI."""
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Missing active session")
+        raise RuntimeError("Missing active session")
     session = servermanager.ActiveConnection.Session
     controller = servermanager.ParaViewPipelineController()
     return controller.GetAnimationScene(session)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2095,6 +2300,7 @@ def AnimateReader(reader=None, view=None):
 
     return servermanager.AnimateReader(reader, view)
 
+
 # -----------------------------------------------------------------------------
 
 def GetRepresentationAnimationHelper(sourceproxy):
@@ -2104,11 +2310,12 @@ def GetRepresentationAnimationHelper(sourceproxy):
     if not sourceproxy in GetSources().values():
         return None
     for proxy in servermanager.ProxyManager():
-        if proxy.GetXMLName() == "RepresentationAnimationHelper" and\
-           proxy.GetProperty("Source").IsProxyAdded(sourceproxy.SMProxy):
-             return proxy
+        if proxy.GetXMLName() == "RepresentationAnimationHelper" and \
+                proxy.GetProperty("Source").IsProxyAdded(sourceproxy.SMProxy):
+            return proxy
     # helper must have been created during RegisterPipelineProxy().
     return None
+
 
 # -----------------------------------------------------------------------------
 
@@ -2133,7 +2340,7 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     if not proxy:
         proxy = GetActiveSource()
     if not isinstance(proxy, servermanager.Proxy):
-        raise TypeError ("proxy must be a servermanager.Proxy instance")
+        raise TypeError("proxy must be a servermanager.Proxy instance")
     if isinstance(propertyname_or_property, str):
         propertyname = propertyname_or_property
     elif isinstance(propertyname_or_property, servermanager.Property):
@@ -2141,7 +2348,7 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
         propertyname = prop.Name
         proxy = prop.Proxy
     else:
-        raise TypeError ("propertyname_or_property must be a string or servermanager.Property")
+        raise TypeError("propertyname_or_property must be a string or servermanager.Property")
 
     # To handle the case where the property is actually a "display" property, in
     # which case we are actually animating the "RepresentationAnimationHelper"
@@ -2149,13 +2356,13 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     if propertyname in ["Visibility", "Opacity"] and proxy.GetXMLName() != "RepresentationAnimationHelper":
         proxy = GetRepresentationAnimationHelper(proxy)
     if not proxy or not proxy.GetProperty(propertyname):
-        raise AttributeError ("Failed to locate property %s" % propertyname)
+        raise AttributeError("Failed to locate property %s" % propertyname)
 
     scene = GetAnimationScene()
     for cue in scene.Cues:
         try:
-            if cue.AnimatedProxy == proxy and\
-               cue.AnimatedPropertyName == propertyname:
+            if cue.AnimatedProxy == proxy and \
+                    cue.AnimatedPropertyName == propertyname:
                 if index == None or index == cue.AnimatedElement:
                     return cue
         except AttributeError:
@@ -2170,6 +2377,7 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     scene.Cues.append(cue)
     return cue
 
+
 # -----------------------------------------------------------------------------
 
 def GetCameraTrack(view=None):
@@ -2179,17 +2387,18 @@ def GetCameraTrack(view=None):
     if not view:
         view = GetActiveView()
     if not view:
-        raise ValueError ("No view specified")
+        raise ValueError("No view specified")
     scene = GetAnimationScene()
     for cue in scene.Cues:
-        if cue.AnimatedProxy == view and\
-           cue.GetXMLName() == "CameraAnimationCue":
+        if cue.AnimatedProxy == view and \
+                cue.GetXMLName() == "CameraAnimationCue":
             return cue
     # no cue was found, create a new one.
     cue = CameraAnimationCue()
     cue.AnimatedProxy = view
     scene.Cues.append(cue)
     return cue
+
 
 # -----------------------------------------------------------------------------
 
@@ -2199,13 +2408,14 @@ def GetTimeTrack():
     This is the "TimeKeeper - Time" track shown in ParaView's 'Animation View'."""
     scene = GetAnimationScene()
     if not scene:
-        raise RuntimeError ("Missing animation scene")
+        raise RuntimeError("Missing animation scene")
     controller = servermanager.ParaViewPipelineController()
     return controller.GetTimeAnimationTrack(scene)
 
-#==============================================================================
+
+# ==============================================================================
 # Plugin Management
-#==============================================================================
+# ==============================================================================
 
 def LoadXML(xmlstring, ns=None):
     """Given a server manager XML as a string, parse and process it.
@@ -2219,6 +2429,7 @@ def LoadXML(xmlstring, ns=None):
         ns = globals()
     servermanager.LoadXML(xmlstring)
     _add_functions(ns)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2240,6 +2451,7 @@ def LoadPlugin(filename, remote=True, ns=None):
     """
 
     return LoadPlugins(filename, remote=remote, ns=ns)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2277,6 +2489,7 @@ def LoadPlugins(*args, **kwargs):
     servermanager.vtkSMProxyManager.GetProxyManager().UpdateProxyDefinitions()
     _add_functions(ns)
 
+
 # -----------------------------------------------------------------------------
 
 def LoadDistributedPlugin(pluginname, remote=True, ns=None):
@@ -2289,7 +2502,7 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
     or when the active connection is not a client-server connection.
     """
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Cannot load a plugin without a session.")
+        raise RuntimeError("Cannot load a plugin without a session.")
 
     conn = servermanager.ActiveConnection
     do_remote = remote and conn.IsRemote()
@@ -2303,11 +2516,12 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
     for cc in range(0, info.GetNumberOfPlugins()):
         if info.GetPluginName(cc) == pluginname:
             return LoadPlugin(info.GetPluginFileName(cc), remote=do_remote, ns=ns)
-    raise RuntimeError ("Plugin '%s' not found" % pluginname)
+    raise RuntimeError("Plugin '%s' not found" % pluginname)
 
-#==============================================================================
+
+# ==============================================================================
 # Custom Filters Management
-#==============================================================================
+# ==============================================================================
 def LoadCustomFilters(filename, ns=None):
     """Loads a custom filter XML file and updates this module with new
     constructors if any. If you loaded the simple module with
@@ -2319,14 +2533,15 @@ def LoadCustomFilters(filename, ns=None):
         ns = globals()
     _add_functions(ns)
 
-#==============================================================================
+
+# ==============================================================================
 # Selection Management
-#==============================================================================
+# ==============================================================================
 def _select(seltype, query=None, proxy=None):
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:
-        raise RuntimeError ("No active source was found.")
+        raise RuntimeError("No active source was found.")
 
     if not query:
         # This ends up being true for all cells.
@@ -2347,12 +2562,14 @@ def _select(seltype, query=None, proxy=None):
     proxy.SMProxy.SetSelectionInput(proxy.Port, selSource.SMProxy, 0)
     return selSource
 
+
 # -----------------------------------------------------------------------------
 
 def SelectCells(query=None, proxy=None):
     """Select cells satisfying the query. If query is None, then all cells are
     selected. If proxy is None, then the active source is used."""
     return _select("CELL", query, proxy)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2361,6 +2578,7 @@ def SelectPoints(query=None, proxy=None):
     selected. If proxy is None, then the active source is used."""
     return _select("POINT", query, proxy)
 
+
 # -----------------------------------------------------------------------------
 
 def ClearSelection(proxy=None):
@@ -2368,13 +2586,13 @@ def ClearSelection(proxy=None):
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:
-        raise RuntimeError ("No active source was found.")
+        raise RuntimeError("No active source was found.")
     proxy.SMProxy.SetSelectionInput(proxy.Port, None, 0)
 
 
-#==============================================================================
+# ==============================================================================
 # Dynamic lights.
-#==============================================================================
+# ==============================================================================
 
 def CreateLight():
     """Makes a new vtkLight, unattached to a view."""
@@ -2391,7 +2609,7 @@ def AddLight(view=None):
     """Makes a new vtkLight and adds it to the designated or active view."""
     view = view if view else GetActiveView()
     if not view:
-        raise ValueError ("No 'view' was provided and no active view was found.")
+        raise ValueError("No 'view' was provided and no active view was found.")
     if view.IsA("vtkSMRenderViewProxy") is False:
         return
 
@@ -2403,20 +2621,22 @@ def AddLight(view=None):
     # This is not the same as returning lightProxy
     return GetLight(len(view.AdditionalLights) - 1, view)
 
+
 def RemoveLight(light):
     """Removes an existing vtkLight from its view."""
     if not light:
-        raise ValueError ("No 'light' was provided.")
+        raise ValueError("No 'light' was provided.")
     view = GetViewForLight(light)
     if view:
         if (not view.IsA("vtkSMRenderViewProxy")) or (len(view.AdditionalLights) < 1):
-            raise RuntimeError ("View retrieved inconsistent with owning a 'light'.")
+            raise RuntimeError("View retrieved inconsistent with owning a 'light'.")
 
         nowlights = [l for l in view.AdditionalLights if l != light]
         view.AdditionalLights = nowlights
 
     controller = servermanager.ParaViewPipelineController()
     controller.SMController.UnRegisterProxy(light.SMProxy)
+
 
 def GetLight(number, view=None):
     """Get a handle on a previously added light"""
@@ -2426,6 +2646,7 @@ def GetLight(number, view=None):
     if numlights < 1 or number < 0 or number >= numlights:
         return
     return view.AdditionalLights[number]
+
 
 def GetViewForLight(proxy):
     """Given a light proxy, find which view it belongs to"""
@@ -2437,21 +2658,23 @@ def GetViewForLight(proxy):
             return consumer
     return None
 
-#==============================================================================
+
+# ==============================================================================
 # Materials.
-#==============================================================================
+# ==============================================================================
 
 def GetMaterialLibrary():
     """Returns the material library for the active session. """
     if not servermanager.ActiveConnection:
-        raise RuntimeError ("Missing active session")
+        raise RuntimeError("Missing active session")
     session = servermanager.ActiveConnection.Session
     controller = servermanager.ParaViewPipelineController()
     return controller.FindMaterialLibrary(session)
 
-#==============================================================================
+
+# ==============================================================================
 # Textures.
-#==============================================================================
+# ==============================================================================
 def CreateTexture(filename=None):
     """Creates and returns a new vtkTexture.
     The texture is not attached to anything by default but it can be applied
@@ -2465,24 +2688,27 @@ def CreateTexture(filename=None):
     controller.SMController.RegisterTextureProxy(textureproxy, filename)
     return servermanager._getPyProxy(textureproxy)
 
-#==============================================================================
+
+# ==============================================================================
 # Miscellaneous functions.
-#==============================================================================
+# ==============================================================================
 def ShowInteractiveWidgets(proxy=None):
     """If possible in the current environment, this method will
     request the application to show the interactive widget(s) for proxy"""
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
-        raise ValueError ("No 'proxy' was provided and no active source was found.")
+        raise ValueError("No 'proxy' was provided and no active source was found.")
     _InvokeWidgetUserEvent(proxy, "ShowWidget")
+
 
 def HideInteractiveWidgets(proxy=None):
     """If possible in the current environment, this method will
     request the application to hide the interactive widget(s) for proxy"""
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
-        raise ValueError ("No 'proxy' was provided and no active source was found.")
+        raise ValueError("No 'proxy' was provided and no active source was found.")
     _InvokeWidgetUserEvent(proxy, "HideWidget")
+
 
 def _InvokeWidgetUserEvent(proxy, event):
     """Internal method used by ShowInteractiveWidgets/HideInteractiveWidgets"""
@@ -2497,26 +2723,28 @@ def _InvokeWidgetUserEvent(proxy, event):
             if smproperty.FindDomain("vtkSMProxyListDomain"):
                 _InvokeWidgetUserEvent(smproperty.GetData(), event)
 
+
 def ExportView(filename, view=None, **params):
     """Export a view to the specified output file."""
     view = view if view else GetActiveView()
     if not view:
-        raise ValueError ("No 'view' was provided and no active view was found.")
+        raise ValueError("No 'view' was provided and no active view was found.")
     if not filename:
-        raise ValueError ("No filename specified")
+        raise ValueError("No filename specified")
 
     # ensure that the view is up-to-date.
     view.StillRender()
     helper = servermanager.vtkSMViewExportHelper()
     proxy = helper.CreateExporter(filename, view.SMProxy)
     if not proxy:
-        raise RuntimeError ("Failed to create exporter for ", filename)
+        raise RuntimeError("Failed to create exporter for ", filename)
     proxy.UnRegister(None)
     proxy = servermanager._getPyProxy(proxy)
     SetProperties(proxy, **params)
     proxy.Write()
     del proxy
     del helper
+
 
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
     if proxy == None:
@@ -2533,6 +2761,7 @@ def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
 
         proxy.SMProxy.UpdateVTKObjects()
 
+
 def GetOpenGLInformation(location=servermanager.vtkSMSession.CLIENT):
     """Recover OpenGL information, by default on the client"""
     openGLInfo = paraview.modules.vtkRemotingViews.vtkPVOpenGLInformation()
@@ -2540,9 +2769,10 @@ def GetOpenGLInformation(location=servermanager.vtkSMSession.CLIENT):
     session.GatherInformation(location, openGLInfo, 0)
     return openGLInfo
 
-#==============================================================================
+
+# ==============================================================================
 # Usage and demo code set
-#==============================================================================
+# ==============================================================================
 
 def demo1():
     """
@@ -2569,6 +2799,7 @@ def demo1():
     # Render the default view.
     Render()
 
+
 # -----------------------------------------------------------------------------
 
 def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
@@ -2579,16 +2810,16 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     reader = ExodusIIReader(FileName=fname)
     # Get the list of point arrays.
     avail = reader.PointVariables.Available
-    print (avail)
+    print(avail)
     # Select all arrays
     reader.PointVariables = avail
 
     # Turn on the visibility of the reader
     Show(reader)
     # Set representation to wireframe
-    SetDisplayProperties(Representation = "Wireframe")
+    SetDisplayProperties(Representation="Wireframe")
     # Black background is not pretty
-    SetViewProperties(Background = [0.4, 0.4, 0.6])
+    SetViewProperties(Background=[0.4, 0.4, 0.6])
     Render()
     # Change the elevation of the camera. See VTK documentation of vtkCamera
     # for camera parameters.
@@ -2600,37 +2831,39 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     pdi = reader[0].PointData
     # This prints a list of all read point data arrays as well as their
     # value ranges.
-    print ('Number of point arrays:', len(pdi))
+    print('Number of point arrays:', len(pdi))
     for i in range(len(pdi)):
         ai = pdi[i]
-        print ("----------------")
-        print ("Array:", i, " ", ai.Name, ":")
+        print("----------------")
+        print("Array:", i, " ", ai.Name, ":")
         numComps = ai.GetNumberOfComponents()
-        print ("Number of components:", numComps)
+        print("Number of components:", numComps)
         for j in range(numComps):
-            print ("Range:", ai.GetRange(j))
+            print("Range:", ai.GetRange(j))
     # White is boring. Let's color the geometry using a variable.
     # First create a lookup table. This object controls how scalar
     # values are mapped to colors. See VTK documentation for
     # details.
     # Map min (0.00678) to blue, max (0.0288) to red
-    SetDisplayProperties(LookupTable = MakeBlueToRedLT(0.00678, 0.0288))
+    SetDisplayProperties(LookupTable=MakeBlueToRedLT(0.00678, 0.0288))
     # Color by point array called Pres
-    SetDisplayProperties(ColorArrayName = ("POINTS", "Pres"))
+    SetDisplayProperties(ColorArrayName=("POINTS", "Pres"))
     Render()
 
-#==============================================================================
+
+# ==============================================================================
 # Set of Internal functions
-#==============================================================================
+# ==============================================================================
 
 def _initializeSession(connection):
     """Internal method used to initialize a session. Users don't need to
     call this directly. Whenever a new session is created this method is called
     by API in this module."""
     if not connection:
-      raise RuntimeError ("'connection' cannot be empty.")
+        raise RuntimeError("'connection' cannot be empty.")
     controller = servermanager.ParaViewPipelineController()
     controller.InitializeSession(connection.Session)
+
 
 def _create_func(key, module, skipRegisteration=False):
     "Internal function."
@@ -2642,9 +2875,9 @@ def _create_func(key, module, skipRegisteration=False):
 
         registrationName = None
         for nameParam in ['registrationName', 'guiName']:
-          if nameParam in params:
-              registrationName = params[nameParam]
-              del params[nameParam]
+            if nameParam in params:
+                registrationName = params[nameParam]
+                del params[nameParam]
 
         # Create a controller instance.
         controller = servermanager.ParaViewPipelineController()
@@ -2664,9 +2897,9 @@ def _create_func(key, module, skipRegisteration=False):
         for inp in input:
             if inp != None and not isinstance(inp, servermanager.Proxy):
                 if px.GetProperty("Input") != None:
-                    raise RuntimeError ("Expecting a proxy as input.")
+                    raise RuntimeError("Expecting a proxy as input.")
                 else:
-                    raise RuntimeError ("This function does not accept non-keyword arguments.")
+                    raise RuntimeError("This function does not accept non-keyword arguments.")
 
         # Assign inputs
         inputName = servermanager.vtkSMCoreUtilities.GetInputPropertyName(px.SMProxy, 0)
@@ -2682,7 +2915,7 @@ def _create_func(key, module, skipRegisteration=False):
                     px.SetPropertyWithName(inputName, active_objects.source)
         else:
             if len(input) > 0:
-                raise RuntimeError ("This function does not expect an input.")
+                raise RuntimeError("This function does not expect an input.")
 
         # Pass all the named arguments as property,value pairs
         SetProperties(px, **params)
@@ -2699,12 +2932,13 @@ def _create_func(key, module, skipRegisteration=False):
             if isinstance(px, servermanager.SourceProxy):
                 controller.RegisterPipelineProxy(px, registrationName)
             elif px.GetXMLGroup() == "animation":
-               controller.RegisterAnimationProxy(px)
+                controller.RegisterAnimationProxy(px)
         return px
 
     # add special tag to detect these functions in _remove_functions
     CreateObject.__paraview_create_object_tag = True
     return CreateObject
+
 
 # -----------------------------------------------------------------------------
 
@@ -2720,16 +2954,18 @@ def _create_doc(new, old):
     res += '\n'
     return res
 
+
 # -----------------------------------------------------------------------------
 
 def _func_name_valid(name):
     "Internal function."
     valid = True
     for c in name:
-        if c == '(' or c ==')':
+        if c == '(' or c == ')':
             valid = False
             break
     return valid
+
 
 # -----------------------------------------------------------------------------
 def _get_proxymodules_to_import(connection):
@@ -2743,6 +2979,7 @@ def _get_proxymodules_to_import(connection):
     else:
         return []
 
+
 def _add_functions(g):
     if not servermanager.ActiveConnection:
         return
@@ -2753,11 +2990,12 @@ def _add_functions(g):
         skipRegisteration = m is activeModule.writers
         for key in dir(m):
             if not key in g and _func_name_valid(key):
-                #print "add %s function" % key
+                # print "add %s function" % key
                 f = _create_func(key, m, skipRegisteration)
                 f.__name__ = key
                 f.__doc__ = _create_doc(m.getDocumentation(key), f.__doc__)
                 g[key] = f
+
 
 # -----------------------------------------------------------------------------
 
@@ -2767,14 +3005,17 @@ def _get_generated_proxies():
         for key in dir(m):
             proxies.append(key)
     return proxies
+
+
 # -----------------------------------------------------------------------------
 
 def _remove_functions(g):
     to_remove = [item[0] for item in g.items() \
-            if hasattr(item[1], '__paraview_create_object_tag')]
+                 if hasattr(item[1], '__paraview_create_object_tag')]
     for key in to_remove:
         del g[key]
         # paraview.print_info("remove %s", key)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2785,7 +3026,7 @@ def _find_writer(filename):
     if len(parts) > 1:
         extension = parts[-1]
     else:
-        raise RuntimeError ("Filename has no extension, please specify a write")
+        raise RuntimeError("Filename has no extension, please specify a write")
 
     if extension == 'png':
         return 'vtkPNGWriter'
@@ -2798,7 +3039,8 @@ def _find_writer(filename):
     elif extension == 'jpg' or extension == 'jpeg':
         return 'vtkJPEGWriter'
     else:
-        raise RuntimeError ("Cannot infer filetype from extension:", extension)
+        raise RuntimeError("Cannot infer filetype from extension:", extension)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2810,20 +3052,22 @@ def _switchToActiveConnectionCallback(caller, event):
         connection = servermanager.GetConnectionFromSession(session)
         SetActiveConnection(connection)
 
-#==============================================================================
+
+# ==============================================================================
 # Set of Internal classes
-#==============================================================================
+# ==============================================================================
 
 class _active_session_observer:
     def __init__(self):
         pxm = servermanager.vtkSMProxyManager.GetProxyManager()
         self.ObserverTag = pxm.AddObserver(pxm.ActiveSessionChanged,
-            _switchToActiveConnectionCallback)
+                                           _switchToActiveConnectionCallback)
 
     def __del__(self):
         if servermanager:
             if servermanager.vtkSMProxyManager:
                 servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
+
 
 # -----------------------------------------------------------------------------
 
@@ -2833,10 +3077,11 @@ class _active_objects(object):
     is for internal use. Use the :ref:`SetActiveSource`,
     :ref:`GetActiveSource`, :ref:`SetActiveView`, and :ref:`GetActiveView`
     methods for setting and getting active objects."""
+
     def __get_selection_model(self, name, session=None):
         "Internal method."
         if session and session != servermanager.ActiveConnection.Session:
-            raise RuntimeError ("Try to set an active object with invalid active connection.")
+            raise RuntimeError("Try to set an active object with invalid active connection.")
         pxm = servermanager.ProxyManager(session)
         model = pxm.GetSelectionModel(name)
         if not model:
@@ -2850,11 +3095,11 @@ class _active_objects(object):
         if view:
             active_view_model = self.__get_selection_model("ActiveView", view.GetSession())
             active_view_model.SetCurrentProxy(view.SMProxy,
-                active_view_model.CLEAR_AND_SELECT)
+                                              active_view_model.CLEAR_AND_SELECT)
         else:
             active_view_model = self.__get_selection_model("ActiveView")
             active_view_model.SetCurrentProxy(None,
-                active_view_model.CLEAR_AND_SELECT)
+                                              active_view_model.CLEAR_AND_SELECT)
 
     def get_view(self):
         "Returns the active view."
@@ -2868,11 +3113,11 @@ class _active_objects(object):
             # 3 == CLEAR_AND_SELECT
             active_sources_model = self.__get_selection_model("ActiveSources", source.GetSession())
             active_sources_model.SetCurrentProxy(source.SMProxy,
-                active_sources_model.CLEAR_AND_SELECT)
+                                                 active_sources_model.CLEAR_AND_SELECT)
         else:
             active_sources_model = self.__get_selection_model("ActiveSources")
             active_sources_model.SetCurrentProxy(None,
-                active_sources_model.CLEAR_AND_SELECT)
+                                                 active_sources_model.CLEAR_AND_SELECT)
 
     def __convert_proxy(self, px):
         "Internal method."
@@ -2880,15 +3125,15 @@ class _active_objects(object):
             return None
         elif px.IsA("vtkSMOutputPort"):
             return servermanager.OutputPort(
-              servermanager._getPyProxy(px.GetSourceProxy()),
-              px.GetPortIndex())
+                servermanager._getPyProxy(px.GetSourceProxy()),
+                px.GetPortIndex())
         else:
             return servermanager._getPyProxy(px)
 
     def get_source(self):
         "Returns the active source."
         return self.__convert_proxy(
-          self.__get_selection_model("ActiveSources").GetCurrentProxy())
+            self.__get_selection_model("ActiveSources").GetCurrentProxy())
 
     def get_selected_sources(self):
         "Returns the set of sources selected in the pipeline browser."
@@ -2901,15 +3146,17 @@ class _active_objects(object):
     view = property(get_view, set_view)
     source = property(get_source, set_source)
 
+
 # -----------------------------------------------------------------------------
 
 class _funcs_internals:
     "Internal class."
     first_render = True
 
-#==============================================================================
+
+# ==============================================================================
 # Start the session and initialize the ServerManager
-#==============================================================================
+# ==============================================================================
 
 if not paraview.options.satelite:
     active_session_observer = _active_session_observer()

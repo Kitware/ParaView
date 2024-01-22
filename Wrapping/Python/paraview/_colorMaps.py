@@ -2947,6 +2947,8 @@ __colorMapsXML = """
   </ColorMap>
 </ColorMaps>
 """
+
+
 def getColorMaps():
     """
     PARAVIEW_DEPRECATED_IN_5_12_0

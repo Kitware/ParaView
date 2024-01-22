@@ -2,6 +2,7 @@ import importlib.abc, importlib.util
 import os.path
 import zipimport
 
+
 class MetaPathFinder(importlib.abc.MetaPathFinder):
 
     def add_file(self, filename, modulename=None):
@@ -23,7 +24,6 @@ class MetaPathFinder(importlib.abc.MetaPathFinder):
         self._registered_files[unique_modulename] = filename
         return unique_modulename
 
-
     def find_spec(self, fullname, path, target=None):
         if not hasattr(self, "_registered_files"):
             return None
@@ -41,6 +41,7 @@ class MetaPathFinder(importlib.abc.MetaPathFinder):
 
         return None
 
+
 _path_finder_instance = MetaPathFinder()
 
 
@@ -54,8 +55,10 @@ def _run_once(f):
         if not f.has_run:
             f.has_run = True
             return f(*args, **kwargs)
+
     f.has_run = False
     return func
+
 
 @_run_once
 def install_pathfinder():

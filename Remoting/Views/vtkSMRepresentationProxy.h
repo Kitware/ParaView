@@ -67,6 +67,8 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"
 
+#include <unordered_map> // needed for std::map
+
 class vtkPVProminentValuesInformation;
 namespace vtkPVComparativeViewNS
 {
@@ -86,6 +88,7 @@ public:
    */
   virtual vtkPVDataInformation* GetRepresentedDataInformation();
 
+  ///@{
   /**
    * Returns information about a specific array component's prominent values (or nullptr).
 
@@ -104,6 +107,11 @@ public:
   virtual vtkPVProminentValuesInformation* GetProminentValuesInformation(std::string name,
     int fieldAssoc, int numComponents, double uncertaintyAllowed = 1e-6, double fraction = 1e-3,
     bool force = false);
+  virtual vtkPVProminentValuesInformation* GetBlockProminentValuesInformation(
+    std::string blockSelector, std::string assemblyName, std::string name, int fieldAssoc,
+    int numComponents, double uncertaintyAllowed = 1e-6, double fraction = 1e-3,
+    bool force = false);
+  ///@}
 
   /**
    * Calls Update() on all sources. It also creates output ports if
@@ -226,6 +234,11 @@ private:
   vtkPVProminentValuesInformation* ProminentValuesInformation;
   double ProminentValuesFraction;
   double ProminentValuesUncertainty;
+
+  std::unordered_map<std::string, bool> BlockProminentValuesInformationValid;
+  std::unordered_map<std::string, vtkPVProminentValuesInformation*> BlockProminentValuesInformation;
+  std::unordered_map<std::string, double> BlockProminentValuesFraction;
+  std::unordered_map<std::string, double> BlockProminentValuesUncertainty;
 
   friend class vtkPVComparativeViewNS::vtkCloningVectorOfRepresentations;
   void ClearMarkedModified() { this->MarkedModified = false; }

@@ -4631,6 +4631,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="BlockSelectors" function="Selectors" />
             <Property name="BlockColors"    function="Colors" />
             <Property name="BlockOpacities" function="Opacities" />
+            <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings"/>
+            <Property name="BlockMapScalars" function="MapScalars"/>
+            <Property name="BlockColorArrayNames" function="ArrayNames"/>
+            <Property name="BlockLookupTableSelectors" function="LookupTableSelectors"/>
+            <Property name="BlockLookupTables" function="LookupTables"/>
+            <Property name="BlockUseSeparateColorMaps" function="UseSeparateColorMaps"/>
             <Hints>
               <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
             </Hints>
@@ -15794,6 +15800,112 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="BlockInterpolateScalarsBeforeMappings"
+                            command="SetBlockInterpolateScalarsBeforeMapping"
+                            clean_command="RemoveAllBlockInterpolateScalarsBeforeMappings"
+                            element_types="2 0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify if to interpolate scalars before mapping associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockMapScalars"
+                            command="SetBlockMapScalars"
+                            clean_command="RemoveAllBlockMapScalars"
+                            element_types="2 0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify if to map scalars associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockColorArrayNames"
+                            command="SetBlockArrayName"
+                            clean_command="RemoveAllBlockArrayNames"
+                            element_types="2 0 2"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify the color array name associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockLookupTableSelectors"
+                            command="SetBlockLookupTableSelector"
+                            clean_command="RemoveAllBlockLookupTableSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify the selectors for the look up tables on the assembly chosen using
+          **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty command="SetBlockLookupTable"
+                     name="BlockLookupTables"
+                     clean_command="RemoveAllBlockLookupTables"
+                     repeat_command="1"
+                     panel_visibility="multiblock_inspector">
+        <Documentation>Set the block lookup-table to use to map data array to colors.
+          Lookuptable is only used with MapScalars to ON or BlockMapScalars to ON.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty name="BlockUseSeparateColorMaps"
+                            element_types="2 0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          By default, ParaView shares a single color map among all datasets colored
+          by arrays that have the same name. When this option is enabled, the block of the active dataset will
+          be assigned a separate color map not shared by other blocks or datasets.
+        </Documentation>
+      </StringVectorProperty>
+
       <PropertyGroup label="Blocks"
                      panel_widget="DataAssemblyEditor"
                      panel_visibility="multiblock_inspector">
@@ -15801,6 +15913,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="BlockSelectors" function="Selectors" />
         <Property name="BlockColors"    function="Colors" />
         <Property name="BlockOpacities" function="Opacities" />
+        <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings" />
+        <Property name="BlockMapScalars" function="MapScalars" />
+        <Property name="BlockColorArrayNames" function="ArrayNames" />
+        <Property name="BlockLookupTableSelectors" function="LookupTableSelectors" />
+        <Property name="BlockLookupTables" function="LookupTables" />
+        <Property name="BlockUseSeparateColorMaps" function="UseSeparateColorMaps" />
         <Hints>
           <DataAssemblyPropertyWidget use_inputname_as_header="1"  link_active_selection="1"/>
         </Hints>
