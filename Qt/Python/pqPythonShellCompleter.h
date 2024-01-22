@@ -21,7 +21,7 @@ public:
     , Interpreter(interp){};
 
 protected:
-  virtual QStringList getPythonCompletions(const QString& pythonObjectName) override;
+  QStringList getPythonCompletions(const QString& pythonObjectName) override;
 
 private:
   vtkWeakPointer<vtkPythonInteractiveInterpreter> Interpreter;
