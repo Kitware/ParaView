@@ -24,7 +24,7 @@ public:
   }
 
 protected:
-  virtual QStringList getPythonCompletions(const QString& pythonObjectName) override;
+  QStringList getPythonCompletions(const QString& pythonObjectName) override;
 
   /**
    * Append the names of arrays of the dataset attributes information object at the end of the

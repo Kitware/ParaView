@@ -19,8 +19,8 @@ public:
     : pqWidgetCompleter(parent){};
 
 protected:
-  virtual QStringList getCompletions(const QString& prompt) override;
-  virtual QString getCompletionPrefix(const QString& prompt) override;
+  QStringList getCompletions(const QString& prompt) override;
+  QString getCompletionPrefix(const QString& prompt) override;
 
   /**
    * From a prompt string that can contain multiple tokens, retrieve the last (possibly incomplete)
