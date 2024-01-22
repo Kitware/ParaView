@@ -65,7 +65,7 @@ protected:
    */
   void propertyChanged(const QString& pname);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateProperty();
 
 private:
