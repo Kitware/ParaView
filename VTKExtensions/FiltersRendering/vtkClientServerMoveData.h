@@ -110,7 +110,8 @@ protected:
 
   enum Tags
   {
-    TRANSMIT_DATA_OBJECT = 23483
+    HAS_DATA_OBJECT_TO_TRANSMIT = 23479,
+    TRANSMIT_DATA_OBJECT = 23483,
   };
 
   int OutputDataType;

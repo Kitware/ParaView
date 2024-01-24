@@ -132,16 +132,40 @@ int vtkClientServerMoveData::RequestData(
 
   if (controller)
   {
-    bool is_server = (processType == SERVER);
-    bool is_client = (processType == CLIENT);
+    const bool is_server = (processType == SERVER);
+    const bool is_client = (processType == CLIENT);
     if (is_server)
     {
+      const int hasInput = (input != nullptr);
+      auto resultHasData =
+        controller->Send(&hasInput, 1, 1, vtkClientServerMoveData::HAS_DATA_OBJECT_TO_TRANSMIT);
+      if (!resultHasData)
+      {
+        vtkErrorMacro("Failed to send data to client.");
+        return 0;
+      }
+      if (!hasInput)
+      {
+        return 1;
+      }
       vtkDebugMacro("Server Root: Send input data to client.");
       output->ShallowCopy(input);
       return this->SendData(input, controller);
     }
     else if (is_client)
     {
+      int hasInput = 0;
+      auto resultHasData =
+        controller->Receive(&hasInput, 1, 1, vtkClientServerMoveData::HAS_DATA_OBJECT_TO_TRANSMIT);
+      if (!resultHasData)
+      {
+        vtkErrorMacro("Failed to receive data from server.");
+        return 0;
+      }
+      if (!hasInput)
+      {
+        return 1;
+      }
       vtkDebugMacro("Client: Get data from server and put it on the output.");
       // This is a client node.
       // If it is a selection, use the XML serializer.
@@ -167,7 +191,10 @@ int vtkClientServerMoveData::RequestData(
   vtkDebugMacro("Shallow copying input to output.");
   // If not a remote connection, nothing more to do than
   // act as a pass through filter.
-  output->ShallowCopy(input);
+  if (input != nullptr)
+  {
+    output->ShallowCopy(input);
+  }
   return 1;
 }
 
