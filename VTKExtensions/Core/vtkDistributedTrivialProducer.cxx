@@ -2,13 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkDistributedTrivialProducer.h"
 
-#include "vtkDataSet.h"
-#include "vtkGarbageCollector.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
+#include "vtkDataObject.h"
+#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <map>
 #include <string>
@@ -66,7 +63,7 @@ void vtkDistributedTrivialProducer::SetGlobalOutput(const char* key, vtkDataObje
   if (key)
   {
     vtkDistributedTrivialProducer::InternalStatic->RegisteredDataObjectMap[key] = output;
-    cout << "Set Global Dataset for " << key << endl;
+    vtkLog(TRACE, << "Set Global Dataset for " << key);
   }
 }
 
@@ -86,7 +83,7 @@ void vtkDistributedTrivialProducer::ReleaseGlobalOutput(const char* key)
 //----------------------------------------------------------------------------
 void vtkDistributedTrivialProducer::UpdateFromGlobal(const char* key)
 {
-  cout << "Update DS with key " << key << endl;
+  vtkDebugMacro(<< "Update DS with key " << key);
   if (vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key))
   {
     // vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key)->PrintSelf(cout,
@@ -94,7 +91,7 @@ void vtkDistributedTrivialProducer::UpdateFromGlobal(const char* key)
   }
   else
   {
-    cout << "No dataset" << endl;
+    vtkDebugMacro(<< "No dataset for key=" << key);
   }
   this->SetOutput(vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key));
 }
