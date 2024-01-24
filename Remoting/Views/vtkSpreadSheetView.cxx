@@ -20,6 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
@@ -30,12 +31,12 @@
 #include "vtkSpreadSheetRepresentation.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
+#include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkVariant.h"
 
 #include <algorithm>
 #include <cstring>
-#include <iterator>
 #include <map>
 #include <set>
 #include <string>
@@ -225,14 +226,25 @@ class vtkSpreadSheetView::vtkInternals
   public:
     vtkSmartPointer<vtkTable> Dataobject;
     vtkTimeStamp RecentUseTime;
+
+    CacheInfo()
+    {
+      this->Dataobject = nullptr;
+      this->RecentUseTime = vtkTimeStamp();
+    }
   };
 
   typedef std::map<vtkIdType, CacheInfo> CacheType;
   CacheType CachedBlocks;
+  std::pair<vtkIdType, CacheInfo> PreviousFirstCachedBlock;
 
 public:
   void ClearCache()
   {
+    if (!this->CachedBlocks.empty())
+    {
+      this->PreviousFirstCachedBlock = *this->CachedBlocks.begin();
+    }
     this->CachedBlocks.clear();
     this->ColumnMetaData.clear();
     this->ColumnIndexMap.clear();
@@ -417,11 +429,18 @@ public:
   }
 
   /**
-   * A convenient method to get some block. It returns either a cached block
-   * or the most recently accessed block, if possible. This method will avoid a
-   * fetch unless needed.
+   * Get Previous first cached block
    */
-  vtkTable* GetSomeBlock(vtkSpreadSheetView* self)
+  std::pair<vtkIdType, CacheInfo> GetPreviousFirstCachedBlock()
+  {
+    return this->PreviousFirstCachedBlock;
+  }
+
+  /**
+   * A convenient method to get an existing block. It returns either the most recently accessed
+   * block or a cached block.
+   */
+  vtkTable* GetAnExistingBlock(vtkSpreadSheetView* self)
   {
     const auto mrbId = this->GetMostRecentlyAccessedBlock(self);
     if (auto table = this->GetDataObject(mrbId))
@@ -436,7 +455,23 @@ public:
         return cinfo.second.Dataobject;
       }
     }
-    return self->FetchBlock(mrbId);
+    return nullptr;
+  }
+
+  /**
+   * A convenient method to get some block. It returns either the most recently accessed block
+   * or a cached block, if possible. This method will avoid a fetch unless needed.
+   */
+  vtkTable* GetSomeBlock(vtkSpreadSheetView* self)
+  {
+    if (auto table = this->GetAnExistingBlock(self))
+    {
+      return table;
+    }
+    else
+    {
+      return self->FetchBlock(this->GetMostRecentlyAccessedBlock(self));
+    }
   }
 
   vtkIdType MostRecentlyAccessedBlock;
@@ -763,7 +798,66 @@ void vtkSpreadSheetView::Update()
   }
 
   this->SomethingUpdated = false;
-  this->Superclass::Update();
+
+  // The code below is the same with vtkPVView::Update() except for the addition of a block to the
+  // cache if none exists. This is needed to ensure that if a progress event is attempted to be
+  // handled, because of a WrongTagEvent during another Receive call message from the client's
+  // controller in any view that is present, the progress can query some block from the cache
+  // instead of trying to fetch it from the server which will result in a deadlock. After finishing
+  // the Update(), a StillRender/InteractiveRender will be called which will ensure that the cache
+  // is cleared and the correct block is fetched from the server.
+
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: update view", this->GetLogName().c_str());
+
+  // Propagate update time.
+  const int num_reprs = this->GetNumberOfRepresentations();
+  const auto view_time = this->GetViewTime();
+  for (int cc = 0; cc < num_reprs; cc++)
+  {
+    if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
+    {
+      // Pass the view time information to the representation
+      if (this->GetViewTime())
+      {
+        pvrepr->SetUpdateTime(view_time);
+      }
+      else
+      {
+        pvrepr->ResetUpdateTime();
+      }
+    }
+  }
+
+  vtkTimerLog::MarkStartEvent("vtkPVView::Update");
+  const int count = this->CallProcessViewRequest(
+    vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
+  vtkTimerLog::MarkEndEvent("vtkPVView::Update");
+
+  // Add a block to the cache if it doesn't exist.
+  if (!this->Internals->GetAnExistingBlock(this))
+  {
+    // Add the previous first cached block to the cache if it exists.
+    auto previousFirstCachedBlock = this->Internals->GetPreviousFirstCachedBlock();
+    vtkSmartPointer<vtkTable> table = previousFirstCachedBlock.second.Dataobject;
+    if (table)
+    {
+      this->Internals->AddToCache(previousFirstCachedBlock.first, table, 10);
+    }
+    else // Add an empty block to the cache.
+    {
+      table = vtkSmartPointer<vtkTable>::New();
+      this->Internals->AddToCache(0, table, 10);
+    }
+  }
+
+  // exchange information about representations that are time-dependent.
+  // this goes from data-server-root to client and render-server.
+  if (count)
+  {
+    this->SynchronizeRepresentationTemporalPipelineStates();
+  }
+
+  this->UpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
