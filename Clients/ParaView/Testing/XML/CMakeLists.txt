@@ -214,6 +214,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/Unbalanced3DepthOctTree3x2x3.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/vehicle_data.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"
+  "DATA{${paraview_test_data_directory_input}/Data/vtkHDF/pdc_multi.vtkhdf}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletElevation.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletMaterial.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletThresholdLegacy.pvsm}"
@@ -771,6 +772,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeIsosurfaceBlendMode.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeNoMapScalars.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeSliceBlendMode.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VTKHDFWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/WaveNoFontScale.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/WaveFontScale.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/YoungsMaterialInterface.png}"
@@ -1512,6 +1514,15 @@ if(VTK_USE_LARGE_DATA)
   list(APPEND TESTS_WITH_BASELINES
     RestoreBlockColorDefaultTransferFunction.xml
     )
+endif()
+
+# VTKHDFWriter does not work with MPI yet
+# See issue https://gitlab.kitware.com/vtk/vtk/-/issues/19231
+if (TARGET VTK::IOHDF)
+  paraview_add_client_tests(
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS VTKHDFWriter.xml
+  )
 endif()
 
 # The color dialog is different on MacOS X which makes this test fail.

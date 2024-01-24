@@ -1,0 +1,100 @@
+<ServerManagerConfiguration>
+<!-- ================================================================= -->
+  <ProxyGroup name="writers">
+    <PWriterProxy base_proxygroup="internal_writers"
+                  name="VTKHDFWriter"
+                  class="vtkHDFWriter">
+      <Documentation short_help="Write a dataset in VTKHDF format."
+                    long_help="Write files stored in VTKHDF format.">
+        The VTKHDF Writer writes files in VTKHDF format,
+        using extension .vtkhdf, a format derived from HDF5.
+        Currently, it supports writing Unstructured Grid
+        and PolyData datasets, possibly transient,
+        as well as composite types Partitioned Dataset Collection
+        and Multiblock Dataset, without transient support.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkPartitionedDataSetCollection"/>
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is written to the file.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                        default_values="0"
+                        name="WriteAllTimeSteps"
+                        number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When WriteAllTimeSteps is turned ON, the writer writes every available
+          timestep to file. Otherwise, only the current timestep is written.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetChunkSize"
+                        default_values="100"
+                        name="ChunkSize"
+                        number_of_elements="1">
+        <IntRangeDomain min="1" name="chunk_range"/>
+        <Documentation>
+          Chunk Size controls the size of HDF5 datasets chunks,
+          only used for transient data. Chunk size can impact multi-process
+          reading performance.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="VTKHDF Writer transient parameters">
+        <Property name="WriteAllTimeSteps"/>
+        <Property name="ChunkSize"/>
+      </PropertyGroup>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="WriteAll" show="0"/>
+        <WriterFactory extensions="vtkhdf" file_description="VTKHDF Files"/>
+      </Hints>
+    </PWriterProxy>
+  </ProxyGroup>
+
+<!-- ================================================================= -->
+  <ProxyGroup name="extract_writers">
+    <DataExtractWriterProxy name="VTKHDF">
+      <Documentation>
+        Extract writer to write data using the VTKHDF file format (.vtkhdf)
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_{timestep:06d}.vtkhdf">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="VTKHDFWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+          <Property name="WriteAllTimeSteps" panel_visibility="advanced" />
+          <Property name="ChunkSize" panel_visibility="advanced" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
+    </DataExtractWriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

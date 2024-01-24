@@ -261,7 +261,8 @@ endif ()
 
 if (TARGET VTK::IOHDF)
   list(APPEND xml_files
-    Resources/readers_iohdf.xml)
+    Resources/readers_iohdf.xml
+    Resources/writers_iohdf.xml)
 endif ()
 
 if (TARGET VTK::IOERF)
