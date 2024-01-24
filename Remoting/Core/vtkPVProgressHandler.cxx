@@ -21,7 +21,7 @@
 
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
-//#define PV_DISABLE_PROGRESS_HANDLING
+// #define PV_DISABLE_PROGRESS_HANDLING
 
 #define SKIP_IF_DISABLED()                                                                         \
   if (this->Internals->DisableProgressHandling)                                                    \
@@ -144,7 +144,7 @@ vtkPVProgressHandler::~vtkPVProgressHandler()
 void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
 {
   if (object &&
-    (object->IsA("vtkAlgorithm") || object->IsA("vtkExporter") ||
+    (object->IsA("vtkAlgorithm") || object->IsA("vtkExporter") || object->IsA("vtkMetaImporter") ||
       object->IsA("vtkSMAnimationSceneWriter")))
   {
     this->Internals->RegisteredObjects[object] = id;
@@ -314,6 +314,7 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* caller, unsigned long even
   this->Internals->ProgressTimer->StopTimer();
   // cout <<"Elapsed: " << this->Internals->ProgressTimer->GetElapsedTime() <<
   //  endl;
+  double progress = *reinterpret_cast<double*>(calldata);
   if (this->Internals->ProgressTimer->GetElapsedTime() < this->ProgressInterval)
   {
     return;
@@ -321,7 +322,6 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* caller, unsigned long even
 
   this->Internals->ProgressTimer->StartTimer();
 
-  double progress = *reinterpret_cast<double*>(calldata);
   if (progress < 0 || progress > 1.0)
   {
 #ifndef NDEBUG
