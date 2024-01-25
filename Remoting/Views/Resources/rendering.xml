@@ -283,6 +283,8 @@
                proxyname="NetworkImageSource" />
         <ExposedProperties>
           <Property name="FileName" />
+          <Property name="TrivialProducerKey" />
+          <Property name="Mode" />
         </ExposedProperties>
       </SubProxy>
       <IntVectorProperty animateable="1"

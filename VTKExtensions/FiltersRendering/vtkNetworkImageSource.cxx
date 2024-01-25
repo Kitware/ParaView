@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkNetworkImageSource.h"
 
+#include "vtkDistributedTrivialProducer.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
@@ -30,14 +32,25 @@ vtkNetworkImageSource::vtkNetworkImageSource()
   this->SetNumberOfInputPorts(0);
   this->Buffer = vtkImageData::New();
   this->FileName = nullptr;
+  this->TrivialProducerKey = nullptr;
+  this->Mode = ModeType::ReadFromFile;
 }
 
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::~vtkNetworkImageSource()
 {
   this->SetFileName(nullptr);
+  this->SetTrivialProducerKey(nullptr);
   this->Buffer->Delete();
   this->Buffer = nullptr;
+}
+
+void vtkNetworkImageSource::SetMode(int mode)
+{
+  if (mode >= 0 && mode <= 1)
+  {
+    this->SetMode(static_cast<ModeType>(mode));
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -48,7 +61,9 @@ void vtkNetworkImageSource::UpdateImage()
     return;
   }
 
-  if (this->FileName == nullptr || this->FileName[0] == 0)
+  const bool hasFileName = (this->FileName != nullptr && this->FileName[0] != 0);
+  const bool hasTPKey = (this->TrivialProducerKey != nullptr && this->TrivialProducerKey[0] != 0);
+  if (!(hasFileName || hasTPKey))
   {
     return;
   }
@@ -66,25 +81,58 @@ void vtkNetworkImageSource::UpdateImage()
     return;
   }
 
-  vtkPVSession::ServerFlags roles = session->GetProcessRoles();
-  if ((roles & vtkPVSession::CLIENT) != 0)
+  const vtkPVSession::ServerFlags roles = session->GetProcessRoles();
+  if (this->Mode == ModeType::ReadFromFile)
   {
-    // We are expected to read the image on this process.
-    this->ReadImageFromFile(this->FileName);
-    vtkMultiProcessController* rs_controller = session->GetController(vtkPVSession::RENDER_SERVER);
-    if (rs_controller)
+    if ((roles & vtkPVSession::CLIENT) != 0)
     {
-      rs_controller->Send(this->Buffer, 1, 0x287823);
+      // We are expected to read the image on this process.
+      this->ReadImageFromFile(this->FileName);
+      vtkMultiProcessController* rs_controller =
+        session->GetController(vtkPVSession::RENDER_SERVER);
+      if (rs_controller)
+      {
+        rs_controller->Send(this->Buffer, 1, 0x287823);
+      }
+    }
+    else if ((roles & vtkPVSession::RENDER_SERVER) != 0 ||
+      (roles & vtkPVSession::RENDER_SERVER_ROOT) != 0)
+    {
+      // receive the image from the client.
+      vtkMultiProcessController* client_controller = session->GetController(vtkPVSession::CLIENT);
+      if (client_controller)
+      {
+        client_controller->Receive(this->Buffer, 1, 0x287823);
+      }
     }
   }
-  else if ((roles & vtkPVSession::RENDER_SERVER) != 0 ||
-    (roles & vtkPVSession::RENDER_SERVER_ROOT) != 0)
+  else if (this->Mode == ModeType::ReadFromMemory)
   {
-    // receive the image from the client.
-    vtkMultiProcessController* client_controller = session->GetController(vtkPVSession::CLIENT);
-    if (client_controller)
+    if (roles == vtkPVSession::CLIENT_AND_SERVERS)
     {
-      client_controller->Receive(this->Buffer, 1, 0x287823);
+      // builtin session, read image on this process.
+      this->ReadImageFromMemory(this->TrivialProducerKey);
+    }
+    else if ((roles & vtkPVSession::CLIENT) != 0)
+    {
+      // receive the image from the server.
+      vtkMultiProcessController* rs_controller =
+        session->GetController(vtkPVSession::RENDER_SERVER);
+      if (rs_controller)
+      {
+        rs_controller->Receive(this->Buffer, 1, 0x287823);
+      }
+    }
+    else if ((roles & vtkPVSession::RENDER_SERVER) != 0 ||
+      (roles & vtkPVSession::RENDER_SERVER_ROOT) != 0)
+    {
+      // We are expected to read the image on this process.
+      this->ReadImageFromMemory(this->TrivialProducerKey);
+      vtkMultiProcessController* client_controller = session->GetController(vtkPVSession::CLIENT);
+      if (client_controller)
+      {
+        client_controller->Send(this->Buffer, 1, 0x287823);
+      }
     }
   }
 
@@ -154,6 +202,31 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
                 "enable `VTK::IOImage` module.");
   return 0;
 #endif
+}
+
+//----------------------------------------------------------------------------
+int vtkNetworkImageSource::ReadImageFromMemory(const char* trivialProducerKey)
+{
+  if (!trivialProducerKey || !trivialProducerKey[0])
+  {
+    vtkErrorMacro("TrivialProducerKey must be set.");
+    return 0;
+  }
+  auto producer = vtk::TakeSmartPointer(vtkDistributedTrivialProducer::New());
+  producer->UpdateFromGlobal(trivialProducerKey);
+  if (auto image = vtkImageData::SafeDownCast(producer->GetOutputDataObject(0)))
+  {
+    this->Buffer->ShallowCopy(image);
+    return 1;
+  }
+  else
+  {
+    producer->GetOutputDataObject(0)->Print(std::cout);
+    vtkErrorMacro("DataObject at key=" << trivialProducerKey << ", "
+                                       << vtkLogIdentifier(producer->GetOutputDataObject(0))
+                                       << " is not a vtkImageData");
+    return 0;
+  }
 }
 
 //----------------------------------------------------------------------------

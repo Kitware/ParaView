@@ -341,11 +341,18 @@ class Trace(object):
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("textures", obj.SMProxy)
             if pname:
                 accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                filename = obj.FileName
-                # repr() will escape the path correctly, especially backslash on Windows.
-                cls.Output.append_separated([ \
-                    "# a texture",
-                    "%s = CreateTexture(%s)" % (accessor, repr(filename))])
+                mode = obj.Mode
+                if mode == 'ReadFromFile':
+                    filename = obj.FileName
+                    # repr() will escape the path correctly, especially backslash on Windows.
+                    cls.Output.append_separated([ \
+                            "# a texture",
+                            "%s = FindTextureOrCreate(registrationName=%s, filename=%s)" % (accessor, repr(pname), repr(filename))])
+                else:
+                    tp_key = obj.TrivialProducerKey
+                    cls.Output.append_separated([ \
+                            "# a texture",
+                            "%s = FindTextureOrCreate(registrationName=%s, filename=None, trivial_producer_key=%s)" % (accessor, repr(pname), repr(tp_key))])
             return True
         if cls.get_registered_name(obj, "extractors"):
             regName = cls.get_registered_name(obj, "extractors")
@@ -1449,6 +1456,34 @@ class RegisterLightProxy(RenderingMixin, TraceItem):
             trace.append(accessor.trace_ctor("AddLight", filter, ctor_args="view=%s" % viewAccessor))
         else:
             trace.append(accessor.trace_ctor("CreateLight", filter))
+        Trace.Output.append_separated(trace.raw_data())
+        TraceItem.finalize(self)
+
+
+class RegisterTextureProxy(RenderingMixin, TraceItem):
+    """Traces creation of a new texture (vtkSMParaViewPipelineController::RegisterTextureProxy)"""
+    def __init__(self, proxy, filename, trivial_producer_key, proxyname):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        self.filename = filename
+        self.trivial_producer_key = trivial_producer_key
+        self.proxyname = proxyname
+        self.read_from_file = len(filename) and not len(trivial_producer_key)
+        self.read_from_memory = not self.read_from_file
+        assert not self.Proxy is None
+
+    def finalize(self):
+        pname = Trace.get_registered_name(self.Proxy, "textures")
+        varname = Trace.get_varname(pname)
+        accessor = ProxyAccessor(varname, self.Proxy)
+        trace = TraceOutput()
+        trace.append("# Create a new '%s'" % self.Proxy.GetXMLLabel())
+        filter = ProxyFilter()
+        if self.read_from_file:
+            trace.append(accessor.trace_ctor("CreateTexture", filter, ctor_args=f"filename={self.filename}"))
+        elif self.read_from_memory:
+            ctor_str = f"filename=None, trivial_producer_key={self.trivial_producer_key}, proxyname={self.proxyname}"
+            trace.append(accessor.trace_ctor("CreateTexture", filter, ctor_args=ctor_str))
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 

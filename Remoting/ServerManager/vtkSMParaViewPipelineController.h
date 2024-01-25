@@ -224,6 +224,8 @@ public:
    * needed python tracing.
    */
   virtual bool RegisterTextureProxy(vtkSMProxy* proxy, const char* filename);
+  virtual bool RegisterTextureProxy(
+    vtkSMProxy* proxy, const char* trivialProducerKeyName, const char* proxyname);
 
   //---------------------------------------------------------------------------
   // *******  Methods for Extractors  *********

@@ -26,12 +26,34 @@ public:
   vtkTypeMacro(vtkNetworkImageSource, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  enum class ModeType : int
+  {
+    ReadFromFile,
+    ReadFromMemory
+  };
+
   ///@{
   /**
    * Get/Set the filename.
    */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the key used to access image from vtkDistributedTrivialProducer.
+   */
+  vtkSetStringMacro(TrivialProducerKey);
+  vtkGetStringMacro(TrivialProducerKey);
+  ///@}
+
+  ///@{
+  /**
+   * Set the mode in which image data is read.
+   */
+  vtkSetEnumMacro(Mode, ModeType);
+  void SetMode(int mode);
   ///@}
 
   /**
@@ -46,9 +68,12 @@ protected:
   vtkTimeStamp UpdateImageTime;
 
   char* FileName;
+  char* TrivialProducerKey;
+  ModeType Mode;
 
   vtkImageData* Buffer;
   int ReadImageFromFile(const char* filename);
+  int ReadImageFromMemory(const char* trivialProducerKey);
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
