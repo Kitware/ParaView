@@ -887,11 +887,11 @@ if (PARAVIEW_ENABLE_CATALYST)
 endif ()
 
 include(vtkModuleJson)
-if(NOT PARAVIEW_USE_EXTERNAL_VTK)
-    vtk_module_json(
-      MODULES ${vtk_modules}
-      OUTPUT "vtk-modules.json")
-endif()
+if (NOT PARAVIEW_USE_EXTERNAL_VTK)
+  vtk_module_json(
+    MODULES ${vtk_modules}
+    OUTPUT "vtk-modules.json")
+endif ()
 vtk_module_json(
   MODULES ${paraview_modules}
   OUTPUT "paraview-modules.json")
