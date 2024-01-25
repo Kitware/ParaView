@@ -1,0 +1,93 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="importers">
+    <!-- Proxy group for importers used to import views -->
+    <ImporterProxy class="vtkMetaImporter"
+                   name="MetaImporter"
+                   processes="dataserver|renderserver|client">
+      <Documentation long_help="Import scene from a file">
+        vtkMetaImporter provides a way to import scene from files.
+      </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>Name of the file to be read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="AssemblyTag"
+                         command="GetAssemblyTag"
+                         information_only="1">
+        <Documentation>
+        This is simply an int that changes whenever a new assembly is built
+        by the importer. This can be used to determine if the assembly should be fetched from
+        the importer whenever the importer is updated.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="Assembly"
+                            command="SetActiveAssembly"
+                            number_of_elements="1"
+                            default_values="DefaultScene"
+                            panel_visibility="default">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property name="AssemblyTag" function="Tag" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose nodes to import from the file.
+        </Documentation>
+        <Hints>
+        <!-- AssemblyTag == 0 implies there's no assembly in the file,
+          in which case, we want to hide this widget entirely -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AssemblyTag"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="NodeSelectors"
+                            command="AddNodeSelector"
+                            clean_command="RemoveAllNodeSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            panel_visibility="default"
+                            number_of_elements="1"
+                            default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property name="Assembly"    function="ActiveAssembly" />
+            <Property name="AssemblyTag" function="Tag" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to extract from the input dataset.
+        </Documentation>
+        <Hints>
+        <!-- AssemblyTag == 0 implies there's no assembly in the file,
+          in which case, we want to hide this widget entirely -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AssemblyTag"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
+      </StringVectorProperty>
+      <Hints>
+        <ImporterFactory extensions="3ds gltf glb obj" />
+      </Hints>
+      <PropertyGroup label="Scene"
+                     panel_widget="DataAssemblyEditor"
+                     panel_visibility="default">
+        <Property name="Assembly"      function="ActiveAssembly" />
+        <Property name="NodeSelectors" function="Selectors" />
+        <Hints>
+          <DataAssemblyPropertyWidget is_checkable="1"/>
+        </Hints>
+      </PropertyGroup>
+      <!-- End of MetaImporter -->
+    </ImporterProxy>
+    <!-- End of "importers" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

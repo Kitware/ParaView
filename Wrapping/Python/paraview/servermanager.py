@@ -64,6 +64,11 @@ except ImportError:
     pass
 
 try:
+    from paraview.modules.vtkRemotingImport import *
+except ImportError:
+    pass
+
+try:
     from paraview.modules.vtkRemotingMisc import *
 except ImportError:
     pass

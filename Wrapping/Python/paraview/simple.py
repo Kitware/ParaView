@@ -2761,6 +2761,26 @@ def ExportView(filename, view=None, **params):
     del helper
 
 
+def ImportView(filename, view=None, **params):
+    """Import a view from the specified input file."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if not filename:
+        raise ValueError ("No filename specified")
+    session = servermanager.ActiveConnection.Session
+    proxy = servermanager.vtkSMImporterFactory.CreateImporter(filename, session)
+    if not proxy:
+        raise RuntimeError ("Failed to create importer for ", filename)
+    proxy.UnRegister(None)
+    proxy = servermanager._getPyProxy(proxy)
+    SetProperties(proxy, **params)
+    proxy.UpdatePipelineInformation()
+    proxy.Import(view)
+    view.StillRender()
+    del proxy
+
+
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
     if proxy == None:
         proxy = GetActiveSource()

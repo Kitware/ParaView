@@ -1558,6 +1558,27 @@ class ExportView(RenderingMixin, TraceItem):
         Trace.Output.append_separated(trace.raw_data())
 
 
+class ImportView(RenderingMixin, TraceItem):
+    def __init__(self, view, importer, filename):
+        TraceItem.__init__(self)
+
+        view = sm._getPyProxy(view)
+        importer = sm._getPyProxy(importer)
+
+        viewAccessor = Trace.get_accessor(view)
+        importerAccessor = ProxyAccessor("temporaryImporter", importer)
+
+        trace = TraceOutput()
+        trace.append("# import file")
+        trace.append(\
+            importerAccessor.trace_ctor("ImportView", ExporterProxyFilter(),
+              ctor_args="%s, view=%s" % (repr(filename), viewAccessor),
+              skip_assignment=True))
+        importerAccessor.finalize() # so that it will get deleted
+        del importerAccessor
+        Trace.Output.append_separated(trace.raw_data())
+
+
 class SaveData(TraceItem):
     def __init__(self, writer, filename, source, port):
         TraceItem.__init__(self)

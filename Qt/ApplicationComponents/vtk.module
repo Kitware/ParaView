@@ -20,6 +20,7 @@ PRIVATE_DEPENDS
   ParaView::RemotingApplication
   ParaView::RemotingCore
   ParaView::RemotingExport
+  ParaView::RemotingImport
   ParaView::RemotingLive
   ParaView::RemotingMisc
   ParaView::RemotingSettings

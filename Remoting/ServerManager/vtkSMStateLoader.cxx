@@ -214,6 +214,10 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
   {
     vtkSMSourceProxy::SafeDownCast(proxy)->UpdatePipelineInformation();
   }
+  else if (proxy->IsA("vtkSMImporterProxy"))
+  {
+    proxy->UpdatePipelineInformation();
+  }
   if (this->Internal->DeferProxyRegistration)
   {
     this->Internal->ProxyCreationOrder.push_back(
