@@ -43,6 +43,15 @@ if (DEFINED "ENV{PARAVIEW_COMMIT_SHORT_SHA}")
 endif()
 
 set(CTEST_BUILD_NAME "$ENV{CI_PROJECT_NAME}-${build_name_prefix}[$ENV{CMAKE_CONFIGURATION}]")
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "mindeps")
+  set(mindeps_cmake "${CTEST_SOURCE_DIRECTORY}/.gitlab/cmake-mindeps/bin/cmake")
+  if (NOT EXISTS "${mindeps_cmake}")
+    message(FATAL_ERROR "Missing mindeps cmake, run `.gitlab/ci/cmake.sh mindeps`")
+  endif ()
+  set(_ctest_configure_command "${mindeps_cmake};${CTEST_SOURCE_DIRECTORY}")
+else ()
+  set(_ctest_configure_command "cmake;${CTEST_SOURCE_DIRECTORY}")
+endif ()
 
 # Default to Release builds.
 if (NOT "$ENV{CMAKE_BUILD_TYPE}" STREQUAL "")
