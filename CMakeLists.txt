@@ -645,7 +645,7 @@ else ()
     add_subdirectory(VTK/Remote)
   endif()
 
-  # Set up these variables now so that modules may acess them
+  # Set up these variables now so that modules may access them
   if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     set(vtk_cmake_dir
       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
