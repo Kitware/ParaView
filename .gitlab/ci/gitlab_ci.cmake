@@ -12,6 +12,9 @@ if (NOT DEFINED "ENV{CI_PROJECT_DIR}")
   set(CTEST_SOURCE_DIRECTORY "${project_dir}")
 else()
   set(CTEST_SOURCE_DIRECTORY "$ENV{CI_PROJECT_DIR}")
+  # Convert path to CMake style path to avoid `\` character clobbering
+  # when building the `CTEST_CONFIGURE_COMMAND`
+  file(TO_CMAKE_PATH "${CTEST_SOURCE_DIRECTORY}" CTEST_SOURCE_DIRECTORY)
   set(CTEST_SITE "gitlab-ci")
 endif()
 
