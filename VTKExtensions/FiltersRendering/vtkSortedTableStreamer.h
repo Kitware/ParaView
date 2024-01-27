@@ -146,8 +146,9 @@ private:
 
   vtkSmartPointer<vtkUnsignedIntArray> GenerateCompositeIndexArray(
     vtkPartitionedDataSet* cd, vtkIdType maxSize);
-  std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray>>
-  GenerateBlockNameArray(vtkPartitionedDataSet* cd, vtkIdType maxSize);
+  vtkSmartPointer<vtkStringArray> GenerateBlockNameArray(vtkPartitionedDataSet* cd);
+  vtkSmartPointer<vtkIdTypeArray> GenerateBlockIndicesArray(
+    vtkPartitionedDataSet* cd, vtkStringArray* blockNames, vtkIdType maxSize);
 };
 
 #endif

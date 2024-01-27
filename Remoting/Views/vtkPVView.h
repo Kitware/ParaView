@@ -87,6 +87,11 @@ public:
   vtkGetMacro(ViewTime, double);
   ///@}
 
+  /**
+   * Get ViewTimeValid.
+   */
+  vtkGetMacro(ViewTimeValid, bool);
+
   ///@{
   /**
    * Get/Set the cache key. When caching is enabled, this key is used to
@@ -362,15 +367,15 @@ protected:
 
   static vtkPVDataDeliveryManager* GetDeliveryManager(vtkInformation* info);
 
-private:
-  vtkPVView(const vtkPVView&) = delete;
-  void operator=(const vtkPVView&) = delete;
-
   /**
    * Called in Update() to sync HasTemporalPipeline flags between
    * representations on all processes.
    */
   void SynchronizeRepresentationTemporalPipelineStates();
+
+private:
+  vtkPVView(const vtkPVView&) = delete;
+  void operator=(const vtkPVView&) = delete;
 
   vtkRenderWindow* RenderWindow;
   bool ViewTimeValid;
