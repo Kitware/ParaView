@@ -1,7 +1,7 @@
 <!-- Proxy definitions for FFMPEG writer -->
 <ServerManagerConfiguration>
   <ProxyGroup name="animation_writers">
-    <Proxy name="FFMPEG" class="vtkFFMPEGWriter" processes="client">
+    <Proxy name="FFMPEG" class="vtkFFMPEGWriter" processes="client,dataserver">
       <Documentation>
         FFMPEG animation writer.
       </Documentation>
