@@ -1081,7 +1081,25 @@ def GetProxy(module, key, **kwargs):
                     assemblyDomain.SetBackwardCompatibilityMode(True)
                     return proxy
 
+    # deprecation case
+    if type(key) == tuple and len(key) == 2:
+        proxy = builtins.getattr(module, key[1])(**kwargs)
+
+        return proxy
+
     return builtins.getattr(module, key)(**kwargs)
+
+
+def get_deprecated_proxies(proxiesNS):
+    """
+    Provide a map between deprecated proxies and their fallback proxy
+    """
+    compatibility_version = get_paraview_compatibility_version()
+    proxies = {}
+    proxies[proxiesNS.sources] = []
+    proxies[proxiesNS.filters] = []
+
+    return proxies
 
 
 def lookupTableUpdate(lutName):
