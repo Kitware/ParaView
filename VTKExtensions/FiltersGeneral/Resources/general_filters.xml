@@ -1871,7 +1871,7 @@ Every Nth Point.
                          default_values="0"
                          name="ExtensiveComputation"
                          number_of_elements="1"
-                         panel_visibility="advanced">
+                         panel_visibility="default">
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
