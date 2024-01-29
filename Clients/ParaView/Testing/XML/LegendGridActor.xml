@@ -13,5 +13,17 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/TopBorderOffset/IntRangeWidget/LineEdit" command="set_string" arguments="80" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/BottomBorderOffset/IntRangeWidget/LineEdit" command="set_string" arguments="80" />
 
+  <!-- Edit Axis color-->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GridColor/ColorButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GridColor/ColorButton/1QColorDialog0" command="setChosenColor" arguments="255,85,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GridColor/ColorButton/1QColorDialog0" command="done" arguments="1" />
+
+  <!-- Edit label notation and number of labels -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/AxisNotation/ComboBox" command="activated" arguments="Scientific" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/AxisPrecision/LineEdit0" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/AdjustLabels/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/HorizontalLabelNumber/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
+
+  <!-- Apply changes -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LegendGrid/EditProxy/widget/OKButton" command="activate" arguments="" />
 </pqevents>

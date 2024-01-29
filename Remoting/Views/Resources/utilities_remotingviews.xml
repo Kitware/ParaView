@@ -3137,6 +3137,37 @@
         </Documentation>
       </IntVectorProperty>
 
+      <SubProxy command="SetAxesProperty">
+        <Proxy name="2DProperty" class="vtkProperty2D" processes="client|dataserver|renderserver" >
+          <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                                name="GridColor"
+                                command="SetColor"
+                                number_of_elements="3"
+                                panel_widget="color_selector">
+            <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+            <Documentation>Color used when coloring the axes and grid</Documentation>
+          </DoubleVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="GridColor" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <IntVectorProperty command="SetGridVisibility"
+                        default_values="1"
+                        name="GridVisibility"
+                        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When turned on, show the full axis grid
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Axis appearance">
+        <Property name="GridColor" />
+        <Property name="GridVisibility" />
+      </PropertyGroup>
+
       <IntVectorProperty name="RightBorderOffset"
                         command="SetRightBorderOffset"
                         number_of_elements="1"
@@ -3189,6 +3220,13 @@
         </Documentation>
       </IntVectorProperty>
 
+      <PropertyGroup label="Axis positions" panel_visibility="advanced">
+        <Property name="RightBorderOffset" />
+        <Property name="LeftBorderOffset" />
+        <Property name="TopBorderOffset" />
+        <Property name="BottomBorderOffset" />
+      </PropertyGroup>
+
       <SubProxy command="SetAxesTextProperty">
         <Proxy name="AxesTextProperties" proxygroup="properties" proxyname="TextProperty" />
         <ExposedProperties>
@@ -3213,6 +3251,96 @@
         <Property name="LegendLabelShadow" function="Shadow" />
         <Property name="LegendLabelOpacity" function="Opacity" />
       </PropertyGroup>
+
+      <IntVectorProperty name="AxisNotation"
+                        command="SetNotation"
+                        default_values="0"
+                        number_of_elements="1">
+        <Documentation>
+          Set the numerical notation for axis labels: standard, scientific or mixed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Default" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetPrecision"
+                        default_values="2"
+                        name="AxisPrecision"
+                        number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Set the numerical precision to use for the axis (only for scientific and fixed-point notation).
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisNotation" value="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisNotation" value="2"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Axis Label notation">
+        <Property name="AxisNotation"/>
+        <Property name="AxisPrecision"/>
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetAdjustLabels"
+                        default_values="1"
+                        name="AdjustLabels"
+                        number_of_elements="1"
+                        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When turned on, automatically select the number of ticks for each axis.
+          Unadjusted labels may not have round values.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetNumberOfHorizontalLabels"
+                        default_values="5"
+                        panel_visibility="advanced"
+                        name="HorizontalLabelNumber"
+                        number_of_elements="1">
+        <IntRangeDomain name="range" min="0" max="24"/>
+        <Documentation>
+          Set the number of ticks and labels for the horizontal axis.
+        </Documentation>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            </ProxyEditorPropertyWidget>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="AdjustLabels" value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetNumberOfVerticalLabels"
+                        default_values="5"
+                        panel_visibility="advanced"
+                        name="VerticalLabelNumber"
+                        number_of_elements="1">
+        <IntRangeDomain name="range" min="0" max="24"/>
+        <Documentation>
+          Set the number of ticks and labels for the vertical axis.
+        </Documentation>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            </ProxyEditorPropertyWidget>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="AdjustLabels" value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Tick configuration" panel_visibility="advanced">
+        <Property name="AdjustLabels" />
+        <Property name="HorizontalLabelNumber" />
+        <Property name="VerticalLabelNumber" />
+      </PropertyGroup>
+
     </Proxy>
 
     <!-- ================================================================== -->

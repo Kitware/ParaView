@@ -12,6 +12,7 @@ vtkStandardNewMacro(vtkPVGridAxes3DActor);
 //----------------------------------------------------------------------------
 vtkPVGridAxes3DActor::vtkPVGridAxes3DActor()
 {
+
   this->DataScale[0] = this->DataScale[1] = this->DataScale[2] = 1.0;
   this->DataPosition[0] = this->DataPosition[1] = this->DataPosition[2] = 0.0;
   this->DataBoundsScaleFactor = 1;
