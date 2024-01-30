@@ -16,14 +16,18 @@
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCoreUtilities.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMReaderFactory.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include <vtksys/SystemTools.hxx>
 
 #include <QInputDialog>
+#include <QMessageBox>
 
 #include <algorithm>
+#include <cassert>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -73,51 +77,73 @@ void pqChangeFileNameReaction::changeFileName()
   }
 
   pqServer* server = pqActiveObjects::instance().activeServer();
-
-  vtkNew<vtkCollection> collection;
-  vtkPVXMLElement* hints = proxy->GetHints();
-  hints->FindNestedElementByName("ReaderFactory", collection);
-
-  if (!collection->GetNumberOfItems())
+  if (!server)
   {
     return;
   }
 
-  vtkPVXMLElement* readerFactory = vtkPVXMLElement::SafeDownCast(collection->GetItemAsObject(0));
-
+  vtkSMReaderFactory* readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   if (!readerFactory)
   {
     return;
   }
 
-  const char* extensions = readerFactory->GetAttribute("extensions");
-  if (!extensions)
+  const auto& filtersDetailed = readerFactory->GetSupportedFileTypesDetailed(server->session());
+
+  const auto& currentReaderName = proxy->GetXMLName();
+
+  const auto& currentReaderMatch =
+    std::count_if(std::begin(filtersDetailed), std::end(filtersDetailed),
+      [currentReaderName](const FileTypeDetailed& ftd) { return ftd.Name == currentReaderName; });
+
+  if (currentReaderMatch == 0)
   {
-    qWarning("Extensions are not specified for the reader. Ignoring File Name Change Request");
+    QString warningTitle(tr("Change File operation aborted"));
+    QMessageBox::warning(pqCoreUtilities::mainWidget(), warningTitle,
+      tr("No reader associated to the selected source was found!"), QMessageBox::Ok);
+    return;
+  }
+  if (currentReaderMatch > 1)
+  {
+    QString warningTitle(tr("Change File operation aborted"));
+    QMessageBox::warning(pqCoreUtilities::mainWidget(), warningTitle,
+      tr("More than one reader associated to the selected source were found!"), QMessageBox::Ok);
     return;
   }
 
-  std::vector<std::string> extensionList;
-  vtksys::SystemTools::Split(extensions, extensionList, ' ');
+  const auto& currentReaderFound =
+    std::find_if(std::begin(filtersDetailed), std::end(filtersDetailed),
+      [currentReaderName](const FileTypeDetailed& ftd) { return ftd.Name == currentReaderName; });
+
+  // In theory it should never append as we checked exactly one reader exists
+  assert(currentReaderFound != std::end(filtersDetailed) &&
+    "No current reader found when exaclty one exists!");
+
+  const auto& extensionList = currentReaderFound->FilenamePatterns;
 
   QString qExtensions = QString("Supported files (");
   for (const std::string& extension : extensionList)
   {
-    qExtensions += QString("*.") + QString(extension.c_str()) + QString(" ");
+    qExtensions += QString(extension.c_str()) + QString(" ");
   }
   qExtensions += QString(")");
 
   pqFileDialog fileDialog(
-    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), qExtensions, false);
+    server, pqCoreUtilities::mainWidget(), QString(), QString(), qExtensions, true);
 
   fileDialog.setObjectName("FileOpenDialog");
-  fileDialog.setFileMode(pqFileDialog::ExistingFile);
+  fileDialog.setFileMode(pqFileDialog::ExistingFilesAndDirectories);
   if (fileDialog.exec() == QDialog::Accepted)
   {
-    QStringList files = fileDialog.getSelectedFiles();
-    std::vector<std::string> filesStd(files.size());
-    std::transform(files.constBegin(), files.constEnd(), filesStd.begin(),
-      [](const QString& str) -> std::string { return str.toStdString(); });
+    QList<QStringList> allFiles = fileDialog.getAllSelectedFiles();
+    std::vector<std::string> allFilesStd{};
+    for (const auto& currentFiles : allFiles)
+    {
+      for (const auto& file : currentFiles)
+      {
+        allFilesStd.push_back(file.toStdString());
+      }
+    }
 
     for (const auto propertyName : { "FileName", "FileNames" })
     {
@@ -126,9 +152,9 @@ void pqChangeFileNameReaction::changeFileName()
         SM_SCOPED_TRACE(CallFunction)
           .arg("ReplaceReaderFileName")
           .arg(proxy)
-          .arg(filesStd)
+          .arg(allFilesStd)
           .arg(propertyName);
-        vtkSMCoreUtilities::ReplaceReaderFileName(proxy, filesStd, propertyName);
+        vtkSMCoreUtilities::ReplaceReaderFileName(proxy, allFilesStd, propertyName);
         CLEAR_UNDO_STACK();
         break;
       }
