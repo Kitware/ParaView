@@ -158,6 +158,22 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/pointSet.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/ParaView_Mark.png}"
   "DATA{${paraview_test_data_directory_input}/Data/ParaView_Logo.png}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_0_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_1_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_2_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_3_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_4_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_5_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_6_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_7_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_8_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_9_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_10_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_11_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_12_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_13_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData/PartialFieldData_14_0.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/PartialFieldDataMultiBlock/PartialFieldData.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/PolarAxesDeprecation.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/porphyrin.cml}"
   "DATA{${paraview_test_data_directory_input}/Data/quadraticTetra01.vtu}"
@@ -381,7 +397,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsSkinned.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostCellsGeneratorImageDistributed.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostCellsGeneratorImageSerial.png}" 
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostCellsGeneratorImageSerial.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GhostFeatureEdgesAndWireframe3.png}"
@@ -1021,6 +1037,7 @@ SET(TESTS_WITH_BASELINES
   MissingPartialArraysColoredByNaN.xml
   MoleculeScalarBar.xml
   NetCDFUGRID.xml
+  PartialFieldDataMultiBlock.xml
   ParticleTracerGlyph.xml
   PassArrays.xml
   PerlinNoise.xml

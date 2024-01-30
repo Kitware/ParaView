@@ -157,7 +157,7 @@ bool vtkSMRepresentedArrayListDomain::IsFilteredArray(
     auto ainfo = info->GetArrayInformation(name, vtkDataObject::FIELD_ASSOCIATION_NONE);
     // for field data arrays, the number of tuples is simply a "max" across all blocks and
     // a `sum`, hence we check for number of tuples.
-    if (ainfo == nullptr || ainfo->GetIsPartial() || ainfo->GetNumberOfTuples() != 1)
+    if (ainfo == nullptr || ainfo->GetNumberOfTuples() != 1)
     {
       // filter i.e. remove the array.
       return true;
