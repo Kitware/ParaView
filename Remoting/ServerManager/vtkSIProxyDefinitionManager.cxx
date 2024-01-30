@@ -751,25 +751,26 @@ void vtkSIProxyDefinitionManager::SaveCustomProxyDefinitions(vtkPVXMLElement* ro
 //---------------------------------------------------------------------------
 bool vtkSIProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xmlContent)
 {
-  return this->LoadConfigurationXMLFromString(xmlContent, false);
+  return this->LoadConfigurationXMLFromString(xmlContent, false, true);
 }
 //---------------------------------------------------------------------------
 bool vtkSIProxyDefinitionManager::LoadConfigurationXMLFromString(
-  const char* xmlContent, bool attachHints)
+  const char* xmlContent, bool attachHints, bool invoke)
 {
   vtkNew<vtkPVXMLParser> parser;
   return (parser->Parse(xmlContent) != 0) &&
-    this->LoadConfigurationXML(parser->GetRootElement(), attachHints);
+    this->LoadConfigurationXML(parser->GetRootElement(), attachHints, invoke);
 }
 
 //---------------------------------------------------------------------------
 bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
 {
-  return this->LoadConfigurationXML(root, false);
+  return this->LoadConfigurationXML(root, false, true);
 }
 
 //---------------------------------------------------------------------------
-bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bool attachHints)
+bool vtkSIProxyDefinitionManager::LoadConfigurationXML(
+  vtkPVXMLElement* root, bool attachHints, bool invoke)
 {
   if (!root)
   {
@@ -807,7 +808,11 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
       }
     }
   }
-  this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
+
+  if (invoke)
+  {
+    this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
+  }
   return true;
 }
 
@@ -1192,12 +1197,13 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
         this->LoadConfigurationXMLFromString(xmls[cc].c_str(),
           // if GetPluginName() == vtkPVInitializerPlugin, it implies that it's
           // the ParaView core and should not be treated as plugin.
-          strcmp(plugin->GetPluginName(), "vtkPVInitializerPlugin") != 0);
+          strcmp(plugin->GetPluginName(), "vtkPVInitializerPlugin") != 0, false);
       }
 
       // Make sure we invalidate any cached flatten version of our proxy definition
       this->InternalsFlatten->Clear();
       this->Internals->ReplaceOverrideInParent = tmpReplaceOverrideInParent;
+      this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
     }
   }
 }
