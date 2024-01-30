@@ -458,6 +458,18 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     this->connect(selectBlockAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
   }
 
+  if (this->isButtonVisible("SelectFrustumBlocks", renderView))
+  {
+    QAction* selectBlocksThroughAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqFrustumSelectionBlock.svg"), tr("Select Blocks Through (n)"));
+    selectBlocksThroughAction->setObjectName("actionSelectFrustumBlocks");
+    selectBlocksThroughAction->setCheckable(true);
+    new pqRenderViewSelectionReaction(selectBlocksThroughAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_FRUSTUM_BLOCKS, modeGroup);
+    this->connect(
+      selectBlocksThroughAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
+  }
+
   if (this->isButtonVisible("InteractiveSelectSurfaceCellData", renderView))
   {
     QAction* interactiveSelectSurfaceCellDataAction =

@@ -211,6 +211,8 @@ public:
     int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
   virtual void selectFrustumPoints(
     int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  virtual void selectFrustumBlocks(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
   ///@}
 
   /**

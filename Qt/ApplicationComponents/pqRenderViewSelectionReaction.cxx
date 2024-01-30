@@ -335,6 +335,7 @@ void pqRenderViewSelectionReaction::beginSelection()
     case SELECT_FRUSTUM_CELLS:
     case SELECT_FRUSTUM_POINTS:
     case SELECT_BLOCKS:
+    case SELECT_FRUSTUM_BLOCKS:
     case SELECT_CUSTOM_BOX:
       this->View->setCursor(Qt::CrossCursor);
       vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_SELECTION);
@@ -565,6 +566,10 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
 
     case SELECT_BLOCKS:
       this->View->selectBlock(region, selectionModifier);
+      break;
+
+    case SELECT_FRUSTUM_BLOCKS:
+      this->View->selectFrustumBlocks(region, selectionModifier);
       break;
 
     case SELECT_CUSTOM_BOX:
