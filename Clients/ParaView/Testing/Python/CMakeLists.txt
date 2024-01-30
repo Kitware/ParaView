@@ -79,6 +79,7 @@ paraview_add_test_python(
   ColorBlockBy.py
   GroupDataSets.py
   PartialArrayIndication.py
+  PvPython.py
   ResetSession.py
   SaveTransparentImages.py
   TestClipCylinder.py
