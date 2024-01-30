@@ -292,6 +292,15 @@ void return_result(FILE* fp)
           MAX_ARGS);
         return;
       }
+      else if (strcmp(rClass, "vtkVariant") == 0)
+      {
+        fprintf(fp,
+          "      resultStream.Reset();\n"
+          "      resultStream << vtkClientServerStream::Reply << temp%i << "
+          "vtkClientServerStream::End;\n",
+          MAX_ARGS);
+        return;
+      }
       else if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
       {
         fprintf(fp,
@@ -720,16 +729,18 @@ int managableArguments(FunctionInfo* curFunction)
     }
   }
 
-  /* if it is a vtk object that isn't a pointer, don't wrap it */
+  /* if it is a vtk object that isn't a pointer or a vtkVariant, don't wrap it */
   if (((returnType & VTK_PARSE_INDIRECT) == 0) &&
-    ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
+    ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT) &&
+    (strcmp(curFunction->ReturnClass, "vtkVariant") != 0))
   {
     args_ok = 0;
   }
 
-  /* if arg is a vtk object, make sure it is a wrapped object */
+  /* if arg is a vtk object, make sure it is a wrapped object or a vtkVariant */
   if ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT &&
-    !class_is_wrapped(curFunction->ReturnClass))
+    !class_is_wrapped(curFunction->ReturnClass) &&
+    (strcmp(curFunction->ReturnClass, "vtkVariant") != 0))
   {
     args_ok = 0;
   }
