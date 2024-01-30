@@ -801,29 +801,41 @@ ExternalData_Expand_Arguments(ParaViewData _
 
 # Some tests can take a long time; increase their timeouts.
 # Really very long (300 seconds):
+set(SeparateOpacityArray_TIMEOUT 300)
+set(TransferFunction2DYScalars_TIMEOUT 300)
 set(UndoRedo1_TIMEOUT 300)
 
 # Very long (200 seconds):
 set(EqualizeLayout_TIMEOUT 200)
 
 # Somewhat long (150 seconds):
+set(AMReXParticlesReader_TIMEOUT 150)
+set(Clip_TIMEOUT 150)
+set(ColorOpacityEditorFreehandDrawing_TIMEOUT 150)
 set(ColorOpacityTableEditorHistogram_TIMEOUT 150)
 set(ComparativeVisPanel_TIMEOUT 150)
 set(Ensemble_TIMEOUT 150)
 set(HelpWindowHistory_TIMEOUT 150)
+set(ImageVolumeRendering_TIMEOUT 150)
 set(LagrangianIntegrationModel_TIMEOUT 150)
-set(LagrangianParticleTracker_TIMEOUT 150)
 set(LagrangianParticleTrackerReseeding_TIMEOUT 150)
+set(LagrangianParticleTracker_TIMEOUT 150)
+set(MemoryInspectorPanel_TIMEOUT 150)
+set(MultiBlockVolumeRendering_TIMEOUT 150)
 set(MultiServer3_TIMEOUT 150)
 set(PropertyContextMenu_TIMEOUT 150)
+set(ProxyCategoriesConfiguration_TIMEOUT 150)
+set(ProxyCategoriesDialog_TIMEOUT 150)
 set(SaveTSV_TIMEOUT 150)
 set(ScalarBarRange_TIMEOUT 150)
+set(SeparatedColorMapOpacity_TIMEOUT 150)
 set(SliceRepresentation_TIMEOUT 150)
 set(SplitViewTrace_TIMEOUT 150)
+set(SpreadSheet3_TIMEOUT 150)
+set(TemporalParticleKeepDeadTrails_TIMEOUT 150)
 set(TraceExportAndSaveData_TIMEOUT 150)
-set(TransferFunction2DYScalars_TIMEOUT 150)
-set(ProxyCategoriesDialog_TIMEOUT 150)
-set(ProxyCategoriesConfiguration_TIMEOUT 150)
+set(TransferFunction2D_TIMEOUT 150)
+set(ZoomToData_TIMEOUT 150)
 
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
