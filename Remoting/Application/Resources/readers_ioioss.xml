@@ -625,6 +625,18 @@
         </Hints>
       </StringVectorProperty>
 
+      <IntVectorProperty name="Caching"
+                         command="SetCaching"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This reader can cache the data that it read across different time steps.
+          The default is off.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="ScanForRelatedFiles"
                          command="SetScanForRelatedFiles"
                          number_of_elements="1"
