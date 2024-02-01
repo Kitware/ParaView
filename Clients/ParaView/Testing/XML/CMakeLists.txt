@@ -1068,6 +1068,7 @@ SET(TESTS_WITH_BASELINES
   FeatureEdgesRepresentationHTG.xml
   IOSSMergeExodusEntityBlocks.xml
   ImageChartView.xml
+  IntegrateVariablesPDC.xml
   LogoSource.xml
   MergeVectorComponents.xml
   MissingPartialArraysColoredByNaN.xml
