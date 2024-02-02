@@ -275,7 +275,7 @@ windows-vs2022-kits-mpi-python-qt:test:
         - .windows_vs2022_kits_mpi_python_qt
         - .cmake_test_windows
         - .windows_test_tags
-        - .cmake_build_artifacts
+        - .cmake_test_artifacts
         - .run_automatically
     dependencies:
         - windows-vs2022-kits-mpi-python-qt:build
@@ -297,7 +297,7 @@ windows-vs2022-qt:test:
         - .windows_vs2022_qt
         - .cmake_test_windows
         - .windows_test_tags
-        - .cmake_build_artifacts
+        - .cmake_test_artifacts
         - .run_automatically
     dependencies:
         - windows-vs2022-qt:build
