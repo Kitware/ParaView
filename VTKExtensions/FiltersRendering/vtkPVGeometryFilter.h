@@ -67,7 +67,7 @@ public:
    * Set/get whether to produce feature edges (vs. surface).
    * If both this and UseOutline are true, then an outline will be produced.
    */
-  vtkSetMacro(GenerateFeatureEdges, bool);
+  void SetGenerateFeatureEdges(bool);
   vtkGetMacro(GenerateFeatureEdges, bool);
   ///@}
 

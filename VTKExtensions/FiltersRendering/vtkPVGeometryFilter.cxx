@@ -159,6 +159,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   // fast mode might generate wrong results because of certain assumptions that don't always hold
   // for that reason, the default is to have fast mode off
   this->GeometryFilter->SetFastMode(false);
+  // Fix issues with FeatureEdges
+  this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
   this->GenericGeometryFilter = vtkSmartPointer<vtkGenericGeometryFilter>::New();
   this->UnstructuredGridGeometryFilter = vtkSmartPointer<vtkUnstructuredGridGeometryFilter>::New();
   this->RecoverWireframeFilter = vtkSmartPointer<vtkRecoverGeometryWireframe>::New();
@@ -418,7 +420,6 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
 int vtkPVGeometryFilter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   if (vtkCompositeDataSet::SafeDownCast(input))
   {
@@ -1745,6 +1746,20 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HideInternalAMRFaces: " << (this->HideInternalAMRFaces ? "on" : "off") << endl;
   os << indent << "UseNonOverlappingAMRMetaDataForOutlines: "
      << (this->UseNonOverlappingAMRMetaDataForOutlines ? "on" : "off") << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetGenerateFeatureEdges(bool val)
+{
+  if (this->GenerateFeatureEdges != val)
+  {
+    this->GenerateFeatureEdges = val;
+    if (this->GeometryFilter)
+    {
+      this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
+    }
+    this->Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
