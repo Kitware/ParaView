@@ -518,7 +518,10 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
     this->FeatureEdgesFilter->Update();
     output->ShallowCopy(this->FeatureEdgesFilter->GetOutput());
   }
-  this->ExecuteCellNormals(output, doCommunicate);
+  if (this->GenerateCellNormals)
+  {
+    this->ExecuteCellNormals(output, doCommunicate);
+  }
   output->RemoveGhostCells();
   if (this->GenerateProcessIds && output)
   {
@@ -1053,11 +1056,6 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
 // are available.
 void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunicate)
 {
-  if (!this->GenerateCellNormals)
-  {
-    return;
-  }
-
   // Do not generate cell normals if any of the processes
   // have lines, verts or strips.
   vtkCellArray* aPrim;
@@ -1095,32 +1093,32 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
     return;
   }
 
-  double polyNorm[3];
+  aPrim = output->GetPolys();
+  const vtkIdType numPolys = aPrim ? aPrim->GetNumberOfCells() : 0;
+  if (numPolys != output->GetNumberOfCells())
+  {
+    vtkErrorMacro("Number of numPolys does not match output.");
+    return;
+  }
+
   vtkNew<vtkFloatArray> cellNormals;
   cellNormals->SetName("cellNormals");
   cellNormals->SetNumberOfComponents(3);
-  cellNormals->Allocate(3 * output->GetNumberOfCells());
+  cellNormals->SetNumberOfTuples(numPolys);
 
-  aPrim = output->GetPolys();
-  if (aPrim && aPrim->GetNumberOfCells())
+  if (aPrim)
   {
     vtkPoints* p = output->GetPoints();
-
-    auto cellIter = vtk::TakeSmartPointer(aPrim->NewIterator());
-    for (cellIter->GoToFirstCell(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
+    vtkNew<vtkIdList> tempPtIds;
+    vtkIdType npts;
+    const vtkIdType* pts;
+    double polyNorm[3];
+    for (vtkIdType cellId = 0; cellId < numPolys; cellId++)
     {
-      vtkIdList* cell = cellIter->GetCurrentCell();
-      vtkPolygon::ComputeNormal(
-        p, static_cast<int>(cell->GetNumberOfIds()), cell->GetPointer(0), polyNorm);
-      cellNormals->InsertNextTuple(polyNorm);
+      aPrim->GetCellAtId(cellId, npts, pts, tempPtIds);
+      vtkPolygon::ComputeNormal(p, static_cast<int>(npts), pts, polyNorm);
+      cellNormals->SetTuple(cellId, polyNorm);
     }
-  }
-
-  if (cellNormals->GetNumberOfTuples() != output->GetNumberOfCells())
-  {
-    vtkErrorMacro("Number of cell normals does not match output.");
-    cellNormals->Delete();
-    return;
   }
 
   output->GetCellData()->AddArray(cellNormals);
