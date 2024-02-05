@@ -155,15 +155,15 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
-  this->GeometryFilter = vtkGeometryFilter::New();
+  this->GeometryFilter = vtkSmartPointer<vtkGeometryFilter>::New();
   // we're prepping geometry for rendering
   // fast mode might generate wrong results because of certain assumptions that don't always hold
   // for that reason, the default is to have fast mode off
   this->GeometryFilter->SetFastMode(false);
-  this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
-  this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
-  this->RecoverWireframeFilter = vtkRecoverGeometryWireframe::New();
-  this->FeatureEdgesFilter = vtkFeatureEdges::New();
+  this->GenericGeometryFilter = vtkSmartPointer<vtkGenericGeometryFilter>::New();
+  this->UnstructuredGridGeometryFilter = vtkSmartPointer<vtkUnstructuredGridGeometryFilter>::New();
+  this->RecoverWireframeFilter = vtkSmartPointer<vtkRecoverGeometryWireframe>::New();
+  this->FeatureEdgesFilter = vtkSmartPointer<vtkFeatureEdges>::New();
 
   // Setup a callback for the internal readers to report progress.
   this->GeometryFilter->AddObserver(
@@ -179,7 +179,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->GenerateProcessIds = (this->Controller && this->Controller->GetNumberOfProcesses() > 1);
 
-  this->OutlineSource = vtkOutlineSource::New();
+  this->OutlineSource = vtkSmartPointer<vtkOutlineSource>::New();
 
   this->PassThroughCellIds = 1;
   this->PassThroughPointIds = 1;
@@ -191,37 +191,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::~vtkPVGeometryFilter()
 {
-  // Be careful how you delete these so that you don't foul up the garbage
-  // collector.
-  if (this->GeometryFilter)
-  {
-    vtkGeometryFilter* tmp = this->GeometryFilter;
-    this->GeometryFilter = nullptr;
-    tmp->Delete();
-  }
-  if (this->GenericGeometryFilter)
-  {
-    vtkGenericGeometryFilter* tmp = this->GenericGeometryFilter;
-    this->GenericGeometryFilter = nullptr;
-    tmp->Delete();
-  }
-  if (this->UnstructuredGridGeometryFilter)
-  {
-    vtkUnstructuredGridGeometryFilter* tmp = this->UnstructuredGridGeometryFilter;
-    this->UnstructuredGridGeometryFilter = nullptr;
-    tmp->Delete();
-  }
-  if (this->RecoverWireframeFilter)
-  {
-    vtkRecoverGeometryWireframe* tmp = this->RecoverWireframeFilter;
-    this->RecoverWireframeFilter = nullptr;
-    tmp->Delete();
-  }
-  if (this->FeatureEdgesFilter)
-  {
-    this->FeatureEdgesFilter->Delete();
-  }
-  this->OutlineSource->Delete();
   this->SetController(nullptr);
 }
 

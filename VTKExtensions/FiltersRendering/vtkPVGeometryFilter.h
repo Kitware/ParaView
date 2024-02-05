@@ -13,6 +13,7 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
+#include "vtkSmartPointer.h"                          // needed for vtkSmartPointer
 
 class vtkCallbackCommand;
 class vtkCellGrid;
@@ -277,12 +278,12 @@ protected:
   int MatchBoundariesIgnoringCellOrder = 0;
 
   vtkMultiProcessController* Controller;
-  vtkOutlineSource* OutlineSource;
-  vtkGeometryFilter* GeometryFilter;
-  vtkGenericGeometryFilter* GenericGeometryFilter;
-  vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
-  vtkRecoverGeometryWireframe* RecoverWireframeFilter;
-  vtkFeatureEdges* FeatureEdgesFilter;
+  vtkSmartPointer<vtkOutlineSource> OutlineSource;
+  vtkSmartPointer<vtkGeometryFilter> GeometryFilter;
+  vtkSmartPointer<vtkGenericGeometryFilter> GenericGeometryFilter;
+  vtkSmartPointer<vtkUnstructuredGridGeometryFilter> UnstructuredGridGeometryFilter;
+  vtkSmartPointer<vtkRecoverGeometryWireframe> RecoverWireframeFilter;
+  vtkSmartPointer<vtkFeatureEdges> FeatureEdgesFilter;
 
   /**
    * Call CheckAttributes on the \c input which ensures that all attribute
