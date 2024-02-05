@@ -285,45 +285,20 @@ void vtkPVGeometryFilter::ExecuteAMRBlockOutline(
   // needed BUG #0011065. We only do this for AMR datasets for now, but we can
   // extend to all types of datasets, if needed.
 
-  vtkNew<vtkPoints> points;
-  points->Allocate(8);
+  auto points = vtkSmartPointer<vtkPoints>::New();
+  points->SetNumberOfPoints(8);
 
-  vtkNew<vtkCellArray> lines;
+  points->SetPoint(0, bounds[0], bounds[2], bounds[4]);
+  points->SetPoint(1, bounds[1], bounds[2], bounds[4]);
+  points->SetPoint(2, bounds[0], bounds[3], bounds[4]);
+  points->SetPoint(3, bounds[1], bounds[3], bounds[4]);
+  points->SetPoint(4, bounds[0], bounds[2], bounds[5]);
+  points->SetPoint(5, bounds[1], bounds[2], bounds[5]);
+  points->SetPoint(6, bounds[0], bounds[3], bounds[5]);
+  points->SetPoint(7, bounds[1], bounds[3], bounds[5]);
+
+  auto lines = vtkSmartPointer<vtkCellArray>::New();
   lines->Allocate(lines->EstimateSize(12, 2));
-
-  double x[3];
-  x[0] = bounds[0];
-  x[1] = bounds[2];
-  x[2] = bounds[4];
-  points->InsertPoint(0, x);
-  x[0] = bounds[1];
-  x[1] = bounds[2];
-  x[2] = bounds[4];
-  points->InsertPoint(1, x);
-  x[0] = bounds[0];
-  x[1] = bounds[3];
-  x[2] = bounds[4];
-  points->InsertPoint(2, x);
-  x[0] = bounds[1];
-  x[1] = bounds[3];
-  x[2] = bounds[4];
-  points->InsertPoint(3, x);
-  x[0] = bounds[0];
-  x[1] = bounds[2];
-  x[2] = bounds[5];
-  points->InsertPoint(4, x);
-  x[0] = bounds[1];
-  x[1] = bounds[2];
-  x[2] = bounds[5];
-  points->InsertPoint(5, x);
-  x[0] = bounds[0];
-  x[1] = bounds[3];
-  x[2] = bounds[5];
-  points->InsertPoint(6, x);
-  x[0] = bounds[1];
-  x[1] = bounds[3];
-  x[2] = bounds[5];
-  points->InsertPoint(7, x);
 
   // xmin face
   if (extractface[0])
@@ -337,7 +312,6 @@ void vtkPVGeometryFilter::ExecuteAMRBlockOutline(
     vtkIdType pts[4] = { 1, 3, 7, 5 };
     lines->InsertNextCell(4, pts);
   }
-
   // ymin face
   if (extractface[2])
   {
@@ -350,23 +324,22 @@ void vtkPVGeometryFilter::ExecuteAMRBlockOutline(
     vtkIdType pts[4] = { 2, 6, 7, 3 };
     lines->InsertNextCell(4, pts);
   }
-
   // zmin face
   if (extractface[4])
   {
     vtkIdType pts[4] = { 0, 2, 3, 1 };
     lines->InsertNextCell(4, pts);
   }
-
   // zmax face
   if (extractface[5])
   {
     vtkIdType pts[4] = { 4, 5, 7, 6 };
     lines->InsertNextCell(4, pts);
   }
+  lines->Squeeze();
 
-  output->SetPoints(points.GetPointer());
-  output->SetPolys(lines.GetPointer());
+  output->SetPoints(points);
+  output->SetPolys(lines);
 
   this->OutlineFlag = 1;
 }
