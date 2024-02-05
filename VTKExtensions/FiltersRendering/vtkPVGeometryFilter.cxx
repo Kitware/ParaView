@@ -1238,13 +1238,13 @@ void vtkPVGeometryFilter::CellGridExecute(
 {
   double bounds[6];
   input->GetBounds(bounds);
-  vtkNew<vtkOutlineSource> outline;
-  outline->SetBounds(bounds);
-  outline->Update();
+  this->OutlineSource->SetBounds(bounds);
+  this->OutlineSource->Update();
+  auto outline = this->OutlineSource->GetOutput();
 
-  output->SetPoints(outline->GetOutput()->GetPoints());
-  output->SetLines(outline->GetOutput()->GetLines());
-  output->SetPolys(outline->GetOutput()->GetPolys());
+  output->SetPoints(outline->GetPoints());
+  output->SetLines(outline->GetLines());
+  output->SetPolys(outline->GetPolys());
 }
 
 //----------------------------------------------------------------------------
