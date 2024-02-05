@@ -295,12 +295,6 @@ protected:
 
   void ReportReferences(vtkGarbageCollector*) override;
 
-  /**
-   * Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
-   * don't generate internal surfaces.
-   */
-  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
   bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;

@@ -285,13 +285,6 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGeometryFilter::RequestUpdateExtent(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  return this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteAMRBlockOutline(
   const double bounds[6], vtkPolyData* output, const bool extractface[6])
 {
