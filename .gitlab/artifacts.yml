@@ -108,3 +108,7 @@
         paths:
             # Logs of the build
             - compile_output.log
+            - build/cdash-build-id
+        reports:
+            annotations:
+                - build/annotations.json
