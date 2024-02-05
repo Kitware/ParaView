@@ -485,27 +485,27 @@ void vtkPVGeometryFilter::GenerateFeatureEdgesHTG(vtkHyperTreeGrid* input, vtkPo
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
 {
-  unsigned int procId =
+  const unsigned int procId =
     this->Controller ? static_cast<unsigned int>(this->Controller->GetLocalProcessId()) : 0;
 
-  vtkIdType numPoints = output->GetNumberOfPoints();
+  const vtkIdType numPoints = output->GetNumberOfPoints();
   if (numPoints > 0)
   {
-    vtkNew<vtkUnsignedIntArray> array;
-    array->SetNumberOfTuples(numPoints);
-    array->FillTypedComponent(0, procId);
-    array->SetName("vtkProcessId");
-    output->GetPointData()->AddArray(array);
+    vtkNew<vtkUnsignedIntArray> pointsProcArray;
+    pointsProcArray->SetNumberOfValues(numPoints);
+    pointsProcArray->FillValue(procId);
+    pointsProcArray->SetName("vtkProcessId");
+    output->GetPointData()->AddArray(pointsProcArray);
   }
 
-  vtkIdType numCells = output->GetNumberOfCells();
+  const vtkIdType numCells = output->GetNumberOfCells();
   if (numCells > 0)
   {
-    vtkNew<vtkUnsignedIntArray> cellArray;
-    cellArray->SetNumberOfTuples(numCells);
-    cellArray->FillTypedComponent(0, procId);
-    cellArray->SetName("vtkProcessId");
-    output->GetCellData()->AddArray(cellArray);
+    vtkNew<vtkUnsignedIntArray> cellsProcArray;
+    cellsProcArray->SetNumberOfValues(numCells);
+    cellsProcArray->FillValue(procId);
+    cellsProcArray->SetName("vtkProcessId");
+    output->GetCellData()->AddArray(cellsProcArray);
   }
 }
 
@@ -625,30 +625,27 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
-  vtkNew<vtkUnsignedIntArray> cindex;
-  cindex->SetNumberOfComponents(1);
-  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  cindex->FillTypedComponent(0, index);
-  cindex->SetName("vtkCompositeIndex");
-  pd->GetCellData()->AddArray(cindex);
+  vtkNew<vtkUnsignedIntArray> pointsCIArray;
+  pointsCIArray->SetNumberOfValues(pd->GetNumberOfPoints());
+  pointsCIArray->FillValue(index);
+  pointsCIArray->SetName("vtkCompositeIndex");
+  pd->GetPointData()->AddArray(pointsCIArray);
 
-  vtkNew<vtkUnsignedIntArray> pindex;
-  pindex->SetNumberOfComponents(1);
-  pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
-  pindex->FillTypedComponent(0, index);
-  pindex->SetName("vtkCompositeIndex");
-  pd->GetPointData()->AddArray(pindex);
+  vtkNew<vtkUnsignedIntArray> cellsCIArray;
+  cellsCIArray->SetNumberOfValues(pd->GetNumberOfCells());
+  cellsCIArray->Fill(index);
+  cellsCIArray->SetName("vtkCompositeIndex");
+  pd->GetCellData()->AddArray(cellsCIArray);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddBlockColors(vtkDataObject* pd, unsigned int index)
 {
-  vtkNew<vtkUnsignedIntArray> cindex;
-  cindex->SetNumberOfComponents(1);
-  cindex->SetNumberOfTuples(1);
-  cindex->SetValue(0, index % this->BlockColorsDistinctValues);
-  cindex->SetName("vtkBlockColors");
-  pd->GetFieldData()->AddArray(cindex);
+  vtkNew<vtkUnsignedIntArray> blockColorsArray;
+  blockColorsArray->SetNumberOfTuples(1);
+  blockColorsArray->SetValue(0, index % this->BlockColorsDistinctValues);
+  blockColorsArray->SetName("vtkBlockColors");
+  pd->GetFieldData()->AddArray(blockColorsArray);
 }
 
 //----------------------------------------------------------------------------
@@ -656,14 +653,14 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(
   vtkPolyData* pd, unsigned int level, unsigned int index)
 {
   vtkNew<vtkUnsignedIntArray> dslevel;
-  dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
-  dslevel->FillTypedComponent(0, level);
+  dslevel->SetNumberOfValues(pd->GetNumberOfCells());
+  dslevel->FillValue(level);
   dslevel->SetName("vtkAMRLevel");
   pd->GetCellData()->AddArray(dslevel);
 
   vtkNew<vtkUnsignedIntArray> dsindex;
-  dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  dsindex->FillTypedComponent(0, index);
+  dsindex->SetNumberOfValues(pd->GetNumberOfCells());
+  dsindex->FillValue(index);
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
 }
