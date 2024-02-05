@@ -243,7 +243,7 @@ void vtkPVGeometryFilter::HandleGeometryFilterProgress(vtkObject* caller, unsign
   // This limits progress for only the GeometryFilter.
   if (algorithm)
   {
-    double progress = algorithm->GetProgress();
+    const double progress = algorithm->GetProgress();
     if (progress > 0.0 && progress < 1.0)
     {
       this->UpdateProgress(progress);
@@ -258,28 +258,21 @@ void vtkPVGeometryFilter::HandleGeometryFilterProgress(vtkObject* caller, unsign
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 {
-  if (input->IsA("vtkDataSet"))
+  if (auto ds = vtkDataSet::SafeDownCast(input))
   {
-    if (static_cast<vtkDataSet*>(input)->CheckAttributes())
-    {
-      return 1;
-    }
+    return ds->CheckAttributes();
   }
-  else if (input->IsA("vtkCompositeDataSet"))
+  else if (auto cds = vtkCompositeDataSet::SafeDownCast(input))
   {
-    vtkCompositeDataSet* compInput = static_cast<vtkCompositeDataSet*>(input);
-    vtkCompositeDataIterator* iter = compInput->NewIterator();
-    iter->GoToFirstItem();
-    while (!iter->IsDoneWithTraversal())
+    auto iter = vtk::TakeSmartPointer(cds->NewIterator());
+    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-      vtkDataObject* curDataSet = iter->GetCurrentDataObject();
-      if (curDataSet && this->CheckAttributes(curDataSet))
+      vtkDataObject* curDs = iter->GetCurrentDataObject();
+      if (curDs)
       {
-        return 1;
+        return this->CheckAttributes(curDs);
       }
-      iter->GoToNextItem();
     }
-    iter->Delete();
   }
   return 0;
 }
