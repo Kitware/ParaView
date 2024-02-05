@@ -13,7 +13,6 @@
 #include "vtkCellGrid.h"
 #include "vtkCellTypes.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataObjectTreeIterator.h"
@@ -235,12 +234,6 @@ int vtkPVGeometryFilter::RequestDataObject(
   }
 
   return 0;
-}
-
-//----------------------------------------------------------------------------
-vtkExecutive* vtkPVGeometryFilter::CreateDefaultExecutive()
-{
-  return vtkCompositeDataPipeline::New();
 }
 
 //----------------------------------------------------------------------------

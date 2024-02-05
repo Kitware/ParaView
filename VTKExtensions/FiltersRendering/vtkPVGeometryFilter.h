@@ -218,9 +218,6 @@ protected:
     vtkInformationVector* outputVector) override;
   ///@}
 
-  // Create a default executive.
-  vtkExecutive* CreateDefaultExecutive() override;
-
   /**
    * Produce geometry for a block in the dataset.
    * This does not handle producing outlines. Call only when this->UseOutline ==
