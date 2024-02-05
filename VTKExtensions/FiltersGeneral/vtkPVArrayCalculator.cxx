@@ -132,6 +132,11 @@ void vtkPVArrayCalculator::AddArrayAndVariableNames(
   {
     vtkAbstractArray* array = inDataAttrs->GetAbstractArray(j);
     const char* arrayName = array->GetName();
+    if (!arrayName)
+    {
+      vtkWarningMacro("Skipping unnamed array at index " << j);
+      continue;
+    }
 
     int numberComps = array->GetNumberOfComponents();
 
