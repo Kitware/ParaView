@@ -40,6 +40,7 @@ class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
 class vtkOrderedCompositingHelper;
+class vtkPolarAxesActor2D;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCameraCollection;
@@ -611,6 +612,11 @@ public:
    * Set the vtkLegendScaleActor to use for the view.
    */
   virtual void SetLegendGridActor(vtkLegendScaleActor*);
+
+  /**
+   * Set the vtkPolarAxesActor to use for the view.
+   */
+  virtual void SetPolarGridActor(vtkPolarAxesActor2D*);
 
   ///@{
   /**
@@ -1235,6 +1241,7 @@ protected:
   vtkSelection* LastSelection;
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
   vtkSmartPointer<vtkLegendScaleActor> LegendGridActor;
+  vtkSmartPointer<vtkPolarAxesActor2D> PolarAxesActor;
   vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCameraOrientationWidget> CameraOrientationWidget;
 
