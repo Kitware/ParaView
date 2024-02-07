@@ -12,6 +12,7 @@
 #include "pqConsoleWidget.h"
 #include "pqFileDialog.h"
 #include "pqPythonShellCompleter.h"
+#include "pqScopedOverrideCursor.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
 
@@ -170,7 +171,7 @@ private:
    */
   void initializeInterpreter()
   {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    pqScopedOverrideCursor scopedWaitCursor(Qt::WaitCursor);
 
     vtkPythonInterpreter::Initialize();
     assert(vtkPythonInterpreter::IsInitialized());
@@ -193,8 +194,6 @@ private:
     ui.clearButton->setEnabled(true);
     ui.resetButton->setEnabled(true);
     this->InterpreterInitialized = true;
-
-    QApplication::restoreOverrideCursor();
   }
 };
 
