@@ -25,8 +25,7 @@
 */
 
 class PARAVIEW_DEPRECATED_IN_5_13_0(
-  "This cursor is limited to a wait type and the RAII aspect is not explicit. "
-  "Use pqScopedOverrideCursor instead.") PQWIDGETS_EXPORT pqWaitCursor
+  "Use pqScopedOverrideCursor(Qt::WaitCursor) instead.") PQWIDGETS_EXPORT pqWaitCursor
   : public pqScopedOverrideCursor
 {
 public:
