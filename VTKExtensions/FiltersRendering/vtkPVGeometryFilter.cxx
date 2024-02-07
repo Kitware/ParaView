@@ -6,6 +6,7 @@
 #include "vtkAMRInformation.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkAppendPolyData.h"
+#include "vtkBoundingBox.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
 #include "vtkCellArrayIterator.h"
@@ -82,62 +83,16 @@ void GetValidWholeExtent(T* ds, const int wholeExt[6], int validWholeExt[6])
   }
 }
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGeometryFilter);
+//----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
+//----------------------------------------------------------------------------
 vtkInformationKeyMacro(vtkPVGeometryFilter, POINT_OFFSETS, IntegerVector);
 vtkInformationKeyMacro(vtkPVGeometryFilter, VERTS_OFFSETS, IntegerVector);
 vtkInformationKeyMacro(vtkPVGeometryFilter, LINES_OFFSETS, IntegerVector);
 vtkInformationKeyMacro(vtkPVGeometryFilter, POLYS_OFFSETS, IntegerVector);
 vtkInformationKeyMacro(vtkPVGeometryFilter, STRIPS_OFFSETS, IntegerVector);
-class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Operation
-{
-public:
-  // Subclasses must overload this method, which performs the actual
-  // operations.  The methods should first do a reinterpret_cast of the arrays
-  // to the type suggested by \c datatype (which will be one of the VTK type
-  // identifiers like VTK_INT, etc.).  Both arrays are considered top be
-  // length entries.  The method should perform the operation A*B (where * is
-  // a placeholder for whatever operation is actually performed) and store the
-  // result in B.  The operation is assumed to be associative.  Commutativity
-  // is specified by the Commutative method.
-  void Function(const void* A, void* B, vtkIdType length, int datatype) override
-  {
-    assert((datatype == VTK_DOUBLE) && (length == 6));
-    (void)datatype;
-    (void)length;
-    const double* bdsA = reinterpret_cast<const double*>(A);
-    double* bdsB = reinterpret_cast<double*>(B);
-    if (bdsA[0] < bdsB[0])
-    {
-      bdsB[0] = bdsA[0];
-    }
-    if (bdsA[1] > bdsB[1])
-    {
-      bdsB[1] = bdsA[1];
-    }
-    if (bdsA[2] < bdsB[2])
-    {
-      bdsB[2] = bdsA[2];
-    }
-    if (bdsA[3] > bdsB[3])
-    {
-      bdsB[3] = bdsA[3];
-    }
-    if (bdsA[4] < bdsB[4])
-    {
-      bdsB[4] = bdsA[4];
-    }
-    if (bdsA[5] > bdsB[5])
-    {
-      bdsB[5] = bdsA[5];
-    }
-  }
-
-  // Description:
-  // Subclasses override this method to specify whether their operation
-  // is commutative.  It should return 1 if commutative or 0 if not.
-  int Commutative() override { return 1; }
-};
 
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter()
@@ -713,14 +668,14 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   double bounds[6];
   amr->GetBounds(bounds);
+  const vtkBoundingBox amrBBox(bounds);
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
   {
     // Since bounds are not necessary synced up, especially for non-overlapping
     // AMR datasets, we sync them up across all processes.
-    vtkPVGeometryFilter::BoundsReductionOperation operation;
-    double received_bounds[6];
-    this->Controller->AllReduce(bounds, received_bounds, 6, &operation);
-    memcpy(bounds, received_bounds, sizeof(double) * 6);
+    vtkBoundingBox recvAmrBBox;
+    this->Controller->AllReduce(amrBBox, recvAmrBBox);
+    recvAmrBBox.GetBounds(bounds);
   }
 
   unsigned int block_id = 0;
@@ -1142,20 +1097,20 @@ void vtkPVGeometryFilter::DataSetExecute(vtkDataSet* input, vtkPolyData* output,
   }
 
   input->GetBounds(bds);
-
-  vtkPVGeometryFilter::BoundsReductionOperation operation;
+  const vtkBoundingBox dataSetBBox(bds);
   if (procid && doCommunicate)
   {
     // Satellite node
-    this->Controller->Reduce(bds, nullptr, 6, &operation, 0);
+    vtkBoundingBox recvBbox;
+    this->Controller->Reduce(dataSetBBox, recvBbox, 0);
   }
   else
   {
     if (this->Controller && doCommunicate)
     {
-      double tmp[6];
-      this->Controller->Reduce(bds, tmp, 6, &operation, 0);
-      memcpy(bds, tmp, 6 * sizeof(double));
+      vtkBoundingBox recvBBox;
+      this->Controller->Reduce(dataSetBBox, recvBBox, 0);
+      recvBBox.GetBounds(bds);
     }
 
     if (bds[1] >= bds[0] && bds[3] >= bds[2] && bds[5] >= bds[4])
@@ -1203,20 +1158,20 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
   }
 
   input->GetBounds(bds);
-
-  vtkPVGeometryFilter::BoundsReductionOperation operation;
+  const vtkBoundingBox dataSetBBox(bds);
   if (procid && doCommunicate)
   {
     // Satellite node
-    this->Controller->Reduce(bds, nullptr, 6, &operation, 0);
+    vtkBoundingBox recvBBox;
+    this->Controller->Reduce(dataSetBBox, recvBBox, 0);
   }
   else
   {
     if (doCommunicate)
     {
-      double tmp[6];
-      this->Controller->Reduce(bds, tmp, 6, &operation, 0);
-      memcpy(bds, tmp, 6 * sizeof(double));
+      vtkBoundingBox recvBBox;
+      this->Controller->Reduce(dataSetBBox, recvBBox, 0);
+      recvBBox.GetBounds(bds);
     }
 
     // only output in process 0.
@@ -1636,20 +1591,20 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
   }
 
   input->GetBounds(bds);
-
-  vtkPVGeometryFilter::BoundsReductionOperation operation;
+  const vtkBoundingBox dataSetBBox(bds);
   if (procid && doCommunicate)
   {
     // Satellite node
-    this->Controller->Reduce(bds, nullptr, 6, &operation, 0);
+    vtkBoundingBox recvBBox;
+    this->Controller->Reduce(dataSetBBox, recvBBox, 0);
   }
   else
   {
     if (this->Controller && doCommunicate)
     {
-      double tmp[6];
-      this->Controller->Reduce(bds, tmp, 6, &operation, 0);
-      memcpy(bds, tmp, 6 * sizeof(double));
+      vtkBoundingBox recvBBox;
+      this->Controller->Reduce(dataSetBBox, recvBBox, 0);
+      recvBBox.GetBounds(bds);
     }
 
     if (bds[1] >= bds[0] && bds[3] >= bds[2] && bds[5] >= bds[4])
