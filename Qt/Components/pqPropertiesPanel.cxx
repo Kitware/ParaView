@@ -13,6 +13,7 @@
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxyWidget.h"
+#include "pqScopedOverrideCursor.h"
 #include "pqSearchBox.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -765,6 +766,8 @@ void pqPropertiesPanel::apply()
   vtkTimerLog::MarkStartEvent("PropertiesPanel::Apply");
 
   BEGIN_UNDO_SET(tr("Apply"));
+
+  pqScopedOverrideCursor scopedWaitCursor(Qt::WaitCursor);
 
   bool onlyApplyCurrentPanel = vtkPVGeneralSettings::GetInstance()->GetAutoApplyActiveOnly();
 
