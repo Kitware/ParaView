@@ -44,6 +44,7 @@ set(classes
   pqQuickLaunchDialog
   pqScaleByButton
   pqScaledSpinBox
+  pqScopedOverrideCursor
   pqSectionVisibilityContextMenu
   pqSeriesGeneratorDialog
   pqSetData
