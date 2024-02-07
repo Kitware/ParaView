@@ -5,7 +5,9 @@
 #ifndef pqWaitCursor_h
 #define pqWaitCursor_h
 
+#include "pqScopedOverrideCursor.h"
 #include "pqWidgetsModule.h"
+#include "vtkParaViewDeprecation.h" // For PARAVIEW_DEPRECATED_IN_5_13_0
 
 /**
   RAII component that displays a wait cursor during a long operation.
@@ -22,11 +24,14 @@
   /endcode
 */
 
-class PQWIDGETS_EXPORT pqWaitCursor
+class PARAVIEW_DEPRECATED_IN_5_13_0(
+  "This cursor is limited to a wait type and the RAII aspect is not explicit. "
+  "Use pqScopedOverrideCursor instead.") PQWIDGETS_EXPORT pqWaitCursor
+  : public pqScopedOverrideCursor
 {
 public:
   pqWaitCursor();
-  ~pqWaitCursor();
+  ~pqWaitCursor() = default;
 };
 
 #endif
