@@ -5,7 +5,7 @@
 #include "pqItemViewSearchWidget.h"
 
 #include "pqHighlightItemDelegate.h"
-#include "pqWaitCursor.h"
+#include "pqScopedOverrideCursor.h"
 
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
@@ -198,7 +198,7 @@ bool pqItemViewSearchWidget::searchModel(const QAbstractItemModel* M, const QMod
   {
     return found;
   }
-  pqWaitCursor wCursor;
+  pqScopedOverrideCursor scopedWaitCursor(Qt::WaitCursor);
 
   if (searchType == Previous && M->hasChildren(curIdx))
   {
