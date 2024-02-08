@@ -30,7 +30,7 @@ class PARAVIEW_DEPRECATED_IN_5_13_0(
 {
 public:
   pqWaitCursor();
-  ~pqWaitCursor() = default;
+  ~pqWaitCursor() override = default;
 };
 
 #endif
