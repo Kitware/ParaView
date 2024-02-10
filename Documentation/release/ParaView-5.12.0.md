@@ -419,6 +419,12 @@ You can now annotate part of your pipeline using the new annotations feature (se
 
 It's now possible to control the display properties of a representation using the Node Editor. These nodes are only visible when the object itself is visible. They are also hidden if the option **View Nodes** is disabled.
 
+## Fixed Z Ordering Bug With StreamLines Representation
+
+The StreamLinesRepresentation plugin is now capable of rendering streamlines
+with correct z-order when there are multiple objects in a render view.
+
+
 # Filter changes
 
 ## **Slice** filter locator is more customizable
