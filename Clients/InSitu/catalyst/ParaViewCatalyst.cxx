@@ -199,22 +199,21 @@ static bool convert_to_blueprint_mesh(
     return true;
   }
 
+  conduit_cpp::Node channel = node[name];
   if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
   {
     if (auto data_object = multi_block->GetBlock(0))
     {
-      conduit_cpp::Node channel = node[name];
       return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
     }
   }
-  else if (auto partitioned =
-             vtkPartitionedDataSet::SafeDownCast(outputDataObject)->GetPartitionAsDataObject(0))
+  else if (auto partitioned = vtkPartitionedDataSet::SafeDownCast(outputDataObject))
   {
-    conduit_cpp::Node channel = node[name];
-    return vtkDataObjectToConduit::FillConduitNode(partitioned, channel);
+    return vtkDataObjectToConduit::FillConduitNode(
+      partitioned->GetPartitionAsDataObject(0), channel);
   }
 
-  return true;
+  return vtkDataObjectToConduit::FillConduitNode(outputDataObject, channel);
 }
 
 enum paraview_catalyst_status
