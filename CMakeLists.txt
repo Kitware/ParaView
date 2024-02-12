@@ -942,8 +942,10 @@ endif()
 
 if (PARAVIEW_USE_PYTHON)
   if (PARAVIEW_USE_EXTERNAL_VTK)
-    # TODO: Check if VTK is already wrapped in Python.
-    # Error out?
+    if (NOT VTK_WRAP_PYTHON)
+      message(FATAL_ERROR
+        "PARAVIEW_USE_PYTHON requires VTK built with VTK_WRAP_PYTHON.")
+    endif()
   else ()
     vtk_module_wrap_python(
       MODULES         ${vtk_modules}
