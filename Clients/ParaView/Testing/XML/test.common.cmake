@@ -1410,6 +1410,7 @@ list(APPEND TESTS_WITH_BASELINES
   PointInterpolator.xml
   PointVolumeInterpolator.xml
   PolarAxes.xml
+  PolarAxes2D.xml
   PolyLineAndSplineSources.xml
   PropertyConversion.xml
   PropertyConversion1.xml
