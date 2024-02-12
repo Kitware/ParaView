@@ -14713,6 +14713,23 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                          processes="client|renderserver|dataserver">
       <Documentation>Representation to show any dataset in a 3D render
       view.</Documentation>
+
+      <IntVectorProperty command="SetPlaceHolderDataType"
+                         default_values="38"
+                         name="PlaceHolderDataType"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <DataTypeQueryDomain name="data_type_query">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </DataTypeQueryDomain>
+        <Documentation>
+          Property to set the placeholder data type.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"

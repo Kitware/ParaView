@@ -275,31 +275,8 @@ void vtkPVProminentValuesInformation::CopyFromCompositeDataSet(vtkCompositeDataS
   if (cds->IsA("vtkDataObjectTree") && this->SubsetAssemblyName && this->SubsetAssemblyName[0] &&
     this->SubsetSelector && this->SubsetSelector[0])
   {
-    // TODO, in the future, when vtkPVGeometryFilter produces PDC, we won't need to read the
-    // vtkDataAssembly from the output data's field data and convert the output to a PDC.
-    const bool mbWithAssembly =
-      cds->IsA("vtkMultiBlockDataSet") && cds->GetFieldData()->HasArray("vtkDataAssembly");
-    vtkSmartPointer<vtkDataObjectTree> cdsToExtract = nullptr;
-    if (mbWithAssembly)
-    {
-      const auto dataAssemblyArray = cds->GetFieldData()->GetAbstractArray("vtkDataAssembly");
-      const auto dataAssemblyString = dataAssemblyArray->GetVariantValue(0).ToString();
-      vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
-      converter->SetInputDataObject(cds);
-      converter->Update();
-      auto pdc = vtkPartitionedDataSetCollection::SafeDownCast(converter->GetOutputDataObject(0));
-      vtkNew<vtkDataAssembly> dataAssembly;
-      dataAssembly->InitializeFromXML(dataAssemblyString.c_str());
-      pdc->SetDataAssembly(dataAssembly);
-      cdsToExtract = vtk::MakeSmartPointer(pdc);
-    }
-    else
-    {
-      cdsToExtract = vtk::MakeSmartPointer(vtkDataObjectTree::SafeDownCast(cds));
-    }
-
     vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
-    extractor->SetInputData(cdsToExtract);
+    extractor->SetInputData(cds);
     extractor->SetAssemblyName(this->SubsetAssemblyName);
     extractor->SetSelector(this->SubsetSelector);
     extractor->Update();
