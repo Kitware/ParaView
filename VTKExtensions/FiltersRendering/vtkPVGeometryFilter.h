@@ -192,14 +192,6 @@ public:
   vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   ///@}
 
-  // These keys are put in the output composite-data metadata for multipieces
-  // since this filter merges multipieces together.
-  static vtkInformationIntegerVectorKey* POINT_OFFSETS();
-  static vtkInformationIntegerVectorKey* VERTS_OFFSETS();
-  static vtkInformationIntegerVectorKey* LINES_OFFSETS();
-  static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
-  static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
-
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter() override;
