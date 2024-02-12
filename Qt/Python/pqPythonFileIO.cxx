@@ -8,6 +8,7 @@
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqPythonScriptEditor.h"
+#include "pqScopedOverrideCursor.h"
 #include "pqServer.h"
 
 #include "vtkPVSession.h"
@@ -120,9 +121,10 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
     }
   }
 
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  str = details::Read(this->Name, this->Location);
-  QApplication::restoreOverrideCursor();
+  {
+    pqScopedOverrideCursor scopedWaitCursor(Qt::WaitCursor);
+    str = details::Read(this->Name, this->Location);
+  }
 
   pqPythonScriptEditor::bringFront();
 

@@ -8,11 +8,6 @@
 #include <QCursor>
 
 pqWaitCursor::pqWaitCursor()
+  : pqScopedOverrideCursor(Qt::WaitCursor)
 {
-  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-}
-
-pqWaitCursor::~pqWaitCursor()
-{
-  QApplication::restoreOverrideCursor();
 }
