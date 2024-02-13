@@ -79,7 +79,6 @@ paraview_add_test_python(
   ColorBlockBy.py
   GroupDataSets.py
   PartialArrayIndication.py
-  PvPython.py
   ResetSession.py
   SaveTransparentImages.py
   TestClipCylinder.py
@@ -91,6 +90,14 @@ paraview_add_test_python(
   TestResetCameraToDirection.py
   LoadStateWithTextures.py
 )
+
+if(NOT APPLE)
+  # PvPython test is not added on mac because of
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/20652
+  paraview_add_test_python(
+    NO_RT
+    PvPython.py)
+endif()
 
 paraview_add_test_python(
   NO_DATA NO_VALID NO_OUTPUT NO_RT
