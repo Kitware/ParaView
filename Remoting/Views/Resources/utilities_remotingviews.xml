@@ -3154,7 +3154,7 @@
       </SubProxy>
 
       <IntVectorProperty command="SetGridVisibility"
-                        default_values="1"
+                        default_values="0"
                         name="GridVisibility"
                         number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -3335,10 +3335,22 @@
         </Hints>
       </IntVectorProperty>
 
+      <DoubleVectorProperty name="Origin"
+                          command="SetOrigin"
+                          panel_visibility="advanced"
+                          number_of_elements="3"
+                          default_values="0 0 0">
+        <Documentation>
+          The origin of the measure.
+        </Documentation>
+      </DoubleVectorProperty>
+
+
       <PropertyGroup label="Tick configuration" panel_visibility="advanced">
         <Property name="AdjustLabels" />
         <Property name="HorizontalLabelNumber" />
         <Property name="VerticalLabelNumber" />
+        <Property name="Origin" />
       </PropertyGroup>
 
     </Proxy>
