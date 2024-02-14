@@ -3,10 +3,10 @@ Internal module used by paraview.servermanager to help warn about properties
 changed or removed.
 
 If the compatibility version is less than the version where a particular
-property was removed, `check_attr` should ideally continue to work as before
-or return a value of appropriate form so old code doesn't fail. Otherwise
-`check_attr` should throw the NotSupportedException with appropriate debug
-message.
+property was removed, `getattr` and `setattr` should ideally continue to
+work as before or return a value of appropriate form so old code doesn't
+fail. Otherwise `getattr` and `setattr` should throw the NotSupportedException
+with appropriate debug message.
 """
 
 import paraview
