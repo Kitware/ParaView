@@ -230,7 +230,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     }
 
     // Create this animation entry.
-    vtkXMLWriter* writer = this->GetWriter(i);
+    vtkXMLWriterBase* writer = this->GetWriter(i);
     std::string fname =
       this->Internal->CreateFileName(i, this->GetFilePrefix(), writer->GetDefaultFileExtension());
     std::ostringstream entry_with_warning_C4701;

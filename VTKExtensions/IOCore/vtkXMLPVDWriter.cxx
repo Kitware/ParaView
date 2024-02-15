@@ -19,6 +19,7 @@
 #include "vtkXMLHyperTreeGridWriter.h"
 #include "vtkXMLImageDataWriter.h"
 #include "vtkXMLPDataWriter.h"
+#include "vtkXMLPHyperTreeGridWriter.h"
 #include "vtkXMLPImageDataWriter.h"
 #include "vtkXMLPMultiBlockDataWriter.h"
 #include "vtkXMLPPolyDataWriter.h"
@@ -26,6 +27,8 @@
 #include "vtkXMLPStructuredGridWriter.h"
 #include "vtkXMLPTableWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
+#include "vtkXMLPartitionedDataSetCollectionWriter.h"
+#include "vtkXMLPartitionedDataSetWriter.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLRectilinearGridWriter.h"
 #include "vtkXMLStructuredGridWriter.h"
@@ -45,7 +48,7 @@ vtkStandardNewMacro(vtkXMLPVDWriter);
 class vtkXMLPVDWriterInternals
 {
 public:
-  std::vector<vtkSmartPointer<vtkXMLWriter>> Writers;
+  std::vector<vtkSmartPointer<vtkXMLWriterBase>> Writers;
   std::string FilePath;
   std::string FilePrefix;
   std::vector<std::string> Entries;
@@ -213,7 +216,7 @@ int vtkXMLPVDWriter::RequestData(
   for (int i = 0; i < this->GetNumberOfInputConnections(0); ++i)
   {
     this->SetProgressRange(progressRange, i, GetNumberOfInputConnections(0) + writeCollection);
-    if (vtkXMLWriter* w = this->GetWriter(i))
+    if (vtkXMLWriterBase* w = this->GetWriter(i))
     {
       // Set the file name.
       std::string fname = this->Internal->CreatePieceFileName(
@@ -497,13 +500,47 @@ void vtkXMLPVDWriter::CreateWriters()
         }
         break;
 
-      case VTK_MULTIBLOCK_DATA_SET:
+      case VTK_PARTITIONED_DATA_SET_COLLECTION:
         if (!this->Internal->Writers[i].GetPointer() ||
-          (this->Internal->Writers[i]->IsA("vtkXMLPMultiBlockDataWriter")))
+          (this->Internal->Writers[i]->IsA("vtkXMLPartitionedDataSetCollectionWriter")))
         {
-          vtkXMLPMultiBlockDataWriter* w = vtkXMLPMultiBlockDataWriter::New();
+          vtkXMLPartitionedDataSetCollectionWriter* w =
+            vtkXMLPartitionedDataSetCollectionWriter::New();
           this->Internal->Writers[i] = w;
           w->Delete();
+        }
+        break;
+
+      case VTK_PARTITIONED_DATA_SET:
+        if (!this->Internal->Writers[i].GetPointer() ||
+          (this->Internal->Writers[i]->IsA("vtkXMLPartitionedDataSetWriter")))
+        {
+          vtkXMLPartitionedDataSetWriter* w = vtkXMLPartitionedDataSetWriter::New();
+          this->Internal->Writers[i] = w;
+          w->Delete();
+        }
+        break;
+
+      case VTK_MULTIBLOCK_DATA_SET:
+        if (this->NumberOfPieces > 1)
+        {
+          if (!this->Internal->Writers[i].GetPointer() ||
+            (this->Internal->Writers[i]->IsA("vtkXMLPMultiBlockDataWriter")))
+          {
+            vtkXMLPMultiBlockDataWriter* w = vtkXMLPMultiBlockDataWriter::New();
+            this->Internal->Writers[i] = w;
+            w->Delete();
+          }
+        }
+        else
+        {
+          if (!this->Internal->Writers[i].GetPointer() ||
+            (this->Internal->Writers[i]->IsA("vtkXMLMultiBlockDataWriter")))
+          {
+            vtkXMLMultiBlockDataWriter* w = vtkXMLMultiBlockDataWriter::New();
+            this->Internal->Writers[i] = w;
+            w->Delete();
+          }
         }
         break;
 
@@ -531,12 +568,25 @@ void vtkXMLPVDWriter::CreateWriters()
         break;
 
       case VTK_HYPER_TREE_GRID:
-        if (!this->Internal->Writers[i].GetPointer() ||
-          (this->Internal->Writers[i]->IsA("vtkXMLHyperTreeGridWriter")))
+        if (this->NumberOfPieces > 1)
         {
-          vtkXMLHyperTreeGridWriter* w = vtkXMLHyperTreeGridWriter::New();
-          this->Internal->Writers[i] = w;
-          w->Delete();
+          if (!this->Internal->Writers[i].GetPointer() ||
+            (this->Internal->Writers[i]->IsA("vtkXMLPHyperTreeGridWriter")))
+          {
+            vtkXMLPHyperTreeGridWriter* w = vtkXMLPHyperTreeGridWriter::New();
+            this->Internal->Writers[i] = w;
+            w->Delete();
+          }
+        }
+        else
+        {
+          if (!this->Internal->Writers[i].GetPointer() ||
+            (this->Internal->Writers[i]->IsA("vtkXMLHyperTreeGridWriter")))
+          {
+            vtkXMLHyperTreeGridWriter* w = vtkXMLHyperTreeGridWriter::New();
+            this->Internal->Writers[i] = w;
+            w->Delete();
+          }
         }
         break;
 
@@ -548,7 +598,7 @@ void vtkXMLPVDWriter::CreateWriters()
     this->Internal->Writers[i]->SetInputConnection(this->GetInputConnection(0, i));
 
     // Copy settings to the writer.
-    if (vtkXMLWriter* w = this->Internal->Writers[i].GetPointer())
+    if (vtkXMLWriterBase* w = this->Internal->Writers[i].GetPointer())
     {
       w->SetDebug(this->GetDebug());
       w->SetByteOrder(this->GetByteOrder());
@@ -600,7 +650,7 @@ void vtkXMLPVDWriter::CreateWriters()
 }
 
 //----------------------------------------------------------------------------
-vtkXMLWriter* vtkXMLPVDWriter::GetWriter(int index)
+vtkXMLWriterBase* vtkXMLPVDWriter::GetWriter(int index)
 {
   int size = static_cast<int>(this->Internal->Writers.size());
   if (index >= 0 && index < size)
