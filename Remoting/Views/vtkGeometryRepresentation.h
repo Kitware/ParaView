@@ -80,6 +80,16 @@ public:
 
   ///@{
   /**
+   * Disables the lighting on the object.
+   * It only displays the Diffuse component
+   * of the lighting color of the object.
+   */
+  vtkBooleanMacro(DisableLighting, bool);
+  vtkSetMacro(DisableLighting, bool);
+  vtkGetMacro(DisableLighting, bool);
+  ///@}
+  ///@{
+  /**
    * Set the lighting properties of the object. vtkGeometryRepresentation
    * overrides these based of the following conditions:
    * \li When Representation is wireframe or points, it disables diffuse or
@@ -173,6 +183,7 @@ public:
   virtual void SetAmbientColor(double r, double g, double b);
   virtual void SetColor(double r, double g, double b);
   virtual void SetDiffuseColor(double r, double g, double b);
+  virtual void SetLighting(bool lighting);
   virtual void SetEdgeColor(double r, double g, double b);
   virtual void SetInteractiveSelectionColor(double r, double g, double b);
   virtual void SetInterpolation(int val);
@@ -547,6 +558,7 @@ protected:
   std::unordered_map<vtkDataObject*, vtkIdType> BlockFieldDataTupleIds;
   ///@}
 private:
+  bool DisableLighting = false;
   vtkGeometryRepresentation(const vtkGeometryRepresentation&) = delete;
   void operator=(const vtkGeometryRepresentation&) = delete;
 };
