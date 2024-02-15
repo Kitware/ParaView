@@ -1077,6 +1077,7 @@ SET(TESTS_WITH_BASELINES
   CameraOrientationWidget.xml
   ChartsClearSelection.xml
   CleanToGridRemovePoints.xml
+  ConstantShadingPerObject.xml
   CONVERGECFDCGNSReader.xml
   DataAxesGrid.xml
   EmptyInitialCompositeReader.xml # Issue #21293
