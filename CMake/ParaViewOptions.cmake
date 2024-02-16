@@ -372,6 +372,7 @@ paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON
   MODULES   VTK::Python
             VTK::PythonInterpreter
+            ParaView::PythonInterpreterPath
   EXCLUSIVE)
 
 paraview_require_module(
