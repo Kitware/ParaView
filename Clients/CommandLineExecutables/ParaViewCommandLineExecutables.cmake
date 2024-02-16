@@ -29,15 +29,18 @@ function (paraview_add_executable name)
   target_link_libraries("${name}"
     PRIVATE
       ParaView::paraview_plugins)
-
-  if (PARAVIEW_USE_PYTHON)
     target_compile_definitions("${name}"
       PRIVATE
-        PARAVIEW_USE_PYTHON)
+      "PARAVIEW_USE_EXTERNAL_VTK=$<BOOL:${PARAVIEW_USE_EXTERNAL_VTK}>")
+    target_compile_definitions("${name}"
+      PRIVATE
+      "PARAVIEW_USE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")
+  if (PARAVIEW_USE_PYTHON)
     target_link_libraries("${name}"
       PRIVATE
         VTK::PythonInterpreter
-        ParaView::PythonInitializer)
+        ParaView::PythonInitializer
+        ParaView::PythonInterpreterPath)
   endif ()
 
   if (paraview_exe_job_link_pool)

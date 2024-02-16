@@ -48,6 +48,8 @@
 #if PARAVIEW_USE_PYTHON
 #include "pqPythonDebugLeaksView.h"
 #include "pqPythonShell.h"
+#include "vtkPVPythonInterpreterPath.h"
+#include "vtkPythonInterpreter.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
 #else
 #include "vtkQtDebugLeaksView.h"
@@ -99,6 +101,9 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->pythonShellDock->hide();
   this->Internals->materialEditorDock->hide();
 #if PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_EXTERNAL_VTK
+  vtkPVPythonInterpreterPath();
+#endif
   pqPythonShell* shell = new pqPythonShell(this);
   shell->setObjectName("pythonShell");
   this->Internals->pythonShellDock->setWidget(shell);

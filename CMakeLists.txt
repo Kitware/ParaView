@@ -866,7 +866,8 @@ vtk_module_build(
   SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
 # Catalyst sanity check. Ensure every module is using the same Catalyst dependency.
-if (PARAVIEW_ENABLE_CATALYST)
+if (PARAVIEW_ENABLE_CATALYST AND NOT PARAVIEW_USE_EXTERNAL_VTK)
+  # global property defined in VTK which is not exported
   get_property(catalyst_dir_primary GLOBAL PROPERTY vtk_catalyst_dir_primary)
   set(catalyst_using_modules ClientsInSitu)
   foreach (catalyst_using_module IN LISTS catalyst_using_modules)
