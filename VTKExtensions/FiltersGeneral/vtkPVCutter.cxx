@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkPVCutter.h"
 
+#include "vtkAppendDataSets.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
@@ -44,7 +45,31 @@ int vtkPVCutter::RequestData(
   vtkDataObject* output = vtkDataObject::GetData(outInfo);
 
   vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->CutFunction);
-  if (plane && this->GetNumberOfContours() == 1 && this->GetGenerateCutScalars() == 0)
+
+  auto executePlaneCutter = [&](int offset) {
+    // Create a copy of the original plane and apply the offsets value
+    // (global offset + "contours")
+    vtkNew<vtkPVPlane> newPlane;
+    newPlane->SetNormal(plane->GetNormal());
+    newPlane->SetOrigin(plane->GetOrigin());
+    // We should not use `Push` here since it does not apply on
+    // the internal plane of vtkPVPlane
+    newPlane->SetOffset(plane->GetOffset() + offset);
+    newPlane->SetAxisAligned(plane->GetAxisAligned());
+
+    this->PlaneCutter->SetInputData(input);
+    this->PlaneCutter->SetPlane(newPlane);
+    bool mergePoints = this->GetLocator() && !this->GetLocator()->IsA("vtkNonMergingPointLocator");
+    this->PlaneCutter->SetMergePoints(mergePoints);
+    this->PlaneCutter->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
+    this->PlaneCutter->SetGeneratePolygons(!this->GetGenerateTriangles());
+    this->PlaneCutter->SetDual(this->GetDual());
+    this->PlaneCutter->BuildTreeOff();
+    this->PlaneCutter->ComputeNormalsOff();
+    this->PlaneCutter->Update();
+  };
+
+  if (plane && this->GetGenerateCutScalars() == 0)
   {
     if (vtkHyperTreeGrid::SafeDownCast(input))
     {
@@ -52,18 +77,42 @@ int vtkPVCutter::RequestData(
       {
         this->CreateDefaultLocator();
       }
-      this->PlaneCutter->SetInputData(input);
-      this->PlaneCutter->SetPlane(plane);
-      this->PlaneCutter->SetGeneratePolygons(!this->GetGenerateTriangles());
-      this->PlaneCutter->BuildTreeOff();
-      bool mergePoints =
-        this->GetLocator() && !this->GetLocator()->IsA("vtkNonMergingPointLocator");
-      this->PlaneCutter->SetMergePoints(mergePoints);
-      this->PlaneCutter->SetDual(this->GetDual());
-      this->PlaneCutter->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
-      this->PlaneCutter->ComputeNormalsOff();
-      this->PlaneCutter->Update();
-      output->ShallowCopy(this->PlaneCutter->GetOutput());
+
+      bool multipleSlices = this->GetNumberOfContours() > 1;
+
+      // PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkAxisAlignedCutter instead")
+      // We do not support multiple axis-aligned slices in this filter. Following assertion can be
+      // removed once the specific axis-aligned codepath is dropped from vtkPVPlaneCutter.
+      if (plane->GetAxisAligned())
+      {
+        multipleSlices = false;
+      }
+
+      if (multipleSlices)
+      {
+        vtkNew<vtkAppendDataSets> append;
+        append->SetContainerAlgorithm(this);
+        append->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
+        append->MergePointsOff();
+        append->SetOutputDataSetType(VTK_POLY_DATA);
+
+        for (vtkIdType i = 0; i < this->GetNumberOfContours(); ++i)
+        {
+          auto offset = this->GetValue(i);
+          executePlaneCutter(offset);
+
+          vtkNew<vtkPolyData> pd;
+          pd->ShallowCopy(this->PlaneCutter->GetOutput());
+          append->AddInputData(pd);
+        }
+        append->Update();
+        output->ShallowCopy(append->GetOutput());
+      }
+      else
+      {
+        executePlaneCutter(0);
+        output->ShallowCopy(this->PlaneCutter->GetOutput());
+      }
       return 1;
     }
     else

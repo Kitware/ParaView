@@ -2733,16 +2733,8 @@ Every Nth Point.
                             use_index="1"
                             panel_visibility="advanced">
         <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                       name="vtkHyperTreeGrid"
-                                       mode="visibility"
-                                       exclude="1" />
-              <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                <Property name="PreserveInputCells" function="boolean_invert" />
-              </PropertyWidgetDecorator>
-            </Expression>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="PreserveInputCells" function="boolean_invert" />
           </PropertyWidgetDecorator>
         </Hints>
         <BoundsDomain mode="magnitude"
