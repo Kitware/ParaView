@@ -378,6 +378,12 @@ void pqVRDockPanel::updateStyles()
     QString name = this->Internals->createName(style);
     this->Internals->StyleNameMap.insert(name, style);
     this->Internals->stylesTable->addItem(name);
+
+    if (!style->HasObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE))
+    {
+      style->AddObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_REQUEST_CONFIGURE, this,
+        &pqVRDockPanel::configureStyle);
+    }
   }
 }
 
