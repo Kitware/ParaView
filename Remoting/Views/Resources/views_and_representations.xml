@@ -4580,6 +4580,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
 
           <PropertyGroup label="Transforming">
             <Property name="Position"
+                      exposed_name="Translation"
                       panel_visibility="advanced" />
             <Property name="Scale"
                       panel_visibility="advanced" />
@@ -5009,6 +5010,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
 
           <PropertyGroup label="Transforming">
             <Property name="Position"
+                      exposed_name="Translation"
                       panel_visibility="advanced" />
             <Property name="Scale"
                       panel_visibility="advanced" />

@@ -478,6 +478,16 @@ def setattr(proxy, pname, value):
             else:
                 raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
 
+    # 5.12 -> 5.13 breaking change on Representation properties
+    # Renamed Position into Translation
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName().endswith("Representation"):
+        if pname == "Position":
+            if compatibility_version < (5, 13):
+                proxy.GetProperty("Translation").SetData(value)
+                raise Continue()
+            else:
+                raise NotSupportedException("'Position' is obsolete.  Use 'Translation' property instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -991,6 +1001,14 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException("'DecomposePolyhedra' property has been removed in ParaView 5.13")
 
+    # 5.12 -> 5.13 breaking change on Representation properties
+    # Renamed Position into Translation
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName().endswith("Representation"):
+        if pname == "Position":
+            if compatibility_version < (5, 13):
+                return proxy.GetProperty("Translation").GetData()
+            else:
+                raise NotSupportedException("'Position' property has been removed in ParaView 5.13")
     raise Continue()
 
 

@@ -51,7 +51,7 @@ r0 = OpenDataFile(join(rootdir, "sphere-rr-0.stl"))
 r1 = OpenDataFile(join(rootdir, "sphere-rr-1.stl"))
 grr = GroupDatasets(Input=[r0, r1])
 dr = Show(grr)
-dr.Position = [1, 1, 0]
+dr.Translation = [1, 1, 0]
 
 ResetCamera()
 ColorBy(dc, ('FIELD', 'vtkBlockColors'))
