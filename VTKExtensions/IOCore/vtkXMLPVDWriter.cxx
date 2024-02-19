@@ -607,6 +607,7 @@ void vtkXMLPVDWriter::CreateWriters()
       w->SetDataMode(this->GetDataMode());
       w->SetEncodeAppendedData(this->GetEncodeAppendedData());
       w->SetHeaderType(this->GetHeaderType());
+      w->SetWriteTimeValue(this->GetWriteTimeValue());
     }
 
     // If this is a parallel writer, set the piece information.

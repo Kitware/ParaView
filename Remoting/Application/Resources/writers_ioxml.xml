@@ -38,6 +38,14 @@
         base64 encoding when writing binary data (only if appended mode is
         selected).</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetWriteTimeValue"
+                         default_values="1"
+                         name="WriteTimeValue"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeValue is turned ON, the writer write
+        field data time values information, if any.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetCompressorType"
                          default_values="0"
                          name="CompressorType"
@@ -483,6 +491,7 @@
             <Property name="GhostLevel" />
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -526,6 +535,7 @@
             <Property name="GhostLevel" />
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -569,6 +579,7 @@
             <!-- <Property name="GhostLevel" /> -->
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -611,6 +622,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -652,6 +664,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -693,6 +706,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -735,6 +749,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -778,6 +793,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -820,6 +836,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -862,6 +879,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -905,6 +923,7 @@
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
             <Property name="HeaderType" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
@@ -1052,6 +1071,7 @@
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
+            <Property name="WriteTimeValue" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
             <Property name="CompressionLevel" />
