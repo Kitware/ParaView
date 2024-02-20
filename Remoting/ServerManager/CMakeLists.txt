@@ -57,6 +57,7 @@ set(classes
   vtkSMDataExtractWriterProxy
   vtkSMDataSourceProxy
   vtkSMDataTypeDomain
+  vtkSMDataTypeQueryDomain
   vtkSMDeserializer
   vtkSMDeserializerProtobuf
   vtkSMDeserializerXML
