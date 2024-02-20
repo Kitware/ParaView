@@ -340,7 +340,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkExtractGhostCells"
+    <SourceProxy class="vtkPVExtractGhostCells"
                  name="ExtractGhostCells"
                  label="Extract Ghost Cells">
       <Documentation short_help="Extract ghost cells so they can be visualized.">
@@ -357,6 +357,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
           <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
       </InputProperty>
       <StringVectorProperty name="ArrayName"

@@ -25,6 +25,7 @@ set(classes
   vtkPVCutter
   vtkPVDataSetAlgorithmSelectorFilter
   vtkPVExtractComponent
+  vtkPVExtractGhostCells
   vtkPVExtractVOI
   vtkPVGlyphFilter
   vtkPVGradientFilter

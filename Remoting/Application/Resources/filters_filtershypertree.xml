@@ -151,6 +151,37 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridExtractGhostCells"
+                 label="HyperTreeGrid Ghost Cells Extractor"
+                 name="HyperTreeGridExtractGhostCells">
+      <Documentation long_help="Extract Ghost Cells for HyperTreeGrid."
+                     short_help="Extract Ghost Cells for HyperTreeGrid.">
+                     This filter extracts ghost cells from a hyper tree grid and displays them
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_types">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty name="ArrayName"
+                            command="SetOutputGhostArrayName"
+                            number_of_elements="1"
+                            default_values="GhostType">
+        <Documentation>
+          Name of the ghost cell array in the output.
+          It must be different to `vtkGhostType` in order for the cells to be displayed.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End vtkHyperTreeGridGhostCellsGenerator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridGeometry"
                  name="HyperTreeGridGeometry"
                  label="HyperTreeGrid Geometry Filter">
