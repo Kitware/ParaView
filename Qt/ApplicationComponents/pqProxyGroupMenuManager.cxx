@@ -228,6 +228,7 @@ struct pqProxyGroupMenuManager::pqInternal
       if (variant.canConvert<QKeySequence>())
       {
         action->setShortcut(variant.value<QKeySequence>());
+        action->setAutoRepeat(false);
       }
     }
   }

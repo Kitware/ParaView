@@ -8,7 +8,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMainWindow>
-#include <QShortcut>
 #include <QTest>
 #include <QTimer>
 #include <QToolButton>

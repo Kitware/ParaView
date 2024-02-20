@@ -13,7 +13,6 @@ class pqModalShortcut;
 class pqPropertyWidget;
 class pqRenderView;
 class pqView;
-class QShortcut;
 
 /**
  * pqPointPickingHelper is a helper class that is designed for use by

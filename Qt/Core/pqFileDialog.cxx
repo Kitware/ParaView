@@ -346,6 +346,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
 
     auto shortcutDel = new QShortcut(QKeySequence::Delete, this);
+    shortcutDel->setAutoRepeat(false);
     QObject::connect(shortcutDel, &QShortcut::activated, this,
       &pqFileDialog::onRemoveSelectedDirectoriesFromFavorites);
 

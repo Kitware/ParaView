@@ -83,6 +83,7 @@ void pqViewMenuManager::buildMenu()
       this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqFullscreen.svg"), tr("Full Screen"));
     fullscreen->setObjectName("actionFullScreen");
     fullscreen->setShortcut(QKeySequence("F11"));
+    fullscreen->setAutoRepeat(false);
     QObject::connect(
       fullscreen, &QAction::triggered, viewManager, &pqTabbedMultiViewWidget::toggleFullScreen);
 

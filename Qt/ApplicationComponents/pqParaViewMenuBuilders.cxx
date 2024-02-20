@@ -192,6 +192,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
+  ui.actionDelete->setAutoRepeat(false);
   new pqDeleteReaction(ui.actionDeleteTree, pqDeleteReaction::DeleteModes::TREE);
   new pqDeleteReaction(ui.actionDelete_All, pqDeleteReaction::DeleteModes::ALL);
   new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
@@ -213,9 +214,11 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
     QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqApply.svg"),
       QCoreApplication::translate("pqEditMenu", "Apply"), &menu);
     applyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
+    applyAction->setAutoRepeat(false);
     QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqCancel.svg"),
       QCoreApplication::translate("pqEditMenu", "Reset"), &menu);
     resetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_R));
+    resetAction->setAutoRepeat(false);
     menu.insertAction(ui.actionDelete, applyAction);
     menu.insertAction(ui.actionDelete, resetAction);
     new pqApplyPropertiesReaction(propertiesPanel, applyAction, true);
@@ -682,6 +685,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   QAction* guide = menu.addAction(QCoreApplication::translate("pqHelpMenu", "ParaView Guide"));
   guide->setObjectName("actionGuide");
   guide->setShortcut(QKeySequence::HelpContents);
+  guide->setAutoRepeat(false);
   if (guideLocalFile.exists())
   {
     guide->setIcon(QIcon(":/pqWidgets/Icons/pdf.png"));
