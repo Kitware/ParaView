@@ -95,6 +95,7 @@
 #include "pqTraceReaction.h"
 #endif
 
+#include <QAction>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDockWidget>
@@ -329,6 +330,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   QAction* configureCategoriesAction =
     menu.addAction(QCoreApplication::translate("pqToolsMenu", "Configure Categories"))
     << pqSetName("actionConfigureCategories");
+  configureCategoriesAction->setMenuRole(QAction::NoRole);
   new pqConfigureCategoriesReaction(configureCategoriesAction, mgr);
 
   new pqCustomizeShortcutsReaction(
