@@ -11,7 +11,6 @@
 #include "vtkSMRenderViewProxy.h"
 
 #include <QDebug>
-#include <QShortcut>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #define QT_ENDL endl

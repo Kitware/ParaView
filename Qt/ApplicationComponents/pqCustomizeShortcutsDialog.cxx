@@ -54,6 +54,7 @@ public:
   {
     this->KeySequence = shortcut.toString();
     this->Action->setShortcut(shortcut);
+    this->Action->setAutoRepeat(false);
     pqSettings* settings = pqApplicationCore::instance()->settings();
     settings->setValue(settingsKey(), shortcut);
   }

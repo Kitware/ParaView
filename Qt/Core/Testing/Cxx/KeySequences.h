@@ -28,11 +28,6 @@ public:
 
   QAction* action() const { return m_action; }
 
-protected Q_SLOTS:
-  virtual void onShortcutEnabled();
-  virtual void onShortcutDisabled();
-  virtual void demo();
-
 protected:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   void enterEvent(QEvent*) override;
@@ -52,6 +47,11 @@ protected:
   QToolButton* m_button;
   pqModalShortcut* m_shortcut;
   bool m_pressed;
+
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  virtual void onShortcutEnabled();
+  virtual void onShortcutDisabled();
+  virtual void demo();
 };
 
 class KeySequencesTester : public QObject
@@ -63,18 +63,20 @@ public:
     : m_counts{ 0, 0, 0, 0, 0 }
   {
   }
-public Q_SLOTS:
+
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void a1();
   void a2();
   void a3();
   void a4();
   void b();
-private Q_SLOTS:
-  void basic();
 
 protected:
   std::array<int, 5> m_counts;
   QLayout* m_layout;
   QList<QWidget*> m_widgets;
+
+private Q_SLOTS:
+  void basic();
 };
 #endif
