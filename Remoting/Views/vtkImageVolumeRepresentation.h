@@ -70,6 +70,10 @@ public:
   void SetAnisotropy(float);
   void SetSliceFunction(vtkImplicitFunction* slice);
 
+  //***************************************************************************
+  // Forwarded to Actor.
+  virtual void SetCoordinateSystem(int);
+
   ///@{
   /**
    * Methods to set isosurface values.

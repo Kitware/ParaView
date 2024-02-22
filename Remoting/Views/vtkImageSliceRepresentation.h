@@ -101,6 +101,7 @@ public:
   void SetPickable(int val);
   void SetPosition(double, double, double);
   void SetScale(double, double, double);
+  virtual void SetCoordinateSystem(int);
 
   //---------------------------------------------------------------------------
   // Forwarded to vtkProperty.

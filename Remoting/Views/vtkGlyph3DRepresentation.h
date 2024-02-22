@@ -81,6 +81,7 @@ public:
   void SetScale(double, double, double) override;
   void SetTexture(vtkTexture*) override;
   void SetUserTransform(const double[16]) override;
+  void SetCoordinateSystem(int) override;
 
 protected:
   vtkGlyph3DRepresentation();

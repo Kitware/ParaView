@@ -89,6 +89,10 @@ bool vtkGlyph3DRepresentation::AddToView(vtkView* view)
   if (rview)
   {
     rview->GetRenderer()->AddActor(this->GlyphActor);
+
+    // Indicate that the above renderer is the one the actor is relative to
+    // in case the coordinate system is set to physical or device.
+    this->GlyphActor->SetCoordinateSystemRenderer(rview->GetRenderer());
   }
   return this->Superclass::AddToView(view);
 }
@@ -99,6 +103,7 @@ bool vtkGlyph3DRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
   {
+    this->GlyphActor->SetCoordinateSystemRenderer(nullptr);
     rview->GetRenderer()->RemoveActor(this->GlyphActor);
   }
   return this->Superclass::RemoveFromView(view);
@@ -509,6 +514,13 @@ void vtkGlyph3DRepresentation::SetScale(double x, double y, double z)
 {
   this->GlyphActor->SetScale(x, y, z);
   this->Superclass::SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetCoordinateSystem(int coordSys)
+{
+  this->GlyphActor->SetCoordinateSystem(static_cast<vtkProp3D::CoordinateSystems>(coordSys));
+  this->Superclass::SetCoordinateSystem(coordSys);
 }
 
 //----------------------------------------------------------------------------

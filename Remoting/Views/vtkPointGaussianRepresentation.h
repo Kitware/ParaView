@@ -60,6 +60,7 @@ public:
   virtual void SetPickable(int val);
   virtual void SetPosition(double, double, double);
   virtual void SetScale(double, double, double);
+  virtual void SetCoordinateSystem(int);
 
   //***************************************************************************
   // Forwarded to Actor->GetProperty()

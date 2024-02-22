@@ -2841,6 +2841,17 @@
           <Property name="ModelTransformMatrix" />
         </ExposedProperties>
       </SubProxy>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPhysicalToWorldMatrix"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="PhysicalToWorldMatrix"
+                            number_of_elements="16"
+                            panel_visibility="never">
+        <Documentation>
+          Get/Set the matrix mapping the physical coordinate system to the
+          world coordinate system.
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetParallelProjection"
                          default_values="0"
                          ignore_synchronization="1"
@@ -4667,6 +4678,8 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                       panel_visibility="advanced" />
             <Property name="CoordinateShiftScaleMethod"
                       panel_visibility="advanced"/>
+            <Property name="CoordinateSystem"
+                      panel_visibility="advanced"/>
           </PropertyGroup>
 
           <PropertyGroup label="Miscellaneous">
@@ -6440,6 +6453,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                             default_values="1 1 1">
         <Documentation>This property specifies the cropping scale.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetCoordinateSystem"
+                         default_values="0"
+                         name="CoordinateSystem"
+                         number_of_elements="1">
+        <Documentation>Specify the coordinate system that this prop is relative to. This defaults
+          to world but can be set to physical.  Representations in the PHYSICAL coordinate
+          system are automatically transformed by the PhysicalToWorldMatrix.  In HMD-based
+          displays, this has the effect of fixing the object with respect to the display.  In
+          general, the PhysicalToWorldMatrix does not necessarily correspond to the coordinate
+          system of the display, but can be used for similar purposes.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Navigable"
+                 value="0" />
+          <Entry text="Fixed"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <InputProperty is_internal="1" name="DummyInput" />
       <Hints>
         <ProxyList>
@@ -7722,6 +7753,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </Hints>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetCoordinateSystem"
+                         default_values="0"
+                         name="CoordinateSystem"
+                         number_of_elements="1">
+        <Documentation>Specify the coordinate system that this prop is relative to. This defaults
+          to world but can be set to physical.  Representations in the PHYSICAL coordinate
+          system are automatically transformed by the PhysicalToWorldMatrix.  In HMD-based
+          displays, this has the effect of fixing the object with respect to the display.  In
+          general, the PhysicalToWorldMatrix does not necessarily correspond to the coordinate
+          system of the display, but can be used for similar purposes.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Navigable"
+                 value="0" />
+          <Entry text="Fixed"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <!-- End of PointGaussianRepresentation -->
     </RepresentationProxy>
 
@@ -8219,6 +8268,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetCoordinateSystem"
+                         default_values="0"
+                         name="CoordinateSystem"
+                         number_of_elements="1">
+        <Documentation>Specify the coordinate system that this prop is relative to. This defaults
+          to world but can be set to physical.  Representations in the PHYSICAL coordinate
+          system are automatically transformed by the PhysicalToWorldMatrix.  In HMD-based
+          displays, this has the effect of fixing the object with respect to the display.  In
+          general, the PhysicalToWorldMatrix does not necessarily correspond to the coordinate
+          system of the display, but can be used for similar purposes.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Navigable"
+                 value="0" />
+          <Entry text="Fixed"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
     <!-- End of ImageSliceRepresentation -->
     </RepresentationProxy>
 
@@ -15806,6 +15873,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           Set the texture transform for the textures.
         </Documentation>
       </ProxyProperty>
+      <IntVectorProperty command="SetCoordinateSystem"
+                         default_values="0"
+                         name="CoordinateSystem"
+                         number_of_elements="1">
+        <Documentation>Specify the coordinate system that this prop is relative to. This defaults
+          to world but can be set to physical.  Representations in the PHYSICAL coordinate
+          system are automatically transformed by the PhysicalToWorldMatrix.  In HMD-based
+          displays, this has the effect of fixing the object with respect to the display.  In
+          general, the PhysicalToWorldMatrix does not necessarily correspond to the coordinate
+          system of the display, but can be used for similar purposes.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Navigable"
+                 value="0" />
+          <Entry text="Fixed"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <IntVectorProperty command="SetSuppressLOD"
                          default_values="0"
                          name="SuppressLOD"

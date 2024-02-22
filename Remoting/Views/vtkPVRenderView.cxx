@@ -3079,6 +3079,15 @@ void vtkPVRenderView::SetStencilCapable(int val)
   this->GetRenderWindow()->SetStencilCapable(val);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetPhysicalToWorldMatrix(const double matrix[16])
+{
+  vtkMatrix4x4* mat = vtkMatrix4x4::New();
+  mat->DeepCopy(matrix);
+  this->GetRenderWindow()->SetPhysicalToWorldMatrix(mat);
+  mat->Delete();
+}
+
 //*****************************************************************
 // Forwarded to vtkCamera if present on local processes.
 //----------------------------------------------------------------------------
