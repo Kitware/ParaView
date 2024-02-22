@@ -14,15 +14,327 @@
 #include "pqPythonTabWidget.h"
 
 // Qt
+#include <QAbstractItemModel>
 #include <QMessageBox>
+#include <QPainter>
 #include <QScopedPointer>
 #include <QShortcut>
 #include <QStringList>
-#include <QTreeWidgetItem>
+#include <QStyledItemDelegate>
+#include <qstyleoption.h>
 
 //----------------------------------------------------------------------------
 struct pqEditMacrosDialog::pqInternals
 {
+  class pqPythonMacrosModel : public QAbstractItemModel
+  {
+  public:
+    pqPythonMacrosModel(QObject* parent = nullptr)
+      : QAbstractItemModel(parent)
+    {
+    }
+
+    // qt item role to store macro path
+    static constexpr int MACRO_PATH_ROLE() { return Qt::UserRole + 1; }
+
+    int columnCount(const QModelIndex&) const override { return pqInternals::Columns::Count; }
+
+    int rowCount(const QModelIndex&) const override
+    {
+      return pqPythonMacroSupervisor::getMacrosFilePaths().size();
+    }
+
+    QModelIndex index(int row, int column, const QModelIndex&) const override
+    {
+      return this->createIndex(row, column);
+    }
+
+    QModelIndex parent(const QModelIndex&) const override { return QModelIndex(); }
+
+    Qt::ItemFlags flags(const QModelIndex& index) const override
+    {
+      return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    }
+
+    QVariant data(const QModelIndex& index, int role) const override
+    {
+      if (!index.isValid())
+      {
+        return QVariant();
+      }
+      const int& row = index.row();
+      const int& column = index.column();
+      QVariant result = QVariant();
+      const QStringList fileNames = pqPythonMacroSupervisor::getMacrosFilePaths();
+      if (row >= fileNames.size())
+      {
+        return result;
+      }
+      const QString fileName = fileNames[row];
+      if (column == pqInternals::Icons)
+      {
+        switch (role)
+        {
+          case Qt::EditRole:
+            result = pqPythonMacroSupervisor::iconPathFromFileName(fileName);
+            break;
+          case Qt::DecorationRole:
+            result = QIcon(pqPythonMacroSupervisor::iconPathFromFileName(fileName));
+            break;
+          case Qt::ToolTipRole:
+            result = QString("Select an icon for the macro.");
+            break;
+          case MACRO_PATH_ROLE():
+            result = fileNames[index.row()];
+            break;
+          default:
+            break;
+        }
+      }
+      else if (column == pqInternals::Tooltips)
+      {
+        switch (role)
+        {
+          case Qt::EditRole:
+          case Qt::DisplayRole:
+            result = pqPythonMacroSupervisor::macroToolTipFromFileName(fileName);
+            break;
+          case Qt::ToolTipRole:
+            result = QString("Edit the tooltip of a macro.");
+            break;
+          case MACRO_PATH_ROLE():
+            result = fileNames[index.row()];
+            break;
+          default:
+            break;
+        }
+      }
+      else if (column == pqInternals::Macros)
+      {
+        switch (role)
+        {
+          case Qt::EditRole:
+          case Qt::DisplayRole:
+            result = pqPythonMacroSupervisor::macroNameFromFileName(fileName);
+            break;
+          case Qt::ToolTipRole:
+            result = QString("Edit the macro.");
+            break;
+          case MACRO_PATH_ROLE():
+            result = fileNames[index.row()];
+            break;
+          default:
+            break;
+        }
+      }
+      return result;
+    }
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override
+    {
+      if (role != Qt::DisplayRole)
+      {
+        return QVariant();
+      }
+      if (orientation == Qt::Orientation::Vertical)
+      {
+        return QVariant();
+      }
+      if (section >= pqEditMacrosDialog::pqInternals::Columns::Count || section < 0)
+      {
+        return QVariant();
+      }
+      const std::vector<std::string> headerLabels = { "Icon", "ToolTip", "Macro" };
+      return QVariant(headerLabels.at(section).c_str());
+    }
+
+    bool setData(const QModelIndex& index, const QVariant& value, int role) override
+    {
+      if (!index.isValid())
+      {
+        return false;
+      }
+      const int& row = index.row();
+      const int& column = index.column();
+      const QStringList fileNames = pqPythonMacroSupervisor::getMacrosFilePaths();
+      if (row >= fileNames.size())
+      {
+        return false;
+      }
+      const QString macroPath = fileNames[row];
+      const QString text = value.toString();
+      if (column == pqInternals::Icons)
+      {
+        pqPythonMacroSupervisor::setIconForMacro(macroPath, text);
+        Q_EMIT this->dataChanged(index, index, { role });
+        return true;
+      }
+      else if (column == pqInternals::Tooltips)
+      {
+        pqPythonMacroSupervisor::setTooltipForMacro(macroPath, text);
+        Q_EMIT this->dataChanged(index, index, { role });
+        return true;
+      }
+      else if (column == pqInternals::Macros)
+      {
+        pqPythonMacroSupervisor::setNameForMacro(macroPath, text);
+        Q_EMIT this->dataChanged(index, index, { role });
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    bool insertRows(int row, int count, const QModelIndex& parent) override
+    {
+      const int last = row + count - 1;
+      this->beginInsertRows(parent, row, last);
+      this->endInsertRows();
+      return count > 0;
+    }
+
+    bool removeRows(int row, int count, const QModelIndex& parent) override
+    {
+      const int last = row + count - 1;
+      this->beginRemoveRows(parent, row, last);
+      this->endRemoveRows();
+      return count > 0;
+    }
+  };
+
+  class pqPythonMacrosItemDelegate : public QStyledItemDelegate
+  {
+  public:
+    pqPythonMacrosItemDelegate(QObject* parent = nullptr)
+      : QStyledItemDelegate(parent)
+    {
+    }
+
+    void paint(QPainter* painter, const QStyleOptionViewItem& option,
+      const QModelIndex& index) const override
+    {
+      Q_ASSERT(index.isValid());
+      switch (index.column())
+      {
+        case pqInternals::Columns::Icons:
+        {
+          QStyleOptionViewItem opt = option;
+          initStyleOption(&opt, index);
+          if (option.state & QStyle::State_Selected)
+          {
+            painter->fillRect(option.rect, option.palette.highlight());
+          }
+          auto value = index.data(Qt::DecorationRole);
+          if (value.isValid() && !value.isNull())
+          {
+            auto icon = qvariant_cast<QIcon>(value);
+            icon.paint(painter, option.rect);
+          }
+        }
+        case pqInternals::Columns::Macros:
+        {
+          QStyleOptionViewItem opt = option;
+          initStyleOption(&opt, index);
+          if (option.state & QStyle::State_Selected)
+          {
+            painter->fillRect(option.rect, option.palette.highlight());
+          }
+          auto value = index.data(Qt::DisplayRole);
+          if (value.isValid() && !value.isNull())
+          {
+            auto name = value.toString();
+            QStyleOption
+          }
+        }
+        case pqInternals::Columns::Tooltips:
+        default:
+          return QStyledItemDelegate::paint(painter, option, index);
+      }
+    }
+
+    QWidget* createEditor(
+      QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+      switch (index.column())
+      {
+        case pqInternals::Columns::Icons:
+        {
+          auto iconBrowser = new pqIconBrowser(pqCoreUtilities::mainWidget());
+          iconBrowser->setObjectName("IconBrowser");
+          QObject::connect(iconBrowser, &pqIconBrowser::accepted, this,
+            &pqPythonMacrosItemDelegate::commitAndCloseEditor);
+          iconBrowser->setModal(true);
+          iconBrowser->setSizePolicy(
+            QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+          return iconBrowser;
+        }
+        case pqInternals::Columns::Tooltips:
+        case pqInternals::Columns::Macros:
+        default:
+          return QStyledItemDelegate::createEditor(parent, option, index);
+      }
+    }
+
+    void setModelData(
+      QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
+    {
+      switch (index.column())
+      {
+        case pqInternals::Columns::Icons:
+        {
+          pqIconBrowser* iconBrowser = qobject_cast<pqIconBrowser*>(editor);
+          auto currentIconPath = index.data(Qt::EditRole).toString();
+          auto newIconPath = iconBrowser->getSelectedIconPath();
+          model->setData(index, newIconPath, Qt::DisplayRole);
+          break;
+        }
+        case pqInternals::Columns::Tooltips:
+        case pqInternals::Columns::Macros:
+        default:
+          QStyledItemDelegate::setModelData(editor, model, index);
+          break;
+      }
+    }
+
+    void updateEditorGeometry(
+      QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+      switch (index.column())
+      {
+        case pqInternals::Columns::Icons:
+          return;
+        case pqInternals::Columns::Tooltips:
+        case pqInternals::Columns::Macros:
+        default:
+          return QStyledItemDelegate::updateEditorGeometry(editor, option, index);
+      }
+    }
+
+  protected:
+    bool eventFilter(QObject* editor, QEvent* event) override
+    {
+      pqIconBrowser* iconBrowser = qobject_cast<pqIconBrowser*>(editor);
+      if (iconBrowser)
+      {
+        if (event->type() == QEvent::FocusOut)
+        {
+          return true;
+        }
+      }
+      return QStyledItemDelegate::eventFilter(editor, event);
+    }
+
+  private:
+    void commitAndCloseEditor()
+    {
+      pqIconBrowser* editor = qobject_cast<pqIconBrowser*>(sender());
+      Q_EMIT this->commitData(editor);
+      Q_EMIT this->closeEditor(editor);
+    }
+  };
+
   pqInternals()
     : Ui(new Ui::pqEditMacrosDialog)
   {
@@ -31,35 +343,27 @@ struct pqEditMacrosDialog::pqInternals
   enum Columns
   {
     Icons,
+    Tooltips,
     Macros,
     Count
   };
-
-  // qt item role to store macro path
-  static constexpr int MACRO_PATH_ROLE() { return Qt::UserRole + 1; }
-
-  // get macro file path stored in item user data
-  QString getMacroFilePath(QTreeWidgetItem* item)
-  {
-    return item->data(Macros, this->MACRO_PATH_ROLE()).toString();
-  }
 
   /**
    * Joins macro names into one string, aggregated with given separator.
    * Joins only the first maxCount macros of the list, adding "..." at
    * the end when more elements are found.
    */
-  QString joinMacrosNames(QList<QTreeWidgetItem*> items, QString separator, int maxCount)
+  QString joinMacrosNames(QList<QModelIndex> indices, QString separator, int maxCount)
   {
     QStringList macroNames;
     int numberOfDisplayedMacros = 0;
-    for (auto item : items)
+    for (auto& index : indices)
     {
-      macroNames << item->text(pqInternals::Macros);
+      macroNames << this->model()->data(index, Qt::DisplayRole).toString();
       numberOfDisplayedMacros++;
       if (numberOfDisplayedMacros >= maxCount)
       {
-        const int extraCount = items.size() - maxCount;
+        const int extraCount = indices.size() - maxCount;
         if (extraCount > 0)
         {
           macroNames << tr("... (%1 more)").arg(extraCount);
@@ -69,6 +373,13 @@ struct pqEditMacrosDialog::pqInternals
     }
     return macroNames.join(separator);
   }
+
+  inline pqPythonMacrosModel* model() const
+  {
+    return static_cast<pqPythonMacrosModel*>(this->view()->model());
+  }
+
+  inline QTreeView* view() const { return this->Ui->macrosTree; }
 
   QScopedPointer<Ui::pqEditMacrosDialog> Ui;
 };
@@ -82,30 +393,32 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
   // hide the Context Help item (it's a "?" in the Title Bar for Windows, a menu item for Linux)
   this->setWindowFlags(this->windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
 
-  this->Internals->Ui->macrosTree->setColumnCount(pqInternals::Count);
-  this->Internals->Ui->macrosTree->sortByColumn(pqInternals::Macros, Qt::AscendingOrder);
-  this->Internals->Ui->macrosTree->setHeaderLabels(QStringList() << tr("Icons") << tr("Macros"));
-  this->Internals->Ui->macrosTree->resizeColumnToContents(pqInternals::Icons);
+  this->Internals->view()->setModel(new pqInternals::pqPythonMacrosModel());
+  this->Internals->view()->setItemDelegate(new pqInternals::pqPythonMacrosItemDelegate());
+  this->Internals->view()->sortByColumn(pqInternals::Macros, Qt::AscendingOrder);
+  this->Internals->view()->setSelectionBehavior(QTreeView::SelectionBehavior::SelectRows);
+  this->Internals->view()->resizeColumnToContents(pqInternals::Icons);
+  this->Internals->view()->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
   QObject::connect(pqPVApplicationCore::instance()->pythonManager()->macroSupervisor(),
-    &pqPythonMacroSupervisor::onAddedMacro, this, &pqEditMacrosDialog::populateTree);
+    &pqPythonMacroSupervisor::onAddedMacro, this, [this]() {
+      this->Internals->view()->resizeColumnToContents(pqInternals::Icons);
+      this->Internals->view()->resizeColumnToContents(pqInternals::Tooltips);
+      this->Internals->view()->resizeColumnToContents(pqInternals::Macros);
+      this->Internals->view()->selectionModel()->setCurrentIndex(
+        QModelIndex(), QItemSelectionModel::NoUpdate);
+    });
+  QObject::connect(this->Internals->model(), &QAbstractItemModel::dataChanged, []() {
+    // Python Manager can't be nullptr as this dialog is built only when Python is enabled
+    pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
+    pythonManager->updateMacroList();
+  });
 
   QObject::connect(
     this->Internals->Ui->add, &QToolButton::released, this, &pqEditMacrosDialog::onAddPressed);
 
   QObject::connect(
     this->Internals->Ui->edit, &QToolButton::released, this, &pqEditMacrosDialog::onEditPressed);
-  this->connect(this->Internals->Ui->macrosTree, &QTreeWidget::itemDoubleClicked, this,
-    [&](QTreeWidgetItem*, int column) {
-      if (column == pqInternals::Icons)
-      {
-        this->onSetIconPressed();
-      }
-      else if (column == pqInternals::Macros)
-      {
-        this->onEditPressed();
-      }
-    });
 
   QObject::connect(this->Internals->Ui->setIcon, &QToolButton::released, this,
     &pqEditMacrosDialog::onSetIconPressed);
@@ -123,10 +436,10 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
   QObject::connect(this->Internals->Ui->searchBox, &pqSearchBox::textChanged, this,
     &pqEditMacrosDialog::onSearchTextChanged);
 
-  this->connect(this->Internals->Ui->macrosTree, &QTreeWidget::itemSelectionChanged, this,
-    &pqEditMacrosDialog::updateUIState);
+  this->connect(this->Internals->view()->selectionModel(), &QItemSelectionModel::selectionChanged,
+    this, &pqEditMacrosDialog::updateUIState);
 
-  this->populateTree();
+  this->updateUIState();
 }
 
 //----------------------------------------------------------------------------
@@ -135,6 +448,7 @@ pqEditMacrosDialog::~pqEditMacrosDialog() = default;
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::onAddPressed()
 {
+  const auto& internals = (*this->Internals);
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(),
     tr("Open Python File to create a Macro:"), QString(),
@@ -145,6 +459,8 @@ void pqEditMacrosDialog::onAddPressed()
   {
     // Python Manager can't be nullptr as this dialog is built only when Python is enabled
     pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
+    const auto& root = internals.view()->rootIndex();
+    internals.model()->insertRow(internals.model()->rowCount(root), root);
     pythonManager->addMacro(fileDialog.getSelectedFiles()[0], fileDialog.getSelectedLocation());
   }
 }
@@ -152,26 +468,34 @@ void pqEditMacrosDialog::onAddPressed()
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::onEditPressed()
 {
-  QList<QTreeWidgetItem*> selected = this->Internals->Ui->macrosTree->selectedItems();
-  for (auto item : selected)
+  const auto& internals = (*this->Internals);
+  auto* selectionModel = internals.view()->selectionModel();
+  auto selectedIndices = selectionModel->selectedRows(pqInternals::Macros);
+  for (const auto& index : selectedIndices)
   {
+    auto macroPath = internals.model()
+                       ->data(index, pqInternals::pqPythonMacrosModel::MACRO_PATH_ROLE())
+                       .toString();
     // Python Manager can't be nullptr as this dialog is built only when Python is enabled
     pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-    pythonManager->editMacro(this->Internals->getMacroFilePath(item));
+    pythonManager->editMacro(macroPath);
   }
 }
 
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::onSetIconPressed()
 {
-  QList<QTreeWidgetItem*> selected = this->Internals->Ui->macrosTree->selectedItems();
-  if (selected.empty())
+  const auto& internals = (*this->Internals);
+  auto* selectionModel = internals.view()->selectionModel();
+  auto selectedIndices = selectionModel->selectedRows(pqInternals::Icons);
+  if (selectedIndices.empty())
   {
     return;
   }
 
-  auto item = selected.first();
-  auto macroPath = this->Internals->getMacroFilePath(item);
+  const auto& index = selectedIndices.first();
+  auto macroPath =
+    internals.model()->data(index, pqInternals::pqPythonMacrosModel::MACRO_PATH_ROLE()).toString();
   QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(macroPath);
 
   auto newIconPath = pqIconBrowser::getIconPath(iconPath);
@@ -180,18 +504,16 @@ void pqEditMacrosDialog::onSetIconPressed()
     return;
   }
 
-  item->setIcon(pqInternals::Icons, QIcon(newIconPath));
-  pqPythonMacroSupervisor::setIconForMacro(macroPath, newIconPath);
-
-  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  pythonManager->updateMacroList();
+  internals.model()->setData(index, newIconPath, Qt::DisplayRole);
 }
 
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::onRemovePressed()
 {
-  QList<QTreeWidgetItem*> selected = this->Internals->Ui->macrosTree->selectedItems();
-  if (selected.empty())
+  const auto& internals = (*this->Internals);
+  auto* selectionModel = internals.view()->selectionModel();
+  auto selectedIndices = selectionModel->selectedRows(pqInternals::Macros);
+  if (selectedIndices.empty())
   {
     return;
   }
@@ -199,7 +521,7 @@ void pqEditMacrosDialog::onRemovePressed()
   QString intro = QCoreApplication::translate("pqMacrosMenu", "Selected macros will be deleted: ");
   static const int maxNumberOfNames = 5;
   QString displayedNames =
-    this->Internals->joinMacrosNames(selected, QString(", "), maxNumberOfNames);
+    this->Internals->joinMacrosNames(selectedIndices, QString(", "), maxNumberOfNames);
   QString question = QCoreApplication::translate("pqMacrosMenu", "Are you sure?");
   QString fullmessage = QString("%1\n%2\n%3").arg(intro).arg(displayedNames).arg(question);
 
@@ -208,7 +530,7 @@ void pqEditMacrosDialog::onRemovePressed()
 
   if (ret == QMessageBox::StandardButton::Yes)
   {
-    this->deleteItems(selected);
+    this->deleteItems(selectedIndices);
     // Python Manager can't be nullptr as this dialog is built only when Python is enabled
     pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
     pythonManager->updateMacroList();
@@ -218,6 +540,7 @@ void pqEditMacrosDialog::onRemovePressed()
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::onRemoveAllPressed()
 {
+  const auto& internals = (*this->Internals);
   QMessageBox::StandardButton ret = QMessageBox::question(pqCoreUtilities::mainWidget(),
     QCoreApplication::translate("pqMacrosMenu", "Delete All"),
     QCoreApplication::translate("pqMacrosMenu", "All macros will be deleted. Are you sure?"));
@@ -232,8 +555,9 @@ void pqEditMacrosDialog::onRemoveAllPressed()
     }
 
     // remove user Macros dir
+    const auto& root = internals.view()->rootIndex();
+    internals.model()->removeRows(0, internals.model()->rowCount(root), root);
     pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getMacrosDir());
-    this->Internals->Ui->macrosTree->clear();
     this->updateUIState();
 
     // Python Manager can't be nullptr as this dialog is built only when Python is enabled
@@ -245,140 +569,92 @@ void pqEditMacrosDialog::onRemoveAllPressed()
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::onSearchTextChanged(const QString& pattern)
 {
-  auto root = this->Internals->Ui->macrosTree->invisibleRootItem();
-  for (int i = 0; i < root->childCount(); ++i)
+  const auto& internals = (*this->Internals);
+  const auto& root = internals.view()->rootIndex();
+  for (int i = 0; i < internals.model()->rowCount(root); ++i)
   {
-    auto item = root->child(i);
     if (pattern.isEmpty())
     {
-      item->setHidden(false);
+      internals.view()->setRowHidden(i, root, false);
     }
     else
     {
-      item->setHidden(!item->text(pqInternals::Macros).contains(pattern, Qt::CaseInsensitive));
+      const auto& index = internals.model()->index(i, pqInternals::Macros, root);
+      const auto& macroName = internals.model()->data(index, Qt::DisplayRole).toString();
+      internals.view()->setRowHidden(i, root, !macroName.contains(pattern, Qt::CaseInsensitive));
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void pqEditMacrosDialog::createItem(QTreeWidgetItem* parent, const QString& fileName,
-  const QString& displayName, QTreeWidgetItem* preceding)
-{
-  if (displayName.isEmpty())
-  {
-    return;
-  }
-
-  if (preceding == nullptr)
-  {
-    preceding = parent->child(parent->childCount() - 1);
-  }
-
-  QTreeWidgetItem* item = new QTreeWidgetItem(parent, preceding);
-  item->setText(pqInternals::Macros, displayName);
-  item->setData(pqInternals::Macros, this->Internals->MACRO_PATH_ROLE(), fileName);
-  item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-  item->setToolTip(pqInternals::Icons, tr("Double click to change icon"));
-  item->setToolTip(pqInternals::Macros, tr("Double click to edit macro"));
-
-  QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(fileName);
-  if (!iconPath.isEmpty())
-  {
-    item->setIcon(pqInternals::Icons, QIcon(iconPath));
-  }
-}
-
-//----------------------------------------------------------------------------
-void pqEditMacrosDialog::populateTree()
-{
-  this->Internals->Ui->macrosTree->clear();
-
-  auto treeRoot = this->Internals->Ui->macrosTree->invisibleRootItem();
-  auto macrosMap = pqPythonMacroSupervisor::getStoredMacros();
-
-  for (auto macrosIter = macrosMap.cbegin(), end = macrosMap.cend(); macrosIter != end;
-       ++macrosIter)
-  {
-    this->createItem(treeRoot, macrosIter.key(), macrosIter.value());
-  }
-
-  this->Internals->Ui->macrosTree->resizeColumnToContents(pqInternals::Macros);
-  this->Internals->Ui->macrosTree->resizeColumnToContents(pqInternals::Icons);
-  this->Internals->Ui->macrosTree->setCurrentItem(nullptr);
-  this->updateUIState();
 }
 
 //----------------------------------------------------------------------------
 bool pqEditMacrosDialog::treeHasItems()
 {
-  return this->Internals->Ui->macrosTree->topLevelItemCount() > 0;
+  return this->Internals->model()->rowCount(this->Internals->view()->rootIndex()) > 0;
 }
 
 //----------------------------------------------------------------------------
 bool pqEditMacrosDialog::treeHasSelectedItems()
 {
-  return !this->Internals->Ui->macrosTree->selectedItems().isEmpty();
+  return this->Internals->view()->selectionModel()->hasSelection();
 }
 
 //----------------------------------------------------------------------------
-QTreeWidgetItem* pqEditMacrosDialog::getSelectedItem()
+QModelIndex pqEditMacrosDialog::getSelectedItem()
 {
+  const auto& internals = (*this->Internals);
   if (this->treeHasSelectedItems())
   {
-    return this->Internals->Ui->macrosTree->selectedItems().first();
+    return internals.view()->selectionModel()->selectedIndexes().first();
   }
 
-  return this->Internals->Ui->macrosTree->invisibleRootItem();
+  return internals.view()->rootIndex();
 }
 
 //----------------------------------------------------------------------------
-QTreeWidgetItem* pqEditMacrosDialog::getNearestItem(QTreeWidgetItem* item)
+QModelIndex pqEditMacrosDialog::getNearestItem(const QModelIndex& index)
 {
-  auto above = this->Internals->Ui->macrosTree->itemAbove(item);
-  auto below = this->Internals->Ui->macrosTree->itemBelow(item);
+  const auto& internals = (*this->Internals);
+  auto above = internals.view()->indexAbove(index);
+  auto below = internals.view()->indexBelow(index);
 
   bool itemIsLastChild = false;
-  auto parent = item->parent();
-  if (parent)
-  {
-    auto numberOfItems = parent->childCount();
-    auto index = parent->indexOfChild(item);
-    itemIsLastChild = index == numberOfItems - 1;
-  }
+  auto numberOfItems = internals.model()->rowCount(internals.view()->rootIndex());
+  itemIsLastChild = index.row() == numberOfItems - 1;
 
   return itemIsLastChild ? above : below;
 }
 
 //----------------------------------------------------------------------------
-void pqEditMacrosDialog::deleteItem(QTreeWidgetItem* item)
+void pqEditMacrosDialog::deleteItem(const QModelIndex& index)
 {
-  pqPythonMacroSupervisor::hideFile(this->Internals->getMacroFilePath(item));
-  delete item;
+  const auto& internals = (*this->Internals);
+  pqPythonMacroSupervisor::hideFile(
+    internals.model()->data(index, pqInternals::pqPythonMacrosModel::MACRO_PATH_ROLE()).toString());
+  internals.model()->removeRow(index.row(), internals.view()->rootIndex());
 }
 
 //----------------------------------------------------------------------------
-void pqEditMacrosDialog::deleteItems(const QList<QTreeWidgetItem*>& items)
+void pqEditMacrosDialog::deleteItems(const QList<QModelIndex>& indices)
 {
-  for (auto item : items)
+  const auto& internals = (*this->Internals);
+  for (const auto& index : indices)
   {
-    if (item)
-    {
-      auto nextSelectedItem = this->getNearestItem(item);
-      this->Internals->Ui->macrosTree->scrollToItem(nextSelectedItem);
-      this->Internals->Ui->macrosTree->setCurrentItem(nextSelectedItem);
-      this->deleteItem(item);
-    }
+    auto nextSelectedItem = this->getNearestItem(index);
+    internals.view()->scrollTo(nextSelectedItem);
+    internals.view()->setCurrentIndex(nextSelectedItem);
+    this->deleteItem(index);
   }
 }
 
 //----------------------------------------------------------------------------
 void pqEditMacrosDialog::updateUIState()
 {
+  const auto& internals = (*this->Internals);
   const bool hasItems = this->treeHasItems();
   const bool hasSelectedItems = this->treeHasSelectedItems();
 
-  this->Internals->Ui->edit->setEnabled(hasSelectedItems);
-  this->Internals->Ui->remove->setEnabled(hasSelectedItems);
-  this->Internals->Ui->setIcon->setEnabled(hasSelectedItems);
-  this->Internals->Ui->removeAll->setEnabled(hasItems);
+  internals.Ui->edit->setEnabled(hasSelectedItems);
+  internals.Ui->remove->setEnabled(hasSelectedItems);
+  internals.Ui->setIcon->setEnabled(hasSelectedItems);
+  internals.Ui->removeAll->setEnabled(hasItems);
 }

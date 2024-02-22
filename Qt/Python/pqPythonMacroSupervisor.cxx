@@ -4,6 +4,7 @@
 #include "pqPythonMacroSupervisor.h"
 #include "pqApplicationCore.h"
 #include "pqIconSettings.h"
+#include "pqPythonMacroSettings.h"
 #include "pqServer.h"
 
 #include "pqCoreUtilities.h"
@@ -13,7 +14,6 @@
 
 #include <QAction>
 #include <QApplication>
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -50,6 +50,10 @@ public:
   QMap<QString, QPointer<QAction>> DeleteActionMap;
 
   static pqIconSettings IconSettings() { return pqIconSettings("Macros"); }
+  static pqPythonMacroSettings MacroSettings(pqPythonMacroSettings::MacroItemCategories category)
+  {
+    return pqPythonMacroSettings(category);
+  }
 
   /**
    * Find an icon for given macro, looking under standard macro directories.
@@ -280,8 +284,16 @@ void pqPythonMacroSupervisor::addMacro(const QString& fileName)
 {
   this->addMacro(pqPythonMacroSupervisor::macroNameFromFileName(fileName), fileName);
 }
+
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& fileName)
+{
+  this->addMacro(macroName, macroName, fileName);
+}
+
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::addMacro(
+  const QString& macroName, const QString& tip, const QString& fileName)
 {
   QAction* action = this->getMacro(fileName);
 
@@ -301,6 +313,29 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
   QAction* runAction = new QAction(macroName, this);
   runAction->setData(fileName);
   runAction->setEnabled(enable);
+  runAction->setToolTip(tip);
+
+  QString storedName = pqPythonMacroSupervisor::macroNameFromFileName(fileName);
+  if (!storedName.isEmpty())
+  {
+    runAction->setText(storedName);
+  }
+  else
+  {
+    auto settings = pqInternal::MacroSettings(pqPythonMacroSettings::MacroItemCategories::Name);
+    settings.removeItemFromSettings(fileName);
+  }
+
+  QString macroToolTip = pqPythonMacroSupervisor::macroToolTipFromFileName(fileName);
+  if (!macroToolTip.isEmpty())
+  {
+    runAction->setToolTip(macroToolTip);
+  }
+  else
+  {
+    auto settings = pqInternal::MacroSettings(pqPythonMacroSettings::MacroItemCategories::ToolTip);
+    settings.removeItemFromSettings(fileName);
+  }
 
   QString iconPath = pqPythonMacroSupervisor::iconPathFromFileName(fileName);
   if (!iconPath.isEmpty() && QFileInfo::exists(iconPath))
@@ -336,7 +371,6 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
 
   Q_EMIT this->onAddedMacro();
 }
-
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::removeMacro(const QString& fileName)
 {
@@ -436,12 +470,60 @@ void pqPythonMacroSupervisor::onEditMacroTriggered()
 //----------------------------------------------------------------------------
 QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& fileName)
 {
-  QString name = QFileInfo(fileName).fileName().replace(".py", "");
-  if (!name.length())
+  auto settings = pqInternal::MacroSettings(pqPythonMacroSettings::MacroItemCategories::Name);
+  QString name = settings.getItemFromSettings(fileName);
+  if (name.isEmpty())
   {
-    name = "Unnamed macro";
+    name = QFileInfo(fileName).fileName().replace(".py", "");
+    if (!name.length())
+    {
+      name = "Unnamed macro";
+    }
   }
   return name;
+}
+
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::setNameForMacro(const QString& macroPath, const QString& name)
+{
+  auto settings = pqInternal::MacroSettings(pqPythonMacroSettings::MacroItemCategories::Name);
+  if (name.isEmpty())
+  {
+    settings.removeItemFromSettings(macroPath);
+  }
+  else
+  {
+    settings.setItemInSettings(macroPath, name);
+  }
+}
+
+//----------------------------------------------------------------------------
+QString pqPythonMacroSupervisor::macroToolTipFromFileName(const QString& fileName)
+{
+  auto settings = pqInternal::MacroSettings(pqPythonMacroSettings::MacroItemCategories::ToolTip);
+  QString tooltip = settings.getItemFromSettings(fileName);
+  if (!tooltip.isEmpty())
+  {
+    return tooltip;
+  }
+  else
+  {
+    return pqPythonMacroSupervisor::macroNameFromFileName(fileName);
+  }
+}
+
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::setTooltipForMacro(const QString& macroPath, const QString& tooltip)
+{
+  auto settings = pqInternal::MacroSettings(pqPythonMacroSettings::MacroItemCategories::ToolTip);
+  if (tooltip.isEmpty())
+  {
+    settings.removeItemFromSettings(macroPath);
+  }
+  else
+  {
+    settings.setItemInSettings(macroPath, tooltip);
+  }
 }
 
 //----------------------------------------------------------------------------
