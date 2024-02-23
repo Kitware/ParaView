@@ -43,6 +43,7 @@ set(python_files
   paraview/detail/python_selector.py
   paraview/detail/catalyst_export.py
   paraview/incubator/__init__.py.in
+  paraview/incubator/pythoninteractorbase.py
   paraview/inspect.py
   paraview/live.py
   paraview/lookuptable.py
