@@ -127,7 +127,7 @@ protected:
     this->SetUseInternalTriangles(0);
   }
 };
-vtkStandardNewMacro(DecimationFilterType);
+inline vtkStandardNewMacro(DecimationFilterType); // NOLINT(misc-definitions-in-headers)
 }
 #endif // VTKM_ENABLE_TBB
 
