@@ -282,6 +282,10 @@ If making a non-RC release:
 
 /cc @mwestphal
 
+/cc @wascott
+
+/cc @phismith25
+
 /label ~"priority:required"
 
 [win-sign-example]:  https://kwgitlab.kitware.com/software-process/package-signing/-/issues/12
