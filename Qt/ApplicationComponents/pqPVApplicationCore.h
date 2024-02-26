@@ -50,8 +50,8 @@ public:
 
   /**
    * Provides access to the animation manager. Animation manager helps with the
+   * animation subsystem -- saving movies, creating scenes etc.
    */
-  // animation subsystem -- saving movies, creating scenes etc.
   pqAnimationManager* animationManager() const;
 
   /**

@@ -181,7 +181,7 @@ pqPythonManager* pqPVApplicationCore::pythonManager() const
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   return this->PythonManager;
 #else
-  return 0;
+  return nullptr;
 #endif
 }
 
