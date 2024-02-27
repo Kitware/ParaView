@@ -913,6 +913,7 @@ SET (TESTS_WITHOUT_BASELINES
   TimeKeeper.xml
   TimeManagerPanel.xml
   TimeManagerSequence.xml
+  WriteXMLTimeValue.xml
   YieldCriteria.xml
 )
 
