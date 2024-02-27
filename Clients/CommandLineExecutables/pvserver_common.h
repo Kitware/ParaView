@@ -14,7 +14,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
 
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
 extern "C"
 {
   void vtkPVInitializePythonModules();
@@ -79,7 +79,7 @@ static int RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 
   auto config = vtkRemotingCoreConfiguration::GetInstance();
 
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
   // register callback to initialize modules statically. The callback is
   // empty when BUILD_SHARED_LIBS is ON.
   vtkPVInitializePythonModules();

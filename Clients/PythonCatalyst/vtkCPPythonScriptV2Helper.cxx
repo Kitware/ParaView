@@ -32,6 +32,10 @@
 #include "vtkLiveInsituLink.h"
 #endif
 
+#if PARAVIEW_USE_EXTERNAL_VTK
+#include "vtkPVPythonInterpreterPath.h"
+#endif
+
 namespace
 {
 template <typename T>
@@ -144,6 +148,9 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::FlushErrors()
 //----------------------------------------------------------------------------
 bool vtkCPPythonScriptV2Helper::vtkInternals::Prepare(const std::string& fname)
 {
+#if PARAVIEW_USE_EXTERNAL_VTK
+  vtkPVPythonInterpreterPath();
+#endif
   vtkPythonInterpreter::Initialize();
   vtkPythonScopeGilEnsurer gilEnsurer;
   if (!this->LoadAPIModule())

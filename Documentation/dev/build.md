@@ -542,6 +542,10 @@ More advanced options:
   * `PARAVIEW_TEST_DIR`: Used on HPC to set the test directory (default is
     "${CMAKE_BINARY_DIR}/Testing/Temporary") to a location that is writable from
     the compute nodes. Typically the user home directory is not.
+  * `PARAVIEW_LINKER_FATAL_WARNINGS`: Specify if linker warnings must
+    be considered as errors
+  * `PARAVIEW_EXTRA_COMPILER_WARNINGS`: Add compiler flags to do
+    stricter checking when building debug
 
 <!--
 These variables should be documented once they're effective again. Note that

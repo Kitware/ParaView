@@ -98,14 +98,6 @@ endif()
 # These should begin with `PARAVIEW_USE_`.
 #========================================================================
 
-# XXX(VTK): External VTK is not yet actually supported.
-if (FALSE)
-option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
-mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
-else ()
-set(PARAVIEW_USE_EXTERNAL_VTK OFF)
-endif ()
-
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_SERIAL_TESTS_USE_MPIEXEC
   "Used on HPC to run serial tests on compute nodes" OFF)
@@ -182,7 +174,7 @@ option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray and/or OptiX ray-t
 
 set(paraview_web_default ON)
 if (PARAVIEW_USE_PYTHON AND WIN32)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/FindPythonModules.cmake")
+  include(ParaViewFindPythonModules)
   find_python_module(win32api have_pywin32)
   set(paraview_web_default "${have_pywin32}")
 endif ()
@@ -380,6 +372,7 @@ paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON
   MODULES   VTK::Python
             VTK::PythonInterpreter
+            ParaView::PythonInterpreterPath
   EXCLUSIVE)
 
 paraview_require_module(

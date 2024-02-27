@@ -1,5 +1,5 @@
 # Check that matplotlib is available
-include(FindPythonModules)
+include(ParaViewFindPythonModules)
 find_python_module(matplotlib matplotlib_found)
 
 # Set variables to make the testing functions.

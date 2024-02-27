@@ -54,6 +54,15 @@ function (_vtk_module_wrap_client_server_sources module sources classes)
       "$<TARGET_PROPERTY:${_vtk_client_server_target_name},COMPILE_DEFINITIONS>")
     set(_vtk_client_server_genex_include_directories
       "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INCLUDE_DIRECTORIES>")
+    set(_vtk_client_server_genex_interface_compile_definitions
+      "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INTERFACE_COMPILE_DEFINITIONS>")
+    set(_vtk_client_server_genex_interface_include_directories
+      "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INTERFACE_INCLUDE_DIRECTORIES>")
+    set(_vtk_client_server_genex_compile_definitions_all
+      "$<IF:$<BOOL:${_vtk_client_server_genex_compile_definitions}>,${_vtk_client_server_genex_compile_definitions},${_vtk_client_server_genex_interface_compile_definitions}>")
+    set(_vtk_client_server_genex_include_directories_all
+      "$<IF:$<BOOL:${_vtk_client_server_genex_include_directories}>,${_vtk_client_server_genex_include_directories},${_vtk_client_server_genex_interface_include_directories}>")
+
   else ()
     if (NOT DEFINED ENV{CI})
       message(AUTHOR_WARNING
@@ -63,10 +72,12 @@ function (_vtk_module_wrap_client_server_sources module sources classes)
         "guarantee intended behavior.")
     endif ()
   endif ()
+  file(GENERATE OUTPUT "compile_definitions_${_vtk_client_server_target_name}" CONTENT "${_vtk_client_server_genex_compile_definitions_all}")
+  file(GENERATE OUTPUT "include_directories_${_vtk_client_server_target_name}" CONTENT "${_vtk_client_server_genex_include_directories_all}")
   file(GENERATE
     OUTPUT  "${_vtk_client_server_args_file}"
-    CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions}>:\n-D\'$<JOIN:${_vtk_client_server_genex_compile_definitions},\'\n-D\'>\'>\n
-$<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_client_server_genex_include_directories},\'\n-I\'>\'>\n")
+    CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions_all}>:\n-D\'$<JOIN:${_vtk_client_server_genex_compile_definitions_all},\'\n-D\'>\'>\n
+$<$<BOOL:${_vtk_client_server_genex_include_directories_all}>:\n-I\'$<JOIN:${_vtk_client_server_genex_include_directories_all},\'\n-I\'>\'>\n")
 
   _vtk_module_get_module_property("${module}"
     PROPERTY  "hierarchy"

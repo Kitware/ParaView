@@ -61,6 +61,11 @@ list(APPEND ExternalData_URL_TEMPLATES
 
   # Data published by developers using git-gitlab-push
   "https://www.paraview.org/files/ExternalData/%(algo)/%(hash)"
+
+  # Data published by VTK developers using git-gitlab-push.
+  # ParaView sometimes uses VTK data. If PARAVIEW_USE_EXTERNAL_VTK the following
+  # location is not added
+  "https://www.vtk.org/files/ExternalData/%(algo)/%(hash)"
   )
 
 # Tell ExternalData commands to transform raw files to content links.

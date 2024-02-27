@@ -5,6 +5,11 @@
 #include "vtkOutputWindow.h"
 #include "vtkProcessModule.h"
 
+#if PARAVIEW_USE_PYTHON && PARAVIEW_USE_EXTERNAL_VTK
+#include "vtkPVPythonInterpreterPath.h"
+#include "vtkPythonInterpreter.h"
+#endif
+
 #if defined(_WIN32) && !defined(__MINGW32__)
 int wmain(int argc, wchar_t* wargv[])
 #else
@@ -14,6 +19,9 @@ int main(int argc, char* argv[])
 #if defined(_WIN32) && !defined(__MINGW32__)
   vtkWideArgsConverter converter(argc, wargv);
   char** argv = converter.GetArgs();
+#endif
+#if PARAVIEW_USE_EXTERNAL_VTK
+  vtkPVPythonInterpreterPath();
 #endif
   // Setup the output window to be vtkOutputWindow, rather than platform
   // specific one. This avoids creating vtkWin32OutputWindow on Windows, for

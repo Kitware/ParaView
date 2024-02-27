@@ -3,7 +3,7 @@ if (NOT PARAVIEW_USE_PYTHON)
   return()
 endif()
 
-include(FindPythonModules)
+include(ParaViewFindPythonModules)
 find_python_module("sphinx" sphinx_found)
 if (NOT sphinx_found)
   message(STATUS

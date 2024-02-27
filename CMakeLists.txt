@@ -30,8 +30,14 @@ if (NOT CMAKE_BUILD_TYPE AND NOT generator_is_multi_config)
       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
+
+
 # Set up our directory structure for output libraries and binaries
 include(GNUInstallDirs)
+# Used to pass common compiler flags to all modules
+add_library(paraviewbuild INTERFACE)
+add_library(ParaView::paraviewbuild ALIAS paraviewbuild)
+
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 endif ()
@@ -51,7 +57,28 @@ if (NOT CMAKE_INSTALL_LICENSEDIR)
 endif ()
 
 set(paraview_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
-set(vtk_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
+
+option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
+mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
+
+if (PARAVIEW_USE_EXTERNAL_VTK)
+  find_package(VTK CONFIG COMPONENTS CommonCore)
+  if (NOT VTK_FOUND)
+    message(FATAL_ERROR
+      "External VTK not found but ParaView requires VTK to function")
+  endif ()
+  if (NOT PARAVIEW_BUILD_SHARED_LIBS)
+    message(FATAL_ERROR
+      "Static build with external VTK does not currently work.")
+  endif()
+  get_filename_component(vtk_cmake_dir "${VTK_CONFIG}" DIRECTORY)
+  # set by vtk-config.cmake. Unsetting this avoids a warning when setting
+  # PARAVIEW_BUILD_LEGACY_REMOVE
+  unset(VTK_LEGACY_REMOVE)
+else()
+  set(vtk_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
+endif()
+
 if (NOT IS_DIRECTORY "${vtk_cmake_dir}")
   message(FATAL_ERROR
     "Failed to find the VTK CMake directory. Did you forget to initialize the "
@@ -72,11 +99,11 @@ set_property(CACHE BUILD_TESTING
   PROPERTY
     TYPE INTERNAL)
 
-include(vtkCompilerChecks)
-include(vtkCompilerPlatformFlags)
-include(vtkCompilerExtraFlags)
-include(vtkInitializeBuildType)
-include(vtkSupportMacros)
+include(ParaViewCompilerChecks)
+include(ParaViewCompilerPlatformFlags)
+include(ParaViewCompilerExtraFlags)
+include(ParaViewInitializeBuildType)
+include(ParaViewSupportMacros)
 include(CMakeDependentOption)
 include(ParaViewOptions)
 include(ParaViewMigrations)
@@ -124,7 +151,7 @@ endif ()
 #-----------------------------------------------------------------------------
 # Does VTK require support for 64 bit file systems
 include(CheckCXXSourceRuns)
-file(READ "${vtk_cmake_dir}/vtkRequireLargeFilesSupport.cxx"
+file(READ "${paraview_cmake_dir}/ParaViewRequireLargeFilesSupport.cxx"
   VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE)
 check_cxx_source_runs("${VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE}"
   CMAKE_REQUIRE_LARGE_FILE_SUPPORT)
@@ -205,7 +232,7 @@ if (PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # our `find_python_module` checks to determine which tests to add or exclude
   # will fail. We find it here.
   find_package(Python3 3.3 QUIET COMPONENTS Interpreter)
-  include(FindPythonModules)
+  include(ParaViewFindPythonModules)
 endif()
 
 set(paraview_features_needing_remote_modules
@@ -224,9 +251,7 @@ if (PARAVIEW_USE_FORTRAN)
   enable_language(Fortran OPTIONAL)
 endif ()
 
-if (PARAVIEW_USE_EXTERNAL_VTK)
-  find_package(VTK REQUIRED)
-else ()
+if (NOT PARAVIEW_USE_EXTERNAL_VTK)
   list(APPEND CMAKE_MODULE_PATH
     "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
   include(vtkCMakeBackports)
@@ -321,6 +346,21 @@ foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
   set("_paraview_plugin_default_${paraview_default_plugin}" "${PARAVIEW_PLUGINS_DEFAULT}")
 endforeach ()
 
+# move modules from ${from} list to ${to} list if they match VTK::
+function (move_vtk_modules from to)
+  set(modules ${${to}})
+  set(from_new_value)
+  foreach(mod IN LISTS ${from})
+    if(mod MATCHES "^VTK::")
+      list(APPEND modules ${mod})
+    else()
+      list(APPEND from_new_value ${mod})
+    endif()
+  endforeach()
+  set(${to} ${modules} PARENT_SCOPE)
+  set(${from} ${from_new_value} PARENT_SCOPE)
+endfunction()
+
 set(paraview_plugin_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
 paraview_plugin_find_plugins(paraview_plugin_files ${paraview_plugin_directories})
@@ -372,7 +412,10 @@ foreach (paraview_module IN LISTS paraview_incubator_unrecognized_modules)
       "${paraview_module}")
   endif ()
 endforeach ()
+set(vtk_modules)
+move_vtk_modules(paraview_plugin_required_modules vtk_modules)
 
+move_vtk_modules(paraview_client_requested_modules vtk_modules)
 set(paraview_client_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
   "${CMAKE_CURRENT_SOURCE_DIR}/Adaptors")
@@ -389,7 +432,9 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_client_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
+move_vtk_modules(paraview_client_required_modules vtk_modules)
 
+move_vtk_modules(paraview_requested_modules vtk_modules)
 set(paraview_source_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
@@ -414,6 +459,7 @@ vtk_module_scan(
   UNRECOGNIZED_MODULES paraview_unrecognized_modules
   WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
+move_vtk_modules(paraview_required_modules vtk_modules)
 
 set(paraview_unrecognized_paraview_modules)
 foreach (paraview_module IN LISTS paraview_unrecognized_modules)
@@ -466,16 +512,51 @@ elseif (UNIX)
 endif ()
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
-  if (paraview_required_modules OR paraview_unrecognized_modules)
-    set(required_modules
-      ${paraview_required_modules}
-      ${paraview_unrecognized_modules})
-    string(REPLACE ";" ", " required_modules "${required_modules}")
+  list(REMOVE_DUPLICATES vtk_modules)
+  foreach(mod IN LISTS vtk_modules)
+    if(NOT TARGET "${mod}")
+      list(APPEND modules_notarget ${mod})
+    endif()
+  endforeach()
+  if(modules_notarget)
     message(FATAL_ERROR
-      "The following modules were requested or required, but not found: "
-      "${required_modules}.")
-  endif ()
+      "The following modules are required, but not found: "
+      "${modules_notarget}")
+  endif()
+  list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
+  macro(search_dependent_targets)
+    set(vtk_mod_dep_list)
+    foreach(vtk_targ ${ARGN})
+      get_target_property(vtk_mod_dep ${vtk_targ} "INTERFACE_vtk_module_depends")
+      if(vtk_mod_dep)
+        list(APPEND vtk_mod_dep_list ${vtk_mod_dep})
+      endif()
+      get_target_property(vtk_mod_pdep ${vtk_targ} "INTERFACE_vtk_module_private_depends")
+      if(vtk_mod_pdep)
+        list(APPEND vtk_mod_dep_list ${vtk_mod_pdep})
+      endif()
 
+      # Check for optional dependencies and only add them if the target exists
+      get_target_property(vtk_mod_odep ${vtk_targ} "INTERFACE_vtk_module_optional_depends")
+      if(vtk_mod_odep)
+        foreach(opt_dep ${vtk_mod_odep})
+          if(TARGET "${opt_dep}")
+            list(APPEND vtk_mod_dep_list ${opt_dep})
+          endif()
+        endforeach()
+      endif()
+
+      if(vtk_mod_dep_list)
+        list(REMOVE_ITEM vtk_mod_dep_list ${vtk_modules})
+        if(vtk_mod_dep_list)
+          list(APPEND vtk_modules ${vtk_mod_dep_list})
+          search_dependent_targets(${vtk_mod_dep_list})
+        endif()
+      endif()
+    endforeach()
+  endmacro()
+  search_dependent_targets(${vtk_modules})
+  find_package(VTK CONFIG REQUIRED COMPONENTS "${vtk_components}")  
   if (PARAVIEW_USE_PYTHON)
     find_package(Python3 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
@@ -564,8 +645,8 @@ else ()
     add_subdirectory(VTK/Remote)
   endif()
 
-  # Set up these variables now so that modules may acess them
-  if (NOT PARAVIEW_USE_EXTERNAL_VTK AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  # Set up these variables now so that modules may access them
+  if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     set(vtk_cmake_dir
       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
     set(vtk_cmake_destination
@@ -585,7 +666,7 @@ else ()
     MODULE_FILES        ${vtk_module_files}
     KIT_FILES           ${vtk_kit_files}
     REQUEST_MODULES     ${vtk_requested_modules}
-                        ${paraview_required_modules}
+                        ${vtk_modules}
                         ${paraview_incubator_required_modules}
     REJECT_MODULES      ${vtk_rejected_modules}
     PROVIDES_MODULES    vtk_modules
@@ -650,7 +731,6 @@ else ()
     set(CMAKE_C_CLANG_TIDY "")
     set(CMAKE_CXX_CLANG_TIDY "")
   endif ()
-
   vtk_module_build(
     MODULES             ${vtk_modules}
     KITS                ${vtk_kits}
@@ -669,12 +749,14 @@ else ()
     BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
     USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
     ENABLE_WRAPPING     ON
+    UTILITY_TARGET      "ParaView::paraviewbuild"
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
     TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing"
     TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
     GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
     SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
     SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/vtk/vtk/-/tree/master")
+  install(TARGETS paraviewbuild EXPORT "VTK")
 
   if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
     set(CMAKE_C_CLANG_TIDY "${CMAKE_C_CLANG_TIDY_save}")
@@ -707,6 +789,9 @@ set(_paraview_add_tests_default_data_directory
 set(_paraview_add_tests_default_test_data_target
   "ParaViewData")
 
+list(REMOVE_DUPLICATES vtk_modules) # Missed this somewhere
+list(REMOVE_DUPLICATES paraview_modules) # probably not needed
+
 vtk_module_build(
   MODULES             ${paraview_modules}
   KITS                ${paraview_kits}
@@ -723,12 +808,16 @@ vtk_module_build(
   TEST_DATA_TARGET    ParaViewData
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
+  UTILITY_TARGET      "ParaView::paraviewbuild"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
   TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
   GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
   SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
   SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
+if (PARAVIEW_USE_EXTERNAL_VTK)
+  install(TARGETS paraviewbuild EXPORT "ParaView")
+endif()
 
 vtk_module_build(
   MODULES             ${paraview_client_modules}
@@ -747,6 +836,7 @@ vtk_module_build(
   TEST_DATA_TARGET    ParaViewData
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
+  UTILITY_TARGET      "ParaView::paraviewbuild"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
   TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
@@ -776,7 +866,8 @@ vtk_module_build(
   SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
 # Catalyst sanity check. Ensure every module is using the same Catalyst dependency.
-if (PARAVIEW_ENABLE_CATALYST)
+if (PARAVIEW_ENABLE_CATALYST AND NOT PARAVIEW_USE_EXTERNAL_VTK)
+  # global property defined in VTK which is not exported
   get_property(catalyst_dir_primary GLOBAL PROPERTY vtk_catalyst_dir_primary)
   set(catalyst_using_modules ClientsInSitu)
   foreach (catalyst_using_module IN LISTS catalyst_using_modules)
@@ -797,9 +888,11 @@ if (PARAVIEW_ENABLE_CATALYST)
 endif ()
 
 include(vtkModuleJson)
-vtk_module_json(
-  MODULES ${vtk_modules}
-  OUTPUT "vtk-modules.json")
+if (NOT PARAVIEW_USE_EXTERNAL_VTK)
+  vtk_module_json(
+    MODULES ${vtk_modules}
+    OUTPUT "vtk-modules.json")
+endif ()
 vtk_module_json(
   MODULES ${paraview_modules}
   OUTPUT "paraview-modules.json")
@@ -874,8 +967,10 @@ endif()
 
 if (PARAVIEW_USE_PYTHON)
   if (PARAVIEW_USE_EXTERNAL_VTK)
-    # TODO: Check if VTK is already wrapped in Python.
-    # Error out?
+    if (NOT VTK_WRAP_PYTHON)
+      message(FATAL_ERROR
+        "PARAVIEW_USE_PYTHON requires VTK built with VTK_WRAP_PYTHON.")
+    endif()
   else ()
     vtk_module_wrap_python(
       MODULES         ${vtk_modules}

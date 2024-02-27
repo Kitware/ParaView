@@ -4,7 +4,7 @@ paraview_add_plugin(NetCDFTimeAnnotationPlugin
   VERSION             "1.0"
   SERVER_MANAGER_XML  NetCDFTimeAnnotation.xml)
 
-include(FindPythonModules)
+include(ParaViewFindPythonModules)
 
 # First look for the module cftime
 find_python_module(cftime module_found)

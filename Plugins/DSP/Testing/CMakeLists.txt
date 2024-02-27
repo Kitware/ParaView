@@ -3,7 +3,7 @@ add_subdirectory(Cxx)
 ExternalData_Expand_Arguments("ParaViewData" _
   "DATA{${paraview_test_data_directory_input}/Data/transient_sphere.hdf}")
 
-include(FindPythonModules)
+include(ParaViewFindPythonModules)
 find_python_module(numpy numpy_found)
 find_python_module(mpi4py mpi4py_found)
 if (NOT PARAVIEW_USE_PYTHON OR NOT numpy_found)

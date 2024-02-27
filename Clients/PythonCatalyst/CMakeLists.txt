@@ -53,6 +53,9 @@ if (catalyst_fortran_using_mangling)
     PRIVATE
       CATALYST_FORTRAN_USING_MANGLING=1)
 endif ()
+vtk_module_definitions(ParaView::PythonCatalyst
+  PRIVATE
+  "PARAVIEW_USE_EXTERNAL_VTK=$<BOOL:${PARAVIEW_USE_EXTERNAL_VTK}>")
 
 if (CMAKE_Fortran_COMPILER_WORKS)
   vtk_module_include(ParaView::PythonCatalyst

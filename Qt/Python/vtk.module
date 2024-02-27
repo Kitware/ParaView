@@ -12,6 +12,7 @@ GROUPS
   PARAVIEW_CANONICAL
 DEPENDS
   ParaView::pqCore
+  ParaView::PythonInitializer
   VTK::PythonInterpreter
   VTK::WrappingPythonCore
 TEST_LABELS

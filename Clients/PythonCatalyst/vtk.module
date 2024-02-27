@@ -15,6 +15,7 @@ KIT
 DEPENDS
   ParaView::Catalyst
   VTK::PythonInterpreter
+  ParaView::PythonInterpreterPath
 PRIVATE_DEPENDS
   ParaView::PythonInitializer
   ParaView::RemotingServerManager
