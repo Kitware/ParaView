@@ -853,7 +853,7 @@ set(TraceExportAndSaveData_TIMEOUT 150)
 set(TransferFunction2D_TIMEOUT 150)
 set(ZoomToData_TIMEOUT 150)
 
-SET (TESTS_WITHOUT_BASELINES
+list (APPEND TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   AddFieldArrays.xml
   ArrayBoundsScaleDomain.xml
@@ -956,7 +956,7 @@ if (WIN32)
     MP4Writer.xml)
 endif()
 
-SET (TESTS_WITH_INLINE_COMPARES
+list (APPEND TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
   BoundingRuler.xml
   BoxWidget.xml
@@ -1072,7 +1072,7 @@ if(NOT APPLE)
   )
 endif()
 
-SET(TESTS_WITH_BASELINES
+list(APPEND TESTS_WITH_BASELINES
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
@@ -2357,42 +2357,11 @@ set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml
 )
 
-list(APPEND TESTS_WITHOUT_BASELINES
-  ${TESTS_WITH_INLINE_COMPARES})
 
 # ResampleToHyperTreeGrid only works in client mode
 paraview_add_client_tests(
   TEST_SCRIPTS ResampleToHyperTreeGrid.xml
 )
-
-paraview_add_client_tests(
-  TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
-)
-
-paraview_add_client_tests(
-  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-)
-
-paraview_add_client_server_tests(
-  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-)
-
-paraview_add_client_server_tests(
-  TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
-)
-
-if (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
-  paraview_add_client_server_render_tests(
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-  )
-
-  paraview_add_client_server_render_tests(
-    TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
-  )
-endif ()
 
 # TODO: remote rendering tests and reverse connect tests.
 
