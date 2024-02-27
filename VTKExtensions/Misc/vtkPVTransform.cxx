@@ -31,6 +31,7 @@ void vtkPVTransform::UpdateMatrix()
 
   // Delegate the setting to the vtkMatrix
   this->SetMatrix(this->AbsoluteTransform->GetMatrix());
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
