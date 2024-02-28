@@ -3,10 +3,10 @@ Internal module used by paraview.servermanager to help warn about properties
 changed or removed.
 
 If the compatibility version is less than the version where a particular
-property was removed, `check_attr` should ideally continue to work as before
-or return a value of appropriate form so old code doesn't fail. Otherwise
-`check_attr` should throw the NotSupportedException with appropriate debug
-message.
+property was removed, `getattr` and `setattr` should ideally continue to
+work as before or return a value of appropriate form so old code doesn't
+fail. Otherwise `getattr` and `setattr` should throw the NotSupportedException
+with appropriate debug message.
 """
 
 import paraview
@@ -477,6 +477,16 @@ def setattr(proxy, pname, value):
                 raise Continue()
             else:
                 raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
+
+    # 5.12 -> 5.13 breaking change on Representation properties
+    # Renamed Position into Translation
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName().endswith("Representation"):
+        if pname == "Position":
+            if compatibility_version < (5, 13):
+                proxy.GetProperty("Translation").SetData(value)
+                raise Continue()
+            else:
+                raise NotSupportedException("'Position' is obsolete.  Use 'Translation' property instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -991,6 +1001,14 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException("'DecomposePolyhedra' property has been removed in ParaView 5.13")
 
+    # 5.12 -> 5.13 breaking change on Representation properties
+    # Renamed Position into Translation
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName().endswith("Representation"):
+        if pname == "Position":
+            if compatibility_version < (5, 13):
+                return proxy.GetProperty("Translation").GetData()
+            else:
+                raise NotSupportedException("'Position' property has been removed in ParaView 5.13")
     raise Continue()
 
 
