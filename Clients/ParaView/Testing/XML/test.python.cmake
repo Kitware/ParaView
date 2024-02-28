@@ -34,7 +34,7 @@ list(APPEND TESTS_WITH_BASELINES
   TraceExodus.xml
   TraceExportAndSaveData.xml
   TraceSaveGeometry.xml
-  # TraceStatisticsFilter.xml (see paraview/paraview#20661)
+  # TraceStatisticsFilter.xml (see paraview/paraview#20661. Also was disabled in CS/CRS mode)
   TraceSupplementalProxiesFully.xml
   TraceTimeControls.xml
   TraceWithoutRenderingComponents.xml
