@@ -122,7 +122,7 @@ class pqTranslationsTesting : public QObject
 
 public:
   pqTranslationsTesting(QObject* parent = nullptr);
-  ~pqTranslationsTesting();
+  ~pqTranslationsTesting() override;
 
   /**
    * Print a warning if the given object's property value does not begin
