@@ -91,7 +91,6 @@ protected:
 
   vtkNew<vtkQuadricClustering> Fallback;
 };
-vtkStandardNewMacro(DecimationFilterType);
 }
 #else // VTKM_ENABLE_TBB
 #include "vtkQuadricClustering.h"
@@ -127,7 +126,6 @@ protected:
     this->SetUseInternalTriangles(0);
   }
 };
-inline vtkStandardNewMacro(DecimationFilterType); // NOLINT(misc-definitions-in-headers)
 }
 #endif // VTKM_ENABLE_TBB
 

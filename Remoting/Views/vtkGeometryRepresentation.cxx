@@ -59,6 +59,11 @@
 #include <tuple>
 #include <vector>
 
+namespace vtkGeometryRepresentation_detail
+{
+vtkStandardNewMacro(DecimationFilterType);
+}
+
 //*****************************************************************************
 // This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is
 // vtkMultiBlockDataSet, then this is simply a pass-through filter. This makes
