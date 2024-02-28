@@ -61,7 +61,7 @@ inline void trim(std::string& string, const std::string& whitespace = " \t\"")
 //========================================================================
 inline int rowFromHeaderCol(const std::string& str)
 {
-  const size_t begin = str.rfind(".");
+  const size_t begin = str.rfind('.');
   if (begin == std::string::npos)
   {
     // no content, so invalid row Id
@@ -75,7 +75,7 @@ inline int rowFromHeaderCol(const std::string& str)
 //========================================================================
 inline std::string nameFromHeaderCol(const std::string& str)
 {
-  const size_t begin = str.rfind(".");
+  const size_t begin = str.rfind('.');
   if (begin == std::string::npos)
   {
     // no content
