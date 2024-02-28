@@ -459,6 +459,7 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
       this->Internals->view()->resizeColumnToContents(pqInternals::Tooltips);
       this->Internals->view()->selectionModel()->setCurrentIndex(
         QModelIndex(), QItemSelectionModel::NoUpdate);
+      this->updateUIState();
     });
   QObject::connect(this->Internals->model(), &QAbstractItemModel::dataChanged, []() {
     // Python Manager can't be nullptr as this dialog is built only when Python is enabled
