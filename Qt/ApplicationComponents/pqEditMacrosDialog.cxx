@@ -17,11 +17,11 @@
 #include <QAbstractItemModel>
 #include <QMessageBox>
 #include <QPainter>
+#include <QPushButton>
 #include <QScopedPointer>
 #include <QShortcut>
 #include <QStringList>
 #include <QStyledItemDelegate>
-#include <qstyleoption.h>
 
 //----------------------------------------------------------------------------
 struct pqEditMacrosDialog::pqInternals
@@ -144,7 +144,7 @@ struct pqEditMacrosDialog::pqInternals
       {
         return QVariant();
       }
-      const std::vector<std::string> headerLabels = { "Icon", "ToolTip", "Macro" };
+      const std::vector<std::string> headerLabels = { "Icon", "Macro", "Tool tip" };
       return QVariant(headerLabels.at(section).c_str());
     }
 
@@ -232,6 +232,7 @@ struct pqEditMacrosDialog::pqInternals
             auto icon = qvariant_cast<QIcon>(value);
             icon.paint(painter, option.rect);
           }
+          break;
         }
         case pqInternals::Columns::Macros:
         {
@@ -245,13 +246,29 @@ struct pqEditMacrosDialog::pqInternals
           if (value.isValid() && !value.isNull())
           {
             auto name = value.toString();
-            QStyleOption
+            QStyledItemDelegate::paint(painter, option, index);
+            QStyleOptionButton buttonOpt;
+            buttonOpt.rect = this->calculateButtonRect(option.rect);
+            buttonOpt.icon = QApplication::style()->standardIcon(QStyle::SP_TitleBarMaxButton);
+            buttonOpt.iconSize = buttonOpt.rect.size();
+            buttonOpt.features = QStyleOptionButton::None;
+            QApplication::style()->drawControl(QStyle::CE_PushButton, &buttonOpt, painter);
+            this->buttonRects[index] = buttonOpt.rect;
           }
+          break;
         }
         case pqInternals::Columns::Tooltips:
         default:
-          return QStyledItemDelegate::paint(painter, option, index);
+          QStyledItemDelegate::paint(painter, option, index);
       }
+    }
+
+    QRect calculateButtonRect(const QRect& cellRect) const
+    {
+      // lets the button paint in a rectangle whose width is cell height - 2 pixels
+      // so that the button icon doesn't look stretched
+      int buttonWidth = cellRect.height() - 2;
+      return QRect(cellRect.right() - buttonWidth, cellRect.top(), buttonWidth, cellRect.height());
     }
 
     QWidget* createEditor(
@@ -270,8 +287,8 @@ struct pqEditMacrosDialog::pqInternals
             QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
           return iconBrowser;
         }
-        case pqInternals::Columns::Tooltips:
         case pqInternals::Columns::Macros:
+        case pqInternals::Columns::Tooltips:
         default:
           return QStyledItemDelegate::createEditor(parent, option, index);
       }
@@ -290,11 +307,30 @@ struct pqEditMacrosDialog::pqInternals
           model->setData(index, newIconPath, Qt::DisplayRole);
           break;
         }
-        case pqInternals::Columns::Tooltips:
         case pqInternals::Columns::Macros:
+        case pqInternals::Columns::Tooltips:
         default:
           QStyledItemDelegate::setModelData(editor, model, index);
           break;
+      }
+    }
+
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+      switch (index.column())
+      {
+        case pqInternals::Columns::Macros:
+        {
+          const auto textSize = QStyledItemDelegate::sizeHint(option, index);
+          auto size = textSize;
+          // makes the icon as wide as the height of the row.
+          size.setWidth(textSize.width() + textSize.height());
+          return size;
+        }
+        case pqInternals::Columns::Icons:
+        case pqInternals::Columns::Tooltips:
+        default:
+          return QStyledItemDelegate::sizeHint(option, index);
       }
     }
 
@@ -304,12 +340,26 @@ struct pqEditMacrosDialog::pqInternals
       switch (index.column())
       {
         case pqInternals::Columns::Icons:
-          return;
-        case pqInternals::Columns::Tooltips:
+          break;
         case pqInternals::Columns::Macros:
+        case pqInternals::Columns::Tooltips:
         default:
           return QStyledItemDelegate::updateEditorGeometry(editor, option, index);
       }
+    }
+
+    bool buttonRectContainsCoordinate(
+      const QModelIndex& index, const QPoint& coordinate, QTreeView* view)
+    {
+      if (this->buttonRects.contains(index))
+      {
+        auto& buttonRect = this->buttonRects[index];
+        auto mappedCoordinate = view->mapFromGlobal(coordinate);
+        const int headerHeight = buttonRect.height();
+        mappedCoordinate.setY(mappedCoordinate.y() - headerHeight);
+        return buttonRect.contains(mappedCoordinate);
+      }
+      return false;
     }
 
   protected:
@@ -327,6 +377,8 @@ struct pqEditMacrosDialog::pqInternals
     }
 
   private:
+    mutable QMap<QModelIndex, QRect> buttonRects;
+
     void commitAndCloseEditor()
     {
       pqIconBrowser* editor = qobject_cast<pqIconBrowser*>(sender());
@@ -343,8 +395,8 @@ struct pqEditMacrosDialog::pqInternals
   enum Columns
   {
     Icons,
-    Tooltips,
     Macros,
+    Tooltips,
     Count
   };
 
@@ -403,8 +455,8 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
   QObject::connect(pqPVApplicationCore::instance()->pythonManager()->macroSupervisor(),
     &pqPythonMacroSupervisor::onAddedMacro, this, [this]() {
       this->Internals->view()->resizeColumnToContents(pqInternals::Icons);
-      this->Internals->view()->resizeColumnToContents(pqInternals::Tooltips);
       this->Internals->view()->resizeColumnToContents(pqInternals::Macros);
+      this->Internals->view()->resizeColumnToContents(pqInternals::Tooltips);
       this->Internals->view()->selectionModel()->setCurrentIndex(
         QModelIndex(), QItemSelectionModel::NoUpdate);
     });
@@ -438,6 +490,18 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
 
   this->connect(this->Internals->view()->selectionModel(), &QItemSelectionModel::selectionChanged,
     this, &pqEditMacrosDialog::updateUIState);
+
+  this->connect(this->Internals->view(), &QTreeView::clicked, [this](const QModelIndex& index) {
+    if (index.column() == pqInternals::Columns::Macros)
+    {
+      auto* delegate = static_cast<pqInternals::pqPythonMacrosItemDelegate*>(
+        this->Internals->view()->itemDelegate());
+      if (delegate->buttonRectContainsCoordinate(index, QCursor::pos(), this->Internals->view()))
+      {
+        this->onEditPressed();
+      }
+    }
+  });
 
   this->updateUIState();
 }
