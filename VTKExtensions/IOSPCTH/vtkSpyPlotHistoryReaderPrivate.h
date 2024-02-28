@@ -44,7 +44,7 @@ bool convert(const std::string& num, T& t)
 }
 
 //========================================================================
-void trim(std::string& string, const std::string& whitespace = " \t\"")
+inline void trim(std::string& string, const std::string& whitespace = " \t\"")
 {
   const size_t begin = string.find_first_not_of(whitespace);
   if (begin == std::string::npos)
@@ -59,7 +59,7 @@ void trim(std::string& string, const std::string& whitespace = " \t\"")
 }
 
 //========================================================================
-int rowFromHeaderCol(const std::string& str)
+inline int rowFromHeaderCol(const std::string& str)
 {
   const size_t begin = str.rfind(".");
   if (begin == std::string::npos)
@@ -73,7 +73,7 @@ int rowFromHeaderCol(const std::string& str)
 }
 
 //========================================================================
-std::string nameFromHeaderCol(const std::string& str)
+inline std::string nameFromHeaderCol(const std::string& str)
 {
   const size_t begin = str.rfind(".");
   if (begin == std::string::npos)
@@ -87,7 +87,7 @@ std::string nameFromHeaderCol(const std::string& str)
 }
 
 //========================================================================
-void split(const std::string& s, const char& delim, std::vector<std::string>& elems)
+inline void split(const std::string& s, const char& delim, std::vector<std::string>& elems)
 {
   std::stringstream ss(s);
   std::string item;
@@ -100,8 +100,8 @@ void split(const std::string& s, const char& delim, std::vector<std::string>& el
 }
 
 //========================================================================
-void getMetaHeaderInfo(const std::string& s, const char& delim, std::map<std::string, int>& fields,
-  std::map<int, std::string>& lookup)
+inline void getMetaHeaderInfo(const std::string& s, const char& delim,
+  std::map<std::string, int>& fields, std::map<int, std::string>& lookup)
 {
   std::stringstream ss(s);
   std::string item;
@@ -133,8 +133,8 @@ void getMetaHeaderInfo(const std::string& s, const char& delim, std::map<std::st
 }
 
 //========================================================================
-void getTimeStepInfo(const std::string& s, const char& delim, std::map<int, std::string>& lookup,
-  std::map<std::string, std::string>& info)
+inline void getTimeStepInfo(const std::string& s, const char& delim,
+  std::map<int, std::string>& lookup, std::map<std::string, std::string>& info)
 {
   std::stringstream ss(s);
   std::string item;
@@ -160,7 +160,7 @@ void getTimeStepInfo(const std::string& s, const char& delim, std::map<int, std:
 }
 
 //========================================================================
-std::vector<std::string> createTableLayoutFromHeader(std::string& header, const char& delim,
+inline std::vector<std::string> createTableLayoutFromHeader(std::string& header, const char& delim,
   std::map<int, int>& columnIndexToRowId, std::map<int, std::string>& fieldCols)
 {
   // the single presumption we have is that all the properties points
