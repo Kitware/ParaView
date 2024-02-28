@@ -79,13 +79,26 @@ void pqViewMenuManager::buildMenu()
       (this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqPreview.svg"), tr("Preview"))
         << pqSetName("Preview")));
 
-    QAction* fullscreen =
-      this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqFullscreen.svg"), tr("Full Screen"));
+    QAction* fullscreen = this->Menu->addAction(
+      QIcon(":/pqWidgets/Icons/pqFullscreen.svg"), tr("Full Screen (layout)"));
     fullscreen->setObjectName("actionFullScreen");
-    fullscreen->setShortcut(QKeySequence("F11"));
+    fullscreen->setShortcut(QKeySequence(Qt::Key_F11));
     fullscreen->setAutoRepeat(false);
     QObject::connect(
       fullscreen, &QAction::triggered, viewManager, &pqTabbedMultiViewWidget::toggleFullScreen);
+
+    QAction* activeViewFullscreen = this->Menu->addAction(
+      QIcon(":/pqWidgets/Icons/pqActiveViewFullscreen.svg"), tr("Full Screen (active view)"));
+    activeViewFullscreen->setObjectName("actionFullScreenActiveView");
+    activeViewFullscreen->setShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F11));
+    QObject::connect(activeViewFullscreen, &QAction::triggered, viewManager,
+      &pqTabbedMultiViewWidget::toggleFullScreenActiveView);
+
+    // Disable one fullscreen mode when the other is in use
+    QObject::connect(viewManager, &pqTabbedMultiViewWidget::fullScreenEnabled, activeViewFullscreen,
+      [activeViewFullscreen](bool enabled) { activeViewFullscreen->setEnabled(!enabled); });
+    QObject::connect(viewManager, &pqTabbedMultiViewWidget::fullScreenActiveViewEnabled, fullscreen,
+      [fullscreen](bool enabled) { fullscreen->setEnabled(!enabled); });
 
     auto showDecorations = this->Menu->addAction(tr("Show Frame Decorations"));
     showDecorations->setCheckable(true);
