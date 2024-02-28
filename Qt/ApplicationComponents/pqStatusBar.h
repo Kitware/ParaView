@@ -32,7 +32,7 @@ protected Q_SLOTS:
   void updateServerConfigInfo();
   void updateMemoryProgressBar();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   vtkNew<vtkPVSystemConfigInformation> ServerConfigsInfo;
   QProgressBar* MemoryProgressBar;
 

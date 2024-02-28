@@ -84,14 +84,14 @@ public:
    */
   std::string toString();
 
-protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+protected Q_SLOTS:
   /**
    * Recompute the points where the edge should pass by.
    * Should be called whenever one of the port the edge is attached to move.
    */
   int updatePoints();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
   QRectF boundingRect() const override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
