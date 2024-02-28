@@ -4500,23 +4500,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                       panel_visibility="advanced" />
           </PropertyGroup>
           <PropertyGroup name="Lighting">
-            <Hints>
-              <PropertyWidgetDecorator type="CompositeDecorator">
-                <Expression type="and">
-                  <!-- Hide when DisableLighting selected -->
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="DisableLighting"
-                                           value="0" />
-                  <!-- Hide for volume representation -->
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Volume"
-                                           inverse="1" />
-                </Expression>
-              </PropertyWidgetDecorator>
-            </Hints>
             <Property name="Interpolation"
                       panel_visibility="advanced" />
             <Property name="Specular"
@@ -4545,9 +4528,28 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="CoatColor"
                       panel_widget="color_selector"
                       panel_visibility="advanced" />
-            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="SelectNormalArray" panel_visibility="advanced"/>
             <Property name="SelectTangentArray" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0" />
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup label="Texturing">
+            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="InterpolateTextures" panel_visibility="advanced"/>
@@ -4566,6 +4568,23 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
             <Property name="FlipTextures" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0" />
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
