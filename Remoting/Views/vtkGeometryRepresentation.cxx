@@ -725,6 +725,7 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
   double diffuse = this->Diffuse;
   double specular = this->Specular;
   double ambient = this->Ambient;
+  bool lighting = !this->DisableLighting;
 
   if (this->Representation != SURFACE && this->Representation != SURFACE_WITH_EDGES)
   {
@@ -743,6 +744,7 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
   this->Property->SetAmbient(ambient);
   this->Property->SetSpecular(specular);
   this->Property->SetDiffuse(diffuse);
+  this->Property->SetLighting(lighting);
 
   switch (this->Representation)
   {
@@ -910,6 +912,12 @@ void vtkGeometryRepresentation::SetStatic(int val)
 void vtkGeometryRepresentation::SetColor(double r, double g, double b)
 {
   this->Property->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetLighting(bool lighting)
+{
+  this->Property->SetLighting(lighting);
 }
 
 //----------------------------------------------------------------------------

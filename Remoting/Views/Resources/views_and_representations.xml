@@ -4493,8 +4493,30 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                        inverse="1" />
             </Hints>
           </PropertyGroup>
-
-          <PropertyGroup label="Lighting">
+          <PropertyGroup name="Lighting">
+            <Property name="DisableLighting"
+                      panel_visibility="advanced" />
+            <Property name="Diffuse"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup name="Lighting">
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0" />
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
             <Property name="Interpolation"
                       panel_visibility="advanced" />
             <Property name="Specular"
@@ -4509,7 +4531,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="Luminosity"
                       panel_visibility="advanced" />
             <Property name="Ambient" panel_visibility="advanced"/>
-            <Property name="Diffuse" panel_visibility="advanced"/>
             <Property name="Roughness" panel_visibility="advanced"/>
             <Property name="Metallic" panel_visibility="advanced"/>
             <Property name="EdgeTint"
@@ -4545,14 +4566,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
             <Property name="FlipTextures" panel_visibility="advanced"/>
-            <Hints>
-              <!--Hide for volume representation-->
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Volume"
-                                       inverse="1" />
-            </Hints>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
@@ -4981,10 +4994,10 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="points"/>
           </PropertyGroup>
-
-          <PropertyGroup label="Lighting">
+          <PropertyGroup name="Lighting">
             <Property name="Interpolation"
                       panel_visibility="advanced" />
+            <Property name="Diffuse" panel_visibility="advanced"/>
             <Property name="Specular"
                       panel_visibility="default" />
             <Property name="SpecularColor"
@@ -4997,7 +5010,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="Luminosity"
                       panel_visibility="advanced" />
             <Property name="Ambient" panel_visibility="advanced"/>
-            <Property name="Diffuse" panel_visibility="advanced"/>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
@@ -14873,6 +14885,16 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetDisableLighting"
+                      default_values="0"
+                      name="DisableLighting"
+                      number_of_elements="1">
+        <Documentation>
+          Disables the render view lighting interactions on this object.
+          It only shows the diffuse lighting component of the object.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetAmbient"
                             default_values="0.0"
                             name="Ambient"
