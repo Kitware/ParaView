@@ -18,11 +18,6 @@ class QString;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-namespace Ui
-{
-class pqConfigureCategoriesDialog;
-}
-
 /**
  * pqConfigureCategoriesDialog is the Configure Categories dialog used by ParaView.
  * It allows to create and remove categories and organize filters in them.
