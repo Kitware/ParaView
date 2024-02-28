@@ -55,7 +55,6 @@ inline void trim(std::string& string, const std::string& whitespace = " \t\"")
   const size_t end = string.find_last_not_of(whitespace);
   const size_t range = end - begin + 1;
   string = string.substr(begin, range);
-  return;
 }
 
 //========================================================================
@@ -96,7 +95,6 @@ inline void split(const std::string& s, const char& delim, std::vector<std::stri
     trim(item);
     elems.push_back(item);
   }
-  return;
 }
 
 //========================================================================
@@ -129,7 +127,6 @@ inline void getMetaHeaderInfo(const std::string& s, const char& delim,
     }
     ++index;
   }
-  return;
 }
 
 //========================================================================
@@ -156,7 +153,6 @@ inline void getTimeStepInfo(const std::string& s, const char& delim,
     }
     ++index;
   }
-  return;
 }
 
 //========================================================================
