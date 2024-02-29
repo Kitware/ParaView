@@ -1559,19 +1559,6 @@ list(APPEND TESTS_WITH_BASELINES
   CompositeGlyphTree.xml
   )
 
-if (PARAVIEW_USE_MPI)
-  if (PARAVIEW_USE_PYTHON)
-    paraview_add_client_server_tests(
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS SaveLoadRemotePythonState.xml
-    )
-    paraview_add_client_server_tests(
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS SaveLoadRemotePythonScript.xml
-    )
-  endif ()
-endif()
-
 #------------------------------------------------------------------------------
 # Add streaming tests.
 # We need to locate smooth.flash since it's not included in the default testing
@@ -1866,15 +1853,6 @@ set (VolumeNoMapScalars_DISABLE_CRS TRUE)
 set (VolumeNoMapScalars_THRESHOLD 50)
 set (MultiBlockVolumeRendering_DISABLE_CRS TRUE)
 set (ColorOpacityEditorFreehandDrawing_DISABLE_CRS TRUE)
-
-# Histogram filter produces different results when running in parallel, so
-# disable it.
-IF (PARAVIEW_USE_MPI)
-  if (PARAVIEW_USE_PYTHON)
-    set (TraceStatisticsFilter_DISABLE_CS TRUE)
-    set (TraceStatisticsFilter_DISABLE_CRS TRUE)
-  endif()
-ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but builtin
 SET (CompositeSurfaceSelection_DISABLE_CS TRUE)

@@ -18,6 +18,10 @@ if(PARAVIEW_USE_PYTHON)
   include(test.python.cmake)
 endif()
 
+if (PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON)
+  include(test.mpi-python.cmake)
+endif ()
+
 # Finally create the tests from the XML lists
 list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
