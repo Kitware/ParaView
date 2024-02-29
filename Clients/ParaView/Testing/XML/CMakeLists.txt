@@ -10,6 +10,10 @@ set(TESTS_WITH_BASELINES)
 
 include(test.common.cmake)
 
+if (PARAVIEW_USE_MPI)
+  include(test.mpi.cmake)
+endif()
+
 if(PARAVIEW_USE_PYTHON)
   include(test.python.cmake)
 endif()
