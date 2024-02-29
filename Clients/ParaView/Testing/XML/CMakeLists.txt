@@ -22,6 +22,15 @@ if (PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON)
   include(test.mpi-python.cmake)
 endif ()
 
+option(PARAVIEW_SSH_SERVERS_TESTING
+    "Add SSH Servers testing"
+    OFF)
+mark_as_advanced(PARAVIEW_SSH_SERVERS_TESTING)
+
+if(PARAVIEW_SSH_SERVERS_TESTING)
+  include(test.ssh.cmake)
+endif(PARAVIEW_SSH_SERVERS_TESTING)
+
 # Finally create the tests from the XML lists
 list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
