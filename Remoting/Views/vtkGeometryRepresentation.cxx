@@ -238,6 +238,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->RepeatTextures = true;
   this->InterpolateTextures = false;
   this->UseMipmapTextures = false;
+  this->TextureTransform = nullptr;
   this->Ambient = 0.0;
   this->Diffuse = 1.0;
   this->Specular = 0.0;
@@ -275,6 +276,11 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->LODMapper->Delete();
   this->Actor->Delete();
   this->Property->Delete();
+  if (this->TextureTransform)
+  {
+    this->TextureTransform->Delete();
+    this->TextureTransform = nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1224,14 +1230,21 @@ void vtkGeometryRepresentation::SetSelection(vtkSelection* selection)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetFlipTextures(bool flip)
 {
-  vtkInformation* info = this->Actor->GetPropertyKeys();
-  info->Remove(vtkProp::GeneralTextureTransform());
-  if (flip)
+  if (this->TextureTransform)
   {
-    double mat[] = { 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-    info->Set(vtkProp::GeneralTextureTransform(), mat, 16);
+    if (flip)
+    {
+      static constexpr double mat[] = { 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+      this->TextureTransform->SetMatrix(mat);
+      this->TextureTransform->Modified();
+    }
+    else
+    {
+      static constexpr double mat[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+      this->TextureTransform->SetMatrix(mat);
+      this->TextureTransform->Modified();
+    }
   }
-  this->Actor->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1243,6 +1256,32 @@ void vtkGeometryRepresentation::SetTexture(vtkTexture* val)
     val->SetRepeat(this->RepeatTextures);
     val->SetInterpolate(this->InterpolateTextures);
     val->SetMipmap(this->UseMipmapTextures);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetTextureTransform(vtkTransform* transform)
+{
+  vtkSetObjectBodyMacro(TextureTransform, vtkTransform, transform);
+  if (this->TextureTransform && this->Actor &&
+    !this->TextureTransform->HasObserver(vtkCommand::ModifiedEvent))
+  {
+    this->UpdateGeneralTextureTransform();
+    this->TextureTransform->AddObserver(
+      vtkCommand::ModifiedEvent, this, &vtkGeometryRepresentation::UpdateGeneralTextureTransform);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::UpdateGeneralTextureTransform()
+{
+  if (this->Actor && this->Actor->GetPropertyKeys())
+  {
+    vtkInformation* info = this->Actor->GetPropertyKeys();
+    info->Remove(vtkProp::GeneralTextureTransform());
+    info->Set(vtkProp::GeneralTextureTransform(),
+      &(this->TextureTransform->GetMatrix()->Element[0][0]), 16);
+    this->Actor->Modified();
   }
 }
 

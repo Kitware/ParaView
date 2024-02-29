@@ -2,7 +2,7 @@
   <!-- ==================================================================== -->
   <ProxyGroup name="extended_sources">
     <!-- ================================================================== -->
-    <Proxy class="vtkPVTransform" name="Transform2">
+    <Proxy class="vtkPVTransform" name="Transform2" processes="dataserver|renderserver|client">
       <!--Transform proxy with unconventional interface, used by BoxWidget -->
       <DoubleVectorProperty command="SetAbsolutePosition"
                             default_values="0.0 0.0 0.0"
@@ -50,7 +50,7 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy class="vtkPVTransform" label="Transform" name="Transform3">
+    <Proxy class="vtkPVTransform" label="Transform" name="Transform3" processes="dataserver|renderserver|client">
       <DoubleVectorProperty command="SetAbsolutePosition"
                             default_values="0.0 0.0 0.0"
                             information_property="PositionInfo"
@@ -105,7 +105,8 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy class="vtkPVRotateAroundOriginTransform" label="RotateAroundOriginTransform" name="RotateAroundOriginTransform">
+    <Proxy class="vtkPVRotateAroundOriginTransform" label="RotateAroundOriginTransform" name="RotateAroundOriginTransform"
+           processes="dataserver|renderserver|client">
       <DoubleVectorProperty command="SetOriginOfRotation"
                             default_values="0.0 0.0 0.0"
                             label="Origin of rotation"

@@ -33,6 +33,7 @@ class vtkPVGeometryFilter;
 class vtkPVLODActor;
 class vtkScalarsToColors;
 class vtkTexture;
+class vtkTransform;
 
 namespace vtkGeometryRepresentation_detail
 {
@@ -231,6 +232,8 @@ public:
 
   //***************************************************************************
   // Forwarded to all textures
+  virtual void SetTextureTransform(vtkTransform*);
+  vtkGetObjectMacro(TextureTransform, vtkTransform);
   virtual void SetRepeatTextures(bool);
   vtkGetMacro(RepeatTextures, bool);
   virtual void SetInterpolateTextures(bool);
@@ -498,6 +501,11 @@ protected:
    */
   virtual void SetPointArrayToProcess(int p, const char* val);
 
+  /**
+   * This is called whenever the texture transformation matrix changes.
+   */
+  void UpdateGeneralTextureTransform();
+
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkGeometryRepresentation_detail::DecimationFilterType* Decimator;
@@ -512,6 +520,7 @@ protected:
   bool RepeatTextures;
   bool InterpolateTextures;
   bool UseMipmapTextures;
+  vtkTransform* TextureTransform;
   double Ambient;
   double Specular;
   double Diffuse;
