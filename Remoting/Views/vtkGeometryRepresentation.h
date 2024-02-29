@@ -403,6 +403,23 @@ public:
    */
   void SetArrayIdNames(const char* pointArray, const char* cellArray) override;
 
+  ///@{
+  /**
+   * Set/Get the placeholder data type.
+   *
+   * This value is set by the proxy and is needed to ensure that the client knows the type of the
+   * input that lives on the server.
+   *
+   * In the past, we were always creating a placeholder of type vtkMultiBlockDataSet when no
+   * input was available on the client. This is no longer valid because vtkPVGeometryFilter
+   * can now generate also vtkPartitionedDataSetCollection.
+   *
+   * This can be potentially removed in the future once vtkMultiBlockDataSet is deprecated.
+   */
+  vtkSetMacro(PlaceHolderDataType, int);
+  vtkGetMacro(PlaceHolderDataType, int);
+  ///@}
+
 protected:
   vtkGeometryRepresentation();
   ~vtkGeometryRepresentation() override;
@@ -532,6 +549,9 @@ protected:
   bool BlockAttrChanged = false;
   vtkTimeStamp BlockAttributeTime;
   bool UpdateBlockAttrLOD = false;
+
+  // This is used to be able to create the correct placeHolder in RequestData for the client
+  int PlaceHolderDataType = VTK_PARTITIONED_DATA_SET_COLLECTION;
 
   // These block variables are similar to the ones in vtkCompositeDataDisplayAttributes
   // Some of them are exposed and some others are not because, as of now, they are not needed.

@@ -42,112 +42,6 @@
 #include <vector>
 
 //*****************************************************************************
-// This is used to convert a vtkPolyData to a vtkPartitionedDataSetCollection.
-// If the input is a vtkPartitionedDataSetCollection, then this is simply a
-// pass-through filter. This makes it easier to unify the code to select and
-// render data by simply dealing with vtkPartitionedDataSetCollection always.
-class vtkCellGridRepresentationMultiBlockMaker : public vtkPartitionedDataSetCollectionAlgorithm
-{
-public:
-  static vtkCellGridRepresentationMultiBlockMaker* New();
-  vtkTypeMacro(vtkCellGridRepresentationMultiBlockMaker, vtkPartitionedDataSetCollectionAlgorithm);
-
-protected:
-  int RequestData(vtkInformation*, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) override
-  {
-    vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
-    auto* inputPDC = vtkPartitionedDataSetCollection::SafeDownCast(inputDO);
-    auto* outputPDC = vtkPartitionedDataSetCollection::GetData(outputVector, 0);
-
-    vtkInformation* infoNormals = this->GetInputArrayInformation(0);
-    vtkInformation* infoTCoords = this->GetInputArrayInformation(1);
-    vtkInformation* infoTangents = this->GetInputArrayInformation(2);
-
-    std::string normalsName;
-    std::string tcoordsName;
-    std::string tangentsName;
-
-    const char* normalField = infoNormals ? infoNormals->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-    const char* tcoordField = infoTCoords ? infoTCoords->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-    const char* tangentField =
-      infoTangents ? infoTangents->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-
-    if (normalField)
-    {
-      normalsName = normalField;
-    }
-    if (tcoordField)
-    {
-      tcoordsName = tcoordField;
-    }
-    if (tangentField)
-    {
-      tangentsName = tangentField;
-    }
-
-    if (inputPDC)
-    {
-      outputPDC->ShallowCopy(inputPDC);
-
-      vtkNew<vtkDataObjectTreeIterator> iter;
-      iter->SetDataSet(outputPDC);
-      iter->SkipEmptyNodesOn();
-      iter->VisitOnlyLeavesOn();
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        this->SetArrays(vtkCellGrid::SafeDownCast(iter->GetCurrentDataObject()), normalsName,
-          tcoordsName, tangentsName);
-      }
-
-      return 1;
-    }
-
-    auto clone = vtkSmartPointer<vtkDataObject>::Take(inputDO->NewInstance());
-    clone->ShallowCopy(inputDO);
-    vtkNew<vtkPartitionedDataSet> partition;
-    partition->SetPartition(0, clone);
-    outputPDC->SetPartitionedDataSet(0, partition);
-    this->SetArrays(vtkCellGrid::SafeDownCast(clone), normalsName, tcoordsName, tangentsName);
-    // if we created a MB out of a non-composite dataset, we add this array to
-    // make it possible for `PopulateBlockAttributes` to be aware of that.
-
-    vtkNew<vtkIntArray> marker;
-    marker->SetName("vtkCellGridRepresentationMultiBlockMaker");
-    outputPDC->GetFieldData()->AddArray(marker);
-    return 1;
-  }
-
-  void SetArrays(vtkCellGrid* dataSet, const std::string& normal, const std::string& tcoord,
-    const std::string& tangent)
-  {
-    if (dataSet)
-    {
-      if (!normal.empty())
-      {
-        dataSet->GetAttributes(vtkDataObject::POINT)->SetActiveNormals(normal.c_str());
-      }
-      if (!tcoord.empty())
-      {
-        dataSet->GetAttributes(vtkDataObject::POINT)->SetActiveTCoords(tcoord.c_str());
-      }
-      if (!tangent.empty())
-      {
-        dataSet->GetAttributes(vtkDataObject::POINT)->SetActiveTangents(tangent.c_str());
-      }
-    }
-  }
-
-  int FillInputPortInformation(int, vtkInformation* info) override
-  {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCellGrid");
-    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSetCollection");
-    return 1;
-  }
-};
-vtkStandardNewMacro(vtkCellGridRepresentationMultiBlockMaker);
-
-//*****************************************************************************
 
 vtkStandardNewMacro(vtkCellGridRepresentation);
 
@@ -156,8 +50,6 @@ vtkCellGridRepresentation::vtkCellGridRepresentation()
   vtkRenderingCellGrid::RegisterCellsAndResponders();
   this->GeometryFilter->Delete();
   this->GeometryFilter = nullptr;
-  this->MultiBlockMaker->Delete();
-  this->MultiBlockMaker = nullptr;
 
   this->SetupDefaults();
 }
@@ -168,7 +60,6 @@ void vtkCellGridRepresentation::SetupDefaults()
 {
   // delete vtkCompositePolyDataMapper created by vtkGeometryRepresentation
   this->GeometryFilter = vtkCellGridComputeSurface::New();
-  this->MultiBlockMaker = vtkCellGridRepresentationMultiBlockMaker::New();
   this->LODOutlineFilter->Delete();
   this->LODOutlineFilter = vtkPVGeometryFilter::New();
 

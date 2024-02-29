@@ -4,6 +4,7 @@
 
 #include "vtkAppendCompositeDataLeaves.h"
 #include "vtkAppendFilter.h"
+#include "vtkAppendPartitionedDataSetCollection.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkGraph.h"
@@ -15,6 +16,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGridAppend.h"
 #include "vtkTrivialProducer.h"
@@ -135,7 +137,6 @@ bool vtkMultiProcessControllerHelper::MergePieces(
   else if (vtkStructuredGrid::SafeDownCast(result))
   {
     appender = vtkStructuredGridAppend::New();
-    ;
   }
   else if (vtkMolecule::SafeDownCast(result))
   {
@@ -146,10 +147,16 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     vtkGenericWarningMacro("Support for vtkGraph has been depreciated.");
     return false;
   }
+  else if (vtkPartitionedDataSetCollection::SafeDownCast(result))
+  {
+    vtkAppendPartitionedDataSetCollection* apdsc = vtkAppendPartitionedDataSetCollection::New();
+    apdsc->AppendFieldDataOn();
+    apdsc->SetAppendModeToAppendPartitions();
+    appender = apdsc;
+  }
   else if (vtkCompositeDataSet::SafeDownCast(result))
   {
-    // this only supports composite datasets of polydata and unstructured
-    // grids.
+    // this only supports composite datasets of polydata and unstructured grids.
     vtkAppendCompositeDataLeaves* cdl = vtkAppendCompositeDataLeaves::New();
     cdl->AppendFieldDataOn();
     appender = cdl;

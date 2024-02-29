@@ -13,6 +13,7 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
+#include "vtkSmartPointer.h"                          // needed for vtkSmartPointer
 
 class vtkCallbackCommand;
 class vtkCellGrid;
@@ -66,7 +67,7 @@ public:
    * Set/get whether to produce feature edges (vs. surface).
    * If both this and UseOutline are true, then an outline will be produced.
    */
-  vtkSetMacro(GenerateFeatureEdges, bool);
+  void SetGenerateFeatureEdges(bool);
   vtkGetMacro(GenerateFeatureEdges, bool);
   ///@}
 
@@ -191,14 +192,6 @@ public:
   vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   ///@}
 
-  // These keys are put in the output composite-data metadata for multipieces
-  // since this filter merges multipieces together.
-  static vtkInformationIntegerVectorKey* POINT_OFFSETS();
-  static vtkInformationIntegerVectorKey* VERTS_OFFSETS();
-  static vtkInformationIntegerVectorKey* LINES_OFFSETS();
-  static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
-  static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
-
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter() override;
@@ -216,9 +209,6 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
   ///@}
-
-  // Create a default executive.
-  vtkExecutive* CreateDefaultExecutive() override;
 
   /**
    * Produce geometry for a block in the dataset.
@@ -277,12 +267,12 @@ protected:
   int MatchBoundariesIgnoringCellOrder = 0;
 
   vtkMultiProcessController* Controller;
-  vtkOutlineSource* OutlineSource;
-  vtkGeometryFilter* GeometryFilter;
-  vtkGenericGeometryFilter* GenericGeometryFilter;
-  vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
-  vtkRecoverGeometryWireframe* RecoverWireframeFilter;
-  vtkFeatureEdges* FeatureEdgesFilter;
+  vtkSmartPointer<vtkOutlineSource> OutlineSource;
+  vtkSmartPointer<vtkGeometryFilter> GeometryFilter;
+  vtkSmartPointer<vtkGenericGeometryFilter> GenericGeometryFilter;
+  vtkSmartPointer<vtkUnstructuredGridGeometryFilter> UnstructuredGridGeometryFilter;
+  vtkSmartPointer<vtkRecoverGeometryWireframe> RecoverWireframeFilter;
+  vtkSmartPointer<vtkFeatureEdges> FeatureEdgesFilter;
 
   /**
    * Call CheckAttributes on the \c input which ensures that all attribute
@@ -296,12 +286,6 @@ protected:
   int FillInputPortInformation(int, vtkInformation*) override;
 
   void ReportReferences(vtkGarbageCollector*) override;
-
-  /**
-   * Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
-   * don't generate internal surfaces.
-   */
-  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   bool GenerateProcessIds;
   int PassThroughCellIds;

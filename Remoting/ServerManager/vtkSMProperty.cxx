@@ -512,7 +512,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
     {
       vtkWarningMacro("Could not create object of type: "
         << name.str().c_str()
-        << ". Make sure that this xml domain is correct.\nIf this error occurred when loading a "
+        << ". Make sure that this xml domain is correct.\nIf this occurred when loading a "
            "plugin in client/server mode, first load the client plugin.");
     }
   }

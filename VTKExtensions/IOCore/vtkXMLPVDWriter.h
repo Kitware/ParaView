@@ -99,7 +99,7 @@ protected:
 
   // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
-  vtkXMLWriter* GetWriter(int index);
+  vtkXMLWriterBase* GetWriter(int index);
 
   // Methods to help construct internal file names.
   void SplitFileName();

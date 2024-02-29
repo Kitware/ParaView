@@ -27,6 +27,8 @@
 #include "vtkXMLPStructuredGridReader.h"
 #include "vtkXMLPTableReader.h"
 #include "vtkXMLPUnstructuredGridReader.h"
+#include "vtkXMLPartitionedDataSetCollectionReader.h"
+#include "vtkXMLPartitionedDataSetReader.h"
 #include "vtkXMLPolyDataReader.h"
 #include "vtkXMLRectilinearGridReader.h"
 #include "vtkXMLStructuredGridReader.h"
@@ -113,6 +115,8 @@ const vtkXMLCollectionReaderInternals::ReaderConstructorsType
     { "vtu", GET_NEW_FUNCTOR(vtkXMLUnstructuredGridReader) },
     { "vti", GET_NEW_FUNCTOR(vtkXMLImageDataReader) },
     { "vtr", GET_NEW_FUNCTOR(vtkXMLRectilinearGridReader) },
+    { "vtpc", GET_NEW_FUNCTOR(vtkXMLPartitionedDataSetCollectionReader) },
+    { "vtpd", GET_NEW_FUNCTOR(vtkXMLPartitionedDataSetReader) },
     { "vtm", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     { "vtmb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     // legacy reader - produces vtkMultiBlockDataSet.

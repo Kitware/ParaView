@@ -10,19 +10,16 @@
 #include "vtkCompositeCellGridMapper.h"
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositePolyDataMapper.h"
-#include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
-#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataObjectTreeRange.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -45,7 +42,6 @@
 #include "vtkStringToken.h"
 #include "vtkTexture.h"
 #include "vtkTransform.h"
-#include "vtkUnstructuredGrid.h"
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayActorNode.h"
@@ -65,114 +61,122 @@ vtkStandardNewMacro(DecimationFilterType);
 }
 
 //*****************************************************************************
-// This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is
-// vtkMultiBlockDataSet, then this is simply a pass-through filter. This makes
-// it easier to unify the code to select and render data by simply dealing with
-// vtkMultiBlockDataSet always.
-class vtkGeometryRepresentationMultiBlockMaker : public vtkMultiBlockDataSetAlgorithm
+// This is used to convert a vtkPolyData to a vtkPartitionedDataSetCollection.
+// If the input is a vtkPartitionedDataSetCollection/vtkMultiBlockDataSet,
+// then this is simply a pass-through filter. This makes it easier to unify
+// the code to select and render data by simply dealing with vtkDataObjectTrees always.
+class vtkGeometryRepresentationMultiBlockMaker : public vtkDataObjectAlgorithm
 {
 public:
   static vtkGeometryRepresentationMultiBlockMaker* New();
-  vtkTypeMacro(vtkGeometryRepresentationMultiBlockMaker, vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkGeometryRepresentationMultiBlockMaker, vtkDataObjectAlgorithm);
 
 protected:
   int RequestData(vtkInformation*, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override
   {
-    vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
-    vtkMultiBlockDataSet* inputMB = vtkMultiBlockDataSet::SafeDownCast(inputDO);
-    vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::GetData(outputVector, 0);
+    auto inputDO = vtkDataObject::GetData(inputVector[0], 0);
+    auto inputDOT = vtkDataObjectTree::SafeDownCast(inputDO);
+    auto outputDOT = vtkDataObjectTree::GetData(outputVector, 0);
 
     vtkInformation* infoNormals = this->GetInputArrayInformation(0);
     vtkInformation* infoTCoords = this->GetInputArrayInformation(1);
     vtkInformation* infoTangents = this->GetInputArrayInformation(2);
 
-    std::string normalsName;
-    std::string tcoordsName;
-    std::string tangentsName;
+    const std::string normalsName = infoNormals && infoNormals->Has(vtkDataObject::FIELD_NAME())
+      ? infoNormals->Get(vtkDataObject::FIELD_NAME())
+      : "";
+    const std::string tcoordsName = infoTCoords && infoTCoords->Has(vtkDataObject::FIELD_NAME())
+      ? infoTCoords->Get(vtkDataObject::FIELD_NAME())
+      : "";
+    const std::string tangentsName = infoTangents && infoTangents->Has(vtkDataObject::FIELD_NAME())
+      ? infoTangents->Get(vtkDataObject::FIELD_NAME())
+      : "";
 
-    const char* normalField = infoNormals ? infoNormals->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-    const char* tcoordField = infoTCoords ? infoTCoords->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-    const char* tangentField =
-      infoTangents ? infoTangents->Get(vtkDataObject::FIELD_NAME()) : nullptr;
+    if (inputDOT)
+    {
+      outputDOT->ShallowCopy(inputDOT);
 
-    if (normalField)
-    {
-      normalsName = normalField;
-    }
-    if (tcoordField)
-    {
-      tcoordsName = tcoordField;
-    }
-    if (tangentField)
-    {
-      tangentsName = tangentField;
-    }
-
-    if (inputMB)
-    {
-      outputMB->ShallowCopy(inputMB);
-
-      vtkNew<vtkDataObjectTreeIterator> iter;
-      iter->SetDataSet(outputMB);
+      auto iter = vtk::TakeSmartPointer(outputDOT->NewTreeIterator());
       iter->SkipEmptyNodesOn();
       iter->VisitOnlyLeavesOn();
       for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-        this->SetArrays(vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()), normalsName,
-          tcoordsName, tangentsName);
+        this->SetArrays(iter->GetCurrentDataObject(), normalsName, tcoordsName, tangentsName);
       }
-
       return 1;
     }
+    else
+    {
+      auto clone = vtkSmartPointer<vtkDataObject>::Take(inputDO->NewInstance());
+      clone->ShallowCopy(inputDO);
+      auto outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(outputDOT);
+      outputPDC->SetNumberOfPartitionedDataSets(1);
+      outputPDC->SetPartition(0, 0, clone);
+      this->SetArrays(clone, normalsName, tcoordsName, tangentsName);
 
-    auto clone = vtkSmartPointer<vtkDataObject>::Take(inputDO->NewInstance());
-    clone->ShallowCopy(inputDO);
-    outputMB->SetBlock(0, clone);
-    this->SetArrays(vtkDataSet::SafeDownCast(clone), normalsName, tcoordsName, tangentsName);
-    // if we created a MB out of a non-composite dataset, we add this array to
-    // make it possible for `PopulateBlockAttributes` to be aware of that.
-
-    vtkNew<vtkIntArray> marker;
-    marker->SetName("vtkGeometryRepresentationMultiBlockMaker");
-    outputMB->GetFieldData()->AddArray(marker);
-    return 1;
+      // if we created a PDC out of a non-composite dataset, we add this array to
+      // make it possible for `PopulateBlockAttributes` to be aware of that.
+      vtkNew<vtkIntArray> marker;
+      marker->SetName("vtkGeometryRepresentationMultiBlockMaker");
+      outputPDC->GetFieldData()->AddArray(marker);
+      return 1;
+    }
   }
 
-  void SetArrays(vtkDataSet* dataSet, const std::string& normal, const std::string& tcoord,
+  void SetArrays(vtkDataObject* dataSet, const std::string& normal, const std::string& tcoord,
     const std::string& tangent)
   {
-    if (dataSet)
+    if (dataSet && dataSet->GetAttributes(vtkDataObject::POINT))
     {
+      auto pointData = dataSet->GetAttributes(vtkDataObject::POINT);
       if (!normal.empty())
       {
-        dataSet->GetPointData()->SetActiveNormals(normal.c_str());
+        pointData->SetActiveNormals(normal.c_str());
       }
       if (!tcoord.empty())
       {
-        dataSet->GetPointData()->SetActiveTCoords(tcoord.c_str());
+        pointData->SetActiveTCoords(tcoord.c_str());
       }
       if (!tangent.empty())
       {
-        dataSet->GetPointData()->SetActiveTangents(tangent.c_str());
+        pointData->SetActiveTangents(tangent.c_str());
       }
     }
   }
 
-  int FillInputPortInformation(int, vtkInformation* info) override
+  int FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info) override
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCellGrid");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSetCollection");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
     return 1;
   }
+
+  int RequestDataObject(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override
+  {
+    auto inputDO = vtkDataObject::GetData(inputVector[0], 0);
+    int outputType = VTK_PARTITIONED_DATA_SET_COLLECTION;
+    if (inputDO && inputDO->GetDataObjectType() == VTK_MULTIBLOCK_DATA_SET)
+    {
+      outputType = VTK_MULTIBLOCK_DATA_SET;
+    }
+
+    return vtkDataObjectAlgorithm::SetOutputDataObject(
+             outputType, outputVector->GetInformationObject(0), /*exact*/ true)
+      ? 1
+      : 0;
+  }
 };
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkGeometryRepresentationMultiBlockMaker);
 
-//*****************************************************************************
-
-vtkStandardNewMacro(vtkGeometryRepresentation);
 //----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkGeometryRepresentation);
 
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::HandleGeometryRepresentationProgress(
   vtkObject* caller, unsigned long, void*)
 {
@@ -378,7 +382,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    // provide the "geometry" to the view so the view can delivery it to the
+    // provide the "geometry" to the view so the view can deliver it to the
     // rendering nodes as and when needed.
     vtkPVView::SetPiece(inInfo, this, this->MultiBlockMaker->GetOutputDataObject(0));
 
@@ -519,23 +523,20 @@ int vtkGeometryRepresentation::RequestData(
 {
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
-    // vtkLogF(INFO, "%s->RequestData", this->GetLogName().c_str());
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-    if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
+    auto prod = vtkPVTrivialProducer::SafeDownCast(this->GetInternalOutputPort()->GetProducer());
+    if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) && prod)
     {
-      vtkAlgorithmOutput* aout = this->GetInternalOutputPort();
-      vtkPVTrivialProducer* prod = vtkPVTrivialProducer::SafeDownCast(aout->GetProducer());
-      if (prod)
-      {
-        prod->SetWholeExtent(inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()));
-      }
+      prod->SetWholeExtent(inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()));
     }
     this->GeometryFilter->SetInputConnection(this->GetInternalOutputPort());
   }
   else
   {
-    vtkNew<vtkMultiBlockDataSet> placeholder;
-    this->GeometryFilter->SetInputDataObject(0, placeholder);
+    auto placeHolder =
+      vtk::TakeSmartPointer(vtkDataObjectTypes::NewDataObject(this->PlaceHolderDataType));
+    placeHolder->Initialize();
+    this->GeometryFilter->SetInputDataObject(0, placeHolder);
   }
 
   // essential to re-execute geometry filter consistently on all ranks since it
@@ -1672,39 +1673,19 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   {
     blockPropertiesSelectorsSet.emplace(item);
   }
+
   // create a vector of selectors for block properties
   const std::vector<std::string> blockPropertiesSelectors(
     blockPropertiesSelectorsSet.begin(), blockPropertiesSelectorsSet.end());
   std::vector<unsigned int> cids;
   std::unordered_map<std::string, std::vector<unsigned int>> selectorsCids;
-  const bool isAssembly =
+
+  const auto outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(outputData);
+  const bool hasAssembly = outputPDC && outputPDC->GetDataAssembly();
+  const bool isAssemblySelected =
     this->ActiveAssembly != nullptr && strcmp(this->ActiveAssembly, "Assembly") == 0;
-  // TODO, in the future, when vtkPVGeometryFilter produces PDC, we won't need to read the
-  // vtkDataAssembly from the output data's field data and convert the output to a PDC.
-  const bool mbWithAssembly = outputData->IsA("vtkMultiBlockDataSet") &&
-    outputData->GetFieldData()->HasArray("vtkDataAssembly");
-  const bool pdcWithAssembly = outputData->IsA("vtkPartitionedDataSetCollection") &&
-    vtkPartitionedDataSetCollection::SafeDownCast(outputData)->GetDataAssembly();
-  if (isAssembly && (mbWithAssembly || pdcWithAssembly))
+  if (hasAssembly && isAssemblySelected)
   {
-    vtkSmartPointer<vtkPartitionedDataSetCollection> outputPDC;
-    if (mbWithAssembly)
-    {
-      const auto dataAssemblyArray =
-        outputData->GetFieldData()->GetAbstractArray("vtkDataAssembly");
-      const auto dataAssemblyString = dataAssemblyArray->GetVariantValue(0).ToString();
-      vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
-      converter->SetInputDataObject(outputData);
-      converter->Update();
-      outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(converter->GetOutputDataObject(0));
-      vtkNew<vtkDataAssembly> dataAssembly;
-      dataAssembly->InitializeFromXML(dataAssemblyString.c_str());
-      outputPDC->SetDataAssembly(dataAssembly);
-    }
-    else // pdcWithAssembly
-    {
-      outputPDC = vtkPartitionedDataSetCollection::SafeDownCast(outputData);
-    }
     // we need to convert assembly selectors to composite ids.
     cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
       blockVisibilitySelectors, outputPDC->GetDataAssembly(), outputPDC);
@@ -1719,7 +1700,7 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   }
   else
   {
-    vtkNew<vtkDataAssembly> hierarchy;
+    const vtkNew<vtkDataAssembly> hierarchy;
     if (!vtkDataAssemblyUtilities::GenerateHierarchy(dtree, hierarchy))
     {
       return;
