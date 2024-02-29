@@ -117,9 +117,7 @@ vtkSIVectorPropertyTemplate<T, force_idtype>::vtkSIVectorPropertyTemplate()
 
 //----------------------------------------------------------------------------
 template <class T, class force_idtype>
-vtkSIVectorPropertyTemplate<T, force_idtype>::~vtkSIVectorPropertyTemplate()
-{
-}
+vtkSIVectorPropertyTemplate<T, force_idtype>::~vtkSIVectorPropertyTemplate() = default;
 
 //---------------------------------------------------------------------------
 template <class T, class force_idtype>

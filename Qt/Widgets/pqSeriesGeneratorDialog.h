@@ -39,7 +39,7 @@ public:
    */
   void setDataRange(double dataMin, double dataMax, bool reset = false);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * Reset the range to the data range

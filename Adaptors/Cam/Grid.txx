@@ -923,7 +923,7 @@ void Grid<gridType>::SetCubeGridPoints(
   this->NLat = ne * (np - 1) + 1;
   this->Ne = ne;
   this->Np = np;
-  this->Radius = (ne * (np - 1)) / 2 * sqrt3;
+  this->Radius = (ne * (np - 1)) / 2. * sqrt3;
   std::cerr << "Computing the grid coordinates ...\n";
   std::set<double, FuzzyLT1E_10> cubeCoordinates;
   for (int i = 0; i < lonSize; ++i)

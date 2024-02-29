@@ -34,28 +34,28 @@ public:
   /**
    * Move the iterator to the first item.
    */
-  virtual void GoToFirstItem() override;
+  void GoToFirstItem() override;
 
   /**
    * Move the iterator to the next item.
    */
-  virtual void GoToNextItem() override;
+  void GoToNextItem() override;
 
   /**
    * Return true if the iterator reached the end.
    */
-  virtual bool IsDoneWithTraversal() override;
+  bool IsDoneWithTraversal() override;
 
   /**
    * Get the current item as a table.
    */
-  virtual vtkTable* GetCurrentTable() override;
+  vtkTable* GetCurrentTable() override;
 
   /**
    * Get the number of iterations needed to traverse the current item.
    * This is equivalent to the number of non-empty leaf blocks.
    */
-  virtual vtkIdType GetNumberOfIterations() override;
+  vtkIdType GetNumberOfIterations() override;
 
 protected:
   vtkDSPMultiBlockIterator();

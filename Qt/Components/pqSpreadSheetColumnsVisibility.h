@@ -25,7 +25,7 @@ public:
   static void populateMenu(vtkSMViewProxy* proxy, pqSpreadSheetViewModel* model, QMenu* menu);
 
 private:
-  static QCheckBox* addCheckableAction(QMenu* menu, const QString& text, const bool checked);
+  static QCheckBox* addCheckableAction(QMenu* menu, const QString& text, bool checked);
 
   static void updateAllCheckState(QCheckBox* allCheckbox, const std::vector<QCheckBox*>& cboxes);
 };
