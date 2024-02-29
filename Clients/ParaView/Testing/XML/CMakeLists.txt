@@ -10,6 +10,10 @@ set(TESTS_WITH_BASELINES)
 
 include(test.common.cmake)
 
+if(PARAVIEW_USE_PYTHON)
+  include(test.python.cmake)
+endif()
+
 # Finally create the tests from the XML lists
 list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
