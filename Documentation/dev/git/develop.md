@@ -96,17 +96,40 @@ git bump VTK master
 
 ### Testing
 
-Every changes and new features needs to be tested. In ParaView, there are mainly two types of tests.
+Every change and new features needs to be tested. In ParaView, there are mainly two types of tests.
 Python tests and XML tests. While both types of tests are as valid to add, XML tests should be preferred for standard
 feature test when possible as they can be considered more generic.
 
 #### XML Tests
 
-To add a XML test, use the Tools -> Record Test menu in ParaView. Interact with ParaView in a way that test your feature
-then record the XML test file.
+First, as XML tests are impacted by the user settings, it is recommanded to always run paraview in dry run (option `--dr`).
+
+To add a XML test, use the `Tools -> Record Test` menu in ParaView. After specifying name for the xml test, a new window named
+`Recording User Input` will pop up. This one will record every action the user will perfom in ParaView to test his feature.
+
+It is also recommanded to lock the view size when we want to create a baseline, choose `Tools -> Lock View Size Custom...`
+and set it to a 400x400 window as it works well.
+
+On top of recording actions, the most important feature in this window is the check mark button which allows the user to:
+- record the value of a property in the Properties Panel.
+- save an intermediary baseline. (in that case, use `TESTS_WITH_INLINE_COMPARES`)
+- check any value in the spreadsheet view.
+
+Advanced features are:
+- `Continuous Flush`: writes events to file as soon as they are recorded. Especially useful when user environment isn't stable.
+- `Record Interaction Timings`: record each pause between interactions as a pause event.
+
+It is also possible to stop the test recording by using the pause button and add comments in the XML test.
+
+Finally, the user can save the xml test by using the `Stop recording` button.
+
 You may need to edit this file slightly to make it work as expected, do not hesitate to look at other files.
 Add the file to `Client/ParaView/Testing/XML` folder and list it in `Client/ParaView/Testing/XML/CMakeLists.txt`.
-There are different categories of tests, but the safest bet is probably the `DATA_WITH_BASELINES` category.
+
+There are different categories of tests depending on what the user want to test :
+- `DATA_WITH_BASELINES`: for general use case, in most of the case the safest bet is this category.
+- `TESTS_WITH_INLINE_COMPARES`: for when the user needs to do multiple image comparison.
+- `TESTS_WITHOUT_BASELINES`: in some context, a valid XML test can be made without baseline.
 
 You can then configure ParaView and run your test from the build directory and check that they pass:
 
@@ -364,18 +387,11 @@ cases, being your topic name with the issue number.
 
 4. Add some tests
 
-    * Start `paraview.exe -dr` to ignore prefs (disable registry)
-    * Choose `Tools .. Record Test` to start.
-    * Choose `Tools .. Lock View Size Custom...` - a 400x400 window works well.
-    * Perform actions in the GUI that exercise your feature. Stop recording.
-    * Put the resulting XML file into `Clients/ParaView/Testing/XML`
-    * Add it to CMakeLists.txt, probably in a TESTS_WITH_BASELINES section
-        * you can manually add `<pqcompareview>` for multiple image comparisons, then add to the TESTS_WITH_INLINE_COMPARES section
-    * Follow the [vtk instructions][] to add the baseline images, which live in `Testing/Data/Baseline/`.
-        * Add your new baseline images to the list in `Testing/XML/CMakeLists.txt`
-    * Add all testing files to your topic.
+    Every changes and new features need to be tested in ParaView. Depending on what the user implements, he can perform
+    an image comparison with a baseline of expected result or checking a property at anytime.
 
-    Some background is in the [testing design wiki](https://www.paraview.org/Wiki/Testing_design).
+    They are mainly 2 types of test in ParaView, python and xml testing. Generally we use a XML test, for more details
+    regarding this topic, it's highly recommanded to check this [section](#testing).
 
 5. Add release notes
 
