@@ -17,6 +17,7 @@
 #define vtkGeometryRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
+#include "vtkParaViewDeprecation.h" // for PV_DEPRECATED
 #include "vtkProperty.h"            // needed for VTK_POINTS etc.
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkVector.h"              // for vtkVector.
@@ -228,6 +229,7 @@ public:
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
   virtual void SetUserTransform(const double[16]);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use SetTextureTransform instead")
   virtual void SetFlipTextures(bool);
 
   //***************************************************************************

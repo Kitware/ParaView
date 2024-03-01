@@ -5,19 +5,16 @@
 // Don't include vtkAxis. Cannot add dependency on vtkChartsCore in
 // vtkPVServerManagerCore.
 // #include "vtkAxis.h"
-#include "vtkLogger.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSelectionNode.h"
 #include "vtkWeakPointer.h"
 
-#include <algorithm>
 #include <set>
 #include <sstream>
 #include <string>
@@ -1689,7 +1686,10 @@ struct Process_5_11_to_5_12
 //===========================================================================
 struct Process_5_12_to_5_13
 {
-  bool operator()(xml_document& document) { return HandleSetDecomposePolyhedra(document); }
+  bool operator()(xml_document& document)
+  {
+    return HandleSetDecomposePolyhedra(document) && HandleRepresentationFlipTextures(document);
+  }
 
   static bool HandleSetDecomposePolyhedra(xml_document& document)
   {
@@ -1711,6 +1711,153 @@ struct Process_5_12_to_5_13
       }
     }
 
+    return true;
+  }
+
+  static bool HandleRepresentationFlipTextures(xml_document& document)
+  {
+    UniqueIdGenerator generator(document);
+    auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='representations']/"
+                                           "Property[@name='FlipTextures']");
+    const std::string propertyName = "TextureTransform";
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      // query information about FlipTextures value
+      const std::string propertyIdAttr = std::string(node.attribute("id").as_string());
+      const std::string propertyId = propertyIdAttr.substr(0, propertyIdAttr.find('.'));
+      const bool flipTextureValue = node.children("Element").begin()->attribute("value").as_bool();
+
+      // edit the property to match the new property
+      node.attribute("name").set_value(propertyName.c_str());
+      node.attribute("id").set_value((propertyId + ".TextureTransform").c_str());
+
+      // add the new child values
+      node.remove_children();
+      const std::string proxyId = std::to_string(generator.GetNextUniqueId());
+
+      auto proxyNode = node.append_child("Proxy");
+      proxyNode.append_attribute("value").set_value(proxyId.c_str());
+
+      auto domainGroupsNode = node.append_child("Domain");
+      domainGroupsNode.append_attribute("name").set_value("groups");
+      domainGroupsNode.append_attribute("id").set_value(
+        (propertyId + ".TextureTransform.groups").c_str());
+
+      auto domainListNode = node.append_child("Domain");
+      domainListNode.append_attribute("name").set_value("proxy_list");
+      domainListNode.append_attribute("id").set_value(
+        (propertyId + ".TextureTransform.proxy_list").c_str());
+      domainListNode.append_child("Proxy").append_attribute("value").set_value(proxyId.c_str());
+
+      // get the representation node information
+      const auto representationNode = node.parent();
+      const std::string reprId = representationNode.attribute("id").as_string();
+
+      // find the logname of the representation
+      const auto proxyCollectionReprResultSet =
+        document.select_nodes("//ServerManagerState/ProxyCollection[@name='representations']");
+      const auto itemChildren = proxyCollectionReprResultSet.begin()->node().children("Item");
+      const std::string reprLogName = std::find_if(itemChildren.begin(), itemChildren.end(),
+        [&](const xml_node& child) { return reprId == child.attribute("id").as_string(); })
+                                        ->attribute("logname")
+                                        .as_string();
+
+      // add the new proxy to the helper proxies
+      const std::string helperProxiesPath =
+        std::string("//ServerManagerState/ProxyCollection[@name='pq_helper_proxies.") + reprId +
+        "']";
+      auto helperProxiesNode = document.select_nodes(helperProxiesPath.c_str()).begin()->node();
+      auto itemNode = helperProxiesNode.append_child("Item");
+      itemNode.append_attribute("id").set_value(proxyId.c_str());
+      itemNode.append_attribute("name").set_value(propertyName.c_str());
+      itemNode.append_attribute("logname").set_value(
+        (reprLogName + "/SurfaceRepresentation/TextureTransform/Trasform2").c_str());
+
+      // now we need to actually add the transform proxy
+      auto serverManagerNode = representationNode.parent();
+      auto extendedSourcesNode = serverManagerNode.append_child("Proxy");
+      extendedSourcesNode.append_attribute("group").set_value("extended_sources");
+      extendedSourcesNode.append_attribute("type").set_value("Transform2");
+      extendedSourcesNode.append_attribute("id").set_value(proxyId.c_str());
+      extendedSourcesNode.append_attribute("servers").set_value("21");
+
+      auto positionNode = extendedSourcesNode.append_child("Property");
+      positionNode.append_attribute("name").set_value("Position");
+      positionNode.append_attribute("id").set_value((proxyId + ".Position").c_str());
+      positionNode.append_attribute("number_of_elements").set_value(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        auto elementNode = positionNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(i);
+        elementNode.append_attribute("value").set_value("0");
+      }
+      auto positionDomainNode = positionNode.append_child("Domain");
+      positionDomainNode.append_attribute("name").set_value("range");
+      positionDomainNode.append_attribute("id").set_value((proxyId + ".Position.range").c_str());
+
+      auto positionInfoNode = extendedSourcesNode.append_child("Property");
+      positionInfoNode.append_attribute("name").set_value("PositionInfo");
+      positionInfoNode.append_attribute("id").set_value((proxyId + ".PositionInfo").c_str());
+      positionInfoNode.append_attribute("number_of_elements").set_value(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        auto elementNode = positionInfoNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(i);
+        elementNode.append_attribute("value").set_value("0");
+      }
+
+      auto rotationNode = extendedSourcesNode.append_child("Property");
+      rotationNode.append_attribute("name").set_value("Rotation");
+      rotationNode.append_attribute("id").set_value((proxyId + ".Rotation").c_str());
+      rotationNode.append_attribute("number_of_elements").set_value(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        auto elementNode = rotationNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(i);
+        elementNode.append_attribute("value").set_value("0");
+      }
+      auto rotationDomainNode = rotationNode.append_child("Domain");
+      rotationDomainNode.append_attribute("name").set_value("range");
+      rotationDomainNode.append_attribute("id").set_value((proxyId + ".Rotation.range").c_str());
+
+      auto rotationInfoNode = extendedSourcesNode.append_child("Property");
+      rotationInfoNode.append_attribute("name").set_value("RotationInfo");
+      rotationInfoNode.append_attribute("id").set_value((proxyId + ".RotationInfo").c_str());
+      rotationInfoNode.append_attribute("number_of_elements").set_value(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        auto elementNode = rotationInfoNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(i);
+        elementNode.append_attribute("value").set_value("0");
+      }
+
+      auto scaleNode = extendedSourcesNode.append_child("Property");
+      scaleNode.append_attribute("name").set_value("Scale");
+      scaleNode.append_attribute("id").set_value((proxyId + ".Scale").c_str());
+      scaleNode.append_attribute("number_of_elements").set_value(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        auto elementNode = scaleNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(i);
+        elementNode.append_attribute("value").set_value(
+          i == 1 ? (flipTextureValue ? "-1" : "1") : "1");
+      }
+      auto scaleDomainNode = scaleNode.append_child("Domain");
+      scaleDomainNode.append_attribute("name").set_value("range");
+      scaleDomainNode.append_attribute("id").set_value((proxyId + ".Scale.range").c_str());
+
+      auto scaleInfoNode = extendedSourcesNode.append_child("Property");
+      scaleInfoNode.append_attribute("name").set_value("ScaleInfo");
+      scaleInfoNode.append_attribute("id").set_value((proxyId + ".ScaleInfo").c_str());
+      scaleInfoNode.append_attribute("number_of_elements").set_value(3);
+      for (int i = 0; i < 3; ++i)
+      {
+        auto elementNode = scaleInfoNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(i);
+        elementNode.append_attribute("value").set_value("1");
+      }
+    }
     return true;
   }
 };

@@ -4567,7 +4567,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="AnisotropyTexture" panel_visibility="advanced"/>
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
-            <Property name="FlipTextures" panel_visibility="advanced"/>
             <Property name="TextureTransform" panel_visibility="advanced"/>
             <Hints>
               <PropertyWidgetDecorator type="CompositeDecorator">
@@ -15389,16 +15388,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                    inverse="1" />
         </Hints>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetFlipTextures"
-                         default_values="0"
-                         name="FlipTextures"
-                         number_of_elements="1">
-        <Documentation>
-          Enable texture coordinate flip on Y axis. Depending on some format specification, the
-          origin of the texture could be either at the bottom left or the top left of the image.
-        </Documentation>
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
       <ProxyProperty command="SetTextureTransform"
                      name="TextureTransform"
                      null_on_empty="1">

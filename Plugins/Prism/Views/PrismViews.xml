@@ -1025,7 +1025,6 @@
             <Property name="AnisotropyTexture" panel_visibility="advanced"/>
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
-            <Property name="FlipTextures" panel_visibility="advanced"/>
             <Property name="TextureTransform" panel_visibility="advanced"/>
             <Hints>
               <PropertyWidgetDecorator type="CompositeDecorator">
