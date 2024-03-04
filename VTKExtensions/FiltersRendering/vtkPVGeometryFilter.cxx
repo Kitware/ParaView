@@ -157,7 +157,9 @@ int vtkPVGeometryFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
   }
   else if (input->IsA("vtkMultiBlockDataSet"))
   {
-    outputType = VTK_MULTIBLOCK_DATA_SET;
+    // Some developers have sub-classed vtkMultiBlockDataSet, in which case,
+    // we try to preserve the type.
+    outputType = input->GetDataObjectType();
   }
   else if (input->IsA("vtkCompositeDataSet"))
   {
