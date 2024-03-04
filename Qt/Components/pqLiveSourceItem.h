@@ -23,7 +23,11 @@ class vtkPVXMLElement;
  * Upon receiving this signal, it triggers the update function, which
  * in turn invokes GetNeedsUpdate on the proxy.
  *
- * @sa pqLiveSourceManager pqLiveSourceBehavior
+ * If the LiveSource is an emulated time algorithm (with the emulated_time
+ * XML attribute), the pqLiveSourceManager will call the update function
+ * with a synchronized "real" time among all live sources.
+ *
+ * @sa pqLiveSourceManager pqLiveSourceBehavior vtkEmulatedTimeAlgorithm
  */
 class PQCOMPONENTS_EXPORT pqLiveSourceItem : public QObject
 {
@@ -36,8 +40,9 @@ public:
 
   /**
    * Calls `GetNeedsUpdate` on the associated vtkAlgorithm proxy.
+   * If the LiveSource is a EmulatedTimeAlgorithm send time as a parameter.
    */
-  void update();
+  void update(double time);
 
   ///@{
   /**
@@ -53,6 +58,17 @@ public:
   bool isPaused();
 
   /**
+   * If the LiveSource is an EmulatedTimeAlgorithm, return the first and last
+   * proxy timestamp, else return nullptr.
+   */
+  double* getTimestampRange();
+
+  /**
+   * Return true is the LiveSource XML tag has a `emulated_time` attribute to true.
+   */
+  bool isEmulatedTimeAlgorithm();
+
+  /**
    * Get underlying proxy global ID.
    */
   vtkTypeUInt32 getSourceId();
@@ -62,6 +78,12 @@ Q_SIGNALS:
    * Triggered when the internal refresh timer timeout.
    */
   void refreshSource();
+
+  /**
+   * Triggered when the proxy information are updated.
+   * (Its time range could have been updated as well)
+   */
+  void onInformationUpdated();
 
   /**
    * Triggered when the live source is paused / resumed.
@@ -81,6 +103,12 @@ private: // NOLINT(readability-redundant-access-specifiers)
   void startInteractionEvent();
   void endInteractionEvent();
   ///@}
+
+  /**
+   * Update timestamp range information if the LiveSource is an EmulatedTimeAlgorithm.
+   * Emit a onInformationUpdated() signal.
+   */
+  void onUpdateInformation();
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

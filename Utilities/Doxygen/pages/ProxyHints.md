@@ -365,6 +365,13 @@ is an algorithm updated at regular time intervals based on real-time and
 its available time steps (in seconds). Note that the proxy class must
 inherit from the `vtkEmulatedTimeAlgorithm` class.
 
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <LiveSource interval="50" emulated_time="1" />
+      </Hints>
+    </SourceProxy>
+
 ConnectToPortIndex
 --------------------------
 Connect to a specific port index.

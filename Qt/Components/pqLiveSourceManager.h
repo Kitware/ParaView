@@ -30,13 +30,14 @@ public:
   ///@{
   /**
    * Pause / Resume live updates for all live sources.
+   * Also pause / resume emulated time timer.
    */
   void pause();
   void resume();
   ///@}
 
   /**
-   * Returns true if any live source updates is paused.
+   * Returns true if all live source updates is paused.
    */
   bool isPaused();
 
@@ -45,14 +46,53 @@ public:
    */
   pqLiveSourceItem* getLiveSourceItem(vtkSMProxy*);
 
+  ///@{
+  /**
+   * Pause / Resume internal emulated time shared timer.
+   */
+  void pauseEmulatedTime();
+  void resumeEmulatedTime();
+  ///@}
+
+  /**
+   * Returns true if the emulated time timer is paused.
+   */
+  bool isEmulatedTimePaused();
+
+  ///@{
+  /**
+   * Change playing speed for emulated time algorithms (in seconds).
+   * Default to 1.
+   */
+  void setEmulatedSpeedMultiplier(double speed);
+  double getEmulatedSpeedMultiplier();
+  ///@}
+
+  /**
+   * Change current global time for emulated time algorithms.
+   */
+  void setEmulatedCurrentTime(double time);
+
+Q_SIGNALS:
+  /**
+   * Triggered when emulated time shared timer is paused / resumed.
+   */
+  void emulatedTimeStateChanged(bool isPaused);
+
 private Q_SLOTS:
   ///@{
   /**
-   * Theses slots handle sources addition/removal.
+   * Theses slots handle view and sources addition/removal.
    */
   void onSourceAdded(pqPipelineSource*);
   void onSourceRemove(pqPipelineSource*);
   ///@}
+
+  /**
+   * Update internal state of time ranges for all emulated
+   * time algorithms live sources.
+   */
+  void onUpdateTimeRanges();
 
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqLiveSourceManager);

@@ -29,6 +29,9 @@ class pqLiveSourceManager;
  * This tag can have multiple attributes:
  *   - `interval`: Call `GetNeedsUpdate` at interval value in milliseconds
  *     (default to 100).
+ *   - `emulated_time`: Boolean to mark the live source as an algorithm inheriting
+ *     from `vtkEmulatedTimeAlgorithm`, which will play all timesteps available in
+ *     an emulated real time.
  *
  * @sa pqLiveSourceManager pqLiveSourceItem vtkEmulatedTimeAlgorithm
  */

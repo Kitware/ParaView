@@ -7,6 +7,7 @@ set(classes
   vtkCommandOptionsXMLParser
   vtkCommunicationErrorCatcher
   vtkDistributedTrivialProducer
+  vtkEmulatedTimeAlgorithm
   vtkFileSequenceParser
   vtkLogRecorder
   vtkMultiProcessControllerHelper

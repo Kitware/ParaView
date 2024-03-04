@@ -26,6 +26,8 @@ public:
   bool IsPaused = false;
   pqTimer Timer;
   QPointer<pqPipelineSource> Source;
+  double TimeRange[2];
+  bool IsEmulatedTimeAlgorithm;
 
   static const int DEFAULT_INTERVAL = 100;
 
@@ -41,7 +43,36 @@ public:
     }
 
     this->Timer.setInterval(interval);
+
+    int emulatedTime = 0;
+    liveHints->GetScalarAttribute("emulated_time", &emulatedTime);
+    this->IsEmulatedTimeAlgorithm = emulatedTime != 0;
+    this->Timer.setSingleShot(true);
+
+    if (this->IsEmulatedTimeAlgorithm)
+    {
+      this->updateTimeRange();
+    }
     this->Timer.start();
+  }
+
+  //-----------------------------------------------------------------------------
+  void updateTimeRange()
+  {
+    auto proxy = vtkSMSourceProxy::SafeDownCast(this->Source->getProxy());
+    auto session = proxy->GetSession();
+
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "GetTimeRange"
+           << vtkClientServerStream::End;
+    session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, /*ignore errors*/ true);
+
+    vtkClientServerStream result = session->GetLastResult(vtkPVSession::DATA_SERVER_ROOT);
+    if (result.GetNumberOfMessages() != 1 || result.GetNumberOfArguments(0) != 1 ||
+      !result.GetArgument(0, 0, this->TimeRange, 2))
+    {
+      this->IsEmulatedTimeAlgorithm = false;
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -66,6 +97,9 @@ pqLiveSourceItem::pqLiveSourceItem(
   : Superclass(parentObject)
   , Internals(new pqLiveSourceItem::pqInternals(src, liveHints))
 {
+  src->getProxy()->AddObserver(
+    vtkCommand::UpdateInformationEvent, this, &pqLiveSourceItem::onUpdateInformation);
+
   this->connect(&this->Internals->Timer, &pqTimer::timeout, this, &pqLiveSourceItem::refreshSource);
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -75,13 +109,14 @@ pqLiveSourceItem::pqLiveSourceItem(
   {
     this->onViewAdded(view);
   }
+  this->update(0);
 }
 
 //-----------------------------------------------------------------------------
 pqLiveSourceItem::~pqLiveSourceItem() = default;
 
 //-----------------------------------------------------------------------------
-void pqLiveSourceItem::update()
+void pqLiveSourceItem::update(double time)
 {
   this->Internals->Timer.stop();
 
@@ -96,6 +131,10 @@ void pqLiveSourceItem::update()
   vtkClientServerStream stream;
 
   stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "GetNeedsUpdate";
+  if (this->Internals->IsEmulatedTimeAlgorithm)
+  {
+    stream << time;
+  }
   stream << vtkClientServerStream::End;
   session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, /*ignore errors*/ true);
 
@@ -137,6 +176,32 @@ void pqLiveSourceItem::resume()
 bool pqLiveSourceItem::isPaused()
 {
   return this->Internals->IsPaused;
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveSourceItem::onUpdateInformation()
+{
+  if (this->Internals->IsEmulatedTimeAlgorithm)
+  {
+    this->Internals->updateTimeRange();
+    Q_EMIT onInformationUpdated();
+  }
+}
+
+//-----------------------------------------------------------------------------
+double* pqLiveSourceItem::getTimestampRange()
+{
+  if (this->Internals->IsEmulatedTimeAlgorithm)
+  {
+    return this->Internals->TimeRange;
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+bool pqLiveSourceItem::isEmulatedTimeAlgorithm()
+{
+  return this->Internals->IsEmulatedTimeAlgorithm;
 }
 
 //-----------------------------------------------------------------------------
