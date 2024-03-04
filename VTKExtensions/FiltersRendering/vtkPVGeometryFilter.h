@@ -13,6 +13,7 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
+#include "vtkParaViewDeprecation.h"                   // For PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkSmartPointer.h"                          // needed for vtkSmartPointer
 
 class vtkCallbackCommand;
@@ -191,6 +192,19 @@ public:
   vtkGetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
   ///@}
+
+  // These keys are put in the output composite-data metadata for multipieces
+  // since this filter merges multipieces together.
+  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
+  static vtkInformationIntegerVectorKey* POINT_OFFSETS();
+  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
+  static vtkInformationIntegerVectorKey* VERTS_OFFSETS();
+  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
+  static vtkInformationIntegerVectorKey* LINES_OFFSETS();
+  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
+  static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
+  PARAVIEW_DEPRECATED_IN_5_13_0("They are not used anymore.")
+  static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
 
 protected:
   vtkPVGeometryFilter();

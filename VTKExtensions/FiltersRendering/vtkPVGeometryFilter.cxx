@@ -89,6 +89,13 @@ vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
 
 //----------------------------------------------------------------------------
+vtkInformationKeyMacro(vtkPVGeometryFilter, POINT_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, VERTS_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, LINES_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, POLYS_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, STRIPS_OFFSETS, IntegerVector);
+
+//----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter()
 {
   this->OutlineFlag = 0;
