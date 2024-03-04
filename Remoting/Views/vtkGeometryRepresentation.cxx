@@ -547,7 +547,13 @@ int vtkGeometryRepresentation::RequestData(
 
   // essential to re-execute geometry filter consistently on all ranks since it
   // does use parallel communication (see #19963).
-  this->GeometryFilter->Modified();
+  // do this only when multiple processes exists, so GeometryFilter can do
+  // some "filter unmodified" optimization.
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  if (controller->GetNumberOfProcesses() > 1)
+  {
+    this->GeometryFilter->Modified();
+  }
   this->MultiBlockMaker->Update();
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
