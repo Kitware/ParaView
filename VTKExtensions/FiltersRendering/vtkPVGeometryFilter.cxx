@@ -15,6 +15,7 @@
 #include "vtkCellTypes.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkConstantArray.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataObjectMeshCache.h"
@@ -557,9 +558,9 @@ void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
   const vtkIdType numPoints = output->GetNumberOfPoints();
   if (numPoints > 0)
   {
-    vtkNew<vtkUnsignedIntArray> pointsProcArray;
-    pointsProcArray->SetNumberOfValues(numPoints);
-    pointsProcArray->FillValue(procId);
+    vtkNew<vtkConstantArray<unsigned int>> pointsProcArray;
+    pointsProcArray->SetNumberOfTuples(numPoints);
+    pointsProcArray->ConstructBackend(procId);
     pointsProcArray->SetName("vtkProcessId");
     output->GetPointData()->AddArray(pointsProcArray);
   }
@@ -567,9 +568,9 @@ void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
   const vtkIdType numCells = output->GetNumberOfCells();
   if (numCells > 0)
   {
-    vtkNew<vtkUnsignedIntArray> cellsProcArray;
-    cellsProcArray->SetNumberOfValues(numCells);
-    cellsProcArray->FillValue(procId);
+    vtkNew<vtkConstantArray<unsigned int>> cellsProcArray;
+    cellsProcArray->SetNumberOfTuples(numCells);
+    cellsProcArray->ConstructBackend(procId);
     cellsProcArray->SetName("vtkProcessId");
     output->GetCellData()->AddArray(cellsProcArray);
   }
