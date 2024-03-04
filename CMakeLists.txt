@@ -533,6 +533,8 @@ else ()
   set(VTK_USE_MEMKIND "${PARAVIEW_USE_MEMKIND}")
   # Forward OpenVDB option to VTK.
   set(VTK_ENABLE_OPENVDB "${PARAVIEW_ENABLE_OPENVDB}")
+  # Forward catalyst option to VTK.
+  set(VTK_ENABLE_CATALYST "${PARAVIEW_ENABLE_CATALYST}")
 
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)
