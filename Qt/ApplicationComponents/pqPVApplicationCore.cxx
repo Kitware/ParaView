@@ -12,6 +12,8 @@
 #include "pqCoreConfiguration.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
+#include "pqLiveSourceBehavior.h"
+#include "pqLiveSourceManager.h"
 #include "pqLoadDataReaction.h"
 #include "pqPresetGroupsManager.h"
 #include "pqPropertiesPanel.h"
@@ -44,6 +46,7 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* 
 #endif
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
+  this->LiveSourceManager = nullptr;
 
   pqApplicationCore::instance()->registerManager("SELECTION_MANAGER", this->SelectionManager);
 
@@ -86,6 +89,7 @@ pqPVApplicationCore::~pqPVApplicationCore()
 {
   delete this->AnimationManager;
   delete this->SelectionManager;
+  delete this->LiveSourceManager;
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   delete this->PythonManager;
 #endif
@@ -186,6 +190,12 @@ pqPythonManager* pqPVApplicationCore::pythonManager() const
 }
 
 //-----------------------------------------------------------------------------
+pqLiveSourceManager* pqPVApplicationCore::liveSourceManager() const
+{
+  return this->LiveSourceManager;
+}
+
+//-----------------------------------------------------------------------------
 pqTestUtility* pqPVApplicationCore::testUtility()
 {
   if (!this->TestUtility)
@@ -248,4 +258,13 @@ void pqPVApplicationCore::loadStateFromPythonFile(
   (void)location;
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::instantiateLiveSourceManager()
+{
+  if (!this->LiveSourceManager)
+  {
+    this->LiveSourceManager = new pqLiveSourceManager(this);
+  }
 }

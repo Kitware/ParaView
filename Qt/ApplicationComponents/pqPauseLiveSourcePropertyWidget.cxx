@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqPauseLiveSourcePropertyWidget.h"
 
-#include "pqLiveSourceBehavior.h"
+#include "pqLiveSourceItem.h"
+#include "pqLiveSourceManager.h"
+#include "pqPVApplicationCore.h"
+#include "vtkPVXMLElement.h"
 
 #include <QCoreApplication>
 #include <QPushButton>
@@ -25,18 +28,31 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
 
   this->setShowLabel(false);
 
-  QObject::connect(button, &QPushButton::clicked, [button](bool checked) {
-    if (checked)
-    {
-      pqLiveSourceBehavior::pause();
-    }
-    else
-    {
-      pqLiveSourceBehavior::resume();
-    }
-    button->setChecked(pqLiveSourceBehavior::isPaused());
-  });
+  QObject::connect(
+    button, &QPushButton::clicked, this, &pqPauseLiveSourcePropertyWidget::onClicked);
+
+  pqLiveSourceManager* lvManager = pqPVApplicationCore::instance()->liveSourceManager();
+  pqLiveSourceItem* lvItem = lvManager->getLiveSourceItem(smproxy);
+  QObject::connect(lvItem, &pqLiveSourceItem::stateChanged, button, &QPushButton::setChecked);
+  button->setChecked(lvItem->isPaused());
 }
 
 //-----------------------------------------------------------------------------
 pqPauseLiveSourcePropertyWidget::~pqPauseLiveSourcePropertyWidget() = default;
+
+//-----------------------------------------------------------------------------
+void pqPauseLiveSourcePropertyWidget::onClicked(bool checked)
+{
+  pqLiveSourceManager* manager = pqPVApplicationCore::instance()->liveSourceManager();
+  pqLiveSourceItem* lvItem = manager->getLiveSourceItem(this->proxy());
+  lvItem->blockSignals(true);
+  if (checked)
+  {
+    lvItem->pause();
+  }
+  else
+  {
+    lvItem->resume();
+  }
+  lvItem->blockSignals(false);
+}
