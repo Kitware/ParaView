@@ -478,7 +478,8 @@ def setattr(proxy, pname, value):
             else:
                 raise NotSupportedException("'MergePoints' is obsolete.  Use 'Locator' property instead.")
 
-    # 5.12 -> 5.13 breaking change on Representation properties
+    # 5.12 -> 5.13
+    # breaking change on Representation properties
     # Renamed Position into Translation
     if proxy.SMProxy and proxy.SMProxy.GetXMLName().endswith("Representation"):
         if pname == "Position":
@@ -487,6 +488,15 @@ def setattr(proxy, pname, value):
                 raise Continue()
             else:
                 raise NotSupportedException("'Position' is obsolete.  Use 'Translation' property instead.")
+    # FlipTextures has been deprecated in favor of TextureTransform
+    if pname == "FlipTextures" and proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
+        if compatibility_version < (5, 13):
+            scale = [1, -1 if value else 1, 1]
+            proxy.GetProperty("TextureTransform").GetProxy(0).GetProperty("Scale").SetElements(scale)
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                "'FlipTextures' is obsolete.  Use 'TextureTransform' property of representation instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()

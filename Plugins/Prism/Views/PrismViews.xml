@@ -772,7 +772,7 @@
   <!-- ==================================================================== -->
   <ProxyGroup name="internal_representations">
     <!-- ==================================================================== -->
-    <PVRepresentationProxy class="vtkPrismCompositeRepresentation"
+    <PVRepresentationProxy class="vtkPVCompositeRepresentation"
                            name="PrismRepresentationBase"
                            processes="client|renderserver|dataserver">
       <Documentation>
@@ -923,6 +923,8 @@
                       panel_visibility="advanced"/>
             <Property name="InterpolateScalarsBeforeMapping"
                       panel_visibility="advanced"/>
+            <Property name="UseNanColorForMissingArrays"
+                      panel_visibility="advanced"/>
           </PropertyGroup>
 
           <PropertyGroup label="Styling">
@@ -949,8 +951,13 @@
                                        inverse="1"/>
             </Hints>
           </PropertyGroup>
-
-          <PropertyGroup label="Lighting">
+          <PropertyGroup name="Lighting">
+            <Property name="DisableLighting"
+                      panel_visibility="advanced"/>
+            <Property name="Diffuse"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+          <PropertyGroup name="Lighting">
             <Property name="Interpolation"
                       panel_visibility="advanced"/>
             <Property name="Specular"
@@ -965,7 +972,6 @@
             <Property name="Luminosity"
                       panel_visibility="advanced"/>
             <Property name="Ambient" panel_visibility="advanced"/>
-            <Property name="Diffuse" panel_visibility="advanced"/>
             <Property name="Roughness" panel_visibility="advanced"/>
             <Property name="Metallic" panel_visibility="advanced"/>
             <Property name="EdgeTint"
@@ -980,9 +986,28 @@
             <Property name="CoatColor"
                       panel_widget="color_selector"
                       panel_visibility="advanced"/>
-            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="SelectNormalArray" panel_visibility="advanced"/>
             <Property name="SelectTangentArray" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0"/>
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1"/>
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup label="Texturing">
+            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="InterpolateTextures" panel_visibility="advanced"/>
@@ -1000,20 +1025,32 @@
             <Property name="AnisotropyTexture" panel_visibility="advanced"/>
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
-            <Property name="FlipTextures" panel_visibility="advanced"/>
+            <Property name="TextureTransform" panel_visibility="advanced"/>
             <Hints>
-              <!--Hide for volume representation-->
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Volume"
-                                       inverse="1"/>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0"/>
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1"/>
+                </Expression>
+              </PropertyWidgetDecorator>
             </Hints>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
             <Property name="EdgeColor"
                       panel_widget="color_selector_with_palette"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="Surface With Edges"/>
+            <Property name="EdgeOpacity"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="Surface With Edges"/>
           </PropertyGroup>
@@ -1033,6 +1070,7 @@
 
           <PropertyGroup label="Transforming">
             <Property name="Position"
+                      exposed_name="Translation"
                       panel_visibility="advanced"/>
             <Property name="Scale"
                       panel_visibility="advanced"/>
@@ -1061,6 +1099,8 @@
                       panel_visibility="advanced"/>
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced"/>
+            <Property name="MatchBoundariesIgnoringCellOrder"
+                      panel_visibility="advanced"/>
             <Property name="BlockColorsDistinctValues"
                       panel_visibility="advanced"/>
             <Property name="UseDataPartitions"
@@ -1082,6 +1122,12 @@
             <Property name="BlockSelectors" function="Selectors"/>
             <Property name="BlockColors"    function="Colors"/>
             <Property name="BlockOpacities" function="Opacities"/>
+            <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings"/>
+            <Property name="BlockMapScalars" function="MapScalars"/>
+            <Property name="BlockColorArrayNames" function="ArrayNames"/>
+            <Property name="BlockLookupTableSelectors" function="LookupTableSelectors"/>
+            <Property name="BlockLookupTables" function="LookupTables"/>
+            <Property name="BlockUseSeparateColorMaps" function="UseSeparateColorMaps"/>
             <Hints>
               <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
             </Hints>

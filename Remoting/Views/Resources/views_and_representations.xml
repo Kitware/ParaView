@@ -4500,23 +4500,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                       panel_visibility="advanced" />
           </PropertyGroup>
           <PropertyGroup name="Lighting">
-            <Hints>
-              <PropertyWidgetDecorator type="CompositeDecorator">
-                <Expression type="and">
-                  <!-- Hide when DisableLighting selected -->
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="DisableLighting"
-                                           value="0" />
-                  <!-- Hide for volume representation -->
-                  <PropertyWidgetDecorator type="GenericDecorator"
-                                           mode="visibility"
-                                           property="Representation"
-                                           value="Volume"
-                                           inverse="1" />
-                </Expression>
-              </PropertyWidgetDecorator>
-            </Hints>
             <Property name="Interpolation"
                       panel_visibility="advanced" />
             <Property name="Specular"
@@ -4545,9 +4528,28 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="CoatColor"
                       panel_widget="color_selector"
                       panel_visibility="advanced" />
-            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="SelectNormalArray" panel_visibility="advanced"/>
             <Property name="SelectTangentArray" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0" />
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup label="Texturing">
+            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="InterpolateTextures" panel_visibility="advanced"/>
@@ -4565,7 +4567,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Property name="AnisotropyTexture" panel_visibility="advanced"/>
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
-            <Property name="FlipTextures" panel_visibility="advanced"/>
+            <Property name="TextureTransform" panel_visibility="advanced"/>
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <!-- Hide when DisableLighting selected -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="DisableLighting"
+                                           value="0" />
+                  <!-- Hide for volume representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume"
+                                           inverse="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
@@ -15145,6 +15164,9 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           <TextureSelectorWidget check_tcoords="1" />
           <!-- enable the texture selector only when tcoords is available. -->
         </Hints>
+        <Documentation>
+          This property allows you to specify the texture to apply to the surface.
+        </Documentation>
       </ProxyProperty>
       <IntVectorProperty command="SetRepeatTextures"
                          default_values="1"
@@ -15383,16 +15405,61 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                    inverse="1" />
         </Hints>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetFlipTextures"
-                         default_values="0"
-                         name="FlipTextures"
-                         number_of_elements="1">
+      <ProxyProperty command="SetTextureTransform"
+                     name="TextureTransform"
+                     null_on_empty="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="transforms"/>
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="Transform2"/>
+        </ProxyListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Texture"
+                                       value="null"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="BaseColorTexture"
+                                       value="null"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="NormalTexture"
+                                       value="null"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="CoatNormalTexture"
+                                       value="null"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="MaterialTexture"
+                                       value="null"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="AnisotropyTexture"
+                                       value="null"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EmissiveTexture"
+                                       value="null"
+                                       inverse="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>
-          Enable texture coordinate flip on Y axis. Depending on some format specification, the
-          origin of the texture could be either at the bottom left or the top left of the image.
+          Set the texture transform for the textures.
         </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
+      </ProxyProperty>
       <IntVectorProperty command="SetSuppressLOD"
                          default_values="0"
                          name="SuppressLOD"

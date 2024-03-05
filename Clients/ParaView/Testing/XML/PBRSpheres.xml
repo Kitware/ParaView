@@ -20,5 +20,5 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/MaterialTexture/1pqTextureComboBox0" command="activated" arguments="Load ..." />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/MaterialTexture/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/pbrSpheresORM.jpg" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/MaterialTexture/1pqTextureComboBox0" command="activated" arguments="pbrSpheresORM" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FlipTextures/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/TextureTransform/ProxySelectionWidget/frame/ChosenProxyWidget/Scale/DoubleLineEdit1" command="set_string" arguments="-1" />
 </pqevents>
