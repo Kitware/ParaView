@@ -3310,12 +3310,6 @@
         <Documentation>
           Set the number of ticks and labels for the horizontal axis.
         </Documentation>
-        <Hints>
-          <ProxyEditorPropertyWidget property="Visibility">
-            </ProxyEditorPropertyWidget>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
-            property="AdjustLabels" value="0" />
-        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetNumberOfVerticalLabels"
@@ -3327,12 +3321,6 @@
         <Documentation>
           Set the number of ticks and labels for the vertical axis.
         </Documentation>
-        <Hints>
-          <ProxyEditorPropertyWidget property="Visibility">
-            </ProxyEditorPropertyWidget>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
-            property="AdjustLabels" value="0" />
-        </Hints>
       </IntVectorProperty>
 
       <DoubleVectorProperty name="Origin"
