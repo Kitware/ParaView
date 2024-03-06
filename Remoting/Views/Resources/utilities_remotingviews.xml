@@ -3289,18 +3289,6 @@
         <Property name="AxisPrecision"/>
       </PropertyGroup>
 
-      <IntVectorProperty command="SetAdjustLabels"
-                        default_values="1"
-                        name="AdjustLabels"
-                        number_of_elements="1"
-                        panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When turned on, automatically select the number of ticks for each axis.
-          Unadjusted labels may not have round values.
-        </Documentation>
-      </IntVectorProperty>
-
       <IntVectorProperty command="SetNumberOfHorizontalLabels"
                         default_values="5"
                         panel_visibility="advanced"
@@ -3335,7 +3323,6 @@
 
 
       <PropertyGroup label="Tick configuration" panel_visibility="advanced">
-        <Property name="AdjustLabels" />
         <Property name="HorizontalLabelNumber" />
         <Property name="VerticalLabelNumber" />
         <Property name="Origin" />
