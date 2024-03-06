@@ -3662,7 +3662,8 @@ void vtkPVRenderView::SetANARILibrary(std::string l)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingAnari
   vtkRenderer* ren = this->GetRenderer();
-  if (vtkAnariRendererNode::GetLibraryName(ren) != l)
+  const char* curL = vtkAnariRendererNode::GetLibraryName(ren);
+  if (!curL || strcmp(curL, l.c_str()))
   {
     vtkAnariRendererNode::SetLibraryName(l.c_str(), ren);
     // Need to reset anaripass to re-init with the new library
