@@ -124,7 +124,11 @@ It is also possible to stop the test recording by using the pause button and add
 Finally, the user can save the xml test by using the `Stop recording` button.
 
 You may need to edit this file slightly to make it work as expected, do not hesitate to look at other files.
-Add the file to `Client/ParaView/Testing/XML` folder and list it in `Client/ParaView/Testing/XML/CMakeLists.txt`.
+
+Add the file to `Client/ParaView/Testing/XML` folder and list it in one of the `test.XXX.cmake` file.
+Those files are conditionally used, typically depending on a build option.
+Look at `Client/ParaView/Testing/XML/CMakeLists.txt` to find the appropriate one.
+By default, tests should be added in `test.common.cmake`.
 
 There are different categories of tests depending on what the user want to test :
 - `DATA_WITH_BASELINES`: for general use case, in most of the case the safest bet is this category.
@@ -160,7 +164,8 @@ git push gitlab
 ### Data
 
 If your test uses new data or baselines, you will need to add it to your fork.
-For data, add the file names to the list in the corresponding `Clients/ParaView/Testing/*/CMakeLists.txt` and drop the files in `Testing/Data/`.
+For data, add the file names to the list in the corresponding `Clients/ParaView/Testing/Python/CMakeLists.txt`
+or `Clients/ParaView/Testing/XML/test.common.cmake` and drop the files in `Testing/Data/`.
 For baselines, just drop the file in `Clients/ParaView/Testing/Data/Baseline/` and run the following commands from your build directory:
 
 ```
