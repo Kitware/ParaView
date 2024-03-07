@@ -131,6 +131,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/glTF/Triangle/Triangle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/SimpleSkin/SimpleSkin.gltf}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/binary_3D_333_mask.htg}"
+  "DATA{${paraview_test_data_directory_input}/Data/HTG/ghost.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_0_0.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti/HTGMulti_1_0.htg}"
@@ -451,6 +452,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridContourStrategyB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDepthLimiter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridEvaluateCoarse.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridExtractGhostCells.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGeometry.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGhostCellsGenerator.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridGradient.png}"
@@ -974,6 +976,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   HyperTreeGridContourStrategy.xml
   HyperTreeGridDepthLimiter.xml
   HyperTreeGridEvaluateCoarse.xml
+  HyperTreeGridExtractGhostCells.xml
   HyperTreeGridGeometry.xml
   HyperTreeGridGhostCellsGenerator.xml
   HyperTreeGridGradient.xml
