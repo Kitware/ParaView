@@ -77,7 +77,7 @@ starting at the usage of `SetupForDevelopment.sh` script.
 You can then develop in the VTK directory as if it was any VTK repository, where you can make changes, commit and push to your VTK fork.
 
 If you want to test the integration of your VTK changes in ParaView [continuous integration](continuous-integration), commit and push your changes
-to your VTK fork, then commit the VTK submodule update with your changes in a separate commit in your ParaView branch, it will be found without issue.
+to your VTK fork, then commit the VTK submodule update with your changes in a separate commit in your ParaView branch. Your VTK commit will be found without issue.
 
 Once your VTK changes are merged into VTK master, you can cleanup your history and commit the submodule update cleanly like this
 (this will remove local non commited changes and also rebase your branch on the last master):
@@ -98,19 +98,19 @@ git bump VTK master
 
 Every change and new features needs to be tested. In ParaView, there are mainly two types of tests.
 Python tests and XML tests. While both types of tests are as valid to add, XML tests should be preferred for standard
-feature test when possible as they can be considered more generic.
+feature tests when possible as they exercise the ParaView user interface as well as core features.
 
 #### XML Tests
 
-First, as XML tests are impacted by the user settings, it is recommanded to always run paraview in dry run (option `--dr`).
+First, as XML tests are impacted by ParaView's user settings, it is recommanded to always run `paraview` in dry run (option `--dr`).
 
-To add a XML test, use the `Tools -> Record Test` menu in ParaView. After specifying name for the xml test, a new window named
-`Recording User Input` will pop up. This one will record every action the user will perfom in ParaView to test his feature.
+To add a XML test, use the `Tools -> Record Test` menu in ParaView. After specifying name for the XML test, a new window named
+`Recording User Input` will pop up. This one will record every action you will perfom in ParaView to test his feature.
 
 It is also recommanded to lock the view size when we want to create a baseline, choose `Tools -> Lock View Size Custom...`
 and set it to a 400x400 window as it works well.
 
-On top of recording actions, the most important feature in this window is the check mark button which allows the user to:
+On top of recording actions, the most important feature in this window is the check mark button which allows you to:
 - record the value of a property in the Properties Panel.
 - save an intermediary baseline. (in that case, use `TESTS_WITH_INLINE_COMPARES`)
 - check any value in the spreadsheet view.
@@ -121,7 +121,7 @@ Advanced features are:
 
 It is also possible to stop the test recording by using the pause button and add comments in the XML test.
 
-Finally, the user can save the xml test by using the `Stop recording` button.
+Finally, you can save the XML test by using the `Stop recording` button.
 
 You may need to edit this file slightly to make it work as expected, do not hesitate to look at other files.
 
@@ -130,9 +130,9 @@ Those files are conditionally used, typically depending on a build option.
 Look at `Client/ParaView/Testing/XML/CMakeLists.txt` to find the appropriate one.
 By default, tests should be added in `test.common.cmake`.
 
-There are different categories of tests depending on what the user want to test :
+There are different categories of tests depending on what you want to test :
 - `DATA_WITH_BASELINES`: for general use case, in most of the case the safest bet is this category.
-- `TESTS_WITH_INLINE_COMPARES`: for when the user needs to do multiple image comparison.
+- `TESTS_WITH_INLINE_COMPARES`: for when you need to do multiple image comparison.
 - `TESTS_WITHOUT_BASELINES`: in some context, a valid XML test can be made without baseline.
 
 You can then configure ParaView and run your test from the build directory and check that they pass:
@@ -388,14 +388,14 @@ cases, being your topic name with the issue number.
     This will add a new commit which update the submodule and prefill the commit message with information about
     the different commits in the submodule. Make sure to still add some information about the reason for the bump.
 
-    Please note you can run CI on a submodule commit in another remote, see [Continuous Integration] for more info.
+    Please note you can run CI on a submodule commit in another remote, see [continuous integration] for more info.
 
 4. Add some tests
 
-    Every changes and new features need to be tested in ParaView. Depending on what the user implements, he can perform
+    Every changes and new features need to be tested in ParaView. Depending on what you implement, you can perform
     an image comparison with a baseline of expected result or checking a property at anytime.
 
-    They are mainly 2 types of test in ParaView, python and xml testing. Generally we use a XML test, for more details
+    They are mainly 2 types of test in ParaView, python and XML testing. Generally we use a XML test, for more details
     regarding this topic, it's highly recommanded to check this [section](#testing).
 
 5. Add release notes
@@ -585,7 +585,7 @@ of the line:
 Each `me` reference may instead be an `@username` reference or a full
 `Real Name <user@domain>` reference to credit someone else for performing
 the review.  References to `me` and `@username` will automatically be
-transformed into a real name and email address according to the user's
+transformed into a real name and email address according to your
 GitLab account profile.
 
 #### Fetching Changes ####
@@ -701,7 +701,7 @@ If you have any question about the CI process, do not hesitate to ask a CI maint
 
 Reading CI results is a very important part of the merge request process
 and is the responsibility of the author of the merge request, although reviewers
-can usually help. There is two locations to read the results, GitLab CI and CDash.
+can usually help. There are two locations to read the results, GitLab CI and CDash.
 Both should be checked and considered clean before merging.
 
 To read GitLab CI result, click on the Pipelines tab then on the last pipeline.
