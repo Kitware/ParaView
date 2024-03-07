@@ -303,6 +303,15 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
            -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
            -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}
     TEST_NAME "basic_rendering")
+
+  paraview_add_test(
+    PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
+    ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+           --dr
+           --
+           -m paraview.tests.proxy_deprecation
+    TEST_NAME "proxy_deprecation")
+
 endif()
 
 #----------------------------------------------------------------------
@@ -336,6 +345,14 @@ paraview_add_test_mpi_optional(
          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}
   TEST_NAME "basic_rendering")
+
+paraview_add_test_mpi_optional(
+  PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch::paraview.tests"
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
+         --dr
+         --
+         -m paraview.tests.proxy_deprecation
+  TEST_NAME "proxy_deprecation")
 
 #----------------------------------------------------------------------
 # Module tests using pvbatch with MPI and in symmetric mode.
