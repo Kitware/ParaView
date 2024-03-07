@@ -1099,6 +1099,9 @@ def get_deprecated_proxies(proxiesNS):
     proxies[proxiesNS.sources] = []
     proxies[proxiesNS.filters] = []
 
+    if compatibility_version <= (5, 13):
+        proxies[proxiesNS.filters] += [("GhostCellsGenerator", "GhostCells")]
+
     return proxies
 
 

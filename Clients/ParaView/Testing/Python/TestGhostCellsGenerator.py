@@ -9,5 +9,5 @@ composite = GroupDatasets(Input=[wavelet1, wavelet2])
 
 # We test if the ghost cells generator can be instantiated for composite data sets as well as
 # data sets
-generator1 = GhostCellsGenerator(Input=composite)
-generator2 = GhostCellsGenerator(Input=wavelet1)
+generator1 = GhostCells(Input=composite)
+generator2 = GhostCells(Input=wavelet1)

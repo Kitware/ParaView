@@ -1688,7 +1688,8 @@ struct Process_5_12_to_5_13
 {
   bool operator()(xml_document& document)
   {
-    return HandleSetDecomposePolyhedra(document) && HandleRepresentationFlipTextures(document);
+    return HandleSetDecomposePolyhedra(document) && HandleRepresentationFlipTextures(document) &&
+      HandleGhostCellsGenerator(document);
   }
 
   static bool HandleSetDecomposePolyhedra(xml_document& document)
@@ -1858,6 +1859,21 @@ struct Process_5_12_to_5_13
         elementNode.append_attribute("value").set_value("1");
       }
     }
+    return true;
+  }
+
+  bool HandleGhostCellsGenerator(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='GhostCellsGenerator']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      // Change filter type
+      node.attribute("type").set_value("GhostCells");
+    }
+
     return true;
   }
 };

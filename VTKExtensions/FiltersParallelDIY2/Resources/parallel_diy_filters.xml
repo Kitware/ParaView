@@ -3,7 +3,7 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVGhostCellsGenerator"
-                 name="GhostCellsGenerator">
+                 name="GhostCells">
       <Documentation short_help="Generate ghosts.">
         Generate ghost cells and ghost points in a composite data set. Ghosts are exchanged
         between blocks / partitions of same type. Currently, vtkImageData, vtkRectilinearGrid,
@@ -121,7 +121,15 @@
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
-      <!-- End CompositeDataSetGhostCellsGenerator -->
+    </SourceProxy>
+
+    <SourceProxy  name="GhostCellsGenerator"
+                  class="vtkPVGhostCellsGenerator"
+                  base_proxyname="GhostCells"
+                  base_proxygroup="filters">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.15">
+        This has been renamed into 'GhostCells'. Please consider using that instead.
+      </Deprecated>
     </SourceProxy>
 
     <!-- ==================================================================== -->
