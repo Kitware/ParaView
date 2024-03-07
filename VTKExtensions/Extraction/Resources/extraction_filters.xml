@@ -559,7 +559,8 @@
         number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Output an unstructured grid instead of a hyper tree grid for input hyper tree grids.
+          Output an unstructured grid instead of a hyper tree grid (for input hyper tree grids).
+          Should not be changed after first execution.
         </Documentation>
        <Hints>
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
