@@ -89,6 +89,13 @@ vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
 
 //----------------------------------------------------------------------------
+vtkInformationKeyMacro(vtkPVGeometryFilter, POINT_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, VERTS_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, LINES_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, POLYS_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, STRIPS_OFFSETS, IntegerVector);
+
+//----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter()
 {
   this->OutlineFlag = 0;
@@ -157,7 +164,9 @@ int vtkPVGeometryFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
   }
   else if (input->IsA("vtkMultiBlockDataSet"))
   {
-    outputType = VTK_MULTIBLOCK_DATA_SET;
+    // Some developers have sub-classed vtkMultiBlockDataSet, in which case,
+    // we try to preserve the type.
+    outputType = input->GetDataObjectType();
   }
   else if (input->IsA("vtkCompositeDataSet"))
   {
