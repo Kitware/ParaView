@@ -99,6 +99,8 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   assert(this->Internal->Domain);
   this->connect(
     this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)), SLOT(currentIndexChanged(int)));
+  this->Internal->Ui.comboBox->setMaxVisibleItems(
+    pqPropertyWidget::hintsWidgetHeightNumberOfRows(smproperty->GetHints()));
   new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, this->Internal->Domain);
   this->addPropertyLink(this, "chosenProxy", SIGNAL(chosenProxyChanged()), smproperty);
 
