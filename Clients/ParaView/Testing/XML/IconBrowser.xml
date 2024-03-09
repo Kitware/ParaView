@@ -27,7 +27,7 @@
 
   <!-- open browser with double click -->
   <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="setCurrent" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="doubleClick" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/EditMacrosDialog/macrosGroup/macrosTree" command="edit" arguments="0.0" />
   <!-- import new image -->
   <pqevent object="pqClientMainWindow/IconBrowser/importIcon" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/IconOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/paraview_icon.svg" />

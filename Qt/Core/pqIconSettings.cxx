@@ -31,11 +31,11 @@ pqIconSettings::pqIconSettings(const QString& key)
 }
 
 //----------------------------------------------------------------------------
-bool pqIconSettings::getItemIndexInSettings(const QString& macroPath, int& idx)
+bool pqIconSettings::getItemIndexInSettings(const QString& macroPath, int& idx, int& size)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup(details::SETTINGS_ICONS_GROUP());
-  int size = settings->beginReadArray(this->IconCategory);
+  size = settings->beginReadArray(this->IconCategory);
   idx = 0;
   for (; idx < size; ++idx)
   {
@@ -55,11 +55,18 @@ bool pqIconSettings::getItemIndexInSettings(const QString& macroPath, int& idx)
 //----------------------------------------------------------------------------
 void pqIconSettings::setItemIconInSettings(const QString& macroPath, const QString& iconPath)
 {
-  int idx;
-  this->getItemIndexInSettings(macroPath, idx);
+  int idx, currentSize;
+  bool exists = this->getItemIndexInSettings(macroPath, idx, currentSize);
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup(details::SETTINGS_ICONS_GROUP());
-  settings->beginWriteArray(this->IconCategory);
+  if (exists)
+  {
+    settings->beginWriteArray(this->IconCategory, /*size=*/currentSize);
+  }
+  else
+  {
+    settings->beginWriteArray(this->IconCategory);
+  }
   settings->setArrayIndex(idx);
   settings->setValue(details::SETTINGS_ITEM_KEY(), macroPath);
   settings->setValue(details::SETTINGS_ICON_KEY(), iconPath);
@@ -70,8 +77,8 @@ void pqIconSettings::setItemIconInSettings(const QString& macroPath, const QStri
 //----------------------------------------------------------------------------
 QString pqIconSettings::getIconFromSettings(const QString& macroPath)
 {
-  int idx;
-  if (!this->getItemIndexInSettings(macroPath, idx))
+  int idx, size;
+  if (!this->getItemIndexInSettings(macroPath, idx, size))
   {
     return QString("");
   }

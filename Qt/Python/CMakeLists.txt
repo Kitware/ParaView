@@ -9,6 +9,7 @@ set(classes
   pqPythonEditorActions
   pqPythonFileIO
   pqPythonLineNumberArea
+  pqPythonMacroSettings
   pqPythonMacroSupervisor
   pqPythonManager
   pqPythonScriptEditor

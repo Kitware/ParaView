@@ -21,7 +21,6 @@ void pqEditMacrosReaction::configureMacros()
     pqEditMacrosReaction::Dialog = new pqEditMacrosDialog(pqCoreUtilities::mainWidget());
     pqEditMacrosReaction::Dialog->setObjectName("EditMacrosDialog");
   }
-
   pqEditMacrosReaction::Dialog->show();
   pqEditMacrosReaction::Dialog->raise();
   pqEditMacrosReaction::Dialog->activateWindow();

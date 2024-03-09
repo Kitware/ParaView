@@ -61,17 +61,6 @@ private Q_SLOTS:
 
 private: // NOLINT(readability-redundant-access-specifiers)
   /**
-   * Add children to tree given macros.
-   */
-  void populateTree();
-
-  /**
-   * Create an item for a macro.
-   */
-  void createItem(QTreeWidgetItem* parent, const QString& fileName, const QString& displayName,
-    QTreeWidgetItem* preceding = nullptr);
-
-  /**
    * Return true if the macros tree contains at least one item.
    */
   bool treeHasItems();
@@ -85,7 +74,7 @@ private: // NOLINT(readability-redundant-access-specifiers)
    * Return the first selected item in the macros tree.
    * If no selection, return the invisibleRootItem.
    */
-  QTreeWidgetItem* getSelectedItem();
+  QModelIndex getSelectedItem();
 
   /**
    * Return the nearest item.
@@ -93,18 +82,18 @@ private: // NOLINT(readability-redundant-access-specifiers)
    *  * next sibling
    *  * previous sibling
    */
-  QTreeWidgetItem* getNearestItem(QTreeWidgetItem* item);
+  QModelIndex getNearestItem(const QModelIndex& index);
 
   /**
    * Delete item and remove associated macro.
    * Do not use item after!
    */
-  void deleteItem(QTreeWidgetItem* item);
+  void deleteItem(const QModelIndex& item);
 
   /**
    * Delete items and update current item.
    */
-  void deleteItems(const QList<QTreeWidgetItem*>& items);
+  void deleteItems(const QList<QModelIndex>& items);
 
   /**
    * Update UI enabled state.

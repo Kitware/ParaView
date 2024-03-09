@@ -24,6 +24,9 @@ class PQCOMPONENTS_EXPORT pqIconBrowser : public QDialog
   Q_OBJECT;
 
 public:
+  pqIconBrowser(QWidget* parent);
+  ~pqIconBrowser() override;
+
   /**
    * Returns the absolute path to the selected icon.
    * May be empty if no icon were selected.
@@ -32,15 +35,12 @@ public:
    */
   static QString getIconPath(const QString& defaultPath = QString());
 
-private:
-  pqIconBrowser(QWidget* parent);
-  ~pqIconBrowser() override;
-
   /**
    * Returns the absolute path of the selected icon.
    */
   QString getSelectedIconPath();
 
+private:
   struct pqInternal;
   std::unique_ptr<pqInternal> Internal;
 };

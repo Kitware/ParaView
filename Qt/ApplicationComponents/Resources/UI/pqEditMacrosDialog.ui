@@ -42,7 +42,7 @@
        <number>0</number>
       </property>
       <item row="9" column="0">
-       <widget class="QTreeWidget" name="macrosTree">
+       <widget class="QTreeView" name="macrosTree">
         <property name="contextMenuPolicy">
          <enum>Qt::NoContextMenu</enum>
         </property>

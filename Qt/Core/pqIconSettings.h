@@ -53,7 +53,7 @@ private:
    * Get the settings index of the given item.
    * Return true if index exists.
    */
-  bool getItemIndexInSettings(const QString& itemKey, int& idx);
+  bool getItemIndexInSettings(const QString& itemKey, int& idx, int& size);
 
   QString IconCategory;
 };

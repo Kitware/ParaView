@@ -74,6 +74,15 @@ public:
    */
   static QString macroNameFromFileName(const QString& fileName);
 
+  static void setNameForMacro(const QString& macroPath, const QString& name);
+
+  /**
+   * Get a macro tooltip from the fileName (absolute path of macro file).
+   */
+  static QString macroToolTipFromFileName(const QString& fileName);
+
+  static void setTooltipForMacro(const QString& macroPath, const QString& name);
+
   /**
    * Get an icon path from the fileName (absolute path of macro file).
    * If no corresponding icon, return an empty string.
@@ -114,6 +123,7 @@ public Q_SLOTS:
    * a macro with the given fileName it's macroname will be updated to the
    * one given. Macro names do not have to be unique.
    */
+  void addMacro(const QString& macroName, const QString& tip, const QString& fileName);
   void addMacro(const QString& macroName, const QString& fileName);
   void addMacro(const QString& fileName);
 
