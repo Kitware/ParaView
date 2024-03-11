@@ -264,7 +264,6 @@ If making a non-RC release:
 
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
-  - [ ] Request DoD vulnerability scan
   - [ ] Request an XRInterface plugin validation using [TESTING.md](https://gitlab.kitware.com/paraview/paraview/-/blob/master/Plugins/XRInterface/TESTING.md) protocol from KEU
 
 <!--
