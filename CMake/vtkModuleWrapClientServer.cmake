@@ -21,6 +21,10 @@ _vtk_module_wrap_client_server_sources(<module> <sources> <classes>)
 cmake_policy(PUSH)
 cmake_policy(SET CMP0053 NEW)
 
+if (POLICY CMP0116)
+  cmake_policy(SET CMP0116 NEW)
+endif()
+
 function (_vtk_module_wrap_client_server_sources module sources classes)
   _vtk_module_get_module_property("${module}"
     PROPERTY  "exclude_wrap"
