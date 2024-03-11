@@ -269,7 +269,7 @@ If making a non-RC release:
 <!--
 If making a non-RC release:
 
-  - [ ] Request from comm@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
+  - [ ] Request from marketing@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
   - [ ] Move unclosed issues in GitLab to the next release milestone in GitLab
 -->
 
