@@ -31,9 +31,7 @@ function (paraview_add_executable name)
       ParaView::paraview_plugins)
     target_compile_definitions("${name}"
       PRIVATE
-      "PARAVIEW_USE_EXTERNAL_VTK=$<BOOL:${PARAVIEW_USE_EXTERNAL_VTK}>")
-    target_compile_definitions("${name}"
-      PRIVATE
+      "PARAVIEW_USE_EXTERNAL_VTK=$<BOOL:${PARAVIEW_USE_EXTERNAL_VTK}>"
       "PARAVIEW_USE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")
   if (PARAVIEW_USE_PYTHON)
     target_link_libraries("${name}"
