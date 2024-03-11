@@ -755,7 +755,7 @@ void vtkPVRenderView::SetLegendGridActor(vtkLegendScaleActor* gridActor)
     if (this->LegendGridActor)
     {
       this->LegendGridActor->SetUseFontSizeFromProperty(true);
-      this->LegendGridActor->SetAdjustLabels(true);
+      this->LegendGridActor->SetSnapToGrid(true);
       this->LegendGridActor->SetLabelModeToCoordinates();
       this->LegendGridActor->LegendVisibilityOff();
       this->LegendGridActor->SetCornerOffsetFactor(1);
