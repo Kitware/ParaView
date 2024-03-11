@@ -1,9 +1,3 @@
-if (PARAVIEW_QT_MAJOR_VERSION VERSION_GREATER "5")
-  # see https://gitlab.kitware.com/paraview/paraview/-/issues/19742
-  message(WARNING "Building the documentation with Qt6 is not supported")
-  return ()
-endif ()
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/index.html"
   "${CMAKE_CURRENT_BINARY_DIR}/index.html"
