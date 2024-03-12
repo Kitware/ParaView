@@ -1,12 +1,32 @@
 r"""
-Internal module used by paraview.servermanager to help warn about properties
-changed or removed.
+Internal module used by paraview.servermanager to help warn about
+proxies/properties changed or removed. To help
+with backward compatibility, the _backwardscompatibilityhelper module
+should be updated to handle deprecated proxies and properties.
 
-If the compatibility version is less than the version where a particular
-property was removed, `getattr` and `setattr` should ideally continue to
-work as before or return a value of appropriate form so old code doesn't
-fail. Otherwise `getattr` and `setattr` should throw the NotSupportedException
-with appropriate debug message.
+Each proxy is associated to a kind of python class. When a proxy is removed,
+this class is no more generated and older scripts will raise `NameError`
+exception. To avoid this, deprecated proxies should be added in `get_deprecated_proxies`
+returned map, so a fallback proxy can be used.
+See also `GetProxy`.
+
+Properties are defined as attribute of the python object. When a property
+is removed, old scripts using it will fail with `AttributeError`.
+When everything else fails, `NotSupportedException` is thrown.
+See `setattr` and `getattr` methods.
+
+Each compatibility code is called depending on the current version
+and on the compatibility version asked by the script.
+Compatibility version should be specified before importing `simple` module.
+For instance:
+```
+import paraview
+paraview.compatibility.major=5
+paraview.compatibility.minor=11
+from paraview.simple import *
+```
+Will create fallback proxies and properties for deprecation done since 5.11
+and will fail for object deprecated before 5.11.
 """
 
 import paraview
