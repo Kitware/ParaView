@@ -91,6 +91,7 @@ if (numpy_found)
     ExpressionChooser.xml
     ExpressionClear.xml
     FieldDataDomainDefault.xml
+    HyperTreeGridVisibleLeavesSize.xml
     PlotOverLine_htg.xml # needs find data
     PythonCalculator.xml
     PythonCalculatorArrayAssociation.xml

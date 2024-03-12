@@ -70,6 +70,49 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy name="HyperTreeGridVisibleLeavesSize"
+                 class="vtkHyperTreeGridVisibleLeavesSize"
+                 label="HyperTreeGrid Visible Leaves Size">
+      <Documentation short_help="Compute size and validity cell fields for HTG leaves">
+        Create 2 new cell fields. The first one, named 'ValidCell' by default, has a value of 1.0
+        for leaf (non-refined) cells that are neither masked nor ghost, and 0.0 otherwise.
+        The second one, named 'CellSize' by default, is set to the size (volume) of the cell for 3D HTGs.
+        This field has a value for every cell traversed through the cursor, valid or not.
+        By extension, CellSize is set to the cell area for 2D HTG and cell length for 1D.
+       </Documentation>
+       <InputProperty command="SetInputConnection"
+                      name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty name="CellSizeArrayName"
+                            command="SetCellSizeArrayName"
+                            number_of_elements="1"
+                            default_values="CellSize">
+        <Documentation>
+          Name of the cell size array in the output.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ValidCellArrayName"
+                            command="SetValidCellArrayName"
+                            number_of_elements="1"
+                            default_values="ValidCell">
+        <Documentation>
+          Name of the cell validity array in the output.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- End HyperTreeGridVisibleLeavesSize -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridDepthLimiter"
                  name="HyperTreeGridDepthLimiter"
                  label="HyperTreeGrid Depth Limiter">
