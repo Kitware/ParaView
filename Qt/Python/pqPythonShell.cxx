@@ -87,6 +87,7 @@ class pqPythonShell::pqInternals
   bool InterpreterInitialized;
 
 public:
+  std::string LastOutputText;
   Ui::PythonShell Ui;
 
   pqInternals(pqPythonShell* self)
@@ -404,18 +405,36 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
 
   switch (eventid)
   {
+    case vtkCommand::SetOutputEvent:
+    {
+      auto* strData = reinterpret_cast<const char*>(calldata);
+      if (strData != nullptr)
+      {
+        this->Internals->LastOutputText = strData;
+      }
+      break;
+    }
     case vtkCommand::UpdateEvent:
     {
       std::string* strData = reinterpret_cast<std::string*>(calldata);
       bool ok;
-      QString inputText = QInputDialog::getText(this, tr("Enter Input requested by Python"),
-        tr("Input: "), QLineEdit::Normal, QString(), &ok);
+      const std::string title = "Python script requested input";
+      std::string label = "Input: ";
+      if (!this->Internals->LastOutputText.empty())
+      {
+        label.swap(this->Internals->LastOutputText);
+        label += ": ";
+      }
+      QString inputText = QInputDialog::getText(
+        this, tr(title.c_str()), tr(label.c_str()), QLineEdit::Normal, QString(), &ok);
       if (ok)
       {
         *strData = inputText.toStdString();
       }
     }
     break;
+    default:
+      break;
   }
 }
 

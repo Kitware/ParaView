@@ -66,17 +66,36 @@ private:
 vtkStandardNewMacro(pqPythonManagerOutputWindow);
 
 //-----------------------------------------------------------------------------
-class pqPythonManagerRawInputHelper
+class pqPythonManagerStdIOHelper
 {
+  std::string LastOutputText;
+
 public:
+  //-----------------------------------------------------------------------------
+  void rawOutput(vtkObject*, unsigned long, void* calldata)
+  {
+    auto* strData = reinterpret_cast<const char*>(calldata);
+    if (strData != nullptr)
+    {
+      this->LastOutputText = strData;
+    }
+  }
+
+  //-----------------------------------------------------------------------------
   void rawInput(vtkObject*, unsigned long, void* calldata)
   {
     std::string* strData = reinterpret_cast<std::string*>(calldata);
     bool ok;
+    const std::string title = "Python script requested input";
+    std::string label = "Input: ";
+    if (!this->LastOutputText.empty())
+    {
+      label.swap(this->LastOutputText);
+      label += ": ";
+    }
     QString inputText = QInputDialog::getText(pqCoreUtilities::mainWidget(),
-      QCoreApplication::translate(
-        "pqPythonManagerRawInputHelper", "Enter Input requested by Python"),
-      QCoreApplication::translate("pqPythonManagerRawInputHelper", "Input: "), QLineEdit::Normal,
+      QCoreApplication::translate("pqPythonManagerStdIOHelper", title.c_str()),
+      QCoreApplication::translate("pqPythonManagerStdIOHelper", label.c_str()), QLineEdit::Normal,
       QString(), &ok);
     if (ok)
     {
@@ -147,7 +166,7 @@ void pqPythonManager::addWidgetForDeleteMacros(QWidget* widget)
 void pqPythonManager::executeCode(
   const QByteArray& code, const QVector<QByteArray>& pre_push, const QVector<QByteArray>& post_push)
 {
-  pqPythonManagerRawInputHelper helper;
+  pqPythonManagerStdIOHelper helper;
 
   // we capture messages from the script so that when the end up on the
   // terminal they are grouped as single message, otherwise they get split at
@@ -159,7 +178,8 @@ void pqPythonManager::executeCode(
   vtkPythonInterpreter::SetCaptureStdin(true);
 
   vtkNew<vtkPythonInteractiveInterpreter> interp;
-  interp->AddObserver(vtkCommand::UpdateEvent, &helper, &pqPythonManagerRawInputHelper::rawInput);
+  interp->AddObserver(vtkCommand::SetOutputEvent, &helper, &pqPythonManagerStdIOHelper::rawOutput);
+  interp->AddObserver(vtkCommand::UpdateEvent, &helper, &pqPythonManagerStdIOHelper::rawInput);
   for (const auto& instr : pre_push)
   {
     interp->Push(instr.data());
