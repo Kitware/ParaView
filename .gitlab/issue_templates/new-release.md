@@ -264,13 +264,12 @@ If making a non-RC release:
 
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
-  - [ ] Request DoD vulnerability scan
   - [ ] Request an XRInterface plugin validation using [TESTING.md](https://gitlab.kitware.com/paraview/paraview/-/blob/master/Plugins/XRInterface/TESTING.md) protocol from KEU
 
 <!--
 If making a non-RC release:
 
-  - [ ] Request from comm@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
+  - [ ] Request from marketing@kitware.com an update of version number in "Download Latest Release" text on www.paraview.org
   - [ ] Move unclosed issues in GitLab to the next release milestone in GitLab
 -->
 
