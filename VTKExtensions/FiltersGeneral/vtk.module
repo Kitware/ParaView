@@ -20,6 +20,7 @@ DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
+  VTK::FiltersAMR
   VTK::FiltersGeneral
   VTK::FiltersParallel
   VTK::FiltersGeometryPreview
