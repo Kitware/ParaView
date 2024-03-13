@@ -193,6 +193,9 @@
           <Entry text="Bezier Wedge"
                  value="80" />
         </EnumerationDomain>
+        <Hints>
+          <WidgetHeight number_of_rows="8" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetOutputPrecision"
                          default_values="0"
