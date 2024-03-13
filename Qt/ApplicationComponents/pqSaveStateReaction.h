@@ -7,6 +7,8 @@
 #include "pqReaction.h"
 #include "vtkType.h" // needed for vtkTypeUInt32
 
+class pqServer;
+
 /**
  * @ingroup Reactions
  * Reaction for saving state file.
@@ -24,11 +26,19 @@ public:
   ~pqSaveStateReaction() override = default;
 
   /**
-   * Open File dialog in order to choose the location and the type of
+   * Open File dialog, with the active server, in order to choose the location and the type of
    * the state file that should be saved
    * Returns true if the user selected a file to save and false if they canceled the dialog
    */
   static bool saveState();
+
+  /**
+   * Open File dialog, with the specified server, in order to choose the location and the type of
+   * the state file that should be saved
+   * If the server is nullptr, files are browsed locally else remotely and optionally locally
+   * Returns true if the user selected a file to save and false if they canceled the dialog
+   */
+  static bool saveState(pqServer* server);
 
   /**
    * Saves the state file.
