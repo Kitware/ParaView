@@ -867,28 +867,6 @@ vtk_module_build(
   SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
   SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/paraview/paraview/-/tree/master")
 
-# Catalyst sanity check. Ensure every module is using the same Catalyst dependency.
-if (PARAVIEW_ENABLE_CATALYST AND NOT PARAVIEW_USE_EXTERNAL_VTK)
-  # global property defined in VTK which is not exported
-  get_property(catalyst_dir_primary GLOBAL PROPERTY vtk_catalyst_dir_primary)
-  set(catalyst_using_modules ClientsInSitu)
-  foreach (catalyst_using_module IN LISTS catalyst_using_modules)
-    get_property(catalyst_dir_module GLOBAL PROPERTY "vtk_catalyst_dir_${catalyst_using_module}")
-    if (NOT catalyst_using_module)
-      continue ()
-    endif ()
-
-    if (NOT catalyst_dir_primary STREQUAL catalyst_dir_module)
-      message(FATAL_ERROR
-        "ParaView's `catalyst` module is using an external catalyst from "
-        "`${catalyst_dir_primary}` but the `${catalyst_using_module}` found "
-        "its copy at `${catalyst_dir_module}`. Due to the way `libcatalyst` "
-        "works, all modules which use it must agree on a single installation "
-        "of it.")
-    endif ()
-  endforeach ()
-endif ()
-
 include(vtkModuleJson)
 if (NOT PARAVIEW_USE_EXTERNAL_VTK)
   vtk_module_json(

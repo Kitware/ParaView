@@ -35,7 +35,7 @@ catalyst_implementation(
     ParaViewCatalyst.cxx
     vtkCatalystBlueprint.cxx
     vtkCatalystBlueprint.h
-  CATALYST_TARGET catalyst::catalyst)
+  CATALYST_TARGET VTK::catalyst)
 add_library(ParaView::catalyst-paraview ALIAS catalyst-paraview)
 
 target_link_libraries(catalyst-paraview
