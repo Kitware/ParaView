@@ -92,6 +92,7 @@ paraview_add_test_python(
   TestPythonViewScript.py
   TestResetCameraToDirection.py
   LoadStateWithTextures.py
+  ExportGLTF.py
 )
 
 if(NOT APPLE)
