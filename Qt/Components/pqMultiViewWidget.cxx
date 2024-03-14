@@ -939,6 +939,12 @@ QSize pqMultiViewWidget::preview(const QSize& nsize)
 }
 
 //-----------------------------------------------------------------------------
+pqViewFrame* pqMultiViewWidget::activeFrame()
+{
+  return this->Internals->ActiveFrame;
+}
+
+//-----------------------------------------------------------------------------
 int pqMultiViewWidget::activeFrameLocation() const
 {
   if (auto frame = this->Internals->ActiveFrame)

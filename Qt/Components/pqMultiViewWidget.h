@@ -87,6 +87,11 @@ public:
   QSize preview(const QSize& previewSize = QSize());
 
   /**
+   * Return the active frame, if any, else nullptr.
+   */
+  pqViewFrame* activeFrame();
+
+  /**
    * Returns the location of the active frame, if any, else -1.
    */
   int activeFrameLocation() const;

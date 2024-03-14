@@ -26,6 +26,9 @@
 #include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 
+#include "pqQVTKWidget.h"
+#include "pqViewFrame.h"
+
 #include <QEvent>
 #include <QGridLayout>
 #include <QInputDialog>
@@ -206,6 +209,7 @@ public:
 
   QPointer<QWidget> FullScreenWindow;
   QPointer<QWidget> NewTabWidget;
+  QPointer<QFrame> ActiveFrame;
 
   void addNewTabWidget()
   {
@@ -529,6 +533,7 @@ void pqTabbedMultiViewWidget::toggleFullScreen()
     internals.FullScreenWindow->layout()->removeWidget(this->Internals->TabWidget);
     this->layout()->addWidget(internals.TabWidget);
     delete internals.FullScreenWindow;
+    Q_EMIT this->fullScreenEnabled(false);
   }
   else
   {
@@ -546,12 +551,83 @@ void pqTabbedMultiViewWidget::toggleFullScreen()
 
     QShortcut* esc = new QShortcut(Qt::Key_Escape, fullScreenWindow);
     QObject::connect(esc, SIGNAL(activated()), this, SLOT(toggleFullScreen()));
-    QShortcut* f11 = new QShortcut(Qt::Key_F11, fullScreenWindow);
+    QShortcut* f11 = new QShortcut(QKeySequence(Qt::Key_F11), fullScreenWindow);
     QObject::connect(f11, SIGNAL(activated()), this, SLOT(toggleFullScreen()));
+    Q_EMIT this->fullScreenEnabled(true);
   }
 
   // when we enter full screen, let's hide decorations by default.
   internals.setDecorationsVisibility(internals.FullScreenWindow == nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::toggleFullScreenActiveView()
+{
+  auto& internals = (*this->Internals);
+  if (internals.FullScreenWindow)
+  {
+    // Restore active widget to active frame
+    auto widgets = internals.FullScreenWindow->findChildren<pqQVTKWidget*>();
+    for (auto wid : widgets)
+    {
+      internals.ActiveFrame->layout()->addWidget(wid);
+    }
+
+    // Restore central tabwidget
+    this->layout()->addWidget(internals.TabWidget);
+    delete internals.FullScreenWindow;
+    Q_EMIT this->fullScreenActiveViewEnabled(false);
+  }
+  else
+  {
+    // Hide central tabwidget
+    this->layout()->removeWidget(internals.TabWidget);
+
+    QWidget* fullScreenWindow = new QWidget(this, Qt::Window);
+    internals.FullScreenWindow = fullScreenWindow;
+    fullScreenWindow->setObjectName("FullScreenWindow");
+
+    QGridLayout* glayout = new QGridLayout(fullScreenWindow);
+    glayout->setSpacing(0);
+    glayout->setContentsMargins(0, 0, 0, 0);
+
+    pqMultiViewWidget* multiViewWidget =
+      internals.findWidget(pqActiveObjects::instance().activeLayout());
+    pqViewFrame* activeViewFrame = multiViewWidget->activeFrame();
+    if (!activeViewFrame)
+    {
+      qWarning() << "Unable to retrieve the active view frame from the active layout.";
+      return;
+    }
+
+    // We are in the active view frame, retrieve the widget containing
+    // the renderview to show it fullscreen
+    QList<pqQVTKWidget*> widgets = activeViewFrame->findChildren<pqQVTKWidget*>();
+    for (pqQVTKWidget* wid : widgets)
+    {
+      // Keep trace of the parent frame to restore it
+      // when exiting fullcreen
+      internals.ActiveFrame = qobject_cast<QFrame*>(wid->parent());
+      if (!internals.ActiveFrame)
+      {
+        qWarning() << "Unable to retrieve parent frame of render widget.";
+        delete internals.FullScreenWindow;
+        return;
+      }
+      // Layout takes widget ownership
+      glayout->addWidget(wid, 0, 0);
+    }
+
+    fullScreenWindow->showFullScreen();
+    fullScreenWindow->show();
+
+    QShortcut* esc = new QShortcut(Qt::Key_Escape, fullScreenWindow);
+    QObject::connect(esc, SIGNAL(activated()), this, SLOT(toggleFullScreenActiveView()));
+    QShortcut* ctrlF11 =
+      new QShortcut(QKeySequence(Qt::ControlModifier | Qt::Key_F11), fullScreenWindow);
+    QObject::connect(ctrlF11, SIGNAL(activated()), this, SLOT(toggleFullScreenActiveView()));
+    Q_EMIT this->fullScreenActiveViewEnabled(true);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -98,6 +98,16 @@ Q_SIGNALS:
    */
   void viewSizeLocked(bool);
 
+  /**
+   * fired when toggleFullscreen() is called.
+   */
+  void fullScreenEnabled(bool);
+
+  /**
+   * fired when toggleFullScreenActiveView() is called.
+   */
+  void fullScreenActiveViewEnabled(bool);
+
 public Q_SLOTS:
   virtual int createTab();
   virtual int createTab(pqServer*);
@@ -120,9 +130,16 @@ public Q_SLOTS:
   ///@}
 
   /**
-   * toggles fullscreen state.
+   * Toggle fullscreen state for the active multi-view widget.
+   * All views contained in the active tab will be displayed fullscreen.
+   * Hide frame decorations, but they can still be shown afterward through the GUI.
    */
   virtual void toggleFullScreen();
+
+  /**
+   * Toggle fullscreen state for active view only.
+   */
+  void toggleFullScreenActiveView();
 
   /**
    * toggles decoration visibility on the current widget
