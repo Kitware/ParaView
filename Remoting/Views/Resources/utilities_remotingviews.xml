@@ -1207,7 +1207,7 @@
             value="1" />
         </Hints>
       </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+      <DoubleVectorProperty default_values="0.384313725 0.364705882 0.352941176"
                             label="Background"
                             command="SetBackgroundColor"
                             name="BackgroundColor"
