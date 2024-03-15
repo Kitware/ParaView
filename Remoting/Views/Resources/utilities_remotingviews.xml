@@ -1416,6 +1416,7 @@
                             repeat_command="1"
                             number_of_elements="12"
                             default_values="0 0.231373 0.298039 0.752941 0.5 0.865003 0.865003 0.865003 1 0.705882 0.0156863 0.14902">
+                            <!--  The RGB points of the default ColorMap "Cool to Warm" found in ColorMaps.json -->
         <Documentation>
           Specify the control points that form the color-transfer-function. These are
           a list of 4-tuples of the form (x, r, g, b) where x is the data value,
@@ -1553,10 +1554,11 @@
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNanColor"
-                            default_values="1 1 0"
                             name="NanColor"
+                            panel_widget="color_selector"
                             number_of_elements="3"
-                            panel_widget="color_selector">
+                            default_values="1 1 0">
+                            <!--  The NanColor of the default ColorMap "Cool to Warm" found in ColorMaps.json -->
         <Documentation>
           Set the color to use when NaN (not-a-number) is encountered.
         </Documentation>
