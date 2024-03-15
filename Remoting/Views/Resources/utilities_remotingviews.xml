@@ -1414,9 +1414,9 @@
                             name="RGBPoints"
                             number_of_elements_per_command="4"
                             repeat_command="1"
-                            number_of_elements="12"
-                            default_values="0 0.231373 0.298039 0.752941 0.5 0.865003 0.865003 0.865003 1 0.705882 0.0156863 0.14902">
-                            <!--  The RGB points of the default ColorMap "Cool to Warm" found in ColorMaps.json -->
+                            number_of_elements="36"
+                            default_values="0 0.0564 0.0564 0.47 0.171592 0.243 0.46035 0.81 0.298491 0.356814 0.745025 0.954368 0.432129 0.6882 0.93 0.91791 0.5 0.899496 0.944646 0.768657 0.588226 0.957108 0.833819 0.508916 0.706141 0.927521 0.621439 0.315357 0.84764 0.8 0.352 0.16 1 0.59 0.0767 0.119475">
+        <!--  The RGB points of the default ColorMap "Fast" found in ColorMaps.json -->
         <Documentation>
           Specify the control points that form the color-transfer-function. These are
           a list of 4-tuples of the form (x, r, g, b) where x is the data value,
@@ -1557,8 +1557,8 @@
                             name="NanColor"
                             panel_widget="color_selector"
                             number_of_elements="3"
-                            default_values="1 1 0">
-                            <!--  The NanColor of the default ColorMap "Cool to Warm" found in ColorMaps.json -->
+                            default_values="0 1 0">
+        <!--  The NanColor of the default ColorMap "Fast" found in ColorMaps.json -->
         <Documentation>
           Set the color to use when NaN (not-a-number) is encountered.
         </Documentation>
