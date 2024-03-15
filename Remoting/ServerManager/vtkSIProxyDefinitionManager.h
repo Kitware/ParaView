@@ -251,11 +251,13 @@ protected:
    * as they allow to automatically add some extra hints for those loaded
    * definition set. This is essentially used when proxy get loaded as
    * legacy proxy don't have those expected Hints.
+   * If invoke is true, these method will invoke `ProxyDefinitionsUpdated` at the end.
    * FIXME: Once those pluging get updated, this extra hint attachment
    * might be removed.
    */
-  bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
-  bool LoadConfigurationXMLFromString(const char* xmlContent, bool attachShowInMenuHints);
+  bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints, bool invoke = true);
+  bool LoadConfigurationXMLFromString(
+    const char* xmlContent, bool attachShowInMenuHints, bool invoke = true);
   ///@}
 
   ///@{

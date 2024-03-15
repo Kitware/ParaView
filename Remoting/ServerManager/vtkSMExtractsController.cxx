@@ -468,7 +468,10 @@ bool vtkSMExtractsController::CreateDir(
   }
   else
   {
-    vtkErrorMacro("Failed to create directory: " << dname.c_str());
+    // Expand directory name for better error message
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(dname);
+
+    vtkErrorMacro("Failed to create directory: " << fullPath.c_str());
     return false;
   }
 }
