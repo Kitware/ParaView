@@ -29,8 +29,6 @@ vtkPVZSpaceView::vtkPVZSpaceView()
   vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
   if (sdkManager)
   {
-    // Should be (re)initialized each time we create a new view
-    sdkManager->InitializeZSpace();
     mode = sdkManager->GetStereoDisplayMode();
   }
 
