@@ -1176,7 +1176,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell" name="input_array" />
         <Documentation>This property specifies the input of the filter.</Documentation>
@@ -1216,7 +1216,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell" name="input_array" />
         <Documentation>This property specifies the input of the filter.</Documentation>
@@ -1257,7 +1257,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <Documentation>This property specifies the input of the
         filter.</Documentation>
