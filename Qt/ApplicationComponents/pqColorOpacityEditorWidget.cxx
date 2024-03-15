@@ -15,14 +15,12 @@
 #include "pqPresetGroupsManager.h"
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
-#include "pqPropertyWidgetDecorator.h"
 #include "pqRescaleScalarRangeReaction.h"
 #include "pqRescaleScalarRangeToCustomDialog.h"
 #include "pqRescaleScalarRangeToDataOverTimeDialog.h"
 #include "pqSettings.h"
 #include "pqSignalsBlocker.h"
 #include "pqTimer.h"
-#include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
@@ -32,7 +30,6 @@
 #include "vtkNew.h"
 #include "vtkPVTransferFunction2D.h"
 #include "vtkPVTransferFunction2DBox.h"
-#include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCoreUtilities.h"
@@ -49,23 +46,18 @@
 #include "vtkTable.h"
 #include "vtkTransferFunctionBoxItem.h"
 #include "vtkTransferFunctionChartHistogram2D.h"
-#include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtk_jsoncpp.h"
 
 #include <QColorDialog>
-#include <QMessageBox>
+#include <QMap>
 #include <QPainter>
-#include <QPointer>
 #include <QStandardItem>
-#include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QtDebug>
 
 #include <cassert>
-#include <cmath>
 #include <set>
 
 namespace
@@ -1135,9 +1127,10 @@ void pqColorOpacityEditorWidget::updateDefaultPresetsList()
   auto transferFunctionPresets = vtkSMTransferFunctionPresets::GetInstance();
   auto groupManager = qobject_cast<pqPresetGroupsManager*>(
     pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
-  QString const currentPreset = defaultPresetsComboBox->currentText();
+  const QString currentPreset = defaultPresetsComboBox->currentText();
   defaultPresetsComboBox->blockSignals(true);
   defaultPresetsComboBox->clear();
+
   // QComboBox::setPlaceHolder is a Qt5.15 function, so until the
   // minimum version is upgraded, we have to do this workaround.
   defaultPresetsComboBox->addItem(tr("Select a color map from default presets"), -1);
@@ -1145,15 +1138,27 @@ void pqColorOpacityEditorWidget::updateDefaultPresetsList()
   QStandardItem* item = model->item(0);
   // Disable the "placeholder"
   item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+
+  QMap<QString, unsigned int> availableGroupPresets;
   for (unsigned int index = 0; index < transferFunctionPresets->GetNumberOfPresets(); ++index)
   {
     auto presetName = QString::fromStdString(transferFunctionPresets->GetPresetName(index));
     if (groupManager->presetRankInGroup(presetName, "Default") != -1)
     {
-      defaultPresetsComboBox->addItem(presetName, index);
+      availableGroupPresets[presetName] = index;
     }
   }
-  int currentPresetIndex = defaultPresetsComboBox->findText(currentPreset);
+  // if a default preset is available, add it to the list
+  const auto groupPresents = groupManager->presetsInGroup("Default");
+  for (auto const& presetName : groupPresents)
+  {
+    auto iter = availableGroupPresets.find(presetName);
+    if (iter != availableGroupPresets.end())
+    {
+      defaultPresetsComboBox->addItem(presetName, iter.value());
+    }
+  }
+  const int currentPresetIndex = defaultPresetsComboBox->findText(currentPreset);
   defaultPresetsComboBox->setCurrentIndex(currentPresetIndex == -1 ? 0 : currentPresetIndex);
   defaultPresetsComboBox->blockSignals(false);
 }

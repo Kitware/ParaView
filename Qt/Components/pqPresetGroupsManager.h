@@ -81,6 +81,12 @@ public:
    * Returns the number of presets in the given group.
    */
   int numberOfPresetsInGroup(const QString& groupName);
+
+  /**
+   * Returns the list of presets in the given group.
+   */
+  QList<QString> presetsInGroup(const QString& groupName);
+
   /**
    * Returns the rank (index) of the given preset in the given group.
    * Returns -1 if the preset is not in the group (the preset dialog relies on this).

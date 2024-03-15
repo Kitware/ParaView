@@ -91,9 +91,8 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
   stdPresetsKey += arrayName;
   if (settings->HasSetting(stdPresetsKey.c_str()))
   {
-    vtkSMTransferFunctionProxy::ApplyPreset(proxy,
-      settings->GetSettingAsString(stdPresetsKey.c_str(), 0, "").c_str(),
-      /*rescale=*/false);
+    const auto stdPreset = settings->GetSettingAsString(stdPresetsKey.c_str(), 0, "");
+    vtkSMTransferFunctionProxy::ApplyPreset(proxy, stdPreset.c_str(), /*usePresetRange=*/false);
   }
 
   // Look up array-specific transfer function
