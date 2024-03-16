@@ -42,7 +42,6 @@ PRIVATE_DEPENDS
   VTK::nlohmannjson
   VTK::ChartsCore
 OPTIONAL_DEPENDS
-  VTK::FiltersParallelMPI
   VTK::IOImage
 TEST_DEPENDS
   VTK::CommonSystem
