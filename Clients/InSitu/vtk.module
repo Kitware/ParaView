@@ -20,7 +20,8 @@ PRIVATE_DEPENDS
 OPTIONAL_DEPENDS
   ParaView::PythonCatalyst
   VTK::IOCatalystConduit
-  VTK::IOFides
-  VTK::IOIOSS
   VTK::ParallelMPI
   VTK::WrappingPythonCore
+ORDER_DEPENDS
+  VTK::IOFides
+  VTK::IOIOSS
