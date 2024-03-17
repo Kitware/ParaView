@@ -28,11 +28,13 @@ PRIVATE_DEPENDS
   VTK::IOCore
 OPTIONAL_DEPENDS
   ParaView::nvpipe
-  ParaView::VTKExtensionsShaderBall
   VTK::PythonInterpreter
   VTK::RenderingRayTracing
 
-  # These affect the public API.
+  # These affect the public API. Note that `VTKExtensionsShaderBall` is
+  # conditional via `paraview_use_materialeditor`, not via `VTK_MODULE_ENABLE_`
+  # checks.
+  ParaView::VTKExtensionsShaderBall
   ParaView::pqPython
 TEST_OPTIONAL_DEPENDS
   VTK::Python
