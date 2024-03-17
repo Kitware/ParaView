@@ -13,7 +13,7 @@ DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsIOCore
+  VTK::ParallelCore
   VTK::netcdf
 OPTIONAL_DEPENDS
-  VTK::ParallelCore
   VTK::ParallelMPI
