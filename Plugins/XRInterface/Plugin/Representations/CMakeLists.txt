@@ -7,7 +7,10 @@ set(xrInterfaceXMLs XRInterfaceRepresentations.xml)
 
 set(qt_required_components)
 
-if (TARGET VTK::RenderingFFMPEGOpenGL2)
+_vtk_module_optional_dependency_exists(VTK::RenderingFFMPEGOpenGL2
+  SATISFIED_VAR _have_vtk_renderingffmpegopengl2)
+
+if (_have_vtk_renderingffmpegopengl2)
   list(APPEND qt_required_components
     Multimedia)
 
