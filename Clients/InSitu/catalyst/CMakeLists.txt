@@ -45,19 +45,26 @@ target_link_libraries(catalyst-paraview
     VTK::IOCatalystConduit
     ParaView::RemotingServerManager)
 
-if (TARGET VTK::ParallelMPI)
+_vtk_module_optional_dependency_exists(VTK::ParallelMPI
+  SATISFIED_VAR _have_vtk_parallelmpi)
+_vtk_module_optional_dependency_exists(VTK::IOIOSS
+  SATISFIED_VAR _have_vtk_ioioss)
+_vtk_module_optional_dependency_exists(VTK::IOFides
+  SATISFIED_VAR _have_vtk_iofides)
+
+if (_have_vtk_parallelmpi)
   target_link_libraries(catalyst-paraview
     PRIVATE
       VTK::ParallelMPI)
-endif()
+endif ()
 
-if (TARGET VTK::IOIOSS)
+if (_have_vtk_ioioss)
   target_link_libraries(catalyst-paraview
     PRIVATE
       VTK::IOIOSS)
 endif ()
 
-if (TARGET VTK::IOFides)
+if (_have_vtk_iofides)
   target_link_libraries(catalyst-paraview
     PRIVATE
       VTK::IOFides)
@@ -65,11 +72,14 @@ endif ()
 
 target_compile_definitions(catalyst-paraview
   PRIVATE
-    "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<TARGET_EXISTS:VTK::ParallelMPI>"
-    "VTK_MODULE_ENABLE_VTK_IOIOSS=$<TARGET_EXISTS:VTK::IOIOSS>"
-    "VTK_MODULE_ENABLE_VTK_IOFides=$<TARGET_EXISTS:VTK::IOFides>")
+    "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<BOOL:${_have_vtk_parallelmpi}>"
+    "VTK_MODULE_ENABLE_VTK_IOIOSS=$<BOOL:${_have_vtk_ioioss}>"
+    "VTK_MODULE_ENABLE_VTK_IOFides=$<BOOL:${_have_vtk_iofides}>")
 
-if (TARGET VTK::Python)
+_vtk_module_optional_dependency_exists(VTK::Python
+  SATISFIED_VAR _have_vtk_python)
+
+if (_have_vtk_python)
   # Simulations loading the ParaView Catalyst implementation might not have
   # their own Python, so we need to ensure that it is brought in when loaded by
   # libcatalyst.
