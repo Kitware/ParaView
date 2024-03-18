@@ -1,5 +1,10 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Color Palette" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaColorPalette/qt_scrollarea_viewport/Container/ProxyWidget/LoadPalette/ComboBox" command="activated" arguments="Blue Gray Background" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="LiveProgrammableSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" command="set_string" arguments="if not hasattr(self, &quot;_my_counter&quot;):&#xA;  setattr(self, &quot;_my_counter&quot;, -1)&#xA;&#xA;counter = self._my_counter&#xA;if counter &lt; 10:&#xA;  counter += 1&#xA;setattr(self, &quot;_my_counter&quot;, counter)&#xA;&#xA;from paraview.vtk.vtkFiltersSources import vtkSphereSource&#xA;src = vtkSphereSource()&#xA;src.SetStartTheta(275.0 * counter / 10.0)&#xA;src.Update()&#xA;&#xA;self.GetOutputDataObject(0).ShallowCopy(src.GetOutput())&#xA; " />

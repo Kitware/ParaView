@@ -36,6 +36,8 @@ def _updateEventCb(obj, event):
 
     prop = GetDisplayProperties(source)
     prop.RescaleTransferFunctionToDataRange(False, True)
+    rTDataLUT = GetColorTransferFunction('RTData')
+    rTDataLUT.ApplyPreset('Cool to Warm', True)
     ResetCamera()
     Render()
 
@@ -113,6 +115,9 @@ def _getSourceToExtractName(insituLink):
         name = pm.GetProxyName('sources', pm.GetNumberOfProxies('sources') - 1)
 
     return name
+
+LoadPalette("BlueGrayBackground")
+
 # ----------------------------
 # Create a render view
 renderView1 = CreateRenderView()
