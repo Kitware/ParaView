@@ -60,10 +60,14 @@ void vtkPVWebExporter::Write()
       throw 1;
     }
 
-    vtkSmartPyObject module(PyImport_ImportModule("vtk.web.vtkjs_helper"));
+#if VTK_MODULE_ENABLE_VTK_WebPython
+    vtkGenericWarningMacro("The VTK::WebPython module was not enabled.");
+    throw 1;
+#else
+    vtkSmartPyObject module(PyImport_ImportModule("vtkmodules.web.vtkjs_helper"));
     if (!module || PyErr_Occurred())
     {
-      vtkGenericWarningMacro("Failed to import vtk.web.vtkjs_helper module.");
+      vtkGenericWarningMacro("Failed to import vtkmodules.web.vtkjs_helper module.");
       throw 1;
     }
 
@@ -85,6 +89,7 @@ void vtkPVWebExporter::Write()
       vtkGenericWarningMacro("Failed to bundle vtkjs data file into HTML viewer");
       throw 1;
     }
+#endif
   }
   catch (int)
   {
