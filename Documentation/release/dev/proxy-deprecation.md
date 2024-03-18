@@ -15,3 +15,4 @@ Here is the list of renamed proxies:
 | `GhostCellsGenerator` | `GhostCells`|
 |`AddFieldArrays` | `FieldArraysFromFile` |
 |`AppendArcLength` | `PolylineLength` |
+|`AppendLocationAttributes` | `Coordinates` |

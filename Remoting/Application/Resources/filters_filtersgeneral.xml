@@ -39,8 +39,8 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAppendLocationAttributes"
-                 label="Append Location Attributes"
-                 name="AppendLocationAttributes">
+                 label="Coordinates"
+                 name="Coordinates">
       <Documentation long_help="Adds points and/or cell centers as point and/or cell data arrays."
                      short_help="Optionally add point and cell centers as point and cell data arrays.">
                     This filter optionally adds point locations and cell centers to point and cell
@@ -76,7 +76,16 @@
         <Documentation>Adds a cell data array named `CellCenters` that is stores the centers
         of cells in the input.</Documentation>
       </IntVectorProperty>
-      <!-- End AppendLocationAttributes -->
+      <!-- End Coordinates -->
+    </SourceProxy>
+    <SourceProxy class="vtkAppendLocationAttributes"
+                 base_proxyname="Coordinates"
+                 base_proxygroup="filters"
+                 name="AppendLocationAttributes">
+
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'Coordinates'. Please consider using that instead.
+      </Deprecated>
     </SourceProxy>
 
     <!-- ==================================================================== -->

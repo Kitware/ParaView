@@ -1128,6 +1128,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("GhostCellsGenerator", "GhostCells")]
         proxies[proxiesNS.filters] += [("AddFieldArrays", "FieldArraysFromFile")]
         proxies[proxiesNS.filters] += [("AppendArcLength", "PolylineLength")]
+        proxies[proxiesNS.filters] += [("AppendLocationAttributes", "Coordinates")]
 
     return proxies
 

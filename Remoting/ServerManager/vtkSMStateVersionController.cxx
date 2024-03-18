@@ -1865,7 +1865,8 @@ struct Process_5_12_to_5_13
   bool HandleRenamedProxies(xml_document& document)
   {
     std::map<std::string, std::string> renamedProxies = { { "GhostCellsGenerator", "GhostCells" },
-      { "AddFieldArrays", "FieldArraysFromFile" }, { "AppendArcLength", "PolylineLength" } };
+      { "AddFieldArrays", "FieldArraysFromFile" }, { "AppendArcLength", "PolylineLength" },
+      { "AppendLocationAttributes", "Coordinates" } };
 
     for (const auto& proxy : renamedProxies)
     {
