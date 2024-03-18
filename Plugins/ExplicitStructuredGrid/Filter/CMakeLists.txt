@@ -3,7 +3,14 @@ set(classes
 set(server_manager_files
   ExplicitStructuredGrid.xml)
 
-if (PARAVIEW_USE_PYTHON)
+_vtk_module_optional_dependency_exists(VTK::Python
+  SATISFIED_VAR _have_vtk_python)
+_vtk_module_optional_dependency_exists(VTK::WrappingPythonCore
+  SATISFIED_VAR _have_vtk_wrappingpythoncore)
+_vtk_module_optional_dependency_exists(VTK::PythonInterpreter
+  SATISFIED_VAR _have_vtk_pythoninterpreter)
+
+if (_have_vtk_python AND _have_vtk_wrappingpythoncore AND _have_vtk_pythoninterpreter)
   list(APPEND classes
     vtkExplicitStructuredGridPythonExtractor)
   list(APPEND server_manager_files
