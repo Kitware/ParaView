@@ -47,6 +47,12 @@ public:
   void SetInteractionMode(int mode) override;
 
   /**
+   * Force VTK_STEREO_ZSPACE_INSPIRE mode if we are
+   * on a zSpace Inspire device.
+   */
+  void SetStereoType(int stereoType) override;
+
+  /**
    * Set the physical distance between eyes on the glasses
    * Delegate to zSpace SDK manager.
    * Default is 0.056f.
@@ -106,6 +112,12 @@ protected:
 private:
   vtkPVZSpaceView(const vtkPVZSpaceView&) = delete;
   void operator=(const vtkPVZSpaceView&) = delete;
+
+  /**
+   * Replace the internal RenderWindow with a vtkZSpaceGenericRenderWindow.
+   * This is needed if we are on zSpace Inspire hardware.
+   */
+  void SetupZSpaceRenderWindow();
 
   vtkNew<vtkZSpaceInteractorStyle> ZSpaceInteractorStyle;
   vtkNew<vtkZSpaceRayActor> StylusRayActor;

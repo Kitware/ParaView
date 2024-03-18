@@ -9,8 +9,10 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
 #include "vtkTransform.h"
 #include "vtkZSpaceCamera.h"
+#include "vtkZSpaceGenericRenderWindow.h"
 #include "vtkZSpaceInteractorStyle.h"
 #include "vtkZSpaceRayActor.h"
 #include "vtkZSpaceRenderWindowInteractor.h"
@@ -22,6 +24,22 @@ vtkStandardNewMacro(vtkPVZSpaceView);
 //----------------------------------------------------------------------------
 vtkPVZSpaceView::vtkPVZSpaceView()
 {
+  vtkZSpaceSDKManager::StereoDisplayMode mode = vtkZSpaceSDKManager::QUAD_BUFFER_STEREO;
+
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+  if (sdkManager)
+  {
+    // Should be (re)initialized each time we create a new view
+    sdkManager->InitializeZSpace();
+    mode = sdkManager->GetStereoDisplayMode();
+  }
+
+  if (mode == vtkZSpaceSDKManager::STEREO_DISPLAY_API)
+  {
+    // Replace standard render window with dedicated one
+    this->SetupZSpaceRenderWindow();
+  }
+
   this->ZSpaceInteractorStyle->SetZSpaceRayActor(this->StylusRayActor);
 
   // Setup the zSpace rendering pipeline
@@ -88,6 +106,28 @@ void vtkPVZSpaceView::SetInteractionMode(int mode)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVZSpaceView::SetStereoType(int stereoType)
+{
+  vtkZSpaceSDKManager::StereoDisplayMode mode = vtkZSpaceSDKManager::QUAD_BUFFER_STEREO;
+
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+  if (sdkManager)
+  {
+    mode = sdkManager->GetStereoDisplayMode();
+  }
+
+  if (mode == vtkZSpaceSDKManager::STEREO_DISPLAY_API)
+  {
+    // Force VTK_STEREO_ZSPACE_INSPIRE if we are on zSpace Inspire
+    this->Superclass::SetStereoType(VTK_STEREO_ZSPACE_INSPIRE);
+  }
+  else
+  {
+    this->Superclass::SetStereoType(stereoType);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVZSpaceView::ResetCamera()
 {
   this->Update();
@@ -128,16 +168,12 @@ void vtkPVZSpaceView::ResetAllUserTransforms()
 //------------------------------------------------------------------------------
 void vtkPVZSpaceView::Render(bool interactive, bool skip_rendering)
 {
-  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
-  sdkManager->BeginFrame();
-
   if (!this->GetMakingSelection())
   {
     vtkZSpaceRenderWindowInteractor::SafeDownCast(this->Interactor)->ProcessEvents();
   }
 
   this->Superclass::Render(interactive, skip_rendering || this->GetMakingSelection());
-  sdkManager->EndFrame();
 }
 
 //----------------------------------------------------------------------------
@@ -169,4 +205,25 @@ void vtkPVZSpaceView::SetDrawStylus(bool drawStylus)
 void vtkPVZSpaceView::SetInteractivePicking(bool interactivePicking)
 {
   this->ZSpaceInteractorStyle->SetHoverPick(interactivePicking);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVZSpaceView::SetupZSpaceRenderWindow()
+{
+  // Calls related to vtkPVView::NewRenderWindow()
+  vtkNew<vtkZSpaceGenericRenderWindow> window;
+  window->AlphaBitPlanesOn();
+  window->SetWindowName("ParaView");
+  this->SetRenderWindow(window);
+
+  // Calls related to  vtkPVView::vtkPVView()
+  this->GetRenderWindow()->SetSize(this->Size);
+  this->GetRenderWindow()->SetPosition(this->Position);
+  this->GetRenderWindow()->SetDPI(this->PPI);
+
+  // Calls related to vtkPVRenderView::vtkPVRenderView()
+  this->GetRenderWindow()->SetMultiSamples(0);
+  this->RenderView->SetRenderWindow(this->GetRenderWindow());
+  this->GetRenderWindow()->AddRenderer(this->NonCompositedRenderer);
+  this->GetRenderWindow()->SetNumberOfLayers(3);
 }

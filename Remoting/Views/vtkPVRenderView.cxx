@@ -2942,6 +2942,7 @@ inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
     case VTK_STEREO_SPLITVIEWPORT_HORIZONTAL:
     case VTK_STEREO_FAKE:
     case VTK_STEREO_EMULATE:
+    case VTK_STEREO_ZSPACE_INSPIRE:
       return 2;
 
     case VTK_STEREO_LEFT:
