@@ -9,5 +9,9 @@ the python backward compatibility module.
 ### Renamed proxies
 It allows to rename proxies, trying to use meaningful, shorter names.
 Here is the list of renamed proxies:
- - `GhostCellsGenerator` becomes `GhostCells`
- - `AddFieldArrays` -> `FieldArraysFromFile`
+
+| previous name | new name|
+| ============= | ======= |
+| `GhostCellsGenerator` | `GhostCells`|
+|`AddFieldArrays` | `FieldArraysFromFile` |
+|`AppendArcLength` | `PolylineLength` |

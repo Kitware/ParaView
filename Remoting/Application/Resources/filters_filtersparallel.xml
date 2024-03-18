@@ -404,11 +404,11 @@
              id="491"
              servers="1"
              type="ProbeLineLegacy" />
-      <Proxy compound_name="AppendArcLength1"
+      <Proxy compound_name="PolylineLength1"
              group="filters"
              id="588"
              servers="1"
-             type="AppendArcLength">
+             type="PolylineLength">
         <Property id="588.Input"
                   name="Input"
                   number_of_elements="1">
@@ -435,7 +435,7 @@
       </ExposedProperties>
       <OutputPort name="Output"
                   port_index="0"
-                  proxy="AppendArcLength1" />
+                  proxy="PolylineLength1" />
       <!-- End ProbeLineLegacy -->
     </CompoundSourceProxy>
 

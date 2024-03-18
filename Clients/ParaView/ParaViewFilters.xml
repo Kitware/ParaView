@@ -346,6 +346,7 @@
   <Proxy group="filters" name="PointVolumeInterpolator" />
   <Proxy group="filters" name="PolyDataNormals" />
   <Proxy group="filters" name="PolyDataTangents" />
+  <Proxy group="filters" name="PolylineLength" />
   <Proxy group="filters" name="ProbeLine" icon=":/pqWidgets/Icons/pqPlotOverLine.svg" />
   <Proxy group="filters" name="ProbeCustomLines" />
   <Proxy group="filters" name="ProbePoint" icon=":/pqWidgets/Icons/pqProbeLocation.svg" />

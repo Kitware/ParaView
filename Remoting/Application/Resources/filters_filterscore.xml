@@ -2,8 +2,8 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAppendArcLength"
-                 label="Append Arc-Length"
-                 name="AppendArcLength">
+                 label="Polyline Length"
+                 name="PolylineLength">
       <Documentation long_help="Appends Arc length for input poly lines."
                      short_help="Appends Arc length for input poly lines.">
                      vtkAppendArcLength is used for filter such as
@@ -25,7 +25,15 @@
         </DataTypeDomain>
         <Documentation>The input.</Documentation>
       </InputProperty>
-      <!-- End of AppendArcLength -->
+    </SourceProxy>
+
+    <SourceProxy class="vtkAppendArcLength"
+                 base_proxyname="PolylineLength"
+                 base_proxygroup="filters"
+                 name="AppendArcLength">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'PolylineLength'. Please consider using that instead.
+      </Deprecated>
     </SourceProxy>
 
     <!-- ==================================================================== -->
