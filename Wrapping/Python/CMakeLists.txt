@@ -66,6 +66,7 @@ set(python_files
   paraview/tests/__init__.py
   paraview/tests/internals.py
   paraview/tests/__main__.py
+  paraview/tests/proxy_deprecation.py
   paraview/tests/validate_extracts.py
   paraview/tests/verify_eyedomelighting.py
   paraview/tpl/__init__.py

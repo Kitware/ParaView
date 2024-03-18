@@ -266,7 +266,7 @@
   <Proxy group="filters" name="GenericCut" />
   <Proxy group="filters" name="GenericGeometryFilter" />
   <Proxy group="filters" name="GenericStreamTracer" />
-  <Proxy group="filters" name="GhostCellsGenerator" icon=":/pqWidgets/Icons/pqGhostCellsGenerator.svg" />
+  <Proxy group="filters" name="GhostCells" icon=":/pqWidgets/Icons/pqGhostCellsGenerator.svg" />
   <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph.svg" />
   <Proxy group="filters" name="GlyphWithCustomSource" icon=":/pqWidgets/Icons/pqGlyph.svg" />
   <Proxy group="filters" name="Gradient" />

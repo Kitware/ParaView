@@ -2985,6 +2985,19 @@ def _add_functions(g):
         return
 
     activeModule = servermanager.ActiveConnection.ProxiesNS
+
+    # add deprecated proxies first, so we create the new function and documentation.
+    modules = paraview._backwardscompatibilityhelper.get_deprecated_proxies(activeModule)
+    for proxyModule in modules:
+        for deprecatedProxyPair in modules[proxyModule]:
+            oldProxyLabel = deprecatedProxyPair[0]
+            newProxyLabel = deprecatedProxyPair[1]
+            if not newProxyLabel in g and _func_name_valid(newProxyLabel):
+                f = _create_func(deprecatedProxyPair, proxyModule)
+                f.__doc__ = "{} is a deprecated proxy. It will be automatically replaced by {}".format(oldProxyLabel, newProxyLabel)
+                f.__name__ = oldProxyLabel
+                g[oldProxyLabel] = f
+
     for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
         # Skip registering proxies in certain modules (currently only writers)
         skipRegisteration = m is activeModule.writers
