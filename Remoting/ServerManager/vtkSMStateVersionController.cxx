@@ -1689,7 +1689,7 @@ struct Process_5_12_to_5_13
   bool operator()(xml_document& document)
   {
     return HandleSetDecomposePolyhedra(document) && HandleRepresentationFlipTextures(document) &&
-      HandleGhostCellsGenerator(document) && HandleAxisAlignedPlaneCut(document);
+      HandleRenamedProxies(document) && HandleAxisAlignedPlaneCut(document);
   }
 
   static bool HandleSetDecomposePolyhedra(xml_document& document)
@@ -1862,16 +1862,23 @@ struct Process_5_12_to_5_13
     return true;
   }
 
-  bool HandleGhostCellsGenerator(xml_document& document)
+  bool HandleRenamedProxies(xml_document& document)
   {
-    pugi::xpath_node_set xpath_set = document.select_nodes(
-      "//ServerManagerState/Proxy[@group='filters' and @type='GhostCellsGenerator']");
+    std::map<std::string, std::string> renamedProxies = { { "GhostCellsGenerator", "GhostCells" },
+      { "AddFieldArrays", "FieldArraysFromFile" } };
 
-    for (auto xpath_node : xpath_set)
+    for (const auto& proxy : renamedProxies)
     {
-      auto node = xpath_node.node();
-      // Change filter type
-      node.attribute("type").set_value("GhostCells");
+      std::string request =
+        "//ServerManagerState/Proxy[@group='filters' and @type='" + proxy.first + "']";
+      pugi::xpath_node_set xpath_set = document.select_nodes(request.c_str());
+
+      for (auto xpath_node : xpath_set)
+      {
+        auto node = xpath_node.node();
+        // Change filter type
+        node.attribute("type").set_value(proxy.second.c_str());
+      }
     }
 
     return true;

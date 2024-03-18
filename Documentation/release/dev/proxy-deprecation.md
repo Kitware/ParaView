@@ -10,3 +10,4 @@ the python backward compatibility module.
 It allows to rename proxies, trying to use meaningful, shorter names.
 Here is the list of renamed proxies:
  - `GhostCellsGenerator` becomes `GhostCells`
+ - `AddFieldArrays` -> `FieldArraysFromFile`
