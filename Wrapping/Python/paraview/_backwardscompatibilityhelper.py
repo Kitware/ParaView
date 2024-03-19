@@ -1113,6 +1113,11 @@ def GetProxy(module, key, **kwargs):
 def get_deprecated_proxies(proxiesNS):
     """
     Provide a map between deprecated proxies and their fallback proxy
+    The key is the previous name, value the new.
+    By name we mean the actual python method name to construct the proxy,
+    not the proxy name.
+    Python method name is constructed from proxy label, sanitized to be
+    a valid python method name.
     """
     compatibility_version = get_paraview_compatibility_version()
     proxies = {}
