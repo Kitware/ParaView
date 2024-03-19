@@ -1869,7 +1869,8 @@ struct Process_5_12_to_5_13
       { "AppendLocationAttributes", "Coordinates" }, { "BlockIdScalars", "BlockIds" },
       { "ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties" },
       { "GenerateGlobalIds", "GlobalPointAndCellIds" }, { "GenerateIdScalars", "PointAndCellIds" },
-      { "GenerateProcessIds", "ProcessIds" } };
+      { "GenerateProcessIds", "ProcessIds" },
+      { "GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics" } };
 
     for (const auto& proxy : renamedProxies)
     {

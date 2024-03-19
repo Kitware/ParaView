@@ -1447,7 +1447,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkSpatioTemporalHarmonicsAttribute"
-                 name="GenerateSpatioTemporalHarmonics">
+                 name="SpatioTemporalHarmonics">
       <Documentation short_help="Add a spatio-temporal harmonics array.">
                      The Spatio Temporal Harmonics Attribute filter adds an
                      array for point data. The values are computed for each
@@ -1495,6 +1495,15 @@
       <PropertyGroup label="Harmonics Settings">
         <Property name="Harmonics" />
       </PropertyGroup>
+    </SourceProxy>
+
+    <SourceProxy class="vtkSpatioTemporalHarmonicsAttribute"
+                 base_proxyname="SpatioTemporalHarmonics"
+                 base_proxygroup="filters"
+                 name="GenerateSpatioTemporalHarmonics">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'SpatioTemporalHarmonics'. Please consider using that instead.
+      </Deprecated>
     </SourceProxy>
 
     <!-- ==================================================================== -->

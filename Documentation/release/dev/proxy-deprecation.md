@@ -21,3 +21,4 @@ Here is the list of renamed proxies:
 |`GenerateGlobalIds` | `GlobalPointAndCellIds` |
 |`GenerateIds` | `PointAndCellIds` |
 |`GenerateProcessIds` | `ProcessIds` |
+|`GenerateSpatioTemporalHarmonics` | `SpatioTemporalHarmonics` |

@@ -1135,6 +1135,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("GenerateGlobalIds", "GlobalPointAndCellIds")]
         proxies[proxiesNS.filters] += [("GenerateIds", "PointAndCellIds")]
         proxies[proxiesNS.filters] += [("GenerateProcessIds", "ProcessIds")]
+        proxies[proxiesNS.filters] += [("GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics")]
 
     return proxies
 
