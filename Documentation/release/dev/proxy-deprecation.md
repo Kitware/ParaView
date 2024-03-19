@@ -17,3 +17,4 @@ Here is the list of renamed proxies:
 |`AppendArcLength` | `PolylineLength` |
 |`AppendLocationAttributes` | `Coordinates` |
 |`BlockScalars` | `BlockIds` |
+|`ComputeConnectedSurfaceProperties` | `ConnectedSurfaceProperties` |

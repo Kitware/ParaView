@@ -4555,8 +4555,8 @@ Every Nth Point.
 
     <!-- ==================================================================== -->
    <SourceProxy class="vtkMultiObjectMassProperties"
-                label="Compute Connected Surface Properties"
-                name="ComputeConnectedSurfaceProperties">
+                label="Connected Surface Properties"
+                name="ConnectedSurfaceProperties">
      <Documentation
              long_help="Compute volume, area, and centroid of multiple connected polygonal
              objects in a single polygonal input"
@@ -4611,6 +4611,14 @@ Every Nth Point.
          This property indicates the name of the array with the object IDs. The default name is "ObjectIds".
        </Documentation>
      </StringVectorProperty>
+   </SourceProxy>
+   <SourceProxy class="vtkMultiObjectMassProperties"
+                base_proxyname="ConnectedSurfaceProperties"
+                base_proxygroup="filters"
+                name="ComputeConnectedSurfaceProperties">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'ConnectedSurfaceProperties'. Please consider using that instead.
+      </Deprecated>
      <!-- End ComputeConnectedSurfaceProperties -->
    </SourceProxy>
 

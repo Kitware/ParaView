@@ -1130,6 +1130,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("AppendArcLength", "PolylineLength")]
         proxies[proxiesNS.filters] += [("AppendLocationAttributes", "Coordinates")]
         proxies[proxiesNS.filters] += [("BlockScalars", "BlockIds")]
+        proxies[proxiesNS.filters] += [("ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties")]
 
     return proxies
 
