@@ -1868,8 +1868,8 @@ struct Process_5_12_to_5_13
       { "AddFieldArrays", "FieldArraysFromFile" }, { "AppendArcLength", "PolylineLength" },
       { "AppendLocationAttributes", "Coordinates" }, { "BlockIdScalars", "BlockIds" },
       { "ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties" },
-      { "GenerateGlobalIds", "GlobalPointAndCellIds" },
-      { "GenerateIdScalars", "PointAndCellIds" } };
+      { "GenerateGlobalIds", "GlobalPointAndCellIds" }, { "GenerateIdScalars", "PointAndCellIds" },
+      { "GenerateProcessIds", "ProcessIds" } };
 
     for (const auto& proxy : renamedProxies)
     {

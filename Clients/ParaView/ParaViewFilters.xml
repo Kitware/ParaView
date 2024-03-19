@@ -356,6 +356,7 @@
   <Proxy group="filters" name="ProbeCustomLines" />
   <Proxy group="filters" name="ProbePoint" icon=":/pqWidgets/Icons/pqProbeLocation.svg" />
   <Proxy group="filters" name="ProcessIdScalars" />
+  <Proxy group="filters" name="ProcessIds" />
   <Proxy group="filters" name="ProgrammableAnnotation" icon=":/pqWidgets/Icons/pqProgrammableAnnotation.svg" />
   <Proxy group="filters" name="ProgrammableFilter" icon=":/pqWidgets/Icons/pqProgrammableFilter.svg" />
   <Proxy group="filters" name="PythonAnnotation" />

@@ -20,3 +20,4 @@ Here is the list of renamed proxies:
 |`ComputeConnectedSurfaceProperties` | `ConnectedSurfaceProperties` |
 |`GenerateGlobalIds` | `GlobalPointAndCellIds` |
 |`GenerateIds` | `PointAndCellIds` |
+|`GenerateProcessIds` | `ProcessIds` |
