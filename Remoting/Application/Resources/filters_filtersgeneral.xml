@@ -90,8 +90,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkBlockIdScalars"
-                 label="Block Scalars"
-                 name="BlockIdScalars">
+                 label="Block Ids"
+                 name="BlockIds">
       <Documentation long_help="The Level Scalars filter uses colors to show levels of a multiblock dataset."
                      short_help="Generate point scalars from level.">The Level
                      Scalars filter uses colors to show levels of a multiblock
@@ -108,9 +108,18 @@
         <Documentation>This property specifies the input to the Level Scalars
         filter.</Documentation>
       </InputProperty>
-      <!-- End GroupIdScalars -->
     </SourceProxy>
-
+    <SourceProxy class="vtkBlockIdScalars"
+                 label="Block Scalars"
+                 base_proxyname="BlockIds"
+                 base_proxygroup="filters"
+                 name="BlockIdScalars">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This filter has been replaced by 'BlockIds'.
+        Please consider using that instead.
+      </Deprecated>
+    </SourceProxy>
+      <!-- End GroupIdScalars -->
     <!-- ==================================================================== -->
     <SourceProxy class="vtkBrownianPoints"
                  label="Random Vectors"

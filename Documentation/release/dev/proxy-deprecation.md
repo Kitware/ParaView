@@ -16,3 +16,4 @@ Here is the list of renamed proxies:
 |`AddFieldArrays` | `FieldArraysFromFile` |
 |`AppendArcLength` | `PolylineLength` |
 |`AppendLocationAttributes` | `Coordinates` |
+|`BlockScalars` | `BlockIds` |

@@ -59,7 +59,7 @@
   <Proxy group="filters" name="AppendPolyData" />
   <Proxy group="filters" name="ArbitrarySourceGlyph" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
-  <Proxy group="filters" name="BlockIdScalars" />
+  <Proxy group="filters" name="BlockIds" />
   <Proxy group="filters" name="BrownianPoints" />
   <Proxy group="filters" name="Calculator" />
   <Proxy group="filters" name="CellCenters" />
