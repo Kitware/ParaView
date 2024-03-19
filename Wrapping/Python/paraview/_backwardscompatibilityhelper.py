@@ -1138,6 +1138,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics")]
         proxies[proxiesNS.filters] += [("GenerateSurfaceNormals", "SurfaceNormals")]
         proxies[proxiesNS.filters] += [("GenerateSurfaceTangents", "SurfaceTangents")]
+        proxies[proxiesNS.filters] += [("LevelScalarsOverlappingAMR", "OverlappingAMRLevelIds")]
 
     return proxies
 

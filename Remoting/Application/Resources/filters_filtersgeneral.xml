@@ -927,8 +927,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkOverlappingAMRLevelIdScalars"
-                 label="Level Scalars(Overlapping AMR)"
-                 name="OverlappingLevelIdScalars">
+                 label="Overlapping AMR Level Ids"
+                 name="OverlappingAMRLevelIds">
       <Documentation long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
                      short_help="Generate point scalars from level.">The Level
                      Scalars filter uses colors to show levels of a
@@ -945,6 +945,16 @@
         <Documentation>This property specifies the input to the Level Scalars
         filter.</Documentation>
       </InputProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkOverlappingAMRLevelIdScalars"
+                 label="Level Scalars(Overlapping AMR)"
+                 base_proxyname="OverlappingAMRLevelIds"
+                 base_proxygroup="filters"
+                 name="OverlappingLevelIdScalars">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'OverlappingAMRLevelIds'. Please consider using that instead.
+      </Deprecated>
       <!-- End GroupIdScalars -->
     </SourceProxy>
 

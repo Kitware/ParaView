@@ -119,7 +119,7 @@
     <Proxy group="filters" name="AMRFragmentIntegration" />
     <Proxy group="filters" name="AMRResampleFilter" />
     <Proxy group="filters" name="AMRToMultiBlock" />
-    <Proxy group="filters" name="OverlappingLevelIdScalars" />
+    <Proxy group="filters" name="OverlappingAMRLevelIds" />
     <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
     <Proxy group="filters" name="AxisAlignedSlice" />
@@ -326,6 +326,7 @@
   <Proxy group="filters" name="OutlineCornerFilter" />
   <Proxy group="filters" name="OutlineFilter" />
   <Proxy group="filters" name="OverlappingCellsDetector" />
+  <Proxy group="filters" name="OverlappingAMRLevelIds" />
   <Proxy group="filters" name="OverlappingLevelIdScalars" />
   <Proxy group="filters" name="PCANormalEstimation" />
   <Proxy group="filters" name="PCAStatistics" />

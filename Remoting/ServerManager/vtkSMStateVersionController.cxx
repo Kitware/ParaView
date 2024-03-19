@@ -1871,7 +1871,8 @@ struct Process_5_12_to_5_13
       { "GenerateGlobalIds", "GlobalPointAndCellIds" }, { "GenerateIdScalars", "PointAndCellIds" },
       { "GenerateProcessIds", "ProcessIds" },
       { "GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics" },
-      { "PolyDataNormals", "SurfaceNormals" }, { "PolyDataTangents", "SurfaceTangents" } };
+      { "PolyDataNormals", "SurfaceNormals" }, { "PolyDataTangents", "SurfaceTangents" },
+      { "OverlappingLevelIdScalars", "OverlappingAMRLevelIds" } };
 
     for (const auto& proxy : renamedProxies)
     {

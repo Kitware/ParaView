@@ -24,3 +24,4 @@ Here is the list of renamed proxies:
 |`GenerateSpatioTemporalHarmonics` | `SpatioTemporalHarmonics` |
 |`GenerateSurfaceNormals` | `SurfaceNormals` |
 |`GenerateSurfaceTangents` | `SurfaceTangents` |
+|`LevelScalarsOverlappingAMR` | `OverlappingAMRLevelIds` |
