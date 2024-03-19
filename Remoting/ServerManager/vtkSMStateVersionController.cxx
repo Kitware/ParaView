@@ -1870,7 +1870,8 @@ struct Process_5_12_to_5_13
       { "ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties" },
       { "GenerateGlobalIds", "GlobalPointAndCellIds" }, { "GenerateIdScalars", "PointAndCellIds" },
       { "GenerateProcessIds", "ProcessIds" },
-      { "GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics" } };
+      { "GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics" },
+      { "PolyDataNormals", "SurfaceNormals" } };
 
     for (const auto& proxy : renamedProxies)
     {

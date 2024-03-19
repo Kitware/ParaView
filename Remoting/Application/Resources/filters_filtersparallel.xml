@@ -1299,8 +1299,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPPolyDataNormals"
-                 label="Generate Surface Normals"
-                 name="PolyDataNormals">
+                 label="Surface Normals"
+                 name="SurfaceNormals">
       <Documentation long_help="This filter will produce surface normals used for smooth shading. Splitting is used to avoid smoothing across feature edges."
                      short_help="Produce surface point normals.">This filter
                      generates surface normals at the points of the input
@@ -1399,6 +1399,16 @@
         processor boundaries). Turn this off if you do want to process ghost
         levels and do not mind seams.</Documentation>
       </IntVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkPPolyDataNormals"
+                 label="Generate Surface Normals"
+                 base_proxyname="SurfaceNormals"
+                 base_proxygroup="filters"
+                 name="PolyDataNormals">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'SurfaceNormals'. Please consider using that instead.
+      </Deprecated>
       <!-- End  PolyDataNormals -->
     </SourceProxy>
 
