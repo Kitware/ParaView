@@ -1015,8 +1015,8 @@ found and the point will be rejected.</Documentation>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkIdFilter"
-                 label="Generate Ids"
-                 name="GenerateIdScalars">
+                 label="Point And Cell Ids"
+                 name="PointAndCellIds">
       <Documentation long_help="Generate scalars from point and cell ids."
                      short_help="Generate scalars from point and cell ids.">
                      This filter generates scalars using cell and point ids.
@@ -1089,7 +1089,16 @@ found and the point will be rejected.</Documentation>
         <Property name="GenerateCellIds" />
         <Property name="CellIdsArrayName" />
       </PropertyGroup>
+    </SourceProxy>
 
+    <SourceProxy class="vtkIdFilter"
+                 label="Generate Ids"
+                 base_proxyname="PointAndCellIds"
+                 base_proxygroup="filters"
+                 name="GenerateIdScalars">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'PointAndCellIds'. Please consider using that instead.
+      </Deprecated>
       <!-- End GenerateIdScalars -->
     </SourceProxy>
 

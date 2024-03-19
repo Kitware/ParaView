@@ -2,7 +2,7 @@ from paraview.simple import *
 from paraview import NotSupportedException
 
 w = Wavelet()
-ids = GenerateIds()
+ids = PointAndCellIds()
 ids.PointIdsArrayName = "pid"
 ids.CellIdsArrayName = "cid"
 

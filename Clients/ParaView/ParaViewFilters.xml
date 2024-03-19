@@ -233,6 +233,7 @@
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="DescriptiveStatistics" />
   <Proxy group="filters" name="DistributePoints" />
+  <Proxy group="filters" name="PointAndCellIds" />
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EnvironmentAnnotation" />
   <Proxy group="filters" name="EqualizerFilter"/>

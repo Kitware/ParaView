@@ -19,3 +19,4 @@ Here is the list of renamed proxies:
 |`BlockScalars` | `BlockIds` |
 |`ComputeConnectedSurfaceProperties` | `ConnectedSurfaceProperties` |
 |`GenerateGlobalIds` | `GlobalPointAndCellIds` |
+|`GenerateIds` | `PointAndCellIds` |

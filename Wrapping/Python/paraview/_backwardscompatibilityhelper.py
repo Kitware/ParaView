@@ -334,8 +334,9 @@ def setattr(proxy, pname, value):
                 'Please set the DestinationMesh property instead.')
 
     # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
-    # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
-    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
+    # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`. Filter was also renamed
+    # in "PointAndCellIds" in 5.13
+    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() in ("GenerateIdScalars", "PointAndCellIds"):
         if compatibility_version < (5, 7):
             proxy.GetProperty("PointIdsArrayName").SetData(value)
             proxy.GetProperty("CellIdsArrayName").SetData(value)
@@ -824,7 +825,7 @@ def getattr(proxy, pname):
 
     # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
     # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
-    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
+    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() in ("GenerateIdScalars", "PointAndCellIds"):
         if compatibility_version < (5, 7):
             return proxy.GetProperty("PointIdsArrayName")
         else:
@@ -1132,6 +1133,7 @@ def get_deprecated_proxies(proxiesNS):
         proxies[proxiesNS.filters] += [("BlockScalars", "BlockIds")]
         proxies[proxiesNS.filters] += [("ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties")]
         proxies[proxiesNS.filters] += [("GenerateGlobalIds", "GlobalPointAndCellIds")]
+        proxies[proxiesNS.filters] += [("GenerateIds", "PointAndCellIds")]
 
     return proxies
 
