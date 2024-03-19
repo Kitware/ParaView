@@ -38,9 +38,7 @@ PRIVATE_DEPENDS
   VTK::ImagingSources
   VTK::ParallelCore
 OPTIONAL_DEPENDS
-  VTK::FiltersParallelFlowPaths
   VTK::FiltersParallelMPI
-  VTK::ParallelMPI
 TEST_DEPENDS
   VTK::CommonSystem
   VTK::TestingCore

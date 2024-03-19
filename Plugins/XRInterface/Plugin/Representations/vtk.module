@@ -10,7 +10,5 @@ DEPENDS
   VTK::GUISupportQt
 OPTIONAL_DEPENDS
   VTK::RenderingFFMPEGOpenGL2
-  Qt5::WebEngineWidgets
-  Qt5::Multimedia
 PRIVATE_DEPENDS
   VTK::CommonCore
