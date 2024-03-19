@@ -1304,8 +1304,8 @@ found and the point will be rejected.</Documentation>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPolyDataTangents"
-                 label="Generate Surface Tangents"
-                 name="PolyDataTangents">
+                 label="Surface Tangents"
+                 name="SurfaceTangents">
       <Documentation long_help="This filter will produce surface tangents used for normal mapping."
                      short_help="Produce surface point tangents.">This filter
                      generates surface tangents at the points of the input
@@ -1334,6 +1334,16 @@ found and the point will be rejected.</Documentation>
         If you want these normals to be passed to the output of this filter,
         set the value of this property to 1.</Documentation>
       </IntVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkPolyDataTangents"
+                 label="Generate Surface Tangents"
+                 base_proxyname="SurfaceTangents"
+                 base_proxygroup="filters"
+                 name="PolyDataTangents">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'SurfaceTangents'. Please consider using that instead.
+      </Deprecated>
       <!-- End  PolyDataTangents -->
     </SourceProxy>
 

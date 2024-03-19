@@ -23,3 +23,4 @@ Here is the list of renamed proxies:
 |`GenerateProcessIds` | `ProcessIds` |
 |`GenerateSpatioTemporalHarmonics` | `SpatioTemporalHarmonics` |
 |`GenerateSurfaceNormals` | `SurfaceNormals` |
+|`GenerateSurfaceTangents` | `SurfaceTangents` |

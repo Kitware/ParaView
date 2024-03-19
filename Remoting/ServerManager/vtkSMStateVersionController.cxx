@@ -1871,7 +1871,7 @@ struct Process_5_12_to_5_13
       { "GenerateGlobalIds", "GlobalPointAndCellIds" }, { "GenerateIdScalars", "PointAndCellIds" },
       { "GenerateProcessIds", "ProcessIds" },
       { "GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics" },
-      { "PolyDataNormals", "SurfaceNormals" } };
+      { "PolyDataNormals", "SurfaceNormals" }, { "PolyDataTangents", "SurfaceTangents" } };
 
     for (const auto& proxy : renamedProxies)
     {

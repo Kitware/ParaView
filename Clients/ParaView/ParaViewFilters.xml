@@ -397,6 +397,7 @@
   <Proxy group="filters" name="StructuredGridOutlineFilter" />
   <Proxy group="filters" name="Subdivide" />
   <Proxy group="filters" name="SurfaceNormals" />
+  <Proxy group="filters" name="SurfaceTangents" />
   <Proxy group="filters" name="SurfaceVectors" />
   <Proxy group="filters" name="SynchronizeTime" />
   <Proxy group="filters" name="TableFFT" />
