@@ -272,6 +272,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `QComboBox`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
+    comboBox->setMaxVisibleItems(
+      pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
     pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
     new pqComboBoxDomain(comboBox, smProperty);
@@ -285,6 +287,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqComboBoxDomain`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
+    comboBox->setMaxVisibleItems(
+      pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
     pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
 

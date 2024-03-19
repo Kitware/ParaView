@@ -176,9 +176,9 @@ To indicate to the UI that this input is a selection input, use the
 
 WidgetHeight
 ------------
-Specify height in rows for tabular/tree widgets.
+Specify height in rows for tabular/tree or combobox widgets.
 
-Certain widgets that show a tablular widget of rows and columns i.e. any property widget
+Certain widgets that show a tabular widget of rows and columns i.e. any property widget
 that uses a `pqTreeWidget` including the ones for  `ArrayListDomain`, `ArraySelectionDomain`,
 `EnumerationDomain`, `CompositeTreeDomain`, respect this hint to setup the default size for the
 tabular/tree widget.
@@ -194,6 +194,20 @@ tabular/tree widget.
         <WidgetHeight number_of_rows="20" />
       </Hints>
     </IntVectorProperty>
+
+`WidgetHeight` hint can also be used on properties that use a `QComboBox` such as `EnumerationDomain`, `ProxyListDomains` or `StringListDomain`. It controls the maximum allowed number of item in the combobox before a scroll appear.
+
+    <StringVectorProperty command="" name="...">
+      <StringListDomain name="array_list">
+        <RequiredProperties>
+          <Property function="..." name="..."/>
+        </RequiredProperties>
+      </StringListDomain>
+      <Hints>
+        <!-- This tag sets the height of the QComboBox -->
+        <WidgetHeight number_of_rows="5" />
+      </Hints>
+    </StringVectorProperty>
 
 Expansion
 ---------
