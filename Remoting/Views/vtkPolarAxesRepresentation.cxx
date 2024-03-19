@@ -425,10 +425,13 @@ void vtkPolarAxesRepresentation::UpdateBounds()
 
   this->PolarAxesActor->SetBounds(bds);
 
+  // PARAVIEW_DEPRECATED_IN_5_13_0(): following line should be removed
+  this->EnableCustomMinRadius = this->EnableCustomRadius;
+
   double pole[3] = { 0.0, 0.0, 0.0 };
   double center[2] = { (bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5 };
-  double maxRadius = 0.0;
-  double minRadius = EnableCustomRadius ? this->MinRadius : 0.0;
+  double maxRadius = this->EnableCustomMaxRadius ? this->MaxRadius : 0.0;
+  double minRadius = this->EnableCustomMinRadius ? this->MinRadius : 0.0;
   double minAngle = EnableCustomAngle ? this->MinAngle : 0.0;
   double maxAngle = EnableCustomAngle ? this->MaxAngle : 360.0;
 
@@ -436,7 +439,10 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   {
     this->PolarAxesActor->SetPole(center);
 
-    maxRadius = sqrt(pow(bds[1] - center[0], 2) + pow(bds[3] - center[1], 2));
+    if (!this->EnableCustomMaxRadius)
+    {
+      maxRadius = sqrt(pow(bds[1] - center[0], 2) + pow(bds[3] - center[1], 2));
+    }
   }
   else
   {
@@ -447,28 +453,31 @@ void vtkPolarAxesRepresentation::UpdateBounds()
 
     this->PolarAxesActor->SetPole(pole);
 
-    // Compute the max length between pole and bounds for maximum radius
-    // Check bottom-left, top-left, bottom-right, top-right
-    if (pole[0] < center[0])
+    if (!this->EnableCustomMaxRadius)
     {
-      if (pole[1] < center[1])
+      // Compute the max length between pole and bounds for maximum radius
+      // Check bottom-left, top-left, bottom-right, top-right
+      if (pole[0] < center[0])
       {
-        maxRadius = sqrt(pow(bds[1] - pole[0], 2) + pow(bds[3] - pole[1], 2));
+        if (pole[1] < center[1])
+        {
+          maxRadius = sqrt(pow(bds[1] - pole[0], 2) + pow(bds[3] - pole[1], 2));
+        }
+        else
+        {
+          maxRadius = sqrt(pow(bds[1] - pole[0], 2) + pow(bds[2] - pole[1], 2));
+        }
       }
       else
       {
-        maxRadius = sqrt(pow(bds[1] - pole[0], 2) + pow(bds[2] - pole[1], 2));
-      }
-    }
-    else
-    {
-      if (pole[1] < center[1])
-      {
-        maxRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[3] - pole[1], 2));
-      }
-      else
-      {
-        maxRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[2] - pole[1], 2));
+        if (pole[1] < center[1])
+        {
+          maxRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[3] - pole[1], 2));
+        }
+        else
+        {
+          maxRadius = sqrt(pow(bds[0] - pole[0], 2) + pow(bds[2] - pole[1], 2));
+        }
       }
     }
     // Compute the min length between pole and bounds if pole is outside box for minimum radius and
@@ -477,7 +486,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     // If inside, keep default values
     if (pole[0] < bds[0])
     {
-      if (!this->EnableCustomRadius)
+      if (!this->EnableCustomMinRadius)
       {
         if (pole[1] < bds[2])
         {
@@ -505,7 +514,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     }
     else if (pole[0] > bds[1])
     {
-      if (!this->EnableCustomRadius)
+      if (!this->EnableCustomMinRadius)
       {
         if (pole[1] < bds[2])
         {
@@ -535,7 +544,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     }
     else if (pole[1] < bds[2])
     {
-      if (!this->EnableCustomRadius)
+      if (!this->EnableCustomMinRadius)
       {
         minRadius = bds[2] - pole[1];
       }
@@ -548,7 +557,7 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     }
     else if (pole[1] > bds[3])
     {
-      if (!this->EnableCustomRadius)
+      if (!this->EnableCustomMinRadius)
       {
         minRadius = pole[1] - bds[3];
       }
@@ -574,6 +583,29 @@ void vtkPolarAxesRepresentation::UpdateBounds()
   {
     this->PolarAxesActor->SetRange(minRadius, maxRadius);
   }
+}
+
+//----------------------------------------------------------------------------
+// PARAVIEW_DEPRECATED_IN_5_13_0(): reimplement with vtkSetMacro(EnableCustomMinRadius, bool);
+void vtkPolarAxesRepresentation::SetEnableCustomMinRadius(bool enabled)
+{
+  this->EnableCustomRadius = enabled;
+  this->EnableCustomMinRadius = enabled;
+}
+
+//----------------------------------------------------------------------------
+// PARAVIEW_DEPRECATED_IN_5_13_0()
+void vtkPolarAxesRepresentation::SetEnableCustomRadius(bool enabled)
+{
+  this->SetEnableCustomMinRadius(enabled);
+}
+
+//----------------------------------------------------------------------------
+// PARAVIEW_DEPRECATED_IN_5_13_0()
+bool vtkPolarAxesRepresentation::GetEnableCustomRadius()
+{
+  this->EnableCustomMinRadius = this->EnableCustomRadius;
+  return this->GetEnableCustomMinRadius();
 }
 
 //----------------------------------------------------------------------------

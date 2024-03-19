@@ -12800,14 +12800,14 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         Depends on the Number Of Polar Axes for automatic computation.
         </Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetEnableCustomRadius"
+      <IntVectorProperty command="SetEnableCustomMinRadius"
                          default_values="1"
                          name="CustomMinRadius"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Activate the use of custom minimum radius.
         If off, Minimum Radius is computed relatively to pole position.
-        Maximum radius is always automatically computed.</Documentation>
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetMinRadius"
                             default_values="0"
@@ -12823,6 +12823,29 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the minimum radius.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetEnableCustomMaxRadius"
+                         default_values="0"
+                         name="CustomMaxRadius"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Activate the use of custom maximum radius.
+        If off, Maximum Radius is computed relatively to pole position.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMaxRadius"
+                            default_values="1"
+                            name="MaximumRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="100"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="CustomMaxRadius"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the maximum radius.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetEnableCustomAngle"
                          default_values="1"
@@ -12898,6 +12921,8 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="DeltaRangePolarAxes" />
         <Property name="CustomMinRadius" />
         <Property name="MinimumRadius" />
+        <Property name="CustomMaxRadius" />
+        <Property name="MaximumRadius" />
         <Property name="CustomAngles" />
         <Property name="MinimumAngle" />
         <Property name="MaximumAngle" />

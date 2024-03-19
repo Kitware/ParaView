@@ -15,7 +15,7 @@
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVRenderView.h"        // needed for renderer enum
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkWeakPointer.h"         // needed for vtkWeakPointer.
 
 class vtkPolarAxesActor;
@@ -126,18 +126,40 @@ public:
   /**
    * Get/Set the use of custom min radius.
    * If off, min radius is computed relatively to pole position.
-   * Max radius is always computed because not exposed.
    */
-  vtkSetMacro(EnableCustomRadius, bool);
-  vtkGetMacro(EnableCustomRadius, bool);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use EnableCustomMinRadius instead")
+  virtual void SetEnableCustomRadius(bool enabled);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use EnableCustomMinRadius instead")
+  virtual bool GetEnableCustomRadius();
+  void SetEnableCustomMinRadius(bool enabled);
+  vtkGetMacro(EnableCustomMinRadius, double);
   ///@}
 
   ///@{
   /**
-   * Get/Set the custom min radius when EnableCustomRadius is On.
+   * Get/Set the custom min radius when EnableCustomMinRadius is On.
+   * Default to 0.
    */
   vtkSetMacro(MinRadius, double);
   vtkGetMacro(MinRadius, double);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the use of custom min radius.
+   * If off, max radius is computed relatively to pole position.
+   */
+  vtkSetMacro(EnableCustomMaxRadius, bool);
+  vtkGetMacro(EnableCustomMaxRadius, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the custom min radius when EnableCustomMaxRadius is On.
+   * Default to 1.
+   */
+  vtkSetMacro(MaxRadius, double);
+  vtkGetMacro(MaxRadius, double);
   ///@}
 
   ///@{
@@ -302,6 +324,7 @@ protected:
   bool EnableCustomAngle = true;
   double MinAngle = 0.0;
   double MaxAngle = 90.0;
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use Get/Set EnableCustomMinRadius methods instead")
   bool EnableCustomRadius = true;
   double MinRadius = 0.0;
   bool EnableOverallColor = true;
@@ -319,6 +342,10 @@ protected:
 private:
   vtkPolarAxesRepresentation(const vtkPolarAxesRepresentation&) = delete;
   void operator=(const vtkPolarAxesRepresentation&) = delete;
+
+  bool EnableCustomMinRadius = true;
+  bool EnableCustomMaxRadius = false;
+  double MaxRadius = 1.0;
 };
 
 #endif
