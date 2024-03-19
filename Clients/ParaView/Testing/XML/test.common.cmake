@@ -1059,6 +1059,8 @@ if(NOT APPLE)
 endif()
 
 list(APPEND TESTS_WITH_BASELINES
+  AxisAlignedCutterAMR.xml
+  AxisAlignedCutterHTG.xml
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
