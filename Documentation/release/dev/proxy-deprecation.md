@@ -11,10 +11,11 @@ It allows to rename proxies, trying to use meaningful, shorter names.
 Here is the list of renamed proxies:
 
 | previous name | new name|
-| ============= | ======= |
+| ----- | ----- |
 | `GhostCellsGenerator` | `GhostCells`|
 |`AddFieldArrays` | `FieldArraysFromFile` |
 |`AppendArcLength` | `PolylineLength` |
 |`AppendLocationAttributes` | `Coordinates` |
 |`BlockScalars` | `BlockIds` |
 |`ComputeConnectedSurfaceProperties` | `ConnectedSurfaceProperties` |
+|`GenerateGlobalIds` | `GlobalPointAndCellIds` |

@@ -1867,7 +1867,8 @@ struct Process_5_12_to_5_13
     std::map<std::string, std::string> renamedProxies = { { "GhostCellsGenerator", "GhostCells" },
       { "AddFieldArrays", "FieldArraysFromFile" }, { "AppendArcLength", "PolylineLength" },
       { "AppendLocationAttributes", "Coordinates" }, { "BlockIdScalars", "BlockIds" },
-      { "ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties" } };
+      { "ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties" },
+      { "GenerateGlobalIds", "GlobalPointAndCellIds" } };
 
     for (const auto& proxy : renamedProxies)
     {
