@@ -21,7 +21,7 @@
 
   <!-- Create AnnotateTime filter  -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Annotation" command="activate" arguments="TimeToTextConvertor" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Display/Annotation" command="activate" arguments="TimeToTextConvertor" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Create histogram  -->

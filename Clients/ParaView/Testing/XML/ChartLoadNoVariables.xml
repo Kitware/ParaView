@@ -9,7 +9,7 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/LoadNoChartVariables/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/DataAnalysis" command="activate" arguments="ProbeLine" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/Close" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ChartLoadNoVariablesA.png" width="300" height="300" />
@@ -21,7 +21,7 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/LoadNoChartVariables/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/DataAnalysis" command="activate" arguments="ProbeLine" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ChartLoadNoVariablesB.png" width="300" height="300" />

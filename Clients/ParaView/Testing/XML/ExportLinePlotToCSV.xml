@@ -4,7 +4,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/DataAnalysis" command="activate" arguments="ProbeLine" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
 

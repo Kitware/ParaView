@@ -5,7 +5,7 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/FileSeries/wavelet_..vti" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Temporal" command="activate" arguments="TemporalShiftScale" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/Temporal" command="activate" arguments="TemporalShiftScale" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Scale/DoubleLineEdit0" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PostShift/DoubleLineEdit0" command="set_string" arguments="0.01" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -15,7 +15,7 @@
 
   <!-- default merge time filter -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Temporal" command="activate" arguments="MergeTime" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/Temporal" command="activate" arguments="MergeTime" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="Information" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/timeValues" property="modelRowCount" arguments="10" />

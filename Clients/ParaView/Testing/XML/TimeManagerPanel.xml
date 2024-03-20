@@ -23,8 +23,7 @@
   <!-- test time sources -->
   <!-- add time source -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="&amp;Temporal" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Temporal" command="activate" arguments="TemporalShiftScale" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/Temporal" command="activate" arguments="TemporalShiftScale" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Scale/DoubleLineEdit0" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqcheck object="pqClientMainWindow/timeManagerDock/timeManagerPanel/timeline/1pqTimelineView0" property="modelItemData" arguments="0.0.1.0,TemporalShiftScale1" />

@@ -19,7 +19,7 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Domain/DataAnalysis" command="activate" arguments="ProbeLine" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SamplingPattern/ComboBox" command="activated" arguments="Sample Uniformly" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="set_string" arguments="l" />
