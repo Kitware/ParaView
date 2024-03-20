@@ -5,29 +5,36 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionConfigureCategories" />
 
   <!-- Check default contents -->
-  <!-- nb of categories, including "Annotation" and "Common" that contains "Slice" -->
+  <!-- nb of categories, including "Common" that contains "Slice" and "Data Array" that contains "Data Forwarding" -->
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addFilter" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="false" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="15" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Annotation" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0,&amp;Common" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0.3.0" />
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="3.0.3.0,Slice" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelRowCount" arguments="8" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0,&amp;Common" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="0.0.3.0,Slice" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0,Data Array" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="expand" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="1.0.0.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="1.0.0.0,Array Forwarding" />
 
+  <!-- go back to Slice filter -->
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="0.0.0.0" />
   <!-- filters can have an icon -->
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="true" />
+
   <!-- categories can be removed and nested, but no icons -->
   <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="3.0" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/setIcon" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="true" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
   <!-- but favorites cannot be removed -->
-  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="7.0,&amp;Favorites" />
-  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="7.0" />
+  <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" property="modelItemData" arguments="5.0,&amp;Favorites" />
+  <pqevent object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/customCategoriesTree" command="setCurrent" arguments="5.0" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/remove" property="enabled" arguments="false" />
   <pqcheck object="pqClientMainWindow/ConfigureCategoriesDialog/customGroup/addSubCategory" property="enabled" arguments="true" />
 
