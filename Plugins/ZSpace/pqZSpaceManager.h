@@ -38,6 +38,7 @@ public:
 public Q_SLOTS:
   void onViewAdded(pqView*);
   void onViewRemoved(pqView*);
+  void onActiveFullScreenEnabled(bool);
 
 protected Q_SLOTS:
   void onRenderEnded();
