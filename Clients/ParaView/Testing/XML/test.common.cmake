@@ -1417,6 +1417,7 @@ list(APPEND TESTS_WITH_BASELINES
   PropertyConversion4.xml
   PropertyLink.xml
   QuadraticGhostCells.xml
+  RandomHyperTreeGridSource.xml
   ReadPIOWithHTG.xml
   ReadXMLPolyDataFileSeries.xml
   RecentFiles.xml
