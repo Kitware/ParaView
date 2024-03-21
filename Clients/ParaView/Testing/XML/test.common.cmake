@@ -1077,6 +1077,7 @@ list(APPEND TESTS_WITH_BASELINES
   MergeVectorComponents.xml
   MissingPartialArraysColoredByNaN.xml
   MoleculeScalarBar.xml
+  MultiSliceHTG.xml
   NetCDFUGRID.xml
   PartialFieldDataMultiBlock.xml
   ParticleTracerGlyph.xml
