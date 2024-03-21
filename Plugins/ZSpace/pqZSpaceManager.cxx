@@ -28,14 +28,6 @@ pqZSpaceManager::pqZSpaceManager(QObject* p)
   QObject::connect(viewManager, &pqTabbedMultiViewWidget::fullScreenActiveViewEnabled, this,
     &pqZSpaceManager::onActiveFullScreenEnabled);
 
-  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
-  if (sdkManager)
-  {
-    // Disable stereo display until active view fullscreen is on
-    // (it only has effect on zSpace Inspire models)
-    sdkManager->SetStereoDisplayEnabled(false);
-  }
-
   // Add currently existing ZSpace views
   for (pqView* view : smmodel->findItems<pqView*>())
   {
@@ -63,6 +55,14 @@ void pqZSpaceManager::onViewAdded(pqView* view)
     {
       this->ZSpaceViews.insert(view);
       QObject::connect(view, SIGNAL(endRender()), this, SLOT(onRenderEnded()));
+
+      vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+      if (sdkManager)
+      {
+        // Disable stereo display until active view fullscreen is on
+        // (it only has effect on zSpace Inspire models)
+        sdkManager->SetStereoDisplayEnabled(false);
+      }
     }
   }
 }

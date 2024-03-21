@@ -29,6 +29,7 @@ vtkPVZSpaceView::vtkPVZSpaceView()
   vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
   if (sdkManager)
   {
+    sdkManager->InitializeZSpace();
     mode = sdkManager->GetStereoDisplayMode();
   }
 
@@ -67,7 +68,14 @@ vtkPVZSpaceView::vtkPVZSpaceView()
 }
 
 //----------------------------------------------------------------------------
-vtkPVZSpaceView::~vtkPVZSpaceView() = default;
+vtkPVZSpaceView::~vtkPVZSpaceView()
+{
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+  if (sdkManager)
+  {
+    sdkManager->ShutDown();
+  }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVZSpaceView::SetupInteractor(vtkRenderWindowInteractor* vtkNotUsed(rwi))
