@@ -63,7 +63,7 @@ void vtkSMCSVExporterProxy::Write()
   {
     /// Note, in CanExport() for now, we're only supporting exporting for
     /// XYChartViews.
-    cview->Export(exporter);
+    cview->Export(vtkAbstractChartExporter::SafeDownCast(exporter));
   }
 }
 

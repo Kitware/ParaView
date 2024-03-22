@@ -12,6 +12,7 @@
 #define vtkPVParallelCoordinatesRepresentation_h
 
 #include "vtkChartRepresentation.h"
+#include "vtkParaViewDeprecation.h" // for deprecation
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 class vtkChartParallelCoordinates;
@@ -71,12 +72,17 @@ public:
   vtkSetMacro(Opacity, double);
   ///@}
 
+  ///@{
   /**
    * Called by vtkPVContextView::Export() to export the representation's data to
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
   bool Export(vtkAbstractChartExporter* exporter) override;
+
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use Export(vtkAbstractChartExporter* exporter) instead")
+  bool Export(vtkCSVExporter* exporter) override;
+  ///@}
 
 protected:
   vtkPVParallelCoordinatesRepresentation();

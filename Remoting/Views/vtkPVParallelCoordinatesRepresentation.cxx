@@ -3,6 +3,7 @@
 #include "vtkPVParallelCoordinatesRepresentation.h"
 
 #include "vtkAbstractChartExporter.h"
+#include "vtkCSVExporter.h"
 #include "vtkChartParallelCoordinates.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
@@ -202,4 +203,10 @@ bool vtkPVParallelCoordinatesRepresentation::Export(vtkAbstractChartExporter* ex
     }
   }
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVParallelCoordinatesRepresentation::Export(vtkCSVExporter* exporter)
+{
+  return this->Export(vtkAbstractChartExporter::SafeDownCast(exporter));
 }
