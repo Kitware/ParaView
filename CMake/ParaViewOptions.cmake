@@ -518,6 +518,7 @@ paraview_require_module(
   MODULES ParaView::VTKExtensionsFiltersGeneral
           VTK::DomainsChemistry
           VTK::FiltersAMR
+          VTK::FiltersCellGrid
           VTK::FiltersCore
           VTK::FiltersExtraction
           VTK::FiltersFlowPaths
@@ -557,6 +558,7 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOAMR
+            VTK::IOCellGrid
             VTK::IOCityGML
             VTK::IOCONVERGECFD
             VTK::IOERF
@@ -580,7 +582,9 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_RENDERING AND PARAVIEW_BUILD_CANONICAL
   MODULES   VTK::FiltersTexture
-            VTK::RenderingFreeType)
+            VTK::RenderingCellGrid
+            VTK::RenderingFreeType
+)
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON
