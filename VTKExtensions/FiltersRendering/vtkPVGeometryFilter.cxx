@@ -195,8 +195,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   // fast mode might generate wrong results because of certain assumptions that don't always hold
   // for that reason, the default is to have fast mode off
   this->GeometryFilter->SetFastMode(false);
-  // Fix issues with FeatureEdges
-  this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
+  // Always preserve ghost interfaces. This is necessary to ensure that
+  // if ghost cells are present, they can be used to generate point normals.
+  this->GeometryFilter->SetRemoveGhostInterfaces(false);
   this->GenericGeometryFilter = vtkSmartPointer<vtkGenericGeometryFilter>::New();
   this->UnstructuredGridGeometryFilter = vtkSmartPointer<vtkUnstructuredGridGeometryFilter>::New();
   this->RecoverWireframeFilter = vtkSmartPointer<vtkRecoverGeometryWireframe>::New();
@@ -1676,10 +1677,6 @@ void vtkPVGeometryFilter::SetGenerateFeatureEdges(bool val)
   if (this->GenerateFeatureEdges != val)
   {
     this->GenerateFeatureEdges = val;
-    if (this->GeometryFilter)
-    {
-      this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
-    }
     this->Modified();
   }
 }
