@@ -43,6 +43,7 @@
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkPolyDataNormals.h"
 #include "vtkPolygon.h"
 #include "vtkRange.h"
 #include "vtkRecoverGeometryWireframe.h"
@@ -182,7 +183,10 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   // it is especially noticeable with the OpenGL2 backend.  Leaving
   // it on for the old backend as some tests rely on the cell normals
   // to be there as they use them for other purposes/etc.
-  this->GenerateCellNormals = 0;
+  this->GenerateCellNormals = false;
+  this->GeneratePointNormals = false;
+  this->Splitting = 1;
+  this->FeatureAngle = 30.0;
   this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
@@ -197,6 +201,16 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UnstructuredGridGeometryFilter = vtkSmartPointer<vtkUnstructuredGridGeometryFilter>::New();
   this->RecoverWireframeFilter = vtkSmartPointer<vtkRecoverGeometryWireframe>::New();
   this->FeatureEdgesFilter = vtkSmartPointer<vtkFeatureEdges>::New();
+  this->PolyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+  this->PolyDataNormals->SetComputePointNormals(this->GeneratePointNormals);
+  this->PolyDataNormals->SetComputeCellNormals(this->GenerateCellNormals);
+  this->PolyDataNormals->SetSplitting(this->Splitting);
+  this->PolyDataNormals->SetFeatureAngle(this->FeatureAngle);
+  this->PolyDataNormals->AutoOrientNormalsOff();
+  this->PolyDataNormals->ConsistencyOff();
+  this->PolyDataNormals->NonManifoldTraversalOff();
+  this->PolyDataNormals->FlipNormalsOff();
+  this->PolyDataNormals->SetOutputPointsPrecision(vtkAlgorithm::DEFAULT_PRECISION);
 
   // Setup a callback for the internal readers to report progress.
   this->GeometryFilter->AddObserver(
@@ -206,6 +220,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UnstructuredGridGeometryFilter->AddObserver(
     vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
   this->RecoverWireframeFilter->AddObserver(
+    vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
+  this->PolyDataNormals->AddObserver(
     vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
 
   this->Controller = nullptr;
@@ -574,7 +590,7 @@ void vtkPVGeometryFilter::GenerateProcessIdsArrays(vtkPolyData* output)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunicate)
+void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output)
 {
   if (this->GenerateFeatureEdges)
   {
@@ -582,9 +598,9 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
     this->FeatureEdgesFilter->Update();
     output->ShallowCopy(this->FeatureEdgesFilter->GetOutput());
   }
-  if (this->GenerateCellNormals)
+  if (this->GenerateCellNormals || this->GeneratePointNormals)
   {
-    this->ExecuteCellNormals(output, doCommunicate);
+    this->ExecuteNormalsComputation(output);
   }
   output->RemoveGhostCells();
   if (this->GenerateProcessIds && output)
@@ -1044,6 +1060,23 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
 
   output->GetCellData()->AddArray(cellNormals);
   output->GetCellData()->SetActiveNormals(cellNormals->GetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ExecuteNormalsComputation(vtkPolyData* output)
+{
+  const auto cellNormals = vtkFloatArray::FastDownCast(output->GetCellData()->GetNormals());
+  const bool hasCellNormals = this->GenerateCellNormals ? cellNormals != nullptr : true;
+  const auto pointNormals = vtkFloatArray::FastDownCast(output->GetPointData()->GetNormals());
+  const bool hasPointNormals = this->GeneratePointNormals ? pointNormals != nullptr : true;
+  if (hasPointNormals && hasCellNormals)
+  {
+    return;
+  }
+  this->PolyDataNormals->SetInputData(output);
+  this->PolyDataNormals->Update();
+  this->PolyDataNormals->SetInputData(nullptr);
+  output->ShallowCopy(this->PolyDataNormals->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -1621,6 +1654,9 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "GenerateFeatureEdges: " << (this->GenerateFeatureEdges ? "on" : "off") << endl;
   os << indent << "BlockColorsDistinctValues: " << this->BlockColorsDistinctValues << endl;
   os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals ? "on" : "off") << endl;
+  os << indent << "GeneratePointNormals: " << (this->GeneratePointNormals ? "on" : "off") << endl;
+  os << indent << "Splitting: " << (this->Splitting ? "on" : "off") << endl;
+  os << indent << "FeatureAngle: " << this->FeatureAngle << endl;
   os << indent << "Triangulate: " << (this->Triangulate ? "on" : "off") << endl;
   os << indent << "NonlinearSubdivisionLevel: " << this->NonlinearSubdivisionLevel << endl;
   os << indent << "MatchBoundariesIgnoringCellOrder: " << this->MatchBoundariesIgnoringCellOrder
@@ -1643,6 +1679,62 @@ void vtkPVGeometryFilter::SetGenerateFeatureEdges(bool val)
     if (this->GeometryFilter)
     {
       this->GeometryFilter->SetRemoveGhostInterfaces(!this->GenerateFeatureEdges);
+    }
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetGenerateCellNormals(int val)
+{
+  if (this->GenerateCellNormals != static_cast<bool>(val))
+  {
+    this->GenerateCellNormals = val;
+    if (this->PolyDataNormals)
+    {
+      this->PolyDataNormals->SetComputeCellNormals(this->GenerateCellNormals);
+    }
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetGeneratePointNormals(bool val)
+{
+  if (this->GeneratePointNormals != val)
+  {
+    this->GeneratePointNormals = val;
+    if (this->PolyDataNormals)
+    {
+      this->PolyDataNormals->SetComputePointNormals(this->GeneratePointNormals);
+    }
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetSplitting(bool val)
+{
+  if (this->Splitting != val)
+  {
+    this->Splitting = val;
+    if (this->PolyDataNormals)
+    {
+      this->PolyDataNormals->SetSplitting(this->Splitting);
+    }
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetFeatureAngle(double val)
+{
+  if (this->FeatureAngle != val)
+  {
+    this->FeatureAngle = val;
+    if (this->PolyDataNormals)
+    {
+      this->PolyDataNormals->SetFeatureAngle(this->FeatureAngle);
     }
     this->Modified();
   }
@@ -1678,12 +1770,10 @@ void vtkPVGeometryFilter::SetNonlinearSubdivisionLevel(int newvalue)
   if (this->NonlinearSubdivisionLevel != newvalue)
   {
     this->NonlinearSubdivisionLevel = newvalue;
-
     if (this->GeometryFilter)
     {
       this->GeometryFilter->SetNonlinearSubdivisionLevel(this->NonlinearSubdivisionLevel);
     }
-
     this->Modified();
   }
 }
@@ -1694,13 +1784,11 @@ void vtkPVGeometryFilter::SetMatchBoundariesIgnoringCellOrder(int newvalue)
   if (this->MatchBoundariesIgnoringCellOrder != newvalue)
   {
     this->MatchBoundariesIgnoringCellOrder = newvalue;
-
     if (this->GeometryFilter)
     {
       this->GeometryFilter->SetMatchBoundariesIgnoringCellOrder(
         this->MatchBoundariesIgnoringCellOrder);
     }
-
     this->Modified();
   }
 }

@@ -36,6 +36,7 @@ class vtkInformationVector;
 class vtkMultiProcessController;
 class vtkOutlineSource;
 class vtkPolyData;
+class vtkPolyDataNormals;
 class vtkRecoverGeometryWireframe;
 class vtkRectilinearGrid;
 class vtkStructuredGrid;
@@ -86,13 +87,46 @@ public:
 
   ///@{
   /**
-   * Whether to generate cell normals.  They can only be used
-   * for poly cells now.  This option does nothing if the output
-   * contains lines, verts, or strips.
+   * Whether to generate cell normals.
+   *
+   * The default value is false.
    */
-  vtkSetMacro(GenerateCellNormals, int);
+  void SetGenerateCellNormals(int);
   vtkGetMacro(GenerateCellNormals, int);
   vtkBooleanMacro(GenerateCellNormals, int);
+  ///@}
+
+  ///@{
+  /**
+   * Whether to generate point normals.
+   *
+   * The default value is false.
+   */
+  void SetGeneratePointNormals(bool);
+  vtkGetMacro(GeneratePointNormals, bool);
+  vtkBooleanMacro(GeneratePointNormals, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Specify the angle that defines a sharp edge. If the difference in
+   * angle across neighboring polygons is greater than this value, the
+   * shared edge is considered "sharp".
+   *
+   * The default value is 30 degrees.
+   */
+  void SetFeatureAngle(double);
+  vtkGetMacro(FeatureAngle, double);
+  ///@}
+
+  ///@{
+  /**
+   * Turn on/off the splitting of sharp edges.
+   *
+   * The default value is true.
+   */
+  void SetSplitting(bool);
+  vtkBooleanMacro(Splitting, vtkTypeBool);
   ///@}
 
   ///@{
@@ -268,18 +302,29 @@ protected:
 
   void CellGridExecute(vtkCellGrid* input, vtkPolyData* output, int doCommunicate);
 
+  ///@{
   /**
    * Cleans up the output polydata. If doCommunicate is true the method is free
    * to communicate with other processes as needed.
    */
-  void CleanupOutputData(vtkPolyData* output, int doCommunicate);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use CleanupOutputData(vtkPolyData* output) instead.")
+  void CleanupOutputData(vtkPolyData* output, int vtkNotUsed(doCommunicate))
+  {
+    this->CleanupOutputData(output);
+  }
+  void CleanupOutputData(vtkPolyData* output);
+  ///@}
 
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use ExecuteNormalsComputation instead.")
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
 
   int OutlineFlag;
   int UseOutline;
   int BlockColorsDistinctValues;
-  int GenerateCellNormals;
+  bool GenerateCellNormals;
+  bool GeneratePointNormals;
+  bool Splitting;
+  double FeatureAngle;
   int Triangulate;
   int NonlinearSubdivisionLevel;
   int MatchBoundariesIgnoringCellOrder = 0;
@@ -291,6 +336,7 @@ protected:
   vtkSmartPointer<vtkUnstructuredGridGeometryFilter> UnstructuredGridGeometryFilter;
   vtkSmartPointer<vtkRecoverGeometryWireframe> RecoverWireframeFilter;
   vtkSmartPointer<vtkFeatureEdges> FeatureEdgesFilter;
+  vtkSmartPointer<vtkPolyDataNormals> PolyDataNormals;
 
   /**
    * Call CheckAttributes on the \c input which ensures that all attribute
@@ -338,6 +384,11 @@ private:
    * filter.
    */
   void GenerateFeatureEdgesHTG(vtkHyperTreeGrid* input, vtkPolyData* output);
+
+  /**
+   * Execute normals computation for the output polydata.
+   */
+  void ExecuteNormalsComputation(vtkPolyData* output);
 
   /**
    * Generate the "vtkProcessId" point and cell data arrays on the output
