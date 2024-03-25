@@ -130,17 +130,29 @@ protected:
     if (dataSet && dataSet->GetAttributes(vtkDataObject::POINT))
     {
       auto pointData = dataSet->GetAttributes(vtkDataObject::POINT);
-      if (!normal.empty())
+      if (!normal.empty() && normal != "None")
       {
         pointData->SetActiveNormals(normal.c_str());
       }
-      if (!tcoord.empty())
+      else if (pointData->GetNormals())
+      {
+        pointData->SetActiveNormals(pointData->GetNormals()->GetName());
+      }
+      if (!tcoord.empty() && tcoord != "None")
       {
         pointData->SetActiveTCoords(tcoord.c_str());
       }
-      if (!tangent.empty())
+      else if (pointData->GetTCoords())
+      {
+        pointData->SetActiveTCoords(pointData->GetTCoords()->GetName());
+      }
+      if (!tangent.empty() && tangent != "None")
       {
         pointData->SetActiveTangents(tangent.c_str());
+      }
+      else if (pointData->GetTangents())
+      {
+        pointData->SetActiveTangents(pointData->GetTangents()->GetName());
       }
     }
   }
@@ -1373,66 +1385,99 @@ void vtkGeometryRepresentation::SetSeamlessV(bool rep)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetUseOutline(int val)
 {
-  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
   {
-    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(val);
+    geometryFilter->SetUseOutline(val);
   }
-
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
+  // since geometry filter needs to execute, we need to mark the representation modified.
   this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetTriangulate(int val)
 {
-  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
   {
-    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetTriangulate(val);
+    geometryFilter->SetTriangulate(val);
   }
-
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
+  // since geometry filter needs to execute, we need to mark the representation modified.
   this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
 {
-  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
   {
-    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(val);
+    geometryFilter->SetNonlinearSubdivisionLevel(val);
   }
-
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
+  // since geometry filter needs to execute, we need to mark the representation modified.
   this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMatchBoundariesIgnoringCellOrder(int val)
 {
-  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
   {
-    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)
-      ->SetMatchBoundariesIgnoringCellOrder(val);
+    geometryFilter->SetMatchBoundariesIgnoringCellOrder(val);
   }
-
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
+  // since geometry filter needs to execute, we need to mark the representation modified.
   this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetGenerateFeatureEdges(bool val)
 {
-  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
   {
-    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetGenerateFeatureEdges(val);
+    geometryFilter->SetGenerateFeatureEdges(val);
   }
+  // since geometry filter needs to execute, we need to mark the representation modified.
+  this->MarkModified();
+}
 
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetComputeCellNormals(bool val)
+{
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  {
+    geometryFilter->SetGenerateCellNormals(val);
+  }
+  // since geometry filter needs to execute, we need to mark the representation modified.
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetComputePointNormals(bool val)
+{
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  {
+    geometryFilter->SetGeneratePointNormals(val);
+  }
+  // since geometry filter needs to execute, we need to mark the representation modified.
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetSplitting(bool val)
+{
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  {
+    geometryFilter->SetSplitting(val);
+  }
+  // since geometry filter needs to execute, we need to mark the representation modified.
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetFeatureAngle(double val)
+{
+  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  {
+    geometryFilter->SetFeatureAngle(val);
+  }
+  // since geometry filter needs to execute, we need to mark the representation modified.
   this->MarkModified();
 }
 

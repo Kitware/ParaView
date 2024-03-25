@@ -4548,6 +4548,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
               </PropertyWidgetDecorator>
             </Hints>
           </PropertyGroup>
+          <PropertyGroup name="Surface Normals">
+            <Property name="ComputeCellNormals"
+                      panel_visibility="default"/>
+            <Property name="ComputePointNormals"
+                      panel_visibility="default"/>
+            <Property name="Splitting"
+                      panel_visibility="advanced"/>
+            <Property name="FeatureAngle"
+                      panel_visibility="advanced"/>
+            <Hints>
+              <!-- Hide for volume representation -->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume"
+                                       inverse="1"/>
+            </Hints>
+          </PropertyGroup>
           <PropertyGroup label="Texturing">
             <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
@@ -15644,6 +15662,78 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           if two adjacent cells are connected.
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeCellNormals"
+                         default_values="0"
+                         name="ComputeCellNormals"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When enabled, and cell normals are not present, they will be computed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputePointNormals"
+                         default_values="0"
+                         name="ComputePointNormals"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When enabled, and point normals are not present, they will be computed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetSplitting"
+                         default_values="1"
+                         name="Splitting"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property controls the splitting of sharp edges. If
+          sharp edges are split (property value = 1), then points are duplicated
+          along these edges, and separate normals are computed for both sets of
+          points to give crisp (rendered) surface definition.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="ComputePointNormals"
+                                   value="1"/>
+          <!-- show this widget when ComputePointNormals==1 -->
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetFeatureAngle"
+                            default_values="30"
+                            name="FeatureAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range"/>
+        <Documentation>
+          The value of this property defines a feature edge. If
+          the surface normal between two adjacent triangles is at least as large
+          as this Feature Angle, a feature edge exists. If Splitting is on,
+          points are duplicated along these feature edges. (See the Splitting property.)
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <!-- Show when ComputePointNormals is on -->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="enabled_state"
+                                       property="ComputePointNormals"
+                                       value="1"/>
+              <!-- Show when Splitting is on -->
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="enabled_state"
+                                       property="Splitting"
+                                       value="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
                             name="Opacity"
