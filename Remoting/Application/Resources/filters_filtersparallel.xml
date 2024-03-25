@@ -1395,32 +1395,6 @@
           This property specifies the input to the Normals Generation filter.
         </Documentation>
       </InputProperty>
-      <DoubleVectorProperty command="SetFeatureAngle"
-                            default_values="30"
-                            name="FeatureAngle"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="180"
-                           min="0"
-                           name="range"/>
-        <Documentation>The value of this property defines a feature edge. If
-          the surface normal between two adjacent triangles is at least as large
-          as this Feature Angle, a feature edge exists. If Splitting is on,
-          points are duplicated along these feature edges. (See the Splitting
-          property.)
-        </Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetSplitting"
-                         default_values="1"
-                         name="Splitting"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          This property controls the splitting of sharp edges. If
-          sharp edges are split (property value = 1), then points are duplicated
-          along these edges, and separate normals are computed for both sets of
-          points to give crisp (rendered) surface definition.
-        </Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetConsistency"
                          default_values="1"
                          name="Consistency"
@@ -1435,6 +1409,58 @@
           rest of those in the data set.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetNonManifoldTraversal"
+                         default_values="1"
+                         label="Non-Manifold Traversal"
+                         name="NonManifoldTraversal"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn on/off traversal across non-manifold edges. Not
+          traversing non-manifold edges will prevent problems where the
+          consistency of polygonal ordering is corrupted due to topological loops.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="Consistency"
+                                   value="1"/>
+          <!-- show this widget when Consistency==1 -->
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSplitting"
+                         default_values="1"
+                         name="Splitting"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property controls the splitting of sharp edges. If
+          sharp edges are split (property value = 1), then points are duplicated
+          along these edges, and separate normals are computed for both sets of
+          points to give crisp (rendered) surface definition.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFeatureAngle"
+                            default_values="30"
+                            name="FeatureAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range"/>
+        <Documentation>
+          The value of this property defines a feature edge. If
+          the surface normal between two adjacent triangles is at least as large
+          as this Feature Angle, a feature edge exists. If Splitting is on,
+          points are duplicated along these feature edges. (See the Splitting property.)
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="Splitting"
+                                   value="1"/>
+          <!-- show this widget when Splitting==1 -->
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetFlipNormals"
                          default_values="0"
                          name="FlipNormals"
@@ -1446,18 +1472,6 @@
           all polygons in the data set; this changes front-facing polygons to
           back-facing ones, and vice versa. You might want to do this if your
           viewing position will be inside the data set instead of outside of it.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetNonManifoldTraversal"
-                         default_values="1"
-                         label="Non-Manifold Traversal"
-                         name="NonManifoldTraversal"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Turn on/off traversal across non-manifold edges. Not
-          traversing non-manifold edges will prevent problems where the
-          consistency of polygonal ordering is corrupted due to topological loops.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetComputeCellNormals"
