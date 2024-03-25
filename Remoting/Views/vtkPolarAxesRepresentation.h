@@ -1,9 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-// .NAME vtkPolarAxesRepresentation - representation for a polar-axes.
-// .SECTION Description
-// vtkPolarAxesRepresentation is a representation for the Polar-Axes that shows a
-// bounding box with labels around any input dataset.
+/**
+ * @class vtkPolarAxesRepresentation
+ * @brief representation for a polar-axes.
+ * vtkPolarAxesRepresentation is a representation for the Polar-Axes that shows a
+ * bounding box with labels around any input dataset.
+ */
 
 #ifndef vtkPolarAxesRepresentation_h
 #define vtkPolarAxesRepresentation_h
@@ -13,7 +15,7 @@
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVRenderView.h"        // needed for renderer enum
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkWeakPointer.h"         // needed for vtkWeakPointer.
 
 class vtkPolarAxesActor;
@@ -27,82 +29,143 @@ public:
   vtkTypeMacro(vtkPolarAxesRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  // Description:
-  // Get/Set the Position to transform the data bounds.
+  ///@{
+  /**
+   * Get/Set the Position to transform the data bounds.
+   */
   vtkSetVector3Macro(Position, double);
   vtkGetVector3Macro(Position, double);
+  ///@}
 
-  // Description:
-  // Get/Set the Orientation to transform the data bounds.
+  ///@{
+  /**
+   * Get/Set the Orientation to transform the data bounds.
+   */
   vtkSetVector3Macro(Orientation, double);
   vtkGetVector3Macro(Orientation, double);
+  ///@}
 
-  // Description:
-  // Get/Set the Scale to transform the data bounds.
+  ///@{
+  /**
+   * Get/Set the Scale to transform the data bounds.
+   */
   vtkSetVector3Macro(Scale, double);
   vtkGetVector3Macro(Scale, double);
+  ///@}
 
-  // Description:
-  // Get the bounds of the data.
+  /**
+   * Get the bounds of the data.
+   */
   vtkGetVector6Macro(DataBounds, double);
 
-  // Description:
-  // Get/Set custom bounds to use. When corresponding CustomBoundsActive is
-  // true, the data bounds will be ignored for that direction and CustomBounds
-  // will be used instead.
+  ///@{
+  /**
+   * Get/Set custom bounds to use. When corresponding CustomBoundsActive is
+   * true, the data bounds will be ignored for that direction and CustomBounds
+   * will be used instead.
+   */
   vtkSetVector6Macro(CustomBounds, double);
   vtkGetVector6Macro(CustomBounds, double);
+  ///@}
 
-  // Description:
-  // Get/Set whether to use custom bounds for a particular dimension.
+  ///@{
+  /**
+   * Get/Set whether to use custom bounds for a particular dimension.
+   */
   vtkSetVector3Macro(EnableCustomBounds, int);
   vtkGetVector3Macro(EnableCustomBounds, int);
+  ///@}
 
-  // Description:
-  // Set the use of a custom range.
+  ///@{
+  /**
+   * Get/Set the use of a custom range.
+   */
   vtkSetMacro(EnableCustomRange, bool);
   vtkGetMacro(EnableCustomRange, bool);
+  ///@}
 
-  // Description:
-  // Get/Set custom range to use.
-  // the data bounds will be ignored for that direction and CustomRange
-  // will be used instead.
+  ///@{
+  /**
+   * Get/Set custom range to use.
+   * The data bounds will be ignored for that direction and CustomRange
+   * will be used instead.
+   */
   vtkSetVector2Macro(CustomRange, double);
   vtkGetVector2Macro(CustomRange, double);
+  ///@}
 
-  // Description:
-  // Get/Set the use of automatically placed pole (origin of the axes).
-  // If on, pole is placed at the center of the bounding box.
+  ///@{
+  /**
+   * Get/Set the use of automatically placed pole (origin of the axes).
+   * If on, pole is placed at the center of the bounding box.
+   */
   vtkSetMacro(EnableAutoPole, bool);
   vtkGetMacro(EnableAutoPole, bool);
+  ///@}
 
-  // Description:
-  // Get/Set the use of custom min/max angles.
-  // If off, min/max angles are computed relatively to pole position.
+  ///@{
+  /**
+   * Get/Set the use of custom min/max angles.
+   * If off, min/max angles are computed relatively to pole position.
+   */
   vtkSetMacro(EnableCustomAngle, bool);
   vtkGetMacro(EnableCustomAngle, bool);
+  ///@}
 
-  // Description:
-  // Get/Set the custom min/max angles when EnableCustomAngle is On.
+  ///@{
+  /**
+   * Get/Set the custom min/max angles when EnableCustomAngle is On.
+   */
   vtkSetMacro(MinAngle, double);
   vtkGetMacro(MinAngle, double);
   vtkSetMacro(MaxAngle, double);
   vtkGetMacro(MaxAngle, double);
+  ///@}
 
-  // Description:
-  // Get/Set the use of custom min radius.
-  // If off, min radius is computed relatively to pole position.
-  // Max radius is always computed because not exposed.
-  vtkSetMacro(EnableCustomRadius, bool);
-  vtkGetMacro(EnableCustomRadius, bool);
+  ///@{
+  /**
+   * Get/Set the use of custom min radius.
+   * If off, min radius is computed relatively to pole position.
+   */
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use EnableCustomMinRadius instead")
+  virtual void SetEnableCustomRadius(bool enabled);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use EnableCustomMinRadius instead")
+  virtual bool GetEnableCustomRadius();
+  void SetEnableCustomMinRadius(bool enabled);
+  vtkGetMacro(EnableCustomMinRadius, double);
+  ///@}
 
-  // Description:
-  // Get/Set the custom min radius when EnableCustomRadius is On.
+  ///@{
+  /**
+   * Get/Set the custom min radius when EnableCustomMinRadius is On.
+   * Default to 0.
+   */
   vtkSetMacro(MinRadius, double);
   vtkGetMacro(MinRadius, double);
+  ///@}
 
-  // Description:
-  // Set the actor color.
+  ///@{
+  /**
+   * Get/Set the use of custom min radius.
+   * If off, max radius is computed relatively to pole position.
+   */
+  vtkSetMacro(EnableCustomMaxRadius, bool);
+  vtkGetMacro(EnableCustomMaxRadius, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Get/Set the custom min radius when EnableCustomMaxRadius is On.
+   * Default to 1.
+   */
+  vtkSetMacro(MaxRadius, double);
+  vtkGetMacro(MaxRadius, double);
+  ///@}
+
+  ///@{
+  /**
+   * Set the actor color.
+   */
   vtkGetMacro(EnableOverallColor, bool);
   virtual void SetEnableOverallColor(bool enable);
   virtual void SetOverallColor(double r, double g, double b);
@@ -115,30 +178,37 @@ public:
   virtual void SetPolarAxisLabelTextProperty(vtkTextProperty* prop);
   virtual void SetLastRadialAxisTextProperty(vtkTextProperty* prop);
   virtual void SetSecondaryRadialAxesTextProperty(vtkTextProperty* prop);
+  ///@}
 
-  // Description:
-  // This needs to be called on all instances of vtkPolarAxesRepresentation when
-  // the input is modified.
+  /**
+   * This needs to be called on all instances of vtkPolarAxesRepresentation when
+   * the input is modified.
+   */
   void MarkModified() override { this->Superclass::MarkModified(); }
 
-  // Description:
-  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
-  // typically called by the vtkView to request meta-data from the
-  // representations or ask them to perform certain tasks e.g.
-  // PrepareForRendering.
+  /**
+   * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+   * typically called by the vtkView to request meta-data from the
+   * representations or ask them to perform certain tasks e.g. PrepareForRendering
+   */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
 
-  // Description:
-  // Set visibility of the representation.
+  /**
+   * Set visibility of the representation.
+   */
   void SetVisibility(bool visible) override;
 
-  // Description:
-  // Set (forward) visibility of the parent (composite) representation.
+  /**
+   * Set (forward) visibility of the parent (composite) representation.
+   */
   virtual void SetParentVisibility(bool visible);
 
   //***************************************************************************
-  // Forwarded to internal vtkPolarAxesActor
+  ///@{
+  /**
+   * Forwarded to internal vtkPolarAxesActor
+   */
   virtual void SetLog(bool active);
   virtual void SetNumberOfRadialAxes(vtkIdType val);
   virtual void SetNumberOfPolarAxes(vtkIdType val);
@@ -203,12 +273,15 @@ public:
   virtual void SetPolarArcResolutionPerDegree(double resolution);
   virtual void SetDeltaRangeMinor(double delta);
   virtual void SetDeltaRangeMajor(double delta);
+  ///@}
 
-  // Description:
-  // Set the renderer to use. Default is to use the
-  // vtkPVRenderView::DEFAULT_RENDERER.
+  ///@{
+  /**
+   * Set the renderer to use. Default is to use the vtkPVRenderView::DEFAULT_RENDERER.
+   */
   vtkSetMacro(RendererType, int);
   vtkGetMacro(RendererType, int);
+  ///@}
 
 protected:
   vtkPolarAxesRepresentation();
@@ -221,16 +294,20 @@ protected:
   virtual void InitializeDataBoundsFromData(vtkDataObject* data);
   virtual void UpdateBounds();
 
-  // Description:
-  // Adds the representation to the view.  This is called from
-  // vtkView::AddRepresentation().  Subclasses should override this method.
-  // Returns true if the addition succeeds.
+  /**
+   * Adds the representation to the view. This is called from vtkView::AddRepresentation().
+   * Returns true if the addition succeeds.
+   *
+   * Subclasses should override this method.
+   */
   bool AddToView(vtkView* view) override;
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view. This is called from vtkView::RemoveRepresentation().
+   * Returns true if the removal succeeds.
+   *
+   * Subclasses should override this method.
+   */
   bool RemoveFromView(vtkView* view) override;
 
   vtkNew<vtkPolyData> OutlineGeometry;
@@ -247,6 +324,7 @@ protected:
   bool EnableCustomAngle = true;
   double MinAngle = 0.0;
   double MaxAngle = 90.0;
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use Get/Set EnableCustomMinRadius methods instead")
   bool EnableCustomRadius = true;
   double MinRadius = 0.0;
   bool EnableOverallColor = true;
@@ -264,6 +342,10 @@ protected:
 private:
   vtkPolarAxesRepresentation(const vtkPolarAxesRepresentation&) = delete;
   void operator=(const vtkPolarAxesRepresentation&) = delete;
+
+  bool EnableCustomMinRadius = true;
+  bool EnableCustomMaxRadius = false;
+  double MaxRadius = 1.0;
 };
 
 #endif
