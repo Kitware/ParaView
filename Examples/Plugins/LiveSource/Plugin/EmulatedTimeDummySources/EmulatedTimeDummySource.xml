@@ -1,0 +1,41 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkEmulatedTimeDummySource"
+                 name="EmulatedTimeDummySource">
+      <Documentation
+        short_help="Emulate dummy real time data."
+        long_help="Emulate dummy real time data using LiveSource behavior.">
+      </Documentation>
+
+      <IntVectorProperty name="SourcePresets"
+                         command="SetSourcePresets"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Sphere Preset" />
+          <Entry value="1" text="Cone Preset" />
+          <Entry value="2" text="Cube Preset" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <!-- Optional, specifically for live sources -->
+      <Property name="PauseLiveSource" panel_widget="pause_livesource">
+        <Documentation>
+          Pause live source.
+        </Documentation>
+      </Property>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <Hints>
+        <LiveSource interval="50" emulated_time="1" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

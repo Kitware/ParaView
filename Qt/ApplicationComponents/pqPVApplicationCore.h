@@ -13,6 +13,7 @@
 class pqAnimationManager;
 class pqPythonManager;
 class pqSelectionManager;
+class pqLiveSourceManager;
 class pqTestUtility;
 class QMenu;
 class QWidget;
@@ -50,8 +51,8 @@ public:
 
   /**
    * Provides access to the animation manager. Animation manager helps with the
+   * animation subsystem -- saving movies, creating scenes etc.
    */
-  // animation subsystem -- saving movies, creating scenes etc.
   pqAnimationManager* animationManager() const;
 
   /**
@@ -66,6 +67,13 @@ public:
   pqPythonManager* pythonManager() const;
 
   /**
+   * Provides access to the live source manager. This can be nullptr if
+   * the live source manager was not instantiated first. (Either with
+   * pqLiveSourceBehavior or directly with instantiateLiveSourceManager()).
+   */
+  pqLiveSourceManager* liveSourceManager() const;
+
+  /**
    * ParaView provides a mechanism to trigger menu actions using a quick-launch
    * dialog. Applications can register menus action from which should be
    * launch-able from the quick-launch dialog. Typical candidates are the
@@ -75,6 +83,12 @@ public:
 
   void loadStateFromPythonFile(const QString& filename, pqServer* server,
     vtkTypeUInt32 location = 0x10 /*vtkPVSession::CLIENT*/);
+
+  /**
+   * Instantiate the live source manager, if it has not been done yet.
+   * This method was designed to be called by pqLiveSourceBehavior.
+   */
+  void instantiateLiveSourceManager();
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -112,6 +126,7 @@ protected:
 
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqAnimationManager> AnimationManager;
+  QPointer<pqLiveSourceManager> LiveSourceManager;
 
   pqPythonManager* PythonManager;
   QList<QPointer<QWidget>> QuickLaunchMenus;

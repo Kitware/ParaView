@@ -359,6 +359,19 @@ true if the algorithm needs update.
 The `interval` attribute is optional (defaults to 100) and can be used to
 provide a refresh rate in milliseconds.
 
+The `emulated_time` attribute is optional and defaults to 0. It is a boolean
+value that marks the live source as an emulated real-time algorithm, which
+is an algorithm updated at regular time intervals based on real-time and
+its available time steps (in seconds). Note that the proxy class must
+inherit from the `vtkEmulatedTimeAlgorithm` class.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <LiveSource interval="50" emulated_time="1" />
+      </Hints>
+    </SourceProxy>
+
 ConnectToPortIndex
 --------------------------
 Connect to a specific port index.

@@ -1,0 +1,8 @@
+NAME
+  EmulatedTimeDummySources
+DEPENDS
+  ParaView::VTKExtensionsCore
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersSources

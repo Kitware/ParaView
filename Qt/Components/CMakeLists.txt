@@ -82,6 +82,8 @@ set(classes
   pqLinksManager
   pqLiveInsituManager
   pqLiveInsituVisualizationManager
+  pqLiveSourceItem
+  pqLiveSourceManager
   pqLockViewSizeCustomDialog
   pqLogViewerDialog
   pqMemoryInspectorPanel
