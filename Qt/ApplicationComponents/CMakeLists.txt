@@ -93,6 +93,7 @@ set(classes
   pqIgnoreSourceTimeReaction
   pqImageCompressorWidget
   pqImplicitPlanePropertyWidget
+  pqImportReaction
   pqInputDataTypeDecorator
   pqInteractiveProperty2DWidget
   pqInteractivePropertyWidget

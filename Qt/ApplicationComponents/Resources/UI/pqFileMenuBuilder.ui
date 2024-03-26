@@ -165,6 +165,15 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionImport">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqImportScene.svg</normaloff>:/pqWidgets/Icons/pqImportScene.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Import Scene...</string>
+   </property>
+  </action>
   <action name="actionExport">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -249,6 +258,8 @@
   <addaction name="separator"/>
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
+  <addaction name="separator"/>
+  <addaction name="actionImport"/>
   <addaction name="actionExport"/>
   <addaction name="actionAnimatedExport"/>
   <addaction name="separator"/>

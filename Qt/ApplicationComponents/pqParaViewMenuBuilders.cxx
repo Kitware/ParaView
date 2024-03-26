@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqParaViewMenuBuilders.h"
 
+#include "pqImportReaction.h"
 #include "ui_pqEditMenuBuilder.h"
 #include "ui_pqFileMenuBuilder.h"
 
@@ -161,6 +162,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationReaction(ui.actionFileSaveAnimation);
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
+  new pqImportReaction(ui.actionImport);
   new pqExportReaction(ui.actionExport);
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   new pqAnimatedExportReaction(ui.actionAnimatedExport);

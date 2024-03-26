@@ -11,6 +11,25 @@
         <Documentation>Set the name of image file to load.</Documentation>
         <FileListDomain name="files" />
       </StringVectorProperty>
+      <StringVectorProperty command="SetTrivialProducerKey"
+                            name="TrivialProducerKey"
+                            number_of_elements="1">
+        <Documentation>
+          Set the key used to locate the image data object on the server.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetMode"
+                         name="Mode"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Set the mode in which image data is read.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="ReadFromFile" value="0"/>
+          <Entry text="ReadFromMemory" value="1"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
       <!-- End of NetworkImageSource -->
     </SourceProxy>
   </ProxyGroup>

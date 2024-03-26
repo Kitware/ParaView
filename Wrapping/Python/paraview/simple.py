@@ -2675,7 +2675,7 @@ def GetMaterialLibrary():
 # ==============================================================================
 # Textures.
 # ==============================================================================
-def CreateTexture(filename=None):
+def CreateTexture(filename=None, trivial_producer_key=None, proxyname=None):
     """Creates and returns a new vtkTexture.
     The texture is not attached to anything by default but it can be applied
     to things, for example the view, like so.
@@ -2685,8 +2685,23 @@ def CreateTexture(filename=None):
     pxm = servermanager.ProxyManager()
     textureproxy = pxm.NewProxy("textures", "ImageTexture")
     controller = servermanager.ParaViewPipelineController()
-    controller.SMController.RegisterTextureProxy(textureproxy, filename)
+    if filename is not None:
+        textureproxy.Mode = "ReadFromFile"
+        controller.SMController.RegisterTextureProxy(textureproxy, filename)
+    elif trivial_producer_key is not None:
+        textureproxy.Mode = "ReadFromMemory"
+        controller.SMController.RegisterTextureProxy(textureproxy, trivial_producer_key, proxyname)
     return servermanager._getPyProxy(textureproxy)
+
+
+def FindTextureOrCreate(registrationName, filename=None, trivial_producer_key=None):
+    """Finds or creates a new vtkTexture"""
+    pxm = servermanager.ProxyManager()
+    textureproxy = pxm.GetProxy("textures", registrationName)
+    if textureproxy is None:
+        return CreateTexture(filename, trivial_producer_key, registrationName)
+    else:
+        return textureproxy
 
 
 # ==============================================================================
@@ -2744,6 +2759,26 @@ def ExportView(filename, view=None, **params):
     proxy.Write()
     del proxy
     del helper
+
+
+def ImportView(filename, view=None, **params):
+    """Import a view from the specified input file."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if not filename:
+        raise ValueError ("No filename specified")
+    session = servermanager.ActiveConnection.Session
+    proxy = servermanager.vtkSMImporterFactory.CreateImporter(filename, session)
+    if not proxy:
+        raise RuntimeError ("Failed to create importer for ", filename)
+    proxy.UnRegister(None)
+    proxy = servermanager._getPyProxy(proxy)
+    SetProperties(proxy, **params)
+    proxy.UpdatePipelineInformation()
+    proxy.Import(view)
+    view.StillRender()
+    del proxy
 
 
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):

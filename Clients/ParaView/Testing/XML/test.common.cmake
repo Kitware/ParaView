@@ -128,8 +128,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/glTF/AnimatedMorphCube/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/BoxAnimated/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/InterpolationTest/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/NestedRings/NestedRings.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/Triangle/Triangle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/SimpleSkin/SimpleSkin.gltf}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/WaterBottle/WaterBottle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/binary_3D_333_mask.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTG/ghost.htg}"
   "DATA{${paraview_test_data_directory_input}/Data/HTGMulti.vtm}"
@@ -405,6 +407,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialogNaN.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FreezeQueryMultiblock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ForceTimeDiamond.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFImporterNestedRings.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFImporterWaterBottle.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderTriangle.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderAnimatedMorphing.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderAnimatedMorphing_IsLoaded.png}"
@@ -1330,6 +1334,8 @@ list(APPEND TESTS_WITH_BASELINES
   Glyph3DRepresentation.xml
   GlyphUseCellCenters.xml
   GlyphWithEmptyCells.xml
+  glTFImporterNestedRings.xml
+  glTFImporterWaterBottle.xml
   glTFReaderAnimatedMorphing.xml
   glTFReaderMultipleAnimations.xml
   glTFReaderMultipleScenes.xml
