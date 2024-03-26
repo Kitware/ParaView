@@ -19,6 +19,7 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
 OPTIONAL_DEPENDS
   ParaView::PythonCatalyst
+  ParaView::PythonInitializer
   VTK::IOCatalystConduit
   VTK::ParallelMPI
   VTK::WrappingPythonCore
