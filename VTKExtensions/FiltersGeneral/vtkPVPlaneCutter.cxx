@@ -69,7 +69,7 @@ int vtkPVPlaneCutter::RequestData(
       {
         planeNormalAxis = 2;
       }
-      this->HTGAxisAlignedPlaneCutter->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
+      this->HTGAxisAlignedPlaneCutter->SetPlanePosition(-plane->FunctionValue(0, 0, 0));
       this->HTGAxisAlignedPlaneCutter->SetPlaneNormalAxis(planeNormalAxis);
       this->HTGAxisAlignedPlaneCutter->SetInputData(inHyperTreeGrid);
       this->HTGAxisAlignedPlaneCutter->Update();
@@ -79,7 +79,7 @@ int vtkPVPlaneCutter::RequestData(
     else
     {
       this->HTGPlaneCutter->SetPlane(
-        normal[0], normal[1], normal[2], -plane->EvaluateFunction(0, 0, 0));
+        normal[0], normal[1], normal[2], -plane->FunctionValue(0, 0, 0));
       this->HTGPlaneCutter->SetDual(this->GetDual());
       this->HTGPlaneCutter->SetInputData(inHyperTreeGrid);
       this->HTGPlaneCutter->Update();
