@@ -654,7 +654,9 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
     vtkPolyData* outputPD = vtkPolyData::GetData(outputVector);
     assert(outputPD);
-    return this->Execute(0, ds, sourceVector, outputPD) ? 1 : 0;
+    const int result = this->Execute(0, ds, sourceVector, outputPD) ? 1 : 0;
+    this->Internals->Reset();
+    return result;
   }
   else if (cds)
   {
