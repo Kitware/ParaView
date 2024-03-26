@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Load old statefile : apply `Slice` and `Slice with plane` filters with `Axis-Aligned Plane` as cut function -->
+  <!-- Each of these filters should be replaced by a `Axis-Aligned Slice` filter instance in the pipeline -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/AxisAlignedSliceBackwardCompat.pvsm" />
+</pqevents>
