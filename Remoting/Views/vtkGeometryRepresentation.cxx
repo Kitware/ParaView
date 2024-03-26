@@ -1438,17 +1438,6 @@ void vtkGeometryRepresentation::SetGenerateFeatureEdges(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetComputeCellNormals(bool val)
-{
-  if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
-  {
-    geometryFilter->SetGenerateCellNormals(val);
-  }
-  // since geometry filter needs to execute, we need to mark the representation modified.
-  this->MarkModified();
-}
-
-//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetComputePointNormals(bool val)
 {
   if (auto geometryFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))

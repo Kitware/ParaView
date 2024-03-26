@@ -4549,21 +4549,27 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             </Hints>
           </PropertyGroup>
           <PropertyGroup name="Surface Normals">
-            <Property name="ComputeCellNormals"
-                      panel_visibility="default"/>
             <Property name="ComputePointNormals"
                       panel_visibility="default"/>
             <Property name="Splitting"
-                      panel_visibility="advanced"/>
+                      panel_visibility="default"/>
             <Property name="FeatureAngle"
-                      panel_visibility="advanced"/>
+                      panel_visibility="default"/>
             <Hints>
-              <!-- Hide for volume representation -->
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Volume"
-                                       inverse="1"/>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <!-- Show for Surface representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface"/>
+                  <!-- Show for Surface LIC representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface LIC"/>
+                </Expression>
+              </PropertyWidgetDecorator>
             </Hints>
           </PropertyGroup>
           <PropertyGroup label="Texturing">
@@ -15660,16 +15666,6 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Documentation>
           Only account for cell corners (topology) to detect
           if two adjacent cells are connected.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetComputeCellNormals"
-                         default_values="0"
-                         name="ComputeCellNormals"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          When enabled, and cell normals are not present, they will be computed.
         </Documentation>
       </IntVectorProperty>
 

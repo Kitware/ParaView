@@ -179,7 +179,6 @@ public:
   void SetNonlinearSubdivisionLevel(int);
   void SetMatchBoundariesIgnoringCellOrder(int);
   virtual void SetGenerateFeatureEdges(bool);
-  void SetComputeCellNormals(bool);
   void SetComputePointNormals(bool);
   void SetSplitting(bool);
   void SetFeatureAngle(double);
