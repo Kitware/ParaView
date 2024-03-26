@@ -19,10 +19,9 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
 OPTIONAL_DEPENDS
   ParaView::PythonCatalyst
-  ParaView::PythonInitializer
-  ParaView::RemotingLive
   VTK::IOCatalystConduit
-  VTK::IOFides
-  VTK::IOIOSS
   VTK::ParallelMPI
   VTK::WrappingPythonCore
+ORDER_DEPENDS
+  VTK::IOFides
+  VTK::IOIOSS
