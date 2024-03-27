@@ -1689,7 +1689,7 @@ struct Process_5_12_to_5_13
   bool operator()(xml_document& document)
   {
     return HandleSetDecomposePolyhedra(document) && HandleRepresentationFlipTextures(document) &&
-      HandleGhostCellsGenerator(document);
+      HandleGhostCellsGenerator(document) && HandleAxisAlignedPlaneCut(document);
   }
 
   static bool HandleSetDecomposePolyhedra(xml_document& document)
@@ -1872,6 +1872,152 @@ struct Process_5_12_to_5_13
       auto node = xpath_node.node();
       // Change filter type
       node.attribute("type").set_value("GhostCells");
+    }
+
+    return true;
+  }
+
+  static bool HandleAxisAlignedPlaneCut(xml_document& document)
+  {
+    // Gather all "Axis Aligned Plane" proxy instances
+    std::set<std::string> cutFuncIds;
+    auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='implicit_functions'"
+                                           "and @type='Axis Aligned Plane']");
+    for (auto xpath_node : xpath_set)
+    {
+      auto aaPlaneProxy = xpath_node.node();
+      const auto aaPlaneId = std::string(aaPlaneProxy.attribute("id").as_string());
+      cutFuncIds.insert(aaPlaneId);
+    }
+
+    // Replace "SliceWithPlane" instances with "AxisAlignedSlice" if it uses an
+    // Axis-Aligned plane as cut function.
+    xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='filters'"
+                                      "and @type='SliceWithPlane']");
+    for (auto xpath_node : xpath_set)
+    {
+      // Check if the filter uses Axis-Aligned plane as cut function. If yes, retrieve the cut
+      // function proxy ID.
+      auto sliceWithPlaneProxy = xpath_node.node();
+      auto cutFuncProp = sliceWithPlaneProxy.select_node("./Property[@name='Plane']").node();
+      auto cutFuncProxy = cutFuncProp.select_node("./Proxy").node();
+      const auto cutFuncId = std::string(cutFuncProxy.attribute("value").as_string());
+      if (cutFuncIds.find(cutFuncId) == cutFuncIds.end())
+      {
+        // Not an Axis-Aligned plane
+        continue;
+      }
+
+      // Retrieve attribute and values we want to transfer to the new proxy
+      auto proxyId = sliceWithPlaneProxy.attribute("id").as_string();
+      auto server = sliceWithPlaneProxy.attribute("servers").as_string();
+
+      auto inputProperty = sliceWithPlaneProxy.select_node("./Property[@name='Input']").node();
+      auto inputProxy = inputProperty.select_node("./Proxy").node();
+      auto inputId = inputProxy.attribute("value").as_string();
+
+      auto levelProperty = sliceWithPlaneProxy.select_node("./Property[@name='Level']").node();
+      auto levelElem = levelProperty.select_node("./Element").node();
+      auto level = levelElem.attribute("value").as_string(); // Only for AMR inputs
+
+      // Remove the "SliceWithPlane" proxy
+      auto parent = sliceWithPlaneProxy.parent();
+      parent.remove_child(sliceWithPlaneProxy);
+
+      // Create new "AxisAlignedSlice" proxy with same input, cut function and level
+      // value
+      std::ostringstream stream;
+      stream << "<Proxy group=\"filters\" type=\"AxisAlignedSlice\" id=\"" << proxyId
+             << "\" servers=\"" << server << "\">\n";
+      stream << "  <Property name=\"CutFunction\" id=\"" << proxyId
+             << ".CutFunction\" number_of_elements=\"1\">\n";
+      stream << "    <Proxy value=\"" << cutFuncId << "\"/>\n";
+      stream << "    <Domain name=\"proxy_list\" id=\"" << proxyId
+             << ".CutFunction.proxy_list\">\n";
+      stream << "      <Proxy value=\"" << cutFuncId << "\"/>\n";
+      stream << "    </Domain>\n";
+      stream << "  </Property>\n";
+      stream << "  <Property name=\"Input\" id=\"" << proxyId
+             << ".Input\" number_of_elements=\"1\">\n";
+      stream << "    <Proxy value=\"" << inputId << "\" output_port=\"0\"/>\n";
+      stream << "    <Domain name=\"groups\" id=\"" << proxyId << ".Input.groups\"/>\n";
+      stream << "    <Domain name=\"input_type\" id=\"" << proxyId << ".Input.input_type\"/>\n";
+      stream << "  </Property>\n";
+      stream << "  <Property name=\"Level\" id=\"" << proxyId
+             << ".Level\" number_of_elements=\"1\">\n";
+      stream << "    <Element index=\"0\" value=\"" << level << "\"/>\n";
+      stream << "    <Domain name=\"range\" id=\"" << proxyId << ".Level.range\"/>\n";
+      stream << "  </Property>\n";
+      stream << "</Proxy>\n";
+
+      pugi::xml_node smstate = document.root().child("ServerManagerState");
+      std::string buffer = stream.str();
+      if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
+      {
+        vtkGenericWarningMacro("Unable to add AxisAlignedSlice proxy.");
+      }
+    }
+
+    // Replace "Cut" instances with "AxisAlignedSlice" if it uses an Axis-Aligned plane
+    // as cut function.
+    xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='filters'"
+                                      "and @type='Cut']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      // Check if the filter uses Axis-Aligned plane as cut function. If yes, retrieve the cut
+      // function proxy ID. In the case of the "Cut" filter, we have a dedicated cut function
+      // property for HTGs. This check actually works because Axis-Aligned plane is not the default
+      // value.
+      auto cutProxy = xpath_node.node();
+      auto cutFuncProp =
+        cutProxy.select_node("./Property[@name='HyperTreeGridImplicitFunction']").node();
+      auto cutFuncProxy = cutFuncProp.select_node("./Proxy").node();
+      const auto cutFuncId = std::string(cutFuncProxy.attribute("value").as_string());
+      if (cutFuncIds.find(cutFuncId) == cutFuncIds.end())
+      {
+        // Not an Axis-Aligned plane
+        continue;
+      }
+
+      // Retrieve attribute and values we want to transfer to the new proxy
+      auto proxyId = cutProxy.attribute("id").as_string();
+      auto server = cutProxy.attribute("servers").as_string();
+
+      auto inputProperty = cutProxy.select_node("./Property[@name='Input']").node();
+      auto inputProxy = inputProperty.select_node("./Proxy").node();
+      auto inputId = inputProxy.attribute("value").as_string();
+
+      // Remove the "Cut" proxy
+      auto parent = cutProxy.parent();
+      parent.remove_child(cutProxy);
+
+      // Create new "AxisAlignedSlice" proxy with same input and cut function value
+      std::ostringstream stream;
+      stream << "<Proxy group=\"filters\" type=\"AxisAlignedSlice\" id=\"" << proxyId
+             << "\" servers=\"" << server << "\">\n";
+      stream << "  <Property name=\"CutFunction\" id=\"" << proxyId
+             << ".CutFunction\" number_of_elements=\"1\">\n";
+      stream << "    <Proxy value=\"" << cutFuncId << "\"/>\n";
+      stream << "    <Domain name=\"proxy_list\" id=\"" << proxyId
+             << ".CutFunction.proxy_list\">\n";
+      stream << "      <Proxy value=\"" << cutFuncId << "\"/>\n";
+      stream << "    </Domain>\n";
+      stream << "  </Property>\n";
+      stream << "  <Property name=\"Input\" id=\"" << proxyId
+             << ".Input\" number_of_elements=\"1\">\n";
+      stream << "    <Proxy value=\"" << inputId << "\" output_port=\"0\"/>\n";
+      stream << "    <Domain name=\"groups\" id=\"" << proxyId << ".Input.groups\"/>\n";
+      stream << "    <Domain name=\"input_type\" id=\"" << proxyId << ".Input.input_type\"/>\n";
+      stream << "  </Property>\n";
+      stream << "</Proxy>\n";
+
+      pugi::xml_node smstate = document.root().child("ServerManagerState");
+      std::string buffer = stream.str();
+      if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
+      {
+        vtkGenericWarningMacro("Unable to add AxisAlignedSlice proxy.");
+      }
     }
 
     return true;

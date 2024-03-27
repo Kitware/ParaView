@@ -219,6 +219,7 @@ int vtkPVCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     }
     if (plane->GetAxisAligned())
     {
+      // PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkAxisAlignedCutter instead")
       vtkHyperTreeGrid* output = vtkHyperTreeGrid::GetData(outInfo);
       if (!output)
       {

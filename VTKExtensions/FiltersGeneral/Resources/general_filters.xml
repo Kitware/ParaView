@@ -3264,6 +3264,115 @@ Every Nth Point.
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkAxisAlignedCutter"
+                 name="AxisAlignedSlice"
+                 label="Axis-Aligned Slice">
+      <Documentation long_help="Slice input data with an Axis-Aligned cut function, preserving the input type."
+                     short_help="Slice input data with an Axis-Aligned cut function.">
+        This filter produces axis-aligned slices of the input HyperTree Grids and Overlapping AMRs.
+        The output data type is the same as the input, effectively reducing the dimensionality of the input by one.
+        In the case of HyperTree Grids, multiple slices can be produced at once. All output slices are stored in a
+        Partitioned Dataset Collection of HyperTree Grids.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid"/>
+          <DataType value="vtkOverlappingAMR"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the slice filter.
+        </Documentation>
+      </InputProperty>
+
+      <ProxyProperty command="SetCutFunction"
+                     name="CutFunction">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Axis Aligned Plane"/>
+        </ProxyListDomain>
+        <Documentation>
+          This property sets the parameters of the cut function.
+        </Documentation>
+      </ProxyProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="InputBounds">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetLevelOfResolution"
+                         default_values="0"
+                         name="Level"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility"
+                                   name="vtkOverlappingAMR"/>
+        </Hints>
+        <AMRLevelsDomain default_mode="max"
+                         name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </AMRLevelsDomain>
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffsetValue"
+                            name="OffsetValues"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfOffsetValues"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility"
+                                   name="vtkOverlappingAMR"
+                                   exclude="1"/>
+        </Hints>
+        <BoundsDomain mode="magnitude"
+                      name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          The values in this property specify a list of current slice
+          offset values. This can be used to create multiple slices with
+          different centers. Each entry represents a new slice with its center
+          shifted by the offset value. The 'Values Range' information is the
+          range based on the global bounding box, not necessarily on the current
+          slice geometry configuration. **These offset values are added
+          to the global offset value set through the "Offset" property.**
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Multiple Slices">
+        <Property name="OffsetValues"/>
+      </PropertyGroup>
+      <PropertyGroup label="Overlapping AMR parameters">
+        <Property name="Level"/>
+      </PropertyGroup>
+      <!-- End SliceWithAxisAlignedPlane -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVTransposeTable"
                  label="Transpose Table"
                  name="TransposeTable">

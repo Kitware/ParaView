@@ -4,6 +4,7 @@
 set(classes
   vtkAnnotateGlobalDataFilter
   vtkAnnotateSelectionFilter
+  vtkAxisAlignedCutter
   vtkCellIntegrator
   vtkConvertPolyhedraFilter
   vtkEquivalenceSet

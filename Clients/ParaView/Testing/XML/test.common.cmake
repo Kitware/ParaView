@@ -11,6 +11,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/AxisAlignedSliceBackwardCompat.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00000.temp/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00000.temp/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00010.temp/,REGEX:.*}"
@@ -1066,6 +1067,8 @@ if(NOT APPLE)
 endif()
 
 list(APPEND TESTS_WITH_BASELINES
+  AxisAlignedCutterAMR.xml
+  AxisAlignedCutterHTG.xml
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
@@ -1235,6 +1238,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRContour.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
+  AxisAlignedSliceBackwardCompat.xml
   AnimationCameraExportImport.xml
   AnimationFollowPath.xml
   AnimationSetTimeCursor.xml

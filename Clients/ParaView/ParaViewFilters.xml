@@ -58,6 +58,7 @@
     <Proxy group="filters" name="GroupDataSets" />
     <Proxy group="filters" name="HyperTreeGridEvaluateCoarse" />
     <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
+    <Proxy group="filters" name="AxisAlignedSlice" />
     <Proxy group="filters" name="Threshold" />
     <Proxy group="filters" name="HyperTreeGridToDualGrid" />
     <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
@@ -120,6 +121,7 @@
     <Proxy group="filters" name="OverlappingLevelIdScalars" />
     <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
+    <Proxy group="filters" name="AxisAlignedSlice" />
     <Proxy group="filters" name="SliceWithPlane"/>
   </Category>
   <Category name="Quadrature Points" menu_label="&amp;Quadrature Points">
@@ -374,6 +376,7 @@
   <Proxy group="filters" name="ScatterPlot" />
   <Proxy group="filters" name="ShrinkFilter" />
   <Proxy group="filters" name="SliceAlongPolyLine" />
+  <Proxy group="filters" name="AxisAlignedSlice" />
   <Proxy group="filters" name="SliceWithPlane" />
   <Proxy group="filters" name="SmoothPolyDataFilter" />
   <Proxy group="filters" name="StitchImageDataWithGhosts" />

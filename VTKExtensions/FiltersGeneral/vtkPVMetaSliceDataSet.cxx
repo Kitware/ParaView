@@ -161,6 +161,7 @@ int vtkPVMetaSliceDataSet::RequestDataObject(
     }
     else
     {
+      // PARAVIEW_DEPRECATED_IN_5_13_0("Use vtkAxisAlignedCutter instead")
       this->SetOutputType(VTK_HYPER_TREE_GRID);
     }
   }
