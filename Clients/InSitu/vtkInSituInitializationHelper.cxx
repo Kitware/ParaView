@@ -40,7 +40,7 @@
 #include <catalyst_conduit.hpp>
 #endif
 
-#if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+#if VTK_MODULE_ENABLE_ParaView_PythonInitializer
 extern "C"
 {
   void vtkPVInitializePythonModules();
@@ -174,7 +174,7 @@ void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
   // deprecate Legacy Catalyst API.
   internals.CPCxxHelper.TakeReference(vtkCPCxxHelper::New());
 
-#if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+#if VTK_MODULE_ENABLE_ParaView_PythonInitializer
   // register static Python modules built, if any.
   vtkPVInitializePythonModules();
 #endif
