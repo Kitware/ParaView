@@ -14,7 +14,7 @@ extern "C"
   void VTKUTILITIESPYTHONINTERPRETERPATH_EXPORT vtkPVPythonInterpreterPath()
   {
     std::string libraryPath = vtkGetLibraryPathForSymbol(vtkPVInitializePythonModules);
-    vtkPythonInterpreter::SetUserPythonPath(
+    vtkPythonInterpreter::AddUserPythonPath(
       libraryPath.c_str(), "paraview/__init__.py" /*landmark*/);
   }
 }
