@@ -337,14 +337,17 @@ public:
     // Instead of creating a unique key for each actor, it is created for each unique data object.
     const std::vector<std::string> queries = { this->NodeSelectors.begin(),
       this->NodeSelectors.end() };
-    const auto hierarchy = this->Importer->GetSceneHierarchy();
-    vtkNew<SceneNodeSerializer> visitor;
-    visitor->Initialize(this);
-    for (const auto& nodeId : hierarchy->SelectNodes(queries))
+    if (auto hierarchy = this->Importer->GetSceneHierarchy())
     {
-      hierarchy->Visit(nodeId, visitor);
+      vtkNew<SceneNodeSerializer> visitor;
+      visitor->Initialize(this);
+      for (const auto& nodeId : hierarchy->SelectNodes(queries))
+      {
+        hierarchy->Visit(nodeId, visitor);
+      }
+      return visitor->ActorsJson;
     }
-    return visitor->ActorsJson;
+    return {};
   }
 
   //----------------------------------------------------------------------------

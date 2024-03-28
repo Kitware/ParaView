@@ -75,7 +75,7 @@
         </Hints>
       </StringVectorProperty>
       <Hints>
-        <ImporterFactory extensions="3ds gltf glb obj" />
+        <ImporterFactory extensions="gltf glb" />
       </Hints>
       <PropertyGroup label="Scene"
                      panel_widget="DataAssemblyEditor"
