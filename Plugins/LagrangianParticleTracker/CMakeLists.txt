@@ -40,7 +40,8 @@ paraview_add_plugin(LagrangianParticleTracker
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}
   MODULES LagrangianParticleTracker::vtkLagrangianParticleTracker
-  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
+  SERVER_MANAGER_XML  LagrangianParticleTracker.xml)
 
 target_link_libraries(LagrangianParticleTracker
   PRIVATE
