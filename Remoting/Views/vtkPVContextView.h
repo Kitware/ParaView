@@ -12,12 +12,14 @@
 
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVView.h"
+#include "vtkParaViewDeprecation.h" // for deprecation
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer.
 
 class vtkAbstractContextItem;
 class vtkChart;
 class vtkChartRepresentation;
+class vtkCSVExporter;
 class vtkPVContextInteractorStyle;
 class vtkContextView;
 class vtkAbstractChartExporter;
@@ -84,6 +86,7 @@ public:
    */
   vtkSelection* GetSelection();
 
+  ///@{
   /**
    * Export the contents of this view using the exporter.
    * Called vtkChartRepresentation::Export() on all visible representations.
@@ -91,6 +94,10 @@ public:
    * Thus all data is expected to available on the local process.
    */
   virtual bool Export(vtkAbstractChartExporter* exporter);
+
+  PARAVIEW_DEPRECATED_IN_5_12_0("Use Export(vtkAbstractChartExporter* exporter) instead")
+  virtual bool Export(vtkCSVExporter* exporter);
+  ///@}
 
   ///@{
   /**

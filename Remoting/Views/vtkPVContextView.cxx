@@ -4,6 +4,7 @@
 
 #include "vtkAbstractChartExporter.h"
 #include "vtkAnnotationLink.h"
+#include "vtkCSVExporter.h"
 #include "vtkCamera.h"
 #include "vtkChart.h"
 #include "vtkChartRepresentation.h"
@@ -182,6 +183,12 @@ bool vtkPVContextView::Export(vtkAbstractChartExporter* exporter)
   }
   exporter->Close();
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVContextView::Export(vtkCSVExporter* exporter)
+{
+  return this->Export(vtkAbstractChartExporter::SafeDownCast(exporter));
 }
 
 //----------------------------------------------------------------------------
