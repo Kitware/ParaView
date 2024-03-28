@@ -61,6 +61,7 @@ void vtkCellGridRepresentation::SetupDefaults()
   // delete vtkCompositePolyDataMapper created by vtkGeometryRepresentation
   auto* surfaceFilter = vtkCellGridComputeSurface::New();
   surfaceFilter->PreserveRenderableCellsOn();
+  surfaceFilter->OmitSidesForRenderableCellsOn();
   this->GeometryFilter = surfaceFilter;
   this->MultiBlockMaker = vtkCellGridRepresentationMultiBlockMaker::New();
   this->LODOutlineFilter->Delete();
