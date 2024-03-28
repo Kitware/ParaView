@@ -2733,8 +2733,17 @@ Every Nth Point.
                             use_index="1"
                             panel_visibility="advanced">
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PreserveInputCells" function="boolean_invert" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="HyperTreeGridImplicitFunction"
+                                       value="Axis Aligned Plane"
+                                       inverse="1" />
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="PreserveInputCells" function="boolean_invert" />
+              </PropertyWidgetDecorator>
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <BoundsDomain mode="magnitude"
