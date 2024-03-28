@@ -103,6 +103,14 @@
         <BooleanDomain name="bool" />
         <Documentation>Save the _BATCHID point array in the GLTF file if found.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetSaveNaNValues"
+                   default_values="0"
+                   name="SaveNaNValues"
+                   label="Save NaN Values"
+                   number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Save the NaN value color in the texture of the GLTF file. It should be disabled if there are no NaN value in your data.</Documentation>
+      </IntVectorProperty>
       <Hints>
         <ExporterFactory extensions="gltf" />
       </Hints>
