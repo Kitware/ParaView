@@ -37,7 +37,7 @@ public:
   /**
    * Tries to the load the plugin by name using tracked plugins.
    */
-  bool LoadPluginByName(const char* name);
+  bool LoadPluginByName(const char* name, bool acceptDelayed = true);
 
   /**
    * Tries to the load the plugin given the path to the plugin file.

@@ -30,6 +30,13 @@ public:
   bool LoadPlugin(const char* filename);
 
   /**
+   * Loads the plugin based on its name. Returns true on success else false. To get the error
+   * string, call UpdatePropertyInformation() on this proxy and then look at the
+   * ErrorString property.
+   */
+  bool LoadPluginByName(const char* name);
+
+  /**
    * Loads the configuration xml contents. Look at
    * vtkPVPluginTracker::LoadPluginConfigurationXMLFromString() to see the
    * details about the configuration xml.

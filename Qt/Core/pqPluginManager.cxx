@@ -220,21 +220,21 @@ vtkPVPluginsInformation* pqPluginManager::loadedExtensions(pqServer* session, bo
 
 //-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadExtension(
-  pqServer* server, const QString& lib, QString* vtkNotUsed(errorMsg), bool remote)
+  pqServer* server, const QString& plugin, QString* vtkNotUsed(errorMsg), bool remote)
 {
   vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
 
   bool ret_val = false;
   if (remote && server && server->isRemote())
   {
-    ret_val = mgr->LoadRemotePlugin(lib.toUtf8().data(), server->session());
+    ret_val = mgr->LoadRemotePlugin(plugin.toUtf8().data(), server->session());
   }
   else
   {
     // All Load*Plugin* call need a utf8 encoded filename or
     // xmlcontent, since vtksys::DynamicLoader itself takes care
     // Of converting to local8bit, even locally.
-    ret_val = mgr->LoadLocalPlugin(lib.toUtf8().data());
+    ret_val = mgr->LoadLocalPlugin(plugin.toUtf8().data());
   }
 
   return ret_val ? LOADED : NOTLOADED;

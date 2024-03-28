@@ -124,9 +124,9 @@ vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(vtkSMSession* 
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
+bool vtkSMPluginManager::LoadLocalPlugin(const char* plugin)
 {
-  SM_SCOPED_TRACE(LoadPlugin).arg(filename).arg("remote", false);
+  SM_SCOPED_TRACE(LoadPlugin).arg(plugin).arg("remote", false);
 
   bool status = false;
   if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
@@ -136,7 +136,7 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
     // too. That's best doing using the same code as "LoadRemotePlugin".
     if (auto session = vtkSMProxyManager::GetProxyManager()->GetActiveSession())
     {
-      status = this->LoadRemotePlugin(filename, session);
+      status = this->LoadRemotePlugin(plugin, session);
     }
     else
     {
@@ -148,7 +148,14 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
   {
     vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
     vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
-    status = loader->LoadPlugin(filename);
+    if (vtksys::SystemTools::FileIsFullPath(plugin))
+    {
+      status = loader->LoadPlugin(plugin);
+    }
+    else
+    {
+      status = loader->LoadPluginByName(plugin);
+    }
     loader->Delete();
   }
 
@@ -163,7 +170,7 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
     temp->Delete();
 
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
-    this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent, (void*)filename);
+    this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent, (void*)plugin);
   }
 
   // We don't report the error here if status == false since vtkPVPluginLoader
@@ -172,11 +179,11 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPluginManager::LoadRemotePlugin(const char* filename, vtkSMSession* session)
+bool vtkSMPluginManager::LoadRemotePlugin(const char* plugin, vtkSMSession* session)
 {
   assert("Session cannot be nullptr" && session != nullptr);
 
-  SM_SCOPED_TRACE(LoadPlugin).arg(filename).arg("remote", true);
+  SM_SCOPED_TRACE(LoadPlugin).arg(plugin).arg("remote", true);
 
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
@@ -184,7 +191,16 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename, vtkSMSession* se
   vtkSMPluginLoaderProxy* proxy =
     vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
   proxy->UpdateVTKObjects();
-  bool status = proxy->LoadPlugin(filename);
+  bool status;
+  if (vtksys::SystemTools::FileIsFullPath(plugin))
+  {
+    status = proxy->LoadPlugin(plugin);
+  }
+  else
+  {
+    status = proxy->LoadPluginByName(plugin);
+  }
+
   if (!status)
   {
     vtkErrorMacro(
@@ -203,7 +219,7 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename, vtkSMSession* se
     this->Internals->RemoteInformations[session]->Update(temp);
     temp->Delete();
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
-    this->InvokeEvent(vtkSMPluginManager::RemotePluginLoadedEvent, (void*)filename);
+    this->InvokeEvent(vtkSMPluginManager::RemotePluginLoadedEvent, (void*)plugin);
   }
   return status;
 }

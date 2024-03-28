@@ -448,7 +448,7 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::LoadPluginByName(const char* name)
+bool vtkPVPluginLoader::LoadPluginByName(const char* name, bool acceptDelayed)
 {
   if (vtkPVPluginLoader::CallPluginLoaderCallbacks(name))
   {
@@ -477,7 +477,15 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name)
         return false;
       }
 
-      return this->LoadPlugin(filename);
+      if (tracker->GetPluginDelayedLoad(i) && acceptDelayed)
+      {
+        auto xmls = tracker->GetPluginXMLs(i);
+        return this->LoadDelayedLoadPlugin(name, xmls, filename);
+      }
+      else
+      {
+        return this->LoadPlugin(filename);
+      }
     }
   }
 
@@ -515,7 +523,7 @@ bool vtkPVPluginLoader::LoadDelayedLoadPlugin(
   this->SetPluginName(name.c_str());
 
   // Avoid duplicate loading of the same plugin
-  if (this->IsLoaded(filename.c_str()))
+  if (this->IsLoaded(filename.c_str(), true))
   {
     return true;
   }

@@ -14,6 +14,19 @@ vtkSMPluginLoaderProxy::vtkSMPluginLoaderProxy() = default;
 vtkSMPluginLoaderProxy::~vtkSMPluginLoaderProxy() = default;
 
 //----------------------------------------------------------------------------
+bool vtkSMPluginLoaderProxy::LoadPluginByName(const char* name)
+{
+  this->CreateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LoadPluginByName" << name
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  this->UpdatePropertyInformation();
+  return vtkSMPropertyHelper(this, "Loaded").GetAsInt(0) != 0;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)
 {
   this->CreateVTKObjects();

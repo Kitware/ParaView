@@ -400,9 +400,9 @@ void pqPluginDialog::loadSelectedPlugins(
     {
       unsigned int index = 0;
       vtkPVPluginsInformation* plInfo = this->getPluginInfo(item, index);
-      if (plInfo && plInfo->GetPluginFileName(index) && !plInfo->GetPluginLoaded(index))
+      if (plInfo && !plInfo->GetPluginLoaded(index))
       {
-        this->loadPlugin(server, QString(plInfo->GetPluginFileName(index)), remote);
+        this->loadPlugin(server, QString(plInfo->GetPluginName(index)), remote);
       }
     }
   this->LoadingMultiplePlugins = false;

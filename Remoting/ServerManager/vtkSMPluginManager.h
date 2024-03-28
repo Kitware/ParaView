@@ -63,9 +63,10 @@ public:
   ///@{
   /**
    * Loads the plugin either locally or remotely.
+   * plugin can either be a full path or a plugin name.
    */
-  bool LoadRemotePlugin(const char* filename, vtkSMSession*);
-  bool LoadLocalPlugin(const char* filename);
+  bool LoadRemotePlugin(const char* plugin, vtkSMSession*);
+  bool LoadLocalPlugin(const char* plugin);
   ///@}
 
   /**

@@ -901,9 +901,10 @@ bool vtkSMProxy::LoadPluginIfEnsured()
 {
   if (this->EnsurePlugin)
   {
+    // TODO support remote plugin
     const char* pluginName = this->EnsurePlugin->GetAttributeOrEmpty("name");
     vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
-    return loader->LoadPluginByName(pluginName);
+    return loader->LoadPluginByName(pluginName, false);
   }
   return false;
 }

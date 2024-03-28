@@ -107,6 +107,8 @@ public:
   const char* GetPluginFileName(unsigned int index);
   bool GetPluginLoaded(unsigned int index);
   bool GetPluginAutoLoad(unsigned int index);
+  bool GetPluginDelayedLoad(unsigned int index);
+  std::vector<std::string> GetPluginXMLs(unsigned int index);
   ///@}
 
   ///@{
