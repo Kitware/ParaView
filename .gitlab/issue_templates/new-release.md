@@ -17,9 +17,6 @@ Please remove this comment.
 # Preparatory steps
 
   - Update ParaView guides
-    - Catalyst Guide
-      - [ ] Rename to ParaViewCatalystGuide-@VERSION@.pdf
-      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
     - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
