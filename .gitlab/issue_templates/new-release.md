@@ -189,11 +189,10 @@ Show(Text(Text="$A^2$"))
 ```
 
   Check that
-  - Getting started guide opens
-  - Help lists Readers, Writers, Filters, and Sources properly
-  - Examples load and match thumbnails in dialog
-  - Python. Open the Python shell and run
-  - Plugins are present and load properly
+  - Check that Help -> Getting Started with ParaView menu opens PDF document
+  - Check that Help -> Reader, Filter, and Writer lists filter information properly
+  - Check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog
+  - Check that plugins are present and load properly. Select Tools -> Manage Plugins menu item and load each plugin in the list.
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representaiton to NVIDIA IndeX)
