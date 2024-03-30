@@ -244,6 +244,7 @@ If making a non-RC release:
   - [ ] Tag the HEAD of release in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
   - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
   - [ ] Go to readthedocs.org and activate
+  - [ ] Head to [ParaView developer docs](github.com/Kitware/paraview-docs) and generate the new developer documentation, following the directions in the README.
   - [ ] Write and publish blog post with release notes.
   - [ ] Update release notes
     (https://www.paraview.org/Wiki/ParaView_Release_Notes)
