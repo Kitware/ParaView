@@ -179,7 +179,13 @@ git submodule update --recursive --init
 
 # Validating binaries
 
-For each binary, open the Python shell and run the following:
+## Linux
+
+Run in client-server configuration with 4 server ranks. Run through the [Classroom Tutorials][classroom-tutorials]. Try a few sources and filters in each section. Be sure to try the **Ghost Cell Generator** as well.
+
+## All other binaries
+
+Open the Python shell and run the following:
 
 ```python
 import numpy
@@ -196,6 +202,7 @@ Show(Text(Text="$A^2$"))
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representaiton to NVIDIA IndeX)
+  - (All binaries) Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
 
 Binary checklist
   - [ ] macOS arm64
@@ -267,3 +274,4 @@ If making a non-RC release:
 /label ~"priority:required"
 
 [win-sign-example]:  https://kwgitlab.kitware.com/software-process/package-signing/-/issues/12
+[classroom-tutorials]:  https://docs.paraview.org/en/latest/Tutorials/ClassroomTutorials/index.html
