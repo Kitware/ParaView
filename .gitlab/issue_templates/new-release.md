@@ -16,6 +16,9 @@ Please remove this comment.
 
 # Preparatory steps
 
+  - Getting Started Guide
+      - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
+      - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
   - macOS signing machine
     - [ ] Check that the macOS signing machine is reachable. If not, request it to be switched on.
 
