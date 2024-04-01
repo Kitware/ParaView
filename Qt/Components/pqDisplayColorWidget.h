@@ -157,9 +157,6 @@ private:
   QPointer<pqScalarsToColors> ColorTransferFunction;
   QString RepresentationText;
 
-  // This is maintained to detect when the representation has changed.
-  void* CachedRepresentation;
-
   class pqInternals;
   pqInternals* Internals;
 

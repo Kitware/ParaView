@@ -220,7 +220,6 @@ public:
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   : Superclass(parentObject)
-  , CachedRepresentation(nullptr)
   , Internals(new pqDisplayColorWidget::pqInternals())
 {
   this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData.svg");
@@ -292,7 +291,7 @@ vtkSMViewProxy* pqDisplayColorWidget::viewProxy() const
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
 {
-  if (this->CachedRepresentation == repr)
+  if (this->Representation != nullptr && this->Representation == repr)
   {
     return;
   }
@@ -319,7 +318,6 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   this->Internals->OutOfDomainEntryIndex = -1;
 
   // now, save the new repr.
-  this->CachedRepresentation = repr;
   this->Representation = repr;
 
   vtkSMProxy* proxy = repr ? repr->getProxy() : nullptr;
