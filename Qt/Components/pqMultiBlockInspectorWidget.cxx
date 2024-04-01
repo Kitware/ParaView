@@ -28,9 +28,6 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqProxyWidget> HelperProxyWidget;
 
-  void* LastOutputPort = nullptr;
-  void* LastRepresentation = nullptr;
-
   vtkSmartPointer<vtkSMProxy> HelperProxy;
 
   vtkSMProxy* helperProxy()
@@ -74,13 +71,11 @@ public:
   Ui::MultiBlockInspectorWidget Ui;
 
   pqInternals(pqMultiBlockInspectorWidget* self)
-    : LastOutputPort(nullptr)
-    , LastRepresentation(nullptr)
   {
     this->Ui.setupUi(self);
     if (auto settings = pqApplicationCore::instance()->settings())
     {
-      bool checked = settings->value("pqMultiBlockInspectorWidget/ShowHints", true).toBool();
+      const bool checked = settings->value("pqMultiBlockInspectorWidget/ShowHints", true).toBool();
       this->Ui.showHints->setChecked(checked);
     }
   }
@@ -154,16 +149,8 @@ void pqMultiBlockInspectorWidget::pqInternals::update()
   auto port = this->outputPort();
   auto repr = this->representation();
 
-  if (port == this->LastOutputPort && repr == this->LastRepresentation)
-  {
-    // nothing has changed.
-    return;
-  }
-
   delete this->HelperProxyWidget;
-  this->LastOutputPort = port;
-  this->LastRepresentation = repr;
-  if (!port)
+  if (!port || !repr)
   {
     return;
   }
