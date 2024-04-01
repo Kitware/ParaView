@@ -199,6 +199,15 @@ git submodule update --recursive --init
 
 # Validating binaries
 
+
+## Linux
+
+Run in client-server configuration with 4 server ranks. Run through the [Classroom Tutorials][classroom-tutorials]. Try a few sources and filters in each section. Be sure to try the **Ghost Cell Generator** as well.
+
+## All other binaries
+
+Open the Python shell and run the following:
+
 For each binary, open the Python shell and run the following:
 
 ```python
@@ -209,14 +218,15 @@ Show(Text(Text="$A^2$"))
 ```
 
   Check that
-  - Getting started guide opens
-  - Help lists Readers, Writers, Filters, and Sources properly
-  - Examples load and match thumbnails in dialog
-  - Plugins are present and load properly
+  - Check that Help -> Getting Started with ParaView menu opens PDF document
+  - Check that Help -> Reader, Filter, and Writer lists filter information properly
+  - Check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog
+  - Check that plugins are present and load properly. Select Tools -> Manage Plugins menu item and load each plugin in the list.
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
     - ref. !22372 for current expected results
   - IndeX runs (load pvNVIDIAIndeX plugin, add a Wavelet dataset, change representaiton to NVIDIA IndeX)
+  - (All binaries) Open can.ex2 example. Split screen horizontally. Switch to Volume rendering in one view, ray tracing in the other. Save screenshot (.png). Save Animation (.avi).
 
 Binary checklist
   - [ ] macOS arm64
@@ -258,6 +268,7 @@ If making a non-RC release:
   - [ ] Tag the HEAD of release in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
   - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
   - [ ] Go to readthedocs.org and activate
+  - [ ] Head to [ParaView developer docs](github.com/Kitware/paraview-docs) and generate the new developer documentation, following the directions in the README.
   - [ ] Write and publish blog post with release notes.
   - [ ] Update release notes
     (https://www.paraview.org/Wiki/ParaView_Release_Notes)
@@ -291,3 +302,4 @@ If making a non-RC release:
 /label ~"priority:required"
 
 [win-sign-example]:  https://kwgitlab.kitware.com/software-process/package-signing/-/issues/12
+[classroom-tutorials]:  https://docs.paraview.org/en/latest/Tutorials/ClassroomTutorials/index.html
