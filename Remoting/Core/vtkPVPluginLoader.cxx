@@ -761,6 +761,12 @@ void vtkPVPluginLoader::LoadPluginConfigurationXMLFromString(const char* xmlcont
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVPluginLoader::LoadPluginConfigurationXML(const char* configurationFile)
+{
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXML(configurationFile);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

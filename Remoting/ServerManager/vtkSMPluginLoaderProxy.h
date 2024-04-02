@@ -34,7 +34,7 @@ public:
    * string, call UpdatePropertyInformation() on this proxy and then look at the
    * ErrorString property.
    */
-  bool LoadPluginByName(const char* name);
+  bool LoadPluginByName(const char* name, bool acceptDelayed = true);
 
   /**
    * Loads the configuration xml contents. Look at

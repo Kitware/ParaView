@@ -423,7 +423,7 @@ bool vtkSMPluginManager::FulfillPluginClientServerRequirements(vtkSMSession* ses
       else
       {
         // Available required remote plugins are automatically loaded
-        if (!this->LoadRemotePlugin(outputPluginInfo->GetPluginFileName(iter2->second), session))
+        if (!this->LoadRemotePlugin(iter2->first.c_str(), session))
         {
           ret = false;
           inputPluginInfo->SetPluginStatusMessage(iter.second,

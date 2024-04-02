@@ -21,6 +21,7 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyListDomain.h"
@@ -901,10 +902,20 @@ bool vtkSMProxy::LoadPluginIfEnsured()
 {
   if (this->EnsurePlugin)
   {
-    // TODO support remote plugin
+    // Ensure local plugin is loaded
     const char* pluginName = this->EnsurePlugin->GetAttributeOrEmpty("name");
     vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
-    return loader->LoadPluginByName(pluginName, false);
+    bool ret = loader->LoadPluginByName(pluginName, false);
+
+    // Ensure remote plugin is loaded
+    vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+    vtkSMPluginLoaderProxy* proxy =
+      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
+    proxy->UpdateVTKObjects();
+    ret &= proxy->LoadPluginByName(pluginName, false);
+    proxy->Delete();
+
+    return ret;
   }
   return false;
 }

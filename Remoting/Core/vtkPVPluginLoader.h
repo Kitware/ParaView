@@ -53,12 +53,14 @@ public:
   bool LoadDelayedLoadPlugin(
     const std::string& name, const std::vector<std::string>& xmls, const std::string& filename);
 
+  ///@{
   /**
    * Simply forwards the call to
-   * vtkPVPluginLoader::LoadPluginConfigurationXMLFromString to load
-   * configuration xml.
+   * vtkPVPluginTracker to load configuration xml.
    */
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
+  void LoadPluginConfigurationXML(const char* configurationFile);
+  ///@}
 
   /**
    * Loads all plugins under the directories mentioned in the SearchPaths.
