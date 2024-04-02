@@ -20,12 +20,23 @@ struct Help
   }
   static bool Check(vtkClientServerStream& css, int& arg)
   {
+    if (css.GetArgument(0, arg).Size != sizeof(vtkTypeUInt32) + sizeof(T))
+    {
+      return false;
+    }
+
     T v;
-    T a[2];
     if (!css.GetArgument(0, arg++, &v) || v != 123)
     {
       return false;
     }
+
+    if (css.GetArgument(0, arg).Size != 2 * (sizeof(vtkTypeUInt32) + sizeof(T)))
+    {
+      return false;
+    }
+
+    T a[2];
     if (!css.GetArgument(0, arg++, a, 2) || a[0] != 12 || a[1] != 3)
     {
       return false;
@@ -123,6 +134,10 @@ bool do_check(vtkClientServerStream& css)
   }
   int arg = 0;
   {
+    if (css.GetArgument(0, arg).Size != sizeof(vtkTypeUInt32) + sizeof(bool))
+    {
+      return false;
+    }
     bool b;
     if (!css.GetArgument(0, arg++, &b) || b != true)
     {
@@ -130,6 +145,10 @@ bool do_check(vtkClientServerStream& css)
     }
   }
   {
+    if (css.GetArgument(0, arg).Size != sizeof(vtkTypeUInt32) + sizeof(vtkClientServerID().ID))
+    {
+      return false;
+    }
     vtkClientServerID id;
     if (!css.GetArgument(0, arg++, &id) || id.ID != 123)
     {
