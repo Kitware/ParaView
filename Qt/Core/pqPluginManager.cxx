@@ -250,6 +250,13 @@ QStringList pqPluginManager::pluginPaths(pqServer* session, bool remote)
 }
 
 //-----------------------------------------------------------------------------
+void pqPluginManager::addPluginConfigFile(pqServer* server, const QString& config, bool remote)
+{
+  vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
+  mgr->LoadPluginConfigurationXML(config.toUtf8().data(), server->session(), remote);
+}
+
+//-----------------------------------------------------------------------------
 void pqPluginManager::hidePlugin(const QString& lib, bool remote)
 {
   if (remote)

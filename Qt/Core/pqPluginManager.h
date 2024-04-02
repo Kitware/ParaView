@@ -80,6 +80,11 @@ public:
   QStringList pluginPaths(pqServer* session, bool remote);
 
   /**
+   * Load a plugin config file and add all plugin from it to the plugin manager of provided server
+   */
+  void addPluginConfigFile(pqServer* session, const QString& config, bool remote = true);
+
+  /**
    * simply adds the plugin to the ignore list, so when this class tries to
    * serialize the plugin information, it skips the indicated plugin.
    */

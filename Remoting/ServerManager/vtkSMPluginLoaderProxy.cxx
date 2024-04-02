@@ -52,6 +52,18 @@ void vtkSMPluginLoaderProxy::LoadPluginConfigurationXMLFromString(const char* xm
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPluginLoaderProxy::LoadPluginConfigurationXML(const char* configurationFile)
+{
+  this->CreateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LoadPluginConfigurationXML"
+         << configurationFile << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  this->UpdatePropertyInformation();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPluginLoaderProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

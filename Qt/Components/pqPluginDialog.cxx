@@ -90,6 +90,10 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     this->Ui->removeRemote, SIGNAL(clicked(bool)), this, SLOT(onRemoveSelectedRemotePlugin()));
   QObject::connect(
     this->Ui->removeLocal, SIGNAL(clicked(bool)), this, SLOT(onRemoveSelectedLocalPlugin()));
+  QObject::connect(
+    this->Ui->addConfig_Remote, SIGNAL(clicked(bool)), this, SLOT(onAddPluginConfigRemote()));
+  QObject::connect(
+    this->Ui->addConfig_Local, SIGNAL(clicked(bool)), this, SLOT(onAddPluginConfigLocal()));
 
   this->LoadingMultiplePlugins = false;
   this->refresh();
@@ -181,6 +185,37 @@ void pqPluginDialog::removePlugin(pqServer*, const QString& plugin, bool remote)
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pm->hidePlugin(plugin, remote);
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::onAddPluginConfigRemote()
+{
+  this->addPluginConfigFile(true);
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::onAddPluginConfigLocal()
+{
+  this->addPluginConfigFile(false);
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::addPluginConfigFile(bool remote)
+{
+  pqFileDialog fd(remote ? this->Server : nullptr, this, "Add Plugin Config File", QString(),
+    QString("%1 (*.xml)").arg(tr("Plugin config file")), false);
+  if (fd.exec() == QDialog::Accepted)
+  {
+    QString config = fd.getSelectedFiles()[0];
+    this->addPluginConfigFile(config, remote);
+  }
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::addPluginConfigFile(const QString& config, bool remote)
+{
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+  pm->addPluginConfigFile(this->Server, config, remote);
 }
 
 //----------------------------------------------------------------------------

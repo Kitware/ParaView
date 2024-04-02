@@ -43,6 +43,13 @@ public:
    */
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
 
+  /**
+   * Loads a configuration xml file. Look at
+   * vtkPVPluginTracker::LoadPluginConfigurationXML() to see the
+   * details about the configuration xml.
+   */
+  void LoadPluginConfigurationXML(const char* configurationFile);
+
 protected:
   vtkSMPluginLoaderProxy();
   ~vtkSMPluginLoaderProxy() override;

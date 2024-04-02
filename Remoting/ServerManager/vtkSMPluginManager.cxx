@@ -225,6 +225,42 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* plugin, vtkSMSession* sess
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPluginManager::LoadPluginConfigurationXML(
+  const char* configurationFile, vtkSMSession* session, bool remote)
+{
+  vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
+  if (remote)
+  {
+    assert("Session should already be set" && (session != nullptr));
+    vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
+    vtkSMPluginLoaderProxy* proxy =
+      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
+    proxy->UpdateVTKObjects();
+    proxy->LoadPluginConfigurationXML(configurationFile);
+    proxy->Delete();
+
+    // Refresh definitions since those may have changed.
+    pxm->GetProxyDefinitionManager()->SynchronizeDefinitions();
+
+    vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
+    session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, temp, 0);
+    this->Internals->RemoteInformations[session]->Update(temp);
+    temp->Delete();
+  }
+  else
+  {
+    vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXML(configurationFile);
+
+    vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
+    temp->CopyFromObject(nullptr);
+    this->LocalInformation->Update(temp);
+    temp->Delete();
+  }
+
+  this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
   const char* xmlcontents, vtkSMSession* session, bool remote)
 {
