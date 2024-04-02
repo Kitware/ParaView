@@ -1892,6 +1892,11 @@ vtkClientServerStream::Argument vtkClientServerStream::GetArgument(int message, 
         result.Size = sizeof(tp) + sizeof(vtkClientServerID().ID);
       }
       break;
+      case vtkClientServerStream::bool_value:
+      {
+        result.Size = sizeof(tp) + sizeof(bool);
+      }
+      break;
       case vtkClientServerStream::string_value:
       {
         // A string is represented as an array of 1 byte values.
