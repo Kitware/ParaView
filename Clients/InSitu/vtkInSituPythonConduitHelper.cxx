@@ -12,6 +12,7 @@
 PyObject* vtkInSituPythonConduitHelper::GetCatalystParameters()
 {
 #if VTK_MODULE_ENABLE_VTK_IOCatalystConduit && VTK_MODULE_ENABLE_VTK_WrappingPythonCore
+#if CATALYST_WRAP_PYTHON
   conduit_node* node = vtkInSituInitializationHelper::GetCatalystParameters();
   if (!node)
   {
@@ -22,6 +23,10 @@ PyObject* vtkInSituPythonConduitHelper::GetCatalystParameters()
   PyObject* pynode = PyCatalystConduit_Node_Wrap(node, 0 /* do not pass ownership to python */);
 
   return pynode;
+#else
+  vtkLogF(ERROR, "ParaView was compiled against Catalyst without Python support");
+  return nullptr;
+#endif
 #else
   vtkLogF(ERROR, "ParaView was compiled without Conduit and Python support");
   return nullptr;
