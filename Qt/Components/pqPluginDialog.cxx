@@ -404,6 +404,13 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoNode->setFlags(infoFlags | Qt::ItemIsUserCheckable);
   infoNode->setCheckState(ValueCol, plInfo->GetAutoLoad(index) ? Qt::Checked : Qt::Unchecked);
   infoNode->setData(NameCol, Qt::UserRole, vdata);
+
+  // Delayed load read only setting
+  infoText.clear();
+  infoText << tr("Delayed Load") << QString();
+  infoNode = new QTreeWidgetItem(pluginNode, infoText);
+  infoNode->setFlags(Qt::ItemIsSelectable);
+  infoNode->setCheckState(ValueCol, plInfo->GetDelayedLoad(index) ? Qt::Checked : Qt::Unchecked);
 }
 
 //----------------------------------------------------------------------------
