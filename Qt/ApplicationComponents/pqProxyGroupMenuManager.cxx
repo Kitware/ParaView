@@ -33,6 +33,7 @@
 #include <QPointer>
 #include <QSet>
 #include <QStringList>
+#include <QTimer>
 #include <QtDebug>
 
 #include <algorithm>
@@ -260,6 +261,8 @@ struct pqProxyGroupMenuManager::pqInternal
 
   bool ClientEnvironmentDone = false;
   bool IsWritingSettings = false;
+
+  QTimer NewDefinitionsTimer;
 };
 
 //-----------------------------------------------------------------------------
@@ -294,6 +297,13 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
 
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)), this,
     SLOT(lookForNewDefinitions()));
+
+  // Plugin can be loaded at any point using the delayed load mechanism
+  // This ensure that the new symbols will be added in the UI as soon as the Qt loop is running
+  this->Internal->NewDefinitionsTimer.setSingleShot(true);
+  this->Internal->NewDefinitionsTimer.setInterval(1);
+  QObject::connect(&this->Internal->NewDefinitionsTimer, &QTimer::timeout, this,
+    &pqProxyGroupMenuManager::lookForNewDefinitions);
 
   this->Internal->ProxyManagerCallBackId =
     pqCoreUtilities::connect(vtkSMProxyManager::GetProxyManager(),
@@ -1090,12 +1100,12 @@ void pqProxyGroupMenuManager::addProxyDefinitionUpdateObservers()
 
   // Regular proxy
   unsigned long callbackID = pxm->AddObserver(vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated,
-    this, &pqProxyGroupMenuManager::lookForNewDefinitions);
+    &this->Internal->NewDefinitionsTimer, &QTimer::start);
   this->Internal->CallBackIDs.insert(callbackID);
 
   // compound proxy
-  callbackID = pxm->AddObserver(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this,
-    &pqProxyGroupMenuManager::lookForNewDefinitions);
+  callbackID = pxm->AddObserver(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+    &this->Internal->NewDefinitionsTimer, &QTimer::start);
   this->Internal->CallBackIDs.insert(callbackID);
 
   // Look inside the definition
