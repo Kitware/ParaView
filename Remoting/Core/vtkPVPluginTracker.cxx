@@ -522,8 +522,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
       if ((autoLoad || forceLoad) && !this->GetPluginLoaded(index))
       {
         // load the plugin.
-        vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
-
+        vtkNew<vtkPVPluginLoader> loader;
         if (delayedLoad)
         {
           if (xmls.empty())
@@ -540,7 +539,6 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
         {
           loader->LoadPlugin(plugin_filename.c_str());
         }
-        loader->Delete();
       }
       (*this->PluginsList)[index].AutoLoad = autoLoad;
       (*this->PluginsList)[index].DelayedLoad = delayedLoad;

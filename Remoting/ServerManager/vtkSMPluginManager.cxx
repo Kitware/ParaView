@@ -147,7 +147,7 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* plugin)
   if (!status)
   {
     vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
-    vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+    vtkNew<vtkPVPluginLoader> loader;
     if (vtksys::SystemTools::FileIsFullPath(plugin))
     {
       status = loader->LoadPlugin(plugin);
@@ -156,7 +156,6 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* plugin)
     {
       status = loader->LoadPluginByName(plugin);
     }
-    loader->Delete();
   }
 
   if (status)

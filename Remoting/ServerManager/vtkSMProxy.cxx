@@ -904,7 +904,7 @@ bool vtkSMProxy::LoadPluginIfEnsured()
   {
     // Ensure local plugin is loaded
     const char* pluginName = this->EnsurePlugin->GetAttributeOrEmpty("name");
-    vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+    vtkNew<vtkPVPluginLoader> loader;
     bool ret = loader->LoadPluginByName(pluginName, false);
 
     // Ensure remote plugin is loaded

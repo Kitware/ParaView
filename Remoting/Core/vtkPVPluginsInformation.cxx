@@ -228,9 +228,8 @@ void vtkPVPluginsInformation::CopyFromStream(const vtkClientServerStream* stream
 void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
 {
   this->Internals->clear();
-  vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+  vtkNew<vtkPVPluginLoader> loader;
   this->SetSearchPaths(loader->GetSearchPaths());
-  loader->Delete();
 
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   for (unsigned int cc = 0; cc < tracker->GetNumberOfPlugins(); cc++)
