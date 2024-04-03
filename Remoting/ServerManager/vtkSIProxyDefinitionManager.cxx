@@ -1003,7 +1003,6 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
         vtkPVXMLElement* overridingProxyDef = subProxySrc[name].GetPointer();
         subProxyDefToRemove->GetParent()->ReplaceNestedElement(
           subProxyDefToRemove, overridingProxyDef);
-        overridingProxyDef->GetParent()->RemoveNestedElement(overridingProxyDef);
       }
     }
     // Move to next
@@ -1034,7 +1033,6 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
         vtkPVXMLElement* subPropDefToRemove = propertiesToFill[name].GetPointer();
         vtkPVXMLElement* overridingProp = propertiesSrc[name].GetPointer();
         subPropDefToRemove->GetParent()->ReplaceNestedElement(subPropDefToRemove, overridingProp);
-        overridingProp->GetParent()->RemoveNestedElement(overridingProp);
       }
     }
     // Move to next
@@ -1054,9 +1052,19 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
   for (cc = 0; cc < numChildren; cc++)
   {
     vtkPVXMLElement* child = element->GetNestedElement(cc);
-    vtkNew<vtkPVXMLElement> newElement;
-    child->CopyTo(newElement.GetPointer());
-    elementToFill->AddNestedElement(newElement.GetPointer());
+    bool addProperty = true;
+    if (child->GetAttribute("override"))
+    {
+      // Only include properties with an override attribute if they are
+      // absent from the element to fill.
+      addProperty = !elementToFill->FindNestedElementByName(child->GetName());
+    }
+    if (addProperty)
+    {
+      vtkNew<vtkPVXMLElement> newElement;
+      child->CopyTo(newElement.GetPointer());
+      elementToFill->AddNestedElement(newElement.GetPointer());
+    }
   }
 }
 

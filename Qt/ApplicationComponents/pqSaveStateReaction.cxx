@@ -46,12 +46,18 @@ void pqSaveStateReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 bool pqSaveStateReaction::saveState()
 {
+  return pqSaveStateReaction::saveState(pqActiveObjects::instance().activeServer());
+}
+
+//-----------------------------------------------------------------------------
+bool pqSaveStateReaction::saveState(pqServer* server)
+{
   QString fileExt = tr("ParaView state file") + QString(" (*.pvsm);;");
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   fileExt += tr("Python state file") + QString(" (*.py);;");
 #endif
   fileExt += tr("All Files") + QString(" (*)");
-  pqServer* server = pqActiveObjects::instance().activeServer();
+
   pqFileDialog fileDialog(
     server, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt, false, false);
 

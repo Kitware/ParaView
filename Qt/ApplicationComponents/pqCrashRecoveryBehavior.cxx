@@ -133,7 +133,7 @@ void pqCrashRecoveryBehavior::onServerDisconnect()
     mbox.setDefaultButton(QMessageBox::Yes);
     if (mbox.exec() == QMessageBox::Yes)
     {
-      pqSaveStateReaction::saveState();
+      pqSaveStateReaction::saveState(nullptr);
     }
     // restore.
     pgm->unblockEvents(prev);

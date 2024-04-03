@@ -451,6 +451,7 @@ bool vtkLiveInsituLink::InitializeInsitu()
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
 
     std::ostringstream url;
+    url.imbue(std::locale::classic());
     url << "tcp://" << this->Hostname << ":" << this->InsituPort << "?"
         << "timeout=0&handshake=paraview.insitu." << PARAVIEW_VERSION;
     this->SetURL(url.str().c_str());
