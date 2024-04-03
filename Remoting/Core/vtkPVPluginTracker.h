@@ -101,7 +101,8 @@ public:
   ///@{
   /**
    * This is provided for wrapped languages since they can't directly access the
-   * vtkPVPlugin instance.
+   * vtkPVPlugin instance. This is also used by vtkPluginsInformation to copy
+   * plugins information.
    */
   const char* GetPluginName(unsigned int index);
   const char* GetPluginFileName(unsigned int index);

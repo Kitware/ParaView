@@ -26,6 +26,8 @@ public:
   std::string StatusMessage;
   bool AutoLoadForce;
   bool AutoLoad;
+  bool DelayedLoad;
+  std::vector<std::string> XMLs;
   bool Loaded;
   bool RequiredOnClient;
   bool RequiredOnServer;
@@ -33,6 +35,7 @@ public:
   vtkItem()
     : AutoLoadForce(false)
     , AutoLoad(false)
+    , DelayedLoad(false)
     , Loaded(false)
     , RequiredOnClient(false)
     , RequiredOnServer(false)
@@ -86,6 +89,25 @@ public:
     {
       return false;
     }
+
+    if (!stream.GetArgument(0, offset++, &this->DelayedLoad))
+    {
+      return false;
+    }
+    size_t nXMLs;
+    if (!stream.GetArgument(0, offset++, &nXMLs))
+    {
+      return false;
+    }
+    for (size_t i = 0; i < nXMLs; i++)
+    {
+      if (!stream.GetArgument(0, offset++, &temp_ptr))
+      {
+        return false;
+      }
+      this->XMLs.push_back(temp_ptr);
+    }
+
     if (!stream.GetArgument(0, offset++, &this->Loaded))
     {
       return false;
@@ -108,8 +130,15 @@ public:
 void operator<<(vtkClientServerStream& stream, const vtkItem& item)
 {
   stream << item.Name.c_str() << item.FileName.c_str() << item.RequiredPlugins.c_str()
-         << item.Description.c_str() << item.Version.c_str() << item.AutoLoad << item.Loaded
-         << item.RequiredOnClient << item.RequiredOnServer;
+         << item.Description.c_str() << item.Version.c_str() << item.AutoLoad << item.DelayedLoad;
+
+  stream << item.XMLs.size();
+  for (std::string xml : item.XMLs)
+  {
+    stream << xml.c_str();
+  }
+
+  stream << item.Loaded << item.RequiredOnClient << item.RequiredOnServer;
 }
 }
 
@@ -210,6 +239,8 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
     item.Name = tracker->GetPluginName(cc);
     item.FileName = tracker->GetPluginFileName(cc);
     item.AutoLoad = tracker->GetPluginAutoLoad(cc);
+    item.DelayedLoad = tracker->GetPluginDelayedLoad(cc);
+    item.XMLs = tracker->GetPluginXMLs(cc);
     item.AutoLoadForce = false;
 
     vtkPVPlugin* plugin = tracker->GetPlugin(cc);
@@ -408,4 +439,37 @@ bool vtkPVPluginsInformation::GetAutoLoad(unsigned int cc)
     return (*this->Internals)[cc].AutoLoad;
   }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginsInformation::SetDelayedLoad(unsigned int cc, bool val)
+{
+  if (cc < this->GetNumberOfPlugins())
+  {
+    (*this->Internals)[cc].DelayedLoad = val;
+  }
+  else
+  {
+    vtkWarningMacro("Invalid index: " << cc);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVPluginsInformation::GetDelayedLoad(unsigned int cc)
+{
+  if (cc < this->GetNumberOfPlugins())
+  {
+    return (*this->Internals)[cc].DelayedLoad;
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkPVPluginsInformation::GetXMLs(unsigned int cc)
+{
+  if (cc < this->GetNumberOfPlugins())
+  {
+    return (*this->Internals)[cc].XMLs;
+  }
+  return {};
 }
