@@ -111,7 +111,7 @@
                      Vectors filter generates a point-centered array of random
                      vectors. It uses a random number generator to determine
                      the components of the vectors. This filter operates on any
-                     type of data set, and the output data set will be of the
+                     type of dataset, and the output dataset will be of the
                      same type as the input.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -153,7 +153,7 @@
       <Documentation long_help="Create a point (no geometry) at the center of each input cell."
                      short_help="Convert cells to vertices.">The Cell Centers
                      filter places a point at the center of each cell in the
-                     input data set. The center computed is the parametric
+                     input dataset. The center computed is the parametric
                      center of the cell, not necessarily the geometric or
                      bounding box center. The cell attributes of the input will
                      be associated with these newly created points of the
@@ -161,8 +161,8 @@
                      point in the output. This is useful because vertex cells
                      are rendered, but points are not. The points themselves
                      could be used for placing glyphs (using the Glyph filter).
-                     The Cell Centers filter takes any type of data set as
-                     input and produces a polygonal data set as
+                     The Cell Centers filter takes any type of dataset as
+                     input and produces a polygonal dataset as
                      output.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -193,7 +193,7 @@
                  name="CellDerivatives">
       <Documentation long_help="This filter computes derivatives of scalars and vectors."
                      short_help="Computes derivatives of scalars/vectors.">
-                     CellDerivatives is a filter that computes derivatives of
+                     Cell Derivatives is a filter that computes derivatives of
                      scalars and vectors at the center of cells. You can choose
                      to generate different output including the scalar gradient
                      (a vector), computed tensor vorticity (a vector), gradient
@@ -265,7 +265,7 @@
           <Entry text="Vorticity"
                  value="2" />
         </EnumerationDomain>
-        <Documentation>This property Controls how the filter works to generate
+        <Documentation>This property controls how the filter works to generate
         vector cell data. You can choose to compute the gradient of the input
         scalars, or extract the vorticity of the computed vector gradient
         tensor. By default, the filter will take the gradient of the input
@@ -394,8 +394,7 @@
     <SourceProxy class="vtkCountVertices"
                  label="Count Cell Vertices"
                  name="CountCellVertices">
-      <Documentation long_help="Counts the number of vertices on each cell and appends a new cell data array."
-                     short_help="Adds a new cell data array containing the number of vertices per cell.">
+      <Documentation short_help="Adds a new cell data array containing the number of vertices per cell.">
         Adds a new cell data array containing the number of vertices per cell.
       </Documentation>
       <InputProperty command="SetInputConnection"
@@ -430,9 +429,9 @@
       <Documentation long_help="This filter will compute the Gaussian or mean curvature of the mesh at each point."
                      short_help="Compute the curvature at each point.">The
                      Curvature filter computes the curvature at each point in a
-                     polygonal data set. This filter supports both Gaussian and
-                     mean curvatures. ; the type can be selected from the
-                     Curvature type menu button.</Documentation>
+                     polygonal dataset. This filter supports both Gaussian and
+                     mean curvatures. The type can be selected from the
+                     Curvature type combobox.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -515,7 +514,7 @@
       <Documentation long_help="Convert string dates to numeric values."
                      short_help="Convert dates to numeric values.">
                      The DateToNumeric filter looks at string arrays in
-                     the input data object and if they contain dates that can be
+                     the input data object. If they contain dates that can be
                      converted numbers then they are converted to doubles and
                      added as additional arrays of the same type (point/cell/field).
                      The format string used to parse dates can be specified by the user.
@@ -664,7 +663,7 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          When this flag is on, the gradient filter will compute the divergence of a 3 component array.
+          When this flag is on, the gradient filter will compute the divergence of a three-component array.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetDivergenceArrayName"
@@ -683,7 +682,7 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          When this flag is on, the gradient filter will compute the vorticity/curl of a 3 component array.
+          When this flag is on, the gradient filter will compute the vorticity/curl of a three-component array.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetVorticityArrayName"
@@ -702,7 +701,7 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          When this flag is on, the gradient filter will compute the Q-criterion of a 3 component array.
+          When this flag is on, the gradient filter will compute the Q-criterion of a three-component array.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetQCriterionArrayName"
@@ -711,7 +710,7 @@
                             number_of_elements="1"
                             panel_visibility="advanced">
         <Documentation>
-          This property provides a name for the output array containing Q criterion.
+          This property provides a name for the output array containing Q-criterion.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetContributingCellOption"
@@ -763,7 +762,7 @@
       short_help="Converts an Image Data to a Point Set">The Image
       Data to Point Set filter takes an image data (uniform
       rectilinear grid) object and outputs an equivalent structured
-      grid (which as a type of point set). This brings the data to a
+      grid, which is a type of point set. This brings the data to a
       broader category of data storage but only adds a small amount of
       overhead. This filter can be helpful in applying filters that
       expect or manipulate point coordinates.</Documentation>
@@ -793,7 +792,7 @@
     <SourceProxy class="vtkGroupDataSetsFilter"
                  label="Group Datasets"
                  name="GroupDataSets">
-      <Documentation long_help="Group data sets."
+      <Documentation long_help="Group datasets."
                      short_help="Group multiple inputs into one collection.">
                      Groups multiple datasets to create a multiblock
                      dataset</Documentation>
@@ -810,7 +809,7 @@
           <DataType value="vtkDataObject" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <Documentation>This property indicates the the inputs to the Group
+        <Documentation>This property indicates the inputs to the Group
         Datasets filter.</Documentation>
       </InputProperty>
 
@@ -864,7 +863,7 @@
     <SourceProxy class="vtkGroupTimeStepsFilter"
                  label="Group Time Steps"
                  name="GroupTimeSteps">
-      <Documentation long_help="Group data set over time."
+      <Documentation long_help="Group dataset over time."
                      short_help="Group all the time steps in the input into one collection with no time.">
                      Groups all the time steps in the input into a collection with no time information.
                      Each timestep will become one block of the output.
@@ -968,7 +967,7 @@
             </RequiredProperties>
           </ArrayListDomain>
           <Documentation>
-            Select the point data arrays to pass through
+            Select the point data arrays to pass through.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="point"/>
@@ -986,7 +985,7 @@
             </RequiredProperties>
           </ArrayListDomain>
           <Documentation>
-            Select the cell data arrays to pass through
+            Select the cell data arrays to pass through.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="cell"/>
@@ -1004,7 +1003,7 @@
             </RequiredProperties>
           </ArrayListDomain>
           <Documentation>
-            Select the field data arrays to pass through
+            Select the field data arrays to pass through.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="field"/>
@@ -1022,7 +1021,7 @@
             </RequiredProperties>
           </ArrayListDomain>
           <Documentation>
-            Select the vertex data arrays to pass through
+            Select the vertex data arrays to pass through.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="vertex"/>
@@ -1040,7 +1039,7 @@
             </RequiredProperties>
           </ArrayListDomain>
           <Documentation>
-            Select the edge data arrays to pass through
+            Select the edge data arrays to pass through.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="edge"/>
@@ -1058,7 +1057,7 @@
             </RequiredProperties>
           </ArrayListDomain>
           <Documentation>
-            Select the row data arrays to pass through
+            Select the row data arrays to pass through.
           </Documentation>
           <Hints>
             <ArraySelectionWidget icon_type="row"/>
@@ -1085,7 +1084,7 @@
                  label="Plot Data"
                  name="PlotAttributes">
       <Documentation short_help="Plot data arrays from the input">This filter
-      prepare arbitrary data to be plotted in any of the plots. By default the
+      prepares arbitrary data to be plotted in any of the plots. By default the
       data is shown in a XY line plot.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -1140,8 +1139,8 @@
                  name="QuadraturePointInterpolator">
       <Documentation long_help="Create scalar/vector data arrays interpolated to quadrature points."
                      short_help="Create scalar/vector data arrays interpolated to quadrature points.">
-      "Create scalar/vector data arrays interpolated to quadrature
-      points."</Documentation>
+      Create scalar/vector data arrays interpolated to quadrature
+      points.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -1180,8 +1179,8 @@
                  name="QuadraturePointsGenerator">
       <Documentation long_help="Create a point set with data at quadrature points."
                      short_help="Create a point set with data at quadrature points.">
-                     "Create a point set with data at quadrature
-                     points."</Documentation>
+                     Create a point set with data at quadrature
+                     points.</Documentation>
       <OutputPort index="0" name="Quadrature Points" />
       <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
@@ -1219,9 +1218,9 @@
     <SourceProxy class="vtkQuadratureSchemeDictionaryGenerator"
                  label="Generate Quadrature Scheme Dictionary"
                  name="QuadratureSchemeDictionaryGenerator">
-      <Documentation long_help="Generate quadrature scheme dictionaries in data sets that do not have them."
-                     short_help="Generate quadrature scheme dictionaries in data sets that do not have them.">
-      Generate quadrature scheme dictionaries in data sets that do not have
+      <Documentation long_help="Generate quadrature scheme dictionaries in datasets that do not have them."
+                     short_help="Generate quadrature scheme dictionaries in datasets that do not have them.">
+      Generate quadrature scheme dictionaries in datasets that do not have
       them.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -1354,9 +1353,9 @@
                  label="Rectilinear Data to Point Set"
                  name="RectilinearGridToPointSet">
       <Documentation short_help="Converts a rectilinear grid to an
-      equivalend structured grid">The Rectilinear Grid to Point Set
-      filter takes an rectilinear grid object and outputs an
-      equivalent Structured Grid (which is a type of point set). This
+      equivalent structured grid">The Rectilinear Grid to Point Set
+      filter takes a rectilinear grid object and produces an
+      equivalent Structured Grid, which is a type of point set. This
       brings the data to a broader category of data storage but only
       adds a small amount of overhead. This filter can be helpful in
       applying filters that expect or manipulate point
@@ -1381,8 +1380,8 @@
                      short_help="Shrink each input cell.">The Shrink filter
                      causes the individual cells of a dataset to break apart
                      from each other by moving each cell's points toward the
-                     centroid of the cell. (The centroid of a cell is the
-                     average position of its points.) This filter operates on
+                     centroid of the cell. The centroid of a cell is the
+                     average position of its points. This filter operates on
                      any type of dataset and produces unstructured grid
                      output.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -1407,7 +1406,7 @@
                            name="range" />
         <Documentation>The value of this property determines how far the points
         will move. A value of 0 positions the points at the centroid of the
-        cell; a value of 1 leaves them at their original
+        cell. A value of 1 leaves them at their original
         positions.</Documentation>
       </DoubleVectorProperty>
       <Hints>
@@ -1540,7 +1539,7 @@
       <Documentation short_help="Set 'close' time step values from the source to the input">
         Synchronize time step values in the first input (Input) to time step
         values in the second input (Source) that are considered close enough.
-        The outputted data set is from the first input and the number of
+        The outputted dataset is from the first input and the number of
         output time steps is also equal to the number of time steps in
         the first input. Time step values in the first input that are
         "close" to time step values in the second input are replaced
@@ -1611,7 +1610,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input..</Documentation>
+        <Documentation>This property specifies the input.</Documentation>
       </InputProperty>
       <StringVectorProperty command="SetXColumn"
                             name="XColumn"
@@ -1662,7 +1661,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Specify whether the points of the polydata are 3D or 2D.
-        If this is set to true then the Z Column will be ignored and the z
+        If this is set to true then the Z Column will be ignored and the Z
         value of each point on the polydata will be set to 0. By default this
         will be off.</Documentation>
       </IntVectorProperty>
@@ -1671,7 +1670,7 @@
                          name="KeepAllDataArrays"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Allow user to keep columns specified as X,Y,Z as Data
+        <Documentation>Keep columns specified as X,Y,Z as Data
         arrays. By default this will be off.</Documentation>
       </IntVectorProperty>
     </SourceProxy>
@@ -1699,7 +1698,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input..</Documentation>
+        <Documentation>This property specifies the input.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetWholeExtent"
                          default_values="0 0 0 0 0 0"
@@ -1793,7 +1792,7 @@
         <InputArrayDomain name="input_array" attribute_type="point"
               optional="1"/>
         <Documentation>
-          The input cells to create pathlines for.
+          The input cells for which to create pathlines.
         </Documentation>
       </InputProperty>
 
@@ -1811,8 +1810,8 @@
         <Documentation>
           Set a second input, which is a selection. Particles with the same
           Id in the selection as the primary input will be chosen for
-          pathlines Note that you must have the same IdChannelArray in the
-          selection as the input
+          pathlines. Note that you must have the same IdChannelArray in the
+          selection as the input.
         </Documentation>
       </InputProperty>
 
@@ -1831,7 +1830,7 @@
                          number_of_elements="1"
                          default_values="25" >
         <Documentation>
-          If the Particles being traced animate for a long time, the trails
+          If the particles being traced animate for a long time, the trails
           or traces will become long and stringy. Setting the
           MaxTraceTimeLength will limit how much of the trace is
           displayed. Tracks longer then the Max will disappear and the
@@ -1853,8 +1852,8 @@
             unrepresentative.  Set a MaxStepDistance{x,y,z} which acts as a
             threshold above which if a step occurs larger than the value (for
             the dimension), the track will be dropped and restarted after the
-            step. (ie the part before the wrap around will be dropped and the
-            newer part kept).
+            step. That is, the part before the wrap around will be dropped and the
+            newer part kept.
           </Documentation>
       </DoubleVectorProperty>
 
@@ -1908,17 +1907,17 @@
     <SourceProxy class="vtkTemporalStatistics"
                  label="Temporal Statistics"
                  name="TemporalStatistics">
-      <Documentation long_help="Loads in all time steps of a data set and computes some statistics about how each point and cell variable changes over time."
+      <Documentation long_help="Loads in all time steps of a dataset and computes some statistics about how each point and cell variable changes over time."
                      short_help="Compute Temporal Statistics">Given an input
-                     that changes over time, vtkTemporalStatistics looks at the
+                     that changes over time, Temporal Statistics looks at the
                      data for each time step and computes some statistical
                      information of how a point or cell variable changes over
-                     time. For example, vtkTemporalStatistics can compute the
+                     time. For example, Temporal Statistics can compute the
                      average value of "pressure" over time of each point. Note
                      that this filter will require the upstream filter to be
                      run on every time step that it reports that it can
                      compute. This may be a time consuming operation.
-                     vtkTemporalStatistics ignores the temporal spacing. Each
+                     Temporal Statistics ignores the temporal spacing. Each
                      timestep will be weighted the same regardless of how long
                      of an interval it is to the next timestep. Thus, the
                      average statistic may be quite different from an
@@ -2094,7 +2093,7 @@
                      short_help="Transform polygonal data.">The Transform
                      filter allows you to specify the position, size, and
                      orientation of polygonal, unstructured grid, and
-                     curvilinear data sets.</Documentation>
+                     curvilinear datasets.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input"
                      panel_visibility="default">
@@ -2132,7 +2131,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation> If off, only Vectors and Normals will be transformed.
-        If on, all 3-component data arrays (considered as 3D vectors) will be transformed.
+        If on, all three-component data arrays (considered as 3D vectors) will be transformed.
         All other arrays won't be flipped and will only be copied.</Documentation>
       </IntVectorProperty>
       <!-- End TransformFilter -->
@@ -2199,12 +2198,12 @@
                  name="WarpScalar">
       <Documentation long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
                      short_help="Warp point scalars into a spatial elevation plot.">
-                     The Warp (scalar) filter translates the points of the
-                     input data set along a vector by a distance determined by
+                     The Warp By Scalar filter translates the points of the
+                     input dataset along a vector by a distance determined by
                      the specified scalars. This filter operates on polygonal,
-                     curvilinear, and unstructured grid data sets containing
+                     curvilinear, and unstructured grid datasets containing
                      single-component scalar arrays. Because it only changes
-                     the positions of the points, the output data set type is
+                     the positions of the points, the output dataset type is
                      the same as that of the input. Any scalars in the input
                      dataset are copied to the output, so the data can be
                      colored by them.</Documentation>
@@ -2222,7 +2221,7 @@
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="1" />
-        <Documentation>This property specifies the input to the Warp (scalar)
+        <Documentation>This property specifies the input to the
         filter.</Documentation>
       </InputProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
@@ -2301,7 +2300,7 @@
                                    name="vtkPointSet"
                                    mode="visibility" />
         </Hints>
-        <Documentation>If this value is checked and the active data set is a
+        <Documentation>If this value is checked and the active dataset is a
         2D surface, generate a water-tight enclosure containing the initial
         surface, the warped surface and "side walls". </Documentation>
       </IntVectorProperty>
@@ -2314,7 +2313,7 @@
                  name="WarpVector">
       <Documentation long_help="This filter displaces point coordinates along a vector attribute. It is useful for showing mechanical deformation."
                      short_help="Warp (displace) the geometry with a given vector field.">
-                     The Warp (vector) filter translates the points of the
+                     The Warp By Vector filter translates the points of the
                      input dataset using a specified vector array. The vector
                      array chosen specifies a vector per point in the input.
                      Each point is translated along its vector by a given scale
@@ -2336,7 +2335,7 @@
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="3" />
-        <Documentation>This property specifies the input to the Warp (vector)
+        <Documentation>This property specifies the input to the
         filter.</Documentation>
       </InputProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
@@ -2580,7 +2579,7 @@
          For certain file formats, like Exodus, simulation codes may use the timesteps
          and time values to represent quantities other than time. For example, for
          modal analysis, the natural frequency for each mode may be used as the time
-         value. vtkAnimateModes can be used to reinterpret time as mode shapes.
+         value. Animate Modes can be used to reinterpret time as mode shapes.
          The filter can also animate vibrations for each mode shape (when
          AnimateVibrations is set to true). In that case, the time requested by the
          downstream pipeline is used to scale the displacement magnitude
