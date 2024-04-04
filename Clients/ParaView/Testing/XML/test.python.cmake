@@ -93,6 +93,7 @@ if (numpy_found)
     FieldDataDomainDefault.xml
     HyperTreeGridVisibleLeavesSize.xml
     PlotOverLine_htg.xml # needs find data
+    ProgrammableFilterFieldData.xml
     PythonCalculator.xml
     PythonCalculatorArrayAssociation.xml
     PythonCalculatorAutocomplete.xml
