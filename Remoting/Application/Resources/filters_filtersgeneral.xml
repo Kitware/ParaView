@@ -1288,7 +1288,9 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Random Scalars
         filter.</Documentation>
@@ -1318,6 +1320,14 @@
           are created.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="Seed"
+                         command="SetSeed"
+                         number_of_elements="1"
+                         default_values="1">
+        <Documentation>
+          Indicate the random seed used to generate random attributes.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetComponentRange"
                             default_values="0 255"
                             name="ComponentRange"
@@ -1336,6 +1346,11 @@
         <Documentation>Indicate that the generated attributes are
         constant within a block. This can be used to highlight
         blocks in a composite dataset.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkCompositeDataSet"
+                                   mode="visibility"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty
           name="GeneratePointScalars"
@@ -1345,6 +1360,12 @@
         <BooleanDomain name="bool"/>
         <Documentation>Indicate that point scalars are to be
         generated.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty
           name="GeneratePointVectors"
@@ -1354,6 +1375,12 @@
         <BooleanDomain name="bool"/>
         <Documentation>Indicate that point vectors are to be
         generated.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty
