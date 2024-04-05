@@ -16,7 +16,7 @@
 #include "pqLiveSourceManager.h"
 #include "pqLoadDataReaction.h"
 #include "pqPresetGroupsManager.h"
-#include "pqQuickLaunchDialog.h"
+#include "pqQuickLaunchDialogExtended.h"
 #include "pqSelectionManager.h"
 #include "pqSpreadSheetViewModel.h"
 #include "vtkProcessModule.h"
@@ -107,7 +107,7 @@ void pqPVApplicationCore::quickLaunch()
   Q_EMIT this->aboutToShowQuickLaunch();
   if (!this->QuickLaunchMenus.empty())
   {
-    pqQuickLaunchDialog dialog(pqCoreUtilities::mainWidget());
+    QList<QAction*> searchableActions;
     for (QWidget* menu : this->QuickLaunchMenus)
     {
       if (menu)
@@ -119,19 +119,19 @@ void pqPVApplicationCore::quickLaunch()
         //         actions() should be used instead of findChildren()
         if (menu->findChildren<QAction*>().empty())
         {
-          dialog.addActions(menu->actions());
+          searchableActions << menu->actions();
         }
         else
         {
-          dialog.addActions(menu->findChildren<QAction*>());
+          searchableActions << menu->findChildren<QAction*>();
         }
       }
     }
+
+    pqQuickLaunchDialogExtended dialog(pqCoreUtilities::mainWidget(), searchableActions);
+    QObject::connect(&dialog, &pqQuickLaunchDialogExtended::applyRequested, this,
+      &pqPVApplicationCore::triggerApply);
     dialog.exec();
-    if (dialog.quickApply())
-    {
-      this->applyPipeline();
-    }
   }
 }
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="quickLaunchAction" />
+
+  <!-- create a sphere with "enter" -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="sphere" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/CreateProxy" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- create a calculator with double click -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="quickLaunchAction" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="calculator" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" command="doubleClick" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- create a clip and auto apply (shift enter) -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="quickLaunchAction" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="clip" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended" command="keyEvent" arguments="6,16777248,33554432,,0,1" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended" command="keyEvent" arguments="6,16777220,33554432,,0,1" />
+
+  <!-- verify that Clip exists in pipeline and is applied -->
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" property="checked" arguments="false" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" property="text" arguments="Properties (Clip1)" />
+</pqevents>

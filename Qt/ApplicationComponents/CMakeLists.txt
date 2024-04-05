@@ -129,6 +129,7 @@ set(classes
   pqOMETransferFunctionsPropertyWidget
   pqOpacityTableModel
   pqOSPRayHidingDecorator
+  pqQuickLaunchDialogExtended
   pqPVAnimationWidget
   pqPVApplicationCore
   pqParaViewBehaviors
@@ -257,6 +258,7 @@ set(ui_files
   Resources/UI/pqOMETransferFunctionsPropertyWidget.ui
   Resources/UI/pqOMETransferFunctionsPropertyWidgetPage.ui
   Resources/UI/pqPauseLiveSourcePropertyWidget.ui
+  Resources/UI/pqQuickLaunchDialogExtended.ui
   Resources/UI/pqPropertyCollectionWidget.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui

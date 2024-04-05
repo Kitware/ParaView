@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="quickLaunchAction" />
+
+  <!-- test arrow motions -->
+  <!-- one down -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777237" />
+  <!-- pageup -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777249" />
+  <!-- pagedown -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777239" />
+  <!-- one up -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777235" />
+  <!-- home -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777232" />
+  <!-- end -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777233" />
+
+  <!-- tab to switch to Disabled list -->
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777217" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="Requires an input" />
+
+  <!-- tab to switch to Available list -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777217" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="" />
+
+  <!-- Esc to quit -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777216" />
+</pqevents>
