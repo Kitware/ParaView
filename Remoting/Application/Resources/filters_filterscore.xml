@@ -1014,7 +1014,7 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkIdFilter"
+    <SourceProxy class="vtkGenerateIds"
                  label="Point And Cell Ids"
                  name="PointAndCellIds">
       <Documentation long_help="Generate scalars from point and cell ids."
@@ -1032,6 +1032,7 @@ found and the point will be rejected.</Documentation>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Cell Data to
         Point Data filter.</Documentation>
@@ -1044,6 +1045,12 @@ found and the point will be rejected.</Documentation>
         <Documentation>
           Enable generation of point ids.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty command="SetPointIdsArrayName"
@@ -1052,10 +1059,18 @@ found and the point will be rejected.</Documentation>
                             number_of_elements="1">
         <Documentation>The name of the point ids array.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="enabled_state"
-                                   property="GeneratePointIds"
-                                   value="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+            <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="enabled_state"
+                                     property="GeneratePointIds"
+                                     value="1" />
+            <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                     name="vtkHyperTreeGrid"
+                                     mode="visibility"
+                                     exclude="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
 
@@ -1067,6 +1082,12 @@ found and the point will be rejected.</Documentation>
         <Documentation>
           Enable generation of cell ids.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty command="SetCellIdsArrayName"
