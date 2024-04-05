@@ -16,12 +16,9 @@
 #include "pqLiveSourceManager.h"
 #include "pqLoadDataReaction.h"
 #include "pqPresetGroupsManager.h"
-#include "pqPropertiesPanel.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqSelectionManager.h"
-#include "pqSetName.h"
 #include "pqSpreadSheetViewModel.h"
-#include "vtkPVLogger.h"
 #include "vtkProcessModule.h"
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
@@ -111,7 +108,7 @@ void pqPVApplicationCore::quickLaunch()
   if (!this->QuickLaunchMenus.empty())
   {
     pqQuickLaunchDialog dialog(pqCoreUtilities::mainWidget());
-    Q_FOREACH (QWidget* menu, this->QuickLaunchMenus)
+    for (QWidget* menu : this->QuickLaunchMenus)
     {
       if (menu)
       {
