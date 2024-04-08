@@ -13,13 +13,22 @@
  * Except for `vtkOverlapingAMR`, this filter can produce multiple slices at once.
  * In such cases, the output slices are stored in a `vtkPartitionedDataSetCollection`.
  *
- * Currently supported input types are:
+ * In the case of a composite input, this filter will produce a composite output with the same
+ * structure, except that each leaf (HyperTreeGrid or PartitionedDataSet containting HTG(s))
+ * will be replaced by a new level of nodes containing slices (one node for each slice).
+ * Output will always be a PartitionedDataSetCollection, even if the input is a MultiBlock.
+ *
+ * Please note that a composite input is considered valid only if it only contains HTGs or
+ * Partitioned DataSets of HTGs. This do not concern Overlaping AMR since they can't be stored
+ * in composite datasets.
+ *
+ * To recap, currently supported input types are:
  * - `vtkHyperTreeGrid`, output is a `vtkPartitionedDataSetCollection` (of `vtkHyperTreeGrid`)
+ * - `vtkCompositeDataSet` of `vtkHyperTreeGrid`, output is a `vtkPartitionedDataSetCollection` of
+ * `vtkHyperTreeGrid` (with one additional layer)
  * - `vtkOverlappingAMR`, output is a `vtkOverlappingAMR`
  *
  * Currently supported cutting function is Axis-Aligned `vtkPVPlane`.
- *
- * @remark This filter do not support composite inputs.
  *
  * @sa
  * vtkCutter vtkPVCutter vtkPlaneCutter vtkPVPlaneCutter vtkPVMetaSliceDataSet
@@ -37,7 +46,11 @@
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" // for export macro
 #include "vtkSmartPointer.h"                        // for vtkSmartPointer
 
+VTK_ABI_NAMESPACE_BEGIN
+class vtkDataAssembly;
 class vtkHyperTreeGridAxisCut;
+class vtkPartitionedDataSet;
+class vtkPartitionedDataSetCollection;
 class vtkPVPlane;
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkAxisAlignedCutter : public vtkDataObjectAlgorithm
@@ -106,6 +119,20 @@ private:
   void operator=(const vtkAxisAlignedCutter&) = delete;
 
   /**
+   * Helper methods that perform slicing on input HTG with given plane and fill outputSlices
+   */
+  void ProcessHTG(
+    vtkHyperTreeGrid* inputHTG, vtkPVPlane* plane, vtkPartitionedDataSetCollection* outputSlices);
+
+  /**
+   * Helper methods that perform slicing on input PDS with given plane. Add produced slices to the
+   * output PDC. Slices indices are added in a new layer of nodes in the output hierarchy at given
+   * node ID.
+   */
+  bool ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPVPlane* plane,
+    vtkPartitionedDataSetCollection* outputPDC, vtkDataAssembly* outputHierarchy, int nodeId);
+
+  /**
    * Cut HTG with axis-aligned plane, applying additional plane offset if needed
    */
   void CutHTGWithAAPlane(
@@ -121,6 +148,10 @@ private:
   vtkNew<vtkAMRSliceFilter> AMRCutter;
   int LevelOfResolution = 0;
   vtkNew<vtkContourValues> OffsetValues;
+
+  class vtkSliceVisitor;
 };
+
+VTK_ABI_NAMESPACE_END
 
 #endif

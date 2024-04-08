@@ -1069,6 +1069,8 @@ endif()
 list(APPEND TESTS_WITH_BASELINES
   AxisAlignedCutterAMR.xml
   AxisAlignedCutterHTG.xml
+  AxisAlignedCutterMBHierarchy.xml
+  AxisAlignedCutterPDCNoHierarchy.xml
   BDFReader.xml
   BoxWidgetVisibleBlock.xml
   CameraOrientationWidget.xml
