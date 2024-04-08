@@ -59,7 +59,7 @@
   <Proxy group="filters" name="AppendPolyData" />
   <Proxy group="filters" name="ArbitrarySourceGlyph" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
-  <Proxy group="filters" name="BlockIdScalars" />
+  <Proxy group="filters" name="BlockIds" />
   <Proxy group="filters" name="BrownianPoints" />
   <Proxy group="filters" name="Calculator" />
   <Proxy group="filters" name="CellCenters" />
@@ -113,7 +113,6 @@
   <Proxy group="filters" name="PlotOnIntersectionCurves" />
   <Proxy group="filters" name="PlotOnSortedLines" />
   <Proxy group="filters" name="PointDataToCellData" />
-  <Proxy group="filters" name="PolyDataNormals" />
   <Proxy group="filters" name="ProbeLine" />
   <Proxy group="filters" name="ProbePoint" />
   <Proxy group="filters" name="ProcessIdScalars" />
@@ -135,6 +134,7 @@
   <Proxy group="filters" name="Stripper" />
   <Proxy group="filters" name="StructuredGridOutlineFilter" />
   <Proxy group="filters" name="Subdivide" />
+  <Proxy group="filters" name="SurfaceNormals" />
   <Proxy group="filters" name="SurfaceVectors" />
   <Proxy group="filters" name="TemporalCache" />
   <Proxy group="filters" name="TemporalInterpolator" />

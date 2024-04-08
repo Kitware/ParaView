@@ -2,8 +2,8 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAdditionalFieldReader"
-                 label="Add Field Arrays"
-                 name="AddFieldArrays">
+                 label="Field Arrays From File"
+                 name="FieldArraysFromFile">
       <Documentation long_help="Reads arrays from a file and adds them to the input data object."
                      short_help="Adds arrays to a data object.">
                      Takes in an input data object and a filename. Opens the file
@@ -37,5 +37,13 @@
       <!-- End of AdditionalFieldReader -->
     </SourceProxy>
 
+    <SourceProxy name="AddFieldArrays"
+      class="vtkAdditionalFieldReader"
+      base_proxyname="FieldArraysFromFile"
+      base_proxygroup="filters">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'FieldArrayFromFile'. Please consider using that instead.
+      </Deprecated>
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

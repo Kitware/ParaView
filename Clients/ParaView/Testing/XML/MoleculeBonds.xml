@@ -4,10 +4,10 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/pointSet.vtk" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Chemistry" command="activate" arguments="PointSetToMolecule" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataModel/Molecule" command="activate" arguments="PointSetToMolecule" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Chemistry" command="activate" arguments="ComputeMoleculeBonds" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataModel/Molecule" command="activate" arguments="ComputeMoleculeBonds" />
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/IsToleranceAbsolute/CheckBox" property="checked" arguments="true" />
   <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Tolerance/DoubleLineEdit0" property="text" arguments="0.45" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />

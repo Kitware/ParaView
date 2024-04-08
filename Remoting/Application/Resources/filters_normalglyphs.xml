@@ -33,11 +33,11 @@
                   name="bool" />
         </Property>
       </Proxy>
-      <Proxy compound_name="GenerateSurfaceNormals1"
+      <Proxy compound_name="SurfaceNormals1"
              group="filters"
              id="1224"
              servers="1"
-             type="PolyDataNormals">
+             type="SurfaceNormals">
         <Property id="1224.ComputeCellNormals"
                   name="ComputeCellNormals"
                   number_of_elements="1">
@@ -315,7 +315,7 @@
       <ExposedProperties>
         <Property exposed_name="Consistency"
                   name="Consistency"
-                  proxy_name="GenerateSurfaceNormals1" />
+                  proxy_name="SurfaceNormals1" />
         <Property exposed_name="Glyph Max. Points"
                   name="MaximumNumberOfSamplePoints"
                   proxy_name="Glyph1" />

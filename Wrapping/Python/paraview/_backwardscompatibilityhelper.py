@@ -334,8 +334,9 @@ def setattr(proxy, pname, value):
                 'Please set the DestinationMesh property instead.')
 
     # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
-    # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
-    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
+    # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`. Filter was also renamed
+    # in "PointAndCellIds" in 5.13
+    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() in ("GenerateIdScalars", "PointAndCellIds"):
         if compatibility_version < (5, 7):
             proxy.GetProperty("PointIdsArrayName").SetData(value)
             proxy.GetProperty("CellIdsArrayName").SetData(value)
@@ -824,7 +825,7 @@ def getattr(proxy, pname):
 
     # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
     # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
-    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
+    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() in ("GenerateIdScalars", "PointAndCellIds"):
         if compatibility_version < (5, 7):
             return proxy.GetProperty("PointIdsArrayName")
         else:
@@ -1113,6 +1114,11 @@ def GetProxy(module, key, **kwargs):
 def get_deprecated_proxies(proxiesNS):
     """
     Provide a map between deprecated proxies and their fallback proxy
+    The key is the previous name, value the new.
+    By name we mean the actual python method name to construct the proxy,
+    not the proxy name.
+    Python method name is constructed from proxy label, sanitized to be
+    a valid python method name.
     """
     compatibility_version = get_paraview_compatibility_version()
     proxies = {}
@@ -1121,6 +1127,18 @@ def get_deprecated_proxies(proxiesNS):
 
     if compatibility_version <= (5, 13):
         proxies[proxiesNS.filters] += [("GhostCellsGenerator", "GhostCells")]
+        proxies[proxiesNS.filters] += [("AddFieldArrays", "FieldArraysFromFile")]
+        proxies[proxiesNS.filters] += [("AppendArcLength", "PolylineLength")]
+        proxies[proxiesNS.filters] += [("AppendLocationAttributes", "Coordinates")]
+        proxies[proxiesNS.filters] += [("BlockScalars", "BlockIds")]
+        proxies[proxiesNS.filters] += [("ComputeConnectedSurfaceProperties", "ConnectedSurfaceProperties")]
+        proxies[proxiesNS.filters] += [("GenerateGlobalIds", "GlobalPointAndCellIds")]
+        proxies[proxiesNS.filters] += [("GenerateIds", "PointAndCellIds")]
+        proxies[proxiesNS.filters] += [("GenerateProcessIds", "ProcessIds")]
+        proxies[proxiesNS.filters] += [("GenerateSpatioTemporalHarmonics", "SpatioTemporalHarmonics")]
+        proxies[proxiesNS.filters] += [("GenerateSurfaceNormals", "SurfaceNormals")]
+        proxies[proxiesNS.filters] += [("GenerateSurfaceTangents", "SurfaceTangents")]
+        proxies[proxiesNS.filters] += [("LevelScalarsOverlappingAMR", "OverlappingAMRLevelIds")]
 
     return proxies
 

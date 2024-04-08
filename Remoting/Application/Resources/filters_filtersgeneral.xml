@@ -39,8 +39,8 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkAppendLocationAttributes"
-                 label="Append Location Attributes"
-                 name="AppendLocationAttributes">
+                 label="Coordinates"
+                 name="Coordinates">
       <Documentation long_help="Adds points and/or cell centers as point and/or cell data arrays."
                      short_help="Optionally add point and cell centers as point and cell data arrays.">
                     This filter optionally adds point locations and cell centers to point and cell
@@ -76,13 +76,22 @@
         <Documentation>Adds a cell data array named `CellCenters` that is stores the centers
         of cells in the input.</Documentation>
       </IntVectorProperty>
-      <!-- End AppendLocationAttributes -->
+      <!-- End Coordinates -->
+    </SourceProxy>
+    <SourceProxy class="vtkAppendLocationAttributes"
+                 base_proxyname="Coordinates"
+                 base_proxygroup="filters"
+                 name="AppendLocationAttributes">
+
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'Coordinates'. Please consider using that instead.
+      </Deprecated>
     </SourceProxy>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkBlockIdScalars"
-                 label="Block Scalars"
-                 name="BlockIdScalars">
+                 label="Block Ids"
+                 name="BlockIds">
       <Documentation long_help="The Level Scalars filter uses colors to show levels of a multiblock dataset."
                      short_help="Generate point scalars from level.">The Level
                      Scalars filter uses colors to show levels of a multiblock
@@ -99,9 +108,18 @@
         <Documentation>This property specifies the input to the Level Scalars
         filter.</Documentation>
       </InputProperty>
-      <!-- End GroupIdScalars -->
     </SourceProxy>
-
+    <SourceProxy class="vtkBlockIdScalars"
+                 label="Block Scalars"
+                 base_proxyname="BlockIds"
+                 base_proxygroup="filters"
+                 name="BlockIdScalars">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This filter has been replaced by 'BlockIds'.
+        Please consider using that instead.
+      </Deprecated>
+    </SourceProxy>
+      <!-- End GroupIdScalars -->
     <!-- ==================================================================== -->
     <SourceProxy class="vtkBrownianPoints"
                  label="Random Vectors"
@@ -909,8 +927,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkOverlappingAMRLevelIdScalars"
-                 label="Level Scalars(Overlapping AMR)"
-                 name="OverlappingLevelIdScalars">
+                 label="Overlapping AMR Level Ids"
+                 name="OverlappingAMRLevelIds">
       <Documentation long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
                      short_help="Generate point scalars from level.">The Level
                      Scalars filter uses colors to show levels of a
@@ -927,6 +945,16 @@
         <Documentation>This property specifies the input to the Level Scalars
         filter.</Documentation>
       </InputProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkOverlappingAMRLevelIdScalars"
+                 label="Level Scalars(Overlapping AMR)"
+                 base_proxyname="OverlappingAMRLevelIds"
+                 base_proxygroup="filters"
+                 name="OverlappingLevelIdScalars">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'OverlappingAMRLevelIds'. Please consider using that instead.
+      </Deprecated>
       <!-- End GroupIdScalars -->
     </SourceProxy>
 
@@ -1429,7 +1457,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkSpatioTemporalHarmonicsAttribute"
-                 name="GenerateSpatioTemporalHarmonics">
+                 name="SpatioTemporalHarmonics">
       <Documentation short_help="Add a spatio-temporal harmonics array.">
                      The Spatio Temporal Harmonics Attribute filter adds an
                      array for point data. The values are computed for each
@@ -1477,6 +1505,15 @@
       <PropertyGroup label="Harmonics Settings">
         <Property name="Harmonics" />
       </PropertyGroup>
+    </SourceProxy>
+
+    <SourceProxy class="vtkSpatioTemporalHarmonicsAttribute"
+                 base_proxyname="SpatioTemporalHarmonics"
+                 base_proxygroup="filters"
+                 name="GenerateSpatioTemporalHarmonics">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'SpatioTemporalHarmonics'. Please consider using that instead.
+      </Deprecated>
     </SourceProxy>
 
     <!-- ==================================================================== -->

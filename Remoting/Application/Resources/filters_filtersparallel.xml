@@ -404,11 +404,11 @@
              id="491"
              servers="1"
              type="ProbeLineLegacy" />
-      <Proxy compound_name="AppendArcLength1"
+      <Proxy compound_name="PolylineLength1"
              group="filters"
              id="588"
              servers="1"
-             type="AppendArcLength">
+             type="PolylineLength">
         <Property id="588.Input"
                   name="Input"
                   number_of_elements="1">
@@ -435,7 +435,7 @@
       </ExposedProperties>
       <OutputPort name="Output"
                   port_index="0"
-                  proxy="AppendArcLength1" />
+                  proxy="PolylineLength1" />
       <!-- End ProbeLineLegacy -->
     </CompoundSourceProxy>
 
@@ -1299,8 +1299,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPPolyDataNormals"
-                 label="Generate Surface Normals"
-                 name="PolyDataNormals">
+                 label="Surface Normals"
+                 name="SurfaceNormals">
       <Documentation long_help="This filter will produce surface normals used for smooth shading. Splitting is used to avoid smoothing across feature edges."
                      short_help="Produce surface point normals.">This filter
                      generates surface normals at the points of the input
@@ -1399,6 +1399,16 @@
         processor boundaries). Turn this off if you do want to process ghost
         levels and do not mind seams.</Documentation>
       </IntVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkPPolyDataNormals"
+                 label="Generate Surface Normals"
+                 base_proxyname="SurfaceNormals"
+                 base_proxygroup="filters"
+                 name="PolyDataNormals">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'SurfaceNormals'. Please consider using that instead.
+      </Deprecated>
       <!-- End  PolyDataNormals -->
     </SourceProxy>
 
@@ -1508,7 +1518,7 @@
                  label="Process Id Scalars"
                  name="ProcessIdScalars">
       <Deprecated deprecated_in="5.12" to_remove_in="5.14">
-        This has been replaced by 'GenerateProcessIds'. Please consider
+        This has been replaced by 'ProcessIds'. Please consider
         using that instead.
       </Deprecated>
       <Documentation long_help="This filter uses colors to show how data is partitioned across processes."
@@ -1555,7 +1565,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkGenerateProcessIds"
-                 name="GenerateProcessIds">
+                 name="ProcessIds"
+                 label="Process Ids">
       <Documentation long_help="This filter generate point and cell data containing the current process id of each point and cell."
                      short_help="Generate process id scalars">
                      GenerateProcessIds is meant to fill in the ProcessIds attribute array,
@@ -1590,7 +1601,15 @@
         <Documentation>The value of this property determines whether to generate process id
         for cells.</Documentation>
       </IntVectorProperty>
+    </SourceProxy>
 
+    <SourceProxy class="vtkGenerateProcessIds"
+                 base_proxyname="ProcessIds"
+                 base_proxygroup="filters"
+                 name="GenerateProcessIds">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been replaced by 'ProcessIds'. Please consider using that instead.
+      </Deprecated>
       <!-- End GenerateProcessIds -->
     </SourceProxy>
 

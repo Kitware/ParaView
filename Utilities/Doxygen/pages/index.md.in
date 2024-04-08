@@ -7,22 +7,26 @@ This is doxygen generated documentation for the C++ API for developers of
 ParaView as well as those writing plugins and custom applications based on
 ParaView.
 
-Navigation
+Using ParaView
 -----------
 
 Page | Description
 -----|----------------------------------------
 [Environment Variables](@ref EnvironmentVariables) | Environment variables that affect application behavior.
 [Major API Changes](@ref MajorAPIChanges) | Descriptions for major API changes.
+[ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
+[String Formatting Arguments](@ref StringFormattingArguments) | String formatting arguments that are used for formatting formattable strings.
+
+Developping with servermanager XML
+-----------------
+
+Page | Description
+-----|----------------------------------------
+[Adding and removing proxies](@ref AddRemoveProxies) | Guideline to correctly adding and removing proxies.
 [Plugin Howto](@ref PluginHowto) | Tutorial on using and creating Plugins.
 [Proxy Hints And Annotations](@ref ProxyHints) | ServerManager XML hints for Proxies.
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
-[Community Atmosphere Model (CAM5) Catalyst Adaptor](@ref Cam5Adaptor) | Analyze Cam5 output with ParaView Catalyst.
-[ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
-[Anatomy of Catalyst Python Module (Version 2.0)](@ref CatalystPythonScriptsV2) | Understanding Catalyst Python modules.
-[String Formatting Arguments](@ref StringFormattingArguments) | String formatting arguments that are used for formatting formattable strings.
-[Localization Howto](@ref LocalizationHowto) | Description of the translation workflow and how comply to it.
 
 
 ParaView Catalyst
@@ -36,6 +40,8 @@ Page | Description
 -----|----------------------------------------
 [ParaView-Catalyst](@ref ParaViewCatalyst) | Design/Implementation details
 [ParaView-Catalyst Blueprint](@ref ParaViewCatalystBlueprint) | Blueprint for ParaView Catalyst
+[Anatomy of Catalyst Python Module (Version 2.0)](@ref CatalystPythonScriptsV2) | Understanding Catalyst Python modules.
+[Community Atmosphere Model (CAM5) Catalyst Adaptor](@ref Cam5Adaptor) | Analyze Cam5 output with ParaView Catalyst.
 
 
 Design/Implementation Details
@@ -45,6 +51,7 @@ Page | Description
 -----|---------------------------------------------------------------
 [Slice View](@ref DesignSliceView) | Implementing the **Slice View**
 [String Encoding](@ref DesignStringEncoding) | How to encode string when developing for ParaView
+[Localization Howto](@ref LocalizationHowto) | Description of the translation workflow and how comply to it.
 
 Developer notes
 ----------------

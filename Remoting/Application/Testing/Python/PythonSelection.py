@@ -8,7 +8,7 @@ smtesting.ProcessCommandLineArguments()
 s = Sphere()
 c = Cone(Resolution=10)
 GroupDatasets(Input=[s, c])
-g = GenerateIds()
+g = PointAndCellIds()
 
 sel = SelectCells("CellIds > 4")
 

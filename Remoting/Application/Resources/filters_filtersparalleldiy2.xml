@@ -63,8 +63,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkGenerateGlobalIds"
-                 label="Generate Global Ids"
-                 name="GenerateGlobalIds">
+                 label="Global Point And Cell Ids"
+                 name="GlobalPointAndCellIds">
       <Documentation short_help="Generate global point and cell ids.">
         Generate global point and cell ids. Global ids are unique ids where the same point
         (or cell) will be assigned the same id even if the point (or cell) is duplicated among
@@ -92,6 +92,16 @@
         </Documentation>
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkGenerateGlobalIds"
+                 label="Generate Global Ids"
+                 base_proxyname="GlobalPointAndCellIds"
+                 base_proxygroup="filters"
+                 name="GenerateGlobalIds">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'GlobalPointAndCellIds'. Please consider using that instead.
+      </Deprecated>
       <!-- End GenerateGlobalIds -->
     </SourceProxy>
 
