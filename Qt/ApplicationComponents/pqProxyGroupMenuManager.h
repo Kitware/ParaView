@@ -67,6 +67,7 @@ public:
   /**
    * Returns the prototype proxy for the action.
    */
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use pqProxyAction::GetProxyPrototype instead.")
   vtkSMProxy* getPrototype(QAction* action) const;
 
   /**

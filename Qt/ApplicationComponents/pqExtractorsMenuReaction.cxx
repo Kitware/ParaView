@@ -10,6 +10,7 @@
 #include "pqMenuReactionUtils.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqProxyAction.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqProxySelection.h"
 #include "pqServerManagerModel.h"
@@ -98,7 +99,7 @@ void pqExtractorsMenuReaction::updateEnableState(bool)
   auto actionList = manager->actions();
   for (auto& actn : actionList)
   {
-    auto prototype = manager->getPrototype(actn);
+    auto prototype = pqProxyAction::GetProxyPrototype(actn);
 
     // If the action is disabled
     if (prototype == nullptr || !enabled)
