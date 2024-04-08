@@ -131,6 +131,8 @@ endif()
 vtk_deprecated_setting(python_default PARAVIEW_USE_PYTHON PARAVIEW_ENABLE_PYTHON OFF)
 option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" "${python_default}")
 
+option(PARAVIEW_USE_SERIALIZATION "Enable/Disable Serialization support" OFF)
+
 # Currently, we're making `PARAVIEW_USE_QT` available only when doing CANONICAL
 # builds with RENDERING. This is technically not necessary so we can support that
 # use-case if needed in future but will require some work to make sure the Qt components
@@ -499,6 +501,11 @@ paraview_require_module(
   CONDITION PARAVIEW_ENABLE_WEB AND PARAVIEW_USE_PYTHON
   MODULES   VTK::WebCore
             VTK::WebPython
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_USE_SERIALIZATION
+  MODULES   VTK::SerializationManager
   EXCLUSIVE)
 
 paraview_require_module(

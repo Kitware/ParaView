@@ -601,6 +601,9 @@ else ()
   # Forward Python option to VTK.
   set(VTK_WRAP_PYTHON "${PARAVIEW_USE_PYTHON}")
 
+  # Forward Serialization option to VTK.
+  set(VTK_WRAP_SERIALIZATION "${PARAVIEW_USE_SERIALIZATION}")
+
   # Forward MPI option to VTK.
   set(VTK_USE_MPI "${PARAVIEW_USE_MPI}")
   set(VTK_SERIAL_TESTS_USE_MPIEXEC "${PARAVIEW_SERIAL_TESTS_USE_MPIEXEC}")
@@ -757,7 +760,8 @@ else ()
     TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}"
     GENERATE_SPDX       "${PARAVIEW_GENERATE_SPDX}"
     SPDX_DOCUMENT_NAMESPACE "https://paraview.org/spdx"
-    SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/vtk/vtk/-/tree/master")
+    SPDX_DOWNLOAD_LOCATION  "https://gitlab.kitware.com/vtk/vtk/-/tree/master"
+    ENABLE_SERIALIZATION    "${PARAVIEW_USE_SERIALIZATION}")
   install(TARGETS paraviewbuild EXPORT "VTK")
 
   if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
@@ -1041,6 +1045,15 @@ if (PARAVIEW_USE_PYTHON)
       FILE        ParaViewPythonIncubator-targets.cmake
       DESTINATION "${paraview_cmake_destination}"
       COMPONENT   "development")
+  endif ()
+endif ()
+
+if (PARAVIEW_USE_SERIALIZATION)
+  if (PARAVIEW_USE_EXTERNAL_VTK)
+    if (NOT VTK_WRAP_SERIALIZATION)
+      message(FATAL_ERROR
+        "PARAVIEW_USE_SERIALIZATION requires VTK built with VTK_WRAP_SERIALIZATION.")
+    endif()
   endif ()
 endif ()
 
