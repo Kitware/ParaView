@@ -31,7 +31,7 @@ if(PARAVIEW_SSH_SERVERS_TESTING)
   include(test.ssh.cmake)
 endif(PARAVIEW_SSH_SERVERS_TESTING)
 
-# Finally create the tests from the XML lists
+# Finally create the tests from the XML lists
 list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
 
