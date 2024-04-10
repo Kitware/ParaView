@@ -15,6 +15,7 @@ The following variables are provided by this module:
   * `PARAVIEW_QT_MAJOR_VERSION`: Major version of Qt used by ParaView if PARAVIEW_USE_QT is TRUE
   * `PARAVIEW_USE_MPI`: If ParaView is built with MPI support.
   * `PARAVIEW_USE_PYTHON`: If ParaView is built with Python support.
+  * `PARAVIEW_USE_SERIALIZATION`: If ParaView is built with Serialization support.
   * `PARAVIEW_USE_QTWEBENGINE`: If ParaView uses Qt's WebEngine for its help.
   * `PARAVIEW_PYTHONPATH`: Where ParaView's Python modules live under the
     install prefix. Unset if Python is not available.
@@ -84,6 +85,7 @@ set(PARAVIEW_USE_QT "@PARAVIEW_USE_QT@")
 set(PARAVIEW_QT_MAJOR_VERSION "@PARAVIEW_QT_MAJOR_VERSION@")
 set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
 set(PARAVIEW_USE_PYTHON "@PARAVIEW_USE_PYTHON@")
+set(PARAVIEW_USE_SERIALIZATION "@PARAVIEW_USE_SERIALIZATION@")
 set(PARAVIEW_USE_QTWEBENGINE "@PARAVIEW_USE_QTWEBENGINE@")
 set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
 
