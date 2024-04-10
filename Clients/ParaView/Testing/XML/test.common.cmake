@@ -1089,6 +1089,7 @@ list(APPEND TESTS_WITH_BASELINES
   MoleculeScalarBar.xml
   MultiSliceHTG.xml
   NetCDFUGRID.xml
+  QuadraturePointsDS.xml
   PartialFieldDataMultiBlock.xml
   ParticleTracerGlyph.xml
   PassArrays.xml
