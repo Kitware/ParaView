@@ -351,6 +351,14 @@ public:
   static void SetNumberOfCallbackThreads(int);
   ///@}
 
+  ///@{
+  /**
+   * Sets the number of threads that are used by `vtkSMPTools`.
+   */
+  static int GetNumberOfSMPThreads();
+  static void SetNumberOfSMPThreads(int);
+  ///@}
+
 protected:
   vtkPVGeneralSettings() = default;
   ~vtkPVGeneralSettings() override = default;

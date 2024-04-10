@@ -472,6 +472,17 @@
         <IntRangeDomain min="1" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="NumberOfSMPThreads"
+        command="SetNumberOfSMPThreads"
+        number_of_elements="1"
+        default_values="-1"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the number of threads that are used in various filters using vtkSMPTools.
+          If the value is negative, the default number of threads usually used by vtkSMPTools will be used.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="DefaultTimeStep"
         number_of_elements="1"
         default_values="1">
