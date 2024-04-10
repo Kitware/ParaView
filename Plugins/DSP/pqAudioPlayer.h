@@ -42,7 +42,6 @@ protected Q_SLOTS:
   void onPlayButtonClicked();
   void onPauseButtonClicked();
   void onStopButtonClicked();
-  void onApplyButtonClicked();
   void onResetButtonClicked();
   void onParametersChanged();
   void onVolumeChanged(int value);
