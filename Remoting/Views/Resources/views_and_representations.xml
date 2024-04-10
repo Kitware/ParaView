@@ -5025,6 +5025,13 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                proxyname="CellGridSurfaceRepresentation"></Proxy>
         <ExposedProperties>
           <PropertyGroup panel_visibility="default"
+                         label="Style" >
+            <Property name="SidesToShow" />
+            <Property name="PreserveRenderableInputs" />
+            <Property name="OmitSidesForRenderableInputs" />
+          </PropertyGroup>
+
+          <PropertyGroup panel_visibility="default"
                          panel_widget="ColorEditor"
                          label="Coloring" >
             <Property name="AmbientColor" />
@@ -8289,6 +8296,41 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           <String value="Outline" />
         </StringListDomain>
       </StringVectorProperty>
+      <IntVectorProperty name="SidesToShow"
+        number_of_elements="1"
+        default_values="37"
+        command="SetSidesToShow">
+        <EnumerationDomain name="enum">
+          <!--
+          <Entry text="Vertices of Edges"     value="1"/>
+          <Entry text="Vertices of Surfaces"  value="2"/>
+          <Entry text="Edges of Surfaces"     value="4"/>
+          <Entry text="Vertices of Volumes"   value="8"/>
+          <Entry text="Edges of Volumes"      value="16"/>
+          <Entry text="Surfaces of Volumes"   value="32"/>
+          -->
+          <Entry text="Surfaces of Inputs"    value="32"/>
+          <Entry text="Edges of Inputs"       value="20"/>
+          <Entry text="Vertices of Inputs"    value="11"/>
+          <Entry text="All Sides"             value="63"/>
+          <Entry text="Next Lowest Dimension" value="37"/>
+        </EnumerationDomain>
+        <Documentation>Choose how to render the input.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="PreserveRenderableInputs"
+        number_of_elements="1"
+        default_values="1"
+        command="SetPreserveRenderableInputs">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to preserve renderable inputs or only show their boundaries.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="OmitSidesForRenderableInputs"
+        number_of_elements="1"
+        default_values="1"
+        command="SetOmitSidesForRenderableInputs">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to compute sides for renderable inputs or only for volumetric cells.</Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetAmbient"
                             default_values="0.0"
                             name="Ambient"

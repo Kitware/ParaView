@@ -338,6 +338,39 @@ void vtkCellGridRepresentation::SetVisibility(bool val)
   this->Superclass::SetVisibility(val);
 }
 
+void vtkCellGridRepresentation::SetSidesToShow(int flags)
+{
+  auto* surfaceFilter = vtkCellGridComputeSurface::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetOutputDimensionControl(flags);
+  this->MarkModified();
+}
+
+void vtkCellGridRepresentation::SetPreserveRenderableInputs(bool shouldPreserve)
+{
+  auto* surfaceFilter = vtkCellGridComputeSurface::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetPreserveRenderableCells(shouldPreserve != 0);
+  this->MarkModified();
+}
+
+void vtkCellGridRepresentation::SetOmitSidesForRenderableInputs(bool shouldOmit)
+{
+  auto* surfaceFilter = vtkCellGridComputeSurface::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetOmitSidesForRenderableCells(shouldOmit);
+  this->MarkModified();
+}
+
 bool vtkCellGridRepresentation::NeedsOrderedCompositing()
 {
   // One would think simply calling `vtkActor::HasTranslucentPolygonalGeometry`
