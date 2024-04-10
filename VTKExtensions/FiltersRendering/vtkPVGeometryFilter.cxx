@@ -1192,17 +1192,49 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::CellGridExecute(
-  vtkCellGrid* input, vtkPolyData* output, int vtkNotUsed(doCommunicate))
+  vtkCellGrid* input, vtkPolyData* output, int doCommunicate)
 {
   double bounds[6];
-  input->GetBounds(bounds);
-  this->OutlineSource->SetBounds(bounds);
-  this->OutlineSource->Update();
-  auto outline = this->OutlineSource->GetOutput();
+  int procid = 0;
 
-  output->SetPoints(outline->GetPoints());
-  output->SetLines(outline->GetLines());
-  output->SetPolys(outline->GetPolys());
+  if (!doCommunicate && input->GetNumberOfCells() == 0)
+  {
+    return;
+  }
+
+  if (this->Controller)
+  {
+    procid = this->Controller->GetLocalProcessId();
+  }
+
+  input->GetBounds(bounds);
+
+  vtkPVGeometryFilter::BoundsReductionOperation operation;
+  if (procid && doCommunicate)
+  {
+    // Satellite node
+    this->Controller->Reduce(bounds, nullptr, 6, &operation, 0);
+  }
+  else
+  {
+    if (this->Controller && doCommunicate)
+    {
+      double tmp[6];
+      this->Controller->Reduce(bounds, tmp, 6, &operation, 0);
+      memcpy(bounds, tmp, 6 * sizeof(double));
+    }
+
+    if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
+    {
+      // only output in process 0.
+      this->OutlineSource->SetBounds(bounds);
+      this->OutlineSource->Update();
+
+      output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
+      output->SetLines(this->OutlineSource->GetOutput()->GetLines());
+      output->SetPolys(this->OutlineSource->GetOutput()->GetPolys());
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
