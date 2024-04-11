@@ -3,8 +3,8 @@
 
     <SourceProxy
       class="vtkCellGridComputeSurface"
-      label="Compute Surface Sides"
-      name="ComputeCellGridSurface">
+      name="ComputeCellGridSides"
+      label="Compute Sides">
       <Documentation
         long_help="Compute external-facing sides of conforming cells."
         short_help="Compute external-facing sides of conforming cells.">
@@ -27,7 +27,66 @@
         </DataTypeDomain>
         <Documentation>The input.</Documentation>
       </InputProperty>
-      <!-- End of ComputeCellGridSurface -->
+      <IntVectorProperty command="SetPreserveRenderableInputs"
+        default_values="1" name="PreserveRenderableInputs"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set this property to true to include the original
+          input cells in the output if they are of dimension 2 or lower
+          (i.e., surface, edges, or vertices). If false, then only the
+          computed sides will be output.
+
+          As an example, if an input has hexahedra and triangle cells,
+          this filter will output quadrilateral sides and triangle cells
+          when PreserveRenderableInputs is true and only quadrilateral
+          sides when PreserveRenderableInputs is false.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOmitSidesForRenderableInputs"
+        default_values="1" name="OmitSidesForRenderableInputs"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set this property to true to avoid generating sides
+          for input cells or sides that can be rendered as they are.
+          If false, then sides will be output even for cells/sides that
+          are surfaces or edges.
+
+          As an example, if an input has hexahedra and triangle cells,
+          this filter will generate quadrilateral sides (for the hexahedra)
+          and edge sides (for the triangles) if OmitSidesForRenderableInputs
+          is true, but only quadrilateral sides (for the hexahedra) if
+          OmitSidesForRenderableInputs is false. Note that this is independent
+          of whether some input cells are preserved or not.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutputDimensionControl"
+        default_values="37" name="OutputDimensionControl" label="Sides to Include"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <!--
+          <Entry text="Vertices of Edges"     value="1"/>
+          <Entry text="Vertices of Surfaces"  value="2"/>
+          <Entry text="Edges of Surfaces"     value="4"/>
+          <Entry text="Vertices of Volumes"   value="8"/>
+          <Entry text="Edges of Volumes"      value="16"/>
+          <Entry text="Surfaces of Volumes"   value="32"/>
+          -->
+          <Entry text="Surfaces of Inputs"    value="32"/>
+          <Entry text="Edges of Inputs"       value="20"/>
+          <Entry text="Vertices of Inputs"    value="11"/>
+          <Entry text="All Sides"             value="63"/>
+          <Entry text="Next Lowest Dimension" value="37"/>
+        </EnumerationDomain>
+        <Documentation>Set this property to true to include the original
+          input cells in the output if they are of dimension 2 or lower
+          (i.e., surface, edges, or vertices). If false, then only the
+          computed sides will be output.
+
+          As an example, if an input has hexahedra and triangle cells,
+          this filter will output quadrilateral sides and triangle cells
+          when PreserveRenderableInputs is true and only quadrilateral
+          sides when PreserveRenderableInputs is false.</Documentation>
+      </IntVectorProperty>
+
+      <!-- End of ComputeCellGridSides -->
     </SourceProxy>
 
     <SourceProxy

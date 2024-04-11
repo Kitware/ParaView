@@ -300,7 +300,7 @@
   <Proxy group="filters" name="CleanUnstructuredGridCells" />
   <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg" />
   <Proxy group="filters" name="ClipClosedSurface" />
-  <Proxy group="filters" name="ComputeCellGridSurface" />
+  <Proxy group="filters" name="ComputeCellGridSides" />
   <Proxy group="filters" name="ComputeConnectedSurfaceProperties" />
   <Proxy group="filters" name="ComputeMoleculeBonds" />
   <Proxy group="filters" name="ComputeMoments" />

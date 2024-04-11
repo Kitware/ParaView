@@ -60,8 +60,8 @@ void vtkCellGridRepresentation::SetupDefaults()
 {
   // delete vtkCompositePolyDataMapper created by vtkGeometryRepresentation
   auto* surfaceFilter = vtkCellGridComputeSurface::New();
-  surfaceFilter->PreserveRenderableCellsOn();
-  surfaceFilter->OmitSidesForRenderableCellsOn();
+  surfaceFilter->PreserveRenderableInputsOn();
+  surfaceFilter->OmitSidesForRenderableInputsOn();
   this->GeometryFilter = surfaceFilter;
   this->MultiBlockMaker = vtkCellGridRepresentationMultiBlockMaker::New();
   this->LODOutlineFilter->Delete();
@@ -356,7 +356,7 @@ void vtkCellGridRepresentation::SetPreserveRenderableInputs(bool shouldPreserve)
   {
     return;
   }
-  surfaceFilter->SetPreserveRenderableCells(shouldPreserve != 0);
+  surfaceFilter->SetPreserveRenderableInputs(shouldPreserve != 0);
   this->MarkModified();
 }
 
@@ -367,7 +367,7 @@ void vtkCellGridRepresentation::SetOmitSidesForRenderableInputs(bool shouldOmit)
   {
     return;
   }
-  surfaceFilter->SetOmitSidesForRenderableCells(shouldOmit);
+  surfaceFilter->SetOmitSidesForRenderableInputs(shouldOmit);
   this->MarkModified();
 }
 
