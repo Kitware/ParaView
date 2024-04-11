@@ -1181,6 +1181,19 @@
         <Documentation>The chance that a given node will be split during
         construction. Higher values mean more splits.</Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaskedFraction"
+                            default_values="0"
+                            name="MaskedFraction"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="1"
+                           name="range" />
+        <Documentation>
+          The total fraction of cell volume to be masked during
+          construction. This is a target value and the actual fraction of masked volume
+          can vary depending on number of tree and children.
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetMaxDepth"
                          default_values="5"
                          name="MaxDepth"
