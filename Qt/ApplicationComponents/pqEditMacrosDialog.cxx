@@ -144,7 +144,7 @@ struct pqEditMacrosDialog::pqInternals
       {
         return QVariant();
       }
-      const std::vector<std::string> headerLabels = { "Icon", "Macro", "Tool tip" };
+      const std::vector<std::string> headerLabels = { "Icon", "Macro", "Script", "Tool tip" };
       return QVariant(headerLabels.at(section).c_str());
     }
 
@@ -234,7 +234,7 @@ struct pqEditMacrosDialog::pqInternals
           }
           break;
         }
-        case pqInternals::Columns::Macros:
+        case pqInternals::Columns::Scripts:
         {
           QStyleOptionViewItem opt = option;
           initStyleOption(&opt, index);
@@ -242,21 +242,15 @@ struct pqEditMacrosDialog::pqInternals
           {
             painter->fillRect(option.rect, option.palette.highlight());
           }
-          auto value = index.data(Qt::DisplayRole);
-          if (value.isValid() && !value.isNull())
-          {
-            auto name = value.toString();
-            QStyledItemDelegate::paint(painter, option, index);
-            QStyleOptionButton buttonOpt;
-            buttonOpt.rect = this->calculateButtonRect(option.rect);
-            buttonOpt.icon = QApplication::style()->standardIcon(QStyle::SP_TitleBarMaxButton);
-            buttonOpt.iconSize = buttonOpt.rect.size();
-            buttonOpt.features = QStyleOptionButton::None;
-            QApplication::style()->drawControl(QStyle::CE_PushButton, &buttonOpt, painter);
-            this->buttonRects[index] = buttonOpt.rect;
-          }
+          QStyleOptionButton buttonOpt;
+          buttonOpt.rect = option.rect;
+          buttonOpt.icon = QApplication::style()->standardIcon(QStyle::SP_TitleBarMaxButton);
+          buttonOpt.iconSize = buttonOpt.rect.size();
+          buttonOpt.features = QStyleOptionButton::None;
+          QApplication::style()->drawControl(QStyle::CE_PushButton, &buttonOpt, painter);
           break;
         }
+        case pqInternals::Columns::Macros:
         case pqInternals::Columns::Tooltips:
         default:
           QStyledItemDelegate::paint(painter, option, index);
@@ -268,7 +262,8 @@ struct pqEditMacrosDialog::pqInternals
       // lets the button paint in a rectangle whose width is cell height - 2 pixels
       // so that the button icon doesn't look stretched
       int buttonWidth = cellRect.height() - 2;
-      return QRect(cellRect.right() - buttonWidth, cellRect.top(), buttonWidth, cellRect.height());
+      int buttonLeft = cellRect.left() + (cellRect.width() - buttonWidth) * 0.5;
+      return QRect(buttonLeft, cellRect.top(), buttonWidth, cellRect.height());
     }
 
     QWidget* createEditor(
@@ -286,6 +281,15 @@ struct pqEditMacrosDialog::pqInternals
           iconBrowser->setSizePolicy(
             QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
           return iconBrowser;
+        }
+        case pqInternals::Columns::Scripts:
+        {
+          auto macroPath =
+            index.data(pqInternals::pqPythonMacrosModel::MACRO_PATH_ROLE()).toString();
+          // Python Manager can't be nullptr as this dialog is built only when Python is enabled
+          pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
+          pythonManager->editMacro(macroPath);
+          return nullptr;
         }
         case pqInternals::Columns::Macros:
         case pqInternals::Columns::Tooltips:
@@ -307,30 +311,12 @@ struct pqEditMacrosDialog::pqInternals
           model->setData(index, newIconPath, Qt::DisplayRole);
           break;
         }
+        case pqInternals::Columns::Scripts:
         case pqInternals::Columns::Macros:
         case pqInternals::Columns::Tooltips:
         default:
           QStyledItemDelegate::setModelData(editor, model, index);
           break;
-      }
-    }
-
-    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
-    {
-      switch (index.column())
-      {
-        case pqInternals::Columns::Macros:
-        {
-          const auto textSize = QStyledItemDelegate::sizeHint(option, index);
-          auto size = textSize;
-          // makes the icon as wide as the height of the row.
-          size.setWidth(textSize.width() + textSize.height());
-          return size;
-        }
-        case pqInternals::Columns::Icons:
-        case pqInternals::Columns::Tooltips:
-        default:
-          return QStyledItemDelegate::sizeHint(option, index);
       }
     }
 
@@ -340,6 +326,12 @@ struct pqEditMacrosDialog::pqInternals
       switch (index.column())
       {
         case pqInternals::Columns::Icons:
+          // editor for icons opens up in a new dialog, doesn't make sense to fit the entire dialog
+          // inside one table cell.
+          break;
+        case pqInternals::Columns::Scripts:
+          // editor for script opens up in a new dialog, doesn't make sense to fit the entire dialog
+          // inside one table cell.
           break;
         case pqInternals::Columns::Macros:
         case pqInternals::Columns::Tooltips:
@@ -348,21 +340,9 @@ struct pqEditMacrosDialog::pqInternals
       }
     }
 
-    bool buttonRectContainsCoordinate(
-      const QModelIndex& index, const QPoint& coordinate, QTreeView* view)
-    {
-      if (this->buttonRects.contains(index))
-      {
-        auto& buttonRect = this->buttonRects[index];
-        auto mappedCoordinate = view->mapFromGlobal(coordinate);
-        const int headerHeight = buttonRect.height();
-        mappedCoordinate.setY(mappedCoordinate.y() - headerHeight);
-        return buttonRect.contains(mappedCoordinate);
-      }
-      return false;
-    }
-
   protected:
+    // skip QEvent::FocusOut when editor is a pqIconBrowser.
+    // Or else, the icon browser dialog will close when mouse is clicked outside it.
     bool eventFilter(QObject* editor, QEvent* event) override
     {
       pqIconBrowser* iconBrowser = qobject_cast<pqIconBrowser*>(editor);
@@ -377,8 +357,6 @@ struct pqEditMacrosDialog::pqInternals
     }
 
   private:
-    mutable QMap<QModelIndex, QRect> buttonRects;
-
     void commitAndCloseEditor()
     {
       pqIconBrowser* editor = qobject_cast<pqIconBrowser*>(sender());
@@ -396,6 +374,7 @@ struct pqEditMacrosDialog::pqInternals
   {
     Icons,
     Macros,
+    Scripts, // simply displays a push button
     Tooltips,
     Count
   };
@@ -449,6 +428,7 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
   this->Internals->view()->setItemDelegate(new pqInternals::pqPythonMacrosItemDelegate());
   this->Internals->view()->sortByColumn(pqInternals::Macros, Qt::AscendingOrder);
   this->Internals->view()->setSelectionBehavior(QTreeView::SelectionBehavior::SelectRows);
+  this->Internals->view()->resizeColumnToContents(pqInternals::Scripts);
   this->Internals->view()->resizeColumnToContents(pqInternals::Icons);
   this->Internals->view()->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
@@ -456,6 +436,7 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
     &pqPythonMacroSupervisor::onAddedMacro, this, [this]() {
       this->Internals->view()->resizeColumnToContents(pqInternals::Icons);
       this->Internals->view()->resizeColumnToContents(pqInternals::Macros);
+      this->Internals->view()->resizeColumnToContents(pqInternals::Scripts);
       this->Internals->view()->resizeColumnToContents(pqInternals::Tooltips);
       this->Internals->view()->selectionModel()->setCurrentIndex(
         QModelIndex(), QItemSelectionModel::NoUpdate);
@@ -493,14 +474,9 @@ pqEditMacrosDialog::pqEditMacrosDialog(QWidget* parent)
     this, &pqEditMacrosDialog::updateUIState);
 
   this->connect(this->Internals->view(), &QTreeView::clicked, [this](const QModelIndex& index) {
-    if (index.column() == pqInternals::Columns::Macros)
+    if (index.column() == pqInternals::Columns::Scripts)
     {
-      auto* delegate = static_cast<pqInternals::pqPythonMacrosItemDelegate*>(
-        this->Internals->view()->itemDelegate());
-      if (delegate->buttonRectContainsCoordinate(index, QCursor::pos(), this->Internals->view()))
-      {
-        this->onEditPressed();
-      }
+      this->onEditPressed();
     }
   });
 
