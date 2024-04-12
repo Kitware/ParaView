@@ -113,11 +113,11 @@ public:
 
     // Set some icons for the buttons
     QStyle* applicationStyle = QApplication::style();
-    ui.RestoreDefaultsButton->setIcon(applicationStyle->standardIcon(QStyle::SP_BrowserReload));
     ui.SaveButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogSaveButton));
     ui.ApplyButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogApplyButton));
-    ui.ResetButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogResetButton));
-    ui.CancelButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogCancelButton));
+    ui.RestoreDefaultsButton->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
+    ui.ResetButton->setIcon(QIcon(":/pqWidgets/Icons/pqCancel.svg"));
+    ui.CancelButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete.svg"));
     ui.OKButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogOkButton));
 
     self->connect(ui.RestoreDefaultsButton, SIGNAL(clicked()), SLOT(onRestoreDefaults()));

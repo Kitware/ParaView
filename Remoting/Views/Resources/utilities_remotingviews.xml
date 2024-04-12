@@ -3119,6 +3119,122 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy name="PolarGridActor"
+           label="Polar Grid Actor"
+           class="vtkPolarAxesActor2D"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        PolarGridActor can be used to render an axes grid in a render view.
+      </Documentation>
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the axes grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="2"
+        default_values="0.5 0.5"
+        panel_visibility="default">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+        <Documentation short="The origin of the axes">
+          This is the origin of the axes, in normalized viewport coordinates. Default is at center [0.5, 0.5].
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="StartAngle"
+        command="SetStartAngle"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation short="In degrees, the origin for angle measurment">
+          This is the orientation of the first axis. It starts from a left-to-right axis
+          and is measured counter-clockwise.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EndAngle"
+        command="SetEndAngle"
+        number_of_elements="1"
+        default_values="180"
+        panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation short="In degrees, the angle for the last axis.">
+          This is the orientation of the last axis. It starts from a left-to-right axis
+          and is measured counter-clockwise.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="AxesLength"
+        command="SetAxesLength"
+        number_of_elements="1"
+        default_values="100"
+        panel_visibility="default">
+          <Documentation short="The size of the axes">
+            The length of each radial axis in Viewport coordinates.
+          </Documentation>
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NumberOfAxes"
+        command="SetNumberOfAxes"
+        number_of_elements="1"
+        default_values="6"
+        panel_visibility="advanced">
+          <Documentation short="The number of axes">
+            The number of axes to display. Axes are evenly oriented around Origin
+            and starting at StartAngle.
+          </Documentation>
+         <IntRangeDomain name="range" min="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfTicks"
+        command="SetNumberOfAxesTicks"
+        number_of_elements="1"
+        default_values="6"
+        panel_visibility="advanced">
+          <Documentation short="The number of ticks along axes">
+            The number of ticks to display on each axis.
+          </Documentation>
+         <IntRangeDomain name="range" min="2" />
+      </IntVectorProperty>
+
+      <PropertyGroup label=" " panel_visibility="advanced">
+        <Property name="NumberOfAxes" />
+        <Property name="NumberOfTicks" />
+      </PropertyGroup>
+
+      <SubProxy command="SetAxesTextProperty">
+        <Proxy name="AxesTextProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="AxesLabelColor" name="Color" />
+          <Property exposed_name="AxesLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="AxesLabelBold" name="Bold" />
+          <Property exposed_name="AxesLabelItalic" name="Italic" />
+          <Property exposed_name="AxesLabelShadow" name="Shadow" />
+          <Property exposed_name="AxesLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Axes Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="AxesLabelColor" function="Color"/>
+        <Property name="AxesLabelFontFamily" function="Family"/>
+        <Property name="AxesLabelBold" function="Bold" />
+        <Property name="AxesLabelItalic" function="Italics"/>
+        <Property name="AxesLabelFontSize" function="Size" />
+        <Property name="AxesLabelShadow" function="Shadow" />
+      </PropertyGroup>
+
+    </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy name="LegendGridActor"
            label="Legend Grid Actor"
            class="vtkLegendScaleActor"

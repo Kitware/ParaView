@@ -66,6 +66,7 @@
 #include "vtkPVTrackballZoomToMouse.h"
 #include "vtkPVView.h"
 #include "vtkPointData.h"
+#include "vtkPolarAxesActor2D.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
@@ -762,6 +763,26 @@ void vtkPVRenderView::SetLegendGridActor(vtkLegendScaleActor* gridActor)
 
       this->GetRenderer()->AddViewProp(this->LegendGridActor);
       culler->DoNotCullList.insert(this->LegendGridActor);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetPolarGridActor(vtkPolarAxesActor2D* polarActor)
+{
+  if (this->PolarAxesActor != polarActor)
+  {
+    vtkPVRendererCuller* culler = vtkPVRendererCuller::SafeDownCast(this->Culler);
+    if (this->PolarAxesActor)
+    {
+      this->GetRenderer()->RemoveViewProp(this->PolarAxesActor);
+      culler->DoNotCullList.erase(this->PolarAxesActor);
+    }
+    this->PolarAxesActor = polarActor;
+    if (this->PolarAxesActor)
+    {
+      this->GetRenderer()->AddViewProp(this->PolarAxesActor);
+      culler->DoNotCullList.insert(this->PolarAxesActor);
     }
   }
 }

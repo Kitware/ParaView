@@ -2868,6 +2868,22 @@
         </Hints>
       </ProxyProperty>
 
+      <ProxyProperty name="PolarGrid"
+                     command="SetPolarGridActor"
+                     panel_widget="proxy_editor">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="annotations" name="PolarGridActor" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility">
+            <!-- UI hint: pqProxyEditorPropertyWidget will display a checkbox
+              for the "Visibility" property next to the "Edit" button -->
+          </ProxyEditorPropertyWidget>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="CameraParallelProjection" value="1" />
+        </Hints>
+      </ProxyProperty>
+
       <IntVectorProperty command="SetUseRenderViewSettingsForBackground"
                          name="UseColorPaletteForBackground"
                          number_of_elements="1"
