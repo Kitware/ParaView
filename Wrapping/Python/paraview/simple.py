@@ -1638,6 +1638,18 @@ def GetNumberOfCallbackThreads(n):
 
 
 # -----------------------------------------------------------------------------
+def SetNumberOfSMPThreads(n):
+    """Sets the number of threads used by vtkSMPTools. It is used in various filters.
+    """
+    paraview.modules.vtkRemotingSetting.GetInstance().SetNumberOfSMPThreads(n)
+
+# -----------------------------------------------------------------------------
+    """Gets the number of threads used by vtkSMPTools. It is used in various filters.
+    """
+def GetNumberOfSMPThreads(n):
+    paraview.modules.vtkRemotingSetting.GetInstance().GetNumberOfSMPThreads()
+
+# -----------------------------------------------------------------------------
 def WaitForScreenshot(filename=None):
     """Pause this thread until screenshot named filename has terminated.
     If no filename is provided, then this thread pauses until all screenshot have been saved.

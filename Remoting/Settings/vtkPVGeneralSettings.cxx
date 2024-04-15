@@ -11,8 +11,10 @@
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMInputArrayDomain.h"
+#include "vtkSMPTools.h"
 #include "vtkSMTrace.h"
 #include "vtkThreadedCallbackQueue.h"
+#include "vtkThreads.h"
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingAnimation
 #include "vtkSMAnimationScene.h"
@@ -260,6 +262,30 @@ void vtkPVGeneralSettings::SetNumberOfCallbackThreads(int n)
       !session->GetController(vtkPVSession::DATA_SERVER)))
   {
     processModule->GetCallbackQueue()->SetNumberOfThreads(n);
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeneralSettings::GetNumberOfSMPThreads()
+{
+  return vtkSMPTools::GetEstimatedNumberOfThreads();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetNumberOfSMPThreads(int n)
+{
+  if (n > 0)
+  {
+    vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
+    auto session = vtkPVSession::SafeDownCast(processModule->GetSession());
+    if (session->GetProcessRoles() & vtkPVSession::DATA_SERVER)
+    {
+      vtkSMPTools::Initialize(n);
+    }
+  }
+  else
+  {
+    vtkSMPTools::Initialize(0);
   }
 }
 
