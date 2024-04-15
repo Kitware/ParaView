@@ -60,8 +60,7 @@ public:
    */
   void operator()(vtkDataArray* input, vtkIdType currentTimeIndex, vtkIdType arrayOffset) override
   {
-    auto typedInput = vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(input);
-    vtkIdType nbOfArrays = typedInput->GetNumberOfTuples();
+    vtkIdType nbOfArrays = input->GetNumberOfTuples();
 
     vtkSMPTools::For(0, nbOfArrays, [&](vtkIdType begin, vtkIdType end) {
       const vtkIdType valueIdx = currentTimeIndex * this->NbOfComponents;
@@ -70,7 +69,7 @@ public:
         for (int comp = 0; comp < this->NbOfComponents; ++comp)
         {
           (*this->Data)[arrayIdx + arrayOffset][valueIdx + comp] =
-            typedInput->GetComponent(arrayIdx, comp);
+            input->GetComponent(arrayIdx, comp);
         }
       }
     });
@@ -350,7 +349,7 @@ void vtkTemporalMultiplexing::GetArraysInformation(
 void vtkTemporalMultiplexing::PrepareVectorsOfArrays(
   const vtkSmartPointer<vtkDataSetAttributes>& attributes, vtkIdType nbOfArrays)
 {
-  using SupportedArrays = vtkArrayDispatch::Arrays;
+  using SupportedArrays = vtkArrayDispatch::AllArrays;
   using Dispatcher = vtkArrayDispatch::DispatchByArray<SupportedArrays>;
 
   this->Internals->Workers.clear();
@@ -373,6 +372,11 @@ void vtkTemporalMultiplexing::PrepareVectorsOfArrays(
       this->Internals->Workers.emplace_back(typeErasedWorker);
       typeErasedWorker->InitData(
         nbOfArrays, this->Internals->NumberOfTimeSteps, array->GetNumberOfComponents(), name);
+    }
+    else
+    {
+      vtkWarningMacro(<< "Ignoring array " << name << " : type " << array->GetArrayTypeAsString()
+                      << " could not be dispatched.");
     }
   }
 }
