@@ -2,7 +2,7 @@
   <ProxyGroup name="filters">
 
     <SourceProxy
-      class="vtkCellGridComputeSurface"
+      class="vtkCellGridComputeSides"
       name="ComputeCellGridSides"
       label="Compute Sides">
       <Documentation
