@@ -466,6 +466,16 @@
           the input data bounding box.
         </Documentation>
       </DoubleVectorProperty>
+      <ProxyProperty command="SetDecimationStrategy"
+                     name="DecimationStrategy">
+        <ProxyListDomain name="proxy_list">
+          <Group name="polyline_decimation_strategies" default="DecimationDistanceStrategy"/>
+        </ProxyListDomain>
+        <Documentation>
+          This property determines which decimation strategy
+          to use for the poly line decimation.
+        </Documentation>
+      </ProxyProperty>
       <!-- End DecimatePolyline -->
     </SourceProxy>
 
