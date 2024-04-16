@@ -254,6 +254,13 @@ int vtkPVGeometryFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
 {
   auto input = vtkDataObject::GetData(inputVector[0], 0);
   int outputType = -1;
+
+  if (!input)
+  {
+    vtkErrorMacro("Missing input data");
+    return 0;
+  }
+
   if (input->IsA("vtkDataSet") || input->IsA("vtkGenericDataSet") || input->IsA("vtkCellGrid") ||
     input->IsA("vtkHyperTreeGrid"))
   {
