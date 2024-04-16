@@ -1,0 +1,83 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkUnstructuredGridGhostCellsGenerator"
+                 label="Legacy Ghost Cells Generator"
+                 name="LegacyGhostCellsGenerator">
+      <Documentation long_help="Generate ghost cells for unstructured grids."
+                     short_help="Generate ghost cells for unstructured grids.">
+                     The GhostCellGenerator operates on unstructured grids only.
+                     This filter does not redistribute the input data, it only
+                     generates ghost cells at processor boundaries by fetching
+                     topological and geometrical information of those cells on
+                     neighbor ranks. The filter can take advantage of global point
+                     ids if they are available - if so it will perform faster,
+                     otherwise point coordinates will be exchanged and processed.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the ghost cells
+        generator.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetBuildIfRequired"
+                         default_values="0"
+                         name="BuildIfRequired"
+                         number_of_elements="1">
+        <Documentation>Specify if the filter must generate the ghost cells only
+          if required by the pipeline downstream. To force at least a fixed level
+          of ghosts, this must be set to 0 (unchecked).</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinimumNumberOfGhostLevels"
+                         number_of_elements="1"
+                         default_values="1"
+                         name="MinimumNumberOfGhosts">
+        <IntRangeDomain name="range" min="1" max="10" />
+        <Documentation>
+          When **BuildIfRequired** if off, use this to specify the minimum number of
+          ghost cells to request. The filter may request more ghost levels than indicated if a
+          downstream filter asked for more ghost levels.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="BuildIfRequired"
+                                   value="0" />
+          <!-- if BuildIfRequired !=0 , we disable this property -->
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseGlobalPointIds"
+                         default_values="1"
+                         name="UseGlobalIds"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Specify if the filter must take benefit of global point
+        ids if they exist or if point coordinates should be used instead.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty command="SetGlobalPointIdsArrayName"
+                            default_values="GlobalNodeIds"
+                            name="GlobalPointIdsArrayName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>This property provides the name for the input array
+        containing the global point ids if the GlobalIds array of the point
+        data if not set. Default is GlobalNodeIds.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGlobalIds" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <!-- End vtkPUnstructuredGridGhostCellsGenerator -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

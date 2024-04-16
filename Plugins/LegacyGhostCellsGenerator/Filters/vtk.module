@@ -1,0 +1,24 @@
+NAME
+  LegacyGhostCellsGeneratorFilters
+LIBRARY_NAME
+  LegacyGhostCellsGeneratorFilters
+IMPLEMENTABLE
+SPDX_LICENSE_IDENTIFIER
+  LicenseRef-BSD-3-Clause-LANL-USGov
+SPDX_CUSTOM_LICENSE_FILE
+  LICENSE
+SPDX_CUSTOM_LICENSE_NAME
+  BSD-3-Clause-LANL-USGov
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) 2017, Los Alamos National Security, LLC
+LICENSE_FILES
+  LICENSE
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonMisc
+OPTIONAL_DEPENDS
+  VTK::ParallelCore

@@ -4561,5 +4561,6 @@ Every Nth Point.
 
     </SourceProxy>
     <!-- End vtkEqualizerFilter -->
+
   </ProxyGroup>
 </ServerManagerConfiguration>
