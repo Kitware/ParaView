@@ -67,7 +67,7 @@ contains
 
     ! Alternatively set the environmental variable CATALYST_IMPLEMENTATION_PATHS to the path of libcatalyst-paraview.so
     call catalyst_conduit_node_set_path_char8_str(node, "catalyst_load/search_paths/paraview", &
-                                                  PARAVIEW_IMPL_DIR)
+    PARAVIEW_IMPL_DIR) ! keep PARAVIEW_IMPL_DIR as left as possible in this line to avoid truncation
 
     err = c_catalyst_initialize(node)
     if (err /= catalyst_status_ok) then
