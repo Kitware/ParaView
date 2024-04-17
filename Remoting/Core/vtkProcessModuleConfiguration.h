@@ -64,6 +64,11 @@ public:
   vtkSetMacro(SymmetricMPIMode, bool);
 
   /**
+   * Get the virtual environment path to set up for Python.
+   */
+  vtkGetMacro(VirtualEnvironmentPath, std::string);
+
+  /**
    * Get the verbosity level to use for reporting log messages on `stderr`.
    * In other words, all messages at the chosen level and higher are posted to
    * `stderr`. Default is `vtkLogger::VERBOSITY_INVALID`.
@@ -117,6 +122,7 @@ private:
   bool ForceNoMPIInit = false;
   bool UseMPISSend = false;
   bool SymmetricMPIMode = false;
+  std::string VirtualEnvironmentPath;
   bool EnableStackTrace = false;
   vtkLogger::Verbosity LogStdErrVerbosity = vtkLogger::VERBOSITY_INVALID;
   std::string CSLogFileName;

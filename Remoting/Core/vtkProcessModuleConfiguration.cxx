@@ -112,6 +112,10 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
     app->add_flag("-s,--sym,--symmetric", this->SymmetricMPIMode,
       "When specified, the python script is processed symmetrically on all processes.");
   }
+#if PARAVIEW_USE_PYTHON
+  app->add_option("--venv", this->VirtualEnvironmentPath,
+    "Initialize python with a virtual environment at this path.");
+#endif // PARAVIEW_USE_PYTHON
 
   return true;
 }
