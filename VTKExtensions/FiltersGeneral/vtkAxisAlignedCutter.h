@@ -7,7 +7,7 @@
  * `vtkAxisAlignedCutter` is a filter producing Axis-Aligned "slices" of the input data.
  * Among slicing filters, this one allows to preserve the input type. In other words,
  * this filter reduces the dimention of the input by 1, following an implicit cutting function.
- * For example, slicing a 3D `vtkHyperTreeGrid` will produce a 2D `vtkHyperTreeGrid`.
+ * For example, slicing a 3D `vtkHyperTreeGrid` will produce one (or several) 2D `vtkHyperTreeGrid`.
  * For that matter, this filter is limited to Axis-Aligned functions.
  *
  * Except for `vtkOverlapingAMR`, this filter can produce multiple slices at once.
@@ -148,8 +148,6 @@ private:
   vtkNew<vtkAMRSliceFilter> AMRCutter;
   int LevelOfResolution = 0;
   vtkNew<vtkContourValues> OffsetValues;
-
-  class vtkSliceVisitor;
 };
 
 VTK_ABI_NAMESPACE_END

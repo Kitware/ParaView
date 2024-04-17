@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkAxisAlignedCutter.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataAssembly.h"
-#include "vtkDataAssemblyVisitor.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridAxisCut.h"
 #include "vtkInformation.h"
@@ -18,68 +18,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
 
+#include <vector>
+
 VTK_ABI_NAMESPACE_BEGIN
-
-/**
- * Visit each node of input hierarchy (describing input PDC) to generate output hierarchy.
- * For each PDS (HTG) in the input PDC, generate one PDS (HTG) for each slice in the output PDC.
- * The resulting ouput hierarchy is the same than the input one, except that each dataset index
- * pointing to a PDS (HTG) in the input hierarchy is replaced by a new node pointing to a slice,
- * for each slice. Empty slices are discarded.
- *
- * Important: we assume each member variable is initialized and output hierarchy is a deep copy
- * of the input hierarchy before calling Visit.
- */
-class vtkAxisAlignedCutter::vtkSliceVisitor : public vtkDataAssemblyVisitor
-{
-public:
-  static vtkSliceVisitor* New();
-  vtkTypeMacro(vtkSliceVisitor, vtkDataAssemblyVisitor);
-
-  void Visit(int nodeId) override
-  {
-    auto indices = this->GetAssembly()->GetDataSetIndices(nodeId, /*traverse_subtree*/ false);
-    if (indices.empty())
-    {
-      return;
-    }
-
-    this->OutputHierarchy->RemoveAllDataSetIndices(nodeId, false);
-
-    for (auto index : indices)
-    {
-      auto inputPDS = this->InputPDC->GetPartitionedDataSet(index);
-      this->Caller->ProcessPDS(
-        inputPDS, this->Plane, this->OutputPDC, this->OutputHierarchy, nodeId);
-    }
-  }
-
-  void SetInputPDC(vtkPartitionedDataSetCollection* inputPDC) { this->InputPDC = inputPDC; }
-  void SetOutputPDC(vtkPartitionedDataSetCollection* outputPDC) { this->OutputPDC = outputPDC; }
-  void SetOutputHierarchy(vtkDataAssembly* outputHierarchy)
-  {
-    this->OutputHierarchy = outputHierarchy;
-  }
-  void SetCaller(vtkAxisAlignedCutter* caller) { this->Caller = caller; }
-  void SetPlane(vtkPVPlane* plane) { this->Plane = plane; }
-
-protected:
-  vtkSliceVisitor() = default;
-  ~vtkSliceVisitor() override = default;
-
-private:
-  vtkSliceVisitor(const vtkSliceVisitor&) = delete;
-  void operator=(const vtkSliceVisitor&) = delete;
-
-  vtkAxisAlignedCutter* Caller = nullptr;
-  vtkPVPlane* Plane = nullptr;
-  vtkPartitionedDataSetCollection* InputPDC = nullptr;
-  vtkPartitionedDataSetCollection* OutputPDC = nullptr;
-  vtkDataAssembly* OutputHierarchy = nullptr;
-};
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkAxisAlignedCutter::vtkSliceVisitor);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAxisAlignedCutter);
@@ -160,21 +101,22 @@ int vtkAxisAlignedCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
   }
 
   // Check we have a valid composite input (should only contain HTGs)
-  vtkCompositeDataSet* inputComposite = vtkCompositeDataSet::GetData(inInfo);
+  vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
   if (inputComposite)
   {
-    vtkSmartPointer<vtkCompositeDataIterator> iter;
-    iter.TakeReference(inputComposite->NewIterator());
+    vtkSmartPointer<vtkDataObjectTreeIterator> iter;
+    iter.TakeReference(inputComposite->NewTreeIterator());
+    iter->VisitOnlyLeavesOn();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       // AMRs cannot be contained in a composite dataset
-      if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()) ||
-        vtkCompositeDataSet::SafeDownCast(iter->GetCurrentDataObject()))
+      if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()))
       {
         continue;
       }
 
-      vtkErrorMacro("Input composite dataset should only contain vtkHyperTreeGrid instances.");
+      vtkErrorMacro(
+        "Input composite dataset should only contain vtkHyperTreeGrid instances as leaves.");
       return 0;
     }
   }
@@ -225,7 +167,7 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
       return 1;
     }
 
-    vtkCompositeDataSet* inputComposite = vtkCompositeDataSet::GetData(inInfo);
+    vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
     if (inputComposite)
     {
       vtkPartitionedDataSetCollection* outputPDC =
@@ -250,48 +192,67 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
 
       outputPDC->Initialize();
 
-      vtkDataAssembly* hierarchy = inputPDC->GetDataAssembly();
-      if (hierarchy)
+      vtkDataAssembly* inputHierarchy = inputPDC->GetDataAssembly();
+      if (inputHierarchy)
       {
         // Keep the same structure. In place of each node pointing to a HTG
-        // in the input PDC, we have one new layer of node(s) pointing to slice(s).
+        // in the input PDC, we have one new layer of node(s) pointing to slice(s)
+        // (since we can have multiple slices generated at once).
         vtkNew<vtkDataAssembly> outputHierarchy;
-        outputHierarchy->DeepCopy(hierarchy);
+        outputHierarchy->DeepCopy(inputHierarchy);
 
-        vtkNew<vtkSliceVisitor> visitor;
-        visitor->SetCaller(this);
-        visitor->SetPlane(plane);
-        visitor->SetInputPDC(inputPDC);
-        visitor->SetOutputPDC(outputPDC);
-        visitor->SetOutputHierarchy(outputHierarchy);
+        std::vector<int> assemblyIndices = inputHierarchy->GetChildNodes(
+          inputHierarchy->GetRootNode(), true, vtkDataAssembly::TraversalOrder::DepthFirst);
 
-        hierarchy->Visit(visitor);
+        for (auto& nodeId : assemblyIndices)
+        {
+          auto indices = inputHierarchy->GetDataSetIndices(nodeId, /*traverse_subtree*/ false);
+          if (indices.empty())
+          {
+            continue;
+          }
+
+          outputHierarchy->RemoveAllDataSetIndices(nodeId, false);
+
+          for (auto index : indices)
+          {
+            auto inputPDS = inputPDC->GetPartitionedDataSet(index);
+            this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, nodeId);
+          }
+        }
+
         outputPDC->SetDataAssembly(outputHierarchy);
       }
       else
       {
         // Create a new assembly. We have one node per HTG (level 1), and one node for each
         // slice under each HTG (level 2).
-        vtkNew<vtkDataAssembly> newHierarchy;
-        int rootId = newHierarchy->GetRootNode();
+        vtkNew<vtkDataAssembly> outputHierarchy;
+        int rootId = outputHierarchy->GetRootNode();
 
         std::string rootNodeName = "AxisAlignedSlice";
-        newHierarchy->SetRootNodeName(rootNodeName.c_str());
+        outputHierarchy->SetRootNodeName(rootNodeName.c_str());
 
-        int hyperTreeGridCount = 0;
+        unsigned int hyperTreeGridCount = 0;
         for (unsigned int pdsIdx = 0; pdsIdx < inputPDC->GetNumberOfPartitionedDataSets(); pdsIdx++)
         {
           std::string htgNodeName = "HyperTreeGrid" + std::to_string(++hyperTreeGridCount);
-          int htgNodeId = newHierarchy->AddNode(htgNodeName.c_str(), rootId);
+          int htgNodeId = outputHierarchy->AddNode(htgNodeName.c_str(), rootId);
+          if (htgNodeId == -1)
+          {
+            vtkErrorMacro("Unable to a add new child node for node " + std::to_string(rootId));
+            continue;
+          }
 
           vtkPartitionedDataSet* inputPDS = inputPDC->GetPartitionedDataSet(pdsIdx);
-          if (!this->ProcessPDS(inputPDS, plane, outputPDC, newHierarchy, htgNodeId))
+          if (!this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, htgNodeId))
           {
-            vtkErrorMacro("Unable to process partitioned dataset at index " + pdsIdx);
-            return 0;
+            vtkErrorMacro(
+              "Unable to process partitioned dataset at index " + std::to_string(pdsIdx));
+            continue;
           }
         }
-        outputPDC->SetDataAssembly(newHierarchy);
+        outputPDC->SetDataAssembly(outputHierarchy);
       }
 
       return 1;
@@ -330,7 +291,7 @@ int vtkAxisAlignedCutter::FillInputPortInformation(int port, vtkInformation* inf
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
-    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
     return 1;
   }
   return 0;
