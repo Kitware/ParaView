@@ -16,6 +16,10 @@
 #include "vtkRemotingApplicationModule.h" // needed for exports
 #include <string>                         // needed for std::string
 
+#if PARAVIEW_USE_PYTHON
+#include "vtkPythonInterpreter.h"
+#endif
+
 class vtkCLIOptions;
 class vtkStringList;
 
@@ -78,6 +82,13 @@ public:
    * from the rest of the initialization.
    */
   static bool InitializeMiscellaneous(int type);
+
+  /**
+   * Initialize Python virtual environment from --venv command-line argument if any was provided.
+   *
+   * Make sure that the vtkPythonInterpreter has been initialized before calling this function.
+   */
+  static void InitializePythonVirtualEnvironment();
 
   /**
    * Finalizes the server manager. Do not use the server manager

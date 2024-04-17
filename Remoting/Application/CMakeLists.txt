@@ -7,6 +7,10 @@ set(classes
 set(private_headers
   vtkPVInitializer.h)
 
+  set_source_files_properties(vtkInitializationHelper.cxx
+  PROPERTIES
+    COMPILE_DEFINITIONS "PARAVIEW_USE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")
+
 vtk_module_add_module(ParaView::RemotingApplication
   CLASSES ${classes}
   PRIVATE_HEADERS ${private_headers})

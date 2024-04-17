@@ -268,6 +268,58 @@ bool vtkInitializationHelper::InitializeOptions(
 }
 
 //----------------------------------------------------------------------------
+void vtkInitializationHelper::InitializePythonVirtualEnvironment()
+{
+#if PARAVIEW_USE_PYTHON
+  auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
+  auto venvPath = pmConfig->GetVirtualEnvironmentPath();
+
+  // If a venv argument is specified, set it up here
+  if (!venvPath.empty())
+  {
+    std::stringstream venvScript;
+    venvScript << R"SCRIPT(
+import os;
+import site
+import sys
+)SCRIPT";
+
+    venvScript << "VENV_BASE = '" << venvPath << "'\n";
+    venvScript << R"SCRIPT(
+VENV_LOADED = False
+
+# Allow venv environment variable override
+if os.environ.get("PV_VENV"):
+    VENV_BASE = os.path.abspath(os.environ.get("PV_VENV"))
+
+if not VENV_LOADED and VENV_BASE and os.path.exists(VENV_BASE):
+    VENV_LOADED = True
+    # Code inspired by virtual-env::bin/active_this.py
+    bin_dir = os.path.join(VENV_BASE, "bin")
+    os.environ["PATH"] = os.pathsep.join([bin_dir] + os.environ.get("PATH", "").split(os.pathsep))
+    os.environ["VIRTUAL_ENV"] = VENV_BASE
+    prev_length = len(sys.path)
+
+    if sys.platform == "win32":
+        python_libs = os.path.join(VENV_BASE, "Lib/site-packages")
+    else:
+        python_libs = os.path.join(VENV_BASE, f"lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages")
+
+    site.addsitedir(python_libs)
+    sys.path[:] = sys.path[prev_length:] + sys.path[0:prev_length]
+    sys.real_prefix = sys.prefix
+    sys.prefix = VENV_BASE
+    #
+    print(f"ParaView is using venv: {VENV_BASE}")
+elif not os.path.exists(VENV_BASE):
+    print(f"Could not find the virtual environment path '{VENV_BASE}' specified by --venv argument")
+)SCRIPT";
+    vtkPythonInterpreter::RunSimpleString(venvScript.str().c_str());
+  }
+#endif // PARAVIEW_USE_PYTHON
+}
+
+//----------------------------------------------------------------------------
 bool vtkInitializationHelper::InitializeMiscellaneous(int type)
 {
   auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
@@ -335,6 +387,21 @@ bool vtkInitializationHelper::InitializeMiscellaneous(int type)
   {
     cout << "Process started" << endl;
   }
+
+#if PARAVIEW_USE_PYTHON
+  // Set up virtual environment if requested.
+  auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
+  if (!pmConfig->GetVirtualEnvironmentPath().empty())
+  {
+    // Note - this may initialize Python at server startup, even if
+    // Python is not invoked later on, which could add some startup
+    // cost. We need to do it here because there are many
+    // places Python could be initialized in the ParaView and VTK
+    // code base, and we can't initialize the virtual environment
+    // in all those places.
+    InitializePythonVirtualEnvironment();
+  }
+#endif
 
   vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
   return true;
