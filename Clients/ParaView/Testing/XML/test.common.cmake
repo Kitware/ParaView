@@ -1240,6 +1240,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   AxisAlignedSliceBackwardCompat.xml
+  AnimationCache.xml
   AnimationCameraExportImport.xml
   AnimationFollowPath.xml
   AnimationSetTimeCursor.xml
