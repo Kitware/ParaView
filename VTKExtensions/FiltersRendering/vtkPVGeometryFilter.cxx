@@ -1208,20 +1208,20 @@ void vtkPVGeometryFilter::CellGridExecute(
   }
 
   input->GetBounds(bounds);
-
-  vtkPVGeometryFilter::BoundsReductionOperation operation;
+  const vtkBoundingBox dataSetBBox(bounds);
   if (procid && doCommunicate)
   {
     // Satellite node
-    this->Controller->Reduce(bounds, nullptr, 6, &operation, 0);
+    vtkBoundingBox recvBbox;
+    this->Controller->Reduce(dataSetBBox, recvBbox, 0);
   }
   else
   {
     if (this->Controller && doCommunicate)
     {
-      double tmp[6];
-      this->Controller->Reduce(bounds, tmp, 6, &operation, 0);
-      memcpy(bounds, tmp, 6 * sizeof(double));
+      vtkBoundingBox recvBBox;
+      this->Controller->Reduce(dataSetBBox, recvBBox, 0);
+      recvBBox.GetBounds(bounds);
     }
 
     if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
@@ -1232,7 +1232,6 @@ void vtkPVGeometryFilter::CellGridExecute(
 
       output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
       output->SetLines(this->OutlineSource->GetOutput()->GetLines());
-      output->SetPolys(this->OutlineSource->GetOutput()->GetPolys());
     }
   }
 }
