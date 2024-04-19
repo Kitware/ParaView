@@ -1184,6 +1184,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRArraySelection.xml
   AMRContour.xml
   AMRCutPlane.xml
+  AnimationCache.xml
   AMReXParticlesReader.xml
   AnimationCameraExportImport.xml
   AnimationFollowPath.xml

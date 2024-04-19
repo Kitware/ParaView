@@ -164,7 +164,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>When enabled, the animated property is directly updated
-        with the value of the Animation clock. Default value it
+        with the value of the Animation clock. Default value is
         true.</Documentation>
       </IntVectorProperty>
       <!-- end of TimeAnimationCue -->
@@ -231,6 +231,13 @@
         <BooleanDomain name="bool" />
         <Documentation>When set the EndTime will not be changed when the data
         time steps change.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceDisableCaching"
+                         default_values="0"
+                         name="ForceDisableCaching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Force disabling animation cache.</Documentation>
       </IntVectorProperty>
       <ProxyProperty argument_type="SMProxy"
                      command="SetTimeKeeper"
