@@ -63,7 +63,6 @@ void vtkCellGridRepresentation::SetupDefaults()
   surfaceFilter->PreserveRenderableInputsOn();
   surfaceFilter->OmitSidesForRenderableInputsOn();
   this->GeometryFilter = surfaceFilter;
-  this->MultiBlockMaker = vtkCellGridRepresentationMultiBlockMaker::New();
   this->LODOutlineFilter->Delete();
   this->LODOutlineFilter = vtkPVGeometryFilter::New();
 
