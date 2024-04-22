@@ -18,3 +18,7 @@ paraview_add_plugin(LegacyGhostCellsGenerator
   VERSION "1.0"
   MODULES ${modules}
   MODULE_FILES ${module_files})
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()
