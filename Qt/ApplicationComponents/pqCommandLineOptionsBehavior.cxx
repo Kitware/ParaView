@@ -209,7 +209,7 @@ void pqCommandLineOptionsBehavior::processState()
     }
     else
     {
-      qCritical() << "Specified state file does not exists: '" << fullPath.c_str() << "'";
+      qCritical() << "Specified state file does not exist: '" << fullPath.c_str() << "'";
     }
   }
 }
