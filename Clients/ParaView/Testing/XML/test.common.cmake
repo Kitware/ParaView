@@ -109,6 +109,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/combxyz.bin}"
   "DATA{${paraview_test_data_directory_input}/Data/cow.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/cth.vtr}"
+  "DATA{${paraview_test_data_directory_input}/Data/cube.off}"
   "DATA{${paraview_test_data_directory_input}/Data/cube.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/cylinder_run1.e}"
   "DATA{${paraview_test_data_directory_input}/Data/cylinder_run2.e}"
@@ -725,6 +726,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestMultiServer2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestMultiServer3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestMultiServer4.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestOFFReader.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPreviewTextScale.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPreviewTextScale_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonView.png}"
@@ -1491,6 +1493,7 @@ list(APPEND TESTS_WITH_BASELINES
   TestSelectionOnMultipiece.xml
   TimeStepProgressBar.xml
   Tessellate.xml
+  TestOFFReader.xml
   Text2D.xml
   TextBillboard3D.xml
   TextureUsages.xml
