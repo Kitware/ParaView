@@ -64,7 +64,34 @@
       <Deprecated deprecated_in="5.13" to_remove_in="5.14">
         This has been replaced by 'ProcessIds'. Please consider using that instead.
       </Deprecated>
-      <!-- End GenerateProcessIds -->
+      <!-- End of GenerateProcessIds -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVRemoveGhosts"
+                 label="Remove Ghost Information"
+                 name="RemoveGhostInformation">
+      <Documentation long_help="Removes ghost information."
+                     short_help="Removes ghost information.">
+        Removes ghost cells, point data and cell data ghost arrays.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkUnstructuredGrid"/>
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the remove ghost
+          information filter. This filter operates only on unstructured grids
+          and polydata since it removes the ghost cells.
+        </Documentation>
+      </InputProperty>
+      <!-- End of RemoveGhostInformation -->
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

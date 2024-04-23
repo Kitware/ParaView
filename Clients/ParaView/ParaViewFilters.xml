@@ -54,6 +54,7 @@
       <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
       <Proxy group="filters" name="HyperTreeGridToDualGrid" />
       <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
+      <Proxy group="filters" name="RemoveGhostInformation" />
       <Proxy group="filters" name="Threshold" />
     </Category>
     <Category name="CosmoTools" menu_label="C&amp;osmoTools" show_in_toolbar="0">

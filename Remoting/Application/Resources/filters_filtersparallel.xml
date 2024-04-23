@@ -1720,32 +1720,6 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkRemoveGhosts"
-                 label="Remove Ghost Information"
-                 name="RemoveGhostInformation">
-      <Documentation long_help="Removes ghost information."
-                     short_help="Removes ghost information.">
-        Removes ghost cells and point data and cell data ghost arrays.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData"/>
-          <DataType value="vtkUnstructuredGrid"/>
-        </DataTypeDomain>
-        <Documentation>
-          This property specifies the input to the remove ghost
-          information filter. This filter operates only on unstructured grids
-          and polydata since it removes the ghost cells.
-        </Documentation>
-      </InputProperty>
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPExtractExodusGlobalTemporalVariables"
                  label="Plot Global Variables Over Time"
                  name="ExtractFieldDataOverTime">

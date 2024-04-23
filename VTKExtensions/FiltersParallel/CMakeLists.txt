@@ -2,7 +2,8 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
-  vtkPVGenerateProcessIds)
+  vtkPVGenerateProcessIds
+  vtkPVRemoveGhosts)
 
 vtk_module_add_module(ParaView::VTKExtensionsFiltersParallel
   CLASSES ${classes})
