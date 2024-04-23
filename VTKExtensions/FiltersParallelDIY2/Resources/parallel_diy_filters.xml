@@ -380,5 +380,56 @@
       </PropertyGroup>
       <!-- end of ResampleToLineLine -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVGenerateGlobalIds"
+                 label="Global Point And Cell Ids"
+                 name="GlobalPointAndCellIds">
+      <Documentation short_help="Generate global point and cell ids.">
+        Generate global point and cell ids. Global ids are unique ids where the same point
+        (or cell) will be assigned the same id even if the point (or cell) is duplicated among
+        multiple blocks or ranks. This filter also flags duplicated points as ghost points.
+        Note that if the input is an HyperTree Grid, this filter only generates global cell ids.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty name="Tolerance"
+        command="SetTolerance"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the tolerance to use to identify coincident points. 0 means the
+          points should be exactly identical.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+      </DoubleVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkPVGenerateGlobalIds"
+                 label="Generate Global Ids"
+                 base_proxyname="GlobalPointAndCellIds"
+                 base_proxygroup="filters"
+                 name="GenerateGlobalIds">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been renamed into 'GlobalPointAndCellIds'. Please consider using that instead.
+      </Deprecated>
+      <!-- End GenerateGlobalIds -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

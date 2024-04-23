@@ -41,6 +41,7 @@
       <Proxy group="filters" name="Clip" />
       <Proxy group="filters" name="Contour" />
       <Proxy group="filters" name="Cut" />
+      <Proxy group="filters" name="GlobalIds" />
       <Proxy group="filters" name="Gradient" />
       <Proxy group="filters" name="GroupDataSets" />
       <Proxy group="filters" name="HyperTreeGridAxisReflection" />

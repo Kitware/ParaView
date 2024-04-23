@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
+  vtkPVGenerateGlobalIds
   vtkPVGhostCellsGenerator
   vtkPVProbeLineFilter)
 
