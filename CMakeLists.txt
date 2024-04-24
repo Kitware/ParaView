@@ -314,6 +314,7 @@ set(paraview_default_plugins
   LagrangianParticleTracker
   LANLX3DReader
   LegacyExodusReader
+  LegacyGhostCellsGenerator
   Moments
   MooseXfemClip
   NodeEditor

@@ -159,7 +159,7 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
         auto element_iter = elementTypesStrMap.find(parts[i]);
         if (element_iter == elementTypesStrMap.end())
         {
-          vtkGenericWarningMacro("Element type " << parts[i] << " does not exists");
+          vtkGenericWarningMacro("Element type " << parts[i] << " does not exist");
         }
         else
         {
