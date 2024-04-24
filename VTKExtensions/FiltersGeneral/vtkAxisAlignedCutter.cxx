@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkAxisAlignedCutter.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkCompositeDataSet.h"
+#include "vtkConvertToPartitionedDataSetCollection.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridAxisCut.h"
 #include "vtkInformation.h"
@@ -14,6 +17,10 @@
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
+
+#include <vector>
+
+VTK_ABI_NAMESPACE_BEGIN
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAxisAlignedCutter);
@@ -77,46 +84,61 @@ int vtkAxisAlignedCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkHyperTreeGrid* htgInput = vtkHyperTreeGrid::GetData(inInfo);
-  if (htgInput)
-  {
-    // Input dataset support can be stored in a composite output (multi-slice available)
-    // so output is a vtkPartitionedDataSetCollection of vtkHyperTreeGrid
-    bool outputAlreadyCreated = vtkPartitionedDataSetCollection::GetData(outInfo);
-    if (!outputAlreadyCreated)
-    {
-      vtkNew<vtkPartitionedDataSetCollection> outputPdc;
-      this->GetExecutive()->SetOutputData(0, outputPdc);
-      this->GetOutputPortInformation(0)->Set(
-        vtkDataObject::DATA_EXTENT_TYPE(), outputPdc->GetExtentType());
-    }
-    return 1;
-  }
-
-  vtkOverlappingAMR* amrInput = vtkOverlappingAMR::GetData(inInfo);
-  if (amrInput)
+  vtkOverlappingAMR* inputAMR = vtkOverlappingAMR::GetData(inInfo);
+  if (inputAMR)
   {
     // Input is an AMR and can't be stored in a vtkPartitionedDataSetCollection,
     // so output is a vtkOverlappingAMR (single slice support only)
     bool outputAlreadyCreated = vtkOverlappingAMR::GetData(outInfo);
     if (!outputAlreadyCreated)
     {
-      vtkNew<vtkOverlappingAMR> amrOutput;
-      this->GetExecutive()->SetOutputData(0, amrOutput);
+      vtkNew<vtkOverlappingAMR> outputAMR;
+      this->GetExecutive()->SetOutputData(0, outputAMR);
       this->GetOutputPortInformation(0)->Set(
-        vtkDataObject::DATA_EXTENT_TYPE(), amrOutput->GetExtentType());
+        vtkDataObject::DATA_EXTENT_TYPE(), outputAMR->GetExtentType());
     }
     return 1;
   }
 
-  vtkCompositeDataSet* compositeInput = vtkCompositeDataSet::GetData(inInfo);
-  if (compositeInput)
+  // Check we have a valid composite input (should only contain HTGs)
+  vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
+  if (inputComposite)
   {
-    vtkErrorMacro("This filter can't process composite data other than vtkOverlappingAMR.");
-    return 0;
+    vtkSmartPointer<vtkDataObjectTreeIterator> iter;
+    iter.TakeReference(inputComposite->NewTreeIterator());
+    iter->VisitOnlyLeavesOn();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      // AMRs cannot be contained in a composite dataset
+      if (vtkHyperTreeGrid::SafeDownCast(iter->GetCurrentDataObject()))
+      {
+        continue;
+      }
+
+      vtkErrorMacro(
+        "Input composite dataset should only contain vtkHyperTreeGrid instances as leaves.");
+      return 0;
+    }
   }
 
-  vtkErrorMacro("Unable to retrieve input as vtkOverlappingAMR or vtkHyperTreeGrid.");
+  vtkHyperTreeGrid* inputHTG = vtkHyperTreeGrid::GetData(inInfo);
+  if (inputHTG || inputComposite)
+  {
+    // Input dataset support can be stored in a composite output (multi-slice available)
+    // so output is a vtkPartitionedDataSetCollection of vtkHyperTreeGrid
+    bool outputAlreadyCreated = vtkPartitionedDataSetCollection::GetData(outInfo);
+    if (!outputAlreadyCreated)
+    {
+      vtkNew<vtkPartitionedDataSetCollection> outputPDC;
+      this->GetExecutive()->SetOutputData(0, outputPDC);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), outputPDC->GetExtentType());
+    }
+    return 1;
+  }
+
+  vtkErrorMacro("Unable to retrieve input as vtkOverlappingAMR, vtkHyperTreeGrid or composite "
+                "dataset of vtkHyperTreeGrid instances.");
   return 0;
 }
 
@@ -130,8 +152,114 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->CutFunction);
   if (plane && plane->GetAxisAligned())
   {
-    vtkHyperTreeGrid* htgInput = vtkHyperTreeGrid::GetData(inInfo);
-    if (htgInput)
+    vtkOverlappingAMR* inputAMR = vtkOverlappingAMR::GetData(inInfo);
+    if (inputAMR)
+    {
+      // vtkOverlappingAMR only support one slice
+      vtkOverlappingAMR* outputAMR = vtkOverlappingAMR::GetData(outInfo);
+      if (!outputAMR)
+      {
+        vtkErrorMacro(<< "Unable to retrieve output as vtkOverlappingAMR.");
+        return 0;
+      }
+
+      this->CutAMRWithAAPlane(inputAMR, outputAMR, plane);
+      return 1;
+    }
+
+    vtkDataObjectTree* inputComposite = vtkDataObjectTree::GetData(inInfo);
+    if (inputComposite)
+    {
+      vtkPartitionedDataSetCollection* outputPDC =
+        vtkPartitionedDataSetCollection::GetData(outInfo);
+      if (!outputPDC)
+      {
+        vtkErrorMacro(<< "Unable to retrieve output as vtkPartitionedDataSetCollection.");
+        return 0;
+      }
+
+      // Convert composite input to PDC if needed
+      vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
+      converter->SetInputDataObject(inputComposite);
+      converter->Update();
+      vtkPartitionedDataSetCollection* inputPDC = converter->GetOutput();
+
+      if (!inputPDC)
+      {
+        vtkErrorMacro(<< "Unable to convert composite input to Partitioned DataSet Collection");
+        return 0;
+      }
+
+      outputPDC->Initialize();
+
+      vtkDataAssembly* inputHierarchy = inputPDC->GetDataAssembly();
+      if (inputHierarchy)
+      {
+        // Keep the same structure. In place of each node pointing to a HTG
+        // in the input PDC, we have one new layer of node(s) pointing to slice(s)
+        // (since we can have multiple slices generated at once).
+        vtkNew<vtkDataAssembly> outputHierarchy;
+        outputHierarchy->DeepCopy(inputHierarchy);
+
+        std::vector<int> assemblyIndices = inputHierarchy->GetChildNodes(
+          inputHierarchy->GetRootNode(), true, vtkDataAssembly::TraversalOrder::DepthFirst);
+
+        for (auto& nodeId : assemblyIndices)
+        {
+          auto indices = inputHierarchy->GetDataSetIndices(nodeId, /*traverse_subtree*/ false);
+          if (indices.empty())
+          {
+            continue;
+          }
+
+          outputHierarchy->RemoveAllDataSetIndices(nodeId, false);
+
+          for (auto index : indices)
+          {
+            auto inputPDS = inputPDC->GetPartitionedDataSet(index);
+            this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, nodeId);
+          }
+        }
+
+        outputPDC->SetDataAssembly(outputHierarchy);
+      }
+      else
+      {
+        // Create a new assembly. We have one node per HTG (level 1), and one node for each
+        // slice under each HTG (level 2).
+        vtkNew<vtkDataAssembly> outputHierarchy;
+        int rootId = outputHierarchy->GetRootNode();
+
+        std::string rootNodeName = "AxisAlignedSlice";
+        outputHierarchy->SetRootNodeName(rootNodeName.c_str());
+
+        unsigned int hyperTreeGridCount = 0;
+        for (unsigned int pdsIdx = 0; pdsIdx < inputPDC->GetNumberOfPartitionedDataSets(); pdsIdx++)
+        {
+          std::string htgNodeName = "HyperTreeGrid" + std::to_string(++hyperTreeGridCount);
+          int htgNodeId = outputHierarchy->AddNode(htgNodeName.c_str(), rootId);
+          if (htgNodeId == -1)
+          {
+            vtkErrorMacro("Unable to a add new child node for node " + std::to_string(rootId));
+            continue;
+          }
+
+          vtkPartitionedDataSet* inputPDS = inputPDC->GetPartitionedDataSet(pdsIdx);
+          if (!this->ProcessPDS(inputPDS, plane, outputPDC, outputHierarchy, htgNodeId))
+          {
+            vtkErrorMacro(
+              "Unable to process partitioned dataset at index " + std::to_string(pdsIdx));
+            continue;
+          }
+        }
+        outputPDC->SetDataAssembly(outputHierarchy);
+      }
+
+      return 1;
+    }
+
+    vtkHyperTreeGrid* inputHTG = vtkHyperTreeGrid::GetData(inInfo);
+    if (inputHTG)
     {
       // vtkHyperTreeGrid support multi-slice, result is stored in a vtkPartitionedDataSetCollection
       vtkPartitionedDataSetCollection* pdcOutput =
@@ -142,45 +270,113 @@ int vtkAxisAlignedCutter::RequestData(vtkInformation* vtkNotUsed(request),
         return 0;
       }
 
-      pdcOutput->SetNumberOfPartitionedDataSets(this->GetNumberOfOffsetValues());
+      this->ProcessHTG(inputHTG, plane, pdcOutput);
 
-      for (int i = 0; i < this->GetNumberOfOffsetValues(); i++)
-      {
-        vtkNew<vtkHyperTreeGrid> htgOutput;
-        double offset = this->GetOffsetValue(i);
-
-        this->CutHTGWithAAPlane(htgInput, htgOutput, plane, offset);
-
-        vtkNew<vtkPartitionedDataSet> pds;
-        pds->SetNumberOfPartitions(1);
-        pds->SetPartition(0, htgOutput);
-        pdcOutput->SetPartitionedDataSet(i, pds);
-      }
       return 1;
     }
 
-    vtkOverlappingAMR* amrInput = vtkOverlappingAMR::GetData(inInfo);
-    if (amrInput)
-    {
-      // vtkOverlappingAMR only support one slice
-      vtkOverlappingAMR* amrOutput = vtkOverlappingAMR::GetData(outInfo);
-      if (!amrOutput)
-      {
-        vtkErrorMacro(<< "Unable to retrieve output as vtkOverlappingAMR.");
-        return 0;
-      }
-
-      this->CutAMRWithAAPlane(amrInput, amrOutput, plane);
-      return 1;
-    }
-
-    vtkErrorMacro(
-      "Wrong input type, expected to be a vtkHyperTreeGrid or vtkOverlappingAMR instance.");
+    vtkErrorMacro("Wrong input type, expected to be a vtkOverlappingAMR, vtkHyperTreeGrid or "
+                  "composite dataset of vtkHyperTreeGrid instances.");
     return 0;
   }
 
   vtkErrorMacro("Unable to retrieve valid axis-aligned implicit function to cut with.");
   return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkAxisAlignedCutter::FillInputPortInformation(int port, vtkInformation* info)
+{
+  if (port == 0)
+  {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
+    return 1;
+  }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkAxisAlignedCutter::ProcessPDS(vtkPartitionedDataSet* inputPDS, vtkPVPlane* plane,
+  vtkPartitionedDataSetCollection* outputPDC, vtkDataAssembly* outputHierarchy, int nodeId)
+{
+  if (!inputPDS)
+  {
+    vtkErrorMacro("Unable to retrieve input partitioned dataset");
+    return false;
+  }
+
+  for (int offsetIdx = 0, nbInserted = 0; offsetIdx < this->GetNumberOfOffsetValues(); offsetIdx++)
+  {
+    vtkNew<vtkPartitionedDataSet> pds;
+    pds->SetNumberOfPartitions(inputPDS->GetNumberOfPartitions());
+
+    double offset = this->GetOffsetValue(offsetIdx);
+    unsigned int nbOfNonEmptyPartitions = 0;
+
+    for (unsigned int partIdx = 0; partIdx < inputPDS->GetNumberOfPartitions(); partIdx++)
+    {
+      vtkNew<vtkHyperTreeGrid> outputHTG;
+      auto htgInput = vtkHyperTreeGrid::SafeDownCast(inputPDS->GetPartitionAsDataObject(partIdx));
+      if (!htgInput)
+      {
+        vtkErrorMacro("Partition "
+          << partIdx << " of input partitioned dataset should contain a HTG instance.");
+        return false;
+      }
+
+      this->CutHTGWithAAPlane(htgInput, outputHTG, plane, offset);
+      pds->SetPartition(partIdx, outputHTG);
+
+      if (outputHTG && outputHTG->GetNumberOfCells() != 0)
+      {
+        nbOfNonEmptyPartitions++;
+      }
+    }
+
+    // Only add partitioned dataset if it contain at least one non-empty partition
+    if (nbOfNonEmptyPartitions == 0)
+    {
+      continue;
+    }
+
+    auto nextDataSetId = outputPDC->GetNumberOfPartitionedDataSets();
+    outputPDC->SetPartitionedDataSet(nextDataSetId, pds);
+    const std::string sliceNodeName = "Slice" + std::to_string(nbInserted + 1);
+    int sliceNodeId = outputHierarchy->AddNode(sliceNodeName.c_str(), nodeId);
+    outputHierarchy->AddDataSetIndex(sliceNodeId, nextDataSetId);
+    nbInserted++;
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkAxisAlignedCutter::ProcessHTG(
+  vtkHyperTreeGrid* inputHTG, vtkPVPlane* plane, vtkPartitionedDataSetCollection* outputSlices)
+{
+  for (int offsetIdx = 0, nbInserted = 0; offsetIdx < this->GetNumberOfOffsetValues(); offsetIdx++)
+  {
+    vtkNew<vtkHyperTreeGrid> outputHTG;
+    double offset = this->GetOffsetValue(offsetIdx);
+
+    this->CutHTGWithAAPlane(inputHTG, outputHTG, plane, offset);
+
+    // Only add non-empty slices
+    if (!outputHTG || outputHTG->GetNumberOfCells() == 0)
+    {
+      continue;
+    }
+
+    vtkNew<vtkPartitionedDataSet> pds;
+    pds->SetNumberOfPartitions(1);
+    pds->SetPartition(0, outputHTG);
+    outputSlices->SetPartitionedDataSet(nbInserted, pds);
+    const std::string sliceName = "Slice" + std::to_string(nbInserted);
+    outputSlices->GetMetaData(nbInserted)->Set(vtkCompositeDataSet::NAME(), sliceName);
+    nbInserted++;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -257,21 +453,4 @@ void vtkAxisAlignedCutter::CutAMRWithAAPlane(
 
   output->ShallowCopy(this->AMRCutter->GetOutput());
 }
-
-//----------------------------------------------------------------------------
-int vtkAxisAlignedCutter::FillInputPortInformation(int port, vtkInformation* info)
-{
-  if (port == 0)
-  {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
-    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
-
-    // We cannot support composite inputs since this algorithm can produce a
-    // vtkPartitionedDatasetCollection instance.
-    // We add this type as supported type to avoid the vtkCompositeDataPipeline to
-    // handle it automatically (and we treat this case in RequestDataObject).
-    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
-    return 1;
-  }
-  return 0;
-}
+VTK_ABI_NAMESPACE_END
