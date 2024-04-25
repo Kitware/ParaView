@@ -29,15 +29,24 @@ paraview_add_client_server_render_tests(
   TEST_SCRIPTS DistributePoints.xml
   )
 
-# GenerateProcessIds is only tested in non-built-in mode.
-# There is no baseline because of TODO
+# Process IDs tests are only tested in non-built-in mode.
 paraview_add_client_server_tests(
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS GenerateProcessIds.xml
+  TEST_SCRIPTS GenerateProcessIds.xml ProcessIdsHTG.xml
   )
 paraview_add_client_server_render_tests(
   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS GenerateProcessIds.xml
+  TEST_SCRIPTS GenerateProcessIds.xml ProcessIdsHTG.xml
+  )
+
+# Global IDs tests are only tested in non-built-in mode.
+paraview_add_client_server_tests(
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS GlobalPointAndCellIdsHTG.xml
+  )
+paraview_add_client_server_render_tests(
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS GlobalPointAndCellIdsHTG.xml
   )
 
 # Volume rendering seems to work better in serial

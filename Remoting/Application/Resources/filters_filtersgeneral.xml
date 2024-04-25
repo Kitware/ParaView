@@ -1320,14 +1320,6 @@
           are created.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty name="Seed"
-                         command="SetSeed"
-                         number_of_elements="1"
-                         default_values="1">
-        <Documentation>
-          Indicate the random seed used to generate random attributes.
-        </Documentation>
-      </IntVectorProperty>
       <DoubleVectorProperty command="SetComponentRange"
                             default_values="0 255"
                             name="ComponentRange"
