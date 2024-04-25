@@ -24,6 +24,8 @@ list(APPEND test_exclusions
   "\\.TraceExodus$"
   # see https://gitlab.kitware.com/paraview/paraview/-/issues/22349
   "\\.SplitViewTrace$"
+  # see https://gitlab.kitware.com/paraview/paraview/-/issues/22478
+  "\\.BivariateTextureRepresentation$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
