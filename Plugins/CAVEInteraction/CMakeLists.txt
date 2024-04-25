@@ -20,6 +20,8 @@ set(sources
   pqVRAddConnectionDialog.h
   pqVRAddStyleDialog.cxx
   pqVRAddStyleDialog.h
+  pqVRCollaborationWidget.cxx
+  pqVRCollaborationWidget.h
   pqVRConnectionManager.cxx
   pqVRConnectionManager.h
   pqVRDockPanel.cxx
@@ -32,6 +34,12 @@ set(sources
   vtkVRInteractorStyleFactory.h
   "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVRConfig.h")
 
+set_property(
+  SOURCE
+  pqVRDockPanel.cxx
+  pqVRCollaborationWidget.cxx
+  APPEND PROPERTY
+    COMPILE_DEFINITIONS "CAVEINTERACTION_HAS_COLLABORATION=$<BOOL:${VTK_ENABLE_VR_COLLABORATION}>")
 
 if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
   find_package(VRPN REQUIRED)
@@ -59,7 +67,18 @@ endif ()
 set(ui_files
   pqVRAddConnectionDialog.ui
   pqVRAddStyleDialog.ui
+  pqVRCollaborationWidget.ui
   pqVRDockPanel.ui)
+
+if (VTK_ENABLE_VR_COLLABORATION)
+  list(APPEND ui_files
+    pqVRAvatarEvents.ui)
+  list(APPEND sources
+    pqVRAvatarEvents.h
+    pqVRAvatarEvents.cxx
+    vtkSMVRCollaborationStyleProxy.h
+    vtkSMVRCollaborationStyleProxy.cxx)
+endif ()
 
 set(interfaces)
 paraview_plugin_add_auto_start(
@@ -115,6 +134,8 @@ target_link_libraries(CAVEInteraction
     VTK::CommonMath
     VTK::CommonTransforms
     VTK::RenderingCore
+    VTK::RenderingOpenGL2
+    VTK::RenderingVR
     "Qt${PARAVIEW_QT_MAJOR_VERSION}::Network")
 target_compile_definitions(CAVEInteraction PRIVATE QT_NO_KEYWORDS)
 

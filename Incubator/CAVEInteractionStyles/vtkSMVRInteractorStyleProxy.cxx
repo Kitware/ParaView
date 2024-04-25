@@ -28,6 +28,7 @@ vtkSMVRInteractorStyleProxy::vtkSMVRInteractorStyleProxy()
   : vtkSMProxy()
   , ControlledProxy(nullptr)
   , ControlledPropertyName(nullptr)
+  , IsInternal(false)
 {
 }
 

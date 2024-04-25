@@ -42,6 +42,13 @@ public:
   vtkSetStringMacro(ControlledPropertyName);
   vtkGetStringMacro(ControlledPropertyName);
 
+  // An internal interactor style proxy should not be shown in the
+  // UI, but can still be used by the CAVEInteraction plugin for
+  // internal purposes.
+  vtkSetMacro(IsInternal, bool);
+  vtkGetMacro(IsInternal, bool);
+  vtkBooleanMacro(IsInternal, bool);
+
   virtual bool HandleEvent(const vtkVREvent& event);
 
   /// Update() called to update all the remote vtkObjects and perhaps even to render.
@@ -118,6 +125,8 @@ protected:
   bool SetValueInMap(StringMap& map_, const std::string& key, const std::string& value);
   std::string GetValueInMap(const StringMap& map_, const std::string& key);
   std::string GetKeyInMap(const StringMap& map_, const std::string& value);
+
+  bool IsInternal;
 
 private:
   vtkSMVRInteractorStyleProxy(const vtkSMVRInteractorStyleProxy&) = delete;

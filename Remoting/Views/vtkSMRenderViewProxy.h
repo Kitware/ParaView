@@ -267,6 +267,14 @@ public:
    */
   bool ClearSelectionCache(bool force = false);
 
+  /**
+   * Turn on/off synchronizable actors.  This is needed for immersive collaboration,
+   * (such as CAVEs) so that various types of vtkActor can be synchronized to all
+   * displays.  It is off/disabled by default.
+   */
+  void SetEnableSynchronizableActors(bool);
+  bool GetEnableSynchronizableActors();
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;
