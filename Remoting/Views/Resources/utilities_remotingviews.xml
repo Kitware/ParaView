@@ -3206,9 +3206,27 @@
          <IntRangeDomain name="range" min="2" />
       </IntVectorProperty>
 
+      <SubProxy command="SetProperty">
+        <Proxy name="2DProperty" class="vtkProperty2D"  >
+          <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                                name="GridColor"
+                                command="SetColor"
+                                number_of_elements="3"
+                                panel_visibility="advanced"
+                                panel_widget="color_selector">
+            <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+            <Documentation>Color for the axes and the arcs.</Documentation>
+          </DoubleVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="GridColor" />
+        </ExposedProperties>
+      </SubProxy>
+
       <PropertyGroup label=" " panel_visibility="advanced">
         <Property name="NumberOfAxes" />
         <Property name="NumberOfTicks" />
+        <Property name="GridColor" />
       </PropertyGroup>
 
       <SubProxy command="SetAxesTextProperty">

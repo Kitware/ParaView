@@ -23,12 +23,16 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/EndAngle/DoubleLineEdit0" command="set_string" arguments="-120" />
 
   <!-- advanced options -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/SearchBox/AdvancedButton" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
 
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/NumberOfAxes/LineEdit0" command="set_string" arguments="5" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/NumberOfTicks/LineEdit0" command="set_string" arguments="3" />
 
-  <!-- change font -->
+  <!-- grid color -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GridColor/ColorButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GridColor/ColorButton/1QColorDialog0" command="setChosenColor" arguments="255,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GridColor/ColorButton/1QColorDialog0" command="done" arguments="1" />
+
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontEditor/FontSize" command="set_int" arguments="24" />
 
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/PolarGrid/EditProxy/widget/OKButton" command="activate" arguments="" />
