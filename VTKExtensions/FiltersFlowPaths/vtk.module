@@ -1,0 +1,27 @@
+NAME
+  ParaView::VTKExtensionsFiltersFlowPaths
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersFlowPaths
+SPDX_LICENSE_IDENTIFIER
+  LicenseRef-BSD-3-Clause-Sandia-USGov
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Kitware Inc.
+SPDX_CUSTOM_LICENSE_FILE
+  LICENSE
+SPDX_CUSTOM_LICENSE_NAME
+  BSD-3-Clause-Sandia-USGov
+LICENSE_FILES
+  LICENSE
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::FiltersFlowPaths
+  ParaView::Versioning
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+TEST_LABELS
+  ParaView

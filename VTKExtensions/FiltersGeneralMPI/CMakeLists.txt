@@ -2,7 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
-  vtkInSituPParticlePathFilter)
+  vtkInSituPParticlePathFilter
+  vtkLegacyParticleTracerBase
+  vtkLegacyPParticlePathFilter
+  vtkLegacyPParticleTracerBase
+  )
 
 vtk_module_add_module(ParaView::VTKExtensionsFiltersGeneralMPI
   CLASSES ${classes})
