@@ -194,13 +194,16 @@ void pqPythonManager::executeCode(
   interp->RemoveObservers(vtkCommand::UpdateEvent);
 
   auto txt = owindow->text();
-  if (!txt.empty())
+  // vtkPythonInteractiveInterpreter always writes a newline, and if there
+  // was no other output from the script, then txt could contain only a
+  // newline here. If this is the case, do not display it to the user.
+  if (!txt.empty() && txt != "\n")
   {
     vtkOutputWindowDisplayText(txt.c_str());
   }
 
   auto errorText = owindow->errorText();
-  if (!errorText.empty())
+  if (!errorText.empty() && errorText != "\n")
   {
     vtkOutputWindowDisplayErrorText(errorText.c_str());
   }
