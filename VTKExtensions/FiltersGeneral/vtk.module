@@ -16,7 +16,6 @@ GROUPS
   PARAVIEW_CANONICAL
 KIT
   ParaView::CoreKit
-IMPLEMENTABLE
 DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel
