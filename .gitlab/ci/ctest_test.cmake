@@ -108,6 +108,18 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pv\\.TooltipCopy$"
     "pvcs\\.ShaderReplacement"
     "pvcrs\\.ShaderReplacement"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22598
+    "^pv\\.HelpWindowHistory$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22599
+    "\\.NetCDFTimeAnnotationFilter$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22600
+    "\\.DigitalRockPhysicsAnalysisFilter$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22601
+    "\\.ConvertToMolecule$"
     )
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
