@@ -4579,6 +4579,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                                            mode="visibility"
                                            property="Representation"
                                            value="Surface"/>
+                  <!-- Show for Surface With Edges representation -->
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface With Edges"/>
                   <!-- Show for Surface LIC representation -->
                   <PropertyWidgetDecorator type="GenericDecorator"
                                            mode="visibility"

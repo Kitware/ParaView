@@ -331,6 +331,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorOpacityTableEditorHistogram_V.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorLegendBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorLegendScaledScreenshot.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ComputeNormalInRepresentation-Default.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ComputeNormalInRepresentation-SurfaceEdgesRepr.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ComputeNormalInRepresentation-WithAngle.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConnectivityCountAscending.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConnectivityCountDescending.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour1.png}"
@@ -962,6 +965,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   ChartLoadNoVariables.xml
   ClampAndUpdateColorMap.xml
   ColorOpacityTableEditorHistogram.xml
+  ComputeNormalsInRepresentation.xml
   Connectivity.xml
   Contour.xml
   ContourRange.xml
