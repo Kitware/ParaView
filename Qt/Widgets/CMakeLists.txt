@@ -29,6 +29,7 @@ set(classes
   pqDoubleSpinBox
   pqExpandableTableView
   pqExpanderButton
+  pqExtendedSortFilterProxyModel
   pqFlatTreeView
   pqHeaderView
   pqHierarchicalGridLayout
