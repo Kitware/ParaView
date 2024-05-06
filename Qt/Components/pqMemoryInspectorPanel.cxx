@@ -3,7 +3,6 @@
 #include "pqMemoryInspectorPanel.h"
 #include "pqRemoteCommandDialog.h"
 #include "ui_pqMemoryInspectorPanelForm.h"
-using Ui::pqMemoryInspectorPanelForm;
 
 // #define pqMemoryInspectorPanelDEBUG
 
