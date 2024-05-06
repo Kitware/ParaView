@@ -2972,6 +2972,8 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
     // given the maximum size of a fragment, i.e., the maximum number of
     // faces per fragment in this vtkPolyData, allocate a buffer to maintain
     // the possible new faces of a single fragment
+    // FIXME: `clang-tidy` reports that `maxFsize[]` can be uninitialized here.
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.NewArraySize)
     newFaces = new vtkRectilinearGridConnectivityFace*[maxFsize[j]];
     for (k = 0; k < maxFsize[j]; k++)
     {

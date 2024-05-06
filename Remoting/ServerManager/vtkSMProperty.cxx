@@ -325,6 +325,8 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   }
   else
   {
+    // FIXME: `xmlname` might be `nullptr` here.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.StringChecker)
     this->SetXMLLabel(vtkSMObject::CreatePrettyLabel(xmlname).c_str());
   }
 

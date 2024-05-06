@@ -1985,9 +1985,12 @@ int vtkRedistributePolyData::DoubleCheckArrays(vtkPolyData* input)
   }
   else
   {
-    int zeroLength;
+    int zeroLength = 0;
     int* zeroSanity;
     this->Controller->Receive(&zeroLength, 1, 0, 77431);
+    // FIXME: There's no check that we got a sensible `zeroLength` here (or
+    // that we got it successfully). It is now zero-initialized above, but
+    // error checking is likely still warranted.
     zeroSanity = new int[zeroLength];
     this->Controller->Receive(zeroSanity, zeroLength, 0, 77432);
 

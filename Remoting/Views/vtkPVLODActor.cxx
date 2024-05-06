@@ -213,6 +213,7 @@ double* vtkPVLODActor::GetBounds()
   // coordinates, then its location may be affected by the renderwindow
   // physical to world matrix or other device to world matrix, and the
   // bounds need to be recomputed in this case as well.
+  // NOLINTNEXTLINE(bugprone-suspicious-memory-comparison)
   if ((memcmp(this->MapperBounds, bounds, 6 * sizeof(double)) != 0) ||
     (this->GetMTime() > this->BoundsMTime) || (this->CoordinateSystem != vtkProp3D::WORLD))
   {
