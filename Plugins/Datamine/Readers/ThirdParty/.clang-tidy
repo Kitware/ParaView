@@ -3,6 +3,7 @@
 # we enable a single set of checks (because disabling all checks is an error).
 Checks: "-*,\
 bugprone-*,\
+-bugprone-assignment-in-if-condition,\
 -bugprone-branch-clone,\
 -bugprone-easily-swappable-parameters,\
 -bugprone-implicit-widening-of-multiplication-result,\
