@@ -50,7 +50,6 @@
 #include "pqView.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 
 #ifdef _WIN32
 #include <windows.h>

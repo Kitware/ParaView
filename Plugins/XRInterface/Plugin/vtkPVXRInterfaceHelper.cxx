@@ -75,7 +75,6 @@
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRModel.h"
 #include "vtkVRRay.h"
-#include "vtkVRRenderWindow.h"
 #include "vtkVRRenderWindowInteractor.h"
 #include "vtkVRRenderer.h"
 #include "vtkVectorOperators.h"

@@ -37,7 +37,6 @@
 
 // pqComponents
 #include "pqLinksModel.h"
-#include "ui_pqLinksEditor.h"
 
 // std
 #include <cassert>

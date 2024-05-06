@@ -9,7 +9,6 @@
 #include "vtkNonOverlappingAMR.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkTable.h"
 

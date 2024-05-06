@@ -12,7 +12,6 @@
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMMessage.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"

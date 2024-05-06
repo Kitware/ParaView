@@ -11,7 +11,6 @@
 #include "vtkSmartPointer.h"
 
 #include <map>
-#include <vtkSmartPointer.h>
 
 //*****************************************************************************
 //                     Internal class definition
