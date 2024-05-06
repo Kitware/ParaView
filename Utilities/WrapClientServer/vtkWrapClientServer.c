@@ -515,25 +515,6 @@ void outputFunction(FILE* fp, ClassInfo* data)
     wrappedFunctions[numberOfWrappedFunctions] = currentFunction;
     numberOfWrappedFunctions++;
   }
-
-#if 0
-  if (!strcmp("vtkObject",data->Name))
-    {
-    fprintf(fp,"  if (!strcmp(\"AddProgressObserver\",method) && msg.NumberOfArguments == 3 &&\n");
-    fprintf(fp,"      msg.ArgumentTypes[2] == vtkClietnServerStream::string_value)\n");
-    fprintf(fp,"    {\n");
-    fprintf(fp,"    vtkClientServerProgressObserver *apo = vtkClientServerProgressObserver::New();\n");
-    fprintf(fp,"    vtkObject* obj = arlu->GetObjectFromMessage(msg, 0, 1);\n");
-    fprintf(fp,"    apo->SetFilterID(arlu->GetIDFromObject(obj));\n");
-    fprintf(fp,"    apo->SetClientServerUtil(arlu);\n");
-    fprintf(fp,"    char *temp0 = vtkClientServerInterpreter::GetString(msg,2);\n");
-    fprintf(fp,"    op->AddObserver(temp0,apo);\n");
-    fprintf(fp,"    apo->Delete();\n");
-    fprintf(fp,"    delete [] temp0;\n");
-    fprintf(fp,"    return 1;\n");
-    fprintf(fp,"    }\n");
-    }
-#endif
 }
 
 //--------------------------------------------------------------------------nix
