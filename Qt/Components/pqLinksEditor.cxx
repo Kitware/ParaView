@@ -452,8 +452,8 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   QObject::connect(this->Ui->lineEdit, SIGNAL(textChanged(const QString&)), this,
     SLOT(updateEnabledState()), Qt::QueuedConnection);
 
-  QObject::connect(this->Ui->comboBox, SIGNAL(currentIndexChanged(const QString&)), this,
-    SLOT(updateSelectedProxies()), Qt::QueuedConnection);
+  QObject::connect(this->Ui->comboBox, &QComboBox::currentTextChanged, this,
+    &pqLinksEditor::updateSelectedProxies, Qt::QueuedConnection);
 
   QObject::connect(
     this->Ui->interactiveViewLinkCheckBox, &QCheckBox::stateChanged, this,

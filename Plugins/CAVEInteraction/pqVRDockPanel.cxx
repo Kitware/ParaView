@@ -159,8 +159,8 @@ void pqVRDockPanel::initStyles()
     this->Internals->stylesCombo->addItem(QString::fromStdString(styleDescs[i]));
   }
 
-  connect(this->Internals->stylesCombo, SIGNAL(currentIndexChanged(QString)), this,
-    SLOT(styleComboChanged(QString)), Qt::UniqueConnection);
+  QObject::connect(this->Internals->stylesCombo, &QComboBox::currentTextChanged, this,
+    &pqVRDockPanel::styleComboChanged, Qt::UniqueConnection);
 }
 
 //-----------------------------------------------------------------------------
