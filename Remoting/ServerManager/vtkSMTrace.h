@@ -180,6 +180,7 @@ public:
     TraceItemArgs& arg(const char* key, bool val);
     TraceItemArgs& arg(const char* key, const std::vector<int>& val);
     TraceItemArgs& arg(const char* key, const std::vector<double>& val);
+    TraceItemArgs& arg(const char* key, const std::vector<std::string>& val);
 
     // Overloads for positional arguments.
     TraceItemArgs& arg(vtkObject* val);
