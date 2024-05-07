@@ -103,8 +103,8 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   this->Model->setActiveView(pqActiveObjects::instance().activeView());
 
   // Clicking on the header should sort the column.
-  QObject::connect(this->View->horizontalHeader(), SIGNAL(sectionClicked(int)), this->View,
-    SLOT(sortByColumn(int)));
+  QObject::connect(this->View->horizontalHeader(), &QHeaderView::sectionClicked, this->View,
+    [=](int col) { this->View->sortByColumn(col, Qt::AscendingOrder); });
 
   // Set the context menu policy for the header.
   this->View->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
