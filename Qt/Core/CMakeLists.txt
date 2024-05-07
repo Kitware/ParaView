@@ -40,6 +40,7 @@ set(classes
   pqImageUtil
   pqInteractiveViewLink
   pqInterfaceTracker
+  pqKeyEventFilter
   pqKeySequences
   pqLinkedObjectInterface
   pqLinkedObjectQTextEdit
