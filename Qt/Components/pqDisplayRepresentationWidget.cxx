@@ -111,8 +111,8 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(QWidget* _p)
 {
   this->Internal = new pqDisplayRepresentationWidget::pqInternals();
   this->Internal->setupUi(this);
-  this->connect(this->Internal->comboBox, SIGNAL(currentIndexChanged(const QString&)),
-    SLOT(comboBoxChanged(const QString&)));
+  QObject::connect(this->Internal->comboBox, &QComboBox::currentTextChanged, this,
+    &pqDisplayRepresentationWidget::comboBoxChanged);
 }
 
 //-----------------------------------------------------------------------------
