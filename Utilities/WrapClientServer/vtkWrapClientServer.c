@@ -1333,7 +1333,10 @@ int main(int argc, char* argv[])
     /* Block inclusion of full streams. */
     fprintf(fp, "#define VTK_STREAMS_FWD_ONLY\n");
   }
-  fprintf(fp, "#include \"%s.h\"\n", data->Name);
+  if (strcmp("vtkClientServerInterpreter", data->Name) != 0)
+  {
+    fprintf(fp, "#include \"%s.h\"\n", data->Name);
+  }
   fprintf(fp, "#include \"vtkSystemIncludes.h\"\n");
   if (classUsesStdString(data))
   {
