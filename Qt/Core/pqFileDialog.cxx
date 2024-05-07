@@ -377,8 +377,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     QObject::connect(
       impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
 
-    QObject::connect(impl.Ui.EntityType, SIGNAL(currentIndexChanged(const QString&)), this,
-      SLOT(onFilterChange(const QString&)));
+    QObject::connect(
+      impl.Ui.EntityType, &QComboBox::currentTextChanged, this, &pqFileDialog::onFilterChange);
 
     QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
       SLOT(onClickedFavorite(const QModelIndex&)));
