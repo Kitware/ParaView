@@ -17,6 +17,11 @@ if (POLICY CMP0116)
   cmake_policy(SET CMP0116 NEW)
 endif()
 
+# Set behavior for `cmake_dependent_option`.
+if (POLICY CMP0127)
+  cmake_policy(SET CMP0127 NEW)
+endif()
+
 #------------------------------------------------------------------------------
 # Set a default build type if none was specified
 get_property(generator_is_multi_config GLOBAL
