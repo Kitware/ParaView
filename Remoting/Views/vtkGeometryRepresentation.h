@@ -343,8 +343,6 @@ public:
    * Note: we need two methods because we can't wrap a string and a vtkObject using either
    * vtkSMStringVectorProperty or vtkSMProxyProperty.
    */
-  void SetBlockLookupTableSelector(const char* selector);
-  void RemoveAllBlockLookupTableSelectors();
   void SetBlockLookupTable(vtkScalarsToColors* lut);
   void RemoveAllBlockLookupTables();
   ///@}
@@ -574,22 +572,21 @@ protected:
   /**
    * Configurable through vtkGeometryRepresentation API
    */
-  std::set<std::string> BlockSelectors;
-  std::unordered_map<std::string, vtkVector3d> BlockColors;
-  std::unordered_map<std::string, double> BlockOpacities;
-  std::unordered_map<std::string, bool> BlockInterpolateScalarsBeforeMapping;
-  std::unordered_map<std::string, int> BlockColorModes;
-  std::unordered_map<std::string, std::pair<int /*assoc*/, std::string>> BlockArrayNames;
-  std::vector<std::string> BlockLookupTableSelectors;
+  std::vector<std::string> BlockSelectors;
+  std::vector<std::pair<std::string, vtkVector3d>> BlockColors;
+  std::vector<std::pair<std::string, double>> BlockOpacities;
+  std::vector<std::pair<std::string, bool>> BlockInterpolateScalarsBeforeMapping;
+  std::vector<std::pair<std::string, int>> BlockColorModes;
+  std::vector<std::pair<std::string, std::pair<int /*assoc*/, std::string>>> BlockArrayNames;
   std::vector<vtkScalarsToColors*> BlockLookupTables;
   ///@}
   ///@{
   /**
    * Configured internally in vtkGeometryRepresentation
    */
-  std::unordered_map<std::string, bool> BlockScalarVisibilities;
-  std::unordered_map<std::string, bool> BlockUseLookupTableScalarRanges;
-  std::unordered_map<vtkDataObject*, vtkIdType> BlockFieldDataTupleIds;
+  std::vector<std::pair<std::string, bool>> BlockScalarVisibilities;
+  std::vector<std::pair<std::string, bool>> BlockUseLookupTableScalarRanges;
+  std::vector<std::pair<vtkDataObject*, vtkIdType>> BlockFieldDataTupleIds;
   ///@}
 private:
   bool DisableLighting = false;

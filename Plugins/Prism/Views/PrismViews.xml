@@ -1119,15 +1119,8 @@
                          panel_widget="DataAssemblyEditor"
                          panel_visibility="multiblock_inspector">
             <Property name="Assembly"       function="ActiveAssembly" />
+            <Property name="SelectedBlockSelectors" function="SelectedSelectors"/>
             <Property name="BlockSelectors" function="Selectors"/>
-            <Property name="BlockColors"    function="Colors"/>
-            <Property name="BlockOpacities" function="Opacities"/>
-            <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings"/>
-            <Property name="BlockMapScalars" function="MapScalars"/>
-            <Property name="BlockColorArrayNames" function="ArrayNames"/>
-            <Property name="BlockLookupTableSelectors" function="LookupTableSelectors"/>
-            <Property name="BlockLookupTables" function="LookupTables"/>
-            <Property name="BlockUseSeparateColorMaps" function="UseSeparateColorMaps"/>
             <Hints>
               <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
             </Hints>

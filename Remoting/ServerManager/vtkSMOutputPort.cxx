@@ -125,7 +125,7 @@ vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(
 vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalSubsetDataInformation(
   const char* selector, const char* assemblyName)
 {
-  auto dinfo = this->GetDataInformation();
+  auto dinfo = this->GetTemporalDataInformation();
   auto assembly = dinfo->GetDataAssembly(assemblyName);
   if (assembly == nullptr || selector == nullptr || selector[0] == '\0')
   {
@@ -251,6 +251,7 @@ void vtkSMOutputPort::InvalidateDataInformation()
   this->TemporalDataInformationValid = false;
   this->SubsetDataInformations.clear();
   this->RankDataInformations.clear();
+  this->TemporalSubsetDataInformations.clear();
 }
 
 //----------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVProminentValuesInformation.h"
@@ -26,8 +27,228 @@
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkStringList.h"
+#include "vtkVariant.h"
 
+#include "vtksys/SystemTools.hxx"
+
+#include <algorithm>
+#include <array>
+#include <cstdint>
+#include <map>
+#include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkSMColorMapEditorHelper);
+
+//----------------------------------------------------------------------------
+vtkSMColorMapEditorHelper::vtkSMColorMapEditorHelper() = default;
+
+//----------------------------------------------------------------------------
+vtkSMColorMapEditorHelper::~vtkSMColorMapEditorHelper() = default;
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent
+     << "SelectedPropertiesType: " << (this->SelectedPropertiesType ? "Blocks" : "Representation")
+     << "\n";
+}
+
+//----------------------------------------------------------------------------
+vtkSMColorMapEditorHelper::SelectedPropertiesTypes vtkSMColorMapEditorHelper::GetPropertyType(
+  vtkSMProperty* prop)
+{
+  if (!prop)
+  {
+    return SelectedPropertiesTypes::Representation;
+  }
+  return std::string(prop->GetXMLName()).substr(0, 5) == "Block"
+    ? SelectedPropertiesTypes::Blocks
+    : SelectedPropertiesTypes::Representation;
+}
+
+namespace
+{
+std::vector<std::string> GetItSelfAndParents(const std::string& blockSelector)
+{
+  std::vector<std::string> parts = vtksys::SystemTools::SplitString(blockSelector, '/', true);
+  std::vector<std::string> paths;
+  std::stringstream ss;
+  for (size_t i = 1; i < parts.size(); ++i)
+  {
+    ss << "/" + parts[i];
+    paths.push_back(ss.str());
+  }
+  // reverse to get the block selector first
+  std::reverse(paths.begin(), paths.end());
+  return paths;
+}
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, vtkSMColorMapEditorHelper::BlockPropertyState>
+vtkSMColorMapEditorHelper::HasBlockProperty(
+  vtkSMProxy* proxy, const std::string& blockSelector, const std::string& propertyName)
+{
+  if (blockSelector.empty())
+  {
+    return { "/", BlockPropertyState::Disabled };
+  }
+  const auto blockProperty =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty(propertyName.c_str()));
+  if (!blockProperty)
+  {
+    return { "/", BlockPropertyState::RepresentationInherited };
+  }
+  const std::vector<std::string> paths = ::GetItSelfAndParents(blockSelector);
+  const int nEpC = blockProperty->GetNumberOfElementsPerCommand();
+  for (size_t i = 0; i < paths.size(); ++i)
+  {
+    // the first path is the blockSelector itself
+    const BlockPropertyState state =
+      i == 0 ? BlockPropertyState::Set : BlockPropertyState::BlockInherited;
+    for (unsigned int j = 0; j < blockProperty->GetNumberOfElements(); j += nEpC)
+    {
+      if (blockProperty->GetElement(j) == paths[i])
+      {
+        return { paths[i], state };
+      }
+    }
+  }
+  return { "/", BlockPropertyState::RepresentationInherited };
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, vtkSMColorMapEditorHelper::BlockPropertyState>
+vtkSMColorMapEditorHelper::GetBlockPropertyStateFromBlockPropertyStates(
+  const std::vector<std::pair<std::string, BlockPropertyState>>& blockPropertyStates)
+{
+  std::string path = "/";
+  std::uint8_t state = BlockPropertyState::Disabled;
+  for (const std::pair<std::string, BlockPropertyState>& blockPropertyState : blockPropertyStates)
+  {
+    if (blockPropertyState.second > state)
+    {
+      path = blockPropertyState.first;
+    }
+    state |= static_cast<std::uint8_t>(blockPropertyState.second);
+  }
+  return std::make_pair(path, static_cast<BlockPropertyState>(state));
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, vtkSMColorMapEditorHelper::BlockPropertyState>
+vtkSMColorMapEditorHelper::HasBlockProperty(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, const std::string& propertyName)
+{
+  if (blockSelectors.empty())
+  {
+    return { "/", BlockPropertyState::Disabled };
+  }
+  std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockPropertyStates.push_back(
+      vtkSMColorMapEditorHelper::HasBlockProperty(proxy, blockSelector, propertyName));
+  }
+  return vtkSMColorMapEditorHelper::GetBlockPropertyStateFromBlockPropertyStates(
+    blockPropertyStates);
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, vtkSMColorMapEditorHelper::BlockPropertyState>
+vtkSMColorMapEditorHelper::HasBlockProperties(vtkSMProxy* proxy, const std::string& blockSelector,
+  const std::vector<std::string>& propertyNames)
+{
+  std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  for (const std::string& propertyName : propertyNames)
+  {
+    blockPropertyStates.push_back(
+      vtkSMColorMapEditorHelper::HasBlockProperty(proxy, blockSelector, propertyName));
+  }
+  return vtkSMColorMapEditorHelper::GetBlockPropertyStateFromBlockPropertyStates(
+    blockPropertyStates);
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, vtkSMColorMapEditorHelper::BlockPropertyState>
+vtkSMColorMapEditorHelper::HasBlocksProperties(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, const std::vector<std::string>& propertyNames)
+{
+  if (blockSelectors.empty())
+  {
+    return { "/", BlockPropertyState::Disabled };
+  }
+  std::vector<std::pair<std::string, BlockPropertyState>> blockPropertyStates;
+  for (const std::string blockSelector : blockSelectors)
+  {
+    blockPropertyStates.push_back(
+      vtkSMColorMapEditorHelper::HasBlockProperties(proxy, blockSelector, propertyNames));
+  }
+  return vtkSMColorMapEditorHelper::GetBlockPropertyStateFromBlockPropertyStates(
+    blockPropertyStates);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(vtkSMProxy* proxy)
+{
+  const auto selectedBlockSelectorsProp =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("SelectedBlockSelectors"));
+  if (selectedBlockSelectorsProp)
+  {
+    const std::vector<std::string>& elements = selectedBlockSelectorsProp->GetElements();
+    if (elements.size() == 1)
+    {
+      return elements[0].empty() ? std::vector<std::string>() : elements;
+    }
+    else
+    {
+      return elements;
+    }
+  }
+  else
+  {
+    return std::vector<std::string>();
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(vtkSMProxy* proxy)
+{
+  const auto blockColorArray =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
+  if (!blockColorArray)
+  {
+    vtkDebugWithObjectMacro(proxy, "No `BlockColorArrayNames` property found.");
+    return std::vector<std::string>();
+  }
+  std::vector<std::string> blockSelectors;
+  for (unsigned int i = 0; i < blockColorArray->GetNumberOfElements(); i += 3)
+  {
+    const std::string blockSelector = blockColorArray->GetElement(i);
+    const std::string attributeTypeStr = blockColorArray->GetElement(i + 1);
+    const std::string arrayName = blockColorArray->GetElement(i + 2);
+    try
+    {
+      const int attributeType = std::stoi(attributeTypeStr);
+      if (vtkSMColorMapEditorHelper::IsColorArrayValid(std::make_pair(attributeType, arrayName)))
+      {
+        blockSelectors.push_back(blockSelector);
+      }
+    }
+    catch (const std::invalid_argument& e)
+    {
+      (void)e;
+      vtkDebugWithObjectMacro(proxy, "Invalid attribute type: " << attributeTypeStr << e.what());
+      break;
+    }
+  }
+  return blockSelectors;
+}
 
 //----------------------------------------------------------------------------
 bool vtkSMColorMapEditorHelper::GetUsingScalarColoring(vtkSMProxy* proxy)
@@ -47,18 +268,25 @@ bool vtkSMColorMapEditorHelper::GetUsingScalarColoring(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
 {
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
   if (!vtkSMRepresentationProxy::SafeDownCast(proxy))
   {
-    return false;
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
-
-  const auto blockArrayAttributeTypeAndName =
-    vtkSMColorMapEditorHelper::GetBlockColorArray(proxy, blockSelector);
-  return blockArrayAttributeTypeAndName.first != -1 &&
-    !blockArrayAttributeTypeAndName.second.empty();
+  const std::vector<ColorArray> blockColorArrays =
+    vtkSMColorMapEditorHelper::GetBlocksColorArrays(proxy, blockSelectors);
+  std::vector<vtkTypeBool> useScalarColorings(blockSelectors.size());
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
+  {
+    useScalarColorings[i] = vtkSMColorMapEditorHelper::IsColorArrayValid(blockColorArrays[i]);
+  }
+  return useScalarColorings;
 }
 
 //----------------------------------------------------------------------------
@@ -68,21 +296,35 @@ bool vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(vtkSMProxy* proxy
   {
     return false;
   }
-  auto blockColorArray =
-    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
-  if (!blockColorArray)
+  const std::vector<vtkTypeBool> blockUsingScalarColoring =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(
+      proxy, vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(proxy));
+  return std::any_of(blockUsingScalarColoring.begin(), blockUsingScalarColoring.end(),
+    [](vtkTypeBool b) { return b; });
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::GetSelectedUsingScalarColorings(
+  vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
   {
-    return false;
+    return vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
   }
-  for (unsigned int i = 0; i < blockColorArray->GetNumberOfElements(); i += 3)
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
   {
-    if (vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(
-          proxy, blockColorArray->GetElement(i)))
-    {
-      return true;
-    }
+    return { vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy) };
   }
-  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::GetAnySelectedUsingScalarColoring(vtkSMProxy* proxy)
+{
+  const std::vector<vtkTypeBool> useScalarColorings =
+    vtkSMColorMapEditorHelper::GetSelectedUsingScalarColorings(proxy);
+  return std::any_of(
+    useScalarColorings.begin(), useScalarColorings.end(), [](vtkTypeBool b) { return b; });
 }
 
 //----------------------------------------------------------------------------
@@ -105,11 +347,11 @@ void vtkSMColorMapEditorHelper::SetupLookupTable(vtkSMProxy* proxy)
       }
       if (vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable"))
       {
-        vtkSMTransferFunctionProxy* lutProxy = vtkSMTransferFunctionProxy::SafeDownCast(
+        vtkSMProxy* lut = vtkSMTransferFunctionProxy::SafeDownCast(
           mgr->GetColorTransferFunction(arrayName, proxy->GetSessionProxyManager()));
         const int rescaleMode =
-          vtkSMPropertyHelper(lutProxy, "AutomaticRescaleRangeMode", true).GetAsInt();
-        vtkSMPropertyHelper(lutProperty).Set(lutProxy);
+          vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode", true).GetAsInt();
+        vtkSMPropertyHelper(lutProperty).Set(lut);
         const bool extend = rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY;
         const bool force = false;
         vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(proxy, extend, force);
@@ -120,35 +362,43 @@ void vtkSMColorMapEditorHelper::SetupLookupTable(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::SetupBlockLookupTable(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+void vtkSMColorMapEditorHelper::SetupBlocksLookupTables(vtkSMProxy* proxy)
 {
-  if (vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
+  if (vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(proxy))
   {
     // If representation has been initialized to use scalar coloring and no
     // transfer functions are setup, we setup the transfer functions.
     const auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    const auto blockArrayAttributeTypeAndName =
-      vtkSMColorMapEditorHelper::GetBlockColorArray(repr, blockSelector);
-    const auto arrayName = blockArrayAttributeTypeAndName.second;
-    if (!arrayName.empty())
+    // get the selectors of the colored blocks
+    const std::vector<std::string> blockSelectors =
+      vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(proxy);
+    const bool hasBlockLUT = repr->GetProperty("BlockLookupTables");
+    // if the representation has a block lookup table property
+    if (!hasBlockLUT)
     {
-      vtkNew<vtkSMTransferFunctionManager> mgr;
-      const bool hasBlockLUT =
-        repr->GetProperty("BlockLookupTableSelectors") && repr->GetProperty("BlockLookupTables");
-      if (hasBlockLUT)
+      return;
+    }
+    const std::map<ColorArray, std::vector<std::string>> commonColorArraysBlockSelectors =
+      vtkSMColorMapEditorHelper::GetCommonColorArraysBlockSelectors(proxy, blockSelectors);
+    vtkNew<vtkSMTransferFunctionManager> mgr;
+    for (const auto& commonColorArrayBlockSelectors : commonColorArraysBlockSelectors)
+    {
+      if (!vtkSMColorMapEditorHelper::IsColorArrayValid(commonColorArrayBlockSelectors.first))
       {
-        auto lutProxy = vtkSMTransferFunctionProxy::SafeDownCast(
-          mgr->GetColorTransferFunction(arrayName.c_str(), proxy->GetSessionProxyManager()));
-        const int rescaleMode =
-          vtkSMPropertyHelper(lutProxy, "AutomaticRescaleRangeMode", true).GetAsInt();
-        vtkSMColorMapEditorHelper::SetBlockLookupTable(proxy, blockSelector, lutProxy);
-        const bool extend = rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY;
-        const bool force = false;
-        vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(
-          proxy, blockSelector, extend, force);
-        proxy->UpdateVTKObjects();
+        return;
       }
+      const std::string arrayName = commonColorArrayBlockSelectors.first.second;
+      const std::vector<std::string>& commonBlockSelectors = commonColorArrayBlockSelectors.second;
+      vtkSMProxy* lut = vtkSMTransferFunctionProxy::SafeDownCast(
+        mgr->GetColorTransferFunction(arrayName.c_str(), proxy->GetSessionProxyManager()));
+      const int rescaleMode =
+        vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode", true).GetAsInt();
+      vtkSMColorMapEditorHelper::SetBlocksLookupTable(proxy, commonBlockSelectors, lut);
+      const bool extend = rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY;
+      const bool force = false;
+      vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+        proxy, commonBlockSelectors, extend, force);
+      proxy->UpdateVTKObjects();
     }
   }
 }
@@ -201,58 +451,96 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(
-  vtkSMProxy* proxy, const std::string& blockSelector, bool extend, bool force)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, bool extend, bool force)
 {
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
+  if (blockSelectors.empty())
   {
-    // we are not using scalar coloring, nothing to do.
-    return false;
+    return std::vector<vtkTypeBool>();
   }
-
   SM_SCOPED_TRACE(CallMethod)
     .arg(proxy)
-    .arg("RescaleBlockTransferFunctionToDataRange")
-    .arg(blockSelector.c_str())
+    .arg("RescaleBlocksTransferFunctionToDataRange")
+    .arg(blockSelectors)
     .arg(extend)
     .arg(force)
     .arg("comment",
-      (extend
-          ? "rescale block color and/or opacity maps used to include current data range"
-          : "rescale block color and/or opacity maps used to exactly fit the current data range"));
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(proxy, blockSelector,
-    vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(proxy, blockSelector), extend,
-    force);
+      (extend ? "rescale block(s) color and/or opacity maps used to include current data range"
+              : "rescale block(s) color and/or opacity maps used to exactly fit the current data "
+                "range"));
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(proxy, blockSelectors,
+    vtkSMColorMapEditorHelper::GetBlocksArrayInformationForColorArray(proxy, blockSelectors),
+    extend, force);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(vtkSMProxy* proxy,
-  const std::string& blockSelector, const char* arrayName, int attributeType, bool extend,
-  bool force)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, const char* arrayName,
+  int attributeType, bool extend, bool force)
 {
-  auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
+  const auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
   const vtkSMPropertyHelper inputHelper(proxy->GetProperty("Input"));
   vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
   const int port = inputHelper.GetOutputPort();
   if (!inputProxy || !inputProxy->GetOutputPort(port))
   {
     // no input.
-    vtkWarningWithObjectMacro(proxy, "No input present. Cannot determine data ranges.");
-    return false;
+    vtkDebugWithObjectMacro(proxy, "No input present. Cannot determine data ranges.");
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
 
-  vtkPVDataInformation* blockDataInfo = inputProxy->GetOutputPort(port)->GetSubsetDataInformation(
-    blockSelector.c_str(), vtkSMPropertyHelper(proxy, "Assembly", true).GetAsString());
-  vtkPVArrayInformation* blockArrayInfo =
-    blockDataInfo->GetArrayInformation(arrayName, attributeType);
-  if (!blockArrayInfo)
+  std::vector<vtkPVArrayInformation*> arrayInfos(blockSelectors.size(), nullptr);
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
   {
-    vtkPVDataInformation* representedDataInfo = repr->GetRepresentedDataInformation();
-    blockArrayInfo = representedDataInfo->GetArrayInformation(arrayName, attributeType);
+    vtkPVDataInformation* blockDataInfo = inputProxy->GetOutputPort(port)->GetSubsetDataInformation(
+      blockSelectors[i].c_str(), vtkSMPropertyHelper(proxy, "Assembly", true).GetAsString());
+    vtkPVArrayInformation* blockArrayInfo =
+      blockDataInfo->GetArrayInformation(arrayName, attributeType);
+    if (!blockArrayInfo)
+    {
+      vtkPVDataInformation* representedDataInfo = repr->GetRepresentedDataInformation();
+      blockArrayInfo = representedDataInfo->GetArrayInformation(arrayName, attributeType);
+    }
+    arrayInfos[i] = blockArrayInfo;
   }
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+    repr, blockSelectors, arrayInfos, extend, force);
+}
 
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(
-    repr, blockSelector, blockArrayInfo, extend, force);
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::RescaleSelectedTransferFunctionToDataRange(
+  vtkSMProxy* proxy, bool extend, bool force)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), extend, force);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(proxy, extend, force) };
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::RescaleSelectedTransferFunctionToDataRange(
+  vtkSMProxy* proxy, const char* arrayName, int attributeType, bool extend, bool force)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(proxy,
+      vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), arrayName, attributeType, extend,
+      force);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
+      proxy, arrayName, attributeType, extend, force) };
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -281,47 +569,126 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(
   vtkPVTemporalDataInformation* dataInfo =
     inputProxy->GetOutputPort(port)->GetTemporalDataInformation();
   vtkPVArrayInformation* info = dataInfo->GetArrayInformation(arrayName, attributeType);
-  return info ? RescaleTransferFunctionToDataRange(proxy, info) : false;
+  return info ? vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(proxy, info) : false;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRangeOverTime(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+std::vector<vtkTypeBool>
+vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
 {
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
+  if (blockSelectors.empty())
   {
-    // we are not using scalar coloring, nothing to do.
-    return false;
+    return std::vector<vtkTypeBool>();
   }
+  const std::map<ColorArray, std::vector<std::string>> commonColorArraysBlockSelectors =
+    vtkSMColorMapEditorHelper::GetCommonColorArraysBlockSelectors(proxy, blockSelectors);
 
-  const auto blockArrayAttributeTypeAndName =
-    vtkSMColorMapEditorHelper::GetBlockColorArray(proxy, blockSelector);
-  return vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(
-    proxy, blockArrayAttributeTypeAndName.second.c_str(), blockArrayAttributeTypeAndName.first);
+  std::map<ColorArray, std::vector<vtkTypeBool>> arrayResults;
+  for (const auto& commonColorArrayBlockSelectors : commonColorArraysBlockSelectors)
+  {
+    if (!vtkSMColorMapEditorHelper::IsColorArrayValid(commonColorArrayBlockSelectors.first))
+    {
+      return std::vector<vtkTypeBool>(commonColorArrayBlockSelectors.second.size(), false);
+    }
+    const std::string arrayName = commonColorArrayBlockSelectors.first.second;
+    const std::vector<std::string>& commonBlockSelectors = commonColorArrayBlockSelectors.second;
+    arrayResults[commonColorArrayBlockSelectors.first] =
+      vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
+        proxy, commonBlockSelectors, arrayName.c_str(), commonColorArrayBlockSelectors.first.first);
+  }
+  if (arrayResults.size() == 1)
+  {
+    return arrayResults.begin()->second;
+  }
+  else
+  {
+    const std::vector<ColorArray> blocksColorArrays =
+      vtkSMColorMapEditorHelper::GetBlocksColorArrays(proxy, blockSelectors);
+    std::vector<vtkTypeBool> results(blockSelectors.size(), false);
+    for (size_t i = 0; i < blockSelectors.size(); ++i)
+    {
+      const ColorArray& blockColorArray = blocksColorArrays[i];
+      const std::string selector = blockSelectors[i];
+      const std::vector<int>& colorArrayResults = arrayResults.find(blockColorArray)->second;
+      const std::vector<std::string>& colorArrayBlockSelectors =
+        commonColorArraysBlockSelectors.find(blockColorArray)->second;
+      for (size_t j = 0; j < colorArrayResults.size(); ++j)
+      {
+        if (colorArrayBlockSelectors[j] == selector)
+        {
+          results[i] = colorArrayResults[j];
+          break;
+        }
+      }
+    }
+    return results;
+  }
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRangeOverTime(
-  vtkSMProxy* proxy, const std::string& blockSelector, const char* arrayName, int attributeType)
+std::vector<vtkTypeBool>
+vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType)
 {
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
   const vtkSMPropertyHelper inputHelper(proxy->GetProperty("Input"));
-  auto inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+  const auto inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
   const int port = inputHelper.GetOutputPort();
   if (!inputProxy || !inputProxy->GetOutputPort(port))
   {
     // no input.
-    vtkWarningWithObjectMacro(proxy, "No input present. Cannot determine data ranges.");
-    return false;
+    vtkDebugWithObjectMacro(proxy, "No input present. Cannot determine data ranges.");
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
 
-  vtkPVTemporalDataInformation* blockDataInfo =
-    inputProxy->GetOutputPort(port)->GetTemporalSubsetDataInformation(
-      blockSelector.c_str(), vtkSMPropertyHelper(proxy, "Assembly", true).GetAsString());
-  vtkPVArrayInformation* blockArrayInfo =
-    blockDataInfo->GetArrayInformation(arrayName, attributeType);
-  return blockArrayInfo ? vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(
-                            proxy, blockSelector, blockArrayInfo)
-                        : false;
+  std::vector<vtkPVArrayInformation*> arrayInfos(blockSelectors.size(), nullptr);
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
+  {
+    vtkPVTemporalDataInformation* blockDataInfo =
+      inputProxy->GetOutputPort(port)->GetTemporalSubsetDataInformation(
+        blockSelectors[i].c_str(), vtkSMPropertyHelper(proxy, "Assembly", true).GetAsString());
+    vtkPVArrayInformation* blockArrayInfo =
+      blockDataInfo->GetArrayInformation(arrayName, attributeType);
+    arrayInfos[i] = blockArrayInfo;
+  }
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+    proxy, blockSelectors, arrayInfos);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool>
+vtkSMColorMapEditorHelper::RescaleSelectedTransferFunctionToDataRangeOverTime(vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool>
+vtkSMColorMapEditorHelper::RescaleSelectedTransferFunctionToDataRangeOverTime(
+  vtkSMProxy* proxy, const char* arrayName, int attributeType)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), arrayName, attributeType);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(
+      proxy, arrayName, attributeType) };
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -374,13 +741,9 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
     const int indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup").GetAsInt();
     if (indexedLookup > 0)
     {
-      vtkPVProminentValuesInformation* prominentValues =
-        vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(proxy);
-      auto activeAnnotations = vtkSmartPointer<vtkStringList>::New();
-      auto activeIndexedColors = vtkSmartPointer<vtkDoubleArray>::New();
-      vtkSmartPointer<vtkAbstractArray> uniqueValues;
-
-      uniqueValues.TakeReference(prominentValues->GetProminentComponentValues(component));
+      vtkSmartPointer<vtkAbstractArray> uniqueValues = vtk::TakeSmartPointer(
+        vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(proxy)
+          ->GetProminentComponentValues(component));
 
       vtkSMStringVectorProperty* allAnnotations =
         vtkSMStringVectorProperty::SafeDownCast(lut->GetProperty("Annotations"));
@@ -388,7 +751,7 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
         vtkSMStringVectorProperty::SafeDownCast(lut->GetProperty("ActiveAnnotatedValues"));
       if (uniqueValues && allAnnotations && activeAnnotatedValuesProperty)
       {
-        auto activeAnnotatedValues = vtkSmartPointer<vtkStringList>::New();
+        vtkNew<vtkStringList> activeAnnotatedValues;
         if (extend)
         {
           activeAnnotatedValuesProperty->GetElements(activeAnnotatedValues);
@@ -418,7 +781,7 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
       double rangeOpacity[2];
 
       bool useOpacityArray = false;
-      if (auto uoaProperty = proxy->GetProperty("UseSeparateOpacityArray"))
+      if (vtkSMProperty* uoaProperty = proxy->GetProperty("UseSeparateOpacityArray"))
       {
         useOpacityArray = vtkSMPropertyHelper(uoaProperty).GetAsInt() == 1;
       }
@@ -499,113 +862,139 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(vtkSMProxy* proxy,
-  const std::string& blockSelector, vtkPVArrayInformation* info, bool extend, bool force)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors,
+  std::vector<vtkPVArrayInformation*> infos, bool extend, bool force)
 {
-  if (!info)
+  if (blockSelectors.empty())
   {
-    vtkGenericWarningMacro("Could not determine array range.");
-    return false;
+    return std::vector<vtkTypeBool>();
+  }
+  const std::vector<vtkTypeBool> blockUsingScalarColoring =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(proxy, blockSelectors);
+  // if no block is using scalar coloring
+  if (!std::any_of(blockUsingScalarColoring.begin(), blockUsingScalarColoring.end(),
+        [](vtkTypeBool b) { return b; }))
+  {
+    // nothing to do.
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
 
-  vtkSMProxy* blockLut = vtkSMColorMapEditorHelper::GetBlockLookupTable(proxy, blockSelector);
-  if (!blockLut)
-  {
-    return false;
-  }
+  std::vector<vtkSMProxy*> blockLuts =
+    vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, blockSelectors);
 
-  if (force == false &&
-    vtkSMPropertyHelper(blockLut, "AutomaticRescaleRangeMode", true).GetAsInt() ==
-      vtkSMTransferFunctionManager::NEVER)
-  {
-    // nothing to change, range is locked.
-    return true;
-  }
+  std::vector<vtkPVProminentValuesInformation*> blockProminentValues =
+    vtkSMColorMapEditorHelper::GetBlocksProminentValuesInformationForColorArray(
+      proxy, blockSelectors);
 
-  // We need to determine the component number to use from the lut.
-  int component = -1;
-  if (blockLut && vtkSMPropertyHelper(blockLut, "VectorMode").GetAsInt() != 0)
+  std::vector<vtkTypeBool> results(blockSelectors.size(), false);
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
   {
-    component = vtkSMPropertyHelper(blockLut, "VectorComponent").GetAsInt();
-  }
-
-  if (blockLut && component < info->GetNumberOfComponents())
-  {
-    const int indexedLookup = vtkSMPropertyHelper(blockLut, "IndexedLookup").GetAsInt();
-    if (indexedLookup)
+    vtkPVArrayInformation* info = infos[i];
+    if (!info)
     {
-      auto prominentValues =
-        vtkSMColorMapEditorHelper::GetBlockProminentValuesInformationForColorArray(
-          proxy, blockSelector);
-      auto activeAnnotations = vtkSmartPointer<vtkStringList>::New();
-      auto activeIndexedColors = vtkSmartPointer<vtkDoubleArray>::New();
-      vtkSmartPointer<vtkAbstractArray> uniqueValues;
+      results[i] = false;
+      continue;
+    }
 
-      uniqueValues.TakeReference(prominentValues->GetProminentComponentValues(component));
+    vtkSMProxy* blockLut = blockLuts[i];
+    if (!blockLut)
+    {
+      results[i] = false;
+      continue;
+    }
 
-      auto allAnnotations =
-        vtkSMStringVectorProperty::SafeDownCast(blockLut->GetProperty("Annotations"));
-      auto activeAnnotatedValuesProperty =
-        vtkSMStringVectorProperty::SafeDownCast(blockLut->GetProperty("ActiveAnnotatedValues"));
-      if (uniqueValues && allAnnotations && activeAnnotatedValuesProperty)
+    if (force == false &&
+      vtkSMPropertyHelper(blockLut, "AutomaticRescaleRangeMode", true).GetAsInt() ==
+        vtkSMTransferFunctionManager::NEVER)
+    {
+      // nothing to change, range is locked.
+      results[i] = true;
+      continue;
+    }
+
+    // We need to determine the component number to use from the lut.
+    int component = -1;
+    if (blockLut && vtkSMPropertyHelper(blockLut, "VectorMode").GetAsInt() != 0)
+    {
+      component = vtkSMPropertyHelper(blockLut, "VectorComponent").GetAsInt();
+    }
+
+    if (blockLut && component < info->GetNumberOfComponents())
+    {
+      const int indexedLookup = vtkSMPropertyHelper(blockLut, "IndexedLookup").GetAsInt();
+      if (indexedLookup > 0)
       {
-        auto activeAnnotatedValues = vtkSmartPointer<vtkStringList>::New();
+        vtkSmartPointer<vtkAbstractArray> uniqueValues =
+          vtk::TakeSmartPointer(blockProminentValues[i]->GetProminentComponentValues(component));
 
-        if (extend)
+        const auto allAnnotations =
+          vtkSMStringVectorProperty::SafeDownCast(blockLut->GetProperty("Annotations"));
+        const auto activeAnnotatedValuesProperty =
+          vtkSMStringVectorProperty::SafeDownCast(blockLut->GetProperty("ActiveAnnotatedValues"));
+        if (uniqueValues && allAnnotations && activeAnnotatedValuesProperty)
         {
-          activeAnnotatedValuesProperty->GetElements(activeAnnotatedValues);
-        }
-
-        for (int idx = 0; idx < uniqueValues->GetNumberOfTuples(); ++idx)
-        {
-          // Look up index of color corresponding to the annotation
-          for (unsigned int j = 0; j < allAnnotations->GetNumberOfElements() / 2; ++j)
+          vtkNew<vtkStringList> activeAnnotatedValues;
+          if (extend)
           {
-            const vtkVariant annotatedValue(allAnnotations->GetElement(2 * j + 0));
-            if (annotatedValue == uniqueValues->GetVariantValue(idx))
+            activeAnnotatedValuesProperty->GetElements(activeAnnotatedValues);
+          }
+
+          for (int idx = 0; idx < uniqueValues->GetNumberOfTuples(); ++idx)
+          {
+            // Look up index of color corresponding to the annotation
+            for (unsigned int j = 0; j < allAnnotations->GetNumberOfElements() / 2; ++j)
             {
-              activeAnnotatedValues->AddString(allAnnotations->GetElement(2 * j + 0));
-              break;
+              const vtkVariant annotatedValue(allAnnotations->GetElement(2 * j + 0));
+              if (annotatedValue == uniqueValues->GetVariantValue(idx))
+              {
+                activeAnnotatedValues->AddString(allAnnotations->GetElement(2 * j + 0));
+                break;
+              }
             }
           }
+
+          activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
+          blockLut->UpdateVTKObjects();
+        }
+      }
+      else
+      {
+        double rangeColor[2];
+        double rangeOpacity[2];
+
+        // No opacity array for block coloring
+        {
+          info->GetComponentFiniteRange(component, rangeColor);
+          rangeOpacity[0] = rangeColor[0];
+          rangeOpacity[1] = rangeColor[1];
         }
 
-        activeAnnotatedValuesProperty->SetElements(activeAnnotatedValues);
-        blockLut->UpdateVTKObjects();
+        // the range must be large enough, compared to values order of magnitude
+        // If data range is too small then we tweak it a bit so scalar mapping
+        // produces valid/reproducible results.
+        vtkSMCoreUtilities::AdjustRange(rangeColor);
+        vtkSMCoreUtilities::AdjustRange(rangeOpacity);
+
+        if (blockLut && rangeColor[1] >= rangeColor[0])
+        {
+          vtkSMTransferFunctionProxy::RescaleTransferFunction(blockLut, rangeColor, extend);
+          vtkSMProxy* sof_lut =
+            vtkSMPropertyHelper(blockLut, "ScalarOpacityFunction", true).GetAsProxy();
+          if (sof_lut && rangeOpacity[1] >= rangeOpacity[0])
+          {
+            vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, rangeOpacity, extend);
+          }
+        }
+        results[i] = (blockLut != nullptr);
       }
     }
     else
     {
-      double rangeColor[2];
-      double rangeOpacity[2];
-
-      // No opacity array for block coloring
-      {
-        info->GetComponentFiniteRange(component, rangeColor);
-        rangeOpacity[0] = rangeColor[0];
-        rangeOpacity[1] = rangeColor[1];
-      }
-
-      // the range must be large enough, compared to values order of magnitude
-      // If data range is too small then we tweak it a bit so scalar mapping
-      // produces valid/reproducible results.
-      vtkSMCoreUtilities::AdjustRange(rangeColor);
-      vtkSMCoreUtilities::AdjustRange(rangeOpacity);
-
-      if (blockLut && rangeColor[1] >= rangeColor[0])
-      {
-        vtkSMTransferFunctionProxy::RescaleTransferFunction(blockLut, rangeColor, extend);
-        vtkSMProxy* sof_lut =
-          vtkSMPropertyHelper(blockLut, "ScalarOpacityFunction", true).GetAsProxy();
-        if (sof_lut && rangeOpacity[1] >= rangeOpacity[0])
-        {
-          vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, rangeOpacity, extend);
-        }
-      }
-      return blockLut;
+      results[i] = false;
     }
   }
-  return false;
+  return results;
 }
 
 //----------------------------------------------------------------------------
@@ -635,7 +1024,7 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(
   }
 
   const vtkSMPropertyHelper inputHelper(proxy->GetProperty("Input"));
-  auto inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+  const auto inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
   const int port = inputHelper.GetOutputPort();
   if (!inputProxy || !inputProxy->GetOutputPort(port))
   {
@@ -720,91 +1109,6 @@ bool vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToVisibleRange(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector)
-{
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
-  {
-    // we are not using scalar coloring, nothing to do.
-    return false;
-  }
-
-  const auto blockArrayAttributeTypeAndName =
-    vtkSMColorMapEditorHelper::GetBlockColorArray(proxy, blockSelector);
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToVisibleRange(proxy, view,
-    blockSelector, blockArrayAttributeTypeAndName.second.c_str(),
-    blockArrayAttributeTypeAndName.first);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToVisibleRange(vtkSMProxy* proxy,
-  vtkSMProxy* view, const std::string& blockSelector, const char* arrayName, int attributeType)
-{
-  auto rview = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!rview || !arrayName || arrayName[0] == 0)
-  {
-    return false;
-  }
-
-  const vtkSMPropertyHelper helper(proxy->GetProperty("Input"));
-  vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy());
-  const int port = helper.GetOutputPort();
-  if (!inputProxy || !inputProxy->GetOutputPort(port))
-  {
-    vtkGenericWarningMacro("No input present. Cannot determine data ranges.");
-    return false;
-  }
-
-  auto blockDataInfo = inputProxy->GetOutputPort(port)->GetSubsetDataInformation(
-    blockSelector.c_str(), vtkSMPropertyHelper(proxy->GetProperty("Assembly"), true).GetAsString());
-  vtkPVArrayInformation* info = blockDataInfo->GetArrayInformation(arrayName, attributeType);
-  if (!info)
-  {
-    return false;
-  }
-
-  const bool hasBlockLUT =
-    proxy->GetProperty("BlockLookupTableSelectors") && proxy->GetProperty("BlockLookupTables");
-  if (!hasBlockLUT)
-  {
-    // No LookupTable found.
-    return false;
-  }
-
-  vtkSMProxy* blockLUT = vtkSMColorMapEditorHelper::GetBlockLookupTable(proxy, blockSelector);
-
-  // We need to determine the component number to use from the lut.
-  int component = -1;
-  if (blockLUT && vtkSMPropertyHelper(blockLUT, "VectorMode").GetAsInt() != 0)
-  {
-    component = vtkSMPropertyHelper(blockLUT, "VectorComponent").GetAsInt();
-  }
-  if (component >= info->GetNumberOfComponents())
-  {
-    // something amiss, the component request is not present in the dataset.
-    // give up.
-    return false;
-  }
-
-  double range[2];
-  if (!rview->ComputeVisibleScalarRange(attributeType, arrayName, component, range))
-  {
-    return false;
-  }
-
-  if (blockLUT)
-  {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(blockLUT, range, false);
-    vtkSMProxy* sof_lut = vtkSMPropertyHelper(blockLUT, "ScalarOpacityFunction", true).GetAsProxy();
-    if (sof_lut)
-    {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, range, false);
-    }
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMColorMapEditorHelper::SetScalarColoring(
   vtkSMProxy* proxy, const char* arrayName, int attributeType)
 {
@@ -848,7 +1152,8 @@ bool vtkSMColorMapEditorHelper::SetScalarColoringInternal(
   }
 
   auto* arraySettings = vtkPVRepresentedArrayListSettings::GetInstance();
-  auto* arrayInfo = vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(proxy, false);
+  vtkPVArrayInformation* arrayInfo =
+    vtkSMColorMapEditorHelper::GetArrayInformationForColorArray(proxy, false);
   const bool forceComponentMode = (arrayInfo && arraySettings &&
     !arraySettings->ShouldUseMagnitudeMode(arrayInfo->GetNumberOfComponents()));
   if (forceComponentMode && (!useComponent || component < 0))
@@ -863,34 +1168,34 @@ bool vtkSMColorMapEditorHelper::SetScalarColoringInternal(
   const std::string decoratedArrayName =
     vtkSMColorMapEditorHelper::GetDecoratedArrayName(proxy, arrayName);
   vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* lutProxy = nullptr;
+  vtkSMProxy* lut = nullptr;
   if (vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable"))
   {
-    lutProxy =
+    lut =
       mgr->GetColorTransferFunction(decoratedArrayName.c_str(), proxy->GetSessionProxyManager());
     if (useComponent || forceComponentMode)
     {
       if (component >= 0)
       {
-        vtkSMPropertyHelper(lutProxy, "VectorMode").Set("Component");
-        vtkSMPropertyHelper(lutProxy, "VectorComponent").Set(component);
-        lutProxy->UpdateVTKObjects();
+        vtkSMPropertyHelper(lut, "VectorMode").Set("Component");
+        vtkSMPropertyHelper(lut, "VectorComponent").Set(component);
+        lut->UpdateVTKObjects();
       }
       else
       {
-        vtkSMPropertyHelper(lutProxy, "VectorMode").Set("Magnitude");
-        lutProxy->UpdateVTKObjects();
+        vtkSMPropertyHelper(lut, "VectorMode").Set("Magnitude");
+        lut->UpdateVTKObjects();
       }
     }
     else
     {
       // No Component defined for coloring, in order to generate a valid trace
       // a component is needed, recover currently used component
-      const char* vectorMode = vtkSMPropertyHelper(lutProxy, "VectorMode").GetAsString();
+      const char* vectorMode = vtkSMPropertyHelper(lut, "VectorMode").GetAsString();
       haveComponent = true;
       if (strcmp(vectorMode, "Component") == 0)
       {
-        component = vtkSMPropertyHelper(lutProxy, "VectorComponent").GetAsInt();
+        component = vtkSMPropertyHelper(lut, "VectorComponent").GetAsInt();
       }
       else // Magnitude
       {
@@ -898,7 +1203,7 @@ bool vtkSMColorMapEditorHelper::SetScalarColoringInternal(
       }
     }
 
-    vtkSMPropertyHelper(lutProperty).Set(lutProxy);
+    vtkSMPropertyHelper(lutProperty).Set(lut);
 
     // Get the array information for the color array to determine transfer function properties
     vtkPVArrayInformation* colorArrayInfo =
@@ -907,8 +1212,8 @@ bool vtkSMColorMapEditorHelper::SetScalarColoringInternal(
     {
       if (colorArrayInfo->GetDataType() == VTK_STRING)
       {
-        vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).Set(1);
-        lutProxy->UpdateVTKObjects();
+        vtkSMPropertyHelper(lut, "IndexedLookup", true).Set(1);
+        lut->UpdateVTKObjects();
       }
       if (haveComponent)
       {
@@ -952,10 +1257,10 @@ bool vtkSMColorMapEditorHelper::SetScalarColoringInternal(
       mgr->GetTransferFunction2D(decoratedArrayName.c_str(), proxy->GetSessionProxyManager());
     vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
     proxy->UpdateProperty("TransferFunction2D");
-    if (lutProxy && useTransfer2D)
+    if (lut && useTransfer2D)
     {
-      vtkSMPropertyHelper(lutProxy, "Using2DTransferFunction").Set(useTransfer2D);
-      lutProxy->UpdateVTKObjects();
+      vtkSMPropertyHelper(lut, "Using2DTransferFunction").Set(useTransfer2D);
+      lut->UpdateVTKObjects();
     }
   }
 
@@ -964,160 +1269,246 @@ bool vtkSMColorMapEditorHelper::SetScalarColoringInternal(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::SetBlockScalarColoring(
-  vtkSMProxy* proxy, const std::string& blockSelector, const char* arrayName, int attributeType)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetBlocksScalarColoring(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType)
 {
-  return vtkSMColorMapEditorHelper::SetBlockScalarColoringInternal(
-    proxy, blockSelector, arrayName, attributeType, false, -1);
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
+  return vtkSMColorMapEditorHelper::SetBlocksScalarColoringInternal(
+    proxy, blockSelectors, arrayName, attributeType, false, -1);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::SetBlockScalarColoring(vtkSMProxy* proxy,
-  const std::string& blockSelector, const char* arrayName, int attributeType, int component)
-{
-  return vtkSMColorMapEditorHelper::SetBlockScalarColoringInternal(
-    proxy, blockSelector, arrayName, attributeType, true, component);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::SetBlockScalarColoringInternal(vtkSMProxy* proxy,
-  const std::string& blockSelector, const char* arrayName, int attributeType, bool useComponent,
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetBlocksScalarColoring(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType,
   int component)
 {
-  auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
+  return vtkSMColorMapEditorHelper::SetBlocksScalarColoringInternal(
+    proxy, blockSelectors, arrayName, attributeType, true, component);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetSelectedScalarColoring(
+  vtkSMProxy* proxy, const char* arrayName, int attributeType)
+{
+  return vtkSMColorMapEditorHelper::SetSelectedScalarColoringInternal(
+    proxy, arrayName, attributeType, false, -1);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetSelectedScalarColoring(
+  vtkSMProxy* proxy, const char* arrayName, int attributeType, int component)
+{
+  return vtkSMColorMapEditorHelper::SetSelectedScalarColoringInternal(
+    proxy, arrayName, attributeType, true, component);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetBlocksScalarColoringInternal(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, const char* arrayName,
+  int attributeType, bool useComponent, int component)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
+  const auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
   if (!repr)
   {
-    return false;
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
+  const std::vector<vtkTypeBool> blockUsingScalarColorings =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(proxy, blockSelectors);
 
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector) &&
+  // if all are not using scalar coloring
+  if (std::all_of(blockUsingScalarColorings.begin(), blockUsingScalarColorings.end(),
+        [](vtkTypeBool b) { return !b; }) &&
     (arrayName == nullptr || arrayName[0] == 0))
   {
     // scalar coloring already off. Nothing to do.
-    return true;
-  }
-  auto blockColorArray = repr->GetProperty("BlockColorArrayNames");
-  if (!blockColorArray)
-  {
-    vtkWarningWithObjectMacro(repr, "No 'BlockColorArrayNames' property found.");
-    return false;
+    return std::vector<vtkTypeBool>(blockSelectors.size(), true);
   }
 
-  vtkSMColorMapEditorHelper::SetBlockColorArray(
-    repr, blockSelector, attributeType, arrayName ? arrayName : "");
-
-  if (arrayName == nullptr || arrayName[0] == '\0')
+  // if any block is using scalar coloring and no array name provided
+  if (arrayName == nullptr || arrayName[0] == 0)
   {
-    SM_SCOPED_TRACE(SetBlockScalarColoring)
+    SM_SCOPED_TRACE(SetBlocksScalarColoring)
       .arg("display", repr)
-      .arg("block_selector", blockSelector.c_str())
+      .arg("block_selectors", blockSelectors)
       .arg("arrayname", arrayName)
       .arg("attribute_type", attributeType);
 
-    vtkSMColorMapEditorHelper::RemoveBlockLookupTable(repr, blockSelector);
+    // IMPORTANT!!! First remove luts and then color arrays
+    vtkSMColorMapEditorHelper::RemoveBlocksLookupTables(repr, blockSelectors);
+    vtkSMColorMapEditorHelper::RemoveBlocksColorArrays(repr, blockSelectors);
     // Scalar Opacity is not supported per block yet
     repr->UpdateVTKObjects();
-    return true;
+    return std::vector<vtkTypeBool>(blockSelectors.size(), true);
+  }
+  else
+  {
+    vtkSMColorMapEditorHelper::SetBlocksColorArray(repr, blockSelectors, attributeType, arrayName);
   }
 
   auto* arraySettings = vtkPVRepresentedArrayListSettings::GetInstance();
-  auto blockArrayInfo =
-    vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(repr, blockSelector, false);
-  const bool forceComponentMode = (blockArrayInfo && arraySettings &&
-    !arraySettings->ShouldUseMagnitudeMode(blockArrayInfo->GetNumberOfComponents()));
+  const std::vector<vtkPVArrayInformation*> blockArrayInfos =
+    vtkSMColorMapEditorHelper::GetBlocksArrayInformationForColorArray(repr, blockSelectors);
+  // if there is no block's array information that is available
+  if (std::all_of(blockArrayInfos.begin(), blockArrayInfos.end(),
+        [](vtkPVArrayInformation* info) { return info == nullptr; }))
+  {
+    vtkWarningWithObjectMacro(repr, "Could not determine array information.");
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
+  }
+  // get first valid block's array information
+  int firstValidInfoIndex = -1;
+  for (size_t i = 0; i < blockArrayInfos.size(); ++i)
+  {
+    if (blockArrayInfos[i])
+    {
+      firstValidInfoIndex = static_cast<int>(i);
+      break;
+    }
+  }
+
+  // since all blocks should use the same array, infos should have the same number of components
+  const bool forceComponentMode = (blockArrayInfos[firstValidInfoIndex] && arraySettings &&
+    !arraySettings->ShouldUseMagnitudeMode(
+      blockArrayInfos[firstValidInfoIndex]->GetNumberOfComponents()));
   if (forceComponentMode && (!useComponent || component < 0))
   {
     component = 0;
   }
 
-  // Now, setup transfer functions.
-  bool haveComponent = useComponent;
-  const bool separate = vtkSMColorMapEditorHelper::GetBlockUseSeparateColorMap(repr, blockSelector);
-  const std::string decoratedArrayName =
-    vtkSMColorMapEditorHelper::GetBlockDecoratedArrayName(repr, blockSelector, arrayName);
-  const bool hasBlockLUTProperty = repr->GetProperty("BlockLookupTableSelectors") != nullptr &&
-    repr->GetProperty("BlockLookupTables") != nullptr;
-  vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* lutProxy = nullptr;
-  if (hasBlockLUTProperty)
+  const bool hasBlockLUTProperty = repr->GetProperty("BlockLookupTables") != nullptr;
+  if (!hasBlockLUTProperty)
   {
-    lutProxy =
-      mgr->GetColorTransferFunction(decoratedArrayName.c_str(), repr->GetSessionProxyManager());
+    vtkDebugWithObjectMacro(repr, "No 'BlockLookupTables' found.");
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
+  }
+
+  const std::vector<int> separates =
+    vtkSMColorMapEditorHelper::GetBlocksUseSeparateColorMaps(repr, blockSelectors);
+  // if all blocks are not using separate color maps
+  const bool sameLut =
+    std::all_of(separates.begin(), separates.end(), [](int s) { return s != 1; });
+
+  const std::vector<std::string> decoratedArrayNames =
+    vtkSMColorMapEditorHelper::GetBlocksDecoratedArrayNames(repr, blockSelectors, arrayName);
+
+  vtkNew<vtkSMTransferFunctionManager> mgr;
+  bool haveComponent = useComponent || forceComponentMode ? useComponent : true;
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
+  {
+    vtkSMProxy* blockLut =
+      mgr->GetColorTransferFunction(decoratedArrayNames[i].c_str(), repr->GetSessionProxyManager());
     if (useComponent || forceComponentMode)
     {
       if (component >= 0)
       {
-        vtkSMPropertyHelper(lutProxy, "VectorMode").Set("Component");
-        vtkSMPropertyHelper(lutProxy, "VectorComponent").Set(component);
-        lutProxy->UpdateVTKObjects();
+        vtkSMPropertyHelper(blockLut, "VectorMode").Set("Component");
+        vtkSMPropertyHelper(blockLut, "VectorComponent").Set(component);
+        blockLut->UpdateVTKObjects();
       }
       else
       {
-        vtkSMPropertyHelper(lutProxy, "VectorMode").Set("Magnitude");
-        lutProxy->UpdateVTKObjects();
+        vtkSMPropertyHelper(blockLut, "VectorMode").Set("Magnitude");
+        blockLut->UpdateVTKObjects();
       }
     }
     else
     {
       // No Component defined for coloring, in order to generate a valid trace
       // a component is needed, recover currently used component
-      const char* vectorMode = vtkSMPropertyHelper(lutProxy, "VectorMode").GetAsString();
-      haveComponent = true;
+      const char* vectorMode = vtkSMPropertyHelper(blockLut, "VectorMode").GetAsString();
       if (strcmp(vectorMode, "Component") == 0)
       {
-        component = vtkSMPropertyHelper(lutProxy, "VectorComponent").GetAsInt();
+        // Many blocks can override the component because it should be the same for all.
+        component = vtkSMPropertyHelper(blockLut, "VectorComponent").GetAsInt();
       }
       else // Magnitude
       {
+        // Many blocks can override the component because it should be the same for all.
         component = -1;
       }
     }
-
-    vtkSMColorMapEditorHelper::SetBlockLookupTable(repr, blockSelector, lutProxy);
-
-    // Get the array information for the color array to determine transfer function properties
-    auto blockColorArrayInfo =
-      vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(repr, blockSelector, true);
-    if (blockColorArrayInfo)
+    // Stop quickly if all blocks will be using the same lut
+    if (sameLut)
     {
-      if (blockColorArrayInfo->GetDataType() == VTK_STRING)
-      {
-        vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).Set(1);
-        lutProxy->UpdateVTKObjects();
-      }
-      if (haveComponent)
-      {
-        const char* componentName = blockColorArrayInfo->GetComponentName(component);
-        if (strcmp(componentName, "") != 0)
-        {
-          SM_SCOPED_TRACE(SetBlockScalarColoring)
-            .arg("display", repr)
-            .arg("block_selector", blockSelector.c_str())
-            .arg("arrayname", arrayName)
-            .arg("attribute_type", attributeType)
-            .arg("component", componentName)
-            .arg("separate", separate);
-        }
-        else
-        {
-          haveComponent = false;
-        }
-      }
+      vtkSMColorMapEditorHelper::SetBlocksLookupTable(repr, blockSelectors, blockLut);
+      break;
+    }
+    else
+    {
+      vtkSMColorMapEditorHelper::SetBlockLookupTable(repr, blockSelectors[i], blockLut);
     }
   }
 
-  if (!haveComponent)
+  // get component name
+  std::string componentName;
+  if (haveComponent)
   {
-    SM_SCOPED_TRACE(SetBlockScalarColoring)
-      .arg("display", repr)
-      .arg("block_selector", blockSelector.c_str())
-      .arg("arrayname", arrayName)
-      .arg("attribute_type", attributeType)
-      .arg("separate", separate);
+    // the component name is the same for all blocks
+    componentName = blockArrayInfos[firstValidInfoIndex]->GetComponentName(component);
+    haveComponent = !componentName.empty();
   }
 
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
+  {
+    vtkSMProxy* blockLut =
+      mgr->GetColorTransferFunction(decoratedArrayNames[i].c_str(), repr->GetSessionProxyManager());
+    if (blockLut && blockArrayInfos[i] && blockArrayInfos[i]->GetDataType() == VTK_STRING)
+    {
+      vtkSMPropertyHelper(blockLut, "IndexedLookup", true).Set(1);
+      blockLut->UpdateVTKObjects();
+    }
+  }
+
+  if (haveComponent)
+  {
+    SM_SCOPED_TRACE(SetBlocksScalarColoring)
+      .arg("display", repr)
+      .arg("block_selectors", blockSelectors)
+      .arg("arrayname", arrayName)
+      .arg("attribute_type", attributeType)
+      .arg("component", componentName.c_str())
+      .arg("separate", !sameLut);
+  }
+  else
+  {
+    SM_SCOPED_TRACE(SetBlocksScalarColoring)
+      .arg("display", repr)
+      .arg("block_selectors", blockSelectors)
+      .arg("arrayname", arrayName)
+      .arg("attribute_type", attributeType)
+      .arg("separate", !sameLut);
+  }
   repr->UpdateVTKObjects();
-  return true;
+
+  return std::vector<vtkTypeBool>(blockSelectors.size(), true);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetSelectedScalarColoringInternal(
+  vtkSMProxy* proxy, const char* arrayName, int attributeType, bool useComponent, int component)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::SetBlocksScalarColoringInternal(proxy,
+      vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), arrayName, attributeType,
+      useComponent, component);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::SetScalarColoringInternal(
+      proxy, arrayName, attributeType, useComponent, component) };
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1156,262 +1547,1407 @@ std::string vtkSMColorMapEditorHelper::GetDecoratedArrayName(
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMColorMapEditorHelper::GetBlockDecoratedArrayName(
-  vtkSMProxy* proxy, const std::string& blockSelector, const std::string& arrayName)
+std::vector<std::string> vtkSMColorMapEditorHelper::GetBlocksDecoratedArrayNames(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, const std::string& arrayName)
 {
+  if (blockSelectors.empty())
+  {
+    return std::vector<std::string>();
+  }
+  std::vector<int> blocksUseSeparateColorMap =
+    vtkSMColorMapEditorHelper::GetBlocksUseSeparateColorMaps(proxy, blockSelectors);
+  const int representationSeparateColorMap =
+    vtkSMPropertyHelper(proxy, "UseSeparateColorMap", true).GetAsInt();
+
   std::ostringstream ss;
   ss << arrayName;
-  if (vtkSMColorMapEditorHelper::GetBlockUseSeparateColorMap(proxy, blockSelector))
+  std::vector<std::string> decoratedArrayNames(blockSelectors.size());
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
   {
-    std::ostringstream ss1;
-    ss1 << "Separate_" << proxy->GetGlobalIDAsString() << "_" << blockSelector << "_" << ss.str();
-    return ss1.str();
+    if (blocksUseSeparateColorMap[i] == 1)
+    {
+      std::ostringstream ss1;
+      ss1 << "Separate_" << proxy->GetGlobalIDAsString() << "_" << blockSelectors[i] << "_"
+          << ss.str();
+      decoratedArrayNames[i] = ss1.str();
+    }
+    else if (representationSeparateColorMap == 1)
+    {
+      std::ostringstream ss1;
+      ss1 << "Separate_" << proxy->GetGlobalIDAsString() << "_" << blockSelectors[i] << "_"
+          << ss.str();
+      decoratedArrayNames[i] = ss1.str();
+    }
+    else
+    {
+      decoratedArrayNames[i] = ss.str();
+    }
   }
-  if (vtkSMPropertyHelper(proxy, "UseSeparateColorMap", true).GetAsInt())
-  {
-    // Use global id for separate color map
-    std::ostringstream ss1;
-    ss1 << "Separate_" << proxy->GetGlobalIDAsString() << "_" << ss.str();
-    return ss1.str();
-  }
-  return ss.str();
+  return decoratedArrayNames;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::SetBlockColorArray(
-  vtkSMProxy* proxy, const std::string& blockSelector, int attributeType, std::string arrayName)
+bool vtkSMColorMapEditorHelper::IsColorValid(Color color)
 {
-  auto blockColorArray =
-    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
-  if (!blockColorArray)
+  return std::all_of(color.begin(), color.end(), [](double c) { return c >= 0.0 && c <= 1.0; });
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetColor(vtkSMProxy* proxy, Color color)
+{
+  if (!vtkSMColorMapEditorHelper::IsColorValid(color))
   {
-    vtkWarningWithObjectMacro(proxy, "No 'BlockColorArrayNames' property found.");
+    vtkWarningWithObjectMacro(proxy, "Invalid color.");
     return;
   }
-  assert(blockColorArray->GetNumberOfElementsPerCommand() == 3);
-  if (arrayName.empty())
+  vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
+  vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
+  if (diffuse == nullptr && ambient == nullptr)
   {
-    // find the block selector
-    bool found = false;
-    unsigned selectorIdx = 0;
-    for (unsigned int i = 0; i < blockColorArray->GetNumberOfElements(); i += 3)
-    {
-      if (blockColorArray->GetElement(i) == blockSelector)
-      {
-        // found the block selector
-        selectorIdx = i;
-        found = true;
-        break;
-      }
-    }
-    if (found)
-    {
-      std::vector<std::string> blockColorArrayVec;
-      // remove the block selector and color array
-      for (unsigned int i = 0; i < blockColorArray->GetNumberOfElements(); i += 3)
-      {
-        if (i != selectorIdx)
-        {
-          blockColorArrayVec.push_back(blockColorArray->GetElement(i));
-          blockColorArrayVec.push_back(blockColorArray->GetElement(i + 1));
-          blockColorArrayVec.push_back(blockColorArray->GetElement(i + 2));
-        }
-      }
-      blockColorArray->SetElements(blockColorArrayVec);
-    }
+    diffuse = proxy->GetProperty("Color");
+  }
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy).arg("comment", " change solid color");
+  vtkSMPropertyHelper(diffuse, /*quiet=*/true).Set(color.data(), 3);
+  vtkSMPropertyHelper(ambient, /*quiet=*/true).Set(color.data(), 3);
+  proxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksColor(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, Color color)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  if (!vtkSMColorMapEditorHelper::IsColorValid(color))
+  {
+    vtkWarningWithObjectMacro(proxy, "Invalid color.");
+    return;
+  }
+  auto blockColorsProp = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColors"));
+  if (!blockColorsProp)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockColors' property found.");
+    return;
+  }
+  assert(blockColorsProp->GetNumberOfElementsPerCommand() == 4);
+  std::map<std::string, Color> blockColorsMap;
+  for (unsigned int i = 0; i < blockColorsProp->GetNumberOfElements(); i += 4)
+  {
+    blockColorsMap[blockColorsProp->GetElement(i)] = {
+      std::stod(blockColorsProp->GetElement(i + 1)), std::stod(blockColorsProp->GetElement(i + 2)),
+      std::stod(blockColorsProp->GetElement(i + 3))
+    };
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockColorsMap[blockSelector] = color;
+  }
+  std::vector<std::string> blockColorsVec;
+  blockColorsVec.reserve(blockColorsMap.size() * 4);
+  for (const auto& blockColor : blockColorsMap)
+  {
+    blockColorsVec.push_back(blockColor.first);
+    blockColorsVec.push_back(std::to_string(blockColor.second[0]));
+    blockColorsVec.push_back(std::to_string(blockColor.second[1]));
+    blockColorsVec.push_back(std::to_string(blockColor.second[2]));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) solid Color");
+  blockColorsProp->SetElements(blockColorsVec);
+  proxy->UpdateProperty("BlockColors");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksColors(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockColorsProp = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColors"));
+  if (!blockColorsProp)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockColors' property found.");
+    return;
+  }
+  assert(blockColorsProp->GetNumberOfElementsPerCommand() == 4);
+  std::map<std::string, Color> blockColorsMap;
+  for (unsigned int i = 0; i < blockColorsProp->GetNumberOfElements(); i += 4)
+  {
+    blockColorsMap[blockColorsProp->GetElement(i)] = {
+      std::stod(blockColorsProp->GetElement(i + 1)), std::stod(blockColorsProp->GetElement(i + 2)),
+      std::stod(blockColorsProp->GetElement(i + 3))
+    };
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockColorsMap.erase(blockSelector);
+  }
+  std::vector<std::string> blockColorsVec;
+  blockColorsVec.reserve(blockColorsMap.size() * 4);
+  for (const auto& blockColor : blockColorsMap)
+  {
+    blockColorsVec.push_back(blockColor.first);
+    blockColorsVec.push_back(std::to_string(blockColor.second[0]));
+    blockColorsVec.push_back(std::to_string(blockColor.second[1]));
+    blockColorsVec.push_back(std::to_string(blockColor.second[2]));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) solid Color");
+  blockColorsProp->SetElements(blockColorsVec);
+  proxy->UpdateProperty("BlockColors");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetSelectedColor(vtkSMProxy* proxy, Color color)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    vtkSMColorMapEditorHelper::SetBlocksColor(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), color);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    vtkSMColorMapEditorHelper::SetColor(proxy, color);
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkSMColorMapEditorHelper::Color vtkSMColorMapEditorHelper::GetColor(vtkSMProxy* proxy)
+{
+  vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
+  vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
+  if (diffuse == nullptr && ambient == nullptr)
+  {
+    diffuse = proxy->GetProperty("Color");
+  }
+  Color color;
+  if (diffuse || ambient)
+  {
+    vtkSMPropertyHelper(diffuse ? diffuse : ambient).Get(color.data(), 3);
   }
   else
   {
-    bool found = false;
-    for (unsigned int i = 0; i < blockColorArray->GetNumberOfElements(); i += 3)
+    color[0] = color[1] = color[2] = VTK_DOUBLE_MAX;
+  }
+  return color;
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMColorMapEditorHelper::Color> vtkSMColorMapEditorHelper::GetBlocksColors(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<Color>();
+  }
+  const auto blockColorsProp =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColors"));
+  if (!blockColorsProp)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockColors' property found.");
+    return std::vector<Color>{ blockSelectors.size(),
+      { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX } };
+  }
+  std::vector<Color> colors(
+    blockSelectors.size(), { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX });
+  for (unsigned int i = 0; i < blockColorsProp->GetNumberOfElements(); i += 4)
+  {
+    for (unsigned int j = 0; j < blockSelectors.size(); ++j)
     {
-      if (blockColorArray->GetElement(i) == blockSelector)
+      if (blockColorsProp->GetElement(i) == blockSelectors[j])
       {
-        // found the block selector, update the color array
-        blockColorArray->SetElement(i + 1, std::to_string(attributeType).c_str());
-        blockColorArray->SetElement(i + 2, arrayName.c_str());
-        found = true;
+        colors[j] = { std::stod(blockColorsProp->GetElement(i + 1)),
+          std::stod(blockColorsProp->GetElement(i + 2)),
+          std::stod(blockColorsProp->GetElement(i + 3)) };
         break;
       }
     }
-    if (!found)
-    {
-      // add the block selector and color array
-      blockColorArray->AppendElements({ blockSelector, std::to_string(attributeType), arrayName });
-    }
+  }
+  return colors;
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMColorMapEditorHelper::Color> vtkSMColorMapEditorHelper::GetSelectedColors(
+  vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksColors(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetColor(proxy) };
   }
 }
 
 //----------------------------------------------------------------------------
-std::pair<int, std::string> vtkSMColorMapEditorHelper::GetBlockColorArray(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+vtkSMProperty* vtkSMColorMapEditorHelper::GetColorArrayProperty(vtkSMProxy* proxy)
 {
-  auto blockColorArray =
+  return proxy->GetProperty("ColorArrayName");
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMColorMapEditorHelper::GetBlockColorArrayProperty(vtkSMProxy* proxy)
+{
+  return proxy->GetProperty("BlockColorArrayNames");
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMColorMapEditorHelper::GetSelectedColorArrayProperty(vtkSMProxy* proxy)
+{
+  return this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks
+    ? vtkSMColorMapEditorHelper::GetBlockColorArrayProperty(proxy)
+    : vtkSMColorMapEditorHelper::GetColorArrayProperty(proxy);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::IsColorArrayValid(const ColorArray& array)
+{
+  return array.first >= vtkDataObject::POINT &&
+    array.first < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES && !array.second.empty();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetColorArray(
+  vtkSMProxy* proxy, int attributeType, std::string arrayName)
+{
+  if (!vtkSMColorMapEditorHelper::IsColorArrayValid(std::make_pair(attributeType, arrayName)))
+  {
+    vtkWarningWithObjectMacro(proxy, "Invalid color array.");
+    return;
+  }
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy).arg("comment", " change color array");
+  vtkSMPropertyHelper(proxy, "ColorArrayName")
+    .SetInputArrayToProcess(attributeType, arrayName.c_str());
+  proxy->UpdateProperty("ColorArrayName");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksColorArray(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, int attributeType, std::string arrayName)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  if (!vtkSMColorMapEditorHelper::IsColorArrayValid(std::make_pair(attributeType, arrayName)))
+  {
+    vtkWarningWithObjectMacro(proxy, "Invalid color array.");
+    return;
+  }
+  auto blockColorArrayNames =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
+  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
+  if (!blockColorArrayNames || !blockLUTs)
+  {
+    vtkDebugWithObjectMacro(
+      proxy, "No 'BlockColorArrayNames' or 'BlockLookupTables' properties found.");
+    return;
+  }
+  assert(blockColorArrayNames->GetNumberOfElementsPerCommand() == 3);
+  if (arrayName.empty())
+  {
+    return;
+  }
+  std::map<std::string, ColorArray> blockColorArrayMap;
+  std::map<std::string, vtkSMProxy*> blockLUTsMap;
+  for (unsigned int i = 0; i < blockLUTs->GetNumberOfProxies(); ++i)
+  {
+    blockColorArrayMap[blockColorArrayNames->GetElement(3 * i)] =
+      std::make_pair(std::stoi(blockColorArrayNames->GetElement(3 * i + 1)),
+        std::string(blockColorArrayNames->GetElement(3 * i + 2)));
+    blockLUTsMap[blockColorArrayNames->GetElement(3 * i)] = blockLUTs->GetProxy(i);
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockColorArrayMap[blockSelector] = std::make_pair(attributeType, arrayName);
+    blockLUTsMap[blockSelector] = nullptr;
+  }
+  std::vector<std::string> blockColorArrayVec;
+  blockColorArrayVec.reserve(blockColorArrayMap.size() * 3);
+  std::vector<vtkSMProxy*> blockLUTsVec;
+  blockLUTsVec.reserve(blockLUTsMap.size());
+  for (const auto& colorArray : blockColorArrayMap)
+  {
+    blockColorArrayVec.push_back(colorArray.first);
+    blockColorArrayVec.push_back(std::to_string(colorArray.second.first));
+    blockColorArrayVec.push_back(colorArray.second.second);
+    blockLUTsVec.push_back(blockLUTsMap[colorArray.first]);
+  }
+  // the following trace is not needed because this function is not supposed to be publicly called
+  // SM_SCOPED_TRACE(PropertiesModified)
+  //   .arg("proxy", proxy)
+  //   .arg("comment", " change block(s) color array");
+  blockColorArrayNames->SetElements(blockColorArrayVec);
+  proxy->UpdateProperty("BlockColorArrayNames");
+  blockLUTs->SetProxies(static_cast<unsigned int>(blockLUTsVec.size()), blockLUTsVec.data());
+  // no need to call UpdateProperty for BlockLookupTables since SetBlocksLookupTable will do that
+}
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksColorArrays(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockColorArrayNames =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
+  if (!blockColorArrayNames)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockColorArrayNames' property found.");
+    return;
+  }
+  assert(blockColorArrayNames->GetNumberOfElementsPerCommand() == 3);
+  std::map<std::string, ColorArray> blockColorArrayMap;
+  for (unsigned int i = 0; i < blockColorArrayNames->GetNumberOfElements(); i += 3)
+  {
+    blockColorArrayMap[blockColorArrayNames->GetElement(i)] =
+      std::make_pair(std::stoi(blockColorArrayNames->GetElement(i + 1)),
+        std::string(blockColorArrayNames->GetElement(i + 2)));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockColorArrayMap.erase(blockSelector);
+  }
+  std::vector<std::string> blockColorArrayVec;
+  blockColorArrayVec.reserve(blockColorArrayMap.size() * 3);
+  for (const auto& colorArray : blockColorArrayMap)
+  {
+    blockColorArrayVec.push_back(colorArray.first);
+    blockColorArrayVec.push_back(std::to_string(colorArray.second.first));
+    blockColorArrayVec.push_back(colorArray.second.second);
+  }
+  // the following trace is not needed because this function is not supposed to be publicly called
+  // SM_SCOPED_TRACE(PropertiesModified)
+  //   .arg("proxy", proxy)
+  //   .arg("comment", " change block(s) color array");
+  blockColorArrayNames->SetElements(blockColorArrayVec);
+  proxy->UpdateProperty("BlockColorArrayNames");
+}
+
+//----------------------------------------------------------------------------
+vtkSMColorMapEditorHelper::ColorArray vtkSMColorMapEditorHelper::GetColorArray(vtkSMProxy* proxy)
+{
+  const vtkSMPropertyHelper colorArray(proxy, "ColorArrayName");
+  return std::make_pair(
+    colorArray.GetInputArrayAssociation(), colorArray.GetInputArrayNameToProcess());
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMColorMapEditorHelper::ColorArray> vtkSMColorMapEditorHelper::GetBlocksColorArrays(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<ColorArray>();
+  }
+  const auto blockColorArray =
     vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
   if (!blockColorArray)
   {
-    vtkWarningWithObjectMacro(proxy, "No 'BlockColorArrayNames' property found.");
-    return std::make_pair(-1, std::string(""));
+    vtkDebugWithObjectMacro(proxy, "No 'BlockColorArrayNames' property found.");
+    return std::vector<ColorArray>(blockSelectors.size(), std::make_pair(-1, ""));
   }
   assert(blockColorArray->GetNumberOfElementsPerCommand() == 3);
+  std::vector<ColorArray> colorArrays(blockSelectors.size(), std::make_pair(-1, ""));
   for (unsigned int i = 0; i < blockColorArray->GetNumberOfElements(); i += 3)
   {
-    if (blockColorArray->GetElement(i) == blockSelector)
+    for (unsigned int j = 0; j < blockSelectors.size(); ++j)
     {
-      return std::make_pair(std::stoi(blockColorArray->GetElement(i + 1)),
-        std::string(blockColorArray->GetElement(i + 2)));
+      if (blockColorArray->GetElement(i) == blockSelectors[j])
+      {
+        colorArrays[j] = std::make_pair(
+          std::stoi(blockColorArray->GetElement(i + 1)), blockColorArray->GetElement(i + 2));
+        break;
+      }
     }
   }
-  return std::make_pair(-1, std::string(""));
+  return colorArrays;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::SetBlockUseSeparateColorMap(
-  vtkSMProxy* proxy, const std::string& blockSelector, bool use)
+std::map<vtkSMColorMapEditorHelper::ColorArray, std::vector<std::string>>
+vtkSMColorMapEditorHelper::GetCommonColorArraysBlockSelectors(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
 {
+  if (blockSelectors.empty())
+  {
+    return std::map<ColorArray, std::vector<std::string>>();
+  }
+  const std::vector<ColorArray> colorArrays =
+    vtkSMColorMapEditorHelper::GetBlocksColorArrays(proxy, blockSelectors);
+  std::map<ColorArray, std::vector<std::string>> commonColorArrays;
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
+  {
+    commonColorArrays[colorArrays[i]].push_back(blockSelectors[i]);
+  }
+  return commonColorArrays;
+}
+//----------------------------------------------------------------------------
+std::vector<vtkSMColorMapEditorHelper::ColorArray>
+vtkSMColorMapEditorHelper::GetSelectedColorArrays(vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksColorArrays(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetColorArray(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMColorMapEditorHelper::GetUseSeparateColorMapProperty(vtkSMProxy* proxy)
+{
+  return proxy->GetProperty("UseSeparateColorMap");
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMColorMapEditorHelper::GetBlockUseSeparateColorMapProperty(vtkSMProxy* proxy)
+{
+  return proxy->GetProperty("BlockUseSeparateColorMaps");
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMColorMapEditorHelper::GetSelectedUseSeparateColorMapProperty(vtkSMProxy* proxy)
+{
+  return this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks
+    ? vtkSMColorMapEditorHelper::GetBlockUseSeparateColorMapProperty(proxy)
+    : vtkSMColorMapEditorHelper::GetUseSeparateColorMapProperty(proxy);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::IsUseSeparateColorMapValid(int useSeparateColorMap)
+{
+  return useSeparateColorMap == 0 || useSeparateColorMap == 1;
+}
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetUseSeparateColorMap(vtkSMProxy* proxy, bool use)
+{
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change use separate color map");
+  vtkSMPropertyHelper(proxy, "UseSeparateColorMap", true).Set(use ? 1 : 0);
+  proxy->UpdateProperty("UseSeparateColorMap");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksUseSeparateColorMap(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, bool use)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
   auto blockUseSeparateColorMaps =
     vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockUseSeparateColorMaps"));
   if (!blockUseSeparateColorMaps)
   {
-    vtkWarningWithObjectMacro(proxy, "No 'blockUseSeparateColorMaps' property found.");
+    vtkDebugWithObjectMacro(proxy, "No 'BlockUseSeparateColorMaps' property found.");
     return;
   }
   assert(blockUseSeparateColorMaps->GetNumberOfElementsPerCommand() == 2);
-  bool found = false;
-  for (unsigned int i = 0; i < blockUseSeparateColorMaps->GetNumberOfElements(); i += 3)
-  {
-    if (blockUseSeparateColorMaps->GetElement(i) == blockSelector)
-    {
-      // found the block selector, update the color array
-      blockUseSeparateColorMaps->SetElement(i + 1, std::to_string(use).c_str());
-      found = true;
-      break;
-    }
-  }
-  if (!found)
-  {
-    // add the block selector and color array
-    blockUseSeparateColorMaps->AppendElements({ blockSelector, std::to_string(use) });
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::GetBlockUseSeparateColorMap(
-  vtkSMProxy* proxy, const std::string& blockSelector)
-{
-  auto blockUseSeparateColorMaps =
-    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockUseSeparateColorMaps"));
-  if (!blockUseSeparateColorMaps)
-  {
-    vtkWarningWithObjectMacro(proxy, "No 'blockUseSeparateColorMaps' property found.");
-    return false;
-  }
-  assert(blockUseSeparateColorMaps->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, bool> blockUseSeparateColorMapsMap;
   for (unsigned int i = 0; i < blockUseSeparateColorMaps->GetNumberOfElements(); i += 2)
   {
-    if (blockUseSeparateColorMaps->GetElement(i) == blockSelector)
+    blockUseSeparateColorMapsMap[blockUseSeparateColorMaps->GetElement(i)] =
+      std::stoi(blockUseSeparateColorMaps->GetElement(i + 1));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockUseSeparateColorMapsMap[blockSelector] = use;
+  }
+  std::vector<std::string> blockUseSeparateColorMapsVec;
+  blockUseSeparateColorMapsVec.reserve(blockUseSeparateColorMapsMap.size() * 2);
+  for (const auto& blockUseSeparateColorMap : blockUseSeparateColorMapsMap)
+  {
+    blockUseSeparateColorMapsVec.push_back(blockUseSeparateColorMap.first);
+    blockUseSeparateColorMapsVec.push_back(std::to_string(blockUseSeparateColorMap.second));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) use separate color map");
+  blockUseSeparateColorMaps->SetElements(blockUseSeparateColorMapsVec);
+  proxy->UpdateProperty("BlockUseSeparateColorMaps");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksUseSeparateColorMaps(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockUseSeparateColorMaps =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockUseSeparateColorMaps"));
+  if (!blockUseSeparateColorMaps)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockUseSeparateColorMaps' property found.");
+    return;
+  }
+  assert(blockUseSeparateColorMaps->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, std::string> blockUseSeparateColorMapsMap;
+  for (unsigned int i = 0; i < blockUseSeparateColorMaps->GetNumberOfElements(); i += 2)
+  {
+    blockUseSeparateColorMapsMap[blockUseSeparateColorMaps->GetElement(i)] =
+      blockUseSeparateColorMaps->GetElement(i + 1);
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockUseSeparateColorMapsMap.erase(blockSelector);
+  }
+  std::vector<std::string> blockUseSeparateColorMapsVec;
+  blockUseSeparateColorMapsVec.reserve(blockUseSeparateColorMapsMap.size() * 2);
+  for (const auto& blockUseSeparateColorMap : blockUseSeparateColorMapsMap)
+  {
+    blockUseSeparateColorMapsVec.push_back(blockUseSeparateColorMap.first);
+    blockUseSeparateColorMapsVec.push_back(blockUseSeparateColorMap.second);
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) use separate color map");
+  blockUseSeparateColorMaps->SetElements(blockUseSeparateColorMapsVec);
+  proxy->UpdateProperty("BlockUseSeparateColorMaps");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetSelectedUseSeparateColorMap(vtkSMProxy* proxy, bool use)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    vtkSMColorMapEditorHelper::SetBlocksUseSeparateColorMap(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), use);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    vtkSMColorMapEditorHelper::SetUseSeparateColorMap(proxy, use);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::GetUseSeparateColorMap(vtkSMProxy* proxy)
+{
+  return vtkSMPropertyHelper(proxy, "UseSeparateColorMap", true).GetAsInt() != 0;
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkSMColorMapEditorHelper::GetBlocksUseSeparateColorMaps(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<int>();
+  }
+  const auto blockUseSeparateColorMaps =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockUseSeparateColorMaps"));
+  if (!blockUseSeparateColorMaps)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockUseSeparateColorMaps' property found.");
+    return std::vector<int>(blockSelectors.size(), -1);
+  }
+  assert(blockUseSeparateColorMaps->GetNumberOfElementsPerCommand() == 2);
+  std::vector<int> useSeparateColorMapsVec(blockSelectors.size(), -1);
+  for (unsigned int i = 0; i < blockUseSeparateColorMaps->GetNumberOfElements(); i += 2)
+  {
+    for (unsigned int j = 0; j < blockSelectors.size(); ++j)
     {
-      if (std::stoi(blockUseSeparateColorMaps->GetElement(i + 1)) == 1)
+      if (blockUseSeparateColorMaps->GetElement(i) == blockSelectors[j])
       {
-        return true;
+        useSeparateColorMapsVec[j] = std::stoi(blockUseSeparateColorMaps->GetElement(i + 1));
+        break;
       }
     }
   }
-  return false;
+  return useSeparateColorMapsVec;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::SetBlockLookupTable(
-  vtkSMProxy* proxy, const std::string& blockSelector, vtkSMProxy* lutProxy)
+std::vector<int> vtkSMColorMapEditorHelper::GetSelectedUseSeparateColorMaps(vtkSMProxy* proxy)
 {
-  auto blockLUTSelectors =
-    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockLookupTableSelectors"));
-  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
-  if (!blockLUTSelectors || !blockLUTs)
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
   {
-    vtkWarningWithObjectMacro(
-      proxy, "Missing 'BlockLookupTableSelectors' or 'BlockLookupTables' property.");
+    return vtkSMColorMapEditorHelper::GetBlocksUseSeparateColorMaps(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetUseSeparateColorMap(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::GetAnySelectedUseSeparateColorMap(vtkSMProxy* proxy)
+{
+  const std::vector<int> useSeparateColorMaps =
+    vtkSMColorMapEditorHelper::GetSelectedUseSeparateColorMaps(proxy);
+  return std::any_of(useSeparateColorMaps.begin(), useSeparateColorMaps.end(),
+    [](int useSeparateColorMap) { return useSeparateColorMap == 1; });
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::IsMapScalarsValid(int mapScalars)
+{
+  return mapScalars == 0 || mapScalars == 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetMapScalars(vtkSMProxy* proxy, bool mapScalars)
+{
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy).arg("comment", " change map scalars");
+  vtkSMPropertyHelper(proxy, "MapScalars", true).Set(mapScalars ? 1 : 0);
+  proxy->UpdateProperty("MapScalars");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksMapScalars(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, bool mapScalars)
+{
+  if (blockSelectors.empty())
+  {
     return;
   }
-  bool found = false;
-  for (unsigned int i = 0; i < blockLUTSelectors->GetNumberOfElements(); ++i)
+  auto blockMapScalars =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockMapScalars"));
+  if (!blockMapScalars)
   {
-    if (blockLUTSelectors->GetElement(i) == blockSelector)
-    {
-      blockLUTs->SetProxy(i, lutProxy);
-      found = true;
-    }
+    vtkDebugWithObjectMacro(proxy, "No 'BlockMapScalars' property found.");
+    return;
   }
-  if (!found)
+  assert(blockMapScalars->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, bool> blockMapScalarsMap;
+  for (unsigned int i = 0; i < blockMapScalars->GetNumberOfElements(); i += 2)
   {
-    blockLUTSelectors->AppendElements({ blockSelector });
-    blockLUTs->AddProxy(lutProxy);
+    blockMapScalarsMap[blockMapScalars->GetElement(i)] =
+      std::stoi(blockMapScalars->GetElement(i + 1));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockMapScalarsMap[blockSelector] = mapScalars;
+  }
+  std::vector<std::string> blockMapScalarsVec;
+  blockMapScalarsVec.reserve(blockMapScalarsMap.size() * 2);
+  for (const auto& blockMapScalar : blockMapScalarsMap)
+  {
+    blockMapScalarsVec.push_back(blockMapScalar.first);
+    blockMapScalarsVec.push_back(std::to_string(blockMapScalar.second));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) map scalars");
+  blockMapScalars->SetElements(blockMapScalarsVec);
+  proxy->UpdateProperty("BlockMapScalars");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksMapScalars(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockMapScalars =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockMapScalars"));
+  if (!blockMapScalars)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockMapScalars' property found.");
+    return;
+  }
+  assert(blockMapScalars->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, std::string> blockMapScalarsMap;
+  for (unsigned int i = 0; i < blockMapScalars->GetNumberOfElements(); i += 2)
+  {
+    blockMapScalarsMap[blockMapScalars->GetElement(i)] = blockMapScalars->GetElement(i + 1);
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockMapScalarsMap.erase(blockSelector);
+  }
+  std::vector<std::string> blockMapScalarsVec;
+  blockMapScalarsVec.reserve(blockMapScalarsMap.size() * 2);
+  for (const auto& blockMapScalar : blockMapScalarsMap)
+  {
+    blockMapScalarsVec.push_back(blockMapScalar.first);
+    blockMapScalarsVec.push_back(blockMapScalar.second);
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) map scalars");
+  blockMapScalars->SetElements(blockMapScalarsVec);
+  proxy->UpdateProperty("BlockMapScalars");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetSelectedMapScalars(vtkSMProxy* proxy, bool mapScalars)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    vtkSMColorMapEditorHelper::SetBlocksMapScalars(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), mapScalars);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    vtkSMColorMapEditorHelper::SetMapScalars(proxy, mapScalars);
   }
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMColorMapEditorHelper::GetBlockLookupTable(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+bool vtkSMColorMapEditorHelper::GetMapScalars(vtkSMProxy* proxy)
 {
-  auto blockLUTSelectors =
-    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockLookupTableSelectors"));
-  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
-  if (!blockLUTSelectors || !blockLUTs)
+  return vtkSMPropertyHelper(proxy, "MapScalars", true).GetAsInt() != 0;
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkSMColorMapEditorHelper::GetBlocksMapScalars(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
   {
-    vtkWarningWithObjectMacro(
-      proxy, "Missing 'BlockLookupTableSelectors' or 'BlockLookupTables' property.");
+    return std::vector<int>();
+  }
+  const auto blockMapScalars =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockMapScalars"));
+  if (!blockMapScalars)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockMapScalars' property found.");
+    return std::vector<int>(blockSelectors.size(), -1);
+  }
+  assert(blockMapScalars->GetNumberOfElementsPerCommand() == 2);
+  std::vector<int> blockMapScalarsVec(blockSelectors.size(), -1);
+  for (unsigned int i = 0; i < blockMapScalars->GetNumberOfElements(); i += 2)
+  {
+    for (unsigned int j = 0; j < blockSelectors.size(); ++j)
+    {
+      if (blockMapScalars->GetElement(i) == blockSelectors[j])
+      {
+        blockMapScalarsVec[j] = std::stoi(blockMapScalars->GetElement(i + 1));
+        break;
+      }
+    }
+  }
+  return blockMapScalarsVec;
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkSMColorMapEditorHelper::GetSelectedMapScalars(vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksMapScalars(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetMapScalars(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::GetAnySelectedMapScalars(vtkSMProxy* proxy)
+{
+  const std::vector<int> mapScalars = vtkSMColorMapEditorHelper::GetSelectedMapScalars(proxy);
+  return std::any_of(
+    mapScalars.begin(), mapScalars.end(), [](int mapScalar) { return mapScalar == 1; });
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::IsInterpolateScalarsBeforeMappingValid(int interpolate)
+{
+  return interpolate == 0 || interpolate == 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetInterpolateScalarsBeforeMapping(
+  vtkSMProxy* proxy, bool interpolateScalars)
+{
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change interpolate scalars before mapping");
+  vtkSMPropertyHelper(proxy, "InterpolateScalarsBeforeMapping", true)
+    .Set(interpolateScalars ? 1 : 0);
+  proxy->UpdateProperty("InterpolateScalarsBeforeMapping");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksInterpolateScalarsBeforeMapping(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, bool interpolate)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockInterpolateScalarsBeforeMapping = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("BlockInterpolateScalarsBeforeMappings"));
+  if (!blockInterpolateScalarsBeforeMapping)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockInterpolateScalarsBeforeMappings' property found.");
+    return;
+  }
+  assert(blockInterpolateScalarsBeforeMapping->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, bool> blockInterpolateScalarsBeforeMappingMap;
+  for (unsigned int i = 0; i < blockInterpolateScalarsBeforeMapping->GetNumberOfElements(); i += 2)
+  {
+    blockInterpolateScalarsBeforeMappingMap[blockInterpolateScalarsBeforeMapping->GetElement(i)] =
+      std::stoi(blockInterpolateScalarsBeforeMapping->GetElement(i + 1));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockInterpolateScalarsBeforeMappingMap[blockSelector] = interpolate;
+  }
+  std::vector<std::string> blockInterpolateScalarsBeforeMappingVec;
+  blockInterpolateScalarsBeforeMappingVec.reserve(
+    blockInterpolateScalarsBeforeMappingMap.size() * 2);
+  for (const auto& blockInterpolate : blockInterpolateScalarsBeforeMappingMap)
+  {
+    blockInterpolateScalarsBeforeMappingVec.push_back(blockInterpolate.first);
+    blockInterpolateScalarsBeforeMappingVec.push_back(std::to_string(blockInterpolate.second));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) interpolate scalars before mapping");
+  blockInterpolateScalarsBeforeMapping->SetElements(blockInterpolateScalarsBeforeMappingVec);
+  proxy->UpdateProperty("BlockInterpolateScalarsBeforeMappings");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksInterpolateScalarsBeforeMappings(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockInterpolateScalarsBeforeMapping = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("BlockInterpolateScalarsBeforeMappings"));
+  if (!blockInterpolateScalarsBeforeMapping)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockInterpolateScalarsBeforeMappings' property found.");
+    return;
+  }
+  assert(blockInterpolateScalarsBeforeMapping->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, bool> blockInterpolateScalarsBeforeMappingMap;
+  for (unsigned int i = 0; i < blockInterpolateScalarsBeforeMapping->GetNumberOfElements(); i += 2)
+  {
+    blockInterpolateScalarsBeforeMappingMap[blockInterpolateScalarsBeforeMapping->GetElement(i)] =
+      std::stoi(blockInterpolateScalarsBeforeMapping->GetElement(i + 1));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockInterpolateScalarsBeforeMappingMap.erase(blockSelector);
+  }
+  std::vector<std::string> blockInterpolateScalarsBeforeMappingVec;
+  blockInterpolateScalarsBeforeMappingVec.reserve(
+    blockInterpolateScalarsBeforeMappingMap.size() * 2);
+  for (const auto& blockInterpolate : blockInterpolateScalarsBeforeMappingMap)
+  {
+    blockInterpolateScalarsBeforeMappingVec.push_back(blockInterpolate.first);
+    blockInterpolateScalarsBeforeMappingVec.push_back(std::to_string(blockInterpolate.second));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) interpolate scalars before mapping");
+  blockInterpolateScalarsBeforeMapping->SetElements(blockInterpolateScalarsBeforeMappingVec);
+  proxy->UpdateProperty("BlockInterpolateScalarsBeforeMappings");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetSelectedInterpolateScalarsBeforeMapping(
+  vtkSMProxy* proxy, bool interpolateScalars)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    vtkSMColorMapEditorHelper::SetBlocksInterpolateScalarsBeforeMapping(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), interpolateScalars);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    vtkSMColorMapEditorHelper::SetInterpolateScalarsBeforeMapping(proxy, interpolateScalars);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::GetInterpolateScalarsBeforeMapping(vtkSMProxy* proxy)
+{
+  return vtkSMPropertyHelper(proxy, "InterpolateScalarsBeforeMapping", true).GetAsInt() != 0;
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkSMColorMapEditorHelper::GetBlocksInterpolateScalarsBeforeMappings(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<int>();
+  }
+  const auto blockInterpolateScalarsBeforeMapping = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("BlockInterpolateScalarsBeforeMappings"));
+  if (!blockInterpolateScalarsBeforeMapping)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockInterpolateScalarsBeforeMappings' property found.");
+    return std::vector<int>(blockSelectors.size(), -1);
+  }
+  assert(blockInterpolateScalarsBeforeMapping->GetNumberOfElementsPerCommand() == 2);
+  std::vector<int> interpolateScalarsBeforeMappingVec(blockSelectors.size(), -1);
+  for (unsigned int i = 0; i < blockInterpolateScalarsBeforeMapping->GetNumberOfElements(); i += 2)
+  {
+    for (unsigned int j = 0; j < blockSelectors.size(); ++j)
+    {
+      if (blockInterpolateScalarsBeforeMapping->GetElement(i) == blockSelectors[j])
+      {
+        interpolateScalarsBeforeMappingVec[j] =
+          std::stoi(blockInterpolateScalarsBeforeMapping->GetElement(i + 1));
+        break;
+      }
+    }
+  }
+  return interpolateScalarsBeforeMappingVec;
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkSMColorMapEditorHelper::GetSelectedInterpolateScalarsBeforeMappings(
+  vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksInterpolateScalarsBeforeMappings(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetInterpolateScalarsBeforeMapping(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::GetAnySelectedInterpolateScalarsBeforeMapping(vtkSMProxy* proxy)
+{
+  const std::vector<int> interpolateScalarsBeforeMappings =
+    vtkSMColorMapEditorHelper::GetSelectedInterpolateScalarsBeforeMappings(proxy);
+  return std::any_of(interpolateScalarsBeforeMappings.begin(),
+    interpolateScalarsBeforeMappings.end(),
+    [](int interpolateScalarsBeforeMapping) { return interpolateScalarsBeforeMapping == 1; });
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::IsOpacityValid(double opacity)
+{
+  return opacity >= 0.0 && opacity <= 1.0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetOpacity(vtkSMProxy* proxy, double opacity)
+{
+  if (!vtkSMColorMapEditorHelper::IsOpacityValid(opacity))
+  {
+    vtkWarningWithObjectMacro(proxy, "Invalid opacity.");
+    return;
+  }
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy).arg("comment", " change opacity");
+  vtkSMPropertyHelper(proxy, "Opacity", true).Set(opacity);
+  proxy->UpdateProperty("Opacity");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksOpacity(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, double opacity)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  if (!vtkSMColorMapEditorHelper::IsOpacityValid(opacity))
+  {
+    vtkWarningWithObjectMacro(proxy, "Invalid opacity.");
+    return;
+  }
+  auto blockOpacities =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockOpacities"));
+  if (!blockOpacities)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockOpacities' property found.");
+    return;
+  }
+  assert(blockOpacities->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, double> blockOpacitiesMap;
+  for (unsigned int i = 0; i < blockOpacities->GetNumberOfElements(); i += 2)
+  {
+    blockOpacitiesMap[blockOpacities->GetElement(i)] = std::stod(blockOpacities->GetElement(i + 1));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockOpacitiesMap[blockSelector] = opacity;
+  }
+  std::vector<std::string> blockOpacitiesVec;
+  blockOpacitiesVec.reserve(blockOpacitiesMap.size() * 2);
+  for (const auto& blockOpacity : blockOpacitiesMap)
+  {
+    blockOpacitiesVec.push_back(blockOpacity.first);
+    blockOpacitiesVec.push_back(std::to_string(blockOpacity.second));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) opacity");
+  blockOpacities->SetElements(blockOpacitiesVec);
+  proxy->UpdateProperty("BlockOpacities");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksOpacities(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockOpacities =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockOpacities"));
+  if (!blockOpacities)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockOpacities' property found.");
+    return;
+  }
+  assert(blockOpacities->GetNumberOfElementsPerCommand() == 2);
+  std::map<std::string, double> blockOpacitiesMap;
+  for (unsigned int i = 0; i < blockOpacities->GetNumberOfElements(); i += 2)
+  {
+    blockOpacitiesMap[blockOpacities->GetElement(i)] = std::stod(blockOpacities->GetElement(i + 1));
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockOpacitiesMap.erase(blockSelector);
+  }
+  std::vector<std::string> blockOpacitiesVec;
+  blockOpacitiesVec.reserve(blockOpacitiesMap.size() * 2);
+  for (const auto& blockOpacity : blockOpacitiesMap)
+  {
+    blockOpacitiesVec.push_back(blockOpacity.first);
+    blockOpacitiesVec.push_back(std::to_string(blockOpacity.second));
+  }
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", proxy)
+    .arg("comment", " change block(s) opacity");
+  blockOpacities->SetElements(blockOpacitiesVec);
+  proxy->UpdateProperty("BlockOpacities");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetSelectedOpacity(vtkSMProxy* proxy, double opacity)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    vtkSMColorMapEditorHelper::SetBlocksOpacity(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), opacity);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    vtkSMColorMapEditorHelper::SetOpacity(proxy, opacity);
+  }
+}
+
+//----------------------------------------------------------------------------
+double vtkSMColorMapEditorHelper::GetOpacity(vtkSMProxy* proxy)
+{
+  return vtkSMPropertyHelper(proxy, "Opacity", true).GetAsDouble();
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> vtkSMColorMapEditorHelper::GetBlocksOpacities(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<double>();
+  }
+  const auto blockOpacities =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockOpacities"));
+  if (!blockOpacities)
+  {
+    vtkDebugWithObjectMacro(proxy, "No 'BlockOpacities' property found.");
+    return std::vector<double>(blockSelectors.size(), VTK_DOUBLE_MAX);
+  }
+  assert(blockOpacities->GetNumberOfElementsPerCommand() == 2);
+  std::vector<double> blockOpacitiesVec(blockSelectors.size(), VTK_DOUBLE_MAX);
+  for (unsigned int i = 0; i < blockOpacities->GetNumberOfElements(); i += 2)
+  {
+    for (unsigned int j = 0; j < blockSelectors.size(); ++j)
+    {
+      if (blockOpacities->GetElement(i) == blockSelectors[j])
+      {
+        blockOpacitiesVec[j] = std::stod(blockOpacities->GetElement(i + 1));
+        break;
+      }
+    }
+  }
+  return blockOpacitiesVec;
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> vtkSMColorMapEditorHelper::GetSelectedOpacities(vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksOpacities(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetOpacity(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::ResetBlocksProperties(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, const std::vector<std::string>& propertyNames)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  if (propertyNames.empty())
+  {
+    return;
+  }
+  std::vector<std::string> removedPropertyNames;
+  if (std::find(propertyNames.begin(), propertyNames.end(), "BlockColors") != propertyNames.end())
+  {
+    vtkSMColorMapEditorHelper::RemoveBlocksColors(proxy, blockSelectors);
+    removedPropertyNames.push_back("BlockColors");
+  }
+  if (std::find(propertyNames.begin(), propertyNames.end(), "BlockColorArrayNames") !=
+      propertyNames.end() ||
+    std::find(propertyNames.begin(), propertyNames.end(), "BlockLookupTables") !=
+      propertyNames.end())
+  {
+    vtkSMColorMapEditorHelper::SetBlocksScalarColoring(proxy, blockSelectors, nullptr, -1);
+    removedPropertyNames.push_back("BlockColorArrayNames");
+    removedPropertyNames.push_back("BlockLookupTables");
+  }
+  if (std::find(propertyNames.begin(), propertyNames.end(), "BlockUseSeparateColorMaps") !=
+    propertyNames.end())
+  {
+    vtkSMColorMapEditorHelper::RemoveBlocksUseSeparateColorMaps(proxy, blockSelectors);
+    removedPropertyNames.push_back("BlockUseSeparateColorMaps");
+    removedPropertyNames.push_back("BlockColorArrayNames");
+  }
+  if (std::find(propertyNames.begin(), propertyNames.end(), "BlockMapScalars") !=
+    propertyNames.end())
+  {
+    vtkSMColorMapEditorHelper::RemoveBlocksMapScalars(proxy, blockSelectors);
+    removedPropertyNames.push_back("BlockMapScalars");
+  }
+  if (std::find(propertyNames.begin(), propertyNames.end(),
+        "BlockInterpolateScalarsBeforeMappings") != propertyNames.end())
+  {
+    vtkSMColorMapEditorHelper::RemoveBlocksInterpolateScalarsBeforeMappings(proxy, blockSelectors);
+    removedPropertyNames.push_back("BlockInterpolateScalarsBeforeMappings");
+  }
+  if (std::find(propertyNames.begin(), propertyNames.end(), "BlockOpacities") !=
+    propertyNames.end())
+  {
+    vtkSMColorMapEditorHelper::RemoveBlocksOpacities(proxy, blockSelectors);
+    removedPropertyNames.push_back("BlockOpacities");
+  }
+  std::vector<std::string> notRemovedPropertyNames;
+  for (const std::string& propertyName : propertyNames)
+  {
+    if (std::find(removedPropertyNames.begin(), removedPropertyNames.end(), propertyName) ==
+      removedPropertyNames.end())
+    {
+      notRemovedPropertyNames.push_back(propertyName);
+    }
+  }
+  for (const std::string& propertyName : notRemovedPropertyNames)
+  {
+    vtkWarningWithObjectMacro(proxy, "Property name: " << propertyName << " could not be removed");
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::SetBlocksLookupTable(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, vtkSMProxy* lut)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockColorArrayNames =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
+  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
+  if (!blockColorArrayNames || !blockLUTs)
+  {
+    vtkDebugWithObjectMacro(
+      proxy, "No 'BlockColorArrayNames' or 'BlockLookupTables' properties found.");
+    return;
+  }
+  std::map<std::string, vtkSMProxy*> blockLUTsMap;
+  for (unsigned int i = 0; i < blockLUTs->GetNumberOfProxies(); ++i)
+  {
+    blockLUTsMap[blockColorArrayNames->GetElement(3 * i)] = blockLUTs->GetProxy(i);
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockLUTsMap[blockSelector] = lut;
+  }
+  std::vector<vtkSMProxy*> blockLUTsVec;
+  blockLUTsVec.reserve(blockLUTsMap.size());
+  for (const auto& blockLUT : blockLUTsMap)
+  {
+    blockLUTsVec.push_back(blockLUT.second);
+  }
+  // the following trace is not needed because this function is not supposed to be publicly called
+  // SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
+  blockLUTs->SetProxies(static_cast<unsigned int>(blockLUTsVec.size()), blockLUTsVec.data());
+  proxy->UpdateProperty("BlockLookupTables");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMColorMapEditorHelper::RemoveBlocksLookupTables(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return;
+  }
+  auto blockColorArrayNames =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
+  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
+  if (!blockColorArrayNames || !blockLUTs)
+  {
+    vtkDebugWithObjectMacro(
+      proxy, "No 'BlockColorArrayNames' or 'BlockLookupTables' properties found.");
+    return;
+  }
+  std::map<std::string, vtkSMProxy*> blockLUTsMap;
+  for (unsigned int i = 0; i < blockLUTs->GetNumberOfProxies(); ++i)
+  {
+    blockLUTsMap[blockColorArrayNames->GetElement(3 * i)] = blockLUTs->GetProxy(i);
+  }
+  for (const std::string& blockSelector : blockSelectors)
+  {
+    blockLUTsMap.erase(blockSelector);
+  }
+  std::vector<vtkSMProxy*> blockLUTsVec;
+  blockLUTsVec.reserve(blockLUTsMap.size());
+  for (const auto& blockLUT : blockLUTsMap)
+  {
+    blockLUTsVec.push_back(blockLUT.second);
+  }
+  // the following trace is not needed because this function is not supposed to be publicly called
+  // SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
+  blockLUTs->SetProxies(static_cast<unsigned int>(blockLUTsVec.size()), blockLUTsVec.data());
+  proxy->UpdateProperty("BlockLookupTables");
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMColorMapEditorHelper::GetLookupTable(vtkSMProxy* proxy)
+{
+  vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable");
+  if (!lutProperty)
+  {
+    vtkGenericWarningMacro("Missing 'LookupTable' property.");
     return nullptr;
   }
-  for (unsigned int i = 0; i < blockLUTSelectors->GetNumberOfElements(); ++i)
+
+  const vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  if (lutPropertyHelper.GetNumberOfElements() == 0)
   {
-    if (blockLUTSelectors->GetElement(i) == blockSelector)
-    {
-      return blockLUTs->GetProxy(i);
-    }
+    return nullptr;
   }
-  return nullptr;
+
+  return lutPropertyHelper.GetAsProxy();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::RemoveBlockLookupTable(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+vtkSMProxy* vtkSMColorMapEditorHelper::GetLookupTable(vtkSMProxy* proxy, vtkSMProxy* view)
 {
-  auto blockLUTSelectors =
-    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockLookupTableSelectors"));
-  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
-  if (!blockLUTSelectors || !blockLUTs)
+  if (!view)
   {
-    vtkWarningWithObjectMacro(
-      proxy, "Missing 'BlockLookupTableSelectors' or 'BlockLookupTables' property.");
-    return;
+    return nullptr;
   }
-  // find selector (if any) and remove the selector and the lut
-  bool found = false;
-  unsigned int selectorIdx = 0;
-  for (unsigned int i = 0; i < blockLUTSelectors->GetNumberOfElements(); ++i)
+  return vtkSMColorMapEditorHelper::GetLookupTable(proxy);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMProxy*> vtkSMColorMapEditorHelper::GetBlocksLookupTables(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
   {
-    if (blockLUTSelectors->GetElement(i) == blockSelector)
-    {
-      selectorIdx = i;
-      found = true;
-      break;
-    }
+    return std::vector<vtkSMProxy*>();
   }
-  if (found)
+  const auto blockColorArrayNames =
+    vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("BlockColorArrayNames"));
+  const auto blockLUTs = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("BlockLookupTables"));
+  if (!blockColorArrayNames || !blockLUTs)
   {
-    std::vector<std::string> blockLUTSelectorsVec;
-    std::vector<vtkSMProxy*> blockLUTsVec;
-    for (unsigned int i = 0; i < blockLUTSelectors->GetNumberOfElements(); ++i)
+    vtkDebugWithObjectMacro(
+      proxy, "No 'BlockColorArrayNames' or 'BlockLookupTables' properties found.");
+    return std::vector<vtkSMProxy*>(blockSelectors.size(), nullptr);
+  }
+  std::vector<vtkSMProxy*> blockLUTsVec(blockSelectors.size(), nullptr);
+  for (unsigned int i = 0; i < blockLUTs->GetNumberOfProxies(); ++i)
+  {
+    for (size_t j = 0; j < blockSelectors.size(); ++j)
     {
-      if (i != selectorIdx)
+      if (blockColorArrayNames->GetElement(3 * i) == blockSelectors[j])
       {
-        blockLUTSelectorsVec.push_back(blockLUTSelectors->GetElement(i));
-        blockLUTsVec.push_back(blockLUTs->GetProxy(i));
+        blockLUTsVec[j] = blockLUTs->GetProxy(i);
+        break;
       }
     }
-    blockLUTSelectors->SetElements(blockLUTSelectorsVec);
-    blockLUTs->SetProxies(static_cast<unsigned int>(blockLUTsVec.size()), blockLUTsVec.data());
   }
+  return blockLUTsVec;
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMProxy*> vtkSMColorMapEditorHelper::GetBlocksLookupTables(
+  vtkSMProxy* proxy, vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
+{
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkSMProxy*>();
+  }
+  if (!view)
+  {
+    return std::vector<vtkSMProxy*>(blockSelectors.size(), nullptr);
+  }
+  return vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, blockSelectors);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMProxy*> vtkSMColorMapEditorHelper::GetSelectedLookupTables(vtkSMProxy* proxy)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksLookupTables(
+      proxy, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetLookupTable(proxy) };
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMProxy*> vtkSMColorMapEditorHelper::GetSelectedLookupTables(
+  vtkSMProxy* proxy, vtkSMProxy* view)
+{
+  if (!view)
+  {
+    return {};
+  }
+  return vtkSMColorMapEditorHelper::GetSelectedLookupTables(proxy, view);
 }
 
 //----------------------------------------------------------------------------
@@ -1433,9 +2969,9 @@ int vtkSMColorMapEditorHelper::IsScalarBarStickyVisible(vtkSMProxy* proxy, vtkSM
     vtkGenericWarningMacro("Failed to determine the LookupTable being used.");
     return -1;
   }
-  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy();
+  vtkSMProxy* lut = lutPropertyHelper.GetAsProxy();
   auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
+    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lut, view));
   if (sbProxy)
   {
     const vtkSMPropertyHelper sbsvPropertyHelper(sbProxy->GetProperty("StickyVisible"));
@@ -1447,28 +2983,44 @@ int vtkSMColorMapEditorHelper::IsScalarBarStickyVisible(vtkSMProxy* proxy, vtkSM
 }
 
 //----------------------------------------------------------------------------
-int vtkSMColorMapEditorHelper::IsBlockScalarBarStickyVisible(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector)
+std::vector<int> vtkSMColorMapEditorHelper::IsBlocksScalarBarStickyVisible(
+  vtkSMProxy* proxy, vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
+  if (blockSelectors.empty())
+  {
+    return std::vector<int>();
+  }
   if (!view)
   {
-    return -1;
+    return std::vector<int>(blockSelectors.size(), -1);
   }
-  vtkSMProxy* blockLUTProxy = vtkSMColorMapEditorHelper::GetBlockLookupTable(proxy, blockSelector);
-  if (!blockLUTProxy)
+  const std::vector<vtkSMProxy*> blockLuts =
+    vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, blockSelectors);
+
+  std::vector<int> blockStickyVisibleVec(blockSelectors.size());
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
   {
-    return -1;
+    if (vtkSMProxy* blockLut = blockLuts[i])
+    {
+      if (auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+            vtkSMTransferFunctionProxy::FindScalarBarRepresentation(blockLut, view)))
+      {
+        const vtkSMPropertyHelper sbsvPropertyHelper(sbProxy->GetProperty("StickyVisible"));
+        blockStickyVisibleVec[i] = sbsvPropertyHelper.GetNumberOfElements()
+          ? vtkSMPropertyHelper(sbProxy, "StickyVisible").GetAsInt()
+          : -1;
+      }
+      else
+      {
+        blockStickyVisibleVec[i] = -1;
+      }
+    }
+    else
+    {
+      blockStickyVisibleVec[i] = -1;
+    }
   }
-  auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(blockLUTProxy, view));
-  if (sbProxy)
-  {
-    const vtkSMPropertyHelper sbsvPropertyHelper(sbProxy->GetProperty("StickyVisible"));
-    return sbsvPropertyHelper.GetNumberOfElements()
-      ? vtkSMPropertyHelper(sbProxy, "StickyVisible").GetAsInt()
-      : -1;
-  }
-  return -1;
+  return blockStickyVisibleVec;
 }
 
 //----------------------------------------------------------------------------
@@ -1491,16 +3043,16 @@ bool vtkSMColorMapEditorHelper::UpdateScalarBarRange(
   }
 
   const vtkSMPropertyHelper lutPropertyHelper(lutProperty);
-  vtkSMProxy* lutProxy = usingScalarBarColoring ? lutPropertyHelper.GetAsProxy()
-                                                : vtkSMColorMapEditorHelper::GetLastLUTProxy(proxy);
+  vtkSMProxy* lut = usingScalarBarColoring ? lutPropertyHelper.GetAsProxy()
+                                           : vtkSMColorMapEditorHelper::GetLastLookupTable(proxy);
 
-  if (!lutProxy)
+  if (!lut)
   {
     return false;
   }
 
   auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
+    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lut, view));
 
   if (!sbProxy)
   {
@@ -1508,7 +3060,7 @@ bool vtkSMColorMapEditorHelper::UpdateScalarBarRange(
   }
 
   vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lut, view);
 
   vtkSMProperty* maxRangeProp = sbSMProxy->GetProperty("DataRangeMax");
   vtkSMProperty* minRangeProp = sbSMProxy->GetProperty("DataRangeMin");
@@ -1534,103 +3086,82 @@ bool vtkSMColorMapEditorHelper::UpdateScalarBarRange(
   }
   sbSMProxy->UpdateVTKObjects();
 
-  vtkSMColorMapEditorHelper::SetLastLUTProxy(proxy, usingScalarBarColoring ? lutProxy : nullptr);
+  vtkSMColorMapEditorHelper::SetLastLookupTable(proxy, usingScalarBarColoring ? lut : nullptr);
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::UpdateBlockScalarBarRange(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector, bool deleteRange)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::UpdateBlocksScalarBarRange(
+  vtkSMProxy* proxy, vtkSMProxy* view, bool deleteRange)
 {
   auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
   if (!repr)
   {
-    return false;
+    return {};
   }
+  // get the selectors of the colored blocks
+  const std::vector<std::string> blockSelectors =
+    vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(proxy);
 
-  const bool usingScalarBarColoring =
-    vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(repr, blockSelector);
+  const std::vector<vtkTypeBool> blocksUsingScalarColoring =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(repr, blockSelectors);
 
-  vtkSMProxy* lutProxy = usingScalarBarColoring
-    ? vtkSMColorMapEditorHelper::GetBlockLookupTable(repr, blockSelector)
-    : vtkSMColorMapEditorHelper::GetLastBlockLUTProxy(repr, blockSelector);
-  if (!lutProxy)
+  std::vector<vtkSMProxy*> blockLuts =
+    vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, blockSelectors);
+  std::vector<vtkSMProxy*> lastblockLuts =
+    vtkSMColorMapEditorHelper::GetLastBlocksLookupTables(repr, blockSelectors);
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
   {
-    return false;
+    blockLuts[i] = blocksUsingScalarColoring[i] ? blockLuts[i] : lastblockLuts[i];
   }
-
-  auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
-  if (!sbProxy)
-  {
-    return false;
-  }
-
   vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
-
-  vtkSMProperty* maxRangeProp = sbSMProxy->GetProperty("DataRangeMax");
-  vtkSMProperty* minRangeProp = sbSMProxy->GetProperty("DataRangeMin");
-
-  if (minRangeProp && maxRangeProp)
+  std::vector<vtkTypeBool> updatedRanges(blockSelectors.size(), false);
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
   {
-    vtkSMPropertyHelper minRangePropHelper(minRangeProp);
-    vtkSMPropertyHelper maxRangePropHelper(maxRangeProp);
-
-    // We remove the range that was potentially previously stored
-    sbProxy->RemoveBlockRange(repr, blockSelector);
-
-    // If we do not want to delete this range, then we update it with its potential new value.
-    if (!deleteRange)
+    if (!blockLuts[i])
     {
-      sbProxy->AddBlockRange(repr, blockSelector);
+      updatedRanges[i] = false;
+      continue;
     }
 
-    double updatedRange[2];
-    sbProxy->GetRange(updatedRange);
-    minRangePropHelper.Set(updatedRange[0]);
-    maxRangePropHelper.Set(updatedRange[1]);
+    auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(blockLuts[i], view));
+    if (!sbProxy)
+    {
+      updatedRanges[i] = false;
+      continue;
+    }
+
+    vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(blockLuts[i], view);
+
+    vtkSMProperty* maxRangeProp = sbSMProxy->GetProperty("DataRangeMax");
+    vtkSMProperty* minRangeProp = sbSMProxy->GetProperty("DataRangeMin");
+
+    if (minRangeProp && maxRangeProp)
+    {
+      vtkSMPropertyHelper minRangePropHelper(minRangeProp);
+      vtkSMPropertyHelper maxRangePropHelper(maxRangeProp);
+
+      // We remove the range that was potentially previously stored
+      sbProxy->RemoveBlockRange(repr, blockSelectors[i]);
+
+      // If we do not want to delete this range, then we update it with its potential new value.
+      if (!deleteRange)
+      {
+        sbProxy->AddBlockRange(repr, blockSelectors[i]);
+      }
+
+      double updatedRange[2];
+      sbProxy->GetRange(updatedRange);
+      minRangePropHelper.Set(updatedRange[0]);
+      maxRangePropHelper.Set(updatedRange[1]);
+    }
+    sbSMProxy->UpdateVTKObjects();
+    vtkSMColorMapEditorHelper::SetLastBlockLookupTable(
+      repr, blockSelectors[i], blocksUsingScalarColoring[i] ? blockLuts[i] : nullptr);
+    updatedRanges[i] = true;
   }
-  sbSMProxy->UpdateVTKObjects();
-
-  vtkSMColorMapEditorHelper::SetLastBlockLUTProxy(
-    repr, blockSelector, usingScalarBarColoring ? lutProxy : nullptr);
-  return true;
-}
-
-//----------------------------------------------------------------------------
-vtkSMProxy* vtkSMColorMapEditorHelper::GetLUTProxy(vtkSMProxy* proxy, vtkSMProxy* view)
-{
-  if (!view)
-  {
-    return nullptr;
-  }
-
-  vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable");
-  if (!lutProperty)
-  {
-    vtkGenericWarningMacro("Missing 'LookupTable' property.");
-    return nullptr;
-  }
-
-  const vtkSMPropertyHelper lutPropertyHelper(lutProperty);
-  if (lutPropertyHelper.GetNumberOfElements() == 0)
-  {
-    return nullptr;
-  }
-
-  return lutPropertyHelper.GetAsProxy();
-}
-
-//----------------------------------------------------------------------------
-vtkSMProxy* vtkSMColorMapEditorHelper::GetBlockLUTProxy(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector)
-{
-  if (!view)
-  {
-    return nullptr;
-  }
-  return vtkSMColorMapEditorHelper::GetBlockLookupTable(proxy, blockSelector);
+  return updatedRanges;
 }
 
 //----------------------------------------------------------------------------
@@ -1643,8 +3174,8 @@ bool vtkSMColorMapEditorHelper::SetScalarBarVisibility(
     return false;
   }
 
-  vtkSMProxy* lutProxy = GetLUTProxy(proxy, view);
-  if (!lutProxy)
+  vtkSMProxy* lut = vtkSMColorMapEditorHelper::GetLookupTable(proxy, view);
+  if (!lut)
   {
     vtkGenericWarningMacro("Failed to determine the LookupTable being used.");
     return false;
@@ -1659,18 +3190,18 @@ bool vtkSMColorMapEditorHelper::SetScalarBarVisibility(
 
   // If the lut proxy changed, we need to remove ourself (representation proxy)
   // from the scalar bar widget that we used to be linked to.
-  vtkSMProxy* lastLUTProxy = vtkSMColorMapEditorHelper::GetLastLUTProxy(proxy);
-  if (lastLUTProxy && lutProxy != lastLUTProxy)
+  vtkSMProxy* lastLut = vtkSMColorMapEditorHelper::GetLastLookupTable(proxy);
+  if (lastLut && lut != lastLut)
   {
     if (auto lastSBProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-          vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lastLUTProxy, view)))
+          vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lastLut, view)))
     {
       lastSBProxy->RemoveRange(repr);
     }
   }
 
   auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
+    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lut, view));
 
   if (sbProxy)
   {
@@ -1712,7 +3243,7 @@ bool vtkSMColorMapEditorHelper::SetScalarBarVisibility(
   }
 
   vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lut, view);
   if (!sbSMProxy)
   {
     vtkGenericWarningMacro("Failed to locate/create ScalarBar representation.");
@@ -1759,133 +3290,166 @@ bool vtkSMColorMapEditorHelper::SetScalarBarVisibility(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::SetBlockScalarBarVisibility(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector, bool visible)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(
+  vtkSMProxy* proxy, vtkSMProxy* view, const std::vector<std::string>& blockSelectors, bool visible)
 {
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkTypeBool>();
+  }
   auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
   if (!repr || !view)
   {
-    return false;
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
 
-  vtkSMProxy* lutBlockProxy =
-    vtkSMColorMapEditorHelper::GetBlockLUTProxy(repr, view, blockSelector);
-  if (!lutBlockProxy)
+  const std::vector<vtkSMProxy*> blockLuts =
+    vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, view, blockSelectors);
+  if (std::all_of(blockLuts.begin(), blockLuts.end(), [](vtkSMProxy* lut) { return !lut; }))
   {
-    return false;
+    vtkGenericWarningMacro("Failed to determine the LookupTables being used.");
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
   }
 
   SM_SCOPED_TRACE(CallMethod)
     .arg(repr)
-    .arg("SetBlockScalarBarVisibility")
+    .arg("SetBlocksScalarBarVisibility")
     .arg(view)
-    .arg(blockSelector.c_str())
+    .arg(blockSelectors)
     .arg(visible)
     .arg("comment",
-      visible ? "show block color bar/color legend" : "hide block color bar/color legend");
+      visible ? "show block(s) color bar/color legend" : "hide block color bar/color legend");
 
-  vtkSMProxy* lastBlockLUTProxy =
-    vtkSMColorMapEditorHelper::GetLastBlockLUTProxy(repr, blockSelector);
+  const std::vector<vtkSMProxy*> lastBlockLuts =
+    vtkSMColorMapEditorHelper::GetLastBlocksLookupTables(repr, blockSelectors);
+  const std::vector<vtkTypeBool> blocksUsingScalarColoring =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(repr, blockSelectors);
+  vtkNew<vtkSMTransferFunctionManager> mgr;
+  const std::vector<ColorArray> blockColorArrayNames =
+    vtkSMColorMapEditorHelper::GetBlocksColorArrays(proxy, blockSelectors);
 
-  // If the lut proxy changed, we need to remove ourself (representation proxy)
-  // from the scalar bar widget that we used to be linked to.
-  if (lastBlockLUTProxy && lutBlockProxy != lastBlockLUTProxy)
+  std::vector<vtkTypeBool> updatedRanges(blockSelectors.size(), false);
+  for (size_t i = 0; i < blockSelectors.size(); ++i)
   {
-    if (auto lastSBProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-          vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lastBlockLUTProxy, view)))
+    const std::string& blockSelector = blockSelectors[i];
+    vtkSMProxy* blockLut = blockLuts[i];
+    vtkSMProxy* lastBlockLut = lastBlockLuts[i];
+    // If the lut proxy changed, we need to remove ourself (representation proxy)
+    // from the scalar bar widget that we used to be linked to.
+    if (lastBlockLut && blockLut != lastBlockLut)
     {
-      lastSBProxy->RemoveBlockRange(repr, blockSelector);
+      if (auto lastSBProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+            vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lastBlockLut, view)))
+      {
+        lastSBProxy->RemoveBlockRange(repr, blockSelector);
+      }
     }
-  }
+    auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(blockLut, view));
 
-  auto sbProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutBlockProxy, view));
-
-  if (sbProxy)
-  {
-    const int legacyVisible = vtkSMPropertyHelper(sbProxy, "Visibility").GetAsInt();
-    // If scalar bar is set to not be visible but was previously visible,
-    // then the user has pressed the scalar bar button hiding the scalar bar.
-    // We keep this information well preserved in the scalar bar representation.
-    // This method is not called when hiding the whole representation, so we are safe
-    // on scalar bar disappearance occuring on such event, it won't mess with this engine.
-    if (legacyVisible && !visible)
-    {
-      vtkSMPropertyHelper(sbProxy, "StickyVisible").Set(0);
-    }
-    // If the scalar bar is set to be visible, we are in the case where we automatically
-    // show the scalarbar, whether it was previously hidden.
-    else if (visible)
-    {
-      vtkSMPropertyHelper(sbProxy, "StickyVisible").Set(1);
-    }
-  }
-
-  // if hiding the Scalar Bar, just look if there's a LUT and then hide the
-  // corresponding scalar bar. We won't worry too much about whether scalar
-  // coloring is currently enabled for this.
-  if (!visible)
-  {
     if (sbProxy)
     {
-      vtkSMPropertyHelper(sbProxy, "Visibility").Set(0);
-      vtkSMPropertyHelper(sbProxy, "Enabled").Set(0);
-      sbProxy->UpdateVTKObjects();
+      const int legacyVisible = vtkSMPropertyHelper(sbProxy, "Visibility").GetAsInt();
+      // If scalar bar is set to not be visible but was previously visible,
+      // then the user has pressed the scalar bar button hiding the scalar bar.
+      // We keep this information well preserved in the scalar bar representation.
+      // This method is not called when hiding the whole representation, so we are safe
+      // on scalar bar disappearance occuring on such event, it won't mess with this engine.
+      if (legacyVisible && !visible)
+      {
+        vtkSMPropertyHelper(sbProxy, "StickyVisible").Set(0);
+      }
+      // If the scalar bar is set to be visible, we are in the case where we automatically
+      // show the scalarbar, whether it was previously hidden.
+      else if (visible)
+      {
+        vtkSMPropertyHelper(sbProxy, "StickyVisible").Set(1);
+      }
     }
-    return true;
-  }
 
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(repr, blockSelector))
-  {
-    return false;
-  }
-
-  vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lutBlockProxy, view);
-  if (!sbSMProxy)
-  {
-    vtkGenericWarningMacro("Failed to locate/create ScalarBar representation.");
-    return false;
-  }
-
-  vtkSMPropertyHelper(sbSMProxy, "Enabled").Set(1);
-  vtkSMPropertyHelper(sbSMProxy, "Visibility").Set(1);
-
-  vtkSMProperty* titleProp = sbSMProxy->GetProperty("Title");
-  vtkSMProperty* compProp = sbSMProxy->GetProperty("ComponentTitle");
-
-  if (titleProp && compProp && titleProp->IsValueDefault() && compProp->IsValueDefault())
-  {
-    vtkSMSettings* settings = vtkSMSettings::GetInstance();
-
-    const auto blockAttributeTypeAndName =
-      vtkSMColorMapEditorHelper::GetBlockColorArray(repr, blockSelector);
-    const std::string arrayName = blockAttributeTypeAndName.second;
-
-    // Look up array-specific title for scalar bar
-    std::ostringstream prefix;
-    prefix << ".array_lookup_tables"
-           << "." << arrayName << ".Title";
-
-    const std::string arrayTitle = settings->GetSettingAsString(prefix.str().c_str(), arrayName);
-
-    vtkSMPropertyHelper titlePropHelper(titleProp);
-
-    if (sbProxy && strcmp(titlePropHelper.GetAsString(), arrayTitle.c_str()) != 0)
+    // if hiding the Scalar Bar, just look if there's a LUT and then hide the
+    // corresponding scalar bar. We won't worry too much about whether scalar
+    // coloring is currently enabled for this.
+    if (!visible)
     {
-      sbProxy->ClearRange();
+      if (sbProxy)
+      {
+        vtkSMPropertyHelper(sbProxy, "Visibility").Set(0);
+        vtkSMPropertyHelper(sbProxy, "Enabled").Set(0);
+        sbProxy->UpdateVTKObjects();
+      }
+      updatedRanges[i] = true;
+      continue;
     }
 
-    titlePropHelper.Set(arrayTitle.c_str());
+    if (!blocksUsingScalarColoring[i])
+    {
+      updatedRanges[i] = false;
+      continue;
+    }
 
-    // now, determine a name for it if possible.
-    auto blockArrayInfo =
-      vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(repr, blockSelector);
-    vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbSMProxy, blockArrayInfo);
+    vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(blockLut, view);
+    if (!sbSMProxy)
+    {
+      vtkGenericWarningMacro("Failed to locate/create ScalarBar representation.");
+      updatedRanges[i] = false;
+      continue;
+    }
+
+    vtkSMPropertyHelper(sbSMProxy, "Enabled").Set(1);
+    vtkSMPropertyHelper(sbSMProxy, "Visibility").Set(1);
+
+    vtkSMProperty* titleProp = sbSMProxy->GetProperty("Title");
+    vtkSMProperty* compProp = sbSMProxy->GetProperty("ComponentTitle");
+
+    if (titleProp && compProp && titleProp->IsValueDefault() && compProp->IsValueDefault())
+    {
+      vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+      const ColorArray& blockAttributeTypeAndName = blockColorArrayNames[i];
+      const std::string arrayName = blockAttributeTypeAndName.second;
+
+      // Look up array-specific title for scalar bar
+      std::ostringstream prefix;
+      prefix << ".array_lookup_tables"
+             << "." << arrayName << ".Title";
+
+      const std::string arrayTitle = settings->GetSettingAsString(prefix.str().c_str(), arrayName);
+
+      vtkSMPropertyHelper titlePropHelper(titleProp);
+
+      if (sbProxy && strcmp(titlePropHelper.GetAsString(), arrayTitle.c_str()) != 0)
+      {
+        sbProxy->ClearRange();
+      }
+
+      titlePropHelper.Set(arrayTitle.c_str());
+
+      // now, determine a name for it if possible.
+      vtkPVArrayInformation* blockArrayInfo =
+        vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(repr, blockSelector);
+      vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbSMProxy, blockArrayInfo);
+    }
+    vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(sbSMProxy, view);
+    sbSMProxy->UpdateVTKObjects();
+    updatedRanges[i] = true;
   }
-  vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(sbSMProxy, view);
-  sbSMProxy->UpdateVTKObjects();
-  return true;
+  return updatedRanges;
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::SetSelectedScalarBarVisibility(
+  vtkSMProxy* proxy, vtkSMProxy* view, bool visible)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(
+      proxy, view, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy), visible);
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::SetScalarBarVisibility(proxy, view, visible) };
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1893,7 +3457,7 @@ bool vtkSMColorMapEditorHelper::HideScalarBarIfNotNeeded(vtkSMProxy* proxy, vtkS
 {
   auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
   vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable");
-  if (!repr || !lutProperty)
+  if (!view || !repr || !lutProperty)
   {
     return false;
   }
@@ -1908,11 +3472,41 @@ bool vtkSMColorMapEditorHelper::HideScalarBarIfNotNeeded(vtkSMProxy* proxy, vtkS
     .arg(proxy)
     .arg("HideScalarBarIfNotNeeded")
     .arg(view)
-    .arg("comment", "hide scalars not actively used");
+    .arg("comment", " hide scalars not actively used");
 
-  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy();
+  vtkSMProxy* lut = lutPropertyHelper.GetAsProxy();
   vtkNew<vtkSMTransferFunctionManager> tmgr;
-  return tmgr->HideScalarBarIfNotNeeded(lutProxy, view);
+  return tmgr->HideScalarBarIfNotNeeded(lut, view);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMColorMapEditorHelper::HideBlocksScalarBarIfNotNeeded(vtkSMProxy* proxy, vtkSMProxy* view)
+{
+  auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
+  auto blockLUTs = vtkSMProxyProperty::SafeDownCast(repr->GetProperty("BlockLookupTables"));
+  if (!view || !repr || !blockLUTs || blockLUTs->GetNumberOfProxies() == 0)
+  {
+    return false;
+  }
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(proxy)
+    .arg("HideBlocksScalarBarIfNotNeeded")
+    .arg(view)
+    .arg("comment", " hide blocks scalars not actively used");
+
+  vtkNew<vtkSMTransferFunctionManager> tmgr;
+  bool result = false;
+  for (unsigned int i = 0; i < blockLUTs->GetNumberOfProxies(); ++i)
+  {
+    vtkSMProxy* blockLut = blockLUTs->GetProxy(i);
+    if (!blockLut)
+    {
+      continue;
+    }
+    result |= tmgr->HideScalarBarIfNotNeeded(blockLut, view);
+  }
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -1931,22 +3525,35 @@ bool vtkSMColorMapEditorHelper::IsScalarBarVisible(vtkSMProxy* proxy, vtkSMProxy
     return false;
   }
 
-  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy();
-  return vtkSMTransferFunctionProxy::IsScalarBarVisible(lutProxy, view);
+  vtkSMProxy* lut = lutPropertyHelper.GetAsProxy();
+  return vtkSMTransferFunctionProxy::IsScalarBarVisible(lut, view);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMColorMapEditorHelper::IsBlockScalarBarVisible(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector)
+std::vector<vtkTypeBool> vtkSMColorMapEditorHelper::IsBlocksScalarBarVisible(
+  vtkSMProxy* proxy, vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
-  auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
-  vtkSMProxy* lutProxy = vtkSMColorMapEditorHelper::GetBlockLUTProxy(proxy, view, blockSelector);
-  if (!repr || !lutProxy)
+  if (blockSelectors.empty())
   {
-    return false;
+    return std::vector<vtkTypeBool>();
   }
-
-  return vtkSMTransferFunctionProxy::IsScalarBarVisible(lutProxy, view);
+  auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
+  std::vector<vtkSMProxy*> blockLuts =
+    vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, view, blockSelectors);
+  if (!repr)
+  {
+    return std::vector<vtkTypeBool>(blockSelectors.size(), false);
+  }
+  std::vector<vtkTypeBool> blockScalarBarVisibleVec(blockSelectors.size(), false);
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
+  {
+    vtkSMProxy* blockLut = blockLuts[i];
+    if (blockLut)
+    {
+      blockScalarBarVisibleVec[i] = vtkSMTransferFunctionProxy::IsScalarBarVisible(blockLut, view);
+    }
+  }
+  return blockScalarBarVisibleVec;
 }
 
 //----------------------------------------------------------------------------
@@ -2008,72 +3615,80 @@ vtkPVArrayInformation* vtkSMColorMapEditorHelper::GetArrayInformationForColorArr
 }
 
 //----------------------------------------------------------------------------
-vtkPVArrayInformation* vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(
-  vtkSMProxy* proxy, const std::string& blockSelector, bool checkRepresentedData)
+std::vector<vtkPVArrayInformation*>
+vtkSMColorMapEditorHelper::GetBlocksArrayInformationForColorArray(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
 {
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
+  if (blockSelectors.empty())
   {
-    return nullptr;
+    return std::vector<vtkPVArrayInformation*>();
   }
+  const std::vector<vtkTypeBool> blocksUsingScalarColoring =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(proxy, blockSelectors);
 
-  auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
-  // now, determine a name for it if possible.
-  const auto attributeTypeAndArrayName =
-    vtkSMColorMapEditorHelper::GetBlockColorArray(repr, blockSelector);
-  const int attributeType = attributeTypeAndArrayName.first;
-  const std::string arrayName = attributeTypeAndArrayName.second;
-
-  const vtkSMPropertyHelper inputHelper(repr->GetProperty("Input"));
-  vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
-  const int port = inputHelper.GetOutputPort();
-  if (!inputProxy || !inputProxy->GetOutputPort(port))
+  std::vector<vtkPVArrayInformation*> blockArrayInfos(blockSelectors.size(), nullptr);
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
   {
-    vtkWarningWithObjectMacro(repr, "No input present. Cannot determine data ranges.");
-    return nullptr;
-  }
-
-  if (inputProxy)
-  {
-    auto blockDataInfo =
-      inputProxy->GetOutputPort(port)->GetSubsetDataInformation(blockSelector.c_str(),
-        vtkSMPropertyHelper(repr->GetProperty("Assembly"), true).GetAsString());
-
-    vtkPVArrayInformation* blockArrayInfo = nullptr;
-    blockArrayInfo = blockDataInfo->GetArrayInformation(arrayName.c_str(), attributeType);
-    if (blockArrayInfo)
+    const std::string& blockSelector = blockSelectors[i];
+    if (!blocksUsingScalarColoring[i])
     {
-      return blockArrayInfo;
+      blockArrayInfos[i] = nullptr;
     }
-
-    if (attributeType == vtkDataObject::POINT_THEN_CELL)
+    else
     {
-      // Try points...
-      blockArrayInfo = blockDataInfo->GetArrayInformation(arrayName.c_str(), vtkDataObject::POINT);
-      if (blockArrayInfo)
+      auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
+      // now, determine a name for it if possible.
+      const ColorArray attributeTypeAndArrayName =
+        vtkSMColorMapEditorHelper::GetBlockColorArray(repr, blockSelector);
+      const int attributeType = attributeTypeAndArrayName.first;
+      const std::string arrayName = attributeTypeAndArrayName.second;
+
+      const vtkSMPropertyHelper inputHelper(repr->GetProperty("Input"));
+      vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+      const int port = inputHelper.GetOutputPort();
+      if (!inputProxy || !inputProxy->GetOutputPort(port))
       {
-        return blockArrayInfo;
+        vtkWarningWithObjectMacro(repr, "No input present. Cannot determine data ranges.");
+        blockArrayInfos[i] = nullptr;
+        continue;
       }
-
-      // ... then cells
-      blockArrayInfo = blockDataInfo->GetArrayInformation(arrayName.c_str(), vtkDataObject::CELL);
-      if (blockArrayInfo)
+      else // inputProxy && inputProxy->GetOutputPort(port)
       {
-        return blockArrayInfo;
+        vtkPVDataInformation* blockDataInfo =
+          inputProxy->GetOutputPort(port)->GetSubsetDataInformation(blockSelector.c_str(),
+            vtkSMPropertyHelper(repr->GetProperty("Assembly"), true).GetAsString());
+
+        vtkPVArrayInformation* blockArrayInfo = nullptr;
+        blockArrayInfo = blockDataInfo->GetArrayInformation(arrayName.c_str(), attributeType);
+        if (blockArrayInfo)
+        {
+          blockArrayInfos[i] = blockArrayInfo;
+        }
+
+        if (attributeType == vtkDataObject::POINT_THEN_CELL)
+        {
+          // Try points...
+          blockArrayInfo =
+            blockDataInfo->GetArrayInformation(arrayName.c_str(), vtkDataObject::POINT);
+          if (blockArrayInfo)
+          {
+            blockArrayInfos[i] = blockArrayInfo;
+          }
+
+          // ... then cells
+          blockArrayInfo =
+            blockDataInfo->GetArrayInformation(arrayName.c_str(), vtkDataObject::CELL);
+          if (blockArrayInfo)
+          {
+            blockArrayInfos[i] = blockArrayInfo;
+          }
+        }
       }
+      // In GetArrayInformationForColorArray we also check for checkRepresentedData,
+      // but we can not do that for blocks, so we skip it.
     }
   }
-
-  if (checkRepresentedData)
-  {
-    vtkPVArrayInformation* arrayInfo =
-      repr->GetRepresentedDataInformation()->GetArrayInformation(arrayName.c_str(), attributeType);
-    if (arrayInfo)
-    {
-      return arrayInfo;
-    }
-  }
-
-  return nullptr;
+  return blockArrayInfos;
 }
 
 //----------------------------------------------------------------------------
@@ -2102,29 +3717,40 @@ vtkSMColorMapEditorHelper::GetProminentValuesInformationForColorArray(
 }
 
 //----------------------------------------------------------------------------
-vtkPVProminentValuesInformation*
-vtkSMColorMapEditorHelper::GetBlockProminentValuesInformationForColorArray(vtkSMProxy* proxy,
-  const std::string& blockSelector, double uncertaintyAllowed, double fraction, bool force)
+std::vector<vtkPVProminentValuesInformation*>
+vtkSMColorMapEditorHelper::GetBlocksProminentValuesInformationForColorArray(vtkSMProxy* proxy,
+  const std::vector<std::string>& blockSelectors, double uncertaintyAllowed, double fraction,
+  bool force)
 {
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
+  if (blockSelectors.empty())
   {
-    return nullptr;
+    return std::vector<vtkPVProminentValuesInformation*>();
   }
-
-  vtkPVArrayInformation* blockArrayInfo =
-    vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(proxy, blockSelector);
-  if (!blockArrayInfo)
-  {
-    return nullptr;
-  }
-
   auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
-  const auto attributeTypeAndArrayName =
-    vtkSMColorMapEditorHelper::GetBlockColorArray(repr, blockSelector);
-  return repr->GetBlockProminentValuesInformation(blockSelector,
-    vtkSMPropertyHelper(repr->GetProperty("Assembly"), true).GetAsString(),
-    blockArrayInfo->GetName(), attributeTypeAndArrayName.first,
-    blockArrayInfo->GetNumberOfComponents(), uncertaintyAllowed, fraction, force);
+
+  const std::vector<vtkPVArrayInformation*> blockArrayInfos =
+    vtkSMColorMapEditorHelper::GetBlocksArrayInformationForColorArray(proxy, blockSelectors);
+  const std::vector<ColorArray> blockColorArrays =
+    vtkSMColorMapEditorHelper::GetBlocksColorArrays(proxy, blockSelectors);
+
+  std::vector<vtkPVProminentValuesInformation*> blockProminentValuesInfos(
+    blockSelectors.size(), nullptr);
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
+  {
+    if (vtkPVArrayInformation* blockArrayInfo = blockArrayInfos[i])
+    {
+      const auto attributeTypeAndArrayName = blockColorArrays[i];
+      blockProminentValuesInfos[i] = repr->GetBlockProminentValuesInformation(blockSelectors[i],
+        vtkSMPropertyHelper(repr->GetProperty("Assembly"), true).GetAsString(),
+        blockArrayInfo->GetName(), attributeTypeAndArrayName.first,
+        blockArrayInfo->GetNumberOfComponents(), uncertaintyAllowed, fraction, force);
+    }
+    else
+    {
+      blockProminentValuesInfos[i] = nullptr;
+    }
+  }
+  return blockProminentValuesInfos;
 }
 
 //----------------------------------------------------------------------------
@@ -2156,9 +3782,9 @@ int vtkSMColorMapEditorHelper::GetEstimatedNumberOfAnnotationsOnScalarBar(
     return -1;
   }
 
-  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy();
+  vtkSMProxy* lut = lutPropertyHelper.GetAsProxy();
   vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(lut, view);
   if (!sbProxy)
   {
     vtkGenericWarningMacro("Failed to locate/create ScalarBar representation.");
@@ -2170,65 +3796,124 @@ int vtkSMColorMapEditorHelper::GetEstimatedNumberOfAnnotationsOnScalarBar(
 }
 
 //----------------------------------------------------------------------------
-int vtkSMColorMapEditorHelper::GetBlockEstimatedNumberOfAnnotationsOnScalarBar(
-  vtkSMProxy* proxy, vtkSMProxy* view, const std::string& blockSelector)
+std::vector<int> vtkSMColorMapEditorHelper::GetBlocksEstimatedNumberOfAnnotationsOnScalarBars(
+  vtkSMProxy* proxy, vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
-  if (!vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(proxy, blockSelector))
+  if (blockSelectors.empty())
   {
-    return 0;
+    return std::vector<int>();
   }
-
-  vtkSMProxy* blockLutProxy =
-    vtkSMColorMapEditorHelper::GetBlockLUTProxy(proxy, view, blockSelector);
-  if (!blockLutProxy)
+  auto repr = vtkSMRepresentationProxy::SafeDownCast(proxy);
+  if (!repr || !view)
   {
-    return -1;
+    return std::vector<int>(blockSelectors.size(), -1);
   }
+  const std::vector<vtkTypeBool> blocksUsingScalarColoring =
+    vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(proxy, blockSelectors);
+  const std::vector<vtkSMProxy*> blockLuts =
+    vtkSMColorMapEditorHelper::GetBlocksLookupTables(proxy, blockSelectors);
 
-  vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(blockLutProxy, view);
-  if (!sbProxy)
+  std::vector<int> estimatedNumberOfAnnotationsVec(blockSelectors.size());
+  for (unsigned int i = 0; i < blockSelectors.size(); ++i)
   {
-    vtkGenericWarningMacro("Failed to locate/create ScalarBar representation.");
-    return -1;
+    if (!blocksUsingScalarColoring[i])
+    {
+      estimatedNumberOfAnnotationsVec[i] = 0;
+    }
+    else
+    {
+      if (vtkSMProxy* blockLut = blockLuts[i])
+      {
+        vtkNew<vtkSMTransferFunctionManager> mgr;
+        vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(blockLut, view);
+        if (!sbProxy)
+        {
+          vtkGenericWarningMacro("Failed to locate/create ScalarBar representation.");
+          estimatedNumberOfAnnotationsVec[i] = -1;
+        }
+        else
+        {
+          sbProxy->UpdatePropertyInformation();
+          estimatedNumberOfAnnotationsVec[i] =
+            vtkSMPropertyHelper(sbProxy, "EstimatedNumberOfAnnotations").GetAsInt();
+        }
+      }
+      else
+      {
+        estimatedNumberOfAnnotationsVec[i] = -1;
+      }
+    }
   }
-
-  sbProxy->UpdatePropertyInformation();
-  return vtkSMPropertyHelper(sbProxy, "EstimatedNumberOfAnnotations").GetAsInt();
+  return estimatedNumberOfAnnotationsVec;
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMColorMapEditorHelper::GetLastLUTProxy(vtkSMProxy* proxy)
+std::vector<int> vtkSMColorMapEditorHelper::GetSelectedEstimatedNumberOfAnnotationsOnScalarBars(
+  vtkSMProxy* proxy, vtkSMProxy* view)
+{
+  if (this->SelectedPropertiesType == SelectedPropertiesTypes::Blocks)
+  {
+    return vtkSMColorMapEditorHelper::GetBlocksEstimatedNumberOfAnnotationsOnScalarBars(
+      proxy, view, vtkSMColorMapEditorHelper::GetSelectedBlockSelectors(proxy));
+  }
+  else // this->SelectedPropertiesType == SelectedPropertiesTypes::Representation
+  {
+    return { vtkSMColorMapEditorHelper::GetEstimatedNumberOfAnnotationsOnScalarBar(proxy, view) };
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMColorMapEditorHelper::GetAnySelectedEstimatedNumberOfAnnotationsOnScalarBar(
+  vtkSMProxy* proxy, vtkSMProxy* view)
+{
+  const std::vector<int> annotations =
+    vtkSMColorMapEditorHelper::GetSelectedEstimatedNumberOfAnnotationsOnScalarBars(proxy, view);
+  auto findResult = std::find_if(
+    annotations.begin(), annotations.end(), [](int annotation) { return annotation >= 0; });
+  return findResult != annotations.end() ? *findResult : -1;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMColorMapEditorHelper::GetLastLookupTable(vtkSMProxy* proxy)
 {
   auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-  return repr ? repr->GetLastLUTProxy() : nullptr;
+  return repr ? repr->GetLastLookupTable() : nullptr;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::SetLastLUTProxy(vtkSMProxy* proxy, vtkSMProxy* lutProxy)
+void vtkSMColorMapEditorHelper::SetLastLookupTable(vtkSMProxy* proxy, vtkSMProxy* lut)
 {
   auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
   if (repr)
   {
-    repr->SetLastLUTProxy(lutProxy);
+    repr->SetLastLookupTable(lut);
   }
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMColorMapEditorHelper::GetLastBlockLUTProxy(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+std::vector<vtkSMProxy*> vtkSMColorMapEditorHelper::GetLastBlocksLookupTables(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors)
 {
+  if (blockSelectors.empty())
+  {
+    return std::vector<vtkSMProxy*>();
+  }
   auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-  return repr ? repr->GetLastBlockLUTProxy(blockSelector) : nullptr;
+  return repr ? repr->GetLastBlocksLookupTables(blockSelectors)
+              : std::vector<vtkSMProxy*>(blockSelectors.size(), nullptr);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMColorMapEditorHelper::SetLastBlockLUTProxy(
-  vtkSMProxy* proxy, const std::string& blockSelector, vtkSMProxy* lutProxy)
+void vtkSMColorMapEditorHelper::SetLastBlocksLookupTable(
+  vtkSMProxy* proxy, const std::vector<std::string>& blockSelectors, vtkSMProxy* lut)
 {
+  if (blockSelectors.empty())
+  {
+    return;
+  }
   auto repr = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
   if (repr)
   {
-    repr->SetLastBlockLUTProxy(lutProxy, blockSelector);
+    repr->SetLastBlocksLookupTable(blockSelectors, lut);
   }
 }
