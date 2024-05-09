@@ -5,9 +5,6 @@
 
 #include "pqApplicationCore.h"
 #include "pqCommandPropertyWidget.h"
-#include "pqDisplayPanel.h"
-#include "pqDisplayPanelInterface.h"
-#include "pqDisplayPanelPropertyWidget.h"
 #include "pqDoubleVectorPropertyWidget.h"
 #include "pqIntVectorPropertyWidget.h"
 #include "pqInterfaceTracker.h"
