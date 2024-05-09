@@ -157,8 +157,9 @@ unsigned int vtkSMSourceProxy::GetNumberOfOutputPorts()
 //---------------------------------------------------------------------------
 vtkSMOutputPort* vtkSMSourceProxy::GetOutputPort(unsigned int idx)
 {
-  return idx == VTK_UNSIGNED_INT_MAX ? nullptr
-                                     : this->PInternals->OutputPorts[idx].Port.GetPointer();
+  return idx < this->PInternals->OutputPorts.size()
+    ? this->PInternals->OutputPorts[idx].Port.GetPointer()
+    : nullptr;
 }
 
 //---------------------------------------------------------------------------
