@@ -554,6 +554,38 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
 }
 
 //----------------------------------------------------------------------------
+vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
+  const char* key, const std::vector<vtkObject*>& val)
+{
+  assert(key);
+  if (vtkSMTrace::GetActiveTracer())
+  {
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
+  VTK_MODULE_ENABLE_VTK_WrappingPythonCore
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject keyObj(PyUnicode_FromString(key));
+    vtkSmartPyObject listObj(PyList_New(0));
+    assert(keyObj && listObj);
+
+    for (vtkObject* item : val)
+    {
+      vtkSmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(item));
+      int ret = PyList_Append(listObj, valObj);
+      (void)ret;
+      assert(ret == 0);
+    }
+
+    int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, listObj);
+    (void)ret;
+    assert(ret == 0);
+#endif
+  }
+  (void)key;
+  (void)val;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(vtkObject* val)
 {
   if (vtkSMTrace::GetActiveTracer())
