@@ -3454,7 +3454,7 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
   {
     this->Internals->OSPRayPass = vtkSmartPointer<vtkOSPRayPass>::New();
   }
-  if (!vtkOSPRayPass::IsSupported())
+  if (v && !vtkOSPRayPass::IsSupported())
   {
     vtkWarningMacro(
       "Refusing to enable OSPRay because it is not supported running in this configuration.");
