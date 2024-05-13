@@ -130,6 +130,22 @@ bool pqPropertyLinks::removePropertyLink(QObject* qobject, const char* qproperty
 }
 
 //-----------------------------------------------------------------------------
+int pqPropertyLinks::getNumberOfPropertyLinks() const
+{
+  return this->Internals->Connections.size();
+}
+
+//-----------------------------------------------------------------------------
+pqPropertyLinksConnection* pqPropertyLinks::getPropertyLink(int index) const
+{
+  if (index < 0 || index >= this->Internals->Connections.size())
+  {
+    return nullptr;
+  }
+  return this->Internals->Connections.value(index);
+}
+
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::clear()
 {
   Q_FOREACH (pqPropertyLinksConnection* connection, this->Internals->Connections)
