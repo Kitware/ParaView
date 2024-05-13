@@ -5,6 +5,7 @@
 #define pqEditScalarBarReaction_h
 
 #include "pqReaction.h"
+
 #include <QPointer>
 
 class pqDataRepresentation;
@@ -30,13 +31,19 @@ public:
   ~pqEditScalarBarReaction() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  ///@{
   /**
    * Set the active representation. This should only be used when
    * \c track_active_objects is false. If used when \c track_active_objects is
    * true, the representation will get replaced whenever the active
    * representation changes.
    */
-  void setRepresentation(pqDataRepresentation*);
+  void setRepresentation(pqDataRepresentation*, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* repr)
+  {
+    this->setRepresentation(repr, 0 /*Representation*/);
+  }
+  ///@}
 
   /**
    * Show the editor dialog for editing scalar bar properties.

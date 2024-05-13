@@ -7,26 +7,33 @@
 #include "pqProxyWidgetDialog.h"
 #include "pqScalarBarVisibilityReaction.h"
 
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
+
+#include <QAction>
+#include <QDialog>
+#include <QObject>
+
 //-----------------------------------------------------------------------------
 pqEditScalarBarReaction::pqEditScalarBarReaction(QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
 {
   QAction* tmp = new QAction(this);
   this->SBVReaction = new pqScalarBarVisibilityReaction(tmp, track_active_objects);
-  this->connect(tmp, SIGNAL(changed()), SLOT(updateEnableState()));
+  QObject::connect(tmp, &QAction::changed, this, &pqEditScalarBarReaction::updateEnableState);
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
-pqEditScalarBarReaction::~pqEditScalarBarReaction()
-{
-  delete this->SBVReaction;
-}
+pqEditScalarBarReaction::~pqEditScalarBarReaction() = default;
 
 //-----------------------------------------------------------------------------
-void pqEditScalarBarReaction::setRepresentation(pqDataRepresentation* repr)
+void pqEditScalarBarReaction::setRepresentation(
+  pqDataRepresentation* repr, int selectedPropertiesType)
 {
-  this->SBVReaction->setRepresentation(repr);
+  this->SBVReaction->setRepresentation(repr, selectedPropertiesType);
 }
 
 //-----------------------------------------------------------------------------
@@ -45,9 +52,18 @@ void pqEditScalarBarReaction::onTriggered()
 //-----------------------------------------------------------------------------
 bool pqEditScalarBarReaction::editScalarBar()
 {
-  if (vtkSMProxy* sbProxy = this->SBVReaction->scalarBarProxy())
+  auto scalarBarProxies = this->SBVReaction->scalarBarProxies();
+  if (scalarBarProxies.empty())
   {
-    pqRepresentation* repr = this->SBVReaction->representation();
+    return false;
+  }
+  if (vtkSMProxy* sbProxy = scalarBarProxies[0])
+  {
+    pqDataRepresentation* repr = this->SBVReaction->representation();
+
+    auto copyProxy = vtk::TakeSmartPointer(
+      repr->proxyManager()->NewProxy(sbProxy->GetXMLGroup(), sbProxy->GetXMLName()));
+    copyProxy->Copy(sbProxy);
 
     pqProxyWidgetDialog dialog(sbProxy);
     dialog.setWindowTitle(tr("Edit Color Legend Properties"));
@@ -55,8 +71,25 @@ bool pqEditScalarBarReaction::editScalarBar()
     dialog.setEnableSearchBar(true);
     dialog.setSettingsKey("ColorLegendEditor");
 
-    repr->connect(&dialog, SIGNAL(accepted()), SLOT(renderViewEventually()));
-    return dialog.exec() == QDialog::Accepted;
+    QObject::connect(
+      &dialog, &pqProxyWidgetDialog::accepted, repr, &pqDataRepresentation::renderViewEventually);
+    const bool accepted = dialog.exec() == QDialog::Accepted;
+    if (accepted)
+    {
+      auto changedProperties = sbProxy->GetPropertiesWithDifferentValues(copyProxy);
+      for (size_t i = 1; i < scalarBarProxies.size(); ++i)
+      {
+        const auto otherSBProxy = scalarBarProxies[i];
+        if (otherSBProxy && otherSBProxy != sbProxy)
+        {
+          for (const auto& prop : changedProperties)
+          {
+            otherSBProxy->GetProperty(prop.c_str())->Copy(sbProxy->GetProperty(prop.c_str()));
+          }
+        }
+      }
+    }
+    return accepted;
   }
   return false;
 }

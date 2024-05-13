@@ -603,6 +603,11 @@ public:
 
   bool GetPropertiesModified() { return this->PropertiesModified; }
 
+  /**
+   * Return the property names that have values different from the otherProxy argument.
+   */
+  virtual std::vector<std::string> GetPropertiesWithDifferentValues(vtkSMProxy* otherProxy);
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy() override;
