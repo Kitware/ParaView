@@ -41,21 +41,25 @@ void pqPipelineRepresentation::setView(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineRepresentation::resetLookupTableScalarRange()
+void pqPipelineRepresentation::resetLookupTableScalarRange(int selectedPropertiesType)
 {
+  vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper;
+  colorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
   vtkSMProxy* proxy = this->getProxy();
-  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
+  if (colorMapEditorHelper->GetAnySelectedUsingScalarColoring(proxy))
   {
-    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(proxy);
+    colorMapEditorHelper->RescaleSelectedTransferFunctionToDataRange(proxy);
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime()
+void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime(int selectedPropertiesType)
 {
+  vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper;
+  colorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
   vtkSMProxy* proxy = this->getProxy();
-  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(proxy))
+  if (colorMapEditorHelper->GetAnySelectedUsingScalarColoring(proxy))
   {
-    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(proxy);
+    colorMapEditorHelper->RescaleSelectedTransferFunctionToDataRangeOverTime(proxy);
   }
 }

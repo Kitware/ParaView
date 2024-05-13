@@ -73,19 +73,28 @@ public:
    */
   bool getDataBounds(double bounds[6]);
 
+  ///@{
   /**
    * Returns the lookuptable proxy, if any.
    * Most consumer displays take a lookup table. This method provides access to
    * the Lookup table, if one exists.
+   *
+   * @note the singular form of this method returns the first lookup table proxy
    */
-  virtual vtkSMProxy* getLookupTableProxy();
+  virtual std::vector<vtkSMProxy*> getLookupTableProxies(
+    int selectedPropertiesType = 0 /*Representation*/) const;
+  virtual vtkSMProxy* getLookupTableProxy(int selectedPropertiesType = 0 /*Representation*/) const;
+  ///@}
 
   /**
    * Returns the pqScalarsToColors object for the lookup table proxy if any.
    * Most consumer displays take a lookup table. This method provides access to
    * the Lookup table, if one exists.
+   *
+   * @note returns the first lookup table
    */
-  virtual pqScalarsToColors* getLookupTable();
+  virtual pqScalarsToColors* getLookupTable(
+    int selectedPropertiesType = 0 /*Representation*/) const;
 
   /**
    * Returns the data size for the full-res data.
@@ -107,18 +116,24 @@ Q_SIGNALS:
    */
   void dataUpdated();
 
+  ///@{
   /**
    * Fired to indicate that the "LookupTable" property (if any) on the
    * representation was modified.
    */
   void colorTransferFunctionModified();
+  void blockColorTransferFunctionModified();
+  ///@}
 
+  ///@{
   /**
    * Signal fired to indicate that the "ColorArrayName" property (if any) on
    * the representation was modified. This property controls the scalar
    * coloring settings on the representation.
    */
   void colorArrayNameModified();
+  void blockColorArrayNameModified();
+  ///@}
 
   /**
    * Signal fired to indicate that the rendering attribute arrays properties

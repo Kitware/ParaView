@@ -3,32 +3,26 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqDataRepresentation.h"
 
-#include "vtkDataObject.h"
+#include "pqApplicationCore.h"
+#include "pqOutputPort.h"
+#include "pqPipelineFilter.h"
+#include "pqScalarsToColors.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
+
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVGeneralSettings.h"
-#include "vtkPVProminentValuesInformation.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkSMTransferFunctionManager.h"
 
 #include <QColor>
 #include <QPointer>
 #include <QtDebug>
-
-#include "pqApplicationCore.h"
-#include "pqOutputPort.h"
-#include "pqPipelineFilter.h"
-#include "pqSMAdaptor.h"
-#include "pqScalarsToColors.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 class pqDataRepresentationInternal
@@ -57,9 +51,19 @@ pqDataRepresentation::pqDataRepresentation(
     vtkconnector->Connect(
       prop, vtkCommand::ModifiedEvent, this, SIGNAL(colorTransferFunctionModified()));
   }
+  if (vtkSMProperty* prop = repr->GetProperty("BlockLookupTables"))
+  {
+    vtkconnector->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(blockColorTransferFunctionModified()));
+  }
   if (vtkSMProperty* prop = repr->GetProperty("ColorArrayName"))
   {
     vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(colorArrayNameModified()));
+  }
+  if (vtkSMProperty* prop = repr->GetProperty("BlockColorArrayNames"))
+  {
+    vtkconnector->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(blockColorArrayNameModified()));
   }
   if (vtkSMProperty* prop = repr->GetProperty("SelectNormalArray"))
   {
@@ -165,18 +169,27 @@ void pqDataRepresentation::onInputChanged()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqDataRepresentation::getLookupTableProxy()
+std::vector<vtkSMProxy*> pqDataRepresentation::getLookupTableProxies(
+  int selectedPropertiesType) const
 {
-  return pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));
+  vtkNew<vtkSMColorMapEditorHelper> helper;
+  helper->SetSelectedPropertiesType(selectedPropertiesType);
+  return helper->GetSelectedLookupTables(this->getProxy());
 }
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors* pqDataRepresentation::getLookupTable()
+vtkSMProxy* pqDataRepresentation::getLookupTableProxy(int selectedPropertiesType) const
+{
+  auto luts = this->getLookupTableProxies(selectedPropertiesType);
+  return luts.empty() ? nullptr : luts[0] /*always get the first*/;
+}
+
+//-----------------------------------------------------------------------------
+pqScalarsToColors* pqDataRepresentation::getLookupTable(int selectedPropertiesType) const
 {
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  vtkSMProxy* lut = this->getLookupTableProxy();
-
-  return (lut ? smmodel->findItem<pqScalarsToColors*>(lut) : 0);
+  vtkSMProxy* lut = this->getLookupTableProxy(selectedPropertiesType);
+  return lut ? smmodel->findItem<pqScalarsToColors*>(lut) : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -288,6 +301,27 @@ void pqDataRepresentation::updateLookupTable()
 
   int rescaleOnVisibilityChange =
     vtkSMPropertyHelper(lut, "RescaleOnVisibilityChange", 1).GetAsInt(0);
+
+  auto blockLutsProp =
+    vtkSMProxyProperty::SafeDownCast(representationProxy->GetProperty("BlockLookupTables"));
+  if (blockLutsProp)
+  {
+    for (unsigned int i = 0; i < blockLutsProp->GetNumberOfProxies(); i++)
+    {
+      if (!blockLutsProp->GetProxy(i))
+      {
+        return;
+      }
+    }
+
+    for (unsigned int i = 0; i < blockLutsProp->GetNumberOfProxies(); i++)
+    {
+      const int blockRescaleOnVisibilityChange =
+        vtkSMPropertyHelper(blockLutsProp->GetProxy(i), "RescaleOnVisibilityChange", 1).GetAsInt(0);
+      rescaleOnVisibilityChange = rescaleOnVisibilityChange || blockRescaleOnVisibilityChange;
+    }
+  }
+
   if (rescaleOnVisibilityChange && this->Internal->VisibilityChangedSinceLastUpdate)
   {
     this->resetAllTransferFunctionRangesUsingCurrentData();
@@ -304,5 +338,20 @@ void pqDataRepresentation::resetAllTransferFunctionRangesUsingCurrentData()
   {
     vtkNew<vtkSMTransferFunctionManager> tfmgr;
     tfmgr->ResetAllTransferFunctionRangesUsingCurrentData(this->getServer()->proxyManager(), false);
+  }
+  auto blockLutsProp =
+    vtkSMProxyProperty::SafeDownCast(representationProxy->GetProperty("BlockLookupTables"));
+  if (blockLutsProp)
+  {
+    for (unsigned int i = 0; i < blockLutsProp->GetNumberOfProxies(); i++)
+    {
+      if (blockLutsProp->GetProxy(i))
+      {
+        vtkNew<vtkSMTransferFunctionManager> tfmgr;
+        tfmgr->ResetAllTransferFunctionRangesUsingCurrentData(
+          this->getServer()->proxyManager(), false);
+        return;
+      }
+    }
   }
 }

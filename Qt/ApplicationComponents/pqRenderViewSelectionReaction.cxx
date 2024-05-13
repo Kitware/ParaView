@@ -278,15 +278,19 @@ void pqRenderViewSelectionReaction::setRepresentation(pqDataRepresentation* repr
 
     if (this->Representation != nullptr)
     {
-      QObject::disconnect(this->RepresentationConnection);
+      this->disconnect(this->Representation);
+      this->Representation = nullptr;
     }
 
-    this->Representation = representation;
-
-    if (this->Representation != nullptr)
+    if (representation)
     {
-      this->RepresentationConnection = this->connect(
-        this->Representation, SIGNAL(colorArrayNameModified()), SLOT(updateEnableState()));
+      this->Representation = representation;
+
+      if (this->Representation != nullptr)
+      {
+        QObject::connect(this->Representation, &pqDataRepresentation::colorArrayNameModified, this,
+          &pqRenderViewSelectionReaction::updateEnableState);
+      }
     }
 
     // update enable state.

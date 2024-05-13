@@ -185,7 +185,6 @@ private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
   QPointer<pqDataRepresentation> Representation;
-  QMetaObject::Connection RepresentationConnection;
   SelectionMode Mode;
   int PreviousRenderViewMode;
   vtkWeakPointer<vtkObject> ObservedObject;
