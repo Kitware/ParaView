@@ -16,10 +16,15 @@
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
   : QObject(p)
 {
-  QObject::connect(p, SIGNAL(currentIndexChanged(const QString&)), this,
-    SIGNAL(currentTextChanged(const QString&)));
+  QObject::connect(
+    p, &QComboBox::currentTextChanged, this, &pqSignalAdaptorComboBox::currentTextChanged);
 
-  QObject::connect(p, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentIndexChanged(int)));
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+  QObject::connect(
+    p, &QComboBox::currentIndexChanged, this, &pqSignalAdaptorComboBox::currentIndexChanged);
+#else
+  QObject::connect(p, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
+#endif
 }
 
 //----------------------------------------------------------------------------
