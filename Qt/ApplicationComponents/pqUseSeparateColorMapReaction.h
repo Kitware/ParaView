@@ -8,8 +8,11 @@
 #include "pqReaction.h"
 #include <QPointer>
 
+#include "vtkNew.h" // For vtkNew
+
 class pqDataRepresentation;
 class pqDisplayColorWidget;
+class vtkSMColorMapEditorHelper;
 
 /**
  * @ingroup Reactions
@@ -36,10 +39,17 @@ public:
   pqDataRepresentation* representation() const;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  ///@{
   /**
    * Set the active representation.
    */
-  void setRepresentation(pqDataRepresentation*);
+  void setRepresentation(pqDataRepresentation*, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* repr)
+  {
+    this->setRepresentation(repr, 0 /*Representation*/);
+  }
+  void setActiveRepresentation();
+  ///@}
 
 protected Q_SLOTS:
   /**
@@ -55,11 +65,12 @@ protected Q_SLOTS:
 private:
   Q_DISABLE_COPY(pqUseSeparateColorMapReaction)
 
+  class PropertyLinksConnection;
+
   pqPropertyLinks Links;
-  QPointer<pqDataRepresentation> CachedRepresentation;
+  QPointer<pqDataRepresentation> Representation;
   pqDisplayColorWidget* ColorWidget;
-  bool TrackActiveObjects;
-  bool BlockSignals;
+  vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
 };
 
 #endif
