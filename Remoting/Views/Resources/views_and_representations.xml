@@ -4713,6 +4713,17 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             </Hints>
           </PropertyGroup>
 
+          <PropertyGroup label="Block Scalar Coloring"
+                         panel_visibility="multiblock_inspector"
+                         panel_widget="BlockPropertiesEditor">
+            <Property name="BlockMapScalars" function="MapScalars"/>
+            <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings"/>
+            <Property name="BlockOpacities" function="Opacities"/>
+            <!-- The following properties are used to create a GUI which edits the above properties -->
+            <Property name="BlockMapScalarsGUI" function="MapScalarsGUI"/>
+            <Property name="BlockInterpolateScalarsBeforeMappingsGUI" function="InterpolateScalarsBeforeMappingsGUI"/>
+            <Property name="BlockOpacitiesGUI" function="OpacitiesGUI"/>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -5120,6 +5131,18 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Hints>
               <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
             </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Block Scalar Coloring"
+                         panel_visibility="multiblock_inspector"
+                         panel_widget="BlockPropertiesEditor">
+            <Property name="BlockMapScalars" function="MapScalars"/>
+            <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings"/>
+            <Property name="BlockOpacities" function="Opacities"/>
+            <!-- The following properties are used to create a GUI which edits the above properties -->
+            <Property name="BlockMapScalarsGUI" function="MapScalarsGUI"/>
+            <Property name="BlockInterpolateScalarsBeforeMappingsGUI" function="InterpolateScalarsBeforeMappingsGUI"/>
+            <Property name="BlockOpacitiesGUI" function="OpacitiesGUI"/>
           </PropertyGroup>
 
         </ExposedProperties>
@@ -8839,6 +8862,44 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           on the assembly chosen using **Assembly**.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty default_values="1"
+                         label="Map Scalars"
+                         name="BlockMapScalarsGUI"
+                         number_of_elements="1"
+                         panel_visibility="multiblock_properties">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          For composite datasets, specify if to map scalars associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty default_values="1"
+                         label="Interpolate Scalars Before Mapping"
+                         name="BlockInterpolateScalarsBeforeMappingsGUI"
+                         number_of_elements="1"
+                         panel_visibility="multiblock_properties">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          For composite datasets, specify if to interpolate scalars before mapping associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty default_values="1.0"
+                            label="Opacity"
+                            name="BlockOpacitiesGUI"
+                            number_of_elements="1"
+                            panel_visibility="multiblock_properties">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"/>
+        <Documentation>
+          For composite datasets, specify opacities associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <IntVectorProperty command="SetBlockColorsDistinctValues"
                          default_values="7"
@@ -16317,6 +16378,44 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
           on the assembly chosen using **Assembly**.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty default_values="1"
+                         label="Map Scalars"
+                         name="BlockMapScalarsGUI"
+                         number_of_elements="1"
+                         panel_visibility="multiblock_properties">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          For composite datasets, specify if to map scalars associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty default_values="1"
+                         label="Interpolate Scalars Before Mapping"
+                         name="BlockInterpolateScalarsBeforeMappingsGUI"
+                         number_of_elements="1"
+                         panel_visibility="multiblock_properties">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          For composite datasets, specify if to interpolate scalars before mapping associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty default_values="1.0"
+                            label="Opacity"
+                            name="BlockOpacitiesGUI"
+                            number_of_elements="1"
+                            panel_visibility="multiblock_properties">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"/>
+        <Documentation>
+          For composite datasets, specify opacities associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <IntVectorProperty command="SetBlockColorsDistinctValues"
                          default_values="7"

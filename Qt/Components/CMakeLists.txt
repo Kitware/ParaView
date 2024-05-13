@@ -88,6 +88,7 @@ set(classes
   pqLogViewerDialog
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
+  pqMultiBlockPropertiesEditorWidget
   pqMultiBlockPropertiesStateWidget
   pqMultiViewWidget
   pqOneLinerTextEdit

@@ -45,6 +45,7 @@
 #include "pqListPropertyWidget.h"
 #include "pqMetaDataPropertyWidget.h"
 #include "pqMoleculePropertyWidget.h"
+#include "pqMultiBlockPropertiesEditorWidget.h"
 #include "pqMultiComponentsDecorator.h"
 #include "pqOMETransferFunctionsPropertyWidget.h"
 #include "pqOSPRayHidingDecorator.h"
@@ -223,7 +224,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
 pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget)
 {
-  QString panelWidget(group->GetPanelWidget());
+  const QString panelWidget(group->GetPanelWidget());
   // *** NOTE: When adding new types, please update the header documentation ***
   if (panelWidget == "ColorEditor")
   {
@@ -349,6 +350,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "SelectionList")
   {
     return new pqSelectionListPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "BlockPropertiesEditor")
+  {
+    return new pqMultiBlockPropertiesEditorWidget(proxy, group, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

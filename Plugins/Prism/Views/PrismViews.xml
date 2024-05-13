@@ -1126,6 +1126,18 @@
             </Hints>
           </PropertyGroup>
 
+          <PropertyGroup label="Block Scalar Coloring"
+                         panel_visibility="multiblock_inspector"
+                         panel_widget="BlockPropertiesEditor">
+            <Property name="BlockMapScalars" function="MapScalars"/>
+            <Property name="BlockInterpolateScalarsBeforeMappings" function="InterpolateScalarsBeforeMappings"/>
+            <Property name="BlockOpacities" function="Opacities"/>
+            <!-- The following properties are used to create a GUI which edits the above properties -->
+            <Property name="BlockMapScalarsGUI" function="MapScalarsGUI"/>
+            <Property name="BlockInterpolateScalarsBeforeMappingsGUI" function="InterpolateScalarsBeforeMappingsGUI"/>
+            <Property name="BlockOpacitiesGUI" function="OpacitiesGUI"/>
+          </PropertyGroup>
+
           <PropertyGroup label="Prism Parameters">
             <Property name="IsSimulationData"/>
             <Property name="AttributeType"/>
