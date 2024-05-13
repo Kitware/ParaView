@@ -12,11 +12,11 @@ KIT
   ParaView::CoreKit
 DEPENDS
   VTK::CommonCore
-  VTK::CommonDataModel
   VTK::CommonExecutionModel
-  VTK::FiltersParallel
   ParaView::VTKExtensionsFiltersGeneral
 PRIVATE_DEPENDS
+  VTK::CommonDataModel
+  VTK::FiltersParallel
   VTK::ParallelCore
 TEST_LABELS
   ParaView

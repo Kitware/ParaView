@@ -1022,8 +1022,10 @@ found and the point will be rejected.</Documentation>
                      This filter generates scalars using cell and point ids.
                      That is, the point attribute data scalars are generated
                      from the point ids, and the cell attribute data scalars or
-                     field data are generated from the the cell
-                     ids.</Documentation>
+                     field data are generated from the the cell ids. Note that
+                     in the case of an input HTG, only cell IDs generation is
+                     available.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">

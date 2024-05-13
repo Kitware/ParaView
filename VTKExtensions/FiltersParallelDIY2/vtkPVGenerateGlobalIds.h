@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /**
  * @class vtkPVGenerateGlobalIds
- * @brief Generate global points and cell IDs
+ * @brief Generate global point and cell IDs
  *
- * vtkGenerateGlobalIds generates global point and cell ids of input vtkDataSet, or
- * global cell ids only of input vtkHyperTreeGrid. If the input is a vtkDataSet instance,
- * this filter also generates ghost-point information, flagging duplicate points appropriately.
- * vtkPVGenerateGlobalIds works across all blocks in the input datasets and across all ranks.
+ * vtkPVGenerateGlobalIds generates global point and cell ids of input vtkDataSet, or
+ * global cell ids only of input vtkHyperTreeGrid. It's a meta-filter internally delegating
+ * the work to the the right VTK filter depending on the input data type. If the input is a
+ * vtkDataSet instance, this filter also generates ghost-point information, flagging duplicate
+ * points appropriately. vtkPVGenerateGlobalIds works across all blocks in the input datasets
+ * and across all ranks.
  *
  * @sa vtkGenerateGlobalIds vtkHyperTreeGridGenerateGlobalIds
  */

@@ -4,8 +4,9 @@
  * @class vtkPVRemoveGhosts
  * @brief Remove ghost information on input vtkPolyData, vtkUnstructuredGrid or vtkHyperTreeGrid.
  *
- * This meta-filter add support of vtkHyperTreeGrid. It forwards ghost information removal
- * to the the appropriate VTK filter.
+ * This meta-filter removes ghost information on input vtkPolyData, vtkUnstructuredGrid
+ * or vtkHyperTreeGrid by forwarding the work to the the appropriate VTK filter, depending
+ * on the input data type.
  *
  * @sa vtkRemoveGhosts vtkHyperTreeGridRemoveGhostCells
  */
@@ -21,7 +22,6 @@ class VTKPVVTKEXTENSIONSFILTERSPARALLEL_EXPORT vtkPVRemoveGhosts : public vtkPas
 public:
   static vtkPVRemoveGhosts* New();
   vtkTypeMacro(vtkPVRemoveGhosts, vtkPassInputTypeAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVRemoveGhosts() = default;

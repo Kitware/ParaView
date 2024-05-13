@@ -263,7 +263,7 @@ public:
         // Add cell ids to the dataset in order to be able to recover the right cells later
         vtkNew<vtkGenerateIds> idFilter;
         idFilter->SetInputData(ds);
-        idFilter->SetCellIdsArrayName(IDS_ARRAY_NAME.c_str());
+        idFilter->SetCellIdsArrayName(IDS_ARRAY_NAME);
         idFilter->PointIdsOff();
         idFilter->Update();
         dataSetToReturn = vtkDataSet::SafeDownCast(idFilter->GetOutput());

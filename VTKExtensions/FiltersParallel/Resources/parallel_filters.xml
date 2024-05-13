@@ -12,6 +12,8 @@
         to know which processor owns which cells and points. It can generate it
         for both PointData and CellData. The ProcessIds array's name will be
         "PointProcessIds" for PointData, and "CellProcessIds" for CellData.
+        Note that if the input is an HyperTree Grid instance, only cell process
+        IDs are available.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -73,6 +75,8 @@
       <Documentation long_help="Removes ghost information."
                      short_help="Removes ghost information.">
         Removes ghost cells, point data and cell data ghost arrays.
+        In the case of HyperTree Grid input, this filter removes the cell
+        data ghost array and masks the ghost cells.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -86,9 +90,9 @@
           <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <Documentation>
-          This property specifies the input to the remove ghost
-          information filter. This filter operates only on unstructured grids
-          and polydata since it removes the ghost cells.
+          This property specifies the input to the remove ghost information filter.
+          This filter operates on unstructured grids and polydata since it removes the ghost cells.
+          It also supports HTGs, in which case it simply masks ghost cells.
         </Documentation>
       </InputProperty>
       <!-- End of RemoveGhostInformation -->

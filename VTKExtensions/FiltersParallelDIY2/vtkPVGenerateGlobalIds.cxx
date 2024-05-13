@@ -18,6 +18,7 @@ vtkStandardNewMacro(vtkPVGenerateGlobalIds);
 void vtkPVGenerateGlobalIds::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Tolerance: " << this->Tolerance << endl;
 }
 
 //----------------------------------------------------------------------------

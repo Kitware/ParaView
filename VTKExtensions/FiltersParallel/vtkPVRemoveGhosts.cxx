@@ -15,12 +15,6 @@
 vtkStandardNewMacro(vtkPVRemoveGhosts);
 
 //----------------------------------------------------------------------------
-void vtkPVRemoveGhosts::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
 int vtkPVRemoveGhosts::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {

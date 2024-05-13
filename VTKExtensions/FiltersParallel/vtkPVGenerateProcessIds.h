@@ -30,6 +30,7 @@ public:
    * Default is true.
    *
    * @note: Unused if input is a vtkHyperTreeGrid instance.
+   * In that case, point data is never generated.
    */
   vtkSetMacro(GeneratePointData, bool);
   vtkGetMacro(GeneratePointData, bool);
@@ -42,6 +43,7 @@ public:
    * Default is false.
    *
    * @note: Unused if input is a vtkHyperTreeGrid instance.
+   * In that case, cell data is always generated.
    */
   vtkSetMacro(GenerateCellData, bool);
   vtkGetMacro(GenerateCellData, bool);

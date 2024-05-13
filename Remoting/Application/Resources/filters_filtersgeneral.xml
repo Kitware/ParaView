@@ -1280,6 +1280,9 @@
 
         This filter provides that capability to specify the data type
         of the attributes and the range for each of the components.
+
+        Note that in the case of an input HTG, only cell random attribute
+        generation is available.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
