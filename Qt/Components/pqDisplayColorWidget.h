@@ -6,14 +6,17 @@
 
 #include "pqComponentsModule.h"
 
+#include <QIcon>
 #include <QPair>
 #include <QPointer>
+#include <QScopedPointer>
 #include <QWidget>
 
+#include <vector>
+
+class QComboBox;
 class pqDataRepresentation;
 class pqScalarsToColors;
-class QComboBox;
-class vtkEventQtSlotConnect;
 class vtkSMProxy;
 class vtkSMViewProxy;
 
@@ -54,10 +57,16 @@ public:
   vtkSMViewProxy* viewProxy() const;
 
   /**
+   * Hides the scalar bars if not needed.
+   */
+  static void hideScalarBarsIfNotNeeded(vtkSMViewProxy* view, std::vector<vtkSMProxy*> luts);
+
+  /**
    * Updates the scalar bar visibility of the representation `reprProxy` in `view`.
    * The behavior of the scalar bar visibility is dependent of the general settings.
    */
-  static void updateScalarBarVisibility(vtkSMViewProxy* view, vtkSMProxy* reprProxy);
+  static void updateScalarBarVisibility(
+    vtkSMViewProxy* view, vtkSMProxy* reprProxy, int selectedPropertiesType = 0 /*Representation*/);
 
   /**
    * Returns the selected representation type as a string.
@@ -76,10 +85,16 @@ Q_SIGNALS:
   void representationTextChanged(const QString& text);
 
 public Q_SLOTS:
+  ///@{
   /**
    * Set the representation to control the scalar coloring properties on.
    */
-  void setRepresentation(pqDataRepresentation* display);
+  void setRepresentation(pqDataRepresentation* display, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* display)
+  {
+    this->setRepresentation(display, 0 /*Representation*/);
+  }
+  ///@}
 
   /**
    * set representation type.
@@ -147,10 +162,10 @@ private:
    */
   int addOutOfDomainEntry(int association, const QString& arrayName);
 
-  QIcon* CellDataIcon;
-  QIcon* PointDataIcon;
-  QIcon* FieldDataIcon;
-  QIcon* SolidColorIcon;
+  QScopedPointer<QIcon> CellDataIcon;
+  QScopedPointer<QIcon> PointDataIcon;
+  QScopedPointer<QIcon> FieldDataIcon;
+  QScopedPointer<QIcon> SolidColorIcon;
   QComboBox* Variables;
   QComboBox* Components;
   QPointer<pqDataRepresentation> Representation;
@@ -158,7 +173,7 @@ private:
   QString RepresentationText;
 
   class pqInternals;
-  pqInternals* Internals;
+  QScopedPointer<pqInternals> Internals;
 
   class PropertyLinksConnection;
   friend class PropertyLinksConnection;
