@@ -5,12 +5,18 @@
 #define pqChooseColorPresetReaction_h
 
 #include "pqReaction.h"
-#include "vtkWeakPointer.h"   // needed for vtkWeakPointer.
+
+#include "vtkNew.h"         // needed for vtkNew.
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+
 #include <QPointer>           // needed for QPointer
 #include <QRegularExpression> // needed for QRegularExpression.
 
+#include <vector> // needed for std::vector.
+
 class pqDataRepresentation;
 class pqPresetDialog;
+class vtkSMColorMapEditorHelper;
 class vtkSMProxy;
 
 /**
@@ -57,17 +63,30 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   bool choosePreset(const char* presetName = nullptr);
 
+  ///@{
   /**
    * Set the data representation explicitly when track_active_objects is false.
    */
-  void setRepresentation(pqDataRepresentation* repr);
+  void setRepresentation(pqDataRepresentation* repr, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* repr)
+  {
+    this->setRepresentation(repr, 0 /*Representation*/);
+  }
+  void setActiveRepresentation();
+  ///@}
 
+  ///@{
   /**
    * Set the transfer function proxy. This can be used, instead of
    * setRepresentation() when \c track_active_objects was false to directly set
    * the transfer function proxy on which to apply the preset.
    */
-  void setTransferFunction(vtkSMProxy* lut);
+  void setTransferFunctions(std::vector<vtkSMProxy*> lut);
+  void setTransferFunction(vtkSMProxy* lut)
+  {
+    this->setTransferFunctions(std::vector<vtkSMProxy*>{ lut });
+  }
+  ///@}
 
   /**
    * Updates the enabled state. Applications need not explicitly call this.
@@ -115,9 +134,10 @@ protected:
 private:
   Q_DISABLE_COPY(pqChooseColorPresetReaction)
   QPointer<pqDataRepresentation> Representation;
-  vtkWeakPointer<vtkSMProxy> TransferFunctionProxy;
+  std::vector<vtkWeakPointer<vtkSMProxy>> TransferFunctionProxies;
   static QPointer<pqPresetDialog> PresetDialog;
   bool AllowsRegexpMatching;
+  vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
 };
 
 #endif
