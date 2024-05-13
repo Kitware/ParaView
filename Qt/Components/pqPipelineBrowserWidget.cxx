@@ -28,6 +28,7 @@
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
+#include <QDebug>
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QMenu>
@@ -338,13 +339,16 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
       // update scalar bars: show new ones if needed. Hiding of scalar bars is
       // taken care of by vtkSMParaViewPipelineControllerWithRendering (I still
       // wonder if that's the best thing to do).
+      const QString scalarBarError =
+        tr("You might have added a new scalar bar mode, you need to do something "
+           "here, skipping.");
       if (scalarBarMode != vtkPVGeneralSettings::MANUAL_SCALAR_BARS)
       {
         // This gets executed if scalar bar mode is
         // AUTOMATICALLY_HIDE_SCALAR_BARS or AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS
         if (visible && vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
         {
-          int stickyVisible =
+          const int stickyVisible =
             vtkSMColorMapEditorHelper::IsScalarBarStickyVisible(reprProxy, viewProxy);
           if (stickyVisible != -1)
           {
@@ -360,9 +364,54 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
           }
           else
           {
-            std::cerr << "You might have added a new scalar bar mode, you need to do something "
-                         "here, skipping"
-                      << std::endl;
+            qCritical() << scalarBarError << "\n";
+          }
+        }
+        if (visible && vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(reprProxy))
+        {
+          const auto selectors = vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(reprProxy);
+          const auto stickyVisibles = vtkSMColorMapEditorHelper::IsBlocksScalarBarStickyVisible(
+            reprProxy, viewProxy, selectors);
+          if (std::any_of(stickyVisibles.begin(), stickyVisibles.end(),
+                [](int stickyVisible) { return stickyVisible != -1; }))
+          {
+            for (size_t i = 0; i < selectors.size(); ++i)
+            {
+              if (stickyVisibles[i] != -1)
+              {
+                vtkSMColorMapEditorHelper::SetBlockScalarBarVisibility(
+                  reprProxy, viewProxy, selectors[i], stickyVisibles[i]);
+              }
+              else if (scalarBarMode ==
+                vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+              {
+                vtkSMColorMapEditorHelper::SetBlockScalarBarVisibility(
+                  reprProxy, viewProxy, selectors[i], true);
+              }
+              else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
+              {
+                vtkSMColorMapEditorHelper::SetBlockScalarBarVisibility(
+                  reprProxy, viewProxy, selectors[i], false);
+              }
+              else
+              {
+                qCritical() << scalarBarError << "\n";
+              }
+            }
+          }
+          else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+          {
+            vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(
+              reprProxy, viewProxy, selectors, true);
+          }
+          else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
+          {
+            vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(
+              reprProxy, viewProxy, selectors, false);
+          }
+          else
+          {
+            qCritical() << scalarBarError << "\n";
           }
         }
       }
