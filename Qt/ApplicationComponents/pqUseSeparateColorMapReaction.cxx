@@ -184,6 +184,16 @@ void pqUseSeparateColorMapReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
+void pqUseSeparateColorMapReaction::querySelectedUseSeparateColorMap()
+{
+  if (this->Representation && this->Links.getPropertyLink(0))
+  {
+    // force the current selected use separate color map to be queried.
+    Q_EMIT this->Links.getPropertyLink(0)->smpropertyModified();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqUseSeparateColorMapReaction::onTriggered()
 {
   // Disable Multi Components Mapping

@@ -101,6 +101,11 @@ public Q_SLOTS:
    */
   void setRepresentationText(const QString& text);
 
+  /**
+   * Query the currently selected array from the property.
+   */
+  void queryCurrentSelectedArray();
+
 private Q_SLOTS:
   /**
    * fills up the Variables combo-box using the active representation's

@@ -4713,6 +4713,15 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             </Hints>
           </PropertyGroup>
 
+          <PropertyGroup label="Block Coloring"
+                         panel_visibility="multiblock_inspector"
+                         panel_widget="BlockColorEditor">
+            <Property name="BlockColors"/>
+            <Property name="BlockColorArrayNames"/>
+            <Property name="BlockLookupTables"/>
+            <Property name="BlockUseSeparateColorMaps"/>
+          </PropertyGroup>
+
           <PropertyGroup label="Block Scalar Coloring"
                          panel_visibility="multiblock_inspector"
                          panel_widget="BlockPropertiesEditor">
@@ -5131,6 +5140,15 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
             <Hints>
               <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
             </Hints>
+          </PropertyGroup>
+
+          <PropertyGroup label="Block Coloring"
+                         panel_visibility="multiblock_inspector"
+                         panel_widget="BlockColorEditor">
+            <Property name="BlockColors"/>
+            <Property name="BlockColorArrayNames"/>
+            <Property name="BlockLookupTables"/>
+            <Property name="BlockUseSeparateColorMaps"/>
           </PropertyGroup>
 
           <PropertyGroup label="Block Scalar Coloring"

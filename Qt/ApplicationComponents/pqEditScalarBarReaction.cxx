@@ -15,15 +15,14 @@
 #include <QAction>
 #include <QDialog>
 #include <QObject>
+#include <QPointer>
 
 //-----------------------------------------------------------------------------
 pqEditScalarBarReaction::pqEditScalarBarReaction(QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
 {
-  QAction* tmp = new QAction(this);
-  this->SBVReaction = new pqScalarBarVisibilityReaction(tmp, track_active_objects);
-  QObject::connect(tmp, &QAction::changed, this, &pqEditScalarBarReaction::updateEnableState);
-  this->updateEnableState();
+  this->setScalarBarVisibilityReaction(
+    this->createDefaultScalarBarVisibilityReaction(track_active_objects));
 }
 
 //-----------------------------------------------------------------------------
@@ -34,6 +33,33 @@ void pqEditScalarBarReaction::setRepresentation(
   pqDataRepresentation* repr, int selectedPropertiesType)
 {
   this->SBVReaction->setRepresentation(repr, selectedPropertiesType);
+}
+
+//-----------------------------------------------------------------------------
+QPointer<pqScalarBarVisibilityReaction>
+pqEditScalarBarReaction::createDefaultScalarBarVisibilityReaction(bool track_active_objects)
+{
+  QAction* tmp = new QAction(this);
+  return new pqScalarBarVisibilityReaction(tmp, track_active_objects);
+}
+
+//-----------------------------------------------------------------------------
+void pqEditScalarBarReaction::setScalarBarVisibilityReaction(
+  pqScalarBarVisibilityReaction* reaction)
+{
+  if (this->SBVReaction)
+  {
+    this->SBVReaction->parentAction()->disconnect(this);
+    delete this->SBVReaction;
+    this->SBVReaction = nullptr;
+  }
+  if (reaction)
+  {
+    this->SBVReaction = reaction;
+    QObject::connect(reaction->parentAction(), &QAction::changed, this,
+      &pqEditScalarBarReaction::updateEnableState);
+    this->updateEnableState();
+  }
 }
 
 //-----------------------------------------------------------------------------

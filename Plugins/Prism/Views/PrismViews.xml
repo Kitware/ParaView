@@ -1126,6 +1126,15 @@
             </Hints>
           </PropertyGroup>
 
+          <PropertyGroup label="Block Coloring"
+                         panel_visibility="multiblock_inspector"
+                         panel_widget="BlockColorEditor">
+            <Property name="BlockColors"/>
+            <Property name="BlockColorArrayNames"/>
+            <Property name="BlockLookupTables"/>
+            <Property name="BlockUseSeparateColorMaps"/>
+          </PropertyGroup>
+
           <PropertyGroup label="Block Scalar Coloring"
                          panel_visibility="multiblock_inspector"
                          panel_widget="BlockPropertiesEditor">

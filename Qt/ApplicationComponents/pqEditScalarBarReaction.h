@@ -46,6 +46,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   ///@}
 
   /**
+   * Set Scalar Bar Visibility Reaction
+   */
+  void setScalarBarVisibilityReaction(pqScalarBarVisibilityReaction* reaction);
+
+  /**
    * Show the editor dialog for editing scalar bar properties.
    */
   bool editScalarBar();
@@ -64,6 +69,10 @@ protected Q_SLOTS:
 
 private:
   Q_DISABLE_COPY(pqEditScalarBarReaction)
+
+  QPointer<pqScalarBarVisibilityReaction> createDefaultScalarBarVisibilityReaction(
+    bool track_active_objects);
+
   QPointer<pqScalarBarVisibilityReaction> SBVReaction;
 };
 

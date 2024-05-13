@@ -69,13 +69,12 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void setScalarBarVisibility(bool visible);
 
-protected Q_SLOTS:
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
   void updateEnableState() override;
 
-protected: // NOLINT(readability-redundant-access-specifiers)
+protected:
   /**
    * Called when the action is triggered.
    */

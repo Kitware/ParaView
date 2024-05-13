@@ -491,6 +491,18 @@ QIcon* pqDisplayColorWidget::itemIcon(int association, const QString& arrayName)
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayColorWidget::queryCurrentSelectedArray()
+{
+  if (this->Representation && this->Internals->Links.getPropertyLink(0))
+  {
+    // force the current selected array to be queried.
+    Q_EMIT this->Internals->Links.getPropertyLink(0)->smpropertyModified();
+    // ensure that we are showing the correct selected component
+    this->updateColorTransferFunction();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayColorWidget::refreshColorArrayNames()
 {
   // Simply update the this->Variables combo-box with values from the domain.

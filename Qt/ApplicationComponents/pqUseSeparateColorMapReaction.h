@@ -51,6 +51,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setActiveRepresentation();
   ///@}
 
+  /**
+   * Query the currently selected use separate color map from the property.
+   */
+  void querySelectedUseSeparateColorMap();
+
 protected Q_SLOTS:
   /**
    * Updates the enabled state. Applications need not explicitly call this.

@@ -68,6 +68,7 @@
 #include "pqViewTypePropertyWidget.h"
 #include "pqXYChartViewBoundsPropertyWidget.h"
 #include "pqYoungsMaterialPropertyWidget.h"
+
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -228,7 +229,11 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   // *** NOTE: When adding new types, please update the header documentation ***
   if (panelWidget == "ColorEditor")
   {
-    return new pqColorEditorPropertyWidget(proxy, parentWidget);
+    return new pqColorEditorPropertyWidget(proxy, parentWidget, 0 /*Representation*/);
+  }
+  else if (panelWidget == "BlockColorEditor")
+  {
+    return new pqColorEditorPropertyWidget(proxy, parentWidget, 1 /*Blocks*/);
   }
   else if (panelWidget == "CubeAxes")
   {

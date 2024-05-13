@@ -6,10 +6,12 @@
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
+#include <QScopedPointer>
+
 /**
  * This is a pqPropertyWidget subclass that presents a widget to edit the color
  * of a representation and other related functionality. It's used as the
- * "widget" for \c ColorEditor property group.
+ * "widget" for \c ColorEditor/BlockColorEditor property group.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqPropertyWidget
 {
@@ -17,15 +19,18 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqProp
 public:
   typedef pqPropertyWidget Superclass;
 
-  pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = nullptr);
+  pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = nullptr,
+    int selectedPropertiesType = 0 /*Representation*/);
   ~pqColorEditorPropertyWidget() override;
 
 private Q_SLOTS:
+  void updateBlockBasedEnableState();
+
   void updateEnableState();
 
 private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternals;
-  pqInternals* Internals;
+  QScopedPointer<pqInternals> Internals;
 
   Q_DISABLE_COPY(pqColorEditorPropertyWidget)
 };
