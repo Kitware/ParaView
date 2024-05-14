@@ -68,6 +68,28 @@
  *     </Documentation>
  *   </StringVectorProperty>
  *
+ *
+ *   <StringVectorProperty name="SelectedSelectors"
+ *                         repeat_command="1"
+ *                         number_of_elements_per_command="1"
+ *                         number_of_elements="1"
+ *                         panel_visibility="multiblock_inspector">
+ *     <RepresentedArrayListDomain name="array_list" input_domain_name="input_array_any">
+ *       <RequiredProperties>
+ *         <Property function="Input" name="Input"/>
+ *         <Property function="ActiveAssembly" name="Assembly"/>
+ *         <Property function="Selectors" name="SelectedSelectors"/>
+ *       </RequiredProperties>
+ *     </RepresentedArrayListDomain>
+ *     <Documentation>
+ *       For composite datasets, specify the color array name associated with selectors
+ *       on the assembly chosen using **Assembly**.
+ *     </Documentation>
+ *     <Hints>
+ *       <NoDefault/>
+ *     </Hints>
+ *   </StringVectorProperty>
+ *
  *   <StringVectorProperty name="Selectors"
  *                         command="AddSelector"
  *                         clean_command="ClearSelectors"
@@ -111,6 +133,7 @@
  *
  *   <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
  *     <Property name="Assembly"  function="ActiveAssembly" />
+ *     <Property name="SelectedSelectors" function="SelectedSelectors" />
  *     <Property name="Selectors" function="Selectors" />
  *     <Property name="BlockColor" function="Colors" />
  *     <Property name="BlockOpacity" function="Opacities" />
