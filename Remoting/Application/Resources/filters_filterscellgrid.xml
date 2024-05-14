@@ -196,5 +196,54 @@
       <!-- End of ComputeCellGridElevation -->
     </SourceProxy>
 
+    <SourceProxy
+      class="vtkCellGridPointProbe"
+      name="CellGridPointProbe"
+      label="CellGrid Probe">
+      <Documentation
+        long_help="Sample input polydata points with a cell grid."
+        short_help="Sample input polydata points with a cell grid.">
+        This filter copies the input polydata and adds information about
+        how its points are related to cells of an input cell-grid.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>An input polydata to use as a probe.</Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSourceConnection" name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="source_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <Documentation>An input cell-grid to probe.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="CellGridAttribute" label="CellGrid Attribute"
+        command="SetAttributeName">
+        <ArrayListDomain input_domain_name="cell_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Source" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property chooses a cell-grid attribute to sample.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <!-- End of CellGridPointProbe -->
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
