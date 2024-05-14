@@ -124,5 +124,77 @@
       <!-- End of ConvertToCellGrid -->
     </SourceProxy>
 
+    <SourceProxy
+      class="vtkCellGridElevation"
+      name="ComputeCellGridElevation"
+      label="CellGrid Elevation">
+      <Documentation
+        long_help="Add a new attribute representing elevation."
+        short_help="Add a new attribute representing elevation.">
+        This filter adds a cell-attribute named Elevation that represents
+        the distance from either (1) a point, (2) a line, or (3) a plane.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell-grid.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="AttributeName" label="Attribute Name"
+        command="SetAttributeName" default_values="Elevation" number_of_elements="1">
+        <Documentation>The name of the output attribute added to the mesh.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetShock"
+        default_values="0" name="Shock"
+        number_of_elements="1">
+        <Documentation>An offset to add to the elevation. Non-zero values create discontinuities.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetOrigin"
+        default_values="0 0 0" name="Origin"
+        number_of_elements="3">
+        <Documentation>A point in space.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetAxis"
+        default_values="0 0 1" name="Axis"
+        number_of_elements="3">
+        <Documentation>A non-zero vector.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetNumberOfAxes"
+        default_values="1" name="NumberOfAxes" label="Distance Type"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Planar distance"        value="1"/>
+          <Entry text="Cylindrical distance"   value="2"/>
+          <Entry text="Spherical distance"     value="3"/>
+        </EnumerationDomain>
+        <Documentation>Set how distance is measured.
+          <ul>
+          <li>planar/linear: elevation is measured by projecting any test point
+            to the input Axis, then computing the distance to the Origin.</li>
+          <li>cylindrical: elevation is measured from the nearest point
+            along the line passing through the Origin along the Axis.
+            All points along line have an elevation of 0.</li>
+          <li>spherical: elevation is measured using the L² norm of the
+            vector from the Origin to each test point. The Axis is
+            ignored.</li>
+          </ul>
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Point Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Origin" />
+      </PropertyGroup>
+
+      <!-- End of ComputeCellGridElevation -->
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
