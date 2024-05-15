@@ -1,39 +1,183 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-     <!-- ==================================================================== -->
-     <SourceProxy name="ForceStaticMesh" class="vtkForceStaticMesh" label="Force Static Mesh">
-       <Documentation
-           long_help="This filter caches its input the first time it is executed then use it as a static mesh"
-           short_help="Force output to be a static mesh">
-           The Force Static Mesh filter create a cache the first time it is executed using its input. It will then only
-           update PointData, CellData and FieldData from the input as long as their dimensions stay the same.
-           This filter operates only on a vtkUnstructuredGrid input or on the first block of a multiblock input
-           if it is a vtkUnstructuredGrid.
-       </Documentation>
-       <InputProperty command="SetInputConnection"
-                      name="Input">
-         <ProxyGroupDomain name="groups">
-           <Group name="sources" />
-           <Group name="filters" />
-         </ProxyGroupDomain>
-         <DataTypeDomain name="input_type">
-           <DataType value="vtkUnstructuredGrid" />
-           <DataType value="vtkPolyData" />
-           <DataType value="vtkCompositeDataSet" />
-         </DataTypeDomain>
-         <Documentation>This property specifies the input of the filter.</Documentation>
-       </InputProperty>
-       <IntVectorProperty
-           name="ForceCacheComputation"
-           command="SetCacheComputation"
-           default_values="0"
-           panel_visibility="advanced" >
-         <BooleanDomain name="bool" />
-         <Documentation>
-           Set this to true to force this filter to recompute the cache instead of using it.
-         </Documentation>
-       </IntVectorProperty>
-     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCriticalTime"
+                 label="Critical Time"
+                 name="CriticalTime">
+      <Documentation long_help="Compute critical time values for the choosen data array"
+                     short_help="Compute critical time values">
+        Given an input that changes over time and a point/cell array, the **Critical Time**
+        filter generates a new point/cell array containing time step values.
+        These values correspond to the time at which a specified threshold criterion
+        has been met for the selected input array, at each point/cell respectively.
+        The name of this array is the same of the selected array with '_critical_time'
+        appended at the end. Other point/cell arrays are discarded.
+        This filter processes all available time steps. If the criterion is never met
+        for a given point/cell, a NaN value is assigned. The output of this filter is
+        not temporal.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
+        <Documentation>
+          Set the input to the **Critical Time** filter.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty command="SetLowerThreshold"
+                            default_values="0.0"
+                            name="LowerThreshold"
+                            number_of_elements="1">
+        <Documentation>
+          This value specifies the lower threshold.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdCriterion" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdCriterion" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThreshold"
+                            default_values="0.0"
+                            name="UpperThreshold"
+                            number_of_elements="1">
+        <Documentation>
+          This value specifies the upper threshold.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdCriterion" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdCriterion" value="2" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetThresholdCriterion"
+                         default_values="2"
+                         name="ThresholdCriterion"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="Between" value="0"/>
+          <Entry text="Below Lower Threshold" value="1"/>
+          <Entry text="Above Upper Threshold" value="2"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates the threshold criterion used to generate the critical time values.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list" input_domain_name="input_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The value of this property contains the name of the array from which to generate
+          the critical time values.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComponentMode"
+                         name="ComponentMode"
+                         default_values="0"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Selected"
+                 value="0" />
+          <Entry text="All"
+                 value="1" />
+          <Entry text="Any"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies how multi-component arrays are handled.
+          'Selected' will use the 'Selected Component' property.
+          'All' will pass if all components satisfy the threshold criterion.
+          'Any' will pass if any component satisfies the threshold criterion.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSelectedComponent"
+                         name="SelectedComponent"
+                         default_values="0"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="ComponentMode" value="0" />
+        </Hints>
+        <Documentation>
+          This property specifies which component of the array needs to satisfy the threshold criterion.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <WarnOnCreate>
+          <Text title="Potentially slow operation">
+            The **Critical Time** filter needs to process all timesteps available in your dataset
+            and can potentially take a long time to complete. Do you want to continue?
+          </Text>
+        </WarnOnCreate>
+      </Hints>
+      <!-- End Critical Time -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="ForceStaticMesh" class="vtkForceStaticMesh" label="Force Static Mesh">
+      <Documentation
+          long_help="This filter caches its input the first time it is executed then use it as a static mesh"
+          short_help="Force output to be a static mesh">
+          The Force Static Mesh filter create a cache the first time it is executed using its input. It will then only
+          update PointData, CellData and FieldData from the input as long as their dimensions stay the same.
+          This filter operates only on a vtkUnstructuredGrid input or on the first block of a multiblock input
+          if it is a vtkUnstructuredGrid.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty
+          name="ForceCacheComputation"
+          command="SetCacheComputation"
+          default_values="0"
+          panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set this to true to force this filter to recompute the cache instead of using it.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End Force Static Mesh -->
+    </SourceProxy>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkTemporalSmoothing"
