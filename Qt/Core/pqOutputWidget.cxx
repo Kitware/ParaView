@@ -140,12 +140,8 @@ void MessageHandler::displayMessage(QtMsgType type, const QString& msg)
         break;
 
       case QtCriticalMsg:
-        vtkWindow->DisplayErrorText(localMsg.data());
-        break;
-
       case QtFatalMsg:
         vtkWindow->DisplayErrorText(localMsg.data());
-        abort();
         break;
     }
   }
