@@ -752,6 +752,7 @@ void pqProxyGroupMenuManager::populateMenu()
     this->Internal->SearchAction =
       mainMenu->addAction(tr("Search...\tCtrl+Space"), this, SLOT(quickLaunch()));
 #endif
+    this->Internal->SearchAction->setObjectName("quickLaunchAction");
   }
 
   if (this->RecentlyUsedMenuSize > 0)
