@@ -139,6 +139,10 @@ _paraview_remoting_application_optional_xml(
   FILES   Resources/filters_filtersstatistics.xml)
 
 _paraview_remoting_application_optional_xml(
+  TARGETS VTK::FiltersTemporal
+  FILES   Resources/filters_filterstemporal.xml)
+
+_paraview_remoting_application_optional_xml(
   TARGETS VTK::ImagingCore
   FILES   Resources/filters_imagingcore.xml
           Resources/sources_imagingcore.xml)

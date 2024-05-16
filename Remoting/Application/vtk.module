@@ -45,6 +45,7 @@ OPTIONAL_DEPENDS
   VTK::FiltersParallelVerdict
   VTK::FiltersSources
   VTK::FiltersStatistics
+  VTK::FiltersTemporal
   VTK::FiltersTexture
   VTK::FiltersVerdict
   VTK::ImagingCore

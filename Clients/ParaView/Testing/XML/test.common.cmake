@@ -889,6 +889,7 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ExtractParticlesOverTime.xml
   FieldDataToAttribute.xml
   FileDialogOpenInteractClose.xml
+  ForceStaticMesh.xml
   GradientBackwardsCompatibility.xml
   ImportCustomPresets.xml
   InformationPanel.xml
