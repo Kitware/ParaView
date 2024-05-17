@@ -31,6 +31,26 @@ def createModifiedCallback(anobject):
 
     return _markmodified
 
+# Order of transposes relative to the layout of data
+# For 3D data : in case of (z, y, x) ordering of axes
+_3d = (2, 1, 0)
+# For 2D data : in case of (z, x) ordering of axes
+_2d = (1, 2, 0)
+# For 1D data : in case data layout (z)
+_1d = (2, 1, 0)
+
+def mesh_needs_transpose(mesh):
+    """VTK meshes are in order FortranArray[x,y,z].
+    openPMD supports labeling nD arrays."""
+    # the openPMD v1.0.*/1.1.* attribute dataOrder describes if metadata is to be inverted
+    meta_data_in_C = mesh.data_order == "C"
+    first_axis_label = mesh.axis_labels[0] if meta_data_in_C else mesh.axis_labels[-1]
+    last_axis_label = mesh.axis_labels[-1] if meta_data_in_C else mesh.axis_labels[0]
+    # common for 1D and 2D data in openPMD from accelerator physics: axes labeled as x-z and only z
+    if (first_axis_label == "x" and last_axis_label == "z"):
+        return False
+    else:
+        return True
 
 class openPMDReader(VTKPythonAlgorithmBase):
     """A reader that reads openPMD format.
@@ -392,10 +412,16 @@ class openPMDReader(VTKPythonAlgorithmBase):
     def _load_array(self, var, chunk_offset, chunk_extent):
         arrays = []
         for name, scalar in var.items():
+            shp = scalar.shape
             comp = scalar.load_chunk(chunk_offset, chunk_extent)
             self._series.flush()
             comp = comp * scalar.unit_SI
-            arrays.append(comp)
+            if len(shp) == 3:
+                arrays.append(np.transpose(comp, _3d) if mesh_needs_transpose(var) else comp)
+            elif len(shp) == 2:
+                arrays.append(np.transpose(comp.reshape(shp[0], shp[1], 1), _2d) if mesh_needs_transpose(var) else comp)
+            else:
+                arrays.append(comp)
 
         ncomp = len(var)
         if ncomp > 1:
@@ -517,7 +543,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
         for i in range(narrays):
             if self._arrayselection.GetArraySetting(i):
                 name = self._arrayselection.GetArrayName(i)
-                arrays.append((name, self._find_array(itr, name)))
+                if not "_lvl" in name:
+                    arrays.append((name, self._find_array(itr, name)))
         shp = None
         spacing = None
         theta_modes = None
@@ -570,9 +597,6 @@ class openPMDReader(VTKPythonAlgorithmBase):
                 values = self._load_array(var[0], chunk_offset, chunk_extent)
                 self._series.flush()
 
-                print(chunk_cyl_shape)
-                print(values.shape)
-                print("+++++++++++")
                 for ntheta in range(nthetas):
                     cyl_values[:, :, ntheta] += values[0, :, :]
                 data.append((name, cyl_values))
@@ -590,7 +614,6 @@ class openPMDReader(VTKPythonAlgorithmBase):
             t_coord = thetas
 
             # to cartesian
-            print(z_coord.shape, r_coord.shape, t_coord.shape)
             cyl_coords = np.meshgrid(r_coord, z_coord, t_coord)
             rs = cyl_coords[1]
             zs = cyl_coords[0]
@@ -653,8 +676,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             ]
 
             # 1D and 2D data: remove extra dimensions for load
-            del chunk_offset[len(shp):]
-            del chunk_extent[len(shp):]
+            del chunk_offset[len(shp) :]
+            del chunk_extent[len(shp) :]
 
             data = []
             for name, var in arrays:
@@ -669,15 +692,28 @@ class openPMDReader(VTKPythonAlgorithmBase):
             i = iter(grid_offset)
             grid_offset = [next(i, 0) for _ in range(3)]
 
+            et.SetGhostLevel(0)
+            et.PieceToExtent()
+            ext = np.array(et.GetExtent()).reshape(3, 2)
+
             img = vtkImageData()
+            if mesh_needs_transpose(var[0]):
+                if len(shp) == 3:
+                    layout = list(_3d)
+                elif len(shp) == 2:
+                    layout = list(_2d)
+                else:
+                    layout = list(_1d)
+                ext         = ext[layout].flatten().tolist()
+                spacing     = np.array(spacing)[layout].flatten().tolist()
+                grid_offset = np.array(grid_offset)[layout].flatten().tolist()
+            else:
+                ext = ext.flatten().tolist()
+
             img.SetExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5])
             img.SetSpacing(spacing)
             img.SetOrigin(grid_offset)
 
-            et.SetGhostLevel(0)
-            et.PieceToExtent()
-            ext = et.GetExtent()
-            ext = [ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]]
             img.GenerateGhostArray(ext)
             imgw = dsa.WrapDataObject(img)
             output.SetPartition(0, img)
@@ -726,6 +762,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
             return 0
 
         from vtkmodules.vtkCommonDataModel import (
+            vtkDataObject,
             vtkPartitionedDataSet,
             vtkPartitionedDataSetCollection,
         )
@@ -740,13 +777,11 @@ class openPMDReader(VTKPythonAlgorithmBase):
             # dictionary-kind object that has all data info requests and output
             # this might only be on port 0 or 1
             outInfo = outInfoVec.GetInformationObject(i)
-
             # Always get the update time step info from the port
             # that is being updated. Update time may be outdated
             # in the other port - this keeps field & particles in
             # time in sync
             timeInfo = outInfoVec.GetInformationObject(from_port)
-
             if i == 0:
                 output = vtkPartitionedDataSet.GetData(outInfoVec, 0)
                 self._RequestFieldData(executive, output, outInfo, timeInfo)
