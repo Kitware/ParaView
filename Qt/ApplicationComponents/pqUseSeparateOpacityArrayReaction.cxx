@@ -17,57 +17,78 @@ pqUseSeparateOpacityArrayReaction::pqUseSeparateOpacityArrayReaction(
   , TrackActiveObjects(track_active_objects)
 {
   parentObject->setCheckable(true);
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)), this, SLOT(updateEnableState()),
-    Qt::QueuedConnection);
-  this->updateEnableState();
+  if (track_active_objects)
+  {
+    QObject::connect(&pqActiveObjects::instance(),
+      QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), this,
+      &pqUseSeparateOpacityArrayReaction::setActiveRepresentation, Qt::QueuedConnection);
+    this->setActiveRepresentation();
+  }
+  else
+  {
+    this->updateEnableState();
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqUseSeparateOpacityArrayReaction::~pqUseSeparateOpacityArrayReaction() = default;
 
 //-----------------------------------------------------------------------------
-void pqUseSeparateOpacityArrayReaction::updateEnableState()
+pqDataRepresentation* pqUseSeparateOpacityArrayReaction::representation() const
 {
-  pqDataRepresentation* cachedRepr = this->CachedRepresentation;
-  this->setRepresentation(
-    this->TrackActiveObjects ? pqActiveObjects::instance().activeRepresentation() : cachedRepr);
+  return this->Representation;
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqUseSeparateOpacityArrayReaction::representation() const
+void pqUseSeparateOpacityArrayReaction::setActiveRepresentation()
 {
-  return this->CachedRepresentation;
+  this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
 }
 
 //-----------------------------------------------------------------------------
 void pqUseSeparateOpacityArrayReaction::setRepresentation(pqDataRepresentation* repr)
 {
-  this->Links.clear();
-  if (this->CachedRepresentation)
+  if (this->Representation != nullptr && this->Representation == repr)
   {
-    QObject::disconnect(this->CachedRepresentation, SIGNAL(colorArrayNameModified()), this,
-      SLOT(updateEnableState()));
-    QObject::disconnect(this->CachedRepresentation, SIGNAL(representationTypeModified()), this,
-      SLOT(updateEnableState()));
-    QObject::disconnect(
-      this->CachedRepresentation, SIGNAL(useTransfer2DModified()), this, SLOT(updateEnableState()));
+    return;
   }
-  this->CachedRepresentation = repr;
+  this->Links.clear();
+  if (this->Representation)
+  {
+    this->disconnect(this->Representation);
+    this->Representation = nullptr;
+  }
   if (repr)
   {
-    QObject::connect(repr, SIGNAL(colorArrayNameModified()), this, SLOT(updateEnableState()),
-      Qt::QueuedConnection);
-    QObject::connect(repr, SIGNAL(representationTypeModified()), this, SLOT(updateEnableState()),
-      Qt::QueuedConnection);
-    QObject::connect(
-      repr, SIGNAL(useTransfer2DModified()), this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    this->Representation = repr;
+    QObject::connect(repr, &pqDataRepresentation::colorArrayNameModified, this,
+      &pqUseSeparateOpacityArrayReaction::updateEnableState, Qt::QueuedConnection);
+    QObject::connect(repr, &pqDataRepresentation::representationTypeModified, this,
+      &pqUseSeparateOpacityArrayReaction::updateEnableState, Qt::QueuedConnection);
+    QObject::connect(repr, &pqDataRepresentation::useTransfer2DModified, this,
+      &pqUseSeparateOpacityArrayReaction::updateEnableState, Qt::QueuedConnection);
   }
 
-  // Recover proxy and action
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
-  QAction* action = this->parentAction();
+  this->updateEnableState();
 
+  // Recover proxy and action
+  vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : nullptr;
+  vtkSMProperty* useSepOpacityProp =
+    reprProxy ? reprProxy->GetProperty("UseSeparateOpacityArray") : nullptr;
+  // add link between action and property
+  if (useSepOpacityProp && reprProxy)
+  {
+    this->Links.addPropertyLink(
+      this->parentAction(), "checked", SIGNAL(toggled(bool)), reprProxy, useSepOpacityProp);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqUseSeparateOpacityArrayReaction::updateEnableState()
+{
+  // Recover proxy and action
+  vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : nullptr;
+  QAction* action = this->parentAction();
   // Set action state
   vtkSMProperty* useSepOpacityProp =
     reprProxy ? reprProxy->GetProperty("UseSeparateOpacityArray") : nullptr;
@@ -75,16 +96,12 @@ void pqUseSeparateOpacityArrayReaction::setRepresentation(pqDataRepresentation* 
 
   // Do not allow usage of a separate opacity array when the representation is
   // using a 2D transfer function.
-  bool usingTf2D = useTf2DProperty ? vtkSMPropertyHelper(useTf2DProperty).GetAsInt() == 1 : false;
-  bool canUseSepOpacityArray = usingTf2D
+  const bool usingTf2D =
+    useTf2DProperty ? vtkSMPropertyHelper(useTf2DProperty).GetAsInt() == 1 : false;
+  const bool canUseSepOpacityArray = usingTf2D
     ? false
     : (reprProxy && useSepOpacityProp && vtkSMRepresentationProxy::IsVolumeRendering(reprProxy) &&
         vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy));
   action->setEnabled(canUseSepOpacityArray);
   action->setChecked(false);
-  if (useSepOpacityProp && reprProxy)
-  {
-    this->Links.addPropertyLink(
-      action, "checked", SIGNAL(toggled(bool)), reprProxy, useSepOpacityProp);
-  }
 }
