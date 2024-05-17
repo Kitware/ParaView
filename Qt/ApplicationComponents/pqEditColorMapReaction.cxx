@@ -5,6 +5,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqColorMapEditor.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqUndoStack.h"
@@ -125,13 +126,16 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
   else
   {
     // Raise the color editor is present in the application.
-    QDockWidget* widget =
+    auto colorMapEditorDock =
       qobject_cast<QDockWidget*>(pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
-    if (widget)
+    if (colorMapEditorDock)
     {
-      widget->setVisible(true);
-      // widget->setFloating(true);
-      widget->raise();
+      auto colorMapEditor = qobject_cast<pqColorMapEditor*>(colorMapEditorDock->widget());
+      colorMapEditor->setSelectedPropertiesType(
+        this->ColorMapEditorHelper->GetSelectedPropertiesType());
+      colorMapEditorDock->setVisible(true);
+      // colorMapEditorDock->setFloating(true);
+      colorMapEditorDock->raise();
     }
     else
     {

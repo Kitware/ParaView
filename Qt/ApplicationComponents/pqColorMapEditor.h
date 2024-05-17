@@ -5,6 +5,9 @@
 #define pqColorMapEditor_h
 
 #include "pqApplicationComponentsModule.h"
+#include "vtkParaViewDeprecation.h" // For PARAVIEW_DEPRECATED
+
+#include <QScopedPointer>
 #include <QWidget>
 
 class vtkSMProxy;
@@ -27,11 +30,20 @@ public:
   pqColorMapEditor(QWidget* parent = nullptr);
   ~pqColorMapEditor() override;
 
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  /**
+   * Set the selected properties type.
+   */
+  void setSelectedPropertiesType(int selectedPropertiesType);
+
 protected Q_SLOTS:
+  ///@{
   /**
    * slot called to update the currently showing proxies.
    */
-  void updateActive();
+  void updateActive(bool forceUpdate);
+  void updateActive() { this->updateActive(false); }
+  ///@}
 
   /**
    * slot called to update the visible widgets.
@@ -67,8 +79,17 @@ protected Q_SLOTS:
   void updateIfNeeded();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
-  void setDataRepresentation(pqDataRepresentation* repr);
-  void setColorTransferFunction(vtkSMProxy* ctf);
+  void setRepresentation(pqDataRepresentation* repr, bool forceUpdate = false);
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use setRepresentation instead.")
+  void setDataRepresentation(pqDataRepresentation* repr, bool forceUpdate = false)
+  {
+    this->setRepresentation(repr, forceUpdate);
+  }
+  void setColorTransferFunctions(std::vector<vtkSMProxy*> ctfs);
+  void setColorTransferFunction(vtkSMProxy* ctf)
+  {
+    this->setColorTransferFunctions(std::vector<vtkSMProxy*>(1, ctf));
+  }
 
 protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -81,9 +102,9 @@ protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
 private:
   Q_DISABLE_COPY(pqColorMapEditor)
+
   class pqInternals;
-  pqInternals* Internals;
-  friend class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif
