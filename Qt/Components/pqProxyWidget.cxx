@@ -957,13 +957,19 @@ void pqProxyWidget::hideEvent(QHideEvent* hevent)
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::apply() const
+void pqProxyWidget::applyInternal() const
 {
-  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
   Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     item->apply();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::apply() const
+{
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
+  this->applyInternal();
 }
 
 //-----------------------------------------------------------------------------

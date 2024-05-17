@@ -18,6 +18,7 @@ set(classes
   pqArraySelectionWidget
   pqArraySelectorPropertyWidget
   pqArrayStatusPropertyWidget
+  pqBlockProxyWidget
   pqCalculatorWidget
   pqCameraDialog
   pqCameraKeyFrameWidget

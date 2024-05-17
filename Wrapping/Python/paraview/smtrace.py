@@ -145,7 +145,7 @@ class Trace(object):
 
     @classmethod
     def get_varname(cls, name):
-        """returns an unique variable name given a suggested variable name. If
+        """returns a unique variable name given a suggested variable name. If
         the suggested variable name is already taken, this method will try to
         find a good suffix that's available."""
         name = sm._make_name_valid(name)
@@ -170,10 +170,10 @@ class Trace(object):
             del cls.__REGISTERED_ACCESSORS[accessor.get_object()]
 
     @classmethod
-    def get_accessor(cls, obj):
+    def get_accessor(cls, obj, selector=None):
         """Returns an accessor for obj. If none exists, a new one may be
         created, if possible. Currently obj is expected to be a
-        :class:`servermanager.Proxy` instance. In future, we may change this to
+        :class:`servermanager.Proxy` instance. In the future, we may change this to
         be a vtkSMProxy instance instead."""
         if obj is None:
             return None
@@ -183,7 +183,7 @@ class Trace(object):
         except KeyError:
             # Create accessor if possible else raise
             # "untraceable" exception.
-            if cls.create_accessor(obj):
+            if cls.create_accessor(obj, selector):
                 return cls.__REGISTERED_ACCESSORS[obj]
             # return "<unknown>"
             raise Untraceable(
@@ -195,7 +195,7 @@ class Trace(object):
         return obj in cls.__REGISTERED_ACCESSORS
 
     @classmethod
-    def create_accessor(cls, obj):
+    def create_accessor(cls, obj, selector=None):
         """Create a new accessor for a proxy. This returns True when a
         ProxyAccessor has been created, other returns False. This is needed to
         bring into trace proxies that were either already created when the trace
@@ -249,7 +249,7 @@ class Trace(object):
                     return True
         if not skip_rendering and cls.get_registered_name(obj, "lookup_tables"):
             pname = cls.get_registered_name(obj, "lookup_tables")
-            if cls._create_accessor_for_tf(obj, pname):
+            if cls._create_accessor_for_tf(obj, pname, selector):
                 return True
         if not skip_rendering and cls.get_registered_name(obj, "piecewise_functions"):
             pname = cls.get_registered_name(obj, "piecewise_functions")
@@ -363,39 +363,55 @@ class Trace(object):
         return False
 
     @classmethod
-    def rename_separate_tf_and_get_representation(cls, arrayName):
+    def rename_separate_tf_and_get_representation(cls, arrayName, selector=None):
         import re
         representation = None
         varname = arrayName
-        regex = re.compile(r"(^Separate_)([0-9]*)_(.*$)")
+        if selector is None:
+            regex = re.compile(r"(^Separate_)([0-9]*)_(.*$)")
+        else:
+            regex = re.compile(r"(^Separate_)([0-9]*)_(.*)_(.*$)")
         if re.match(regex, arrayName):
             gid = re.sub(regex, "\g<2>", arrayName)
             representation = next((value for key, value in simple.GetRepresentations().items() if key[1] == gid), None)
             if representation:
                 repAccessor = Trace.get_accessor(representation)
-                arrayName = re.sub(regex, "\g<3>", arrayName)
-                varname = ("Separate_%s_%s" % (repAccessor, arrayName))
+                if selector is None:
+                    arrayName = re.sub(regex, "\g<3>", arrayName)
+                    varname = ("Separate_%s_%s" % (repAccessor, arrayName))
+                else:
+                    arrayName = re.sub(regex, "\g<4>", arrayName)
+                    varname = ("Separate_%s_%s_%s" % (repAccessor, selector, arrayName))
         return arrayName, varname, representation
 
     @classmethod
-    def _create_accessor_for_tf(cls, proxy, regname):
+    def _create_accessor_for_tf(cls, proxy, regname, selector=None):
         import re
         m = re.match("^[0-9.]*(.+)\\.%s$" % proxy.GetXMLName(), regname)
         if m:
             arrayName = m.group(1)
-            # TODO: when block coloring properties have a GUI which calls pqProxyWidget::onChangeFinished()
-            # Add GetBlockColorTransferFunction tracing
             if proxy.GetXMLGroup() == "lookup_tables":
-                arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
-                if rep:
-                    repAccessor = Trace.get_accessor(rep)
-                    args = ("'%s', %s, separate=True" % (arrayName, repAccessor))
-                    comment = "separate color transfer function/color map"
+                arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName, selector)
+                if selector is None:
+                    if rep:
+                        repAccessor = Trace.get_accessor(rep)
+                        args = ("'%s', %s, separate=True" % (arrayName, repAccessor))
+                        comment = "separate color transfer function/color map"
+                    else:
+                        args = ("'%s'" % arrayName)
+                        comment = "color transfer function/color map"
+                    method = "GetColorTransferFunction"
+                    varsuffix = "LUT"
                 else:
-                    args = ("'%s'" % arrayName)
-                    comment = "color transfer function/color map"
-                method = "GetColorTransferFunction"
-                varsuffix = "LUT"
+                    if rep:
+                        repAccessor = Trace.get_accessor(rep)
+                        args = ("'%s', '%s', %s, separate=True" % (selector, arrayName, repAccessor))
+                        comment = "separate block color transfer function/block color map"
+                    else:
+                        args = ("'%s', '%s'" % (selector, arrayName))
+                        comment = "block color block transfer function/block color map"
+                    method = "GetBlockColorTransferFunction"
+                    varsuffix = "BlockLUT"
             elif proxy.GetXMLGroup() == "piecewise_functions":
                 arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
                 if rep:
@@ -1131,11 +1147,11 @@ class BlockTraceItems(NestableTraceItem):
 class PropertiesModified(NestableTraceItem):
     """Traces properties modified on a specific proxy."""
 
-    def __init__(self, proxy, comment=None):
+    def __init__(self, proxy, selector=None, comment=None):
         TraceItem.__init__(self)
 
         proxy = sm._getPyProxy(proxy)
-        self.ProxyAccessor = Trace.get_accessor(proxy)
+        self.ProxyAccessor = Trace.get_accessor(proxy, selector)
         self.MTime = vtkTimeStamp()
         self.MTime.Modified()
         self.Comment = "#%s" % comment if not comment is None else \
@@ -1330,67 +1346,72 @@ class SetScalarColoring(RenderingMixin, TraceItem):
             Trace.get_accessor(self.Lut)
 
 
-class SetBlockScalarColoring(RenderingMixin, TraceItem):
-    """Trace vtkSMPVRepresentationProxy.SetBlockScalarColoring"""
+class SetBlocksScalarColoring(RenderingMixin, TraceItem):
+    """Trace vtkSMPVRepresentationProxy.SetBlocksScalarColoring"""
 
-    def __init__(self, display, block_selector, arrayname, attribute_type, component=None, separate=False, lut=None):
+    def __init__(self, display, block_selectors, arrayname, attribute_type, component=None, separate=False, luts=None):
         TraceItem.__init__(self)
 
         self.Display = sm._getPyProxy(display)
-        self.BlockSelector = block_selector
+        self.BlockSelectors = block_selectors
         self.ArrayName = arrayname
         self.AttributeType = attribute_type
         self.Component = component
-        self.Lut = sm._getPyProxy(lut)
+        # a list of luts
+        self.Luts = []
+        if luts is not None:
+            for lut in luts:
+                self.Luts.append(sm._getPyProxy(lut))
         self.Separate = separate
 
     def finalize(self):
         TraceItem.finalize(self)
 
-        if self.BlockSelector:
+        if self.BlockSelectors:
             if self.ArrayName:
                 if self.Component is None:
                     if self.Separate:
                         Trace.Output.append_separated([ \
-                            "# set block scalar coloring using an separate color/opacity maps",
-                            "ColorBlockBy(%s, %s, ('%s', '%s'), %s)" % ( \
+                            "# set blocks scalar coloring using an separate color/opacity maps",
+                            "ColorBlocksBy(%s, %s, ('%s', '%s'), %s)" % ( \
                                 str(Trace.get_accessor(self.Display)),
-                                self.BlockSelector,
+                                str(self.BlockSelectors),
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName, self.Separate)])
                     else:
                         Trace.Output.append_separated([ \
-                            "# set block scalar coloring",
-                            "ColorBlockBy(%s, %s, ('%s', '%s'))" % ( \
+                            "# set blocks scalar coloring",
+                            "ColorBlocksBy(%s, %s, ('%s', '%s'))" % ( \
                                 str(Trace.get_accessor(self.Display)),
-                                self.BlockSelector,
+                                str(self.BlockSelectors),
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName)])
                 else:
                     if self.Separate:
                         Trace.Output.append_separated([ \
-                            "# set block scalar coloring using an separate color/opacity maps",
-                            "ColorBlockBy(%s, %s, ('%s', '%s', '%s'), %s)" % ( \
+                            "# set blocks scalar coloring using an separate color/opacity maps",
+                            "ColorBlocksBy(%s, %s, ('%s', '%s', '%s'), %s)" % ( \
                                 str(Trace.get_accessor(self.Display)),
-                                self.BlockSelector,
+                                str(self.BlockSelectors),
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName, self.Component, self.Separate)])
                     else:
                         Trace.Output.append_separated([ \
-                            "# set block scalar coloring",
-                            "ColorBlockBy(%s, %s, ('%s', '%s', '%s'))" % ( \
+                            "# set blocks scalar coloring",
+                            "ColorBlocksBy(%s, %s, ('%s', '%s', '%s'))" % ( \
                                 str(Trace.get_accessor(self.Display)),
-                                self.BlockSelector,
+                                str(self.BlockSelectors),
                                 sm.GetAssociationAsString(self.AttributeType),
                                 self.ArrayName, self.Component)])
             else:
                 Trace.Output.append_separated([ \
-                    "# turn off block scalar coloring",
-                    "ColorBlockBy(%s, %s, None)" % (str(Trace.get_accessor(self.Display)), self.BlockSelector)])
+                    "# turn off blocks scalar coloring",
+                    "ColorBlocksBy(%s, %s, None)" % (str(Trace.get_accessor(self.Display)), str(self.BlockSelectors))])
 
             # only for "Fully Trace Supplemental Proxies" support
-            if self.Lut:
-                Trace.get_accessor(self.Lut)
+            for i in range(len(self.Luts)):
+                if self.Luts[i]:
+                    Trace.get_accessor(self.Luts[i], self.BlockSelectors[i])
 
 
 class RegisterViewProxy(RenderingMixin, TraceItem):

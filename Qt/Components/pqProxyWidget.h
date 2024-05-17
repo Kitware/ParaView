@@ -172,7 +172,7 @@ public Q_SLOTS:
   /**
    * Accepts the property widget changes changes.
    */
-  void apply() const;
+  virtual void apply() const;
 
   /**
    * Cleans the property widget changes and resets the widgets.
@@ -211,14 +211,16 @@ protected:
   void showEvent(QShowEvent* event) override;
   void hideEvent(QHideEvent* event) override;
 
-private Q_SLOTS:
+  void applyInternal() const;
+
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when a pqPropertyWidget fires changeFinished() signal.
    * This callback fires changeFinished() signal and handles AutoUpdateVTKObjects.
    */
-  void onChangeFinished();
+  virtual void onChangeFinished();
 
-private: // NOLINT(readability-redundant-access-specifiers)
+private:
   /**
    * create all widgets
    */

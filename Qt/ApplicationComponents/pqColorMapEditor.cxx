@@ -6,6 +6,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqBlockProxyWidget.h"
 #include "pqDataRepresentation.h"
 #include "pqEditScalarBarReaction.h"
 #include "pqProxyWidget.h"
@@ -27,6 +28,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkSmartPointer.h"
 
@@ -328,7 +330,19 @@ void pqColorMapEditor::setColorTransferFunctions(std::vector<vtkSMProxy*> ctfs)
     return;
   }
 
-  pqProxyWidget* widget = new pqProxyWidget(firstCTF, this);
+  pqProxyWidget* widget;
+  if (this->Internals->ColorMapEditorHelper->GetSelectedPropertiesType() ==
+    vtkSMColorMapEditorHelper::Representation)
+  {
+    widget = new pqProxyWidget(firstCTF, this);
+  }
+  else
+  {
+    const std::vector<std::string> selectedBlockSelectors =
+      this->Internals->ColorMapEditorHelper->GetSelectedBlockSelectors(
+        this->Internals->Representation->getProxy());
+    widget = new pqBlockProxyWidget(firstCTF, selectedBlockSelectors[0].c_str(), this);
+  }
   widget->setObjectName("Properties");
   widget->setApplyChangesImmediately(true);
   widget->filterWidgets();
@@ -596,10 +610,18 @@ void pqColorMapEditor::updateIfNeeded()
     auto firstCTF = this->Internals->ProxyWidget->proxy();
     auto changedProperties =
       firstCTF->GetPropertiesWithDifferentValues(this->Internals->CopyFirstCTF);
-    for (vtkSMProxy* otherCTF : this->Internals->CTFs)
+    const std::vector<std::string> selectedBlockSelectors =
+      this->Internals->ColorMapEditorHelper->GetSelectedBlockSelectors(
+        this->Internals->Representation->getProxy());
+    for (size_t i = 0; i < selectedBlockSelectors.size(); ++i)
     {
+      vtkSMProxy* otherCTF = this->Internals->CTFs[i];
+      const std::string& selector = selectedBlockSelectors[i];
       if (otherCTF && otherCTF != firstCTF)
       {
+        SM_SCOPED_TRACE(PropertiesModified)
+          .arg("proxy", otherCTF)
+          .arg("selector", selector.c_str());
         for (const auto& prop : changedProperties)
         {
           otherCTF->GetProperty(prop.c_str())->Copy(firstCTF->GetProperty(prop.c_str()));
