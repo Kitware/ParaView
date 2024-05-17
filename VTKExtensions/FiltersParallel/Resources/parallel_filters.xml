@@ -1,0 +1,101 @@
+<ServerManagerConfiguration>
+  <!-- ******************************************************************** -->
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVGenerateProcessIds"
+                 name="ProcessIds"
+                 label="Process Ids">
+      <Documentation
+              long_help="This filter generate point and cell data containing the current process id of each point and cell."
+              short_help="Generate process id scalars">
+        GenerateProcessIds is meant to fill in the ProcessIds attribute array,
+        to know which processor owns which cells and points. It can generate it
+        for both PointData and CellData. The ProcessIds array's name will be
+        "PointProcessIds" for PointData, and "CellProcessIds" for CellData.
+        Note that if the input is an HyperTree Grid instance, only cell process
+        IDs are available.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetGeneratePointData"
+                         default_values="1"
+                         name="GeneratePointData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          The value of this property determines whether to generate process id for points.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateCellData"
+                         default_values="0"
+                         name="GenerateCellData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          The value of this property determines whether to generate process id for cells.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkPVGenerateProcessIds"
+                 base_proxyname="ProcessIds"
+                 base_proxygroup="filters"
+                 name="GenerateProcessIds">
+      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
+        This has been replaced by 'ProcessIds'. Please consider using that instead.
+      </Deprecated>
+      <!-- End of GenerateProcessIds -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVRemoveGhosts"
+                 label="Remove Ghost Information"
+                 name="RemoveGhostInformation">
+      <Documentation long_help="Removes ghost information."
+                     short_help="Removes ghost information.">
+        Removes ghost cells, point data and cell data ghost arrays.
+        In the case of HyperTree Grid input, this filter removes the cell
+        data ghost array and masks the ghost cells.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkUnstructuredGrid"/>
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the remove ghost information filter.
+          This filter operates on unstructured grids and polydata since it removes the ghost cells.
+          It also supports HTGs, in which case it simply masks ghost cells.
+        </Documentation>
+      </InputProperty>
+      <!-- End of RemoveGhostInformation -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

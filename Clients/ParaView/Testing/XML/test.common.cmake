@@ -579,6 +579,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotLines.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomAttributesHTGScalars.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomAttributesHTGVectors.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_BCOnly.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_BCOnlyBlockColors.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_CellData.png}"
@@ -1103,7 +1105,9 @@ list(APPEND TESTS_WITH_BASELINES
   PassArrays.xml
   PerlinNoise.xml
   PickCenter.xml
+  PointAndCellIdsHTG.xml
   Protractor.xml
+  RemoveGhostInformationHTG.xml
   ResampleToLine.xml
   ReverseSense.xml
   SaveLoadScreenShotWithEmbedState.xml
@@ -1960,10 +1964,16 @@ set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml
 )
 
-
 # ResampleToHyperTreeGrid only works in client mode
 paraview_add_client_tests(
   TEST_SCRIPTS ResampleToHyperTreeGrid.xml
+)
+
+# RandomAttributes generate different results depending on the data 
+# distribution so we enable it on client mode only for now
+# See https://gitlab.kitware.com/paraview/paraview/-/issues/22596
+paraview_add_client_tests(
+  TEST_SCRIPTS RandomAttributesHTG.xml
 )
 
 # TODO: remote rendering tests and reverse connect tests.

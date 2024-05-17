@@ -1674,59 +1674,6 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkGenerateProcessIds"
-                 name="ProcessIds"
-                 label="Process Ids">
-      <Documentation
-              long_help="This filter generate point and cell data containing the current process id of each point and cell."
-              short_help="Generate process id scalars">
-        GenerateProcessIds is meant to fill in the ProcessIds attribute array,
-        to know which processor owns which cells and points. It can generate it
-        for both PointData and CellData. The ProcessIds array's name will be
-        "PointProcessIds" for PointData, and "CellProcessIds" for CellData.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain composite_data_supported="1"
-                        name="input_type">
-          <DataType value="vtkDataSet"/>
-        </DataTypeDomain>
-      </InputProperty>
-      <IntVectorProperty command="SetGeneratePointData"
-                         default_values="1"
-                         name="GeneratePointData"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          The value of this property determines whether to generate process id for points.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetGenerateCellData"
-                         default_values="0"
-                         name="GenerateCellData"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          The value of this property determines whether to generate process id for cells.
-        </Documentation>
-      </IntVectorProperty>
-    </SourceProxy>
-
-    <SourceProxy class="vtkGenerateProcessIds"
-                 base_proxyname="ProcessIds"
-                 base_proxygroup="filters"
-                 name="GenerateProcessIds">
-      <Deprecated deprecated_in="5.13" to_remove_in="5.14">
-        This has been replaced by 'ProcessIds'. Please consider using that instead.
-      </Deprecated>
-      <!-- End GenerateProcessIds -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPTextureMapToSphere"
                  label="Texture Map to Sphere"
                  name="TextureMapToSphere">
@@ -1770,32 +1717,6 @@
         </Documentation>
       </IntVectorProperty>
       <!-- End TextureMapToSphere -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkRemoveGhosts"
-                 label="Remove Ghost Information"
-                 name="RemoveGhostInformation">
-      <Documentation long_help="Removes ghost information."
-                     short_help="Removes ghost information.">
-        Removes ghost cells and point data and cell data ghost arrays.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData"/>
-          <DataType value="vtkUnstructuredGrid"/>
-        </DataTypeDomain>
-        <Documentation>
-          This property specifies the input to the remove ghost
-          information filter. This filter operates only on unstructured grids
-          and polydata since it removes the ghost cells.
-        </Documentation>
-      </InputProperty>
     </SourceProxy>
 
     <!-- ==================================================================== -->

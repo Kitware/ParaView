@@ -1280,6 +1280,9 @@
 
         This filter provides that capability to specify the data type
         of the attributes and the range for each of the components.
+
+        Note that in the case of an input HTG, only cell random attribute
+        generation is available.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -1288,7 +1291,9 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Random Scalars
         filter.</Documentation>
@@ -1336,6 +1341,11 @@
         <Documentation>Indicate that the generated attributes are
         constant within a block. This can be used to highlight
         blocks in a composite dataset.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkCompositeDataSet"
+                                   mode="visibility"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty
           name="GeneratePointScalars"
@@ -1345,6 +1355,12 @@
         <BooleanDomain name="bool"/>
         <Documentation>Indicate that point scalars are to be
         generated.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty
           name="GeneratePointVectors"
@@ -1354,6 +1370,12 @@
         <BooleanDomain name="bool"/>
         <Documentation>Indicate that point vectors are to be
         generated.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"
+                                   exclude="1"/>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty

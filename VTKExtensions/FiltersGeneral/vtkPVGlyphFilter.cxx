@@ -11,7 +11,7 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDataSetTriangleFilter.h"
 #include "vtkFloatArray.h"
-#include "vtkIdFilter.h"
+#include "vtkGenerateIds.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMinimalStandardRandomSequence.h"
@@ -261,12 +261,12 @@ public:
         auto& uniformSamplingVector = empRet.first->second;
 
         // Add cell ids to the dataset in order to be able to recover the right cells later
-        vtkNew<vtkIdFilter> idFilter;
+        vtkNew<vtkGenerateIds> idFilter;
         idFilter->SetInputData(ds);
-        idFilter->SetCellIdsArrayName(IDS_ARRAY_NAME.c_str());
+        idFilter->SetCellIdsArrayName(IDS_ARRAY_NAME);
         idFilter->PointIdsOff();
         idFilter->Update();
-        dataSetToReturn = idFilter->GetOutput();
+        dataSetToReturn = vtkDataSet::SafeDownCast(idFilter->GetOutput());
         ds = dataSetToReturn.Get();
 
         if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE)

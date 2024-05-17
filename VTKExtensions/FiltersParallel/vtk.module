@@ -1,0 +1,22 @@
+NAME
+  ParaView::VTKExtensionsFiltersParallel
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersParallel
+SPDX_LICENSE_IDENTIFIER
+  BSD-3-Clause
+SPDX_COPYRIGHT_TEXT
+  Copyright (c) Kitware Inc.
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  ParaView::VTKExtensionsFiltersGeneral
+PRIVATE_DEPENDS
+  VTK::CommonDataModel
+  VTK::FiltersParallel
+  VTK::ParallelCore
+TEST_LABELS
+  ParaView
