@@ -17,58 +17,80 @@ pqUse2DTransferFunctionReaction::pqUse2DTransferFunctionReaction(
   , TrackActiveObjects(track_active_objects)
 {
   parentObject->setCheckable(true);
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)), this, SLOT(updateEnableState()),
-    Qt::QueuedConnection);
-  this->updateEnableState();
+  if (track_active_objects)
+  {
+    QObject::connect(&pqActiveObjects::instance(),
+      QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), this,
+      &pqUse2DTransferFunctionReaction::setActiveRepresentation, Qt::QueuedConnection);
+    this->setActiveRepresentation();
+  }
+  else
+  {
+    this->updateEnableState();
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqUse2DTransferFunctionReaction::~pqUse2DTransferFunctionReaction() = default;
 
 //-----------------------------------------------------------------------------
-void pqUse2DTransferFunctionReaction::updateEnableState()
+pqDataRepresentation* pqUse2DTransferFunctionReaction::representation() const
 {
-  pqDataRepresentation* cachedRepr = this->CachedRepresentation;
-  this->setRepresentation(
-    this->TrackActiveObjects ? pqActiveObjects::instance().activeRepresentation() : cachedRepr);
+  return this->Representation;
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqUse2DTransferFunctionReaction::representation() const
+void pqUse2DTransferFunctionReaction::setActiveRepresentation()
 {
-  return this->CachedRepresentation;
+  this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
 }
 
 //-----------------------------------------------------------------------------
 void pqUse2DTransferFunctionReaction::setRepresentation(pqDataRepresentation* repr)
 {
-  this->Links.clear();
-  if (this->CachedRepresentation)
+  if (this->Representation != nullptr && this->Representation == repr)
   {
-    QObject::disconnect(this->CachedRepresentation, SIGNAL(colorArrayNameModified()), this,
-      SLOT(updateEnableState()));
-    QObject::disconnect(this->CachedRepresentation, SIGNAL(representationTypeModified()), this,
-      SLOT(updateEnableState()));
-    QObject::disconnect(this->CachedRepresentation, SIGNAL(useSeparateOpacityArrayModified()), this,
-      SLOT(updateEnableState()));
+    return;
   }
-  this->CachedRepresentation = repr;
+  this->Links.clear();
+  if (this->Representation)
+  {
+    this->disconnect(this->Representation);
+    this->Representation = nullptr;
+  }
   if (repr)
   {
+    this->Representation = repr;
     // Observing `colorArrayNameModified` lets this reaction disable its parent action
     // when the representation is not using scalar coloring.
     // For example, when the color array combo box is set to "Solid Color".
-    QObject::connect(repr, SIGNAL(colorArrayNameModified()), this, SLOT(updateEnableState()),
-      Qt::QueuedConnection);
-    QObject::connect(repr, SIGNAL(representationTypeModified()), this, SLOT(updateEnableState()),
-      Qt::QueuedConnection);
-    QObject::connect(repr, SIGNAL(useSeparateOpacityArrayModified()), this,
-      SLOT(updateEnableState()), Qt::QueuedConnection);
+    QObject::connect(repr, &pqDataRepresentation::colorArrayNameModified, this,
+      &pqUse2DTransferFunctionReaction::updateEnableState, Qt::QueuedConnection);
+    QObject::connect(repr, &pqDataRepresentation::representationTypeModified, this,
+      &pqUse2DTransferFunctionReaction::updateEnableState, Qt::QueuedConnection);
+    QObject::connect(repr, &pqDataRepresentation::useSeparateOpacityArrayModified, this,
+      &pqUse2DTransferFunctionReaction::updateEnableState, Qt::QueuedConnection);
   }
+
+  this->updateEnableState();
 
   // Recover proxy and action
   vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
+  QAction* action = this->parentAction();
+  vtkSMProperty* useTf2DProperty = reprProxy ? reprProxy->GetProperty("UseTransfer2D") : nullptr;
+  // add link between action and property
+  if (useTf2DProperty && reprProxy)
+  {
+    this->Links.addPropertyLink(
+      action, "checked", SIGNAL(toggled(bool)), reprProxy, useTf2DProperty);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqUse2DTransferFunctionReaction::updateEnableState()
+{
+  // Recover proxy and action
+  vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : nullptr;
   QAction* action = this->parentAction();
 
   // Set action state
@@ -77,18 +99,13 @@ void pqUse2DTransferFunctionReaction::setRepresentation(pqDataRepresentation* re
 
   // Do not allow usage of a 2D transfer function when the representation is already using
   // a separate array to map opacity to the scalar opacity function.
-  bool usingSepOpacityArray =
+  const bool usingSepOpacityArray =
     reprProxy && uoaProperty && vtkSMPropertyHelper(uoaProperty).GetAsInt() == 1;
   vtkSMProperty* useTf2DProperty = reprProxy ? reprProxy->GetProperty("UseTransfer2D") : nullptr;
-  bool canUseTf2D = usingSepOpacityArray
+  const bool canUseTf2D = usingSepOpacityArray
     ? false
     : (reprProxy && useTf2DProperty && vtkSMRepresentationProxy::IsVolumeRendering(reprProxy) &&
         vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy));
   action->setEnabled(canUseTf2D);
   action->setChecked(false);
-  if (useTf2DProperty && reprProxy)
-  {
-    this->Links.addPropertyLink(
-      action, "checked", SIGNAL(toggled(bool)), reprProxy, useTf2DProperty);
-  }
 }

@@ -34,10 +34,13 @@ public:
   pqDataRepresentation* representation() const;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  ///@{
   /**
    * Set the active representation.
    */
   void setRepresentation(pqDataRepresentation*);
+  void setActiveRepresentation();
+  ///@}
 
 protected Q_SLOTS:
   /**
@@ -49,7 +52,7 @@ private:
   Q_DISABLE_COPY(pqUse2DTransferFunctionReaction)
 
   pqPropertyLinks Links;
-  QPointer<pqDataRepresentation> CachedRepresentation;
+  QPointer<pqDataRepresentation> Representation;
   bool TrackActiveObjects;
 };
 
