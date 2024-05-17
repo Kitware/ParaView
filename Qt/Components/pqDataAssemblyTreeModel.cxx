@@ -281,7 +281,7 @@ pqDataAssemblyTreeModel::pqDataAssemblyTreeModel(QObject* parentObject)
   , Internals(new pqDataAssemblyTreeModel::pqInternals())
   , UserCheckable(false)
 {
-  // set default to propagage checkstate change to the entire subtree.
+  // set default to propagate check state change to the entire subtree.
   this->setRoleProperty(Qt::CheckStateRole, pqDataAssemblyTreeModel::Inherited);
 }
 
@@ -447,6 +447,10 @@ bool pqDataAssemblyTreeModel::setData(const QModelIndex& indx, const QVariant& v
 {
   auto& internals = (*this->Internals);
   const auto assembly = internals.DataAssembly.GetPointer();
+  if (indx.column() != 0)
+  {
+    return false;
+  }
   const auto node = ::getNodeID(indx);
   if (node == -1 || assembly == nullptr)
   {

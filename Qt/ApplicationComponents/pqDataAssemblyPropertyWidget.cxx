@@ -7,183 +7,82 @@
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
-#include "pqDoubleRangeDialog.h"
+#include "pqDataRepresentation.h"
+#include "pqDisplayColorWidget.h"
 #include "pqHeaderView.h"
+#include "pqHighlightableToolButton.h"
+#include "pqMultiBlockPropertiesStateWidget.h"
 #include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
+#include "pqSMAdaptor.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
-
-#include "vtkPVGeneralSettings.h"
-
-#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
+#include "vtkDataAssemblyVisitor.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDataAssemblyDomain.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentedArrayListDomain.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSelectionSource.h"
 #include "vtkSmartPointer.h"
-#include "vtkStringArray.h"
 
-#include <QColorDialog>
+#include <QAbstractTableModel>
+#include <QAction>
 #include <QIdentityProxyModel>
 #include <QPainter>
+#include <QPointer>
 #include <QScopedValueRollback>
 #include <QSortFilterProxyModel>
-#include <QStringListModel>
-#include <QVBoxLayout>
 
 #include <algorithm>
-#include <iterator>
 #include <set>
 
 namespace detail
 {
-constexpr int ColorRole = Qt::UserRole;
-constexpr int OpacityRole = Qt::UserRole + 1;
-
-//-----------------------------------------------------------------------------
-/**
- * Creates a pixmap for color.
- */
-//-----------------------------------------------------------------------------
-QPixmap ColorPixmap(int iconSize, const QColor& color, bool inherited)
-{
-  QPixmap pixmap(iconSize, iconSize);
-  pixmap.fill(Qt::transparent);
-  QPainter painter(&pixmap);
-  painter.setRenderHint(QPainter::Antialiasing, true);
-  if (color.isValid())
-  {
-    QPen pen = painter.pen();
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::SolidLine);
-    pen.setWidth(1);
-    painter.setPen(pen);
-
-    QBrush brush = painter.brush();
-    brush.setColor(color);
-    brush.setStyle(inherited ? Qt::Dense5Pattern : Qt::SolidPattern);
-    painter.setBrush(brush);
-  }
-  else
-  {
-    QPen pen = painter.pen();
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::DashLine);
-    pen.setWidth(1);
-    painter.setPen(pen);
-
-    painter.setBrush(Qt::NoBrush);
-  }
-  const int radius = 3 * iconSize / 8;
-  painter.drawEllipse(QPoint(iconSize / 2, iconSize / 2), radius, radius);
-  return pixmap;
-}
-
-//-----------------------------------------------------------------------------
-/**
- * Creates a pixmap for opacity.
- */
-//-----------------------------------------------------------------------------
-QPixmap OpacityPixmap(int iconSize, double opacity, bool inherited)
-{
-  QPixmap pixmap(iconSize, iconSize);
-  pixmap.fill(Qt::transparent);
-  QPainter painter(&pixmap);
-  painter.setRenderHint(QPainter::Antialiasing, true);
-
-  if (opacity >= 0.0 && opacity <= 1.0)
-  {
-    QPen pen = painter.pen();
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::SolidLine);
-    pen.setWidth(1);
-    painter.setPen(pen);
-
-    QBrush brush = painter.brush();
-    brush.setColor(Qt::gray);
-    brush.setStyle(inherited ? Qt::Dense7Pattern : Qt::SolidPattern);
-    painter.setBrush(brush);
-  }
-  else
-  {
-    QPen pen = painter.pen();
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::DashLine);
-    pen.setWidth(1);
-    painter.setPen(pen);
-
-    painter.setBrush(Qt::NoBrush);
-    opacity = 1.0;
-  }
-
-  const int delta = 3 * iconSize / 4;
-  QRect rect(0, 0, delta, delta);
-  rect.moveCenter(QPoint(iconSize / 2, iconSize / 2));
-  painter.drawPie(rect, 0, 5760 * opacity);
-  return pixmap;
-}
-
+constexpr int BlockPropertiesStateRole = Qt::UserRole;
+constexpr int BlockPropertiesResetRole = Qt::UserRole + 1;
 } // end of detail
 
 namespace
 {
 //=================================================================================
 /**
- * A table model to show lists for chosen selectors + properties. This helps use
- * show a compact/non-hierarchical view of selectors and properties like opacity
- * or color specified.
+ * A table model to show lists for chosen selectors. This helps use
+ * show a compact/non-hierarchical view of selectors.
  */
-class TableModel : public QAbstractTableModel
+class TableSelectorsModel : public QAbstractTableModel
 {
   using Superclass = QAbstractTableModel;
 
 public:
-  enum ModeT
-  {
-    SELECTORS,
-    COLORS,
-    OPACITIES,
-  };
-
-  TableModel(int pixmapSize, ModeT mode, QObject* prnt)
+  TableSelectorsModel(QObject* prnt)
     : Superclass(prnt)
-    , Mode(mode)
-    , PixmapSize(pixmapSize)
   {
   }
-  ~TableModel() override = default;
+  ~TableSelectorsModel() override = default;
 
   int columnCount(const QModelIndex&) const override
   {
-    switch (this->Mode)
-    {
-      case COLORS:
-        // selector, r, g, b
-        return 4;
-      case OPACITIES:
-        // selector, opacity
-        return 2;
-      case SELECTORS:
-      default:
-        // selector
-        return 1;
-    }
+    return 1; // only one column.
   }
 
   int rowCount(const QModelIndex&) const override { return this->Values.size(); }
@@ -205,7 +104,6 @@ public:
 
   void setData(const QStringList& selectors)
   {
-    Q_ASSERT(this->Mode == SELECTORS);
     QList<QPair<QString, QVariant>> values;
     for (const auto& value : selectors)
     {
@@ -237,30 +135,9 @@ public:
     {
       switch (section)
       {
+        default:
         case 0:
           return "Selector";
-        case 1:
-          return this->Mode == OPACITIES ? "Opacity" : "Red  ";
-        case 2:
-          return "Green";
-        case 3:
-          return "Blue ";
-      }
-    }
-    else if (role == Qt::DecorationRole)
-    {
-      switch (section)
-      {
-        case 1:
-          return this->Mode == OPACITIES
-            ? detail::OpacityPixmap(this->PixmapSize, 0.75, false)
-            : detail::ColorPixmap(this->PixmapSize, QColor(Qt::red), false);
-
-        case 2:
-          return detail::ColorPixmap(this->PixmapSize, QColor(Qt::green), false);
-
-        case 3:
-          return detail::ColorPixmap(this->PixmapSize, QColor(Qt::blue), false);
       }
     }
     return QVariant();
@@ -278,25 +155,6 @@ public:
         if (pair.first != value.toString())
         {
           pair.first = value.toString();
-          changed = true;
-        }
-      }
-      else if (this->Mode == OPACITIES)
-      {
-        if (pair.second != value)
-        {
-          pair.second = value;
-          changed = true;
-        }
-      }
-      else if (this->Mode == COLORS)
-      {
-        auto color = pair.second.value<QColor>();
-        double rgbF[3] = { color.redF(), color.greenF(), color.blueF() };
-        rgbF[index.column() - 1] = value.toDouble();
-        if (color != QColor::fromRgbF(rgbF[0], rgbF[1], rgbF[2]))
-        {
-          pair.second = QColor::fromRgbF(rgbF[0], rgbF[1], rgbF[2]);
           changed = true;
         }
       }
@@ -320,34 +178,6 @@ public:
         case Qt::ToolTipRole:
         case Qt::EditRole:
           return pair.first;
-        case Qt::DecorationRole:
-          return this->Mode == COLORS
-            ? detail::ColorPixmap(this->PixmapSize, pair.second.value<QColor>(), false)
-            : detail::OpacityPixmap(this->PixmapSize, pair.second.value<double>(), false);
-      }
-    }
-    else if (indx.column() == 1 && this->Mode == OPACITIES)
-    {
-      switch (role)
-      {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-        case Qt::ToolTipRole:
-          return QString::number(pair.second.toDouble(), 'f', 2);
-      }
-    }
-    else if (indx.column() >= 1 && indx.column() < 4 && this->Mode == COLORS)
-    {
-      switch (role)
-      {
-        case Qt::DisplayRole:
-        case Qt::ToolTipRole:
-        case Qt::EditRole:
-        {
-          const auto color = pair.second.value<QColor>();
-          const double rgbF[3] = { color.redF(), color.greenF(), color.blueF() };
-          return QString::number(rgbF[indx.column() - 1], 'f', 2);
-        }
       }
     }
     return QVariant();
@@ -385,24 +215,49 @@ public:
   }
 
 private:
-  Q_DISABLE_COPY(TableModel);
-  ModeT Mode;
-  int PixmapSize;
+  Q_DISABLE_COPY(TableSelectorsModel);
   QList<QPair<QString, QVariant>> Values;
 };
+
+class CallbackDataVisitor : public vtkDataAssemblyVisitor
+{
+public:
+  static CallbackDataVisitor* New();
+  vtkTypeMacro(CallbackDataVisitor, vtkDataAssemblyVisitor);
+
+  std::function<void(int)> VisitCallback;
+  void Visit(int nodeid) override
+  {
+    if (this->VisitCallback)
+    {
+      this->VisitCallback(nodeid);
+    }
+  }
+
+protected:
+  CallbackDataVisitor() = default;
+  ~CallbackDataVisitor() override = default;
+
+private:
+  CallbackDataVisitor(const CallbackDataVisitor&) = delete;
+  void operator=(const CallbackDataVisitor&) = delete;
+};
+vtkStandardNewMacro(CallbackDataVisitor);
 
 //=================================================================================
 /**
  * Specialization to ensure the header checkstate/label etc. reflects the root-node.
- * This also handles mapping custom roles such as detail::ColorRole and detail::OpacityRole
- * to columns and rendering appropriate swatches for the same.
+ * This also handles mapping the custom detail::BlockPropertiesStateRole and
+ * detail::BlockPropertiesResetRole roles to columns,
+ * and rendering appropriate swatches for the same.
  */
 class pqDAPModel : public QIdentityProxyModel
 {
-  int PixmapSize = 16;
+  const int PixmapSize;
   using Superclass = QIdentityProxyModel;
 
   QString HeaderText; // header text for column 0.
+
 public:
   pqDAPModel(int pixmapSize, QObject* prnt)
     : Superclass(prnt)
@@ -417,12 +272,32 @@ public:
       });
   }
 
+  ~pqDAPModel() override { this->resetStateWidgets(); }
+
   void setHeaderText(const QString& txt)
   {
     if (this->HeaderText != txt)
     {
       this->HeaderText = txt;
       this->headerDataChanged(Qt::Horizontal, 0, 0);
+    }
+  }
+
+  void setPropertyNames(const QList<QString>& propertyNames)
+  {
+    if (this->PropertyNames != propertyNames)
+    {
+      this->PropertyNames = propertyNames;
+    }
+  }
+
+  void setRepresentation(vtkSMProxy* repr)
+  {
+    pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
+    auto pqRepr = qobject_cast<pqDataRepresentation*>(smm->findItem<pqProxy*>(repr));
+    if (this->Representation != pqRepr)
+    {
+      this->Representation = pqRepr;
     }
   }
 
@@ -446,6 +321,20 @@ public:
           }
         });
     }
+  }
+
+  void initializeStateWidgets(vtkDataAssembly* assembly)
+  {
+    if (!assembly || this->ExtraColumns.empty())
+    {
+      return;
+    }
+    this->resetStateWidgets();
+    vtkNew<CallbackDataVisitor> visitor;
+    visitor->VisitCallback = [&](int nodeId) -> void {
+      this->StateWidgets[nodeId] = this->createStateWidget(nodeId);
+    };
+    assembly->Visit(visitor);
   }
 
   QVariant headerData(
@@ -482,64 +371,55 @@ public:
     return this->Superclass::setHeaderData(section, orientation, value, role);
   }
 
-  int columnCount(const QModelIndex& indx = QModelIndex()) const override
+  int columnCount(const QModelIndex& index = QModelIndex()) const override
   {
-    return this->Superclass::columnCount(indx) + static_cast<int>(this->ExtraColumns.size());
+    return this->Superclass::columnCount(index) + static_cast<int>(this->ExtraColumns.size());
   }
 
-  QVariant data(const QModelIndex& indx, int role) const override
+  QVariant data(const QModelIndex& index, int role) const override
   {
-    if (indx.column() == 0 || !indx.isValid())
+    if (index.column() == 0 || !index.isValid())
     {
-      return this->Superclass::data(indx, role);
+      return this->Superclass::data(index, role);
     }
 
-    const int columnRole = this->ExtraColumns.at(indx.column() - 1);
-    auto isDerived = [&]() {
-      const auto var = this->Superclass::data(
-        indx.siblingAtColumn(0), pqDataAssemblyTreeModel::GetIsDerivedRole(columnRole));
-      return var.isValid() == false || var.toBool();
-    };
-
-    if (columnRole == detail::ColorRole)
+    const int columnRole = this->ExtraColumns.at(index.column() - 1);
+    if (columnRole == detail::BlockPropertiesStateRole)
     {
+      pqMultiBlockPropertiesStateWidget* stateWidget = this->getStateWidget(index);
+      if (!stateWidget)
+      {
+        return QVariant();
+      }
       switch (role)
       {
         case Qt::DecorationRole:
-        {
-          const auto itemdata = this->Superclass::data(indx.siblingAtColumn(0), columnRole);
-          return detail::ColorPixmap(this->PixmapSize, itemdata.value<QColor>(), isDerived());
-        }
-
+          return stateWidget->getStatePixmap(stateWidget->getState());
         case Qt::ToolTipRole:
-          return isDerived()
-            ? QVariant("Double-click to set color.")
-            : QVariant("Double-click to change color,\nControl-click to remove color.");
-          break;
-
-        case detail::ColorRole:
-          return this->Superclass::data(indx.siblingAtColumn(0), detail::ColorRole);
+          return stateWidget->getStateToolTip(stateWidget->getState());
+        case detail::BlockPropertiesStateRole:
+          return this->Superclass::data(index.siblingAtColumn(0), detail::BlockPropertiesStateRole);
+        default:
+          return QVariant();
       }
     }
-    else if (columnRole == detail::OpacityRole)
+    else if (columnRole == detail::BlockPropertiesResetRole)
     {
+      pqMultiBlockPropertiesStateWidget* stateWidget = this->getStateWidget(index);
+      if (!stateWidget)
+      {
+        return QVariant();
+      }
       switch (role)
       {
         case Qt::DecorationRole:
-        {
-          const auto itemdata = this->Superclass::data(indx.siblingAtColumn(0), columnRole);
-          return detail::OpacityPixmap(
-            this->PixmapSize, itemdata.isValid() ? itemdata.toDouble() : -1.0, isDerived());
-        }
-
+          return stateWidget->getResetButton()->grab();
         case Qt::ToolTipRole:
-          return isDerived()
-            ? QVariant("Double-click to set opacity.")
-            : QVariant("Double-click to change opacity,\nControl-click to remove opacity.");
-          break;
-
-        case detail::OpacityRole:
-          return this->Superclass::data(indx.siblingAtColumn(0), detail::OpacityRole);
+          return stateWidget->getResetButton()->toolTip();
+        case detail::BlockPropertiesResetRole:
+          return this->Superclass::data(index.siblingAtColumn(0), detail::BlockPropertiesResetRole);
+        default:
+          return QVariant();
       }
     }
     return QVariant();
@@ -571,9 +451,80 @@ public:
     }
   }
 
+  pqMultiBlockPropertiesStateWidget* getStateWidget(const QModelIndex& index) const
+  {
+    const int nodeId = this->getNodeId(index);
+    const auto& result = this->StateWidgets.find(nodeId);
+    return result != this->StateWidgets.end() ? result.value() : nullptr;
+  }
+
 private:
   Q_DISABLE_COPY(pqDAPModel);
+
+  int getNodeId(const QModelIndex& index) const
+  {
+    auto treeModel = qobject_cast<pqDataAssemblyTreeModel*>(this->sourceModel());
+    return treeModel->nodeId(index);
+  }
+
+  pqMultiBlockPropertiesStateWidget* createStateWidget(const int nodeId)
+  {
+    auto treeModel = qobject_cast<pqDataAssemblyTreeModel*>(this->sourceModel());
+    const QString selector = QString::fromStdString(treeModel->dataAssembly()->GetNodePath(nodeId));
+
+    pqMultiBlockPropertiesStateWidget* widget = new pqMultiBlockPropertiesStateWidget(
+      this->Representation->getProxy(), this->PropertyNames, this->PixmapSize, selector);
+    const bool hasBlockColorArrayNames =
+      std::find(this->PropertyNames.begin(), this->PropertyNames.end(), "BlockColorArrayNames") !=
+      this->PropertyNames.end();
+    if (hasBlockColorArrayNames)
+    {
+      QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::startStateReset, this,
+        [this, nodeId]() -> void {
+          this->OldLuts[nodeId] =
+            this->Representation->getLookupTableProxies(vtkSMColorMapEditorHelper::Blocks);
+        });
+    }
+    QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::endStateReset, this,
+      [this, nodeId, hasBlockColorArrayNames]() -> void {
+        if (hasBlockColorArrayNames)
+        {
+          pqDisplayColorWidget::hideScalarBarsIfNotNeeded(
+            this->Representation->getViewProxy(), this->OldLuts[nodeId]);
+        }
+        Q_EMIT qobject_cast<pqDataAssemblyPropertyWidget*>(this->parent())->changeFinished();
+      });
+    QObject::connect(widget, &pqMultiBlockPropertiesStateWidget::stateChanged, this,
+      [this, nodeId](pqMultiBlockPropertiesStateWidget::BlockPropertyState) {
+        auto sourceModel = qobject_cast<pqDataAssemblyTreeModel*>(this->sourceModel());
+        QModelIndex sourceModelIndex = sourceModel->index(0);
+        // TODO: The above line forces the entire model to be updated, which is not great,
+        // but since the below line doesn't work as expected, we have to do this.
+        // QModelIndex sourceModelIndex = sourceModel->index(nodeId);
+        QModelIndex modelIndex = this->mapFromSource(sourceModelIndex);
+        const QModelIndex stateIndex = modelIndex.siblingAtColumn(1);
+        const QModelIndex resetIndex = modelIndex.siblingAtColumn(2);
+        Q_EMIT this->dataChanged(stateIndex, resetIndex, { Qt::DecorationRole, Qt::ToolTipRole });
+      });
+    return widget;
+  }
+
+  void resetStateWidgets()
+  {
+    for (auto& widget : this->StateWidgets)
+    {
+      delete widget;
+    }
+    this->StateWidgets.clear();
+  }
+
   std::vector<int> ExtraColumns;
+
+  QList<QString> PropertyNames;
+  QPointer<pqDataRepresentation> Representation;
+
+  QMap<int, pqMultiBlockPropertiesStateWidget*> StateWidgets;
+  QMap<int, std::vector<vtkSMProxy*>> OldLuts;
 };
 
 //=================================================================================
@@ -588,7 +539,7 @@ void adjustHeader(QHeaderView* header)
 }
 
 //=================================================================================
-void hookupTableView(QTableView* view, TableModel* model, QAbstractButton* addButton,
+void hookupTableView(QTableView* view, TableSelectorsModel* model, QAbstractButton* addButton,
   QAbstractButton* removeButton, QAbstractButton* removeAllButton)
 {
   // hookup add button
@@ -806,38 +757,6 @@ void hookupActiveSelection(vtkSMProxy* repr, vtkSMProperty* selectedSelectors,
 }
 
 //=================================================================================
-template <typename T1>
-QList<QVariant> colorsToVariantList(const QList<QPair<T1, QVariant>>& colors)
-{
-  QList<QVariant> result;
-  for (const auto& pair : colors)
-  {
-    result.push_back(pair.first);
-
-    const QVariant& variant = pair.second;
-
-    auto color = variant.value<QColor>();
-    result.push_back(color.redF());
-    result.push_back(color.greenF());
-    result.push_back(color.blueF());
-  }
-  return result;
-}
-
-//=================================================================================
-template <typename T1>
-QList<QVariant> opacitiesToVariantList(const QList<QPair<T1, QVariant>>& opacities)
-{
-  QList<QVariant> result;
-  for (const auto& pair : opacities)
-  {
-    result.push_back(pair.first);
-    result.push_back(pair.second.toDouble());
-  }
-  return result;
-}
-
-//=================================================================================
 QList<QVariant> compositeIndicesToVariantList(const std::vector<unsigned int>& cids)
 {
   QList<QVariant> result;
@@ -870,25 +789,16 @@ public:
   QPointer<pqDataAssemblyTreeModel> AssemblyTreeModel;
   QPointer<pqDAPModel> ProxyModel;
 
-  ///@{
   /**
-   * Table models for advanced editing of the selectors + properties.
+   * A Table model for advanced editing of the selectors.
    * This is not supported in composite-indices mode.
    */
-  QPointer<TableModel> SelectorsTableModel;
-  QPointer<TableModel> ColorsTableModel;
-  QPointer<TableModel> OpacitiesTableModel;
-  ///@}
+  QPointer<TableSelectorsModel> SelectorsTableModel;
 
   ///@{
   // Cached values.
   QStringList Selectors;
-  QList<QVariant> Colors;
-  QList<QVariant> Opacities;
-
   QList<QVariant> CompositeIndices;
-  QList<QVariant> CompositeIndexColors;
-  QList<QVariant> CompositeIndexOpacities;
   ///@}
 
   bool BlockUpdates = false;
@@ -948,29 +858,19 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.UseInputNameAsHeader = true;
   }
 
-  // Add a sort-filter model to enable sorting and filtering of item in the
-  // tree.
-  auto sortmodel = new QSortFilterProxyModel(this);
-  sortmodel->setSourceModel(internals.ProxyModel);
-  sortmodel->setRecursiveFilteringEnabled(true);
-  internals.Ui.hierarchy->setModel(sortmodel);
+  // Add a sort-filter model to enable sorting and filtering of item in the tree.
+  auto sortModel = new QSortFilterProxyModel(this);
+  sortModel->setSourceModel(internals.ProxyModel);
+  sortModel->setRecursiveFilteringEnabled(true);
+  internals.Ui.hierarchy->setModel(sortModel);
 
-  internals.SelectorsTableModel = new TableModel(iconSize, TableModel::SELECTORS, this);
+  internals.SelectorsTableModel = new ::TableSelectorsModel(this);
   internals.Ui.table->setModel(internals.SelectorsTableModel);
-
-  internals.ColorsTableModel = new TableModel(iconSize, TableModel::COLORS, this);
-  internals.Ui.colors->setModel(internals.ColorsTableModel);
-  internals.Ui.colors->horizontalHeader()->setDefaultSectionSize(iconSize + 6);
-  internals.Ui.colors->horizontalHeader()->setMinimumSectionSize(iconSize + 6);
-
-  internals.OpacitiesTableModel = new TableModel(iconSize, TableModel::OPACITIES, this);
-  internals.Ui.opacities->setModel(internals.OpacitiesTableModel);
-  internals.Ui.opacities->horizontalHeader()->setDefaultSectionSize(iconSize + 6);
-  internals.Ui.opacities->horizontalHeader()->setMinimumSectionSize(iconSize + 6);
 
   // change pqTreeView header.
   internals.Ui.hierarchy->setupCustomHeader(/*use_pqHeaderView=*/true);
   new pqTreeViewSelectionHelper(internals.Ui.hierarchy);
+  // TODO maintain selections even when another GUI element is selected
   if (auto headerView = qobject_cast<pqHeaderView*>(internals.Ui.hierarchy->header()))
   {
     headerView->setToggleCheckStateOnSectionClick(false);
@@ -980,10 +880,6 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
 
   hookupTableView(internals.Ui.table, internals.SelectorsTableModel, internals.Ui.add,
     internals.Ui.remove, internals.Ui.removeAll);
-  hookupTableView(internals.Ui.colors, internals.ColorsTableModel, internals.Ui.addColors,
-    internals.Ui.removeColors, internals.Ui.removeAllColors);
-  hookupTableView(internals.Ui.opacities, internals.OpacitiesTableModel, internals.Ui.addOpacities,
-    internals.Ui.removeOpacities, internals.Ui.removeAllOpacities);
 
   int linkActiveSelection = 0;
   if (groupHints && groupHints->GetScalarAttribute("link_active_selection", &linkActiveSelection) &&
@@ -1088,110 +984,61 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.Ui.assemblyCombo->hide();
   }
 
-  if (auto smproperty = smgroup->GetProperty("Colors"))
+  if (auto repr = vtkSMPVRepresentationProxy::SafeDownCast(smproxy))
   {
-    internals.ProxyModel->addColumn(detail::ColorRole);
-    internals.AssemblyTreeModel->setRoleProperty(
-      detail::ColorRole, pqDataAssemblyTreeModel::InheritedUntilOverridden);
-
-    if (vtkSMDomain* colorsDomain = smproperty->FindDomain<vtkSMCompositeTreeDomain>())
+    QList<QString> blockPropertyNames;
+    auto blockColors = vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("BlockColors"));
+    if (blockColors && blockColors->FindDomain<vtkSMDataAssemblyDomain>())
     {
-      // compositeIndices mode is exclusive: either all properties in the group are using it
-      // or none are.
-      Q_ASSERT(!usingCompositeIndices.isValid() || usingCompositeIndices.toBool() == true);
-
-      usingCompositeIndices = true;
-
-      domain = domain ? domain : colorsDomain;
-
-      // remove colors tab, we only show it when not in composite indices mode.
-      internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.colorsTab));
-
-      this->addPropertyLink(this, "compositeIndexColors", SIGNAL(colorsChanged()), smproperty);
+      blockPropertyNames.push_back("BlockColors");
     }
-    else if ((colorsDomain = smproperty->FindDomain<vtkSMDataAssemblyDomain>()))
+    auto blockColorArrayNames =
+      vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("BlockColorArrayNames"));
+    if (blockColorArrayNames && blockColorArrayNames->FindDomain<vtkSMRepresentedArrayListDomain>())
     {
-      // compositeIndices mode is exclusive: either all properties in the group are using it
-      // or none are.
+      blockPropertyNames.push_back("BlockColorArrayNames");
+    }
+    auto blockUseSeparateColorMaps =
+      vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("BlockUseSeparateColorMaps"));
+    if (blockUseSeparateColorMaps &&
+      blockUseSeparateColorMaps->FindDomain<vtkSMDataAssemblyDomain>())
+    {
+      blockPropertyNames.push_back("BlockUseSeparateColorMaps");
+    }
+    auto blockMapScalars =
+      vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("BlockMapScalars"));
+    if (blockMapScalars && blockMapScalars->FindDomain<vtkSMDataAssemblyDomain>())
+    {
+      blockPropertyNames.push_back("BlockMapScalars");
+    }
+    auto blockInterpolateScalarsBeforeMappings = vtkSMStringVectorProperty::SafeDownCast(
+      repr->GetProperty("BlockInterpolateScalarsBeforeMappings"));
+    if (blockInterpolateScalarsBeforeMappings &&
+      blockInterpolateScalarsBeforeMappings->FindDomain<vtkSMDataAssemblyDomain>())
+    {
+      blockPropertyNames.push_back("BlockInterpolateScalarsBeforeMappings");
+    }
+    auto blockOpacities =
+      vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("BlockOpacities"));
+    if (blockOpacities && blockOpacities->FindDomain<vtkSMDataAssemblyDomain>())
+    {
+      blockPropertyNames.push_back("BlockOpacities");
+    }
+    if (!blockPropertyNames.empty())
+    {
       Q_ASSERT(!usingCompositeIndices.isValid() || usingCompositeIndices.toBool() == false);
 
       usingCompositeIndices = false;
 
-      domain = domain ? domain : colorsDomain;
-
-      // monitor ColorsTableModel.
-      QObject::connect(internals.ColorsTableModel.data(), &QAbstractItemModel::dataChanged, this,
-        &pqDataAssemblyPropertyWidget::colorsTableModified);
-      QObject::connect(internals.ColorsTableModel.data(), &QAbstractItemModel::rowsInserted, this,
-        &pqDataAssemblyPropertyWidget::colorsTableModified);
-      QObject::connect(internals.ColorsTableModel.data(), &QAbstractItemModel::rowsRemoved, this,
-        &pqDataAssemblyPropertyWidget::colorsTableModified);
-      QObject::connect(internals.ColorsTableModel.data(), &QAbstractItemModel::modelReset, this,
-        &pqDataAssemblyPropertyWidget::colorsTableModified);
-
-      this->addPropertyLink(this, "selectorColors", SIGNAL(colorsChanged()), smproperty);
+      internals.ProxyModel->setRepresentation(repr);
+      internals.ProxyModel->setPropertyNames(blockPropertyNames);
+      internals.ProxyModel->addColumn(detail::BlockPropertiesStateRole);
+      internals.ProxyModel->addColumn(detail::BlockPropertiesResetRole);
+      internals.AssemblyTreeModel->setRoleProperty(
+        detail::BlockPropertiesStateRole, pqDataAssemblyTreeModel::InheritedUntilOverridden);
+      internals.AssemblyTreeModel->setRoleProperty(
+        detail::BlockPropertiesResetRole, pqDataAssemblyTreeModel::InheritedUntilOverridden);
     }
-    else
-    {
-      qWarning("Missing suitable domain on property for 'Colors'");
-    }
-  }
-  else
-  {
-    internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.colorsTab));
-  }
-
-  if (auto smproperty = smgroup->GetProperty("Opacities"))
-  {
-    internals.ProxyModel->addColumn(detail::OpacityRole);
-    internals.AssemblyTreeModel->setRoleProperty(
-      detail::OpacityRole, pqDataAssemblyTreeModel::InheritedUntilOverridden);
-
-    if (vtkSMDomain* opacitiesDomain = smproperty->FindDomain<vtkSMCompositeTreeDomain>())
-    {
-      // compositeIndices mode is exclusive: either all properties in the group are using it
-      // or none are.
-      Q_ASSERT(!usingCompositeIndices.isValid() || usingCompositeIndices.toBool() == true);
-
-      usingCompositeIndices = true;
-
-      domain = domain ? domain : opacitiesDomain;
-
-      // remove opacities tab; we only show it when not in composite indices
-      // mode.
-      internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.opacitiesTab));
-      this->addPropertyLink(
-        this, "compositeIndexOpacities", SIGNAL(opacitiesChanged()), smproperty);
-    }
-    else if ((opacitiesDomain = smproperty->FindDomain<vtkSMDataAssemblyDomain>()))
-    {
-      // compositeIndices mode is exclusive: either all properties in the group are using it
-      // or none are.
-      Q_ASSERT(!usingCompositeIndices.isValid() || usingCompositeIndices.toBool() == false);
-
-      usingCompositeIndices = false;
-
-      domain = domain ? domain : opacitiesDomain;
-
-      // monitor OpacitiesTableModel.
-      QObject::connect(internals.OpacitiesTableModel.data(), &QAbstractItemModel::dataChanged, this,
-        &pqDataAssemblyPropertyWidget::opacitiesTableModified);
-      QObject::connect(internals.OpacitiesTableModel.data(), &QAbstractItemModel::rowsInserted,
-        this, &pqDataAssemblyPropertyWidget::opacitiesTableModified);
-      QObject::connect(internals.OpacitiesTableModel.data(), &QAbstractItemModel::rowsRemoved, this,
-        &pqDataAssemblyPropertyWidget::opacitiesTableModified);
-      QObject::connect(internals.OpacitiesTableModel.data(), &QAbstractItemModel::modelReset, this,
-        &pqDataAssemblyPropertyWidget::opacitiesTableModified);
-      this->addPropertyLink(this, "selectorOpacities", SIGNAL(opacitiesChanged()), smproperty);
-    }
-    else
-    {
-      qWarning("Missing suitable domain on property for 'Opacities'");
-    }
-  }
-  else
-  {
-    internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.opacitiesTab));
   }
 
   internals.InCompositeIndicesMode =
@@ -1219,64 +1066,48 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   auto header = internals.Ui.hierarchy->header();
   if (header->count() > 1)
   {
-    // hookup double click to edit color and opacity.
-    QObject::connect(
-      internals.Ui.hierarchy, &QTreeView::doubleClicked, [&](const QModelIndex& idx) {
-        auto model = internals.Ui.hierarchy->model();
-        switch (internals.ProxyModel->roleForColumn(idx.column()))
+    // hookup pressed to reset state.
+    QObject::connect(internals.Ui.hierarchy, &QTreeView::pressed, [&](const QModelIndex& idx) {
+      auto model = internals.Ui.hierarchy->model();
+      auto sourceIndex = qobject_cast<QAbstractProxyModel*>(model)->mapToSource(idx);
+      switch (internals.ProxyModel->roleForColumn(idx.column()))
+      {
+        case detail::BlockPropertiesResetRole:
         {
-          case detail::ColorRole:
+          auto stateWidget = internals.ProxyModel->getStateWidget(sourceIndex);
+          if (stateWidget->getResetButton()->isEnabled())
           {
-            QColor color(255, 255, 255);
-            if (model->data(idx, detail::ColorRole).canConvert<QColor>())
-            {
-              color = model->data(idx, detail::ColorRole).value<QColor>();
-            }
-            color = QColorDialog::getColor(
-              color, this, "Select Color", QColorDialog::DontUseNativeDialog);
-            if (color.isValid())
-            {
-              model->setData(idx, color, detail::ColorRole);
-            }
-          }
-          break;
-
-          case detail::OpacityRole:
-          {
-            // provide non-zero default when data is unset.
-            double opacity = 1.0;
-            if (model->data(idx, detail::OpacityRole).canConvert<double>())
-            {
-              opacity = model->data(idx, detail::OpacityRole).toDouble();
-            }
-            pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
-            dialog.setObjectName("OpacityDialog");
-            dialog.setWindowTitle(tr("Select Opacity"));
-            dialog.setValue(opacity);
-            if (dialog.exec() == QDialog::Accepted)
-            {
-              model->setData(idx, qBound(0.0, dialog.value(), 1.0), detail::OpacityRole);
-            }
+            stateWidget->getResetButton()->setDown(true);
           }
           break;
         }
-      });
-
-    // hookup cntrl+clip to clear color and opacity.
-    QObject::connect(internals.Ui.hierarchy, &QTreeView::clicked, [&](const QModelIndex& idx) {
-      if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
-      {
-        return;
+        default:
+          break;
       }
+    });
+    // hookup clicked to reset state.
+    QObject::connect(internals.Ui.hierarchy, &QTreeView::clicked, [&](const QModelIndex& idx) {
       auto model = internals.Ui.hierarchy->model();
-      const int role = internals.ProxyModel->roleForColumn(idx.column());
-      model->setData(idx.siblingAtColumn(0), QVariant(), role);
+      auto sourceIndex = qobject_cast<QAbstractProxyModel*>(model)->mapToSource(idx);
+      switch (internals.ProxyModel->roleForColumn(idx.column()))
+      {
+        case detail::BlockPropertiesResetRole:
+        {
+          auto stateWidget = internals.ProxyModel->getStateWidget(sourceIndex);
+          if (stateWidget->getResetButton()->isEnabled())
+          {
+            stateWidget->getResetButton()->setDown(false);
+            stateWidget->getResetButton()->click();
+          }
+          break;
+        }
+        default:
+          break;
+      }
     });
   }
 
   adjustHeader(internals.Ui.hierarchy->header());
-  adjustHeader(internals.Ui.colors->horizontalHeader());
-  adjustHeader(internals.Ui.opacities->horizontalHeader());
 }
 
 //-----------------------------------------------------------------------------
@@ -1310,50 +1141,6 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     }
     Q_EMIT this->selectorsChanged();
   }
-  else if (role == detail::ColorRole)
-  {
-    const auto colors = internals.AssemblyTreeModel->data(detail::ColorRole);
-    internals.ColorsTableModel->setData(colors);
-    internals.Colors = colorsToVariantList(colors);
-    internals.CompositeIndexColors.clear();
-    if (assembly != nullptr && internals.InCompositeIndicesMode)
-    {
-      // convert selector:colors map to composite-index:color map.
-      QList<QPair<unsigned int, QVariant>> idColors;
-      for (const auto& pair : colors)
-      {
-        auto ids =
-          vtkDataAssemblyUtilities::GetSelectedCompositeIds({ pair.first.toStdString() }, assembly);
-        Q_ASSERT(ids.size() == 1);
-        idColors.push_back(qMakePair(ids.front(), pair.second));
-      }
-      internals.CompositeIndexColors = colorsToVariantList(idColors);
-    }
-
-    Q_EMIT this->colorsChanged();
-  }
-  else if (role == detail::OpacityRole)
-  {
-    const auto opacities = internals.AssemblyTreeModel->data(detail::OpacityRole);
-    internals.OpacitiesTableModel->setData(opacities);
-    internals.Opacities = opacitiesToVariantList(opacities);
-    internals.CompositeIndexOpacities.clear();
-    if (assembly != nullptr && internals.InCompositeIndicesMode)
-    {
-      // convert selector:opacities map to composite-index:opacities map.
-      QList<QPair<unsigned int, QVariant>> idOpacities;
-      for (const auto& pair : opacities)
-      {
-        auto ids =
-          vtkDataAssemblyUtilities::GetSelectedCompositeIds({ pair.first.toStdString() }, assembly);
-        Q_ASSERT(ids.size() == 1);
-        idOpacities.push_back(qMakePair(ids.front(), pair.second));
-      }
-      internals.CompositeIndexOpacities = opacitiesToVariantList(idOpacities);
-    }
-
-    Q_EMIT this->opacitiesChanged();
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1369,38 +1156,6 @@ void pqDataAssemblyPropertyWidget::selectorsTableModified()
   internals.Selectors = internals.SelectorsTableModel->selectors();
   internals.AssemblyTreeModel->setCheckedNodes(internals.Selectors);
   Q_EMIT this->selectorsChanged();
-}
-
-//-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::colorsTableModified()
-{
-  auto& internals = (*this->Internals);
-  if (internals.BlockUpdates)
-  {
-    return;
-  }
-
-  QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
-  const auto& colors = internals.ColorsTableModel->values();
-  internals.Colors = colorsToVariantList(colors);
-  internals.AssemblyTreeModel->setData(colors, detail::ColorRole);
-  Q_EMIT this->colorsChanged();
-}
-
-//-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::opacitiesTableModified()
-{
-  auto& internals = (*this->Internals);
-  if (internals.BlockUpdates)
-  {
-    return;
-  }
-
-  QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
-  const auto& opacities = internals.OpacitiesTableModel->values();
-  internals.Opacities = opacitiesToVariantList(opacities);
-  internals.AssemblyTreeModel->setData(opacities, detail::OpacityRole);
-  Q_EMIT this->opacitiesChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1432,15 +1187,12 @@ void pqDataAssemblyPropertyWidget::updateDataAssembly(vtkObject* sender)
   if (internals.InCompositeIndicesMode)
   {
     this->setCompositeIndices(internals.CompositeIndices);
-    this->setCompositeIndexColors(internals.CompositeIndexColors);
-    this->setCompositeIndexOpacities(internals.CompositeIndexOpacities);
   }
   else
   {
     this->setSelectors(internals.Selectors);
-    this->setSelectorColors(internals.Colors);
-    this->setSelectorOpacities(internals.Opacities);
   }
+  internals.ProxyModel->initializeStateWidgets(assembly);
 
   auto domain = vtkSMDomain::SafeDownCast(sender);
   if (internals.UseInputNameAsHeader && domain)
@@ -1515,104 +1267,6 @@ QList<QVariant> pqDataAssemblyPropertyWidget::compositeIndicesAsVariantList() co
 {
   const auto& internals = (*this->Internals);
   return internals.CompositeIndices;
-}
-
-//-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::setCompositeIndexColors(const QList<QVariant>& values)
-{
-  auto& internals = (*this->Internals);
-  internals.CompositeIndexColors = values;
-
-  QList<QVariant> cidColorSelectors;
-  for (int cc = 0; (cc + 3) < values.size(); cc += 4)
-  {
-    cidColorSelectors.push_back(QString("//*[@cid=%1]").arg(values[cc].value<unsigned int>()));
-    cidColorSelectors.push_back(values[cc + 1]);
-    cidColorSelectors.push_back(values[cc + 2]);
-    cidColorSelectors.push_back(values[cc + 3]);
-  }
-  this->setSelectorColors(cidColorSelectors);
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqDataAssemblyPropertyWidget::compositeIndexColorsAsVariantList() const
-{
-  const auto& internals = (*this->Internals);
-  return internals.CompositeIndexColors;
-}
-
-//-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::setSelectorColors(const QList<QVariant>& values)
-{
-  auto& internals = (*this->Internals);
-  internals.Colors = values;
-
-  QList<QPair<QString, QVariant>> colors;
-  for (int cc = 0, max = values.size(); (cc + 3) < max; cc += 4)
-  {
-    const auto color = QColor::fromRgbF(
-      values[cc + 1].toDouble(), values[cc + 2].toDouble(), values[cc + 3].toDouble());
-    colors.push_back(qMakePair(values[cc].toString(), color));
-  }
-
-  QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
-  internals.AssemblyTreeModel->setData(colors, detail::ColorRole);
-  internals.ColorsTableModel->setData(colors);
-  Q_EMIT this->colorsChanged();
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqDataAssemblyPropertyWidget::selectorColorsAsVariantList() const
-{
-  const auto& internals = (*this->Internals);
-  return internals.Colors;
-}
-
-//-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::setCompositeIndexOpacities(const QList<QVariant>& values)
-{
-  auto& internals = (*this->Internals);
-  internals.CompositeIndexOpacities = values;
-
-  QList<QVariant> cidOpacitySelectors;
-  for (int cc = 0; (cc + 1) < values.size(); cc += 2)
-  {
-    cidOpacitySelectors.push_back(QString("//*[@cid=%1]").arg(values[cc].value<unsigned int>()));
-    cidOpacitySelectors.push_back(values[cc + 1]);
-  }
-  this->setSelectorOpacities(cidOpacitySelectors);
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqDataAssemblyPropertyWidget::compositeIndexOpacitiesAsVariantList() const
-{
-  const auto& internals = (*this->Internals);
-  return internals.CompositeIndexOpacities;
-}
-
-//-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::setSelectorOpacities(const QList<QVariant>& values)
-{
-  auto& internals = (*this->Internals);
-  internals.Opacities = values;
-
-  QList<QPair<QString, QVariant>> opacities;
-  for (int cc = 0, max = values.size(); (cc + 1) < max; cc += 2)
-  {
-    opacities.push_back(qMakePair(values[cc].toString(), values[cc + 1].toDouble()));
-  }
-
-  QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
-  internals.AssemblyTreeModel->setData(opacities, detail::OpacityRole);
-  internals.OpacitiesTableModel->setData(opacities);
-  Q_EMIT this->opacitiesChanged();
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqDataAssemblyPropertyWidget::selectorOpacitiesAsVariantList() const
-{
-  const auto& internals = (*this->Internals);
-  return internals.Opacities;
 }
 
 //-----------------------------------------------------------------------------

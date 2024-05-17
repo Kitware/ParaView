@@ -7,6 +7,8 @@
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED
+
 #include <QScopedPointer> // for QScopedPointer
 
 /**
@@ -16,13 +18,12 @@
  * pqDataAssemblyPropertyWidget is intended for properties that rely on a
  * vtkDataAssembly i.e. use a vtkSMDataAssemblyDomain. This
  * supports getting/setting the list of selectors for checked nodes based on the
- * chosen vtkDataAssembly. Further more, it supports editing color and opacity,
- * if requested.
+ * chosen vtkDataAssembly. Further more, it supports show the state and resetting
+ * block properties.
  *
  * pqDataAssemblyPropertyWidget can be used on a single property with a
  * vtkSMDataAssemblyDomain or for a group of properties. For a single property,
- * it allows for editing on selectors for checked nodes. For a group, it can
- * support opacity and color editing as well.
+ * it allows for editing on selectors for checked nodes.
  *
  * Here's an example proxy XML for a single property.
  *
@@ -45,12 +46,11 @@
  * The widget will use the assembly provided by
  * `vtkSMDataAssemblyDomain::GetDataAssembly` to render a tree in UI.
  *
- * A property-group for editing color and opacity, along with choosing which
- * named-assembly to use is as follows. All properties in the group are optional
- * and one may specify on subset that is relevant for their use-case. It is
- * assumed, however, that all properties in the group use the same data
- * assembly. If that's not the case, one should use separate property groups,
- * hence separate widgets, for each.
+ * A property-group for choosing which named-assembly to use is as follows.
+ * All properties in the group are optional and one may specify on subset
+ * that is relevant for their use-case. It is assumed, however, that all properties
+ * in the group use the same data assembly. If that's not the case, one should use
+ * separate property groups, hence separate widgets, for each.
  *
  * @code{xml}
  * <Proxy ...>
@@ -107,36 +107,10 @@
  *     </Documentation>
  *   </StringVectorProperty>
  *
- *   <StringVectorProperty name="BlockColor"
- *                         element_types="2 1 1 1"
- *                         number_of_elements_per_command="4"
- *                         repeat_command="1">
- *      <DataAssemblyDomain name="data_assembly">
- *       <RequiredProperties>
- *         <Property function="Input" name="Input" />
- *         <Property function="ActiveAssembly" name="Assembly" />
- *       </RequiredProperties>
- *     </DataAssemblyDomain>
- *   </StringVectorProperty>
-
- *   <StringVectorProperty name="BlockOpacity"
- *                         element_types="2 1"
- *                         number_of_elements_per_command="2"
- *                         repeat_command="1">
- *      <DataAssemblyDomain name="data_assembly">
- *       <RequiredProperties>
- *         <Property function="Input" name="Input" />
- *         <Property function="ActiveAssembly" name="Assembly" />
- *       </RequiredProperties>
- *     </DataAssemblyDomain>
- *   </StringVectorProperty>
- *
  *   <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
  *     <Property name="Assembly"  function="ActiveAssembly" />
  *     <Property name="SelectedSelectors" function="SelectedSelectors" />
  *     <Property name="Selectors" function="Selectors" />
- *     <Property name="BlockColor" function="Colors" />
- *     <Property name="BlockOpacity" function="Opacities" />
  *   </PropertyGroup>
  * </Proxy>
  * @endcode
@@ -148,7 +122,7 @@
  * all properties in the group to consistently use vtkSMDataAssemblyDomain or
  * vtkSMCompositeTreeDomain and mixing is not allowed.
  *
- * TODO: Remove the usage of vvtkSMCompositeTreeDomain.
+ * TODO: Remove the usage of vtkSMCompositeTreeDomain.
  *
  * @section Hints Hints
  *
@@ -185,36 +159,14 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
 
+  ///@{
   /**
-   * Property with selectors for checked nodes in the hierarchy.
+   * Property with selectors/composite indices for checked nodes in the hierarchy.
    */
   Q_PROPERTY(QList<QVariant> selectors READ selectorsAsVariantList WRITE setSelectors NOTIFY
       selectorsChanged);
-
-  /**
-   * Property with selectors and associated colors (as RGB).
-   */
-  Q_PROPERTY(QList<QVariant> selectorColors READ selectorColorsAsVariantList WRITE setSelectorColors
-      NOTIFY colorsChanged);
-
-  /**
-   * Property with selectors and associated opacities.
-   */
-  Q_PROPERTY(QList<QVariant> selectorOpacities READ selectorOpacitiesAsVariantList WRITE
-      setSelectorOpacities NOTIFY opacitiesChanged);
-
-  ///@{
-  /**
-   * These are similar to the selector-based variants, except, instead of a
-   * selector, the composite index is used. This is used when supported
-   * vtkSMCompositeTreeDomain-based properties.
-   */
   Q_PROPERTY(QList<QVariant> compositeIndices READ compositeIndicesAsVariantList WRITE
       setCompositeIndices NOTIFY selectorsChanged);
-  Q_PROPERTY(QList<QVariant> compositeIndexOpacities READ compositeIndexOpacitiesAsVariantList WRITE
-      setCompositeIndexOpacities NOTIFY opacitiesChanged);
-  Q_PROPERTY(QList<QVariant> compositeIndexColors READ compositeIndexColorsAsVariantList WRITE
-      setCompositeIndexColors NOTIFY colorsChanged);
   ///@}
 public:
   pqDataAssemblyPropertyWidget(
@@ -247,11 +199,15 @@ public:
    * followed by corresponding RGB color or list of composite indices followed by
    * the color.
    */
-  void setCompositeIndexColors(const QList<QVariant>& values);
-  QList<QVariant> compositeIndexColorsAsVariantList() const;
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  void setCompositeIndexColors(const QList<QVariant>& values) { Q_UNUSED(values); }
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  QList<QVariant> compositeIndexColorsAsVariantList() const { return QList<QVariant>(); }
 
-  void setSelectorColors(const QList<QVariant>& values);
-  QList<QVariant> selectorColorsAsVariantList() const;
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  void setSelectorColors(const QList<QVariant>& values) { Q_UNUSED(values); }
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  QList<QVariant> selectorColorsAsVariantList() const { return QList<QVariant>(); }
   ///@}
 
   ///@{
@@ -260,26 +216,30 @@ public:
    * followed by corresponding opacity or list of composite indices followed by
    * the opacity.
    */
-  void setCompositeIndexOpacities(const QList<QVariant>& values);
-  QList<QVariant> compositeIndexOpacitiesAsVariantList() const;
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  void setCompositeIndexOpacities(const QList<QVariant>& values) { Q_UNUSED(values); }
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  QList<QVariant> compositeIndexOpacitiesAsVariantList() const { return QList<QVariant>(); }
 
-  void setSelectorOpacities(const QList<QVariant>& values);
-  QList<QVariant> selectorOpacitiesAsVariantList() const;
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  void setSelectorOpacities(const QList<QVariant>& values) { Q_UNUSED(values); }
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  QList<QVariant> selectorOpacitiesAsVariantList() const { return QList<QVariant>(); }
   ///@}
 
   void updateWidget(bool showing_advanced_properties) override;
 
 Q_SIGNALS:
   void selectorsChanged();
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   void colorsChanged();
+  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   void opacitiesChanged();
 
 private Q_SLOTS:
   void updateDataAssembly(vtkObject* sender);
   void assemblyTreeModified(int role);
   void selectorsTableModified();
-  void colorsTableModified();
-  void opacitiesTableModified();
 
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqDataAssemblyPropertyWidget);
