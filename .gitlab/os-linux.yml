@@ -33,7 +33,7 @@
 
 .el8_icc:
     extends: .linux
-    image: "kitware/paraview:ci-el8-icc-20220809"
+    image: "kitware/paraview:ci-el8-icc-20240521"
 
     variables:
         CC: icx
