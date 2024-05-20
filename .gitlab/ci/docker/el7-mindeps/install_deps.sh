@@ -28,8 +28,13 @@ yum install -y --setopt=install_weak_deps=False \
 
 # Python dependencies
 yum install -y --setopt=install_weak_deps=False \
-    python3 python3-devel python3-numpy \
-    python3-pip python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib
+    centos-release-scl
+
+# Python dependencies
+yum install -y --setopt=install_weak_deps=False \
+    rh-python38-python3 rh-python38-python-devel rh-python38-python3-numpy \
+    rh-python38-python3-pip rh-python38-python3-mpi4py-mpich \
+    rh-python38-python3-mpi4py-openmpi rh-python38-python3-matplotlib
 
 # EPEL for more tools
 yum install -y --setopt=install_weak_deps=False \
