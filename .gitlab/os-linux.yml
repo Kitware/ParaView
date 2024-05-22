@@ -26,11 +26,14 @@
 
 .el7_mindeps:
     extends: .linux
-    image: "kitware/paraview:ci-el7-mindeps-20230224"
+    image: "kitware/paraview:ci-el7-mindeps-20240521"
+
+    variables:
+        LAUNCHER: "scl enable rh-python38 --"
 
 .el8_icc:
     extends: .linux
-    image: "kitware/paraview:ci-el8-icc-20220809"
+    image: "kitware/paraview:ci-el8-icc-20240521"
 
     variables:
         CC: icx
