@@ -19,7 +19,6 @@ class vtkSMProxy;
  */
 namespace pqMenuReactionUtils
 {
-
 /**
  * Generates a QString with an error helper message for a given vtkSMDomain
  */
