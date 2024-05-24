@@ -178,6 +178,7 @@
       <Proxy group="filters" name="TemporalCache" />
       <Proxy group="filters" name="TemporalInterpolator" />
       <Proxy group="filters" name="TemporalShiftScale" />
+      <Proxy group="filters" name="TemporalSmoothing" />
       <Proxy group="filters" name="TemporalSnapToTimeStep" />
       <Proxy group="filters" name="TemporalStatistics" />
       <Proxy group="filters" name="TimeStepProgressFilter" />
@@ -507,6 +508,7 @@
   <Proxy group="filters" name="TemporalShiftScale" />
   <Proxy group="filters" name="TemporalSnapToTimeStep" />
   <Proxy group="filters" name="TemporalStatistics" />
+  <Proxy group="filters" name="TemporalSmoothing" />
   <Proxy group="filters" name="TensorGlyph" />
   <Proxy group="filters" name="TensorPrincipalInvariants" />
   <Proxy group="filters" name="TessellatorFilter" />
