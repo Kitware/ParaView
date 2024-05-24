@@ -533,6 +533,7 @@ paraview_require_module(
           VTK::FiltersParallelVerdict
           VTK::FiltersSources
           VTK::FiltersStatistics
+          VTK::FiltersTemporal
           VTK::FiltersTensor
           VTK::FiltersTexture
           VTK::FiltersVerdict

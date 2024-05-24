@@ -165,6 +165,7 @@
       <Proxy group="filters" name="AnimateModes" />
       <Proxy group="filters" name="ExtractParticlesOverTime" />
       <Proxy group="filters" name="ExtractTimeSteps" />
+      <Proxy group="filters" name="ForceStaticMesh" />
       <Proxy group="filters" name="ForceTime" />
       <Proxy group="filters" name="GenerateTimeSteps" />
       <Proxy group="filters" name="GroupTimeSteps" />

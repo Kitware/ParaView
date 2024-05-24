@@ -1,0 +1,38 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+     <!-- ==================================================================== -->
+     <SourceProxy name="ForceStaticMesh" class="vtkForceStaticMesh" label="Force Static Mesh">
+       <Documentation
+           long_help="This filter caches its input the first time it is executed then use it as a static mesh"
+           short_help="Force output to be a static mesh">
+           The Force Static Mesh filter create a cache the first time it is executed using its input. It will then only
+           update PointData, CellData and FieldData from the input as long as their dimensions stay the same.
+           This filter operates only on a vtkUnstructuredGrid input or on the first block of a multiblock input
+           if it is a vtkUnstructuredGrid.
+       </Documentation>
+       <InputProperty command="SetInputConnection"
+                      name="Input">
+         <ProxyGroupDomain name="groups">
+           <Group name="sources" />
+           <Group name="filters" />
+         </ProxyGroupDomain>
+         <DataTypeDomain name="input_type">
+           <DataType value="vtkUnstructuredGrid" />
+           <DataType value="vtkPolyData" />
+           <DataType value="vtkCompositeDataSet" />
+         </DataTypeDomain>
+         <Documentation>This property specifies the input of the filter.</Documentation>
+       </InputProperty>
+       <IntVectorProperty
+           name="ForceCacheComputation"
+           command="SetCacheComputation"
+           default_values="0"
+           panel_visibility="advanced" >
+         <BooleanDomain name="bool" />
+         <Documentation>
+           Set this to true to force this filter to recompute the cache instead of using it.
+         </Documentation>
+       </IntVectorProperty>
+     </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
