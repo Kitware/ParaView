@@ -910,6 +910,9 @@ list (APPEND TESTS_WITHOUT_BASELINES
   ProxyCategoriesFavorites.xml
   ProxyCategoriesMenusDefault.xml
   ProxyCategoriesToolbar.xml
+  QuickLaunchCreateProxy.xml
+  QuickLaunchNavigation.xml
+  QuickLaunchRequest.xml
   ReadIOHDFAMRMaxLevels.xml
   ReaderRegistrationName.xml
   ReloadCGNSFile.xml
@@ -1731,6 +1734,9 @@ set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (PropertyContextMenu_FORCE_SERIAL TRUE)
 set (ProxyCategoriesConfiguration_FORCE_SERIAL TRUE) # since this uses popup-line edit
+set (QuickLaunchCreateProxy_FORCE_SERIAL TRUE)
+set (QuickLaunchNavigation_FORCE_SERIAL TRUE)
+set (QuickLaunchRequest_FORCE_SERIAL TRUE)
 set (ReadPartitionedCGNS_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 set (RecentFilesHardFilename_FORCE_SERIAL TRUE) # use key events

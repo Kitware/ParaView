@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "pqMenuReactionUtils.h"
 
+#include "pqApplicationCore.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 
+#include <QCoreApplication>
 #include <QStringList>
 #include <vector>
 
@@ -41,27 +43,30 @@ QString getDomainDisplayText(vtkSMDomain* domain)
   {
     vtkSMInputArrayDomain* iad = static_cast<vtkSMInputArrayDomain*>(domain);
     QString txt = (iad->GetAttributeType() == vtkSMInputArrayDomain::ANY
-        ? QString("Requires an attribute array")
-        : QString("Requires a %1 attribute array").arg(iad->GetAttributeTypeAsString()));
+        ? QCoreApplication::translate("pqMenuReactionUtils", "Requires an attribute array")
+        : QCoreApplication::translate("pqMenuReactionUtils", "Requires a %1 attribute array")
+            .arg(iad->GetAttributeTypeAsString()));
     std::vector<int> numbersOfComponents = iad->GetAcceptableNumbersOfComponents();
     if (!numbersOfComponents.empty())
     {
-      txt += QString(" with ");
+      QString compDetails =
+        QCoreApplication::translate("pqMenuReactionUtils", " with %1 component(s)");
       for (unsigned int i = 0; i < numbersOfComponents.size(); i++)
       {
         if (i == numbersOfComponents.size() - 1)
         {
-          txt += QString("%1 ").arg(numbersOfComponents[i]);
+          compDetails = compDetails.arg(numbersOfComponents[i]);
         }
         else
         {
-          txt += QString("%1 or ").arg(numbersOfComponents[i]);
+          compDetails = compDetails.arg(numbersOfComponents[i]);
+          compDetails += QCoreApplication::translate("pqMenuReactionUtils", " or %1");
         }
       }
-      txt += QString("component(s)");
+      txt += compDetails;
     }
     return txt;
   }
-  return QString("Requirements not met");
+  return QCoreApplication::translate("pqMenuReactionUtils", "Requirements not met");
 }
 }

@@ -121,7 +121,6 @@ set(classes
   pqManageLinksReaction
   pqManagePluginsReaction
   pqMasterOnlyReaction
-  pqMenuReactionUtils
   pqMetaDataPropertyWidget
   pqModelTransformSupportBehavior
   pqMoleculePropertyWidget
@@ -130,6 +129,7 @@ set(classes
   pqOMETransferFunctionsPropertyWidget
   pqOpacityTableModel
   pqOSPRayHidingDecorator
+  pqQuickLaunchDialogExtended
   pqPVAnimationWidget
   pqPVApplicationCore
   pqParaViewBehaviors
@@ -258,6 +258,7 @@ set(ui_files
   Resources/UI/pqOMETransferFunctionsPropertyWidget.ui
   Resources/UI/pqOMETransferFunctionsPropertyWidgetPage.ui
   Resources/UI/pqPauseLiveSourcePropertyWidget.ui
+  Resources/UI/pqQuickLaunchDialogExtended.ui
   Resources/UI/pqPropertyCollectionWidget.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
@@ -326,6 +327,9 @@ if (PARAVIEW_USE_QTHELP)
     pqPluginDocumentationBehavior)
 endif ()
 
+set (private_classes
+  pqProxyActionListModel)
+
 vtk_module_find_package(
   PACKAGE     "Qt${PARAVIEW_QT_MAJOR_VERSION}"
   COMPONENTS  ${qt_components})
@@ -353,8 +357,10 @@ if (PARAVIEW_BUILD_TRANSLATIONS)
     OUTPUT_TS "${PARAVIEW_TRANSLATIONS_DIRECTORY}/Qt_ApplicationComponents.ts")
   add_dependencies(localization "ApplicationComponents.ts")
 endif ()
+
 vtk_module_add_module(ParaView::pqApplicationComponents
   CLASSES ${classes}
+  PRIVATE_CLASSES ${private_classes}
   HEADERS ${headers}
   SOURCES ${ui_files}
           ${resource_files})

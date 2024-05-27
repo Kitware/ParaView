@@ -110,6 +110,7 @@ set(classes
   pqPropertyWidgetDecorator
   pqPropertyWidgetInterface
   pqProxiesWidget
+  pqProxyAction
   pqProxyEditorPropertyWidget
   pqProxyInformationWidget
   pqProxyPropertyWidget

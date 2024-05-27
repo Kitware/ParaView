@@ -8,6 +8,7 @@
 #include "pqCoreUtilities.h"
 #include "pqManageFavoritesReaction.h"
 #include "pqPVApplicationCore.h"
+#include "pqProxyAction.h"
 #include "pqProxyCategory.h"
 #include "pqQtDeprecated.h"
 #include "pqServerManagerModel.h"
@@ -128,30 +129,6 @@ struct pqProxyGroupMenuManager::pqInternal
     return actionAddToFavorites;
   }
 
-  //-----------------------------------------------------------------------------
-  vtkSMProxy* getPrototype(QAction* action) const
-  {
-    if (!action)
-    {
-      return nullptr;
-    }
-    QStringList data_list = action->data().toStringList();
-    if (data_list.size() != 2)
-    {
-      return nullptr;
-    }
-
-    QPair<QString, QString> key(data_list[0], data_list[1]);
-    vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    if (!pxm)
-    {
-      return nullptr;
-    }
-
-    return pxm->GetPrototypeProxy(key.first.toUtf8().data(), key.second.toUtf8().data());
-  }
-
   /**
    * Proxy action update.
    */
@@ -179,7 +156,7 @@ struct pqProxyGroupMenuManager::pqInternal
 
     if (icon.isEmpty())
     {
-      vtkSMProxy* prototype = this->getPrototype(action);
+      vtkSMProxy* prototype = pqProxyAction::GetProxyPrototype(action);
       // Try to add some default icons if none is specified.
       if (prototype && prototype->IsA("vtkSMCompoundSourceProxy"))
       {
@@ -752,6 +729,7 @@ void pqProxyGroupMenuManager::populateMenu()
     this->Internal->SearchAction =
       mainMenu->addAction(tr("Search...\tCtrl+Space"), this, SLOT(quickLaunch()));
 #endif
+    this->Internal->SearchAction->setObjectName("quickLaunchAction");
   }
 
   if (this->RecentlyUsedMenuSize > 0)
@@ -860,12 +838,16 @@ QAction* pqProxyGroupMenuManager::createAction(pqProxyInfo* proxyInfo)
   action << pqSetName(name) << pqSetData(data_list);
   action->setText(proxyInfo->label());
 
+  vtkSMProxy* prototype = pqProxyAction::GetProxyPrototype(action);
   // create action only for valid proxies
-  if (!this->getPrototype(action))
+  if (!prototype)
   {
     action->deleteLater();
     return nullptr;
   }
+
+  QString tooltip = pqProxyAction::GetProxyDocumentation(action);
+  action->setToolTip(tooltip);
 
   // Add action in the pool for the QuickSearch...
   this->Internal->Widget.addAction(action);
@@ -968,7 +950,7 @@ QList<QAction*> pqProxyGroupMenuManager::actions() const
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
 {
-  return this->Internal->getPrototype(action);
+  return pqProxyAction::GetProxyPrototype(action);
 }
 
 //-----------------------------------------------------------------------------

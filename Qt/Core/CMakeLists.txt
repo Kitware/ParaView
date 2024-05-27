@@ -40,6 +40,7 @@ set(classes
   pqImageUtil
   pqInteractiveViewLink
   pqInterfaceTracker
+  pqKeyEventFilter
   pqKeySequences
   pqLinkedObjectInterface
   pqLinkedObjectQTextEdit
@@ -47,6 +48,7 @@ set(classes
   pqLinksModel
   pqLogViewerWidget
   pqMainWindowEventManager
+  pqMenuReactionUtils
   pqModalShortcut
   pqMultiSliceAxisWidget
   pqMultiSliceView

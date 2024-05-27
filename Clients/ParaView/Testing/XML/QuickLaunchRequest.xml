@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="quickLaunchAction" />
+
+  <!-- test request -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="sphere" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelRowCount" arguments="1" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelItemData" arguments="0.0,Sphere" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/CreateProxy" property="text" arguments="Sphere" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/ShortHelp" property="text" arguments="Create a 3D sphere" />
+
+  <!-- test "fuzzy match" -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="set group" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelRowCount" arguments="0" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" property="modelRowCount" arguments="1" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" property="modelItemData" arguments="0.0,Group Datasets" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="Requires an input" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/ShortHelp" property="text" arguments="Group multiple inputs into one collection." />
+
+  <!-- test search in documentation -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="radi" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelItemData" arguments="0.0,Cone" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/ShortHelp" property="text" arguments="3D cone of a given radius and height" />
+
+  <!-- test more requirements -->
+  <!-- create proxy -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/CreateProxy" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters" command="activate" arguments="quickLaunchAction" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="stream tracer" />
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="Requires a any-except-field attribute array with 3 component(s)" />
+
+  <!-- test help window -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/GoToHelp" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" property="modelItemData" arguments="0.0,ParaView User Manual" />
+</pqevents>
