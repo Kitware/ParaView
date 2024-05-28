@@ -189,9 +189,16 @@ if (NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif ()
 
-cmake_dependent_option(PARAVIEW_USE_HIP "Support HIP backend accelerator" OFF
+cmake_dependent_option(PARAVIEW_USE_KOKKOS "Support Kokkos backend accelerator" OFF
   "CMAKE_VERSION VERSION_GREATER_EQUAL 3.21 AND NOT PARAVIEW_USE_CUDA" OFF)
-mark_as_advanced(PARAVIEW_USE_HIP)
+mark_as_advanced(PARAVIEW_USE_KOKKOS)
+if(PARAVIEW_USE_KOKKOS)
+  set(PARAVIEW_KOKKOS_BACKEND "SERIAL" CACHE STRING "'HIP', 'SYCL', or 'CUDA'")
+endif()
+# If the Kokkos backend is set, it should imply that Kokkos is to used
+if(PARAVIEW_KOKKOS_BACKEND)
+  set(PARAVIEW_USE_KOKKOS ON)
+endif()
 
 # The following `enable_language` needs to be a top level flag as
 # enable_language needs to be called from CMake entry point for variables to
@@ -200,8 +207,36 @@ if(PARAVIEW_USE_CUDA)
   enable_language(CUDA)
 endif()
 
+# Add an option to enable/disable KOKKOS support.
+cmake_dependent_option(PARAVIEW_USE_KOKKOS "Support KOKKOS backend accelerator" OFF
+  "CMAKE_VERSION VERSION_GREATER_EQUAL 3.21;NOT VTK_USE_CUDA" OFF)
+mark_as_advanced(PARAVIEW_USE_KOKKOS)
+if(PARAVIEW_USE_KOKKOS)
+  set(PARAVIEW_KOKKOS_BACKEND:STRING "None" CACHE STRING "'HIP', 'SYCL', or 'CUDA'")
+endif()
+
 if(PARAVIEW_USE_HIP)
-  enable_language(HIP)
+  message(WARNING "PARAVIEW_USE_HIP will be removed in future releases, please use PARAVIEW_USE_KOKKOS and PARAVIEW_KOKKOS_BACKEND")
+  set(PARAVIEW_USE_KOKKOS ON)
+  set(PARAVIEW_KOKKOS_BACKEND "HIP")
+endif()
+
+if(PARAVIEW_USE_KOKKOS)
+  if(PARAVIEW_USE_CUDA)
+    message(FATAL_ERROR "PARAVIEW_USE_KOKKOS and PARAVIEW_USE_CUDA are mutually exclusive, enable only one.")
+  endif()
+  # This needs to be a top level flag as enable_language needs
+  # to be called from CMake entry point for variables to have
+  # the correct scope.
+  if(PARAVIEW_KOKKOS_BACKEND STREQUAL "HIP")
+    enable_language(HIP)
+  elseif(PARAVIEW_KOKKOS_BACKEND STREQUAL "CUDA")
+    enable_language(CUDA)
+  elseif(PARAVIEW_KOKKOS_BACKEND STREQUAL "SYCL")
+  elseif(PARAVIEW_KOKKOS_BACKEND STREQUAL "SERIAL")
+  else()
+    message(FATAL_ERROR "PARAVIEW_KOKKOS_BACKEND not recognized")
+  endif()
 endif()
 
 set(BUILD_TESTING OFF)
@@ -611,8 +646,9 @@ else ()
 
   # Forward CUDA option to VTK
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
-  # Forward HIP option to VTK
-  set(VTK_USE_HIP "${PARAVIEW_USE_HIP}")
+  # Forward KOKKOS option to VTK
+  set(VTK_USE_KOKKOS "${PARAVIEW_USE_KOKKOS}")
+  set(VTK_KOKKOS_BACKEND "${PARAVIEW_KOKKOS_BACKEND}")
   # Forward Memkind option to VTK.
   set(VTK_USE_MEMKIND "${PARAVIEW_USE_MEMKIND}")
   # Forward OpenVDB option to VTK.
