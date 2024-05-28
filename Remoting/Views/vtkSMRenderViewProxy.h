@@ -13,8 +13,11 @@
 #define vtkSMRenderViewProxy_h
 
 #include "vtkNew.h"                 // needed for vtkInteractorObserver.
-#include "vtkRemotingViewsModule.h" //needed for exports
-#include "vtkSMViewProxy.h"
+#include "vtkRemotingViewsModule.h" // needed for exports
+#include "vtkSMViewProxy.h"         // for base class
+#include "vtkTuple.h"               // for vtkTuple
+
+#include <memory> // for std::unique_ptr
 
 class vtkCamera;
 class vtkCollection;
@@ -275,6 +278,81 @@ public:
   void SetEnableSynchronizableActors(bool);
   bool GetEnableSynchronizableActors();
 
+  /**
+   * @brief Get whether system is in CAVE mode.
+   *
+   * @return bool
+   */
+  bool GetIsInCAVE();
+
+  /**
+   * @brief Get the number of remote displays.
+   *
+   * @return int
+   */
+  int GetNumberOfDisplays();
+
+  /**
+   * @brief Get the remotely configured eye separation.
+   *
+   * @return int
+   */
+  double GetEyeSeparation();
+
+  /**
+   * @brief Get whether or not remote displays show borders.
+   *
+   * @return bool
+   */
+  bool GetShowBorders();
+
+  /**
+   * @brief Get whether or not remote displays are fullscreen.
+   *
+   * @return bool
+   */
+  bool GetFullScreen();
+
+  /**
+   * @brief Get the geometry of the screen at the given index, as
+   * (x, y, width, height).
+   *
+   * @return vtkTuple<int, 4>
+   */
+  vtkTuple<int, 4> GetGeometry(int index);
+
+  /**
+   * @brief Get whether or not the given display has screen corner
+   * set.
+   *
+   * @return bool
+   */
+  bool GetHasCorners(int index);
+
+  /**
+   * @brief Get the lower left corner of the screen at the given
+   * index, as (x, y, z).
+   *
+   * @return vtkTuple<double, 3>
+   */
+  vtkTuple<double, 3> GetLowerLeft(int index);
+
+  /**
+   * @brief Get the lower right corner of the screen at the given
+   * index, as (x, y, z).
+   *
+   * @return vtkTuple<double, 3>
+   */
+  vtkTuple<double, 3> GetLowerRight(int index);
+
+  /**
+   * @brief Get the upper right corner of the screen at the given
+   * index, as (x, y, z).
+   *
+   * @return vtkTuple<double, 3>
+   */
+  vtkTuple<double, 3> GetUpperRight(int index);
+
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;
@@ -346,6 +424,9 @@ private:
     bool selectBlocks = false);
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
+
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internal;
 };
 
 #endif

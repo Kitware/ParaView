@@ -12,6 +12,7 @@ set(classes
   vtkProcessModuleConfiguration
   vtkPVAlgorithmPortsInformation
   vtkPVArrayInformation
+  vtkPVCAVEConfigInformation
   vtkPVClassNameInformation
   vtkPVDataAssemblyInformation
   vtkPVDataInformation

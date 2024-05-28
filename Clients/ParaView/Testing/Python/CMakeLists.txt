@@ -245,6 +245,32 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
 endif()
 
 #------------------------------------------------------------------------------
+# Test pvx file configuration is available to the client
+if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE AND TARGET pvserver AND TARGET pvpython)
+  set(num_procs 2)
+
+  _paraview_add_tests("paraview_add_cave_python_tests"
+    PREFIX "pv_cave_python"
+    SUFFIX "-${num_procs}"
+    ENVIRONMENT
+      PV_SHARED_WINDOW_SIZE=400x300
+      SMTESTDRIVER_MPI_NUMPROCS=${num_procs}
+    NUMPROCS "${num_procs}"
+    _COMMAND_PATTERN
+      __paraview_smtesting_args__
+      --server "$<TARGET_FILE:ParaView::pvserver>"
+        --enable-bt
+        --force-offscreen-rendering
+        --pvx
+        "${CMAKE_CURRENT_SOURCE_DIR}/../XML/LeftRight.pvx"
+      --client $<TARGET_FILE:ParaView::pvpython>
+        --enable-bt
+        --dr
+        "${CMAKE_CURRENT_SOURCE_DIR}/TestPVXInfoAvailableInClient.py"
+    TEST_NAME "TestPVXInfoAvailableInClient")
+endif()
+
+#------------------------------------------------------------------------------
 # Add a test using python plugin and a python script
 
 paraview_add_test_python(
