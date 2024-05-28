@@ -322,7 +322,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     QObject::connect(
       impl.Ui.NavigateForward, SIGNAL(clicked(bool)), this, SLOT(onNavigateForward()));
     impl.Ui.NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
-    impl.Ui.NavigateUp->setShortcut(Qt::ALT + Qt::Key_Up);
+    impl.Ui.NavigateUp->setShortcut(Qt::ALT | Qt::Key_Up);
     impl.Ui.NavigateUp->setToolTip(
       tr("Navigate Up (%1)").arg(impl.Ui.NavigateUp->shortcut().toString()));
     impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
@@ -377,8 +377,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     QObject::connect(
       impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
 
-    QObject::connect(impl.Ui.EntityType, SIGNAL(currentIndexChanged(const QString&)), this,
-      SLOT(onFilterChange(const QString&)));
+    QObject::connect(
+      impl.Ui.EntityType, &QComboBox::currentTextChanged, this, &pqFileDialog::onFilterChange);
 
     QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
       SLOT(onClickedFavorite(const QModelIndex&)));
