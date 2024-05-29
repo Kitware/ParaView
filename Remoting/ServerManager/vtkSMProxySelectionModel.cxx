@@ -397,7 +397,8 @@ void vtkSMProxySelectionModel::PushStateToSession()
   // - Current
   if (this->Current)
   {
-    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(this->Current.GetPointer()))
+    vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(this->Current.GetPointer());
+    if (port && port->GetSourceProxy())
     {
       this->State->SetExtension(
         ProxySelectionModelState::current_proxy, port->GetSourceProxy()->GetGlobalID());
