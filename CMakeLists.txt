@@ -551,9 +551,11 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     endif()
   endforeach()
   if(modules_notarget)
+    list(TRANSFORM modules_notarget REPLACE "VTK::(.*)" "-DVTK_MODULE_ENABLE_VTK_\\1=WANT" OUTPUT_VARIABLE external_vtk_required_options)
+    list(JOIN external_vtk_required_options " " external_vtk_required_options)
     message(FATAL_ERROR
-      "The following modules are required, but not found: "
-      "${modules_notarget}")
+      "Please reconfigure VTK with the following parameters to add required modules: "
+      "${external_vtk_required_options}")
   endif()
   list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
   macro(search_dependent_targets)
