@@ -281,6 +281,7 @@ Once all plugins have been scanned, they need to be built.
 paraview_plugin_build(
   PLUGINS <plugin>...
   [AUTOLOAD <plugin>...]
+  [DELAYED_LOAD <plugin>...]
   [PLUGINS_COMPONENT <component>]
 
   [TARGET <target>]
@@ -306,6 +307,10 @@ paraview_plugin_build(
 
   * `PLUGINS`: (Required) The list of plugins to build. May be empty.
   * `AUTOLOAD`: A list of plugins to mark for autoloading.
+  * `DELAYED_LOAD`: A list of plugins to mark for delayed loading. A delayed load
+    plugin is a plugin where only the XMLs are loaded on load, while the actual
+    shared library of the plugin is loaded only when a proxy defined in these XMLs
+    is used.
   * `PLUGINS_COMPONENT`: (Defaults to `paraview_plugins`) The installation
     component to use for installed plugins.
   * `TARGET`: (Recommended) The name of an interface target to generate. This
@@ -352,7 +357,7 @@ function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
     "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS;DISABLE_XML_DOCUMENTATION;GENERATE_SPDX;SPDX_DOCUMENT_NAMESPACE;SPDX_DOWNLOAD_LOCATION;USE_FILE_SETS"
-    "PLUGINS;AUTOLOAD"
+    "PLUGINS;AUTOLOAD;DELAYED_LOAD"
     ${ARGN})
 
   if (_paraview_build_UNPARSED_ARGUMENTS)
@@ -712,8 +717,37 @@ static void ${_paraview_build_target_safe}_initialize()
       if (_paraview_build_plugin IN_LIST _paraview_build_AUTOLOAD)
         set(_paraview_build_autoload 1)
       endif ()
+      set(_paraview_build_delayed_load 0)
+      if (_paraview_build_plugin IN_LIST _paraview_build_DELAYED_LOAD)
+        set(_paraview_build_delayed_load 1)
+      endif ()
       string(APPEND _paraview_build_xml_content
-        "  <Plugin name=\"${_paraview_build_plugin}\" auto_load=\"${_paraview_build_autoload}\"/>\n")
+        "  <Plugin name=\"${_paraview_build_plugin}\" auto_load=\"${_paraview_build_autoload}\" delayed_load=\"${_paraview_build_delayed_load}\"")
+
+      if (_paraview_build_delayed_load)
+        string(APPEND _paraview_build_xml_content ">\n")
+
+        get_property(_paraview_build_plugin_delayed_load_xmls GLOBAL
+          PROPERTY "_paraview_plugin_${_paraview_build_plugin}_xmls")
+        foreach (_paraview_build_plugin_delayed_load_xml IN LISTS _paraview_build_plugin_delayed_load_xmls)
+          # Copy XML to build for easier usage
+          configure_file(${_paraview_build_plugin_delayed_load_xml} "${CMAKE_BINARY_DIR}/${_paraview_build_plugin_directory}" COPYONLY)
+
+          # Add XML relative path to to plugin config file
+          cmake_path(GET _paraview_build_plugin_delayed_load_xml FILENAME _paraview_build_plugin_delayed_load_xml_name)
+          string(APPEND _paraview_build_xml_content "    <XML filename=\"${_paraview_build_plugin}/${_paraview_build_plugin_delayed_load_xml_name}\"/>\n")
+        endforeach ()
+        string(APPEND _paraview_build_xml_content "  </Plugin>\n")
+
+        # Install XMLs
+        install(
+          FILES       "${_paraview_build_plugin_delayed_load_xmls}"
+          DESTINATION "${_paraview_build_plugin_directory}"
+          COMPONENT   "${_paraview_build_TARGET_COMPONENT}")
+      else ()
+       string(APPEND _paraview_build_xml_content "/>\n")
+      endif ()
+
     endforeach ()
     string(APPEND _paraview_build_xml_content
       "</Plugins>\n")
@@ -1254,6 +1288,10 @@ function (paraview_add_plugin name)
       list(APPEND _paraview_add_plugin_xmls
         "${_paraview_add_plugin_xml}")
     endforeach ()
+
+    set_property(GLOBAL APPEND
+      PROPERTY
+        "_paraview_plugin_${_paraview_build_plugin}_xmls" "${_paraview_add_plugin_xmls}")
 
     paraview_server_manager_process_files(
       TARGET    "${_paraview_build_plugin}_server_manager"
