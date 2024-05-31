@@ -8,12 +8,9 @@ set(python_files
   paraview/apps/__init__.py
   paraview/apps/__main__.py
   paraview/apps/_internals.py
-  paraview/apps/divvy.py
   paraview/apps/flow.py
   paraview/apps/glance.py
-  paraview/apps/lite.py
   paraview/apps/trame.py
-  paraview/apps/visualizer.py
   paraview/benchmark/__init__.py
   paraview/benchmark/basic.py
   paraview/benchmark/logbase.py
