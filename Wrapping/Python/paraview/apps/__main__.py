@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser("paraview.apps",
                                  description="ParaView Applications",
                                  epilog="""This package provides access to ParaView applications.
 Launch a specific application using '-m <appname'. For example:
-'pvpython -m paraview.apps.flow'. Available applications can be listed
+'pvpython -m paraview.apps.trame'. Available applications can be listed
 using the '-l' or '--list'.""")
 parser.add_argument("-l", "--list",
                     help="list available applications",
@@ -14,11 +14,8 @@ parser.add_argument("-l", "--list",
 
 args = parser.parse_args()
 if args.list:
-    from . import flow
     from . import glance
 
     print("Available applications:")
-    if flow.is_supported():
-        print("  flow")
     if glance.is_supported():
         print("  glance")
