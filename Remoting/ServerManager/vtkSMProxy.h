@@ -988,14 +988,19 @@ protected:
 
   void SetHints(vtkPVXMLElement* hints);
   void SetDeprecated(vtkPVXMLElement* deprecated);
+
+  /**
+   * Set the "EnsurePlugin" XML element
+   * that is used in LoadPluginIfEnsured
+   */
   void SetEnsurePlugin(vtkPVXMLElement* ensurePlugin);
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
 
   vtkSMDocumentation* Documentation;
-  vtkPVXMLElement* Hints;
-  vtkPVXMLElement* Deprecated;
+  vtkPVXMLElement* Hints = nullptr;
+  vtkPVXMLElement* Deprecated = nullptr;
   vtkPVXMLElement* EnsurePlugin = nullptr;
 
   // Cached version of State

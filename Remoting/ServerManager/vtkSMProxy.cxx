@@ -113,9 +113,6 @@ vtkSMProxy::vtkSMProxy()
 
   this->NeedsUpdate = true;
 
-  this->Hints = nullptr;
-  this->Deprecated = nullptr;
-
   this->State = new vtkSMMessage();
 
   this->LogName = nullptr;
@@ -909,12 +906,10 @@ bool vtkSMProxy::LoadPluginIfEnsured()
 
     // Ensure remote plugin is loaded
     vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-    vtkSMPluginLoaderProxy* proxy =
-      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
+    auto proxy = vtkSmartPointer<vtkSMPluginLoaderProxy>::Take(
+      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader")));
     proxy->UpdateVTKObjects();
     ret &= proxy->LoadPluginByName(pluginName, false);
-    proxy->Delete();
-
     return ret;
   }
   return false;
