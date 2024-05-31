@@ -11,11 +11,12 @@
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
 
+#include "vtkPVDataInformation.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
@@ -67,6 +68,13 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
     return false;
   }
 
+  static bool isCompositeDataSet(pqDataRepresentation* repr)
+  {
+    auto reprProxy = repr ? vtkSMRepresentationProxy::SafeDownCast(repr->getProxy()) : nullptr;
+    auto dataInfo = reprProxy ? reprProxy->GetRepresentedDataInformation() : nullptr;
+    return dataInfo && dataInfo->IsCompositeDataSet();
+  }
+
 public:
   Ui::MultiBlockInspectorWidget Ui;
 
@@ -105,7 +113,7 @@ public:
       this->Representation = repr;
       this->update();
     }
-    this->Ui.extractBlocks->setEnabled(repr != nullptr);
+    this->Ui.extractBlocks->setEnabled(pqInternals::isCompositeDataSet(repr));
   }
 
   void extract()
@@ -161,8 +169,11 @@ void pqMultiBlockInspectorWidget::pqInternals::update()
     // that have the panel visibility set to "multiblock_inspector". This way we instantiate a
     // pqDataAssemblyPropertyWidget which we later add to the container.
     this->HelperProxyWidget = new pqProxyWidget(repr->getProxy(), { "multiblock_inspector" }, {});
-    QObject::connect(this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished,
-      [repr]() { repr->renderViewEventually(); });
+    QObject::connect(
+      this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished, [this, repr]() {
+        this->Ui.extractBlocks->setEnabled(pqInternals::isCompositeDataSet(repr));
+        repr->renderViewEventually();
+      });
   }
   else
   {
