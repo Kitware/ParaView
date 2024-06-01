@@ -17,5 +17,6 @@ DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
+  VTK::IOCore
 PRIVATE_DEPENDS
   VTK::ParallelMPI

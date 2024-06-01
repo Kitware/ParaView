@@ -17,14 +17,14 @@
 #ifndef vtkInSituPParticlePathFilter_h
 #define vtkInSituPParticlePathFilter_h
 
-#include "vtkPParticlePathFilter.h"
+#include "vtkLegacyPParticlePathFilter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralMPIModule.h" //needed for exports
 
 class VTKPVVTKEXTENSIONSFILTERSGENERALMPI_EXPORT vtkInSituPParticlePathFilter
-  : public vtkPParticlePathFilter
+  : public vtkLegacyPParticlePathFilter
 {
 public:
-  vtkTypeMacro(vtkInSituPParticlePathFilter, vtkPParticlePathFilter);
+  vtkTypeMacro(vtkInSituPParticlePathFilter, vtkLegacyPParticlePathFilter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkInSituPParticlePathFilter* New();
@@ -103,7 +103,7 @@ protected:
    * particles.
    */
   void AssignSeedsToProcessors(double time, vtkDataSet* source, int sourceID, int ptId,
-    vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints,
+    vtkLegacyParticleTracerBaseNamespace::ParticleVector& localSeedPoints,
     int& localAssignedCount) override;
 
 private:

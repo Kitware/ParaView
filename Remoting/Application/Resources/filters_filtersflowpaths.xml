@@ -284,17 +284,6 @@
           Usually a point/radius or a line with a given resolution.
         </Documentation>
       </InputProperty>
-      <DoubleVectorProperty command="SetTerminationTime"
-                            default_values="0.0"
-                            name="TerminationTime"
-                            number_of_elements="1"
-                            panel_visibility="default">
-        <DoubleRangeDomain name="range"/>
-        <Documentation>
-          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
-          The units of time should be consistent with the primary time variable.
-        </Documentation>
-      </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
         <TimeStepsInformationHelper/>
@@ -354,6 +343,17 @@
           faster though the second is more robust in locating cells during streamline integration.
         </Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetTerminationTime"
+                            default_values="0.0"
+                            name="TerminationTime"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
+          The units of time should be consistent with the primary time variable.
+        </Documentation>
+      </DoubleVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -641,17 +641,6 @@
           point/radius or a line with a given resolution.
         </Documentation>
       </InputProperty>
-      <DoubleVectorProperty command="SetTerminationTime"
-                            default_values="0.0"
-                            name="TerminationTime"
-                            number_of_elements="1"
-                            panel_visibility="default">
-        <DoubleRangeDomain name="range"/>
-        <Documentation>
-          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
-          The units of time should be consistent with the primary time variable.
-        </Documentation>
-      </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
         <TimeStepsInformationHelper/>

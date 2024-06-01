@@ -1,0 +1,337 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLegacyParticlePathFilter"
+                 name="LegacyParticlePath">
+      <Documentation long_help="Trace Particle Paths through time in a vector field."
+                     short_help="Trace Particle Paths through time in a vector field.">
+        The Particle Trace filter generates pathlines in a vector
+        field from a collection of seed points. The vector field
+        used is selected from the Vectors menu, so the input data
+        set is required to have point-centered vectors. The Seed
+        portion of the interface allows you to select whether the
+        seed points for this integration lie in a point cloud or
+        along a line. Depending on which is selected, the
+        appropriate 3D widget (point or line widget) is displayed
+        along with traditional user interface controls for
+        positioning the point cloud or line within the data set.
+        Instructions for using the 3D widgets and the
+        corresponding manual controls can be found in section 7.4.
+        This filter operates on any type of data set, provided it
+        has point-centered vectors. The output is polygonal data
+        containing polylines. This filter is available on the
+        Toolbar.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="3"/>
+        <Documentation>
+          Specify which is the Input of the StreamTracer filter.
+        </Documentation>
+      </InputProperty>
+      <InputProperty clean_command="RemoveAllSources"
+                     command="AddSourceConnection"
+                     label="Seed Source"
+                     multiple_input="1"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Specify the seed dataset. Typically, from where the vector field integration should begin.
+          Usually a point/radius or a line with a given resolution.
+        </Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetTerminationTime"
+                            default_values="0.0"
+                            name="TerminationTime"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
+          The units of time should be consistent with the primary time variable.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetForceReinjectionEveryNSteps"
+                         default_values="0"
+                         name="ForceReinjectionEveryNSteps"
+                         number_of_elements="1">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          When animating particles, it is nice to inject new ones every Nth step to produce a continuous flow.
+          Setting ForceReinjectionEveryNSteps to a non zero value will cause the particle source to reinject
+          particles every Nth step even if it is otherwise unchanged. Note that if the particle source is also animated,
+          this flag will be redundant as the particles will be reinjected whenever the source changes anyway.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStaticSeeds"
+                         default_values="0"
+                         name="StaticSeeds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the input seeds are not changing, then this can be set to 1 to avoid having to do a repeated grid search
+          that would return the exact same result.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMeshOverTime"
+                         default_values="0"
+                         name="MeshOverTime"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
+        <Documentation>
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputVectors"
+                            number_of_elements="5"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Vectors"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Specify which vector array should be used for the integration through that filter.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeVorticity"
+                         default_values="1"
+                         name="ComputeVorticity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute vorticity and angular rotation of particles as they progress
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTerminalSpeed"
+                            default_values="0.000000000001"
+                            label="Terminal Speed"
+                            name="TerminalSpeed"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the terminal speed, below which particle advection/integration is terminated.
+        </Documentation>
+      </DoubleVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLegacyStreaklineFilter"
+                 name="LegacyStreakLine">
+      <Documentation long_help="Trace Streak lines through time in a vector field."
+                     short_help="Trace Streak lines through time in a vector field.">
+        The Particle Trace filter generates pathlines in a vector
+        field from a collection of seed points. The vector field
+        used is selected from the Vectors menu, so the input data
+        set is required to have point-centered vectors. The Seed
+        portion of the interface allows you to select whether the
+        seed points for this integration lie in a point cloud or
+        along a line. Depending on which is selected, the
+        appropriate 3D widget (point or line widget) is displayed
+        along with traditional user interface controls for
+        positioning the point cloud or line within the data set.
+        Instructions for using the 3D widgets and the
+        corresponding manual controls can be found in section 7.4.
+        This filter operates on any type of data set, provided it
+        has point-centered vectors. The output is polygonal data
+        containing polylines. This filter is available on the
+        Toolbar.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="3"/>
+        <Documentation>
+          Specify which is the Input of the StreamTracer filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetStaticSeeds"
+                         default_values="0"
+                         name="StaticSeeds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the input seeds are not changing, then this can be set to 1 to avoid having to do a repeated grid search
+          that would return the exact same result.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMeshOverTime"
+                         default_values="0"
+                         name="MeshOverTime"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
+        <Documentation>
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
+        </Documentation>
+      </IntVectorProperty>
+      <InputProperty clean_command="RemoveAllSources"
+                     command="AddSourceConnection"
+                     label="Seed Source"
+                     multiple_input="1"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Specify the seed dataset. Typically, from where the vector field integration should begin. Usually a
+          point/radius or a line with a given resolution.
+        </Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetTerminationTime"
+                            default_values="0.0"
+                            name="TerminationTime"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Setting TerminationTime to a positive value will cause particles to terminate when the time is reached.
+          The units of time should be consistent with the primary time variable.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetForceReinjectionEveryNSteps"
+                         default_values="1"
+                         name="ForceReinjectionEveryNSteps"
+                         number_of_elements="1">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          When animating particles, it is nice to inject new ones every Nth step to produce a continuous flow.
+          Setting ForceReinjectionEveryNSteps to a non zero value will cause the particle source to reinject particles
+          every Nth step even if it is otherwise unchanged. Note that if the particle source is also animated, this flag
+          will be redundant as the particles will be reinjected whenever the source changes anyway.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputVectors"
+                            number_of_elements="5"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Vectors"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Specify which vector array should be used for the integration through that filter.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeVorticity"
+                         default_values="1"
+                         name="ComputeVorticity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute vorticity and angular rotation of particles as they progress
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Prevents cache from getting reset so that new computation always start from previous results.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

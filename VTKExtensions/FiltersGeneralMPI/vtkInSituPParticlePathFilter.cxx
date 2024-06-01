@@ -16,7 +16,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTemporalInterpolatedVelocityField.h"
 
-using namespace vtkParticleTracerBaseNamespace;
+using namespace vtkLegacyParticleTracerBaseNamespace;
 using IDStates = vtkTemporalInterpolatedVelocityField::IDStates;
 
 vtkStandardNewMacro(vtkInSituPParticlePathFilter);

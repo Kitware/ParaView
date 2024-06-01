@@ -1085,13 +1085,6 @@ def GetProxy(module, key, **kwargs):
             # into a unique 'Gradient" filter.
             gradient = builtins.getattr(module, "GradientLegacy")(**kwargs)
             return gradient
-    if compatibility_version <= (5, 10):
-        if key in ["ParticleTracer, ParticlePath, StreakLine"]:
-            # in 5.11, we changed the StaticMesh flag of ParticleTracer, ParticlePath and StreakLine
-            # This restores the previous StaticMesh.
-            particleTracerBase = builtins.getattr(module, key)(**kwargs)
-            particleTracerBase.MeshOverTime = 0
-            return particleTracerBase
     if compatibility_version <= (5, 11):
         proxy = builtins.getattr(module, key)(**kwargs)
         if hasattr(proxy, "Assembly"):
@@ -1101,6 +1094,9 @@ def GetProxy(module, key, **kwargs):
                 if assemblyDomain:
                     assemblyDomain.SetBackwardCompatibilityMode(True)
                     return proxy
+    if compatibility_version <= (5, 12):
+        if key in ["ParticlePath", "StreakLine"]:
+            return builtins.getattr(module, 'Legacy' + key)(**kwargs)
 
     # deprecation case
     if type(key) == tuple and len(key) == 2:

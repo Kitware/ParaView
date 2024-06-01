@@ -8,6 +8,8 @@ set(${_vtk_build_test}_TEST_LABELS paraview)
 
 ExternalData_Expand_Arguments(ParaViewData _
   # data files
+  "DATA{${paraview_test_data_directory_input}/Data/BackwardCompatibility/LegacyPathLine.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/BackwardCompatibility/LegacyStreakLine.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/vtk_dark_bkg.png}"
   "DATA{${paraview_test_data_directory_input}/Data/blow.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
@@ -80,6 +82,8 @@ paraview_add_test_python(
   ColorBy.py
   ColorBlockBy.py
   GroupDataSets.py
+  LegacyPathLine.py
+  LegacyStreakLine.py
   PartialArrayIndication.py
   ResetSession.py
   SaveTransparentImages.py

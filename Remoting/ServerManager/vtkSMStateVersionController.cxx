@@ -1689,7 +1689,8 @@ struct Process_5_12_to_5_13
   bool operator()(xml_document& document)
   {
     return HandleSetDecomposePolyhedra(document) && HandleRepresentationFlipTextures(document) &&
-      HandleRenamedProxies(document) && HandleAxisAlignedPlaneCut(document);
+      HandleRenamedProxies(document) && HandleAxisAlignedPlaneCut(document) &&
+      HandleStreakLine(document) && HandlePathLine(document);
   }
 
   static bool HandleSetDecomposePolyhedra(xml_document& document)
@@ -1710,6 +1711,32 @@ struct Process_5_12_to_5_13
           node.remove_child(child);
         }
       }
+    }
+
+    return true;
+  }
+
+  static bool HandleStreakLine(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='StreakLine']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      xpath_node.node().attribute("type").set_value("LegacyStreakLine");
+    }
+
+    return true;
+  }
+
+  static bool HandlePathLine(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='ParticlePath']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      xpath_node.node().attribute("type").set_value("LegacyParticlePath");
     }
 
     return true;
