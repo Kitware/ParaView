@@ -18,6 +18,7 @@
 #include "pqUndoStack.h"
 
 #include "vtkCollection.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -124,7 +125,21 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
     QString stateFile = pathNoExt + ".pvsm";
     pqSaveStateReaction::saveState(stateFile, this->Location);
     QString screenshotFile = pathNoExt + ".png";
-    shProxy->WriteImage(screenshotFile.toUtf8().data(), this->Location);
+
+    const bool embedParaViewState =
+      vtkSMPropertyHelper(shProxy, "EmbedParaViewState").GetAsInt() == 1;
+    vtkSmartPointer<vtkPVXMLElement> stateXMLRoot;
+    if (embedParaViewState)
+    {
+      Q_EMIT pqApplicationCore::instance()->aboutToWriteState(screenshotFile);
+      vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
+      stateXMLRoot = vtkSmartPointer<vtkPVXMLElement>::Take(pxm->SaveXMLState());
+    }
+    else
+    {
+      stateXMLRoot = nullptr;
+    }
+    shProxy->WriteImage(screenshotFile.toUtf8().data(), this->Location, stateXMLRoot);
     QString textFile = pathNoExt + ".txt";
     auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
     pxm->SaveString(nameNoExt.toUtf8().data(), textFile.toUtf8().data(), this->Location);
