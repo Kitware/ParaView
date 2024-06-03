@@ -602,12 +602,12 @@ void vtkSIProxyDefinitionManager::AttachShowInMenuHintsToProxyFromProxyGroups(vt
 }
 
 //---------------------------------------------------------------------------
-void vtkSIProxyDefinitionManager::AttachEnsurePluginToProxies(
-  vtkPVXMLElement* root, const std::string& ensurePlugin)
+void vtkSIProxyDefinitionManager::AttachEnsurePluginLoadedToProxies(
+  vtkPVXMLElement* root, const std::string& ensurePluginLoaded)
 {
-  if (!root || ensurePlugin.empty())
+  if (!root || ensurePluginLoaded.empty())
   {
-    vtkWarningMacro("Calling AttachEnsurePluginToProxies with incorrect arguments");
+    vtkWarningMacro("Calling AttachEnsurePluginLoadedToProxies with incorrect arguments");
     return;
   }
 
@@ -617,17 +617,17 @@ void vtkSIProxyDefinitionManager::AttachEnsurePluginToProxies(
     for (int cc = 0; cc < size; ++cc)
     {
       vtkPVXMLElement* proxy = root->GetNestedElement(cc);
-      vtkPVXMLElement* ensure = proxy->FindNestedElementByName("EnsurePlugin");
+      vtkPVXMLElement* ensure = proxy->FindNestedElementByName("EnsurePluginLoaded");
       if (ensure == nullptr)
       {
         vtkNew<vtkPVXMLElement> localEnsure;
-        localEnsure->SetName("EnsurePlugin");
-        localEnsure->SetAttribute("name", ensurePlugin.c_str());
+        localEnsure->SetName("EnsurePluginLoaded");
+        localEnsure->SetAttribute("name", ensurePluginLoaded.c_str());
         proxy->AddNestedElement(localEnsure.GetPointer());
       }
       else
       {
-        vtkWarningMacro(<< "Not attaching EnsureProxy: " << ensurePlugin
+        vtkWarningMacro(<< "Not attaching EnsureProxy: " << ensurePluginLoaded
                         << " because an EnxureProxy tag is already present");
       }
     }
@@ -640,7 +640,7 @@ void vtkSIProxyDefinitionManager::AttachEnsurePluginToProxies(
     for (int cc = 0; cc < size; ++cc)
     {
       vtkPVXMLElement* group = vtkPVXMLElement::SafeDownCast(collection->GetItemAsObject(cc));
-      this->AttachEnsurePluginToProxies(group, ensurePlugin);
+      this->AttachEnsurePluginLoadedToProxies(group, ensurePluginLoaded);
     }
   }
 }
@@ -799,11 +799,11 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xml
 }
 //---------------------------------------------------------------------------
 bool vtkSIProxyDefinitionManager::LoadConfigurationXMLFromString(
-  const char* xmlContent, bool attachHints, bool invoke, const std::string& ensurePlugin)
+  const char* xmlContent, bool attachHints, bool invoke, const std::string& ensurePluginLoaded)
 {
   vtkNew<vtkPVXMLParser> parser;
   return (parser->Parse(xmlContent) != 0) &&
-    this->LoadConfigurationXML(parser->GetRootElement(), attachHints, invoke, ensurePlugin);
+    this->LoadConfigurationXML(parser->GetRootElement(), attachHints, invoke, ensurePluginLoaded);
 }
 
 //---------------------------------------------------------------------------
@@ -814,7 +814,7 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
 
 //---------------------------------------------------------------------------
 bool vtkSIProxyDefinitionManager::LoadConfigurationXML(
-  vtkPVXMLElement* root, bool attachHints, bool invoke, const std::string& ensurePlugin)
+  vtkPVXMLElement* root, bool attachHints, bool invoke, const std::string& ensurePluginLoaded)
 {
   if (!root)
   {
@@ -834,10 +834,10 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(
     this->AttachShowInMenuHintsToProxyFromProxyGroups(root);
   }
 
-  // Attach ensurePlugin if any
-  if (!ensurePlugin.empty())
+  // Attach ensurePluginLoaded if any
+  if (!ensurePluginLoaded.empty())
   {
-    this->AttachEnsurePluginToProxies(root, ensurePlugin);
+    this->AttachEnsurePluginLoadedToProxies(root, ensurePluginLoaded);
   }
 
   // Loop over the top-level elements.
@@ -1262,7 +1262,7 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
       for (size_t cc = 0; cc < xmls.size(); cc++)
       {
         this->LoadConfigurationXMLFromString(xmls[cc].c_str(), !core, false,
-          smplugin->GetEnsurePlugin() ? plugin->GetPluginName() : "");
+          smplugin->GetEnsurePluginLoaded() ? plugin->GetPluginName() : "");
       }
 
       // Make sure we invalidate any cached flatten version of our proxy definition

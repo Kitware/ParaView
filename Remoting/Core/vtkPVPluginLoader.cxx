@@ -182,7 +182,7 @@ public:
   /**
    * Delayed load plugin need ensure plugin, force it
    */
-  bool GetEnsurePlugin() override { return true; }
+  bool GetEnsurePluginLoaded() override { return true; }
 
 private:
   std::vector<std::string> XMLVector;

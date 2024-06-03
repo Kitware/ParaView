@@ -232,10 +232,11 @@ protected:
   ~vtkSIProxyDefinitionManager() override;
 
   /**
-   * Helper method that add a EnsurePlugin XML element with name ensurePlugin for a provided proxy
-   * definition.
+   * Helper method that add a EnsurePluginLoaded XML element with name ensurePluginLoaded for a
+   * provided proxy definition.
    */
-  void AttachEnsurePluginToProxies(vtkPVXMLElement* proxy, const std::string& ensurePlugin);
+  void AttachEnsurePluginLoadedToProxies(
+    vtkPVXMLElement* proxy, const std::string& ensurePluginLoaded);
 
   /**
    * Helper method that add a ShowInMenu Hint for a proxy definition.
@@ -260,12 +261,13 @@ protected:
    * If invoke is true, these method will invoke `ProxyDefinitionsUpdated` at the end.
    * FIXME: Once those pluging get updated, this extra hint attachment
    * might be removed.
-   * Set ensurePlugin to a non empty string to add the EnsurePlugin XML tag to each proxy
+   * Set ensurePluginLoaded to a non empty string to add the EnsurePluginLoaded XML tag to each
+   * proxy
    */
   bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints, bool invoke = true,
-    const std::string& ensurePlugin = "");
+    const std::string& ensurePluginLoaded = "");
   bool LoadConfigurationXMLFromString(const char* xmlContent, bool attachShowInMenuHints,
-    bool invoke = true, const std::string& ensurePlugin = "");
+    bool invoke = true, const std::string& ensurePluginLoaded = "");
   ///@}
 
   ///@{

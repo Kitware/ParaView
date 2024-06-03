@@ -81,7 +81,7 @@ vtkStandardNewMacro(vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Deprecated, vtkPVXMLElement);
-vtkCxxSetObjectMacro(vtkSMProxy, EnsurePlugin, vtkPVXMLElement);
+vtkCxxSetObjectMacro(vtkSMProxy, EnsurePluginLoaded, vtkPVXMLElement);
 
 //---------------------------------------------------------------------------
 vtkSMProxy::vtkSMProxy()
@@ -141,7 +141,7 @@ vtkSMProxy::~vtkSMProxy()
   this->Documentation->Delete();
   this->SetHints(nullptr);
   this->SetDeprecated(nullptr);
-  this->SetEnsurePlugin(nullptr);
+  this->SetEnsurePluginLoaded(nullptr);
   this->SetSIClassName(nullptr);
 
   if (this->State)
@@ -897,10 +897,10 @@ bool vtkSMProxy::WarnIfDeprecated()
 //---------------------------------------------------------------------------
 bool vtkSMProxy::LoadPluginIfEnsured()
 {
-  if (this->EnsurePlugin)
+  if (this->EnsurePluginLoaded)
   {
     // Ensure local plugin is loaded
-    const char* pluginName = this->EnsurePlugin->GetAttributeOrEmpty("name");
+    const char* pluginName = this->EnsurePluginLoaded->GetAttributeOrEmpty("name");
     vtkNew<vtkPVPluginLoader> loader;
     bool ret = loader->LoadPluginByName(pluginName, false);
 
@@ -1604,9 +1604,9 @@ int vtkSMProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement*
     {
       this->SetDeprecated(subElem);
     }
-    else if (strcmp(subElem->GetName(), "EnsurePlugin") == 0)
+    else if (strcmp(subElem->GetName(), "EnsurePluginLoaded") == 0)
     {
-      this->SetEnsurePlugin(subElem);
+      this->SetEnsurePluginLoaded(subElem);
     }
   }
 
