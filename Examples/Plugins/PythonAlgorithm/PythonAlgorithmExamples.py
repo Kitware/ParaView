@@ -107,8 +107,16 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
     def SetString(self, value):
         print("Setting ", value)
 
-
-
+    # A proxy property with a proxy list domain
+    @smproperty.proxy(command="SetProxyProperty", name="ProxyProperty")
+    @smdomain.xml(\
+        """
+       <ProxyListDomain name="proxy_list">
+          <Group name="incremental_point_locators"/>
+       </ProxyListDomain>
+        """)
+    def SetProxyProperty(self, proxy):
+        print("ProxyProperty: ", proxy)
 
 #------------------------------------------------------------------------------
 # A reader example.
