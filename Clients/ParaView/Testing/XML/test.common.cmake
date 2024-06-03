@@ -1121,7 +1121,6 @@ list(APPEND TESTS_WITH_BASELINES
   ShowMultiPieceFieldData.xml
   TemporalParticleKeepDeadTrails.xml
   TestHiddenLineRemoval.xml
-  TestOpacityRendering.xml
   TestOpenFOAMWeighByCell.xml
   TestResampleHyperTreeGridWithSphere.xml
   TransferFunction2D.xml
