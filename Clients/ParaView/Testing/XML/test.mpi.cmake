@@ -125,15 +125,16 @@ paraview_add_client_server_render_tests(
 
 # Regression test for https://gitlab.kitware.com/paraview/paraview/-/issues/21396
 # Opacity rendering specifically needs to be tested with >4 procs and remote rendering
+paraview_add_client_tests(
+  TEST_SCRIPTS TestOpacityRendering.xml
+)
 paraview_add_client_server_tests(
   TEST_SCRIPTS TestOpacityRendering.xml
   NUMSERVERS 5
 )
-paraview_add_client_tests(
-  TEST_SCRIPTS TestOpacityRendering.xml
-)
 paraview_add_client_server_render_tests(
   TEST_SCRIPTS TestOpacityRendering.xml
+  NUMSERVERS 5
 )
   
 if (PARAVIEW_ENABLE_COSMOTOOLS)
