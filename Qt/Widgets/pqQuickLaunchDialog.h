@@ -15,8 +15,9 @@
  * A borderless pop-up dialog used to show actions that the user can launch.
  * Provides search and quick apply capabilities.
  */
-PARAVIEW_DEPRECATED_IN_5_13_0("Please use pqQuickLaunchDialog extended instead");
-class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
+class PARAVIEW_DEPRECATED_IN_5_13_0(
+  "Please use pqQuickLaunchDialog extended instead") PQWIDGETS_EXPORT pqQuickLaunchDialog
+  : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
