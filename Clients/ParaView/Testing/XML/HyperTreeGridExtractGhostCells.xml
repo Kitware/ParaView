@@ -7,7 +7,7 @@
 
   <!-- Create HTG Extract Ghost Cells filter -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataModel/Hyper Tree Grid" command="activate" arguments="HyperTreeGridExtractGhostCells" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataModel/Hyper Tree Grid" command="activate" arguments="ExtractGhostCells" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Compare to baseline and delete filter -->
