@@ -362,7 +362,7 @@ endfunction ()
 
 function (paraview_add_client_server_render_tests)
   _get_prefix(chosen_prefix "pvcrs" ${ARGN})
-  _paraview_add_tests("paraview_add_client_server_render_tests"
+  set(_paraview_add_tests_args
     PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_CRS"
     _COMMAND_PATTERN
@@ -381,6 +381,19 @@ function (paraview_add_client_server_render_tests)
         --dr
         --exit
     ${ARGN})
+
+  _get_num_servers(num_servers ${ARGN})
+  if (NOT num_servers STREQUAL "NOT_FOUND")
+    set(_paraview_add_tests_args ${_paraview_add_tests_args};
+    # Set the number of pvservers through the SMTESTDRIVER_MPI_NUMPROCS environment variable.
+      ENVIRONMENT
+        SMTESTDRIVER_MPI_NUMPROCS=${num_servers}
+      # Requires CTest to reserve NUMPROCS among the available processors
+      NUMPROCS "${num_servers}"
+    )
+  endif()
+
+  _paraview_add_tests("paraview_add_client_server_render_tests" ${_paraview_add_tests_args})
 endfunction ()
 
 function (paraview_add_multi_server_tests count)
