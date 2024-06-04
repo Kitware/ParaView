@@ -5,6 +5,7 @@
 #include "vtkClientSocket.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkServerSocket.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
@@ -435,8 +436,9 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(int por
   }
   else
   {
+    auto config = vtkRemotingCoreConfiguration::GetInstance();
     server_socket = vtkServerSocket::New();
-    if (server_socket->CreateServer(port) != 0)
+    if (server_socket->CreateServer(port, config->GetBindAddress()) != 0)
     {
       vtkErrorMacro("Failed to set up server socket.");
       server_socket->Delete();
