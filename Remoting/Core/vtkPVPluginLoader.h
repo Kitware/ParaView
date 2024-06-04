@@ -166,7 +166,7 @@ protected:
    * Return true if a plugin pointing provided filename is already loaded, return false otherwise.
    * Delayed load plugin are considered not loaded until they actually are as standard plugins.
    */
-  bool IsLoaded(const char* filename);
+  bool IsLoaded(const char* filename, bool acceptDelayed = false);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);

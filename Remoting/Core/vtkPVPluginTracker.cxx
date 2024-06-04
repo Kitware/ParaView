@@ -44,13 +44,10 @@ class vtkItem
 public:
   std::string FileName;
   std::string PluginName;
-  vtkPVPlugin* Plugin;
-  bool AutoLoad;
-  vtkItem()
-  {
-    this->Plugin = nullptr;
-    this->AutoLoad = false;
-  }
+  vtkPVPlugin* Plugin = nullptr;
+  bool AutoLoad = false;
+  bool DelayedLoad = false;
+  std::vector<std::string> XMLs;
 };
 
 /**
@@ -421,8 +418,10 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
 
       int auto_load = 0;
       child->GetScalarAttribute("auto_load", &auto_load);
+      bool autoLoad = auto_load == 1;
       int delayed_load = 0;
       child->GetScalarAttribute("delayed_load", &delayed_load);
+      bool delayedLoad = delayed_load == 1;
 
       vtkVLogF(
         PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Trying to locate plugin with name `%s`", name.c_str());
@@ -477,52 +476,53 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
       }
       vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "found `%s`", plugin_filename.c_str());
       unsigned int index = this->RegisterAvailablePlugin(plugin_filename.c_str());
-      if ((auto_load || forceLoad) && !this->GetPluginLoaded(index))
+
+      // It is a delayed load plugin, recover the XMLs if provided
+      std::vector<std::string> xmls;
+      for (unsigned int cd = 0; cd < child->GetNumberOfNestedElements(); cd++)
+      {
+        vtkPVXMLElement* xmlChild = child->GetNestedElement(cd);
+        if (strcmp(xmlChild->GetName(), "XML") != 0)
+        {
+          vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+            "XML child elements are expected to be named XML, but one is named instead: `%s`, "
+            "skipping element",
+            xmlChild->GetName());
+          continue;
+        }
+        if (!xmlChild->GetAttribute("filename"))
+        {
+          vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+            "XML child elements are expected to contain a filename attribute, skipping "
+            "element");
+          continue;
+        }
+        std::string xmlFilename = xmlChild->GetAttribute("filename");
+        if (hint && !vtksys::SystemTools::FileIsFullPath(xmlFilename))
+        {
+          std::string basedir =
+            vtksys::SystemTools::CollapseFullPath(vtksys::SystemTools::GetFilenamePath(hint));
+          xmlFilename = vtksys::SystemTools::CollapseFullPath(xmlFilename, basedir);
+
+          // Ensure the path is under the base directory given.
+          if (!vtksys::SystemTools::IsSubDirectory(xmlFilename, basedir))
+          {
+            vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+              "Invalid `filename=` attribute for %s; must be underneath the XML directory.",
+              name.c_str());
+            continue;
+          }
+        }
+        xmls.push_back(xmlFilename);
+      }
+
+      if ((autoLoad || forceLoad) && !this->GetPluginLoaded(index))
       {
         // load the plugin.
         vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
 
-        if (delayed_load)
+        if (delayedLoad)
         {
-          std::vector<std::string> xmls;
-
-          // It is a delayed load plugin, load only the XML if provided
-          for (unsigned int cd = 0; cd < child->GetNumberOfNestedElements(); cd++)
-          {
-            vtkPVXMLElement* xmlChild = child->GetNestedElement(cd);
-            if (strcmp(xmlChild->GetName(), "XML") != 0)
-            {
-              vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-                "XML child elements are expected to be named XML, but one is named instead: `%s`, "
-                "skipping element",
-                xmlChild->GetName());
-              continue;
-            }
-            if (!xmlChild->GetAttribute("filename"))
-            {
-              vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-                "XML child elements are expected to contain a filename attribute, skipping "
-                "element");
-              continue;
-            }
-            std::string xmlFilename = xmlChild->GetAttribute("filename");
-            if (hint && !vtksys::SystemTools::FileIsFullPath(xmlFilename))
-            {
-              std::string basedir =
-                vtksys::SystemTools::CollapseFullPath(vtksys::SystemTools::GetFilenamePath(hint));
-              xmlFilename = vtksys::SystemTools::CollapseFullPath(xmlFilename, basedir);
-
-              // Ensure the path is under the base directory given.
-              if (!vtksys::SystemTools::IsSubDirectory(xmlFilename, basedir))
-              {
-                vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-                  "Invalid `filename=` attribute for %s; must be underneath the XML directory.",
-                  name.c_str());
-                continue;
-              }
-            }
-            xmls.push_back(xmlFilename);
-          }
           if (xmls.empty())
           {
             vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
@@ -539,7 +539,9 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
         }
         loader->Delete();
       }
-      (*this->PluginsList)[index].AutoLoad = (auto_load != 0);
+      (*this->PluginsList)[index].AutoLoad = autoLoad;
+      (*this->PluginsList)[index].DelayedLoad = delayedLoad;
+      (*this->PluginsList)[index].XMLs = xmls;
     }
   }
 }

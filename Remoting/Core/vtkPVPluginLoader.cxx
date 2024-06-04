@@ -534,7 +534,7 @@ bool vtkPVPluginLoader::LoadDelayedLoadPlugin(
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::IsLoaded(const char* file)
+bool vtkPVPluginLoader::IsLoaded(const char* file, bool acceptDelayed)
 {
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   unsigned int nPlugins = tracker->GetNumberOfPlugins();
@@ -552,8 +552,17 @@ bool vtkPVPluginLoader::IsLoaded(const char* file)
       continue;
     }
 
-    bool alreadyLoaded = tracker->GetPluginLoaded(i) &&
-      dynamic_cast<vtkPVDelayedLoadPlugin*>(tracker->GetPlugin(i)) == nullptr;
+    bool alreadyLoaded = tracker->GetPluginLoaded(i);
+
+    if (alreadyLoaded)
+    {
+      // Unless acceptedDelayed is true, do not consider delayedLoadPlugin to be loaded
+      if (!acceptDelayed && dynamic_cast<vtkPVDelayedLoadPlugin*>(tracker->GetPlugin(i)) != nullptr)
+      {
+        alreadyLoaded = false;
+      }
+    }
+
     if (alreadyLoaded)
     {
       return true;
