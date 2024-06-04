@@ -26,7 +26,8 @@ paraview_add_plugin(ElevationFilter
   DOCUMENTATION_DEPENDENCIES DummyDocumentationCustomTarget
   DOCUMENTATION_TOC "${table_of_contents}"
   MODULES ElevationFilters
-  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/ElevationFilters/vtk.module")
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/ElevationFilters/vtk.module"
+  SERVER_MANAGER_XML MyElevationFilter.xml)
 
 option(BUILD_TESTING "Build Plugin Testing" OFF)
 if (BUILD_TESTING AND BUILD_SHARED_LIBS)

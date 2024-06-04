@@ -56,9 +56,10 @@ public:
    * return status on success, if NOTLOADED was returned, the error is reported
    * If errorMsg is non-nullptr, then errors are not reported, but the error
    * message is put in the errorMsg string
+   * the plugin arg can be a full path or the name of an existing plugin
    */
   LoadStatus loadExtension(
-    pqServer* session, const QString& lib, QString* errorMsg = nullptr, bool remote = true);
+    pqServer* session, const QString& plugin, QString* errorMsg = nullptr, bool remote = true);
 
   /**
    * attempt to load all available plugins on a server, or client plugins if
@@ -77,6 +78,11 @@ public:
    * Return all the paths that plugins will be searched for.
    */
   QStringList pluginPaths(pqServer* session, bool remote);
+
+  /**
+   * Load a plugin config file and add all plugin from it to the plugin manager of provided server
+   */
+  void addPluginConfigFile(pqServer* session, const QString& config, bool remote = true);
 
   /**
    * simply adds the plugin to the ignore list, so when this class tries to

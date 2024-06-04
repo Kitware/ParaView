@@ -70,7 +70,24 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   void removeSelectedPlugins(QList<QTreeWidgetItem*> selItems, pqServer* server, bool remote);
   QString getStatusText(vtkPVPluginsInformation* plInfo, unsigned int cc);
 
+private Q_SLOTS:
+  ///@{
+  /**
+   * Internal slots called when the a add plugin config file button is pressed
+   */
+  void onAddPluginConfigRemote();
+  void onAddPluginConfigLocal();
+  ///@}
+
 private:
+  ///@{
+  /**
+   * Internal methods called to add a plugin config file to the plugin manager
+   */
+  void addPluginConfigFile(bool remote);
+  void addPluginConfigFile(const QString& config, bool remote);
+  ///@}
+
   QScopedPointer<Ui::pqPluginDialog> Ui;
   pqServer* Server;
   bool LoadingMultiplePlugins;

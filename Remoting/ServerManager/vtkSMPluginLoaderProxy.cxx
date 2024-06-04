@@ -14,6 +14,19 @@ vtkSMPluginLoaderProxy::vtkSMPluginLoaderProxy() = default;
 vtkSMPluginLoaderProxy::~vtkSMPluginLoaderProxy() = default;
 
 //----------------------------------------------------------------------------
+bool vtkSMPluginLoaderProxy::LoadPluginByName(const char* name, bool acceptDelayed)
+{
+  this->CreateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LoadPluginByName" << name
+         << acceptDelayed << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  this->UpdatePropertyInformation();
+  return vtkSMPropertyHelper(this, "Loaded").GetAsInt(0) != 0;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)
 {
   this->CreateVTKObjects();
@@ -34,6 +47,18 @@ void vtkSMPluginLoaderProxy::LoadPluginConfigurationXMLFromString(const char* xm
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this)
          << "LoadPluginConfigurationXMLFromString" << xmlcontents << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  this->UpdatePropertyInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPluginLoaderProxy::LoadPluginConfigurationXML(const char* configurationFile)
+{
+  this->CreateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LoadPluginConfigurationXML"
+         << configurationFile << vtkClientServerStream::End;
   this->ExecuteStream(stream);
   this->UpdatePropertyInformation();
 }

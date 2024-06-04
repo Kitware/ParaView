@@ -90,6 +90,10 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     this->Ui->removeRemote, SIGNAL(clicked(bool)), this, SLOT(onRemoveSelectedRemotePlugin()));
   QObject::connect(
     this->Ui->removeLocal, SIGNAL(clicked(bool)), this, SLOT(onRemoveSelectedLocalPlugin()));
+  QObject::connect(
+    this->Ui->addConfig_Remote, SIGNAL(clicked(bool)), this, SLOT(onAddPluginConfigRemote()));
+  QObject::connect(
+    this->Ui->addConfig_Local, SIGNAL(clicked(bool)), this, SLOT(onAddPluginConfigLocal()));
 
   this->LoadingMultiplePlugins = false;
   this->refresh();
@@ -181,6 +185,37 @@ void pqPluginDialog::removePlugin(pqServer*, const QString& plugin, bool remote)
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pm->hidePlugin(plugin, remote);
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::onAddPluginConfigRemote()
+{
+  this->addPluginConfigFile(true);
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::onAddPluginConfigLocal()
+{
+  this->addPluginConfigFile(false);
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::addPluginConfigFile(bool remote)
+{
+  pqFileDialog fd(remote ? this->Server : nullptr, this, "Add Plugin Config File", QString(),
+    QString("%1 (*.xml)").arg(tr("Plugin config file")), false);
+  if (fd.exec() == QDialog::Accepted)
+  {
+    QString config = fd.getSelectedFiles()[0];
+    this->addPluginConfigFile(config, remote);
+  }
+}
+
+//----------------------------------------------------------------------------
+void pqPluginDialog::addPluginConfigFile(const QString& config, bool remote)
+{
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+  pm->addPluginConfigFile(this->Server, config, remote);
 }
 
 //----------------------------------------------------------------------------
@@ -369,6 +404,13 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoNode->setFlags(infoFlags | Qt::ItemIsUserCheckable);
   infoNode->setCheckState(ValueCol, plInfo->GetAutoLoad(index) ? Qt::Checked : Qt::Unchecked);
   infoNode->setData(NameCol, Qt::UserRole, vdata);
+
+  // Delayed load read only setting
+  infoText.clear();
+  infoText << tr("Delayed Load") << QString();
+  infoNode = new QTreeWidgetItem(pluginNode, infoText);
+  infoNode->setFlags(Qt::ItemIsSelectable);
+  infoNode->setCheckState(ValueCol, plInfo->GetDelayedLoad(index) ? Qt::Checked : Qt::Unchecked);
 }
 
 //----------------------------------------------------------------------------
@@ -400,9 +442,9 @@ void pqPluginDialog::loadSelectedPlugins(
     {
       unsigned int index = 0;
       vtkPVPluginsInformation* plInfo = this->getPluginInfo(item, index);
-      if (plInfo && plInfo->GetPluginFileName(index) && !plInfo->GetPluginLoaded(index))
+      if (plInfo && !plInfo->GetPluginLoaded(index))
       {
-        this->loadPlugin(server, QString(plInfo->GetPluginFileName(index)), remote);
+        this->loadPlugin(server, QString(plInfo->GetPluginName(index)), remote);
       }
     }
   this->LoadingMultiplePlugins = false;

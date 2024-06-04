@@ -82,7 +82,17 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="4">
+         <item row="2" column="1">
+          <widget class="QPushButton" name="loadSelected_Remote">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Load Selected</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
           <widget class="QPushButton" name="removeRemote">
            <property name="enabled">
             <bool>false</bool>
@@ -92,13 +102,17 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="loadSelected_Remote">
-           <property name="enabled">
-            <bool>false</bool>
+         <item row="3" column="3">
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
+          </spacer>
+         </item>
+         <item row="2" column="4">
+          <widget class="QPushButton" name="addConfig_Remote">
            <property name="text">
-            <string>Load Selected</string>
+            <string>Add plugin configuration file</string>
            </property>
           </widget>
          </item>
@@ -127,7 +141,7 @@
            </property>
           </spacer>
          </item>
-         <item row="0" column="0" rowspan="2" colspan="4">
+         <item row="0" column="0" rowspan="2" colspan="5">
           <widget class="pqPluginTreeWidget" name="localPlugins">
            <property name="contextMenuPolicy">
             <enum>Qt::NoContextMenu</enum>
@@ -145,16 +159,6 @@
            </column>
           </widget>
          </item>
-         <item row="3" column="3">
-          <widget class="QPushButton" name="removeLocal">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Remove</string>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="0">
           <widget class="QPushButton" name="loadLocal">
            <property name="text">
@@ -169,6 +173,30 @@
            </property>
            <property name="text">
             <string>Load Selected</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QPushButton" name="removeLocal">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Remove</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="4">
+          <widget class="QPushButton" name="addConfig_Local">
+           <property name="text">
+            <string>Add plugin configuration file</string>
            </property>
           </widget>
          </item>

@@ -63,11 +63,13 @@ public:
   ///@{
   /**
    * Loads the plugin either locally or remotely.
+   * plugin can either be a full path or a plugin name.
    */
-  bool LoadRemotePlugin(const char* filename, vtkSMSession*);
-  bool LoadLocalPlugin(const char* filename);
+  bool LoadRemotePlugin(const char* plugin, vtkSMSession*);
+  bool LoadLocalPlugin(const char* plugin);
   ///@}
 
+  ///@{
   /**
    * Plugin configuration XML is a simple XML that makes ParaView aware of the
    * plugins available and may result in loading of those plugins that are
@@ -75,12 +77,15 @@ public:
    * \li .plugins - used to notify ParaView of the distributed plugins
    * \li session - used to save/restore the plugins loaded by the users.
 
-   * This method loads the plugin configuration xml either on the local process or the
-   * remote server process(es). \c session is only used when
-   * remote==true and session itself is a remote session.
+   * This method loads the plugin configuration xml content or file
+   * either on the local process or the remote server process(es).
+   * \c session is only used when remote==true and session itself is a remote session.
    */
   void LoadPluginConfigurationXMLFromString(
     const char* xmlcontents, vtkSMSession* session, bool remote);
+  void LoadPluginConfigurationXML(
+    const char* configurationFile, vtkSMSession* session, bool remote);
+  ///@}
 
   /**
    * Method to load remote plugins in order to meet plugin requirement across processes.

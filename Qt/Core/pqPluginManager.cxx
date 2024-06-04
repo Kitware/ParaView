@@ -55,7 +55,23 @@ public:
 
       stream << "  <Plugin name=\"" << info->GetPluginName(cc) << "\""
              << " filename=\"" << info->GetPluginFileName(cc) << "\""
-             << " auto_load=\"" << (info->GetAutoLoad(cc) ? 1 : 0) << "\" />\n";
+             << " auto_load=\"" << (info->GetAutoLoad(cc) ? 1 : 0) << "\""
+             << " delayed_load=\"" << (info->GetDelayedLoad(cc) ? 1 : 0);
+
+      std::vector<std::string> xmls = info->GetXMLs(cc);
+      if (!xmls.empty())
+      {
+        stream << "\" >\n";
+        for (std::string xml : xmls)
+        {
+          stream << "<XML filename=\"" << xml << "\" />\n";
+        }
+        stream << "</Plugin>\n";
+      }
+      else
+      {
+        stream << "\" />\n";
+      }
     }
     stream << "</Plugins>\n";
     // cout << stream.str().c_str() << endl;
@@ -220,21 +236,21 @@ vtkPVPluginsInformation* pqPluginManager::loadedExtensions(pqServer* session, bo
 
 //-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadExtension(
-  pqServer* server, const QString& lib, QString* vtkNotUsed(errorMsg), bool remote)
+  pqServer* server, const QString& plugin, QString* vtkNotUsed(errorMsg), bool remote)
 {
   vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
 
   bool ret_val = false;
   if (remote && server && server->isRemote())
   {
-    ret_val = mgr->LoadRemotePlugin(lib.toUtf8().data(), server->session());
+    ret_val = mgr->LoadRemotePlugin(plugin.toUtf8().data(), server->session());
   }
   else
   {
     // All Load*Plugin* call need a utf8 encoded filename or
     // xmlcontent, since vtksys::DynamicLoader itself takes care
     // Of converting to local8bit, even locally.
-    ret_val = mgr->LoadLocalPlugin(lib.toUtf8().data());
+    ret_val = mgr->LoadLocalPlugin(plugin.toUtf8().data());
   }
 
   return ret_val ? LOADED : NOTLOADED;
@@ -247,6 +263,13 @@ QStringList pqPluginManager::pluginPaths(pqServer* session, bool remote)
   QString paths =
     remote ? mgr->GetRemotePluginSearchPaths(session->session()) : mgr->GetLocalPluginSearchPaths();
   return paths.split(';', PV_QT_SKIP_EMPTY_PARTS);
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::addPluginConfigFile(pqServer* server, const QString& config, bool remote)
+{
+  vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
+  mgr->LoadPluginConfigurationXML(config.toUtf8().data(), server->session(), remote);
 }
 
 //-----------------------------------------------------------------------------

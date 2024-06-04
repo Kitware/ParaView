@@ -34,6 +34,12 @@ public:
    */
   virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
   GetInitializeInterpreterCallback() = 0;
+
+  /**
+   * Return if the plugin should be ensured when using a proxy provided by the XMLs
+   * Useful for delayed load plugin
+   */
+  virtual bool GetEnsurePluginLoaded() { return false; };
 };
 //@}
 

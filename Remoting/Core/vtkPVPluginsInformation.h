@@ -36,6 +36,8 @@ public:
   bool GetRequiredOnClient(unsigned int);
   const char* GetDescription(unsigned int);
   bool GetAutoLoad(unsigned int);
+  bool GetDelayedLoad(unsigned int);
+  std::vector<std::string> GetXMLs(unsigned int);
   ///@}
 
   ///@{
@@ -50,6 +52,11 @@ public:
    * API to change auto-load status.
    */
   void SetAutoLoad(unsigned int cc, bool);
+
+  /**
+   * API to change DelayedLoad status.
+   */
+  void SetDelayedLoad(unsigned int cc, bool);
 
   /**
    * This is a hack. When the user sets an auto-load option from  the GUI to

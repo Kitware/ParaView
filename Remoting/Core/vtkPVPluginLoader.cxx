@@ -48,24 +48,31 @@ class vtkPVXMLOnlyPlugin
   : public vtkPVPlugin
   , public vtkPVServerManagerPluginInterface
 {
-  std::string PluginName;
-  std::string XML;
-  vtkPVXMLOnlyPlugin() = default;
-  vtkPVXMLOnlyPlugin(const vtkPVXMLOnlyPlugin& other);
-  void operator=(const vtkPVXMLOnlyPlugin& other);
-
 public:
   static vtkPVXMLOnlyPlugin* Create(const char* xmlfile)
+  {
+    vtkPVXMLOnlyPlugin* instance = new vtkPVXMLOnlyPlugin();
+    instance->PluginName = vtksys::SystemTools::GetFilenameWithoutExtension(xmlfile);
+    instance->XML = vtkPVXMLOnlyPlugin::ParseXML(xmlfile);
+    if (instance->XML.empty())
+    {
+      delete instance;
+      return nullptr;
+    }
+    else
+    {
+      return instance;
+    }
+  }
+
+  static std::string ParseXML(const char* xmlfile)
   {
     vtkNew<vtkPVXMLParser> parser;
     parser->SetFileName(xmlfile);
     if (!parser->Parse())
     {
-      return nullptr;
+      return "";
     }
-
-    vtkPVXMLOnlyPlugin* instance = new vtkPVXMLOnlyPlugin();
-    instance->PluginName = vtksys::SystemTools::GetFilenameWithoutExtension(xmlfile);
 
     vtksys::ifstream is;
     is.open(xmlfile, ios::binary);
@@ -81,9 +88,9 @@ public:
     is.read(buffer, length);
     is.close();
     buffer[length] = 0;
-    instance->XML = buffer;
+    std::string xmlString(buffer);
     delete[] buffer;
-    return instance;
+    return xmlString;
   }
 
   /**
@@ -136,6 +143,52 @@ public:
    * Returns EULA for the plugin, if any. If none, this will return nullptr.
    */
   const char* GetEULA() override { return nullptr; }
+
+protected:
+  std::string PluginName;
+  std::string XML;
+  vtkPVXMLOnlyPlugin() = default;
+  vtkPVXMLOnlyPlugin(const vtkPVXMLOnlyPlugin& other);
+  void operator=(const vtkPVXMLOnlyPlugin& other);
+};
+
+// This is an helper class used for load delayed load plugins.
+class vtkPVDelayedLoadPlugin : public vtkPVXMLOnlyPlugin
+{
+public:
+  static vtkPVDelayedLoadPlugin* Create(
+    const std::string& name, const std::vector<std::string>& xmlFiles)
+  {
+    vtkPVDelayedLoadPlugin* instance = new vtkPVDelayedLoadPlugin();
+    instance->PluginName = name;
+    for (const std::string& xmlFile : xmlFiles)
+    {
+      std::string xml = vtkPVXMLOnlyPlugin::ParseXML(xmlFile.c_str());
+      if (xml.empty())
+      {
+        delete instance;
+        return nullptr;
+      }
+      instance->XMLVector.push_back(xml);
+    }
+    return instance;
+  }
+
+  /**
+   * Obtain the server-manager configuration xmls, if any.
+   */
+  void GetXMLs(std::vector<std::string>& xmls) override { xmls = this->XMLVector; }
+
+  /**
+   * Delayed load plugin need ensure plugin, force it
+   */
+  bool GetEnsurePluginLoaded() override { return true; }
+
+private:
+  std::vector<std::string> XMLVector;
+  vtkPVDelayedLoadPlugin() = default;
+  vtkPVDelayedLoadPlugin(const vtkPVDelayedLoadPlugin& other);
+  void operator=(const vtkPVDelayedLoadPlugin& other);
 };
 
 // Cleans successfully opened libs when the application quits.
@@ -395,10 +448,11 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::LoadPluginByName(const char* name)
+bool vtkPVPluginLoader::LoadPluginByName(const char* name, bool acceptDelayed)
 {
   if (vtkPVPluginLoader::CallPluginLoaderCallbacks(name))
   {
+    this->Loaded = true;
     return true;
   }
 
@@ -423,10 +477,109 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name)
         return false;
       }
 
-      return this->LoadPlugin(filename);
+      if (tracker->GetPluginDelayedLoad(i) && acceptDelayed)
+      {
+        auto xmls = tracker->GetPluginXMLs(i);
+        return this->LoadDelayedLoadPlugin(name, xmls, filename);
+      }
+      else
+      {
+        return this->LoadPlugin(filename);
+      }
     }
   }
 
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::LoadDelayedLoadPlugin(
+  const std::string& name, const std::vector<std::string>& xmls, const std::string& filename)
+{
+  this->Loaded = false;
+  bool no_errors = false;
+
+  if (name.empty())
+  {
+    vtkPVPluginLoaderErrorMacro("Plugin name should not be empty");
+    return false;
+  }
+
+  if (xmls.empty())
+  {
+    vtkPVPluginLoaderErrorMacro("No XMLs provided for a delayed load plugin");
+    return false;
+  }
+
+  if (filename.empty())
+  {
+    vtkPVPluginLoaderErrorMacro("Plugin filename should not be empty");
+    return false;
+  }
+
+  vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Attempting to delayed load: %s", name.c_str());
+
+  this->SetFileName(filename.c_str());
+  this->SetPluginName(name.c_str());
+
+  // Avoid duplicate loading of the same plugin
+  if (this->IsLoaded(filename.c_str(), true))
+  {
+    return true;
+  }
+
+  vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Loading delayed load plugin.");
+  vtkPVDelayedLoadPlugin* plugin = vtkPVDelayedLoadPlugin::Create(name, xmls);
+  if (plugin)
+  {
+    vtkPVPluginLoaderCleaner::GetInstance()->Register(plugin);
+    plugin->SetFileName(filename.c_str());
+    return this->LoadPluginInternal(plugin);
+  }
+  vtkPVPluginLoaderErrorMacro(
+    "Failed to load delayed load plugin. Contains invalid XMLs or file could not be read.");
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::IsLoaded(const char* file, bool acceptDelayed)
+{
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  unsigned int nPlugins = tracker->GetNumberOfPlugins();
+
+  for (unsigned int i = 0; i < nPlugins; ++i)
+  {
+    const char* filename = tracker->GetPluginFileName(i);
+    if (!filename)
+    {
+      continue;
+    }
+
+    if (strcmp(file, filename) != 0)
+    {
+      continue;
+    }
+
+    bool alreadyLoaded = tracker->GetPluginLoaded(i);
+
+    if (alreadyLoaded)
+    {
+      // Unless acceptedDelayed is true, do not consider delayedLoadPlugin to be loaded
+      if (!acceptDelayed && dynamic_cast<vtkPVDelayedLoadPlugin*>(tracker->GetPlugin(i)) != nullptr)
+      {
+        alreadyLoaded = false;
+      }
+    }
+
+    if (alreadyLoaded)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
   return false;
 }
 
@@ -447,33 +600,9 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   this->SetPluginName(defaultname.c_str());
 
   // Avoid duplicate loading of the same plugin
+  if (this->IsLoaded(file))
   {
-    vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
-    unsigned int nplugins = tracker->GetNumberOfPlugins();
-
-    for (unsigned int i = 0; i < nplugins; ++i)
-    {
-      const char* filename = tracker->GetPluginFileName(i);
-      if (!filename)
-      {
-        continue;
-      }
-
-      if (strcmp(file, filename) != 0)
-      {
-        continue;
-      }
-
-      bool already_loaded = tracker->GetPluginLoaded(i);
-      if (already_loaded)
-      {
-        return true;
-      }
-      else
-      {
-        break;
-      }
-    }
+    return true;
   }
 
   // first, try the callbacks.
@@ -629,6 +758,12 @@ bool vtkPVPluginLoader::LoadPluginInternal(vtkPVPlugin* plugin)
 void vtkPVPluginLoader::LoadPluginConfigurationXMLFromString(const char* xmlcontents)
 {
   vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(xmlcontents);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPluginLoader::LoadPluginConfigurationXML(const char* configurationFile)
+{
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXML(configurationFile);
 }
 
 //-----------------------------------------------------------------------------

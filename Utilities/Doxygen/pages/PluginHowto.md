@@ -69,6 +69,10 @@ There are four ways for loading plugins:
     - You can set up ParaView to automatically load the plugin at startup (for
       client plugins) or on connecting to the server (for server plugins) by
       checking the "Auto Load" checkbox on a loaded plugin.
+    - Plugin configuration file can also be added interactively in the UI by clicking on the
+      "Add plugin configuration file". This will add plugins to the list and potentially
+      load them if they are flagged as auto load plugins. Once a plugin have been added
+      this way, it is then saved in the settings. See below for the specification.
 
 ![Plugin Manager when not connected to a remote server, showing loaded plugins on the local site.](images/LocalPlugin_Manager.png)
 ![Plugin Manager when connected to a server showing loaded plugins on the local as well as remote sites.](images/RemotePlugin_Manager.png)
@@ -89,7 +93,7 @@ There are four ways for loading plugins:
       configuration files (separated by colon (`:`) on Unix platforms or
       semi-colon (`;`) on Windows). ParaView will read these files on startup
       to load specified plugins. The XML plugin configuration file format looks
-      like this:
+      like this (see below for the complete specification):
 
 ```xml
 <?xml version="1.0"?>
@@ -102,13 +106,13 @@ There are four ways for loading plugins:
 
       Plugins listed this way will always be loaded, irrespective of the status
       of the `Auto Load` checkbox in the `Plugin Manager`.
-  * *Using the plugin file `.plugins`* (Make plugins available and possibly
-    Auto-load plugins)
+  * *Using the ParaView internal plugin configuration file `.plugins`*
+     (Make plugins available and possibly Auto-load plugins)
     - Plugins that are listed in the `.plugins` file on the client and server
       will automatically be listed in the `Plugin Manager`, and may optionally
       be auto loaded. ParaView creates its own `.plugins` file listing plugins
       known during its build and uses it as the default. An example `.plugins`
-      file, auto loading H5PartReader, looks like this:
+      file, auto loading H5PartReader, looks like this (see below for the complete specification):
 
 ```xml
 <?xml version="1.0"?>
@@ -125,6 +129,78 @@ There are four ways for loading plugins:
     - Recognized locations are:
       * A `plugins` subdirectory under the `paraview-X.Y` directory in the
         library path (usually `lib` on Unix platforms and `bin` on Windows).
+
+## Delayed load plugins
+
+When loading a plugin configuration file (see above), it is possible to specify certain parameters
+that will affect how the plugin will be loaded, eg: `auto_load="1"` will load the plugin as soon as the
+plugin configuration file is loaded.
+
+It is also possible to delay the loading of plugin until they are actually needed, by first
+only loading the XML part of a plugin and loading the actual plugin shared library file only
+when the proxy provided by the XML is created.
+
+This means that any part of the plugin that is visible to users but not described as XML, such as Qt additions,
+will not be visible until a proxy is created.
+
+This also means that the XML of the plugin must be available alongside the actual plugin and this is where the specific
+syntax of the plugin configuration file comes into play.
+
+A plugin configuration file for a delayed load plugin would look like this:
+
+```
+<?xml version="1.0"?>
+<Plugins>
+  <Plugin name="ElevationFilter" auto_load="0" delayed_load="1">
+    <XML filename="ElevationFilter/MyElevationFilter.xml"/>
+  </Plugin>
+</Plugins>
+```
+
+The `XML` `filename` argument is a relative or absolute path to a XML file.
+
+Such file can be automatically generated during the compilation of a ParaView plugin.
+
+It would look like this in the `CMakeLists.txt` of a plugin:
+
+```
+paraview_plugin_build(
+  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
+  PLUGINS_FILE_NAME "elev.plugins.xml"
+  DELAYED_LOAD ElevationFilter
+  PLUGINS ${plugins})
+```
+
+The XML files are also required to be listed as `SERVER_MANAGER_XMLS` in the `paraview_plugin_add` call,
+XML files added using `paraview_add_server_manager_xmls` are not supported.
+
+## Plugin configuration file XML Schema
+
+Here is the exhaustive plugin configuration file XML schema
+
+Complete example:
+
+```
+<?xml version="1.0"?>
+<Plugins>
+  <Plugin name="PluginName" filename="relative/or/absolute/path/to/plugin.ext" auto_load="bool" delayed_load="bool">
+    <XML filename="relative/or/absolute/path/to/file.xml"/>
+    <XML filename="relative/or/absolute/path/to/file2.xml"/>
+  </Plugin>
+</Plugins>
+```
+
+ * The `<Plugins>` tag is the root element of the document, which contains zero-to-many `<Plugin>` tags.
+ * Each `<Plugin>` tag represents a plugin to add with the following configuration:
+  * The `name` attribute (required) uniquely identifies the plugin, it is also used to find the plugin filename in directories relative to the plugin configuration file if the `filename` attribute is not provided.
+  * The `filename` attribute (optional) is a relative or absolute path to the plugin file to be loaded.
+  * The `auto_load` attribute (optional) is a boolean that control if the plugin should be loaded as soon as the plugin is added.
+  * The `delayed_load` attribute (optional) is a boolean that control if the plugin should be *actually* loaded only when needed (see above).
+  * Each `<Plugin>` tag contains zero-to-many `<XML>` tags.
+   * Each `<XML>` tag represents a XML file associated with the plugin, only used in context of `delayed_load="1"`
+   * The `filename` attribute (required) is a relative or absolute path to a the XML file to be loaded in the context of the delayed load mechanism
 
 ## Debugging Plugins
 
