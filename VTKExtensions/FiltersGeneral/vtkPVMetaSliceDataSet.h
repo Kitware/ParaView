@@ -12,7 +12,6 @@
 
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
-#include "vtkParaViewDeprecation.h"                 // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkSmartPointer.h"
 
 class vtkImplicitFunction;
@@ -75,17 +74,6 @@ public:
    * Expose method from vtkPVCutter
    */
   void SetGenerateTriangles(int status);
-
-  /**
-   * Expose method from vtkPVCutter
-   *
-   * @deprecated in favor of SetLocator to allow octree locator.
-   * SetMergePoints(true) <=> SetLocator(vtkMergePoints::New())
-   * SetMergePoints(false) <=> SetLocator(vtkNonMergingPointLocator::New())
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Use `vtkPVMetaSliceDataSet::SetLocator(vtkIncrementalPointLocator*)` instead")
-  void SetMergePoints(bool status);
 
   /**
    * Method used for vtkHyperTreeGrid

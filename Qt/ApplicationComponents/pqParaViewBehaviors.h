@@ -6,7 +6,7 @@
 
 #include "pqApplicationComponentsModule.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_13_0
 #include "vtkSetGet.h"              // for VTK_LEGACY.
 
 #include <QFlags>
@@ -83,10 +83,6 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(CustomShortcutBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(MainWindowEventBehavior);
 
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use AddExamplesInFileDialogBehavior instead")
-  PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFavoritesBehavior);
-  PQ_BEHAVIOR_DEFINE_METHODS(AddExamplesInFileDialogBehavior);
-
   ///@{
   /**
    * Controls whether `pqUsageLoggingBehavior` is created. Disabled by default
@@ -153,9 +149,6 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(CustomShortcutBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(MainWindowEventBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(UsageLoggingBehavior);
-  // PARAVIEW_DEPRECATED_IN_5_12_0
-  PQ_BEHAVIOR_DECLARE_FLAG(AddExamplesInFavoritesBehavior);
-  PQ_BEHAVIOR_DECLARE_FLAG(AddExamplesInFileDialogBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

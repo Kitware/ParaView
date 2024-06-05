@@ -2558,18 +2558,6 @@ def CreatePiecewiseFunction(**params):
 
 
 # -----------------------------------------------------------------------------
-def GetLookupTableForArray(arrayname, num_components, **params):
-    """Used to get an existing lookup table for a array or to create one if none
-    exists. Keyword arguments can be passed in to initialize the LUT if a new
-    one is created.
-    PARAVIEW_DEPRECATED_IN_5_12_0: Use GetColorTransferFunction instead"""
-    import warnings
-    warnings.warn("'GetLookupTableForArray' is deprecated, use GetColorTransferFunction instead", DeprecationWarning)
-
-    return GetColorTransferFunction(arrayname, **params)
-
-
-# -----------------------------------------------------------------------------
 def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
     """Assign a lookup table to an array by lookup table name.
 

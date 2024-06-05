@@ -12,8 +12,6 @@
 #include "pqLineEdit.h"
 #include "pqWidgetsModule.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 /**
  * @class pqDoubleLineEdit
  * @brief pqLineEdit subclass that supports a low precision view when inactive
@@ -96,18 +94,6 @@ public:
   QString simplifiedText() const;
 
   /**
-   * Return a double formatted according to a QTextStream::RealNumberNotation and number
-   * of digits of precision.
-   *
-   * @deprecated deprecated in favor of
-   * pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int)
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Use `pqDoubleLineEdit::formatDouble(double,pqDoubleLineEdit::RealNumberNotation,int)` instead")
-  static QString formatDouble(
-    double value, QTextStream::RealNumberNotation notation, int precision);
-
-  /**
    * Return a double formatted according to a pqDoubleLineEdit::RealNumberNotation
    * notation and a number of digits of precision.
    * Supports QLocale::FloatingPointShortest as precision.
@@ -117,13 +103,6 @@ public:
    */
   static QString formatDouble(double value, pqDoubleLineEdit::RealNumberNotation notation,
     int precision, int fullLowExponent = -6, int fullHighExponent = 20);
-
-  /**
-   * Return a double formatted according to the values set for global precision
-   * and notation.
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use `pqCoreUtilities::formatNumber()` instead")
-  static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -143,13 +122,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * @sa useGlobalPrecisionAndNotation()
    */
   void setUseGlobalPrecisionAndNotation(bool value);
-
-  /**
-   * Set whether to always render at full precision
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Use `pqDoubleLineEdit::setNotation(pqDoubleLineEdit::FullNotation)` instead")
-  void setAlwaysUseFullPrecision(bool value);
 
 protected:
   void paintEvent(QPaintEvent* evt) override;

@@ -129,15 +129,6 @@ void vtkPVMetaSliceDataSet::SetGenerateTriangles(int status)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMetaSliceDataSet::SetMergePoints(bool status)
-{
-  vtkSmartPointer<vtkIncrementalPointLocator> locator = status
-    ? vtk::TakeSmartPointer<vtkIncrementalPointLocator>(vtkMergePoints::New())
-    : vtk::TakeSmartPointer<vtkIncrementalPointLocator>(vtkNonMergingPointLocator::New());
-  this->SetLocator(locator);
-}
-
-//----------------------------------------------------------------------------
 int vtkPVMetaSliceDataSet::RequestDataObject(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {

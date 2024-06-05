@@ -255,36 +255,6 @@ bool vtkPVRepresentedArrayListSettings::GetSeriesVisibilityDefault(const char* n
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetNumberOfExcludedNameFilters(int n)
-{
-  vtkPVIOSettings::GetInstance()->SetNumberOfExcludedNameFilters(n);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVRepresentedArrayListSettings::GetNumberOfExcludedNameFilters()
-{
-  return vtkPVIOSettings::GetInstance()->GetNumberOfExcludedNameFilters();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetExcludedNameFilter(int i, const char* expression)
-{
-  vtkPVIOSettings::GetInstance()->SetExcludedNameFilter(i, expression);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVRepresentedArrayListSettings::GetExcludedNameFilter(int i)
-{
-  return vtkPVIOSettings::GetInstance()->GetExcludedNameFilter(i);
-}
-
-//----------------------------------------------------------------------------
-vtkStringArray* vtkPVRepresentedArrayListSettings::GetAllNameFilters()
-{
-  return vtkPVIOSettings::GetInstance()->GetAllNameFilters();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRepresentedArrayListSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

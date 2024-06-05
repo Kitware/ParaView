@@ -2,9 +2,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 
-// Hide PARAVIEW_DEPRECATED_IN_5_12_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "pqAnnotationsModel.h"
 
 #include "vtkSMStringListDomain.h"
@@ -195,7 +192,6 @@ public:
 //=============================================================================
 pqAnnotationsModel::pqAnnotationsModel(QObject* parentObject)
   : Superclass(parentObject)
-  , MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png") // PARAVIEW_DEPRECATED_IN_5_12_0
   , Internals(new pqInternals())
 {
 }

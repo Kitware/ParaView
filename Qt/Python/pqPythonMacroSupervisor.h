@@ -6,8 +6,6 @@
 
 #include "pqPythonModule.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 #include <QList>
 #include <QMap>
 #include <QObject>
@@ -60,13 +58,6 @@ public:
    * Hide file by prepending a `.` to its name.
    * Hidden file in macro directory are not loaded.
    */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use hideFile instead.")
-  static void removeStoredMacro(const QString& fileName);
-
-  /**
-   * Hide file by prepending a `.` to its name.
-   * Hidden file in macro directory are not loaded.
-   */
   static void hideFile(const QString& fileName);
 
   /**
@@ -95,9 +86,6 @@ public:
    * Get a list a "*.py" files from macro directories.
    */
   static QStringList getMacrosFilePaths();
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("User pqIconListModel::getSupportedIconFormats instead.")
-  static QStringList getSupportedIconFormats();
 
 Q_SIGNALS:
 
