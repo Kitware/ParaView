@@ -2,10 +2,6 @@
 # SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 set(classes
-  pqAnimationKeyFrame
-  pqAnimationModel
-  pqAnimationTrack
-  pqAnimationWidget
   pqCheckBoxPixMaps
   pqCheckBoxPixMaps
   pqCheckableHeaderView

@@ -169,14 +169,6 @@ void pqHelpWindow::setNameSpace(const QString& namespace_name)
 }
 
 //-----------------------------------------------------------------------------
-// PARAVIEW_DEPRECATED_IN_5_12_0
-void pqHelpWindow::showHomePage(const QString& namespace_name)
-{
-  this->setNameSpace(namespace_name);
-  this->showHomePage();
-}
-
-//-----------------------------------------------------------------------------
 void pqHelpWindow::showHomePage()
 {
   QUrl homePage;

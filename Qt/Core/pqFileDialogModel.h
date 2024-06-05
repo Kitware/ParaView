@@ -8,7 +8,6 @@
 #include "pqCoreModule.h"
 
 #include "vtkPVFileInformation.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 
 #include <QAbstractItemModel>
 #include <QFileIconProvider>
@@ -69,12 +68,6 @@ public:
   void setGroupFiles(bool group);
   bool isGroupingFiles();
   ///@}
-
-  /**
-   * Sets groupFiles to the provided value then set the path that the file dialog will display.
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use setGroupFiles(bool) and setCurrentPath(path) instead.")
-  void setCurrentPath(const QString& path, bool groupFiles);
 
   /**
    * Set the path that the file dialog will display.

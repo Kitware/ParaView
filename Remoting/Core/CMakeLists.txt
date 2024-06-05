@@ -27,8 +27,6 @@ set(classes
   vtkPVInformation
   vtkPVLogInformation
   vtkPVMemoryUseInformation
-  vtkPVOptions
-  vtkPVOptionsXMLParser
   vtkPVPlugin
   vtkPVPluginLoader
   vtkPVPluginsInformation

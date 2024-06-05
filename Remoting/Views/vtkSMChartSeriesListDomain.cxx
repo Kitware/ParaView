@@ -138,23 +138,6 @@ int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLE
 }
 
 //----------------------------------------------------------------------------
-const char** vtkSMChartSeriesListDomain::GetKnownSeriesNames()
-{
-  static std::vector<const char*> staticStorage;
-
-  // Convert vector of std::string to a const char**
-  const auto& knownSeries =
-    vtkPVRepresentedArrayListSettings::GetInstance()->GetAllChartsDefaultXAxis();
-  staticStorage.resize(knownSeries.size() + 1);
-  for (std::size_t i = 0; i < knownSeries.size(); ++i)
-  {
-    staticStorage[i] = knownSeries[i].c_str();
-  }
-  staticStorage[knownSeries.size()] = nullptr;
-
-  return staticStorage.data();
-}
-//----------------------------------------------------------------------------
 int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   const auto& strings_to_check =

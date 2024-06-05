@@ -30,9 +30,6 @@
 
 #include "pqSMAdaptor.h"
 
-// PARAVIEW_DEPRECATED_IN_5_12_0
-bool pqFileDialogFavoriteModel::AddExamplesInFavorites = true;
-
 /////////////////////////////////////////////////////////////////////
 // Icons
 // NOLINTNEXTLINE(readability-redundant-member-init)

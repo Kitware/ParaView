@@ -14,8 +14,6 @@
 #include "vtkAnimationPlayer.h"
 #include "vtkRemotingAnimationModule.h" // needed for export macro
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 class vtkSequenceAnimationPlayer;
 class vtkTimestepsAnimationPlayer;
 
@@ -44,12 +42,6 @@ public:
    * Forwarded to vtkSequenceAnimationPlayer
    */
   void SetNumberOfFrames(int val);
-
-  /**
-   * Forwarded to vtkRealtimeAnimationPlayer.
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use `SetStride` and vtkSequenceAnimationPlayer instead")
-  void SetDuration(int val);
 
   ///@{
   /**

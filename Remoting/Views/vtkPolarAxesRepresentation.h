@@ -212,10 +212,6 @@ public:
   virtual void SetLog(bool active);
   virtual void SetNumberOfRadialAxes(vtkIdType val);
   virtual void SetNumberOfPolarAxes(vtkIdType val);
-  PARAVIEW_DEPRECATED_IN_5_12_0("Set DeltaRangeMajor instead or enable AxisTickMatchesPolarAxes")
-  virtual void SetNumberOfPolarAxisTicks(int val);
-  PARAVIEW_DEPRECATED_IN_5_12_0("Set DeltaRangePolarAxes instead")
-  virtual void SetAutoSubdividePolarAxis(bool active);
   virtual void SetDeltaAngleRadialAxes(double angle);
   virtual void SetDeltaRangePolarAxes(double range);
   virtual void SetSmallestVisiblePolarAngle(double angle);

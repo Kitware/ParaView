@@ -12,7 +12,6 @@ set(classes
   pqAnimationProgressDialog
   pqAnimationTimeWidget
   pqAnimationTrackEditor
-  pqAnimationViewWidget
   pqArrayListDomain
   pqArrayListWidget
   pqArraySelectionWidget
@@ -123,7 +122,6 @@ set(classes
   pqRecentFilesMenu
   pqRemoteCommandDialog
   pqRemoteCommandTemplateDialog
-  pqRescaleRange
   pqRescaleScalarRangeToCustomDialog
   pqRescaleScalarRangeToDataOverTimeDialog
   pqSingleLogViewerWidget
@@ -226,7 +224,6 @@ set(ui_files
   Resources/UI/pqPythonAnimationCue.ui
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
-  Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqRescaleScalarRangeToCustomDialog.ui
   Resources/UI/pqRescaleScalarRangeToDataOverTimeDialog.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui

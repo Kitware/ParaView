@@ -128,7 +128,6 @@
 #ifndef vtkSMProperty_h
 #define vtkSMProperty_h
 
-#include "vtkParaViewDeprecation.h"         // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMDomainIterator.h"            // needed for vtkSMDomainIterator
 #include "vtkSMMessageMinimal.h"            // needed for vtkSMMessage
@@ -496,17 +495,6 @@ public:
    * Use this method to clear unchecked values set of this property.
    */
   virtual void ClearUncheckedElements() {}
-
-  /**
-   * Given the string, this method will create and set a well-formated
-   * string as XMLLabel and returns it. Need to be deleted after use.
-   * Add space:
-   (1) - before every uppercase letter succeded by a lowercase letter
-   (2) - after every lowercase letter succeded by an uppercase letter
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Use vtkSMObject::CreatePrettyLabel(const std::string& name) instead.")
-  static const char* CreateNewPrettyLabel(const char* name);
 
 protected:
   vtkSMProperty();

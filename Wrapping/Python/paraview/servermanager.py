@@ -1530,21 +1530,6 @@ class DataInformation(object):
         self.Proxy = proxy
         self.Idx = idx
 
-    def Update(self):
-        """
-        PARAVIEW_DEPRECATED_IN_5_12_0 There is no reason anymore to use this method
-        explicitly, it is called automatically when one gets any value from the
-        data information object.
-
-        Update the data information if necessary. Note that this
-        does not cause execution of the underlying object. In certain
-        cases, you may have to call UpdatePipeline() on the proxy."""
-        import warnings
-        warnings.warn("'DataInformation.Update' is no longer necessary and thus deprecated.", DeprecationWarning)
-
-        if self.Proxy:
-            self.Proxy.GetDataInformation(self.Idx)
-
     def GetDataSetType(self):
         """Returns the dataset type as defined in vtkDataObjectTypes."""
         self.Update()
@@ -2422,13 +2407,6 @@ class ParaViewLoader(importlib.abc.InspectLoader):
         return self._info(fullname).GetSource()
 
 
-def LoadXML(xmlstring):
-    """
-    PARAVIEW_DEPRECATED_IN_5_12_0 Use LoadPlugin(...) instead
-    """
-    raise RuntimeError("Deprecated. Use LoadPlugin(...) instead.")
-
-
 def LoadPlugin(filename, remote=True, connection=None):
     """ Given a filename and a session (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
@@ -2729,13 +2707,6 @@ def _printProgress(caller, event):
         print("]")
         currentAlgorithm = None
         currentProgress = 0
-
-
-def updateModules(m=None):
-    """PARAVIEW_DEPRECATED_IN_5_12_0. Not needed since 5.10."""
-    import warnings
-    warnings.warn("'servermanager.updateModules' is no longer necessary and thus deprecated.", DeprecationWarning)
-    pass
 
 
 class ProxyNamespace:
