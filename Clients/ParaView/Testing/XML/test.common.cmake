@@ -1736,6 +1736,7 @@ set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (PropertyContextMenu_FORCE_SERIAL TRUE)
 set (ProxyCategoriesConfiguration_FORCE_SERIAL TRUE) # since this uses popup-line edit
+set (ProxyCategoriesToolbar_FORCE_SERIAL TRUE)
 set (QuickLaunchCreateProxy_FORCE_SERIAL TRUE)
 set (QuickLaunchNavigation_FORCE_SERIAL TRUE)
 set (QuickLaunchRequest_FORCE_SERIAL TRUE)
