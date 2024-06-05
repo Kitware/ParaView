@@ -34,5 +34,49 @@
          </Documentation>
        </IntVectorProperty>
      </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTemporalSmoothing"
+                 label="Temporal Smoothing"
+                 name="TemporalSmoothing">
+      <Documentation long_help="This filter smooths a temporal input's point and cell data by computing an average over a temporal window."
+                     short_help="Smooths a temporal input over a sliding temporal window.">
+                     Given an input that changes over time, Temporal Smoothing will provide an average
+                     of each point and cell data values over a temporal window centered on a requested time step.
+                     Because of this, the input's topology is assumed to not change over time, and so the number and order
+                     of its points and cells should stay the same. In order to provide comparable results for different time steps,
+                     the temporal window must be the same size. To enforce this the filter clips its input available time steps
+                     to allow the full window size to fit. If an out-of-bound time step is requested, the filter will use the closest available time step.
+                     Note that updating this filter will trigger upstream updates for each time steps of the window, which could be expensive.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Temporal Smoothing
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetTemporalWindowHalfWidth"
+                         default_values="10"
+                         name="TemporalWindowHalfWidth"
+                         number_of_elements="1">
+        <Documentation>
+          Set the temporal window half width. When requesting a time step, the associated data
+          will be smoothed using this number of time steps before and after it. The resulting window's width is (halfwidth*2)+1
+          time steps. This property also influences the number of timesteps produced by the filter to exclude time steps where
+          the full window cannot be applied.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TemporalSmoothing -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

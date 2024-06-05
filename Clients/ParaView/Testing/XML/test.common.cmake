@@ -698,6 +698,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridVolumeRendering.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TableFFT1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TableFFT2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TemporalSmoothingHalfWidthSmall.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TemporalSmoothingHalfWidthLarge.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestAnnotateSelectionFilter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVE-tile0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVE-tile1.png}"
@@ -1049,6 +1051,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   SeparateOpacityArray.xml
   SliceRepresentation.xml
   SteeringDataGenerator.xml
+  TemporalSmoothing.xml
   TestCleanGridPointDataStrategies.xml
   TestColorMapModificationRendersAllViews.xml
   TestERFReader.xml
