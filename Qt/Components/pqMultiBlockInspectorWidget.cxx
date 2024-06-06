@@ -21,6 +21,9 @@
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
+#include <QStyle>
+
+#include <algorithm>
 
 //=============================================================================
 class pqMultiBlockInspectorWidget::pqInternals : public QObject
@@ -78,6 +81,13 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
 public:
   Ui::MultiBlockInspectorWidget Ui;
 
+  static void resizeLabelPixmap(QLabel* iconLabel, int iconSize)
+  {
+    const QPixmap pixmap = iconLabel->pixmap(Qt::ReturnByValue);
+    iconLabel->setPixmap(
+      pixmap.scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  }
+
   pqInternals(pqMultiBlockInspectorWidget* self)
   {
     this->Ui.setupUi(self);
@@ -86,7 +96,17 @@ public:
       const bool checked = settings->value("pqMultiBlockInspectorWidget/ShowHints", true).toBool();
       this->Ui.showHints->setChecked(checked);
     }
+    const int iconSize = std::max(self->style()->pixelMetric(QStyle::PM_SmallIconSize), 20);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateDisabled, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateRepresentationInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateBlockInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateMixedInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSet, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSetAndRepresentationInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSetAndBlockInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSetAndMixedInherited, iconSize);
   }
+
   ~pqInternals() override
   {
     if (auto settings = pqApplicationCore::instance()->settings())
