@@ -951,6 +951,7 @@
         </Hints>
       </StringVectorProperty>
 
+      <!--
       <StringVectorProperty name="EdgeBlockInfo"
         command="GetEdgeBlockSelection"
         number_of_elements_per_command="2"
@@ -1010,6 +1011,7 @@
         </Hints>
         <Documentation>Select the face blocks to read.</Documentation>
       </StringVectorProperty>
+      -->
 
       <StringVectorProperty name="ElementBlockInfo"
         command="GetElementBlockSelection"
@@ -1096,6 +1098,7 @@
         </Hints>
       </StringVectorProperty>
 
+      <!--
       <StringVectorProperty name="EdgeBlockFieldInfo"
         command="GetEdgeBlockFieldSelection"
         number_of_elements_per_command="2"
@@ -1143,6 +1146,7 @@
         </Hints>
         <Documentation>Select the face blocks fields / arrays to read.</Documentation>
       </StringVectorProperty>
+      -->
 
       <StringVectorProperty name="ElementBlockFieldInfo"
         command="GetElementBlockFieldSelection"
@@ -1579,7 +1583,7 @@
       <IntVectorProperty name="ReadIds"
         command="SetReadIds"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -1624,16 +1628,20 @@
         panel_widget="ArrayStatus">
         <Property name="ElementBlocks" />
         <Property name="StructuredBlocks" />
+     <!--
         <Property name="EdgeBlocks" />
         <Property name="FaceBlocks" />
+      -->
 
         <Hints>
           <ArrayStatusPropertyWidget customColumnCount="1">
             <Column label="id" align="right">
               <Property key="ElementBlocks"    name="ElementBlocksIdInfo" />
               <Property key="StructuredBlocks" name="StructuredBlocksIdInfo" />
+     <!--
               <Property key="EdgeBlocks"       name="EdgeBlocksIdInfo" />
               <Property key="FaceBlocks"       name="FaceBlocksIdInfo" />
+      -->
             </Column>
           </ArrayStatusPropertyWidget>
         </Hints>
@@ -1645,8 +1653,10 @@
         <Property name="NodeBlockFields" />
         <Property name="ElementBlockFields" />
         <Property name="StructuredBlockFields" />
+     <!--
         <Property name="EdgeBlockFields" />
         <Property name="FaceBlockFields" />
+      -->
       </PropertyGroup>
 
       <PropertyGroup label="Sets"
