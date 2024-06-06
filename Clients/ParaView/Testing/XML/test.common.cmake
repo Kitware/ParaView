@@ -246,6 +246,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/ugrid.nc}"
   "DATA{${paraview_test_data_directory_input}/Data/UnstructuredGridWithTwoAdjacentHexahedraOfDifferentOrder.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/DecimatePolyline.vtp}"
 
   # Baselines
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AAXAxis.png}"
@@ -356,6 +357,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid2X.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-Custom.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-CustomWithReset.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineAngle.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineCustomFieldHigh.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineCustomFieldLow.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DecimatePolylineDistance.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser2.png}"
@@ -980,6 +985,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   Contour.xml
   ContourRange.xml
   DataAxesGrid2X.xml
+  DecimatePolyline.xml
   DeleteSubtreePipelineBrowser.xml
   EllipseSource.xml
   Ensemble.xml

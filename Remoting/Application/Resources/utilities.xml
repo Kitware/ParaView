@@ -2149,6 +2149,40 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="polyline_decimation_strategies">
+    <Proxy class="vtkDecimatePolylineDistanceStrategy"
+               name="DecimationDistanceStrategy">
+      <Documentation>
+        Decimation strategy that uses the eulerian distance between 3 consecutive points
+        to compute its error.
+      </Documentation>
+    </Proxy>
+    <Proxy class="vtkDecimatePolylineAngleStrategy"
+           name="DecimationAngleStrategy">
+      <Documentation>
+        Decimation strategy that uses the angle between 3 consecutive points to compute
+        its error.
+      </Documentation>
+    </Proxy>
+    <Proxy class="vtkDecimatePolylineCustomFieldStrategy"
+           name="DecimationCustomFieldStrategy">
+      <Documentation>
+        Decimation strategy that uses the values stored in a custom PointData array as a metric
+        for its decimation. The name of this array must be passed
+        through the FieldName property.
+      </Documentation>
+      <StringVectorProperty name="FieldName"
+                            command="SetFieldName"
+                            number_of_elements="1"
+                            default_values="">
+        <Documentation>
+          The name of the PointData array from which will be retrieved the data for the
+          decimation strategy to be performed.
+        </Documentation>
+      </StringVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="options">
     <LoadStateOptionsProxy class="vtkLoadStateOptions"
                            name="LoadStateOptions">
