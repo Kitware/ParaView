@@ -587,12 +587,6 @@ void vtkSMAnimationScene::SetNumberOfFrames(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationScene::SetDuration(int val)
-{
-  // Does nothing.
-}
-
-//----------------------------------------------------------------------------
 void vtkSMAnimationScene::SetFramesPerTimestep(int val)
 {
   this->AnimationPlayer->SetFramesPerTimestep(val);
