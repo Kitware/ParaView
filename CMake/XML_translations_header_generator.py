@@ -40,7 +40,8 @@ def translationUnit(file: str, line: int, context: str, content: str) -> str:
     if not content:
         return ""
     content = ' '.join(content.replace('"', '\\"').split())
-    res = f"\t//: Real source: {file}:{str(line)} - {context}\n"
+    # line is not used for now as it creates git merge conflict when modifying the translation and ParaView at the same time
+    res = f"\t//: Real source: {file} - {context}\n"
     res += f"\tQT_TRANSLATE_NOOP(\"ServerManagerXML\", R\"({content})\"),\n\n"
     return res
 
