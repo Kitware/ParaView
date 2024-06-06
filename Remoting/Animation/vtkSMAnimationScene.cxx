@@ -589,7 +589,7 @@ void vtkSMAnimationScene::SetNumberOfFrames(int val)
 //----------------------------------------------------------------------------
 void vtkSMAnimationScene::SetDuration(int val)
 {
-  this->AnimationPlayer->SetDuration(val);
+  // Does nothing.
 }
 
 //----------------------------------------------------------------------------
