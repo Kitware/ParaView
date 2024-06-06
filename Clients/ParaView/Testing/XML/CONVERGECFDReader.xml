@@ -9,7 +9,8 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.435832,0.575139,1,0,0)" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="MultiBlock Inspector" />
-  <pqevent object="pqClientMainWindow" command="set_tab_with_text" arguments="MultiBlock Inspector" />
+  <!-- undock the MultiBlock Inspector because on macOS it can affect the zoom factor in the test images -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/qt_dockwidget_floatbutton" command="activate" arguments="" />
   <!-- set assembly name to be hierarchy instead of assembly -->
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/assemblyCombo" command="activated" arguments="Hierarchy"/>/
   <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/container/1pqProxyWidget0/DataAssemblyEditor/tabWidget/qt_tabwidget_stackedwidget/hierarchyTab/hierarchy" command="setCheckState" arguments="0.0,0" />
