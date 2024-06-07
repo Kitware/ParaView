@@ -1532,7 +1532,6 @@ class DataInformation(object):
 
     def GetDataSetType(self):
         """Returns the dataset type as defined in vtkDataObjectTypes."""
-        self.Update()
         if not self.DataInformation:
             raise RuntimeError("No data information is available")
         if self.DataInformation.GetCompositeDataSetType() > -1:
@@ -1550,7 +1549,6 @@ class DataInformation(object):
         if not self.DataInformation:
             raise AttributeError("class has no attribute %s" % name)
             return None
-        self.Update()
         return getattr(self.DataInformation, name)
 
 
