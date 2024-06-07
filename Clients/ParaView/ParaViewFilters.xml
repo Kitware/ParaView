@@ -294,13 +294,15 @@
   <Proxy group="filters" name="CellCenters" />
   <Proxy group="filters" name="CellDataToPointData" />
   <Proxy group="filters" name="CellDerivatives" />
+  <Proxy group="filters" name="CellGridPointProbe" />
   <Proxy group="filters" name="CellSize" />
   <Proxy group="filters" name="CleanPolyData" />
   <Proxy group="filters" name="CleanUnstructuredGrid" />
   <Proxy group="filters" name="CleanUnstructuredGridCells" />
   <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg" />
   <Proxy group="filters" name="ClipClosedSurface" />
-  <Proxy group="filters" name="ComputeCellGridSurface" />
+  <Proxy group="filters" name="ComputeCellGridElevation" />
+  <Proxy group="filters" name="ComputeCellGridSides" />
   <Proxy group="filters" name="ComputeConnectedSurfaceProperties" />
   <Proxy group="filters" name="ComputeMoleculeBonds" />
   <Proxy group="filters" name="ComputeMoments" />

@@ -4,7 +4,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCellGrid.h"
-#include "vtkCellGridComputeSurface.h"
+#include "vtkCellGridComputeSides.h"
 #include "vtkCompositeCellGridMapper.h"
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkDataAssembly.h"
@@ -59,7 +59,10 @@ vtkCellGridRepresentation::~vtkCellGridRepresentation() = default;
 void vtkCellGridRepresentation::SetupDefaults()
 {
   // delete vtkCompositePolyDataMapper created by vtkGeometryRepresentation
-  this->GeometryFilter = vtkCellGridComputeSurface::New();
+  auto* surfaceFilter = vtkCellGridComputeSides::New();
+  surfaceFilter->PreserveRenderableInputsOn();
+  surfaceFilter->OmitSidesForRenderableInputsOn();
+  this->GeometryFilter = surfaceFilter;
   this->LODOutlineFilter->Delete();
   this->LODOutlineFilter = vtkPVGeometryFilter::New();
 
@@ -332,6 +335,39 @@ void vtkCellGridRepresentation::SetVisibility(bool val)
 {
   this->Actor->SetVisibility(val);
   this->Superclass::SetVisibility(val);
+}
+
+void vtkCellGridRepresentation::SetSidesToShow(int flags)
+{
+  auto* surfaceFilter = vtkCellGridComputeSides::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetOutputDimensionControl(flags);
+  this->MarkModified();
+}
+
+void vtkCellGridRepresentation::SetPreserveRenderableInputs(bool shouldPreserve)
+{
+  auto* surfaceFilter = vtkCellGridComputeSides::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetPreserveRenderableInputs(shouldPreserve != 0);
+  this->MarkModified();
+}
+
+void vtkCellGridRepresentation::SetOmitSidesForRenderableInputs(bool shouldOmit)
+{
+  auto* surfaceFilter = vtkCellGridComputeSides::SafeDownCast(this->GeometryFilter);
+  if (!surfaceFilter)
+  {
+    return;
+  }
+  surfaceFilter->SetOmitSidesForRenderableInputs(shouldOmit);
+  this->MarkModified();
 }
 
 bool vtkCellGridRepresentation::NeedsOrderedCompositing()

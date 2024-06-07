@@ -589,6 +589,7 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
   else if (auto cg = vtkCellGrid::SafeDownCast(dobj))
   {
     cg->GetBounds(this->Bounds);
+    this->NumberOfElements[vtkDataObject::CELL] = cg->GetNumberOfCells();
     // this->AttributeInformations[cc]->CopyFromDataObject(dobj);
   }
 }
@@ -798,6 +799,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString(int dataType)
       return "Partitioned Dataset";
     case VTK_PARTITIONED_DATA_SET_COLLECTION:
       return "Partitioned Dataset Collection";
+    case VTK_CELL_GRID:
+      return "Cell Grid";
     default:
       break;
   }
@@ -954,7 +957,8 @@ bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
 
       case vtkDataObject::FIELD_ASSOCIATION_CELLS:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET) ||
-          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
+          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID) ||
+          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_CELL_GRID);
 
       case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);

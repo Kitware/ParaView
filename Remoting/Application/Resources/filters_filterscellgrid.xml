@@ -2,9 +2,9 @@
   <ProxyGroup name="filters">
 
     <SourceProxy
-      class="vtkCellGridComputeSurface"
-      label="Compute Surface Sides"
-      name="ComputeCellGridSurface">
+      class="vtkCellGridComputeSides"
+      name="ComputeCellGridSides"
+      label="Compute Sides">
       <Documentation
         long_help="Compute external-facing sides of conforming cells."
         short_help="Compute external-facing sides of conforming cells.">
@@ -27,7 +27,66 @@
         </DataTypeDomain>
         <Documentation>The input.</Documentation>
       </InputProperty>
-      <!-- End of ComputeCellGridSurface -->
+      <IntVectorProperty command="SetPreserveRenderableInputs"
+        default_values="1" name="PreserveRenderableInputs"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set this property to true to include the original
+          input cells in the output if they are of dimension 2 or lower
+          (i.e., surface, edges, or vertices). If false, then only the
+          computed sides will be output.
+
+          As an example, if an input has hexahedra and triangle cells,
+          this filter will output quadrilateral sides and triangle cells
+          when PreserveRenderableInputs is true and only quadrilateral
+          sides when PreserveRenderableInputs is false.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOmitSidesForRenderableInputs"
+        default_values="1" name="OmitSidesForRenderableInputs"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set this property to true to avoid generating sides
+          for input cells or sides that can be rendered as they are.
+          If false, then sides will be output even for cells/sides that
+          are surfaces or edges.
+
+          As an example, if an input has hexahedra and triangle cells,
+          this filter will generate quadrilateral sides (for the hexahedra)
+          and edge sides (for the triangles) if OmitSidesForRenderableInputs
+          is true, but only quadrilateral sides (for the hexahedra) if
+          OmitSidesForRenderableInputs is false. Note that this is independent
+          of whether some input cells are preserved or not.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutputDimensionControl"
+        default_values="37" name="OutputDimensionControl" label="Sides to Include"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <!--
+          <Entry text="Vertices of Edges"     value="1"/>
+          <Entry text="Vertices of Surfaces"  value="2"/>
+          <Entry text="Edges of Surfaces"     value="4"/>
+          <Entry text="Vertices of Volumes"   value="8"/>
+          <Entry text="Edges of Volumes"      value="16"/>
+          <Entry text="Surfaces of Volumes"   value="32"/>
+          -->
+          <Entry text="Surfaces of Inputs"    value="32"/>
+          <Entry text="Edges of Inputs"       value="20"/>
+          <Entry text="Vertices of Inputs"    value="11"/>
+          <Entry text="All Sides"             value="63"/>
+          <Entry text="Next Lowest Dimension" value="37"/>
+        </EnumerationDomain>
+        <Documentation>Set this property to true to include the original
+          input cells in the output if they are of dimension 2 or lower
+          (i.e., surface, edges, or vertices). If false, then only the
+          computed sides will be output.
+
+          As an example, if an input has hexahedra and triangle cells,
+          this filter will output quadrilateral sides and triangle cells
+          when PreserveRenderableInputs is true and only quadrilateral
+          sides when PreserveRenderableInputs is false.</Documentation>
+      </IntVectorProperty>
+
+      <!-- End of ComputeCellGridSides -->
     </SourceProxy>
 
     <SourceProxy
@@ -63,6 +122,127 @@
         <Documentation>The input.</Documentation>
       </InputProperty>
       <!-- End of ConvertToCellGrid -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridElevation"
+      name="ComputeCellGridElevation"
+      label="CellGrid Elevation">
+      <Documentation
+        long_help="Add a new attribute representing elevation."
+        short_help="Add a new attribute representing elevation.">
+        This filter adds a cell-attribute named Elevation that represents
+        the distance from either (1) a point, (2) a line, or (3) a plane.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <Documentation>An input cell-grid.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="AttributeName" label="Attribute Name"
+        command="SetAttributeName" default_values="Elevation" number_of_elements="1">
+        <Documentation>The name of the output attribute added to the mesh.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetShock"
+        default_values="0" name="Shock"
+        number_of_elements="1">
+        <Documentation>An offset to add to the elevation. Non-zero values create discontinuities.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetOrigin"
+        default_values="0 0 0" name="Origin"
+        number_of_elements="3">
+        <Documentation>A point in space.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetAxis"
+        default_values="0 0 1" name="Axis"
+        number_of_elements="3">
+        <Documentation>A non-zero vector.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetNumberOfAxes"
+        default_values="1" name="NumberOfAxes" label="Distance Type"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Planar distance"        value="1"/>
+          <Entry text="Cylindrical distance"   value="2"/>
+          <Entry text="Spherical distance"     value="3"/>
+        </EnumerationDomain>
+        <Documentation>Set how distance is measured.
+          <ul>
+          <li>planar/linear: elevation is measured by projecting any test point
+            to the input Axis, then computing the distance to the Origin.</li>
+          <li>cylindrical: elevation is measured from the nearest point
+            along the line passing through the Origin along the Axis.
+            All points along line have an elevation of 0.</li>
+          <li>spherical: elevation is measured using the L² norm of the
+            vector from the Origin to each test point. The Axis is
+            ignored.</li>
+          </ul>
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Point Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Origin" />
+      </PropertyGroup>
+
+      <!-- End of ComputeCellGridElevation -->
+    </SourceProxy>
+
+    <SourceProxy
+      class="vtkCellGridPointProbe"
+      name="CellGridPointProbe"
+      label="CellGrid Probe">
+      <Documentation
+        long_help="Sample input polydata points with a cell grid."
+        short_help="Sample input polydata points with a cell grid.">
+        This filter copies the input polydata and adds information about
+        how its points are related to cells of an input cell-grid.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>An input polydata to use as a probe.</Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSourceConnection" name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="source_type">
+          <DataType value="vtkCellGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <Documentation>An input cell-grid to probe.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="CellGridAttribute" label="CellGrid Attribute"
+        command="SetAttributeName">
+        <ArrayListDomain input_domain_name="cell_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Source" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property chooses a cell-grid attribute to sample.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <!-- End of CellGridPointProbe -->
     </SourceProxy>
 
   </ProxyGroup>

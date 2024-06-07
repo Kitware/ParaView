@@ -46,6 +46,21 @@ public:
    */
   void SetSuppressLOD(bool vtkNotUsed(suppress)) override {} // We do not support LOD yet.
 
+  /**
+   * Set which sides of the input to show.
+   */
+  void SetSidesToShow(int flags);
+
+  /**
+   * Set whether to preserve renderable inputs.
+   */
+  void SetPreserveRenderableInputs(bool shouldPreserve);
+
+  /**
+   * Set whether to omit sides for renderable inputs.
+   */
+  void SetOmitSidesForRenderableInputs(bool shouldOmit);
+
 protected:
   vtkCellGridRepresentation();
   ~vtkCellGridRepresentation() override;
