@@ -407,10 +407,17 @@ void pqDeleteReaction::aboutToDelete(pqProxy* source)
         // preference is such.
         if (reprProxy &&
           vtkPVGeneralSettings::GetInstance()->GetScalarBarMode() ==
-            vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
-          vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
+            vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
         {
-          vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, true);
+          if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
+          {
+            vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, viewProxy, true);
+          }
+          if (vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(reprProxy))
+          {
+            vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(reprProxy, viewProxy,
+              vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(reprProxy), true);
+          }
         }
         view->render();
       }
