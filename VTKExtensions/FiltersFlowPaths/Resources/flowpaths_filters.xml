@@ -19,8 +19,7 @@
         corresponding manual controls can be found in section 7.4.
         This filter operates on any type of data set, provided it
         has point-centered vectors. The output is polygonal data
-        containing polylines. This filter is available on the
-        Toolbar.
+        containing polylines.
       </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
@@ -186,8 +185,7 @@
         corresponding manual controls can be found in section 7.4.
         This filter operates on any type of data set, provided it
         has point-centered vectors. The output is polygonal data
-        containing polylines. This filter is available on the
-        Toolbar.
+        containing polylines.
       </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
