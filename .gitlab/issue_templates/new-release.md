@@ -131,12 +131,8 @@ git submodule update --recursive --init
             http URL source is the _DEFAULT_ source.
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
       - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
-      - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
-        - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
-        - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
-        - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
       - [ ] Commit changes
-        - [ ] `git add README.md versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile`
+        - [ ] `git add README.md versions.cmake CMakeLists.txt`
         - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
     - Make a commit for each of these `release`-only changes
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
