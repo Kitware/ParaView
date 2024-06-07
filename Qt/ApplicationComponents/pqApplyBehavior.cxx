@@ -391,6 +391,11 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       {
         vtkSMColorMapEditorHelper::SetScalarBarVisibility(reprProxy, preferredView, true);
       }
+      if (vtkSMColorMapEditorHelper::GetAnyBlockUsingScalarColoring(reprProxy))
+      {
+        vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(reprProxy, preferredView,
+          vtkSMColorMapEditorHelper::GetColorArraysBlockSelectors(reprProxy), true);
+      }
     }
 
     // Save the newly created representation for further fine-tuning in
