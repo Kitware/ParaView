@@ -6,6 +6,8 @@
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
 
+namespace
+{
 namespace details
 {
 QString SETTINGS_ITEM_KEY()
@@ -39,6 +41,7 @@ QString SETTINGS_VALUE_KEY(const pqPythonMacroSettings::MacroItemCategories& typ
     default:
       return "unused";
   }
+}
 }
 }
 

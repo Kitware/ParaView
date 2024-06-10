@@ -528,7 +528,6 @@ paraview_require_module(
           VTK::FiltersHybrid
           VTK::FiltersHyperTree
           VTK::FiltersModeling
-          VTK::FiltersOpenTURNS
           VTK::FiltersParallel
           VTK::FiltersParallelDIY2
           VTK::FiltersParallelVerdict

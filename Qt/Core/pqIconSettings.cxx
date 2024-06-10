@@ -6,6 +6,8 @@
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
 
+namespace
+{
 namespace details
 {
 QString SETTINGS_ICONS_GROUP()
@@ -21,6 +23,7 @@ QString SETTINGS_ICON_KEY()
 QString SETTINGS_ITEM_KEY()
 {
   return "item";
+}
 }
 }
 

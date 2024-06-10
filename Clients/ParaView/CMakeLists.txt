@@ -121,9 +121,7 @@ endif()
 
 target_compile_definitions(paraview
   PRIVATE
-  "PARAVIEW_USE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")
-target_compile_definitions(paraview
-  PRIVATE
+    "PARAVIEW_USE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>"
     "PARAVIEW_USE_EXTERNAL_VTK=$<BOOL:${PARAVIEW_USE_EXTERNAL_VTK}>")
 if (PARAVIEW_USE_PYTHON)
   target_link_libraries(paraview

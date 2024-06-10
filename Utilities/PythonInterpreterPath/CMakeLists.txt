@@ -8,5 +8,4 @@ vtk_module_link(ParaView::PythonInterpreterPath
   PRIVATE
     ParaView::pvpythonmodules
     ParaView::pvincubatorpythonmodules
-    VTK::vtkpythonmodules
-    VTK::PythonInterpreter)
+    VTK::vtkpythonmodules)

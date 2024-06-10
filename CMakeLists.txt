@@ -67,10 +67,6 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     message(FATAL_ERROR
       "External VTK not found but ParaView requires VTK to function")
   endif ()
-  if (NOT PARAVIEW_BUILD_SHARED_LIBS)
-    message(FATAL_ERROR
-      "Static build with external VTK does not currently work.")
-  endif()
   get_filename_component(vtk_cmake_dir "${VTK_CONFIG}" DIRECTORY)
   # set by vtk-config.cmake. Unsetting this avoids a warning when setting
   # PARAVIEW_BUILD_LEGACY_REMOVE
@@ -555,9 +551,11 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
     endif()
   endforeach()
   if(modules_notarget)
+    list(TRANSFORM modules_notarget REPLACE "VTK::(.*)" "-DVTK_MODULE_ENABLE_VTK_\\1=WANT" OUTPUT_VARIABLE external_vtk_required_options)
+    list(JOIN external_vtk_required_options " " external_vtk_required_options)
     message(FATAL_ERROR
-      "The following modules are required, but not found: "
-      "${modules_notarget}")
+      "Please reconfigure VTK with the following parameters to add required modules: "
+      "${external_vtk_required_options}")
   endif()
   list(TRANSFORM vtk_modules REPLACE "VTK::" "" OUTPUT_VARIABLE vtk_components)
   macro(search_dependent_targets)
