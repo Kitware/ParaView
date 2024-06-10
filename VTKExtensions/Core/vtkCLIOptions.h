@@ -101,11 +101,15 @@ public:
   ///@{
   /**
    * Indicate whether the parsing should stop as soon as the first unrecognized
-   * option is detected. This implies SetAllowExtras(true).
+   * option is detected.
    *
-   * Forwards to `CLI::App::prefix_command`.
+   * Setting this to false implies to ignore the "AllowExtras" status.
    *
-   * By default, this is set to true.
+   * Forwards to `CLI::App::prefix_command` by inverting the provided boolean.
+   * Note there seem to be an issue in the documentation for `CLI::App::prefix_command`
+   * See https://github.com/CLIUtils/CLI11/issues/1052 for more information.
+   *
+   * By default, this is set to false.
    */
   void SetStopOnUnrecognizedArgument(bool val);
   bool GetStopOnUnrecognizedArgument() const;
