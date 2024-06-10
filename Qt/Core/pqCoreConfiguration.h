@@ -71,7 +71,7 @@ public:
   int testScriptCount() const { return this->TestScripts.size(); }
   const std::string& testScript(int index) const { return this->TestScripts.at(index).FileName; }
   const std::string& testBaseline(int index) const { return this->TestScripts.at(index).Baseline; }
-  int testThreshold(int index) const { return this->TestScripts.at(index).Threshold; }
+  double testThreshold(int index) const { return this->TestScripts.at(index).Threshold; }
   ///@}
 
   /**
@@ -99,7 +99,7 @@ public:
   void setActiveTestIndex(int index) { this->ActiveTestIndex = index; }
   const std::string& testScript() const { return this->testScript(this->ActiveTestIndex); }
   const std::string& testBaseline() const { return this->testBaseline(this->ActiveTestIndex); }
-  int testThreshold() const { return this->testThreshold(this->ActiveTestIndex); }
+  double testThreshold() const { return this->testThreshold(this->ActiveTestIndex); }
   ///@}
 
   ///@{
@@ -141,7 +141,7 @@ private:
   {
     std::string FileName;
     std::string Baseline;
-    int Threshold = 12;
+    double Threshold = 0.05;
   };
   QVector<TestScriptInfo> TestScripts;
 };

@@ -109,7 +109,7 @@ int pqXMLEventSource::getNextEvent(
     elem->GetScalarAttribute("height", &height);
 
     // Recover optional threshold
-    int threshold = 0;
+    double threshold = 0;
     if (elem->GetScalarAttribute("threshold", &threshold) && threshold >= 0)
     {
       // use the threshold specified by the XML
@@ -228,7 +228,7 @@ int pqXMLEventSource::getNextEvent(
     elem->GetScalarAttribute("tdx", &tdx);
     elem->GetScalarAttribute("tdy", &tdy);
     const QString baseline = pqCoreTestUtility::fixPath(elem->GetAttribute("baseline"));
-    int threshold = 0;
+    double threshold = 0;
     if (!elem->GetScalarAttribute("threshold", &threshold))
     {
       threshold = config->testThreshold();
