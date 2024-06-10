@@ -45,21 +45,27 @@
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetChunkSize"
-                        default_values="100"
+                        default_values="25000"
                         name="ChunkSize"
                         number_of_elements="1">
-        <IntRangeDomain min="1" name="chunk_range"/>
         <Documentation>
-          Chunk Size controls the size of HDF5 datasets chunks,
-          only used for transient data. Chunk size can impact multi-process
-          reading performance.
+          Chunk Size controls the size of HDF5 datasets chunks.
+          Chunk size can impact multi-process reading performance and compression
+          efficiency.
         </Documentation>
       </IntVectorProperty>
 
-      <PropertyGroup label="VTKHDF Writer transient parameters">
-        <Property name="WriteAllTimeSteps"/>
-        <Property name="ChunkSize"/>
-      </PropertyGroup>
+      <IntVectorProperty command="SetCompressionLevel"
+                        default_values="0"
+                        name="CompressionLevel"
+                        number_of_elements="1">
+        <IntRangeDomain min="0" max="9" name="range"/>
+        <Documentation>
+          Compression level controls how much user wants to compress the written data.
+          Using a higher level of compression will decrease file size but significantly
+          slow down read and write operations.
+        </Documentation>
+      </IntVectorProperty>
 
       <Hints>
         <Property name="Input" show="0"/>
@@ -89,6 +95,7 @@
           <Property name="Input" />
           <Property name="WriteAllTimeSteps" panel_visibility="advanced" />
           <Property name="ChunkSize" panel_visibility="advanced" />
+          <Property name="CompressionLevel" panel_visibility="advanced" />
         </ExposedProperties>
       </SubProxy>
 
