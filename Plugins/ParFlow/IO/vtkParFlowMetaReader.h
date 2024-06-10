@@ -9,7 +9,10 @@
 #include "vtkSmartPointer.h" // for ivars
 #include "vtkVector.h"       // for vtkVector*
 
-#include "nlohmann/json.hpp" // for json bits
+#include "vtk_nlohmannjson.h"
+// clang-format off
+#include VTK_NLOHMANN_JSON(json.hpp)
+// clang-format on
 
 #include <map>    // for std::map
 #include <set>    // for std::set

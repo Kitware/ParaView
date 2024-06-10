@@ -5,7 +5,10 @@
 
 #include "vtkVector.h"
 
-#include "nlohmann/json.hpp" // for json
+#include "vtk_nlohmannjson.h"
+// clang-format off
+#include VTK_NLOHMANN_JSON(json.hpp) // for json
+// clang-format on
 
 #include <stdexcept>
 
