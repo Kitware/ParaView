@@ -8,8 +8,6 @@ if (BUILD_SHARED_LIBS)
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/SLAC/pic-example/,REGEX:.*}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/SLAC/pillbox/,REGEX:.*}")
 
-  set(SLACTools_THRESHOLD 70)
-
   paraview_add_client_tests(
     LOAD_PLUGIN "SLACTools"
     TEST_DATA_TARGET ParaViewData

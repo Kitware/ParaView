@@ -1840,47 +1840,18 @@ set(CTHAMRClip_DISABLE_CRS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
-# Add image threshold overrides for tests.
-# Generally all tests with wireframes need higher thresholds.
-SET (Flow2_THRESHOLD 15)
-SET (UndoRedo1_THRESHOLD 15)
-SET (UndoRedo4_THRESHOLD 15)
-
-# Differences between systems on whether the lines are anti-aliased or not
-SET (SortLineChartData_THRESHOLD 50)
-
-# Since often there are issues with fonts etc.
-SET (XYChart_THRESHOLD 150)
-SET (CheckableHeader_THRESHOLD 150)
 # Since the test uses surface-selection, it cannot work in render-server mode.
 set(XYChart_DISABLE_CRS TRUE)
 # this uses charts: nb of points changes in client server, so graphs differs
 set(LinkViews_DISABLE_CS TRUE)
 set(LinkViews_DISABLE_CRS TRUE)
 
-SET (XYHistogram_THRESHOLD 150)
-set (ChartAxisRangeAndLabels_THRESHOLD 5)
-
-# The color and opacity are often different on different machines.
-SET (ColorEditorControls_THRESHOLD 60)
-SET (ColorEditorVolumeControls_THRESHOLD 300)
-
-# PlotDataOverTime produces different block labels in parallel
-# This leeway helps that.
-set (PlotDataOverTime-NonDistributed_THRESHOLD 25)
-
 # Test needs to load a plugin, the test only records that for the
 # client side.
 set (SteeringDataGenerator_DISABLE_CS TRUE)
 set (SteeringDataGenerator_DISABLE_CRS TRUE)
 
-# Plot image leeway.
-set (SpreadSheet2_THRESHOLD 50)
-set (PlotOverTimeAutoApply_THRESHOLD 50)
-set (ExportLinePlotToCSV_THRESHOLD 30)
-set (ExportLinePlotToTSV_THRESHOLD 30)
 set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
-set (QuartilePlot_THRESHOLD 20)
 # The ExportLinePlotToTSV test uses the same image baseline as the ExportLinePlotToCSV test
 set (ExportLinePlotToTSV_BASELINE ExportLinePlotToCSV.png)
 
@@ -1892,11 +1863,8 @@ set(ExportSceneSpreadSheetView2_DISABLE_CRS TRUE)
 # Cannot support CRS since we do volume rendering of image data
 # in this test.
 set (RemoteRendering_DISABLE_CRS TRUE)
-set (RemoteRendering_THRESHOLD 50)
 set (VolumeRenderingWithContour_DISABLE_CRS TRUE)
-set (VolumeRenderingWithContour_THRESHOLD 50)
 set (VolumeNoMapScalars_DISABLE_CRS TRUE)
-set (VolumeNoMapScalars_THRESHOLD 50)
 set (MultiBlockVolumeRendering_DISABLE_CRS TRUE)
 set (ColorOpacityEditorFreehandDrawing_DISABLE_CRS TRUE)
 
@@ -1912,19 +1880,6 @@ SET (Clip_DISABLE_CRS TRUE)
 set (ImageVolumeRendering_DISABLE_CRS TRUE)
 set (RectilinearVolumeRendering_DISABLE_CRS TRUE)
 
-# These Xdmf tests have wireframes, hence the increased thresholds.
-SET (XdmfReadImageData_THRESHOLD 20)
-SET (XdmfReadRectilinearGrid_THRESHOLD 20)
-SET (XdmfReadRectilinearGridCollection_THRESHOLD 20)
-SET (XdmfReadStructuredGrid_THRESHOLD 20)
-SET (XdmfReadStructuredGridCollection_THRESHOLD 20)
-SET (XdmfReadImageDataCollection_THRESHOLD 20)
-
-# This test renders points and they are offsetted a bit differently on
-# different platforms so just increase the threshold
-SET (SaveCSV_THRESHOLD 40)
-SET (SaveTSV_THRESHOLD 40)
-SET (SaveTXT_THRESHOLD 40)
 # The SaveTXT and SaveTSV tests use the same image baseline as the SaveCSV test
 SET (SaveTSV_BASELINE SaveCSV.png)
 SET (SaveTXT_BASELINE SaveCSV.png)
@@ -1935,10 +1890,8 @@ SET (SaveTXT_BASELINE SaveCSV.png)
 ## selection is not supported in render server mode esp. when number of render
 ## server processes is not the same as the data server processes
 set (FFTOverTime_DISABLE_CRS TRUE)
-set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
-                               # rendering differences.
 
-# ColorEditorVolumeControls does volume rendering of structrued data which required remote
+# ColorEditorVolumeControls does volume rendering of structured data which required remote
 # rendering in client-serve mode.
 SET (ColorEditorVolumeControls_DISABLE_CS TRUE)
 SET (ColorEditorVolumeControls_DISABLE_CRS TRUE)
@@ -1964,12 +1917,6 @@ SET (TransferFunction2DYScalars_DISABLE_CRS TRUE)
 SET (TransferFunction2DYScalarsEditor_DISABLE_CRS TRUE)
 SET (TransferFunction2DYScalarsEditorA_DISABLE_CRS TRUE)
 SET (TransferFunction2DYScalarsEditorB_DISABLE_CRS TRUE)
-## The 2D transfer function editor baselines are different on different machines
-SET (TransferFunction2D_THRESHOLD 300)
-SET (TransferFunction2DYScalars_THRESHOLD 500)
-SET (TransferFunction2DYScalarsEditor_THRESHOLD 500)
-SET (TransferFunction2DYScalarsEditorA_THRESHOLD 500)
-SET (TransferFunction2DYScalarsEditorB_THRESHOLD 500)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
@@ -1979,20 +1926,8 @@ ENDIF ()
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
-# Set image threshold overrides for the tests.
-SET(SaveLargeScreenshot_THRESHOLD 40)
-
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
-
-# Since this involves charts.
-SET(HistogramSelection_THRESHOLD 40)
-SET(LineChartSelection_THRESHOLD 40)
-SET(MultiBlockChartSelection_THRESHOLD 40)
-
-# Increate threshold for this one since the chart axes
-# tends to render slightly differently.
-set (LoadStateMultiView_THRESHOLD 20)
 
 # Selection not supported in CRS and is needed for this test.
 set (ResetToVisibleRange_DISABLE_CRS TRUE)
@@ -2032,6 +1967,37 @@ set(ReadCGNSBCDataset_DISABLE_CS TRUE)
 set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
 set(CONVERGECFDCGNSReader_DISABLE_CS TRUE)
 set(CONVERGECFDCGNSReader_DISABLE_CRS TRUE)
+
+# Add image method overrides for tests.
+
+# images with text need loose method
+set(4AxesContextView_METHOD LOOSE_VALID)
+set(BoxClipStateBackwardsCompatibility_METHOD LOOSE_VALID)
+set(ChartAxisRangeAndLabels_METHOD LOOSE_VALID)
+set(ChartLoadNoVariables_METHOD LOOSE_VALID)
+set(ExodusModeShapes_METHOD LOOSE_VALID) # update baseline
+set(ExportLinePlotToCSV_METHOD LOOSE_VALID)
+set(ExportLinePlotToTSV_METHOD LOOSE_VALID)
+set(HistogramSelection_METHOD LOOSE_VALID)
+set(LineChartSelection_METHOD LOOSE_VALID)
+set(OrthographicView_METHOD LOOSE_VALID)
+set(PlotGlobalVariablesOverTime_METHOD LOOSE_VALID)
+set(PointChartView_METHOD LOOSE_VALID)
+set(Preview_METHOD LOOSE_VALID)
+set(ProgrammableAnnotation_METHOD LOOSE_VALID)
+set(ReloadExodusFile_METHOD LOOSE_VALID)
+set(SaveLargeScreenshot_METHOD LOOSE_VALID)
+set(SeriesPresetRegexp_METHOD LOOSE_VALID)
+set(SimpleInteraction_METHOD LOOSE_VALID)
+set(SortLineChartData_METHOD LOOSE_VALID)
+set(SpreadSheet2_METHOD LOOSE_VALID)
+set(TileDisplaySplitView-1x1_METHOD LOOSE_VALID)
+set(TileDisplaySplitView-2x1_METHOD LOOSE_VALID)
+set(TileDisplaySplitView-2x2_METHOD LOOSE_VALID)
+set(TileDisplaySplitView-3x1_METHOD LOOSE_VALID)
+set(TransferFunction2DYScalars_METHOD LOOSE_VALID)
+set(XYChart_METHOD LOOSE_VALID)
+set(XYHistogram_METHOD LOOSE_VALID)
 
 set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml
@@ -2111,7 +2077,6 @@ if (TARGET ParaView::paraview)
     # command line option as well as loading a Python state file that was
     # generated with PV 5.4.1. Loading the 5.4.1 Python state file checks
     # on backwards compatibility.
-    set (Calculator54State_THRESHOLD 100)
     paraview_add_client_tests(
       ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.py"
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}

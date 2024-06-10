@@ -5,6 +5,8 @@ if (BUILD_SHARED_LIBS)
     "DATA{Data/Baseline/BagPlots_B.png}"
     "DATA{Data/Baseline/BagPlotMatrixView_A.png}")
 
+  set(BagPlots_METHOD LOOSE_VALID)
+
   paraview_add_client_tests(
     TEST_DATA_TARGET ParaViewData
     TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/CheckPluginVersionDescription.xml")

@@ -24,7 +24,7 @@
   <pqevent object="pqClientMainWindow" command="pause" arguments="2500" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PauseLiveSource/EmulatedTimeControlsGroupBox/EmulatedTimePauseButton" command="activate" arguments="" />
 
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_TEST_BASELINE_DIR/Data/Baseline/TestEmulatedTimeSourceDummy_a.png" threshold="5" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_TEST_BASELINE_DIR/Data/Baseline/TestEmulatedTimeSourceDummy_a.png" />
 
   <!-- Play emulated time and wait 0.4s (from 18.0 to 30.3), necessary as command="pause" prevent
        the manager to get refresh and therefore to "skip" the timesteps gap. -->
@@ -32,7 +32,7 @@
   <pqevent object="pqClientMainWindow" command="pause" arguments="400" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PauseLiveSource/EmulatedTimeControlsGroupBox/EmulatedTimePauseButton" command="activate" arguments="" />
 
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_TEST_BASELINE_DIR/Data/Baseline/TestEmulatedTimeSourceDummy_b.png" threshold="5" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_TEST_BASELINE_DIR/Data/Baseline/TestEmulatedTimeSourceDummy_b.png" />
 
   <!-- Play emulated time and wait 1.0s (from 30.3 to 31.3) -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/PauseLiveSource/EmulatedTimeControlsGroupBox/EmulatedTimePauseButton" command="activate" arguments="" />
