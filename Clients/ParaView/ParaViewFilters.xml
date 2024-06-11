@@ -163,6 +163,7 @@
     </Category>
     <Category name="Temporal" menu_label="&amp;Temporal">
       <Proxy group="filters" name="AnimateModes" />
+      <Proxy group="filters" name="CriticalTime" />
       <Proxy group="filters" name="ExtractParticlesOverTime" />
       <Proxy group="filters" name="ExtractTimeSteps" />
       <Proxy group="filters" name="ForceStaticMesh" />
@@ -318,6 +319,7 @@
   <Proxy group="filters" name="Coordinates" />
   <Proxy group="filters" name="CountCellFaces" />
   <Proxy group="filters" name="CountCellVertices" />
+  <Proxy group="filters" name="CriticalTime" />
   <Proxy group="filters" name="Curvatures" />
   <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg" />
   <Proxy group="filters" name="D3" />
