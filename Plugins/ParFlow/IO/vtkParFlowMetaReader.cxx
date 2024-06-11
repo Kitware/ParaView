@@ -26,7 +26,10 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
-#include "nlohmann/json.hpp"
+#include "vtk_nlohmannjson.h"
+// clang-format off
+#include VTK_NLOHMANN_JSON(json.hpp)
+// clang-format on
 
 #include <algorithm>
 #include <cmath>
