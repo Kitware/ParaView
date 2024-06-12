@@ -26,7 +26,9 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="SurfaceVectors" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Glyph" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ScaleFactor/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="1.1" />  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/GlyphMode/ComboBox" command="activated" arguments="All Points" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Density" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/DisplayColorWidget/Variables" command="set_string" arguments="Solid Color" />
