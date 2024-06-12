@@ -63,10 +63,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.FeatureEdgesFilterHTG$"
     "\\.FeatureEdgesRepresentationHTG$"
 
-    # Image corruption.
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21429
-    "^pv\\.StreamLinesRepresentationTransform$"
-
     # Transfer function image corruption
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21428
     "\\.TransferFunction2DYScalars$"
@@ -89,9 +85,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21656
     "^pv\\.ShaderReplacements$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21657
-    "^pv\\.StreamLinesRepresentationColor$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
     "\\.ComparativeViewOverlay$"
