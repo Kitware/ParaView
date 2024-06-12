@@ -49,14 +49,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.BlockLinkedSelection$"
     "\\.BoxWidget$"
     "\\.CTHAMRClip$"
-    "\\.CTHAMRContour$"
     "\\.MultiSliceWavelet$"
     "\\.NonConvexPolygon$"
-    "\\.SelectCellsTrace$"
     "\\.SelectionLinkMultiple$"
     "\\.SelectionModifiersBlocks$"
     "\\.SpreadSheet1$"
-    "\\.VariableSelector1$"
     "\\.VolumeCrop$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22352
