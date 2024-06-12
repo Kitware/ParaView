@@ -779,6 +779,13 @@ void pqProxyGroupMenuManager::updateActionsStyle()
   {
     QFont font = action->font();
     font.setBold(false);
+
+    vtkSMProxy* prototype = pqProxyAction::GetProxyPrototype(action);
+    if (prototype)
+    {
+      font.setItalic(prototype->IsDeprecated());
+    }
+
     action->setFont(font);
   }
 
