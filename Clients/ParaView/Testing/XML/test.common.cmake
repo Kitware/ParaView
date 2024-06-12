@@ -387,7 +387,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExtractSubsetWithSeed_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExtractSubsetWithSeed_2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExtractSubsetWithSeed_3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExodusModeShapes.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExodusModeShapes_A.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExodusModeShapes_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EyeDomeLighting.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FastUniformGridSource1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FastUniformGridSource2.png}"
@@ -1975,7 +1976,7 @@ set(4AxesContextView_METHOD LOOSE_VALID)
 set(BoxClipStateBackwardsCompatibility_METHOD LOOSE_VALID)
 set(ChartAxisRangeAndLabels_METHOD LOOSE_VALID)
 set(ChartLoadNoVariables_METHOD LOOSE_VALID)
-set(ExodusModeShapes_METHOD LOOSE_VALID) # update baseline
+set(ExodusModeShapes_METHOD LOOSE_VALID)
 set(ExportLinePlotToCSV_METHOD LOOSE_VALID)
 set(ExportLinePlotToTSV_METHOD LOOSE_VALID)
 set(HistogramSelection_METHOD LOOSE_VALID)

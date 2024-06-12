@@ -80,7 +80,6 @@ if (numpy_found)
   list(APPEND TESTS_WITH_BASELINES
     AnnotateNotSanitizedArray.xml
     ContextViewSelectionTrace.xml
-    ExodusModeShapes.xml
     FindDataNameSanitization.xml
     FindDataNonDistributedData.xml
     FindDataPartialArrays.xml
@@ -118,6 +117,7 @@ if (numpy_found)
   set(SpreadSheetSelectionTrace_DISABLE_CRS TRUE)
 
   list(APPEND TESTS_WITH_INLINE_COMPARES
+    ExodusModeShapes.xml
     FindDataTrace.xml
     FindDataQueries.xml
     TestTableFFT.xml # needs programmable filter + numpy
