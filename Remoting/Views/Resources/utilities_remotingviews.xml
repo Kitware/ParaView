@@ -3123,8 +3123,8 @@
            label="Polar Grid Actor"
            class="vtkPolarAxesActor2D"
            processes="client|dataserver|renderserver">
-      <Documentation>
-        PolarGridActor can be used to render an axes grid in a render view.
+      <Documentation short_help="Polar coordinates grid for render view.">
+        PolarGridActor is a polar coordinates grid that can be displayed in overlay of a render view.
       </Documentation>
       <IntVectorProperty name="Visibility"
                          command="SetVisibility"
@@ -3133,7 +3133,7 @@
                          panel_visibility="default">
         <BooleanDomain name="bool" />
         <Documentation>
-          Show/hide the axes grid.
+          Show/hide the polar grid.
         </Documentation>
       </IntVectorProperty>
 
@@ -3143,8 +3143,8 @@
         default_values="0.5 0.5"
         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0" max="1" />
-        <Documentation short="The origin of the axes">
-          This is the origin of the axes, in normalized viewport coordinates. Default is at center [0.5, 0.5].
+        <Documentation>
+          The origin of the axes (in normalized coordinates). Default is at center [0.5, 0.5].
         </Documentation>
       </DoubleVectorProperty>
 
@@ -3154,8 +3154,8 @@
         default_values="0"
         panel_visibility="default">
         <DoubleRangeDomain name="range" />
-        <Documentation short="In degrees, the origin for angle measurment">
-          This is the orientation of the first axis. It starts from a left-to-right axis
+        <Documentation>
+          This is the orientation of the first axis (in degrees). It starts from a left-to-right axis
           and is measured counter-clockwise.
         </Documentation>
       </DoubleVectorProperty>
@@ -3166,8 +3166,8 @@
         default_values="180"
         panel_visibility="default">
         <DoubleRangeDomain name="range" />
-        <Documentation short="In degrees, the angle for the last axis.">
-          This is the orientation of the last axis. It starts from a left-to-right axis
+        <Documentation>
+          This is the orientation of the last axis (in degrees). It starts from a left-to-right axis
           and is measured counter-clockwise.
         </Documentation>
       </DoubleVectorProperty>
@@ -3177,8 +3177,8 @@
         number_of_elements="1"
         default_values="100"
         panel_visibility="default">
-          <Documentation short="The size of the axes">
-            The length of each radial axis in Viewport coordinates.
+          <Documentation>
+            The length of each radial axis in Viewport coordinates (in pixels).
           </Documentation>
          <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
@@ -3188,7 +3188,7 @@
         number_of_elements="1"
         default_values="6"
         panel_visibility="advanced">
-          <Documentation short="The number of axes">
+          <Documentation>
             The number of axes to display. Axes are evenly oriented around Origin
             and starting at StartAngle.
           </Documentation>
@@ -3200,7 +3200,7 @@
         number_of_elements="1"
         default_values="6"
         panel_visibility="advanced">
-          <Documentation short="The number of ticks along axes">
+          <Documentation>
             The number of ticks to display on each axis.
           </Documentation>
          <IntRangeDomain name="range" min="2" />
