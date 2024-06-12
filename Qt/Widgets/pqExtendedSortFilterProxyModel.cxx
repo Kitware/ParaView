@@ -14,6 +14,7 @@ pqExtendedSortFilterProxyModel::pqExtendedSortFilterProxyModel(QObject* parent)
 //-----------------------------------------------------------------------------
 void pqExtendedSortFilterProxyModel::setRequest(const QString& request)
 {
+  this->Request = request;
   this->DefaultRequests.clear();
   QStringList requests = request.split(" ");
   for (const QString& subRequest : requests)
@@ -46,14 +47,23 @@ void pqExtendedSortFilterProxyModel::clearExclusions()
 //-----------------------------------------------------------------------------
 void pqExtendedSortFilterProxyModel::clearRequests()
 {
+  this->Request.clear();
   this->DefaultRequests.clear();
   this->UserRequests.clear();
+}
+
+//-----------------------------------------------------------------------------
+bool pqExtendedSortFilterProxyModel::hasExactMatch(const QModelIndex& index) const
+{
+  auto proxyName = this->sourceModel()->data(index, this->filterRole()).toString();
+  return proxyName.startsWith(this->Request, Qt::CaseInsensitive);
 }
 
 //-----------------------------------------------------------------------------
 bool pqExtendedSortFilterProxyModel::hasMatch(const QModelIndex& index) const
 {
   auto proxyName = this->sourceModel()->data(index, this->filterRole()).toString();
+
   for (const auto& subRequest : this->DefaultRequests)
   {
     if (!proxyName.contains(subRequest))
@@ -133,12 +143,8 @@ bool pqExtendedSortFilterProxyModel::filterAcceptsRow(
     return false;
   }
 
-  if (this->hasMatch(proxyIndex))
-  {
-    return true;
-  }
-
-  if (this->hasUserMatch(proxyIndex))
+  if (this->hasExactMatch(proxyIndex) || this->hasMatch(proxyIndex) ||
+    this->hasUserMatch(proxyIndex))
   {
     return true;
   }
@@ -150,28 +156,21 @@ bool pqExtendedSortFilterProxyModel::filterAcceptsRow(
 bool pqExtendedSortFilterProxyModel::lessThan(
   const QModelIndex& left, const QModelIndex& right) const
 {
-  auto leftName = this->sourceModel()->data(left, Qt::DisplayRole).toString();
-  auto rightName = this->sourceModel()->data(right, Qt::DisplayRole).toString();
+  int leftPriority =
+    this->hasExactMatch(left) ? 0 : this->hasMatch(left) ? 1 : this->hasUserMatch(left) ? 2 : 3;
+  int rightPriority =
+    this->hasExactMatch(right) ? 0 : this->hasMatch(right) ? 1 : this->hasUserMatch(right) ? 2 : 3;
 
-  bool leftMatch = this->hasMatch(left);
-  bool rightMatch = this->hasMatch(right);
-  if (leftMatch != rightMatch)
+  if (leftPriority == rightPriority)
   {
-    return leftMatch;
+    auto leftName = this->sourceModel()->data(left, Qt::DisplayRole).toString();
+    auto rightName = this->sourceModel()->data(right, Qt::DisplayRole).toString();
+    return leftName < rightName;
   }
-
-  if (!leftMatch)
+  else
   {
-    bool leftHasUserMatch = this->hasUserMatch(left);
-    bool rightHasUserMatch = this->hasUserMatch(right);
-
-    if (leftHasUserMatch != rightHasUserMatch)
-    {
-      return leftHasUserMatch;
-    }
+    return leftPriority < rightPriority;
   }
-
-  return leftName < rightName;
 }
 
 //-----------------------------------------------------------------------------
