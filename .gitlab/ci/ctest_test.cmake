@@ -65,7 +65,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # Image corruption.
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21429
-    "^pv\\.StreamLinesRepresentationThick$"
     "^pv\\.StreamLinesRepresentationTransform$"
 
     # Transfer function image corruption
