@@ -160,14 +160,14 @@ void vtkCLIOptions::SetStopOnUnrecognizedArgument(bool val)
   /**
    * stop parsing after the first unrecognized command / option.
    */
-  internals.App->prefix_command(val);
+  internals.App->prefix_command(!val);
 }
 
 //----------------------------------------------------------------------------
 bool vtkCLIOptions::GetStopOnUnrecognizedArgument() const
 {
   auto& internals = (*this->Internals);
-  return internals.App->get_prefix_command();
+  return !internals.App->get_prefix_command();
 }
 
 //----------------------------------------------------------------------------

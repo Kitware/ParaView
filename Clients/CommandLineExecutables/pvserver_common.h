@@ -27,7 +27,7 @@ static int RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 {
   auto cliApp = vtk::TakeSmartPointer(vtkCLIOptions::New());
   cliApp->SetAllowExtras(false);
-  cliApp->SetStopOnUnrecognizedArgument(false);
+  cliApp->SetStopOnUnrecognizedArgument(true);
   switch (type)
   {
     case vtkProcessModule::PROCESS_DATA_SERVER:
