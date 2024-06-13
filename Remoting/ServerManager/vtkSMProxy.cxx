@@ -23,6 +23,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyLocator.h"
@@ -2675,4 +2676,53 @@ void vtkSMProxy::SetLogNameInternal(
 
     this->PushState(&logname_state);
   }
+}
+
+//---------------------------------------------------------------------------
+std::vector<std::string> vtkSMProxy::GetPropertiesWithDifferentValues(vtkSMProxy* otherProxy)
+{
+  if (!otherProxy)
+  {
+    return std::vector<std::string>();
+  }
+  if (strcmp(this->GetXMLName(), otherProxy->GetXMLName()) != 0 ||
+    strcmp(this->GetXMLGroup(), otherProxy->GetXMLGroup()) != 0)
+  {
+    return std::vector<std::string>();
+  }
+
+  std::vector<std::string> differentProperties;
+  auto iter = vtk::TakeSmartPointer(this->NewPropertyIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
+    vtkSMProperty* property = iter->GetProperty();
+    vtkSMProperty* otherProperty = otherProxy->GetProperty(iter->GetKey());
+    if (property && otherProperty && std::string(property->GetClassName()) != "vtkSMProperty" &&
+      property->IsA(otherProperty->GetClassName()))
+    {
+      const vtkSMPropertyHelper helper(property);
+      const vtkSMPropertyHelper otherHelper(otherProperty);
+      bool different = false;
+      if (helper.GetNumberOfElements() != otherHelper.GetNumberOfElements())
+      {
+        different = true;
+      }
+      else
+      {
+        for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
+        {
+          if (!helper.GetAsVariant(i).IsEqual(otherHelper.GetAsVariant(i)))
+          {
+            different = true;
+            break;
+          }
+        }
+      }
+      if (different)
+      {
+        differentProperties.push_back(iter->GetKey());
+      }
+    }
+  }
+  return differentProperties;
 }

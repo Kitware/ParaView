@@ -5,11 +5,13 @@
 #define pqEditColorMapReaction_h
 
 #include "pqReaction.h"
+#include <QPointer> // For QPointer
 
-#include <QPointer>
+#include <vtkNew.h> // For vtkNew
 
 class pqPipelineRepresentation;
 class pqDataRepresentation;
+class vtkSMColorMapEditorHelper;
 
 /**
  * @ingroup Reactions
@@ -26,11 +28,12 @@ public:
    * pqActiveObjects automatically.
    */
   pqEditColorMapReaction(QAction* parent, bool track_active_objects = true);
+  ~pqEditColorMapReaction() override;
 
   /**
    * Edit active representation's color map (or solid color).
    */
-  static void editColorMap(pqPipelineRepresentation* repr = nullptr);
+  void editColorMap(pqPipelineRepresentation* repr = nullptr);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -38,10 +41,17 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void updateEnableState() override;
 
+  ///@{
   /**
    * Set the active representation.
    */
-  void setRepresentation(pqDataRepresentation*);
+  void setRepresentation(pqDataRepresentation*, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* repr)
+  {
+    this->setRepresentation(repr, 0 /*Representation*/);
+  }
+  void setActiveRepresentation();
+  ///@}
 
 protected:
   /**
@@ -52,6 +62,8 @@ protected:
 private:
   Q_DISABLE_COPY(pqEditColorMapReaction)
   QPointer<pqPipelineRepresentation> Representation;
+
+  vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
 };
 
 #endif

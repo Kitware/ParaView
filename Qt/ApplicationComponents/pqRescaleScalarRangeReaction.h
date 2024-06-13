@@ -5,16 +5,16 @@
 #define pqRescaleScalarRangeReaction_h
 
 #include "pqReaction.h"
-#include "vtkSmartPointer.h"
 
 #include <QPointer>
+
+#include <vector>
 
 class pqDataRepresentation;
 class pqPipelineRepresentation;
 class pqRescaleScalarRangeToCustomDialog;
 class pqRescaleScalarRangeToDataOverTimeDialog;
 class pqServer;
-class vtkEventQtSlotConnect;
 class vtkSMProxy;
 
 /**
@@ -52,9 +52,12 @@ public:
    * @param[in] repr The data representation to use to determine the data range.
    *                 If `nullptr`, then the active representation is used, if
    *                 available.
+   * @param[in] selectedPropertiesType The selected properties type to use.
+   *
    * @returns `true` if the operation was successful, otherwise `false`.
    */
-  static bool rescaleScalarRangeToData(pqPipelineRepresentation* repr = nullptr);
+  static bool rescaleScalarRangeToData(
+    pqPipelineRepresentation* repr = nullptr, int selectedPropertiesType = 0 /*Representation*/);
 
   /**
    * Rescale range to a custom range.
@@ -62,10 +65,26 @@ public:
    * @param[in] repr The representation used to determine the transfer function
    *                 to change range on. If \c repr is `nullptr`, then the active
    *                 representation is used, if available.
+   * @param[in] selectedPropertiesType The selected properties type to use.
+   *
    * @returns a pointer to the dialog if the operation was successful, otherwise `nullptr`.
    */
   static pqRescaleScalarRangeToCustomDialog* rescaleScalarRangeToCustom(
-    pqPipelineRepresentation* repr = nullptr);
+    pqPipelineRepresentation* repr = nullptr, int selectedPropertiesType = 0 /*Representation*/);
+
+  /**
+   * Rescale range to a custom range.
+   *
+   * @param[in] tfProxies The transfer function proxies to rescale the range on.
+   * @param[in] separateOpacity Show controls for setting the opacity function range
+   *                            separately from the color transfer function.
+   * @param[in] selectedPropertiesType The selected properties type to use.
+   *
+   * @returns a pointer to the dialog if the operation was successful, otherwise `nullptr`.
+   */
+  static pqRescaleScalarRangeToCustomDialog* rescaleScalarRangeToCustom(
+    std::vector<vtkSMProxy*> tfProxies, bool separateOpacity = false,
+    int selectedPropertiesType = 0 /*Representation*/);
 
   /**
    * Rescale range to a custom range.
@@ -73,11 +92,16 @@ public:
    * @param[in] tfProxy The transfer function proxy to rescale the range on.
    * @param[in] separateOpacity Show controls for setting the opacity function range
    *                            separately from the color transfer function.
+   * @param[in] selectedPropertiesType The selected properties type to use.
    *
    * @returns a pointer to the dialog if the operation was successful, otherwise `nullptr`.
    */
-  static pqRescaleScalarRangeToCustomDialog* rescaleScalarRangeToCustom(
-    vtkSMProxy* tfProxy, bool separateOpacity = false);
+  static pqRescaleScalarRangeToCustomDialog* rescaleScalarRangeToCustom(vtkSMProxy* tfProxy,
+    bool separateOpacity = false, int selectedPropertiesType = 0 /*Representation*/)
+  {
+    return rescaleScalarRangeToCustom(
+      std::vector<vtkSMProxy*>(1, tfProxy), separateOpacity, selectedPropertiesType);
+  }
 
   /**
    * Rescale range to data range over time.
@@ -85,10 +109,12 @@ public:
    * @param[in] repr The data representation to use to determine the data range.
    *                 If `nullptr`, then the active representation is used, if
    *                 available.
+   * @param[in] selectedPropertiesType The selected properties type to use.
+   *
    * @returns `true` if the operation was successful, otherwise `false`.
    */
   static pqRescaleScalarRangeToDataOverTimeDialog* rescaleScalarRangeToDataOverTime(
-    pqPipelineRepresentation* repr = nullptr);
+    pqPipelineRepresentation* repr = nullptr, int selectedPropertiesType = 0 /*Representation*/);
 
   /**
    * Rescale range to data range for data visible in the view.
@@ -96,6 +122,7 @@ public:
    * @param[in] repr The data representation to use to determine the data range.
    *                 If `nullptr`, then the active representation is used, if
    *                 available.
+   *
    * @returns `true` if the operation was successful, otherwise `false`.
    */
   static bool rescaleScalarRangeToVisible(pqPipelineRepresentation* repr = nullptr);
@@ -106,10 +133,17 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void updateEnableState() override;
 
+  ///@{
   /**
    * Set the data representation explicitly when track_active_objects is false.
    */
-  void setRepresentation(pqDataRepresentation* repr);
+  void setRepresentation(pqDataRepresentation* repr, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* repr)
+  {
+    this->setRepresentation(repr, 0 /*Representation*/);
+  }
+  void setActiveRepresentation();
+  ///@}
 
 protected:
   /**
@@ -125,7 +159,8 @@ private:
   Q_DISABLE_COPY(pqRescaleScalarRangeReaction)
   QPointer<pqPipelineRepresentation> Representation;
   Modes Mode;
-  vtkSmartPointer<vtkEventQtSlotConnect> Connection;
+  unsigned long ServerAddedObserverId;
+  int SelectedPropertiesType;
 };
 
 #endif

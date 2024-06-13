@@ -97,6 +97,16 @@ public:
   bool autoUpdateVTKObjects() const { return this->AutoUpdateVTKObjects; }
   bool useUncheckedProperties() const { return this->UseUncheckedProperties; }
 
+  /**
+   * Returns the number of property links.
+   */
+  int getNumberOfPropertyLinks() const;
+
+  /**
+   * Returns the property link at the given index.
+   */
+  pqPropertyLinksConnection* getPropertyLink(int index) const;
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Remove all links.

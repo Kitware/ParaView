@@ -40,7 +40,7 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void loadLocalPlugin();
   void loadRemotePlugin();
 
-protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+protected Q_SLOTS:
   void onPluginItemChanged(QTreeWidgetItem*, int);
   void onRefresh();
   void refresh();
@@ -70,7 +70,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   void removeSelectedPlugins(QList<QTreeWidgetItem*> selItems, pqServer* server, bool remote);
   QString getStatusText(vtkPVPluginsInformation* plInfo, unsigned int cc);
 
-private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+private Q_SLOTS:
   ///@{
   /**
    * Internal slots called when the a add plugin config file button is pressed
@@ -79,7 +79,7 @@ private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onAddPluginConfigLocal();
   ///@}
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   ///@{
   /**
    * Internal methods called to add a plugin config file to the plugin manager

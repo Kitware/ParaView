@@ -45,6 +45,7 @@
 #include "pqListPropertyWidget.h"
 #include "pqMetaDataPropertyWidget.h"
 #include "pqMoleculePropertyWidget.h"
+#include "pqMultiBlockPropertiesEditorWidget.h"
 #include "pqMultiComponentsDecorator.h"
 #include "pqOMETransferFunctionsPropertyWidget.h"
 #include "pqOSPRayHidingDecorator.h"
@@ -67,6 +68,7 @@
 #include "pqViewTypePropertyWidget.h"
 #include "pqXYChartViewBoundsPropertyWidget.h"
 #include "pqYoungsMaterialPropertyWidget.h"
+
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -223,11 +225,15 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
 pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget)
 {
-  QString panelWidget(group->GetPanelWidget());
+  const QString panelWidget(group->GetPanelWidget());
   // *** NOTE: When adding new types, please update the header documentation ***
   if (panelWidget == "ColorEditor")
   {
-    return new pqColorEditorPropertyWidget(proxy, parentWidget);
+    return new pqColorEditorPropertyWidget(proxy, parentWidget, 0 /*Representation*/);
+  }
+  else if (panelWidget == "BlockColorEditor")
+  {
+    return new pqColorEditorPropertyWidget(proxy, parentWidget, 1 /*Blocks*/);
   }
   else if (panelWidget == "CubeAxes")
   {
@@ -349,6 +355,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "SelectionList")
   {
     return new pqSelectionListPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "BlockPropertiesEditor")
+  {
+    return new pqMultiBlockPropertiesEditorWidget(proxy, group, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

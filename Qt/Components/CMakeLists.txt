@@ -18,6 +18,7 @@ set(classes
   pqArraySelectionWidget
   pqArraySelectorPropertyWidget
   pqArrayStatusPropertyWidget
+  pqBlockProxyWidget
   pqCalculatorWidget
   pqCameraDialog
   pqCameraKeyFrameWidget
@@ -88,6 +89,8 @@ set(classes
   pqLogViewerDialog
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
+  pqMultiBlockPropertiesEditorWidget
+  pqMultiBlockPropertiesStateWidget
   pqMultiViewWidget
   pqOneLinerTextEdit
   pqOrbitCreatorDialog

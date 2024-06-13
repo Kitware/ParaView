@@ -198,6 +198,14 @@
         <file>Icons/pqSplitHorizontal.svg</file>
         <file>Icons/pqSplitVertical.svg</file>
         <file>Icons/pqSpreadsheet.svg</file>
+        <file>Icons/pqStateBlockInherited.svg</file>
+        <file>Icons/pqStateDisabled.svg</file>
+        <file>Icons/pqStateMixedInherited.svg</file>
+        <file>Icons/pqStateRepresentationInherited.svg</file>
+        <file>Icons/pqStateSet.svg</file>
+        <file>Icons/pqStateSetAndBlockInherited.svg</file>
+        <file>Icons/pqStateSetAndMixedInherited.svg</file>
+        <file>Icons/pqStateSetAndRepresentationInherited.svg</file>
         <file>Icons/pqStep24.png</file>
         <file>Icons/pqStreamTracer.svg</file>
         <file>Icons/pqStructuredGrid16.png</file>

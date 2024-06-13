@@ -50,6 +50,7 @@
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <memory>
 #include <numeric>
 #include <tuple>
@@ -1473,8 +1474,11 @@ void vtkGeometryRepresentation::SetFeatureAngle(double val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::AddBlockSelector(const char* selector)
 {
-  if (selector != nullptr && this->BlockSelectors.insert(selector).second)
+  if (selector != nullptr &&
+    std::find(this->BlockSelectors.begin(), this->BlockSelectors.end(), selector) ==
+      this->BlockSelectors.end())
   {
+    this->BlockSelectors.push_back(selector);
     this->BlockAttrChanged = true;
   }
 }
@@ -1494,10 +1498,12 @@ void vtkGeometryRepresentation::SetBlockColor(const char* selector, double r, do
 {
   if (selector != nullptr)
   {
-    auto iter = this->BlockColors.find(selector);
+    auto iter = std::find_if(this->BlockColors.begin(), this->BlockColors.end(),
+      [selector](
+        const std::pair<std::string, vtkVector3d>& apair) { return apair.first == selector; });
     if (iter == this->BlockColors.end())
     {
-      this->BlockColors.insert(std::make_pair(selector, vtkVector3d(r, g, b)));
+      this->BlockColors.emplace_back(selector, vtkVector3d(r, g, b));
       this->BlockAttrChanged = true;
     }
     else if (iter->second != vtkVector3d(r, g, b))
@@ -1523,10 +1529,11 @@ void vtkGeometryRepresentation::SetBlockOpacity(const char* selector, double alp
 {
   if (selector != nullptr)
   {
-    auto iter = this->BlockOpacities.find(selector);
+    auto iter = std::find_if(this->BlockOpacities.begin(), this->BlockOpacities.end(),
+      [selector](const std::pair<std::string, double>& apair) { return apair.first == selector; });
     if (iter == this->BlockOpacities.end())
     {
-      this->BlockOpacities.insert(std::make_pair(selector, alpha));
+      this->BlockOpacities.emplace_back(selector, alpha);
       this->BlockAttrChanged = true;
     }
     else if (iter->second != alpha)
@@ -1553,10 +1560,12 @@ void vtkGeometryRepresentation::SetBlockInterpolateScalarsBeforeMapping(
 {
   if (selector != nullptr)
   {
-    auto iter = this->BlockInterpolateScalarsBeforeMapping.find(selector);
+    auto iter = std::find_if(this->BlockInterpolateScalarsBeforeMapping.begin(),
+      this->BlockInterpolateScalarsBeforeMapping.end(),
+      [selector](const std::pair<std::string, bool>& apair) { return apair.first == selector; });
     if (iter == this->BlockInterpolateScalarsBeforeMapping.end())
     {
-      this->BlockInterpolateScalarsBeforeMapping.insert(std::make_pair(selector, interpolate));
+      this->BlockInterpolateScalarsBeforeMapping.emplace_back(selector, interpolate);
       this->BlockAttrChanged = true;
     }
     else if (iter->second != interpolate)
@@ -1590,10 +1599,11 @@ void vtkGeometryRepresentation::SetBlockMapScalars(const char* selector, int val
   const int colorMode = mapToColorMode[val];
   if (selector != nullptr)
   {
-    auto iter = this->BlockColorModes.find(selector);
+    auto iter = std::find_if(this->BlockColorModes.begin(), this->BlockColorModes.end(),
+      [selector](const std::pair<std::string, int>& apair) { return apair.first == selector; });
     if (iter == this->BlockColorModes.end())
     {
-      this->BlockColorModes.insert(std::make_pair(selector, colorMode));
+      this->BlockColorModes.emplace_back(selector, colorMode);
       this->BlockAttrChanged = true;
     }
     else if (iter->second != colorMode)
@@ -1620,10 +1630,13 @@ void vtkGeometryRepresentation::SetBlockArrayName(
 {
   if (selector != nullptr && colorArray != nullptr)
   {
-    auto iter = this->BlockArrayNames.find(selector);
+    auto iter = std::find_if(this->BlockArrayNames.begin(), this->BlockArrayNames.end(),
+      [selector](const std::pair<std::string, std::pair<int, std::string>>& apair) {
+        return apair.first == selector;
+      });
     if (iter == this->BlockArrayNames.end())
     {
-      this->BlockArrayNames.insert(std::make_pair(selector, std::make_pair(assoc, colorArray)));
+      this->BlockArrayNames.emplace_back(selector, std::make_pair(assoc, colorArray));
       this->BlockAttrChanged = true;
     }
     else if (iter->second.first != assoc && iter->second.second != colorArray)
@@ -1640,26 +1653,6 @@ void vtkGeometryRepresentation::RemoveAllBlockArrayNames()
   if (!this->BlockArrayNames.empty())
   {
     this->BlockArrayNames.clear();
-    this->BlockAttrChanged = true;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetBlockLookupTableSelector(const char* selector)
-{
-  if (selector != nullptr)
-  {
-    this->BlockLookupTableSelectors.push_back(selector);
-    this->BlockAttrChanged = true;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveAllBlockLookupTableSelectors()
-{
-  if (!this->BlockLookupTableSelectors.empty())
-  {
-    this->BlockLookupTableSelectors.clear();
     this->BlockAttrChanged = true;
   }
 }
@@ -1723,9 +1716,6 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
 
   // Handle visibilities.
   attrs->SetBlockVisibility(dtree, false); // start by marking root invisible first.
-  // create a vector of selectors for block visibilities
-  const std::vector<std::string> blockVisibilitySelectors(
-    this->BlockSelectors.begin(), this->BlockSelectors.end());
   // get the selectors for block properties
   std::set<std::string> blockPropertiesSelectorsSet;
   for (const auto& item : this->BlockColors)
@@ -1748,10 +1738,6 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   {
     blockPropertiesSelectorsSet.emplace(item.first);
   }
-  for (const auto& item : this->BlockLookupTableSelectors)
-  {
-    blockPropertiesSelectorsSet.emplace(item);
-  }
 
   // create a vector of selectors for block properties
   const std::vector<std::string> blockPropertiesSelectors(
@@ -1767,7 +1753,7 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   {
     // we need to convert assembly selectors to composite ids.
     cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
-      blockVisibilitySelectors, outputPDC->GetDataAssembly(), outputPDC);
+      this->BlockSelectors, outputPDC->GetDataAssembly(), outputPDC);
 
     // create a composite ids map for the assembly selectors.
     for (const auto& selector : blockPropertiesSelectors)
@@ -1785,7 +1771,7 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
       return;
     }
     // compute the composite ids for the hierarchy selectors
-    cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(blockVisibilitySelectors, hierarchy);
+    cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(this->BlockSelectors, hierarchy);
     // create a composite ids map for the hierarchy selectors.
     for (const auto& selector : blockPropertiesSelectors)
     {
@@ -1895,11 +1881,11 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   }
 
   // Handle lookup tables
-  if (this->BlockLookupTables.size() == this->BlockLookupTableSelectors.size())
+  if (this->BlockLookupTables.size() == this->BlockArrayNames.size())
   {
     for (size_t i = 0, numLUTs = this->BlockLookupTables.size(); i < numLUTs; ++i)
     {
-      const auto& ids = selectorsCids[this->BlockLookupTableSelectors[i]];
+      const auto& ids = selectorsCids[this->BlockArrayNames[i].first];
       for (const auto& id : ids)
       {
         auto iter = cid_to_dobj.find(id);

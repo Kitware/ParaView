@@ -5,18 +5,22 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqColorMapEditor.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqUndoStack.h"
+
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMTrace.h"
 
 #include <QColorDialog>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDockWidget>
+#include <QString>
+
+#include <array>
 
 //-----------------------------------------------------------------------------
 pqEditColorMapReaction::pqEditColorMapReaction(QAction* parentObject, bool track_active_objects)
@@ -25,15 +29,35 @@ pqEditColorMapReaction::pqEditColorMapReaction(QAction* parentObject, bool track
   if (track_active_objects)
   {
     QObject::connect(&pqActiveObjects::instance(),
-      SIGNAL(representationChanged(pqDataRepresentation*)), this,
-      SLOT(setRepresentation(pqDataRepresentation*)));
-    this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+      QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), this,
+      &pqEditColorMapReaction::setActiveRepresentation);
+    this->setActiveRepresentation();
+  }
+  else
+  {
+    this->updateEnableState();
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqEditColorMapReaction::setRepresentation(pqDataRepresentation* repr)
+pqEditColorMapReaction::~pqEditColorMapReaction() = default;
+
+//-----------------------------------------------------------------------------
+void pqEditColorMapReaction::setActiveRepresentation()
 {
+  this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+}
+
+//-----------------------------------------------------------------------------
+void pqEditColorMapReaction::setRepresentation(
+  pqDataRepresentation* repr, int selectedPropertiesType)
+{
+  if (this->Representation != nullptr && this->Representation == repr &&
+    selectedPropertiesType == this->ColorMapEditorHelper->GetSelectedPropertiesType())
+  {
+    return;
+  }
+  this->ColorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
   this->Representation = qobject_cast<pqPipelineRepresentation*>(repr);
   this->updateEnableState();
 }
@@ -53,7 +77,7 @@ void pqEditColorMapReaction::onTriggered()
 //-----------------------------------------------------------------------------
 void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
 {
-  if (repr == nullptr)
+  if (!repr)
   {
     repr =
       qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
@@ -64,40 +88,36 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
     }
   }
 
-  if (!vtkSMColorMapEditorHelper::GetUsingScalarColoring(repr->getProxy()))
+  if (!this->ColorMapEditorHelper->GetAnySelectedUsingScalarColoring(repr->getProxy()))
   {
     // Get the color property.
     vtkSMProxy* proxy = repr->getProxy();
-    SM_SCOPED_TRACE(PropertiesModified)
-      .arg(proxy)
-      .arg("comment", qPrintable(tr(" change solid color")));
-
-    vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
-    vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
-    if (diffuse == nullptr && ambient == nullptr)
+    std::array<double, 3> rgb = this->ColorMapEditorHelper->GetSelectedColors(proxy)[0];
+    // if no valid color found, get the color of the representation
+    QString extraInfo;
+    if (this->ColorMapEditorHelper->GetSelectedPropertiesType() ==
+      vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks)
     {
-      diffuse = proxy->GetProperty("Color");
+      extraInfo = tr("Block ");
+      if (!vtkSMColorMapEditorHelper::IsColorValid(rgb))
+      {
+        rgb = this->ColorMapEditorHelper->GetColor(proxy);
+      }
     }
-
-    if (diffuse || ambient)
+    if (vtkSMColorMapEditorHelper::IsColorValid(rgb))
     {
-      // Get the current color from the property.
-      double rgb[3];
-      vtkSMPropertyHelper(diffuse ? diffuse : ambient).Get(rgb, 3);
-
       // Let the user pick a new color.
+      const QString dialogTitle = tr("Pick ") + extraInfo + tr("Solid Color");
       auto color = QColorDialog::getColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]),
-        pqCoreUtilities::mainWidget(), tr("Pick Solid Color"), QColorDialog::DontUseNativeDialog);
+        pqCoreUtilities::mainWidget(), dialogTitle, QColorDialog::DontUseNativeDialog);
       if (color.isValid())
       {
         // Set the properties to the new color.
-        rgb[0] = color.redF();
-        rgb[1] = color.greenF();
-        rgb[2] = color.blueF();
-        BEGIN_UNDO_SET(tr("Changed Solid Color"));
-        vtkSMPropertyHelper(diffuse, /*quiet=*/true).Set(rgb, 3);
-        vtkSMPropertyHelper(ambient, /*quiet=*/true).Set(rgb, 3);
-        proxy->UpdateVTKObjects();
+        rgb = { color.redF(), color.greenF(), color.blueF() };
+        const QString undoName = tr("Change ") + extraInfo + tr("Solid Color");
+        BEGIN_UNDO_SET(undoName);
+        this->ColorMapEditorHelper->SetSelectedColor(proxy, rgb);
+        // no need to call repr->UpdateVTKObjects(), the SetSelectedColor call will do that
         repr->renderViewEventually();
         END_UNDO_SET();
       }
@@ -106,13 +126,16 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
   else
   {
     // Raise the color editor is present in the application.
-    QDockWidget* widget =
+    auto colorMapEditorDock =
       qobject_cast<QDockWidget*>(pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
-    if (widget)
+    if (colorMapEditorDock)
     {
-      widget->setVisible(true);
-      // widget->setFloating(true);
-      widget->raise();
+      auto colorMapEditor = qobject_cast<pqColorMapEditor*>(colorMapEditorDock->widget());
+      colorMapEditor->setSelectedPropertiesType(
+        this->ColorMapEditorHelper->GetSelectedPropertiesType());
+      colorMapEditorDock->setVisible(true);
+      // colorMapEditorDock->setFloating(true);
+      colorMapEditorDock->raise();
     }
     else
     {

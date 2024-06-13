@@ -54,13 +54,13 @@ public Q_SLOTS:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current
   // range of the selected array.
-  void resetLookupTableScalarRange();
+  void resetLookupTableScalarRange(int selectedPropertiesType = 0 /*Representation*/);
 
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the
   // range of the selected array over time. This can potentially be a slow
   // processes hence use with caution!!!
-  void resetLookupTableScalarRangeOverTime();
+  void resetLookupTableScalarRangeOverTime(int selectedPropertiesType = 0 /*Representation*/);
 };
 
 #endif

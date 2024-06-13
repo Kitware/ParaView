@@ -137,8 +137,7 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     return;
   }
 
-  // Irrespective of other properties, scalar coloring is inherited if
-  // possible.
+  // Irrespective of other properties, scalar coloring is inherited if possible.
   if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(inputRepr) &&
     !vtkSMColorMapEditorHelper::GetUsingScalarColoring(repr))
   {
@@ -349,6 +348,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
   }
 
   vtkSMColorMapEditorHelper::SetupLookupTable(proxy);
+  vtkSMColorMapEditorHelper::SetupBlocksLookupTables(proxy);
   return true;
 }
 
@@ -536,6 +536,7 @@ void vtkSMParaViewPipelineControllerWithRendering::Hide(vtkSMProxy* repr, vtkSMV
     if (vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide)
     {
       vtkSMColorMapEditorHelper::HideScalarBarIfNotNeeded(repr, view);
+      vtkSMColorMapEditorHelper::HideBlocksScalarBarIfNotNeeded(repr, view);
     }
   }
 }

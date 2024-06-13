@@ -7,8 +7,14 @@
 #include "pqReaction.h"
 #include <QPointer>
 
+#include "vtkNew.h" // For vtkNew
+
+#include <vector> // For std::vector
+
 class pqDataRepresentation;
 class pqTimer;
+class pqView;
+class vtkSMColorMapEditorHelper;
 class vtkSMProxy;
 
 /**
@@ -33,29 +39,42 @@ public:
    */
   pqDataRepresentation* representation() const;
 
+  ///@{
   /**
    * Returns the scalar bar for the current representation, if any.
    */
-  vtkSMProxy* scalarBarProxy() const;
+  std::vector<vtkSMProxy*> scalarBarProxies() const;
+  vtkSMProxy* scalarBarProxy() const
+  {
+    std::vector<vtkSMProxy*> proxies = this->scalarBarProxies();
+    return proxies.empty() ? nullptr : proxies[0];
+  }
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+  ///@{
   /**
-   * Set the active representation.
+   * Set the representation.
    */
-  void setRepresentation(pqDataRepresentation*);
+  void setRepresentation(pqDataRepresentation*, int selectedPropertiesType);
+  void setRepresentation(pqDataRepresentation* repr)
+  {
+    this->setRepresentation(repr, 0 /*Representation*/);
+  }
+  void setActiveRepresentation();
+  ///@}
 
   /**
    * set scalar bar visibility.
    */
   void setScalarBarVisibility(bool visible);
 
-protected Q_SLOTS:
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
   void updateEnableState() override;
 
-protected: // NOLINT(readability-redundant-access-specifiers)
+protected:
   /**
    * Called when the action is triggered.
    */
@@ -64,12 +83,10 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 private:
   Q_DISABLE_COPY(pqScalarBarVisibilityReaction)
 
-  bool BlockSignals;
-  bool TrackActiveObjects;
-  QPointer<pqDataRepresentation> CachedRepresentation;
-  QPointer<QObject> CachedScalarBar;
-  QPointer<QObject> CachedView;
-  pqTimer* Timer;
+  QPointer<pqDataRepresentation> Representation;
+  QPointer<pqView> View;
+  QPointer<pqTimer> Timer;
+  vtkNew<vtkSMColorMapEditorHelper> ColorMapEditorHelper;
 };
 
 #endif

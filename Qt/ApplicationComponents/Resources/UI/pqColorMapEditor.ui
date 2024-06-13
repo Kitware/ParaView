@@ -100,27 +100,34 @@
        <item>
         <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0">
          <item row="0" column="1">
+          <widget class="QLabel" name="SelectedPropertiesText">
+           <property name="text">
+            <string>Selected Properties</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
           <widget class="QLabel" name="ColorLabel">
            <property name="text">
             <string>Color</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QLabel" name="Color2Label">
            <property name="text">
             <string>Color Y</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QLabel" name="OpacityLabel">
            <property name="text">
             <string>Opacity</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QToolButton" name="UseSeparateColorArray">
            <property name="toolTip">
             <string>Use separate color map</string>
@@ -143,7 +150,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QToolButton" name="Use2DTransferFunction">
            <property name="toolTip">
             <string>Use a 2D transfer function. Available only for volume rendering.</string>
@@ -163,7 +170,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QToolButton" name="UseSeparateOpacityArray">
            <property name="toolTip">
             <string>Use a separate array to map opacity. Available only for volume rendering.</string>
@@ -187,20 +194,30 @@
           </widget>
          </item>
          <item row="0" column="2" colspan="2">
+          <widget class="QComboBox" name="SelectedPropertiesComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2" colspan="2">
           <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true">
            <property name="toolTip">
             <string>Select array used to map color.</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="2" colspan="2">
+         <item row="2" column="2" colspan="2">
           <widget class="pqDisplayColor2Widget" name="DisplayColor2Widget" native="true">
            <property name="toolTip">
             <string>Select array used to map to the Y-Axis of a 2D transfer function.</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="2" colspan="2">
+         <item row="3" column="2" colspan="2">
           <widget class="pqDisplayOpacityWidget" name="DisplayOpacityWidget" native="true">
            <property name="toolTip">
             <string>Select array used to map opacity.</string>

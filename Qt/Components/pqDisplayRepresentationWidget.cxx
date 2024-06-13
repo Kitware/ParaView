@@ -13,14 +13,12 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
 
 #include <QPointer>
 #include <QSet>
 
 #include <cassert>
-#include <cstdlib>
 
 //=============================================================================
 class pqDisplayRepresentationWidget::PropertyLinksConnection : public pqPropertyLinksConnection
@@ -67,7 +65,8 @@ protected:
       // because volume redering can only be done when using a scalar field.
       if (!lutProxy && type == QString("Volume"))
       {
-        pqDisplayColorWidget::updateScalarBarVisibility(view, reprProxy);
+        pqDisplayColorWidget::updateScalarBarVisibility(
+          view, reprProxy, vtkSMColorMapEditorHelper::Representation);
       }
     }
     END_UNDO_SET();

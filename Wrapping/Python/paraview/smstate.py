@@ -323,22 +323,32 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
                     if rep.IsScalarBarVisible(view):
                         # FIXME: this will save this multiple times, right now,
                         # if two representations use the same LUT.
+                        # If someone wants to fix it, also fix it below for blocks.
                         trace.append_separated([ \
                             "# show color legend",
                             "%s.SetScalarBarVisibility(%s, True)" % ( \
                                 smtrace.Trace.get_accessor(rep),
                                 smtrace.Trace.get_accessor(view))])
 
-                    if rep.BlockLookupTableSelectors:
-                        selectors = rep.BlockLookupTableSelectors.GetData()
-                        for selector in selectors:
-                            if rep.IsBlockScalarBarVisible(view, selector):
-                                trace.append_separated([ \
-                                    "# set color map for block %s" % selector,
-                                    "%s.SetBlockScalarBarVisibility(%s, %s, True)" % ( \
-                                        smtrace.Trace.get_accessor(rep),
-                                        selector,
-                                        smtrace.Trace.get_accessor(view))])
+                    if rep.BlockColorArrayNames:
+                        selectors = rep.BlockColorArrayNames.GetData()[::3]
+                        isScalarVisibles = rep.IsBlocksScalarBarVisible(view, selectors)
+                        if all(isScalarVisible == 1 for isScalarVisible in isScalarVisibles):
+                            trace.append_separated([ \
+                                "# set color map for blocks",
+                                "%s.SetBlocksScalarBarVisibility(%s, %s, True)" % ( \
+                                    smtrace.Trace.get_accessor(rep),
+                                    smtrace.Trace.get_accessor(view),
+                                    str(selectors))])
+                        else:
+                            for i in range(len(selectors)):
+                                if isScalarVisibles[i]:
+                                    trace.append_separated([ \
+                                        "# set color map for block %s" % selectors[i],
+                                        "%s.SetBlockScalarBarVisibility(%s, %s, True)" % ( \
+                                            smtrace.Trace.get_accessor(rep),
+                                            smtrace.Trace.get_accessor(view),
+                                            selectors[i])])
 
                     if not rep.Visibility:
                         traceitem = smtrace.Hide(producer, port, view)

@@ -5,132 +5,161 @@
 
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
-#include "pqRenderViewBase.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
+
 #include "vtkAbstractArray.h"
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
+#include <QAction>
+#include <QCursor>
 #include <QDebug>
 #include <QMessageBox>
+#include <QObject>
+#include <QPointer>
+#include <QString>
 
-#include <cassert>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 pqScalarBarVisibilityReaction::pqScalarBarVisibilityReaction(
   QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
-  , BlockSignals(false)
-  , TrackActiveObjects(track_active_objects)
   , Timer(new pqTimer(this))
 {
   parentObject->setCheckable(true);
-
   this->Timer->setSingleShot(true);
   this->Timer->setInterval(0);
-  this->connect(this->Timer, SIGNAL(timeout()), SLOT(updateEnableState()));
+  QObject::connect(
+    this->Timer, &pqTimer::timeout, this, &pqScalarBarVisibilityReaction::updateEnableState);
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)), this, SLOT(updateEnableState()),
-    Qt::QueuedConnection);
-
-  this->updateEnableState();
+  if (track_active_objects)
+  {
+    QObject::connect(&pqActiveObjects::instance(),
+      QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), this,
+      &pqScalarBarVisibilityReaction::setActiveRepresentation, Qt::QueuedConnection);
+    this->setActiveRepresentation();
+  }
+  else
+  {
+    this->updateEnableState();
+  }
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarVisibilityReaction::~pqScalarBarVisibilityReaction()
+pqScalarBarVisibilityReaction::~pqScalarBarVisibilityReaction() = default;
+
+//-----------------------------------------------------------------------------
+pqDataRepresentation* pqScalarBarVisibilityReaction::representation() const
 {
-  delete this->Timer;
+  return this->Representation;
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarVisibilityReaction::setActiveRepresentation()
+{
+  this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarVisibilityReaction::setRepresentation(
+  pqDataRepresentation* repr, int selectedPropertiesType)
+{
+  if (this->Representation != nullptr && this->Representation == repr &&
+    this->ColorMapEditorHelper->GetSelectedPropertiesType() == selectedPropertiesType)
+  {
+    return;
+  }
+  if (this->Representation)
+  {
+    this->Representation->disconnect(this->Timer);
+    this->Timer->disconnect(this->Representation);
+    this->Representation = nullptr;
+  }
+  if (this->View)
+  {
+    this->View->disconnect(this->Timer);
+    this->Timer->disconnect(this->View);
+    this->View = nullptr;
+  }
+  this->ColorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
+
+  if (repr && repr->getView())
+  {
+    this->Representation = repr;
+    this->View = repr->getView();
+
+    // connect the representation's and view's signals to a timer's start,
+    // such that a state update occurs only when a previous start has timeout.
+    QObject::connect(this->View, &pqView::representationVisibilityChanged, this->Timer,
+      QOverload<>::of(&pqTimer::start));
+    if (this->ColorMapEditorHelper->GetSelectedPropertiesType() ==
+      vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks)
+    {
+      QObject::connect(this->Representation,
+        &pqDataRepresentation::blockColorTransferFunctionModified, this->Timer,
+        QOverload<>::of(&pqTimer::start));
+      QObject::connect(this->Representation, &pqDataRepresentation::blockColorArrayNameModified,
+        this->Timer, QOverload<>::of(&pqTimer::start));
+    }
+    else
+    {
+      QObject::connect(this->Representation, &pqDataRepresentation::colorTransferFunctionModified,
+        this->Timer, QOverload<>::of(&pqTimer::start));
+      QObject::connect(this->Representation, &pqDataRepresentation::colorArrayNameModified,
+        this->Timer, QOverload<>::of(&pqTimer::start));
+    }
+  }
+  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarBarVisibilityReaction::updateEnableState()
 {
-  pqDataRepresentation* cachedRepr = this->CachedRepresentation;
-  this->setRepresentation(
-    this->TrackActiveObjects ? pqActiveObjects::instance().activeRepresentation() : cachedRepr);
-}
-
-//-----------------------------------------------------------------------------
-pqDataRepresentation* pqScalarBarVisibilityReaction::representation() const
-{
-  return this->CachedRepresentation;
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr)
-{
-  if (this->CachedRepresentation)
+  vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : nullptr;
+  const bool canShowSB = this->Representation &&
+    this->ColorMapEditorHelper->GetAnySelectedUsingScalarColoring(reprProxy);
+  bool isShown = false;
+  if (canShowSB)
   {
-    this->CachedRepresentation->disconnect(this->Timer);
-    this->Timer->disconnect(this->CachedRepresentation);
-    this->CachedRepresentation = nullptr;
-  }
-  if (this->CachedView)
-  {
-    this->CachedView->disconnect(this->Timer);
-    this->Timer->disconnect(this->CachedView);
-    this->CachedView = nullptr;
-  }
-
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
-  pqView* view = repr ? repr->getView() : nullptr;
-
-  bool can_show_sb = repr && vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy);
-  bool is_shown = false;
-  if (repr)
-  {
-    this->CachedRepresentation = repr;
-    this->CachedView = view;
-
-    this->Timer->connect(repr, SIGNAL(colorTransferFunctionModified()), SLOT(start()));
-    this->Timer->connect(repr, SIGNAL(colorArrayNameModified()), SLOT(start()));
-    this->Timer->connect(
-      view, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)), SLOT(start()));
-  }
-
-  if (can_show_sb)
-  {
-    assert(repr);
-    assert(view);
-
     // get whether the scalar bar is currently shown.
     vtkSMProxy* sb = this->scalarBarProxy();
-    is_shown = sb ? (vtkSMPropertyHelper(sb, "Visibility").GetAsInt() != 0) : false;
+    isShown = sb ? (vtkSMPropertyHelper(sb, "Visibility").GetAsInt() != 0) : false;
   }
 
-  QAction* parent_action = this->parentAction();
-  this->BlockSignals = true;
-  parent_action->setEnabled(can_show_sb);
-  parent_action->setChecked(is_shown);
-  this->BlockSignals = false;
+  const bool prev = this->blockSignals(true);
+  QAction* parentAction = this->parentAction();
+  parentAction->setEnabled(canShowSB);
+  parentAction->setChecked(isShown);
+  this->blockSignals(prev);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqScalarBarVisibilityReaction::scalarBarProxy() const
+std::vector<vtkSMProxy*> pqScalarBarVisibilityReaction::scalarBarProxies() const
 {
-  pqDataRepresentation* repr = this->CachedRepresentation;
+  pqDataRepresentation* repr = this->Representation;
   vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
   pqView* view = repr ? repr->getView() : nullptr;
-  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
+  std::vector<vtkSMProxy*> proxies;
+  if (this->ColorMapEditorHelper->GetAnySelectedUsingScalarColoring(reprProxy))
   {
-    return vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
-      repr->getLookupTableProxy(), view->getProxy());
+    auto luts = this->ColorMapEditorHelper->GetSelectedLookupTables(reprProxy);
+    for (auto& lut : luts)
+    {
+      proxies.push_back(
+        vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lut, view->getProxy()));
+    }
   }
-  return nullptr;
+  return proxies;
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
 {
-  if (this->BlockSignals)
-  {
-    return;
-  }
-
-  pqDataRepresentation* repr = this->CachedRepresentation;
+  pqDataRepresentation* repr = this->Representation;
   if (!repr)
   {
     qCritical() << "Required active objects are not available.";
@@ -138,26 +167,31 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
   }
 
   if (visible &&
-    vtkSMColorMapEditorHelper::GetEstimatedNumberOfAnnotationsOnScalarBar(
+    this->ColorMapEditorHelper->GetAnySelectedEstimatedNumberOfAnnotationsOnScalarBar(
       repr->getProxy(), repr->getView()->getProxy()) > vtkAbstractArray::MAX_DISCRETE_VALUES)
   {
-    QMessageBox* box = new QMessageBox(QMessageBox::Warning, tr("Number of annotations warning"),
-      tr("The color map have been configured to show lots of annotations."
-         " Showing the scalar bar in this situation may slow down the rendering"
-         " and it may not be readable anyway. Do you really want to show the color map ?"),
-      QMessageBox::Yes | QMessageBox::No);
+    QPointer<QMessageBox> box =
+      new QMessageBox(QMessageBox::Warning, tr("Number of annotations warning"),
+        tr("The color map have been configured to show lots of annotations."
+           " Showing the scalar bar in this situation may slow down the rendering"
+           " and it may not be readable anyway. Do you really want to show the color map ?"),
+        QMessageBox::Yes | QMessageBox::No);
     box->move(QCursor::pos());
     if (box->exec() == QMessageBox::No)
     {
       visible = false;
-      int blocked = this->parentAction()->blockSignals(true);
+      const bool blocked = this->parentAction()->blockSignals(true);
       this->parentAction()->setChecked(false);
       this->parentAction()->blockSignals(blocked);
     }
-    delete box;
   }
-  BEGIN_UNDO_SET(tr("Toggle Color Legend Visibility"));
-  vtkSMColorMapEditorHelper::SetScalarBarVisibility(
+  const QString extraInfo = this->ColorMapEditorHelper->GetSelectedPropertiesType() ==
+      vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
+    ? tr("Block ")
+    : QString();
+  const QString undoName = tr("Toggle ") + extraInfo + tr("Color Legend Visibility");
+  BEGIN_UNDO_SET(extraInfo);
+  this->ColorMapEditorHelper->SetSelectedScalarBarVisibility(
     repr->getProxy(), repr->getView()->getProxy(), visible);
   END_UNDO_SET();
   repr->renderViewEventually();

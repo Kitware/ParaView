@@ -34,6 +34,6 @@ void pqColorToolbar::constructor()
   new pqUseSeparateColorMapReaction(ui.actionUseSeparateColorMap, display_color);
 
   QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)), display_color,
-    SLOT(setRepresentation(pqDataRepresentation*)));
+    QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), display_color,
+    QOverload<pqDataRepresentation*>::of(&pqDisplayColorWidget::setRepresentation));
 }

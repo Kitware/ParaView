@@ -8,14 +8,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
+    <width>662</width>
     <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MultiBlock Inspector</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,0,0,0,0,0,0">
    <property name="spacing">
     <number>2</number>
    </property>
@@ -82,17 +82,263 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="labelHeader">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Color Legend:&lt;/span&gt;&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/no_color.png&quot;/&gt; - using coloring parameters from display&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/inherited_color.png&quot;/&gt; - color is inherited from a parent node or color map&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/explicit_color.png&quot;/&gt; - color explicitly specified for this node&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Opacity Legend:&lt;/span&gt;&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/no_opacity.png&quot;/&gt; - using opacity parameters from display&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/inherited_opacity.png&quot;/&gt; - opacity is inherited from a parent node&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/explicit_opacity.png&quot;/&gt; - opacity explicitly specified for this node&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>State Legend:</string>
      </property>
      <property name="textFormat">
-      <enum>Qt::RichText</enum>
+      <enum>Qt::PlainText</enum>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateDisabled">
+     <item>
+      <widget class="QLabel" name="iconStateDisabled">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateDisabled.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateDisabled">
+       <property name="text">
+        <string>Property/ies is/are disabled because it/they cannot be edited.</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateRepresentationInherited">
+     <item>
+      <widget class="QLabel" name="iconStateRepresentationInherited">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateRepresentationInherited.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateRepresentationInherited">
+       <property name="text">
+        <string>Property/ies are inherited from the representation.</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateBlockInherited">
+     <item>
+      <widget class="QLabel" name="iconStateBlockInherited">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateBlockInherited.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateBlockInherited">
+       <property name="text">
+        <string>Property/ies is/are inherited from block(s).</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateMixedInherited">
+     <item>
+      <widget class="QLabel" name="iconStateMixedInherited">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateMixedInherited.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateMixedInherited">
+       <property name="text">
+        <string>Property/ies is/are inherited from block(s) and the representation.</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateSet">
+     <item>
+      <widget class="QLabel" name="iconStateSet">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateSet.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateSet">
+       <property name="text">
+        <string>Property/ies is/are set in block(s).</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateSetAndRepresentationInherited">
+     <item>
+      <widget class="QLabel" name="iconStateSetAndRepresentationInherited">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateSetAndRepresentationInherited.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateSetAndRepresentationInherited">
+       <property name="text">
+        <string>Property/ies is/are set in block(s) and inherited from the representation.</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateSetAndBlockInherited">
+     <item>
+      <widget class="QLabel" name="iconStateSetAndBlockInherited">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateSetAndBlockInherited.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateSetAndBlockInherited">
+       <property name="text">
+        <string>Property/ies is/are set in block(s) and inherited from block(s).</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_stateSetAndMixedInherited">
+     <item>
+      <widget class="QLabel" name="iconStateSetAndMixedInherited">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/pqStateSetAndMixedInherited.svg</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelStateSetAndMixedInherited">
+       <property name="text">
+        <string>Property/ies is/are set in block(s) and inherited from block(s) and the representation.</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -103,18 +349,104 @@
   <connection>
    <sender>showHints</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label</receiver>
+   <receiver>labelHeader</receiver>
    <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>440</x>
-     <y>431</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>239</x>
-     <y>541</y>
-    </hint>
-   </hints>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateDisabled</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateDisabled</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateRepresentationInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateRepresentationInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateBlockInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateBlockInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateMixedInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateMixedInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateSet</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateSet</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateSetAndRepresentationInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateSetAndRepresentationInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateSetAndBlockInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateSetAndBlockInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>iconStateSetAndMixedInherited</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelStateSetAndMixedInherited</receiver>
+   <slot>setVisible(bool)</slot>
   </connection>
  </connections>
 </ui>

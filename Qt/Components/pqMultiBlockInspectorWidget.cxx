@@ -11,15 +11,19 @@
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
 
+#include "vtkPVDataInformation.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
+#include <QStyle>
+
+#include <algorithm>
 
 //=============================================================================
 class pqMultiBlockInspectorWidget::pqInternals : public QObject
@@ -27,9 +31,6 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
   QPointer<pqDataRepresentation> Representation;
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqProxyWidget> HelperProxyWidget;
-
-  void* LastOutputPort = nullptr;
-  void* LastRepresentation = nullptr;
 
   vtkSmartPointer<vtkSMProxy> HelperProxy;
 
@@ -70,20 +71,42 @@ class pqMultiBlockInspectorWidget::pqInternals : public QObject
     return false;
   }
 
+  static bool isCompositeDataSet(pqDataRepresentation* repr)
+  {
+    auto reprProxy = repr ? vtkSMRepresentationProxy::SafeDownCast(repr->getProxy()) : nullptr;
+    auto dataInfo = reprProxy ? reprProxy->GetRepresentedDataInformation() : nullptr;
+    return dataInfo && dataInfo->IsCompositeDataSet();
+  }
+
 public:
   Ui::MultiBlockInspectorWidget Ui;
 
+  static void resizeLabelPixmap(QLabel* iconLabel, int iconSize)
+  {
+    const QPixmap pixmap = iconLabel->pixmap(Qt::ReturnByValue);
+    iconLabel->setPixmap(
+      pixmap.scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  }
+
   pqInternals(pqMultiBlockInspectorWidget* self)
-    : LastOutputPort(nullptr)
-    , LastRepresentation(nullptr)
   {
     this->Ui.setupUi(self);
     if (auto settings = pqApplicationCore::instance()->settings())
     {
-      bool checked = settings->value("pqMultiBlockInspectorWidget/ShowHints", true).toBool();
+      const bool checked = settings->value("pqMultiBlockInspectorWidget/ShowHints", true).toBool();
       this->Ui.showHints->setChecked(checked);
     }
+    const int iconSize = std::max(self->style()->pixelMetric(QStyle::PM_SmallIconSize), 20);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateDisabled, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateRepresentationInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateBlockInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateMixedInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSet, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSetAndRepresentationInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSetAndBlockInherited, iconSize);
+    pqInternals::resizeLabelPixmap(this->Ui.iconStateSetAndMixedInherited, iconSize);
   }
+
   ~pqInternals() override
   {
     if (auto settings = pqApplicationCore::instance()->settings())
@@ -110,7 +133,7 @@ public:
       this->Representation = repr;
       this->update();
     }
-    this->Ui.extractBlocks->setEnabled(repr != nullptr);
+    this->Ui.extractBlocks->setEnabled(pqInternals::isCompositeDataSet(repr));
   }
 
   void extract()
@@ -154,16 +177,8 @@ void pqMultiBlockInspectorWidget::pqInternals::update()
   auto port = this->outputPort();
   auto repr = this->representation();
 
-  if (port == this->LastOutputPort && repr == this->LastRepresentation)
-  {
-    // nothing has changed.
-    return;
-  }
-
   delete this->HelperProxyWidget;
-  this->LastOutputPort = port;
-  this->LastRepresentation = repr;
-  if (!port)
+  if (!port || !repr)
   {
     return;
   }
@@ -174,8 +189,11 @@ void pqMultiBlockInspectorWidget::pqInternals::update()
     // that have the panel visibility set to "multiblock_inspector". This way we instantiate a
     // pqDataAssemblyPropertyWidget which we later add to the container.
     this->HelperProxyWidget = new pqProxyWidget(repr->getProxy(), { "multiblock_inspector" }, {});
-    QObject::connect(this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished,
-      [repr]() { repr->renderViewEventually(); });
+    QObject::connect(
+      this->HelperProxyWidget.data(), &pqProxyWidget::changeFinished, [this, repr]() {
+        this->Ui.extractBlocks->setEnabled(pqInternals::isCompositeDataSet(repr));
+        repr->renderViewEventually();
+      });
   }
   else
   {

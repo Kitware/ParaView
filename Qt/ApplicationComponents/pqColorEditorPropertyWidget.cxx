@@ -8,128 +8,201 @@
 #include "pqDataRepresentation.h"
 #include "pqEditColorMapReaction.h"
 #include "pqEditScalarBarReaction.h"
+#include "pqMultiBlockPropertiesStateWidget.h"
 #include "pqPropertiesPanel.h"
 #include "pqRescaleScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqServerManagerModel.h"
 #include "pqUseSeparateColorMapReaction.h"
-#include "vtkSMPropertyHelper.h"
 
-class pqColorEditorPropertyWidget::pqInternals
+#include "vtkSMColorMapEditorHelper.h"
+#include "vtkSMProxy.h"
+
+#include <QAction>
+#include <QPointer>
+#include <QPushButton>
+#include <QStyle>
+#include <QWidget>
+
+#include <algorithm>
+#include <vector>
+
+class pqColorEditorPropertyWidget::pqInternals : public QObject
 {
 public:
   Ui::ColorEditorPropertyWidget Ui;
+
+  QPointer<pqScalarBarVisibilityReaction> ScalarBarVisibilityReaction;
+  QPointer<pqUseSeparateColorMapReaction> UseSeparateColorMapReaction;
+
   QPointer<QAction> ScalarBarVisibilityAction;
-  QPointer<QAction> UseSeparateColorMapAction;
   QPointer<QAction> EditScalarBarAction;
+
+  QPointer<pqDataRepresentation> Representation;
+  QPointer<pqMultiBlockPropertiesStateWidget> StateWidget;
+
+  std::vector<vtkSMProxy*> OldLuts;
 };
 
 //-----------------------------------------------------------------------------
-pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
+pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(
+  vtkSMProxy* smProxy, QWidget* parentObject, int selectedPropertiesType)
   : Superclass(smProxy, parentObject)
   , Internals(new pqColorEditorPropertyWidget::pqInternals())
 {
   this->setShowLabel(true);
+  auto& internals = *this->Internals;
 
-  Ui::ColorEditorPropertyWidget& Ui = this->Internals->Ui;
+  Ui::ColorEditorPropertyWidget& Ui = internals.Ui;
   Ui.setupUi(this);
-  Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargin(),
-    pqPropertiesPanel::suggestedMargin(), pqPropertiesPanel::suggestedMargin(),
-    pqPropertiesPanel::suggestedMargin());
+  Ui.gridLayout->setContentsMargins(pqPropertiesPanel::suggestedMargins());
   Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
-  // Setup various widget properties.
+  // Get the representation.
   pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
   pqProxy* pqproxy = smm->findItem<pqProxy*>(smProxy);
-  pqDataRepresentation* representation = qobject_cast<pqDataRepresentation*>(pqproxy);
-  Ui.DisplayColorWidget->setRepresentation(representation);
+  internals.Representation = qobject_cast<pqDataRepresentation*>(pqproxy);
+
+  // Setup various widget properties.
+  Ui.DisplayColorWidget->setRepresentation(internals.Representation, selectedPropertiesType);
 
   // show scalar bar button
   QAction* scalarBarAction = new QAction(this);
   this->Internals->ScalarBarVisibilityAction = scalarBarAction;
-  scalarBarAction->connect(Ui.ShowScalarBar, SIGNAL(clicked()), SLOT(trigger()));
-  Ui.ShowScalarBar->connect(scalarBarAction, SIGNAL(toggled(bool)), SLOT(setChecked(bool)));
-  pqScalarBarVisibilityReaction* sbvr =
-    new pqScalarBarVisibilityReaction(scalarBarAction, /*track_active_objects*/ false);
-  sbvr->setRepresentation(representation);
-  this->connect(scalarBarAction, SIGNAL(changed()), SLOT(updateEnableState()));
+  QObject::connect(Ui.ShowScalarBar, &QPushButton::clicked, scalarBarAction, &QAction::trigger);
+  QObject::connect(scalarBarAction, &QAction::toggled, Ui.ShowScalarBar, &QPushButton::setChecked);
+  this->Internals->ScalarBarVisibilityReaction =
+    new pqScalarBarVisibilityReaction(scalarBarAction, /*track_active_objects=*/false);
+  this->Internals->ScalarBarVisibilityReaction->setRepresentation(
+    internals.Representation, selectedPropertiesType);
+  QObject::connect(
+    scalarBarAction, &QAction::changed, this, &pqColorEditorPropertyWidget::updateEnableState);
 
   // edit scalar bar.
   QAction* editScalarBarAction = new QAction(this);
   this->Internals->EditScalarBarAction = editScalarBarAction;
-  editScalarBarAction->connect(Ui.EditScalarBar, SIGNAL(clicked()), SLOT(trigger()));
-  pqEditScalarBarReaction* esbr = new pqEditScalarBarReaction(editScalarBarAction, false);
-  esbr->setRepresentation(representation);
-  this->connect(editScalarBarAction, SIGNAL(changed()), SLOT(updateEnableState()));
+  QObject::connect(Ui.EditScalarBar, &QPushButton::clicked, editScalarBarAction, &QAction::trigger);
+  pqEditScalarBarReaction* esbr =
+    new pqEditScalarBarReaction(editScalarBarAction, /*track_active_objects=*/false);
+  esbr->setScalarBarVisibilityReaction(this->Internals->ScalarBarVisibilityReaction);
+  esbr->setRepresentation(internals.Representation, selectedPropertiesType);
+  QObject::connect(
+    editScalarBarAction, &QAction::changed, this, &pqColorEditorPropertyWidget::updateEnableState);
 
   // edit color map button
   QAction* editColorMapAction = new QAction(this);
-  QObject::connect(Ui.EditColorMap, SIGNAL(clicked()), editColorMapAction, SLOT(trigger()));
-  pqEditColorMapReaction* ecmr = new pqEditColorMapReaction(editColorMapAction, false);
-  ecmr->setRepresentation(representation);
+  QObject::connect(Ui.EditColorMap, &QPushButton::clicked, editColorMapAction, &QAction::trigger);
+  pqEditColorMapReaction* ecmr =
+    new pqEditColorMapReaction(editColorMapAction, /*track_active_objects=*/false);
+  ecmr->setRepresentation(internals.Representation, selectedPropertiesType);
 
   // separate color map button
   QAction* useSeparateColorMapAction = new QAction(this);
-  this->Internals->UseSeparateColorMapAction = useSeparateColorMapAction;
-  useSeparateColorMapAction->connect(Ui.UseSeparateColorMap, SIGNAL(clicked()), SLOT(trigger()));
-  Ui.UseSeparateColorMap->connect(
-    useSeparateColorMapAction, SIGNAL(toggled(bool)), SLOT(setChecked(bool)));
-  pqUseSeparateColorMapReaction* uscmr =
-    new pqUseSeparateColorMapReaction(useSeparateColorMapAction, Ui.DisplayColorWidget, false);
-  uscmr->setRepresentation(representation);
-  this->connect(useSeparateColorMapAction, SIGNAL(changed()), SLOT(updateEnableState()));
+  QObject::connect(
+    Ui.UseSeparateColorMap, &QPushButton::clicked, useSeparateColorMapAction, &QAction::trigger);
+  QObject::connect(
+    useSeparateColorMapAction, &QAction::toggled, Ui.UseSeparateColorMap, &QPushButton::setChecked);
+  this->Internals->UseSeparateColorMapReaction = new pqUseSeparateColorMapReaction(
+    useSeparateColorMapAction, Ui.DisplayColorWidget, /*track_active_objects=*/false);
+  this->Internals->UseSeparateColorMapReaction->setRepresentation(
+    internals.Representation, selectedPropertiesType);
+  QObject::connect(useSeparateColorMapAction, &QAction::changed, this,
+    &pqColorEditorPropertyWidget::updateEnableState);
 
   // reset range button
   QAction* resetRangeAction = new QAction(this);
-  QObject::connect(Ui.Rescale, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
-  pqRescaleScalarRangeReaction* rsrr = new pqRescaleScalarRangeReaction(resetRangeAction, false);
-  rsrr->setRepresentation(representation);
+  QObject::connect(Ui.Rescale, &QPushButton::clicked, resetRangeAction, &QAction::trigger);
+  pqRescaleScalarRangeReaction* rsrr = new pqRescaleScalarRangeReaction(
+    resetRangeAction, /*track_active_objects=*/false, pqRescaleScalarRangeReaction::DATA);
+  rsrr->setRepresentation(internals.Representation, selectedPropertiesType);
 
   // reset custom range button
   QAction* resetCustomRangeAction = new QAction(this);
-  resetCustomRangeAction->connect(Ui.RescaleCustom, SIGNAL(clicked()), SLOT(trigger()));
+  QObject::connect(
+    Ui.RescaleCustom, &QPushButton::clicked, resetCustomRangeAction, &QAction::trigger);
   rsrr = new pqRescaleScalarRangeReaction(
-    resetCustomRangeAction, false, pqRescaleScalarRangeReaction::CUSTOM);
-  rsrr->setRepresentation(representation);
+    resetCustomRangeAction, /*track_active_objects=*/false, pqRescaleScalarRangeReaction::CUSTOM);
+  rsrr->setRepresentation(internals.Representation, selectedPropertiesType);
 
   // reset custom range button
   QAction* resetTemporalRangeAction = new QAction(this);
-  resetTemporalRangeAction->connect(Ui.RescaleTemporal, SIGNAL(clicked()), SLOT(trigger()));
-  rsrr = new pqRescaleScalarRangeReaction(
-    resetTemporalRangeAction, false, pqRescaleScalarRangeReaction::TEMPORAL);
-  rsrr->setRepresentation(representation);
+  QObject::connect(
+    Ui.RescaleTemporal, &QPushButton::clicked, resetTemporalRangeAction, &QAction::trigger);
+  rsrr = new pqRescaleScalarRangeReaction(resetTemporalRangeAction, /*track_active_objects=*/false,
+    pqRescaleScalarRangeReaction::TEMPORAL);
+  rsrr->setRepresentation(internals.Representation, selectedPropertiesType);
 
   // choose preset button.
   QAction* choosePresetAction = new QAction(this);
-  choosePresetAction->connect(Ui.ChoosePreset, SIGNAL(clicked()), SLOT(trigger()));
-  pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(choosePresetAction, false);
-  ccpr->setRepresentation(representation);
-  representation->connect(
-    ccpr, SIGNAL(presetApplied(const QString&)), SLOT(renderViewEventually()));
+  QObject::connect(Ui.ChoosePreset, &QPushButton::clicked, choosePresetAction, &QAction::trigger);
+  pqChooseColorPresetReaction* ccpr =
+    new pqChooseColorPresetReaction(choosePresetAction, /*track_active_objects=*/false);
+  ccpr->setRepresentation(internals.Representation, selectedPropertiesType);
+  QObject::connect(ccpr, &pqChooseColorPresetReaction::presetApplied, internals.Representation,
+    &pqDataRepresentation::renderViewEventually);
 
+  if (selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks)
+  {
+    const int iconSize = std::max(this->style()->pixelMetric(QStyle::PM_SmallIconSize), 20);
+    this->Internals->StateWidget = new pqMultiBlockPropertiesStateWidget(smProxy,
+      { "BlockColors", "BlockColorArrayNames", "BlockUseSeparateColorMaps" }, iconSize, QString(),
+      this);
+    const int numColumns = Ui.gridLayout->columnCount();
+    Ui.gridLayout->addWidget(this->Internals->StateWidget, 1, numColumns, 1, 1, Qt::AlignVCenter);
+    QObject::connect(this->Internals->StateWidget, &pqMultiBlockPropertiesStateWidget::stateChanged,
+      this, &pqColorEditorPropertyWidget::updateBlockBasedEnableState);
+    QObject::connect(this->Internals->StateWidget,
+      &pqMultiBlockPropertiesStateWidget::selectedBlockSelectorsChanged, this,
+      &pqColorEditorPropertyWidget::updateBlockBasedEnableState);
+    QObject::connect(
+      internals.StateWidget, &pqMultiBlockPropertiesStateWidget::startStateReset, this, [&]() {
+        this->Internals->OldLuts =
+          this->Internals->Representation->getLookupTableProxies(vtkSMColorMapEditorHelper::Blocks);
+      });
+    QObject::connect(
+      internals.StateWidget, &pqMultiBlockPropertiesStateWidget::endStateReset, this, [&]() {
+        pqDisplayColorWidget::hideScalarBarsIfNotNeeded(
+          this->Internals->Representation->getViewProxy(), this->Internals->OldLuts);
+        this->Internals->Representation->renderViewEventually();
+      });
+  }
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
-pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget()
+pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget() = default;
+
+//-----------------------------------------------------------------------------
+void pqColorEditorPropertyWidget::updateBlockBasedEnableState()
 {
-  delete this->Internals;
-  this->Internals = nullptr;
+  this->Internals->Ui.DisplayColorWidget->queryCurrentSelectedArray();
+  this->Internals->UseSeparateColorMapReaction->querySelectedUseSeparateColorMap();
+  this->Internals->ScalarBarVisibilityReaction->updateEnableState();
+  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqColorEditorPropertyWidget::updateEnableState()
 {
-  Ui::ColorEditorPropertyWidget& ui = this->Internals->Ui;
-  const QAction* sbva = this->Internals->ScalarBarVisibilityAction;
-  ui.ShowScalarBar->setEnabled(sbva->isEnabled());
-  ui.UseSeparateColorMap->setEnabled(sbva->isEnabled());
-  ui.Rescale->setEnabled(sbva->isEnabled());
-  ui.RescaleCustom->setEnabled(sbva->isEnabled());
-  ui.RescaleTemporal->setEnabled(sbva->isEnabled());
-  ui.ChoosePreset->setEnabled(sbva->isEnabled());
-
-  const QAction* esba = this->Internals->EditScalarBarAction;
-  ui.EditScalarBar->setEnabled(esba->isEnabled());
+  auto& internals = *this->Internals;
+  bool enabled = true;
+  if (!internals.StateWidget.isNull())
+  {
+    // enable any widget only if there is at least a block selected
+    enabled = internals.StateWidget->getState() !=
+      pqMultiBlockPropertiesStateWidget::BlockPropertyState::Disabled;
+  }
+  Ui::ColorEditorPropertyWidget& ui = internals.Ui;
+  ui.DisplayColorWidget->setEnabled(enabled);
+  ui.EditColorMap->setEnabled(enabled);
+  const bool isScalarBarVisibilityActionEnabled = internals.ScalarBarVisibilityAction->isEnabled();
+  ui.UseSeparateColorMap->setEnabled(enabled && isScalarBarVisibilityActionEnabled);
+  ui.Rescale->setEnabled(enabled && isScalarBarVisibilityActionEnabled);
+  ui.RescaleCustom->setEnabled(enabled && isScalarBarVisibilityActionEnabled);
+  ui.RescaleTemporal->setEnabled(enabled && isScalarBarVisibilityActionEnabled);
+  ui.ChoosePreset->setEnabled(enabled && isScalarBarVisibilityActionEnabled);
+  ui.ShowScalarBar->setEnabled(enabled && isScalarBarVisibilityActionEnabled);
+  const bool isEditScalarBarActionEnabled = internals.EditScalarBarAction->isEnabled();
+  ui.EditScalarBar->setEnabled(enabled && isEditScalarBarActionEnabled);
 }

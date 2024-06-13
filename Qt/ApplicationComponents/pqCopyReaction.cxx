@@ -403,6 +403,7 @@ void copyDescendants(pqObjectBuilder* builder, pqPipelineSource* source, pqPipel
     if (repr)
     {
       vtkSMColorMapEditorHelper::SetupLookupTable(repr->getProxy());
+      vtkSMColorMapEditorHelper::SetupBlocksLookupTables(repr->getProxy());
     }
   }
 

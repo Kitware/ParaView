@@ -12,6 +12,9 @@
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
+
+#include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
@@ -21,58 +24,59 @@
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 
-namespace
-{
-vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
-{
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
-  if (vtkSMColorMapEditorHelper::GetUsingScalarColoring(reprProxy))
-  {
-    return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
-  }
-  return nullptr;
-}
-}
+#include <algorithm>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 pqRescaleScalarRangeReaction::pqRescaleScalarRangeReaction(
   QAction* parentObject, bool track_active_objects, pqRescaleScalarRangeReaction::Modes mode)
   : Superclass(parentObject)
   , Mode(mode)
-  , Connection(nullptr)
+  , ServerAddedObserverId(0)
 {
   if (track_active_objects)
   {
     QObject::connect(&pqActiveObjects::instance(),
-      SIGNAL(representationChanged(pqDataRepresentation*)), this,
-      SLOT(setRepresentation(pqDataRepresentation*)));
-    this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+      QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), this,
+      &pqRescaleScalarRangeReaction::setActiveRepresentation);
+    this->setActiveRepresentation();
 
     if (this->Mode == TEMPORAL)
     {
       // Get ready to connect timekeepers with the reaction enabled state
-      this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
       pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
-      this->connect(model, SIGNAL(serverAdded(pqServer*)), SLOT(onServerAdded(pqServer*)));
-      this->connect(
-        model, SIGNAL(aboutToRemoveServer(pqServer*)), SLOT(onAboutToRemoveServer(pqServer*)));
+      QObject::connect(model, &pqServerManagerModel::serverAdded, this,
+        &pqRescaleScalarRangeReaction::onServerAdded);
+      QObject::connect(model, &pqServerManagerModel::aboutToRemoveServer, this,
+        &pqRescaleScalarRangeReaction::onAboutToRemoveServer);
     }
   }
-}
-
-//-----------------------------------------------------------------------------
-pqRescaleScalarRangeReaction::~pqRescaleScalarRangeReaction()
-{
-  if (this->Connection)
+  else
   {
-    this->Connection->Disconnect();
+    this->updateEnableState();
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqRescaleScalarRangeReaction::setRepresentation(pqDataRepresentation* repr)
+pqRescaleScalarRangeReaction::~pqRescaleScalarRangeReaction() = default;
+
+//-----------------------------------------------------------------------------
+void pqRescaleScalarRangeReaction::setActiveRepresentation()
 {
+  this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
+}
+
+//-----------------------------------------------------------------------------
+void pqRescaleScalarRangeReaction::setRepresentation(
+  pqDataRepresentation* repr, int selectedPropertiesType)
+{
+  if (this->Representation != nullptr && this->Representation == repr &&
+    this->SelectedPropertiesType == selectedPropertiesType)
+  {
+    return;
+  }
   this->Representation = qobject_cast<pqPipelineRepresentation*>(repr);
+  this->SelectedPropertiesType = selectedPropertiesType;
   this->updateEnableState();
 }
 
@@ -97,25 +101,30 @@ void pqRescaleScalarRangeReaction::onTriggered()
   switch (this->Mode)
   {
     case DATA:
-      pqRescaleScalarRangeReaction::rescaleScalarRangeToData(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToData(
+        this->Representation, this->SelectedPropertiesType);
       break;
 
     case CUSTOM:
-      pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(
+        this->Representation, this->SelectedPropertiesType);
       break;
 
     case TEMPORAL:
-      pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(this->Representation);
+      pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(
+        this->Representation, this->SelectedPropertiesType);
       break;
 
     case VISIBLE:
+      // Visible does NOT support selectedPropertiesType == Blocks
       pqRescaleScalarRangeReaction::rescaleScalarRangeToVisible(this->Representation);
       break;
   }
 }
 
 //-----------------------------------------------------------------------------
-bool pqRescaleScalarRangeReaction::rescaleScalarRangeToData(pqPipelineRepresentation* repr)
+bool pqRescaleScalarRangeReaction::rescaleScalarRangeToData(
+  pqPipelineRepresentation* repr, int selectedPropertiesType)
 {
   if (repr == nullptr)
   {
@@ -128,20 +137,23 @@ bool pqRescaleScalarRangeReaction::rescaleScalarRangeToData(pqPipelineRepresenta
     }
   }
 
-  BEGIN_UNDO_SET(tr("Reset transfer function ranges using data range"));
-  repr->resetLookupTableScalarRange();
+  const QString extraInfo =
+    selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
+    ? tr("Block ")
+    : QString();
+  const QString undoText =
+    tr("Reset ") + extraInfo + tr("Transfer Function Ranges Using Data Range");
+  BEGIN_UNDO_SET(undoText);
+  repr->resetLookupTableScalarRange(selectedPropertiesType);
+  // no need to call lut->UpdateVTKObjects(), the resetLookupTableScalarRange call will do that
   repr->renderViewEventually();
-  if (vtkSMProxy* lut = lutProxy(repr))
-  {
-    lut->UpdateVTKObjects();
-  }
   END_UNDO_SET();
   return true;
 }
 
 //-----------------------------------------------------------------------------
 pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(
-  pqPipelineRepresentation* repr)
+  pqPipelineRepresentation* repr, int selectedPropertiesType)
 {
   if (repr == nullptr)
   {
@@ -159,13 +171,17 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
   auto proxy = repr->getProxy();
   if (proxy->GetProperty("UseSeparateOpacityArray"))
   {
-    vtkSMPropertyHelper helper(proxy, "UseSeparateOpacityArray", true /*quiet*/);
+    const vtkSMPropertyHelper helper(proxy, "UseSeparateOpacityArray", true /*quiet*/);
     separateOpacity = helper.GetAsInt() == 1;
   }
 
-  vtkSMProxy* lut = lutProxy(repr);
+  vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper;
+  colorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
+  const std::vector<vtkSMProxy*> luts =
+    colorMapEditorHelper->GetSelectedLookupTables(repr->getProxy());
   pqRescaleScalarRangeToCustomDialog* dialog =
-    pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(lut, separateOpacity);
+    pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(
+      luts, separateOpacity, selectedPropertiesType);
   if (dialog != nullptr)
   {
     QObject::connect(
@@ -176,80 +192,150 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
 
 //-----------------------------------------------------------------------------
 pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarRangeToCustom(
-  vtkSMProxy* lut, bool separateOpacity)
+  std::vector<vtkSMProxy*> luts, bool separateOpacity, int selectedPropertiesType)
 {
-  vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
-  if (tfProxy == nullptr || lut == nullptr)
+  if (luts.empty())
   {
     return nullptr;
   }
+  for (auto lut : luts)
+  {
+    auto tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
+    if (!lut || !tfProxy)
+    {
+      return nullptr;
+    }
+  }
 
-  double range[2] = { 0, 0 };
-  if (!tfProxy->GetRange(range))
+  double range[2] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
+  bool foundValidRange = false;
+  for (auto lut : luts)
+  {
+    double lutRange[2];
+    auto tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
+    if (tfProxy->GetRange(lutRange))
+    {
+      range[0] = std::min(range[0], lutRange[0]);
+      range[1] = std::max(range[1], lutRange[1]);
+      foundValidRange = true;
+    }
+  }
+  if (!foundValidRange)
   {
     range[0] = 0;
     range[1] = 1.0;
   }
 
-  int lockInfo = 0;
-  vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Get(&lockInfo);
+  std::vector<int> locksInfo(luts.size(), 0);
+  for (size_t i = 0; i < luts.size(); ++i)
+  {
+    vtkSMPropertyHelper(luts[i], "AutomaticRescaleRangeMode").Get(&locksInfo[i]);
+  }
+  const int lockInfo = *std::min_element(locksInfo.begin(), locksInfo.end());
+  const int maxLockInfo = *std::max_element(locksInfo.begin(), locksInfo.end());
+  if (maxLockInfo != lockInfo)
+  {
+    qWarning() << "Transfer functions have different lock states.";
+    return nullptr;
+  }
 
   pqRescaleScalarRangeToCustomDialog* dialog =
     new pqRescaleScalarRangeToCustomDialog(pqCoreUtilities::mainWidget());
   dialog->setLock(lockInfo == vtkSMTransferFunctionManager::NEVER);
   dialog->setRange(range[0], range[1]);
   dialog->showOpacityControls(separateOpacity);
-  vtkSMTransferFunctionProxy* sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
-    vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy());
-  vtkSMTransferFunction2DProxy* tf2dProxy = vtkSMTransferFunction2DProxy::SafeDownCast(
-    vtkSMPropertyHelper(lut, "TransferFunction2D", true).GetAsProxy());
-  if (sofProxy && true)
+  std::vector<vtkSMTransferFunctionProxy*> sofProxies;
+  for (auto lut : luts)
   {
-    if (!sofProxy->GetRange(range))
+    auto sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
+      vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy());
+    sofProxies.push_back(sofProxy);
+  }
+  const bool hasAnySof = std::any_of(sofProxies.begin(), sofProxies.end(),
+    [](vtkSMTransferFunctionProxy* sofProxy) { return sofProxy != nullptr; });
+  std::vector<vtkSMTransferFunction2DProxy*> tf2dProxies;
+  for (auto lut : luts)
+  {
+    auto tf2dProxy = vtkSMTransferFunction2DProxy::SafeDownCast(
+      vtkSMPropertyHelper(lut, "TransferFunction2D", true).GetAsProxy());
+    tf2dProxies.push_back(tf2dProxy);
+  }
+  if (hasAnySof)
+  {
+    foundValidRange = false;
+    for (size_t i = 0; i < luts.size(); ++i)
+    {
+      if (sofProxies[i])
+      {
+        double sofRange[2];
+        if (sofProxies[i]->GetRange(sofRange))
+        {
+          range[0] = std::min(range[0], sofRange[0]);
+          range[1] = std::max(range[1], sofRange[1]);
+          foundValidRange = true;
+        }
+      }
+    }
+    if (!foundValidRange)
     {
       range[0] = 0;
       range[1] = 1.0;
     }
     dialog->setOpacityRange(range[0], range[1]);
-  };
+  }
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
 
   QObject::connect(dialog, &pqRescaleScalarRangeToCustomDialog::apply, [=]() {
-    BEGIN_UNDO_SET(tr("Reset transfer function ranges"));
+    const QString extraInfo =
+      selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
+      ? tr("Block ")
+      : QString();
+    const QString undoText =
+      tr("Reset ") + extraInfo + tr("Transfer Function Ranges To Custom Range");
+    BEGIN_UNDO_SET(undoText);
     double tRange[2];
     tRange[0] = dialog->minimum();
     tRange[1] = dialog->maximum();
-    tfProxy->RescaleTransferFunction(tRange[0], tRange[1]);
-    if (sofProxy)
+    for (size_t i = 0; i < luts.size(); ++i)
     {
-      // If we are using a separate opacity range, get those values from the GUI
-      if (separateOpacity)
+      auto tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(luts[i]);
+      auto sofProxy = sofProxies[i];
+      auto tf2dProxy = tf2dProxies[i];
+      tfProxy->RescaleTransferFunction(tRange[0], tRange[1]);
+      if (sofProxy)
       {
-        tRange[0] = dialog->opacityMinimum();
-        tRange[1] = dialog->opacityMaximum();
+        // If we are using a separate opacity range, get those values from the GUI
+        if (separateOpacity)
+        {
+          tRange[0] = dialog->opacityMinimum();
+          tRange[1] = dialog->opacityMaximum();
+        }
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, tRange[0], tRange[1]);
       }
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, tRange[0], tRange[1]);
-    }
-    if (tf2dProxy)
-    {
-      double tf2dRange[4];
-      if (!tf2dProxy->GetRange(tf2dRange))
+      if (tf2dProxy)
       {
-        tf2dRange[1] = 0.0;
-        tf2dRange[2] = 1.0;
+        double tf2dRange[4];
+        if (!tf2dProxy->GetRange(tf2dRange))
+        {
+          tf2dRange[2] = 0.0;
+          tf2dRange[3] = 1.0;
+        }
+        tf2dRange[0] = tRange[0];
+        tf2dRange[1] = tRange[1];
+        tf2dProxy->RescaleTransferFunction(tf2dRange);
       }
-      tf2dRange[0] = tRange[0];
-      tf2dRange[1] = tRange[1];
-      tf2dProxy->RescaleTransferFunction(tf2dRange);
-    }
-    // disable auto-rescale of transfer function since the user has set on
-    // explicitly (BUG #14371).
-    if (dialog->doLock())
-    {
-      vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
-        .Set(vtkSMTransferFunctionManager::NEVER);
-      lut->UpdateVTKObjects();
+      // disable auto-rescale of transfer function since the user has set on
+      // explicitly (BUG #14371).
+      if (dialog->doLock())
+      {
+        for (auto lut : luts)
+        {
+          vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+            .Set(vtkSMTransferFunctionManager::NEVER);
+          lut->UpdateVTKObjects();
+        }
+      }
     }
     END_UNDO_SET();
   });
@@ -259,7 +345,8 @@ pqRescaleScalarRangeToCustomDialog* pqRescaleScalarRangeReaction::rescaleScalarR
 
 //-----------------------------------------------------------------------------
 pqRescaleScalarRangeToDataOverTimeDialog*
-pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(pqPipelineRepresentation* repr)
+pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(
+  pqPipelineRepresentation* repr, int selectedPropertiesType)
 {
   if (repr == nullptr)
   {
@@ -272,10 +359,26 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(pqPipelineReprese
     }
   }
 
-  int lockInfo = 0;
-  if (vtkSMProxy* lut = lutProxy(repr))
+  vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper;
+  colorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
+  const std::vector<vtkSMProxy*> luts =
+    colorMapEditorHelper->GetSelectedLookupTables(repr->getProxy());
+  if (luts.empty())
   {
-    vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Get(&lockInfo);
+    return nullptr;
+  }
+
+  std::vector<int> locksInfo(luts.size(), 0);
+  for (size_t i = 0; i < luts.size(); ++i)
+  {
+    vtkSMPropertyHelper(luts[i], "AutomaticRescaleRangeMode", /*quiet=*/true).Get(&locksInfo[i]);
+  }
+  const int lockInfo = *std::min_element(locksInfo.begin(), locksInfo.end());
+  const int maxLockInfo = *std::max_element(locksInfo.begin(), locksInfo.end());
+  if (maxLockInfo != lockInfo)
+  {
+    qWarning() << "Transfer functions have different lock states.";
+    return nullptr;
   }
   pqRescaleScalarRangeToDataOverTimeDialog* dialog =
     new pqRescaleScalarRangeToDataOverTimeDialog(pqCoreUtilities::mainWidget());
@@ -284,18 +387,33 @@ pqRescaleScalarRangeReaction::rescaleScalarRangeToDataOverTime(pqPipelineReprese
   dialog->show();
 
   QObject::connect(dialog, &pqRescaleScalarRangeToDataOverTimeDialog::apply, [=]() {
-    BEGIN_UNDO_SET(tr("Reset transfer function ranges using temporal data range"));
-    vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
+    const QString extraInfo =
+      selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks
+      ? tr("Block ")
+      : QString();
+    const QString undoText =
+      tr("Reset ") + extraInfo + tr("Transfer Function Ranges Using Temporal Data Range");
+    BEGIN_UNDO_SET(undoText);
+    repr->resetLookupTableScalarRangeOverTime(selectedPropertiesType);
 
     // disable auto-rescale of transfer function since the user has set one
     // explicitly (BUG #14371).
     if (dialog->doLock())
     {
-      if (vtkSMProxy* lut = lutProxy(repr))
+      vtkNew<vtkSMColorMapEditorHelper> colorMapEditorHelper;
+      colorMapEditorHelper->SetSelectedPropertiesType(selectedPropertiesType);
+      if (colorMapEditorHelper->GetAnySelectedUsingScalarColoring(repr->getProxy()))
       {
-        vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
-          .Set(vtkSMTransferFunctionManager::NEVER);
-        lut->UpdateVTKObjects();
+        auto luts = colorMapEditorHelper->GetSelectedLookupTables(repr->getProxy());
+        for (auto& lut : luts)
+        {
+          if (lut)
+          {
+            vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+              .Set(vtkSMTransferFunctionManager::NEVER);
+            lut->UpdateVTKObjects();
+          }
+        }
       }
     }
     repr->renderViewEventually();
@@ -325,7 +443,7 @@ bool pqRescaleScalarRangeReaction::rescaleScalarRangeToVisible(pqPipelineReprese
     return false;
   }
 
-  BEGIN_UNDO_SET(tr("Reset transfer function ranges to visible data range"));
+  BEGIN_UNDO_SET(tr("Reset Transfer Function Ranges To Visible Data Range"));
   vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(
     repr->getProxy(), view->getProxy());
   repr->renderViewEventually();
@@ -340,8 +458,9 @@ void pqRescaleScalarRangeReaction::onServerAdded(pqServer* server)
   {
     // Connect new server timekeeper with the reaction enable state
     vtkSMProxy* timeKeeper = server->getTimeKeeper()->getProxy();
-    this->Connection->Connect(timeKeeper->GetProperty("SuppressedTimeSources"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
+    this->ServerAddedObserverId =
+      pqCoreUtilities::connect(timeKeeper->GetProperty("SuppressedTimeSources"),
+        vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
   }
 }
 
@@ -352,7 +471,10 @@ void pqRescaleScalarRangeReaction::onAboutToRemoveServer(pqServer* server)
   {
     // Disconnect previously connected timekeeper
     vtkSMProxy* timeKeeper = server->getTimeKeeper()->getProxy();
-    this->Connection->Disconnect(timeKeeper->GetProperty("SuppressedTimeSources"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
+    if (this->ServerAddedObserverId != 0)
+    {
+      timeKeeper->GetProperty("SuppressedTimeSources")->RemoveObserver(this->ServerAddedObserverId);
+      this->ServerAddedObserverId = 0;
+    }
   }
 }

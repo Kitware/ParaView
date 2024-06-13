@@ -356,15 +356,15 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
         colored_reprs.insert(proxy);
         luts.insert(lut);
       }
-      const vtkSMPropertyHelper blockLookupTableSelectors(proxy, "BlockLookupTableSelectors", true);
+      const vtkSMPropertyHelper blockColorArrayNames(proxy, "BlockColorArrayNames", true);
       const vtkSMPropertyHelper blockLookUpTables(proxy, "BlockLookupTables", true);
-      for (unsigned int i = 0; i < blockLookupTableSelectors.GetNumberOfElements(); ++i)
+      for (unsigned int i = 0; i < blockLookUpTables.GetNumberOfElements(); ++i)
       {
         vtkSMProxy* blockLut = blockLookUpTables.GetAsProxy(i);
         if (blockLut && luts.find(blockLut) == luts.end())
         {
           colored_reprs_blocks.insert(
-            std::make_pair(proxy, blockLookupTableSelectors.GetAsString(i)));
+            std::make_pair(proxy, blockColorArrayNames.GetAsString(3 * i)));
           luts.insert(blockLut);
         }
       }
@@ -426,14 +426,14 @@ bool vtkSMTransferFunctionManager::UpdateScalarBarsComponentTitle(
   {
     ret |= result;
   }
-  if (representation->GetProperty("BlockLookupTableSelectors"))
+  if (representation->GetProperty("BlockColorArrayNames"))
   {
-    vtkSMPropertyHelper blockLookUpTableSelectors(representation, "BlockLookupTableSelectors");
-    for (unsigned int i = 0; i < blockLookUpTableSelectors.GetNumberOfElements(); ++i)
+    vtkSMPropertyHelper blockColorArrayNames(representation, "BlockColorArrayNames");
+    for (unsigned int i = 0; i < blockColorArrayNames.GetNumberOfElements(); i += 3)
     {
       if (auto result = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(lutProxy,
             vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(
-              representation, blockLookUpTableSelectors.GetAsString(i))))
+              representation, blockColorArrayNames.GetAsString(i))))
       {
         ret |= result;
       }

@@ -886,8 +886,8 @@ def ColorBy(rep=None, value=None, separate=False):
 
 
 # -----------------------------------------------------------------------------
-def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
-    """Set block scalar color. This will automatically setup the color maps and others
+def ColorBlocksBy(rep=None, selectors=None, value=None, separate=False):
+    """Set blocks scalar color. This will automatically setup the color maps and others
     necessary state for the representations. 'rep' must be the display
     properties proxy i.e. the value returned by GetDisplayProperties() function.
     If none is provided the display properties for the active source will be
@@ -896,19 +896,21 @@ def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
     rep = rep if rep else GetDisplayProperties()
     if not rep:
         raise ValueError("No display properties can be determined.")
-    if selector is None:
+    if selectors is None or len(selectors) == 0:
         raise ValueError("No selector can be determined.")
 
-    rep.SetBlockUseSeparateColorMap(selector, separate)
-    associationInt = rep.GetBlockColorArrayAssociation(selector)
+    rep.SetBlocksUseSeparateColorMap(selectors, separate)
+
+    firstSelector = selectors[0]
+    associationInt = rep.GetBlockColorArrayAssociation(firstSelector)
     association = servermanager.GetAssociationAsString(associationInt) if associationInt != -1 else None
-    arrayname = rep.GetBlockColorArrayName(selector)
+    arrayname = rep.GetBlockColorArrayName(firstSelector)
     component = None
     if value is None:
         if association is not None:
-            rep.SetBlockScalarColoring(selector, None, servermanager.GetAssociationFromString(association))
+            rep.SetBlocksScalarColoring(selectors, None, servermanager.GetAssociationFromString(association))
         else:
-            rep.SetBlockScalarColoring(selector, None, 0)
+            rep.SetBlocksScalarColoring(selectors, None, 0)
         return
     if not isinstance(value, tuple) and not isinstance(value, list):
         value = (value,)
@@ -940,11 +942,15 @@ def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
                         except ValueError:
                             pass
     if component is None:
-        rep.SetBlockScalarColoring(selector, arrayname, servermanager.GetAssociationFromString(association))
+        rep.SetBlocksScalarColoring(selectors, arrayname, servermanager.GetAssociationFromString(association))
     else:
-        rep.SetBlockScalarColoring(selector, arrayname, servermanager.GetAssociationFromString(association), component)
-    rep.RescaleBlockTransferFunctionToDataRange(selector)
+        rep.SetBlocksScalarColoring(selectors, arrayname, servermanager.GetAssociationFromString(association), component)
+    rep.RescaleBlocksTransferFunctionToDataRange(selectors)
 
+
+# -----------------------------------------------------------------------------
+def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
+    return ColorBlocksBy(rep, [selector], value, separate)
 
 # -----------------------------------------------------------------------------
 def _DisableFirstRenderCameraReset():

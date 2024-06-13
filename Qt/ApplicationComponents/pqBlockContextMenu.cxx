@@ -9,8 +9,8 @@
 #include "pqDoubleRangeDialog.h"
 #include "pqUndoStack.h"
 #include "vtkDataAssembly.h"
-#include "vtkDataAssemblyUtilities.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -21,8 +21,7 @@
 #include <QtDebug>
 
 #include <algorithm>
-#include <map>
-#include <set>
+#include <array>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -189,10 +188,19 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
   if (auto smProperty = reprProxy->GetProperty("BlockColors"))
   {
     menu->addAction(QIcon(":/pqWidgets/Icons/explicit_color.png"), tr("Set Block Color"), [=]() {
+      std::array<double, 3> rgb = vtkSMColorMapEditorHelper::GetColor(reprProxy);
+      if (!dataBlockContext.empty())
+      {
+        auto blockRGB = vtkSMColorMapEditorHelper::GetBlockColor(reprProxy, dataBlockContext[0]);
+        if (vtkSMColorMapEditorHelper::IsColorValid(blockRGB))
+        {
+          rgb = blockRGB;
+        }
+      }
       // it's potentially expensive to get the current color and hence I am just
       // using QColor here as the default color for the QColorDialog.
-      QColor color = QColorDialog::getColor(QColor(), pqCoreUtilities::mainWidget(),
-        "Set Block Color", QColorDialog::DontUseNativeDialog);
+      const QColor color = QColorDialog::getColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]),
+        pqCoreUtilities::mainWidget(), tr("Set Block Color"), QColorDialog::DontUseNativeDialog);
       if (color.isValid())
       {
         double colorF[3] = { color.redF(), color.greenF(), color.blueF() };

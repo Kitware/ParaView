@@ -14,12 +14,13 @@
 #include "vtkSMColorMapEditorHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <string>
 
-vtkCxxSetSmartPointerMacro(vtkSMPVRepresentationProxy, LastLUTProxy, vtkSMProxy);
+vtkCxxSetSmartPointerMacro(vtkSMPVRepresentationProxy, LastLookupTable, vtkSMProxy);
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
 //----------------------------------------------------------------------------
@@ -27,30 +28,46 @@ vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
   this->SetSIClassName("vtkSIPVRepresentationProxy");
   this->InReadXMLAttributes = false;
-  this->LastLUTProxy = nullptr;
+  this->LastLookupTable = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::~vtkSMPVRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPVRepresentationProxy::GetLastLUTProxy()
+vtkSMProxy* vtkSMPVRepresentationProxy::GetLastLookupTable()
 {
-  return this->LastLUTProxy;
+  return this->LastLookupTable;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPVRepresentationProxy::SetLastBlockLUTProxy(
-  vtkSMProxy* proxy, const std::string& blockSelector)
+void vtkSMPVRepresentationProxy::SetLastBlocksLookupTable(
+  const std::vector<std::string>& blockSelectors, vtkSMProxy* proxy)
 {
-  this->LastBlockLUTProxies[blockSelector] = proxy;
+  for (const auto& selector : blockSelectors)
+  {
+    this->LastBlocksLookupTables[selector] = proxy;
+  }
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPVRepresentationProxy::GetLastBlockLUTProxy(const std::string& blockSelector)
+std::vector<vtkSMProxy*> vtkSMPVRepresentationProxy::GetLastBlocksLookupTables(
+  const std::vector<std::string>& blockSelectors)
 {
-  const auto& iter = this->LastBlockLUTProxies.find(blockSelector);
-  return iter != this->LastBlockLUTProxies.end() ? iter->second : nullptr;
+  std::vector<vtkSMProxy*> proxies;
+  for (const auto& selector : blockSelectors)
+  {
+    auto found = this->LastBlocksLookupTables.find(selector);
+    if (found == this->LastBlocksLookupTables.end())
+    {
+      proxies.push_back(nullptr);
+    }
+    else
+    {
+      proxies.push_back(found->second);
+    }
+  }
+  return proxies;
 }
 
 //----------------------------------------------------------------------------
@@ -175,9 +192,10 @@ bool vtkSMPVRepresentationProxy::GetUsingScalarColoring()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::GetBlockUsingScalarColoring(const std::string& blockSelector)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::GetBlocksUsingScalarColoring(
+  const std::vector<std::string>& blockSelector)
 {
-  return vtkSMColorMapEditorHelper::GetBlockUsingScalarColoring(this, blockSelector);
+  return vtkSMColorMapEditorHelper::GetBlocksUsingScalarColoring(this, blockSelector);
 }
 
 //----------------------------------------------------------------------------
@@ -199,11 +217,11 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(bool extend,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleBlockTransferFunctionToDataRange(
-  const std::string& blockSelector, bool extend, bool force)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::RescaleBlocksTransferFunctionToDataRange(
+  const std::vector<std::string>& blockSelectors, bool extend, bool force)
 {
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(
-    this, blockSelector, extend, force);
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+    this, blockSelectors, extend, force);
 }
 
 //----------------------------------------------------------------------------
@@ -215,12 +233,12 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleBlockTransferFunctionToDataRange(
-  const std::string& blockSelector, const char* arrayName, int attributeType, bool extend,
-  bool force)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::RescaleBlocksTransferFunctionToDataRange(
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType,
+  bool extend, bool force)
 {
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRange(
-    this, blockSelector, arrayName, attributeType, extend, force);
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRange(
+    this, blockSelectors, arrayName, attributeType, extend, force);
 }
 
 //----------------------------------------------------------------------------
@@ -230,11 +248,12 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleBlockTransferFunctionToDataRangeOverTime(
-  const std::string& blockSelector)
+std::vector<vtkTypeBool>
+vtkSMPVRepresentationProxy::RescaleBlocksTransferFunctionToDataRangeOverTime(
+  const std::vector<std::string>& blockSelectors)
 {
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRangeOverTime(
-    this, blockSelector);
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
+    this, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
@@ -246,11 +265,12 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleBlockTransferFunctionToDataRangeOverTime(
-  const std::string& blockSelector, const char* arrayName, int attributeType)
+std::vector<vtkTypeBool>
+vtkSMPVRepresentationProxy::RescaleBlocksTransferFunctionToDataRangeOverTime(
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType)
 {
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToDataRangeOverTime(
-    this, blockSelector, arrayName, attributeType);
+  return vtkSMColorMapEditorHelper::RescaleBlocksTransferFunctionToDataRangeOverTime(
+    this, blockSelectors, arrayName, attributeType);
 }
 
 //----------------------------------------------------------------------------
@@ -267,27 +287,11 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(vtkSMProx
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleBlockTransferFunctionToVisibleRange(
-  vtkSMProxy* view, const std::string& blockSelector)
-{
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToVisibleRange(
-    this, view, blockSelector);
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
   vtkSMProxy* view, const char* arrayName, int attributeType)
 {
   return vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(
     this, view, arrayName, attributeType);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleBlockTransferFunctionToVisibleRange(
-  vtkSMProxy* view, const std::string& blockSelector, const char* arrayName, int attributeType)
-{
-  return vtkSMColorMapEditorHelper::RescaleBlockTransferFunctionToVisibleRange(
-    this, view, blockSelector, arrayName, attributeType);
 }
 
 //----------------------------------------------------------------------------
@@ -297,11 +301,11 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayName, int at
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::SetBlockScalarColoring(
-  const std::string& blockSelector, const char* arrayName, int attributeType)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::SetBlocksScalarColoring(
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType)
 {
-  return vtkSMColorMapEditorHelper::SetBlockScalarColoring(
-    this, blockSelector, arrayName, attributeType);
+  return vtkSMColorMapEditorHelper::SetBlocksScalarColoring(
+    this, blockSelectors, arrayName, attributeType);
 }
 
 //----------------------------------------------------------------------------
@@ -312,11 +316,12 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::SetBlockScalarColoring(
-  const std::string& blockSelector, const char* arrayName, int attributeType, int component)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::SetBlocksScalarColoring(
+  const std::vector<std::string>& blockSelectors, const char* arrayName, int attributeType,
+  int component)
 {
-  return vtkSMColorMapEditorHelper::SetBlockScalarColoring(
-    this, blockSelector, arrayName, attributeType, component);
+  return vtkSMColorMapEditorHelper::SetBlocksScalarColoring(
+    this, blockSelectors, arrayName, attributeType, component);
 }
 
 //----------------------------------------------------------------------------
@@ -340,10 +345,10 @@ int vtkSMPVRepresentationProxy::IsScalarBarStickyVisible(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMPVRepresentationProxy::IsBlockScalarBarStickyVisible(
-  vtkSMProxy* view, const std::string& blockSelector)
+std::vector<int> vtkSMPVRepresentationProxy::IsBlocksScalarBarStickyVisible(
+  vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
-  return vtkSMColorMapEditorHelper::IsBlockScalarBarStickyVisible(this, view, blockSelector);
+  return vtkSMColorMapEditorHelper::IsBlocksScalarBarStickyVisible(this, view, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
@@ -353,24 +358,23 @@ bool vtkSMPVRepresentationProxy::UpdateScalarBarRange(vtkSMProxy* view, bool del
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::UpdateBlockScalarBarRange(
-  vtkSMProxy* view, const std::string& blockSelector, bool deleteRange)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::UpdateBlocksScalarBarRange(
+  vtkSMProxy* view, bool deleteRange)
 {
-  return vtkSMColorMapEditorHelper::UpdateBlockScalarBarRange(
-    this, view, blockSelector, deleteRange);
+  return vtkSMColorMapEditorHelper::UpdateBlocksScalarBarRange(this, view, deleteRange);
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPVRepresentationProxy::GetLUTProxy(vtkSMProxy* view)
+vtkSMProxy* vtkSMPVRepresentationProxy::GetLookupTable(vtkSMProxy* view)
 {
-  return vtkSMColorMapEditorHelper::GetLUTProxy(this, view);
+  return vtkSMColorMapEditorHelper::GetLookupTable(this, view);
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPVRepresentationProxy::GetBlockLUTProxy(
-  vtkSMProxy* view, const std::string& blockSelector)
+std::vector<vtkSMProxy*> vtkSMPVRepresentationProxy::GetBlocksLookupTables(
+  vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
-  return vtkSMColorMapEditorHelper::GetBlockLUTProxy(this, view, blockSelector);
+  return vtkSMColorMapEditorHelper::GetBlocksLookupTables(this, view, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
@@ -380,10 +384,11 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::SetBlockScalarBarVisibility(
-  vtkSMProxy* view, const std::string& blockSelector, bool visible)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::SetBlocksScalarBarVisibility(
+  vtkSMProxy* view, const std::vector<std::string>& blockSelectors, bool visible)
 {
-  return vtkSMColorMapEditorHelper::SetBlockScalarBarVisibility(this, view, blockSelector, visible);
+  return vtkSMColorMapEditorHelper::SetBlocksScalarBarVisibility(
+    this, view, blockSelectors, visible);
 }
 
 //----------------------------------------------------------------------------
@@ -393,16 +398,22 @@ bool vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::HideBlocksScalarBarIfNotNeeded(vtkSMProxy* view)
+{
+  return vtkSMColorMapEditorHelper::HideBlocksScalarBarIfNotNeeded(this, view);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::IsScalarBarVisible(vtkSMProxy* view)
 {
   return vtkSMColorMapEditorHelper::IsScalarBarVisible(this, view);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::IsBlockScalarBarVisible(
-  vtkSMProxy* view, const std::string& blockSelector)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::IsBlocksScalarBarVisible(
+  vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
-  return vtkSMColorMapEditorHelper::IsBlockScalarBarVisible(this, view, blockSelector);
+  return vtkSMColorMapEditorHelper::IsBlocksScalarBarVisible(this, view, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
@@ -413,11 +424,11 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
 }
 
 //----------------------------------------------------------------------------
-vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetBlockArrayInformationForColorArray(
-  const std::string& blockSelector, bool checkRepresentedData)
+std::vector<vtkPVArrayInformation*>
+vtkSMPVRepresentationProxy::GetBlocksArrayInformationForColorArray(
+  const std::vector<std::string>& blockSelectors)
 {
-  return vtkSMColorMapEditorHelper::GetBlockArrayInformationForColorArray(
-    this, blockSelector, checkRepresentedData);
+  return vtkSMColorMapEditorHelper::GetBlocksArrayInformationForColorArray(this, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
@@ -430,12 +441,13 @@ vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
 }
 
 //----------------------------------------------------------------------------
-vtkPVProminentValuesInformation*
-vtkSMPVRepresentationProxy::GetBlockProminentValuesInformationForColorArray(
-  const std::string& blockSelector, double uncertaintyAllowed, double fraction, bool force)
+std::vector<vtkPVProminentValuesInformation*>
+vtkSMPVRepresentationProxy::GetBlocksProminentValuesInformationForColorArray(
+  const std::vector<std::string>& blockSelectors, double uncertaintyAllowed, double fraction,
+  bool force)
 {
-  return vtkSMColorMapEditorHelper::GetBlockProminentValuesInformationForColorArray(
-    this, blockSelector, uncertaintyAllowed, fraction, force);
+  return vtkSMColorMapEditorHelper::GetBlocksProminentValuesInformationForColorArray(
+    this, blockSelectors, uncertaintyAllowed, fraction, force);
 }
 
 //----------------------------------------------------------------------------
@@ -515,11 +527,11 @@ int vtkSMPVRepresentationProxy::GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSM
 }
 
 //----------------------------------------------------------------------------
-int vtkSMPVRepresentationProxy::GetBlockEstimatedNumberOfAnnotationsOnScalarBar(
-  vtkSMProxy* view, const std::string& blockSelector)
+std::vector<int> vtkSMPVRepresentationProxy::GetBlocksEstimatedNumberOfAnnotationsOnScalarBars(
+  vtkSMProxy* view, const std::vector<std::string>& blockSelectors)
 {
-  return vtkSMColorMapEditorHelper::GetBlockEstimatedNumberOfAnnotationsOnScalarBar(
-    this, view, blockSelector);
+  return vtkSMColorMapEditorHelper::GetBlocksEstimatedNumberOfAnnotationsOnScalarBars(
+    this, view, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
@@ -546,7 +558,8 @@ void vtkSMPVRepresentationProxy::ViewUpdated(vtkSMProxy* view)
 {
   if (this->GetProperty("Visibility"))
   {
-    if (vtkSMPropertyHelper(this, "Visibility").GetAsInt() && this->GetUsingScalarColoring())
+    const bool visible = vtkSMPropertyHelper(this, "Visibility").GetAsInt() != 0;
+    if (visible && this->GetUsingScalarColoring())
     {
       this->UpdateScalarBarRange(view, false /* deleteRange */);
     }
@@ -554,33 +567,35 @@ void vtkSMPVRepresentationProxy::ViewUpdated(vtkSMProxy* view)
     {
       this->UpdateScalarBarRange(view, true /* deleteRange */);
     }
+    if (visible && this->GetAnyBlockUsingScalarColoring())
+    {
+      this->UpdateBlocksScalarBarRange(view, false /* deleteRange */);
+    }
+    else
+    {
+      this->UpdateBlocksScalarBarRange(view, true /* deleteRange */);
+    }
   }
   this->Superclass::ViewUpdated(view);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPVRepresentationProxy::SetBlockColorArray(
-  const std::string& blockSelector, int attributeType, std::string arrayName)
+std::vector<std::pair<int, std::string>> vtkSMPVRepresentationProxy::GetBlocksColorArrays(
+  const std::vector<std::string>& blockSelectors)
 {
-  vtkSMColorMapEditorHelper::SetBlockColorArray(this, blockSelector, attributeType, arrayName);
+  return vtkSMColorMapEditorHelper::GetBlocksColorArrays(this, blockSelectors);
 }
 
 //----------------------------------------------------------------------------
-std::pair<int, std::string> vtkSMPVRepresentationProxy::GetBlockColorArray(
-  const std::string& blockSelector)
+void vtkSMPVRepresentationProxy::SetBlocksUseSeparateColorMap(
+  const std::vector<std::string>& blockSelectors, bool use)
 {
-  return vtkSMColorMapEditorHelper::GetBlockColorArray(this, blockSelector);
+  vtkSMColorMapEditorHelper::SetBlocksUseSeparateColorMap(this, blockSelectors, use);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPVRepresentationProxy::SetBlockUseSeparateColorMap(
-  const std::string& blockSelector, bool use)
+std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::GetBlocksUseSeparateColorMaps(
+  const std::vector<std::string>& blockSelectors)
 {
-  vtkSMColorMapEditorHelper::SetBlockUseSeparateColorMap(this, blockSelector, use);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::GetBlockUseSeparateColorMap(const std::string& blockSelector)
-{
-  return vtkSMColorMapEditorHelper::GetBlockUseSeparateColorMap(this, blockSelector);
+  return vtkSMColorMapEditorHelper::GetBlocksUseSeparateColorMaps(this, blockSelectors);
 }
