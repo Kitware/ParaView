@@ -3,6 +3,7 @@ if (BUILD_SHARED_LIBS)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/Baseline/BagPlots_A.png}"
     "DATA{Data/Baseline/BagPlots_B.png}"
+    "DATA{Data/Baseline/BagPlots_B_1.png}"
     "DATA{Data/Baseline/BagPlotMatrixView_A.png}")
 
   set(BagPlots_METHOD LOOSE_VALID)

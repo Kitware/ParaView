@@ -101,9 +101,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22598
     "^pv\\.HelpWindowHistory$"
 
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/22599
-    "\\.NetCDFTimeAnnotationFilter$"
-
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22600
     "\\.DigitalRockPhysicsAnalysisFilter$"
     "\\.DigitalRockPhysicsExplodeFilter$"
