@@ -184,7 +184,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     "^pvcrs\\.FindDataDialog$"
     "^pvcs\\.ColorOpacityTableEditorHistogram$"
     "^pvcs\\.SplitViewTrace$"
-    "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
 
     # The generated paths are too long and don't work in MSVC.
     # See https://gitlab.kitware.com/paraview/paraview/-/issues/20589
