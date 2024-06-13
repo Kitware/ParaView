@@ -947,11 +947,6 @@ def ColorBlocksBy(rep=None, selectors=None, value=None, separate=False):
         rep.SetBlocksScalarColoring(selectors, arrayname, servermanager.GetAssociationFromString(association), component)
     rep.RescaleBlocksTransferFunctionToDataRange(selectors)
 
-
-# -----------------------------------------------------------------------------
-def ColorBlockBy(rep=None, selector=None, value=None, separate=False):
-    return ColorBlocksBy(rep, [selector], value, separate)
-
 # -----------------------------------------------------------------------------
 def _DisableFirstRenderCameraReset():
     """Disable the first render camera reset.  Normally a ResetCamera is called
