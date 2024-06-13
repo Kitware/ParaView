@@ -64,69 +64,99 @@ public:
   // Options added using `PopulateConnectionOptions`.
   //---------------------------------------------------------------------------
 
+  ///@{
   /**
-   * Get the hostname to use. By default, this is initialized to the hostname
+   * Set/Get the hostname to use. By default, this is initialized to the hostname
    * determined automatically using system calls (specifically,
    * vtksys::SystemInformation).
+   * Default is "localhost".
    */
-  const std::string& GetHostName() const { return this->HostName; }
+  vtkSetMacro(HostName, std::string);
+  vtkGetMacro(HostName, std::string);
+  ///@}
 
+  ///@{
   /**
-   * Get the hostname for the "client" process. This is used by server processes
+   * Set/Get the hostname for the "client" process. This is used by server processes
    * when in reverse-connection mode to determine where the client can be
-   * reached. Default is "localhost".
+   * reached.
+   * Default is "localhost".
    */
-  const std::string& GetClientHostName() const { return this->ClientHostName; }
+  vtkSetMacro(ClientHostName, std::string);
+  vtkGetMacro(ClientHostName, std::string);
+  ///@}
 
+  ///@{
   /**
-   * Get the server-port number to use. This is the port number that a
+   * Set/Get the server-port number to use. This is the port number that a
    * server-process is expected to use as the 'listening' port. For
    * reverse-connection, this is the port number that the client process is
    * listening on.
+   * Default is 0 but this value will be computed depending on the process type when populating
+   * options.
    */
+  vtkSetMacro(ServerPort, int);
   vtkGetMacro(ServerPort, int);
+  ///@}
 
+  ///@{
   /**
-   * Get the (string) address the server socket is bound to.
+   * Set/Get the address the server socket is bound to.
+   * Default is "0.0.0.0"
    */
-  const std::string& GetBindAddress() const { return this->BindAddress; }
+  vtkSetMacro(BindAddress, std::string);
+  vtkGetMacro(BindAddress, std::string);
+  ///@}
 
+  ///@{
   /**
-   * Get if the process is acting in reverse connection mode. This flag is only
+   * Set/Get if the process is acting in reverse connection mode. This flag is only
    * read on the server processes since client is capable of supported reverse
    * and non-reverse connections in the same process.
+   * Default is false.
    */
+  vtkSetMacro(ReverseConnection, bool);
   vtkGetMacro(ReverseConnection, bool);
+  ///@}
 
+  ///@{
   /**
-   * Returns the connection identifier used to validate client-server
+   * Set/Get the connection identifier used to validate client-server
    * connections.
-   */
-  vtkGetMacro(ConnectID, int);
-
-  /**
-   * @note This API may change in future. This is left as is for now to keep
-   * changes in this MR to a minimal.
+   * Default is 0.
    */
   vtkSetMacro(ConnectID, int);
+  vtkGetMacro(ConnectID, int);
+  ///@}
 
+  ///@{
   /**
-   * On server processes, this denotes the time (in minutes)
-   * since the time that the connection was established with the server that the
-   * server may timeout. timeout <= 0 means no timeout.
+   * Set/Get the expected infrastructure imposed timeout of the server.
+   * Timeout <= 0 means no timeout.
+   * Default is 0.
    */
+  vtkSetMacro(Timeout, int);
   vtkGetMacro(Timeout, int);
+  ///@}
 
+  ///@{
   /**
-   * Get the timeout command, called regularly on server side and giving
+   * Set/Get the timeout command, called regularly on server side and giving
    * remaining time available for server access.
+   * Default is empty string.
    */
-  const std::string& GetTimeoutCommand() const { return this->TimeoutCommand; }
+  vtkSetMacro(TimeoutCommand, std::string);
+  vtkGetMacro(TimeoutCommand, std::string);
+  ///@}
 
+  ///@{
   /**
-   * On server processes, the interval in seconds between consecutive calls of `TimeoutCommand`.
+   * Set/Get the interval in seconds between consecutive calls of `TimeoutCommand`, on the server.
+   * Default is 60.
    */
+  vtkSetMacro(TimeoutCommandInterval, int);
   vtkGetMacro(TimeoutCommandInterval, int);
+  ///@}
 
   /**
    * On client processes, this returns the server connection url to use to
@@ -134,13 +164,13 @@ public:
    *
    * @sa GetServerResourceName
    */
-  const std::string& GetServerURL() const { return this->ServerURL; }
+  vtkGetMacro(ServerURL, std::string);
 
   /**
    * On client processes, this returns the server connection resource name to
    * use to connect to the server process(es) on startup, if any.
    */
-  const std::string& GetServerResourceName() const { return this->ServerResourceName; }
+  vtkGetMacro(ServerResourceName, std::string);
 
   /**
    * On client processes, this provides list of server configurations files to
@@ -150,6 +180,7 @@ public:
   {
     return this->ServerConfigurationsFiles;
   }
+
   ///@}
 
   //---------------------------------------------------------------------------
@@ -308,7 +339,7 @@ private:
   std::string HostName = "localhost";
   std::string ClientHostName = "localhost";
   std::string BindAddress = "0.0.0.0";
-  int ServerPort = 11111;
+  int ServerPort = 0;
   bool ReverseConnection = false;
   int ConnectID = 0;
   std::string ServerURL;
