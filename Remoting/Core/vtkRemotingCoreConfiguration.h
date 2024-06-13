@@ -87,6 +87,11 @@ public:
   vtkGetMacro(ServerPort, int);
 
   /**
+   * Get the (string) address the server socket is bound to.
+   */
+  const std::string& GetBindAddress() const { return this->BindAddress; }
+
+  /**
    * Get if the process is acting in reverse connection mode. This flag is only
    * read on the server processes since client is capable of supported reverse
    * and non-reverse connections in the same process.
@@ -302,6 +307,7 @@ private:
   bool DisableRegistry = false;
   std::string HostName = "localhost";
   std::string ClientHostName = "localhost";
+  std::string BindAddress = "0.0.0.0";
   int ServerPort = 11111;
   bool ReverseConnection = false;
   int ConnectID = 0;

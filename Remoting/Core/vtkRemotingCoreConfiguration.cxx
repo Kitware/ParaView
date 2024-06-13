@@ -347,6 +347,12 @@ bool vtkRemotingCoreConfiguration::PopulateConnectionOptions(
       ->default_val(port);
 
     groupConnection
+      ->add_option("--bind-address", this->BindAddress,
+        "Address to bind the server socket. Used to restrict the network interfaces the client "
+        "can connect to.")
+      ->default_val("0.0.0.0");
+
+    groupConnection
       ->add_option("--timeout", this->Timeout,
         "Time interval (in minutes) since a connection is established that the server-connection "
         "may timeout. "
@@ -543,6 +549,7 @@ void vtkRemotingCoreConfiguration::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HostName: " << this->HostName.c_str() << endl;
   os << indent << "ClientHostName: " << this->ClientHostName.c_str() << endl;
   os << indent << "ServerPort: " << this->ServerPort << endl;
+  os << indent << "BindAddress: " << this->BindAddress << endl;
   os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
   os << indent << "ConnectID: " << this->ConnectID << endl;
   os << indent << "ServerURL: " << this->ServerURL.c_str() << endl;
