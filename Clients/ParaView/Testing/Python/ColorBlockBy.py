@@ -47,16 +47,16 @@ vtkBlockColorsPWF = GetOpacityTransferFunction('vtkBlockColors')
 vtkBlockColorsTF2D = GetTransferFunction2D('vtkBlockColors')
 
 # set block scalar coloring
-ColorBlockBy(canex2Display, '/IOSS/element_blocks/block_2', ('POINTS', 'ACCL', 'X'))
+ColorBlocksBy(canex2Display, ['/IOSS/element_blocks/block_2'], ('POINTS', 'ACCL', 'X'))
 
 # rescale block color and/or opacity maps used to exactly fit the current data range
-canex2Display.RescaleBlockTransferFunctionToDataRange('/IOSS/element_blocks/block_2', False, True)
+canex2Display.RescaleBlocksTransferFunctionToDataRange(['/IOSS/element_blocks/block_2'], False, True)
 
 # get color transfer function/color map for 'ACCl'
 blockACCLLUT = GetBlockColorTransferFunction('/IOSS/element_blocks/block_2', 'ACCL')
 
 # show block color bar/color legend
-canex2Display.SetBlockScalarBarVisibility(renderView1, '/IOSS/element_blocks/block_2', True)
+canex2Display.SetBlocksScalarBarVisibility(renderView1, ['/IOSS/element_blocks/block_2'], True)
 
 # reset active camera to negative y
 renderView1.ResetActiveCameraToNegativeY()
