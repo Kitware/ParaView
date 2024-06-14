@@ -454,8 +454,8 @@ bool vtkInitializationHelper::InitializeSettings(int type, bool defaultCoreConfi
       (prefix + "reverse-connection").c_str(), coreConfig->GetReverseConnection()));
     coreConfig->SetServerPort(
       settings->GetSettingAsInt((prefix + portSetting).c_str(), coreConfig->GetServerPort()));
-    coreConfig->SetBindAddress(
-      settings->GetSettingAsString((prefix + "bind-adress").c_str(), coreConfig->GetBindAddress()));
+    coreConfig->SetBindAddress(settings->GetSettingAsString(
+      (prefix + "bind-address").c_str(), coreConfig->GetBindAddress()));
     coreConfig->SetTimeout(
       settings->GetSettingAsInt((prefix + "timeout").c_str(), coreConfig->GetTimeout()));
     coreConfig->SetTimeoutCommand(settings->GetSettingAsString(
