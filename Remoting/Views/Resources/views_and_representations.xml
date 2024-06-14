@@ -12890,21 +12890,21 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                             name="Position"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the polar axes origin position.</Documentation>
+        <Documentation>Translate the origin of the axes.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetScale"
                             default_values="1 1 1"
                             name="Scale"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the polar axes bounds transform scale.</Documentation>
+        <Documentation>Scale the origin of the axes.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientation"
                             default_values="0 0 0"
                             name="Orientation"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the polar axes bounds transform orientation.</Documentation>
+        <Documentation>Rotate the origin of the axes around the scene origin.</Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Transform">
         <Property name="Position"/>
