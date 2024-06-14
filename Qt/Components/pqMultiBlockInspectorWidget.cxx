@@ -83,13 +83,22 @@ public:
 
   static void resizeLabelPixmap(QLabel* iconLabel, int iconSize)
   {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    const QPixmap* pixmap = iconLabel->pixmap();
+    iconLabel->setPixmap(
+      pixmap->scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+#else
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0) && QT_VERSION < QT_VERSION_CHECK(5, 16, 0)
     const QPixmap pixmap = iconLabel->pixmap(Qt::ReturnByValue);
 #else
     const QPixmap pixmap = iconLabel->pixmap();
 #endif
+
     iconLabel->setPixmap(
       pixmap.scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+#endif
   }
 
   pqInternals(pqMultiBlockInspectorWidget* self)
