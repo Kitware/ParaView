@@ -57,6 +57,12 @@ QString pqProxyAction::GetProxyDocumentation(QAction* action)
 {
   auto prototype = pqProxyAction::GetProxyPrototype(action);
   QString help = prototype->GetDocumentation()->GetShortHelp();
+
+  if (prototype->IsDeprecated())
+  {
+    help.prepend(tr("(deprecated) "));
+  }
+
   help = help.simplified();
   return QCoreApplication::translate("ServerManagerXML", help.toUtf8());
 }

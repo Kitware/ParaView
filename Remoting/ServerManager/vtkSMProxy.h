@@ -445,6 +445,11 @@ public:
   ///@}
 
   /**
+   * Returns true if the proxy has a deprecation tag.
+   */
+  bool IsDeprecated() { return this->Deprecated != nullptr; }
+
+  /**
    * Given a source proxy, makes this proxy point to the same server-side
    * object (with a new id). This method copies connection id as well as
    * server ids. This method can be called only once on an uninitialized

@@ -10,6 +10,11 @@
   <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/CreateProxy" property="text" arguments="Sphere" />
   <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/ShortHelp" property="text" arguments="Create a 3D sphere" />
 
+  <!--test exact match: appears before fuzzy match-->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="Point Data To" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" property="modelItemData" arguments="0.0,Point Data to Cell Data" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" property="modelItemData" arguments="1.0,Cell Data to Point Data" />
+
   <!-- test "fuzzy match" -->
   <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="set group" />
   <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelRowCount" arguments="0" />

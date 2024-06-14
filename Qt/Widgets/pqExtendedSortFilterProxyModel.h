@@ -11,9 +11,13 @@
  * \details: Allow to do extended search in a model, using different ItemRole.
  *
  * Different kind of matches can be used to filter elements:
- *  - default role match: split the (string) request around space character and try to match
- *  each of them in any order.
- *  - User match: match on UserRole instead of default one, with lowest priority in sort.
+ *  - exact match: the item DefaultRole string starts with the "Request" string.
+ *  - standard match: split the "Request" string around space character and try to match
+ *  each of them in any order with the item DefaultRole string.
+ *  - User match: match on UserRole instead of default one
+ *
+ * Items are sorted per match kind: exact match first, then standard match and finally user match.
+ * Within a match kind, alphabetical sort is used.
  *
  * Items matching an Exlusion criteria are always hidden, regardless of the requests.
  */
@@ -110,6 +114,14 @@ private:
   bool hasMatch(const QModelIndex& index) const;
 
   /**
+   * Returns true if an exact match is found.
+   * An item gives an exact match if it starts with the whole `Request` string.
+   * An item with an exact match is order before classical match.
+   * See setRequest
+   */
+  bool hasExactMatch(const QModelIndex& index) const;
+
+  /**
    * Returns true if the index matches one of the user defined rules.
    */
   bool hasUserMatch(const QModelIndex& index) const;
@@ -119,6 +131,7 @@ private:
    */
   bool isExcluded(const QModelIndex& index) const;
 
+  QString Request;
   QList<QRegularExpression> DefaultRequests;
 
   QMap<int, QVariant> UserRequests;
