@@ -25,6 +25,8 @@ extern "C"
 
 static int RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 {
+  vtkInitializationHelper::SetApplicationName("ParaViewServer");
+
   auto cliApp = vtk::TakeSmartPointer(vtkCLIOptions::New());
   cliApp->SetAllowExtras(false);
   cliApp->SetStopOnUnrecognizedArgument(true);

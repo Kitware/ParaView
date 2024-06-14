@@ -13,6 +13,7 @@
 #define vtkInitializationHelper_h
 
 #include "vtkObject.h"
+#include "vtkParaViewDeprecation.h"       // for deprecation macros
 #include "vtkRemotingApplicationModule.h" // needed for exports
 #include <string>                         // needed for std::string
 
@@ -21,6 +22,7 @@
 #endif
 
 class vtkCLIOptions;
+class vtkRemotingCoreConfiguration;
 class vtkStringList;
 
 class VTKREMOTINGAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
@@ -39,7 +41,12 @@ public:
    * an internal vtkCLIOptions instance. In that case, extra / unknown arguments
    * are simply ignored.
    *
-   * Internally calls InitializeOptions and InitializeMiscellaneous.
+   * Internally calls, in this order:
+   *  - InitializeProcessModule
+   *  - InitializeGlobalOptions
+   *  - InitializeSettings
+   *  - InitializeOtherOptions
+   *  - InitializeOthers
    */
   static bool Initialize(int argc, char** argv, int processType, vtkCLIOptions* options = nullptr,
     bool enableStandardArgs = true);
@@ -55,32 +62,105 @@ public:
   static bool Initialize(const char* executable, int type);
 
   /**
-   * Initialize only the options of ParaView engine.
+   * Initialize the vtkProcessModule used in ParaView
+   *
+   * This method should be called before any other initialization method
+   * Unless that method calls it.
+   *
+   * This method should be called only once
    *
    * Returns `true` on success, `false` otherwise.
-   * When `false`, use `GetExitCode` to obtain the exit code. Note, for requests
-   * like `--help`, `--version` etc, this method returns `false` with exit-code
-   * set to 0.
    *
-   * If vtkCLIOptions is nullptr, then this method internally creates and uses
+   * This method is used by Initialize but can be used when separating options initialization
+   * from the rest of the initialization.
+   */
+  static bool InitializeProcessModule(int argc, char** argv, int type);
+
+  /**
+   * Initialize only the global options (see vtkCLIOptions) of ParaView engine but
+   * do not check for options that cause early exit of the program.
+   *
+   * Returns `true` on success, `false` otherwise.
+   * When `false`, use `GetExitCode` to obtain the exit code.
+   *
+   * If options is nullptr, then this method internally creates and uses
    * an internal vtkCLIOptions instance. In that case, extra / unknown arguments
    * are simply ignored.
    *
    * This method is used by Initialize but can be used when separating options initialization
-   * from the rest of the initialization.
+   * from the rest of the initialization, in combination with InitializeOtherOptions.
+   */
+  static bool InitializeGlobalOptions(int argc, char** argv, int processType,
+    vtkCLIOptions* options = nullptr, bool enableStandardArgs = true);
+
+  /**
+   * Initialize all options of ParaView engine but the global options, then
+   * check for options that cause early exit of the program.
+   *
+   * Returns `true` on success, `false` otherwise.
+   * When `false`, use `GetExitCode` to obtain the exit code. Note, for
+   * options that cause early exit of the program like `--help`, `--version` etc,
+   * this method returns `false` with exit-code set to 0.
+   *
+   * If options is nullptr, then this method internally creates and uses
+   * an internal vtkCLIOptions instance. In that case, extra / unknown arguments
+   * are simply ignored.
+   *
+   * This method is used by Initialize but can be used when separating options initialization
+   * from the rest of the initialization, in combination with InitializeGlobalOptions.
+   */
+  static bool InitializeOtherOptions(int argc, char** argv, int processType,
+    vtkCLIOptions* options = nullptr, bool enableStandardArgs = true);
+
+  /**
+   * Initialize the process module and options of ParaView engine.
+   *
+   * Returns `true` on success, `false` otherwise.
+   * When `false`, use `GetExitCode` to obtain the exit code. Note, for
+   * options that cause early exit of the program like `--help`, `--version` etc,
+   * this method returns `false` with exit-code set to 0.
+   *
+   * If options is nullptr, then this method internally creates and uses
+   * an internal vtkCLIOptions instance. In that case, extra / unknown arguments
+   * are simply ignored.
+   *
+   * This method call InitializeProcessModule, then initialize all options.
    */
   static bool InitializeOptions(int argc, char** argv, int processType,
     vtkCLIOptions* options = nullptr, bool enableStandardArgs = true);
 
   /**
-   * Initialize everything that needs to be initialized in the paraview engine after the options.
-   * Returns `true` on success, `false` otherwise.
+   * Initialize the setting by reading the settings file,
+   * unless coreConfig DisableRegistry is set to true.
+   * Assume that InitializeProcessModule has been called.
    *
-   * Make sure to call InitializeOptions before calling this method.
+   * If defaultCoreConfig is set to true, this will use
+   * the setting to set default values on the vtkRemotingCoreConfiguration
+   *
+   * This method always returns `true`.
    *
    * This method is used by Initialize but can be used when separating options initialization
    * from the rest of the initialization.
    */
+  static bool InitializeSettings(int type, bool defaultCoreConfig);
+
+  /**
+   * Initialize everything that is not initialized by specific methods,
+   * see Initialize method for more info.
+   *
+   * Assume that InitializeProcessModule has been called.
+   * Returns `true` on success, `false` otherwise.
+   *
+   * This method is used by Initialize but can be used when separating options initialization
+   * from the rest of the initialization.
+   */
+  static bool InitializeOthers();
+
+  /**
+   * Initialize everything that needs to be initialized in the paraview engine after the options.
+   * Returns `true` on success, `false` otherwise.
+   */
+  PARAVIEW_DEPRECATED_IN_5_13_0("Use InitializeSettings and InitializeOthers instead")
   static bool InitializeMiscellaneous(int type);
 
   /**
@@ -163,6 +243,13 @@ protected:
 private:
   vtkInitializationHelper(const vtkInitializationHelper&) = delete;
   void operator=(const vtkInitializationHelper&) = delete;
+
+  /**
+   * Parse options and optionally check the code config for options that
+   * cause early exit of the program like `--help` or `--version`.
+   */
+  static bool ParseOptions(int argc, char** argv, vtkCLIOptions* options,
+    vtkRemotingCoreConfiguration* coreConfig, bool checkForExit);
 
   static bool LoadSettingsFilesDuringInitialization;
   static bool SaveUserSettingsFileDuringFinalization;

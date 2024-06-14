@@ -26,10 +26,12 @@
 #include "vtkStringList.h"
 
 #include "vtksys/SystemInformation.hxx"
+#include "vtksys/SystemTools.hxx"
+
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <vtksys/SystemTools.hxx>
 
 // Windows-only helper functionality:
 #ifdef _WIN32
@@ -158,16 +160,31 @@ bool vtkInitializationHelper::Initialize(vtkStringList* slist, int type)
 bool vtkInitializationHelper::Initialize(
   int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
 {
-  if (!vtkInitializationHelper::InitializeOptions(argc, argv, type, options, addStandardArgs))
+  vtkNew<vtkCLIOptions> tmpoptions;
+  options = options ? options : tmpoptions;
+
+  if (!vtkInitializationHelper::InitializeProcessModule(argc, argv, type))
   {
     return false;
   }
-  return vtkInitializationHelper::InitializeMiscellaneous(type);
+
+  if (!vtkInitializationHelper::InitializeGlobalOptions(argc, argv, type, options, addStandardArgs))
+  {
+    return false;
+  }
+
+  if (!vtkInitializationHelper::InitializeSettings(type, true))
+  {
+    return false;
+  }
+  if (!vtkInitializationHelper::InitializeOtherOptions(argc, argv, type, options, addStandardArgs))
+  {
+    return false;
+  }
+  return vtkInitializationHelper::InitializeOthers();
 }
 
-//----------------------------------------------------------------------------
-bool vtkInitializationHelper::InitializeOptions(
-  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
+bool vtkInitializationHelper::InitializeProcessModule(int argc, char** argv, int type)
 {
   if (vtkProcessModule::GetProcessModule())
   {
@@ -175,9 +192,6 @@ bool vtkInitializationHelper::InitializeOptions(
     vtkInitializationHelper::ExitCode = EXIT_FAILURE;
     return false;
   }
-
-  vtkNew<vtkCLIOptions> tmpoptions;
-  options = options ? options : tmpoptions;
 
   const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
 
@@ -187,15 +201,73 @@ bool vtkInitializationHelper::InitializeOptions(
 
   vtkProcessModule::Initialize(processType, argc, argv);
 
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeGlobalOptions(
+  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
+{
+  // Populate options (unless told otherwise).
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
+  if (addStandardArgs)
+  {
+    const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
+    coreConfig->PopulateGlobalOptions(options, processType);
+  }
+  bool previous = options->GetStopOnUnrecognizedArgument();
+  options->SetStopOnUnrecognizedArgument(false);
+  bool status = vtkInitializationHelper::ParseOptions(argc, argv, options, coreConfig, false);
+  options->SetStopOnUnrecognizedArgument(previous);
+  return status;
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeOtherOptions(
+  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
+{
   // Populate options (unless told otherwise).
   auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
   if (addStandardArgs)
   {
     auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
+    const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
+    pmConfig->PopulateOptions(options, processType);
+
+    coreConfig->PopulatePluginOptions(options, processType);
+    coreConfig->PopulateConnectionOptions(options, processType);
+    coreConfig->PopulateRenderingOptions(options, processType);
+    coreConfig->PopulateMiscellaneousOptions(options, processType);
+  }
+
+  return vtkInitializationHelper::ParseOptions(argc, argv, options, coreConfig, true);
+}
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeOptions(
+  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
+{
+  vtkInitializationHelper::InitializeProcessModule(argc, argv, type);
+
+  vtkNew<vtkCLIOptions> tmpoptions;
+  options = options ? options : tmpoptions;
+
+  // Populate options (unless told otherwise).
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
+  if (addStandardArgs)
+  {
+    auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
+    const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
     pmConfig->PopulateOptions(options, processType);
     coreConfig->PopulateOptions(options, processType);
   }
 
+  return vtkInitializationHelper::ParseOptions(argc, argv, options, coreConfig, true);
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::ParseOptions(int argc, char** argv, vtkCLIOptions* options,
+  vtkRemotingCoreConfiguration* coreConfig, bool checkForExit)
+{
   auto controller = vtkMultiProcessController::GetGlobalController();
   const auto rank0 = (controller == nullptr || controller->GetLocalProcessId() == 0);
 
@@ -213,56 +285,60 @@ bool vtkInitializationHelper::InitializeOptions(
     vtkInitializationHelper::ExitCode = EXIT_FAILURE;
     return false;
   }
-  else if (options->GetHelpRequested())
+
+  if (checkForExit)
   {
-    if (rank0)
+    if (options->GetHelpRequested())
     {
-      std::ostringstream str;
-      str << options->GetHelp() << endl;
+      if (rank0)
+      {
+        std::ostringstream str;
+        str << options->GetHelp() << endl;
 
 #ifndef _WIN32
-      vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
+        vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
 #else
-      // Pop up a console and reopen stdin, stderr, stdout to it to display help
-      AllocConsole();
-      FILE* fDummy;
-      freopen_s(&fDummy, "CONIN$", "r", stdin);
-      freopen_s(&fDummy, "CONOUT$", "w", stderr);
-      freopen_s(&fDummy, "CONOUT$", "w", stdout);
+        // Pop up a console and reopen stdin, stderr, stdout to it to display help
+        AllocConsole();
+        FILE* fDummy;
+        freopen_s(&fDummy, "CONIN$", "r", stdin);
+        freopen_s(&fDummy, "CONOUT$", "w", stderr);
+        freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
-      std::cout << str.str() << std::endl;
+        std::cout << str.str() << std::endl;
 
-      // Need user input to close the console, otherwise it will close immediately
-      std::cout << "Press any key to exit" << std::endl;
-      getch();
+        // Need user input to close the console, otherwise it will close immediately
+        std::cout << "Press any key to exit" << std::endl;
+        getch();
 #endif
+      }
+      vtkProcessModule::Finalize();
+      vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+      return false;
     }
-    vtkProcessModule::Finalize();
-    vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
-    return false;
-  }
-  else if (coreConfig->GetTellVersion())
-  {
-    if (rank0)
+    else if (coreConfig->GetTellVersion())
     {
-      std::ostringstream str;
-      str << "paraview version " << PARAVIEW_VERSION_FULL << "\n";
-      vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
+      if (rank0)
+      {
+        std::ostringstream str;
+        str << "paraview version " << PARAVIEW_VERSION_FULL << "\n";
+        vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
+      }
+      vtkProcessModule::Finalize();
+      vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+      return false;
     }
-    vtkProcessModule::Finalize();
-    vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
-    return false;
-  }
-  else if (coreConfig->GetPrintMonitors())
-  {
-    if (rank0)
+    else if (coreConfig->GetPrintMonitors())
     {
-      const std::string monitors = ListAttachedMonitors();
-      vtkOutputWindow::GetInstance()->DisplayText(monitors.c_str());
+      if (rank0)
+      {
+        const std::string monitors = ListAttachedMonitors();
+        vtkOutputWindow::GetInstance()->DisplayText(monitors.c_str());
+      }
+      vtkProcessModule::Finalize();
+      vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+      return false;
     }
-    vtkProcessModule::Finalize();
-    vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
-    return false;
   }
   return true;
 }
@@ -322,29 +398,18 @@ elif not os.path.exists(VENV_BASE):
 //----------------------------------------------------------------------------
 bool vtkInitializationHelper::InitializeMiscellaneous(int type)
 {
+  bool status = vtkInitializationHelper::InitializeSettings(type, false);
+  status &= vtkInitializationHelper::InitializeOthers();
+  return status;
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeSettings(int type, bool defaultCoreConfig)
+{
   auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
-  // this has to happen after process module is initialized and options have
-  // been set.
-  paraview_initialize();
-
-  // Set multi-server flag to vtkProcessModule
-  vtkProcessModule::GetProcessModule()->SetMultipleSessionsSupport(
-    coreConfig->GetMultiServerMode());
-
-  // Make sure the ProxyManager get created...
-  vtkSMProxyManager::GetProxyManager();
-
-  // Now load any plugins located in the PV_PLUGIN_PATH environment variable.
-  // These are always loaded (not merely located).
-  vtkNew<vtkPVPluginLoader> loader;
-  loader->LoadPluginsFromPluginSearchPath();
-  loader->LoadPluginsFromPluginConfigFile();
-
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
-  // Load settings files on client-processes.
-  if (!coreConfig->GetDisableRegistry() && type != vtkProcessModule::PROCESS_SERVER &&
-    type != vtkProcessModule::PROCESS_DATA_SERVER &&
-    type != vtkProcessModule::PROCESS_RENDER_SERVER)
+
+  if (!coreConfig->GetDisableRegistry())
   {
     vtkInitializationHelper::LoadSettings();
   }
@@ -355,6 +420,75 @@ bool vtkInitializationHelper::InitializeMiscellaneous(int type)
                                     "\"AtomicNumbers\": \"BlueObeliskElements\" "
                                     "} }",
     0.0);
+
+  if (defaultCoreConfig)
+  {
+    // Find the right setting to use for port
+    const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
+    std::string prefix = "cli-options.connection.";
+    std::string portSetting;
+    switch (processType)
+    {
+      case vtkProcessModule::PROCESS_DATA_SERVER:
+        portSetting = "data-server-port";
+        break;
+
+      case vtkProcessModule::PROCESS_RENDER_SERVER:
+        portSetting = "render-server-port";
+        break;
+
+      case vtkProcessModule::PROCESS_SERVER:
+      default:
+        portSetting = "server-port";
+        break;
+    }
+
+    // Check for cli options connection settings and init the core config accordingly
+    coreConfig->SetConnectID(
+      settings->GetSettingAsInt((prefix + "connect-id").c_str(), coreConfig->GetConnectID()));
+    coreConfig->SetHostName(
+      settings->GetSettingAsString((prefix + "hostname").c_str(), coreConfig->GetHostName()));
+    coreConfig->SetClientHostName(settings->GetSettingAsString(
+      (prefix + "client-host").c_str(), coreConfig->GetClientHostName()));
+    coreConfig->SetReverseConnection(settings->GetSettingAsInt(
+      (prefix + "reverse-connection").c_str(), coreConfig->GetReverseConnection()));
+    coreConfig->SetServerPort(
+      settings->GetSettingAsInt((prefix + portSetting).c_str(), coreConfig->GetServerPort()));
+    coreConfig->SetBindAddress(
+      settings->GetSettingAsString((prefix + "bind-adress").c_str(), coreConfig->GetBindAddress()));
+    coreConfig->SetTimeout(
+      settings->GetSettingAsInt((prefix + "timeout").c_str(), coreConfig->GetTimeout()));
+    coreConfig->SetTimeoutCommand(settings->GetSettingAsString(
+      (prefix + "timeout-command").c_str(), coreConfig->GetTimeoutCommand()));
+    coreConfig->SetTimeoutCommandInterval(settings->GetSettingAsInt(
+      (prefix + "timeout-command-interval").c_str(), coreConfig->GetTimeoutCommandInterval()));
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeOthers()
+{
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
+  // this has to happen after process module is initialized and options have
+  // been set.
+  paraview_initialize();
+
+  // Set multi-server flag to vtkProcessModule
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  assert(pm != nullptr);
+
+  pm->SetMultipleSessionsSupport(coreConfig->GetMultiServerMode());
+
+  // Make sure the ProxyManager get created...
+  vtkSMProxyManager::GetProxyManager();
+
+  // Now load any plugins located in the PV_PLUGIN_PATH environment variable.
+  // These are always loaded (not merely located).
+  vtkNew<vtkPVPluginLoader> loader;
+  loader->LoadPluginsFromPluginSearchPath();
+  loader->LoadPluginsFromPluginConfigFile();
 
   const char* undefined = "Undefined";
 
@@ -457,9 +591,11 @@ void vtkInitializationHelper::LoadSettings()
     return;
   }
 
-  vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  int myRank = vtkProcessModule::GetProcessModule()->GetPartitionId();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  assert(pm != nullptr);
+  int myRank = pm->GetPartitionId();
 
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
   if (myRank > 0) // don't read files on satellites.
   {
     settings->DistributeSettings();
@@ -478,7 +614,7 @@ void vtkInitializationHelper::LoadSettings()
   }
 
   // Load site-level settings
-  const auto& app_dir = vtkProcessModule::GetProcessModule()->GetSelfDir();
+  const auto& app_dir = pm->GetSelfDir();
 
   // If the application path ends with lib/paraview-X.X, shared
   // forwarding of the executable was used. Remove that part of the

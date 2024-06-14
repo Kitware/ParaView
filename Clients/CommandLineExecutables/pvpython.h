@@ -103,7 +103,8 @@ inline int Run(int processType, int argc, char* argv[])
     1, static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front(), programName);
 
   // Do the rest of the initialization
-  status = vtkInitializationHelper::InitializeMiscellaneous(processType);
+  status = vtkInitializationHelper::InitializeSettings(processType, /*defaultCoreConfig*/ true);
+  status &= vtkInitializationHelper::InitializeOthers();
   if (!status)
   {
     return vtkInitializationHelper::GetExitCode();

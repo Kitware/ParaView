@@ -298,46 +298,49 @@ bool vtkRemotingCoreConfiguration::PopulateConnectionOptions(
 #if PARAVIEW_ALWAYS_SECURE_CONNECTION
     ->required();
 #else
-    ->default_val(0);
+    ->default_val(this->ConnectID);
 #endif
 
-  groupConnection->add_option("--hostname", this->HostName,
-    "Override the hostname to be used to connect to this process. "
-    "By default, the hostname is determined using appropriate system calls.");
+  groupConnection
+    ->add_option("--hostname", this->HostName,
+      "Override the hostname to be used to connect to this process. "
+      "By default, the hostname is determined using appropriate system calls.")
+    ->default_val(this->HostName);
 
   if (ptype == vtkProcessModule::PROCESS_SERVER || ptype == vtkProcessModule::PROCESS_DATA_SERVER ||
     ptype == vtkProcessModule::PROCESS_RENDER_SERVER)
   {
-    groupConnection->add_option("--client-host", this->ClientHostName,
-      "Hostname to use to connect to the ParaView client when using reverse-connection mode. "
-      "Defaults to 'localhost'.");
+    groupConnection
+      ->add_option("--client-host", this->ClientHostName,
+        "Hostname to use to connect to the ParaView client when using reverse-connection mode. "
+        "Defaults to 'localhost'.")
+      ->default_val(this->ClientHostName);
 
     groupConnection
       ->add_flag("-r,--rc,--reverse-connection", this->ReverseConnection,
         "Use reverse connection mode, i.e. instead of client connecting to the server(s), "
         "the server(s) will connect back to the client.")
-      ->default_val(false);
+      ->default_val(this->ReverseConnection);
 
     std::string argnames;
     int port;
     switch (ptype)
     {
-      case vtkProcessModule::PROCESS_SERVER:
-        argnames = "-p,--sp,--server-port";
-        port = 11111;
-        break;
-
       case vtkProcessModule::PROCESS_DATA_SERVER:
         argnames = "-p,--dsp,--data-server-port";
-        port = 11111;
+        port = this->ServerPort > 0 ? this->ServerPort : 11111;
         break;
 
       case vtkProcessModule::PROCESS_RENDER_SERVER:
         argnames = "-p,--rsp,--render-server-port";
-        port = 22221;
+        port = this->ServerPort > 0 ? this->ServerPort : 22221;
         break;
+
+      case vtkProcessModule::PROCESS_SERVER:
       default:
-        abort();
+        argnames = "-p,--sp,--server-port";
+        port = this->ServerPort > 0 ? this->ServerPort : 11111;
+        break;
     }
 
     groupConnection
@@ -350,25 +353,28 @@ bool vtkRemotingCoreConfiguration::PopulateConnectionOptions(
       ->add_option("--bind-address", this->BindAddress,
         "Address to bind the server socket. Used to restrict the network interfaces the client "
         "can connect to.")
-      ->default_val("0.0.0.0");
+      ->default_val(this->BindAddress);
 
     groupConnection
       ->add_option("--timeout", this->Timeout,
         "Time interval (in minutes) since a connection is established that the server-connection "
         "may timeout. "
         "The client typically shows a warning message before the server times out.")
-      ->default_val(0);
+      ->default_val(this->Timeout);
 
-    groupConnection->add_option("--timeout-command", this->TimeoutCommand,
-      "Timeout command allowing server to regularly check remaining time available. When executed, "
-      "the command should write an integer value to stdout, corresponding to the remaining "
-      "connection time, in minutes.");
+    groupConnection
+      ->add_option("--timeout-command", this->TimeoutCommand,
+        "Timeout command allowing server to regularly check remaining time available. When "
+        "executed, "
+        "the command should write an integer value to stdout, corresponding to the remaining "
+        "connection time, in minutes.")
+      ->default_val(this->TimeoutCommand);
 
     groupConnection
       ->add_option("--timeout-command-interval", this->TimeoutCommandInterval,
         "Interval in seconds between consecutive calls to the timeout command. Only applies if "
         "--timeout-command is set.")
-      ->default_val(60);
+      ->default_val(this->TimeoutCommandInterval);
   }
   else if (ptype == vtkProcessModule::PROCESS_CLIENT)
   {
