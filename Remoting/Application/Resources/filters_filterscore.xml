@@ -319,6 +319,16 @@
           <!-- show this widget when ExtractionMode==6 -->
         </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetCompressArrays"
+                         default_values="0"
+                         name="CompressArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Controls the extraction of the closest point region.
+          The default is off to make sure selections with cell data work.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <WarnOnCreate>
           <DataTypeDomain name="input_type">

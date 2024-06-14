@@ -1736,6 +1736,7 @@ set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
 set(TestHTGSelection_DISABLE_CRS TRUE)
+set(SelectionByArray_DISABLE_CRS TRUE) # yes, this test does a selection
 set(SelectionBlocks_DISABLE_CRS TRUE)
 set(SelectionEditor_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
