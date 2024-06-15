@@ -136,10 +136,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
     "\\.PythonEditorRun$"
 
-    # Transfer function image corruption
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21428
-    "\\.TransferFunction2DYScalars$"
-
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22674 
     "^paraviewPython-Batch-TestStereoSaveScreenshot$"
 
