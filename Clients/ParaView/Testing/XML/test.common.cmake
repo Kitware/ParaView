@@ -602,6 +602,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotLines.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomAttributesHTGScalars.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomAttributesHTGVectors.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomHyperTreeGridSourceA_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomHyperTreeGridSourceA.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RandomHyperTreeGridSourceB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_BCOnly.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_BCOnlyBlockColors.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_CellData.png}"
@@ -1052,6 +1055,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   PreviewFontScaling.xml
   PropertyContextMenu.xml
   QuartilePlot.xml
+  RandomHyperTreeGridSource.xml
   ReadPartitionedCGNS.xml
   ReadCGNSBCDataset.xml
   ReadIOHDFFileSeries.xml
@@ -1461,7 +1465,6 @@ list(APPEND TESTS_WITH_BASELINES
   PropertyConversion4.xml
   PropertyLink.xml
   QuadraticGhostCells.xml
-  RandomHyperTreeGridSource.xml
   ReadPIOWithHTG.xml
   ReadXMLPolyDataFileSeries.xml
   RecentFiles.xml
@@ -1723,6 +1726,7 @@ set(ZoomToData_DISABLE_CRS TRUE)
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
 set (AnimateProperty_FORCE_SERIAL TRUE) # since this uses popup window
+set (AnimationCache_FORCE_SERIAL TRUE) # since this uses popup window
 set (AnimationFollowPath_FORCE_SERIAL TRUE) # since this uses popup window
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 set (CGNSReaderDataLocation_FORCE_SERIAL TRUE)  # since this uses popup-menu
