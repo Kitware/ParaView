@@ -1040,6 +1040,60 @@ def getattr(proxy, pname):
                 return proxy.GetProperty("Translation").GetData()
             else:
                 raise NotSupportedException("'Position' property has been removed in ParaView 5.13")
+
+
+    # 5.13 -> 5.14 breaking change in PolarAxes representation
+    # Properties Renaming
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "PolarAxesRepresentation":
+        # "NumberOfPolarAxes" -> "NumberOfArcs"
+        if pname == "NumberOfPolarAxes":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("NumberOfArcs").GetData()
+            else:
+                raise NotSupportedException("'NumberOfPolarAxes' was renamed in 'NumberOfArcs' since ParaView 5.14")
+
+        # "DeltaRangePolarAxes" -> "DeltaRangeArcs"
+        if pname == "DeltaRangePolarAxes":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("DeltaRangeArcs").GetData()
+            else:
+                raise NotSupportedException("'DeltaRangePolarAxes' was renamed in 'DeltaRangeArcs' since ParaView 5.14")
+
+        # "RadialTitleVisibility" -> "RadialLabelVisibility"
+        if pname == "RadialTitleVisibility":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("RadialLabelVisibility").GetData()
+            else:
+                raise NotSupportedException("'RadialTitleVisibility' was renamed in 'RadialLabelVisibility' since ParaView 5.14")
+
+        # "RadialTitleFormat" -> "RadialLabelFormat"
+        if pname == "RadialTitleFormat":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("RadialLabelFormat").GetData()
+            else:
+                raise NotSupportedException("'RadialTitleFormat' was renamed in 'RadialLabelFormat' since ParaView 5.14")
+
+        # "RadialTitleLocation" -> "RadialLabelLocation"
+        if pname == "RadialTitleLocation":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("RadialLabelLocation").GetData()
+            else:
+                raise NotSupportedException("'RadialTitleLocation' was renamed in 'RadialLabelLocation' since ParaView 5.14")
+
+        # "RadialTitleOffset" -> "RadialLabelOffset"
+        if pname == "RadialTitleOffset":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("RadialLabelOffset").GetData()
+            else:
+                raise NotSupportedException("'RadialTitleOffset' was renamed in 'RadialLabelOffset' since ParaView 5.14")
+
+        # "PolarTicksVisibility" -> "AllTicksVisibility"
+        if pname == "PolarTicksVisibility":
+            if compatibility_version < (5, 14):
+                return proxy.GetProperty("AllTicksVisibility").GetData()
+            else:
+                raise NotSupportedException("'PolarTicksVisibility' was renamed in 'AllTicksVisibility' since ParaView 5.14")
+
     raise Continue()
 
 

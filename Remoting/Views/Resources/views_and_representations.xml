@@ -13052,24 +13052,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </DoubleVectorProperty>
       <IntVectorProperty command="SetNumberOfPolarAxes"
                          default_values="5"
-                         name="NumberOfPolarAxes"
+                         name="NumberOfArcs"
                          number_of_elements="1">
         <IntRangeDomain min="0"
                         max="100"
                         name="range" />
-        <Documentation>Set the number of polar axes,
-        If value is 0, the number of polar axes is automatically calculated.
-        Depends on the Delta Range Polar Axes for automatic computation.
+        <Documentation>Set the number of arcs,
+        If value is 0, the number of arcs is automatically calculated.
+        Depends on the Delta Range Arcs for automatic computation.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetDeltaRangePolarAxes"
-                         name="DeltaRangePolarAxes"
+                         name="DeltaRangeArcs"
                          number_of_elements="1"
                          default_values="0">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the range between polar axes,
-        If value is 0 (the default), the range between polar axes is automatically calculated.
-        Depends on the Number Of Polar Axes for automatic computation.
+        <Documentation>Set the range between arcs,
+        If value is 0 (the default), the range between arcs is automatically calculated.
+        Depends on the Number Of Arcs for automatic computation.
         </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetEnableCustomMinRadius"
@@ -13189,8 +13189,8 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       <PropertyGroup label="Aspect Control">
         <Property name="NumberOfRadialAxes" />
         <Property name="DeltaAngleRadialAxes" />
-        <Property name="NumberOfPolarAxes" />
-        <Property name="DeltaRangePolarAxes" />
+        <Property name="NumberOfArcs" />
+        <Property name="DeltaRangeArcs" />
         <Property name="CustomMinRadius" />
         <Property name="MinimumRadius" />
         <Property name="CustomMaxRadius" />
@@ -13438,19 +13438,19 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </DoubleVectorProperty>
       <IntVectorProperty command="SetRadialTitleVisibility"
                          default_values="1"
-                         name="RadialTitleVisibility"
+                         name="RadialLabelVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set radial title visibility.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetRadialAngleFormat"
                             default_values="%-#3.1f"
-                            name="RadialTitleFormat"
+                            name="RadialLabelFormat"
                             panel_visibility="advanced"
                             number_of_elements="1">
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialTitleVisibility"
+            <Property name="RadialLabelVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13458,7 +13458,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </StringVectorProperty>
       <IntVectorProperty command="SetRadialAxisTitleLocation"
                          default_values="0"
-                         name="RadialTitleLocation"
+                         name="RadialLabelLocation"
                          panel_visibility="advanced"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -13469,7 +13469,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialTitleVisibility"
+            <Property name="RadialLabelVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13477,12 +13477,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </IntVectorProperty>
       <DoubleVectorProperty command="SetRadialTitleOffset"
                             default_values="20 0"
-                            name="RadialTitleOffset"
+                            name="RadialLabelOffset"
                             number_of_elements="2">
         <DoubleRangeDomain name="range" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialTitleVisibility"
+            <Property name="RadialLabelVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13518,10 +13518,10 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="PolarLabelExponentLocation" />
         <Property name="PolarLabelOffset" />
         <Property name="PolarExponentOffset" />
-        <Property name="RadialTitleVisibility" />
-        <Property name="RadialTitleFormat" />
-        <Property name="RadialTitleLocation" />
-        <Property name="RadialTitleOffset" />
+        <Property name="RadialLabelVisibility" />
+        <Property name="RadialLabelFormat" />
+        <Property name="RadialLabelLocation" />
+        <Property name="RadialLabelOffset" />
         <Property name="RadialUnitsVisibility" />
         <Property name="ScreenSize" />
       </PropertyGroup>
@@ -13696,7 +13696,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
 
       <IntVectorProperty command="SetPolarTickVisibility"
                          default_values="1"
-                         name="PolarTicksVisibility"
+                         name="AllTicksVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set all ticks visibility.</Documentation>
@@ -13709,7 +13709,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
        <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13732,7 +13732,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13745,7 +13745,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
        <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13759,7 +13759,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13815,7 +13815,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
        <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13829,7 +13829,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13857,7 +13857,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickMatchesRadialAxes" value="0" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13875,7 +13875,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickMatchesRadialAxes" value="0" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13892,7 +13892,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            max="0.1"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13911,7 +13911,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13931,7 +13931,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
             </Expression>
@@ -13950,7 +13950,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13968,7 +13968,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
             </Expression>
@@ -13988,7 +13988,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -14008,7 +14008,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
             </Expression>
@@ -14027,7 +14027,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -14045,7 +14045,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
             </Expression>
@@ -14064,7 +14064,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -14084,7 +14084,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcMinorTickVisibility" value="1" />
             </Expression>
@@ -14103,7 +14103,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -14121,7 +14121,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcMinorTickVisibility" value="1" />
             </Expression>
@@ -14131,7 +14131,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </DoubleVectorProperty>
 
       <PropertyGroup label="Generic Ticks Control">
-        <Property name="PolarTicksVisibility" />
+        <Property name="AllTicksVisibility" />
         <Property name="TickLocation" />
         <Property name="TickRatioRadiusSize" />
       </PropertyGroup>
