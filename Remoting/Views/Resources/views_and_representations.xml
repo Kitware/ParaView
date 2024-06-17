@@ -14095,21 +14095,19 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </Hints>
         <Documentation>Set the thickness ratio between major and minor ticks of arc.</Documentation>
       </DoubleVectorProperty>
-      <PropertyGroup label="Ticks Control">
+
+      <PropertyGroup label="Generic Ticks Control">
         <Property name="PolarTicksVisibility" />
-        <Property name="ArcTicksOriginToPolarAxis" />
         <Property name="TickLocation" />
+        <Property name="TickRatioRadiusSize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Radial Ticks Control">
         <Property name="AxisTickVisibility" />
         <Property name="AxisMinorTickVisibility" />
         <Property name="AxisTickMatchesPolarAxes" />
         <Property name="DeltaRangeMajor" />
         <Property name="DeltaRangeMinor" />
-        <Property name="ArcTickVisibility" />
-        <Property name="ArcMinorTickVisibility" />
-        <Property name="ArcTickMatchesRadialAxes" />
-        <Property name="DeltaAngleMajor" />
-        <Property name="DeltaAngleMinor" />
-        <Property name="TickRatioRadiusSize" />
         <Property name="PolarAxisMajorTickSize" />
         <Property name="PolarAxisTickRatioSize" />
         <Property name="PolarAxisMajorTickThickness" />
@@ -14118,6 +14116,15 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="LastRadialAxisTickRatioSize" />
         <Property name="LastRadialAxisMajorTickThickness" />
         <Property name="LastRadialAxisTickRatioThickness" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Arc Ticks Control">
+        <Property name="ArcTicksOriginToPolarAxis" />
+        <Property name="ArcTickVisibility" />
+        <Property name="ArcMinorTickVisibility" />
+        <Property name="ArcTickMatchesRadialAxes" />
+        <Property name="DeltaAngleMajor" />
+        <Property name="DeltaAngleMinor" />
         <Property name="ArcMajorTickSize" />
         <Property name="ArcTickRatioSize" />
         <Property name="ArcMajorTickThickness" />
