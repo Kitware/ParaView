@@ -2171,6 +2171,15 @@
         for its decimation. The name of this array must be passed
         through the FieldName property.
       </Documentation>
+      <InputProperty is_internal="1" name="DummyInput">
+        <InputArrayDomain name = "input_array_point"
+                          attribute_type="point"/>
+      </InputProperty>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input"/>
+        </ProxyList>
+      </Hints>
       <StringVectorProperty name="FieldName"
                             command="SetFieldName"
                             number_of_elements="1"
@@ -2179,6 +2188,12 @@
           The name of the PointData array from which will be retrieved the data for the
           decimation strategy to be performed.
         </Documentation>
+        <ArrayListDomain input_domain_name="input_array_point"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
       </StringVectorProperty>
     </Proxy>
   </ProxyGroup>

@@ -34,7 +34,7 @@
 
   <!-- Test custom field strategy -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DecimationStrategy/ProxySelectionWidget/comboBox" command="activated" arguments="Decimation Custom Field Strategy" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DecimationStrategy/ProxySelectionWidget/frame/ChosenProxyWidget/FieldName/FieldName" command="set_string" arguments="__custom__field__" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/DecimationStrategy/ProxySelectionWidget/frame/ChosenProxyWidget/FieldName/ComboBox" property="currentText" arguments="__custom__field__" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/DecimatePolylineCustomFieldHigh.png" threshold="5" />
   <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/pointCount" property="text" arguments="16 (float)" />
