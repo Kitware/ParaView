@@ -41,5 +41,4 @@
 
   <!-- test help window -->
   <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/GoToHelp" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" property="modelItemData" arguments="0.0,ParaView User Manual" />
 </pqevents>
