@@ -163,10 +163,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
   /**
    * Property with selectors/composite indices for checked nodes in the hierarchy.
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   Q_PROPERTY(QList<QVariant> selectors READ selectorsAsVariantList WRITE setSelectors NOTIFY
       selectorsChanged);
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   Q_PROPERTY(QList<QVariant> compositeIndices READ compositeIndicesAsVariantList WRITE
       setCompositeIndices NOTIFY selectorsChanged);
   ///@}
@@ -175,10 +173,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
   /**
    * Property with selectors/composite indices and associated colors (as RGB).
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   Q_PROPERTY(QList<QVariant> selectorColors READ selectorColorsAsVariantList WRITE setSelectorColors
       NOTIFY colorsChanged);
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   Q_PROPERTY(QList<QVariant> compositeIndexColors READ compositeIndexColorsAsVariantList WRITE
       setCompositeIndexColors NOTIFY colorsChanged);
   ///@}
@@ -187,10 +185,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPro
   /**
    * Properties with selectors/composite indieces and associated opacities.
    */
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   Q_PROPERTY(QList<QVariant> selectorOpacities READ selectorOpacitiesAsVariantList WRITE
       setSelectorOpacities NOTIFY opacitiesChanged);
-  PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
+  // PARAVIEW_DEPRECATED_IN_5_13_0("No longer used.")
   Q_PROPERTY(QList<QVariant> compositeIndexOpacities READ compositeIndexOpacitiesAsVariantList WRITE
       setCompositeIndexOpacities NOTIFY opacitiesChanged);
   ///@}
