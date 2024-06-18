@@ -49,7 +49,7 @@ Please remove this comment.
         git commit -m 'Update version number to @VERSION@@RC@' version.txt
         ```
     - Make a commit for each of these `release`-only changes
-<!-- if not RC1 and patch == 0 -->
+<!-- if RC1 and patch == 0 -->
       - [ ] Update VTK's `paraview/release` branch. The
             [`release-mr`][release-mr]  script should be used to do this. Pass
             `-c .kitware-release-paraview.json` to use the appropriate
@@ -127,8 +127,10 @@ git submodule update --recursive --init
 
   - Integrate changes.
     - Update versions
-      - [ ] Guide selections in `versions.cmake` and ensure that the paraview
-            http URL source is the _DEFAULT_ source.
+<!-- if not RC -->
+      - [ ] Update the version in the `Buliding a specific version` section
+            example in `README.md`
+<!-- endif -->
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
       - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
       - [ ] Commit changes
@@ -140,7 +142,7 @@ git submodule update --recursive --init
       - [ ] Create a commit which will be tagged:
         - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
         - [ ] Create tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
-<!-- if not RC and patch == 0 -->
+<!-- if RC1 and patch == 0 -->
       - [ ] Create a commit that changes the paraview _DEFAULT_ source to the git
             url source in the `versions.cmake` file.
 <!-- endif -->
@@ -161,7 +163,7 @@ git submodule update --recursive --init
           Merge Request (see script for usage)
       - [ ] Pull the script for each release; it may have been updated since it
         was last used
-      - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
+      - [ ] `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BASEBRANCH@`
 <!-- if not RC and patch == 0-->
       - [ ] Make sure that the backporting directive in the merge-request
             description skips the last commit such as: `Backport: master:HEAD~`
