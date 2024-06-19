@@ -94,6 +94,10 @@
 .cmake_test_macos:
     stage: test
 
+    # enable XML tests "stack trace" on failure
+    variables:
+        PV_DEBUG_TEST: 1
+
     script:
         - *before_script_macos
         # Reuse the venv from the build step (avoids version changes between
