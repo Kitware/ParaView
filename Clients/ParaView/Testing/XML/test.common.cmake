@@ -1736,6 +1736,7 @@ set (CTHAMRDualClip_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHAMRMaterialInterfaceFilter_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (CTHDerivedDensity2DClyinder_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (CalculatorInput_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
@@ -1758,6 +1759,7 @@ set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (MathTextColumn_FORCE_SERIAL TRUE)  # since this uses popup-menu
+set (MoleculeToLines_FORCE_SERIAL TRUE)  # since this uses popup-menu
 set (PolygonCellSelection_FORCE_SERIAL TRUE)
 set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (PropertyLink_FORCE_SERIAL TRUE)
