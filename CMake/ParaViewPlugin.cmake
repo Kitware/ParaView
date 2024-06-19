@@ -746,7 +746,7 @@ static void ${_paraview_build_target_safe}_initialize()
 
         # Install XMLs
         install(
-          FILES       "${_paraview_build_plugin_delayed_load_xmls}"
+          FILES       ${_paraview_build_plugin_delayed_load_xmls}
           DESTINATION "${_paraview_build_plugin_directory}"
           COMPONENT   "${_paraview_build_TARGET_COMPONENT}")
       else ()
