@@ -21,6 +21,13 @@ vtkEmulatedTimeAlgorithm::vtkEmulatedTimeAlgorithm()
 vtkEmulatedTimeAlgorithm::~vtkEmulatedTimeAlgorithm() = default;
 
 //------------------------------------------------------------------------------
+void vtkEmulatedTimeAlgorithm::Modified()
+{
+  this->NeedsInitialization = true;
+  this->Superclass::Modified();
+}
+
+//------------------------------------------------------------------------------
 bool vtkEmulatedTimeAlgorithm::GetNeedsUpdate(double time)
 {
   bool isRequested = false;
@@ -41,7 +48,7 @@ bool vtkEmulatedTimeAlgorithm::GetNeedsUpdate(double time)
   double lastRequestedTime = this->RequestedTime;
   if (isRequested && requestedTime != lastRequestedTime)
   {
-    this->Modified();
+    this->Superclass::Modified();
     this->NeedsUpdate = true;
     this->RequestedTime = requestedTime;
   }
@@ -62,7 +69,7 @@ vtkTypeBool vtkEmulatedTimeAlgorithm::ProcessRequest(
     return this->RequestUpdateExtent(request, inputVector, outputVector);
   }
 
-  if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+  if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()) && this->NeedsInitialization)
   {
     vtkTypeBool ret = this->RequestInformation(request, inputVector, outputVector);
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -96,6 +103,7 @@ vtkTypeBool vtkEmulatedTimeAlgorithm::ProcessRequest(
       vtkErrorMacro("Requires valid time steps.");
       return 0;
     }
+    this->NeedsInitialization = false;
     return ret;
   }
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
