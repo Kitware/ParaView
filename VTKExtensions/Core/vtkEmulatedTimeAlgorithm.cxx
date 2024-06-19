@@ -98,11 +98,6 @@ vtkTypeBool vtkEmulatedTimeAlgorithm::ProcessRequest(
       this->TimeRange[0] = this->TimeSteps.front();
       this->TimeRange[1] = this->TimeSteps.back();
     }
-    else
-    {
-      vtkErrorMacro("Requires valid time steps.");
-      return 0;
-    }
     this->NeedsInitialization = false;
     return ret;
   }
