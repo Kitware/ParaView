@@ -50,7 +50,7 @@ public:
    *
    * Required for LiveSource behavior.
    */
-  bool GetNeedsUpdate(double time);
+  virtual bool GetNeedsUpdate(double time);
 
   /**
    * LiveSources algorithm requires calling this->Modified() to update the data.
