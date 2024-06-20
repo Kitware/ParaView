@@ -44,6 +44,52 @@
           timestep to file. Otherwise, only the current timestep is written.
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseExternalComposite"
+                        default_values="0"
+                        name="UseExternalComposite"
+                        number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Write composite leaf blocks in different files.
+          Only applies to vtkPartitionedDataSetCollection and vtkMultiBlockDataSet inputs.
+        </Documentation>
+
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                  name="vtkCompositeDataSet"
+                                  mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseExternalTimeSteps"
+                        default_values="0"
+                        name="UseExternalTimeSteps"
+                        number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Write each time step data in a different file,
+          referrenced by the main file to form a time-varying dataset.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseExternalPartitions"
+                        default_values="0"
+                        name="UseExternalPartitions"
+                        number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Write each partition in a different file.
+          Only applies to vtkPartitionedDataSet and composite inputs.
+        </Documentation>
+
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                  name="vtkCompositeDataSet"
+                                  mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetChunkSize"
                         default_values="25000"
                         name="ChunkSize"
@@ -94,6 +140,8 @@
         <ExposedProperties>
           <Property name="Input" />
           <Property name="WriteAllTimeSteps" panel_visibility="advanced" />
+          <Property name="UseExternalComposite" panel_visibility="advanced" />
+          <Property name="UseExternalPartitions" panel_visibility="advanced" />
           <Property name="ChunkSize" panel_visibility="advanced" />
           <Property name="CompressionLevel" panel_visibility="advanced" />
         </ExposedProperties>
