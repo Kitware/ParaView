@@ -257,6 +257,12 @@ void pqLiveSourceManager::setEmulatedCurrentTime(double time)
 }
 
 //-----------------------------------------------------------------------------
+double pqLiveSourceManager::getEmulatedCurrentTime()
+{
+  return this->Internals->getCurrentTime();
+}
+
+//-----------------------------------------------------------------------------
 void pqLiveSourceManager::onSourceAdded(pqPipelineSource* src)
 {
   vtkSMProxy* proxy = src->getProxy();
