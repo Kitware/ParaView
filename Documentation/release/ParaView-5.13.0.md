@@ -101,8 +101,8 @@ This file is expected to look like this:
   {
     "connection" :
     {
-      "connect-id" : 17
-      "reverse-connection" : true
+      "connect-id" : 17,
+      "reverse-connection" : true,
       "client-host" : "bailey"
     }
   }
@@ -468,7 +468,7 @@ This script is executed as usual when `catalyst_execute` is called, but the extr
 
 ## Fix the behavior of vtkCLIOptions::SetStopOnUnrecognizedArgument
 
-T`SetStopOnUnrecognizedArgument` was behaving in an inverted way according to its name and documentation. This was fixed and documentation was clarified.
+`SetStopOnUnrecognizedArgument` was behaving in an inverted way according to its name and documentation. This was fixed and documentation was clarified.
 
 Now, `vtkCLIOptions::SetStopOnUnrecognizedArgument(true)` will indeed stop the parsing on unrecognized arguments.
 
