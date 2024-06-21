@@ -42,6 +42,12 @@ if (USE_CATALYST)
     PRIVATE
       "PARAVIEW_IMPL_DIR=\"${ParaView_CATALYST_DIR}\""
       USE_CATALYST=1)
+  
+  target_compile_options(Fortran90FullExampleV2
+    PRIVATE
+      "$<IF:$<Fortran_COMPILER_ID:Intel,IntelLLVM>,-extend-source,-ffree-line-length-none>"
+      )
+
   target_link_libraries(Fortran90FullExampleV2
     PRIVATE
       catalyst::catalyst_fortran)
