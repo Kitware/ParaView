@@ -12890,21 +12890,21 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                             name="Position"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the polar axes origin position.</Documentation>
+        <Documentation>Translate the origin of the axes.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetScale"
                             default_values="1 1 1"
                             name="Scale"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the polar axes bounds transform scale.</Documentation>
+        <Documentation>Scale the origin of the axes.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientation"
                             default_values="0 0 0"
                             name="Orientation"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the polar axes bounds transform orientation.</Documentation>
+        <Documentation>Rotate the origin of the axes around the scene origin.</Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Transform">
         <Property name="Position"/>
@@ -13052,24 +13052,24 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </DoubleVectorProperty>
       <IntVectorProperty command="SetNumberOfPolarAxes"
                          default_values="5"
-                         name="NumberOfPolarAxes"
+                         name="NumberOfArcs"
                          number_of_elements="1">
         <IntRangeDomain min="0"
                         max="100"
                         name="range" />
-        <Documentation>Set the number of polar axes,
-        If value is 0, the number of polar axes is automatically calculated.
-        Depends on the Delta Range Polar Axes for automatic computation.
+        <Documentation>Set the number of arcs,
+        If value is 0, the number of arcs is automatically calculated.
+        Depends on the Delta Range Arcs for automatic computation.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetDeltaRangePolarAxes"
-                         name="DeltaRangePolarAxes"
+                         name="DeltaRangeArcs"
                          number_of_elements="1"
                          default_values="0">
         <DoubleRangeDomain name="range" />
-        <Documentation>Set the range between polar axes,
-        If value is 0 (the default), the range between polar axes is automatically calculated.
-        Depends on the Number Of Polar Axes for automatic computation.
+        <Documentation>Set the range between arcs,
+        If value is 0 (the default), the range between arcs is automatically calculated.
+        Depends on the Number Of Arcs for automatic computation.
         </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetEnableCustomMinRadius"
@@ -13189,8 +13189,8 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       <PropertyGroup label="Aspect Control">
         <Property name="NumberOfRadialAxes" />
         <Property name="DeltaAngleRadialAxes" />
-        <Property name="NumberOfPolarAxes" />
-        <Property name="DeltaRangePolarAxes" />
+        <Property name="NumberOfArcs" />
+        <Property name="DeltaRangeArcs" />
         <Property name="CustomMinRadius" />
         <Property name="MinimumRadius" />
         <Property name="CustomMaxRadius" />
@@ -13438,19 +13438,19 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </DoubleVectorProperty>
       <IntVectorProperty command="SetRadialTitleVisibility"
                          default_values="1"
-                         name="RadialTitleVisibility"
+                         name="RadialLabelVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set radial title visibility.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetRadialAngleFormat"
                             default_values="%-#3.1f"
-                            name="RadialTitleFormat"
+                            name="RadialLabelFormat"
                             panel_visibility="advanced"
                             number_of_elements="1">
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialTitleVisibility"
+            <Property name="RadialLabelVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13458,7 +13458,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </StringVectorProperty>
       <IntVectorProperty command="SetRadialAxisTitleLocation"
                          default_values="0"
-                         name="RadialTitleLocation"
+                         name="RadialLabelLocation"
                          panel_visibility="advanced"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -13469,7 +13469,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialTitleVisibility"
+            <Property name="RadialLabelVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13477,12 +13477,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
       </IntVectorProperty>
       <DoubleVectorProperty command="SetRadialTitleOffset"
                             default_values="20 0"
-                            name="RadialTitleOffset"
+                            name="RadialLabelOffset"
                             number_of_elements="2">
         <DoubleRangeDomain name="range" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="RadialTitleVisibility"
+            <Property name="RadialLabelVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13518,10 +13518,10 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="PolarLabelExponentLocation" />
         <Property name="PolarLabelOffset" />
         <Property name="PolarExponentOffset" />
-        <Property name="RadialTitleVisibility" />
-        <Property name="RadialTitleFormat" />
-        <Property name="RadialTitleLocation" />
-        <Property name="RadialTitleOffset" />
+        <Property name="RadialLabelVisibility" />
+        <Property name="RadialLabelFormat" />
+        <Property name="RadialLabelLocation" />
+        <Property name="RadialLabelOffset" />
         <Property name="RadialUnitsVisibility" />
         <Property name="ScreenSize" />
       </PropertyGroup>
@@ -13627,7 +13627,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                          name="EnableDistanceLOD"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Set the use of LOD based on distance.</Documentation>
+        <Documentation>Enable Level Of Details optimization based on distance.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetDistanceLODThreshold"
                             default_values="0.7"
@@ -13636,21 +13636,21 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                             number_of_elements="1">
         <DoubleRangeDomain name="range"
                            min="0"
-                           max="100"/>
+                           max="1"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="EnableDistanceLOD"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
-        <Documentation>Set the LOD distance threshold to use.</Documentation>
+        <Documentation>Distance, in proportion of visible scene, beyond which Level Of Details should apply. In range [0, 1]</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetEnableViewAngleLOD"
                          default_values="1"
                          name="EnableViewAngleLOD"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Set the use of LOD based on the View Angle.</Documentation>
+        <Documentation>Enable Level Of Details optimization based on the View Angle.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetViewAngleLODThreshold"
                             default_values="0.7"
@@ -13659,14 +13659,14 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                             number_of_elements="1">
         <DoubleRangeDomain name="range"
                            min="0"
-                           max="360"/>
+                           max="1"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="EnableViewAngleLOD"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
-        <Documentation>Set the LOD View Angle threshold to use.</Documentation>
+        <Documentation>Angle until which Level Of Details should apply. In range [0, 1].</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSmallestVisiblePolarAngle"
                             default_values="0.5"
@@ -13678,7 +13678,15 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            name="range" />
         <Documentation>Set the smallest radial angle distinguishable from polar axis.</Documentation>
       </DoubleVectorProperty>
+
       <PropertyGroup label="LOD and Details control">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Use2DMode"
+                      inverse="1"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Property name="EnableDistanceLOD" />
         <Property name="DistanceLODThreshold" />
         <Property name="EnableViewAngleLOD" />
@@ -13688,7 +13696,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
 
       <IntVectorProperty command="SetPolarTickVisibility"
                          default_values="1"
-                         name="PolarTicksVisibility"
+                         name="AllTicksVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set all ticks visibility.</Documentation>
@@ -13701,7 +13709,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
        <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13724,7 +13732,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13737,7 +13745,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
        <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13749,9 +13757,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                          number_of_elements="1">
        <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set polar axis and last radial axis minor tick visibility.</Documentation>
@@ -13805,7 +13815,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
        <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13817,9 +13827,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set polar arc minor tick visibility.</Documentation>
@@ -13845,7 +13857,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickMatchesRadialAxes" value="0" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13863,7 +13875,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="PolarTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
               <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickMatchesRadialAxes" value="0" />
             </Expression>
           </PropertyWidgetDecorator>
@@ -13880,7 +13892,7 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            max="0.1"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
+            <Property name="AllTicksVisibility"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
@@ -13897,9 +13909,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the polar axis major tick size,
@@ -13915,9 +13929,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       <Documentation>Set the polar axis size ratio between major and minor ticks.</Documentation>
@@ -13931,9 +13948,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="100"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the thickness of polar axis major ticks.</Documentation>
@@ -13947,9 +13966,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the thickness ratio between major and minor ticks of polar axis.
@@ -13964,9 +13986,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the last radial axis major tick size,
@@ -13982,9 +14006,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the last radial axis size ratio between major and minor ticks.</Documentation>
@@ -13998,9 +14025,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="100"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the thickness of last radial axis major ticks.</Documentation>
@@ -14014,9 +14043,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AxisMinorTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the thickness ratio between major and minor ticks of last radial axis.</Documentation>
@@ -14030,9 +14062,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the arc major tick size,
@@ -14048,9 +14082,12 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcMinorTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the arc size ratio between major and minor ticks.</Documentation>
@@ -14064,9 +14101,11 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="100"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the thickness of arc major ticks.</Documentation>
@@ -14080,28 +14119,29 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
                            min="0"
                            max="1"/>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PolarTicksVisibility"
-                      function="boolean" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AllTicksVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcTickVisibility" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ArcMinorTickVisibility" value="1" />
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>Set the thickness ratio between major and minor ticks of arc.</Documentation>
       </DoubleVectorProperty>
-      <PropertyGroup label="Ticks Control">
-        <Property name="PolarTicksVisibility" />
-        <Property name="ArcTicksOriginToPolarAxis" />
+
+      <PropertyGroup label="Generic Ticks Control">
+        <Property name="AllTicksVisibility" />
         <Property name="TickLocation" />
+        <Property name="TickRatioRadiusSize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Radial Ticks Control">
         <Property name="AxisTickVisibility" />
         <Property name="AxisMinorTickVisibility" />
         <Property name="AxisTickMatchesPolarAxes" />
         <Property name="DeltaRangeMajor" />
         <Property name="DeltaRangeMinor" />
-        <Property name="ArcTickVisibility" />
-        <Property name="ArcMinorTickVisibility" />
-        <Property name="ArcTickMatchesRadialAxes" />
-        <Property name="DeltaAngleMajor" />
-        <Property name="DeltaAngleMinor" />
-        <Property name="TickRatioRadiusSize" />
         <Property name="PolarAxisMajorTickSize" />
         <Property name="PolarAxisTickRatioSize" />
         <Property name="PolarAxisMajorTickThickness" />
@@ -14110,6 +14150,15 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
         <Property name="LastRadialAxisTickRatioSize" />
         <Property name="LastRadialAxisMajorTickThickness" />
         <Property name="LastRadialAxisTickRatioThickness" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Arc Ticks Control">
+        <Property name="ArcTickVisibility" />
+        <Property name="ArcMinorTickVisibility" />
+        <Property name="ArcTicksOriginToPolarAxis" />
+        <Property name="ArcTickMatchesRadialAxes" />
+        <Property name="DeltaAngleMajor" />
+        <Property name="DeltaAngleMinor" />
         <Property name="ArcMajorTickSize" />
         <Property name="ArcTickRatioSize" />
         <Property name="ArcMajorTickThickness" />

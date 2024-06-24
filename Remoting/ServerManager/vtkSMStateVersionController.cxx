@@ -2065,6 +2065,66 @@ struct Process_5_12_to_5_13
   }
 };
 
+//===========================================================================
+struct Process_5_13_to_5_14
+{
+  bool operator()(xml_document& document) { return HandlePolarAxesRenaming(document); }
+
+  bool HandlePolarAxesRenaming(xml_document& document)
+  {
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='representations' and @type='PolarAxesRepresentation']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      // Rename "NumberOfPolarAxes" in "NumberOfArcs"
+      if (auto nbPolarAxesNode = node.find_child_by_attribute("name", "NumberOfPolarAxes"))
+      {
+        nbPolarAxesNode.attribute("name").set_value("NumberOfArcs");
+      }
+
+      // Rename "DeltaRangePolarAxes" in "DeltaRangeArcs"
+      if (auto deltaRangeNode = node.find_child_by_attribute("name", "DeltaRangePolarAxes"))
+      {
+        deltaRangeNode.attribute("name").set_value("DeltaRangeArcs");
+      }
+
+      // Rename "RadialTitleVisibility" in "RadialLabelVisibility"
+      if (auto radialTitleNode = node.find_child_by_attribute("name", "RadialTitleVisibility"))
+      {
+        radialTitleNode.attribute("name").set_value("RadialLabelVisibility");
+      }
+
+      // Rename "RadialTitleFormat" in "RadialLabelFormat"
+      if (auto radialTitleNode = node.find_child_by_attribute("name", "RadialTitleFormat"))
+      {
+        radialTitleNode.attribute("name").set_value("RadialLabelFormat");
+      }
+
+      // Rename "RadialTitleLocation" in "RadialLabelLocation"
+      if (auto radialTitleNode = node.find_child_by_attribute("name", "RadialTitleLocation"))
+      {
+        radialTitleNode.attribute("name").set_value("RadialLabelLocation");
+      }
+
+      // Rename "RadialTitleOffset" in "RadialLabelOffset"
+      if (auto radialTitleNode = node.find_child_by_attribute("name", "RadialTitleOffset"))
+      {
+        radialTitleNode.attribute("name").set_value("RadialLabelOffset");
+      }
+
+      // Rename "PolarTicksVisibility" in "AllTicksVisibility"
+      if (auto polarTicksNode = node.find_child_by_attribute("name", "PolarTicksVisibility"))
+      {
+        polarTicksNode.attribute("name").set_value("AllTicksVisibility");
+      }
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -2191,6 +2251,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_12_to_5_13 converter;
     status = converter(document);
     version = vtkSMVersion(5, 13, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 14, 0)))
+  {
+    Process_5_13_to_5_14 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 14, 0);
   }
 
   if (status)
