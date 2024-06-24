@@ -187,8 +187,8 @@ void pqQuickLaunchDialogExtended::showProxyHelp()
   QVariant group = viewCurrent.data(pqProxyActionListModel::GroupRole);
   QVariant name = viewCurrent.data(pqProxyActionListModel::NameRole);
 
-  pqHelpReaction::showProxyHelp(group.toString(), name.toString());
   this->reject();
+  pqHelpReaction::showProxyHelp(group.toString(), name.toString());
 #endif
 }
 
