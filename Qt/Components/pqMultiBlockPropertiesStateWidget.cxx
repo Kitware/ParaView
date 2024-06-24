@@ -10,6 +10,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkSMColorMapEditorHelper.h"
+#include "vtkSMDataAssemblyDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -246,6 +247,14 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   }
   QObject::connect(internals.ResetButton, &pqHighlightableToolButton::clicked, this,
     &pqMultiBlockPropertiesStateWidget::onResetButtonClicked);
+  if (auto selectors = vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("Selectors")))
+  {
+    if (auto domain = selectors->FindDomain<vtkSMDataAssemblyDomain>())
+    {
+      pqCoreUtilities::connect(
+        domain, vtkCommand::DomainModifiedEvent, this, SLOT(onResetButtonClicked()));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
