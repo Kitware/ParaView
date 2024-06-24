@@ -138,6 +138,7 @@ private:
   int LastTag = 0;
 
   vtkSmartPointer<vtkDataAssembly> Assembly;
+  std::string AssemblyXMLContents;
   std::string Name;
   int EntityType = -1;
 };
