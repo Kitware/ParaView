@@ -713,6 +713,11 @@ static void ${_paraview_build_target_safe}_initialize()
     set(_paraview_build_xml_content
       "<?xml version=\"1.0\"?>\n<Plugins>\n")
     foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
+
+      # Make a variable for where the plugin should go.
+      set(_paraview_build_plugin_directory
+        "${_paraview_build_plugin_destination}/${_paraview_build_plugin}")
+
       set(_paraview_build_autoload 0)
       if (_paraview_build_plugin IN_LIST _paraview_build_AUTOLOAD)
         set(_paraview_build_autoload 1)
@@ -741,7 +746,7 @@ static void ${_paraview_build_target_safe}_initialize()
 
         # Install XMLs
         install(
-          FILES       "${_paraview_build_plugin_delayed_load_xmls}"
+          FILES       ${_paraview_build_plugin_delayed_load_xmls}
           DESTINATION "${_paraview_build_plugin_directory}"
           COMPONENT   "${_paraview_build_TARGET_COMPONENT}")
       else ()
