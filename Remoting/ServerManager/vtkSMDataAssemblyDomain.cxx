@@ -114,11 +114,13 @@ vtkDataAssembly* vtkSMDataAssemblyDomain::GetDataAssembly() const
 //----------------------------------------------------------------------------
 void vtkSMDataAssemblyDomain::ChooseAssembly(const std::string& name, vtkDataAssembly* assembly)
 {
+  const std::string assemblyXMLContents = assembly ? assembly->SerializeToXML(vtkIndent()) : "";
   if (this->Name != name || assembly != this->Assembly ||
-    (assembly != nullptr && assembly->GetMTime() > this->GetMTime()))
+    (assembly != nullptr && this->AssemblyXMLContents != assemblyXMLContents))
   {
     this->Name = name;
     this->Assembly = assembly;
+    this->AssemblyXMLContents = assemblyXMLContents;
     this->DomainModified();
   }
 }

@@ -85,7 +85,7 @@ private Q_SLOTS:
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqMultiBlockPropertiesStateWidget)
 
-  void setState(BlockPropertyState state);
+  void updateState();
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

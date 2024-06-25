@@ -10,6 +10,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkSMColorMapEditorHelper.h"
+#include "vtkSMDataAssemblyDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -228,8 +229,7 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   internals.HLayout->addWidget(internals.ResetButton);
 
   // set the initial state
-  this->setState(this->Internals->Selector.isEmpty() ? BlockPropertyState::Disabled
-                                                     : BlockPropertyState::RepresentationInherited);
+  this->updateState();
 
   // connect the signals
   for (const auto& propertyName : internals.BlockPropertyNames)
@@ -247,16 +247,29 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   }
   QObject::connect(internals.ResetButton, &pqHighlightableToolButton::clicked, this,
     &pqMultiBlockPropertiesStateWidget::onResetButtonClicked);
+  if (auto selectors = vtkSMStringVectorProperty::SafeDownCast(repr->GetProperty("Selectors")))
+  {
+    if (auto domain = selectors->FindDomain<vtkSMDataAssemblyDomain>())
+    {
+      pqCoreUtilities::connect(
+        domain, vtkCommand::DomainModifiedEvent, this, SLOT(onResetButtonClicked()));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqMultiBlockPropertiesStateWidget::~pqMultiBlockPropertiesStateWidget() = default;
 
 //-----------------------------------------------------------------------------
-void pqMultiBlockPropertiesStateWidget::setState(BlockPropertyState state)
+void pqMultiBlockPropertiesStateWidget::updateState()
 {
   auto& internals = *this->Internals;
-  if (internals.CurrentState != state)
+  const std::vector<std::string> blockSelectors = this->getSelectors();
+  const std::pair<std::string, BlockPropertyState> selectorAndState =
+    internals.ColorMapEditorHelper->HasBlocksProperties(
+      internals.Representation, blockSelectors, internals.BlockPropertyNames);
+  const BlockPropertyState state = selectorAndState.second;
+  if (internals.CurrentState != selectorAndState.second)
   {
     internals.CurrentState = state;
 
@@ -318,19 +331,14 @@ std::vector<std::string> pqMultiBlockPropertiesStateWidget::getSelectors() const
 //-----------------------------------------------------------------------------
 void pqMultiBlockPropertiesStateWidget::onPropertiesChanged()
 {
-  auto& internals = *this->Internals;
-  const std::vector<std::string> blockSelectors = this->getSelectors();
-  const std::pair<std::string, BlockPropertyState> selectorAndState =
-    internals.ColorMapEditorHelper->HasBlocksProperties(
-      internals.Representation, blockSelectors, internals.BlockPropertyNames);
-  this->setState(selectorAndState.second);
+  this->updateState();
 }
 
 //-----------------------------------------------------------------------------
 void pqMultiBlockPropertiesStateWidget::onSelectedBlockSelectorsChanged()
 {
   const BlockPropertyState oldState = this->getState();
-  this->onPropertiesChanged();
+  this->updateState();
   // if the state remains the same, we still need to emit a signal,
   // because the selected block selectors have changed
   if (oldState == this->getState())
