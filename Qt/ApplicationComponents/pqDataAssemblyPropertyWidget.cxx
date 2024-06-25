@@ -329,6 +329,10 @@ public:
     {
       return;
     }
+    for (auto& widget : this->StateWidgets)
+    {
+      widget->getResetButton()->click();
+    }
     this->resetStateWidgets();
     vtkNew<CallbackDataVisitor> visitor;
     visitor->VisitCallback = [&](int nodeId) -> void {
