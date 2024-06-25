@@ -264,6 +264,8 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
     return;
   }
 
+  std::vector<bool> duplicateArrays(this->Internals->ArrayInformations.size(), false);
+
   const auto& ointernals = (*other->Internals);
   for (auto& pair : ointernals.ArrayInformationLookupMap)
   {
@@ -280,16 +282,16 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
     {
       auto ainfo = internals.ArrayInformations[iter->second].GetPointer();
       ainfo->AddInformation(oinfo, this->FieldAssociation);
+      duplicateArrays[iter->second] = true;
     }
   }
 
   // Mark partial arrays not present in `other`
-  for (auto& pair : internals.ArrayInformationLookupMap)
+  for (size_t arrayIdx = 0; arrayIdx < duplicateArrays.size(); ++arrayIdx)
   {
-    auto iter = ointernals.ArrayInformationLookupMap.find(pair.first);
-    if (iter == ointernals.ArrayInformationLookupMap.end())
+    if (!duplicateArrays[arrayIdx])
     {
-      ointernals.ArrayInformations[pair.second]->SetIsPartial(1); // since only present in `this`.
+      internals.ArrayInformations[arrayIdx]->SetIsPartial(true); // since only present in `this`.
     }
   }
 
