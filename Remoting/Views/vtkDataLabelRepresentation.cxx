@@ -375,12 +375,14 @@ int vtkDataLabelRepresentation::ProcessViewRequest(
       this->PointMask->SetInputConnection(producerPort);
       this->CellCenters->SetInputConnection(producerPort);
       this->CellLabelActor->SetVisibility(this->CellLabelVisibility);
+      this->PointLabelActor->SetVisibility(this->PointLabelVisibility);
     }
     else
     {
       // Turn off visibility if the output from the producer is not acceptable input to
       // PointMask and vtkCellCenters. Fixes bug #20548.
       this->CellLabelActor->VisibilityOff();
+      this->PointLabelActor->VisibilityOff();
     }
   }
 
