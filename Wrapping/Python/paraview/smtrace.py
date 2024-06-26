@@ -2231,10 +2231,12 @@ def get_current_trace_output(raw=False):
 
 
 def get_current_trace_output_and_reset(raw=False):
-    """Equivalent to calling::
+    """
+    Equivalent to calling the following code:
 
         get_current_trace_output(raw)
         reset_trace_output()
+
     """
 
     output = get_current_trace_output(raw)
