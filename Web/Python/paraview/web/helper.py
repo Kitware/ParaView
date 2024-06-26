@@ -245,16 +245,20 @@ def getProxyAsState(id):
     """
     Return a json representation of the given proxy state.
 
-    Example of the state of the Clip filter
-      {
-         proxy_id: 234,
-         ClipType: {
-            proxy_id: 235,
-            Normal: [0,0,1],
-            Origin: [0,0,0],
-            InsideOut: 0
-         }
-      }
+    Example of the state of the Clip filter:
+
+    .. code-block:: json
+
+        {
+            "proxy_id": 234,
+            "ClipType": {
+                "proxy_id": 235,
+                "Normal": [0, 0, 1],
+                "Origin": [0, 0, 0],
+                "InsideOut": 0
+            }
+        }
+
     """
     proxy_id = int(id)
     proxy = idToProxy(proxy_id)
@@ -483,16 +487,19 @@ def extractDomain(proxy, propertyName, xmlDomainElement):
 
 def listFiles(pathToList):
     """
-    Create a tree structure of the given directory that will be understand by
+    Create a tree structure of the given directory that will be understood by
     the pipelineBrowser widget.
     The provided path should not have a trailing '/'.
 
-    return {
-       children: [
-           { name: 'fileName.vtk', path: '/full_path/to_file/fileName.vtk' },
-           { name: 'directoryName', path: '/full_path/to_file/directoryName', children: [] }
-       ]
-    }
+    .. code-block:: json
+
+         {
+            children: [
+                { name: 'fileName.vtk', path: '/full_path/to_file/fileName.vtk' },
+                { name: 'directoryName', path: '/full_path/to_file/directoryName', children: [] }
+            ]
+        }
+
     """
     global fileList
     if pathToList[-1] == "/":
