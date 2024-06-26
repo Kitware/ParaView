@@ -146,7 +146,7 @@ processed by the decorator simply gets added to the generated XML node as
 attribute.
 
 `smproxy.source`
----------------
+----------------
 
 This decorator can be used to declare data sources. Data sources don't have any
 inputs, but provide 1 or more outputs. While technically a reader is a source,
@@ -209,7 +209,7 @@ The following keyword parameters are supported by all `smproperty` decorators:
    objects (with the exception of `smproperty.input`).
 
 `smproperty.xml`
----------------
+----------------
 
 This is a catch-all decorator. One can use this to add arbitrary XML to the
 proxy definition.
@@ -228,13 +228,13 @@ These are used to declare various types of vector properties. The arguments are
 simply the XML attributes.
 
 `smproperty.proxy`
------------------
+------------------
 
 This decorator can be used for adding a `ProxyProperty`, i.e. a method that
 takes another VTK object as argument.
 
 `smproperty.input`
------------------
+------------------
 
 This decorator can be used to add inputs to a `vtkAlgorithm`. Since
 `vtkAlgorithm` provides the appropriate API to set an input, often one doesn't
@@ -251,7 +251,7 @@ particular method.
        ...
 
 `smproperty.dataarrayselection`
-------------------------------
+-------------------------------
 
 This a convenience decorator that can be used to decorate a method that returns
 a `vtkDataArraySelection` object often used to array selection in data sources
