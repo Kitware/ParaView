@@ -47,7 +47,7 @@ new :class:`.ProxyAccessor` instances. Other such as
 :class:`.PropertiesModified` trace item rely on accessors already created.
 :class:`.Trace` can provide access to already created accessor as well as create
 new accessor for proxies create before the tracing began
-(:method:`.Trace.get_accessor`).
+(:meth:`.Trace.get_accessor`).
 
 Additionally, there are filters such as :class:`.ProxyFilter`,
 :class:`.PipelineProxyFilter`, etc. which are used to filter properties that get
