@@ -61,17 +61,20 @@ public:
 
   ///@{
   /**
-   * Change playing speed for emulated time algorithms (in seconds).
+   * Set/get playing speed for emulated time algorithms (in seconds).
    * Default to 1.
    */
   void setEmulatedSpeedMultiplier(double speed);
   double getEmulatedSpeedMultiplier();
   ///@}
 
+  ///@{
   /**
-   * Change current global time for emulated time algorithms.
+   * Set/get current global time for emulated time algorithms.
    */
   void setEmulatedCurrentTime(double time);
+  double getEmulatedCurrentTime();
+  ///@}
 
 Q_SIGNALS:
   /**

@@ -50,7 +50,15 @@ public:
    *
    * Required for LiveSource behavior.
    */
-  bool GetNeedsUpdate(double time);
+  virtual bool GetNeedsUpdate(double time);
+
+  /**
+   * LiveSources algorithm requires calling this->Modified() to update the data.
+   * However, doing so triggers an unwanted call to RequestInformation.
+   * To address this, we override the standard Modified method to ensure that
+   * RequestInformation is only invoked when the parameters are actually modified.
+   */
+  void Modified() override;
 
   /**
    * Return the first and last time steps of the implemented algorithm.
@@ -104,6 +112,7 @@ protected:
 
 private:
   bool NeedsUpdate = false;
+  bool NeedsInitialization = true;
   double RequestedTime = 0.;
   double TimeRange[2];
   std::vector<double> TimeSteps;
