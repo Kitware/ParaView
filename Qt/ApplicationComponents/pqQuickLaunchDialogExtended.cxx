@@ -106,7 +106,12 @@ void pqQuickLaunchDialogExtended::requestChanged(const QString& request)
   this->DisabledSortFilterModel->update();
 
   QListView* current = this->currentList();
+  if (this->Ui->AvailableProxies->model()->rowCount() > 0)
+  {
+    current = this->Ui->AvailableProxies;
+  }
   this->makeCurrent(current, 0);
+
   if (current->model()->rowCount() == 0)
   {
     this->toggleFocus();
