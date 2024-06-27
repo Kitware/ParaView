@@ -2852,14 +2852,19 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         """
         Generates a block of color information, given a representation proxy.
 
-            colorBy: {
-                'representation': '652',
-                'scalarBar': 0,
-                'mode': 'color'    # 'array'
-                'color': [ 0.5, 1.0, 1.0 ],
-                'array': [ 'POINTS', 'RTData', -1 ],
-                'colorMap': 'Blue to Red'
+        Example output format:
+
+        .. code-block:: json
+
+            "colorBy": {
+                "representation": "652",
+                "scalarBar": 0,
+                "mode": "color",   # 'array'
+                "color": [0.5, 1.0, 1.0],
+                "array": ["POINTS", "RTData", -1],
+                "colorMap": "Blue to Red"
             }
+
         """
         colorInfo = {"representation": proxy.GetGlobalIDAsString()}
         if proxy.GetProperty("DiffuseColor"):
@@ -2898,21 +2903,33 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
     def getUiProperties(self, proxyId, proxyProperties):
         """
         Generates an array of objects, parallel to the properties, containing
-        the information needed to render ui for each property.  Not all of the
+        the information needed to render UI for each property. Not all of the
         following attributes will always be present.
 
-        ui : [ {
-                 'name': 'Clip Type',
-                 'advanced': 1,                 # 0
-                 'doc': 'Documentation string for the property',
-                 'dependency': '498:ClipFunction:Sphere:1',
-                 'values': { 'Plane': '456', 'Box': '457', 'Scalar': '458', 'Sphere': '459' },
-                 'type': 'int',                    # 'float', 'int', 'str', 'proxy', 'input', ...
-                 'widget': 'textfield',            # 'checkbox', 'textarea', 'list-1', 'list-n'
-                 'size': -1,                       # -1, 0, 2, 3, 6
-                 'range': [ { 'min': 0, 'max': 1 }, { 'min': 4, 'max': 7 }, ... ]
-               }, ...
-             ]
+        :param proxyId: The ID of the proxy.
+        :type proxyId: str
+        :param proxyProperties: The properties of the proxy.
+        :type proxyProperties: list
+
+        Example output format:
+
+        .. code-block:: json
+
+            "ui": [
+                {
+                    "name": "Clip Type",
+                    "advanced": 1,                  # 0
+                    "doc": "Documentation string for the property",
+                    "dependency": "498:ClipFunction:Sphere:1",
+                    "values": { "Plane": "456", "Box": "457", "Scalar": "458", "Sphere": "459" },
+                    "type": "int",                  # 'float', 'int', 'str', 'proxy', 'input', ...
+                    "widget": "textfield",          # 'checkbox', 'textarea', 'list-1', 'list-n'
+                    "size": -1,                     # -1, 0, 2, 3, 6
+                    "range": [ { "min": 0, "max": 1 }, { "min": 4, "max": 7 } ]
+                }
+                # More objects...
+            ]
+
         """
 
         if self.proxyIsRepresentation:
@@ -3490,18 +3507,26 @@ class ParaViewWebSaveData(ParaViewWebProtocol):
     @exportRpc("pv.data.save")
     def saveData(self, filePath, options=None):
         """
-        Save some data on the server side.  Can save data from a proxy, a
-        screenshot, or else the current state.  Options may be different
-        depending on the type of data to be save.  Saving a screenshot
+        Save some data on the server side. Can save data from a proxy, a
+        screenshot, or else the current state. Options may be different
+        depending on the type of data to be saved. Saving a screenshot
         can take an optional size array indicating the desired width and
-        height of the saved image.  Saving data can take an optional proxy
+        height of the saved image. Saving data can take an optional proxy
         id specifying which filter or source to save output from.
 
-            options = {
-                'proxyId': '426',
-                'size': [ <imgWidth>, <imgHeight> ]
-            }
+        :param filePath: The path where the data will be saved.
+        :type filePath: str
+        :param options: Optional parameters to customize the save operation.
+        :type options: dict
 
+        Example usage of `options`:
+
+        .. code-block:: json
+
+            {
+                "proxyId": "426",
+                "size": [800, 600]
+            }
         """
 
         # make sure file path exists

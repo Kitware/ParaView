@@ -475,12 +475,20 @@ def SelectLocation(Locations=[], Source=None, Modifier=None):
 
 
 def QuerySelect(QueryString='', FieldType='POINT', Source=None, InsideOut=False):
-    """Selection by query expression.
-    - QueryString - string with NumPy-like boolean expression defining which attributes are selected
-    - FieldType - atttribute to select, e.g., 'POINT' or 'CELL'
-    - Source - if not set, then the selection will be on the active source
-    - InsideOut - Invert the selection so that attributes that do not satisfy the expression are
-      selected instead of elements that do
+    """
+    Selection by query expression.
+
+    :param QueryString: string with NumPy-like boolean expression defining which attributes are selected
+    :type QueryString: str
+    :param FieldType: attribute to select, e.g., 'POINT' or 'CELL'
+    :type FieldType: str
+    :param Source: if not set, then the selection will be on the active source
+    :type Source: paraview.servermanager.source.Proxy
+    :param InsideOut: Invert the selection so that attributes that do not satisfy the
+        expression are selected instead of elements that do.
+    :type InsideOut: bool
+    :return: None
+
     """
     if not Source:
         Source = paraview.simple.GetActiveSource()
