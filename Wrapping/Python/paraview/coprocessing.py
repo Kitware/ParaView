@@ -812,11 +812,11 @@ class CoProcessor(object):
         Return True if the given timestep in datadescription is in one of the provided frequencies
         or output is forced. This can be interpreted as follow::
 
-        isFM = IsInModulo(timestep-timeStepToStartOutputAt, [2,3,7])
+            isFM = IsInModulo(timestep-timeStepToStartOutputAt, [2,3,7])
 
         is similar to::
 
-        isFM = (timestep-timeStepToStartOutputAt % 2 == 0) or (timestep-timeStepToStartOutputAt % 3 == 0) or (timestep-timeStepToStartOutputAt % 7 == 0)
+            isFM = (timestep-timeStepToStartOutputAt % 2 == 0) or (timestep-timeStepToStartOutputAt % 3 == 0) or (timestep-timeStepToStartOutputAt % 7 == 0)
 
         The timeStepToStartOutputAt is the first timestep that will potentially be output.
         """

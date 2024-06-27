@@ -6,7 +6,7 @@ Changes in 5.10
 ---------------
 
 Render View Background Color
----------------------------
+----------------------------
 
 `UseGradientBackground`, `UseTexturedBackground` and `UseSkyboxBackground`
 properties have been replaced by `BackgroundColorMode` which is an
