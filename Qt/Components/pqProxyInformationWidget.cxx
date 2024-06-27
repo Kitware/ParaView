@@ -33,6 +33,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
+#include <memory>
 #include <vtksys/SystemTools.hxx>
 
 #include <tuple>
@@ -133,19 +134,26 @@ void pqArraysModel::setDataInformation(vtkPVDataInformation* dinfo)
   this->beginResetModel();
   this->DataInformation = dinfo;
   this->ArrayInformations.clear();
-  for (int cc = 0; dinfo && cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS; ++cc)
+  for (int attributeIdx = 0; dinfo && attributeIdx < vtkDataObject::NUMBER_OF_ASSOCIATIONS;
+       ++attributeIdx)
   {
-    if (auto dsa = dinfo->GetAttributeInformation(cc))
+    if (auto dsa = dinfo->GetAttributeInformation(attributeIdx))
     {
-      this->AttributeInformations[cc] = dsa;
-      for (int kk = 0, max = dsa->GetNumberOfArrays(); kk < max; ++kk)
+      this->AttributeInformations[attributeIdx] = dsa;
+
+      std::shared_ptr<vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator> iter(
+        dsa->NewAlphabeticalArrayInformationIterator());
+      int arrayIdx = 0;
+      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-        this->ArrayInformations.emplace_back(cc, kk, dsa->GetArrayInformation(kk));
+        this->ArrayInformations.emplace_back(
+          attributeIdx, arrayIdx, iter->GetCurrentArrayInformation());
+        ++arrayIdx;
       }
     }
     else
     {
-      this->AttributeInformations[cc] = nullptr;
+      this->AttributeInformations[attributeIdx] = nullptr;
     }
   }
   this->endResetModel();

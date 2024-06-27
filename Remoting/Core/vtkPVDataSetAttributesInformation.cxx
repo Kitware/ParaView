@@ -67,8 +67,10 @@ public:
     return this->ArrayInformations[it->second];
   }
 
-  std::vector<vtkSmartPointer<vtkPVArrayInformation>> ArrayInformations;
-  std::map<std::string, size_t, comparator> ArrayInformationLookupMap;
+  typedef std::map<std::string, size_t, comparator> lookupMap_t;
+  typedef std::vector<vtkSmartPointer<vtkPVArrayInformation>> storageVector_t;
+  storageVector_t ArrayInformations;
+  lookupMap_t ArrayInformationLookupMap;
   std::string AttributesInformation[vtkDataSetAttributes::NUM_ATTRIBUTES];
   bool ValuesPopulated = false;
 };
@@ -454,4 +456,59 @@ void vtkPVDataSetAttributesInformation::CopyFromStream(const vtkClientServerStre
       return;
     }
   }
+}
+
+//----------------------------------------------------------------------------
+struct vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::vtkInternals
+{
+  vtkPVDataSetAttributesInformation* DSAttributesInformation = nullptr;
+  vtkPVDataSetAttributesInformation::vtkInternals::lookupMap_t::iterator LookupMapIter;
+};
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::
+  AlphabeticalArrayInformationIterator(vtkPVDataSetAttributesInformation* dsAttributesInformation)
+{
+  this->Internals = std::unique_ptr<vtkInternals>(new vtkInternals());
+  this->Internals->DSAttributesInformation = dsAttributesInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::
+  ~AlphabeticalArrayInformationIterator() = default;
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator*
+vtkPVDataSetAttributesInformation::NewAlphabeticalArrayInformationIterator()
+{
+  return new vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::GoToFirstItem()
+{
+  this->Internals->LookupMapIter =
+    this->Internals->DSAttributesInformation->Internals->ArrayInformationLookupMap.begin();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::GoToNextItem()
+{
+  this->Internals->LookupMapIter++;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::IsDoneWithTraversal()
+  const
+{
+  return this->Internals->LookupMapIter ==
+    this->Internals->DSAttributesInformation->Internals->ArrayInformationLookupMap.end();
+}
+
+//----------------------------------------------------------------------------
+vtkPVArrayInformation* vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator::
+  GetCurrentArrayInformation()
+{
+  auto& infoStorage = this->Internals->DSAttributesInformation->Internals->ArrayInformations;
+  return infoStorage[this->Internals->LookupMapIter->second];
 }
