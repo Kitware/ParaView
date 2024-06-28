@@ -34,6 +34,12 @@ protected:
   void appendPyObjectAttributes(PyObject* object, QStringList& results);
 
   /**
+   * Given a PyObject that is a function, append all of it's keyword arguments to the
+   * results list.
+   */
+  void appendFunctionKeywordArguments(PyObject* function, QStringList& results);
+
+  /**
    * Given `pythonObjectName` string in the form "X.Y.Z.T" and script locals,
    * return the most derived PyObject that matches the string.
    * For example, given "X.Y.Z" string and a locals object containing an object X with attribute Z,
