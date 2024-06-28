@@ -16,7 +16,7 @@ QString pqPythonCompleter::getVariableToComplete(const QString& prompt)
   {
     QChar c = prompt.at(i);
     if (c.isLetterOrNumber() || c == '.' || c == '_' || c == '[' || c == ']' || c == '(' ||
-      c == ')')
+      c == ')' || c == ' ' || c == ',' || c == '=' || c == '\'' || c == '"')
     {
       textToComplete.prepend(c);
     }
@@ -33,7 +33,7 @@ QStringList pqPythonCompleter::getCompletions(const QString& prompt)
 {
   QString textToComplete = this->getVariableToComplete(prompt);
 
-  // Variable to lookup is the name before the last dot if there is one.
+  // Variable to lookup is the name before the last dot or paren if there is one.
   QString lookup{};
   int dot = textToComplete.lastIndexOf('.');
   int paren = textToComplete.lastIndexOf('(');
@@ -60,7 +60,9 @@ QString pqPythonCompleter::getCompletionPrefix(const QString& prompt)
   QString compareText = this->getVariableToComplete(prompt);
   int dot = compareText.lastIndexOf('.');
   int paren = compareText.lastIndexOf('(');
-  int maxPos = std::max<int>(dot, paren);
+  int comma = compareText.lastIndexOf(',');
+  int space = compareText.lastIndexOf(' ');
+  int maxPos = std::max<int>({ dot, paren, comma, space });
   if (maxPos != -1)
   {
     compareText = compareText.mid(maxPos + 1);
