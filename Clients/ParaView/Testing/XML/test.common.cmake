@@ -41,7 +41,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/CubeStringArray.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/EnSight/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/ExRestarts/,REGEX:.*}"
-  "DATA{${paraview_test_data_directory_input}/Data/FDSExample/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/FDS/test_core/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FileSeries/,REGEX:.*}"
@@ -737,9 +737,14 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCompositedGeometryCulling.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestGeometryBoundsClobber.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestERFReader.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader0.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t0_boundaries_cc.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t0_boundaries.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t0_slice_cc.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t0_slice.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t8_boundaries_cc.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t8_boundaries.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t8_slice_cc.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFDSReader_t8_slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestHTGSelection_C.png}"
@@ -1082,7 +1087,6 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   TestCleanGridPointDataStrategies.xml
   TestColorMapModificationRendersAllViews.xml
   TestERFReader.xml
-  TestFDSReader.xml
   TestHTGSelection.xml
   TestHTGThreshold.xml
   TestIsoVolume.xml
@@ -2018,6 +2022,12 @@ paraview_add_client_tests(
 # See https://gitlab.kitware.com/paraview/paraview/-/issues/22596
 paraview_add_client_tests(
   TEST_SCRIPTS RandomAttributesHTG.xml
+)
+
+# FDS Reader has issues in client-server mode.
+# See https://gitlab.kitware.com/paraview/paraview/-/issues/22687
+paraview_add_client_tests(
+  TEST_SCRIPTS TestFDSReader.xml
 )
 
 # TODO: remote rendering tests and reverse connect tests.
