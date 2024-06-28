@@ -3670,6 +3670,29 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName=("POINTS", "Pres"))
     Render()
 
+# -----------------------------------------------------------------------------
+def ListProperties(proxyOrCreateFunction):
+    """Given a proxy or a proxy creation function, e.g. paraview.simple.Sphere,
+    returns the list of properties for the proxy that would be created.
+
+    :param proxyOrCreateFunction: Proxy or proxy creation function whose property
+        names are desired.
+    :type proxyOrCreateFunction: Proxy or proxy creation function
+    :return: List of property names
+    :rtype: List of str"""
+
+    try:
+        return _listProperties(proxyOrCreateFunction)
+    except:
+        pass
+
+    try:
+        return proxyOrCreateFunction.ListProperties()
+    except:
+        pass
+
+    return None
+
 
 # ==============================================================================
 # Set of Internal functions
@@ -3760,8 +3783,37 @@ def _create_func(key, module, skipRegisteration=False):
 
     # add special tag to detect these functions in _remove_functions
     CreateObject.__paraview_create_object_tag = True
+    CreateObject.__paraview_create_object_key = key
+    CreateObject.__paraview_create_object_module = module
     return CreateObject
 
+# -----------------------------------------------------------------------------
+def _listProperties(create_func):
+    """Internal function that, given a proxy creation function, e.g.,
+    paraview.simple.Sphere, returns the list of named properties that can
+    be set during construction."""
+    key = create_func.__paraview_create_object_key
+    module = create_func.__paraview_create_object_module
+    prototype_func = _create_func(key, module, skipRegisteration=True)
+
+    # Find the prototype by XML label name
+    xml_definition = module._findProxy(name=key)
+    xml_group = xml_definition['group']
+    xml_name = xml_definition['key']
+    prototype = sm.ProxyManager().GetPrototypeProxy(xml_group, xml_name)
+
+    # Iterate over properties and add them to the list
+    property_iter = prototype.NewPropertyIterator()
+    property_iter.UnRegister(None)
+    property_names = []
+    while not property_iter.IsAtEnd():
+        label = property_iter.GetPropertyLabel()
+        if label is None:
+          label = property_iter.GetKey()
+        property_names.append(paraview.make_name_valid(label))
+        property_iter.Next()
+
+    return property_names
 
 # -----------------------------------------------------------------------------
 
