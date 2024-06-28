@@ -61,6 +61,8 @@ protected Q_SLOTS:
   /**
    * Updates the dialog with the given user request.
    * This filters the proxies lists.
+   * Force focus to the first available proxy if any. Fallback to the first disabled proxy
+   * otherwise.
    */
   void requestChanged(const QString& request);
 

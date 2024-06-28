@@ -29,6 +29,14 @@
   <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelItemData" arguments="0.0,Cone" />
   <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/ShortHelp" property="text" arguments="3D cone of a given radius and height" />
 
+  <!--test autoswitch between available / disable-->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="conn" />
+  <!--available list is empty-->
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/AvailableProxies" property="modelRowCount" arguments="0" />
+  <!--removing extra "n" should switch back to available list, with "Cone" selected-->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="set_string" arguments="con" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/CreateProxy" property="text" arguments="Cone" />
+
   <!-- test more requirements -->
   <!-- create proxy -->
   <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/CreateProxy" command="activate" arguments="" />
