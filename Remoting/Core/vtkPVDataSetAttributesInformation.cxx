@@ -130,12 +130,12 @@ void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformati
   internals.ArrayInformations.clear();
   internals.ArrayInformationLookupMap.clear();
   Internals->ArrayInformations.reserve(ointernals.ArrayInformations.size());
-  for (const auto& pair : ointernals.ArrayInformationLookupMap)
+  for (const auto& oinfo : ointernals.ArrayInformations)
   {
     vtkNew<vtkPVArrayInformation> arrayInfo;
-    arrayInfo->DeepCopy(ointernals.ArrayInformations[pair.second]);
+    arrayInfo->DeepCopy(oinfo);
 
-    internals.ArrayInformationLookupMap[pair.first] = internals.ArrayInformations.size();
+    internals.ArrayInformationLookupMap[arrayInfo->GetName()] = internals.ArrayInformations.size();
     internals.ArrayInformations.push_back(arrayInfo);
   }
 
@@ -269,16 +269,15 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
   std::vector<bool> duplicateArrays(this->Internals->ArrayInformations.size(), false);
 
   const auto& ointernals = (*other->Internals);
-  for (auto& pair : ointernals.ArrayInformationLookupMap)
+  for (const auto& oinfo : ointernals.ArrayInformations)
   {
-    auto& oinfo = ointernals.ArrayInformations[pair.second];
-    auto iter = internals.ArrayInformationLookupMap.find(pair.first);
+    auto iter = internals.ArrayInformationLookupMap.find(oinfo->GetName());
     if (iter == internals.ArrayInformationLookupMap.end())
     {
       auto ainfo = vtkPVArrayInformation::New();
       ainfo->DeepCopy(oinfo);
-      ainfo->SetIsPartial(1); // since only present in `other`.
-      internals.GetOrCreateArrayInformation(pair.first).TakeReference(ainfo);
+      ainfo->SetIsPartial(true); // since only present in `other`.
+      internals.GetOrCreateArrayInformation(oinfo->GetName()).TakeReference(ainfo);
     }
     else
     {
