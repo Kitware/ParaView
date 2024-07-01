@@ -184,10 +184,8 @@ pqMultiBlockPropertiesStateWidget::pqMultiBlockPropertiesStateWidget(vtkSMProxy*
   // create the tooltips
   const QString toolTipFirstPart =
     internals.BlockPropertyNames.size() > 1 ? tr("Properties are ") : tr("Property is ");
-  const QString toolTipSecondPart =
-    internals.BlockPropertyNames.size() > 1 ? tr(" they ") : tr(" it ");
   internals.ToolTips[BlockPropertyState::Disabled] =
-    toolTipFirstPart + tr("disabled because") + toolTipSecondPart + tr("can not be edited");
+    toolTipFirstPart + tr("disabled because no blocks are selected");
   internals.ToolTips[BlockPropertyState::RepresentationInherited] =
     toolTipFirstPart + tr("inherited from the representation");
   internals.ToolTips[BlockPropertyState::BlockInherited] =

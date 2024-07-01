@@ -118,7 +118,7 @@
      <item>
       <widget class="QLabel" name="labelStateDisabled">
        <property name="text">
-        <string>Property/ies is/are disabled because it/they cannot be edited.</string>
+        <string>At least one property is disabled because no blocks are selected.</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -148,7 +148,7 @@
      <item>
       <widget class="QLabel" name="labelStateRepresentationInherited">
        <property name="text">
-        <string>Property/ies are inherited from the representation.</string>
+        <string>At least one property is inherited from the representation.</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -178,7 +178,7 @@
      <item>
       <widget class="QLabel" name="labelStateBlockInherited">
        <property name="text">
-        <string>Property/ies is/are inherited from block(s).</string>
+        <string>At least one property is inherited from block(s).</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -208,7 +208,7 @@
      <item>
       <widget class="QLabel" name="labelStateMixedInherited">
        <property name="text">
-        <string>Property/ies is/are inherited from block(s) and the representation.</string>
+        <string>At least one property is inherited from block(s) and the representation.</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -238,7 +238,7 @@
      <item>
       <widget class="QLabel" name="labelStateSet">
        <property name="text">
-        <string>Property/ies is/are set in block(s).</string>
+        <string>At least one property is set in block(s).</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -268,7 +268,7 @@
      <item>
       <widget class="QLabel" name="labelStateSetAndRepresentationInherited">
        <property name="text">
-        <string>Property/ies is/are set in block(s) and inherited from the representation.</string>
+        <string>At least one property is set in block(s) and inherited from the representation.</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -298,7 +298,7 @@
      <item>
       <widget class="QLabel" name="labelStateSetAndBlockInherited">
        <property name="text">
-        <string>Property/ies is/are set in block(s) and inherited from block(s).</string>
+        <string>At least one property is set in block(s) and inherited from block(s).</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -328,7 +328,7 @@
      <item>
       <widget class="QLabel" name="labelStateSetAndMixedInherited">
        <property name="text">
-        <string>Property/ies is/are set in block(s) and inherited from block(s) and the representation.</string>
+        <string>At least one property is set in block(s) and inherited from block(s) and the representation.</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
