@@ -219,14 +219,16 @@ public:
   }
   ~pqTimestepValuesModel() override = default;
 
-  void setTimeSteps(const std::vector<double>& timesteps)
+  bool setTimeSteps(const std::vector<double>& timesteps)
   {
     if (this->TimeSteps != timesteps)
     {
       this->beginResetModel();
       this->TimeSteps = timesteps;
       this->endResetModel();
+      return true;
     }
+    return false;
   }
 
   int rowCount(const QModelIndex&) const override
@@ -459,18 +461,22 @@ public:
   // populate timesteps info.
   void setTimeSteps(vtkPVDataInformation* dinfo)
   {
+    bool updated = false;
     if (dinfo)
     {
       const std::set<double>& timeSteps = dinfo->GetTimeSteps();
       std::vector<double> vec;
       std::copy(timeSteps.begin(), timeSteps.end(), std::back_inserter(vec));
-      this->TimestepValuesModel.setTimeSteps(vec);
+      updated = this->TimestepValuesModel.setTimeSteps(vec);
     }
     else
     {
-      this->TimestepValuesModel.setTimeSteps({});
+      updated = this->TimestepValuesModel.setTimeSteps({});
     }
-    this->Ui.timeValues->header()->resizeSections(QHeaderView::ResizeToContents);
+    if (updated)
+    {
+      this->Ui.timeValues->header()->resizeSections(QHeaderView::ResizeToContents);
+    }
   }
 
   // update data statistics widgets
