@@ -3,11 +3,18 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "pqPresetGroupsManager.h"
+
 #include "vtkSMSettings.h"
 
+#include <QDebug>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <QSet>
+#include <QString>
 
 //-----------------------------------------------------------------------------
 pqPresetGroupsManager::pqPresetGroupsManager(QObject* p)
@@ -109,14 +116,81 @@ void pqPresetGroupsManager::replaceGroups(const QString& json)
 //-----------------------------------------------------------------------------
 bool pqPresetGroupsManager::loadGroupsFromSettings()
 {
-  std::string setting =
-    vtkSMSettings::GetInstance()->GetSettingAsString("TransferFunctionPresets.Groups", "");
-  if (setting.empty())
+  const QString settingPresetGroups = QString::fromStdString(
+    vtkSMSettings::GetInstance()->GetSettingAsString("TransferFunctionPresets.Groups", ""));
+  if (settingPresetGroups.isEmpty())
   {
     return false;
   }
 
-  this->replaceGroups(QString::fromStdString(setting));
+  // combine what exists in the settings with the default groups
+  const QString presetGroups = pqPresetGroupsManager::getPresetGroupsJson();
+  const QJsonDocument presetGroupsJson = QJsonDocument::fromJson(presetGroups.toUtf8());
+  const QJsonDocument settingPresetGroupsJson =
+    QJsonDocument::fromJson(settingPresetGroups.toUtf8());
+
+  // Find "User" groupName, and "Default" presets in settingPresetGroupsJson
+  QJsonObject userGroup;
+  QList<QString> settingsDefaultPresets;
+  for (const QJsonValue value : settingPresetGroupsJson.array())
+  {
+    QJsonObject obj = value.toObject();
+    if (obj["groupName"].toString() == "Default")
+    {
+      // Extract the preset names
+      for (const QJsonValue preset : obj["presets"].toArray())
+      {
+        settingsDefaultPresets.push_back(preset.toString());
+      }
+    }
+    else if (obj["groupName"].toString() == "User")
+    {
+      userGroup = obj;
+    }
+  }
+
+  // Add "User" groupName to the end of presetGroupsJson
+  QJsonArray presetGroupsArray = presetGroupsJson.array();
+  if (!userGroup.isEmpty())
+  {
+    presetGroupsArray.append(userGroup);
+  }
+
+  // Add all the presets from the "Default" groupName of settingPresetGroupsJson
+  // that do not exist in the "Default" groupName of presetGroupsJson
+  for (int i = 0; i < presetGroupsArray.size(); ++i)
+  {
+    QJsonObject obj = presetGroupsArray[i].toObject();
+    if (obj["groupName"].toString() == "Default")
+    {
+      QJsonArray defaultPresetsArray = obj["presets"].toArray();
+      QSet<QString> defaultPresetsSet;
+      for (const QJsonValue preset : defaultPresetsArray)
+      {
+        defaultPresetsSet.insert(preset.toString());
+      }
+
+      // Find the presets that are not part of the "Default" groupName of presetGroupsJson
+      for (const QString& preset : settingsDefaultPresets)
+      {
+        if (!defaultPresetsSet.contains(preset))
+        {
+          defaultPresetsArray.append(preset);
+        }
+      }
+
+      obj["presets"] = defaultPresetsArray;
+      presetGroupsArray[i] = obj; // Update the array with the modified object
+      break;
+    }
+  }
+
+  // Get the string representation of the updated presetGroupsJson
+  const QJsonDocument updatedPresetGroupsJson(presetGroupsArray);
+  const QString updatedPresetGroups = updatedPresetGroupsJson.toJson(QJsonDocument::Compact);
+  this->replaceGroups(updatedPresetGroups);
+
+  return true;
   return true;
 }
 
@@ -187,4 +261,16 @@ void pqPresetGroupsManager::removeFromAllGroups(const QString& presetName)
   {
     this->removeFromGroup(groupName, presetName);
   }
+}
+
+//-----------------------------------------------------------------------------
+QString pqPresetGroupsManager::getPresetGroupsJson()
+{
+  QFile groupsFile(":pqWidgets/pqPresetGroups.json");
+  if (!groupsFile.open(QIODevice::ReadOnly))
+  {
+    qWarning() << "Could not load preset group list.";
+    return QString();
+  }
+  return groupsFile.readAll();
 }
