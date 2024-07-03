@@ -13,6 +13,7 @@
 #include <vector>
 
 class vtkCamera;
+class vtkMatrix4x4;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMProxy;
@@ -103,13 +104,19 @@ public:
 
   enum
   {
-    INTERACTOR_STYLE_REQUEST_CONFIGURE = vtkCommand::UserEvent + 7370
+    INTERACTOR_STYLE_REQUEST_CONFIGURE = vtkCommand::UserEvent + 7370,
+    INTERACTOR_STYLE_NAVIGATION = vtkCommand::UserEvent + 7371
   };
 
   // Description:
   // Get active objects or return nullptr
   static vtkSMRenderViewProxy* GetActiveViewProxy();
   static vtkCamera* GetActiveCamera();
+
+  // Description:
+  // Get/Set the matrix used to navigate the scene.
+  vtkMatrix4x4* GetNavigationMatrix();
+  void SetNavigationMatrix(vtkMatrix4x4*);
 
 protected:
   vtkSMVRInteractorStyleProxy();

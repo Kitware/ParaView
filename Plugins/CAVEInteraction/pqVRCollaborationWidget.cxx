@@ -157,10 +157,20 @@ public:
     {
       this->CollabStyleProxy = vtkSmartPointer<vtkSMVRCollaborationStyleProxy>::New();
       this->CollabStyleProxy->IsInternalOn();
-      this->CollabStyleProxy->SetHeadEventName(&(this->HeadEventName));
-      this->CollabStyleProxy->SetLeftHandEventName(&(this->LeftHandEventName));
-      this->CollabStyleProxy->SetRightHandEventName(&(this->RightHandEventName));
+      this->CollabStyleProxy->SetCollaborationClient(this->CollaborationClient);
     }
+
+    // Connect the INTERACTOR_STYLE_NAVIGATION events on the render view proxy
+    // to the observer in the proxy class responsible for sharing navigation info
+    // with collaborators.
+    vtkSMRenderViewProxy* proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+    if (proxy && this->CollabStyleProxy->GetNavigationObserver())
+    {
+      proxy->AddObserver(vtkSMVRInteractorStyleProxy::INTERACTOR_STYLE_NAVIGATION,
+        this->CollabStyleProxy->GetNavigationObserver());
+    }
+
+    this->UpdateCollaborationStyleProxy();
 
     vtkSMVRCollaborationStyleProxy* foundIt = this->FindCollaborationProxyInHandler();
 
@@ -180,6 +190,21 @@ public:
 
     // Use the start render event as a hook for collaborationClient->Render()
     oglRen->AddObserver(vtkCommand::StartEvent, this->StartRenderObserver);
+  }
+
+  /*
+   * Update the vtkSMVRCollaborationStyleProxy with locally stored configuration
+   * details.
+   */
+  void UpdateCollaborationStyleProxy()
+  {
+    if (this->CollabStyleProxy)
+    {
+      this->CollabStyleProxy->SetHeadEventName(&(this->HeadEventName));
+      this->CollabStyleProxy->SetLeftHandEventName(&(this->LeftHandEventName));
+      this->CollabStyleProxy->SetRightHandEventName(&(this->RightHandEventName));
+      this->CollabStyleProxy->SetNavigationSharing(this->NavigationSharingEnabled);
+    }
   }
 
   /*
@@ -232,6 +257,16 @@ public:
     if (this->StartRenderObserver)
     {
       oglRen->RemoveObserver(this->StartRenderObserver);
+    }
+
+    if (this->CollabStyleProxy->GetNavigationObserver())
+    {
+      vtkSMRenderViewProxy* proxy =
+        vtkSMRenderViewProxy::SafeDownCast(this->ActiveView->getViewProxy());
+      if (proxy)
+      {
+        proxy->RemoveObserver(this->CollabStyleProxy->GetNavigationObserver());
+      }
     }
 
     vtkSMVRCollaborationStyleProxy* foundIt = this->FindCollaborationProxyInHandler();
@@ -363,6 +398,13 @@ public:
       {
         this->RightHandEventName = grandChild->GetAttributeOrEmpty("value");
       }
+
+      grandChild = child->FindNestedElementByName("ShareNavigation");
+      if (grandChild)
+      {
+        const char* attr = grandChild->GetAttributeOrEmpty("value");
+        this->NavigationSharingEnabled = strcmp(attr, "true") == 0 ? true : false;
+      }
     }
   }
 
@@ -448,6 +490,12 @@ public:
     child->AddNestedElement(grandChild);
     grandChild->Delete();
 
+    grandChild = vtkPVXMLElement::New();
+    grandChild->SetName("ShareNavigation");
+    grandChild->AddAttribute("value", (this->NavigationSharingEnabled ? "true" : "false"));
+    child->AddNestedElement(grandChild);
+    grandChild->Delete();
+
     sectionParent->AddNestedElement(child);
     child->Delete();
 
@@ -471,6 +519,7 @@ public:
   QString HeadEventName;
   QString LeftHandEventName;
   QString RightHandEventName;
+  bool NavigationSharingEnabled;
 
   QStringList TrackerNames;
 };
@@ -487,6 +536,7 @@ pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::Wind
   this->Internals->StartRenderObserver = nullptr;
   this->Internals->CollabStyleProxy = nullptr;
   this->Internals->CollabEnabled = false;
+  this->Internals->NavigationSharingEnabled = false;
   this->updateCollabWidgetState();
 
   this->Internals->outputWindow->setReadOnly(true);
@@ -564,15 +614,8 @@ void pqVRCollaborationWidget::configureAvatar()
     dialog->getEventName(pqVRAvatarEvents::Head, this->Internals->HeadEventName);
     dialog->getEventName(pqVRAvatarEvents::LeftHand, this->Internals->LeftHandEventName);
     dialog->getEventName(pqVRAvatarEvents::RightHand, this->Internals->RightHandEventName);
-
-    if (this->Internals->CollabStyleProxy)
-    {
-      this->Internals->CollabStyleProxy->SetHeadEventName(&(this->Internals->HeadEventName));
-      this->Internals->CollabStyleProxy->SetLeftHandEventName(
-        &(this->Internals->LeftHandEventName));
-      this->Internals->CollabStyleProxy->SetRightHandEventName(
-        &(this->Internals->RightHandEventName));
-    }
+    this->Internals->NavigationSharingEnabled = dialog->getNavigationSharing();
+    this->Internals->UpdateCollaborationStyleProxy();
   }
 }
 
@@ -668,6 +711,7 @@ void pqVRCollaborationWidget::restoreCollaborationState(
   dialog->setEventName(pqVRAvatarEvents::Head, this->Internals->HeadEventName);
   dialog->setEventName(pqVRAvatarEvents::LeftHand, this->Internals->LeftHandEventName);
   dialog->setEventName(pqVRAvatarEvents::RightHand, this->Internals->RightHandEventName);
+  dialog->setNavigationSharing(this->Internals->NavigationSharingEnabled);
 }
 #else
 pqVRCollaborationWidget::pqVRCollaborationWidget(QWidget* parentObject, Qt::WindowFlags f) {}

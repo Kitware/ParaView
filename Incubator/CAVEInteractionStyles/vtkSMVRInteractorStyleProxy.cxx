@@ -10,8 +10,11 @@
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 
+#include "vtkCamera.h"
+#include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMRenderViewProxy.h"
@@ -525,4 +528,36 @@ vtkCamera* vtkSMVRInteractorStyleProxy::GetActiveCamera()
   }
 
   return nullptr;
+}
+
+// ----------------------------------------------------------------------------
+vtkMatrix4x4* vtkSMVRInteractorStyleProxy::GetNavigationMatrix()
+{
+  vtkCamera* activeCamera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
+  if (activeCamera)
+  {
+    return activeCamera->GetModelTransformMatrix();
+  }
+
+  return nullptr;
+}
+
+// ----------------------------------------------------------------------------
+void vtkSMVRInteractorStyleProxy::SetNavigationMatrix(vtkMatrix4x4* matrix)
+{
+  vtkCamera* activeCamera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
+  if (activeCamera)
+  {
+    activeCamera->SetModelTransformMatrix(matrix);
+
+    vtkNew<vtkMatrix4x4> physicalToWorld;
+    physicalToWorld->DeepCopy(matrix);
+    physicalToWorld->Invert();
+    double matrixBuffer[16];
+    vtkMatrix4x4::DeepCopy(matrixBuffer, physicalToWorld);
+
+    vtkSMRenderViewProxy* viewProxy = vtkSMVRInteractorStyleProxy::GetActiveViewProxy();
+    vtkSMPropertyHelper(viewProxy, "PhysicalToWorldMatrix").Set(matrixBuffer, 16);
+    viewProxy->InvokeEvent(INTERACTOR_STYLE_NAVIGATION, physicalToWorld);
+  }
 }

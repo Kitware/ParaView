@@ -73,6 +73,7 @@ public:
     this->TrackerNames.insert(0, "");
   }
 
+  bool navigationSharingEnabled;
   QStringList TrackerNames;
   QMap<AvatarEventType, QString> avatarEventMap;
 };
@@ -83,6 +84,8 @@ pqVRAvatarEvents::pqVRAvatarEvents(QWidget* parentObject, Qt::WindowFlags f)
   , Internals(new pqInternals())
 {
   this->Internals->setupUi(this);
+
+  this->Internals->navigationSharingEnabled = false;
 
   connect(this->Internals->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(this->Internals->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -107,6 +110,18 @@ void pqVRAvatarEvents::setEventName(AvatarEventType type, QString& eventName)
 }
 
 //-----------------------------------------------------------------------------
+bool pqVRAvatarEvents::getNavigationSharing()
+{
+  return this->Internals->navigationSharingEnabled;
+}
+
+//-----------------------------------------------------------------------------
+void pqVRAvatarEvents::setNavigationSharing(bool enabled)
+{
+  this->Internals->navigationSharingEnabled = enabled;
+}
+
+//-----------------------------------------------------------------------------
 void pqVRAvatarEvents::accept()
 {
   this->Internals->avatarEventMap[Head] = this->Internals->avatarHeadEventCombo->currentText();
@@ -114,6 +129,8 @@ void pqVRAvatarEvents::accept()
     this->Internals->avatarLeftHandEventCombo->currentText();
   this->Internals->avatarEventMap[RightHand] =
     this->Internals->avatarRightHandEventCombo->currentText();
+
+  this->Internals->navigationSharingEnabled = this->Internals->cShareNavigation->isChecked();
 
   this->Superclass::accept();
 }
@@ -148,6 +165,9 @@ int pqVRAvatarEvents::exec()
     this->Internals->avatarRightHandEventCombo->setCurrentText(
       this->Internals->avatarEventMap[RightHand]);
   }
+
+  // Sync checkbox state
+  this->Internals->cShareNavigation->setChecked(this->Internals->navigationSharingEnabled);
 
   return this->Superclass::exec();
 }
