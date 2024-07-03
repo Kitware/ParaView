@@ -26,6 +26,14 @@
   <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777217" />
   <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="" />
 
+  <!--select first disable -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/DisabledProxies" command="setCurrent" arguments="0.0" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="Requires an input" />
+
+  <!-- tab to switch to Available list -->
+  <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777217" />
+  <pqcheck object="pqClientMainWindow/QuickLaunchDialogExtended/Requirements" property="text" arguments="" />
+
   <!-- Esc to quit -->
   <pqevent object="pqClientMainWindow/QuickLaunchDialogExtended/Request" command="key" arguments="16777216" />
 </pqevents>

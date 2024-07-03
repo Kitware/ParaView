@@ -110,17 +110,17 @@ bool pqKeyEventFilter::eventFilter(QObject* obj, QEvent* event)
       Q_EMIT this->motion(key);
       return true;
     }
+    if (this->shouldHandle(obj, Focus) && this->isFocusType(key))
+    {
+      Q_EMIT this->focusChanged();
+      return true;
+    }
     QString text = keyEvent->text();
     QChar keyChar = text.isEmpty() ? QChar() : text.front();
     if (this->shouldHandle(obj, TextInput) && this->isTextUpdateType(keyChar) &&
       (keyEvent->modifiers() == Qt::NoModifier))
     {
       Q_EMIT this->textChanged(key);
-      return true;
-    }
-    if (this->shouldHandle(obj, Focus) && this->isFocusType(key))
-    {
-      Q_EMIT this->focusChanged();
       return true;
     }
   }
