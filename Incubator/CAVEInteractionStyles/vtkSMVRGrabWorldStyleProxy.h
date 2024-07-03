@@ -49,7 +49,6 @@ private:
   void operator=(const vtkSMVRGrabWorldStyleProxy&) = delete;             // Not implemented
 
   float GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix); /* WRS: what does this do? */
-  vtkCamera* GetCamera();
 };
 
 #endif // vtkSMVRGrabWorldStyleProxy_h

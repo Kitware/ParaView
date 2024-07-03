@@ -49,7 +49,6 @@ private:
   void operator=(const vtkSMVRGrabPointStyleProxy&) = delete;             // Not implemented
 
   float GetSpeedFactor(vtkCamera* cam); // WRS-TODO: what does this do?
-  vtkCamera* GetCamera();               // WRS-TODO: how is this used?
 };
 
 #endif // vtkSMVRGrabPointStyleProxy_h

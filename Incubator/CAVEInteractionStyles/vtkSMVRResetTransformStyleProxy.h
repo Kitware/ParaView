@@ -42,7 +42,6 @@ private:
   void operator=(const vtkSMVRResetTransformStyleProxy&) = delete; // Not implemented
 
   float GetSpeedFactor(vtkCamera* cam); // WRS-TODO: what does this do?
-  vtkCamera* GetCamera();
 };
 
 #endif // vtkSMVRResetTransformStyleProxy_h

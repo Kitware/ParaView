@@ -10,13 +10,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
-
-#include "pqActiveObjects.h"
-#include "pqRenderView.h"
-#include "pqView.h"
 
 #include <algorithm>
 #include <cmath>
@@ -64,41 +59,6 @@ bool vtkSMVRGrabPointStyleProxy::Update()
 }
 
 // ----------------------------------------------------------------------------
-// GetCamera() method
-//
-// NOTE: in the vtkVRSpaceNavigatorGrabWorldStyle.cxx code, the multiple steps used to
-//   get the "rview->getProxy()" value is simply replaced with "this->ControlledProxy".
-//   I would like to get an explanation so we know if we can do the same here.
-vtkCamera* vtkSMVRGrabPointStyleProxy::GetCamera()
-{
-  vtkCamera* camera = nullptr;
-  pqActiveObjects& activeObjs = pqActiveObjects::instance();
-
-  /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-   * (WRS: I assume) */
-  if (pqView* pqview = activeObjs.activeView())
-  {
-    /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-     * (WRS: I assume) */
-    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqview))
-    {
-      /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
-       * (WRS: I assume) */
-      if (vtkSMRenderViewProxy* rviewPxy = vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
-      {
-        camera = rviewPxy->GetActiveCamera();
-      }
-    }
-  }
-  if (!camera)
-  {
-    vtkWarningMacro(<< "Cannot grab active camera.");
-  }
-
-  return camera;
-}
-
-// ----------------------------------------------------------------------------
 // HandleButton() method
 void vtkSMVRGrabPointStyleProxy::HandleButton(const vtkVREvent& event)
 {
@@ -131,7 +91,7 @@ void vtkSMVRGrabPointStyleProxy::HandleTracker(const vtkVREvent& event)
     return;
   if (this->EnableNavigate)
   {
-    camera = vtkSMVRGrabPointStyleProxy::GetCamera();
+    camera = vtkSMVRInteractorStyleProxy::GetActiveCamera();
     if (!camera)
     {
       vtkWarningMacro(<< " HandleTracker: Cannot grab active camera.");

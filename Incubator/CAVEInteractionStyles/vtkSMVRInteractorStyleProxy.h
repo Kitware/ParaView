@@ -12,10 +12,12 @@
 #include <string>
 #include <vector>
 
+class vtkCamera;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMProxy;
 class vtkSMDoubleVectorProperty;
+class vtkSMRenderViewProxy;
 class vtkStringList;
 struct vtkVREvent;
 
@@ -103,6 +105,11 @@ public:
   {
     INTERACTOR_STYLE_REQUEST_CONFIGURE = vtkCommand::UserEvent + 7370
   };
+
+  // Description:
+  // Get active objects or return nullptr
+  static vtkSMRenderViewProxy* GetActiveViewProxy();
+  static vtkCamera* GetActiveCamera();
 
 protected:
   vtkSMVRInteractorStyleProxy();
