@@ -96,7 +96,7 @@
 
     # enable XML tests "stack trace" on failure
     variables:
-        PV_DEBUG_TEST: 1
+        PV_DEBUG_TEST: "1"
 
     script:
         - *before_script_macos
