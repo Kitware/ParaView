@@ -5,6 +5,8 @@
 
 #include "vtkObjectFactory.h"
 
+#include "vtkPVFileInformation.h"
+
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
 #include "vtkPython.h"
@@ -13,12 +15,14 @@
 #include "vtkSmartPyObject.h"
 #endif
 
+namespace
+{
+const std::string GLANCE_HTML_LOCATION = "/web/glance/ParaViewGlance.html";
+}
+
 vtkStandardNewMacro(vtkPVWebExporter);
 //----------------------------------------------------------------------------
-vtkPVWebExporter::vtkPVWebExporter()
-{
-  this->ParaViewGlanceHTML = nullptr;
-}
+vtkPVWebExporter::vtkPVWebExporter() = default;
 
 //----------------------------------------------------------------------------
 vtkPVWebExporter::~vtkPVWebExporter()
@@ -30,12 +34,36 @@ vtkPVWebExporter::~vtkPVWebExporter()
 void vtkPVWebExporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ExportToGlance ? " << (this->ExportToGlance ? "yes" : "no") << endl;
+  os << indent << "AutomaticGlanceHTML ? " << (this->AutomaticGlanceHTML ? "yes" : "no") << endl;
+  os << indent << "ParaViewGlanceHTML: " << this->ParaViewGlanceHTML << endl;
+  os << indent << "DisableNetwork ?" << (this->DisableNetwork ? "yes" : "no") << endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWebExporter::Write()
 {
   this->Superclass::Write();
+
+  std::string glanceHTML;
+  if (this->ExportToGlance)
+  {
+    if (this->AutomaticGlanceHTML)
+    {
+      glanceHTML =
+        vtkPVFileInformation::GetParaViewSharedResourcesDirectory() + ::GLANCE_HTML_LOCATION;
+    }
+    else
+    {
+      glanceHTML = this->ParaViewGlanceHTML;
+    }
+    if (!vtksys::SystemTools::FileExists(glanceHTML.c_str()))
+    {
+      vtkWarningMacro(
+        "Could not find file " << glanceHTML << ", not writing ParaView Glance HTML file");
+      glanceHTML = "";
+    }
+  }
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
@@ -76,10 +104,10 @@ void vtkPVWebExporter::Write()
       throw 1;
     }
 
-    if (this->ParaViewGlanceHTML)
+    if (!glanceHTML.empty())
     {
       PyObject_CallMethod(module, const_cast<char*>("addDataToViewer"), const_cast<char*>("(ss)"),
-        const_cast<char*>(this->FileName), const_cast<char*>(this->ParaViewGlanceHTML));
+        const_cast<char*>(this->FileName), const_cast<char*>(glanceHTML.c_str()));
     }
     if (PyErr_Occurred())
     {

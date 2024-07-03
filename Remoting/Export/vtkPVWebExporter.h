@@ -23,10 +23,30 @@ public:
 
   ///@{
   /**
-   * Specify file name of the ParaViewGlance HTML file to use to embed the data in
+   * Specify file name of the custom ParaViewGlance HTML file to use to embed the data in
    */
   vtkSetStringMacro(ParaViewGlanceHTML);
   vtkGetStringMacro(ParaViewGlanceHTML);
+  ///@}
+
+  ///@{
+  /**
+   * When checked, ignore ParaViewGlanceHTML and try to find the ParaViewGlance.html file coming
+   * with the ParaView distribution. This file is supposed to be in
+   * share/paraview-X/web/glance/ParaViewGlance.html
+   */
+  vtkGetMacro(ExportToGlance, bool);
+  vtkSetMacro(ExportToGlance, bool);
+  ///@}
+
+  ///@{
+  /**
+   * When checked, ignore ParaViewGlanceHTML and try to find the ParaViewGlance.html file coming
+   * with the ParaView distribution. This file is supposed to be in
+   * share/paraview-X/web/glance/ParaViewGlance.html
+   */
+  vtkGetMacro(AutomaticGlanceHTML, bool);
+  vtkSetMacro(AutomaticGlanceHTML, bool);
   ///@}
 
 protected:
@@ -40,7 +60,9 @@ private:
   vtkPVWebExporter(const vtkPVWebExporter&) = delete;
   void operator=(const vtkPVWebExporter&) = delete;
 
-  char* ParaViewGlanceHTML;
+  char* ParaViewGlanceHTML = nullptr;
+  bool AutomaticGlanceHTML = true;
+  bool ExportToGlance = true;
 };
 
 #endif

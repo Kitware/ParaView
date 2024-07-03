@@ -591,12 +591,46 @@
                              number_of_elements="1">
           <Documentation>Name of the file to write into</Documentation>
        </StringVectorProperty>
+       <IntVectorProperty command="SetExportToGlance"
+                          default_values="0"
+                          name="ExportToGlance"
+                          number_of_elements="1">
+         <BooleanDomain name="bool" />
+         <Documentation>Embed the VTKJS Scene into a standalone HTML file using Kitware Glance</Documentation>
+       </IntVectorProperty>
+       <IntVectorProperty command="SetAutomaticGlanceHTML"
+                          default_values="1"
+                          name="AutomaticGlanceHTML"
+                          number_of_elements="1">
+         <BooleanDomain name="bool" />
+         <Documentation>Use the default HTML file bundled with ParaView.</Documentation>
+         <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ExportToGlance"
+                                   value="1" />
+          </Hints>
+       </IntVectorProperty>
        <StringVectorProperty name="ParaViewGlanceHTML"
                              command="SetParaViewGlanceHTML"
                              number_of_elements="1"
                              panel_visibility="advanced">
-          <Documentation>Filepath to the HTML viewer to embed data in</Documentation>
+          <Documentation>Custom filepath to the HTML viewer to embed data in.</Documentation>
           <FileListDomain name="files" />
+          <Hints>
+            <PropertyWidgetDecorator type="CompositeDecorator">
+              <Expression type="and">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="ExportToGlance"
+                                         value="1" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="AutomaticGlanceHTML"
+                                         value="0" />
+              </Expression>
+            </PropertyWidgetDecorator>
+          </Hints>
        </StringVectorProperty>
       <IntVectorProperty command="SetWriteTextures"
                          default_values="1"
