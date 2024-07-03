@@ -24,7 +24,7 @@
 
       <Hints>
         <!-- Required for live sources -->
-        <LiveSource interval="50"/>
+        <LiveSource interval="50" refresh_on_interaction="1" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>

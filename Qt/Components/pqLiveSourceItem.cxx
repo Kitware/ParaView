@@ -27,7 +27,8 @@ public:
   pqTimer Timer;
   QPointer<pqPipelineSource> Source;
   double TimeRange[2];
-  bool IsEmulatedTimeAlgorithm;
+  bool IsEmulatedTimeAlgorithm = false;
+  bool AllowRefreshOnInteraction = false;
 
   static const int DEFAULT_INTERVAL = 100;
 
@@ -44,9 +45,17 @@ public:
 
     this->Timer.setInterval(interval);
 
+    int refreshOnInteraction = 0;
+    if (liveHints->GetScalarAttribute("refresh_on_interaction", &refreshOnInteraction))
+    {
+      this->AllowRefreshOnInteraction = refreshOnInteraction != 0;
+    }
+
     int emulatedTime = 0;
-    liveHints->GetScalarAttribute("emulated_time", &emulatedTime);
-    this->IsEmulatedTimeAlgorithm = emulatedTime != 0;
+    if (liveHints->GetScalarAttribute("emulated_time", &emulatedTime))
+    {
+      this->IsEmulatedTimeAlgorithm = emulatedTime != 0;
+    }
     this->Timer.setSingleShot(true);
 
     if (this->IsEmulatedTimeAlgorithm)
@@ -102,13 +111,16 @@ pqLiveSourceItem::pqLiveSourceItem(
 
   this->connect(&this->Internals->Timer, &pqTimer::timeout, this, &pqLiveSourceItem::refreshSource);
 
-  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  this->connect(smmodel, &pqServerManagerModel::viewAdded, this, &pqLiveSourceItem::onViewAdded);
-
-  Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
+  if (!this->Internals->AllowRefreshOnInteraction)
   {
-    this->onViewAdded(view);
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    this->connect(smmodel, &pqServerManagerModel::viewAdded, this, &pqLiveSourceItem::onViewAdded);
+    for (pqView* view : smmodel->findItems<pqView*>())
+    {
+      this->onViewAdded(view);
+    }
   }
+
   this->update(0);
 }
 

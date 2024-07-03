@@ -359,6 +359,11 @@ true if the algorithm needs update.
 The `interval` attribute is optional (defaults to 100) and can be used to
 provide a refresh rate in milliseconds.
 
+The `refresh_on_interaction` boolean attribute is optional (defaults to false).
+When enabled, allows live sources to be refreshed upon user interaction.
+However, enabling this option can complicate interactions, especially with
+large data sets.
+
 The `emulated_time` attribute is optional and defaults to 0. It is a boolean
 value that marks the live source as an emulated real-time algorithm, which
 is an algorithm updated at regular time intervals based on real-time and
