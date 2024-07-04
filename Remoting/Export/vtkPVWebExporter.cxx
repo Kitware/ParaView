@@ -61,9 +61,6 @@ void vtkPVWebExporter::Write()
     }
 
 #if VTK_MODULE_ENABLE_VTK_WebPython
-    vtkGenericWarningMacro("The VTK::WebPython module was not enabled.");
-    throw 1;
-#else
     vtkSmartPyObject module(PyImport_ImportModule("vtkmodules.web.vtkjs_helper"));
     if (!module || PyErr_Occurred())
     {
@@ -89,6 +86,9 @@ void vtkPVWebExporter::Write()
       vtkGenericWarningMacro("Failed to bundle vtkjs data file into HTML viewer");
       throw 1;
     }
+#else
+    vtkGenericWarningMacro("The VTK::WebPython module was not enabled.");
+    throw 1;
 #endif
   }
   catch (int)
