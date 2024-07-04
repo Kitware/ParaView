@@ -16,7 +16,8 @@ namespace OutputWidgetInternals
 class OutputWindow;
 };
 
-Q_DECLARE_METATYPE(QtMsgType) // NOLINT(performance-no-int-to-ptr)
+Q_DECLARE_METATYPE(QtMsgType); // NOLINT(performance-no-int-to-ptr)
+
 /**
  * @class MessageHandler
  * @brief widget to show Qt and VTK messages.
@@ -169,7 +170,7 @@ protected:
   virtual QString extractSummary(const QString& message, QtMsgType type);
 
 private:
-  Q_DISABLE_COPY(pqOutputWidget)
+  Q_DISABLE_COPY(pqOutputWidget);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
