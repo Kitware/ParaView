@@ -240,6 +240,8 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
     item.AutoLoad = tracker->GetPluginAutoLoad(cc);
     item.DelayedLoad = tracker->GetPluginDelayedLoad(cc);
     item.XMLs = tracker->GetPluginXMLs(cc);
+    item.Description = tracker->GetPluginDescription(cc);
+    item.Version = tracker->GetPluginVersion(cc);
     item.AutoLoadForce = false;
 
     vtkPVPlugin* plugin = tracker->GetPlugin(cc);
@@ -249,8 +251,6 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
       item.RequiredPlugins = plugin->GetRequiredPlugins();
       item.RequiredOnClient = plugin->GetRequiredOnClient();
       item.RequiredOnServer = plugin->GetRequiredOnServer();
-      item.Description = plugin->GetDescription();
-      item.Version = plugin->GetPluginVersionString();
     }
     else
     {

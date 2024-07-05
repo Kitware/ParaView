@@ -56,12 +56,14 @@ public:
       stream << "  <Plugin name=\"" << info->GetPluginName(cc) << "\""
              << " filename=\"" << info->GetPluginFileName(cc) << "\""
              << " auto_load=\"" << (info->GetAutoLoad(cc) ? 1 : 0) << "\""
-             << " delayed_load=\"" << (info->GetDelayedLoad(cc) ? 1 : 0);
+             << " delayed_load=\"" << (info->GetDelayedLoad(cc) ? 1 : 0) << "\""
+             << " version=\"" << info->GetPluginVersion(cc) << "\""
+             << " description=\"" << info->GetDescription(cc) << "\"";
 
       std::vector<std::string> xmls = info->GetXMLs(cc);
       if (!xmls.empty())
       {
-        stream << "\" >\n";
+        stream << " >\n";
         for (std::string xml : xmls)
         {
           stream << "<XML filename=\"" << xml << "\" />\n";
@@ -70,7 +72,7 @@ public:
       }
       else
       {
-        stream << "\" />\n";
+        stream << " />\n";
       }
     }
     stream << "</Plugins>\n";

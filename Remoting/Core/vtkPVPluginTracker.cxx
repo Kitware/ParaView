@@ -48,6 +48,8 @@ public:
   bool AutoLoad = false;
   bool DelayedLoad = false;
   std::vector<std::string> XMLs;
+  std::string Version;
+  std::string Description;
 };
 
 /**
@@ -477,6 +479,20 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
       vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "found `%s`", plugin_filename.c_str());
       unsigned int index = this->RegisterAvailablePlugin(plugin_filename.c_str());
 
+      // Recover version and description if available
+      std::string version;
+      if (child->GetAttribute("version"))
+      {
+        version = child->GetAttribute("version");
+      }
+      std::string description;
+      if (child->GetAttribute("description"))
+      {
+        description = child->GetAttribute("description");
+      }
+      (*this->PluginsList)[index].Version = version;
+      (*this->PluginsList)[index].Description = description;
+
       // It is a delayed load plugin, recover the XMLs if provided
       std::vector<std::string> xmls;
       if (delayedLoad)
@@ -532,7 +548,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
           }
           else
           {
-            loader->LoadDelayedLoadPlugin(name, xmls, plugin_filename);
+            loader->LoadDelayedLoadPlugin(name, xmls, plugin_filename, version, description);
           }
         }
         else
@@ -727,6 +743,28 @@ std::vector<std::string> vtkPVPluginTracker::GetPluginXMLs(unsigned int index)
     return {};
   }
   return (*this->PluginsList)[index].XMLs;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVPluginTracker::GetPluginVersion(unsigned int index)
+{
+  if (index >= this->GetNumberOfPlugins())
+  {
+    vtkWarningMacro("Invalid index: " << index);
+    return "";
+  }
+  return (*this->PluginsList)[index].Version;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVPluginTracker::GetPluginDescription(unsigned int index)
+{
+  if (index >= this->GetNumberOfPlugins())
+  {
+    vtkWarningMacro("Invalid index: " << index);
+    return "";
+  }
+  return (*this->PluginsList)[index].Description;
 }
 
 //-----------------------------------------------------------------------------

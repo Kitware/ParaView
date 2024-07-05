@@ -110,6 +110,8 @@ public:
   bool GetPluginAutoLoad(unsigned int index);
   bool GetPluginDelayedLoad(unsigned int index);
   std::vector<std::string> GetPluginXMLs(unsigned int index);
+  std::string GetPluginVersion(unsigned int index);
+  std::string GetPluginDescription(unsigned int index);
   ///@}
 
   ///@{
