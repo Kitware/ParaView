@@ -41,7 +41,7 @@ QString getPVSCSourcesFromSettings()
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return settings
     ->value("PVSC_SOURCES",
-      QString("# %1\n# %2\n# %3\n#   pvsc <url> <%4>\n\n# %5\n%6")
+      QString("# %1\n# %2\n#   pvsc <url> <%3>\n\n# %4\n%5")
         .arg(QCoreApplication::translate(
           "pqServerConnectDialog", "Enter list of URLs to obtain server configurations from."))
         .arg(QCoreApplication::translate("pqServerConnectDialog", "Syntax:"))
