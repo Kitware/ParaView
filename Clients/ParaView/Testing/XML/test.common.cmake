@@ -1548,7 +1548,6 @@ list(APPEND TESTS_WITH_BASELINES
   UnstructuredOutline.xml
   UniformInverseTransformSamplingGlyph.xml
   VectorComponentHistogram.xml
-  VolumeCrop.xml
   VolumeIsosurfaceBlendMode.xml
   VolumeRenderingWithContour.xml
   VolumeReprTwoIndepComp.xml
@@ -1593,6 +1592,12 @@ if(VTK_USE_LARGE_DATA)
   list(APPEND TESTS_WITH_BASELINES
     RestoreBlockColorDefaultTransferFunction.xml
     )
+endif()
+
+if (NOT PARAVIEW_USE_MPI)
+  list(APPEND TESTS_WITH_BASELINES
+    VolumeCrop.xml
+  )
 endif()
 
 # VTKHDFWriter does not work with MPI yet
