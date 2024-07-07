@@ -34,6 +34,7 @@ public:
 
   QPointer<pqScalarBarVisibilityReaction> ScalarBarVisibilityReaction;
   QPointer<pqUseSeparateColorMapReaction> UseSeparateColorMapReaction;
+  QPointer<pqChooseColorPresetReaction> ChooseColorPresetReaction;
 
   QPointer<QAction> ScalarBarVisibilityAction;
   QPointer<QAction> EditScalarBarAction;
@@ -136,10 +137,12 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(
   // choose preset button.
   QAction* choosePresetAction = new QAction(this);
   QObject::connect(Ui.ChoosePreset, &QPushButton::clicked, choosePresetAction, &QAction::trigger);
-  pqChooseColorPresetReaction* ccpr =
+  this->Internals->ChooseColorPresetReaction =
     new pqChooseColorPresetReaction(choosePresetAction, /*track_active_objects=*/false);
-  ccpr->setRepresentation(internals.Representation, selectedPropertiesType);
-  QObject::connect(ccpr, &pqChooseColorPresetReaction::presetApplied, internals.Representation,
+  this->Internals->ChooseColorPresetReaction->setRepresentation(
+    internals.Representation, selectedPropertiesType);
+  QObject::connect(this->Internals->ChooseColorPresetReaction,
+    &pqChooseColorPresetReaction::presetApplied, internals.Representation,
     &pqDataRepresentation::renderViewEventually);
 
   if (selectedPropertiesType == vtkSMColorMapEditorHelper::SelectedPropertiesTypes::Blocks)
@@ -179,6 +182,8 @@ void pqColorEditorPropertyWidget::updateBlockBasedEnableState()
   this->Internals->Ui.DisplayColorWidget->queryCurrentSelectedArray();
   this->Internals->UseSeparateColorMapReaction->querySelectedUseSeparateColorMap();
   this->Internals->ScalarBarVisibilityReaction->updateEnableState();
+  this->Internals->ChooseColorPresetReaction->setTransferFunctions(
+    this->Internals->Representation->getLookupTableProxies(vtkSMColorMapEditorHelper::Blocks));
   this->updateEnableState();
 }
 
