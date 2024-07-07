@@ -95,6 +95,12 @@ void pqChooseColorPresetReaction::updateTransferFunction()
 //-----------------------------------------------------------------------------
 void pqChooseColorPresetReaction::setTransferFunctions(std::vector<vtkSMProxy*> luts)
 {
+  if (luts ==
+    std::vector<vtkSMProxy*>(
+      this->TransferFunctionProxies.begin(), this->TransferFunctionProxies.end()))
+  {
+    return;
+  }
   this->TransferFunctionProxies.clear();
   for (auto& lut : luts)
   {
