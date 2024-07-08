@@ -718,6 +718,7 @@ static void ${_paraview_build_target_safe}_initialize()
       set(_paraview_build_plugin_directory
         "${_paraview_build_plugin_destination}/${_paraview_build_plugin}")
 
+      # Recover different attributes of the plugin
       set(_paraview_build_autoload 0)
       if (_paraview_build_plugin IN_LIST _paraview_build_AUTOLOAD)
         set(_paraview_build_autoload 1)
@@ -726,8 +727,13 @@ static void ${_paraview_build_target_safe}_initialize()
       if (_paraview_build_plugin IN_LIST _paraview_build_DELAYED_LOAD)
         set(_paraview_build_delayed_load 1)
       endif ()
+      get_property(_paraview_build_plugin_version GLOBAL
+        PROPERTY "_paraview_plugin_${_paraview_build_plugin}_version")
+      get_property(_paraview_build_plugin_description GLOBAL
+        PROPERTY "_paraview_plugin_${_paraview_build_plugin}_description")
+
       string(APPEND _paraview_build_xml_content
-        "  <Plugin name=\"${_paraview_build_plugin}\" auto_load=\"${_paraview_build_autoload}\" delayed_load=\"${_paraview_build_delayed_load}\"")
+        "  <Plugin name=\"${_paraview_build_plugin}\" auto_load=\"${_paraview_build_autoload}\" delayed_load=\"${_paraview_build_delayed_load}\" version=\"${_paraview_build_plugin_version}\" description=\"${_paraview_build_plugin_description}\"")
 
       if (_paraview_build_delayed_load)
         string(APPEND _paraview_build_xml_content ">\n")
@@ -1070,6 +1076,9 @@ function (paraview_add_plugin name)
     message(FATAL_ERROR
       "The `VERSION` argument is required.")
   endif ()
+  set_property(GLOBAL
+    PROPERTY
+      "_paraview_plugin_${name}_version" "${_paraview_add_plugin_VERSION}")
 
   if (NOT DEFINED _paraview_add_plugin_XML_DOCUMENTATION)
     set(_paraview_add_plugin_XML_DOCUMENTATION ON)
