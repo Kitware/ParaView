@@ -477,65 +477,92 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
         continue;
       }
       vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "found `%s`", plugin_filename.c_str());
-      unsigned int index = this->RegisterAvailablePlugin(plugin_filename.c_str());
 
-      // Recover version and description if available
       std::string version;
-      if (child->GetAttribute("version"))
-      {
-        version = child->GetAttribute("version");
-      }
       std::string description;
-      if (child->GetAttribute("description"))
-      {
-        description = child->GetAttribute("description");
-      }
-      (*this->PluginsList)[index].Version = version;
-      (*this->PluginsList)[index].Description = description;
-
-      // It is a delayed load plugin, recover the XMLs if provided
       std::vector<std::string> xmls;
-      if (delayedLoad)
-      {
-        for (unsigned int cd = 0; cd < child->GetNumberOfNestedElements(); cd++)
-        {
-          vtkPVXMLElement* xmlChild = child->GetNestedElement(cd);
-          if (strcmp(xmlChild->GetName(), "XML") != 0)
-          {
-            vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-              "XML child elements are expected to be named XML, but one is named instead: `%s`, "
-              "skipping element",
-              xmlChild->GetName());
-            continue;
-          }
-          if (!xmlChild->GetAttribute("filename"))
-          {
-            vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-              "XML child elements are expected to contain a filename attribute, skipping "
-              "element");
-            continue;
-          }
-          std::string xmlFilename = xmlChild->GetAttribute("filename");
-          if (hint && !vtksys::SystemTools::FileIsFullPath(xmlFilename))
-          {
-            std::string basedir =
-              vtksys::SystemTools::CollapseFullPath(vtksys::SystemTools::GetFilenamePath(hint));
-            xmlFilename = vtksys::SystemTools::CollapseFullPath(xmlFilename, basedir);
 
-            // Ensure the path is under the base directory given.
-            if (!vtksys::SystemTools::IsSubDirectory(xmlFilename, basedir))
+      // Check if plugin is already known
+      vtkPluginsList::iterator iter =
+        this->PluginsList->LocateUsingFileName(plugin_filename.c_str());
+      if (iter == this->PluginsList->end())
+      {
+        iter = this->PluginsList->LocateUsingPluginName(name.c_str());
+      }
+      if (iter == this->PluginsList->end())
+      {
+        // New plugin, add an entry
+        vtkItem item;
+        item.FileName = plugin_filename;
+        item.PluginName = name;
+
+        // Recover version and description if available
+        if (child->GetAttribute("version"))
+        {
+          version = child->GetAttribute("version");
+        }
+        if (child->GetAttribute("description"))
+        {
+          description = child->GetAttribute("description");
+        }
+        item.Version = version;
+        item.Description = description;
+        item.AutoLoad = autoLoad;
+        item.DelayedLoad = delayedLoad;
+
+        // It is a delayed load plugin, recover the XMLs if provided
+        // We could consider always recovering them when available
+        if (delayedLoad)
+        {
+          for (unsigned int cd = 0; cd < child->GetNumberOfNestedElements(); cd++)
+          {
+            vtkPVXMLElement* xmlChild = child->GetNestedElement(cd);
+            if (strcmp(xmlChild->GetName(), "XML") != 0)
             {
               vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-                "Invalid `filename=` attribute for %s; must be underneath the XML directory.",
-                name.c_str());
+                "XML child elements are expected to be named XML, but one is named instead: `%s`, "
+                "skipping element",
+                xmlChild->GetName());
               continue;
             }
+            if (!xmlChild->GetAttribute("filename"))
+            {
+              vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+                "XML child elements are expected to contain a filename attribute, skipping "
+                "element");
+              continue;
+            }
+            std::string xmlFilename = xmlChild->GetAttribute("filename");
+            if (hint && !vtksys::SystemTools::FileIsFullPath(xmlFilename))
+            {
+              std::string basedir =
+                vtksys::SystemTools::CollapseFullPath(vtksys::SystemTools::GetFilenamePath(hint));
+              xmlFilename = vtksys::SystemTools::CollapseFullPath(xmlFilename, basedir);
+
+              // Ensure the path is under the base directory given.
+              if (!vtksys::SystemTools::IsSubDirectory(xmlFilename, basedir))
+              {
+                vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+                  "Invalid `filename=` attribute for %s; must be underneath the XML directory.",
+                  name.c_str());
+                continue;
+              }
+            }
+            xmls.push_back(xmlFilename);
           }
-          xmls.push_back(xmlFilename);
         }
+        item.XMLs = xmls;
+        this->PluginsList->push_back(item);
+        this->InvokeEvent(vtkPVPluginTracker::RegisterAvailablePluginEvent);
+      }
+      else
+      {
+        version = iter->Version;
+        description = iter->Description;
+        xmls = iter->XMLs;
       }
 
-      if ((autoLoad || forceLoad) && !this->GetPluginLoaded(index))
+      if ((autoLoad || forceLoad) && iter->Plugin == nullptr)
       {
         // load the plugin.
         vtkNew<vtkPVPluginLoader> loader;
@@ -556,9 +583,6 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
           loader->LoadPlugin(plugin_filename.c_str());
         }
       }
-      (*this->PluginsList)[index].AutoLoad = autoLoad;
-      (*this->PluginsList)[index].DelayedLoad = delayedLoad;
-      (*this->PluginsList)[index].XMLs = xmls;
     }
   }
 }
