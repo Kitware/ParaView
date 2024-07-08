@@ -209,9 +209,12 @@ double* vtkPVLODActor::GetBounds()
   // values returned by this->Mapper->GetBounds() and we store the time
   // of caching. If the values returned this time are different, or
   // the modified time of this class is newer than the cached time,
-  // then we need to rebuild.
+  // then we need to rebuild. Also, if this prop3d is not in world
+  // coordinates, then its location may be affected by the renderwindow
+  // physical to world matrix or other device to world matrix, and the
+  // bounds need to be recomputed in this case as well.
   if ((memcmp(this->MapperBounds, bounds, 6 * sizeof(double)) != 0) ||
-    (this->GetMTime() > this->BoundsMTime))
+    (this->GetMTime() > this->BoundsMTime) || (this->CoordinateSystem != vtkProp3D::WORLD))
   {
     vtkDebugMacro(<< "Recomputing bounds...");
 

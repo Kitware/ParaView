@@ -759,6 +759,7 @@ public:
   void SetMultiSamples(int val);
   void SetAlphaBitPlanes(int val);
   void SetStencilCapable(int val);
+  void SetPhysicalToWorldMatrix(const double[16]);
   ///@}
 
   /**

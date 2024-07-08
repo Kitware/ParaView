@@ -616,6 +616,10 @@ bool vtkGeometryRepresentation::AddToView(vtkView* view)
   {
     rview->GetRenderer()->AddActor(this->Actor);
 
+    // Indicate that the above renderer is the one the actor is relative to
+    // in case the coordinate system is set to physical or device.
+    this->Actor->SetCoordinateSystemRenderer(rview->GetRenderer());
+
     // Indicate that this is prop that we are rendering when hardware selection
     // is enabled.
     rview->RegisterPropForHardwareSelection(this, this->GetRenderedProp());
@@ -630,6 +634,7 @@ bool vtkGeometryRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
   {
+    this->Actor->SetCoordinateSystemRenderer(nullptr);
     rview->GetRenderer()->RemoveActor(this->Actor);
     rview->UnRegisterPropForHardwareSelection(this, this->GetRenderedProp());
     return this->Superclass::RemoveFromView(view);
@@ -1381,6 +1386,12 @@ void vtkGeometryRepresentation::SetSeamlessV(bool rep)
   {
     lod->SetSeamlessV(rep);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoordinateSystem(int coordSys)
+{
+  this->Actor->SetCoordinateSystem(static_cast<vtkProp3D::CoordinateSystems>(coordSys));
 }
 
 //----------------------------------------------------------------------------

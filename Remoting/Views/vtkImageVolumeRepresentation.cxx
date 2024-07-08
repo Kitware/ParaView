@@ -341,6 +341,11 @@ bool vtkImageVolumeRepresentation::AddToView(vtkView* view)
   if (rview)
   {
     rview->GetRenderer()->AddActor(this->Actor);
+
+    // Indicate that the above renderer is the one the actor is relative to
+    // in case the coordinate system is set to physical or device.
+    this->Actor->SetCoordinateSystemRenderer(rview->GetRenderer());
+
     // Indicate that this is a prop to be rendered during hardware selection.
     rview->RegisterPropForHardwareSelection(this, this->GetRenderedProp());
 
@@ -355,6 +360,7 @@ bool vtkImageVolumeRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
   {
+    this->Actor->SetCoordinateSystemRenderer(nullptr);
     rview->GetRenderer()->RemoveActor(this->Actor);
     return this->Superclass::RemoveFromView(view);
   }
@@ -527,6 +533,12 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 void vtkImageVolumeRepresentation::SetAnisotropy(float val)
 {
   this->Property->SetScatteringAnisotropy(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetCoordinateSystem(int coordSys)
+{
+  this->Actor->SetCoordinateSystem(static_cast<vtkProp3D::CoordinateSystems>(coordSys));
 }
 
 //----------------------------------------------------------------------------

@@ -226,6 +226,11 @@ bool vtkImageSliceRepresentation::AddToView(vtkView* view)
   if (rview)
   {
     rview->GetRenderer()->AddActor(this->Actor);
+
+    // Indicate that the above renderer is the one the actor is relative to
+    // in case the coordinate system is set to physical or device.
+    this->Actor->SetCoordinateSystemRenderer(rview->GetRenderer());
+
     return this->Superclass::AddToView(rview);
   }
   return false;
@@ -237,6 +242,7 @@ bool vtkImageSliceRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
   {
+    this->Actor->SetCoordinateSystemRenderer(nullptr);
     rview->GetRenderer()->RemoveActor(this->Actor);
     return this->Superclass::RemoveFromView(rview);
   }
@@ -280,6 +286,12 @@ void vtkImageSliceRepresentation::SetPosition(double x, double y, double z)
 void vtkImageSliceRepresentation::SetScale(double x, double y, double z)
 {
   this->Actor->SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceRepresentation::SetCoordinateSystem(int coordSys)
+{
+  this->Actor->SetCoordinateSystem(static_cast<vtkProp3D::CoordinateSystems>(coordSys));
 }
 
 //----------------------------------------------------------------------------
