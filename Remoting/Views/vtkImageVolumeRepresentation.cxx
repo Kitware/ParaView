@@ -411,7 +411,7 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     double planes[6];
     for (int i = 0; i < 6; i++)
     {
-      planes[i] = this->CroppingOrigin[i / 2] + this->DataBounds[i] * this->CroppingScale[i / 2];
+      planes[i] = this->CroppingOrigin[i / 2] + this->WholeExtent[i] * this->CroppingScale[i / 2];
     }
     this->VolumeMapper->SetCroppingRegionPlanes(planes);
   }
