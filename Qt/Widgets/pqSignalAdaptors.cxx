@@ -19,12 +19,8 @@ pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
   QObject::connect(
     p, &QComboBox::currentTextChanged, this, &pqSignalAdaptorComboBox::currentTextChanged);
 
-#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-  QObject::connect(
-    p, &QComboBox::currentIndexChanged, this, &pqSignalAdaptorComboBox::currentIndexChanged);
-#else
-  QObject::connect(p, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
-#endif
+  QObject::connect(p, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSignalAdaptorComboBox::currentIndexChanged);
 }
 
 //----------------------------------------------------------------------------
