@@ -25,10 +25,7 @@ vtkStandardNewMacro(vtkPVWebExporter);
 vtkPVWebExporter::vtkPVWebExporter() = default;
 
 //----------------------------------------------------------------------------
-vtkPVWebExporter::~vtkPVWebExporter()
-{
-  delete[] this->ParaViewGlanceHTML;
-}
+vtkPVWebExporter::~vtkPVWebExporter() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVWebExporter::PrintSelf(ostream& os, vtkIndent indent)
@@ -106,8 +103,9 @@ void vtkPVWebExporter::Write()
 
     if (!glanceHTML.empty())
     {
-      PyObject_CallMethod(module, const_cast<char*>("addDataToViewer"), const_cast<char*>("(ss)"),
-        const_cast<char*>(this->FileName), const_cast<char*>(glanceHTML.c_str()));
+      PyObject_CallMethod(module, const_cast<char*>("addDataToViewer"), const_cast<char*>("(ssb)"),
+        const_cast<char*>(this->FileName), const_cast<char*>(glanceHTML.c_str()),
+        this->DisableNetwork);
     }
     if (PyErr_Occurred())
     {

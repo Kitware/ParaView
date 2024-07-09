@@ -632,6 +632,20 @@
             </PropertyWidgetDecorator>
           </Hints>
        </StringVectorProperty>
+       <IntVectorProperty command="SetDisableNetwork"
+                          default_values="1"
+                          name="DisableNetwork"
+                          number_of_elements="1">
+         <BooleanDomain name="bool" />
+         <Documentation>Disable components requiring network access in the Glance application,
+          preventing any external network call from the HTML page.</Documentation>
+         <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ExportToGlance"
+                                   value="1" />
+          </Hints>
+       </IntVectorProperty>
       <IntVectorProperty command="SetWriteTextures"
                          default_values="1"
                          name="WriteTextures"
