@@ -136,7 +136,19 @@ paraview_add_client_server_render_tests(
   TEST_SCRIPTS TestOpacityRendering.xml
   NUMSERVERS 5
 )
-  
+
+# Regression test for https://gitlab.kitware.com/paraview/paraview/-/issues/22681
+# as it occurs when we have >=4 procs
+paraview_add_client_tests(
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS VolumeCrop.xml
+)
+paraview_add_client_server_tests(
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS VolumeCrop.xml
+  NUMSERVERS 4
+)
+
 if (PARAVIEW_ENABLE_COSMOTOOLS)
   # Test the Generic IO file writer in VTKExtensions/CosmoTools
   ExternalData_Expand_Arguments(ParaViewData _
