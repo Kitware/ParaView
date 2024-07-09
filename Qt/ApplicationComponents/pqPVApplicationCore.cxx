@@ -12,7 +12,6 @@
 #include "pqCoreConfiguration.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
-#include "pqLiveSourceBehavior.h"
 #include "pqLiveSourceManager.h"
 #include "pqLoadDataReaction.h"
 #include "pqPresetGroupsManager.h"
@@ -31,6 +30,7 @@
 #include <QDebug>
 #include <QFileOpenEvent>
 #include <QList>
+#include <QPointer>
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* options,
@@ -47,25 +47,12 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* 
 
   pqApplicationCore::instance()->registerManager("SELECTION_MANAGER", this->SelectionManager);
 
-  pqPresetGroupsManager* presetGroupManager = new pqPresetGroupsManager(this);
-  bool loadedFromSettings = presetGroupManager->loadGroupsFromSettings();
+  QPointer<pqPresetGroupsManager> presetGroupManager = new pqPresetGroupsManager(this);
+  const bool loadedFromSettings = presetGroupManager->loadGroupsFromSettings();
   // If the groups could not be loaded from the settings, use the default groups
   if (!loadedFromSettings)
   {
-    QString groupString;
-    QFile groupsFile(":pqWidgets/pqPresetGroups.json");
-
-    if (!groupsFile.open(QIODevice::ReadOnly))
-    {
-      qWarning() << "Could not load preset group list.";
-    }
-    else
-    {
-      groupString = groupsFile.readAll();
-    }
-    groupsFile.close();
-
-    presetGroupManager->loadGroups(groupString);
+    presetGroupManager->loadGroups(pqPresetGroupsManager::getPresetGroupsJson());
   }
   pqApplicationCore::instance()->registerManager("PRESET_GROUP_MANAGER", presetGroupManager);
 
