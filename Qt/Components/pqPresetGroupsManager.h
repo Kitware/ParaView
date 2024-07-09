@@ -133,6 +133,11 @@ public:
    */
   void removeFromAllGroups(const QString& presetName);
 
+  /*
+   * Get preset groups
+   */
+  static QString getPresetGroupsJson();
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Save groups to settings
