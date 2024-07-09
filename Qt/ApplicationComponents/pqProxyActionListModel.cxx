@@ -8,6 +8,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QPalette>
 #include <QVariant>
 
 //-----------------------------------------------------------------------------
