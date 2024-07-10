@@ -25,7 +25,6 @@
 #ifndef vtkSMChartSeriesListDomain_h
 #define vtkSMChartSeriesListDomain_h
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMStringListDomain.h"
 
@@ -49,18 +48,6 @@ public:
    * Set the default values for the property.
    */
   int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
-
-  /**
-   * Returns the list of series that are know to this domain are are given a
-   * priority when setting default values. This array is nullptr terminated i.e.
-   * the last entry in this array will be nullptr.
-   *
-   * @deprecated this should now be accessed via ParaView settings at
-   * vtkPVRepresentedArrayListSettings::GetAllChartsDefaultXAxis
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "See vtkPVRepresentedArrayListSettings::GetAllChartsDefaultXAxis instead")
-  static const char** GetKnownSeriesNames();
 
 protected:
   vtkSMChartSeriesListDomain();

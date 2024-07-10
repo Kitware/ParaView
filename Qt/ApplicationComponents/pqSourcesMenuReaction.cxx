@@ -138,23 +138,6 @@ bool pqSourcesMenuReaction::warnOnCreate(
         QString title;
         QString text;
 
-        // PARAVIEW_DEPRECATED_IN_5_12_0
-#if !defined(VTK_LEGACY_REMOVE)
-        title = hints->GetAttributeOrEmpty("title");
-        text = hints->GetCharacterData();
-#if !defined(VTK_LEGACY_SILENT)
-        if (!title.isEmpty())
-        {
-          qWarning("WarnOnCreate title property has been deprecated in ParaView 5.12, "
-                   "add a Text element with a title property instead");
-        }
-        if (!text.trimmed().isEmpty())
-        {
-          qWarning("WarnOnCreate character data has been deprecated in ParaView 5.12, "
-                   "add a Text element with character data instead.");
-        }
-#endif
-#endif
         vtkPVXMLElement* textElement = hints->FindNestedElementByName("Text");
         if (textElement)
         {

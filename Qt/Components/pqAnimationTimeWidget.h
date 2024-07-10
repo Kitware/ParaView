@@ -7,8 +7,6 @@
 #include "pqComponentsModule.h"
 #include "pqDoubleLineEdit.h" // for pqDoubleLineEdit::RealNumberNotation.
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 #include <QList>
 #include <QScopedPointer>
 #include <QVariant>
@@ -125,19 +123,6 @@ Q_SIGNALS:
   void dummySignal();
 
 public Q_SLOTS:
-  /**
-   * Set the notation used to display the number.
-   * \sa notation()
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Unused. Display rely on global setting")
-  void setNotation(RealNumberNotation _notation);
-
-  /**
-   * Set the precision used to display the number.
-   * \sa precision()
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("Unused. Display rely on global setting")
-  void setPrecision(int precision);
 
   /**
    * Re render the widget.

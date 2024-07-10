@@ -11,8 +11,6 @@
  *============================================================================
  */
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 #include <QBuffer>
 #include <QFileInfo>
 #include <QNetworkAccessManager>
@@ -87,17 +85,6 @@ public:
     QWebEngineProfile* profile = QWebEngineProfile::defaultProfile();
     profile->installUrlSchemeHandler("qthelp", new pqUrlSchemeHandler(engine));
     self->connect(instance, &pqWebView::loadFinished, self, &pqHelpWindow::updateHistoryButtons);
-    return instance;
-  }
-
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "This constructor is deprecated, please use the specialized one instead: pqWebView* "
-    "newInstance(QHelpEngine* engine, pqHelpWindow* self)")
-  static pqWebView* newInstance(QHelpEngine* engine, QWidget* parentObject)
-  {
-    pqWebView* instance = new pqWebView(parentObject);
-    QWebEngineProfile* profile = QWebEngineProfile::defaultProfile();
-    profile->installUrlSchemeHandler("qthelp", new pqUrlSchemeHandler(engine));
     return instance;
   }
 

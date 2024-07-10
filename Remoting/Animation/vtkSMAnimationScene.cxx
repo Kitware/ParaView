@@ -1,9 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
 
-// Hide PARAVIEW_DEPRECATED_IN_5_12_0() warnings for this class.
-#define PARAVIEW_DEPRECATION_LEVEL 0
-
 #include "vtkSMAnimationScene.h"
 
 #include "vtkCompositeAnimationPlayer.h"
@@ -587,12 +584,6 @@ int vtkSMAnimationScene::GetPlayMode()
 void vtkSMAnimationScene::SetNumberOfFrames(int val)
 {
   this->AnimationPlayer->SetNumberOfFrames(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationScene::SetDuration(int val)
-{
-  this->AnimationPlayer->SetDuration(val);
 }
 
 //----------------------------------------------------------------------------

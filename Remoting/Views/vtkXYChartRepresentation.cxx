@@ -392,9 +392,3 @@ bool vtkXYChartRepresentation::Export(vtkAbstractChartExporter* exporter)
   assert(this->GetVisibility() == true);
   return this->Internals->Export(this, exporter);
 }
-
-//----------------------------------------------------------------------------
-bool vtkXYChartRepresentation::Export(vtkCSVExporter* exporter)
-{
-  return this->Export(vtkAbstractChartExporter::SafeDownCast(exporter));
-}

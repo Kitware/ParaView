@@ -133,14 +133,17 @@
    </attribute>
    <widget class="pqDataInformationWidget" name="statisticsView"/>
   </widget>
-  <widget class="QDockWidget" name="animationViewDock">
+  <widget class="QDockWidget" name="timeManagerDock">
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
-    <string>Animation View</string>
+    <string>Time Manager</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="pqPVAnimationWidget" name="animationView"/>
+   <widget class="pqTimeManagerWidget" name="timeManagerPanel"/>
   </widget>
   <widget class="QDockWidget" name="comparativePanelDock">
    <property name="windowTitle">
@@ -160,9 +163,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqPVAnimationWidget</class>
+   <class>pqTimeManagerWidget</class>
    <extends>QWidget</extends>
-   <header>pqPVAnimationWidget.h</header>
+   <header>pqTimeManagerWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

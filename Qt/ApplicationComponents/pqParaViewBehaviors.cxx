@@ -134,9 +134,6 @@ PQ_BEHAVIOR_DEFINE_FLAG(LiveSourceBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CustomShortcutBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(MainWindowEventBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(UsageLoggingBehavior, false);
-// PARAVIEW_DEPRECATED_IN_5_12_0
-PQ_BEHAVIOR_DEFINE_FLAG(AddExamplesInFavoritesBehavior, true);
-PQ_BEHAVIOR_DEFINE_FLAG(AddExamplesInFileDialogBehavior, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
 
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
@@ -165,13 +162,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     // Register standard recent file menu handlers.
     pgm->addInterface(new pqStandardRecentlyUsedResourceLoaderImplementation(pgm));
   }
-
-  pqFileDialogLocationModel::AddExamplesInLocations =
-    PQ_IS_BEHAVIOR_ENABLED(AddExamplesInFileDialogBehavior);
-
-  // PARAVIEW_DEPRECATED_IN_5_12_0
-  pqFileDialogLocationModel::AddExamplesInLocations &=
-    PQ_IS_BEHAVIOR_ENABLED(AddExamplesInFavoritesBehavior);
 
   // Define application behaviors.
   if (PQ_IS_BEHAVIOR_ENABLED(DataTimeStepBehavior))

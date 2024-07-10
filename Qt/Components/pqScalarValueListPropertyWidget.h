@@ -6,8 +6,6 @@
 
 #include "pqPropertyWidget.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 #include <QVariant>
 #include <string>
 #include <vector>
@@ -52,10 +50,6 @@ public:
 
   void setShowLabels(bool);
   void setLabels(const std::vector<std::string>& labels);
-
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "vector of const char* is not memory safe, use std::string version instead")
-  void setLabels(std::vector<const char*>&);
 
 Q_SIGNALS:
   void scalarsChanged();

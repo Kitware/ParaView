@@ -1,7 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-License-Identifier: BSD-3-Clause
-// VTK_DEPRECATED_IN_9_3_0() warnings for this class.
-#define VTK_DEPRECATION_LEVEL 0
 
 #include "vtkPolarAxesRepresentation.h"
 
@@ -631,18 +629,6 @@ void vtkPolarAxesRepresentation::SetNumberOfRadialAxes(vtkIdType val)
 void vtkPolarAxesRepresentation::SetNumberOfPolarAxes(vtkIdType val)
 {
   this->PolarAxesActor->SetRequestedNumberOfPolarAxes(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetNumberOfPolarAxisTicks(int val)
-{
-  this->PolarAxesActor->SetNumberOfPolarAxisTicks(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkPolarAxesRepresentation::SetAutoSubdividePolarAxis(bool active)
-{
-  this->PolarAxesActor->SetAutoSubdividePolarAxis(active);
 }
 
 //----------------------------------------------------------------------------

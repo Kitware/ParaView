@@ -252,19 +252,6 @@ QString pqDoubleLineEdit::simplifiedText() const
 }
 
 //-----------------------------------------------------------------------------
-QString pqDoubleLineEdit::formatDouble(
-  double value, QTextStream::RealNumberNotation notation, int precision)
-{
-  QString text;
-  QTextStream converter(&text);
-  converter.setRealNumberNotation(notation);
-  converter.setRealNumberPrecision(precision);
-  converter << value;
-
-  return text;
-}
-
-//-----------------------------------------------------------------------------
 QString pqDoubleLineEdit::formatDouble(double value, pqDoubleLineEdit::RealNumberNotation notation,
   int precision, int fullLowExponent, int fullHighExponent)
 {
@@ -292,17 +279,4 @@ QString pqDoubleLineEdit::formatDouble(double value, pqDoubleLineEdit::RealNumbe
       break;
   };
   return "";
-}
-
-//-----------------------------------------------------------------------------
-QString pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(double value)
-{
-  return pqDoubleLineEdit::formatDouble(
-    value, pqDoubleLineEdit::globalNotation(), pqDoubleLineEdit::globalPrecision());
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleLineEdit::setAlwaysUseFullPrecision(bool value)
-{
-  this->Internals->AlwaysUseFullPrecision = value;
 }

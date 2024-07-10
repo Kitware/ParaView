@@ -22,7 +22,6 @@
 #ifndef vtkSMParaViewPipelineControllerWithRendering_h
 #define vtkSMParaViewPipelineControllerWithRendering_h
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMParaViewPipelineController.h"
 
@@ -228,13 +227,6 @@ protected:
    */
   virtual bool AlsoShowInCurrentView(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* currentView);
-
-  /**
-   * Overridden here where the library has link access to rendering classes.
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Material setup is now handled by the RenderView proxy on raytracing back-end update")
-  void DoMaterialSetup(vtkSMProxy* proxy) override;
 
 private:
   vtkSMParaViewPipelineControllerWithRendering(

@@ -1,72 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkExtractBlock"
-                 label="Extract Block (Legacy)"
-                 name="ExtractBlockLegacy">
-      <Documentation long_help="This filter extracts a range of blocks from a multiblock dataset."
-                     short_help="Extract block.">
-        This filter extracts a range of groups from a multiblock dataset
-      </Documentation>
-      <Deprecated deprecated_in="5.11" to_remove_in="5.13">
-        Extract Block (Legacy) has been deprecated. Please use ExtractBlock instead.
-      </Deprecated>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkMultiBlockDataSet"/>
-        </DataTypeDomain>
-        <Documentation>
-          This property specifies the input to the Extract Group filter.
-        </Documentation>
-      </InputProperty>
-      <IntVectorProperty clean_command="RemoveAllIndices"
-                         command="AddIndex"
-                         name="BlockIndices"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <Hints>
-          <WidgetHeight number_of_rows="20"/>
-        </Hints>
-        <Documentation>
-          This property lists the ids of the blocks to extract from the input multiblock dataset.
-        </Documentation>
-        <CompositeTreeDomain name="tree">
-          <RequiredProperties>
-            <Property function="Input" name="Input"/>
-          </RequiredProperties>
-        </CompositeTreeDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetPruneOutput"
-                         default_values="1"
-                         name="PruneOutput"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          When set, the output multiblock dataset will be pruned to remove empty nodes. On by default.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMaintainStructure"
-                         default_values="0"
-                         name="MaintainStructure"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          This is used only when PruneOutput is ON. By default,
-          when pruning the output i.e. remove empty blocks, if node has only 1
-          non-null child block, then that node is removed. To preserve these
-          parent nodes, set this flag to true.
-        </Documentation>
-      </IntVectorProperty>
-      <!-- End ExtractBlockLegacy -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy name="ExtractBlock"
                  label="Extract Block"
                  class="vtkExtractBlockUsingDataAssembly">
@@ -299,44 +233,6 @@
         </WarnOnCreate>
       </Hints>
       <!-- End ExtractGeometry -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkExtractLevel"
-                 label="Extract Level (Legacy)"
-                 name="ExtractHierarchicalLevel">
-      <Documentation long_help="This filter extracts a range of groups from a hierarchical dataset."
-                     short_help="Extract level.">This filter extracts a range
-        of levels from a hierarchical dataset
-      </Documentation>
-      <Deprecated deprecated_in="5.10" to_remove_in="5.12">
-        **Extract Level** has been deprecated. **Extract Block** now supports
-        extract levels from AMR datasets as well and hence this filter is unnecessary.
-      </Deprecated>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkUniformGridAMR"/>
-        </DataTypeDomain>
-        <Documentation>
-          This property specifies the input to the Extract Group filter.
-        </Documentation>
-      </InputProperty>
-      <IntVectorProperty clean_command="RemoveAllLevels"
-                         command="AddLevel"
-                         name="Levels"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <Documentation>
-          This property lists the levels to extract from the input hierarchical dataset.
-        </Documentation>
-      </IntVectorProperty>
-      <!-- End ExtractHierarchicalLevel -->
     </SourceProxy>
 
     <!-- ==================================================================== -->

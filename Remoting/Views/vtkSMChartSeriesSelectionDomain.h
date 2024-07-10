@@ -29,7 +29,6 @@
 #ifndef vtkSMChartSeriesSelectionDomain_h
 #define vtkSMChartSeriesSelectionDomain_h
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMStringListDomain.h"
 
@@ -73,15 +72,6 @@ public:
    */
   vtkGetMacro(DefaultMode, int);
   ///@}
-
-  /**
-   * Add/Remove series names to hide by default. These are regular expressions.
-   *
-   * @deprecated see vtkPVRepresentedArrayListSettings::SetChartsHiddenAttributes instead
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "See vtkPVRepresentedArrayListSettings::SetChartsHiddenAttributes instead")
-  static void AddSeriesVisibilityDefault(const char*, bool) {}
 
   /**
    * Global flag to toggle between (a) the default behavior and

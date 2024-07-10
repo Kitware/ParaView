@@ -382,25 +382,9 @@ const QList<QVariant>& pqAnimationTimeWidget::timestepValues() const
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::setPrecision(int val)
-{
-  Q_UNUSED(val);
-  auto& internals = (*this->Internals);
-  internals.render(this);
-}
-
-//-----------------------------------------------------------------------------
 int pqAnimationTimeWidget::precision() const
 {
   return pqDoubleLineEdit::globalPrecision();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::setNotation(pqAnimationTimeWidget::RealNumberNotation val)
-{
-  Q_UNUSED(val);
-  auto& internals = (*this->Internals);
-  internals.render(this);
 }
 
 //-----------------------------------------------------------------------------

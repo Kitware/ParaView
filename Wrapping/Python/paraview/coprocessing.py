@@ -602,35 +602,6 @@ class CoProcessor(object):
         self.__ViewsList.append(view)
         return view
 
-    def CreateWriter(self, proxy_ctor, filename, freq):
-        """
-        PARAVIEW_DEPRECATED_IN_5_12_0 Use RegisterWriter instead
-
-        Creates a writer proxy. This method is generally used in
-        reatePipeline() to create writers. All writes created as such will
-        write the output files appropriately in WriteData() is called.
-        """
-        import warnings
-        warnings.warn("'CoProcessor.CreateWriter' is deprecated, use CoProcessor.RegisterWriter instead",
-                      DeprecationWarning)
-
-        writer = proxy_ctor()
-        return self.RegisterWriter(writer, filename, freq)
-
-    def CreateView(self, proxy_ctor, filename, freq, fittoscreen, magnification, width, height):
-        """
-        PARAVIEW_DEPRECATED_IN_5_12_0 Use RegisterView instead
-
-        Create a CoProcessing view for image capture with extra meta-data
-        such as magnification, size and frequency.
-        """
-        import warnings
-        warnings.warn("'CoProcessor.CreateView' is deprecated, use 'CoProcessor.RegisterView' instead",
-                      DeprecationWarning)
-
-        view = proxy_ctor()
-        return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height, None)
-
     def Finalize(self):
         for writer in self.__WritersList:
             if hasattr(writer, 'Finalize'):

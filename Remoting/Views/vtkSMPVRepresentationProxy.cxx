@@ -205,12 +205,6 @@ bool vtkSMPVRepresentationProxy::GetAnyBlockUsingScalarColoring()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPVRepresentationProxy::SetupLookupTable(vtkSMProxy* proxy)
-{
-  vtkSMColorMapEditorHelper::SetupLookupTable(proxy);
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(bool extend, bool force)
 {
   return vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(this, extend, force);
@@ -274,13 +268,6 @@ vtkSMPVRepresentationProxy::RescaleBlocksTransferFunctionToDataRangeOverTime(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
-  vtkPVArrayInformation* info, bool extend, bool force)
-{
-  return vtkSMColorMapEditorHelper::RescaleTransferFunctionToDataRange(this, info, extend, force);
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(vtkSMProxy* view)
 {
   return vtkSMColorMapEditorHelper::RescaleTransferFunctionToVisibleRange(this, view);
@@ -322,20 +309,6 @@ std::vector<vtkTypeBool> vtkSMPVRepresentationProxy::SetBlocksScalarColoring(
 {
   return vtkSMColorMapEditorHelper::SetBlocksScalarColoring(
     this, blockSelectors, arrayName, attributeType, component);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
-  const char* arrayName, int attributeType, bool useComponent, int component)
-{
-  return vtkSMColorMapEditorHelper::SetScalarColoringInternal(
-    this, arrayName, attributeType, useComponent, component);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMPVRepresentationProxy::GetDecoratedArrayName(const std::string& arrayName)
-{
-  return vtkSMColorMapEditorHelper::GetDecoratedArrayName(this, arrayName);
 }
 
 //----------------------------------------------------------------------------

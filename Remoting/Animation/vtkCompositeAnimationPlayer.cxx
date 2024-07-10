@@ -120,12 +120,6 @@ void vtkCompositeAnimationPlayer::SetNumberOfFrames(int val)
   this->SequenceAnimationPlayer->SetNumberOfFrames(val);
 }
 
-//----------------------------------------------------------------------------
-void vtkCompositeAnimationPlayer::SetDuration(int val)
-{
-  (void)val;
-}
-
 // Forwarded to vtkTimestepsAnimationPlayer.
 //----------------------------------------------------------------------------
 void vtkCompositeAnimationPlayer::AddTimeStep(double val)
