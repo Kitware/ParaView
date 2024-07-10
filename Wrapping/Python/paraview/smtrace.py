@@ -372,15 +372,15 @@ class Trace(object):
         else:
             regex = re.compile(r"(^Separate_)([0-9]*)_(.*)_(.*$)")
         if re.match(regex, arrayName):
-            gid = re.sub(regex, "\g<2>", arrayName)
+            gid = re.sub(regex, "\\g<2>", arrayName)
             representation = next((value for key, value in simple.GetRepresentations().items() if key[1] == gid), None)
             if representation:
                 repAccessor = Trace.get_accessor(representation)
                 if selector is None:
-                    arrayName = re.sub(regex, "\g<3>", arrayName)
+                    arrayName = re.sub(regex, "\\g<3>", arrayName)
                     varname = ("Separate_%s_%s" % (repAccessor, arrayName))
                 else:
-                    arrayName = re.sub(regex, "\g<4>", arrayName)
+                    arrayName = re.sub(regex, "\\g<4>", arrayName)
                     varname = ("Separate_%s_%s_%s" % (repAccessor, selector, arrayName))
         return arrayName, varname, representation
 
