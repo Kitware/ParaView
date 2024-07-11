@@ -26,6 +26,8 @@ list(APPEND test_exclusions
   "\\.SplitViewTrace$"
   # see https://gitlab.kitware.com/paraview/paraview/-/issues/22478
   "\\.BivariateTextureRepresentation$"
+  # see https://gitlab.kitware.com/paraview/paraview/-/issues/22694
+  "\\.HyperTreeGridObliquePlaneCutter$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
