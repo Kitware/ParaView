@@ -28,6 +28,8 @@ list(APPEND test_exclusions
   "\\.BivariateTextureRepresentation$"
   # see https://gitlab.kitware.com/paraview/paraview/-/issues/22694
   "\\.HyperTreeGridObliquePlaneCutter$"
+  # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
+  "\\.CDISimpleRead$"
   )
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
@@ -87,9 +89,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/21752
     "\\.ComparativeViewOverlay$"
-
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/21774
-    "pvcs\\.CDISimpleRead$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22427
     "pqCoreKeySequences$"
