@@ -37,10 +37,14 @@ QStringList pqPythonCompleter::getCompletions(const QString& prompt)
   QString lookup{};
   int dot = textToComplete.lastIndexOf('.');
   int paren = textToComplete.lastIndexOf('(');
+  // look the first equal sign to extract the name in case a contructor is used
+  // i.e. with prompt " s = Sphere( Radius=1,End<TAB> " we want to get "Sphere"
+  int equal = textToComplete.indexOf('=') + 1;
   int maxPos = std::max<int>(dot, paren);
   if (maxPos != -1)
   {
-    lookup = textToComplete.mid(0, maxPos);
+    lookup = textToComplete.mid(equal, maxPos - equal);
+    lookup = lookup.trimmed();
   }
 
   // Lookup python names
