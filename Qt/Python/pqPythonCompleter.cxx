@@ -127,54 +127,56 @@ void pqPythonCompleter::appendFunctionKeywordArguments(PyObject* function, QStri
 {
   // Check if we have a function from paraview.simple
   PyObject* pvtag = PyObject_GetAttrString(function, "__paraview_create_object_tag");
+  vtkSmartPyObject simpleModule;
+  simpleModule.TakeReference(PyImport_ImportModule("paraview.simple"));
+  if (!simpleModule)
+  {
+    qWarning() << "Failed to import 'paraview.simple'";
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+      return;
+    }
+  }
+  std::string argumentExtractorUtility;
   if (pvtag && PyBool_Check(pvtag))
   {
     // Hard-code this non-property default argument
     results.append("registrationName");
-
-    vtkSmartPyObject simpleModule;
-    simpleModule.TakeReference(PyImport_ImportModule("paraview.simple"));
-    if (!simpleModule)
-    {
-      qWarning() << "Failed to import 'paraview.simple'";
-      if (PyErr_Occurred())
-      {
-        PyErr_Print();
-        PyErr_Clear();
-        return;
-      }
-    }
-    vtkSmartPyObject listProperties(PyUnicode_FromString("ListProperties"));
-    vtkSmartPyObject retList(
-      PyObject_CallMethodObjArgs(simpleModule.GetPointer(), listProperties, function, nullptr));
-    if (!retList)
-    {
-      qWarning() << "Could not invoke 'paraview.simple.ListProperties()'";
-      if (PyErr_Occurred())
-      {
-        PyErr_Print();
-        PyErr_Clear();
-      }
-    }
-
-    if (PyList_Check(retList))
-    {
-      const auto len = PyList_Size(retList);
-      for (Py_ssize_t cc = 0; cc < len; ++cc)
-      {
-        PyObject* attributeItem = PyList_GetItem(retList, cc);
-        Py_ssize_t size;
-        const char* attributeName = PyUnicode_AsUTF8AndSize(attributeItem, &size);
-        if (attributeName)
-        {
-          results.append(attributeName);
-        }
-      }
-    }
+    argumentExtractorUtility = "ListProperties";
   }
   else
   {
-    // TODO - fill in named args
+    argumentExtractorUtility = "_get_function_arguments";
+  }
+
+  vtkSmartPyObject getArguments(PyUnicode_FromString(argumentExtractorUtility.c_str()));
+  vtkSmartPyObject retList(
+    PyObject_CallMethodObjArgs(simpleModule.GetPointer(), getArguments, function, nullptr));
+  if (!retList)
+  {
+    qWarning() << "Could not invoke 'paraview.simple.'" << argumentExtractorUtility.c_str();
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+    }
+  }
+
+  if (PyList_Check(retList))
+  {
+    const auto len = PyList_Size(retList);
+    for (Py_ssize_t cc = 0; cc < len; ++cc)
+    {
+      PyObject* attributeItem = PyList_GetItem(retList, cc);
+      Py_ssize_t size;
+      const char* attributeName = PyUnicode_AsUTF8AndSize(attributeItem, &size);
+      if (attributeName)
+      {
+        results.append(attributeName);
+      }
+    }
   }
 }
 
