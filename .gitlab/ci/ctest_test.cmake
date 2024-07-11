@@ -143,6 +143,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22676
     "^paraviewPython-TestHTGContourMonoHT$"
     "^paraviewPython-TestHTG3DContourPolyhedron$"
+
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/22696
+    "^pv\\.LagrangianSurfaceHelperComposite$"
     )
 endif ()
 
