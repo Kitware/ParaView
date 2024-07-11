@@ -593,19 +593,24 @@ class RealProxyAccessor(Accessor):
         args_in_ctor = str(ctor_args) if ctor_args is not None else ""
         # trace any properties that the 'filter' tells us should be traced
         # in ctor.
+        # when ctor is null, add them to the other props to trace in creation
+        other_props = [];
         ctor_props = [x for x in self.OrderedProperties if filter.should_trace_in_ctor(x)]
-        ctor_props_trace = self.trace_properties(ctor_props, in_ctor=True)
-        if args_in_ctor and ctor_props_trace:
-            args_in_ctor = "%s, %s" % (args_in_ctor, ctor_props_trace)
+        if not ctor is None:
+          ctor_props_trace = self.trace_properties(ctor_props, in_ctor=True)
+          if args_in_ctor and ctor_props_trace:
+              args_in_ctor = "%s, %s" % (args_in_ctor, ctor_props_trace)
+          else:
+              args_in_ctor += ctor_props_trace
+          if args_in_ctor and ctor_extra_args:
+              args_in_ctor = "%s, %s" % (args_in_ctor, ctor_extra_args)
+          elif ctor_extra_args:
+              args_in_ctor = ctor_extra_args
         else:
-            args_in_ctor += ctor_props_trace
-        if args_in_ctor and ctor_extra_args:
-            args_in_ctor = "%s, %s" % (args_in_ctor, ctor_extra_args)
-        elif ctor_extra_args:
-            args_in_ctor = ctor_extra_args
+          other_props += ctor_props
 
         # locate all the other properties that should be traced in create.
-        other_props = [x for x in self.OrderedProperties \
+        other_props += [x for x in self.OrderedProperties \
                        if filter.should_trace_in_create(x) and not filter.should_trace_in_ctor(x)]
 
         trace = TraceOutput()

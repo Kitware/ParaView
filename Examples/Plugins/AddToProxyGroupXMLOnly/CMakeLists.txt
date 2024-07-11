@@ -4,6 +4,7 @@ project(AddToProxyGroupXMLOnly)
 find_package(ParaView REQUIRED)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+enable_testing()
 
 include(GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")

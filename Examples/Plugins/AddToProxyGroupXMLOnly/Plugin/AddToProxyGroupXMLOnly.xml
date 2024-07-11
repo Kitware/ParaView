@@ -41,6 +41,13 @@
           direction by the number specified.
         </Documentation>
       </DoubleVectorProperty>
+      <StringVectorProperty name="DummyFileName"
+                            number_of_elements="1">
+          <FileListDomain name="files"/>
+          <Documentation>
+              This property is a dummy filename xml property
+          </Documentation>
+      </StringVectorProperty>
 
       <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
         <Property function="Origin" name="Origin" />
