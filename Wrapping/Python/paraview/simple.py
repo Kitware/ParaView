@@ -3815,6 +3815,19 @@ def _listProperties(create_func):
 
     return property_names
 
+def _get_function_arguments(function):
+  """The a list of named arguments for a function.
+  Used for autocomplete in PythonShell in ParaView GUI"""
+  import inspect
+  if not inspect.isfunction(function):
+      raise TypeError(f"input argument: {function} is not a function")
+  result = []
+  for _,parameter in inspect.signature(function).parameters.items():
+    # skip *args and **kwargs
+    if parameter.kind != inspect.Parameter.VAR_POSITIONAL and parameter.kind != inspect.Parameter.VAR_KEYWORD:
+      result.append(parameter.name)
+  return result
+
 # -----------------------------------------------------------------------------
 
 def _create_doc(new, old):
