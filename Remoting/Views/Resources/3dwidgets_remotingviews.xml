@@ -421,8 +421,55 @@
                proxygroup="3d_widgets"
                proxyname="ImplicitCylinderWidget"></Proxy>
       </SubProxy>
-      <!-- End of SphereWidgetRepresentation -->
+      <!-- End of ImplicitCylinderWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="ImplicitConeWidgetRepresentation">
+      <Documentation>Representation proxy for the cone widget. This
+      includes the widget/representation proxies for the cone 3D
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="ImplicitConeRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="ConstrainToWidgetBounds" />
+          <Property name="WidgetBounds" />
+          <Property name="PlaceFactor" />
+          <Property name="Origin" />
+          <Property name="OriginInfo" />
+          <Property name="Axis" />
+          <Property name="AxisInfo" />
+          <Property name="Angle" />
+          <Property name="AngleInfo" />
+          <Property name="DrawCone" />
+          <Property name="Tubing" />
+          <Property name="OutlineTranslation" />
+          <Property name="OutsideBounds" />
+          <Property name="ScaleEnabled" />
+          <Property name="ForegroundWidgetColor" />
+          <Property name="InteractiveWidgetColor" />
+          <Property name="WidgetColor" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="ImplicitConeWidget"></Proxy>
+      </SubProxy>
+      <!-- End of ImplicitConeWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="SliderWidgetRepresentation">
@@ -1617,6 +1664,176 @@
       </DoubleVectorProperty>
       <!-- End of ImplicitCylinderRepresentation -->
     </Proxy>
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVImplicitConeRepresentation"
+           name="ImplicitConeRepresentation">
+      <Documentation>Proxy for vtkImplicitConeWidget. Not to be confused with
+      the vtkSMRepresentation proxy for the cone widget (which is the
+      ImplicitConeWidget).
+      </Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConstrainToWidgetBounds"
+                         default_values="0"
+                         name="ConstrainToWidgetBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetWidgetBounds"
+                            default_values="none"
+                            name="WidgetBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.2"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            information_property="OriginInfo"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The origin of the cone.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOrigin"
+                            information_only="1"
+                            name="OriginInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxis"
+                            default_values="0.0 0.0 1.0"
+                            information_property="AxisInfo"
+                            name="Axis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The orientation axis of the cone. If the axis is not
+          specified as a unit vector, it will be normalized.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAxis"
+                            information_only="1"
+                            name="AxisInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAngle"
+                            default_values="45"
+                            information_property="AngleInfo"
+                            name="Angle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.1"
+                           max="89.9"
+                           name="range" />
+        <Documentation>The angle of the cone. Note that this is not the aperture, which is twice this angle.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAngle"
+                            information_only="1"
+                            name="AngleInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawCone"
+                         default_values="1"
+                         name="DrawCone"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the drawing of the cone. In some cases
+          the cone interferes with the object that it is operating on (e.g.,
+          the cone interferes with the cut surface it produces resulting in
+          z-buffer artifacts.) By default it is on.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="128"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="8"
+                        max="2048"
+                        name="range" />
+        <Documentation>This is the number of polygonal facets used to approximate
+        the cone surface (for rendering purposes). A vtkCone
+        is used under the hood to provide an exact surface representation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTubing"
+                         default_values="1"
+                         name="Tubing"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable tubing of the wire outline of the cone
+        intersection (against the bounding box). The tube thickens the
+        line by wrapping with a vtkTubeFilter.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutlineTranslation"
+                         default_values="0"
+                         name="OutlineTranslation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to translate the bounding box by
+        moving it with the mouse.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutsideBounds"
+                         default_values="1"
+                         name="OutsideBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to move the widget outside of
+        the bounds specified in the initial PlaceWidget() invocation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScaleEnabled"
+                            default_values="1"
+                            name="ScaleEnabled"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable the ability to scale the widget with the
+        mouse.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundWidgetColor"
+                            command="SetForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used when coloring the outline</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 0.0"
+                            name="WidgetColor"
+                            command="SetHandleColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="WidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            name="InteractiveWidgetColor"
+                            command="SetInteractionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Documentation>Color used for interacting widget handles</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- End of ImplicitConeRepresentation -->
     <!-- ================================================================== -->
     <Proxy class="vtkDistanceRepresentation2D"
            name="DistanceRepresentation2D"
@@ -2921,6 +3138,12 @@
            class="vtkImplicitCylinderWidget"
            name="ImplicitCylinderWidget">
       <Documentation>Proxy for vtkImplicitCylinderWidget.</Documentation>
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkImplicitConeWidget"
+           name="ImplicitConeWidget">
+      <Documentation>Proxy for vtkImplicitConeWidget.</Documentation>
     </Proxy>
 
     <!-- End of ProxyGroup 3d_widgets -->

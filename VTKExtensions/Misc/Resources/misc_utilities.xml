@@ -479,6 +479,52 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkPVCone" name="Cone">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            name="Origin"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the origin of the cone.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxis"
+                            default_values="0. 1. 0."
+                            name="Axis"
+                            number_of_elements="3">
+        <Documentation>
+          Set the axis of the cone. The created cone has infinite length towards this direction.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAngle"
+                            default_values="45"
+                            name="Angle"
+                            number_of_elements="1">
+        <Documentation>
+          Set the angle of the cone.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Cone Parameters" panel_widget="InteractiveCone">
+        <Property function="Origin" name="Origin" />
+        <Property function="Axis" name="Axis" />
+        <Property function="Angle" name="Angle" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Cone -->
+    </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy class="vtkPerlinNoise" name="PerlinNoise">
       <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty
@@ -643,6 +689,8 @@
            name="Cylinder" />
     <Proxy group="implicit_functions"
            name="Scalar" />
+    <Proxy group="implicit_functions"
+           name="Cone" />
   </ProxyGroup>
   <ProxyGroup name="clip_htg_implicit_functions">
     <Proxy group="implicit_functions"

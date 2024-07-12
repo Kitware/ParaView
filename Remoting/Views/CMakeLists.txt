@@ -63,6 +63,7 @@ set(classes
   vtkPVHistogramChartRepresentation
   vtkPVImageChartRepresentation
   vtkPVImageSliceMapper
+  vtkPVImplicitConeRepresentation
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
   vtkPVInteractiveViewLinkRepresentation

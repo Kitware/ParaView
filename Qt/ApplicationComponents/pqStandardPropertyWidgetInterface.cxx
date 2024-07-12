@@ -19,6 +19,7 @@
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCompositePropertyWidgetDecorator.h"
+#include "pqConePropertyWidget.h"
 #include "pqCoordinateFramePropertyWidget.h"
 #include "pqCylinderPropertyWidget.h"
 #include "pqDataAssemblyPropertyWidget.h"
@@ -319,6 +320,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "YoungsMaterial")
   {
     return new pqYoungsMaterialPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveCone")
+  {
+    return new pqConePropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractiveCylinder")
   {
