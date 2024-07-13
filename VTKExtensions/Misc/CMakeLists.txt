@@ -4,10 +4,8 @@
 set(classes
   vtkAppendRectilinearGrid
   vtkAttributeDataReductionFilter
-  vtkCleanArrays
   vtkCompleteArrays
   vtkEnvironmentAnnotationFilter
-  vtkMergeBlocks
   vtkMinMax
   vtkPExtractHistogram
   vtkPVExtractHistogram2D

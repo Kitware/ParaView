@@ -17,6 +17,7 @@ DEPENDS
   ParaView::VTKExtensionsExtraction
 PRIVATE_DEPENDS
   VTK::CommonSystem
+  VTK::FiltersParallel
 TEST_DEPENDS
   ParaView::RemotingApplication
   VTK::TestingCore
