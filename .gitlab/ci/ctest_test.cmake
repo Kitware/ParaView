@@ -121,7 +121,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22601
     "\\.ConvertToMolecule$"
+
+    # Timeouts https://gitlab.kitware.com/paraview/paraview/-/issues/20108
+    "^ParaViewExample-Catalyst$"
     )
+
 
   if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
     list(APPEND test_exclusions
@@ -149,7 +153,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "\\.TransferFunction2DYScalars$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22674 
-    "\\.TestStereoSaveScreenshot$"
+    "^paraviewPython-Batch-TestStereoSaveScreenshot$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/22676
     "^paraviewPython-TestHTGContourMonoHT$"
