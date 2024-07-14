@@ -55,7 +55,7 @@ protected:
       // (it means that the user clicked on `Volume` while no array was selected)
       // This needs to be done before calling SetRepresentationType, as this method
       // will setup a LUT proxy.
-      vtkSMProxy* lutProxy = vtkSMColorMapEditorHelper::GetLUTProxy(reprPVProxy, view);
+      vtkSMProxy* lutProxy = vtkSMColorMapEditorHelper::GetLookupTable(reprPVProxy, view);
       const QString& type = value.toString();
 
       // Let'set the new representation
