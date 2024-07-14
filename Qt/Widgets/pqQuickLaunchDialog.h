@@ -16,7 +16,7 @@
  * Provides search and quick apply capabilities.
  */
 class PARAVIEW_DEPRECATED_IN_5_13_0(
-  "Please use pqQuickLaunchDialog extended instead") PQWIDGETS_EXPORT pqQuickLaunchDialog
+  "Please use pqQuickLaunchDialogExtended instead") PQWIDGETS_EXPORT pqQuickLaunchDialog
   : public QDialog
 {
   Q_OBJECT
