@@ -525,6 +525,28 @@ OSPRay pathtracer may need to transfer default materials from client to server. 
 
 ## Source code deprecation and removals
 
+### Deprecations new in 5.13
+
+* The class `pqAddToFavoritesReaction` has been deprecated in favor of the new Categories mechanism. See `pqProxyCategory`.
+* In `pqCategoryToolbarsBehavior`, the protected `prepareForTest()` slot has been deprecated as it was mostly unused.
+* In `pqColorMapEditor`, the protected member function `setDataRepresentation(pqDataRepresentation* repr, bool forceUpdate = false)` has been deprecated in favor of `setRepresentation(pqDataRepresentation* repr, bool forceUpdate = false)` in the same class.
+* In `pqDataAssemblyPropertyWidget`, the `selectorColors`, `compositeIndexColors`, `selectorOpacities`, `compositeIndexOpacities` properties and their associated setters (`setSelectorColors()`, `setCompositeIndexColors()`, `setSelectorOpacities()`, and `setCompositeIndexOpacities()`), variant list getters (`selectorColorsAsVariantList`, `compositeIndexColorsAsVariantList`, `selectorOpacitiesAsVariantList`, and `compositeIndexOpacitiesAsVariantList`), and notification signals (`colorsChanged`, and `opacitiesChanged`) are no longer used.
+* In `pqLiveSourceBehavior`, the `pause()`, `resume()`, and `isPaused()` static member functions are deprecated in favor of non-static member functions of the same name in `pqLiveSourceManager`.
+* The class `pqManageFavoritesReaction` has been deprecated in favor of the new Categories mechanism. See `pqConfigureCategories` instead.
+* In `pqProxyGroupMenuManager`, `vtkSMProxy* getPrototype(QAction* action) const` has been deprecated in favor of `static vtkSMProxy* GetProxyPrototype(QAction*)`, `bool hideForTests(const QString&) const` and `void setEnabled(bool)` have been deprecated because they were mostly unused, `void populateFavoritesMenu()`, `void loadFavoritesItems()`, and `QAction* getAddToFavoritesAction(const QString& path)` have been deprecated because favorites are now a category configurable like other categories, and the protected `Enabled` member variable has been deprecated because it is unused.
+* The class `pqFavoritesDialog` has been replaced by the new Categories mechanism. See `pqConfigureCategories` instead.
+* The class `pqQuickLaunchDialog` has been deprecated. Use `pqQuickLaunchDialogExtended` instead.
+* The class `pqWaitCursor` has been deprecated. Use `pqScopedOverrideCursor(Qt::WaitCursor)` instead.
+* In `vtkInitializationHelper`, `static bool InitializeMiscellaneous(int type)` has been deprecated. Use `InitializeSettings` and `InitializeOthers` instead.
+* In `vtkGeometryRepresentation`, `void SetFlipTextures(bool)` has been deprecated. Use `SetTextureTransform(vtkTransform*)` instead.
+* In `vtkPolarAxesRepresentation`, `void SetEnableCustomRadius()` and `bool GetEnableCustomRadius()` have been removed. Use `void SetEnableCustomMinRadius(bool)` and `bool GetEnableCustomMinRadius()` instead.
+* In `vtkSMColorMapEditorHelper`, `static vtkSMProxy* GetLUTProxy(vtkSMProxy* proxy, vtkSMProxy* view)` has been deprecated. Use `static vtkSMProxy* GetLookupTable(vtkSMProxy* proxy, vtkSMProxy* view)` instead.
+* In `vtkSMPVRepresentationProxy`, `SetLastLUTProxy(vtkSMProxy* proxy)`, `vtkSMProxy* GetLastLUTProxy()`, and `vtkSMProxy* GetLUTProxy(vtkSMProxy* view)` have been deprecated. Use `void SetLastLookupTable(vtkSMProxy* proxy)`, `vtkSMProxy* GetLastLookupTable()`, and `vtkSMProxy* GetLUTProxy(vtkSMProxy* view)`, respectively, instead.
+* In the **Slice With Plane** filter (VTK class `vtkPVPlaneCutter`), the "Axis-Aligned" plane cut function is deprecated. Use the **Axis-Aligned Slice** filter (VTK class `vtkAxisAlignedCutter`) instead.
+* In `vtkPVGeometryFilter`, the information keys `POINT_OFFSETS()`, `VERTS_OFFSETS()`, `LINES_OFFSETS()`, `POLYS_OFFSETS()`, and `STRIPS_OFFSETS()` have been deprecated. They are not used anymore.
+
+### Removals
+
 * The `SurfaceLIC` plugin has been removed (deprecated in 5.11). The `Surface LIC` representation is still available in ParaView.
 * In `pqAnimationManager`, the `beginPlay()` and `endPlay()` argument-less signals have been removed (deprecated in 5.11). Use the variants with `vtkCallback` APIs instead.
 * In `pqAnimationManager`, the `onBeginPlay()` and `onEndPlay()` argument-less slots have been removed (deprecated in 5.11). the variants with `vtkCallback` APIs instead.
