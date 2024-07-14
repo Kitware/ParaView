@@ -3,6 +3,9 @@
 // VTK_DEPRECATED_IN_9_3_0() warnings for this class.
 #define VTK_DEPRECATION_LEVEL 0
 
+// Hide PARAVIEW_DEPRECATED_IN_5_13_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkPolarAxesRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
