@@ -1,6 +1,10 @@
 // SPDX-FileCopyrightText: Copyright (c) Kitware Inc.
 // SPDX-FileCopyrightText: Copyright (c) Sandia Corporation
 // SPDX-License-Identifier: BSD-3-Clause
+
+// Hide PARAVIEW_DEPRECATED_IN_5_13_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqProxyGroupMenuManager.h"
 
 #include "pqActiveObjects.h"
@@ -270,6 +274,7 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   QMenu* mainMenu, const QString& resourceTagName, bool quickLaunchable, bool enableFavorites)
   : Superclass(mainMenu)
   , ResourceTagName(resourceTagName)
+  , Enabled(true)
   , EnableFavorites(enableFavorites)
   , Internal(new pqInternal())
   , SupportsQuickLaunch(quickLaunchable)
