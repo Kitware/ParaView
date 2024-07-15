@@ -258,9 +258,7 @@
 
     script:
         - *before_script_linux
-        - test -n "$GITHUB_SSH_PRIVATE_KEY" && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i $GITHUB_SSH_PRIVATE_KEY"
-        - test -n "$GITHUB_SSH_PRIVATE_KEY" && chmod 600 $GITHUB_SSH_PRIVATE_KEY
-        - test -n "$GITHUB_SSH_PRIVATE_KEY" && PARAVIEW_DOCS_REPO="ssh://git@github.com/kitware/paraview-docs"
+        - test -n "$RSYNC_SSH_PRIVATE_KEY" && chmod 600 $RSYNC_SSH_PRIVATE_KEY
         - git clone $PARAVIEW_DOCS_REPO paraview-docs
         - mkdir -p build
         - cd build
@@ -272,13 +270,12 @@
         - make ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
         - cd $GIT_CLONE_PATH/paraview-docs
         - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
-        - test -n "$GITHUB_SSH_PRIVATE_KEY" && $LAUNCHER bash -x ./scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE" &> $GIT_CLONE_PATH/prepare_output.log
+        - test -n "$RSYNC_SSH_PRIVATE_KEY" && $LAUNCHER bash -x ./scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE" &> $GIT_CLONE_PATH/prepare_output.log
         - tar czf $GIT_CLONE_PATH/paraview-docs-doxygen.tgz $GIT_CLONE_PATH/build/doc
 
     variables:
         PARAVIEW_DOCS_REPO: https://github.com/Kitware/paraview-docs.git
         CURRENT_RELEASE: nightly
-        GIT_SSH_COMMAND: ""
         PARAVIEW_DOC_UPLOAD: "true"
 
     interruptible: true
