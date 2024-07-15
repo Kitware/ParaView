@@ -290,10 +290,6 @@ _paraview_remoting_application_optional_xml(
           Resources/writers_ensight.xml)
 
 _paraview_remoting_application_optional_xml(
-  TARGETS VTK::IOEnSight
-  FILES   Resources/readers_ensight.xml)
-
-_paraview_remoting_application_optional_xml(
   TARGETS VTK::IOParallelLSDyna
   FILES   Resources/readers_lsdyna.xml)
 

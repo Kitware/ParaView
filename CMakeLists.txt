@@ -335,6 +335,7 @@ set(paraview_default_plugins
   DigitalSignalProcessing
   EULATestPlugin
   EmbossingRepresentations
+  EnSightGoldCombinedReader
   EyeDomeLighting
   ExplicitStructuredGrid
   FlipBookPlugin

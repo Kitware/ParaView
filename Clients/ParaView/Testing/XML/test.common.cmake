@@ -375,12 +375,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnSightCombinedReaderElementsASCII0.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnSightCombinedReaderElementsASCII1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnSightCombinedReaderElementsASCII2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnSightCombinedReaderElementsASCII3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnSightCombinedReaderElementsASCII4.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnSightCombinedReaderElementsASCII5.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EqualizeLayoutA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EqualizeLayoutB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ExpandSelection_A.png}"
@@ -1019,8 +1013,6 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   DeleteSubtreePipelineBrowser.xml
   EllipseSource.xml
   Ensemble.xml
-  EnSightCombinedReaderElementsASCII.xml
-  EnSightCombinedReaderElementsSOS.xml
   EqualizeLayout.xml
   ExtractSubsetWithSeed.xml
   FastUniformGridSource.xml
