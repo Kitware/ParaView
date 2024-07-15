@@ -253,7 +253,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   vtkPVXMLElement* MenuRoot = nullptr;
   int RecentlyUsedMenuSize = 0;
   PARAVIEW_DEPRECATED_IN_5_13_0("Inner member is not used")
-  bool Enabled = true;
+  bool Enabled;
   bool EnableFavorites = false;
 
   void loadRecentlyUsedItems();

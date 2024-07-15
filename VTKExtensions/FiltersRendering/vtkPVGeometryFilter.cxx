@@ -546,7 +546,7 @@ int vtkPVGeometryFilter::RequestData(
     else
     {
       this->ExecuteBlock(modifiedInput, output, 1, procid, numProcs, 0, wholeExtent);
-      this->CleanupOutputData(output, 1);
+      this->CleanupOutputData(output);
     }
   }
 
@@ -784,7 +784,7 @@ int vtkPVGeometryFilter::RequestAMRData(
       {
         // don't process attribute arrays when generating outlines.
 
-        this->CleanupOutputData(outputPartition, /*doCommunicate=*/0);
+        this->CleanupOutputData(outputPartition);
         this->AddCompositeIndex(outputPartition, amr->GetCompositeIndex(level, partitionIdx));
         this->AddHierarchicalIndex(outputPartition, level, partitionIdx);
         // we don't call this->AddBlockColors() for AMR dataset since it doesn't
@@ -878,7 +878,7 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     else
     {
       this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
-      this->CleanupOutputData(tmpOut, 0);
+      this->CleanupOutputData(tmpOut);
     }
     // skip empty nodes.
     if (tmpOut->GetNumberOfPoints() > 0)
