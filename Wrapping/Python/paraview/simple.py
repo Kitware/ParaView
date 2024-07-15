@@ -3817,15 +3817,18 @@ def _listProperties(create_func):
 
 def _get_function_arguments(function):
   """The a list of named arguments for a function.
-  Used for autocomplete in PythonShell in ParaView GUI"""
+  Used for autocomplete in PythonShell in ParaView GUI and in pvpython"""
   import inspect
-  if not inspect.isfunction(function):
+  if not inspect.isfunction(function) and not inspect.ismethod(function):
       raise TypeError(f"input argument: {function} is not a function")
   result = []
-  for _,parameter in inspect.signature(function).parameters.items():
-    # skip *args and **kwargs
-    if parameter.kind != inspect.Parameter.VAR_POSITIONAL and parameter.kind != inspect.Parameter.VAR_KEYWORD:
-      result.append(parameter.name)
+  if hasattr(function,"__paraview_create_object_tag") and getattr(function,"__paraview_create_object_tag"):
+    result = ListProperties(function)
+  else:
+    for _,parameter in inspect.signature(function).parameters.items():
+      # skip *args and **kwargs
+      if parameter.kind != inspect.Parameter.VAR_POSITIONAL and parameter.kind != inspect.Parameter.VAR_KEYWORD:
+        result.append(parameter.name)
   return result
 
 # -----------------------------------------------------------------------------
