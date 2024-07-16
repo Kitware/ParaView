@@ -218,7 +218,13 @@ Show(Text(Text="$A^2$"))
   Check that
   - Check that Help -> Getting Started with ParaView menu opens PDF document
   - Check that Help -> Reader, Filter, and Writer lists filter information properly
-  - Check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog
+  - Run remote server with 8 ranks. Connect the client to it and check that each visualization in Help -> Example Visualizations load and match thumbnails in dialog:
+
+```
+> mpirun -n 8 pvserver --mpi --hostname=localhost -p 11111 &
+> paraview --server localhost:11111
+```
+
   - Check that plugins are present and load properly. Select Tools -> Manage Plugins menu item and load each plugin in the list.
   - OSPRay raycasting and pathtracing runs ("Enable Ray Tracing" property in View panel)
   - OptiX pathtracing runs (not macOS)
