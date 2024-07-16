@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" command="expand" arguments="3.0" />
+  <pqcheck object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" property="modelItemData" arguments="3.0.2.1,Bag Plot related views and filters" />
+  <pqcheck object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" property="modelItemData" arguments="3.0.6.1,1.0" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+</pqevents>

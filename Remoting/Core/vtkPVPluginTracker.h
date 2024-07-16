@@ -18,8 +18,9 @@
 
 #include "vtkCommand.h" // needed for vtkCommand
 #include "vtkObject.h"
-#include "vtkRemotingCoreModule.h" // needed for exports
-#include "vtkSmartPointer.h"       // needed for vtkSmartPointer
+#include "vtkParaViewDeprecation.h" // for deprecation macro
+#include "vtkRemotingCoreModule.h"  // needed for exports
+#include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 
 #include <vector> // for std::vector
 
@@ -61,6 +62,7 @@ public:
    * This fires `vtkPVPluginTracker::RegisterAvailablePluginEvent` to notify a
    * new plugin has been made available.
    */
+  PARAVIEW_DEPRECATED_IN_5_14_0("Use LoadPluginConfigurationXML instead.")
   unsigned int RegisterAvailablePlugin(const char* filename);
 
   ///@{
@@ -73,8 +75,8 @@ public:
    * ...
    * </Plugins>
    * @endcode
-   * This method will process the XML, locate the plugin shared library and
-   * either load the plugin or call RegisterAvailablePlugin based on the status
+   * This method will process the XML, locate the plugin shared library,
+   * register it with all its properties and then load it or not based on the status
    * of the auto_load flag. auto_load flag is optional and is 0 by default.
    * filename is also optional, if not provided this method will look in
    * different place to find the plugin, eg. paraview lib dir. It will NOT look
@@ -110,6 +112,8 @@ public:
   bool GetPluginAutoLoad(unsigned int index);
   bool GetPluginDelayedLoad(unsigned int index);
   std::vector<std::string> GetPluginXMLs(unsigned int index);
+  std::string GetPluginVersion(unsigned int index);
+  std::string GetPluginDescription(unsigned int index);
   ///@}
 
   ///@{

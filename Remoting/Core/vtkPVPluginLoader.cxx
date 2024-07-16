@@ -156,8 +156,9 @@ protected:
 class vtkPVDelayedLoadPlugin : public vtkPVXMLOnlyPlugin
 {
 public:
-  static vtkPVDelayedLoadPlugin* Create(
-    const std::string& name, const std::vector<std::string>& xmlFiles)
+  static vtkPVDelayedLoadPlugin* Create(const std::string& name,
+    const std::vector<std::string>& xmlFiles, const std::string& version,
+    const std::string& description)
   {
     vtkPVDelayedLoadPlugin* instance = new vtkPVDelayedLoadPlugin();
     instance->PluginName = name;
@@ -170,6 +171,8 @@ public:
         return nullptr;
       }
       instance->XMLVector.push_back(xml);
+      instance->Version = version;
+      instance->Description = description;
     }
     return instance;
   }
@@ -184,8 +187,20 @@ public:
    */
   bool GetEnsurePluginLoaded() override { return true; }
 
+  /**
+   * Returns the version for this plugin.
+   */
+  const char* GetPluginVersionString() override { return this->Version.c_str(); }
+
+  /**
+   * Returns a description of this plugin.
+   */
+  const char* GetDescription() override { return this->Description.c_str(); }
+
 private:
   std::vector<std::string> XMLVector;
+  std::string Version;
+  std::string Description;
   vtkPVDelayedLoadPlugin() = default;
   vtkPVDelayedLoadPlugin(const vtkPVDelayedLoadPlugin& other);
   void operator=(const vtkPVDelayedLoadPlugin& other);
@@ -480,7 +495,8 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name, bool acceptDelayed)
       if (tracker->GetPluginDelayedLoad(i) && acceptDelayed)
       {
         auto xmls = tracker->GetPluginXMLs(i);
-        return this->LoadDelayedLoadPlugin(name, xmls, filename);
+        return this->LoadDelayedLoadPlugin(
+          name, xmls, filename, tracker->GetPluginVersion(i), tracker->GetPluginDescription(i));
       }
       else
       {
@@ -492,9 +508,18 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name, bool acceptDelayed)
   return false;
 }
 
+// PARAVIEW_DEPRECATED_IN_5_14_0(): following method should be removed
 //-----------------------------------------------------------------------------
 bool vtkPVPluginLoader::LoadDelayedLoadPlugin(
   const std::string& name, const std::vector<std::string>& xmls, const std::string& filename)
+{
+  return this->LoadDelayedLoadPlugin(name, xmls, filename, "", "");
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::LoadDelayedLoadPlugin(const std::string& name,
+  const std::vector<std::string>& xmls, const std::string& filename, const std::string& version,
+  const std::string& description)
 {
   this->Loaded = false;
   bool no_errors = false;
@@ -529,7 +554,7 @@ bool vtkPVPluginLoader::LoadDelayedLoadPlugin(
   }
 
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Loading delayed load plugin.");
-  vtkPVDelayedLoadPlugin* plugin = vtkPVDelayedLoadPlugin::Create(name, xmls);
+  vtkPVDelayedLoadPlugin* plugin = vtkPVDelayedLoadPlugin::Create(name, xmls, version, description);
   if (plugin)
   {
     vtkPVPluginLoaderCleaner::GetInstance()->Register(plugin);
