@@ -94,9 +94,6 @@ public:
    * Thus all data is expected to available on the local process.
    */
   virtual bool Export(vtkAbstractChartExporter* exporter);
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use Export(vtkAbstractChartExporter* exporter) instead")
-  virtual bool Export(vtkCSVExporter* exporter);
   ///@}
 
   ///@{

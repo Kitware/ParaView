@@ -215,12 +215,6 @@ QMap<QString, QString> pqPythonMacroSupervisor::getStoredMacros()
 }
 
 //----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::removeStoredMacro(const QString& fileName)
-{
-  pqPythonMacroSupervisor::hideFile(fileName);
-}
-
-//----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::hideFile(const QString& fileName)
 {
   QFileInfo file = QFileInfo(fileName);
@@ -593,10 +587,4 @@ QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
   }
 
   return macroList;
-}
-
-//----------------------------------------------------------------------------
-QStringList pqPythonMacroSupervisor::getSupportedIconFormats()
-{
-  return pqIconListModel::getSupportedIconFormats();
 }

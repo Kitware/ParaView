@@ -144,9 +144,6 @@ public:
    * to abort and raise an error. Default implementation simply returns false.
    */
   virtual bool Export(vtkAbstractChartExporter* vtkNotUsed(exporter)) { return false; }
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use Export(vtkAbstractChartExporter* exporter) instead")
-  virtual bool Export(vtkCSVExporter* vtkNotUsed(exporter)) { return false; }
   ///@}
 protected:
   vtkChartRepresentation();

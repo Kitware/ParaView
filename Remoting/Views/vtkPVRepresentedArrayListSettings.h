@@ -20,7 +20,6 @@
 #define vtkPVRepresentedArrayListSettings_h
 
 #include "vtkObject.h"
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 
@@ -118,26 +117,6 @@ public:
   virtual void SetChartsHiddenAttributes(int i, const char* expression);
   virtual const std::vector<vtksys::RegularExpression>& GetAllChartsHiddenAttributes() const;
   virtual bool GetSeriesVisibilityDefault(const char* name) const;
-  ///@}
-
-  ///@{
-  /**
-   * @deprecated All following settings has been moved from this class to vtkPVIOSettings.
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::SetNumberOfExcludedNameFilters instead")
-  virtual void SetNumberOfExcludedNameFilters(int n);
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::GetNumberOfExcludedNameFilters instead")
-  virtual int GetNumberOfExcludedNameFilters();
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::SetExcludedNameFilter instead")
-  virtual void SetExcludedNameFilter(int i, const char* expression);
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::GetExcludedNameFilter instead")
-  virtual const char* GetExcludedNameFilter(int i);
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("See vtkPVIOSettings::GetAllNameFilters instead")
-  vtkStringArray* GetAllNameFilters();
   ///@}
 
 protected:

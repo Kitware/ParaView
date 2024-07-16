@@ -308,14 +308,6 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMProperty::CreateNewPrettyLabel(const char* xmlname)
-{
-  std::string label = vtkSMObject::CreatePrettyLabel(std::string(xmlname));
-  char* clabel = strcpy(new char[label.length() + 1], label.c_str());
-  return clabel;
-}
-
-//---------------------------------------------------------------------------
 int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element)
 {
   // TODO: some of the attributes are no longer necessary on the proxy-side,

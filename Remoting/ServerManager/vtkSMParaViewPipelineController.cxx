@@ -272,12 +272,6 @@ bool vtkSMParaViewPipelineController::CreateAnimationHelpers(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParaViewPipelineController::DoMaterialSetup(vtkSMProxy* vtkNotUsed(proxy))
-{
-  // expected to be overridden by rendering capable subclass
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
 {
   assert(session != nullptr);

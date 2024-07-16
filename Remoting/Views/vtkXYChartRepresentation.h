@@ -137,9 +137,6 @@ public:
    * to abort and raise an error. Default implementation simply returns false.
    */
   bool Export(vtkAbstractChartExporter* exporter) override;
-
-  PARAVIEW_DEPRECATED_IN_5_12_0("Use Export(vtkAbstractChartExporter* exporter) instead")
-  bool Export(vtkCSVExporter* exporter) override;
   ///@}
 
 protected:

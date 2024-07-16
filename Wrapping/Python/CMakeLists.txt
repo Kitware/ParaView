@@ -1,7 +1,6 @@
 set(python_files
   paraview/__init__.py.in
   paraview/_backwardscompatibilityhelper.py
-  paraview/_colorMaps.py
   paraview/algorithms/__init__.py
   paraview/algorithms/openpmd.py
   paraview/algorithms/savgreader.py
@@ -45,7 +44,6 @@ set(python_files
   paraview/incubator/__init__.py.in
   paraview/inspect.py
   paraview/live.py
-  paraview/lookuptable.py
   paraview/modules/__init__.py.in
   paraview/numeric.py
   paraview/numpy_support.py

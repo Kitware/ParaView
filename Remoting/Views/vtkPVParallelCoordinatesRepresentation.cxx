@@ -204,9 +204,3 @@ bool vtkPVParallelCoordinatesRepresentation::Export(vtkAbstractChartExporter* ex
   }
   return true;
 }
-
-//----------------------------------------------------------------------------
-bool vtkPVParallelCoordinatesRepresentation::Export(vtkCSVExporter* exporter)
-{
-  return this->Export(vtkAbstractChartExporter::SafeDownCast(exporter));
-}

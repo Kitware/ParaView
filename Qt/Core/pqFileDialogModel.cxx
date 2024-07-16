@@ -632,12 +632,6 @@ pqServer* pqFileDialogModel::server() const
   return this->Implementation->getServer();
 }
 
-void pqFileDialogModel::setCurrentPath(const QString& path, bool groupFiles)
-{
-  this->setGroupFiles(groupFiles);
-  this->setCurrentPath(path);
-}
-
 void pqFileDialogModel::setCurrentPath(const QString& path)
 {
   this->beginResetModel();

@@ -793,13 +793,6 @@ void vtkSMParaViewPipelineControllerWithRendering::PrintSelf(ostream& os, vtkInd
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParaViewPipelineControllerWithRendering::DoMaterialSetup(vtkSMProxy* prox)
-{
-  vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
-  mlp->LoadDefaultMaterials();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMParaViewPipelineControllerWithRendering::AssignViewToLayout(
   vtkSMViewProxy* view, vtkSMViewLayoutProxy* layout, int hint)
 {

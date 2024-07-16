@@ -28,10 +28,10 @@ myMainWindow::myMainWindow()
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-  this->Internals->animationViewDock->hide();
+  this->Internals->timeManagerDock->hide();
   this->Internals->statisticsDock->hide();
   this->Internals->comparativePanelDock->hide();
-  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
+  this->tabifyDockWidget(this->Internals->timeManagerDock, this->Internals->statisticsDock);
 
   // Enable help from the properties panel.
   QObject::connect(this->Internals->proxyTabWidget,

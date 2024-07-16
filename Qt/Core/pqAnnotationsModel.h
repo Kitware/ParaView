@@ -6,7 +6,6 @@
 
 #include "pqCoreModule.h"
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
 #include "vtkSmartPointer.h"
 
 #include <QAbstractTableModel>
@@ -147,8 +146,6 @@ public:
   void reorder(std::vector<int> newOrder);
 
 protected:
-  PARAVIEW_DEPRECATED_IN_5_12_0("Unused protected member variable.")
-  QIcon MissingColorIcon;
   double GlobalOpacity = 1.0;
   vtkSmartPointer<vtkSMStringListDomain> VisibilityDomain;
   bool SupportsReorder = false;

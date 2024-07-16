@@ -186,12 +186,6 @@ bool vtkPVContextView::Export(vtkAbstractChartExporter* exporter)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVContextView::Export(vtkCSVExporter* exporter)
-{
-  return this->Export(vtkAbstractChartExporter::SafeDownCast(exporter));
-}
-
-//----------------------------------------------------------------------------
 std::string vtkPVContextView::GetFormattedTitle()
 {
   return vtkPVStringFormatter::Format(this->Title ? this->Title : std::string());

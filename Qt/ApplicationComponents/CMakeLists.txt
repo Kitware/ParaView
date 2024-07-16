@@ -130,7 +130,6 @@ set(classes
   pqOpacityTableModel
   pqOSPRayHidingDecorator
   pqQuickLaunchDialogExtended
-  pqPVAnimationWidget
   pqPVApplicationCore
   pqParaViewBehaviors
   pqParaViewMenuBuilders
@@ -153,7 +152,6 @@ set(classes
   pqRenderViewSelectionReaction
   pqRepresentationToolbar
   pqRescaleScalarRangeReaction
-  pqResetScalarRangeReaction
   pqResetDefaultSettingsReaction
   pqSaveAnimationGeometryReaction
   pqAnimatedExportReaction
@@ -188,7 +186,6 @@ set(classes
   pqTemporalExportReaction
   pqTestingReaction
   pqTextLocationWidget
-  pqTimeInspectorWidget
   pqTimelineItemDelegate
   pqTimelineModel
   pqTimelinePainter
@@ -268,7 +265,6 @@ set(ui_files
   Resources/UI/pqSplinePropertyWidget.ui
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTextLocationWidget.ui
-  Resources/UI/pqTimeInspectorWidget.ui
   Resources/UI/pqTimeManagerWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyDialog.ui
   Resources/UI/pqVCRToolbar.ui

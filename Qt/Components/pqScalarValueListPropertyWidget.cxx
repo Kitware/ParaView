@@ -428,13 +428,6 @@ void pqScalarValueListPropertyWidget::setShowLabels(bool showLabels)
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarValueListPropertyWidget::setLabels(std::vector<const char*>& labels)
-{
-  const std::vector<std::string> strLabels(labels.begin(), labels.end());
-  this->Internals->Model.setLabels(strLabels);
-}
-
-//-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::setLabels(const std::vector<std::string>& labels)
 {
   this->Internals->Model.setLabels(labels);

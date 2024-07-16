@@ -4,8 +4,6 @@
 #ifndef pqHelpWindow_h
 #define pqHelpWindow_h
 
-#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_12_0
-
 #include "pqComponentsModule.h" // For export macro
 
 #include <QMainWindow>
@@ -42,14 +40,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * shows that page.
    */
   virtual void showHomePage();
-
-  /**
-   * Set the namespace from the provided one, then tries to locate a file name
-   * index.html in the given namespace and shows that page.
-   */
-  PARAVIEW_DEPRECATED_IN_5_12_0(
-    "Please use separated setNameSpace() and showHomePage() functions instead.")
-  virtual void showHomePage(const QString& namespace_name);
 
   /**
    * Save current page as home page.

@@ -20,7 +20,6 @@ set(classes
   vtkPVRampKeyFrame
   vtkPVRepresentationAnimationHelper
   vtkPVSinusoidKeyFrame
-  vtkRealtimeAnimationPlayer
   vtkSIXMLAnimationWriterRepresentationProperty
   vtkSMAnimationFrameWindowDomain
   vtkSMAnimationScene

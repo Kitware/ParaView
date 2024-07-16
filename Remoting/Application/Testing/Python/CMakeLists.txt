@@ -28,7 +28,6 @@ set(PY_TESTS
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
   GetActiveCamera.py,NO_VALID
   GhostCellsInMergeBlocks.py
-  GradientBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
   LocatorNonMergingBackwardsCompatibilityTest.py,NO_VALID
   LookupTable.py,NO_VALID
@@ -36,7 +35,6 @@ set(PY_TESTS
   PointGaussianProperties.py
   ProgrammableFilterProperties.py,NO_VALID
   ProgrammableFilter.py,NO_VALID
-  ProxyBackwardsCompatibilityTest.py,NO_VALID
   ProxyManager.py,NO_VALID
   ProxyPropertyLinks.py
   PythonVersion.py,NO_VALID
