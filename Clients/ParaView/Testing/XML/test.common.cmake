@@ -1387,6 +1387,7 @@ list(APPEND TESTS_WITH_BASELINES
   Glyph3DRepresentation.xml
   GlyphUseCellCenters.xml
   GlyphWithEmptyCells.xml
+  GroupDataSetOutputType.xml
   glTFImporterNestedRings.xml
   glTFImporterWaterBottle.xml
   glTFReaderAnimatedMorphing.xml
