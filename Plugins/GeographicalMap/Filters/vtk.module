@@ -9,7 +9,9 @@ SPDX_COPYRIGHT_TEXT
 DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
+  VTK::FiltersGeneral
   VTK::GeovisCore
+  VTK::IOImage
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
   VTK::vtksys
