@@ -1,3 +1,4 @@
 set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "")
+set(PARAVIEW_PLUGIN_ENABLE_GeographicalMap ON CACHE BOOL "")
 
 include("${CMAKE_CURRENT_LIST_DIR}/configure_macos.cmake")
