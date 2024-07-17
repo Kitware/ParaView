@@ -22,7 +22,7 @@
 
 .fedora35:
     extends: .linux
-    image: "kitware/paraview:ci-fedora35-20240529"
+    image: "kitware/paraview:ci-fedora35-20240716"
 
 .el7_mindeps:
     extends: .linux
