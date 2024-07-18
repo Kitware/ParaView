@@ -64,11 +64,13 @@ protected:
   vtkSMDataTypeQueryDomain();
   ~vtkSMDataTypeQueryDomain() override;
 
-  int InputDataType = -1;
-
 private:
   vtkSMDataTypeQueryDomain(const vtkSMDataTypeQueryDomain&) = delete;
   void operator=(const vtkSMDataTypeQueryDomain&) = delete;
+
+  int InputDataType = -1;
+
+  void OnDomainModified();
 };
 
 #endif // vtkSMDataTypeQueryDomain_h
