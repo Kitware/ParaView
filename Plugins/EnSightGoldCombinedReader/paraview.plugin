@@ -1,0 +1,6 @@
+NAME
+  EnSightGoldCombinedReader
+DESCRIPTION
+  Readers for EnSight Gold and SOS files.
+REQUIRES_MODULES
+  VTK::IOEnSight

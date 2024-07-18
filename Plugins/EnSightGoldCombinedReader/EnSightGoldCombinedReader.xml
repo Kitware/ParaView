@@ -1,0 +1,221 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy name="EnSightGoldCombinedReader"
+                 label="EnSight Gold Combined Reader"
+                 class="vtkEnSightGoldCombinedReader">
+      <Documentation short_help="Read EnSight Gold files.">
+        Reader for EnSight Gold binary and ASCII files.
+      </Documentation>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty
+            name="CaseFileName"
+            animateable="0"
+            command="SetCaseFileName"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property sets the case file to be read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="case CASE Case encas ENCAS Encas"
+                       file_description="EnSight Gold files" />
+      </Hints>
+
+      <StringVectorProperty name="BlockInfo"
+        command="GetPartSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Parts"
+        command="GetPartSelection"
+        information_property="BlockInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="BlockInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which data elements to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Point Arrays"
+        command="GetPointArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which point arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayInfo"
+        command="GetCellArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Cell Arrays"
+        command="GetCellArraySelection"
+        information_property="CellArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which cell arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="FieldArrayInfo"
+        command="GetFieldArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Field Arrays"
+        command="GetFieldArraySelection"
+        information_property="FieldArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FieldArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which field data arrays to read.</Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <SourceProxy name="EnSightSOSGoldReader"
+                 label="EnSight SOS Gold Reader"
+                 class="vtkEnSightSOSGoldReader">
+      <Documentation short_help="Read EnSight Gold SOS files.">
+        Reader for EnSight Gold SOS files.
+      </Documentation>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty
+            name="CaseFileName"
+            animateable="0"
+            command="SetCaseFileName"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property sets the SOS file to be read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="sos SOS"
+                       file_description="EnSight Gold Server of Server (SOS) files" />
+      </Hints>
+      <StringVectorProperty name="BlockInfo"
+        command="GetPartSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Parts"
+        command="GetPartSelection"
+        information_property="BlockInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="BlockInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which data elements to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Point Arrays"
+        command="GetPointArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which point arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayInfo"
+        command="GetCellArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Cell Arrays"
+        command="GetCellArraySelection"
+        information_property="CellArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which cell arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="FieldArrayInfo"
+        command="GetFieldArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="Field Arrays"
+        command="GetFieldArraySelection"
+        information_property="FieldArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FieldArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which field data arrays to read.</Documentation>
+      </StringVectorProperty>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
