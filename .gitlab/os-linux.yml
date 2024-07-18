@@ -263,22 +263,19 @@
     script:
         - *before_script_linux
         - test -n "$RSYNC_SSH_PRIVATE_KEY" && chmod 600 $RSYNC_SSH_PRIVATE_KEY
-        - git clone $PARAVIEW_DOCS_REPO paraview-docs
         - mkdir -p build
         - cd build
-        - echo "$PARAVIEW_DOCS_REPO  $GIT_SSH_COMMAND"
         - $LAUNCHER cmake -DCMAKE_PREFIX_PATH=/usr/lib64/openmpi -DPARAVIEW_USE_PYTHON=ON -DVTK_WRAP_PYTHON=ON \
           -DVTK_ENABLE_WRAPPING=ON -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON -DPARAVIEW_USE_MPI=ON \
           -DPARAVIEW_BUILD_EDITION=CATALYST -DDOCUMENTATION_HTML_TARZ=ON ..
         - cmake --build . -j $(nproc) &> $GIT_CLONE_PATH/compile_output.log
         - make ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
-        - cd $GIT_CLONE_PATH/paraview-docs
+        - cd $GIT_CLONE_PATH
         - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
-        - test -n "$RSYNC_SSH_PRIVATE_KEY" && $LAUNCHER bash -x ./scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE" &> $GIT_CLONE_PATH/prepare_output.log
+        - test -n "$RSYNC_SSH_PRIVATE_KEY" && $LAUNCHER bash -x Utilities/scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE" &> $GIT_CLONE_PATH/prepare_output.log
         - tar czf $GIT_CLONE_PATH/paraview-docs-doxygen.tgz $GIT_CLONE_PATH/build/doc
 
     variables:
-        PARAVIEW_DOCS_REPO: https://github.com/Kitware/paraview-docs.git
         CURRENT_RELEASE: nightly
         PARAVIEW_DOC_UPLOAD: "true"
 
