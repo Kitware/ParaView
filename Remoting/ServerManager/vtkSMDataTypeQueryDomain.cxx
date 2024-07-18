@@ -2,15 +2,21 @@
 // SPDX-License-Identifier: BSD-3-Clause
 #include "vtkSMDataTypeQueryDomain.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMDataTypeQueryDomain);
 
 //----------------------------------------------------------------------------
-vtkSMDataTypeQueryDomain::vtkSMDataTypeQueryDomain() = default;
+vtkSMDataTypeQueryDomain::vtkSMDataTypeQueryDomain()
+{
+  this->AddObserver(
+    vtkCommand::DomainModifiedEvent, this, &vtkSMDataTypeQueryDomain::OnDomainModified);
+}
 
 //----------------------------------------------------------------------------
 vtkSMDataTypeQueryDomain::~vtkSMDataTypeQueryDomain() = default;
@@ -53,7 +59,6 @@ void vtkSMDataTypeQueryDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   if (inputDataType != this->InputDataType)
   {
     this->InputDataType = inputDataType;
-    vtkSMIntVectorProperty::SafeDownCast(this->GetProperty())->SetElement(0, this->InputDataType);
     this->DomainModified();
   }
 }
@@ -76,4 +81,15 @@ int vtkSMDataTypeQueryDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unc
     placeHolderProp->SetElement(0, this->InputDataType);
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDataTypeQueryDomain::OnDomainModified()
+{
+  vtkSMProperty* prop = this->GetProperty();
+  this->SetDefaultValues(prop, true);
+  if (prop->GetParent())
+  {
+    prop->GetParent()->UpdateProperty(prop->GetXMLName());
+  }
 }
