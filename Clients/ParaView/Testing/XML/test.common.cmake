@@ -630,6 +630,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanDefaultColor.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanGUIColor.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanPresetColor.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderViewContextMenuArrayColoring.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderViewContextMenuSolidColoring.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGridBranching_3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DX.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DY.png}"
@@ -1072,6 +1074,7 @@ list (APPEND TESTS_WITH_INLINE_COMPARES
   RemoteRendering.xml
   RenameArrays.xml
   RenderNan.xml
+  RenderViewContextMenu.xml
   ResetToVisibleRange.xml
   Ruler.xml
   SaveExodus.xml
@@ -1727,6 +1730,7 @@ set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
 set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
 set(CombineFrustumSelections_DISABLE_CRS TRUE) # yes, this test does a selection
+set(RenderViewContextMenu_DISABLE_CRS TRUE)
 
 # BoxWidgetVisibleBlock and ZoomToData are not working as well in crs
 set(BoxWidgetVisibleBlock_DISABLE_CRS TRUE)
@@ -2017,7 +2021,7 @@ paraview_add_client_tests(
   TEST_SCRIPTS ResampleToHyperTreeGrid.xml
 )
 
-# RandomAttributes generate different results depending on the data 
+# RandomAttributes generate different results depending on the data
 # distribution so we enable it on client mode only for now
 # See https://gitlab.kitware.com/paraview/paraview/-/issues/22596
 paraview_add_client_tests(

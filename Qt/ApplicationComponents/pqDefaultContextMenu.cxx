@@ -125,7 +125,12 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
     }
 
     action = menu->addAction(QIcon(":/pqWidgets/Icons/pqEditColor.svg"), tr("Edit Color"));
-    new pqEditColorMapReaction(action);
+
+    // Don't edit colors on the active representation, edit them on the selected representation.
+    // Fixes #22391.
+    auto editColorReaction =
+      new pqEditColorMapReaction(action, false /* don't track active objects */);
+    editColorReaction->setRepresentation(repr);
 
     menu->addSeparator();
   }
