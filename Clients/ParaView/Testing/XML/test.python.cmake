@@ -22,6 +22,14 @@ if(NOT APPLE)
     )
 endif()
 
+# VTTKJS exporter requires the Web module
+if (PARAVIEW_ENABLE_WEB)
+  list (APPEND TESTS_WITHOUT_BASELINES
+    ExportToVTKJS.xml
+  )
+  set (ExportToVTKJS_FORCE_SERIAL TRUE) # since this uses popup-menu
+endif ()
+
 list(APPEND TESTS_WITH_BASELINES
   ColorByComponentNames.xml # needs programmable filter
   LiveProgrammableSource.xml
