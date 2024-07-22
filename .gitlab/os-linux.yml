@@ -22,7 +22,7 @@
 
 .fedora35:
     extends: .linux
-    image: "kitware/paraview:ci-fedora35-20240716"
+    image: "kitware/paraview:ci-fedora35-20240723"
 
 .el7_mindeps:
     extends: .linux
@@ -258,22 +258,38 @@
 
     script:
         - *before_script_linux
-        - test -n "$RSYNC_SSH_PRIVATE_KEY" && chmod 600 $RSYNC_SSH_PRIVATE_KEY
-        - mkdir -p build
-        - cd build
-        - $LAUNCHER cmake -DCMAKE_PREFIX_PATH=/usr/lib64/openmpi -DPARAVIEW_USE_PYTHON=ON -DVTK_WRAP_PYTHON=ON \
-          -DVTK_ENABLE_WRAPPING=ON -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON -DPARAVIEW_USE_MPI=ON \
-          -DPARAVIEW_BUILD_EDITION=CATALYST -DDOCUMENTATION_HTML_TARZ=ON ..
-        - cmake --build . -j $(nproc) &> $GIT_CLONE_PATH/compile_output.log
-        - make ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
-        - cd $GIT_CLONE_PATH
-        - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
-        - test -n "$RSYNC_SSH_PRIVATE_KEY" && $LAUNCHER bash -x ./Utilities/DocsUploader/Scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE" &> $GIT_CLONE_PATH/prepare_output.log
-        - tar czf $GIT_CLONE_PATH/paraview-docs-doxygen.tgz $GIT_CLONE_PATH/build/doc
+        - if [ -n "$RSYNC_SSH_PRIVATE_KEY" ]; then
+            chmod 600 $RSYNC_SSH_PRIVATE_KEY;
+            MAYBE_SSH_KEY_PATH="-k $RSYNC_SSH_PRIVATE_KEY";
+          fi
+        - if [ -n "$CI_COMMIT_TAG" ]; then
+            CURRENT_RELEASE="$CI_COMMIT_TAG";
+            MAYBE_UPDATE_LATEST="-u";
+          fi
+        - $LAUNCHER cmake -S $GIT_CLONE_PATH -B $GIT_CLONE_PATH/build
+            -GNinja
+            -DDOCUMENTATION_HTML_TARZ=ON
+            -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON
+            -DPARAVIEW_BUILD_EDITION=CATALYST
+            -DPARAVIEW_USE_MPI=ON
+            -DPARAVIEW_USE_PYTHON=ON
+        - $LAUNCHER cmake --build $GIT_CLONE_PATH/build -j $(nproc) &> $GIT_CLONE_PATH/compile_output.log
+        - $LAUNCHER cmake --build $GIT_CLONE_PATH/build --target ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
+        - $LAUNCHER bash -x $GIT_CLONE_PATH/Utilities/DocsUploader/Scripts/paraview_docs_uploader
+            -s "$GIT_CLONE_PATH"
+            -b "$GIT_CLONE_PATH/build"
+            -w "$GIT_CLONE_PATH"
+            -v "$CURRENT_RELEASE"
+            $MAYBE_SSH_KEY_PATH
+            $MAYBE_UPDATE_LATEST
+            &> $GIT_CLONE_PATH/prepare_output.log
+        - tar -c --use-compress-program=pigz -f $GIT_CLONE_PATH/paraview-docs-doxygen.tgz $GIT_CLONE_PATH/build/doc
 
     variables:
+        CMAKE_PREFIX_PATH: "/usr/lib64/openmpi:$CMAKE_PREFIX_PATH"
         CURRENT_RELEASE: nightly
-        PARAVIEW_DOC_UPLOAD: "true"
+        MAYBE_SSH_KEY_PATH:
+        MAYBE_UPDATE_LATEST:
 
     interruptible: true
     timeout: 3 hours
