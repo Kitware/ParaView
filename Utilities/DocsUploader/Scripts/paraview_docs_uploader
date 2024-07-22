@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+set -e
+
+readonly PV_URL="https://www.paraview.org/paraview-docs/"
+readonly HELP_MSG="usage: paraview_docs_uploader [options]
+  options:
+    -s path       Paraview source directory, <MANDATORY>.
+    -b path       Paraview build directory, <MANDATORY>.
+    -w path       Working directory for this program, <MANDATORY>.
+    -k path       SSH key to upload the docs.
+    -v version    Force a version, Default: git-describe.
+    -u            Update latest release."
+
+while getopts "s:b:v:w:k:u" opt
+do
+  case $opt in
+    s) PV_SRC="${OPTARG}";;
+    b) PV_BUILD="${OPTARG}";;
+    v) VERSION="${OPTARG}";;
+    w) WORK_DIR="${OPTARG}";;
+    k) SSH_PRIVATE_KEY_PATH="${OPTARG}";;
+    u) UPDATE_LATEST="true";;
+    *) echo "${HELP_MSG}"; exit 0;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "${PV_SRC}" ] || [ -z "${PV_BUILD}" ] || [ -z "${WORK_DIR}" ]
+then
+  echo "error: missing mandatory arguments"
+  echo "${HELP_MSG}"
+  exit 1
+fi
+
+if [ -n "${UPDATE_LATEST}" ] && ! [[ "${VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]
+then
+  echo "error: updating latest with non tag-released version"
+  echo "${HELP_MSG}"
+  exit 2
+fi
+
+if [ -z "${VERSION}" ]
+then
+  VERSION=$(git -C "$PV_SRC" describe)
+fi
+
+mkdir -p "$WORK_DIR/paraview-docs"
+cd "$WORK_DIR/paraview-docs"
+
+# -----------------------------------------------------------------------------
+# Grab Content
+# -----------------------------------------------------------------------------
+curl -OL "${PV_URL}/versions"
+curl -OL "${PV_URL}/versions.json"
+cp -v "${PV_SRC}/Utilities/DocsUploader/Dist/paraview-version.js" .
+
+# -----------------------------------------------------------------------------
+# Copy Documentation to target
+# -----------------------------------------------------------------------------
+mkdir -p "${WORK_DIR}/paraview-docs/${VERSION}"
+cp -r "${PV_BUILD}/doc/cxx" "${WORK_DIR}/paraview-docs/${VERSION}/cxx"
+cp -r "${PV_BUILD}/doc/python" "${WORK_DIR}/paraview-docs/${VERSION}/python"
+rm -rf "${WORK_DIR}/paraview-docs/${VERSION}/python/.doctrees"
+
+# -----------------------------------------------------------------------------
+# update available `versions` file.
+# -----------------------------------------------------------------------------
+echo "${VERSION}" >> versions
+
+# Scrub versions file
+LC_ALL=C sort --version-sort --reverse --unique --output versions versions
+# Delete anything other than a line that starts with: vX.Y.Z
+sed --regexp-extended -i '/v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+.*/!d' versions
+
+# -----------------------------------------------------------------------------
+# update available `versions.json` file.
+# -----------------------------------------------------------------------------
+GENERATED_TAGS="$(
+  sed --regexp-extended '
+     # Every line
+     {
+       s/v(.*)/{ "value": "v\1",  "label": "\1"}/
+     }
+     # Every line but the last one
+     $! {
+       s/$/,/
+     }' versions
+     )"
+
+last_release=$(head -n1 versions | tr -d '\n')
+cat << EOF > versions.json
+[
+{ "value": "nightly", "label": "nightly (development)" },
+{ "value": "latest",  "label": "latest release ($last_release)" },
+$GENERATED_TAGS
+]
+EOF
+
+
+# -----------------------------------------------------------------------------
+# Commit to server
+# -----------------------------------------------------------------------------
+
+if [ -n "$UPDATE_LATEST" ]
+then
+  if [ -d latest ]; then
+      rm -rf latest
+  fi
+  cp -av "$VERSION"/ latest/
+fi
+
+if [ -f "${SSH_PRIVATE_KEY_PATH}" ]
+then
+  rsync -e "ssh -o StrictHostKeyChecking=accept-new -i $SSH_PRIVATE_KEY_PATH" -av --progress . kitware@web:
+fi

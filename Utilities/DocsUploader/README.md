@@ -17,7 +17,14 @@ The resulting script is `Dist/paraview-version.js`.
 ## Shell script to automate publication
 
 ```
-./Scripts/prepare-doc.sh /path/to/paraview/src /path/to/paraview/build /path/to/workdir
+usage: paraview_docs_uploader [options]
+  options:
+    -s path       Paraview source directory, <MANDATORY>.
+    -b path       Paraview build directory, <MANDATORY>.
+    -w path       Working directory for this program, <MANDATORY>.
+    -k path       SSH key to upload the docs.
+    -v version    Force a version, Default: git-describe.
+    -u            Update latest release.
 ```
 
 For nightly or latest (i.e. latest release) you can pass in an additional
@@ -25,7 +32,7 @@ parameter on  the command line which is the name to use instead of `git
 describe` e.g.
 
 ```
-./Scripts/prepare-doc.sh /path/to/paraview/src /path/to/paraview/build /path/to/workdir nightly
+paraview_docs_uploader -v nightly
 ```
 
 ## Updating ParaView docs
@@ -42,7 +49,7 @@ been tested on a Linux system.
   correctly.
 * Build the `ParaViewDoc-TGZ` target e.g. `ninja ParaViewDoc-TGZ`. This will
   generate the Doxygen and Sphinx generated docs.
-* Now run `prepare-doc` script. Provide the optional `version` command line
+* Now run `paraview_docs_uploader` script. Provide the optional `version` command line
   argument when generated docs for `latest` or `nightly` instead of using the
   value obtained from `git describe` executed on the source directory. The
   script will update and push the documentation changes to the kitware webserver.
