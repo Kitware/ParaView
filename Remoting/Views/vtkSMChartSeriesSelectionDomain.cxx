@@ -449,9 +449,7 @@ void vtkSMChartSeriesSelectionDomain::OnDomainModified()
   this->UpdateDefaultValues(prop, true);
   if (prop->GetParent())
   {
-    // FIXME:
-    // prop->GetParent()->UpdateProperty(prop);
-    prop->GetParent()->UpdateVTKObjects();
+    prop->GetParent()->UpdateProperty(prop->GetXMLName());
   }
 }
 

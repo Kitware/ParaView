@@ -233,9 +233,3 @@ set(SelectionLinkScripting_DISABLE_CS TRUE)
 set(ManyTypesXMLWriterReader_DISABLE_CS TRUE)
 set(ManyTypesXMLWriterReader_DISABLE_CRS TRUE)
 set(ManyTypesXMLWriterReaderMPI_DISABLE_C TRUE)
-
-# CGNS BC patches not supported in parallel
-set(ReadCGNSBCDataset_DISABLE_CS TRUE)
-set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
-set(CONVERGECFDCGNSReader_DISABLE_CS TRUE)
-set(CONVERGECFDCGNSReader_DISABLE_CRS TRUE)

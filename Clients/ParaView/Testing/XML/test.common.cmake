@@ -1391,6 +1391,7 @@ list(APPEND TESTS_WITH_BASELINES
   Glyph3DRepresentation.xml
   GlyphUseCellCenters.xml
   GlyphWithEmptyCells.xml
+  GroupDataSetOutputType.xml
   glTFImporterNestedRings.xml
   glTFImporterWaterBottle.xml
   glTFReaderAnimatedMorphing.xml
@@ -2011,6 +2012,12 @@ set (PlotOverLine_htg_DISABLE_CS TRUE)
 set (PlotOverLine_htg_DISABLE_CRS TRUE)
 set (PlotOverLine_surface_DISABLE_CS TRUE)
 set (PlotOverLine_surface_DISABLE_CRS TRUE)
+
+# CGNS BC patches not supported in parallel
+set(ReadCGNSBCDataset_DISABLE_CS TRUE)
+set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
+set(CONVERGECFDCGNSReader_DISABLE_CS TRUE)
+set(CONVERGECFDCGNSReader_DISABLE_CRS TRUE)
 
 set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml

@@ -1483,6 +1483,16 @@ void vtkGeometryRepresentation::SetFeatureAngle(double val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetPlaceHolderDataType(int datatype)
+{
+  if (this->PlaceHolderDataType != datatype)
+  {
+    this->PlaceHolderDataType = datatype;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::AddBlockSelector(const char* selector)
 {
   if (selector != nullptr &&
