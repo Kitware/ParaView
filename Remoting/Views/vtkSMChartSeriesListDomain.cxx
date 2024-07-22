@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 #include <vector>
 
 vtkStandardNewMacro(vtkSMChartSeriesListDomain);
@@ -50,9 +51,14 @@ void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)
   int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
   vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
 
-  for (int cc = 0; dsa != nullptr && cc < dsa->GetNumberOfArrays(); cc++)
+  if (dsa != nullptr)
   {
-    this->PopulateArrayComponents(dsa->GetArrayInformation(cc), strings);
+    std::unique_ptr<vtkPVDataSetAttributesInformation::AlphabeticalArrayInformationIterator> iter(
+      dsa->NewAlphabeticalArrayInformationIterator());
+    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      this->PopulateArrayComponents(iter->GetCurrentArrayInformation(), strings);
+    }
   }
 
   // Process point coordinates array
