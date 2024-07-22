@@ -422,7 +422,7 @@ public:
    *
    * This can be potentially removed in the future once vtkMultiBlockDataSet is deprecated.
    */
-  vtkSetMacro(PlaceHolderDataType, int);
+  void SetPlaceHolderDataType(int datatype);
   vtkGetMacro(PlaceHolderDataType, int);
   ///@}
 
