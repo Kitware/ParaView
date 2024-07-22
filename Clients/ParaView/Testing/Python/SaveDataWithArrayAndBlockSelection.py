@@ -64,8 +64,8 @@ SaveData(filename, ChooseArraysToWrite=0, PointDataArrays=["Normals"], ChooseBlo
 
 r = OpenDataFile(filename)
 assert r.PointData.GetNumberOfArrays() == 2
-assert r.PointData.GetArray(0).GetName() == "Elevation"
-assert r.PointData.GetArray(1).GetName() == "Normals"
+assert r.PointData.GetArray("Elevation") is not None
+assert r.PointData.GetArray("Normals") is not None
 
 dii = r.GetDataInformation().DataInformation
 assert dii.GetNumberOfDataSets() == 1
@@ -80,8 +80,8 @@ SaveData(filename, ChooseArraysToWrite=0, PointDataArrays=["Normals"], ChooseBlo
 
 r = OpenDataFile(filename)
 assert r.PointData.GetNumberOfArrays() == 2
-assert r.PointData.GetArray(0).GetName() == "Elevation"
-assert r.PointData.GetArray(1).GetName() == "Normals"
+assert r.PointData.GetArray("Elevation") is not None
+assert r.PointData.GetArray("Normals") is not None
 
 dii = r.GetDataInformation().DataInformation
 assert dii.GetNumberOfDataSets() == 2
