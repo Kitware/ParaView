@@ -34,7 +34,7 @@ protected:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
-  std::function<void(QGraphicsSceneMouseEvent*)> mousePressCallback = {};
+  std::function<void(QGraphicsSceneMouseEvent*)> mousePressCallback;
 };
 
 #endif // pqNodeEditorLabel_h

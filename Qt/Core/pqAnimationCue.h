@@ -17,7 +17,7 @@ class vtkSMProperty;
 struct pqAnimatedPropertyInfo
 {
   vtkSmartPointer<vtkSMProxy> Proxy;
-  QString Name = QString();
+  QString Name;
   int Index = 0;
 };
 
