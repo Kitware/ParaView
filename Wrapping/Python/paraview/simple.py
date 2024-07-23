@@ -607,6 +607,38 @@ def RemoveViewsAndLayouts():
         pxm.UnRegisterProxy('layouts', name, layouts[(name, id)])
 
 
+def EqualizeViewsHorizontally(layout=None):
+    """Equalizes horizontal view sizes in the provided layout.
+
+    :param layout: Layout the layout contain the views to equalize. Optional, defaults
+                   to the active layout.
+    :type layout: Layout proxy.
+    """
+    layout = layout if layout else GetLayout()
+    layout.SMProxy.EqualizeViews(paraview.modules.vtkRemotingViews.vtkSMViewLayoutProxy.HORIZONTAL)
+
+def EqualizeViewsVertically(layout=None):
+    """Equalizes vertical view sizes in the provided layout.
+
+    :param layout: Layout the layout contain the views to equalize. Optional, defaults
+                   to the active layout.
+    :type layout: Layout proxy.
+    """
+    layout = layout if layout else GetLayout()
+    layout.SMProxy.EqualizeViews(paraview.modules.vtkRemotingViews.vtkSMViewLayoutProxy.VERTICAL)
+
+
+def EqualizeViewsBoth(layout=None):
+    """Equalizes the vertical and horizontal view sizes in the provided layout.
+
+    :param layout: Layout the layout contain the views to equalize. Optional, defaults
+                   to the active layout.
+    :type layout: Layout proxy.
+    """
+    layout = layout if layout else GetLayout()
+    layout.SMProxy.EqualizeViews()
+
+
 # ==============================================================================
 # Extracts and Extractors
 # ==============================================================================
