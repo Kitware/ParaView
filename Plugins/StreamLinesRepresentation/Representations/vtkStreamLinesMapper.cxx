@@ -137,7 +137,7 @@ protected:
   bool InterpolateSpeedAndColor(
     std::array<double, 3>& position, std::array<double, 3>& velocity, vtkIdType particleId);
 
-  inline double Rand(double vmin = 0., double vmax = 1.)
+  double Rand(double vmin = 0., double vmax = 1.)
   {
     this->RandomNumberSequence->Next();
     return this->RandomNumberSequence->GetRangeValue(vmin, vmax);

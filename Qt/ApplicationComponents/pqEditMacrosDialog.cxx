@@ -405,12 +405,12 @@ struct pqEditMacrosDialog::pqInternals
     return macroNames.join(separator);
   }
 
-  inline pqPythonMacrosModel* model() const
+  pqPythonMacrosModel* model() const
   {
     return static_cast<pqPythonMacrosModel*>(this->view()->model());
   }
 
-  inline QTreeView* view() const { return this->Ui->macrosTree; }
+  QTreeView* view() const { return this->Ui->macrosTree; }
 
   QScopedPointer<Ui::pqEditMacrosDialog> Ui;
 };

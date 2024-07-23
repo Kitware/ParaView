@@ -101,7 +101,7 @@ public:
 
   // This callback is invoked to get the propagation weight at a given vertex.
   // Th result is no weight == 1
-  static inline GW::GW_Float FastMarchingPropagationNoWeightCallback(GW::GW_GeodesicVertex&, void*)
+  static GW::GW_Float FastMarchingPropagationNoWeightCallback(GW::GW_GeodesicVertex&, void*)
   {
     return 1.0;
   }
