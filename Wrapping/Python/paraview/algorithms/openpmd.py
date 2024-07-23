@@ -5,6 +5,8 @@ from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
 from .. import print_error
 
+import math
+
 try:
     import numpy as np
     import openpmd_api as io
@@ -415,7 +417,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             shp = scalar.shape
             comp = scalar.load_chunk(chunk_offset, chunk_extent)
             self._series.flush()
-            comp = comp * scalar.unit_SI
+            if not math.isclose(1.0, scalar.unit_SI):
+                comp = comp * scalar.unit_SI
             if len(shp) == 3:
                 arrays.append(np.transpose(comp, _3d) if mesh_needs_transpose(var) else comp)
             elif len(shp) == 2:
@@ -454,7 +457,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
         for name, scalar in var.items():
             comp = scalar.load_chunk([start], [end - start + 1])
             self._series.flush()
-            comp = comp * scalar.unit_SI
+            if not math.isclose(1.0, scalar.unit_SI):
+                comp = comp * scalar.unit_SI
             arrays.append(comp)
 
         ncomp = len(var)
