@@ -384,7 +384,7 @@ void pqXRInterfaceDockPanel::collaborationCallback(
   std::string const& msg, vtkLogger::Verbosity /*verbosity*/)
 {
   // send message if any to text window
-  if (!msg.length())
+  if (msg.empty())
   {
     return;
   }

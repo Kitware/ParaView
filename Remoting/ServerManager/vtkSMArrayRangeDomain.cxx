@@ -85,8 +85,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName, int fieldAssociation,
     // first try to see if there's a component suffix added and hence we failed
     // to locate the array information.
     std::string name = vtkSMArrayListDomain::ArrayNameFromMangledName(arrayName);
-    arrayInfo =
-      name.length() > 0 ? info->GetArrayInformation(name.c_str(), fieldAssociation) : nullptr;
+    arrayInfo = !name.empty() ? info->GetArrayInformation(name.c_str(), fieldAssociation) : nullptr;
     if (!arrayInfo)
     {
       // try the other field association.

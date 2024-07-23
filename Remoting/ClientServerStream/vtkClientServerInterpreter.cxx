@@ -874,7 +874,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName, const char* const* 
     for (const char* const* p = optionalPaths; *p; ++p)
     {
       std::string path = *p;
-      if (path.length() > 0)
+      if (!path.empty())
       {
         char end = *(path.end() - 1);
         if (end != '/' && end != '\\')

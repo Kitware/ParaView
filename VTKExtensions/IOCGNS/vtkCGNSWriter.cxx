@@ -883,7 +883,7 @@ void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
     }
     vtkNew<vtkAppendDataSets> append;
     append->SetMergePoints(true);
-    if (name.length() <= 0)
+    if (name.empty())
     {
       name = "Zone " + std::to_string(zoneOffset);
     }
@@ -947,7 +947,7 @@ void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
     vtkPointSet* pointSet = vtkPointSet::SafeDownCast(curDO);
     if (pointSet)
     {
-      if (name.length() > 0)
+      if (!name.empty())
       {
         pointSet->GetInformation()->Set(vtkCompositeDataSet::NAME(), name);
       }
