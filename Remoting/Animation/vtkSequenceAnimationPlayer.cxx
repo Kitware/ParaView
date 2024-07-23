@@ -99,7 +99,7 @@ int vtkSequenceAnimationPlayer::GetTimestep(double start, double end, double cur
 //----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GetTimeFromTimestep(double start, double end, int timestep)
 {
-  double delta = static_cast<double>(end - start) / (this->NumberOfFrames - 1);
+  double delta = (end - start) / (this->NumberOfFrames - 1);
   return start + timestep * delta;
 }
 

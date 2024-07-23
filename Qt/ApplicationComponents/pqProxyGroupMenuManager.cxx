@@ -936,7 +936,7 @@ void pqProxyGroupMenuManager::triggered()
   {
     this->Internal->RecentlyUsed.removeAll(key);
     this->Internal->RecentlyUsed.push_front(key);
-    while (this->Internal->RecentlyUsed.size() > static_cast<int>(this->RecentlyUsedMenuSize))
+    while (this->Internal->RecentlyUsed.size() > this->RecentlyUsedMenuSize)
     {
       this->Internal->RecentlyUsed.pop_back();
     }

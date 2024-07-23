@@ -63,7 +63,7 @@ public:
     }
 
     // now verify that every parent node for location is a split cell.
-    int parent = (static_cast<int>(location) - 1) / 2;
+    int parent = (location - 1) / 2;
     while (this->KDTree[parent].Direction != vtkSMViewLayoutProxy::NONE)
     {
       if (parent == 0)
@@ -71,7 +71,7 @@ public:
         return true;
       }
 
-      parent = (static_cast<int>(parent) - 1) / 2;
+      parent = (parent - 1) / 2;
     }
 
     return false;

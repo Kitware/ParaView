@@ -1041,7 +1041,7 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments, vtkMultiBloc
   for (segment = Segment::SafeDownCast(segments->GetNextItemAsObject()); segment;
        segment = Segment::SafeDownCast(segments->GetNextItemAsObject()))
   {
-    vtkPolyData* polyData = const_cast<vtkPolyData*>(segment->GetPolyData());
+    vtkPolyData* polyData = segment->GetPolyData();
 
     vtkNew<vtkPolyData> pd;
     std::string partitionName = "segment_" + std::to_string(cc);

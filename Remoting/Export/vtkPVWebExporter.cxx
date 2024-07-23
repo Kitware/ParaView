@@ -77,8 +77,8 @@ void vtkPVWebExporter::Write()
       throw 1;
     }
 
-    PyObject_CallMethod(pvmodule, const_cast<char*>("applyParaViewNaming"),
-      const_cast<char*>("(s)"), const_cast<char*>(this->FileName));
+    PyObject_CallMethod(
+      pvmodule, const_cast<char*>("applyParaViewNaming"), const_cast<char*>("(s)"), this->FileName);
     if (PyErr_Occurred())
     {
       vtkGenericWarningMacro("Failed to rename datasets using ParaView proxy name");
@@ -94,7 +94,7 @@ void vtkPVWebExporter::Write()
     }
 
     PyObject_CallMethod(module, const_cast<char*>("convertDirectoryToZipFile"),
-      const_cast<char*>("(s)"), const_cast<char*>(this->FileName));
+      const_cast<char*>("(s)"), this->FileName);
     if (PyErr_Occurred())
     {
       vtkGenericWarningMacro("Failed to bundle vtkjs file");
@@ -104,8 +104,7 @@ void vtkPVWebExporter::Write()
     if (!glanceHTML.empty())
     {
       PyObject_CallMethod(module, const_cast<char*>("addDataToViewer"), const_cast<char*>("(ssb)"),
-        const_cast<char*>(this->FileName), const_cast<char*>(glanceHTML.c_str()),
-        this->DisableNetwork);
+        this->FileName, const_cast<char*>(glanceHTML.c_str()), this->DisableNetwork);
     }
     if (PyErr_Occurred())
     {

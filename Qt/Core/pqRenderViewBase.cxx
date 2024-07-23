@@ -225,7 +225,7 @@ void pqRenderViewBase::beginDelayInteractiveRender()
 {
   vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
     this->getProxy()->GetProperty("NonInteractiveRenderDelay"));
-  double value = prop ? static_cast<double>(prop->GetElement(0)) : 0;
+  double value = prop ? prop->GetElement(0) : 0;
   this->Internal->startInteractiveRenderDelay(value);
   this->InteractiveDelayUpdateTimer->start(100);
 }

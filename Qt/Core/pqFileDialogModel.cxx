@@ -971,7 +971,7 @@ QVariant pqFileDialogModel::data(const QModelIndex& idx, int role) const
           return static_cast<int>(file->type());
           break;
         case 2:
-          return static_cast<qulonglong>(file->size());
+          return file->size();
           break;
         case 3:
           return file->modificationTime();

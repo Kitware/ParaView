@@ -292,7 +292,7 @@ void return_result(FILE* fp)
           MAX_ARGS);
         return;
       }
-      else if (strcmp(rClass, "vtkVariant") == 0)
+      else if (strcmp(rClass, "vtkVariant") == 0 || strcmp(rClass, "vtkObjectBase") == 0)
       {
         fprintf(fp,
           "      resultStream.Reset();\n"

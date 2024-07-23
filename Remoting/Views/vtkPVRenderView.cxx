@@ -1253,8 +1253,7 @@ void vtkPVRenderView::ResetCameraScreenSpace(double* bounds, double offsetRatio)
 {
   if (!this->LockBounds)
   {
-    this->RenderView->GetRenderer()->ResetCameraScreenSpace(
-      bounds, static_cast<double>(offsetRatio));
+    this->RenderView->GetRenderer()->ResetCameraScreenSpace(bounds, offsetRatio);
   }
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }

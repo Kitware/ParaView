@@ -561,10 +561,10 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
           }
         }
       }
-      this->Controller->Send((int*)(&schedLen1), 1, id, SCHED_LEN_1_TAG);
-      this->Controller->Send((int*)(&schedLen2), 1, id, SCHED_LEN_2_TAG);
-      this->Controller->Send((int*)schedArray1, schedLen1, id, SCHED_1_TAG);
-      this->Controller->Send((vtkIdType*)schedArray2, schedLen2, id, SCHED_2_TAG);
+      this->Controller->Send(&schedLen1, 1, id, SCHED_LEN_1_TAG);
+      this->Controller->Send(&schedLen2, 1, id, SCHED_LEN_2_TAG);
+      this->Controller->Send(schedArray1, schedLen1, id, SCHED_1_TAG);
+      this->Controller->Send(schedArray2, schedLen2, id, SCHED_2_TAG);
       delete[] schedArray1;
       delete[] schedArray2;
     }
@@ -627,8 +627,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
     // myId != 0
     schedLen1 = 0;
     schedLen2 = 0;
-    this->Controller->Receive((int*)(&schedLen1), 1, 0, SCHED_LEN_1_TAG);
-    this->Controller->Receive((int*)(&schedLen2), 1, 0, SCHED_LEN_2_TAG);
+    this->Controller->Receive(&schedLen1, 1, 0, SCHED_LEN_1_TAG);
+    this->Controller->Receive(&schedLen2, 1, 0, SCHED_LEN_2_TAG);
     schedArray1 = new int[schedLen1];
     schedArray2 = new vtkIdType[schedLen2];
     this->Controller->Receive(schedArray1, schedLen1, 0, SCHED_1_TAG);

@@ -439,9 +439,9 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   bool useScalars = this->Scalars && this->Mapper->GetScalarVisibility();
   double* col = actor->GetProperty()->GetDiffuseColor();
   float color[3];
-  color[0] = static_cast<double>(col[0]);
-  color[1] = static_cast<double>(col[1]);
-  color[2] = static_cast<double>(col[2]);
+  color[0] = col[0];
+  color[1] = col[1];
+  color[2] = col[2];
   this->StreamLineSegmentProgram->SetUniform3f("color", color);
   this->StreamLineSegmentProgram->SetUniformi("scalarVisibility", useScalars);
 

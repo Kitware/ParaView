@@ -1337,7 +1337,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
       if (measured)
       {
         partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
-        output = static_cast<vtkDataSet*>(this->GetDataSetFromBlock(compositeOutput, partId));
+        output = this->GetDataSetFromBlock(compositeOutput, partId);
         numPts = this->GetPointIds(partId)->GetNumberOfIds();
         if (numPts)
         {
@@ -1352,7 +1352,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
         this->ReadPartId(&partId);
         partId--; // EnSight starts #ing with 1.
         realId = this->InsertNewPartId(partId);
-        output = static_cast<vtkDataSet*>(this->GetDataSetFromBlock(compositeOutput, realId));
+        output = this->GetDataSetFromBlock(compositeOutput, realId);
         numPts = this->GetPointIds(realId)->GetNumberOfIds();
         if (numPts)
         {
@@ -1381,7 +1381,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
   if (measured)
   {
     partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
-    output = static_cast<vtkDataSet*>(this->GetDataSetFromBlock(compositeOutput, partId));
+    output = this->GetDataSetFromBlock(compositeOutput, partId);
     numPts = this->GetPointIds(partId)->GetNumberOfIds();
     if (numPts)
     {
@@ -1554,7 +1554,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
       if (measured)
       {
         partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
-        output = static_cast<vtkDataSet*>(this->GetDataSetFromBlock(compositeOutput, partId));
+        output = this->GetDataSetFromBlock(compositeOutput, partId);
         numPts = this->GetPointIds(partId)->GetNumberOfIds();
         if (numPts)
         {
@@ -1569,7 +1569,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
         this->ReadPartId(&partId);
         partId--; // EnSight starts #ing with 1.
         realId = this->InsertNewPartId(partId);
-        output = static_cast<vtkDataSet*>(this->GetDataSetFromBlock(compositeOutput, realId));
+        output = this->GetDataSetFromBlock(compositeOutput, realId);
         numPts = this->GetPointIds(realId)->GetNumberOfIds();
         if (numPts)
         {
@@ -1598,7 +1598,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
   if (measured)
   {
     partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
-    output = static_cast<vtkDataSet*>(this->GetDataSetFromBlock(compositeOutput, partId));
+    output = this->GetDataSetFromBlock(compositeOutput, partId);
     numPts = this->GetPointIds(partId)->GetNumberOfIds();
     if (numPts)
     {

@@ -589,8 +589,7 @@ int vtkCDIReader::RequestData(vtkInformation* vtkNotUsed(reqInfo),
   int numRequestedTimeSteps = 0;
 #endif
 
-  vtkInformationDoubleKey* timeKey =
-    static_cast<vtkInformationDoubleKey*>(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  vtkInformationDoubleKey* timeKey = vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP();
   if (outInfo->Has(timeKey))
   {
 #ifndef NDEBUG
@@ -1292,8 +1291,8 @@ void vtkCDIReader::RemoveDuplicates(
   {
     double curr_lon, curr_lat;
     double threshold = (vtkMath::Pi() / 2.0) - 1e-4;
-    curr_lon = ((double*)pointLon)[i];
-    curr_lat = ((double*)pointLat)[i];
+    curr_lon = pointLon[i];
+    curr_lat = pointLat[i];
 
     while (curr_lon < 0.0)
     {

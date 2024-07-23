@@ -1339,11 +1339,11 @@ void vtkAnalyzeWriter::WriteFile(
           outSliceOffset = tempSliceSizeInt * idZ;
           outSliceBit = (idY * outDim[0]) + idX;
           outTotalBitNumber = outSliceBit + (outSliceOffset * 8);
-          outSliceByte = (int)(outSliceBit / 8);
+          outSliceByte = outSliceBit / 8;
           outOffsetByte = outSliceOffset + outSliceByte;
           outBitNumber = outSliceBit % 8;
           byteBitCount = totalBitCount % 8;
-          byteCount = (int)(totalBitCount / 8);
+          byteCount = totalBitCount / 8;
 
           tempByteValue = tempOutUnsignedCharData[byteCount];
           tempBitValue = (tempByteValue >> byteBitCount) & 0x01;

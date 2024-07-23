@@ -494,7 +494,7 @@ void FetchRMI(void* localArg, void* remoteArg, int remoteArgLength, int)
 
   auto arg = reinterpret_cast<vtkTypeUInt64*>(remoteArg);
   vtkSpreadSheetView* self = reinterpret_cast<vtkSpreadSheetView*>(localArg);
-  if (static_cast<vtkTypeUInt32>(self->GetIdentifier()) == arg[0])
+  if (self->GetIdentifier() == arg[0])
   {
     self->FetchBlockCallback(static_cast<vtkIdType>(arg[1]));
   }

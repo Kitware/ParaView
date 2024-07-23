@@ -188,7 +188,7 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
 {
   vtkPVDiscretizableColorTransferFunction* dct =
     vtkPVDiscretizableColorTransferFunction::SafeDownCast(stc);
-  int numSwatches = static_cast<int>(dct->GetNumberOfIndexedColorsInFullSet());
+  int numSwatches = dct->GetNumberOfIndexedColorsInFullSet();
   if (numSwatches < 1)
   {
     return QPixmap();

@@ -246,8 +246,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   UpdateThreadName(type, vtkProcessModule::GlobalController);
   if (config->GetLogStdErrVerbosity() != vtkLogger::VERBOSITY_INVALID)
   {
-    vtkLogger::SetStderrVerbosity(
-      static_cast<vtkLogger::Verbosity>(config->GetLogStdErrVerbosity()));
+    vtkLogger::SetStderrVerbosity(config->GetLogStdErrVerbosity());
   }
   vtkLogger::Init(argc, argv, nullptr);
   for (const auto& log_pair : config->GetLogFiles())

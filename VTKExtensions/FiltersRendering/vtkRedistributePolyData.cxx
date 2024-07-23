@@ -332,8 +332,8 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
 
   for (i = 0; i < cntRec; i++)
   {
-    this->Controller->Receive((vtkIdType*)cellptCntr[i], NUM_CELL_TYPES, recFrom[i], CELL_CNT_TAG);
-    this->Controller->Receive((vtkIdType*)&numPointsRec[i], 1, recFrom[i], POINTS_SIZE_TAG);
+    this->Controller->Receive(cellptCntr[i], NUM_CELL_TYPES, recFrom[i], CELL_CNT_TAG);
+    this->Controller->Receive(&numPointsRec[i], 1, recFrom[i], POINTS_SIZE_TAG);
   }
   vtkCellData* outputCellData = output->GetCellData();
   vtkPointData* outputPointData = output->GetPointData();
@@ -1272,10 +1272,10 @@ void vtkRedistributePolyData::SendCellSizes(vtkIdType* startCell, vtkIdType* sto
   // ... send sizes first (must be in this order to allocate for
   //   receive)...
 
-  this->Controller->Send((vtkIdType*)ptcntr, NUM_CELL_TYPES, sendTo, CELL_CNT_TAG);
+  this->Controller->Send(ptcntr, NUM_CELL_TYPES, sendTo, CELL_CNT_TAG);
 
   numPoints = pointIncr;
-  this->Controller->Send((vtkIdType*)&numPoints, 1, sendTo, POINTS_SIZE_TAG);
+  this->Controller->Send(&numPoints, 1, sendTo, POINTS_SIZE_TAG);
 }
 //*****************************************************************
 void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCell,
