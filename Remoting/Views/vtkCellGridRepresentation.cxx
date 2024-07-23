@@ -328,7 +328,7 @@ bool vtkCellGridRepresentation::RemoveFromView(vtkView* view)
 
 void vtkCellGridRepresentation::UpdateColoringParameters()
 {
-  return this->Superclass::UpdateColoringParameters();
+  this->Superclass::UpdateColoringParameters();
 }
 
 void vtkCellGridRepresentation::SetVisibility(bool val)

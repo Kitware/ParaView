@@ -111,8 +111,9 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(double t, vtkDataSet*
 {
   if (!this->Controller)
   {
-    return Superclass::AssignSeedsToProcessors(
+    Superclass::AssignSeedsToProcessors(
       t, source, sourceID, ptId, localSeedPoints, localAssignedCount);
+    return;
   }
 
   ParticleVector candidates;

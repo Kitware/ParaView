@@ -336,7 +336,7 @@ struct pqEditMacrosDialog::pqInternals
         case pqInternals::Columns::Macros:
         case pqInternals::Columns::Tooltips:
         default:
-          return QStyledItemDelegate::updateEditorGeometry(editor, option, index);
+          QStyledItemDelegate::updateEditorGeometry(editor, option, index);
       }
     }
 

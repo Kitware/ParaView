@@ -399,7 +399,7 @@ void vtkOpenGLExtrusionMapperDelegator::ShallowCopy(vtkCompositePolyDataMapper* 
 void vtkOpenGLExtrusionMapperDelegator::GetDataRange(double range[2])
 {
   auto glExtrusionMapper = static_cast<vtkOpenGLBatchedExtrusionMapper*>(this->GLDelegate);
-  return glExtrusionMapper->GetDataRange(range);
+  glExtrusionMapper->GetDataRange(range);
 }
 
 //------------------------------------------------------------------------------

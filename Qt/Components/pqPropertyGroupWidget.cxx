@@ -182,5 +182,5 @@ char* pqPropertyGroupWidget::panelVisibility() const
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::setPanelVisibility(const char* vis)
 {
-  return this->PropertyGroup->SetPanelVisibility(vis);
+  this->PropertyGroup->SetPanelVisibility(vis);
 }
