@@ -171,9 +171,9 @@ nv::index::IAffinity_information* vtknvindex_cluster_properties::copy_affinity()
 void vtknvindex_cluster_properties::scene_dump_affinity_info(std::ostringstream& s) const
 {
   if (m_affinity_kdtree)
-    return m_affinity_kdtree->scene_dump_affinity_info(s);
+    m_affinity_kdtree->scene_dump_affinity_info(s);
   else if (m_affinity)
-    return m_affinity->scene_dump_affinity_info(s);
+    m_affinity->scene_dump_affinity_info(s);
 }
 
 // ------------------------------------------------------------------------------------------------
