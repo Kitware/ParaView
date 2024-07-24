@@ -270,7 +270,6 @@
             -GNinja
             -DDOCUMENTATION_HTML_TARZ=ON
             -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON
-            -DPARAVIEW_BUILD_EDITION=CATALYST
             -DPARAVIEW_USE_MPI=ON
             -DPARAVIEW_USE_PYTHON=ON
         - $LAUNCHER cmake --build $GIT_CLONE_PATH/build -j $(nproc) &> $GIT_CLONE_PATH/compile_output.log
