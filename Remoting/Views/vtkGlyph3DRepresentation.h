@@ -131,7 +131,7 @@ protected:
    */
   void ComputeGlyphBounds(double bounds[6]);
 
-  vtkAlgorithm* PassThrough;
+  vtkAlgorithm* GlyphMultiBlockMaker;
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;
