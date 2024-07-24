@@ -369,9 +369,9 @@ void vtkPVHistogramChartRepresentation::SetInputArrayToProcess(
   }
 
   std::string arrayName(name ? name : "");
-  if (this->ArrayName != name)
+  if (this->ArrayName != arrayName)
   {
-    this->ArrayName = name;
+    this->ArrayName = arrayName;
     this->SetLabel(BIN_VALUES, this->ArrayName.c_str());
     this->MarkModified();
   }

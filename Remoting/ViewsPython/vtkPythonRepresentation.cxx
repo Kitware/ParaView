@@ -120,7 +120,6 @@ const char* vtkPythonRepresentation::GetAttributeArrayName(int attributeType, in
 void vtkPythonRepresentation::SetAttributeArrayStatus(
   int attributeType, const char* name, int status)
 {
-  std::string nameStr(name);
   this->Internal->AttributeArrayEnabled[attributeType][name] = (status != 0);
 }
 
