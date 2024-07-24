@@ -283,7 +283,6 @@
             $MAYBE_SSH_KEY_PATH
             $MAYBE_UPDATE_LATEST
             &> $GIT_CLONE_PATH/prepare_output.log
-        - tar -c --use-compress-program=pigz -f $GIT_CLONE_PATH/paraview-docs-doxygen.tgz $GIT_CLONE_PATH/build/doc
 
     variables:
         CMAKE_PREFIX_PATH: "/usr/lib64/openmpi:$CMAKE_PREFIX_PATH"
