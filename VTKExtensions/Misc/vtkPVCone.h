@@ -3,10 +3,10 @@
 
 /**
  * @class   vtkPVCone
- * @brief   extends vtkCone to add ParaView specific API.
+ * @brief   extends vtkCone to add ParaView specific behavior.
  *
- * vtkPVCone extends vtkCone to add ParaView specific API. Not that unlike vtkCone, vtkPVCone is
- * oriented and represent a one-sided cone.
+ * vtkPVCone extends vtkCone to add ParaView specific behavior. Unlike vtkCone, vtkPVCone represents
+ * a one-sided cone by default.
  */
 
 #ifndef vtkPVCone_h
@@ -22,36 +22,12 @@ public:
 
   vtkTypeMacro(vtkPVCone, vtkCone);
 
-  ///@{
-  /**
-   * Get/Set the vector defining the direction of the cone.
-   */
-  void SetAxis(double x, double y, double z) override;
-  void SetAxis(double axis[3]) override;
-  ///@}
-
-  // Reimplemented to update transform on change:
-  void SetOrigin(double x, double y, double z) override;
-  void SetOrigin(const double xyz[3]) override;
-
-  /**
-   * Evaluate cone equation.
-   */
-  double EvaluateFunction(double x[3]) override;
-
-  /**
-   * Evaluate cone normal.
-   */
-  void EvaluateGradient(double x[3], double g[3]) override;
-
 private:
-  vtkPVCone() = default;
+  vtkPVCone();
   ~vtkPVCone() override = default;
 
   vtkPVCone(const vtkPVCone&) = delete;
   void operator=(const vtkPVCone&) = delete;
-
-  void UpdateTransform();
 };
 
 #endif
