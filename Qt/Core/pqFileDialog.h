@@ -11,12 +11,13 @@
 
 #include <QDialog>
 #include <QMap>
+#include <QPointer>
 #include <QStringList>
 
 class QModelIndex;
 class QPoint;
-class pqServer;
 class QShowEvent;
+class pqServer;
 
 /**
   Provides a standard file dialog "front-end" for the pqFileDialogModel
@@ -113,7 +114,7 @@ public:
 
   ///@{
   /**
-   * set the file mode
+   * Set the file mode
    */
   void setFileMode(FileMode, vtkTypeUInt32);
   void setFileMode(FileMode);
@@ -285,8 +286,17 @@ private: // NOLINT(readability-redundant-access-specifiers)
   pqFileDialog& operator=(const pqFileDialog&);
 
   class pqImplementation;
-  QMap<vtkTypeUInt32, pqImplementation*> Implementations;
+  QMap<vtkTypeUInt32, QPointer<pqImplementation>> Implementations;
   vtkTypeUInt32 SelectedLocation;
+
+  QPointer<pqServer> Server;
+  const QString StartDirectory;
+  const QString NameFilter;
+  bool SupportsGroupFiles;
+  vtkTypeUInt32 DefaultLocation;
+  QString RecentlyUsedExtension;
+
+  void addImplementation(vtkTypeUInt32 location);
 
   // returns if true if files are loaded
   bool acceptInternal(const QStringList& selected_files);
