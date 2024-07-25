@@ -8,7 +8,7 @@ dnf install -y --setopt=install_weak_deps=False \
 
 # Install extra dependencies for ParaView
 dnf install -y --setopt=install_weak_deps=False \
-    bzip2 patch doxygen git-core git-lfs
+    bzip2 patch pigz doxygen git-core git-lfs rsync
 
 # MPI dependencies
 dnf install -y --setopt=install_weak_deps=False \

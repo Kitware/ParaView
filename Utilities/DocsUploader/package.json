@@ -1,0 +1,31 @@
+{
+  "name": "paraview-docs",
+  "version": "1.0.0",
+  "description": "Version selector for ParaView documentation",
+  "main": "Dist/paraview-version.js",
+  "scripts": {
+    "build": "webpack",
+    "build:release": "webpack -p"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kitware/paraview-docs.git"
+  },
+  "author": "Kitware",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/Kitware/paraview-docs/issues"
+  },
+  "homepage": "https://github.com/Kitware/paraview-docs#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "css-loader": "1.0.0",
+    "file-loader": "2.0.0",
+    "style-loader": "0.23.0",
+    "expose-loader": "0.7.5",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-preset-es2015": "6.24.1",
+    "webpack": "3.6.0"
+  }
+}

@@ -9,7 +9,8 @@
             - compile_output.log
             - doxygen_output.log
             - prepare_output.log
-            - paraview-docs-doxygen.tgz
+            - build/CMakeCache.txt
+            - build/Documentation/ParaViewGeneratedDocs.tar.gz
 
 .cmake_translations_artifacts:
     artifacts:
