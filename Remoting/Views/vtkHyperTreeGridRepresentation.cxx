@@ -4,6 +4,12 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCellData.h"
+#include "vtkCompositeDataDisplayAttributes.h"
+#include "vtkCompositePolyDataMapper.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyUtilities.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeRange.h"
 #include "vtkDataSet.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
@@ -31,6 +37,7 @@
 #include "vtkOSPRayActorNode.h"
 #endif
 
+#include <unordered_map>
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -53,6 +60,10 @@ void vtkHyperTreeGridRepresentation::SetupDefaults()
 {
   vtkNew<vtkSelection> sel;
   this->Mapper->SetSelection(sel);
+
+  // Required to set block visiblities for composite inputs
+  vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
+  this->Mapper->SetCompositeDataDisplayAttributes(compositeAttributes);
 
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetProperty(this->Property);
@@ -106,6 +117,13 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
     auto data = vtkPVView::GetDeliveredPiece(inInfo, this);
     this->Mapper->SetInputDataObject(data);
     this->Mapper->SetUseAdaptiveDecimation(this->AdaptiveDecimation);
+
+    // Toggle block visibility in the mapper based on block selectors for composite inputs
+    auto dtree = vtkDataObjectTree::SafeDownCast(data);
+    if (dtree)
+    {
+      this->UpdateBlockVisibility(dtree);
+    }
 
     // This is called just before the vtk-level render. In this pass, we simply
     // pick the correct rendering mode and rendering parameters.
@@ -209,6 +227,30 @@ const char* vtkHyperTreeGridRepresentation::GetColorArrayName()
     return info->Get(vtkDataObject::FIELD_NAME());
   }
   return nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::UpdateBlockVisibility(vtkDataObjectTree* dtree)
+{
+  const vtkNew<vtkDataAssembly> hierarchy;
+  if (!vtkDataAssemblyUtilities::GenerateHierarchy(dtree, hierarchy))
+  {
+    return;
+  }
+
+  // The mapper needs a compositeAttributes in order to set block visibility
+  vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
+  this->Mapper->SetCompositeDataDisplayAttributes(compositeAttributes);
+
+  // compute the composite ids for the hierarchy selectors
+  this->Mapper->RemoveBlockVisibilities();
+  this->Mapper->SetBlockVisibility(hierarchy->GetRootNode(), false); // Hide root first
+  std::vector<unsigned int> cids =
+    vtkDataAssemblyUtilities::GetSelectedCompositeIds(this->BlockSelectors, hierarchy);
+  for (const auto& id : cids)
+  {
+    this->Mapper->SetBlockVisibility(id, true);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -919,4 +961,21 @@ void vtkHyperTreeGridRepresentation::UpdateShaderReplacements()
         break;
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::AddBlockSelector(const char* selector)
+{
+  if (selector != nullptr &&
+    std::find(this->BlockSelectors.begin(), this->BlockSelectors.end(), selector) ==
+      this->BlockSelectors.end())
+  {
+    this->BlockSelectors.emplace_back(selector);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::RemoveAllBlockSelectors()
+{
+  this->BlockSelectors.clear();
 }

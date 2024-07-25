@@ -27,6 +27,7 @@
 
 #include <string> // needed for std::string
 
+class vtkDataObjectTree;
 class vtkOpenGLHyperTreeGridMapper;
 class vtkPVGeometryFilter;
 class vtkPiecewiseFunction;
@@ -247,6 +248,14 @@ public:
   vtkGetMacro(UseShaderReplacements, bool);
   ///@}
 
+  ///@{
+  /**
+   * Update list of selectors that determine the selected blocks.
+   */
+  void AddBlockSelector(const char* selector);
+  void RemoveAllBlockSelectors();
+  ///@}
+
   /**
    * Specify shader replacements using a Json string.
    * Please refer to the XML definition of the property for details about
@@ -299,6 +308,11 @@ protected:
   bool RemoveFromView(vtkView* view) override;
 
   /**
+   * For composite inputs, use block selectors to toggle block visibility.
+   */
+  void UpdateBlockVisibility(vtkDataObjectTree* dtree);
+
+  /**
    * Passes on parameters to vtkProperty and vtkMapper
    */
   virtual void UpdateColoringParameters();
@@ -344,6 +358,7 @@ protected:
   double VisibleDataBounds[6];
   bool UseShaderReplacements = false;
   std::string ShaderReplacementsString;
+  std::vector<std::string> BlockSelectors;
 
 private:
   vtkHyperTreeGridRepresentation(const vtkHyperTreeGridRepresentation&) = delete;
